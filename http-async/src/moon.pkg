@@ -1,3 +1,20 @@
-// Imports will be added when this placeholder is implemented.
+import {
+  "gaato/http",
+  "moonbitlang/async",
+  "moonbitlang/async/http" @ahttp,
+}
+
+import {
+  "gaato/http-async" @adapter,
+  "gaato/http/mock",
+  "gaato/http/sse",
+} for "test"
 
 supported_targets = "js + native"
+
+options(
+  targets: {
+    "head_error.native.mbt": [ "native" ],
+    "head_error.js.mbt": [ "js" ],
+  },
+)

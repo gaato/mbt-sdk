@@ -36,16 +36,18 @@ pub(all) struct Request { http_method : String; url : String; headers : Headers;
 pub(all) struct Response { status : Int; headers : Headers; body : Bytes }
 pub(all) struct ResponseHead { status : Int; headers : Headers }
 // Headers: 名前は小文字に正規化、同名複数値を保持(set / append / get / get_all / iter)
-pub(open) trait BodyStream { async fn read_some(Self) -> Bytes?; fn close(Self) -> Unit }
+pub(open) trait BodyStream { async fn read_some(Self) -> Bytes? raise HttpError; fn close(Self) -> Unit }
 pub(open) trait Transport {
   async fn send(Self, Request) -> Response raise HttpError
   async fn send_stream(Self, Request) -> (ResponseHead, &BodyStream) raise HttpError
 }
-pub(all) suberror HttpError { Connect(String); Timeout(Int); Protocol(String); Cancelled }
+pub(all) suberror HttpError { Connect(String); Timeout(Int); Protocol(String) }
 pub type Middleware = async (Request, async (Request) -> Response raise HttpError) -> Response raise HttpError
 ```
 - `Request` / `Response` / `ResponseHead` は `Eq` と `Debug` を持つ(mock の照合とテストの失敗表示に使う)。
 - `gaato/http` は依存ゼロなので `async test` を実行できない。async な挙動(`send_with` の順序、`each_event`、`FakeTransport`)の実行テストは `http-async` 側のテストに置く。`http` 側は純粋関数のテストとコンパイル確認まで。
+- `BodyStream::read_some` が上げるのは `HttpError` だけ(2c で締めた)。ストリーム途中の切断は `Protocol`、タイムアウトは `Timeout`。
+- キャンセルは `HttpError` にしない。`moonbitlang/async` のキャンセルは `Error` とは別のシグナルで `catch` では捕まらず、エラーに変換するとタスクグループが「失敗」として扱ってしまう。transport はシグナルをそのまま伝播させ、後始末は `defer` / `errdefer` で行う。`Cancelled` は 2c で契約から外した。
 - transport は status を解釈しない(4xx/5xx も `Response` で返す。分類は M2 の runtime の仕事)。
 - `Response::text()` / `json()`、`Request` の builder(`Request::get(url)`, `.header(k, v)`, `.json_body(j)`)を付ける。
 
@@ -69,7 +71,21 @@ SSE の判断:
 
 `gaato/http/mock`: `FakeTransport::new()`、`.expect(method, url_suffix, Response)`、`.expect_stream(..., chunks : Array[Bytes])`、`.sent() -> Array[Request]`、`.assert_complete()`。不一致はその場で raise し、かつラッチして `assert_complete` でも落とす。
 
-`gaato/http-async`: `AsyncTransport::new(timeout_ms? = 30000)`。`impl Transport`。`@http.Client` を直接使い、`content-length` は async 側に任せる、応答ヘッダ名を小文字化、`send_stream` は `read_some` をそのまま `BodyStream` にする、`@async.with_timeout` でタイムアウト、キャンセル時は接続を close。接続プールは M1 では持たない(1 リクエスト 1 接続)。
+`gaato/http-async`: `AsyncTransport::new(timeout_ms? = 30000)`。`impl Transport`。`@http.Client` を直接使い、`content-length` は async 側に任せる、応答ヘッダ名を小文字化、`send_stream` は `read_some` をそのまま `BodyStream` にする、`@async.with_timeout` でタイムアウト、キャンセル時はシグナルを伝播させつつ `defer` で接続を close。接続プールは M1 では持たない(1 リクエスト 1 接続)。
+
+http-async の判断:
+- タイムアウトは `@async.with_timeout(ms, f, error=HttpError::Timeout(ms))` で掛ける。`timeout_ms <= 0` は接続せずに即 `Timeout`。`send` は接続から本文の読み切りまでを 1 つの期限で、`send_stream` は応答ヘッダまでを 1 つの期限で、その後は `read_some` 1 回ごとに新しい期限(アイドルタイムアウト)で縛る。
+- キャンセルには何もしない。`catch` に現れないのでそのまま伝播し、接続は `defer` / `errdefer` で閉じる。テストで、外側のキャンセルが `catch` を素通りすることと、サーバ側から接続の close が見えることを確認している。
+- エラーの写し方: URL の形式不正・未対応スキーム・未知のメソッドは接続前に `Protocol`。native は `Client` の生成時に DNS/TCP/TLS を済ませるので、生成時の失敗が `Connect`、それ以降の失敗が `Protocol`。js は fetch が遅延接続なので、応答ヘッダまでの失敗を `Connect` とする(fetch は接続失敗と不正応答を区別して返さない)。本文読み取り中の失敗は両ターゲットとも `Protocol`。
+- 送信ヘッダ: async の `Headers` は Map なので、同名の複数値は `", "` で連結する。呼び出し側の `content-length` は送らず async に計算させる。
+- 応答ヘッダ: 名前は小文字化。async は `Set-Cookie` を `cookies` に分離して持つので、属性から `set-cookie` 値を組み立て直して複数値として載せる(元の文字列とバイト単位で一致する保証はない)。それ以外の同名ヘッダは async が渡す形のまま。
+- リダイレクト: native は追従せず 3xx をそのまま返す(テストで確認)。js は fetch の既定動作(追従)になる。js での統一は M2 以降の課題。
+- URL: `http` / `https` の絶対 URL のみ。フラグメントは送らない。
+- loopback テストは `http-async/src/loopback`(native 限定パッケージ)に置き、`127.0.0.1:0` のエフェメラルポートを使う。全テストを 5 秒の期限で包む。ソケットを使わない async テスト(middleware の順序、`FakeTransport`、`each_event`、検証エラー)は js でも実行される。
+
+M1 の既知の制限:
+- リクエスト本文は `Bytes` で全量バッファする(ストリーミング送信なし)。discord.mbt は multipart のパートを接続へ逐次書き込んでいるので、大きなファイル送信を移すなら `Transport` にストリーミング送信を足す必要がある。
+- 接続プールなし(1 リクエスト 1 接続)。SSE パーサに行長の上限なし。どちらも M2 で扱う。
 
 ## 検証
 

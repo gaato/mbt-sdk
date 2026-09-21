@@ -1,11 +1,22 @@
 // Generated using `moon info`, DON'T EDIT IT
 package "gaato/http-async"
 
+import {
+  "gaato/http",
+}
+
 // Values
 
 // Errors
 
 // Types and methods
+pub struct AsyncTransport {
+  // private fields
+}
+pub fn AsyncTransport::new(timeout_ms? : Int) -> Self
+pub async fn AsyncTransport::send(Self, @http.Request) -> @http.Response raise @http.HttpError
+pub async fn AsyncTransport::send_stream(Self, @http.Request) -> (@http.ResponseHead, &@http.BodyStream) raise @http.HttpError
+pub impl @http.Transport for AsyncTransport
 
 // Type aliases
 

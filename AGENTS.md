@@ -29,9 +29,12 @@ moon -C http test --target js
 moon -C http-async check --deny-warn --target native
 moon -C http-async check --deny-warn --target js
 moon -C http-async test --target native
+moon -C http-async test --target js      # socket-free async tests only
 moon fmt --check
 moon info
 ```
+
+Loopback socket tests live in `http-async/src/loopback` (native only). They need permission to open sockets on 127.0.0.1; a sandbox that forbids sockets cannot run them, so say so instead of reporting them as passed.
 
 ## Hard limits for agents
 

@@ -14,7 +14,6 @@ pub(all) suberror HttpError {
   Connect(String)
   Timeout(Int)
   Protocol(String)
-  Cancelled
 } derive(@debug.Debug)
 pub fn HttpError::to_repr(Self) -> @debug.Repr
 
@@ -82,7 +81,7 @@ pub type Middleware = async (Request, async (Request) -> Response raise HttpErro
 
 // Traits
 pub(open) trait BodyStream {
-  async fn read_some(Self) -> Bytes?
+  async fn read_some(Self) -> Bytes? raise HttpError
   fn close(Self) -> Unit
 }
 

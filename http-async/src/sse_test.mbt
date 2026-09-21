@@ -29,7 +29,7 @@ impl @http.BodyStream for TestStream with fn close(self) {
 }
 
 ///|
-// Compile-only here; execute with an async runtime in step 2c.
+// Executed copy of gaato/http/sse's compile-only scenarios.
 async fn each_event_scenarios() -> Unit {
   let stream = TestStream::{
     chunks: [b"", b"data: a\r", b"\n\r\ndata: b\n\ndata: discarded"],
@@ -77,6 +77,6 @@ async fn each_event_scenarios() -> Unit {
 }
 
 ///|
-test "each_event scenarios compile without a runtime" {
-  let _ : async () -> Unit = each_event_scenarios
+async test "each_event scenarios execute" {
+  each_event_scenarios()
 }

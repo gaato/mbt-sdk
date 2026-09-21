@@ -1,0 +1,15 @@
+import {
+  "gaato/http-async" @adapter,
+  "gaato/http",
+  "gaato/http/sse",
+  "moonbitlang/async",
+  "moonbitlang/async/http" @ahttp,
+  "moonbitlang/async/socket",
+  "moonbitlang/async/io",
+} for "test"
+
+supported_targets = "native"
+
+options(
+  targets: { "loopback_test.mbt": [ "native" ] },
+)

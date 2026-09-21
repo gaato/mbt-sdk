@@ -2,7 +2,7 @@
 /// A readable response body. None signals end of stream.
 pub(open) trait BodyStream {
   /// Reads the next chunk, or None at end of stream.
-  async fn read_some(Self) -> Bytes?
+  async fn read_some(Self) -> Bytes? raise HttpError
   /// Releases the stream's resources.
   fn close(Self) -> Unit
 }
@@ -22,7 +22,6 @@ pub(all) suberror HttpError {
   Connect(String)
   Timeout(Int)
   Protocol(String)
-  Cancelled
 } derive(Debug)
 
 ///|

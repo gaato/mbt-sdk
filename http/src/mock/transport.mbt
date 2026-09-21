@@ -195,7 +195,7 @@ priv struct ScriptStream {
 }
 
 ///|
-impl @http.BodyStream for ScriptStream with fn read_some(self) {
+impl @http.BodyStream for ScriptStream with fn read_some(self) -> Bytes? raise @http.HttpError {
   if self.closed {
     return None
   }
