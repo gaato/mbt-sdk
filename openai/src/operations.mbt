@@ -10,15 +10,36 @@ fn[T] decode_http_response(
 }
 
 ///|
+fn model_from_generated(model : @gen.Model) -> Model {
+  {
+    id: model.id,
+    created: Some(model.created),
+    owned_by: Some(model.owned_by),
+  }
+}
+
+///|
+fn embedding_response_from_generated(
+  response : @gen.CreateEmbeddingResponse,
+) -> EmbeddingResponse {
+  {
+    data: response.data.map(item => {
+      index: item.index,
+      embedding: item.embedding,
+    }),
+    model: response.model,
+    prompt_tokens: response.usage.prompt_tokens,
+    total_tokens: response.usage.total_tokens,
+  }
+}
+
+///|
 /// Lists the models visible to the configured account.
 pub async fn OpenAI::list_models(
   self : OpenAI,
 ) -> Array[Model] raise @runtime.SdkError {
-  let response = self.client.send(
-    @http.Request::get("/models"),
-    bucket="models",
-  )
-  decode_http_response(response, decode_model_list)
+  let response = self.client.send(@gen.list_models_request(), bucket="models")
+  @gen.list_models_decode(response).data.map(model_from_generated)
 }
 
 ///|
@@ -28,10 +49,10 @@ pub async fn OpenAI::retrieve_model(
   model : String,
 ) -> Model raise @runtime.SdkError {
   let response = self.client.send(
-    @http.Request::get("/models/" + model),
+    @gen.retrieve_model_request(model),
     bucket="models",
   )
-  decode_http_response(response, decode_model)
+  model_from_generated(@gen.retrieve_model_decode(response))
 }
 
 ///|
@@ -40,11 +61,19 @@ pub async fn OpenAI::create_embeddings(
   self : OpenAI,
   request : EmbeddingRequest,
 ) -> EmbeddingResponse raise @runtime.SdkError {
+  let body : @gen.CreateEmbeddingRequest = {
+    model: request.model,
+    input: @gen.TextArray(request.input.copy()),
+    encoding_format: None,
+    dimensions: request.dimensions,
+    user: request.user,
+  }
+  let generated_request = @gen.create_embedding_request(body)
   let response = self.client.send(
-    @http.Request::post("/embeddings").json_body(embedding_body(request)),
+    generated_request.json_body(embedding_body(request)),
     bucket="embeddings",
   )
-  decode_http_response(response, decode_embedding_response)
+  embedding_response_from_generated(@gen.create_embedding_decode(response))
 }
 
 ///|

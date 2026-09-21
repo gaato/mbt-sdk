@@ -1,28 +1,4 @@
 ///|
-priv struct ModelJson(Model)
-
-///|
-impl @json.FromJson for ModelJson with fn from_json(value, path) {
-  let obj = @sdkjson.expect_object(value, path)
-  let created : Json? = @sdkjson.opt_field(obj, "created", path)
-  ModelJson({
-    id: @sdkjson.field(obj, "id", path),
-    created: created.map(raw => json_int64(raw, path.add_key("created"))),
-    owned_by: @sdkjson.opt_field(obj, "owned_by", path),
-  })
-}
-
-///|
-priv struct ModelListJson(Array[Model])
-
-///|
-impl @json.FromJson for ModelListJson with fn from_json(value, path) {
-  let obj = @sdkjson.expect_object(value, path)
-  let values : Array[ModelJson] = @sdkjson.field(obj, "data", path)
-  ModelListJson(values.map(value => value.0))
-}
-
-///|
 priv struct UsageJson(Usage)
 
 ///|
@@ -32,43 +8,6 @@ impl @json.FromJson for UsageJson with fn from_json(value, path) {
     input_tokens: @sdkjson.field(obj, "input_tokens", path),
     output_tokens: @sdkjson.field(obj, "output_tokens", path),
     total_tokens: @sdkjson.field(obj, "total_tokens", path),
-  })
-}
-
-///|
-priv struct EmbeddingJson(Embedding)
-
-///|
-impl @json.FromJson for EmbeddingJson with fn from_json(value, path) {
-  let obj = @sdkjson.expect_object(value, path)
-  EmbeddingJson({
-    index: @sdkjson.field(obj, "index", path),
-    embedding: @sdkjson.field(obj, "embedding", path),
-  })
-}
-
-///|
-priv struct EmbeddingResponseJson(EmbeddingResponse)
-
-///|
-impl @json.FromJson for EmbeddingResponseJson with fn from_json(value, path) {
-  let obj = @sdkjson.expect_object(value, path)
-  let data : Array[EmbeddingJson] = @sdkjson.field(obj, "data", path)
-  let usage : Json = @sdkjson.field(obj, "usage", path)
-  let usage_obj = @sdkjson.expect_object(usage, path.add_key("usage"))
-  EmbeddingResponseJson({
-    data: data.map(value => value.0),
-    model: @sdkjson.field(obj, "model", path),
-    prompt_tokens: @sdkjson.field(
-      usage_obj,
-      "prompt_tokens",
-      path.add_key("usage"),
-    ),
-    total_tokens: @sdkjson.field(
-      usage_obj,
-      "total_tokens",
-      path.add_key("usage"),
-    ),
   })
 }
 
@@ -165,26 +104,6 @@ impl @json.FromJson for ApiErrorEnvelopeJson with fn from_json(value, path) {
 }
 
 ///|
-fn decode_model(value : Json) -> Model raise @json.JsonDecodeError {
-  let decoded : ModelJson = @json.from_json(value)
-  decoded.0
-}
-
-///|
-fn decode_model_list(value : Json) -> Array[Model] raise @json.JsonDecodeError {
-  let decoded : ModelListJson = @json.from_json(value)
-  decoded.0
-}
-
-///|
-fn decode_embedding_response(
-  value : Json,
-) -> EmbeddingResponse raise @json.JsonDecodeError {
-  let decoded : EmbeddingResponseJson = @json.from_json(value)
-  decoded.0
-}
-
-///|
 fn decode_response(value : Json) -> Response raise @json.JsonDecodeError {
   let decoded : ResponseJson = @json.from_json(value)
   decoded.0
@@ -247,107 +166,6 @@ fn decode_response_event(
 ) -> ResponseEvent raise @json.JsonDecodeError {
   let decoded : ResponseEventJson = @json.from_json(value)
   decoded.0
-}
-
-///|
-fn parse_plain_int64(text : String) -> Int64? {
-  if text.length() == 0 {
-    return None
-  }
-  let negative = text[0] == '-'
-  let digits_start = if negative { 1 } else { 0 }
-  if digits_start == text.length() {
-    return None
-  }
-  for index in digits_start..<text.length() {
-    if text[index] < '0' || text[index] > '9' {
-      return None
-    }
-  }
-  let mut significant_start = digits_start
-  while significant_start < text.length() && text[significant_start] == '0' {
-    significant_start += 1
-  }
-  if significant_start == text.length() {
-    return Some(0L)
-  }
-  let significant_length = text.length() - significant_start
-  let limit = if negative {
-    "9223372036854775808"
-  } else {
-    "9223372036854775807"
-  }
-  if significant_length > limit.length() {
-    return None
-  }
-  if significant_length == limit.length() {
-    for offset in 0..<significant_length {
-      let digit = text[significant_start + offset]
-      let boundary = limit[offset]
-      if digit > boundary {
-        return None
-      }
-      if digit < boundary {
-        break
-      }
-    }
-  }
-  let mut result = 0L
-  for index in significant_start..<text.length() {
-    let digit = (text[index] - '0').to_int().to_int64()
-    if negative {
-      result = result * 10L - digit
-    } else {
-      result = result * 10L + digit
-    }
-  }
-  Some(result)
-}
-
-///|
-fn is_plain_integer(text : String) -> Bool {
-  if text.length() == 0 {
-    return false
-  }
-  let start = if text[0] == '-' { 1 } else { 0 }
-  if start == text.length() {
-    return false
-  }
-  for index in start..<text.length() {
-    if text[index] < '0' || text[index] > '9' {
-      return false
-    }
-  }
-  true
-}
-
-///|
-fn json_int64(
-  value : Json,
-  path : @json.JsonPath,
-) -> Int64 raise @json.JsonDecodeError {
-  guard value is Number(raw, repr~) else {
-    raise @json.JsonDecodeError((path, "expected JSON number for Int64"))
-  }
-  if repr is Some(text) && is_plain_integer(text) {
-    match parse_plain_int64(text) {
-      Some(value) => return value
-      None =>
-        raise @json.JsonDecodeError(
-          (path, "JSON number is outside Int64 range"),
-        )
-    }
-  }
-  if raw.is_nan() ||
-    raw < -9223372036854775808.0 ||
-    raw >= 9223372036854775808.0 {
-    raise @json.JsonDecodeError((path, "JSON number is outside Int64 range"))
-  }
-  let result = raw.to_int64()
-  if result.to_double() != raw {
-    raise @json.JsonDecodeError((path, "expected integral JSON number"))
-  }
-  result
 }
 
 ///|

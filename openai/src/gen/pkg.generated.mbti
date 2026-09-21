@@ -1,0 +1,107 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "gaato/openai/gen"
+
+import {
+  "gaato/http",
+  "gaato/sdk-runtime",
+  "moonbitlang/core/json",
+}
+
+// Values
+pub fn create_embedding_decode(@http.Response) -> CreateEmbeddingResponse raise @sdk-runtime.SdkError
+
+pub fn create_embedding_request(CreateEmbeddingRequest) -> @http.Request
+
+pub fn list_models_decode(@http.Response) -> ListModelsResponse raise @sdk-runtime.SdkError
+
+pub fn list_models_request() -> @http.Request
+
+pub fn retrieve_model_decode(@http.Response) -> Model raise @sdk-runtime.SdkError
+
+pub fn retrieve_model_request(String) -> @http.Request
+
+// Errors
+
+// Types and methods
+pub(all) struct CreateEmbeddingRequest {
+  input : CreateEmbeddingRequestInput
+  model : String
+  encoding_format : CreateEmbeddingRequestEncodingFormat?
+  dimensions : Int?
+  user : String?
+}
+pub fn CreateEmbeddingRequest::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn CreateEmbeddingRequest::to_json(Self) -> Json
+pub impl ToJson for CreateEmbeddingRequest
+pub impl @json.FromJson for CreateEmbeddingRequest
+
+pub(all) enum CreateEmbeddingRequestEncodingFormat {
+  Float
+  Base64
+  Custom(String)
+}
+pub fn CreateEmbeddingRequestEncodingFormat::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn CreateEmbeddingRequestEncodingFormat::to_json(Self) -> Json
+pub impl ToJson for CreateEmbeddingRequestEncodingFormat
+pub impl @json.FromJson for CreateEmbeddingRequestEncodingFormat
+
+pub(all) enum CreateEmbeddingRequestInput {
+  Text(String)
+  TextArray(Array[String])
+  IntArray(Array[Int])
+  IntArrayArray(Array[Array[Int]])
+}
+pub fn CreateEmbeddingRequestInput::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn CreateEmbeddingRequestInput::to_json(Self) -> Json
+pub impl ToJson for CreateEmbeddingRequestInput
+pub impl @json.FromJson for CreateEmbeddingRequestInput
+
+pub(all) struct CreateEmbeddingResponse {
+  data : Array[Embedding]
+  model : String
+  usage : CreateEmbeddingResponseUsage
+}
+pub fn CreateEmbeddingResponse::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn CreateEmbeddingResponse::to_json(Self) -> Json
+pub impl ToJson for CreateEmbeddingResponse
+pub impl @json.FromJson for CreateEmbeddingResponse
+
+pub(all) struct CreateEmbeddingResponseUsage {
+  prompt_tokens : Int
+  total_tokens : Int
+}
+pub fn CreateEmbeddingResponseUsage::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn CreateEmbeddingResponseUsage::to_json(Self) -> Json
+pub impl ToJson for CreateEmbeddingResponseUsage
+pub impl @json.FromJson for CreateEmbeddingResponseUsage
+
+pub(all) struct Embedding {
+  index : Int
+  embedding : Array[Double]
+}
+pub fn Embedding::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn Embedding::to_json(Self) -> Json
+pub impl ToJson for Embedding
+pub impl @json.FromJson for Embedding
+
+pub(all) struct ListModelsResponse {
+  data : Array[Model]
+}
+pub fn ListModelsResponse::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ListModelsResponse::to_json(Self) -> Json
+pub impl ToJson for ListModelsResponse
+pub impl @json.FromJson for ListModelsResponse
+
+pub(all) struct Model {
+  id : String
+  created : Int64
+  owned_by : String
+}
+pub fn Model::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn Model::to_json(Self) -> Json
+pub impl ToJson for Model
+pub impl @json.FromJson for Model
+
+// Type aliases
+
+// Traits

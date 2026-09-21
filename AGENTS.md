@@ -42,11 +42,19 @@ moon -C openai check --deny-warn --target js
 moon -C openai test --target wasm-gc
 moon -C openai test --target native
 moon -C openai test --target js
+moon -C openai check src/gen --deny-warn --target wasm-gc
+moon -C openai check src/gen --deny-warn --target native
+moon -C openai check src/gen --deny-warn --target js
+moon -C openai test src/gen --target wasm-gc
+moon -C openai test src/gen --target native
+moon -C openai test src/gen --target js
 moon -C runtime-tests check --deny-warn --target native
 moon -C runtime-tests check --deny-warn --target js
 moon -C runtime-tests test --target js
 moon -C runtime-tests test --target native     # runs loopback socket tests of other members too; needs socket permission
-uv run tools/apply_overlay.py openai/spec/openai.yaml openai/spec/openai.patched.json openai/overlays/*.yaml
+.venv/bin/python tools/apply_overlay.py openai/spec/openai.yaml openai/spec/openai.patched.json openai/overlays/*.yaml
+.venv/bin/python -m unittest discover -s tools/gen/tests -v
+.venv/bin/python tools/gen/main.py --spec openai/spec/openai.yaml --overlay openai/overlays/moonbit.yaml --out openai/src/gen --package gaato/openai/gen --check
 moon fmt --check
 moon info
 ```
