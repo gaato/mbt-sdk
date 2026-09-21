@@ -1,0 +1,43 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "gaato/sdk-runtime"
+
+import {
+  "gaato/http",
+  "moonbitlang/core/debug",
+}
+
+// Values
+pub fn classify(@http.Response, now_unix_ms? : Int64) -> @http.Response raise SdkError
+
+pub fn parse_retry_after(String, now_unix_ms? : Int64) -> Int?
+
+pub fn retry_after_ms(@http.Headers, now_unix_ms? : Int64) -> Int?
+
+// Errors
+pub(all) suberror SdkError {
+  Transport(@http.HttpError)
+  Status(status~ : Int, headers~ : @http.Headers, body~ : Bytes)
+  RateLimited(retry_after_ms~ : Int?, headers~ : @http.Headers, body~ : Bytes)
+  Decode(message~ : String, body~ : Bytes)
+  Config(String)
+} derive(@debug.Debug)
+pub fn SdkError::is_retryable(Self) -> Bool
+pub fn SdkError::status(Self) -> Int?
+pub fn SdkError::to_repr(Self) -> @debug.Repr
+
+// Types and methods
+pub(all) struct Backoff {
+  base_ms : Int
+  max_ms : Int
+  factor : Double
+  jitter : Double
+} derive(Eq, @debug.Debug)
+pub fn Backoff::default() -> Self
+pub fn Backoff::delay_ms(Self, Int, Double) -> Int
+pub fn Backoff::equal(Self, Self) -> Bool
+pub fn Backoff::not_equal(Self, Self) -> Bool
+pub fn Backoff::to_repr(Self) -> @debug.Repr
+
+// Type aliases
+
+// Traits

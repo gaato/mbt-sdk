@@ -38,7 +38,7 @@ pub fn Backoff::delay_ms(Self, attempt : Int, random : Double) -> Int
   (409 は OpenAI・Stainless 系 SDK がロック競合として再試行する慣行に合わせる。冪等でない要求を再試行してよいかの判断は 3b の retry 側で行う。ここは「状態としては再試行に値する」だけを答える。)
 - `status`: `Status` と `RateLimited`(= 429)は `Some`、他は `None`。
 - `parse_retry_after`: 戻り値はミリ秒。受理する形は (1) 非負の 10 進整数秒 (2) 非負の 10 進小数秒(`"1.5"` → 1500。小数点以下は 3 桁まで使い、残りは切り捨て)(3) `now_unix_ms` が与えられたときだけ HTTP-date(IMF-fixdate、例 `Sun, 06 Nov 1994 08:49:37 GMT`)。過去の日時は `Some(0)`。前後の空白は無視。`Int` に収まらない値は `Int` の最大値に丸める。解釈できなければ `None`。obsolete な日付形式(RFC 850、asctime)は受理しない。
-- `retry_after_ms`: `retry-after-ms` ヘッダ(非負の 10 進整数または小数のミリ秒。OpenAI が送る)を先に見て、無ければ `retry-after` を `parse_retry_after` に渡す。
+- `retry_after_ms`: `retry-after-ms` ヘッダ(非負の 10 進整数または小数のミリ秒。OpenAI が送る)を先に見て、無いか解釈できなければ `retry-after` を `parse_retry_after` に渡す。
 - `Backoff::delay_ms`: `attempt` は 0 始まり。`raw = min(max_ms, base_ms * factor^attempt)`(オーバーフローしないよう Double で計算して丸める)。`random` は [0, 1) の一様乱数を呼び出し側が渡す。結果は `raw * (1 - jitter + 2 * jitter * random)` を [0, max_ms] に収めた `Int`。`attempt < 0` は 0 として扱う。`random` が範囲外なら [0, 1) に切り詰める。乱数源そのものは持たない(純粋関数)。
 
 ### `gaato/sdk-runtime/json`
@@ -80,3 +80,15 @@ pub fn[T] open_int(json : Json, path : @json.JsonPath, known : (Int) -> T?, unkn
 
 - 3b: `pub(open) trait Clock { async fn sleep(Self, Int) -> Unit; fn now_unix_ms(Self) -> Int64 }`、`FakeClock`、retry middleware(`Backoff` と `retry_after_ms` を使い、冪等なメソッドか冪等キー付きの要求だけ再試行)、`RateLimiter` trait と in-memory 実装、`Paginator[T]`、認証ヘッダの注入、`gaato/http-async` に `AsyncClock`。
 - 3c: `multipart/form-data` の writer(境界の生成は乱数を注入)。`Yoorkin/multipart` を先に評価する。
+
+## 3a の判断
+
+- 数値は ASCII の `digits` / `digits.digits` のみ。符号、指数表記、`.5`、`1.` は拒否する。前後は core の `String::trim` で除去する。秒は小数 3 桁まで、ミリ秒ヘッダは整数部分まで使い、切り捨てる。飽和後も末尾まで検証して不正文字を拒否する。
+- `retry-after-ms` が無い、または解釈できないときは `retry-after` にフォールバックする(OpenAI 公式 SDK の挙動に合わせ、レビューで Codex の初期判断から変更)。どちらも解釈できなければ `None`。同名の複数値は `Headers::get` に合わせて最初の値を使う。
+- IMF-fixdate は固定桁数・英語の曜日/月・大文字 `GMT` を要求し、年 0001–9999、実在する月日、曜日との一致を検証する。Gregorian の 400 年周期を自前で計算する。秒 60 は受理し、Unix 時刻では次の秒として扱う(うるう秒表は持たない)。Int64 の最小/最大の現在時刻でも、比較を先に行い差分のオーバーフローを避ける。
+- backoff は raw を Double のまま cap と jitter に使い、最後にミリ秒未満を切り捨てる。random の上限は 1 未満の最大 Double (`0.9999999999999999`)、負値・NaN は 0。丸め誤差により jitter 上限と同じ結果になる場合もある(既定値の範囲外 random → 600ms)。巨大な attempt は `@math.pow` の無限大を cap して処理する。
+- backoff の契約に範囲指定がない設定値について、負の base/max は 0、負値・NaN の factor は 0、jitter は [0, 1] に収める(NaN は 0)。base/max が 0 の場合は先に 0 を返し、`0 * Infinity` を避ける。公開の設定検証 API は追加しない。
+- `ObjBuilder::build` は Map のコピーを返すため、後のビルダ更新で既存のオブジェクトのフィールドは変わらない(JSON の値自体の深いコピーはしない)。`opt(None)` / `presence(Absent)` は既存キーも削除せず無操作。順序と上書きは core の挿入順 Map を使う。
+- required `field` は null を一律拒否せず `T` の FromJson に従う(`String` はエラー、`String?` は None)。`open_int` は core の Int デコーダが小数を切り捨てるため、独自に範囲と整数性を検査する。数値として整数なら `1.0`、`-0.0`、指数表記由来の JSON 数値も受理する。
+- core の正確な型は `@json.JsonPath` と `@json.JsonDecodeError`、エラー構築は `@json.JsonDecodeError((path, message))`、キー追加は `path.add_key(key)`。JsonPath は外部には抽象型で Root コンストラクタは公開されない。利用例・テストは `@json.from_json` が `FromJson::from_json(json, path)` に渡す path を受け取る。JSON 構築には読み取り専用 enum のコンストラクタでなく `Json::null()` / `Json::object(...)` を使う。
+- toolchain `0.1.20260920` で `pub fn[T : @json.FromJson]` / `pub fn[T : ToJson]` は契約どおりコンパイルする。明示的な trait メソッド公開は `pub extend Presence with Eq::{equal, not_equal}` 等とし、型パラメータの制約は derive から引き継ぐ。公開 API の追加・変更はない(規約で要求される derive の明示的 extend を含む)。

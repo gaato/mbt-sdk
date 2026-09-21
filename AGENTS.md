@@ -30,6 +30,12 @@ moon -C http-async check --deny-warn --target native
 moon -C http-async check --deny-warn --target js
 moon -C http-async test --target native
 moon -C http-async test --target js      # socket-free async tests only
+moon -C sdk-runtime check --deny-warn --target wasm-gc
+moon -C sdk-runtime check --deny-warn --target native
+moon -C sdk-runtime check --deny-warn --target js
+moon -C sdk-runtime test --target wasm-gc
+moon -C sdk-runtime test --target native
+moon -C sdk-runtime test --target js
 moon fmt --check
 moon info
 ```
