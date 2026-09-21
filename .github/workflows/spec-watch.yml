@@ -1,0 +1,88 @@
+name: Spec watch
+
+# Fetches the upstream OpenAI spec daily. When it changed: re-vendor, apply the
+# overlays, regenerate, run the gates, and open a PR. Overlay actions that no
+# longer match (zero-match) or no longer change anything (no-op: upstream fixed
+# it) fail the overlay step; their messages go into the PR body so a human can
+# prune the overlay.
+
+on:
+  schedule:
+    - cron: "43 4 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+env:
+  SPEC_URL: https://raw.githubusercontent.com/openai/openai-openapi/manual_spec/openapi.yaml
+  MOONBIT_IMAGE: ghcr.io/gaato/moonbit:0.10.14
+
+jobs:
+  watch:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Fetch upstream spec and compare
+        id: fetch
+        run: |
+          curl --proto '=https' --tlsv1.2 --fail --silent --show-error --location \
+            "$SPEC_URL" --output "$RUNNER_TEMP/openai.yaml"
+          new="$(sha256sum "$RUNNER_TEMP/openai.yaml" | cut -d' ' -f1)"
+          old="$(sha256sum openai/spec/openai.yaml | cut -d' ' -f1)"
+          echo "new=$new" >> "$GITHUB_OUTPUT"
+          if [ "$new" = "$old" ]; then echo "changed=false" >> "$GITHUB_OUTPUT"; else echo "changed=true" >> "$GITHUB_OUTPUT"; fi
+
+      - name: Set up uv
+        if: steps.fetch.outputs.changed == 'true'
+        uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
+
+      - name: Re-vendor and regenerate
+        if: steps.fetch.outputs.changed == 'true'
+        id: regen
+        run: |
+          cp "$RUNNER_TEMP/openai.yaml" openai/spec/openai.yaml
+          today="$(date -u +%F)"
+          sed -i -E "s/^- Fetched: .*/- Fetched: $today/; s/^- sha256: .*/- sha256: ${{ steps.fetch.outputs.new }}/" openai/spec/SOURCE.md
+          set +e
+          scripts/generate.sh > "$RUNNER_TEMP/generate.log" 2>&1
+          echo "generate_status=$?" >> "$GITHUB_OUTPUT"
+          set -e
+          docker run --rm -v "$PWD:/work" -w /work "$MOONBIT_IMAGE" bash -c 'moon fmt && moon info' || true
+
+      - name: Gates (native and wasm-gc; the PR's CI run adds js)
+        if: steps.fetch.outputs.changed == 'true'
+        id: gates
+        run: |
+          set +e
+          docker run --rm -v "$PWD:/work" -w /work "$MOONBIT_IMAGE" scripts/gates.sh --no-js > "$RUNNER_TEMP/gates.log" 2>&1
+          echo "gates_status=$?" >> "$GITHUB_OUTPUT"
+
+      - name: Open pull request
+        if: steps.fetch.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          branch="spec-watch/${{ steps.fetch.outputs.new }}"
+          branch="${branch:0:31}"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git switch -c "$branch"
+          git add -A openai
+          git commit -m "Update vendored OpenAI spec and regenerate"
+          git push origin "$branch"
+          {
+            echo "Upstream spec changed (sha256 \`${{ steps.fetch.outputs.new }}\`)."
+            echo
+            echo "- overlay + generator exit status: \`${{ steps.regen.outputs.generate_status }}\`"
+            echo "- gates exit status: \`${{ steps.gates.outputs.gates_status }}\`"
+            echo
+            echo '<details><summary>generate.log</summary>'; echo; echo '```'; tail -n 80 "$RUNNER_TEMP/generate.log"; echo '```'; echo '</details>'
+            echo '<details><summary>gates.log (tail)</summary>'; echo; echo '```'; tail -n 60 "$RUNNER_TEMP/gates.log"; echo '```'; echo '</details>'
+          } > "$RUNNER_TEMP/body.md"
+          gh pr create --base main --head "$branch" \
+            --title "Update vendored OpenAI spec" --body-file "$RUNNER_TEMP/body.md"

@@ -19,6 +19,8 @@ Foundation for MoonBit SDKs: a sans-IO HTTP vocabulary (`http/`), transport adap
 
 ## Gates (must all pass; run from the repo root)
 
+`scripts/gates.sh` runs the whole list below (`--no-native-tests` where sockets are forbidden, `--no-js` without Node). `scripts/generate.sh --check` verifies the overlays and the generated code.
+
 ```sh
 moon -C http check --deny-warn --target wasm-gc
 moon -C http check --deny-warn --target native

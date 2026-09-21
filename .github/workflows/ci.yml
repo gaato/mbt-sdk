@@ -1,0 +1,51 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  gates:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    container:
+      # Pinned toolchain. canary.yml runs the same gates on :latest.
+      image: ghcr.io/gaato/moonbit:0.10.14
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Trust the workspace (container runs as a different user)
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+
+      - name: Set up Node (js target tests)
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+
+      - name: Set up uv (overlay applier and generator)
+        uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
+
+      - name: Toolchain versions
+        run: moon version --all
+
+      - name: Generator unit tests
+        run: uv run --with pyyaml --with jsonpath-rfc9535 python -m unittest discover -s tools/gen/tests
+
+      - name: Overlays apply and generated code is current
+        run: scripts/generate.sh --check
+
+      - name: Gates
+        run: scripts/gates.sh
