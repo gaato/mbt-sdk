@@ -1,7 +1,3 @@
-import {
-  "gaato/http",
-  "moonbitlang/async",
-  "moonbitlang/async/http" @ahttp,
-}
+// Imports will be added when this placeholder is implemented.
 
 supported_targets = "js + native"

@@ -1,0 +1,83 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "gaato/http"
+
+import {
+  "moonbitlang/core/debug",
+  "moonbitlang/core/encoding/utf8",
+}
+
+// Values
+pub async fn send_with(&Transport, Array[async (Request, async (Request) -> Response raise HttpError) -> Response raise HttpError], Request) -> Response raise HttpError
+
+// Errors
+pub(all) suberror HttpError {
+  Connect(String)
+  Timeout(Int)
+  Protocol(String)
+  Cancelled
+} derive(@debug.Debug)
+pub fn HttpError::to_repr(Self) -> @debug.Repr
+
+// Types and methods
+pub struct Headers {
+  // private fields
+} derive(Eq, @debug.Debug)
+pub fn Headers::append(Self, String, String) -> Unit
+pub fn Headers::contains(Self, String) -> Bool
+pub fn Headers::each(Self, (String, String) -> Unit raise?) -> Unit raise?
+pub fn Headers::equal(Self, Self) -> Bool
+pub fn Headers::from_array(Array[(String, String)]) -> Self
+pub fn Headers::get(Self, String) -> String?
+pub fn Headers::get_all(Self, String) -> Array[String]
+pub fn Headers::iter(Self) -> Iter[(String, String)]
+pub fn Headers::length(Self) -> Int
+pub fn Headers::new() -> Self
+pub fn Headers::not_equal(Self, Self) -> Bool
+pub fn Headers::remove(Self, String) -> Unit
+pub fn Headers::set(Self, String, String) -> Unit
+pub fn Headers::to_repr(Self) -> @debug.Repr
+
+pub(all) struct Request {
+  http_method : String
+  url : String
+  headers : Headers
+  body : Bytes
+}
+pub fn Request::body_bytes(Self, Bytes) -> Self
+pub fn Request::body_text(Self, String) -> Self
+pub fn Request::delete(String) -> Self
+pub fn Request::get(String) -> Self
+pub fn Request::header(Self, String, String) -> Self
+pub fn Request::json_body(Self, Json) -> Self
+pub fn Request::new(String, String) -> Self
+pub fn Request::patch(String) -> Self
+pub fn Request::post(String) -> Self
+pub fn Request::put(String) -> Self
+
+pub(all) struct Response {
+  status : Int
+  headers : Headers
+  body : Bytes
+}
+pub fn Response::is_success(Self) -> Bool
+pub fn Response::json(Self) -> Json raise
+pub fn Response::text(Self) -> String raise @utf8.Malformed
+
+pub(all) struct ResponseHead {
+  status : Int
+  headers : Headers
+}
+
+// Type aliases
+pub type Middleware = async (Request, async (Request) -> Response raise HttpError) -> Response raise HttpError
+
+// Traits
+pub(open) trait BodyStream {
+  async fn read_some(Self) -> Bytes?
+  fn close(Self) -> Unit
+}
+
+pub(open) trait Transport {
+  async fn send(Self, Request) -> Response raise HttpError
+  async fn send_stream(Self, Request) -> (ResponseHead, &BodyStream) raise HttpError
+}
