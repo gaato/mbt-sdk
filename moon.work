@@ -2,4 +2,5 @@ members = [
   "http",
   "http-async",
   "sdk-runtime",
+  "runtime-tests",
 ]

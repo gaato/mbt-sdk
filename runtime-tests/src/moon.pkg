@@ -1,0 +1,10 @@
+import {
+  "gaato/http",
+  "gaato/http/clock",
+  "gaato/http/mock",
+  "gaato/http-async" @adapter,
+  "gaato/sdk-runtime" @runtime,
+  "moonbitlang/async",
+} for "test"
+
+supported_targets = "js + native"

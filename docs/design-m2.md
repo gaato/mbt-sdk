@@ -76,10 +76,91 @@ pub fn[T] open_int(json : Json, path : @json.JsonPath, known : (Int) -> T?, unkn
 
 `@json.JsonPath` / `@json.JsonDecodeError` の正確な名前と組み立て方は `moonbitlang/core/json` の現行 API に合わせる(違っていたら最も近い形にして報告)。
 
-## 3b / 3c(概要のみ。着手時に契約を書く)
+## 3b の公開 API(契約)
 
-- 3b: `pub(open) trait Clock { async fn sleep(Self, Int) -> Unit; fn now_unix_ms(Self) -> Int64 }`、`FakeClock`、retry middleware(`Backoff` と `retry_after_ms` を使い、冪等なメソッドか冪等キー付きの要求だけ再試行)、`RateLimiter` trait と in-memory 実装、`Paginator[T]`、認証ヘッダの注入、`gaato/http-async` に `AsyncClock`。
-- 3c: `multipart/form-data` の writer(境界の生成は乱数を注入)。`Yoorkin/multipart` を先に評価する。
+前提: 依存ゼロのモジュールは `async test` を実行できない(`moonbitlang/async` が要る)。テスト用の import でもモジュールの依存に入るので、async の実行テストは **公開しないモジュール `runtime-tests/`(`gaato/mbt-sdk-runtime-tests`)** に置く。`sdk-runtime` 側は純粋関数のテストとコンパイル確認まで。
+
+### `gaato/http/clock`(新パッケージ。時間も IO なので sans-IO の語彙に置く)
+
+```moonbit
+pub(open) trait Clock {
+  async fn sleep(Self, Int) -> Unit        // ミリ秒。0 以下は即戻る。エラーは上げない(`noraise` が書けるなら付ける)
+  fn now_unix_ms(Self) -> Int64
+}
+```
+`gaato/http/mock` に追加: `pub struct FakeClock`、`FakeClock::new(start_unix_ms? : Int64 = 0L)`、`impl Clock`(`sleep` は待たずに時刻を進めて記録)、`FakeClock::slept(Self) -> Array[Int]`、`FakeClock::advance(Self, Int) -> Unit`。
+`gaato/http-async` に追加: `pub struct AsyncClock`、`AsyncClock::new()`、`impl @clock.Clock`(`@async.sleep` と壁時計。壁時計の取得元は core / async の現行 API から選んで報告)。
+
+### `gaato/sdk-runtime`(root)
+
+```moonbit
+pub(all) enum Auth { NoAuth; Bearer(String); Header(String, String) }     // Debug は秘密を必ず伏せる("Bearer(<redacted>)")
+pub fn Auth::apply(Self, @http.Request) -> @http.Request                  // 既に同名ヘッダがあれば上書きしない
+
+pub(all) struct RetryPolicy { max_retries : Int; backoff : Backoff; max_retry_after_ms : Int; retry_non_idempotent : Bool } derive(Eq, Debug)
+pub fn RetryPolicy::default() -> RetryPolicy          // 2, Backoff::default(), 60000, false
+pub fn RetryPolicy::none() -> RetryPolicy             // max_retries 0
+pub fn is_idempotent(@http.Request) -> Bool           // GET HEAD PUT DELETE OPTIONS TRACE、または idempotency-key ヘッダあり
+pub fn RetryPolicy::next_delay_ms(Self, error : SdkError, request : @http.Request, attempt : Int, random : Double) -> Int?   // 純粋。再試行しないなら None
+
+pub(all) struct RateLimitState { remaining : Int; reset_at_unix_ms : Int64 } derive(Eq, Debug)
+pub(open) trait RateLimiter {
+  async fn acquire(Self, String) -> Unit                                   // bucket
+  fn observe(Self, String, Int, @http.Headers, Int64) -> Unit              // bucket, status, headers, now_unix_ms
+}
+pub struct NoLimiter;  pub fn NoLimiter::new() -> NoLimiter;  impl RateLimiter
+pub struct WindowLimiter
+pub fn WindowLimiter::new(clock : &@clock.Clock, parse : (@http.Headers, Int64) -> RateLimitState?) -> WindowLimiter
+impl RateLimiter for WindowLimiter
+pub fn WindowLimiter::state(Self, String) -> RateLimitState?
+pub fn rate_limit_headers(remaining~ : String, reset_after_seconds? : String, reset_unix_seconds? : String) -> (@http.Headers, Int64) -> RateLimitState?
+
+pub struct Client
+pub fn Client::new(
+  transport : &@http.Transport, clock : &@clock.Clock, base_url~ : String,
+  default_headers? : @http.Headers, auth? : Auth, retry? : RetryPolicy,
+  limiter? : &RateLimiter, middleware? : Array[@http.Middleware], random? : () -> Double,
+) -> Client
+pub async fn Client::send(Self, @http.Request, bucket? : String) -> @http.Response raise SdkError
+pub async fn Client::send_json(Self, @http.Request, bucket? : String) -> Json raise SdkError
+pub async fn Client::send_stream(Self, @http.Request, bucket? : String) -> (@http.ResponseHead, &@http.BodyStream) raise SdkError
+
+pub(all) struct Page[T] { items : Array[T]; next : String? }
+pub struct Paginator[T]
+pub fn[T] Paginator::new(fetch : async (String?) -> Page[T] raise SdkError) -> Paginator[T]
+pub async fn[T] Paginator::next_page(Self[T]) -> Array[T]? raise SdkError
+pub async fn[T] Paginator::each(Self[T], async (T) -> Unit raise SdkError) -> Unit raise SdkError
+pub async fn[T] Paginator::collect(Self[T], max~ : Int) -> Array[T] raise SdkError
+pub fn parse_link_next(@http.Headers) -> String?      // RFC 8288 の Link ヘッダから rel="next" の URL
+```
+
+規則:
+- `Client::send` の順序: (1) URL 解決(`request.url` が `http://` / `https://` で始まれば そのまま、そうでなければ `base_url` と `/` が重複も欠落もしないように連結)(2) `default_headers` を「要求に同名が無いものだけ」足す (3) `auth.apply` (4) ここから再試行ループ: `limiter.acquire(bucket)` → `send_with(transport, middleware, request)` → `limiter.observe(bucket, status, headers, now)` → `classify`。`HttpError` は `SdkError::Transport` に包む。(5) 失敗したら `retry.next_delay_ms(...)` が `Some(ms)` のとき `clock.sleep(ms)` して次の試行、`None` ならそのエラーを上げる。`bucket` の既定は `""`。`random` の既定は core に全ターゲットで使える乱数があればそれ、無ければ定数 0.5(報告する)。
+- `next_delay_ms`: `attempt`(0 始まり、これまでに失敗した回数 − 1)が `max_retries` 以上なら `None`。`error.is_retryable()` が false なら `None`。要求が冪等でなく `retry_non_idempotent` も false なら `None`。ただし `RateLimited` と `Transport(Connect(_))` は「サーバが処理していない」ので冪等でなくても再試行する。待ち時間は `RateLimited(retry_after_ms=Some(ms))` なら `ms`(`max_retry_after_ms` を超えたら再試行せず `None`)、`Status` で `retry_after_ms(headers)` が取れればそれ(同じ上限)、それ以外は `backoff.delay_ms(attempt, random)`。
+- `send_json`: `send` の後、本文が空(204 など)なら `Json::null()`、JSON として不正なら `SdkError::Decode`。
+- `send_stream`: 応答ヘッダを受け取るまでは `send` と同じ再試行。2xx ならストリームを返す。2xx 以外なら本文を最大 1 MiB まで読んで close し、`classify` と同じ分類でエラーにする(それも再試行の対象)。ストリームを返した後の失敗は再試行しない。
+- `WindowLimiter`: `observe` は `parse` が `Some` を返せばそのバケットの状態を置き換える。429 のときは、`retry_after_ms(headers, now)` が取れれば `remaining = 0`、`reset_at = now + ms` にする(`parse` の結果より優先)。`acquire` は、状態が無いか `remaining > 0` か `now >= reset_at` なら通す(`remaining > 0` なら 1 減らす。`now >= reset_at` なら状態を消す)。そうでなければ `clock.sleep(reset_at - now)` して再判定をループする。協調的マルチタスクで `sleep` の間に別の要求が状態を変える前提で書く。
+- `rate_limit_headers`: `remaining` ヘッダが非負整数として読めなければ `None`。`reset_after_seconds`(小数秒可)があれば `now + 秒`、無ければ `reset_unix_seconds`(小数秒可の Unix 秒)。どちらも読めなければ `None`。OpenAI の `6m0s` 形式は扱わない(SDK 側が自前の `parse` を渡す)。
+- `Paginator`: `fetch(None)` が最初のページ。`next` が `None` になったら終わりで、以後 `next_page` は `None`。空の `items` でも `next` があれば続ける。`collect(max~)` は `max` 件に達したら打ち切る(余りは捨てる)。`fetch` が失敗したら状態を進めず、同じカーソルで再度呼べる。
+- `parse_link_next`: 複数の `Link` ヘッダ値とカンマ区切りの両方を扱う。`rel` は引用符あり/なし、複数 rel(`rel="next last"`)を扱う。`<>` の中のカンマで分割しない。
+
+### テスト
+- `sdk-runtime` 内(全ターゲットで実行): `Auth` の redaction と上書きしない規則、`is_idempotent`、`next_delay_ms` の表(各エラー × 冪等/非冪等 × attempt × retry-after の有無と上限超え)、`rate_limit_headers`、`parse_link_next`、`RetryPolicy` の既定値。async な API はコンパイル確認。
+- `runtime-tests/`(native と js で実行。`FakeTransport` と `FakeClock` を使い、ソケットは使わない): `Client::send` の URL 解決とヘッダ/認証の注入、500 → 500 → 200 で 2 回 sleep して成功、`max_retries` 到達で最後のエラー、POST は 500 を再試行しないが 429 と Connect は再試行、`idempotency-key` 付き POST は再試行、`retry-after` が上限超えなら再試行しない、`send_json` の空本文と不正 JSON、`send_stream` の 2xx と 非 2xx(本文が分類に入ること、ストリームが close されること)、`WindowLimiter` が枯渇時に `reset_at` まで sleep すること・429 の `retry-after` を反映すること・バケットが独立なこと、`Paginator` の全規則、`AsyncClock` の sleep と時刻(native のみ、期限つき)。
+
+## 3c の公開 API(契約)— `gaato/sdk-runtime/multipart`(純粋)
+
+```moonbit
+pub(all) struct Part { name : String; filename : String?; content_type : String?; body : Bytes } derive(Eq, Debug)
+pub fn Part::text(name : String, value : String) -> Part                     // UTF-8、content_type なし
+pub fn Part::file(name : String, filename : String, content_type : String, body : Bytes) -> Part
+pub fn Part::json(name : String, value : Json) -> Part                       // content_type application/json
+pub(all) suberror MultipartError { InvalidBoundary(String); BoundaryCollision; InvalidHeaderValue(String) } derive(Debug)
+pub fn encode(parts : Array[Part], boundary : String) -> (String, Bytes) raise MultipartError   // (content-type ヘッダ値, 本文)
+pub fn make_boundary(random : () -> Double) -> String                        // 先頭 "mbt-sdk-"、続けて 32 文字の [0-9a-z]
+pub fn apply(request : @http.Request, parts : Array[Part], boundary : String) -> @http.Request raise MultipartError
+```
+規則: boundary は RFC 2046 の bchars で 1–70 文字、末尾が空白でないこと。各パートは `--boundary CRLF`、`Content-Disposition: form-data; name="..."[; filename="..."] CRLF`、`Content-Type: ... CRLF`(あれば)、空行、本文、`CRLF`。最後に `--boundary-- CRLF`。`name` / `filename` は WHATWG の multipart/form-data 符号化に従い `"` → `%22`、CR → `%0D`、LF → `%0A` に置換して UTF-8 のまま書く。`content_type` に CR / LF があれば `InvalidHeaderValue`。どれかのパート本文に `CRLF--boundary` が含まれる(または本文が `--boundary` で始まる)なら `BoundaryCollision`。content-type ヘッダ値は `multipart/form-data; boundary=<boundary>`(bchars のうち引用が要る文字を含むときだけ引用符で囲む)。`apply` は本文と `content-type` を設定した新しい `Request` を返す(既存の `content-type` は置き換える)。パート 0 個も有効(終端だけ)。
 
 ## 3a の判断
 
