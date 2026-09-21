@@ -1,4 +1,5 @@
 import {
   "gaato/http",
+  "gaato/http/clock",
   "moonbitlang/core/debug",
 }

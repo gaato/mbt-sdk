@@ -3,6 +3,7 @@ package "gaato/http/mock"
 
 import {
   "gaato/http",
+  "gaato/http/clock",
   "moonbitlang/core/debug",
 }
 
@@ -18,6 +19,16 @@ pub(all) suberror MockError {
 pub fn MockError::to_repr(Self) -> @debug.Repr
 
 // Types and methods
+pub struct FakeClock {
+  // private fields
+}
+pub fn FakeClock::advance(Self, Int) -> Unit
+pub fn FakeClock::new(start_unix_ms? : Int64) -> Self
+pub fn FakeClock::now_unix_ms(Self) -> Int64
+pub async fn FakeClock::sleep(Self, Int) -> Unit noraise
+pub fn FakeClock::slept(Self) -> Array[Int]
+pub impl @clock.Clock for FakeClock
+
 pub struct FakeTransport {
   // private fields
 }

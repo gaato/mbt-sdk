@@ -1,0 +1,6 @@
+import {
+  "gaato/http-async" @adapter,
+  "moonbitlang/async",
+} for "test"
+
+supported_targets = "native"

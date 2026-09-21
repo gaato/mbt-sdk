@@ -1,5 +1,6 @@
 import {
   "gaato/http",
+  "gaato/http/clock",
   "moonbitlang/async",
   "moonbitlang/async/http" @ahttp,
 }

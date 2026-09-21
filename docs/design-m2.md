@@ -173,3 +173,23 @@ pub fn apply(request : @http.Request, parts : Array[Part], boundary : String) ->
 - required `field` は null を一律拒否せず `T` の FromJson に従う(`String` はエラー、`String?` は None)。`open_int` は core の Int デコーダが小数を切り捨てるため、独自に範囲と整数性を検査する。数値として整数なら `1.0`、`-0.0`、指数表記由来の JSON 数値も受理する。
 - core の正確な型は `@json.JsonPath` と `@json.JsonDecodeError`、エラー構築は `@json.JsonDecodeError((path, message))`、キー追加は `path.add_key(key)`。JsonPath は外部には抽象型で Root コンストラクタは公開されない。利用例・テストは `@json.from_json` が `FromJson::from_json(json, path)` に渡す path を受け取る。JSON 構築には読み取り専用 enum のコンストラクタでなく `Json::null()` / `Json::object(...)` を使う。
 - toolchain `0.1.20260920` で `pub fn[T : @json.FromJson]` / `pub fn[T : ToJson]` は契約どおりコンパイルする。明示的な trait メソッド公開は `pub extend Presence with Eq::{equal, not_equal}` 等とし、型パラメータの制約は derive から引き継ぐ。公開 API の追加・変更はない(規約で要求される derive の明示的 extend を含む)。
+
+## 3b の判断
+
+- `Clock::sleep` は toolchain `0.1.20260920` で `noraise` を trait に書けた。trait の async method 実装は `impl ... with fn sleep` と書くと async effect を trait から引き継ぐ。`&@clock.Clock` の struct field と `Paginator[T]` の generic async function field も契約どおりコンパイルした。
+- `RateLimiter::acquire` も `noraise` にした。ここが通常の `Error` を上げ得る型だと、`Client::{send,send_json,send_stream}` の `raise SdkError` 契約を保てず、limiter のエラーを分類する公開契約も無いためである。
+- `FakeClock::sleep` は 0 以下も呼び出しの事実として `slept()` に記録するが、時刻は正の値だけ進める。`advance` はテストが時刻を戻す用途も許すため符号付きの値をそのまま加える。
+- `AsyncClock` は `moonbitlang/async@0.22.1` の `@async.sleep` と `@async.now()` を使う。後者は native / js 共通の Unix epoch ミリ秒 `Int64` 壁時計である。
+- `Client` の既定乱数は全ターゲットにある core の `@env.rand(6)` から 48 bit の `[0, 1)` 値を作り、実行環境が entropy を提供しない場合だけ `0.5` にする。テストは常に乱数関数を注入する。
+- default headers は request にその名前が元から無い場合、同名の複数値もすべて順序どおり追加する。constructor 入力の headers / middleware と送信 request は snapshot を取り、後の外部変更や retry 間の mutation を共有しない。
+- URL 結合は境界の slash だけを正規化し、絶対 URL は変更しない。空の relative URL も slash が欠落しない規則に従い `base_url + "/"` とする。
+- buffered middleware の型は `Response` 専用で stream を表現できないため、`send_stream` は同じ URL/default header/auth/limiter/retry 順序を使うが `@http.Middleware` は通さず `Transport::send_stream` を直接呼ぶ。stream middleware の公開 API は追加しない。
+- 非 2xx stream body は chunk が上限をまたぐ場合も正確に 1 MiB で切り、`defer` で読み取り成功・失敗の両方を close する。2xx stream の所有権と close は caller に渡す。
+- `Auth::Debug` は bearer token と custom header value の両方を `<redacted>` にし、custom header は秘密でない header name だけを表示する。
+- `RetryPolicy::next_delay_ms` の Status にある HTTP-date は現在時刻を引数に持たないため解釈せず、契約どおり `retry_after_ms(headers)` で数値形式だけを見る。
+- rate-limit の秒値は 3 桁までの小数をミリ秒へ切り捨て、符号と指数を拒否する。invalid な reset-after は reset-unix に fallback し、remaining の `Int` overflow は invalid、時刻計算の `Int64` overflow は最大値へ飽和する。reset までが `Int` の sleep 上限を超える場合は複数回再判定できるよう 2147483647 ms ずつ sleep する。
+- `WindowLimiter` の state が `remaining > 0` かつ既に reset 時刻を過ぎている場合は、古い remaining を減らさず expired state を削除して通す。
+- `parse_link_next` は header 順で最初の `next` を返し、parameter 名と registered relation token は ASCII case-insensitive とした。`<>` 内に加えて quoted-string 内の comma / semicolon も分割しない。
+- `Paginator::collect(max <= 0)` は fetch しない。上限が page の途中なら残り item は捨てるが、その page の `next` cursor は保持する。fetch failure 前には state を変更しない。
+- `FakeTransport` の既存契約には transport error を台本化する公開 API が無いため、Connect retry の実行テストだけ runtime-tests 内の private transport を使い、その他の Client/stream tests は `@mock.FakeTransport`、全 timing tests は `@mock.FakeClock` を使う。mock の公開 API は増やさない。
+- `AsyncClock` の実行テストは契約どおり native-only の nested package に分けた。他の runtime-tests は同じ source で native / js の両方を対象にし、各 async test を 5 秒以下の outer timeout で囲んだ。

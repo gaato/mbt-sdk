@@ -3,13 +3,20 @@ package "gaato/sdk-runtime"
 
 import {
   "gaato/http",
+  "gaato/http/clock",
   "moonbitlang/core/debug",
 }
 
 // Values
 pub fn classify(@http.Response, now_unix_ms? : Int64) -> @http.Response raise SdkError
 
+pub fn is_idempotent(@http.Request) -> Bool
+
+pub fn parse_link_next(@http.Headers) -> String?
+
 pub fn parse_retry_after(String, now_unix_ms? : Int64) -> Int?
+
+pub fn rate_limit_headers(remaining~ : String, reset_after_seconds? : String, reset_unix_seconds? : String) -> (@http.Headers, Int64) -> RateLimitState?
 
 pub fn retry_after_ms(@http.Headers, now_unix_ms? : Int64) -> Int?
 
@@ -26,6 +33,15 @@ pub fn SdkError::status(Self) -> Int?
 pub fn SdkError::to_repr(Self) -> @debug.Repr
 
 // Types and methods
+pub(all) enum Auth {
+  NoAuth
+  Bearer(String)
+  Header(String, String)
+}
+pub fn Auth::apply(Self, @http.Request) -> @http.Request
+pub fn Auth::to_repr(Self) -> @debug.Repr
+pub impl @debug.Debug for Auth
+
 pub(all) struct Backoff {
   base_ms : Int
   max_ms : Int
@@ -38,6 +54,68 @@ pub fn Backoff::equal(Self, Self) -> Bool
 pub fn Backoff::not_equal(Self, Self) -> Bool
 pub fn Backoff::to_repr(Self) -> @debug.Repr
 
+pub struct Client {
+  // private fields
+}
+pub fn Client::new(&@http.Transport, &@clock.Clock, base_url~ : String, default_headers? : @http.Headers, auth? : Auth, retry? : RetryPolicy, limiter? : &RateLimiter, middleware? : Array[async (@http.Request, async (@http.Request) -> @http.Response raise @http.HttpError) -> @http.Response raise @http.HttpError], random? : () -> Double) -> Self
+pub async fn Client::send(Self, @http.Request, bucket? : String) -> @http.Response raise SdkError
+pub async fn Client::send_json(Self, @http.Request, bucket? : String) -> Json raise SdkError
+pub async fn Client::send_stream(Self, @http.Request, bucket? : String) -> (@http.ResponseHead, &@http.BodyStream) raise SdkError
+
+pub struct NoLimiter {
+}
+pub async fn NoLimiter::acquire(Self, String) -> Unit noraise
+pub fn NoLimiter::new() -> Self
+pub fn NoLimiter::observe(Self, String, Int, @http.Headers, Int64) -> Unit
+pub impl RateLimiter for NoLimiter
+
+pub(all) struct Page[T] {
+  items : Array[T]
+  next : String?
+}
+
+pub struct Paginator[T] {
+  // private fields
+}
+pub async fn[T] Paginator::collect(Self[T], max~ : Int) -> Array[T] raise SdkError
+pub async fn[T] Paginator::each(Self[T], async (T) -> Unit raise SdkError) -> Unit raise SdkError
+pub fn[T] Paginator::new(async (String?) -> Page[T] raise SdkError) -> Self[T]
+pub async fn[T] Paginator::next_page(Self[T]) -> Array[T]? raise SdkError
+
+pub(all) struct RateLimitState {
+  remaining : Int
+  reset_at_unix_ms : Int64
+} derive(Eq, @debug.Debug)
+pub fn RateLimitState::equal(Self, Self) -> Bool
+pub fn RateLimitState::not_equal(Self, Self) -> Bool
+pub fn RateLimitState::to_repr(Self) -> @debug.Repr
+
+pub(all) struct RetryPolicy {
+  max_retries : Int
+  backoff : Backoff
+  max_retry_after_ms : Int
+  retry_non_idempotent : Bool
+} derive(Eq, @debug.Debug)
+pub fn RetryPolicy::default() -> Self
+pub fn RetryPolicy::equal(Self, Self) -> Bool
+pub fn RetryPolicy::next_delay_ms(Self, SdkError, @http.Request, Int, Double) -> Int?
+pub fn RetryPolicy::none() -> Self
+pub fn RetryPolicy::not_equal(Self, Self) -> Bool
+pub fn RetryPolicy::to_repr(Self) -> @debug.Repr
+
+pub struct WindowLimiter {
+  // private fields
+}
+pub async fn WindowLimiter::acquire(Self, String) -> Unit noraise
+pub fn WindowLimiter::new(&@clock.Clock, (@http.Headers, Int64) -> RateLimitState?) -> Self
+pub fn WindowLimiter::observe(Self, String, Int, @http.Headers, Int64) -> Unit
+pub fn WindowLimiter::state(Self, String) -> RateLimitState?
+pub impl RateLimiter for WindowLimiter
+
 // Type aliases
 
 // Traits
+pub(open) trait RateLimiter {
+  async fn acquire(Self, String) -> Unit noraise
+  fn observe(Self, String, Int, @http.Headers, Int64) -> Unit
+}

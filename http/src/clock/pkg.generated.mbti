@@ -1,0 +1,16 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "gaato/http/clock"
+
+// Values
+
+// Errors
+
+// Types and methods
+
+// Type aliases
+
+// Traits
+pub(open) trait Clock {
+  async fn sleep(Self, Int) -> Unit noraise
+  fn now_unix_ms(Self) -> Int64
+}
