@@ -162,6 +162,14 @@ pub fn apply(request : @http.Request, parts : Array[Part], boundary : String) ->
 ```
 規則: boundary は RFC 2046 の bchars で 1–70 文字、末尾が空白でないこと。各パートは `--boundary CRLF`、`Content-Disposition: form-data; name="..."[; filename="..."] CRLF`、`Content-Type: ... CRLF`(あれば)、空行、本文、`CRLF`。最後に `--boundary-- CRLF`。`name` / `filename` は WHATWG の multipart/form-data 符号化に従い `"` → `%22`、CR → `%0D`、LF → `%0A` に置換して UTF-8 のまま書く。`content_type` に CR / LF があれば `InvalidHeaderValue`。どれかのパート本文に `CRLF--boundary` が含まれる(または本文が `--boundary` で始まる)なら `BoundaryCollision`。content-type ヘッダ値は `multipart/form-data; boundary=<boundary>`(bchars のうち引用が要る文字を含むときだけ引用符で囲む)。`apply` は本文と `content-type` を設定した新しい `Request` を返す(既存の `content-type` は置き換える)。パート 0 個も有効(終端だけ)。
 
+## 3c の判断
+
+- boundary の引用は RFC の token にそのまま置けない bchars (`(`、`)`、`,`、`/`、`:`、`=`、`?`、空白) がある場合に行う。bchars に `"` と `\\` は無いため、引用符内の追加 escape は不要。
+- `make_boundary` は乱数 1 回を base-36 の 1 文字に対応させ、負値と NaN は `0`、1 以上は `z` に clamp する。これにより常に 32 文字を生成し、範囲外の乱数でも添字外アクセスを起こさない。
+- boundary collision は指定どおり本文先頭の `--boundary` と、任意位置の `CRLF--boundary` を byte 列で検査する。単なる boundary 文字列や途中の `--boundary` は衝突としない。
+- JSON は core の `Json::stringify` の compact 表現を UTF-8 化し、`application/json` を付ける。charset parameter は追加しない。
+- `apply` は `Request::body_bytes` が作る独立した headers に `Headers::set` し、同名の既存値をすべて最初の位置で 1 値へ置換する。入力 request と他の header は変更しない。
+
 ## 3a の判断
 
 - 数値は ASCII の `digits` / `digits.digits` のみ。符号、指数表記、`.5`、`1.` は拒否する。前後は core の `String::trim` で除去する。秒は小数 3 桁まで、ミリ秒ヘッダは整数部分まで使い、切り捨てる。飽和後も末尾まで検証して不正文字を拒否する。

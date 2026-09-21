@@ -1,0 +1,40 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "gaato/sdk-runtime/multipart"
+
+import {
+  "gaato/http",
+  "moonbitlang/core/debug",
+}
+
+// Values
+pub fn apply(@http.Request, Array[Part], String) -> @http.Request raise MultipartError
+
+pub fn encode(Array[Part], String) -> (String, Bytes) raise MultipartError
+
+pub fn make_boundary(() -> Double) -> String
+
+// Errors
+pub(all) suberror MultipartError {
+  InvalidBoundary(String)
+  BoundaryCollision
+  InvalidHeaderValue(String)
+} derive(@debug.Debug)
+pub fn MultipartError::to_repr(Self) -> @debug.Repr
+
+// Types and methods
+pub(all) struct Part {
+  name : String
+  filename : String?
+  content_type : String?
+  body : Bytes
+} derive(Eq, @debug.Debug)
+pub fn Part::equal(Self, Self) -> Bool
+pub fn Part::file(String, String, String, Bytes) -> Self
+pub fn Part::json(String, Json) -> Self
+pub fn Part::not_equal(Self, Self) -> Bool
+pub fn Part::text(String, String) -> Self
+pub fn Part::to_repr(Self) -> @debug.Repr
+
+// Type aliases
+
+// Traits
