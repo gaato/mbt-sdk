@@ -1,0 +1,7 @@
+import {
+  "gaato/http",
+  "moonbitlang/async",
+  "moonbitlang/async/http" @ahttp,
+}
+
+supported_targets = "js + native"

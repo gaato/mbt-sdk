@@ -1,0 +1,40 @@
+# mbt-sdk
+
+Foundation for MoonBit SDKs: a sans-IO HTTP vocabulary (`http/`), transport adapters (`http-async/`), later a client runtime and a generator. Design and public API spec: `docs/design.md`. Treat that spec as the contract: do not add public API that is not in it; if something is unclear or seems wrong, stop and report instead of guessing.
+
+## Layout rules
+
+- `http/` (module `gaato/http`) must stay dependency-free: no `import` block in `http/moon.mod`, only `moonbitlang/core/*` in its `moon.pkg` files. It must check on wasm-gc, native and js.
+- Anything needing `moonbitlang/async` goes in `http-async/` (imports are module-wide in MoonBit).
+- Target differences are expressed with `options(targets: {...})` in `moon.pkg`, not with ad-hoc conditionals.
+
+## Code rules
+
+- Follow the `moonbit-agent-guide` skill.
+- Every public item has a `///|` doc comment; add a ```` ```mbt check ```` example where it can run without IO.
+- Black-box tests in `*_test.mbt`, white-box tests in `*_wbtest.mbt`.
+- Do not suppress the `implicit_impl_as_method` warning. If a trait method must be callable with dot syntax, declare `pub extend T with Trait::{method}` explicitly.
+- `pkg.generated.mbti` files are committed. Run `moon info` after changing public API.
+- Delete the `placeholder.mbt` of a package when you add its real code, and drop unused imports from its `moon.pkg`.
+
+## Gates (must all pass; run from the repo root)
+
+```sh
+moon -C http check --deny-warn --target wasm-gc
+moon -C http check --deny-warn --target native
+moon -C http check --deny-warn --target js
+moon -C http test --target wasm-gc
+moon -C http test --target native
+moon -C http test --target js
+moon -C http-async check --deny-warn --target native
+moon -C http-async check --deny-warn --target js
+moon -C http-async test --target native
+moon fmt --check
+moon info
+```
+
+## Hard limits for agents
+
+- Do not run jj or git. Do not publish. Do not create anything on GitHub. Network use is limited to `moon update` / `moon add`.
+- No browser, dev server or computer-use. Verification is the gate commands only.
+- No long-blocking commands: every test that opens a socket must have a timeout.
