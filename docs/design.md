@@ -44,6 +44,8 @@ pub(open) trait Transport {
 pub(all) suberror HttpError { Connect(String); Timeout(Int); Protocol(String); Cancelled }
 pub type Middleware = async (Request, async (Request) -> Response raise HttpError) -> Response raise HttpError
 ```
+- `Request` / `Response` / `ResponseHead` は `Eq` と `Debug` を持つ(mock の照合とテストの失敗表示に使う)。
+- `gaato/http` は依存ゼロなので `async test` を実行できない。async な挙動(`send_with` の順序、`each_event`、`FakeTransport`)の実行テストは `http-async` 側のテストに置く。`http` 側は純粋関数のテストとコンパイル確認まで。
 - transport は status を解釈しない(4xx/5xx も `Response` で返す。分類は M2 の runtime の仕事)。
 - `Response::text()` / `json()`、`Request` の builder(`Request::get(url)`, `.header(k, v)`, `.json_body(j)`)を付ける。
 
@@ -57,6 +59,13 @@ pub fn SseParser::finish(Self) -> Array[SseEvent]        // 仕様どおり、�
 pub async fn each_event(&BodyStream, async (SseEvent) -> Unit raise E) -> Unit raise E  // 便利関数
 ```
 WHATWG「Server-sent events」の解釈規則に準拠: `\n` / `\r\n` / `\r`、先頭 BOM、コメント行、複数 `data:` の改行連結、`id` に NUL を含む場合は無視、`retry` は数字のみ、UTF-8 の多バイト文字がチャンク境界で割れても壊れない(バイトで溜めて行単位でデコード)。`[DONE]` の扱いは API 固有なので入れない。
+
+SSE の判断:
+- `retry` は空でない ASCII 数字列かつ `Int` に収まる場合だけ受理する。空・非数字・オーバーフローは無視し、それ以前の有効な値を保持する。
+- `SseEvent.retry` は前回のイベント送出以降に受理した最後の値。データのない空行では保持し、次のイベントに載せてから `None` に戻す。last-event-id のようには永続化しない。
+- 未設定の id は `None`、明示的な空 id は `Some("")`。`data:` が一行ある空文字イベントは送出するが、data 行のないブロックは送出しない。
+- `finish()` は未完イベントを捨てて終端状態にする。繰り返し呼び出しと、その後の `feed()` は `[]` を返す。
+- `each_event` の実装は callback の型を `raise E` に保ち、関数の戻り側は `raise` (`Error`) とする。`BodyStream::read_some()` が任意の `Error` を送出するため、`raise E` だけには限定できない。読み取り・callback のエラーはそのまま伝播し、`defer` で必ず close する。
 
 `gaato/http/mock`: `FakeTransport::new()`、`.expect(method, url_suffix, Response)`、`.expect_stream(..., chunks : Array[Bytes])`、`.sent() -> Array[Request]`、`.assert_complete()`。不一致はその場で raise し、かつラッチして `assert_complete` でも落とす。
 

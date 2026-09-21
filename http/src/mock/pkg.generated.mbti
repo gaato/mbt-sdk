@@ -1,11 +1,35 @@
 // Generated using `moon info`, DON'T EDIT IT
 package "gaato/http/mock"
 
+import {
+  "gaato/http",
+  "moonbitlang/core/debug",
+}
+
 // Values
 
 // Errors
+pub(all) suberror MockError {
+  Unexpected(String)
+  Mismatch(String)
+  Unconsumed(Int)
+  Violated(String)
+} derive(@debug.Debug)
+pub fn MockError::to_repr(Self) -> @debug.Repr
 
 // Types and methods
+pub struct FakeTransport {
+  // private fields
+}
+pub fn FakeTransport::assert_complete(Self) -> Unit raise MockError
+pub fn FakeTransport::expect(Self, String, String, @http.Response) -> Unit
+pub fn FakeTransport::expect_stream(Self, String, String, @http.ResponseHead, Array[Bytes]) -> Unit
+pub fn FakeTransport::new() -> Self
+pub async fn FakeTransport::send(Self, @http.Request) -> @http.Response raise @http.HttpError
+pub async fn FakeTransport::send_stream(Self, @http.Request) -> (@http.ResponseHead, &@http.BodyStream) raise @http.HttpError
+pub fn FakeTransport::sent(Self) -> Array[@http.Request]
+pub fn FakeTransport::streams_closed(Self) -> Int
+pub impl @http.Transport for FakeTransport
 
 // Type aliases
 

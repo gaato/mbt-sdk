@@ -16,7 +16,15 @@ pub(all) struct Response {
   status : Int
   headers : Headers
   body : Bytes
-}
+} derive(Eq, Debug)
+
+///|
+/// Compares all response fields.
+pub extend Response with Eq::{equal, not_equal}
+
+///|
+/// Debug representation of a response.
+pub extend Response with @debug.Debug::{to_repr}
 
 ///|
 /// Strictly decodes the UTF-8 body, raising on malformed input.
@@ -41,4 +49,12 @@ pub fn Response::is_success(self : Response) -> Bool {
 pub(all) struct ResponseHead {
   status : Int
   headers : Headers
-}
+} derive(Eq, Debug)
+
+///|
+/// Compares status and headers.
+pub extend ResponseHead with Eq::{equal, not_equal}
+
+///|
+/// Debug representation of a response head.
+pub extend ResponseHead with @debug.Debug::{to_repr}

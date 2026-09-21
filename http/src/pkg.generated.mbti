@@ -42,31 +42,40 @@ pub(all) struct Request {
   url : String
   headers : Headers
   body : Bytes
-}
+} derive(Eq, @debug.Debug)
 pub fn Request::body_bytes(Self, Bytes) -> Self
 pub fn Request::body_text(Self, String) -> Self
 pub fn Request::delete(String) -> Self
+pub fn Request::equal(Self, Self) -> Bool
 pub fn Request::get(String) -> Self
 pub fn Request::header(Self, String, String) -> Self
 pub fn Request::json_body(Self, Json) -> Self
 pub fn Request::new(String, String) -> Self
+pub fn Request::not_equal(Self, Self) -> Bool
 pub fn Request::patch(String) -> Self
 pub fn Request::post(String) -> Self
 pub fn Request::put(String) -> Self
+pub fn Request::to_repr(Self) -> @debug.Repr
 
 pub(all) struct Response {
   status : Int
   headers : Headers
   body : Bytes
-}
+} derive(Eq, @debug.Debug)
+pub fn Response::equal(Self, Self) -> Bool
 pub fn Response::is_success(Self) -> Bool
 pub fn Response::json(Self) -> Json raise
+pub fn Response::not_equal(Self, Self) -> Bool
 pub fn Response::text(Self) -> String raise @utf8.Malformed
+pub fn Response::to_repr(Self) -> @debug.Repr
 
 pub(all) struct ResponseHead {
   status : Int
   headers : Headers
-}
+} derive(Eq, @debug.Debug)
+pub fn ResponseHead::equal(Self, Self) -> Bool
+pub fn ResponseHead::not_equal(Self, Self) -> Bool
+pub fn ResponseHead::to_repr(Self) -> @debug.Repr
 
 // Type aliases
 pub type Middleware = async (Request, async (Request) -> Response raise HttpError) -> Response raise HttpError

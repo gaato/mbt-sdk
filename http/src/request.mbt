@@ -14,7 +14,15 @@ pub(all) struct Request {
   url : String
   headers : Headers
   body : Bytes
-}
+} derive(Eq, Debug)
+
+///|
+/// Compares all request fields.
+pub extend Request with Eq::{equal, not_equal}
+
+///|
+/// Debug representation of a request.
+pub extend Request with @debug.Debug::{to_repr}
 
 ///|
 /// Creates a request with the supplied method, empty headers and an empty body.
