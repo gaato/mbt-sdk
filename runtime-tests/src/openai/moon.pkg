@@ -1,0 +1,9 @@
+import {
+  "gaato/http",
+  "gaato/http/mock",
+  "gaato/sdk-runtime" @runtime,
+  "gaato/openai",
+  "moonbitlang/async",
+} for "test"
+
+supported_targets = "js + native"

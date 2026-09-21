@@ -2,5 +2,6 @@ members = [
   "http",
   "http-async",
   "sdk-runtime",
+  "openai",
   "runtime-tests",
 ]

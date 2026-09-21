@@ -2,3 +2,7 @@ _build/
 target/
 .mooncakes/
 .moonagent/
+
+# overlay applier cache
+__pycache__/
+openai/spec/*.patched.json

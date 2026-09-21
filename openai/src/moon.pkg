@@ -1,0 +1,8 @@
+import {
+  "gaato/http",
+  "gaato/http/clock",
+  "gaato/http/sse",
+  "gaato/sdk-runtime" @runtime,
+  "gaato/sdk-runtime/json" @sdkjson,
+  "moonbitlang/core/json",
+}
