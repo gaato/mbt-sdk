@@ -6,3 +6,4 @@ target/
 # overlay applier cache
 __pycache__/
 openai/spec/*.patched.json
+.venv/
