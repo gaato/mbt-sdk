@@ -1,0 +1,25 @@
+overlay: 1.0.0
+info:
+  title: MoonBit generation slice
+  version: 0.1.0
+actions:
+  - target: "$['paths']['/models']['get']"
+    description: Include the listModels operation in the M4 MoonBit generator slice.
+    update:
+      x-moonbit-include: true
+  - target: "$['paths']['/models/{model}']['get']"
+    description: Include the retrieveModel operation in the M4 MoonBit generator slice.
+    update:
+      x-moonbit-include: true
+  - target: "$['paths']['/embeddings']['post']"
+    description: Include the createEmbedding operation in the M4 MoonBit generator slice.
+    update:
+      x-moonbit-include: true
+  - target: "$['paths']['/responses']['post']"
+    description: Include the createResponse operation in the M4 MoonBit generator slice.
+    update:
+      x-moonbit-include: true
+  - target: "$['components']['schemas']['Model']['properties']['created']"
+    description: Preserve Model.created beyond the MoonBit Int range.
+    update:
+      x-moonbit-type: Int64

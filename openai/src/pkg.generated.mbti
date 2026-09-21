@@ -1,0 +1,143 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "gaato/openai"
+
+import {
+  "gaato/http",
+  "gaato/http/clock",
+  "gaato/sdk-runtime",
+  "moonbitlang/core/debug",
+}
+
+// Values
+pub fn api_error(@sdk-runtime.SdkError) -> ApiErrorBody?
+
+// Errors
+
+// Types and methods
+pub(all) struct ApiErrorBody {
+  message : String
+  type_ : String?
+  param : String?
+  code : String?
+} derive(Eq, @debug.Debug)
+pub fn ApiErrorBody::equal(Self, Self) -> Bool
+pub fn ApiErrorBody::not_equal(Self, Self) -> Bool
+pub fn ApiErrorBody::to_repr(Self) -> @debug.Repr
+
+pub(all) struct Embedding {
+  index : Int
+  embedding : Array[Double]
+} derive(Eq, @debug.Debug)
+pub fn Embedding::equal(Self, Self) -> Bool
+pub fn Embedding::not_equal(Self, Self) -> Bool
+pub fn Embedding::to_repr(Self) -> @debug.Repr
+
+pub(all) struct EmbeddingRequest {
+  model : String
+  input : Array[String]
+  dimensions : Int?
+  user : String?
+} derive(Eq, @debug.Debug)
+pub fn EmbeddingRequest::equal(Self, Self) -> Bool
+pub fn EmbeddingRequest::new(model~ : String, input~ : Array[String], dimensions? : Int, user? : String) -> Self
+pub fn EmbeddingRequest::not_equal(Self, Self) -> Bool
+pub fn EmbeddingRequest::to_repr(Self) -> @debug.Repr
+
+pub(all) struct EmbeddingResponse {
+  data : Array[Embedding]
+  model : String
+  prompt_tokens : Int
+  total_tokens : Int
+} derive(Eq, @debug.Debug)
+pub fn EmbeddingResponse::equal(Self, Self) -> Bool
+pub fn EmbeddingResponse::not_equal(Self, Self) -> Bool
+pub fn EmbeddingResponse::to_repr(Self) -> @debug.Repr
+
+pub(all) struct Model {
+  id : String
+  created : Int64?
+  owned_by : String?
+} derive(Eq, @debug.Debug)
+pub fn Model::equal(Self, Self) -> Bool
+pub fn Model::not_equal(Self, Self) -> Bool
+pub fn Model::to_repr(Self) -> @debug.Repr
+
+pub struct OpenAI {
+  // private fields
+}
+pub async fn OpenAI::create_embeddings(Self, EmbeddingRequest) -> EmbeddingResponse raise @sdk-runtime.SdkError
+pub async fn OpenAI::create_response(Self, ResponseRequest) -> Response raise @sdk-runtime.SdkError
+pub fn OpenAI::from_client(@sdk-runtime.Client) -> Self
+pub async fn OpenAI::list_models(Self) -> Array[Model] raise @sdk-runtime.SdkError
+pub fn OpenAI::new(api_key~ : String, &@http.Transport, &@clock.Clock, base_url? : String, organization? : String, project? : String, retry? : @sdk-runtime.RetryPolicy) -> Self
+pub async fn OpenAI::retrieve_model(Self, String) -> Model raise @sdk-runtime.SdkError
+pub async fn[E : Error] OpenAI::stream_response(Self, ResponseRequest, async (ResponseEvent) -> Unit raise E) -> Unit
+pub fn OpenAI::to_repr(Self) -> @debug.Repr
+pub impl @debug.Debug for OpenAI
+
+pub(all) struct Response {
+  id : String
+  status : ResponseStatus
+  model : String
+  output_text : String
+  usage : Usage?
+  raw : Json
+} derive(Eq, @debug.Debug)
+pub fn Response::equal(Self, Self) -> Bool
+pub fn Response::not_equal(Self, Self) -> Bool
+pub fn Response::to_repr(Self) -> @debug.Repr
+
+pub(all) enum ResponseEvent {
+  Created(Response)
+  InProgress(Response)
+  OutputTextDelta(String)
+  OutputTextDone(String)
+  Completed(Response)
+  Failed(Response)
+  Incomplete(Response)
+  Error(ApiErrorBody)
+  Other(String, Json)
+} derive(Eq, @debug.Debug)
+pub fn ResponseEvent::equal(Self, Self) -> Bool
+pub fn ResponseEvent::not_equal(Self, Self) -> Bool
+pub fn ResponseEvent::to_repr(Self) -> @debug.Repr
+
+pub(all) struct ResponseRequest {
+  model : String
+  input : String
+  instructions : String?
+  max_output_tokens : Int?
+  temperature : Double?
+  previous_response_id : String?
+  extra : Map[String, Json]
+} derive(Eq, @debug.Debug)
+pub fn ResponseRequest::equal(Self, Self) -> Bool
+pub fn ResponseRequest::new(model~ : String, input~ : String, instructions? : String, max_output_tokens? : Int, temperature? : Double, previous_response_id? : String, extra? : Map[String, Json]) -> Self
+pub fn ResponseRequest::not_equal(Self, Self) -> Bool
+pub fn ResponseRequest::to_repr(Self) -> @debug.Repr
+
+pub(all) enum ResponseStatus {
+  Completed
+  Failed
+  InProgress
+  Incomplete
+  Cancelled
+  Queued
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+pub fn ResponseStatus::equal(Self, Self) -> Bool
+pub fn ResponseStatus::not_equal(Self, Self) -> Bool
+pub fn ResponseStatus::to_repr(Self) -> @debug.Repr
+
+pub(all) struct Usage {
+  input_tokens : Int
+  output_tokens : Int
+  total_tokens : Int
+} derive(Eq, @debug.Debug)
+pub fn Usage::equal(Self, Self) -> Bool
+pub fn Usage::not_equal(Self, Self) -> Bool
+pub fn Usage::to_repr(Self) -> @debug.Repr
+
+// Type aliases
+
+// Traits

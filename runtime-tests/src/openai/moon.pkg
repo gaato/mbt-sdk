@@ -2,8 +2,11 @@ import {
   "gaato/http",
   "gaato/http/mock",
   "gaato/sdk-runtime" @runtime,
-  "gaato/openai",
+  "gaato/openai" @openai_sdk,
   "moonbitlang/async",
+  "moonbitlang/core/debug",
+  "moonbitlang/core/encoding/utf8",
+  "moonbitlang/core/json",
 } for "test"
 
 supported_targets = "js + native"

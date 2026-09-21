@@ -36,10 +36,17 @@ moon -C sdk-runtime check --deny-warn --target js
 moon -C sdk-runtime test --target wasm-gc
 moon -C sdk-runtime test --target native
 moon -C sdk-runtime test --target js
+moon -C openai check --deny-warn --target wasm-gc
+moon -C openai check --deny-warn --target native
+moon -C openai check --deny-warn --target js
+moon -C openai test --target wasm-gc
+moon -C openai test --target native
+moon -C openai test --target js
 moon -C runtime-tests check --deny-warn --target native
 moon -C runtime-tests check --deny-warn --target js
 moon -C runtime-tests test --target js
 moon -C runtime-tests test --target native     # runs loopback socket tests of other members too; needs socket permission
+uv run tools/apply_overlay.py openai/spec/openai.yaml openai/spec/openai.patched.json openai/overlays/*.yaml
 moon fmt --check
 moon info
 ```

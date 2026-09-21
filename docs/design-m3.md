@@ -78,3 +78,20 @@ pub async fn[E : Error] OpenAI::stream_response(Self, ResponseRequest, async (Re
 ## テスト(`runtime-tests/src/openai/`、native と js)
 
 `FakeTransport` の台本で: 各操作の要求(メソッド、URL、ヘッダ、JSON 本文の完全一致)、spec 内の例(`x-oaiMeta` の response 例)を元にした応答のデコード、未知フィールド・未知の status・未知のイベント型が落ちないこと、必須フィールド欠落が `Decode` になること、401 / 429 の本文から `api_error` が取れること、429 → 成功の再試行(FakeClock で sleep を確認)、ストリームのイベント列(チャンク境界を任意に割る)、`[DONE]`、コールバックのエラーで close されること、`extra` の衝突、Debug にキーが出ないこと。
+
+## M3 の判断
+
+- `OpenAI` は `@runtime.Client` だけを保持し、手書きの `Debug` は runtime の内部を一切たどらず `OpenAI(<credentials redacted>)` だけを返す。API key は `@runtime.Auth::Bearer` に渡し、organization / project は default headers として設定する。
+- `EmbeddingRequest::new` は `input`、`ResponseRequest::new` は `extra` を copy する。constructor 呼び出し後の caller 側の変更が、後の送信内容を変えないようにした。
+- `retrieve_model` の path parameter は spec の model ID をそのまま `/models/` の後ろへ置く。今回の spec の ID は colon を含み得るが slash を含まず、契約には percent-encoding の規則や公開 helper がないため、追加の変換はしない。
+- core JSON の `Int64` decoder は JSON string を期待し、JSON number を受理しなかった。このため `Model.created` は `Json::Number` を直接読み、通常の符号付き十進整数表記は文字列表現で Int64 全域を厳密に範囲検査し、それ以外の数値表現は Double 値の整数性と範囲を検査する。`2147483648` を回帰テストにした。
+- 必須として decode するのは、公開値を構成するために必要な field と spec 上の配列要素の discriminator である。`Model.created` / `owned_by` は vendored spec では required だが、M3 契約の型が optional なので契約を優先する。`Response` は `id` / `status` / `model` / `output` を必須、`usage` を missing / null のどちらでも `None` とした。
+- vendored spec の `Response.status` enum は `completed` / `failed` / `in_progress` / `incomplete` だけだが、M3 契約に従って `cancelled` / `queued` も既知値とし、それ以外は `Unknown(raw)` に保持する。
+- `Response.output_text` は top-level の SDK convenience field を信用せず、契約どおり `output` の message 順、各 message の content 順で `output_text.text` を連結する。対応する part が無いときは空文字にする。
+- HTTP error の `api_error` は `Status` / `RateLimited` だけを対象にし、標準 envelope または field 型が不正なら `None` を返す。stream の `error` event は top-level の `type` が event discriminator なので `ApiErrorBody.type_ = None` とする。
+- streaming は `@sse.each_event` に close の所有権を渡す。`[DONE]` は private な終了 error で callback から抜け、normal EOF / `[DONE]` / callback error / JSON decode error の全経路で `each_event` の `defer` が stream を close する。SSE の `event:` は分岐に使わず JSON の `type` だけを使う。
+- `ResponseRequest.extra` は既知 key との衝突を body 構築の最初に全件検査する。buffered / streaming のどちらでも transport を呼ぶ前に `SdkError::Config` とし、衝突が無い extra は既知 field の後ろへ insertion order のまま追加する。
+- operation bucket は list / retrieve が `models`、embedding が `embeddings`、buffered / streaming response が `responses`。テスト用 limiter で acquire / observe の両方を固定した。
+- response fixture は vendored spec の `x-oaiMeta` examples を縮小して使い、embedding vector や response output は構造を保ったまま最小件数にした。未知 field、未知 event、未知 status も別途混ぜた。
+- decode / body builder / event decoder は public API を増やさない private な同期関数にしたため、その直接テストだけは `decode_wbtest.mbt` に置く。公開 API の要求・retry・streaming は `runtime-tests/src/openai/openai_test.mbt` から black-box で検証する。
+- 今回の slice では言語非依存の上流 spec error は見つからなかったため `overlays/fix.yaml` は作らない。MoonBit 固有 overlay は 4 operation の include と `Model.created` の Int64 注釈だけにした。
