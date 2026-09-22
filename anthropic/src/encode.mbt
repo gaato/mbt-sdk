@@ -39,14 +39,16 @@ pub fn MessageRequest::to_params(
     system?=self.system.map(text => @gen.CreateMessageParamsSystem::Text(text)),
     temperature?=self.temperature,
     stop_sequences?=self.stop_sequences,
-    tools?=self.tools.map(tools => tools.map(tool => {
-      @gen.CreateMessageParamsToolsItem::Tool(generated_tool(tool))
-    })),
+    tools?=self.tools.map(tools => {
+      tools.map(tool => {
+        @gen.CreateMessageParamsToolsItem::Tool(generated_tool(tool))
+      })
+    }),
     tool_choice?=self.tool_choice,
     thinking?=self.thinking,
     output_config?=self.output_config,
     metadata?=self.metadata,
-    stream?=(if stream { Some(true) } else { None }),
+    stream?=if stream { Some(true) } else { None },
   )
 }
 
@@ -61,9 +63,11 @@ pub fn MessageRequest::to_count_tokens_params(
     system?=self.system.map(text => {
       @gen.CountMessageTokensParamsSystem::Text(text)
     }),
-    tools?=self.tools.map(tools => tools.map(tool => {
-      @gen.CountMessageTokensParamsToolsItem::Tool(generated_tool(tool))
-    })),
+    tools?=self.tools.map(tools => {
+      tools.map(tool => {
+        @gen.CountMessageTokensParamsToolsItem::Tool(generated_tool(tool))
+      })
+    }),
     tool_choice?=self.tool_choice,
     thinking?=self.thinking,
     output_config?=self.output_config,

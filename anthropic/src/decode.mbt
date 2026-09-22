@@ -53,23 +53,23 @@ fn decode_message_response(
 fn api_error_from_generated(error : @gen.ErrorResponseError) -> ApiErrorBody {
   match error {
     @gen.ErrorResponseError::ApiError(body) =>
-      { type_: body.type_, message: body.message }
+      { type_: body.type_, message: body.message, }
     @gen.ErrorResponseError::AuthenticationError(body) =>
-      { type_: body.type_, message: body.message }
+      { type_: body.type_, message: body.message, }
     @gen.ErrorResponseError::BillingError(body) =>
-      { type_: body.type_, message: body.message }
+      { type_: body.type_, message: body.message, }
     @gen.ErrorResponseError::InvalidRequestError(body) =>
-      { type_: body.type_, message: body.message }
+      { type_: body.type_, message: body.message, }
     @gen.ErrorResponseError::NotFoundError(body) =>
-      { type_: body.type_, message: body.message }
+      { type_: body.type_, message: body.message, }
     @gen.ErrorResponseError::OverloadedError(body) =>
-      { type_: body.type_, message: body.message }
+      { type_: body.type_, message: body.message, }
     @gen.ErrorResponseError::PermissionError(body) =>
-      { type_: body.type_, message: body.message }
+      { type_: body.type_, message: body.message, }
     @gen.ErrorResponseError::RateLimitError(body) =>
-      { type_: body.type_, message: body.message }
+      { type_: body.type_, message: body.message, }
     @gen.ErrorResponseError::TimeoutError(body) =>
-      { type_: body.type_, message: body.message }
+      { type_: body.type_, message: body.message, }
     @gen.ErrorResponseError::Unknown(kind, value) => {
       let message = match value {
         Object(fields) =>
@@ -79,7 +79,7 @@ fn api_error_from_generated(error : @gen.ErrorResponseError) -> ApiErrorBody {
           }
         _ => ""
       }
-      { type_: kind, message }
+      { type_: kind, message, }
     }
   }
 }

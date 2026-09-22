@@ -155,7 +155,8 @@ async test "Anthropic tool use round trip and stream accumulator use FakeTranspo
     ])
     // The response replays as the next assistant turn with its typed tool_use block.
     let replay = @anthropic_sdk.Message::from_response(response)
-    guard replay.content is @anthropic_sdk.Blocks([@anthropic_gen.ToolUse(block)]) else {
+    guard replay.content
+      is @anthropic_sdk.Blocks([@anthropic_gen.ToolUse(block)]) else {
       fail("expected one typed tool_use block")
     }
     assert_eq(block.id, "toolu_1")
@@ -212,9 +213,6 @@ priv struct RecordingLimiter {
 }
 
 ///|
-extend RecordingLimiter with @runtime.RateLimiter::{acquire, observe}
-
-///|
 impl @runtime.RateLimiter for RecordingLimiter with fn acquire(self, bucket) {
   self.acquired.push(bucket)
 }
@@ -245,14 +243,14 @@ async test "from_client uses Bearer configuration, version, and per-operation bu
       "GET",
       "/v1/models?limit=2",
       json_response(
-        "{\"data\":[{\"type\":\"model\",\"id\":\"claude-opus-5\",\"display_name\":\"Claude Opus 5\",\"created_at\":\"2026-04-01T00:00:00Z\"},{\"type\":\"model\",\"id\":\"claude-haiku-4-5\",\"display_name\":\"Claude Haiku 4.5\",\"created_at\":\"2025-10-01T00:00:00Z\",\"max_tokens\":64000}],\"has_more\":true,\"first_id\":\"claude-opus-5\",\"last_id\":\"claude-haiku-4-5\"}",
+        "{\"data\":[{\"type\":\"model\",\"id\":\"claude-opus-5\",\"display_name\":\"Claude Opus 5\",\"created_at\":\"2026-04-01T00:00:00Z\",\"capabilities\":null,\"max_input_tokens\":null,\"max_tokens\":null},{\"type\":\"model\",\"id\":\"claude-haiku-4-5\",\"display_name\":\"Claude Haiku 4.5\",\"created_at\":\"2025-10-01T00:00:00Z\",\"capabilities\":null,\"max_input_tokens\":null,\"max_tokens\":64000}],\"has_more\":true,\"first_id\":\"claude-opus-5\",\"last_id\":\"claude-haiku-4-5\"}",
       ),
     )
     transport.expect(
       "GET",
       "/v1/models/claude-haiku-4-5",
       json_response(
-        "{\"type\":\"model\",\"id\":\"claude-haiku-4-5\",\"display_name\":\"Claude Haiku 4.5\",\"created_at\":\"2025-10-01T00:00:00Z\"}",
+        "{\"type\":\"model\",\"id\":\"claude-haiku-4-5\",\"display_name\":\"Claude Haiku 4.5\",\"created_at\":\"2025-10-01T00:00:00Z\",\"capabilities\":null,\"max_input_tokens\":null,\"max_tokens\":null}",
       ),
     )
     let limiter = RecordingLimiter::{ acquired: [], observed: [], }
@@ -288,7 +286,10 @@ async test "from_client uses Bearer configuration, version, and per-operation bu
     assert_eq(sent[0].headers.get("anthropic-version"), Some("2023-06-01"))
     assert_eq(sent[1].url, "https://openrouter.ai/api/v1/models?limit=2")
     assert_eq(sent[1].headers.get("anthropic-version"), Some("2023-06-01"))
-    assert_eq(sent[2].url, "https://openrouter.ai/api/v1/models/claude-haiku-4-5")
+    assert_eq(
+      sent[2].url,
+      "https://openrouter.ai/api/v1/models/claude-haiku-4-5",
+    )
     assert_eq(limiter.acquired, ["messages", "models", "models"])
     assert_eq(limiter.observed, ["messages", "models", "models"])
     transport.assert_complete()
@@ -300,7 +301,11 @@ async test "HTTP errors expose API bodies and 429 retries before success" {
   bounded(() => {
     let failures = @mock.FakeTransport::new()
     let error_body = "{\"type\":\"error\",\"error\":{\"type\":\"authentication_error\",\"message\":\"bad key\"},\"request_id\":\"req_1\"}"
-    failures.expect("POST", "/v1/messages", json_response(error_body, status=401))
+    failures.expect(
+      "POST",
+      "/v1/messages",
+      json_response(error_body, status=401),
+    )
     let no_retry = @anthropic_sdk.Anthropic::new(
       api_key="key",
       failures,
@@ -435,7 +440,10 @@ async test "stream decodes every event across chunks and reads past message_stop
     )
     assert_eq(events[2], @anthropic_sdk.TextDelta(index=0, text="Hi"))
     assert_eq(events[3], @anthropic_sdk.ThinkingDelta(index=1, thinking="idea"))
-    assert_eq(events[4], @anthropic_sdk.SignatureDelta(index=1, signature="sig"))
+    assert_eq(
+      events[4],
+      @anthropic_sdk.SignatureDelta(index=1, signature="sig"),
+    )
     assert_eq(
       events[5],
       @anthropic_sdk.InputJsonDelta(index=2, partial_json="{}"),
@@ -641,8 +649,11 @@ async test "count_tokens and the generated passthrough share the transport" {
     let events : Array[@anthropic_gen.MessageStreamEvent] = []
     client.stream_message_params(params, event => events.push(event))
     assert_eq(events.length(), 3)
-    assert_true(events[0] is @anthropic_gen.MessageStreamEvent::Unknown("ping", _))
-    guard events[1] is @anthropic_gen.MessageStreamEvent::ContentBlockDelta(delta) else {
+    assert_true(
+      events[0] is @anthropic_gen.MessageStreamEvent::Unknown("ping", _),
+    )
+    guard events[1]
+      is @anthropic_gen.MessageStreamEvent::ContentBlockDelta(delta) else {
       fail("expected a generated delta event")
     }
     assert_eq(delta.index, 0)

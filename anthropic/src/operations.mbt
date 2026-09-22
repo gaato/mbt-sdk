@@ -31,7 +31,7 @@ pub async fn Anthropic::create_message_params(
   self : Anthropic,
   params : CreateMessageParams,
 ) -> @gen.Message raise @runtime.SdkError {
-  let params = { ..params, stream: None }
+  let params = { ..params, stream: None, }
   let response = self.client.send(
     @gen.messages_post_request(params, anthropic_version=self.version),
     bucket="messages",
@@ -71,11 +71,7 @@ async fn[E : Error] Anthropic::each_stream_data(
   // Anthropic itself ends with message_stop and EOF, but OpenAI-compatible
   // gateways such as OpenRouter add an OpenAI-style `data: [DONE]` sentinel.
   // It carries no event, so it is skipped rather than decoded.
-  @sse.each_event(stream, event => {
-    if event.data != "[DONE]" {
-      f(event.data)
-    }
-  })
+  @sse.each_event(stream, event => if event.data != "[DONE]" { f(event.data) })
 }
 
 ///|
@@ -104,7 +100,7 @@ pub async fn[E : Error] Anthropic::stream_message_params(
   params : CreateMessageParams,
   f : async (MessageStreamEvent) -> Unit raise E,
 ) -> Unit {
-  let params = { ..params, stream: Some(true) }
+  let params = { ..params, stream: Some(true), }
   self.each_stream_data(
     @gen.messages_post_request(params, anthropic_version=self.version),
     data => f(decode_stream_event(data)),

@@ -45,7 +45,11 @@ test "request body is the generated encoding plus extra, and extra is validated"
         "content": [
           {
             "type": "image",
-            "source": { "type": "base64", "media_type": "image/png", "data": "abc" },
+            "source": {
+              "type": "base64",
+              "media_type": "image/png",
+              "data": "abc",
+            },
           },
           { "type": "future_block", "value": 1 },
         ],
@@ -83,12 +87,9 @@ test "request body is the generated encoding plus extra, and extra is validated"
     }
   }
   // Extra keys the schema models are validated against it.
-  let invalid = MessageRequest::new(
-    model="m",
-    max_tokens=1,
-    messages=[],
-    extra={ "top_p": "high" },
-  )
+  let invalid = MessageRequest::new(model="m", max_tokens=1, messages=[], extra={
+    "top_p": "high",
+  })
   try message_body(invalid, false) catch {
     @runtime.Config(message) => assert_true(message.contains("top_p"))
     _ => fail("expected Config")
@@ -118,7 +119,11 @@ test "typed request fields encode through the generated vocabulary" {
           ),
         ),
       ]),
-      Message::tool_result(tool_use_id="toolu_1", content="sunny", is_error=false),
+      Message::tool_result(
+        tool_use_id="toolu_1",
+        content="sunny",
+        is_error=false,
+      ),
     ],
     tools=[
       ToolDef::new(
@@ -174,13 +179,38 @@ test "typed request fields encode through the generated vocabulary" {
   guard counted is Object(fields) else { fail("body must be an object") }
   assert_eq(fields.get("max_tokens"), None)
   assert_eq(fields.get("model"), Some("claude".to_json()))
-  assert_eq(fields.get("tool_choice"), Some({ "type": "tool", "name": "get_weather" }))
+  assert_eq(
+    fields.get("tool_choice"),
+    Some({ "type": "tool", "name": "get_weather" }),
+  )
   assert_eq(tool_choice_auto().to_json(), { "type": "auto" })
   assert_eq(tool_choice_any(disable_parallel_tool_use=true).to_json(), {
     "type": "any",
     "disable_parallel_tool_use": true,
   })
   assert_eq(tool_choice_none().to_json(), { "type": "none" })
+}
+
+///|
+test "generated model metadata distinguishes required null from missing" {
+  let complete : Json = {
+    "type": "model",
+    "id": "test-model",
+    "created_at": "2026-09-23T00:00:00Z",
+    "display_name": "Test model",
+    "capabilities": Json::null(),
+    "max_input_tokens": Json::null(),
+    "max_tokens": Json::null(),
+  }
+  let model : @gen.ModelInfo = @json.from_json(complete)
+  assert_eq(model.max_tokens, None)
+  guard complete is Object(fields) else { fail("expected object") }
+  fields.remove("max_tokens")
+  try (@json.from_json(complete) : @gen.ModelInfo) catch {
+    @json.JsonDecodeError(_) => ()
+  } noraise {
+    _ => fail("missing required nullable field must fail")
+  }
 }
 
 ///|
@@ -314,7 +344,9 @@ test "event decoder trusts data type and retains unknown events and deltas" {
       "{\"type\":\"message_delta\",\"delta\":{\"stop_reason\":\"end_turn\"},\"usage\":{\"output_tokens\":7,\"cost\":0.1}}",
     ),
   )
-  guard delta is MessageDelta(delta~, usage~) else { fail("expected message_delta") }
+  guard delta is MessageDelta(delta~, usage~) else {
+    fail("expected message_delta")
+  }
   assert_eq(delta.stop_reason, Some(EndTurn))
   assert_eq(usage.output_tokens, 7)
   assert_eq(

@@ -154,3 +154,6 @@ OpenAI 30 件の内訳は M4e 時点で (a) 13、(b) 9、(c) 8。M4f の現行�
 | OpenAI all ops、fix.yaml + moonbit.yaml 適用後 | 0 |
 
 直したもの: Realtime*Session* の `modalities` に欠けていた `type: array`(4 箇所、JSONPath のフィルタで一括)、Transcript*Event の `logprobs.items.bytes` に欠けていた `items: {type: integer}`(2 箇所、`ChatCompletionTokenLogprob.bytes` と説明文が根拠)、certificate path template の `certificate_id` と parameter 名 `cert_id` の不一致。最後の1件は census 数には現れず、全操作生成物の `check --deny-warn` で unused parameter として見つかった。`Tool` の discriminator は wire 意図が判然としないため言語非依存 fix ではなく canonical tag を選ぶ MoonBit overlay に置く。上流が直せば apply_overlay.py が no-op を検出して落ちるので、そのとき action を消す。
+# Anthropic first-party slice (2026-09-23)
+
+The vendored `anthropic/spec/anthropic.json` contains 244 operations. With the Anthropic overlay, the shipped slice (`messages_post`, `messages_count_tokens_post`, `models_list`, `models_get`) has zero diagnostics. The full-spec census still has 13 diagnostics: six reserved authorization headers, four non-object allOf members, two fallback-constructor collisions, and one untagged object union. The gate checks the four shipped operations; this is not full Anthropic API coverage.

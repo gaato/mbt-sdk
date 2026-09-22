@@ -41,7 +41,7 @@ class Field:
     presence: Presence
     description: str = ""
     constant: Any | None = None
-    # A required field with a non-null `default`: absent on decode means this value.
+    # An explicitly annotated decode fallback; schema defaults alone do not relax required.
     default: Any | None = None
 
 
@@ -1328,7 +1328,7 @@ class IRBuilder:
                     "make the field nullable/optional or place the recursive value behind an array",
                 )
             default = None
-            if presence == Presence.REQUIRED and field_schema.get("default") is not None and field_type.kind != "map" and field_type.moon_type() != "Int64":
+            if field_schema.get("x-moonbit-default-on-missing") is True and presence == Presence.REQUIRED and field_schema.get("default") is not None and field_type.kind != "map" and field_type.moon_type() != "Int64":
                 default = field_schema["default"]
             fields.append(Field(json_name, snake_case(json_name), field_type, presence, field_schema.get("description", ""), None, default))
         self._add_declaration(Struct(name, tuple(fields), schema.get("description", "")), pointer)

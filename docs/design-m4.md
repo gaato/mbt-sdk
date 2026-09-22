@@ -226,6 +226,8 @@ M4d の差し替えで見えた生成型の使いにくさと、census の (c) �
 
 ### 互換 API で required field が欠ける場合の overlay 手順
 
+Anthropic の旧互換 tool-use 応答で `caller` が欠ける場合は、対象フィールドの overlay に `x-moonbit-default-on-missing: true` を付け、上流の非 null `default` を使う。通常の schema `default` だけでは required を緩めない。現時点では非 nullable の required フィールドに限定し、map と Int64 は対象外。nullable メタデータの欠落は引き続き対象 schema の `required` から個別に除外する。
+
 生成 decoder は required field の欠落を `required だが欠落: <JSON path>` として報告する。実際の互換 API で欠落を確認した場合も generator は自動で optional にしない。まず応答 fixture で欠落 path を固定し、対象 spec の `required` 配列からその field だけを overlay の `remove: true` で外し、理由に provider と観測した応答を記す。`openai/overlays/moonbit.yaml` の `Model.required` から `owned_by` を外す action が実例である。変更後は生成型が `T?` になったことと、正規 provider の応答も引き続き decode できることをテストする。
 
 ## M4e の判断

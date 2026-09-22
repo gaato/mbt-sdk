@@ -3,6 +3,25 @@ info:
   title: MoonBit generation slice for the Anthropic API
   version: 0.1.0
 actions:
+  - target: "$['components']['schemas']['ResponseToolUseBlock','ResponseServerToolUseBlock']['properties']['caller']"
+    description: Older compatible tool-use fixtures omit caller; explicitly use the upstream direct-caller default for these two blocks.
+    update:
+      x-moonbit-default-on-missing: true
+  - target: "$['components']['schemas']['Message']['required'][?@ == 'stop_sequence' || @ == 'stop_details' || @ == 'container']"
+    description: Preserve the compatible-provider response fixtures in helpers_wbtest; these nullable metadata fields are absent there.
+    remove: true
+  - target: "$['components']['schemas']['MessageDelta']['required'][?@ == 'container' || @ == 'stop_details' || @ == 'stop_sequence']"
+    description: Compatible streaming fixtures carry stop_reason without the additional nullable metadata.
+    remove: true
+  - target: "$['components']['schemas']['MessageDeltaUsage']['required'][?@ != 'output_tokens']"
+    description: Compatible streaming fixtures carry only output_tokens; retain other counters as optional nullable fields.
+    remove: true
+  - target: "$['components']['schemas']['Usage']['required'][?@ != 'input_tokens' && @ != 'output_tokens']"
+    description: Compatible response fixtures carry only the two core counters; additional nullable usage metadata is optional.
+    remove: true
+  - target: "$['components']['schemas']['ResponseTextBlock']['required'][?@ == 'citations']"
+    description: The compatible text-block fixtures omit nullable citations.
+    remove: true
   - target: "$['paths']['/v1/messages']['post']"
     description: Include Messages creation, the core of the SDK.
     update:

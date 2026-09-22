@@ -538,6 +538,20 @@ fn[T] nullable_presence(value : T?) -> @sdkjson.Presence[T] {
 }
 
 ///|
+fn[T : @json.FromJson] decode_nullable_field(
+  obj : Map[String, Json],
+  key : String,
+  path : @json.JsonPath,
+) -> T? raise @json.JsonDecodeError {
+  let raw : Json = required_field(obj, key, path)
+  match raw {
+    Null => None
+    value => Some(@json.from_json(value, path=path.add_key(key)))
+  }
+}'''
+
+
+DEFAULT_HELPER = r'''///|
 /// A required field with a non-null default in the spec: absent decodes as that default.
 fn[T : @json.FromJson] decode_defaulted_field(
   obj : Map[String, Json],
@@ -548,21 +562,6 @@ fn[T : @json.FromJson] decode_defaulted_field(
   match obj.get(key) {
     Some(value) => @json.from_json(value, path=path.add_key(key))
     None => @json.from_json(default, path=path.add_key(key))
-  }
-}
-
-///|
-/// A required-but-nullable field. Null and absent both decode as None: servers
-/// that implement a spec (and compatible gateways) routinely omit a field whose
-/// only other value would be null, and the two carry the same information.
-fn[T : @json.FromJson] decode_nullable_field(
-  obj : Map[String, Json],
-  key : String,
-  path : @json.JsonPath,
-) -> T? raise @json.JsonDecodeError {
-  match obj.get(key) {
-    None | Some(Null) => None
-    Some(value) => Some(@json.from_json(value, path=path.add_key(key)))
   }
 }'''
 
@@ -973,6 +972,8 @@ def emit(ir: IR) -> dict[str, str]:
         helpers.append(PRESENCE_INT64_HELPER)
     if has_nullable:
         helpers.append(NULLABLE_HELPERS)
+    if any(isinstance(declaration, Struct) and any(field.default is not None for field in declaration.fields) for declaration in ir.declarations):
+        helpers.append(DEFAULT_HELPER)
     if has_map:
         helpers.append(MAP_HELPERS)
     if has_nullable_map:

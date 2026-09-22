@@ -139,31 +139,15 @@ fn[T] nullable_presence(value : T?) -> @sdkjson.Presence[T] {
 }
 
 ///|
-/// A required field with a non-null default in the spec: absent decodes as that default.
-fn[T : @json.FromJson] decode_defaulted_field(
-  obj : Map[String, Json],
-  key : String,
-  path : @json.JsonPath,
-  default : Json,
-) -> T raise @json.JsonDecodeError {
-  match obj.get(key) {
-    Some(value) => @json.from_json(value, path=path.add_key(key))
-    None => @json.from_json(default, path=path.add_key(key))
-  }
-}
-
-///|
-/// A required-but-nullable field. Null and absent both decode as None: servers
-/// that implement a spec (and compatible gateways) routinely omit a field whose
-/// only other value would be null, and the two carry the same information.
 fn[T : @json.FromJson] decode_nullable_field(
   obj : Map[String, Json],
   key : String,
   path : @json.JsonPath,
 ) -> T? raise @json.JsonDecodeError {
-  match obj.get(key) {
-    None | Some(Null) => None
-    Some(value) => Some(@json.from_json(value, path=path.add_key(key)))
+  let raw : Json = required_field(obj, key, path)
+  match raw {
+    Null => None
+    value => Some(@json.from_json(value, path=path.add_key(key)))
   }
 }
 
@@ -3439,7 +3423,7 @@ pub extend Click with @json.FromJson::{from_json}
 pub impl @json.FromJson for Click with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    type_: decode_defaulted_field(obj, "type", path, "click"),
+    type_: required_field(obj, "type", path),
     button: required_field(obj, "button", path),
     x: required_field(obj, "x", path),
     y: required_field(obj, "y", path),
@@ -3964,9 +3948,9 @@ pub extend CompletionUsage with @json.FromJson::{from_json}
 pub impl @json.FromJson for CompletionUsage with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    completion_tokens: decode_defaulted_field(obj, "completion_tokens", path, 0),
-    prompt_tokens: decode_defaulted_field(obj, "prompt_tokens", path, 0),
-    total_tokens: decode_defaulted_field(obj, "total_tokens", path, 0),
+    completion_tokens: required_field(obj, "completion_tokens", path),
+    prompt_tokens: required_field(obj, "prompt_tokens", path),
+    total_tokens: required_field(obj, "total_tokens", path),
     completion_tokens_details: @sdkjson.opt_field(
       obj, "completion_tokens_details", path,
     ),
@@ -4021,7 +4005,7 @@ pub extend DoubleClick with @json.FromJson::{from_json}
 pub impl @json.FromJson for DoubleClick with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    type_: decode_defaulted_field(obj, "type", path, "double_click"),
+    type_: required_field(obj, "type", path),
     x: required_field(obj, "x", path),
     y: required_field(obj, "y", path),
   }
@@ -4112,7 +4096,7 @@ pub extend Drag with @json.FromJson::{from_json}
 pub impl @json.FromJson for Drag with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    type_: decode_defaulted_field(obj, "type", path, "drag"),
+    type_: required_field(obj, "type", path),
     path: required_field(obj, "path", path),
   }
 }
@@ -4160,7 +4144,7 @@ pub extend KeyPress with @json.FromJson::{from_json}
 pub impl @json.FromJson for KeyPress with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    type_: decode_defaulted_field(obj, "type", path, "keypress"),
+    type_: required_field(obj, "type", path),
     keys: required_field(obj, "keys", path),
   }
 }
@@ -4210,7 +4194,7 @@ pub extend Move with @json.FromJson::{from_json}
 pub impl @json.FromJson for Move with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    type_: decode_defaulted_field(obj, "type", path, "move"),
+    type_: required_field(obj, "type", path),
     x: required_field(obj, "x", path),
     y: required_field(obj, "y", path),
   }
@@ -4254,7 +4238,7 @@ pub extend Screenshot with @json.FromJson::{from_json}
 ///|
 pub impl @json.FromJson for Screenshot with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
-  { type_: decode_defaulted_field(obj, "type", path, "screenshot"), }
+  { type_: required_field(obj, "type", path), }
 }
 
 ///|
@@ -4312,7 +4296,7 @@ pub extend Scroll with @json.FromJson::{from_json}
 pub impl @json.FromJson for Scroll with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    type_: decode_defaulted_field(obj, "type", path, "scroll"),
+    type_: required_field(obj, "type", path),
     x: required_field(obj, "x", path),
     y: required_field(obj, "y", path),
     scroll_x: required_field(obj, "scroll_x", path),
@@ -4363,7 +4347,7 @@ pub extend Type with @json.FromJson::{from_json}
 pub impl @json.FromJson for Type with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    type_: decode_defaulted_field(obj, "type", path, "type"),
+    type_: required_field(obj, "type", path),
     text: required_field(obj, "text", path),
   }
 }
@@ -4406,7 +4390,7 @@ pub extend Wait with @json.FromJson::{from_json}
 ///|
 pub impl @json.FromJson for Wait with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
-  { type_: decode_defaulted_field(obj, "type", path, "wait"), }
+  { type_: required_field(obj, "type", path), }
 }
 
 ///|
@@ -4703,7 +4687,7 @@ pub extend ComputerToolCall with @json.FromJson::{from_json}
 pub impl @json.FromJson for ComputerToolCall with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    type_: decode_defaulted_field(obj, "type", path, "computer_call"),
+    type_: required_field(obj, "type", path),
     id: required_field(obj, "id", path),
     call_id: required_field(obj, "call_id", path),
     action: required_field(obj, "action", path),
@@ -7539,7 +7523,7 @@ pub extend FileSearchTool with @json.FromJson::{from_json}
 pub impl @json.FromJson for FileSearchTool with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    type_: decode_defaulted_field(obj, "type", path, "file_search"),
+    type_: required_field(obj, "type", path),
     vector_store_ids: required_field(obj, "vector_store_ids", path),
     max_num_results: @sdkjson.opt_field(obj, "max_num_results", path),
     ranking_options: @sdkjson.opt_field(obj, "ranking_options", path),
@@ -7611,7 +7595,7 @@ pub extend FunctionTool with @json.FromJson::{from_json}
 pub impl @json.FromJson for FunctionTool with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    type_: decode_defaulted_field(obj, "type", path, "function"),
+    type_: required_field(obj, "type", path),
     name: required_field(obj, "name", path),
     description: @sdkjson.presence_field(obj, "description", path),
     parameters: decode_nullable_field(obj, "parameters", path),
@@ -7796,7 +7780,7 @@ pub extend WebSearchPreviewTool with @json.FromJson::{from_json}
 pub impl @json.FromJson for WebSearchPreviewTool with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    type_: decode_defaulted_field(obj, "type", path, "web_search_preview"),
+    type_: required_field(obj, "type", path),
     user_location: @sdkjson.presence_field(obj, "user_location", path),
     search_context_size: @sdkjson.opt_field(obj, "search_context_size", path),
   }
@@ -7920,7 +7904,7 @@ pub impl @json.FromJson for ComputerUsePreviewTool with fn from_json(
 ) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    type_: decode_defaulted_field(obj, "type", path, "computer_use_preview"),
+    type_: required_field(obj, "type", path),
     environment: required_field(obj, "environment", path),
     display_width: required_field(obj, "display_width", path),
     display_height: required_field(obj, "display_height", path),
@@ -8081,7 +8065,7 @@ pub extend FileCitationBody with @json.FromJson::{from_json}
 pub impl @json.FromJson for FileCitationBody with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    type_: decode_defaulted_field(obj, "type", path, "file_citation"),
+    type_: required_field(obj, "type", path),
     file_id: required_field(obj, "file_id", path),
     index: required_field(obj, "index", path),
   }
@@ -8142,7 +8126,7 @@ pub extend UrlCitationBody with @json.FromJson::{from_json}
 pub impl @json.FromJson for UrlCitationBody with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    type_: decode_defaulted_field(obj, "type", path, "url_citation"),
+    type_: required_field(obj, "type", path),
     url: required_field(obj, "url", path),
     start_index: required_field(obj, "start_index", path),
     end_index: required_field(obj, "end_index", path),
@@ -8302,7 +8286,7 @@ pub extend OutputTextContent with @json.FromJson::{from_json}
 pub impl @json.FromJson for OutputTextContent with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    type_: decode_defaulted_field(obj, "type", path, "output_text"),
+    type_: required_field(obj, "type", path),
     text: required_field(obj, "text", path),
     annotations: @sdkjson.opt_field(obj, "annotations", path),
   }
@@ -8354,7 +8338,7 @@ pub extend RefusalContent with @json.FromJson::{from_json}
 pub impl @json.FromJson for RefusalContent with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    type_: decode_defaulted_field(obj, "type", path, "refusal"),
+    type_: required_field(obj, "type", path),
     refusal: required_field(obj, "refusal", path),
   }
 }
@@ -8621,7 +8605,7 @@ pub extend InputTextContent with @json.FromJson::{from_json}
 pub impl @json.FromJson for InputTextContent with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    type_: decode_defaulted_field(obj, "type", path, "input_text"),
+    type_: required_field(obj, "type", path),
     text: required_field(obj, "text", path),
   }
 }
@@ -8740,7 +8724,7 @@ pub extend InputImageContent with @json.FromJson::{from_json}
 pub impl @json.FromJson for InputImageContent with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    type_: decode_defaulted_field(obj, "type", path, "input_image"),
+    type_: required_field(obj, "type", path),
     image_url: @sdkjson.presence_field(obj, "image_url", path),
     file_id: @sdkjson.presence_field(obj, "file_id", path),
     detail: required_field(obj, "detail", path),
@@ -8804,7 +8788,7 @@ pub extend InputFileContent with @json.FromJson::{from_json}
 pub impl @json.FromJson for InputFileContent with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    type_: decode_defaulted_field(obj, "type", path, "input_file"),
+    type_: required_field(obj, "type", path),
     file_id: @sdkjson.presence_field(obj, "file_id", path),
     filename: @sdkjson.opt_field(obj, "filename", path),
     file_data: @sdkjson.opt_field(obj, "file_data", path),
@@ -9586,7 +9570,7 @@ pub impl @json.FromJson for ComputerCallOutputItemParam with fn from_json(
   {
     id: @sdkjson.presence_field(obj, "id", path),
     call_id: required_field(obj, "call_id", path),
-    type_: decode_defaulted_field(obj, "type", path, "computer_call_output"),
+    type_: required_field(obj, "type", path),
     output: required_field(obj, "output", path),
     acknowledged_safety_checks: @sdkjson.presence_field(
       obj, "acknowledged_safety_checks", path,
@@ -9957,7 +9941,7 @@ pub impl @json.FromJson for FunctionCallOutputItemParam with fn from_json(
   {
     id: @sdkjson.presence_field(obj, "id", path),
     call_id: required_field(obj, "call_id", path),
-    type_: decode_defaulted_field(obj, "type", path, "function_call_output"),
+    type_: required_field(obj, "type", path),
     output: required_field(obj, "output", path),
     status: @sdkjson.presence_field(obj, "status", path),
   }
@@ -11527,9 +11511,7 @@ pub impl @json.FromJson for Response with fn from_json(value, path) {
     output: required_field(obj, "output", path),
     output_text: @sdkjson.presence_field(obj, "output_text", path),
     usage: @sdkjson.opt_field(obj, "usage", path),
-    parallel_tool_calls: decode_defaulted_field(
-      obj, "parallel_tool_calls", path, true,
-    ),
+    parallel_tool_calls: required_field(obj, "parallel_tool_calls", path),
   }
 }
 

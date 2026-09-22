@@ -1,6 +1,6 @@
 name: Spec watch
 
-# Fetches the upstream OpenAI spec daily. When it changed: re-vendor, apply the
+# Fetches the upstream OpenAI and Anthropic specs daily. When changed: re-vendor, apply the
 # overlays, regenerate, run the gates, and open a PR. Overlay actions that no
 # longer match (zero-match) or no longer change anything (no-op: upstream fixed
 # it) fail the overlay step; their messages go into the PR body so a human can
@@ -16,11 +16,24 @@ permissions:
   pull-requests: write
 
 env:
-  SPEC_URL: https://raw.githubusercontent.com/openai/openai-openapi/manual_spec/openapi.yaml
   MOONBIT_IMAGE: ghcr.io/gaato/moonbit:0.10.14
 
 jobs:
   watch:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - provider: openai
+            spec_file: openai.yaml
+            spec_url: https://raw.githubusercontent.com/openai/openai-openapi/manual_spec/openapi.yaml
+          - provider: anthropic
+            spec_file: anthropic.json
+            spec_url: https://raw.githubusercontent.com/anthropics/anthropic-sdk-python/main/scripts/mock-spec.json.gz
+    env:
+      PROVIDER: ${{ matrix.provider }}
+      SPEC_FILE: ${{ matrix.spec_file }}
+      SPEC_URL: ${{ matrix.spec_url }}
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     steps:
@@ -31,9 +44,15 @@ jobs:
         id: fetch
         run: |
           curl --proto '=https' --tlsv1.2 --fail --silent --show-error --location \
-            "$SPEC_URL" --output "$RUNNER_TEMP/openai.yaml"
-          new="$(sha256sum "$RUNNER_TEMP/openai.yaml" | cut -d' ' -f1)"
-          old="$(sha256sum openai/spec/openai.yaml | cut -d' ' -f1)"
+            "$SPEC_URL" --output "$RUNNER_TEMP/download"
+          if [ "$PROVIDER" = anthropic ]; then
+            gzip -dc "$RUNNER_TEMP/download" > "$RUNNER_TEMP/$SPEC_FILE"
+            echo "gzip_sha=$(sha256sum "$RUNNER_TEMP/download" | cut -d' ' -f1)" >> "$GITHUB_OUTPUT"
+          else
+            cp "$RUNNER_TEMP/download" "$RUNNER_TEMP/$SPEC_FILE"
+          fi
+          new="$(sha256sum "$RUNNER_TEMP/$SPEC_FILE" | cut -d' ' -f1)"
+          old="$(sha256sum "$PROVIDER/spec/$SPEC_FILE" | cut -d' ' -f1)"
           echo "new=$new" >> "$GITHUB_OUTPUT"
           if [ "$new" = "$old" ]; then echo "changed=false" >> "$GITHUB_OUTPUT"; else echo "changed=true" >> "$GITHUB_OUTPUT"; fi
 
@@ -45,9 +64,12 @@ jobs:
         if: steps.fetch.outputs.changed == 'true'
         id: regen
         run: |
-          cp "$RUNNER_TEMP/openai.yaml" openai/spec/openai.yaml
+          cp "$RUNNER_TEMP/$SPEC_FILE" "$PROVIDER/spec/$SPEC_FILE"
           today="$(date -u +%F)"
-          sed -i -E "s/^- Fetched: .*/- Fetched: $today/; s/^- sha256: .*/- sha256: ${{ steps.fetch.outputs.new }}/" openai/spec/SOURCE.md
+          sed -i -E "s/^- Fetched: .*/- Fetched: $today/; s/^- sha256: .*/- sha256: ${{ steps.fetch.outputs.new }}/" "$PROVIDER/spec/SOURCE.md"
+          if [ "$PROVIDER" = anthropic ]; then
+            sed -i -E "s/^- sha256 \(gzip as downloaded\): .*/- sha256 (gzip as downloaded): ${{ steps.fetch.outputs.gzip_sha }}/" "$PROVIDER/spec/SOURCE.md"
+          fi
           set +e
           scripts/generate.sh > "$RUNNER_TEMP/generate.log" 2>&1
           echo "generate_status=$?" >> "$GITHUB_OUTPUT"
@@ -67,13 +89,13 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          branch="spec-watch/${{ steps.fetch.outputs.new }}"
-          branch="${branch:0:31}"
+          hash="${{ steps.fetch.outputs.new }}"
+          branch="spec-watch/$PROVIDER/${hash:0:20}"
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git switch -c "$branch"
-          git add -A openai
-          git commit -m "Update vendored OpenAI spec and regenerate"
+          git add -A "$PROVIDER"
+          git commit -m "Update vendored $PROVIDER spec and regenerate"
           git push origin "$branch"
           {
             echo "Upstream spec changed (sha256 \`${{ steps.fetch.outputs.new }}\`)."
@@ -85,4 +107,4 @@ jobs:
             echo '<details><summary>gates.log (tail)</summary>'; echo; echo '```'; tail -n 60 "$RUNNER_TEMP/gates.log"; echo '```'; echo '</details>'
           } > "$RUNNER_TEMP/body.md"
           gh pr create --base main --head "$branch" \
-            --title "Update vendored OpenAI spec" --body-file "$RUNNER_TEMP/body.md"
+            --title "Update vendored $PROVIDER spec" --body-file "$RUNNER_TEMP/body.md"

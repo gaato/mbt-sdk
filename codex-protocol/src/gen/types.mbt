@@ -154,31 +154,15 @@ fn[T] nullable_presence(value : T?) -> @sdkjson.Presence[T] {
 }
 
 ///|
-/// A required field with a non-null default in the spec: absent decodes as that default.
-fn[T : @json.FromJson] decode_defaulted_field(
-  obj : Map[String, Json],
-  key : String,
-  path : @json.JsonPath,
-  default : Json,
-) -> T raise @json.JsonDecodeError {
-  match obj.get(key) {
-    Some(value) => @json.from_json(value, path=path.add_key(key))
-    None => @json.from_json(default, path=path.add_key(key))
-  }
-}
-
-///|
-/// A required-but-nullable field. Null and absent both decode as None: servers
-/// that implement a spec (and compatible gateways) routinely omit a field whose
-/// only other value would be null, and the two carry the same information.
 fn[T : @json.FromJson] decode_nullable_field(
   obj : Map[String, Json],
   key : String,
   path : @json.JsonPath,
 ) -> T? raise @json.JsonDecodeError {
-  match obj.get(key) {
-    None | Some(Null) => None
-    Some(value) => Some(@json.from_json(value, path=path.add_key(key)))
+  let raw : Json = required_field(obj, key, path)
+  match raw {
+    Null => None
+    value => Some(@json.from_json(value, path=path.add_key(key)))
   }
 }
 

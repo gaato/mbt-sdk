@@ -5,6 +5,7 @@ import {
   "gaato/sdk-runtime" @runtime,
   "gaato/openai" @openai_sdk,
   "gaato/anthropic" @anthropic_sdk,
+  "gaato/anthropic/gen" @anthropic_gen,
   "moonbitlang/async",
   "moonbitlang/core/debug",
   "moonbitlang/core/env",

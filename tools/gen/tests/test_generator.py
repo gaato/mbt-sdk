@@ -209,14 +209,15 @@ class IRTests(unittest.TestCase):
         self.assertIn("pub extend Shape with @debug.Debug::{to_repr}", types)
         self.assertIn('"moonbitlang/core/debug"', emit(IRBuilder(doc, "example/gen").build())["moon.pkg"])
 
-    def test_required_nullable_field_decodes_when_absent(self):
+    def test_required_nullable_field_requires_presence(self):
         schema = {"type": "object", "properties": {"id": {"type": "string"}, "note": {"type": "string", "nullable": True}}, "required": ["id", "note"]}
         ir = IRBuilder(document(operation(response=schema)), "example/gen").build()
         field = next(field for field in declaration(ir, "TestOperationResponse").fields if field.moon_name == "note")
         self.assertEqual(field.presence, Presence.NULLABLE_REQUIRED)
         types = emit(ir)["types.mbt"]
         self.assertIn('note: decode_nullable_field(obj, "note", path)', types)
-        self.assertIn("None | Some(Null) => None", types)
+        self.assertIn("let raw : Json = required_field(obj, key, path)", types)
+        self.assertNotIn("decode_defaulted_field", types)
 
     def test_optional_discriminator_selects_a_default_variant(self):
         # Anthropic's client `Tool.type` is `null | "custom"` and not required; a tool without it is still a Tool.
@@ -244,6 +245,10 @@ class IRTests(unittest.TestCase):
             "Block": {"type": "object", "properties": {"id": {"type": "string"}, "caller": {"$ref": "#/components/schemas/Caller", "default": {"type": "direct"}}, "count": {"type": "integer", "default": 0}, "big": {"type": "integer", "format": "int64", "default": 0}}, "required": ["id", "caller", "count", "big"]},
         }
         ir = IRBuilder(document(operation(response={"$ref": "#/components/schemas/Block"}), schemas), "example/gen").build()
+        self.assertNotIn("decode_defaulted_field", emit(ir)["types.mbt"])
+        for field in schemas["Block"]["properties"].values():
+            field["x-moonbit-default-on-missing"] = True
+        ir = IRBuilder(document(operation(response={"$ref": "#/components/schemas/Block"}), schemas), "example/gen").build()
         fields = {field.moon_name: field for field in declaration(ir, "Block").fields}
         self.assertEqual(fields["caller"].default, {"type": "direct"})
         self.assertEqual(fields["count"].default, 0)
@@ -251,6 +256,7 @@ class IRTests(unittest.TestCase):
         types = emit(ir)["types.mbt"]
         self.assertIn('caller: decode_defaulted_field(obj, "caller", path, { "type": "direct" })', types)
         self.assertIn('count: decode_defaulted_field(obj, "count", path, 0)', types)
+        self.assertIn('fn[T : @json.FromJson] decode_defaulted_field(', types)
         self.assertIn('big: json_int64(required_field(obj, "big", path)', types)
 
     def test_emission_is_byte_deterministic(self):

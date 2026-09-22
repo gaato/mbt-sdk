@@ -687,9 +687,145 @@ async test "live OpenAI official minimal operations" {
 }
 
 ///|
+async test "live Anthropic official tools and thinking" {
+  bounded(() => {
+    guard credential("ANTHROPIC_API_KEY", "Anthropic") is Some(key) else {
+      return
+    }
+    let client = @anthropic_sdk.Anthropic::new(
+      api_key=key,
+      @adapter.AsyncTransport::new(timeout_ms=45000),
+      @adapter.AsyncClock::new(),
+      retry=live_retry(),
+    )
+    let model = "claude-haiku-4-5"
+    let tools = [
+      @anthropic_sdk.ToolDef::new(
+        name="lookup_code",
+        description="Return the code for a named item.",
+        input_schema={
+          "type": "object",
+          "properties": { "item": { "type": "string", "enum": ["test"] } },
+          "required": ["item"],
+          "additionalProperties": false,
+        },
+      ),
+    ]
+    let user = @anthropic_sdk.Message::user(
+      "Look up the code for item test using lookup_code, then reply with only the returned code.",
+    )
+    let request = @anthropic_sdk.MessageRequest::new(
+      model~,
+      max_tokens=128,
+      messages=[user],
+      tools~,
+      tool_choice=@anthropic_sdk.tool_choice_tool("lookup_code"),
+    )
+    let response = one_anthropic_call("Anthropic", model, () => {
+      client.create_message(request)
+    })
+    let calls = response.tool_uses()
+    assert_eq(calls.length(), 1)
+    let (id, name, input) = calls[0]
+    assert_eq(name, "lookup_code")
+    assert_eq(input, { "item": "test" })
+    let followup = one_anthropic_call("Anthropic", model, () => {
+      client.create_message(
+        @anthropic_sdk.MessageRequest::new(
+          model~,
+          max_tokens=64,
+          messages=[
+            user,
+            @anthropic_sdk.Message::from_response(response),
+            @anthropic_sdk.Message::tool_result(
+              tool_use_id=id,
+              content="CHECK_731",
+            ),
+          ],
+          tools~,
+          tool_choice=@anthropic_sdk.tool_choice_none(),
+        ),
+      )
+    })
+    assert_true(followup.text().contains("CHECK_731"))
+    let accumulator = @anthropic_sdk.ToolUseAccumulator::new()
+    let mut tool_stopped = false
+    one_anthropic_call("Anthropic", model, () => {
+      client.stream_message(request, event => {
+        accumulator.feed(event)
+        if event is @anthropic_sdk.MessageStop {
+          tool_stopped = true
+        }
+      })
+    })
+    let streamed = accumulator.finish()
+    assert_true(tool_stopped)
+    assert_eq(streamed.length(), 1)
+    assert_eq(streamed[0].1, "lookup_code")
+    assert_eq(streamed[0].2, { "item": "test" })
+    let thinking_request = @anthropic_sdk.MessageRequest::new(
+      model~,
+      max_tokens=1536,
+      messages=[
+        @anthropic_sdk.Message::user(
+          "Compute 17 * 19. Reply with only the number.",
+        ),
+      ],
+      thinking=@anthropic_gen.ThinkingConfigParam::Enabled(
+        @anthropic_gen.ThinkingConfigEnabled::new(
+          type_="enabled",
+          budget_tokens=1024,
+        ),
+      ),
+    )
+    let thought = one_anthropic_call("Anthropic", model, () => {
+      client.create_message(thinking_request)
+    })
+    assert_true(thought.text().contains("323"))
+    assert_true(
+      thought.content.any(block => {
+        match block {
+          @anthropic_sdk.Thinking(thinking~, signature~) =>
+            !thinking.is_empty() && !signature.is_empty()
+          _ => false
+        }
+      }),
+    )
+    let mut thinking_delta = false
+    let mut signature_delta = false
+    let mut thinking_stopped = false
+    let text = StringBuilder()
+    one_anthropic_call("Anthropic", model, () => {
+      client.stream_message(thinking_request, event => {
+        match event {
+          @anthropic_sdk.ThinkingDelta(thinking~, ..) =>
+            if !thinking.is_empty() {
+              thinking_delta = true
+            }
+          @anthropic_sdk.SignatureDelta(signature~, ..) =>
+            if !signature.is_empty() {
+              signature_delta = true
+            }
+          @anthropic_sdk.TextDelta(text=delta, ..) => text.write_string(delta)
+          @anthropic_sdk.MessageStop => thinking_stopped = true
+          _ => ()
+        }
+      })
+    })
+    assert_true(thinking_delta && signature_delta && thinking_stopped)
+    assert_true(text.to_string().contains("323"))
+    println(
+      "Anthropic official: tool round trip, streamed tool JSON, buffered thinking/signature, streamed thinking/signature passed",
+    )
+  })
+}
+
+///|
 async test "live Anthropic official minimal operations" {
   bounded(() => {
-    guard credential("ANTHROPIC_API_KEY", "Anthropic") is Some(key) else { return }
+    guard credential("ANTHROPIC_API_KEY", "Anthropic") is Some(key) else {
+      return
+    }
     let client = @anthropic_sdk.Anthropic::new(
       api_key=key,
       @adapter.AsyncTransport::new(timeout_ms=45000),
@@ -706,13 +842,13 @@ async test "live Anthropic official minimal operations" {
       client.retrieve_model(model)
     })
     if retrieved.id.is_empty() {
-      validation_failure("Anthropic", model, "retrieve_model returned an empty id")
+      validation_failure(
+        "Anthropic", model, "retrieve_model returned an empty id",
+      )
     }
-    let request = @anthropic_sdk.MessageRequest::new(
-      model~,
-      max_tokens=16,
-      messages=[@anthropic_sdk.Message::user("Reply with one word.")],
-    )
+    let request = @anthropic_sdk.MessageRequest::new(model~, max_tokens=16, messages=[
+      @anthropic_sdk.Message::user("Reply with one word."),
+    ])
     let counted = one_anthropic_call("Anthropic", model, () => {
       client.count_tokens(request)
     })
@@ -739,7 +875,9 @@ async test "live Anthropic official minimal operations" {
       })
     })
     if delta_count < 1 || !stopped {
-      validation_failure("Anthropic", model, "stream lacked TextDelta or MessageStop")
+      validation_failure(
+        "Anthropic", model, "stream lacked TextDelta or MessageStop",
+      )
     }
   })
 }

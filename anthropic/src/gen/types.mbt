@@ -33,6 +33,19 @@ fn[T] nullable_presence(value : T?) -> @sdkjson.Presence[T] {
 }
 
 ///|
+fn[T : @json.FromJson] decode_nullable_field(
+  obj : Map[String, Json],
+  key : String,
+  path : @json.JsonPath,
+) -> T? raise @json.JsonDecodeError {
+  let raw : Json = required_field(obj, key, path)
+  match raw {
+    Null => None
+    value => Some(@json.from_json(value, path=path.add_key(key)))
+  }
+}
+
+///|
 /// A required field with a non-null default in the spec: absent decodes as that default.
 fn[T : @json.FromJson] decode_defaulted_field(
   obj : Map[String, Json],
@@ -43,21 +56,6 @@ fn[T : @json.FromJson] decode_defaulted_field(
   match obj.get(key) {
     Some(value) => @json.from_json(value, path=path.add_key(key))
     None => @json.from_json(default, path=path.add_key(key))
-  }
-}
-
-///|
-/// A required-but-nullable field. Null and absent both decode as None: servers
-/// that implement a spec (and compatible gateways) routinely omit a field whose
-/// only other value would be null, and the two carry the same information.
-fn[T : @json.FromJson] decode_nullable_field(
-  obj : Map[String, Json],
-  key : String,
-  path : @json.JsonPath,
-) -> T? raise @json.JsonDecodeError {
-  match obj.get(key) {
-    None | Some(Null) => None
-    Some(value) => Some(@json.from_json(value, path=path.add_key(key)))
   }
 }
 
@@ -104,10 +102,8 @@ pub extend APIError with @json.FromJson::{from_json}
 pub impl @json.FromJson for APIError with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    message: decode_defaulted_field(
-      obj, "message", path, "Internal server error",
-    ),
-    type_: decode_defaulted_field(obj, "type", path, "api_error"),
+    message: required_field(obj, "message", path),
+    type_: required_field(obj, "type", path),
   }
 }
 
@@ -214,10 +210,8 @@ pub extend AuthenticationError with @json.FromJson::{from_json}
 pub impl @json.FromJson for AuthenticationError with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    message: decode_defaulted_field(
-      obj, "message", path, "Authentication error",
-    ),
-    type_: decode_defaulted_field(obj, "type", path, "authentication_error"),
+    message: required_field(obj, "message", path),
+    type_: required_field(obj, "type", path),
   }
 }
 
@@ -716,8 +710,8 @@ pub extend BillingError with @json.FromJson::{from_json}
 pub impl @json.FromJson for BillingError with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    message: decode_defaulted_field(obj, "message", path, "Billing error"),
-    type_: decode_defaulted_field(obj, "type", path, "billing_error"),
+    message: required_field(obj, "message", path),
+    type_: required_field(obj, "type", path),
   }
 }
 
@@ -3103,11 +3097,11 @@ pub extend CacheCreation with @json.FromJson::{from_json}
 pub impl @json.FromJson for CacheCreation with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    ephemeral_1h_input_tokens: decode_defaulted_field(
-      obj, "ephemeral_1h_input_tokens", path, 0,
+    ephemeral_1h_input_tokens: required_field(
+      obj, "ephemeral_1h_input_tokens", path,
     ),
-    ephemeral_5m_input_tokens: decode_defaulted_field(
-      obj, "ephemeral_5m_input_tokens", path, 0,
+    ephemeral_5m_input_tokens: required_field(
+      obj, "ephemeral_5m_input_tokens", path,
     ),
   }
 }
@@ -3234,7 +3228,7 @@ pub impl @json.FromJson for ResponseCharLocationCitation with fn from_json(
     end_char_index: required_field(obj, "end_char_index", path),
     file_id: decode_nullable_field(obj, "file_id", path),
     start_char_index: required_field(obj, "start_char_index", path),
-    type_: decode_defaulted_field(obj, "type", path, "char_location"),
+    type_: required_field(obj, "type", path),
   }
 }
 
@@ -3319,7 +3313,7 @@ pub impl @json.FromJson for ResponseContentBlockLocationCitation with fn from_js
     end_block_index: required_field(obj, "end_block_index", path),
     file_id: decode_nullable_field(obj, "file_id", path),
     start_block_index: required_field(obj, "start_block_index", path),
-    type_: decode_defaulted_field(obj, "type", path, "content_block_location"),
+    type_: required_field(obj, "type", path),
   }
 }
 
@@ -3404,7 +3398,7 @@ pub impl @json.FromJson for ResponsePageLocationCitation with fn from_json(
     end_page_number: required_field(obj, "end_page_number", path),
     file_id: decode_nullable_field(obj, "file_id", path),
     start_page_number: required_field(obj, "start_page_number", path),
-    type_: decode_defaulted_field(obj, "type", path, "page_location"),
+    type_: required_field(obj, "type", path),
   }
 }
 
@@ -3486,7 +3480,7 @@ pub impl @json.FromJson for ResponseSearchResultLocationCitation with fn from_js
     source: required_field(obj, "source", path),
     start_block_index: required_field(obj, "start_block_index", path),
     title: decode_nullable_field(obj, "title", path),
-    type_: decode_defaulted_field(obj, "type", path, "search_result_location"),
+    type_: required_field(obj, "type", path),
   }
 }
 
@@ -3555,9 +3549,7 @@ pub impl @json.FromJson for ResponseWebSearchResultLocationCitation with fn from
     cited_text: required_field(obj, "cited_text", path),
     encrypted_index: required_field(obj, "encrypted_index", path),
     title: decode_nullable_field(obj, "title", path),
-    type_: decode_defaulted_field(
-      obj, "type", path, "web_search_result_location",
-    ),
+    type_: required_field(obj, "type", path),
     url: required_field(obj, "url", path),
   }
 }
@@ -3669,7 +3661,7 @@ pub impl @json.FromJson for CitationsDelta with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
   {
     citation: required_field(obj, "citation", path),
-    type_: decode_defaulted_field(obj, "type", path, "citations_delta"),
+    type_: required_field(obj, "type", path),
   }
 }
 
@@ -5774,7 +5766,7 @@ pub impl @json.FromJson for InputJsonContentBlockDelta with fn from_json(
   let obj = @sdkjson.expect_object(value, path)
   {
     partial_json: required_field(obj, "partial_json", path),
-    type_: decode_defaulted_field(obj, "type", path, "input_json_delta"),
+    type_: required_field(obj, "type", path),
   }
 }
 
@@ -5828,7 +5820,7 @@ pub impl @json.FromJson for SignatureContentBlockDelta with fn from_json(
   let obj = @sdkjson.expect_object(value, path)
   {
     signature: required_field(obj, "signature", path),
-    type_: decode_defaulted_field(obj, "type", path, "signature_delta"),
+    type_: required_field(obj, "type", path),
   }
 }
 
@@ -5879,7 +5871,7 @@ pub impl @json.FromJson for TextContentBlockDelta with fn from_json(value, path)
   let obj = @sdkjson.expect_object(value, path)
   {
     text: required_field(obj, "text", path),
-    type_: decode_defaulted_field(obj, "type", path, "text_delta"),
+    type_: required_field(obj, "type", path),
   }
 }
 
@@ -5933,7 +5925,7 @@ pub impl @json.FromJson for ThinkingContentBlockDelta with fn from_json(
   let obj = @sdkjson.expect_object(value, path)
   {
     thinking: required_field(obj, "thinking", path),
-    type_: decode_defaulted_field(obj, "type", path, "thinking_delta"),
+    type_: required_field(obj, "type", path),
   }
 }
 
@@ -6048,7 +6040,7 @@ pub impl @json.FromJson for ContentBlockDeltaEvent with fn from_json(
   {
     delta: required_field(obj, "delta", path),
     index: required_field(obj, "index", path),
-    type_: decode_defaulted_field(obj, "type", path, "content_block_delta"),
+    type_: required_field(obj, "type", path),
   }
 }
 
@@ -7188,9 +7180,7 @@ pub impl @json.FromJson for ResponseBashCodeExecutionToolResultError with fn fro
   let obj = @sdkjson.expect_object(value, path)
   {
     error_code: required_field(obj, "error_code", path),
-    type_: decode_defaulted_field(
-      obj, "type", path, "bash_code_execution_tool_result_error",
-    ),
+    type_: required_field(obj, "type", path),
   }
 }
 
@@ -7305,9 +7295,7 @@ pub impl @json.FromJson for ResponseBashCodeExecutionResultBlock with fn from_js
     return_code: required_field(obj, "return_code", path),
     stderr: required_field(obj, "stderr", path),
     stdout: required_field(obj, "stdout", path),
-    type_: decode_defaulted_field(
-      obj, "type", path, "bash_code_execution_result",
-    ),
+    type_: required_field(obj, "type", path),
   }
 }
 
@@ -7430,9 +7418,7 @@ pub impl @json.FromJson for ResponseBashCodeExecutionToolResultBlock with fn fro
   {
     content: required_field(obj, "content", path),
     tool_use_id: required_field(obj, "tool_use_id", path),
-    type_: decode_defaulted_field(
-      obj, "type", path, "bash_code_execution_tool_result",
-    ),
+    type_: required_field(obj, "type", path),
   }
 }
 
@@ -7486,9 +7472,7 @@ pub impl @json.FromJson for ResponseCodeExecutionToolResultError with fn from_js
   let obj = @sdkjson.expect_object(value, path)
   {
     error_code: required_field(obj, "error_code", path),
-    type_: decode_defaulted_field(
-      obj, "type", path, "code_execution_tool_result_error",
-    ),
+    type_: required_field(obj, "type", path),
   }
 }
 
@@ -7603,7 +7587,7 @@ pub impl @json.FromJson for ResponseCodeExecutionResultBlock with fn from_json(
     return_code: required_field(obj, "return_code", path),
     stderr: required_field(obj, "stderr", path),
     stdout: required_field(obj, "stdout", path),
-    type_: decode_defaulted_field(obj, "type", path, "code_execution_result"),
+    type_: required_field(obj, "type", path),
   }
 }
 
@@ -7675,9 +7659,7 @@ pub impl @json.FromJson for ResponseEncryptedCodeExecutionResultBlock with fn fr
     encrypted_stdout: required_field(obj, "encrypted_stdout", path),
     return_code: required_field(obj, "return_code", path),
     stderr: required_field(obj, "stderr", path),
-    type_: decode_defaulted_field(
-      obj, "type", path, "encrypted_code_execution_result",
-    ),
+    type_: required_field(obj, "type", path),
   }
 }
 
@@ -7798,9 +7780,7 @@ pub impl @json.FromJson for ResponseCodeExecutionToolResultBlock with fn from_js
   {
     content: required_field(obj, "content", path),
     tool_use_id: required_field(obj, "tool_use_id", path),
-    type_: decode_defaulted_field(
-      obj, "type", path, "code_execution_tool_result",
-    ),
+    type_: required_field(obj, "type", path),
   }
 }
 
@@ -7854,7 +7834,7 @@ pub impl @json.FromJson for ResponseContainerUploadBlock with fn from_json(
   let obj = @sdkjson.expect_object(value, path)
   {
     file_id: required_field(obj, "file_id", path),
-    type_: decode_defaulted_field(obj, "type", path, "container_upload"),
+    type_: required_field(obj, "type", path),
   }
 }
 
@@ -7908,7 +7888,7 @@ pub impl @json.FromJson for ResponseRedactedThinkingBlock with fn from_json(
   let obj = @sdkjson.expect_object(value, path)
   {
     data: required_field(obj, "data", path),
-    type_: decode_defaulted_field(obj, "type", path, "redacted_thinking"),
+    type_: required_field(obj, "type", path),
   }
 }
 
@@ -8242,7 +8222,7 @@ pub impl @json.FromJson for ResponseServerToolUseBlock with fn from_json(
     id: required_field(obj, "id", path),
     input: required_field(obj, "input", path),
     name: required_field(obj, "name", path),
-    type_: decode_defaulted_field(obj, "type", path, "server_tool_use"),
+    type_: required_field(obj, "type", path),
   }
 }
 
@@ -8310,7 +8290,7 @@ pub impl @json.FromJson for ResponseTextBlockCitationsItem with fn from_json(
 ///
 /// Generated representation of ResponseTextBlock.
 pub(all) struct ResponseTextBlock {
-  citations : Array[ResponseTextBlockCitationsItem]?
+  citations : @sdkjson.Presence[Array[ResponseTextBlockCitationsItem]]
   text : String
   type_ : String
 } derive(Eq, @debug.Debug)
@@ -8329,7 +8309,7 @@ pub fn ResponseTextBlock::new(
   type_~ : String,
   citations? : Array[ResponseTextBlockCitationsItem],
 ) -> ResponseTextBlock {
-  { citations, text, type_, }
+  { citations: @sdkjson.Presence::from_option(citations), text, type_, }
 }
 
 ///|
@@ -8340,7 +8320,7 @@ pub extend ResponseTextBlock with ToJson::{to_json}
 ///|
 pub impl ToJson for ResponseTextBlock with fn to_json(self) {
   @sdkjson.ObjBuilder::new()
-  .presence("citations", nullable_presence(self.citations.map(value => value)))
+  .presence("citations", self.citations)
   .field("text", self.text)
   .field("type", self.type_)
   .build()
@@ -8355,9 +8335,9 @@ pub extend ResponseTextBlock with @json.FromJson::{from_json}
 pub impl @json.FromJson for ResponseTextBlock with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    citations: decode_nullable_field(obj, "citations", path),
+    citations: @sdkjson.presence_field(obj, "citations", path),
     text: required_field(obj, "text", path),
-    type_: decode_defaulted_field(obj, "type", path, "text"),
+    type_: required_field(obj, "type", path),
   }
 }
 
@@ -8499,9 +8479,7 @@ pub impl @json.FromJson for ResponseTextEditorCodeExecutionToolResultError with 
   {
     error_code: required_field(obj, "error_code", path),
     error_message: decode_nullable_field(obj, "error_message", path),
-    type_: decode_defaulted_field(
-      obj, "type", path, "text_editor_code_execution_tool_result_error",
-    ),
+    type_: required_field(obj, "type", path),
   }
 }
 
@@ -8654,9 +8632,7 @@ pub impl @json.FromJson for ResponseTextEditorCodeExecutionViewResultBlock with 
     num_lines: decode_nullable_field(obj, "num_lines", path),
     start_line: decode_nullable_field(obj, "start_line", path),
     total_lines: decode_nullable_field(obj, "total_lines", path),
-    type_: decode_defaulted_field(
-      obj, "type", path, "text_editor_code_execution_view_result",
-    ),
+    type_: required_field(obj, "type", path),
   }
 }
 
@@ -8721,9 +8697,7 @@ pub impl @json.FromJson for ResponseTextEditorCodeExecutionCreateResultBlock wit
   let obj = @sdkjson.expect_object(value, path)
   {
     is_file_update: required_field(obj, "is_file_update", path),
-    type_: decode_defaulted_field(
-      obj, "type", path, "text_editor_code_execution_create_result",
-    ),
+    type_: required_field(obj, "type", path),
   }
 }
 
@@ -8804,9 +8778,7 @@ pub impl @json.FromJson for ResponseTextEditorCodeExecutionStrReplaceResultBlock
     new_start: decode_nullable_field(obj, "new_start", path),
     old_lines: decode_nullable_field(obj, "old_lines", path),
     old_start: decode_nullable_field(obj, "old_start", path),
-    type_: decode_defaulted_field(
-      obj, "type", path, "text_editor_code_execution_str_replace_result",
-    ),
+    type_: required_field(obj, "type", path),
   }
 }
 
@@ -8950,9 +8922,7 @@ pub impl @json.FromJson for ResponseTextEditorCodeExecutionToolResultBlock with 
   {
     content: required_field(obj, "content", path),
     tool_use_id: required_field(obj, "tool_use_id", path),
-    type_: decode_defaulted_field(
-      obj, "type", path, "text_editor_code_execution_tool_result",
-    ),
+    type_: required_field(obj, "type", path),
   }
 }
 
@@ -9007,7 +8977,7 @@ pub impl @json.FromJson for ResponseThinkingBlock with fn from_json(value, path)
   {
     signature: required_field(obj, "signature", path),
     thinking: required_field(obj, "thinking", path),
-    type_: decode_defaulted_field(obj, "type", path, "thinking"),
+    type_: required_field(obj, "type", path),
   }
 }
 
@@ -9128,9 +9098,7 @@ pub impl @json.FromJson for ResponseToolSearchToolResultError with fn from_json(
   {
     error_code: required_field(obj, "error_code", path),
     error_message: decode_nullable_field(obj, "error_message", path),
-    type_: decode_defaulted_field(
-      obj, "type", path, "tool_search_tool_result_error",
-    ),
+    type_: required_field(obj, "type", path),
   }
 }
 
@@ -9237,9 +9205,7 @@ pub impl @json.FromJson for ResponseToolSearchToolSearchResultBlock with fn from
   let obj = @sdkjson.expect_object(value, path)
   {
     tool_references: required_field(obj, "tool_references", path),
-    type_: decode_defaulted_field(
-      obj, "type", path, "tool_search_tool_search_result",
-    ),
+    type_: required_field(obj, "type", path),
   }
 }
 
@@ -9351,7 +9317,7 @@ pub impl @json.FromJson for ResponseToolSearchToolResultBlock with fn from_json(
   {
     content: required_field(obj, "content", path),
     tool_use_id: required_field(obj, "tool_use_id", path),
-    type_: decode_defaulted_field(obj, "type", path, "tool_search_tool_result"),
+    type_: required_field(obj, "type", path),
   }
 }
 
@@ -9478,7 +9444,7 @@ pub impl @json.FromJson for ResponseToolUseBlock with fn from_json(value, path) 
     input: required_field(obj, "input", path),
     name: required_field(obj, "name", path),
     toolset_name: @sdkjson.presence_field(obj, "toolset_name", path),
-    type_: decode_defaulted_field(obj, "type", path, "tool_use"),
+    type_: required_field(obj, "type", path),
   }
 }
 
@@ -9665,9 +9631,7 @@ pub impl @json.FromJson for ResponseWebFetchToolResultError with fn from_json(
   let obj = @sdkjson.expect_object(value, path)
   {
     error_code: required_field(obj, "error_code", path),
-    type_: decode_defaulted_field(
-      obj, "type", path, "web_fetch_tool_result_error",
-    ),
+    type_: required_field(obj, "type", path),
   }
 }
 
@@ -9712,7 +9676,7 @@ pub impl @json.FromJson for ResponseCitationsConfig with fn from_json(
   path,
 ) {
   let obj = @sdkjson.expect_object(value, path)
-  { enabled: decode_defaulted_field(obj, "enabled", path, false), }
+  { enabled: required_field(obj, "enabled", path), }
 }
 
 ///|
@@ -9928,7 +9892,7 @@ pub impl @json.FromJson for ResponseWebFetchResultBlock with fn from_json(
   {
     content: required_field(obj, "content", path),
     retrieved_at: decode_nullable_field(obj, "retrieved_at", path),
-    type_: decode_defaulted_field(obj, "type", path, "web_fetch_result"),
+    type_: required_field(obj, "type", path),
     url: required_field(obj, "url", path),
   }
 }
@@ -10039,10 +10003,10 @@ pub impl @json.FromJson for ResponseWebFetchToolResultBlock with fn from_json(
 ) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    caller: decode_defaulted_field(obj, "caller", path, { "type": "direct" }),
+    caller: required_field(obj, "caller", path),
     content: required_field(obj, "content", path),
     tool_use_id: required_field(obj, "tool_use_id", path),
-    type_: decode_defaulted_field(obj, "type", path, "web_fetch_tool_result"),
+    type_: required_field(obj, "type", path),
   }
 }
 
@@ -10396,10 +10360,10 @@ pub impl @json.FromJson for ResponseWebSearchToolResultBlock with fn from_json(
 ) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    caller: decode_defaulted_field(obj, "caller", path, { "type": "direct" }),
+    caller: required_field(obj, "caller", path),
     content: required_field(obj, "content", path),
     tool_use_id: required_field(obj, "tool_use_id", path),
-    type_: decode_defaulted_field(obj, "type", path, "web_search_tool_result"),
+    type_: required_field(obj, "type", path),
   }
 }
 
@@ -10542,7 +10506,7 @@ pub impl @json.FromJson for ContentBlockStartEvent with fn from_json(
   {
     content_block: required_field(obj, "content_block", path),
     index: required_field(obj, "index", path),
-    type_: decode_defaulted_field(obj, "type", path, "content_block_start"),
+    type_: required_field(obj, "type", path),
   }
 }
 
@@ -10593,7 +10557,7 @@ pub impl @json.FromJson for ContentBlockStopEvent with fn from_json(value, path)
   let obj = @sdkjson.expect_object(value, path)
   {
     index: required_field(obj, "index", path),
-    type_: decode_defaulted_field(obj, "type", path, "content_block_stop"),
+    type_: required_field(obj, "type", path),
   }
 }
 
@@ -19147,8 +19111,8 @@ pub extend InvalidRequestError with @json.FromJson::{from_json}
 pub impl @json.FromJson for InvalidRequestError with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    message: decode_defaulted_field(obj, "message", path, "Invalid request"),
-    type_: decode_defaulted_field(obj, "type", path, "invalid_request_error"),
+    message: required_field(obj, "message", path),
+    type_: required_field(obj, "type", path),
   }
 }
 
@@ -19195,8 +19159,8 @@ pub extend NotFoundError with @json.FromJson::{from_json}
 pub impl @json.FromJson for NotFoundError with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    message: decode_defaulted_field(obj, "message", path, "Not found"),
-    type_: decode_defaulted_field(obj, "type", path, "not_found_error"),
+    message: required_field(obj, "message", path),
+    type_: required_field(obj, "type", path),
   }
 }
 
@@ -19246,8 +19210,8 @@ pub extend OverloadedError with @json.FromJson::{from_json}
 pub impl @json.FromJson for OverloadedError with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    message: decode_defaulted_field(obj, "message", path, "Overloaded"),
-    type_: decode_defaulted_field(obj, "type", path, "overloaded_error"),
+    message: required_field(obj, "message", path),
+    type_: required_field(obj, "type", path),
   }
 }
 
@@ -19297,8 +19261,8 @@ pub extend PermissionError with @json.FromJson::{from_json}
 pub impl @json.FromJson for PermissionError with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    message: decode_defaulted_field(obj, "message", path, "Permission denied"),
-    type_: decode_defaulted_field(obj, "type", path, "permission_error"),
+    message: required_field(obj, "message", path),
+    type_: required_field(obj, "type", path),
   }
 }
 
@@ -19348,8 +19312,8 @@ pub extend RateLimitError with @json.FromJson::{from_json}
 pub impl @json.FromJson for RateLimitError with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    message: decode_defaulted_field(obj, "message", path, "Rate limited"),
-    type_: decode_defaulted_field(obj, "type", path, "rate_limit_error"),
+    message: required_field(obj, "message", path),
+    type_: required_field(obj, "type", path),
   }
 }
 
@@ -19399,8 +19363,8 @@ pub extend GatewayTimeoutError with @json.FromJson::{from_json}
 pub impl @json.FromJson for GatewayTimeoutError with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    message: decode_defaulted_field(obj, "message", path, "Request timeout"),
-    type_: decode_defaulted_field(obj, "type", path, "timeout_error"),
+    message: required_field(obj, "message", path),
+    type_: required_field(obj, "type", path),
   }
 }
 
@@ -20156,7 +20120,7 @@ pub extend OutputTokensDetails with @json.FromJson::{from_json}
 ///|
 pub impl @json.FromJson for OutputTokensDetails with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
-  { thinking_tokens: decode_defaulted_field(obj, "thinking_tokens", path, 0), }
+  { thinking_tokens: required_field(obj, "thinking_tokens", path), }
 }
 
 ///|
@@ -20205,12 +20169,8 @@ pub extend ServerToolUsage with @json.FromJson::{from_json}
 pub impl @json.FromJson for ServerToolUsage with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    web_fetch_requests: decode_defaulted_field(
-      obj, "web_fetch_requests", path, 0,
-    ),
-    web_search_requests: decode_defaulted_field(
-      obj, "web_search_requests", path, 0,
-    ),
+    web_fetch_requests: required_field(obj, "web_fetch_requests", path),
+    web_search_requests: required_field(obj, "web_search_requests", path),
   }
 }
 
@@ -20272,15 +20232,15 @@ pub impl @json.FromJson for UsageServiceTier with fn from_json(value, path) {
 ///
 /// Generated representation of Usage.
 pub(all) struct Usage {
-  cache_creation : CacheCreation?
-  cache_creation_input_tokens : Int?
-  cache_read_input_tokens : Int?
-  inference_geo : String?
+  cache_creation : @sdkjson.Presence[CacheCreation]
+  cache_creation_input_tokens : @sdkjson.Presence[Int]
+  cache_read_input_tokens : @sdkjson.Presence[Int]
+  inference_geo : @sdkjson.Presence[String]
   input_tokens : Int
   output_tokens : Int
-  output_tokens_details : OutputTokensDetails?
-  server_tool_use : ServerToolUsage?
-  service_tier : UsageServiceTier?
+  output_tokens_details : @sdkjson.Presence[OutputTokensDetails]
+  server_tool_use : @sdkjson.Presence[ServerToolUsage]
+  service_tier : @sdkjson.Presence[UsageServiceTier]
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -20304,15 +20264,19 @@ pub fn Usage::new(
   service_tier? : UsageServiceTier,
 ) -> Usage {
   {
-    cache_creation,
-    cache_creation_input_tokens,
-    cache_read_input_tokens,
-    inference_geo,
+    cache_creation: @sdkjson.Presence::from_option(cache_creation),
+    cache_creation_input_tokens: @sdkjson.Presence::from_option(
+      cache_creation_input_tokens,
+    ),
+    cache_read_input_tokens: @sdkjson.Presence::from_option(
+      cache_read_input_tokens,
+    ),
+    inference_geo: @sdkjson.Presence::from_option(inference_geo),
     input_tokens,
     output_tokens,
-    output_tokens_details,
-    server_tool_use,
-    service_tier,
+    output_tokens_details: @sdkjson.Presence::from_option(output_tokens_details),
+    server_tool_use: @sdkjson.Presence::from_option(server_tool_use),
+    service_tier: @sdkjson.Presence::from_option(service_tier),
   }
 }
 
@@ -20324,36 +20288,15 @@ pub extend Usage with ToJson::{to_json}
 ///|
 pub impl ToJson for Usage with fn to_json(self) {
   @sdkjson.ObjBuilder::new()
-  .presence(
-    "cache_creation",
-    nullable_presence(self.cache_creation.map(value => value)),
-  )
-  .presence(
-    "cache_creation_input_tokens",
-    nullable_presence(self.cache_creation_input_tokens.map(value => value)),
-  )
-  .presence(
-    "cache_read_input_tokens",
-    nullable_presence(self.cache_read_input_tokens.map(value => value)),
-  )
-  .presence(
-    "inference_geo",
-    nullable_presence(self.inference_geo.map(value => value)),
-  )
+  .presence("cache_creation", self.cache_creation)
+  .presence("cache_creation_input_tokens", self.cache_creation_input_tokens)
+  .presence("cache_read_input_tokens", self.cache_read_input_tokens)
+  .presence("inference_geo", self.inference_geo)
   .field("input_tokens", self.input_tokens)
   .field("output_tokens", self.output_tokens)
-  .presence(
-    "output_tokens_details",
-    nullable_presence(self.output_tokens_details.map(value => value)),
-  )
-  .presence(
-    "server_tool_use",
-    nullable_presence(self.server_tool_use.map(value => value)),
-  )
-  .presence(
-    "service_tier",
-    nullable_presence(self.service_tier.map(value => value)),
-  )
+  .presence("output_tokens_details", self.output_tokens_details)
+  .presence("server_tool_use", self.server_tool_use)
+  .presence("service_tier", self.service_tier)
   .build()
 }
 
@@ -20366,21 +20309,21 @@ pub extend Usage with @json.FromJson::{from_json}
 pub impl @json.FromJson for Usage with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    cache_creation: decode_nullable_field(obj, "cache_creation", path),
-    cache_creation_input_tokens: decode_nullable_field(
+    cache_creation: @sdkjson.presence_field(obj, "cache_creation", path),
+    cache_creation_input_tokens: @sdkjson.presence_field(
       obj, "cache_creation_input_tokens", path,
     ),
-    cache_read_input_tokens: decode_nullable_field(
+    cache_read_input_tokens: @sdkjson.presence_field(
       obj, "cache_read_input_tokens", path,
     ),
-    inference_geo: decode_nullable_field(obj, "inference_geo", path),
+    inference_geo: @sdkjson.presence_field(obj, "inference_geo", path),
     input_tokens: required_field(obj, "input_tokens", path),
     output_tokens: required_field(obj, "output_tokens", path),
-    output_tokens_details: decode_nullable_field(
+    output_tokens_details: @sdkjson.presence_field(
       obj, "output_tokens_details", path,
     ),
-    server_tool_use: decode_nullable_field(obj, "server_tool_use", path),
-    service_tier: decode_nullable_field(obj, "service_tier", path),
+    server_tool_use: @sdkjson.presence_field(obj, "server_tool_use", path),
+    service_tier: @sdkjson.presence_field(obj, "service_tier", path),
   }
 }
 
@@ -20392,10 +20335,10 @@ pub(all) struct Message {
   content : Array[ContentBlock]
   model : String
   stop_reason : StopReason?
-  stop_sequence : String?
-  stop_details : RefusalStopDetails?
+  stop_sequence : @sdkjson.Presence[String]
+  stop_details : @sdkjson.Presence[RefusalStopDetails]
   usage : Usage
-  container : Container?
+  container : @sdkjson.Presence[Container]
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -20422,10 +20365,10 @@ pub fn Message::new(
     content,
     model,
     stop_reason,
-    stop_sequence,
-    stop_details,
+    stop_sequence: @sdkjson.Presence::from_option(stop_sequence),
+    stop_details: @sdkjson.Presence::from_option(stop_details),
     usage,
-    container,
+    container: @sdkjson.Presence::from_option(container),
   }
 }
 
@@ -20446,16 +20389,10 @@ pub impl ToJson for Message with fn to_json(self) {
     "stop_reason",
     nullable_presence(self.stop_reason.map(value => value)),
   )
-  .presence(
-    "stop_sequence",
-    nullable_presence(self.stop_sequence.map(value => value)),
-  )
-  .presence(
-    "stop_details",
-    nullable_presence(self.stop_details.map(value => value)),
-  )
+  .presence("stop_sequence", self.stop_sequence)
+  .presence("stop_details", self.stop_details)
   .field("usage", self.usage)
-  .presence("container", nullable_presence(self.container.map(value => value)))
+  .presence("container", self.container)
   .build()
 }
 
@@ -20472,10 +20409,10 @@ pub impl @json.FromJson for Message with fn from_json(value, path) {
     content: required_field(obj, "content", path),
     model: required_field(obj, "model", path),
     stop_reason: decode_nullable_field(obj, "stop_reason", path),
-    stop_sequence: decode_nullable_field(obj, "stop_sequence", path),
-    stop_details: decode_nullable_field(obj, "stop_details", path),
+    stop_sequence: @sdkjson.presence_field(obj, "stop_sequence", path),
+    stop_details: @sdkjson.presence_field(obj, "stop_details", path),
     usage: required_field(obj, "usage", path),
-    container: decode_nullable_field(obj, "container", path),
+    container: @sdkjson.presence_field(obj, "container", path),
   }
 }
 
@@ -20483,10 +20420,10 @@ pub impl @json.FromJson for Message with fn from_json(value, path) {
 ///
 /// Generated representation of MessageDelta.
 pub(all) struct MessageDelta {
-  container : Container?
-  stop_details : RefusalStopDetails?
+  container : @sdkjson.Presence[Container]
+  stop_details : @sdkjson.Presence[RefusalStopDetails]
   stop_reason : StopReason?
-  stop_sequence : String?
+  stop_sequence : @sdkjson.Presence[String]
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -20504,7 +20441,12 @@ pub fn MessageDelta::new(
   stop_reason? : StopReason,
   stop_sequence? : String,
 ) -> MessageDelta {
-  { container, stop_details, stop_reason, stop_sequence, }
+  {
+    container: @sdkjson.Presence::from_option(container),
+    stop_details: @sdkjson.Presence::from_option(stop_details),
+    stop_reason,
+    stop_sequence: @sdkjson.Presence::from_option(stop_sequence),
+  }
 }
 
 ///|
@@ -20515,19 +20457,13 @@ pub extend MessageDelta with ToJson::{to_json}
 ///|
 pub impl ToJson for MessageDelta with fn to_json(self) {
   @sdkjson.ObjBuilder::new()
-  .presence("container", nullable_presence(self.container.map(value => value)))
-  .presence(
-    "stop_details",
-    nullable_presence(self.stop_details.map(value => value)),
-  )
+  .presence("container", self.container)
+  .presence("stop_details", self.stop_details)
   .presence(
     "stop_reason",
     nullable_presence(self.stop_reason.map(value => value)),
   )
-  .presence(
-    "stop_sequence",
-    nullable_presence(self.stop_sequence.map(value => value)),
-  )
+  .presence("stop_sequence", self.stop_sequence)
   .build()
 }
 
@@ -20540,10 +20476,10 @@ pub extend MessageDelta with @json.FromJson::{from_json}
 pub impl @json.FromJson for MessageDelta with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    container: decode_nullable_field(obj, "container", path),
-    stop_details: decode_nullable_field(obj, "stop_details", path),
+    container: @sdkjson.presence_field(obj, "container", path),
+    stop_details: @sdkjson.presence_field(obj, "stop_details", path),
     stop_reason: decode_nullable_field(obj, "stop_reason", path),
-    stop_sequence: decode_nullable_field(obj, "stop_sequence", path),
+    stop_sequence: @sdkjson.presence_field(obj, "stop_sequence", path),
   }
 }
 
@@ -20551,12 +20487,12 @@ pub impl @json.FromJson for MessageDelta with fn from_json(value, path) {
 ///
 /// Generated representation of MessageDeltaUsage.
 pub(all) struct MessageDeltaUsage {
-  cache_creation_input_tokens : Int?
-  cache_read_input_tokens : Int?
-  input_tokens : Int?
+  cache_creation_input_tokens : @sdkjson.Presence[Int]
+  cache_read_input_tokens : @sdkjson.Presence[Int]
+  input_tokens : @sdkjson.Presence[Int]
   output_tokens : Int
-  output_tokens_details : OutputTokensDetails?
-  server_tool_use : ServerToolUsage?
+  output_tokens_details : @sdkjson.Presence[OutputTokensDetails]
+  server_tool_use : @sdkjson.Presence[ServerToolUsage]
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -20577,12 +20513,16 @@ pub fn MessageDeltaUsage::new(
   server_tool_use? : ServerToolUsage,
 ) -> MessageDeltaUsage {
   {
-    cache_creation_input_tokens,
-    cache_read_input_tokens,
-    input_tokens,
+    cache_creation_input_tokens: @sdkjson.Presence::from_option(
+      cache_creation_input_tokens,
+    ),
+    cache_read_input_tokens: @sdkjson.Presence::from_option(
+      cache_read_input_tokens,
+    ),
+    input_tokens: @sdkjson.Presence::from_option(input_tokens),
     output_tokens,
-    output_tokens_details,
-    server_tool_use,
+    output_tokens_details: @sdkjson.Presence::from_option(output_tokens_details),
+    server_tool_use: @sdkjson.Presence::from_option(server_tool_use),
   }
 }
 
@@ -20594,27 +20534,12 @@ pub extend MessageDeltaUsage with ToJson::{to_json}
 ///|
 pub impl ToJson for MessageDeltaUsage with fn to_json(self) {
   @sdkjson.ObjBuilder::new()
-  .presence(
-    "cache_creation_input_tokens",
-    nullable_presence(self.cache_creation_input_tokens.map(value => value)),
-  )
-  .presence(
-    "cache_read_input_tokens",
-    nullable_presence(self.cache_read_input_tokens.map(value => value)),
-  )
-  .presence(
-    "input_tokens",
-    nullable_presence(self.input_tokens.map(value => value)),
-  )
+  .presence("cache_creation_input_tokens", self.cache_creation_input_tokens)
+  .presence("cache_read_input_tokens", self.cache_read_input_tokens)
+  .presence("input_tokens", self.input_tokens)
   .field("output_tokens", self.output_tokens)
-  .presence(
-    "output_tokens_details",
-    nullable_presence(self.output_tokens_details.map(value => value)),
-  )
-  .presence(
-    "server_tool_use",
-    nullable_presence(self.server_tool_use.map(value => value)),
-  )
+  .presence("output_tokens_details", self.output_tokens_details)
+  .presence("server_tool_use", self.server_tool_use)
   .build()
 }
 
@@ -20627,18 +20552,18 @@ pub extend MessageDeltaUsage with @json.FromJson::{from_json}
 pub impl @json.FromJson for MessageDeltaUsage with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    cache_creation_input_tokens: decode_nullable_field(
+    cache_creation_input_tokens: @sdkjson.presence_field(
       obj, "cache_creation_input_tokens", path,
     ),
-    cache_read_input_tokens: decode_nullable_field(
+    cache_read_input_tokens: @sdkjson.presence_field(
       obj, "cache_read_input_tokens", path,
     ),
-    input_tokens: decode_nullable_field(obj, "input_tokens", path),
+    input_tokens: @sdkjson.presence_field(obj, "input_tokens", path),
     output_tokens: required_field(obj, "output_tokens", path),
-    output_tokens_details: decode_nullable_field(
+    output_tokens_details: @sdkjson.presence_field(
       obj, "output_tokens_details", path,
     ),
-    server_tool_use: decode_nullable_field(obj, "server_tool_use", path),
+    server_tool_use: @sdkjson.presence_field(obj, "server_tool_use", path),
   }
 }
 
@@ -20692,7 +20617,7 @@ pub impl @json.FromJson for MessageDeltaEvent with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
   {
     delta: required_field(obj, "delta", path),
-    type_: decode_defaulted_field(obj, "type", path, "message_delta"),
+    type_: required_field(obj, "type", path),
     usage: required_field(obj, "usage", path),
   }
 }
@@ -20744,7 +20669,7 @@ pub impl @json.FromJson for MessageStartEvent with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
   {
     message: required_field(obj, "message", path),
-    type_: decode_defaulted_field(obj, "type", path, "message_start"),
+    type_: required_field(obj, "type", path),
   }
 }
 
@@ -20786,7 +20711,7 @@ pub extend MessageStopEvent with @json.FromJson::{from_json}
 ///|
 pub impl @json.FromJson for MessageStopEvent with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
-  { type_: decode_defaulted_field(obj, "type", path, "message_stop"), }
+  { type_: required_field(obj, "type", path), }
 }
 
 ///|

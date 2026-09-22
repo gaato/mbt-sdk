@@ -1879,10 +1879,10 @@ pub(all) struct Message {
   content : Array[ContentBlock]
   model : String
   stop_reason : StopReason?
-  stop_sequence : String?
-  stop_details : RefusalStopDetails?
+  stop_sequence : @gaato/sdk-runtime/json.Presence[String]
+  stop_details : @gaato/sdk-runtime/json.Presence[RefusalStopDetails]
   usage : Usage
-  container : Container?
+  container : @gaato/sdk-runtime/json.Presence[Container]
 } derive(Eq, @debug.Debug)
 pub fn Message::equal(Self, Self) -> Bool
 pub fn Message::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
@@ -1894,10 +1894,10 @@ pub impl ToJson for Message
 pub impl @moonbitlang/core/json.FromJson for Message
 
 pub(all) struct MessageDelta {
-  container : Container?
-  stop_details : RefusalStopDetails?
+  container : @gaato/sdk-runtime/json.Presence[Container]
+  stop_details : @gaato/sdk-runtime/json.Presence[RefusalStopDetails]
   stop_reason : StopReason?
-  stop_sequence : String?
+  stop_sequence : @gaato/sdk-runtime/json.Presence[String]
 } derive(Eq, @debug.Debug)
 pub fn MessageDelta::equal(Self, Self) -> Bool
 pub fn MessageDelta::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
@@ -1923,12 +1923,12 @@ pub impl ToJson for MessageDeltaEvent
 pub impl @moonbitlang/core/json.FromJson for MessageDeltaEvent
 
 pub(all) struct MessageDeltaUsage {
-  cache_creation_input_tokens : Int?
-  cache_read_input_tokens : Int?
-  input_tokens : Int?
+  cache_creation_input_tokens : @gaato/sdk-runtime/json.Presence[Int]
+  cache_read_input_tokens : @gaato/sdk-runtime/json.Presence[Int]
+  input_tokens : @gaato/sdk-runtime/json.Presence[Int]
   output_tokens : Int
-  output_tokens_details : OutputTokensDetails?
-  server_tool_use : ServerToolUsage?
+  output_tokens_details : @gaato/sdk-runtime/json.Presence[OutputTokensDetails]
+  server_tool_use : @gaato/sdk-runtime/json.Presence[ServerToolUsage]
 } derive(Eq, @debug.Debug)
 pub fn MessageDeltaUsage::equal(Self, Self) -> Bool
 pub fn MessageDeltaUsage::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
@@ -3579,7 +3579,7 @@ pub impl ToJson for ResponseServerToolUseBlockName
 pub impl @moonbitlang/core/json.FromJson for ResponseServerToolUseBlockName
 
 pub(all) struct ResponseTextBlock {
-  citations : Array[ResponseTextBlockCitationsItem]?
+  citations : @gaato/sdk-runtime/json.Presence[Array[ResponseTextBlockCitationsItem]]
   text : String
   type_ : String
 } derive(Eq, @debug.Debug)
@@ -4520,15 +4520,15 @@ pub impl ToJson for URLPDFSource
 pub impl @moonbitlang/core/json.FromJson for URLPDFSource
 
 pub(all) struct Usage {
-  cache_creation : CacheCreation?
-  cache_creation_input_tokens : Int?
-  cache_read_input_tokens : Int?
-  inference_geo : String?
+  cache_creation : @gaato/sdk-runtime/json.Presence[CacheCreation]
+  cache_creation_input_tokens : @gaato/sdk-runtime/json.Presence[Int]
+  cache_read_input_tokens : @gaato/sdk-runtime/json.Presence[Int]
+  inference_geo : @gaato/sdk-runtime/json.Presence[String]
   input_tokens : Int
   output_tokens : Int
-  output_tokens_details : OutputTokensDetails?
-  server_tool_use : ServerToolUsage?
-  service_tier : UsageServiceTier?
+  output_tokens_details : @gaato/sdk-runtime/json.Presence[OutputTokensDetails]
+  server_tool_use : @gaato/sdk-runtime/json.Presence[ServerToolUsage]
+  service_tier : @gaato/sdk-runtime/json.Presence[UsageServiceTier]
 } derive(Eq, @debug.Debug)
 pub fn Usage::equal(Self, Self) -> Bool
 pub fn Usage::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError

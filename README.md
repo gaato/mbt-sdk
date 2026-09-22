@@ -23,7 +23,7 @@ Status: experimental. The HTTP, runtime and API modules are published on [moonca
 | `gaato/codex-app-server` | unpublished | Initialized Codex connections, native stdio sessions, progress events and explicit approval/user-input handlers; [usage and scope](codex-app-server/README.md) | `gaato/codex-protocol`, `gaato/jsonrpc-async`, `moonbitlang/async` |
 | `gaato/sdk-runtime` | [![mooncakes](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fmooncakes.io%2Fapi%2Fv0%2Fmodules%2Fgaato%2Fsdk-runtime&query=%24.version&label=mooncakes&prefix=v)](https://mooncakes.io/docs/gaato/sdk-runtime) | API-agnostic client runtime: error taxonomy, `Retry-After` / `retry-after-ms`, backoff, retry policy, rate limiting, pagination, auth, tri-state JSON fields, open enums, multipart writer | `gaato/http` |
 | `gaato/openai` | [![mooncakes](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fmooncakes.io%2Fapi%2Fv0%2Fmodules%2Fgaato%2Fopenai&query=%24.version&label=mooncakes&prefix=v)](https://mooncakes.io/docs/gaato/openai) | First consumer: a stable hand-written facade for models, embeddings, Responses, and Chat Completions (buffered and streaming), backed by types and operations generated from the vendored OpenAPI spec | `gaato/http`, `gaato/sdk-runtime` |
-| `gaato/anthropic` | [![mooncakes](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fmooncakes.io%2Fapi%2Fv0%2Fmodules%2Fgaato%2Fanthropic&query=%24.version&label=mooncakes&prefix=v)](https://mooncakes.io/docs/gaato/anthropic) | Second consumer: Anthropic-compatible messages (buffered and streaming), including open content blocks and stream events | `gaato/http`, `gaato/sdk-runtime` |
+| `gaato/anthropic` | [![mooncakes](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fmooncakes.io%2Fapi%2Fv0%2Fmodules%2Fgaato%2Fanthropic&query=%24.version&label=mooncakes&prefix=v)](https://mooncakes.io/docs/gaato/anthropic) | Messages (buffered and streaming), token counting, and Models, backed by generated first-party spec types and operations | `gaato/http`, `gaato/sdk-runtime` |
 | `runtime-tests/` | — | Unpublished. Executes the async behaviour of the modules above (a module without an async runtime cannot run `async test`) | everything |
 
 HTTP SDK modules never import an async runtime: the caller passes a `Transport` and a `Clock`. That keeps them portable and makes retry, rate-limit and streaming logic testable with fakes and a fake clock. The Codex SDK keeps generated protocol types portable and puts connection/process ownership in a separate async module.
@@ -38,6 +38,8 @@ openai.stream_response(@openai.ResponseRequest::new(model="gpt-5.6-sol", input="
 ```
 
 For OpenAI-compatible servers that implement Chat Completions, use `ChatRequest` with `chat_completion` or `stream_chat_completion`. The opt-in live suite also accepts `OPENAI_COMPAT_BASE_URL` and `OPENAI_COMPAT_MODEL`; `OPENAI_COMPAT_API_KEY` is optional for local servers.
+
+Anthropic now generates its Messages, token-counting, and Models types and operations from the official SDK's vendored OpenAPI document. See [the Anthropic module](anthropic/README.md) for scope and migration notes, including the `base_url` change.
 
 ## Generation pipeline
 
