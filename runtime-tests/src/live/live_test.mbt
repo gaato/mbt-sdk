@@ -162,6 +162,52 @@ async fn[X] one_call(
 }
 
 ///|
+async fn[X] one_anthropic_call(
+  provider : String,
+  model : String,
+  call : async () -> X,
+) -> X {
+  call() catch {
+    @runtime.Transport(inner) =>
+      fail(
+        sdk_failure(provider, model, anthropic_error, @runtime.Transport(inner)),
+      )
+    @runtime.Status(status~, headers~, body~) =>
+      fail(
+        sdk_failure(
+          provider,
+          model,
+          anthropic_error,
+          @runtime.Status(status~, headers~, body~),
+        ),
+      )
+    @runtime.RateLimited(retry_after_ms~, headers~, body~) =>
+      fail(
+        sdk_failure(
+          provider,
+          model,
+          anthropic_error,
+          @runtime.RateLimited(retry_after_ms~, headers~, body~),
+        ),
+      )
+    @runtime.Decode(message~, body~) =>
+      fail(
+        sdk_failure(
+          provider,
+          model,
+          anthropic_error,
+          @runtime.Decode(message~, body~),
+        ),
+      )
+    @runtime.Config(message) =>
+      fail(
+        sdk_failure(provider, model, anthropic_error, @runtime.Config(message)),
+      )
+    error => raise error
+  }
+}
+
+///|
 fn validation_failure(
   provider : String,
   model : String,
@@ -399,6 +445,30 @@ async test "live local OpenAI-compatible Chat Completions API" {
         "local OpenAI-compatible", model, "buffered chat completion text was empty",
       )
     }
+    ignore(
+      one_call("local OpenAI-compatible tools", model, () => {
+        client.chat_completion(
+          @openai_sdk.ChatRequest::new(
+            model~,
+            messages=[
+              @openai_sdk.ChatMessage::user("What is the weather in Tokyo?"),
+            ],
+            max_tokens=64,
+            tools=[
+              @openai_sdk.ToolDef::new(
+                name="get_weather",
+                description="Get weather for a city",
+                parameters={
+                  "type": "object",
+                  "properties": { "city": { "type": "string" } },
+                  "required": ["city"],
+                },
+              ),
+            ],
+          ),
+        )
+      }),
+    )
     let mut delta_count = 0
     let mut finished = false
     let mut finished_was_last_non_usage = false
@@ -415,8 +485,9 @@ async test "live local OpenAI-compatible Chat Completions API" {
               delta_count += 1
               finished_was_last_non_usage = false
             }
-            @openai_sdk.ReasoningDelta(_) | @openai_sdk.Other(_, _) =>
-              finished_was_last_non_usage = false
+            @openai_sdk.ReasoningDelta(_)
+            | @openai_sdk.ToolCallDelta(..)
+            | @openai_sdk.Other(_, _) => finished_was_last_non_usage = false
             @openai_sdk.Finished(_) => {
               finished = true
               finished_was_last_non_usage = true
@@ -429,6 +500,102 @@ async test "live local OpenAI-compatible Chat Completions API" {
     if delta_count < 1 || !finished || !finished_was_last_non_usage {
       validation_failure(
         "local OpenAI-compatible", model, "stream lacked Delta or did not end its choice events with Finished",
+      )
+    }
+  })
+}
+
+///|
+async test "live local Anthropic-compatible Messages API" {
+  bounded(() => {
+    let base_url = optional_setting("ANTHROPIC_COMPAT_BASE_URL")
+    let model = optional_setting("ANTHROPIC_COMPAT_MODEL")
+    guard base_url is Some(base_url) && model is Some(model) else {
+      println(
+        "skip: local Anthropic-compatible: ANTHROPIC_COMPAT_BASE_URL and ANTHROPIC_COMPAT_MODEL are both required",
+      )
+      return
+    }
+    let transport = @adapter.AsyncTransport::new(timeout_ms=45000)
+    let clock = @adapter.AsyncClock::new()
+    let client = match optional_setting("ANTHROPIC_COMPAT_API_KEY") {
+      Some(key) =>
+        @anthropic_sdk.Anthropic::new(
+          api_key=key,
+          transport,
+          clock,
+          base_url~,
+          retry=live_retry(),
+        )
+      None =>
+        @anthropic_sdk.Anthropic::from_client(
+          @runtime.Client::new(
+            transport,
+            clock,
+            base_url~,
+            auth=@runtime.NoAuth,
+            retry=live_retry(),
+          ),
+        )
+    }
+    let response = one_anthropic_call(
+      "local Anthropic-compatible buffered",
+      model,
+      () => {
+        client.create_message(
+          @anthropic_sdk.MessageRequest::new(model~, max_tokens=64, messages=[
+            @anthropic_sdk.Message::user("Reply with one short word."),
+          ]),
+        )
+      },
+    )
+    if response.role != @anthropic_sdk.Assistant {
+      validation_failure(
+        "local Anthropic-compatible buffered", model, "expected role Assistant",
+      )
+    }
+    if response.content.is_empty() {
+      validation_failure(
+        "local Anthropic-compatible buffered", model, "expected at least one content block",
+      )
+    }
+
+    let mut start_order = -1
+    let mut delta_order = -1
+    let mut stop_order = -1
+    let mut order = 0
+    one_anthropic_call("local Anthropic-compatible streaming", model, () => {
+      client.stream_message(
+        @anthropic_sdk.MessageRequest::new(model~, max_tokens=64, messages=[
+          @anthropic_sdk.Message::user("Reply with one short word."),
+        ]),
+        event => {
+          match event {
+            @anthropic_sdk.MessageStart(_) =>
+              if start_order < 0 {
+                start_order = order
+              }
+            @anthropic_sdk.TextDelta(..)
+            | @anthropic_sdk.ThinkingDelta(..)
+            | @anthropic_sdk.InputJsonDelta(..) =>
+              if delta_order < 0 {
+                delta_order = order
+              }
+            @anthropic_sdk.MessageStop =>
+              if stop_order < 0 {
+                stop_order = order
+              }
+            _ => ()
+          }
+          order += 1
+        },
+      )
+    })
+    if !(start_order >= 0 &&
+      delta_order > start_order &&
+      stop_order > delta_order) {
+      validation_failure(
+        "local Anthropic-compatible streaming", model, "expected MessageStart -> delta -> MessageStop order; got {start_order}, {delta_order}, {stop_order}",
       )
     }
   })

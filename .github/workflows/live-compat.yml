@@ -1,7 +1,7 @@
 name: Live compat
 
 # Runs the live tests against local, key-free, CPU-only OpenAI- and
-# Anthropic-compatible servers (Ollama + LiteLLM with a ~135M model).
+# Anthropic-compatible servers (Ollama + LiteLLM with a ~500M tools-capable model).
 # Nothing external is called, so this can block like CI does. Ollama and LiteLLM
 # are intentionally unpinned (latest): their releases changing behaviour is the
 # kind of drift these tests are for.
@@ -41,7 +41,7 @@ jobs:
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ~/.ollama/models
-          key: ollama-smollm2-135m
+          key: ollama-qwen25-05b
 
       - name: Set up uv
         uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0

@@ -331,6 +331,139 @@ async test "chat completion streaming handles split reasoning usage and DONE" {
 }
 
 ///|
+async test "tool calls decode from OpenAI and Ollama fixtures and stream in wire order" {
+  bounded(() => {
+    let documented =
+      #|{"id":"chatcmpl-tool","object":"chat.completion","created":1750000000,"model":"gpt-chat","choices":[{"index":0,"message":{"role":"assistant","content":null,"refusal":null,"tool_calls":[{"id":"call_1","type":"function","function":{"name":"get_weather","arguments":"{\"city\":\"Tokyo\"}"}}]},"finish_reason":"tool_calls","logprobs":null}],"usage":null}
+      #|
+    let ollama =
+      #|{"id":"chatcmpl-ollama","object":"chat.completion","created":1750000000,"model":"qwen","choices":[{"index":0,"message":{"role":"assistant","content":"","tool_calls":[{"id":"call_ollama","type":"function","function":{"name":"get_weather","arguments":"{\"city\":\"Osaka\"}"}}]},"finish_reason":"tool_calls"}],"usage":null}
+      #|
+    let chunk1 =
+      #|{"id":"chatcmpl-stream","object":"chat.completion.chunk","created":1750000000,"model":"gpt-chat","choices":[{"index":0,"delta":{"tool_calls":[{"index":0,"id":"call_stream","type":"function","function":{"name":"get_weather","arguments":"{\"city\":"}}]},"finish_reason":null}]}
+      #|
+    let chunk2 =
+      #|{"id":"chatcmpl-stream","object":"chat.completion.chunk","created":1750000000,"model":"gpt-chat","choices":[{"index":0,"delta":{"tool_calls":[{"index":0,"type":"function","function":{"arguments":"\"Tok"}}]},"finish_reason":null}]}
+      #|
+    let chunk3 =
+      #|{"id":"chatcmpl-stream","object":"chat.completion.chunk","created":1750000000,"model":"gpt-chat","choices":[{"index":0,"delta":{"tool_calls":[{"index":0,"type":"function","function":{"arguments":"yo\"}"}}]},"finish_reason":null}]}
+      #|
+    let finished =
+      #|{"id":"chatcmpl-stream","object":"chat.completion.chunk","created":1750000000,"model":"gpt-chat","choices":[{"index":0,"delta":{},"finish_reason":"tool_calls"}]}
+      #|
+    let transport = @mock.FakeTransport::new()
+    transport.expect("POST", "/chat/completions", json_response(documented))
+    transport.expect("POST", "/chat/completions", json_response(ollama))
+    transport.expect_stream(
+      "POST",
+      "/chat/completions",
+      { status: 200, headers: @http.Headers::new(), },
+      split_chunks(
+        "data: " +
+        chunk1 +
+        "\n\ndata: " +
+        chunk2 +
+        "\n\ndata: " +
+        chunk3 +
+        "\n\ndata: " +
+        finished +
+        "\n\ndata: [DONE]\n\n",
+        [3, 47, 191, 337],
+      ),
+    )
+    let client = @openai_sdk.OpenAI::from_client(
+      @runtime.Client::new(
+        transport,
+        @mock.FakeClock::new(),
+        base_url="https://api.test",
+      ),
+    )
+    let schema : Json = {
+      "type": "object",
+      "properties": { "city": { "type": "string" } },
+    }
+    let documented_response = client.chat_completion(
+      @openai_sdk.ChatRequest::new(
+        model="gpt-chat",
+        messages=[@openai_sdk.ChatMessage::user("weather")],
+        tools=[
+          @openai_sdk.ToolDef::new(
+            name="get_weather",
+            parameters=schema,
+            description="Get weather",
+          ),
+        ],
+        tool_choice="auto",
+      ),
+    )
+    assert_eq(documented_response.text, "")
+    assert_eq(documented_response.finish_reason, Some(@openai_sdk.ToolCalls))
+    assert_eq(documented_response.tool_calls, [
+      { id: "call_1", name: "get_weather", arguments: "{\"city\":\"Tokyo\"}", },
+    ])
+    assert_eq(documented_response.tool_calls[0].arguments_json(), {
+      "city": "Tokyo",
+    })
+    let ollama_response = client.chat_completion(
+      @openai_sdk.ChatRequest::new(model="qwen", messages=[
+        @openai_sdk.ChatMessage::user("weather"),
+      ]),
+    )
+    assert_eq(ollama_response.tool_calls[0].id, "call_ollama")
+    assert_eq(ollama_response.tool_calls[0].name, "get_weather")
+
+    let events : Array[@openai_sdk.ChatEvent] = []
+    let accumulator = @openai_sdk.ToolCallAccumulator::new()
+    client.stream_chat_completion(
+      @openai_sdk.ChatRequest::new(model="gpt-chat", messages=[
+        @openai_sdk.ChatMessage::user("weather"),
+      ]),
+      event => {
+        events.push(event)
+        if event is @openai_sdk.ToolCallDelta(index~, id~, name~, arguments~) {
+          accumulator.feed(index~, id?, name?, arguments~)
+        }
+      },
+    )
+    assert_eq(events, [
+      @openai_sdk.ToolCallDelta(
+        index=0,
+        id=Some("call_stream"),
+        name=Some("get_weather"),
+        arguments="{\"city\":",
+      ),
+      @openai_sdk.ToolCallDelta(index=0, id=None, name=None, arguments="\"Tok"),
+      @openai_sdk.ToolCallDelta(index=0, id=None, name=None, arguments="yo\"}"),
+      @openai_sdk.Finished(@openai_sdk.ToolCalls),
+    ])
+    assert_eq(accumulator.finish(), [
+      {
+        id: "call_stream",
+        name: "get_weather",
+        arguments: "{\"city\":\"Tokyo\"}",
+      },
+    ])
+    let sent = transport.sent()
+    assert_eq(@json.parse(@utf8.decode(sent[0].body)), {
+      "model": "gpt-chat",
+      "messages": [{ "role": "user", "content": "weather" }],
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "get_weather",
+            "description": "Get weather",
+            "parameters": schema,
+          },
+        },
+      ],
+      "tool_choice": "auto",
+    })
+    transport.assert_complete()
+  })
+}
+
+///|
 priv struct RecordingLimiter {
   acquired : Array[String]
   observed : Array[String]

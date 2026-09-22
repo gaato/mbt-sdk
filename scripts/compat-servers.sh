@@ -1,13 +1,15 @@
 #!/usr/bin/env bash
 # Starts the local OpenAI-/Anthropic-compatible servers the live tests can target,
-# CPU-only and key-free: Ollama with a ~135M model, and a LiteLLM proxy in front
+# CPU-only and key-free: Ollama with a ~500M tools-capable model, and a LiteLLM proxy in front
 # of it that speaks Anthropic /v1/messages. Prints the env vars to export.
 # Usage: scripts/compat-servers.sh [start|stop|env]
 set -euo pipefail
 cd "$(dirname "$0")/.."
-MODEL="${COMPAT_MODEL:-smollm2:135m}"
+MODEL="${COMPAT_MODEL:-qwen2.5:0.5b}"
+# smollm2 rejects the tools parameter. Keep a small, non-thinking model that
+# accepts tools even when it does not reliably choose to call one.
 # Both servers are deliberately unpinned: a new Ollama/LiteLLM release breaking
-# these tests is exactly the drift this repo exists to catch (see AGENTS.md).
+# these tests is exactly the drift this repo exists to catch (see README.md).
 case "${1:-start}" in
   start)
     if ! curl -sf -m 2 http://127.0.0.1:11434/api/version >/dev/null; then

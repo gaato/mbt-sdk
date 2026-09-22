@@ -23,6 +23,15 @@ fn message_json(message : Message) -> Json {
 }
 
 ///|
+fn tool_json(tool : ToolDef) -> Json {
+  @sdkjson.ObjBuilder::new()
+  .field("name", tool.name)
+  .opt("description", tool.description)
+  .field("input_schema", tool.input_schema)
+  .build()
+}
+
+///|
 fn is_message_key(key : String) -> Bool {
   match key {
     "model"
@@ -31,6 +40,8 @@ fn is_message_key(key : String) -> Bool {
     | "system"
     | "temperature"
     | "stop_sequences"
+    | "tools"
+    | "tool_choice"
     | "stream" => true
     _ => false
   }
@@ -53,6 +64,8 @@ fn message_body(
     .opt("system", request.system)
     .opt("temperature", request.temperature)
     .opt("stop_sequences", request.stop_sequences)
+    .opt("tools", request.tools.map(tools => tools.map(tool_json)))
+    .opt("tool_choice", request.tool_choice)
   if stream {
     ignore(builder.field("stream", true))
   }

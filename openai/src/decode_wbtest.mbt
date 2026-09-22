@@ -150,7 +150,7 @@ test "request body builder uses generated JSON and rejects every known extra col
   for
     key in [
       "model", "input", "instructions", "max_output_tokens", "temperature", "previous_response_id",
-      "stream",
+      "tools", "tool_choice", "stream",
     ] {
     let collision = ResponseRequest::new(
       model="gpt",
@@ -167,11 +167,13 @@ test "request body builder uses generated JSON and rejects every known extra col
 }
 
 ///|
-test "chat request conversion validates roles and maps tool names to tool_call_id" {
+test "chat request conversion validates roles and uses explicit tool_call_id" {
   let tool : ChatMessage = {
     role: "tool",
     content: "result",
-    name: Some("call_1"),
+    name: Some("weather_result"),
+    tool_calls: None,
+    tool_call_id: Some("call_1"),
   }
   assert_eq(
     chat_parts(
@@ -181,7 +183,12 @@ test "chat request conversion validates roles and maps tool names to tool_call_i
     {
       "model": "g",
       "messages": [
-        { "role": "tool", "content": "result", "tool_call_id": "call_1" },
+        {
+          "role": "tool",
+          "content": "result",
+          "name": "weather_result",
+          "tool_call_id": "call_1",
+        },
       ],
       "stream": true,
       "stream_options": { "include_usage": true },
@@ -190,7 +197,8 @@ test "chat request conversion validates roles and maps tool names to tool_call_i
   )
   for
     key in [
-      "model", "messages", "max_tokens", "temperature", "stream", "stream_options",
+      "model", "messages", "max_tokens", "temperature", "tools", "tool_choice", "stream",
+      "stream_options",
     ] {
     try
       ignore(
@@ -214,7 +222,13 @@ test "chat request conversion validates roles and maps tool names to tool_call_i
     ignore(
       chat_parts(
         ChatRequest::new(model="g", messages=[
-          { role: "future", content: "hello", name: None, },
+          {
+            role: "future",
+            content: "hello",
+            name: None,
+            tool_calls: None,
+            tool_call_id: None,
+          },
         ]),
         false,
       ),
@@ -224,5 +238,155 @@ test "chat request conversion validates roles and maps tool names to tool_call_i
     _ => fail("expected Config")
   } noraise {
     _ => fail("unknown role must fail")
+  }
+}
+
+///|
+test "tool request encoding is exact for chat and responses" {
+  let schema : Json = {
+    "type": "object",
+    "properties": { "city": { "type": "string" } },
+    "required": ["city"],
+  }
+  let tool = ToolDef::new(
+    name="get_weather",
+    description="Get weather",
+    parameters=schema,
+    strict=true,
+  )
+  let call : ToolCall = {
+    id: "call_1",
+    name: "get_weather",
+    arguments: "{\"city\":\"Tokyo\"}",
+  }
+  let choice : Json = {
+    "type": "function",
+    "function": { "name": "get_weather" },
+  }
+  assert_eq(
+    chat_parts(
+      ChatRequest::new(
+        model="gpt",
+        messages=[
+          ChatMessage::assistant_tool_calls([call]),
+          ChatMessage::tool(tool_call_id="call_1", content="sunny"),
+        ],
+        tools=[tool],
+        tool_choice=choice,
+      ),
+      false,
+    ).1,
+    {
+      "model": "gpt",
+      "messages": [
+        {
+          "role": "assistant",
+          "tool_calls": [
+            {
+              "id": "call_1",
+              "type": "function",
+              "function": {
+                "name": "get_weather",
+                "arguments": "{\"city\":\"Tokyo\"}",
+              },
+            },
+          ],
+        },
+        { "role": "tool", "content": "sunny", "tool_call_id": "call_1" },
+      ],
+      "tools": [
+        {
+          "type": "function",
+          "function": {
+            "name": "get_weather",
+            "description": "Get weather",
+            "parameters": schema,
+            "strict": true,
+          },
+        },
+      ],
+      "tool_choice": choice,
+    },
+  )
+  assert_eq(
+    response_parts(
+      ResponseRequest::new(
+        model="gpt",
+        input="weather",
+        tools=[tool],
+        tool_choice="auto",
+      ).with_tool_outputs([("call_1", "sunny")]),
+      false,
+    ).1,
+    {
+      "model": "gpt",
+      "input": [
+        { "role": "user", "content": "weather" },
+        {
+          "type": "function_call_output",
+          "call_id": "call_1",
+          "output": "sunny",
+        },
+      ],
+      "tools": [
+        {
+          "type": "function",
+          "name": "get_weather",
+          "description": "Get weather",
+          "parameters": schema,
+          "strict": true,
+        },
+      ],
+      "tool_choice": "auto",
+    },
+  )
+}
+
+///|
+test "responses decode function calls and function argument events" {
+  let text =
+    #|{
+    #|  "metadata":{},"temperature":1,"top_p":1,"previous_response_id":null,
+    #|  "model":"gpt","reasoning":null,"max_output_tokens":null,"instructions":null,
+    #|  "tools":[],"tool_choice":"auto","id":"resp_1","object":"response",
+    #|  "status":"completed","created_at":1,"error":null,"incomplete_details":null,
+    #|  "output":[{"type":"function_call","id":"fc_1","call_id":"call_1","name":"get_weather","arguments":"{\"city\":\"Tokyo\"}","status":"completed"}],
+    #|  "usage":null,"parallel_tool_calls":true
+    #|}
+    #|
+  let response = decode_response(test_response(text))
+  assert_eq(response.tool_calls, [
+    { id: "call_1", name: "get_weather", arguments: "{\"city\":\"Tokyo\"}", },
+  ])
+  assert_eq(
+    decode_response_event(
+      @json.parse(
+        "{\"type\":\"response.function_call_arguments.delta\",\"item_id\":\"fc_1\",\"output_index\":0,\"delta\":\"{\"}",
+      ),
+    ),
+    FunctionCallArgumentsDelta(item_id="fc_1", delta="{"),
+  )
+  assert_eq(
+    decode_response_event(
+      @json.parse(
+        "{\"type\":\"response.function_call_arguments.done\",\"item_id\":\"fc_1\",\"output_index\":0,\"arguments\":\"{}\"}",
+      ),
+    ),
+    FunctionCallArgumentsDone(item_id="fc_1", arguments="{}"),
+  )
+}
+
+///|
+test "chat decoding retains invalid tool argument JSON as raw text" {
+  let text =
+    #|{"id":"chatcmpl-bad-args","object":"chat.completion","created":1,"model":"gpt","choices":[{"index":0,"message":{"role":"assistant","content":null,"refusal":null,"tool_calls":[{"id":"call_bad","type":"function","function":{"name":"lookup","arguments":"{"}}]},"finish_reason":"tool_calls","logprobs":null}],"usage":null}
+    #|
+  let completion = decode_chat_completion(test_response(text))
+  assert_eq(completion.tool_calls[0].arguments, "{")
+  try ignore(completion.tool_calls[0].arguments_json()) catch {
+    @json.InvalidEof => ()
+    _ => fail("expected InvalidEof")
+  } noraise {
+    _ => fail("invalid arguments_json must fail only when parsed explicitly")
   }
 }

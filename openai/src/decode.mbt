@@ -35,6 +35,13 @@ fn chat_usage_from_generated(usage : @gen.CompletionUsage) -> Usage {
 }
 
 ///|
+fn tool_call_from_generated(
+  call : @gen.ChatCompletionMessageToolCall,
+) -> ToolCall {
+  { id: call.id, name: call.function.name, arguments: call.function.arguments, }
+}
+
+///|
 fn chat_finish_reason(
   reason : @gen.CreateChatCompletionResponseChoicesItemFinishReason,
 ) -> FinishReason {
@@ -86,6 +93,9 @@ fn decode_chat_completion(
     text: choice.message.content.unwrap_or(""),
     finish_reason: Some(chat_finish_reason(choice.finish_reason)),
     usage: generated.usage.map(chat_usage_from_generated),
+    tool_calls: choice.message.tool_calls
+    .map(calls => calls.map(tool_call_from_generated))
+    .unwrap_or([]),
     raw,
   }
 }
@@ -129,6 +139,21 @@ fn decode_chat_chunk(
     if reasoning_delta_at(value, index) is Some(text) {
       events.push(ReasoningDelta(text))
     }
+    if index == 0 && choice.delta.tool_calls is Some(calls) {
+      for call in calls {
+        let name = match call.function {
+          Some(function) => function.name
+          None => None
+        }
+        let arguments = match call.function {
+          Some(function) => function.arguments.unwrap_or("")
+          None => ""
+        }
+        events.push(
+          ToolCallDelta(index=call.index, id=call.id, name~, arguments~),
+        )
+      }
+    }
     if choice.finish_reason is Some(reason) {
       events.push(Finished(chat_stream_finish_reason(reason)))
     }
@@ -162,6 +187,21 @@ fn output_text_from_generated(output : Array[@gen.OutputItem]) -> String {
 }
 
 ///|
+fn response_tool_calls(output : Array[@gen.OutputItem]) -> Array[ToolCall] {
+  let calls : Array[ToolCall] = []
+  for item in output {
+    if item is @gen.FunctionCall(call) {
+      calls.push({
+        id: call.call_id,
+        name: call.name,
+        arguments: call.arguments,
+      })
+    }
+  }
+  calls
+}
+
+///|
 fn response_from_generated(
   response : @gen.Response,
   raw : Json,
@@ -177,6 +217,7 @@ fn response_from_generated(
       output_tokens: usage.output_tokens,
       total_tokens: usage.total_tokens,
     }),
+    tool_calls: response_tool_calls(response.output),
     raw,
   }
 }
@@ -269,6 +310,13 @@ fn response_event_from_generated(
     }
     @gen.ResponseOutputTextDelta(event) => OutputTextDelta(event.delta)
     @gen.ResponseOutputTextDone(event) => OutputTextDone(event.text)
+    @gen.ResponseFunctionCallArgumentsDelta(event) =>
+      FunctionCallArgumentsDelta(item_id=event.item_id, delta=event.delta)
+    @gen.ResponseFunctionCallArgumentsDone(event) =>
+      FunctionCallArgumentsDone(
+        item_id=event.item_id,
+        arguments=event.arguments,
+      )
     @gen.Error(event) =>
       Error({
         message: event.message,

@@ -69,6 +69,41 @@ pub extend InputContent with Eq::{equal, not_equal}
 pub extend InputContent with @debug.Debug::{to_repr}
 
 ///|
+/// A function tool definition for the Messages API.
+///
+/// ```mbt check
+/// test {
+///   let tool = @anthropic.ToolDef::new(name="lookup", input_schema={
+///     "type": "object",
+///   })
+///   assert_eq(tool.name, "lookup")
+/// }
+/// ```
+pub(all) struct ToolDef {
+  name : String
+  description : String?
+  input_schema : Json
+} derive(Eq, Debug)
+
+///|
+/// Compares tool definitions field by field.
+pub extend ToolDef with Eq::{equal, not_equal}
+
+///|
+/// Debug representation of a tool definition.
+pub extend ToolDef with @debug.Debug::{to_repr}
+
+///|
+/// Creates a function tool definition with a JSON Schema input object.
+pub fn ToolDef::new(
+  name~ : String,
+  input_schema~ : Json,
+  description? : String,
+) -> ToolDef {
+  { name, description, input_schema, }
+}
+
+///|
 /// One user or assistant turn sent to the Messages API.
 pub(all) struct Message {
   role : Role
@@ -114,6 +149,49 @@ pub fn Message::assistant(text : String) -> Message {
 }
 
 ///|
+/// Creates a user message containing one tool result block.
+///
+/// ```mbt check
+/// test {
+///   let message = @anthropic.Message::tool_result(
+///     tool_use_id="toolu_1",
+///     content="done",
+///   )
+///   assert_eq(message.role, @anthropic.User)
+/// }
+/// ```
+pub fn Message::tool_result(
+  tool_use_id~ : String,
+  content~ : String,
+  is_error? : Bool,
+) -> Message {
+  let block : Map[String, Json] = {
+    "type": "tool_result",
+    "tool_use_id": tool_use_id,
+    "content": content,
+  }
+  if is_error is Some(value) {
+    block["is_error"] = value.to_json()
+  }
+  { role: User, content: Blocks([Json::object(block)]), }
+}
+
+///|
+/// Creates an assistant input message from raw content blocks.
+///
+/// ```mbt check
+/// test {
+///   let message = @anthropic.Message::assistant_blocks([
+///     { "type": "tool_use", "id": "toolu_1" },
+///   ])
+///   assert_eq(message.role, @anthropic.Assistant)
+/// }
+/// ```
+pub fn Message::assistant_blocks(blocks : Array[Json]) -> Message {
+  { role: Assistant, content: Blocks(blocks.copy()), }
+}
+
+///|
 /// Input accepted by buffered and streaming message creation.
 pub(all) struct MessageRequest {
   model : String
@@ -122,6 +200,8 @@ pub(all) struct MessageRequest {
   system : String?
   temperature : Double?
   stop_sequences : Array[String]?
+  tools : Array[ToolDef]?
+  tool_choice : Json?
   extra : Map[String, Json]
 } derive(Eq, Debug)
 
@@ -153,6 +233,8 @@ pub fn MessageRequest::new(
   system? : String,
   temperature? : Double,
   stop_sequences? : Array[String],
+  tools? : Array[ToolDef],
+  tool_choice? : Json,
   extra? : Map[String, Json],
 ) -> MessageRequest {
   {
@@ -162,6 +244,8 @@ pub fn MessageRequest::new(
     system,
     temperature,
     stop_sequences: stop_sequences.map(Array::copy),
+    tools: tools.map(Array::copy),
+    tool_choice,
     extra: extra.map(Map::copy).unwrap_or({}),
   }
 }
@@ -299,3 +383,84 @@ pub extend MessageEvent with Eq::{equal, not_equal}
 ///|
 /// Debug representation of a message event.
 pub extend MessageEvent with @debug.Debug::{to_repr}
+
+///|
+/// Reconstructs streamed Anthropic tool-use inputs by content block index.
+///
+/// ```mbt check
+/// test {
+///   let tools = @anthropic.ToolUseAccumulator::new()
+///   tools.feed(
+///     @anthropic.ContentBlockStart(
+///       index=0,
+///       block=@anthropic.ToolUse(id="toolu_1", name="lookup", input={}),
+///     ),
+///   )
+///   tools.feed(@anthropic.InputJsonDelta(index=0, partial_json="{}"))
+///   tools.feed(@anthropic.ContentBlockStop(index=0))
+///   assert_eq(tools.finish()[0].2, {})
+/// }
+/// ```
+pub struct ToolUseAccumulator {
+  priv calls : Array[PendingToolUse]
+}
+
+///|
+/// Creates an empty tool-use accumulator.
+pub fn ToolUseAccumulator::new() -> ToolUseAccumulator {
+  { calls: [], }
+}
+
+///|
+/// Consumes one message event. Invalid partial JSON is retained without raising.
+pub fn ToolUseAccumulator::feed(
+  self : ToolUseAccumulator,
+  event : MessageEvent,
+) -> Unit {
+  match event {
+    ContentBlockStart(index~, block=ToolUse(id~, name~, ..)) => {
+      let pending : PendingToolUse = {
+        index,
+        id,
+        name,
+        arguments: StringBuilder(),
+        complete: false,
+      }
+      match self.calls.search_by(call => call.index == index) {
+        Some(position) => self.calls[position] = pending
+        None => self.calls.push(pending)
+      }
+    }
+    InputJsonDelta(index~, partial_json~) =>
+      if self.calls.search_by(call => call.index == index) is Some(position) {
+        self.calls[position].arguments.write_string(partial_json)
+      }
+    ContentBlockStop(index~) =>
+      if self.calls.search_by(call => call.index == index) is Some(position) {
+        self.calls[position].complete = true
+      }
+    _ => ()
+  }
+}
+
+///|
+/// Returns completed tool uses ordered by block index.
+/// Invalid accumulated JSON raises `@json.ParseError` here rather than from `feed`.
+pub fn ToolUseAccumulator::finish(
+  self : ToolUseAccumulator,
+) -> Array[(String, String, Json)] raise @json.ParseError {
+  let pending = self.calls.filter(call => call.complete)
+  pending.sort_by((left, right) => left.index - right.index)
+  pending.map(call => {
+    (call.id, call.name, @json.parse(call.arguments.to_string()))
+  })
+}
+
+///|
+priv struct PendingToolUse {
+  index : Int
+  id : String
+  name : String
+  arguments : StringBuilder
+  mut complete : Bool
+}

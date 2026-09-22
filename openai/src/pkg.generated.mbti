@@ -6,6 +6,7 @@ import {
   "gaato/http/clock",
   "gaato/sdk-runtime",
   "moonbitlang/core/debug",
+  "moonbitlang/core/json",
 }
 
 // Values
@@ -30,6 +31,7 @@ pub(all) struct ChatCompletion {
   text : String
   finish_reason : FinishReason?
   usage : Usage?
+  tool_calls : Array[ToolCall]
   raw : Json
 } derive(Eq, @debug.Debug)
 pub fn ChatCompletion::equal(Self, Self) -> Bool
@@ -39,6 +41,7 @@ pub fn ChatCompletion::to_repr(Self) -> @debug.Repr
 pub(all) enum ChatEvent {
   Delta(String)
   ReasoningDelta(String)
+  ToolCallDelta(index~ : Int, id~ : String?, name~ : String?, arguments~ : String)
   Finished(FinishReason)
   Usage(Usage)
   Other(String, Json)
@@ -51,12 +54,16 @@ pub(all) struct ChatMessage {
   role : String
   content : String
   name : String?
+  tool_calls : Array[ToolCall]?
+  tool_call_id : String?
 } derive(Eq, @debug.Debug)
 pub fn ChatMessage::assistant(String) -> Self
+pub fn ChatMessage::assistant_tool_calls(Array[ToolCall], content? : String) -> Self
 pub fn ChatMessage::equal(Self, Self) -> Bool
 pub fn ChatMessage::not_equal(Self, Self) -> Bool
 pub fn ChatMessage::system(String) -> Self
 pub fn ChatMessage::to_repr(Self) -> @debug.Repr
+pub fn ChatMessage::tool(tool_call_id~ : String, content~ : String) -> Self
 pub fn ChatMessage::user(String) -> Self
 
 pub(all) struct ChatRequest {
@@ -64,10 +71,12 @@ pub(all) struct ChatRequest {
   messages : Array[ChatMessage]
   max_tokens : Int?
   temperature : Double?
+  tools : Array[ToolDef]?
+  tool_choice : Json?
   extra : Map[String, Json]
 } derive(Eq, @debug.Debug)
 pub fn ChatRequest::equal(Self, Self) -> Bool
-pub fn ChatRequest::new(model~ : String, messages~ : Array[ChatMessage], max_tokens? : Int, temperature? : Double, extra? : Map[String, Json]) -> Self
+pub fn ChatRequest::new(model~ : String, messages~ : Array[ChatMessage], max_tokens? : Int, temperature? : Double, tools? : Array[ToolDef], tool_choice? : Json, extra? : Map[String, Json]) -> Self
 pub fn ChatRequest::not_equal(Self, Self) -> Bool
 pub fn ChatRequest::to_repr(Self) -> @debug.Repr
 
@@ -141,6 +150,7 @@ pub(all) struct Response {
   model : String
   output_text : String
   usage : Usage?
+  tool_calls : Array[ToolCall]
   raw : Json
 } derive(Eq, @debug.Debug)
 pub fn Response::equal(Self, Self) -> Bool
@@ -152,6 +162,8 @@ pub(all) enum ResponseEvent {
   InProgress(Response)
   OutputTextDelta(String)
   OutputTextDone(String)
+  FunctionCallArgumentsDelta(item_id~ : String, delta~ : String)
+  FunctionCallArgumentsDone(item_id~ : String, arguments~ : String)
   Completed(Response)
   Failed(Response)
   Incomplete(Response)
@@ -169,12 +181,16 @@ pub(all) struct ResponseRequest {
   max_output_tokens : Int?
   temperature : Double?
   previous_response_id : String?
+  tools : Array[ToolDef]?
+  tool_choice : Json?
   extra : Map[String, Json]
+  // private fields
 } derive(Eq, @debug.Debug)
 pub fn ResponseRequest::equal(Self, Self) -> Bool
-pub fn ResponseRequest::new(model~ : String, input~ : String, instructions? : String, max_output_tokens? : Int, temperature? : Double, previous_response_id? : String, extra? : Map[String, Json]) -> Self
+pub fn ResponseRequest::new(model~ : String, input~ : String, instructions? : String, max_output_tokens? : Int, temperature? : Double, previous_response_id? : String, tools? : Array[ToolDef], tool_choice? : Json, extra? : Map[String, Json]) -> Self
 pub fn ResponseRequest::not_equal(Self, Self) -> Bool
 pub fn ResponseRequest::to_repr(Self) -> @debug.Repr
+pub fn ResponseRequest::with_tool_outputs(Self, Array[(String, String)]) -> Self
 
 pub(all) enum ResponseStatus {
   Completed
@@ -188,6 +204,34 @@ pub(all) enum ResponseStatus {
 pub fn ResponseStatus::equal(Self, Self) -> Bool
 pub fn ResponseStatus::not_equal(Self, Self) -> Bool
 pub fn ResponseStatus::to_repr(Self) -> @debug.Repr
+
+pub(all) struct ToolCall {
+  id : String
+  name : String
+  arguments : String
+} derive(Eq, @debug.Debug)
+pub fn ToolCall::arguments_json(Self) -> Json raise @json.ParseError
+pub fn ToolCall::equal(Self, Self) -> Bool
+pub fn ToolCall::not_equal(Self, Self) -> Bool
+pub fn ToolCall::to_repr(Self) -> @debug.Repr
+
+pub struct ToolCallAccumulator {
+  // private fields
+}
+pub fn ToolCallAccumulator::feed(Self, index~ : Int, id? : String, name? : String, arguments~ : String) -> Unit
+pub fn ToolCallAccumulator::finish(Self) -> Array[ToolCall]
+pub fn ToolCallAccumulator::new() -> Self
+
+pub(all) struct ToolDef {
+  name : String
+  description : String?
+  parameters : Json
+  strict : Bool?
+} derive(Eq, @debug.Debug)
+pub fn ToolDef::equal(Self, Self) -> Bool
+pub fn ToolDef::new(name~ : String, parameters~ : Json, description? : String, strict? : Bool) -> Self
+pub fn ToolDef::not_equal(Self, Self) -> Bool
+pub fn ToolDef::to_repr(Self) -> @debug.Repr
 
 pub(all) struct Usage {
   input_tokens : Int

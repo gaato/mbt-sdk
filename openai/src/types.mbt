@@ -60,6 +60,74 @@ pub extend Usage with Eq::{equal, not_equal}
 pub extend Usage with @debug.Debug::{to_repr}
 
 ///|
+/// A function tool definition shared by Chat Completions and Responses.
+///
+/// ```mbt check
+/// test {
+///   let tool = @openai.ToolDef::new(name="lookup", parameters={ "type": "object" })
+///   assert_eq(tool.name, "lookup")
+/// }
+/// ```
+pub(all) struct ToolDef {
+  name : String
+  description : String?
+  parameters : Json
+  strict : Bool?
+} derive(Eq, Debug)
+
+///|
+/// Compares tool definitions field by field.
+pub extend ToolDef with Eq::{equal, not_equal}
+
+///|
+/// Debug representation of a tool definition.
+pub extend ToolDef with @debug.Debug::{to_repr}
+
+///|
+/// Creates a function tool definition with a JSON Schema parameter object.
+pub fn ToolDef::new(
+  name~ : String,
+  parameters~ : Json,
+  description? : String,
+  strict? : Bool,
+) -> ToolDef {
+  { name, description, parameters, strict, }
+}
+
+///|
+/// A function call produced by a model. Arguments remain raw text until parsed.
+pub(all) struct ToolCall {
+  id : String
+  name : String
+  arguments : String
+} derive(Eq, Debug)
+
+///|
+/// Compares tool calls field by field.
+pub extend ToolCall with Eq::{equal, not_equal}
+
+///|
+/// Debug representation of a tool call.
+pub extend ToolCall with @debug.Debug::{to_repr}
+
+///|
+/// Parses the model-produced argument string as JSON on demand.
+///
+/// ```mbt check
+/// test {
+///   let call : @openai.ToolCall = {
+///     id: "call_1",
+///     name: "lookup",
+///     arguments: "{\"id\":1}",
+///   }
+///   assert_eq(call.arguments_json(), { "id": 1 })
+/// }
+/// ```
+pub fn ToolCall::arguments_json(self : ToolCall) -> Json raise @json.ParseError {
+  @json.parse(self.arguments)
+}
+
+///|
 /// One text message sent to the Chat Completions API.
 ///
 /// ```mbt check
@@ -73,6 +141,8 @@ pub(all) struct ChatMessage {
   role : String
   content : String
   name : String?
+  tool_calls : Array[ToolCall]?
+  tool_call_id : String?
 } derive(Eq, Debug)
 
 ///|
@@ -92,7 +162,7 @@ pub extend ChatMessage with @debug.Debug::{to_repr}
 /// }
 /// ```
 pub fn ChatMessage::system(content : String) -> ChatMessage {
-  { role: "system", content, name: None, }
+  { role: "system", content, name: None, tool_calls: None, tool_call_id: None, }
 }
 
 ///|
@@ -104,7 +174,7 @@ pub fn ChatMessage::system(content : String) -> ChatMessage {
 /// }
 /// ```
 pub fn ChatMessage::user(content : String) -> ChatMessage {
-  { role: "user", content, name: None, }
+  { role: "user", content, name: None, tool_calls: None, tool_call_id: None, }
 }
 
 ///|
@@ -116,7 +186,60 @@ pub fn ChatMessage::user(content : String) -> ChatMessage {
 /// }
 /// ```
 pub fn ChatMessage::assistant(content : String) -> ChatMessage {
-  { role: "assistant", content, name: None, }
+  {
+    role: "assistant",
+    content,
+    name: None,
+    tool_calls: None,
+    tool_call_id: None,
+  }
+}
+
+///|
+/// Creates a tool result message associated with one model tool call.
+///
+/// ```mbt check
+/// test {
+///   let message = @openai.ChatMessage::tool(tool_call_id="call_1", content="done")
+///   assert_eq(message.tool_call_id, Some("call_1"))
+/// }
+/// ```
+pub fn ChatMessage::tool(
+  tool_call_id~ : String,
+  content~ : String,
+) -> ChatMessage {
+  {
+    role: "tool",
+    content,
+    name: None,
+    tool_calls: None,
+    tool_call_id: Some(tool_call_id),
+  }
+}
+
+///|
+/// Creates an assistant message containing function tool calls.
+/// When content is absent it is encoded without a content field.
+///
+/// ```mbt check
+/// test {
+///   let message = @openai.ChatMessage::assistant_tool_calls([
+///     { id: "call_1", name: "lookup", arguments: "{}", },
+///   ])
+///   assert_eq(message.tool_calls.unwrap().length(), 1)
+/// }
+/// ```
+pub fn ChatMessage::assistant_tool_calls(
+  tool_calls : Array[ToolCall],
+  content? : String,
+) -> ChatMessage {
+  {
+    role: "assistant",
+    content: content.unwrap_or(""),
+    name: None,
+    tool_calls: Some(tool_calls.copy()),
+    tool_call_id: None,
+  }
 }
 
 ///|
@@ -126,6 +249,8 @@ pub(all) struct ChatRequest {
   messages : Array[ChatMessage]
   max_tokens : Int?
   temperature : Double?
+  tools : Array[ToolDef]?
+  tool_choice : Json?
   extra : Map[String, Json]
 } derive(Eq, Debug)
 
@@ -153,15 +278,24 @@ pub fn ChatRequest::new(
   messages~ : Array[ChatMessage],
   max_tokens? : Int,
   temperature? : Double,
+  tools? : Array[ToolDef],
+  tool_choice? : Json,
   extra? : Map[String, Json],
 ) -> ChatRequest {
   {
     model,
-    messages: messages.copy(),
+    messages: messages.map(copy_chat_message),
     max_tokens,
     temperature,
+    tools: tools.map(Array::copy),
+    tool_choice,
     extra: extra.map(Map::copy).unwrap_or({}),
   }
+}
+
+///|
+fn copy_chat_message(message : ChatMessage) -> ChatMessage {
+  { ..message, tool_calls: message.tool_calls.map(Array::copy), }
 }
 
 ///|
@@ -190,6 +324,7 @@ pub(all) struct ChatCompletion {
   text : String
   finish_reason : FinishReason?
   usage : Usage?
+  tool_calls : Array[ToolCall]
   raw : Json
 } derive(Eq, Debug)
 
@@ -206,6 +341,12 @@ pub extend ChatCompletion with @debug.Debug::{to_repr}
 pub(all) enum ChatEvent {
   Delta(String)
   ReasoningDelta(String)
+  ToolCallDelta(
+    index~ : Int,
+    id~ : String?,
+    name~ : String?,
+    arguments~ : String
+  )
   Finished(FinishReason)
   Usage(Usage)
   Other(String, Json)
@@ -218,6 +359,76 @@ pub extend ChatEvent with Eq::{equal, not_equal}
 ///|
 /// Debug representation of a chat event.
 pub extend ChatEvent with @debug.Debug::{to_repr}
+
+///|
+/// Incrementally reconstructs tool calls from streamed chat deltas.
+///
+/// ```mbt check
+/// test {
+///   let calls = @openai.ToolCallAccumulator::new()
+///   calls.feed(index=0, id="call_1", name="lookup", arguments="{}")
+///   assert_eq(calls.finish()[0].arguments, "{}")
+/// }
+/// ```
+pub struct ToolCallAccumulator {
+  priv calls : Array[PendingToolCall]
+}
+
+///|
+/// Creates an empty streamed tool-call accumulator.
+pub fn ToolCallAccumulator::new() -> ToolCallAccumulator {
+  { calls: [], }
+}
+
+///|
+/// Adds one tool-call delta. The first supplied id and name for an index win.
+pub fn ToolCallAccumulator::feed(
+  self : ToolCallAccumulator,
+  index~ : Int,
+  id? : String,
+  name? : String,
+  arguments~ : String,
+) -> Unit {
+  match self.calls.search_by(call => call.index == index) {
+    None => {
+      self.calls.push({ index, id, name, arguments: StringBuilder(), })
+      self.calls.last().unwrap().arguments.write_string(arguments)
+    }
+    Some(call_index) => {
+      let call = self.calls[call_index]
+      if call.id is None && id is Some(value) {
+        call.id = Some(value)
+      }
+      if call.name is None && name is Some(value) {
+        call.name = Some(value)
+      }
+      call.arguments.write_string(arguments)
+    }
+  }
+}
+
+///|
+/// Returns reconstructed calls ordered by their stream index.
+/// Missing ids or names are returned as empty strings.
+pub fn ToolCallAccumulator::finish(
+  self : ToolCallAccumulator,
+) -> Array[ToolCall] {
+  let pending = self.calls.copy()
+  pending.sort_by((left, right) => left.index - right.index)
+  pending.map(call => {
+    id: call.id.unwrap_or(""),
+    name: call.name.unwrap_or(""),
+    arguments: call.arguments.to_string(),
+  })
+}
+
+///|
+priv struct PendingToolCall {
+  index : Int
+  mut id : String?
+  mut name : String?
+  arguments : StringBuilder
+}
 
 ///|
 /// Input accepted by the embeddings operation.
@@ -317,7 +528,10 @@ pub(all) struct ResponseRequest {
   max_output_tokens : Int?
   temperature : Double?
   previous_response_id : String?
+  tools : Array[ToolDef]?
+  tool_choice : Json?
   extra : Map[String, Json]
+  priv tool_outputs : Array[(String, String)]
 } derive(Eq, Debug)
 
 ///|
@@ -344,6 +558,8 @@ pub fn ResponseRequest::new(
   max_output_tokens? : Int,
   temperature? : Double,
   previous_response_id? : String,
+  tools? : Array[ToolDef],
+  tool_choice? : Json,
   extra? : Map[String, Json],
 ) -> ResponseRequest {
   {
@@ -353,8 +569,30 @@ pub fn ResponseRequest::new(
     max_output_tokens,
     temperature,
     previous_response_id,
+    tools: tools.map(Array::copy),
+    tool_choice,
     extra: extra.map(Map::copy).unwrap_or({}),
+    tool_outputs: [],
   }
+}
+
+///|
+/// Returns a request with function outputs appended to its input items.
+///
+/// ```mbt check
+/// test {
+///   let request = @openai.ResponseRequest::new(model="gpt-4.1", input="continue").with_tool_outputs([
+///       ("call_1", "done"),
+///     ],
+///   )
+///   assert_eq(request.input, "continue")
+/// }
+/// ```
+pub fn ResponseRequest::with_tool_outputs(
+  self : ResponseRequest,
+  outputs : Array[(String, String)],
+) -> ResponseRequest {
+  { ..self, tool_outputs: self.tool_outputs + outputs, }
 }
 
 ///|
@@ -365,6 +603,7 @@ pub(all) struct Response {
   model : String
   output_text : String
   usage : Usage?
+  tool_calls : Array[ToolCall]
   raw : Json
 } derive(Eq, Debug)
 
@@ -383,6 +622,8 @@ pub(all) enum ResponseEvent {
   InProgress(Response)
   OutputTextDelta(String)
   OutputTextDone(String)
+  FunctionCallArgumentsDelta(item_id~ : String, delta~ : String)
+  FunctionCallArgumentsDone(item_id~ : String, arguments~ : String)
   Completed(Response)
   Failed(Response)
   Incomplete(Response)

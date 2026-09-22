@@ -64,6 +64,116 @@ async test "Anthropic sends exact request and decodes a compatible response" {
 }
 
 ///|
+async test "Anthropic tool use round trip and stream accumulator use FakeTransport" {
+  bounded(() => {
+    let transport = @mock.FakeTransport::new()
+    transport.expect(
+      "POST",
+      "/messages",
+      json_response(
+        "{\"id\":\"msg_tool\",\"type\":\"message\",\"role\":\"assistant\",\"model\":\"claude\",\"content\":[{\"type\":\"tool_use\",\"id\":\"toolu_1\",\"name\":\"get_weather\",\"input\":{\"city\":\"Tokyo\"}}],\"stop_reason\":\"tool_use\",\"usage\":{\"input_tokens\":8,\"output_tokens\":5}}",
+      ),
+    )
+    let start = "{\"type\":\"content_block_start\",\"index\":0,\"content_block\":{\"type\":\"tool_use\",\"id\":\"toolu_2\",\"name\":\"get_weather\",\"input\":{}}}"
+    let delta1 = "{\"type\":\"content_block_delta\",\"index\":0,\"delta\":{\"type\":\"input_json_delta\",\"partial_json\":\"{\\\"city\\\":\"}}"
+    let delta2 = "{\"type\":\"content_block_delta\",\"index\":0,\"delta\":{\"type\":\"input_json_delta\",\"partial_json\":\"\\\"Tok\"}}"
+    let delta3 = "{\"type\":\"content_block_delta\",\"index\":0,\"delta\":{\"type\":\"input_json_delta\",\"partial_json\":\"yo\\\"}\"}}"
+    let stop = "{\"type\":\"content_block_stop\",\"index\":0}"
+    let sse = "data: " +
+      start +
+      "\n\ndata: " +
+      delta1 +
+      "\n\ndata: " +
+      delta2 +
+      "\n\ndata: " +
+      delta3 +
+      "\n\ndata: " +
+      stop +
+      "\n\ndata: {\"type\":\"message_stop\"}\n\n"
+    transport.expect_stream(
+      "POST",
+      "/messages",
+      { status: 200, headers: @http.Headers::new(), },
+      split_chunks(sse, [2, 31, 117, 233]),
+    )
+    let client = @anthropic_sdk.Anthropic::from_client(
+      @runtime.Client::new(
+        transport,
+        @mock.FakeClock::new(),
+        base_url="https://api.test",
+      ),
+    )
+    let schema : Json = {
+      "type": "object",
+      "properties": { "city": { "type": "string" } },
+    }
+    let response = client.create_message(
+      @anthropic_sdk.MessageRequest::new(
+        model="claude",
+        max_tokens=64,
+        messages=[
+          @anthropic_sdk.Message::tool_result(
+            tool_use_id="toolu_previous",
+            content="sunny",
+          ),
+        ],
+        tools=[
+          @anthropic_sdk.ToolDef::new(
+            name="get_weather",
+            description="Get weather",
+            input_schema=schema,
+          ),
+        ],
+        tool_choice={ "type": "auto" },
+      ),
+    )
+    assert_eq(response.stop_reason, Some(@anthropic_sdk.ToolUse))
+    assert_eq(
+      response.content[0],
+      @anthropic_sdk.ToolUse(id="toolu_1", name="get_weather", input={
+        "city": "Tokyo",
+      }),
+    )
+    let accumulator = @anthropic_sdk.ToolUseAccumulator::new()
+    client.stream_message(
+      @anthropic_sdk.MessageRequest::new(model="claude", max_tokens=64, messages=[
+        @anthropic_sdk.Message::user("weather"),
+      ]),
+      event => accumulator.feed(event),
+    )
+    assert_eq(accumulator.finish(), [
+      ("toolu_2", "get_weather", { "city": "Tokyo" }),
+    ])
+    let sent = transport.sent()
+    assert_eq(@json.parse(@utf8.decode(sent[0].body)), {
+      "model": "claude",
+      "max_tokens": 64,
+      "messages": [
+        {
+          "role": "user",
+          "content": [
+            {
+              "type": "tool_result",
+              "tool_use_id": "toolu_previous",
+              "content": "sunny",
+            },
+          ],
+        },
+      ],
+      "tools": [
+        {
+          "name": "get_weather",
+          "description": "Get weather",
+          "input_schema": schema,
+        },
+      ],
+      "tool_choice": { "type": "auto" },
+    })
+    transport.assert_complete()
+  })
+}
+
+///|
 priv struct RecordingLimiter {
   acquired : Array[String]
   observed : Array[String]

@@ -6,6 +6,7 @@ import {
   "gaato/http/clock",
   "gaato/sdk-runtime",
   "moonbitlang/core/debug",
+  "moonbitlang/core/json",
 }
 
 // Values
@@ -63,9 +64,11 @@ pub(all) struct Message {
   content : InputContent
 } derive(Eq, @debug.Debug)
 pub fn Message::assistant(String) -> Self
+pub fn Message::assistant_blocks(Array[Json]) -> Self
 pub fn Message::equal(Self, Self) -> Bool
 pub fn Message::not_equal(Self, Self) -> Bool
 pub fn Message::to_repr(Self) -> @debug.Repr
+pub fn Message::tool_result(tool_use_id~ : String, content~ : String, is_error? : Bool) -> Self
 pub fn Message::user(String) -> Self
 
 pub(all) enum MessageEvent {
@@ -92,10 +95,12 @@ pub(all) struct MessageRequest {
   system : String?
   temperature : Double?
   stop_sequences : Array[String]?
+  tools : Array[ToolDef]?
+  tool_choice : Json?
   extra : Map[String, Json]
 } derive(Eq, @debug.Debug)
 pub fn MessageRequest::equal(Self, Self) -> Bool
-pub fn MessageRequest::new(model~ : String, max_tokens~ : Int, messages~ : Array[Message], system? : String, temperature? : Double, stop_sequences? : Array[String], extra? : Map[String, Json]) -> Self
+pub fn MessageRequest::new(model~ : String, max_tokens~ : Int, messages~ : Array[Message], system? : String, temperature? : Double, stop_sequences? : Array[String], tools? : Array[ToolDef], tool_choice? : Json, extra? : Map[String, Json]) -> Self
 pub fn MessageRequest::not_equal(Self, Self) -> Bool
 pub fn MessageRequest::to_repr(Self) -> @debug.Repr
 
@@ -132,6 +137,23 @@ pub(all) enum StopReason {
 pub fn StopReason::equal(Self, Self) -> Bool
 pub fn StopReason::not_equal(Self, Self) -> Bool
 pub fn StopReason::to_repr(Self) -> @debug.Repr
+
+pub(all) struct ToolDef {
+  name : String
+  description : String?
+  input_schema : Json
+} derive(Eq, @debug.Debug)
+pub fn ToolDef::equal(Self, Self) -> Bool
+pub fn ToolDef::new(name~ : String, input_schema~ : Json, description? : String) -> Self
+pub fn ToolDef::not_equal(Self, Self) -> Bool
+pub fn ToolDef::to_repr(Self) -> @debug.Repr
+
+pub struct ToolUseAccumulator {
+  // private fields
+}
+pub fn ToolUseAccumulator::feed(Self, MessageEvent) -> Unit
+pub fn ToolUseAccumulator::finish(Self) -> Array[(String, String, Json)] raise @json.ParseError
+pub fn ToolUseAccumulator::new() -> Self
 
 pub(all) struct Usage {
   input_tokens : Int

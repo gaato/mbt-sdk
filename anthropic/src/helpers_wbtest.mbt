@@ -34,7 +34,7 @@ test "request body encodes text and raw blocks and rejects every known collision
   for
     key in [
       "model", "max_tokens", "messages", "system", "temperature", "stop_sequences",
-      "stream",
+      "tools", "tool_choice", "stream",
     ] {
     let collision = MessageRequest::new(
       model="m",
@@ -61,7 +61,7 @@ test "response decoder handles documented and compatible-provider shapes" {
     #|  "model":"claude-sonnet-4-5",
     #|  "content":[
     #|    {"type":"text","text":"Hello!"},
-    #|    {"type":"thinking","thinking":"Consider the request."},
+    #|    {"type":"thinking","thinking":"Consider the request.","signature":"sig_1"},
     #|    {"type":"tool_use","id":"toolu_1","name":"weather","input":{"city":"Tokyo"}},
     #|    {"type":"future_block","value":7}
     #|  ],
@@ -193,5 +193,107 @@ test "missing required response and event fields fail decoding" {
     @json.JsonDecodeError(_) => ()
   } noraise {
     _ => fail("missing event type must fail")
+  }
+}
+
+///|
+test "tool definitions and tool results encode exactly" {
+  let schema : Json = {
+    "type": "object",
+    "properties": { "city": { "type": "string" } },
+    "required": ["city"],
+  }
+  let assistant_blocks : Array[Json] = [
+    {
+      "type": "tool_use",
+      "id": "toolu_1",
+      "name": "get_weather",
+      "input": { "city": "Tokyo" },
+    },
+  ]
+  assert_eq(
+    message_body(
+      MessageRequest::new(
+        model="claude",
+        max_tokens=64,
+        messages=[
+          Message::assistant_blocks(assistant_blocks),
+          Message::tool_result(
+            tool_use_id="toolu_1",
+            content="sunny",
+            is_error=false,
+          ),
+        ],
+        tools=[
+          ToolDef::new(
+            name="get_weather",
+            description="Get weather",
+            input_schema=schema,
+          ),
+        ],
+        tool_choice={ "type": "tool", "name": "get_weather" },
+      ),
+      false,
+    ),
+    {
+      "model": "claude",
+      "max_tokens": 64,
+      "messages": [
+        { "role": "assistant", "content": assistant_blocks },
+        {
+          "role": "user",
+          "content": [
+            {
+              "type": "tool_result",
+              "tool_use_id": "toolu_1",
+              "content": "sunny",
+              "is_error": false,
+            },
+          ],
+        },
+      ],
+      "tools": [
+        {
+          "name": "get_weather",
+          "description": "Get weather",
+          "input_schema": schema,
+        },
+      ],
+      "tool_choice": { "type": "tool", "name": "get_weather" },
+    },
+  )
+}
+
+///|
+test "ToolUseAccumulator reconstructs partial JSON and reports invalid JSON at finish" {
+  let accumulator = ToolUseAccumulator::new()
+  accumulator.feed(
+    ContentBlockStart(
+      index=2,
+      block=ToolUse(id="toolu_1", name="get_weather", input={}),
+    ),
+  )
+  accumulator.feed(InputJsonDelta(index=2, partial_json="{\"city\":"))
+  accumulator.feed(InputJsonDelta(index=2, partial_json="\"Tok"))
+  accumulator.feed(InputJsonDelta(index=2, partial_json="yo\"}"))
+  accumulator.feed(ContentBlockStop(index=2))
+  assert_eq(accumulator.finish(), [
+    ("toolu_1", "get_weather", { "city": "Tokyo" }),
+  ])
+
+  let invalid = ToolUseAccumulator::new()
+  invalid.feed(
+    ContentBlockStart(
+      index=0,
+      block=ToolUse(id="toolu_bad", name="bad", input={}),
+    ),
+  )
+  invalid.feed(InputJsonDelta(index=0, partial_json="{"))
+  invalid.feed(ContentBlockStop(index=0))
+  try ignore(invalid.finish()) catch {
+    @json.InvalidEof => ()
+    _ => fail("expected InvalidEof")
+  } noraise {
+    _ => fail("invalid accumulated JSON must fail from finish")
   }
 }
