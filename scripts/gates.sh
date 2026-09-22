@@ -40,7 +40,9 @@ run moon fmt --check
 run moon info
 run .venv/bin/python tools/gen/census.py specs/badhttp/openapi.json badhttp --expect-zero
 run .venv/bin/python tools/gen/census.py specs/petstore3/openapi.json petstore3 --expect-zero
-if command -v git >/dev/null && git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+# Only meaningful in CI: in a jj working copy `git diff` compares against the parent change,
+# so uncommitted edits would look stale. Set MBT_SDK_CHECK_MBTI=1 to enforce locally.
+if [ "${CI:-}" = true ] || [ "${MBT_SDK_CHECK_MBTI:-}" = 1 ]; then
   git diff --exit-code -- '*.mbti' || { echo "pkg.generated.mbti is stale: run 'moon info' and commit" >&2; exit 1; }
 fi
 echo "gates: OK"
