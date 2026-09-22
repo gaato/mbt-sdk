@@ -1,8 +1,12 @@
 name: Canary
 
-# Same gates as CI, on the newest upstream MoonBit release. A failure here with a
-# green CI means the language or toolchain changed under us: fix it once in the
-# generator/runtime, regenerate, and bump the pinned image in ci.yml.
+# Same gates as CI, on the newest upstream MoonBit release (latest) and on the
+# nightly toolchain. A failure here with a green CI means the language or
+# toolchain changed under us. Read the two channels differently:
+#   latest  - the release users install has moved: fix it once in the
+#             generator/runtime, regenerate, and bump the pinned image in ci.yml.
+#   nightly - an early warning of what the next release will do; nightly itself
+#             is sometimes broken, so confirm before changing anything.
 
 on:
   schedule:
@@ -14,10 +18,15 @@ permissions:
 
 jobs:
   gates:
+    name: gates (${{ matrix.channel }})
     runs-on: ubuntu-24.04
     timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        channel: [latest, nightly]
     container:
-      image: ghcr.io/gaato/moonbit:latest
+      image: ghcr.io/gaato/moonbit:${{ matrix.channel }}
     steps:
       - name: Check out repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1

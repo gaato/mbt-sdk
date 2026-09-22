@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     container:
-      # Pinned toolchain. canary.yml runs the same gates on :latest.
+      # Pinned toolchain. canary.yml runs the same gates on :latest and :nightly.
       image: ghcr.io/gaato/moonbit:0.10.14
     steps:
       - name: Check out repository
