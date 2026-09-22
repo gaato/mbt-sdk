@@ -34,13 +34,14 @@ run timeout 120 moon -C runtime-tests test --target wasm-gc
 [ "$js" = 1 ] && run timeout 120 moon -C runtime-tests test --target js
 [ "$native_tests" = 1 ] && run timeout 120 moon -C runtime-tests test --target native
 
-run .venv/bin/python -m unittest discover -s tools/gen/tests -v
+py=(uv run --with pyyaml --with jsonpath-rfc9535 python); [ -x .venv/bin/python ] && py=(.venv/bin/python)
+run "${py[@]}" -m unittest discover -s tools/gen/tests -v
 run scripts/generate.sh --check
 run moon fmt --check
 run moon info
-run .venv/bin/python tools/gen/census.py specs/badhttp/openapi.json badhttp --expect-zero
-run .venv/bin/python tools/gen/census.py specs/petstore3/openapi.json petstore3 --expect-zero
-run .venv/bin/python tools/gen/census.py openai/spec/openai.yaml openai --derive-operation-ids --overlay openai/overlays/fix.yaml --overlay openai/overlays/moonbit.yaml --expect-zero
+run "${py[@]}" tools/gen/census.py specs/badhttp/openapi.json badhttp --expect-zero
+run "${py[@]}" tools/gen/census.py specs/petstore3/openapi.json petstore3 --expect-zero
+run "${py[@]}" tools/gen/census.py openai/spec/openai.yaml openai --derive-operation-ids --overlay openai/overlays/fix.yaml --overlay openai/overlays/moonbit.yaml --expect-zero
 # Only meaningful in CI: in a jj working copy `git diff` compares against the parent change,
 # so uncommitted edits would look stale. Set MBT_SDK_CHECK_MBTI=1 to enforce locally.
 if [ "${CI:-}" = true ] || [ "${MBT_SDK_CHECK_MBTI:-}" = 1 ]; then

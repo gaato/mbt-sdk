@@ -3,7 +3,7 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
-py=(uv run)
+py=(uv run --with pyyaml --with jsonpath-rfc9535 python)
 [ -x .venv/bin/python ] && py=(.venv/bin/python)
 
 for spec in specs/*/openapi.json; do
