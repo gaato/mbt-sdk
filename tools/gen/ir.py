@@ -324,7 +324,18 @@ def _is_string_schema(schema: dict[str, Any], resolve: callable) -> bool:
     union = schema.get("oneOf") or schema.get("anyOf")
     if isinstance(union, list) and union:
         return all(isinstance(item, dict) and _is_string_schema(item, resolve) for item in union)
-    return schema.get("type") == "string"
+    return schema.get("type") == "string" or isinstance(schema.get("const"), str)
+
+
+def _string_values(schema: dict[str, Any]) -> list[str] | None:
+    """The string values a schema admits: its enum, or its const as a one-item list."""
+    values = schema.get("enum")
+    if isinstance(values, list):
+        return [value for value in values if isinstance(value, str)]
+    constant = schema.get("const")
+    if isinstance(constant, str):
+        return [constant]
+    return None
 
 
 class IRBuilder:
@@ -844,14 +855,18 @@ class IRBuilder:
         annotations = schema.get("x-moonbit-variants")
         variants: list[EnumVariant] = []
         used: set[str] = set()
+        open_enum = "response" in usage
+        fallback = "Unknown" if open_enum else "Custom"
         for index, value in enumerate(values):
             variant = annotations[index] if isinstance(annotations, list) and index < len(annotations) else pascal_case(value)
             variant = pascal_case(str(variant))
             if variant in used:
                 self.add_diag(pointer_join(pointer, "enum"), f"enum variant name collision for {value!r}", "set x-moonbit-variants to unique names")
+            if variant == fallback:
+                self.add_diag(pointer_join(pointer, "enum"), f"enum value {value!r} collides with the {fallback} fallback constructor", f"set x-moonbit-variants to a name other than {fallback}")
             used.add(variant)
             variants.append(EnumVariant(variant, value))
-        self._add_declaration(StringEnum(name, tuple(variants), "response" in usage, schema.get("description", "")), pointer)
+        self._add_declaration(StringEnum(name, tuple(variants), open_enum, schema.get("description", "")), pointer)
         return TypeRef("named", name=name)
 
     def _tagged_union_type(
@@ -1139,11 +1154,11 @@ class IRBuilder:
                 if "oneOf" in normalized or "anyOf" in normalized:
                     unconstrained = True
                     break
-                values = normalized.get("enum")
-                if not isinstance(values, list):
+                values = _string_values(normalized)
+                if values is None:
                     unconstrained = True
                     break
-                enum_values.extend(value for value in values if isinstance(value, str))
+                enum_values.extend(values)
             if unconstrained:
                 return TypeRef("String")
             combined = dict(schema)

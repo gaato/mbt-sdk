@@ -132,6 +132,34 @@ class IRTests(unittest.TestCase):
         self.assertEqual(ir.operations[0].request_type.moon_type(), "String")
         self.assertFalse(any(isinstance(item, StringEnum) for item in ir.declarations))
 
+    def test_any_of_string_and_const_choices_folds_to_string(self):
+        # Anthropic's `Model` is `anyOf: [{type: string}, {const: id, ...}, ...]`: an open string.
+        schema = {"anyOf": [{"type": "string"}, {"const": "claude-a"}, {"const": "claude-b", "description": "b"}]}
+        ir = IRBuilder(document(operation(request=schema)), "example/gen").build()
+        self.assertEqual(ir.operations[0].request_type.moon_type(), "String")
+        self.assertFalse(any(isinstance(item, StringEnum) for item in ir.declarations))
+
+    def test_const_only_choices_fold_to_a_string_enum(self):
+        schema = {"anyOf": [{"const": "left"}, {"const": "right", "type": "string"}]}
+        ir = IRBuilder(document(operation(request=schema)), "example/gen").build()
+        enum = declaration(ir, "TestOperationRequest")
+        self.assertIsInstance(enum, StringEnum)
+        self.assertEqual([variant.value for variant in enum.variants], ["left", "right"])
+
+    def test_enum_value_colliding_with_fallback_constructor_is_a_diagnostic(self):
+        request_schema = {"type": "string", "enum": ["anthropic", "custom"]}
+        with self.assertRaises(GenerationError) as caught:
+            IRBuilder(document(operation(request=request_schema)), "example/gen").build()
+        self.assertIn("'custom' collides with the Custom fallback constructor", str(caught.exception))
+        response_schema = {"type": "string", "enum": ["known", "unknown"]}
+        with self.assertRaises(GenerationError) as caught:
+            IRBuilder(document(operation(response=response_schema)), "example/gen").build()
+        self.assertIn("'unknown' collides with the Unknown fallback constructor", str(caught.exception))
+        renamed = {"type": "string", "enum": ["anthropic", "custom"], "x-moonbit-variants": ["Anthropic", "CustomSkill"]}
+        ir = IRBuilder(document(operation(request=renamed)), "example/gen").build()
+        self.assertEqual([variant.name for variant in declaration(ir, "TestOperationRequest").variants], ["Anthropic", "CustomSkill"])
+        self.assertIn("Custom(String)", emit(ir)["types.mbt"])
+
     def test_named_primitive_expands_without_annotation_and_newtypes_with_it(self):
         schemas = {
             "Plain": {"type": "string"},
