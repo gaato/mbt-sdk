@@ -201,6 +201,2696 @@ fn[T : @json.FromJson] decode_presence_json_map(
 
 ///|
 ///
+/// Specifying a particular function via `{"name": "my_function"}` forces the model to call that function.
+pub(all) struct ChatCompletionFunctionCallOption {
+  name : String
+}
+
+///|
+///
+/// Creates a ChatCompletionFunctionCallOption with omitted optional fields absent.
+pub fn ChatCompletionFunctionCallOption::new(
+  name~ : String,
+) -> ChatCompletionFunctionCallOption {
+  { name, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend ChatCompletionFunctionCallOption with ToJson::{to_json}
+
+///|
+pub impl ToJson for ChatCompletionFunctionCallOption with fn to_json(self) {
+  @sdkjson.ObjBuilder::new().field("name", self.name).build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend ChatCompletionFunctionCallOption with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for ChatCompletionFunctionCallOption with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  { name: required_field(obj, "name", path), }
+}
+
+///|
+///
+/// Generated representation of ChatCompletionFunctions.
+pub(all) struct ChatCompletionFunctions {
+  description : String?
+  name : String
+  parameters : Json?
+}
+
+///|
+///
+/// Creates a ChatCompletionFunctions with omitted optional fields absent.
+pub fn ChatCompletionFunctions::new(
+  name~ : String,
+  description? : String,
+  parameters? : Json,
+) -> ChatCompletionFunctions {
+  { description, name, parameters, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend ChatCompletionFunctions with ToJson::{to_json}
+
+///|
+pub impl ToJson for ChatCompletionFunctions with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .opt("description", self.description)
+  .field("name", self.name)
+  .opt("parameters", self.parameters)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend ChatCompletionFunctions with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for ChatCompletionFunctions with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    description: @sdkjson.opt_field(obj, "description", path),
+    name: required_field(obj, "name", path),
+    parameters: @sdkjson.opt_field(obj, "parameters", path),
+  }
+}
+
+///|
+///
+/// The function that the model called.
+pub(all) struct ChatCompletionMessageToolCallFunction {
+  name : String
+  arguments : String
+}
+
+///|
+///
+/// Creates a ChatCompletionMessageToolCallFunction with omitted optional fields absent.
+pub fn ChatCompletionMessageToolCallFunction::new(
+  name~ : String,
+  arguments~ : String,
+) -> ChatCompletionMessageToolCallFunction {
+  { name, arguments, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend ChatCompletionMessageToolCallFunction with ToJson::{to_json}
+
+///|
+pub impl ToJson for ChatCompletionMessageToolCallFunction with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("name", self.name)
+  .field("arguments", self.arguments)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend ChatCompletionMessageToolCallFunction with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for ChatCompletionMessageToolCallFunction with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    name: required_field(obj, "name", path),
+    arguments: required_field(obj, "arguments", path),
+  }
+}
+
+///|
+///
+/// Generated representation of ChatCompletionMessageToolCall.
+pub(all) struct ChatCompletionMessageToolCall {
+  id : String
+  function : ChatCompletionMessageToolCallFunction
+}
+
+///|
+///
+/// Creates a ChatCompletionMessageToolCall with omitted optional fields absent.
+pub fn ChatCompletionMessageToolCall::new(
+  id~ : String,
+  function~ : ChatCompletionMessageToolCallFunction,
+) -> ChatCompletionMessageToolCall {
+  { id, function, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend ChatCompletionMessageToolCall with ToJson::{to_json}
+
+///|
+pub impl ToJson for ChatCompletionMessageToolCall with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("id", self.id)
+  .field("type", "function")
+  .field("function", self.function)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend ChatCompletionMessageToolCall with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for ChatCompletionMessageToolCall with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    id: required_field(obj, "id", path),
+    function: required_field(obj, "function", path),
+  }
+}
+
+///|
+///
+/// Generated representation of ChatCompletionMessageToolCallChunkFunction.
+pub(all) struct ChatCompletionMessageToolCallChunkFunction {
+  name : String?
+  arguments : String?
+}
+
+///|
+///
+/// Creates a ChatCompletionMessageToolCallChunkFunction with omitted optional fields absent.
+pub fn ChatCompletionMessageToolCallChunkFunction::new(
+  name? : String,
+  arguments? : String,
+) -> ChatCompletionMessageToolCallChunkFunction {
+  { name, arguments, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend ChatCompletionMessageToolCallChunkFunction with ToJson::{to_json}
+
+///|
+pub impl ToJson for ChatCompletionMessageToolCallChunkFunction with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("name", self.name)
+  .opt("arguments", self.arguments)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend ChatCompletionMessageToolCallChunkFunction with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for ChatCompletionMessageToolCallChunkFunction with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    name: @sdkjson.opt_field(obj, "name", path),
+    arguments: @sdkjson.opt_field(obj, "arguments", path),
+  }
+}
+
+///|
+///
+/// Generated representation of ChatCompletionMessageToolCallChunk.
+pub(all) struct ChatCompletionMessageToolCallChunk {
+  index : Int
+  id : String?
+  function : ChatCompletionMessageToolCallChunkFunction?
+}
+
+///|
+///
+/// Creates a ChatCompletionMessageToolCallChunk with omitted optional fields absent.
+pub fn ChatCompletionMessageToolCallChunk::new(
+  index~ : Int,
+  id? : String,
+  function? : ChatCompletionMessageToolCallChunkFunction,
+) -> ChatCompletionMessageToolCallChunk {
+  { index, id, function, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend ChatCompletionMessageToolCallChunk with ToJson::{to_json}
+
+///|
+pub impl ToJson for ChatCompletionMessageToolCallChunk with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("index", self.index)
+  .opt("id", self.id)
+  .field("type", "function")
+  .opt("function", self.function)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend ChatCompletionMessageToolCallChunk with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for ChatCompletionMessageToolCallChunk with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    index: required_field(obj, "index", path),
+    id: @sdkjson.opt_field(obj, "id", path),
+    function: @sdkjson.opt_field(obj, "function", path),
+  }
+}
+
+///|
+///
+/// Generated representation of ChatCompletionNamedToolChoiceFunction.
+pub(all) struct ChatCompletionNamedToolChoiceFunction {
+  name : String
+}
+
+///|
+///
+/// Creates a ChatCompletionNamedToolChoiceFunction with omitted optional fields absent.
+pub fn ChatCompletionNamedToolChoiceFunction::new(
+  name~ : String,
+) -> ChatCompletionNamedToolChoiceFunction {
+  { name, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend ChatCompletionNamedToolChoiceFunction with ToJson::{to_json}
+
+///|
+pub impl ToJson for ChatCompletionNamedToolChoiceFunction with fn to_json(self) {
+  @sdkjson.ObjBuilder::new().field("name", self.name).build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend ChatCompletionNamedToolChoiceFunction with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for ChatCompletionNamedToolChoiceFunction with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  { name: required_field(obj, "name", path), }
+}
+
+///|
+///
+/// Specifies a tool the model should use. Use to force the model to call a specific function.
+pub(all) struct ChatCompletionNamedToolChoice {
+  function : ChatCompletionNamedToolChoiceFunction
+}
+
+///|
+///
+/// Creates a ChatCompletionNamedToolChoice with omitted optional fields absent.
+pub fn ChatCompletionNamedToolChoice::new(
+  function~ : ChatCompletionNamedToolChoiceFunction,
+) -> ChatCompletionNamedToolChoice {
+  { function, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend ChatCompletionNamedToolChoice with ToJson::{to_json}
+
+///|
+pub impl ToJson for ChatCompletionNamedToolChoice with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("type", "function")
+  .field("function", self.function)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend ChatCompletionNamedToolChoice with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for ChatCompletionNamedToolChoice with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  { function: required_field(obj, "function", path), }
+}
+
+///|
+///
+/// Learn about [text inputs](/docs/guides/text-generation).
+pub(all) struct ChatCompletionRequestMessageContentPartText {
+  type_ : String
+  text : String
+}
+
+///|
+///
+/// Creates a ChatCompletionRequestMessageContentPartText with omitted optional fields absent.
+pub fn ChatCompletionRequestMessageContentPartText::new(
+  type_~ : String,
+  text~ : String,
+) -> ChatCompletionRequestMessageContentPartText {
+  { type_, text, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend ChatCompletionRequestMessageContentPartText with ToJson::{to_json}
+
+///|
+pub impl ToJson for ChatCompletionRequestMessageContentPartText with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .field("type", self.type_)
+  .field("text", self.text)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend ChatCompletionRequestMessageContentPartText with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for ChatCompletionRequestMessageContentPartText with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    type_: required_field(obj, "type", path),
+    text: required_field(obj, "text", path),
+  }
+}
+
+///|
+///
+/// Generated representation of ChatCompletionRequestMessageContentPartRefusal.
+pub(all) struct ChatCompletionRequestMessageContentPartRefusal {
+  type_ : String
+  refusal : String
+}
+
+///|
+///
+/// Creates a ChatCompletionRequestMessageContentPartRefusal with omitted optional fields absent.
+pub fn ChatCompletionRequestMessageContentPartRefusal::new(
+  type_~ : String,
+  refusal~ : String,
+) -> ChatCompletionRequestMessageContentPartRefusal {
+  { type_, refusal, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend ChatCompletionRequestMessageContentPartRefusal with ToJson::{to_json}
+
+///|
+pub impl ToJson for ChatCompletionRequestMessageContentPartRefusal with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .field("type", self.type_)
+  .field("refusal", self.refusal)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend ChatCompletionRequestMessageContentPartRefusal with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for ChatCompletionRequestMessageContentPartRefusal with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    type_: required_field(obj, "type", path),
+    refusal: required_field(obj, "refusal", path),
+  }
+}
+
+///|
+///
+/// Generated tagged union ChatCompletionRequestAssistantMessageContentPart.
+pub(all) enum ChatCompletionRequestAssistantMessageContentPart {
+  Text(ChatCompletionRequestMessageContentPartText)
+  Refusal(ChatCompletionRequestMessageContentPartRefusal)
+  Unknown(String, Json)
+}
+
+///|
+///
+/// Encodes this tagged union as JSON.
+pub extend ChatCompletionRequestAssistantMessageContentPart with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for ChatCompletionRequestAssistantMessageContentPart with fn to_json(
+  self,
+) {
+  match self {
+    Text(value) => value.to_json()
+    Refusal(value) => value.to_json()
+    Unknown(_, value) => value
+  }
+}
+
+///|
+///
+/// Decodes this tagged union from JSON.
+pub extend ChatCompletionRequestAssistantMessageContentPart with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for ChatCompletionRequestAssistantMessageContentPart with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  let tag : String = required_field(obj, "type", path)
+  match tag {
+    "text" => Text(@json.from_json(value, path~))
+    "refusal" => Refusal(@json.from_json(value, path~))
+    other => Unknown(other, value)
+  }
+}
+
+///|
+///
+/// The contents of the assistant message. Required unless `tool_calls` or `function_call` is specified.
+pub(all) enum ChatCompletionRequestAssistantMessageContent {
+  Text(String)
+  ChatCompletionRequestAssistantMessageContentPartArray(
+    Array[ChatCompletionRequestAssistantMessageContentPart]
+  )
+}
+
+///|
+///
+/// Encodes this union as JSON.
+pub extend ChatCompletionRequestAssistantMessageContent with ToJson::{to_json}
+
+///|
+pub impl ToJson for ChatCompletionRequestAssistantMessageContent with fn to_json(
+  self,
+) {
+  match self {
+    Text(value) => value.to_json()
+    ChatCompletionRequestAssistantMessageContentPartArray(value) =>
+      value.to_json()
+  }
+}
+
+///|
+///
+/// Decodes this union from JSON.
+pub extend ChatCompletionRequestAssistantMessageContent with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for ChatCompletionRequestAssistantMessageContent with fn from_json(
+  value,
+  path,
+) {
+  if value is String(_) {
+    let decoded : String = @json.from_json(value, path~)
+    return Text(decoded)
+  }
+  if json_array_matches(value, item => item is Object(_)) {
+    let decoded : Array[ChatCompletionRequestAssistantMessageContentPart] = @json.from_json(
+      value,
+      path~,
+    )
+    return ChatCompletionRequestAssistantMessageContentPartArray(decoded)
+  }
+  raise @json.JsonDecodeError(
+    (
+      path, "JSON shape does not match any ChatCompletionRequestAssistantMessageContent variant",
+    ),
+  )
+}
+
+///|
+///
+/// Data about a previous audio response from the model. [Learn more](/docs/guides/audio).
+pub(all) struct ChatCompletionRequestAssistantMessageAudio {
+  id : String
+}
+
+///|
+///
+/// Creates a ChatCompletionRequestAssistantMessageAudio with omitted optional fields absent.
+pub fn ChatCompletionRequestAssistantMessageAudio::new(
+  id~ : String,
+) -> ChatCompletionRequestAssistantMessageAudio {
+  { id, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend ChatCompletionRequestAssistantMessageAudio with ToJson::{to_json}
+
+///|
+pub impl ToJson for ChatCompletionRequestAssistantMessageAudio with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new().field("id", self.id).build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend ChatCompletionRequestAssistantMessageAudio with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for ChatCompletionRequestAssistantMessageAudio with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  { id: required_field(obj, "id", path), }
+}
+
+///|
+///
+/// Deprecated and replaced by `tool_calls`. The name and arguments of a function that should be called, as generated by the model.
+pub(all) struct ChatCompletionRequestAssistantMessageFunctionCall {
+  arguments : String
+  name : String
+}
+
+///|
+///
+/// Creates a ChatCompletionRequestAssistantMessageFunctionCall with omitted optional fields absent.
+pub fn ChatCompletionRequestAssistantMessageFunctionCall::new(
+  arguments~ : String,
+  name~ : String,
+) -> ChatCompletionRequestAssistantMessageFunctionCall {
+  { arguments, name, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend ChatCompletionRequestAssistantMessageFunctionCall with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for ChatCompletionRequestAssistantMessageFunctionCall with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .field("arguments", self.arguments)
+  .field("name", self.name)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend ChatCompletionRequestAssistantMessageFunctionCall with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for ChatCompletionRequestAssistantMessageFunctionCall with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    arguments: required_field(obj, "arguments", path),
+    name: required_field(obj, "name", path),
+  }
+}
+
+///|
+///
+/// Messages sent by the model in response to user messages.
+pub(all) struct ChatCompletionRequestAssistantMessage {
+  content : @sdkjson.Presence[ChatCompletionRequestAssistantMessageContent]
+  refusal : @sdkjson.Presence[String]
+  role : String
+  name : String?
+  audio : @sdkjson.Presence[ChatCompletionRequestAssistantMessageAudio]
+  tool_calls : Array[ChatCompletionMessageToolCall]?
+  function_call : @sdkjson.Presence[
+    ChatCompletionRequestAssistantMessageFunctionCall,
+  ]
+}
+
+///|
+///
+/// Creates a ChatCompletionRequestAssistantMessage with omitted optional fields absent.
+pub fn ChatCompletionRequestAssistantMessage::new(
+  role~ : String,
+  content? : ChatCompletionRequestAssistantMessageContent,
+  refusal? : String,
+  name? : String,
+  audio? : ChatCompletionRequestAssistantMessageAudio,
+  tool_calls? : Array[ChatCompletionMessageToolCall],
+  function_call? : ChatCompletionRequestAssistantMessageFunctionCall,
+) -> ChatCompletionRequestAssistantMessage {
+  {
+    content: @sdkjson.Presence::from_option(content),
+    refusal: @sdkjson.Presence::from_option(refusal),
+    role,
+    name,
+    audio: @sdkjson.Presence::from_option(audio),
+    tool_calls,
+    function_call: @sdkjson.Presence::from_option(function_call),
+  }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend ChatCompletionRequestAssistantMessage with ToJson::{to_json}
+
+///|
+pub impl ToJson for ChatCompletionRequestAssistantMessage with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .presence("content", self.content)
+  .presence("refusal", self.refusal)
+  .field("role", self.role)
+  .opt("name", self.name)
+  .presence("audio", self.audio)
+  .opt("tool_calls", self.tool_calls)
+  .presence("function_call", self.function_call)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend ChatCompletionRequestAssistantMessage with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for ChatCompletionRequestAssistantMessage with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    content: @sdkjson.presence_field(obj, "content", path),
+    refusal: @sdkjson.presence_field(obj, "refusal", path),
+    role: required_field(obj, "role", path),
+    name: @sdkjson.opt_field(obj, "name", path),
+    audio: @sdkjson.presence_field(obj, "audio", path),
+    tool_calls: @sdkjson.opt_field(obj, "tool_calls", path),
+    function_call: @sdkjson.presence_field(obj, "function_call", path),
+  }
+}
+
+///|
+///
+/// The contents of the developer message.
+pub(all) enum ChatCompletionRequestDeveloperMessageContent {
+  Text(String)
+  ChatCompletionRequestMessageContentPartTextArray(
+    Array[ChatCompletionRequestMessageContentPartText]
+  )
+}
+
+///|
+///
+/// Encodes this union as JSON.
+pub extend ChatCompletionRequestDeveloperMessageContent with ToJson::{to_json}
+
+///|
+pub impl ToJson for ChatCompletionRequestDeveloperMessageContent with fn to_json(
+  self,
+) {
+  match self {
+    Text(value) => value.to_json()
+    ChatCompletionRequestMessageContentPartTextArray(value) => value.to_json()
+  }
+}
+
+///|
+///
+/// Decodes this union from JSON.
+pub extend ChatCompletionRequestDeveloperMessageContent with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for ChatCompletionRequestDeveloperMessageContent with fn from_json(
+  value,
+  path,
+) {
+  if value is String(_) {
+    let decoded : String = @json.from_json(value, path~)
+    return Text(decoded)
+  }
+  if json_array_matches(value, item => item is Object(_)) {
+    let decoded : Array[ChatCompletionRequestMessageContentPartText] = @json.from_json(
+      value,
+      path~,
+    )
+    return ChatCompletionRequestMessageContentPartTextArray(decoded)
+  }
+  raise @json.JsonDecodeError(
+    (
+      path, "JSON shape does not match any ChatCompletionRequestDeveloperMessageContent variant",
+    ),
+  )
+}
+
+///|
+///
+/// Developer-provided instructions that the model should follow, regardless of messages sent by the user. With o1 models and newer, `developer` messages replace the previous `system` messages.
+pub(all) struct ChatCompletionRequestDeveloperMessage {
+  content : ChatCompletionRequestDeveloperMessageContent
+  role : String
+  name : String?
+}
+
+///|
+///
+/// Creates a ChatCompletionRequestDeveloperMessage with omitted optional fields absent.
+pub fn ChatCompletionRequestDeveloperMessage::new(
+  content~ : ChatCompletionRequestDeveloperMessageContent,
+  role~ : String,
+  name? : String,
+) -> ChatCompletionRequestDeveloperMessage {
+  { content, role, name, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend ChatCompletionRequestDeveloperMessage with ToJson::{to_json}
+
+///|
+pub impl ToJson for ChatCompletionRequestDeveloperMessage with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("content", self.content)
+  .field("role", self.role)
+  .opt("name", self.name)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend ChatCompletionRequestDeveloperMessage with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for ChatCompletionRequestDeveloperMessage with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    content: required_field(obj, "content", path),
+    role: required_field(obj, "role", path),
+    name: @sdkjson.opt_field(obj, "name", path),
+  }
+}
+
+///|
+///
+/// Generated representation of ChatCompletionRequestFunctionMessage.
+pub(all) struct ChatCompletionRequestFunctionMessage {
+  role : String
+  content : String?
+  name : String
+}
+
+///|
+///
+/// Creates a ChatCompletionRequestFunctionMessage with omitted optional fields absent.
+pub fn ChatCompletionRequestFunctionMessage::new(
+  role~ : String,
+  name~ : String,
+  content? : String,
+) -> ChatCompletionRequestFunctionMessage {
+  { role, content, name, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend ChatCompletionRequestFunctionMessage with ToJson::{to_json}
+
+///|
+pub impl ToJson for ChatCompletionRequestFunctionMessage with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("role", self.role)
+  .presence("content", nullable_presence(self.content.map(value => value)))
+  .field("name", self.name)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend ChatCompletionRequestFunctionMessage with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for ChatCompletionRequestFunctionMessage with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    role: required_field(obj, "role", path),
+    content: decode_nullable_field(obj, "content", path),
+    name: required_field(obj, "name", path),
+  }
+}
+
+///|
+///
+/// Generated tagged union ChatCompletionRequestSystemMessageContentPart.
+pub(all) enum ChatCompletionRequestSystemMessageContentPart {
+  Text(ChatCompletionRequestMessageContentPartText)
+  Unknown(String, Json)
+}
+
+///|
+///
+/// Encodes this tagged union as JSON.
+pub extend ChatCompletionRequestSystemMessageContentPart with ToJson::{to_json}
+
+///|
+pub impl ToJson for ChatCompletionRequestSystemMessageContentPart with fn to_json(
+  self,
+) {
+  match self {
+    Text(value) => value.to_json()
+    Unknown(_, value) => value
+  }
+}
+
+///|
+///
+/// Decodes this tagged union from JSON.
+pub extend ChatCompletionRequestSystemMessageContentPart with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for ChatCompletionRequestSystemMessageContentPart with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  let tag : String = required_field(obj, "type", path)
+  match tag {
+    "text" => Text(@json.from_json(value, path~))
+    other => Unknown(other, value)
+  }
+}
+
+///|
+///
+/// The contents of the system message.
+pub(all) enum ChatCompletionRequestSystemMessageContent {
+  Text(String)
+  ChatCompletionRequestSystemMessageContentPartArray(
+    Array[ChatCompletionRequestSystemMessageContentPart]
+  )
+}
+
+///|
+///
+/// Encodes this union as JSON.
+pub extend ChatCompletionRequestSystemMessageContent with ToJson::{to_json}
+
+///|
+pub impl ToJson for ChatCompletionRequestSystemMessageContent with fn to_json(
+  self,
+) {
+  match self {
+    Text(value) => value.to_json()
+    ChatCompletionRequestSystemMessageContentPartArray(value) => value.to_json()
+  }
+}
+
+///|
+///
+/// Decodes this union from JSON.
+pub extend ChatCompletionRequestSystemMessageContent with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for ChatCompletionRequestSystemMessageContent with fn from_json(
+  value,
+  path,
+) {
+  if value is String(_) {
+    let decoded : String = @json.from_json(value, path~)
+    return Text(decoded)
+  }
+  if json_array_matches(value, item => item is Object(_)) {
+    let decoded : Array[ChatCompletionRequestSystemMessageContentPart] = @json.from_json(
+      value,
+      path~,
+    )
+    return ChatCompletionRequestSystemMessageContentPartArray(decoded)
+  }
+  raise @json.JsonDecodeError(
+    (
+      path, "JSON shape does not match any ChatCompletionRequestSystemMessageContent variant",
+    ),
+  )
+}
+
+///|
+///
+/// Developer-provided instructions that the model should follow, regardless of messages sent by the user. With o1 models and newer, use `developer` messages for this purpose instead.
+pub(all) struct ChatCompletionRequestSystemMessage {
+  content : ChatCompletionRequestSystemMessageContent
+  role : String
+  name : String?
+}
+
+///|
+///
+/// Creates a ChatCompletionRequestSystemMessage with omitted optional fields absent.
+pub fn ChatCompletionRequestSystemMessage::new(
+  content~ : ChatCompletionRequestSystemMessageContent,
+  role~ : String,
+  name? : String,
+) -> ChatCompletionRequestSystemMessage {
+  { content, role, name, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend ChatCompletionRequestSystemMessage with ToJson::{to_json}
+
+///|
+pub impl ToJson for ChatCompletionRequestSystemMessage with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("content", self.content)
+  .field("role", self.role)
+  .opt("name", self.name)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend ChatCompletionRequestSystemMessage with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for ChatCompletionRequestSystemMessage with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    content: required_field(obj, "content", path),
+    role: required_field(obj, "role", path),
+    name: @sdkjson.opt_field(obj, "name", path),
+  }
+}
+
+///|
+///
+/// Specifies the detail level of the image. Learn more in the [Vision guide](/docs/guides/vision#low-or-high-fidelity-image-understanding).
+pub(all) enum ChatCompletionRequestMessageContentPartImageImageUrlDetail {
+  Auto
+  Low
+  High
+  Custom(String)
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend ChatCompletionRequestMessageContentPartImageImageUrlDetail with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for ChatCompletionRequestMessageContentPartImageImageUrlDetail with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Auto => "auto"
+    Low => "low"
+    High => "high"
+    Custom(raw) => raw
+  }
+  raw.to_json()
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend ChatCompletionRequestMessageContentPartImageImageUrlDetail with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for ChatCompletionRequestMessageContentPartImageImageUrlDetail with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "auto" => Some(Auto)
+        "low" => Some(Low)
+        "high" => Some(High)
+        _ => None
+      }
+    },
+    raw => Custom(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of ChatCompletionRequestMessageContentPartImageImageUrl.
+pub(all) struct ChatCompletionRequestMessageContentPartImageImageUrl {
+  url : String
+  detail : ChatCompletionRequestMessageContentPartImageImageUrlDetail?
+}
+
+///|
+///
+/// Creates a ChatCompletionRequestMessageContentPartImageImageUrl with omitted optional fields absent.
+pub fn ChatCompletionRequestMessageContentPartImageImageUrl::new(
+  url~ : String,
+  detail? : ChatCompletionRequestMessageContentPartImageImageUrlDetail,
+) -> ChatCompletionRequestMessageContentPartImageImageUrl {
+  { url, detail, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend ChatCompletionRequestMessageContentPartImageImageUrl with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for ChatCompletionRequestMessageContentPartImageImageUrl with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .field("url", self.url)
+  .opt("detail", self.detail)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend ChatCompletionRequestMessageContentPartImageImageUrl with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for ChatCompletionRequestMessageContentPartImageImageUrl with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    url: required_field(obj, "url", path),
+    detail: @sdkjson.opt_field(obj, "detail", path),
+  }
+}
+
+///|
+///
+/// Learn about [image inputs](/docs/guides/vision).
+pub(all) struct ChatCompletionRequestMessageContentPartImage {
+  type_ : String
+  image_url : ChatCompletionRequestMessageContentPartImageImageUrl
+}
+
+///|
+///
+/// Creates a ChatCompletionRequestMessageContentPartImage with omitted optional fields absent.
+pub fn ChatCompletionRequestMessageContentPartImage::new(
+  type_~ : String,
+  image_url~ : ChatCompletionRequestMessageContentPartImageImageUrl,
+) -> ChatCompletionRequestMessageContentPartImage {
+  { type_, image_url, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend ChatCompletionRequestMessageContentPartImage with ToJson::{to_json}
+
+///|
+pub impl ToJson for ChatCompletionRequestMessageContentPartImage with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .field("type", self.type_)
+  .field("image_url", self.image_url)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend ChatCompletionRequestMessageContentPartImage with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for ChatCompletionRequestMessageContentPartImage with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    type_: required_field(obj, "type", path),
+    image_url: required_field(obj, "image_url", path),
+  }
+}
+
+///|
+///
+/// The format of the encoded audio data. Currently supports "wav" and "mp3".
+pub(all) enum ChatCompletionRequestMessageContentPartAudioInputAudioFormat {
+  Wav
+  Mp3
+  Custom(String)
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend ChatCompletionRequestMessageContentPartAudioInputAudioFormat with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for ChatCompletionRequestMessageContentPartAudioInputAudioFormat with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Wav => "wav"
+    Mp3 => "mp3"
+    Custom(raw) => raw
+  }
+  raw.to_json()
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend ChatCompletionRequestMessageContentPartAudioInputAudioFormat with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for ChatCompletionRequestMessageContentPartAudioInputAudioFormat with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "wav" => Some(Wav)
+        "mp3" => Some(Mp3)
+        _ => None
+      }
+    },
+    raw => Custom(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of ChatCompletionRequestMessageContentPartAudioInputAudio.
+pub(all) struct ChatCompletionRequestMessageContentPartAudioInputAudio {
+  data : String
+  format : ChatCompletionRequestMessageContentPartAudioInputAudioFormat
+}
+
+///|
+///
+/// Creates a ChatCompletionRequestMessageContentPartAudioInputAudio with omitted optional fields absent.
+pub fn ChatCompletionRequestMessageContentPartAudioInputAudio::new(
+  data~ : String,
+  format~ : ChatCompletionRequestMessageContentPartAudioInputAudioFormat,
+) -> ChatCompletionRequestMessageContentPartAudioInputAudio {
+  { data, format, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend ChatCompletionRequestMessageContentPartAudioInputAudio with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for ChatCompletionRequestMessageContentPartAudioInputAudio with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .field("data", self.data)
+  .field("format", self.format)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend ChatCompletionRequestMessageContentPartAudioInputAudio with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for ChatCompletionRequestMessageContentPartAudioInputAudio with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    data: required_field(obj, "data", path),
+    format: required_field(obj, "format", path),
+  }
+}
+
+///|
+///
+/// Learn about [audio inputs](/docs/guides/audio).
+pub(all) struct ChatCompletionRequestMessageContentPartAudio {
+  type_ : String
+  input_audio : ChatCompletionRequestMessageContentPartAudioInputAudio
+}
+
+///|
+///
+/// Creates a ChatCompletionRequestMessageContentPartAudio with omitted optional fields absent.
+pub fn ChatCompletionRequestMessageContentPartAudio::new(
+  type_~ : String,
+  input_audio~ : ChatCompletionRequestMessageContentPartAudioInputAudio,
+) -> ChatCompletionRequestMessageContentPartAudio {
+  { type_, input_audio, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend ChatCompletionRequestMessageContentPartAudio with ToJson::{to_json}
+
+///|
+pub impl ToJson for ChatCompletionRequestMessageContentPartAudio with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .field("type", self.type_)
+  .field("input_audio", self.input_audio)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend ChatCompletionRequestMessageContentPartAudio with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for ChatCompletionRequestMessageContentPartAudio with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    type_: required_field(obj, "type", path),
+    input_audio: required_field(obj, "input_audio", path),
+  }
+}
+
+///|
+///
+/// Generated representation of ChatCompletionRequestMessageContentPartFileFile.
+pub(all) struct ChatCompletionRequestMessageContentPartFileFile {
+  filename : String?
+  file_data : String?
+  file_id : String?
+}
+
+///|
+///
+/// Creates a ChatCompletionRequestMessageContentPartFileFile with omitted optional fields absent.
+pub fn ChatCompletionRequestMessageContentPartFileFile::new(
+  filename? : String,
+  file_data? : String,
+  file_id? : String,
+) -> ChatCompletionRequestMessageContentPartFileFile {
+  { filename, file_data, file_id, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend ChatCompletionRequestMessageContentPartFileFile with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for ChatCompletionRequestMessageContentPartFileFile with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("filename", self.filename)
+  .opt("file_data", self.file_data)
+  .opt("file_id", self.file_id)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend ChatCompletionRequestMessageContentPartFileFile with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for ChatCompletionRequestMessageContentPartFileFile with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    filename: @sdkjson.opt_field(obj, "filename", path),
+    file_data: @sdkjson.opt_field(obj, "file_data", path),
+    file_id: @sdkjson.opt_field(obj, "file_id", path),
+  }
+}
+
+///|
+///
+/// Learn about [file inputs](/docs/guides/text) for text generation.
+pub(all) struct ChatCompletionRequestMessageContentPartFile {
+  type_ : String
+  file : ChatCompletionRequestMessageContentPartFileFile
+}
+
+///|
+///
+/// Creates a ChatCompletionRequestMessageContentPartFile with omitted optional fields absent.
+pub fn ChatCompletionRequestMessageContentPartFile::new(
+  type_~ : String,
+  file~ : ChatCompletionRequestMessageContentPartFileFile,
+) -> ChatCompletionRequestMessageContentPartFile {
+  { type_, file, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend ChatCompletionRequestMessageContentPartFile with ToJson::{to_json}
+
+///|
+pub impl ToJson for ChatCompletionRequestMessageContentPartFile with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .field("type", self.type_)
+  .field("file", self.file)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend ChatCompletionRequestMessageContentPartFile with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for ChatCompletionRequestMessageContentPartFile with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    type_: required_field(obj, "type", path),
+    file: required_field(obj, "file", path),
+  }
+}
+
+///|
+///
+/// Generated tagged union ChatCompletionRequestUserMessageContentPart.
+pub(all) enum ChatCompletionRequestUserMessageContentPart {
+  Text(ChatCompletionRequestMessageContentPartText)
+  ImageUrl(ChatCompletionRequestMessageContentPartImage)
+  InputAudio(ChatCompletionRequestMessageContentPartAudio)
+  File(ChatCompletionRequestMessageContentPartFile)
+  Unknown(String, Json)
+}
+
+///|
+///
+/// Encodes this tagged union as JSON.
+pub extend ChatCompletionRequestUserMessageContentPart with ToJson::{to_json}
+
+///|
+pub impl ToJson for ChatCompletionRequestUserMessageContentPart with fn to_json(
+  self,
+) {
+  match self {
+    Text(value) => value.to_json()
+    ImageUrl(value) => value.to_json()
+    InputAudio(value) => value.to_json()
+    File(value) => value.to_json()
+    Unknown(_, value) => value
+  }
+}
+
+///|
+///
+/// Decodes this tagged union from JSON.
+pub extend ChatCompletionRequestUserMessageContentPart with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for ChatCompletionRequestUserMessageContentPart with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  let tag : String = required_field(obj, "type", path)
+  match tag {
+    "text" => Text(@json.from_json(value, path~))
+    "image_url" => ImageUrl(@json.from_json(value, path~))
+    "input_audio" => InputAudio(@json.from_json(value, path~))
+    "file" => File(@json.from_json(value, path~))
+    other => Unknown(other, value)
+  }
+}
+
+///|
+///
+/// The contents of the user message.
+pub(all) enum ChatCompletionRequestUserMessageContent {
+  Text(String)
+  ChatCompletionRequestUserMessageContentPartArray(
+    Array[ChatCompletionRequestUserMessageContentPart]
+  )
+}
+
+///|
+///
+/// Encodes this union as JSON.
+pub extend ChatCompletionRequestUserMessageContent with ToJson::{to_json}
+
+///|
+pub impl ToJson for ChatCompletionRequestUserMessageContent with fn to_json(
+  self,
+) {
+  match self {
+    Text(value) => value.to_json()
+    ChatCompletionRequestUserMessageContentPartArray(value) => value.to_json()
+  }
+}
+
+///|
+///
+/// Decodes this union from JSON.
+pub extend ChatCompletionRequestUserMessageContent with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for ChatCompletionRequestUserMessageContent with fn from_json(
+  value,
+  path,
+) {
+  if value is String(_) {
+    let decoded : String = @json.from_json(value, path~)
+    return Text(decoded)
+  }
+  if json_array_matches(value, item => item is Object(_)) {
+    let decoded : Array[ChatCompletionRequestUserMessageContentPart] = @json.from_json(
+      value,
+      path~,
+    )
+    return ChatCompletionRequestUserMessageContentPartArray(decoded)
+  }
+  raise @json.JsonDecodeError(
+    (
+      path, "JSON shape does not match any ChatCompletionRequestUserMessageContent variant",
+    ),
+  )
+}
+
+///|
+///
+/// Messages sent by an end user, containing prompts or additional context information.
+pub(all) struct ChatCompletionRequestUserMessage {
+  content : ChatCompletionRequestUserMessageContent
+  role : String
+  name : String?
+}
+
+///|
+///
+/// Creates a ChatCompletionRequestUserMessage with omitted optional fields absent.
+pub fn ChatCompletionRequestUserMessage::new(
+  content~ : ChatCompletionRequestUserMessageContent,
+  role~ : String,
+  name? : String,
+) -> ChatCompletionRequestUserMessage {
+  { content, role, name, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend ChatCompletionRequestUserMessage with ToJson::{to_json}
+
+///|
+pub impl ToJson for ChatCompletionRequestUserMessage with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("content", self.content)
+  .field("role", self.role)
+  .opt("name", self.name)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend ChatCompletionRequestUserMessage with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for ChatCompletionRequestUserMessage with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    content: required_field(obj, "content", path),
+    role: required_field(obj, "role", path),
+    name: @sdkjson.opt_field(obj, "name", path),
+  }
+}
+
+///|
+///
+/// Generated tagged union ChatCompletionRequestToolMessageContentPart.
+pub(all) enum ChatCompletionRequestToolMessageContentPart {
+  Text(ChatCompletionRequestMessageContentPartText)
+  Unknown(String, Json)
+}
+
+///|
+///
+/// Encodes this tagged union as JSON.
+pub extend ChatCompletionRequestToolMessageContentPart with ToJson::{to_json}
+
+///|
+pub impl ToJson for ChatCompletionRequestToolMessageContentPart with fn to_json(
+  self,
+) {
+  match self {
+    Text(value) => value.to_json()
+    Unknown(_, value) => value
+  }
+}
+
+///|
+///
+/// Decodes this tagged union from JSON.
+pub extend ChatCompletionRequestToolMessageContentPart with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for ChatCompletionRequestToolMessageContentPart with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  let tag : String = required_field(obj, "type", path)
+  match tag {
+    "text" => Text(@json.from_json(value, path~))
+    other => Unknown(other, value)
+  }
+}
+
+///|
+///
+/// The contents of the tool message.
+pub(all) enum ChatCompletionRequestToolMessageContent {
+  Text(String)
+  ChatCompletionRequestToolMessageContentPartArray(
+    Array[ChatCompletionRequestToolMessageContentPart]
+  )
+}
+
+///|
+///
+/// Encodes this union as JSON.
+pub extend ChatCompletionRequestToolMessageContent with ToJson::{to_json}
+
+///|
+pub impl ToJson for ChatCompletionRequestToolMessageContent with fn to_json(
+  self,
+) {
+  match self {
+    Text(value) => value.to_json()
+    ChatCompletionRequestToolMessageContentPartArray(value) => value.to_json()
+  }
+}
+
+///|
+///
+/// Decodes this union from JSON.
+pub extend ChatCompletionRequestToolMessageContent with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for ChatCompletionRequestToolMessageContent with fn from_json(
+  value,
+  path,
+) {
+  if value is String(_) {
+    let decoded : String = @json.from_json(value, path~)
+    return Text(decoded)
+  }
+  if json_array_matches(value, item => item is Object(_)) {
+    let decoded : Array[ChatCompletionRequestToolMessageContentPart] = @json.from_json(
+      value,
+      path~,
+    )
+    return ChatCompletionRequestToolMessageContentPartArray(decoded)
+  }
+  raise @json.JsonDecodeError(
+    (
+      path, "JSON shape does not match any ChatCompletionRequestToolMessageContent variant",
+    ),
+  )
+}
+
+///|
+///
+/// Generated representation of ChatCompletionRequestToolMessage.
+pub(all) struct ChatCompletionRequestToolMessage {
+  role : String
+  content : ChatCompletionRequestToolMessageContent
+  tool_call_id : String
+}
+
+///|
+///
+/// Creates a ChatCompletionRequestToolMessage with omitted optional fields absent.
+pub fn ChatCompletionRequestToolMessage::new(
+  role~ : String,
+  content~ : ChatCompletionRequestToolMessageContent,
+  tool_call_id~ : String,
+) -> ChatCompletionRequestToolMessage {
+  { role, content, tool_call_id, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend ChatCompletionRequestToolMessage with ToJson::{to_json}
+
+///|
+pub impl ToJson for ChatCompletionRequestToolMessage with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("role", self.role)
+  .field("content", self.content)
+  .field("tool_call_id", self.tool_call_id)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend ChatCompletionRequestToolMessage with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for ChatCompletionRequestToolMessage with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    role: required_field(obj, "role", path),
+    content: required_field(obj, "content", path),
+    tool_call_id: required_field(obj, "tool_call_id", path),
+  }
+}
+
+///|
+///
+/// Generated tagged union ChatCompletionRequestMessage.
+pub(all) enum ChatCompletionRequestMessage {
+  Developer(ChatCompletionRequestDeveloperMessage)
+  System(ChatCompletionRequestSystemMessage)
+  User(ChatCompletionRequestUserMessage)
+  Assistant(ChatCompletionRequestAssistantMessage)
+  Tool(ChatCompletionRequestToolMessage)
+  Function(ChatCompletionRequestFunctionMessage)
+  Unknown(String, Json)
+}
+
+///|
+///
+/// Encodes this tagged union as JSON.
+pub extend ChatCompletionRequestMessage with ToJson::{to_json}
+
+///|
+pub impl ToJson for ChatCompletionRequestMessage with fn to_json(self) {
+  match self {
+    Developer(value) => value.to_json()
+    System(value) => value.to_json()
+    User(value) => value.to_json()
+    Assistant(value) => value.to_json()
+    Tool(value) => value.to_json()
+    Function(value) => value.to_json()
+    Unknown(_, value) => value
+  }
+}
+
+///|
+///
+/// Decodes this tagged union from JSON.
+pub extend ChatCompletionRequestMessage with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for ChatCompletionRequestMessage with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  let tag : String = required_field(obj, "role", path)
+  match tag {
+    "developer" => Developer(@json.from_json(value, path~))
+    "system" => System(@json.from_json(value, path~))
+    "user" => User(@json.from_json(value, path~))
+    "assistant" => Assistant(@json.from_json(value, path~))
+    "tool" => Tool(@json.from_json(value, path~))
+    "function" => Function(@json.from_json(value, path~))
+    other => Unknown(other, value)
+  }
+}
+
+///|
+///
+/// A URL citation when using web search.
+pub(all) struct ChatCompletionResponseMessageAnnotationsItemUrlCitation {
+  end_index : Int
+  start_index : Int
+  url : String
+  title : String
+}
+
+///|
+///
+/// Creates a ChatCompletionResponseMessageAnnotationsItemUrlCitation with omitted optional fields absent.
+pub fn ChatCompletionResponseMessageAnnotationsItemUrlCitation::new(
+  end_index~ : Int,
+  start_index~ : Int,
+  url~ : String,
+  title~ : String,
+) -> ChatCompletionResponseMessageAnnotationsItemUrlCitation {
+  { end_index, start_index, url, title, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend ChatCompletionResponseMessageAnnotationsItemUrlCitation with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for ChatCompletionResponseMessageAnnotationsItemUrlCitation with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .field("end_index", self.end_index)
+  .field("start_index", self.start_index)
+  .field("url", self.url)
+  .field("title", self.title)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend ChatCompletionResponseMessageAnnotationsItemUrlCitation with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for ChatCompletionResponseMessageAnnotationsItemUrlCitation with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    end_index: required_field(obj, "end_index", path),
+    start_index: required_field(obj, "start_index", path),
+    url: required_field(obj, "url", path),
+    title: required_field(obj, "title", path),
+  }
+}
+
+///|
+///
+/// A URL citation when using web search.
+pub(all) struct ChatCompletionResponseMessageAnnotationsItem {
+  url_citation : ChatCompletionResponseMessageAnnotationsItemUrlCitation
+}
+
+///|
+///
+/// Creates a ChatCompletionResponseMessageAnnotationsItem with omitted optional fields absent.
+pub fn ChatCompletionResponseMessageAnnotationsItem::new(
+  url_citation~ : ChatCompletionResponseMessageAnnotationsItemUrlCitation,
+) -> ChatCompletionResponseMessageAnnotationsItem {
+  { url_citation, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend ChatCompletionResponseMessageAnnotationsItem with ToJson::{to_json}
+
+///|
+pub impl ToJson for ChatCompletionResponseMessageAnnotationsItem with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .field("type", "url_citation")
+  .field("url_citation", self.url_citation)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend ChatCompletionResponseMessageAnnotationsItem with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for ChatCompletionResponseMessageAnnotationsItem with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  { url_citation: required_field(obj, "url_citation", path), }
+}
+
+///|
+///
+/// Deprecated and replaced by `tool_calls`. The name and arguments of a function that should be called, as generated by the model.
+pub(all) struct ChatCompletionResponseMessageFunctionCall {
+  arguments : String
+  name : String
+}
+
+///|
+///
+/// Creates a ChatCompletionResponseMessageFunctionCall with omitted optional fields absent.
+pub fn ChatCompletionResponseMessageFunctionCall::new(
+  arguments~ : String,
+  name~ : String,
+) -> ChatCompletionResponseMessageFunctionCall {
+  { arguments, name, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend ChatCompletionResponseMessageFunctionCall with ToJson::{to_json}
+
+///|
+pub impl ToJson for ChatCompletionResponseMessageFunctionCall with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .field("arguments", self.arguments)
+  .field("name", self.name)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend ChatCompletionResponseMessageFunctionCall with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for ChatCompletionResponseMessageFunctionCall with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    arguments: required_field(obj, "arguments", path),
+    name: required_field(obj, "name", path),
+  }
+}
+
+///|
+///
+/// If the audio output modality is requested, this object contains data about the audio response from the model. [Learn more](/docs/guides/audio).
+pub(all) struct ChatCompletionResponseMessageAudio {
+  id : String
+  expires_at : Int
+  data : String
+  transcript : String
+}
+
+///|
+///
+/// Creates a ChatCompletionResponseMessageAudio with omitted optional fields absent.
+pub fn ChatCompletionResponseMessageAudio::new(
+  id~ : String,
+  expires_at~ : Int,
+  data~ : String,
+  transcript~ : String,
+) -> ChatCompletionResponseMessageAudio {
+  { id, expires_at, data, transcript, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend ChatCompletionResponseMessageAudio with ToJson::{to_json}
+
+///|
+pub impl ToJson for ChatCompletionResponseMessageAudio with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("id", self.id)
+  .field("expires_at", self.expires_at)
+  .field("data", self.data)
+  .field("transcript", self.transcript)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend ChatCompletionResponseMessageAudio with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for ChatCompletionResponseMessageAudio with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    id: required_field(obj, "id", path),
+    expires_at: required_field(obj, "expires_at", path),
+    data: required_field(obj, "data", path),
+    transcript: required_field(obj, "transcript", path),
+  }
+}
+
+///|
+///
+/// A chat completion message generated by the model.
+pub(all) struct ChatCompletionResponseMessage {
+  content : String?
+  refusal : @sdkjson.Presence[String]
+  tool_calls : Array[ChatCompletionMessageToolCall]?
+  annotations : Array[ChatCompletionResponseMessageAnnotationsItem]?
+  function_call : ChatCompletionResponseMessageFunctionCall?
+  audio : @sdkjson.Presence[ChatCompletionResponseMessageAudio]
+}
+
+///|
+///
+/// Creates a ChatCompletionResponseMessage with omitted optional fields absent.
+pub fn ChatCompletionResponseMessage::new(
+  content? : String,
+  refusal? : String,
+  tool_calls? : Array[ChatCompletionMessageToolCall],
+  annotations? : Array[ChatCompletionResponseMessageAnnotationsItem],
+  function_call? : ChatCompletionResponseMessageFunctionCall,
+  audio? : ChatCompletionResponseMessageAudio,
+) -> ChatCompletionResponseMessage {
+  {
+    content,
+    refusal: @sdkjson.Presence::from_option(refusal),
+    tool_calls,
+    annotations,
+    function_call,
+    audio: @sdkjson.Presence::from_option(audio),
+  }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend ChatCompletionResponseMessage with ToJson::{to_json}
+
+///|
+pub impl ToJson for ChatCompletionResponseMessage with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .presence("content", nullable_presence(self.content.map(value => value)))
+  .presence("refusal", self.refusal)
+  .opt("tool_calls", self.tool_calls)
+  .opt("annotations", self.annotations)
+  .field("role", "assistant")
+  .opt("function_call", self.function_call)
+  .presence("audio", self.audio)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend ChatCompletionResponseMessage with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for ChatCompletionResponseMessage with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    content: decode_nullable_field(obj, "content", path),
+    refusal: @sdkjson.presence_field(obj, "refusal", path),
+    tool_calls: @sdkjson.opt_field(obj, "tool_calls", path),
+    annotations: @sdkjson.opt_field(obj, "annotations", path),
+    function_call: @sdkjson.opt_field(obj, "function_call", path),
+    audio: @sdkjson.presence_field(obj, "audio", path),
+  }
+}
+
+///|
+///
+/// Options for streaming response. Only set this when you set `stream: true`.
+pub(all) struct ChatCompletionStreamOptions {
+  include_usage : Bool?
+}
+
+///|
+///
+/// Creates a ChatCompletionStreamOptions with omitted optional fields absent.
+pub fn ChatCompletionStreamOptions::new(
+  include_usage? : Bool,
+) -> ChatCompletionStreamOptions {
+  { include_usage, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend ChatCompletionStreamOptions with ToJson::{to_json}
+
+///|
+pub impl ToJson for ChatCompletionStreamOptions with fn to_json(self) {
+  @sdkjson.ObjBuilder::new().opt("include_usage", self.include_usage).build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend ChatCompletionStreamOptions with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for ChatCompletionStreamOptions with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  { include_usage: @sdkjson.opt_field(obj, "include_usage", path), }
+}
+
+///|
+///
+/// Deprecated and replaced by `tool_calls`. The name and arguments of a function that should be called, as generated by the model.
+pub(all) struct ChatCompletionStreamResponseDeltaFunctionCall {
+  arguments : String?
+  name : String?
+}
+
+///|
+///
+/// Creates a ChatCompletionStreamResponseDeltaFunctionCall with omitted optional fields absent.
+pub fn ChatCompletionStreamResponseDeltaFunctionCall::new(
+  arguments? : String,
+  name? : String,
+) -> ChatCompletionStreamResponseDeltaFunctionCall {
+  { arguments, name, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend ChatCompletionStreamResponseDeltaFunctionCall with ToJson::{to_json}
+
+///|
+pub impl ToJson for ChatCompletionStreamResponseDeltaFunctionCall with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("arguments", self.arguments)
+  .opt("name", self.name)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend ChatCompletionStreamResponseDeltaFunctionCall with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for ChatCompletionStreamResponseDeltaFunctionCall with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    arguments: @sdkjson.opt_field(obj, "arguments", path),
+    name: @sdkjson.opt_field(obj, "name", path),
+  }
+}
+
+///|
+///
+/// The role of the author of this message.
+pub(all) enum ChatCompletionStreamResponseDeltaRole {
+  Developer
+  System
+  User
+  Assistant
+  Tool
+  Unknown(String)
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend ChatCompletionStreamResponseDeltaRole with ToJson::{to_json}
+
+///|
+pub impl ToJson for ChatCompletionStreamResponseDeltaRole with fn to_json(self) {
+  let raw = match self {
+    Developer => "developer"
+    System => "system"
+    User => "user"
+    Assistant => "assistant"
+    Tool => "tool"
+    Unknown(raw) => raw
+  }
+  raw.to_json()
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend ChatCompletionStreamResponseDeltaRole with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for ChatCompletionStreamResponseDeltaRole with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "developer" => Some(Developer)
+        "system" => Some(System)
+        "user" => Some(User)
+        "assistant" => Some(Assistant)
+        "tool" => Some(Tool)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// A chat completion delta generated by streamed model responses.
+pub(all) struct ChatCompletionStreamResponseDelta {
+  content : @sdkjson.Presence[String]
+  function_call : ChatCompletionStreamResponseDeltaFunctionCall?
+  tool_calls : Array[ChatCompletionMessageToolCallChunk]?
+  role : ChatCompletionStreamResponseDeltaRole?
+  refusal : @sdkjson.Presence[String]
+}
+
+///|
+///
+/// Creates a ChatCompletionStreamResponseDelta with omitted optional fields absent.
+pub fn ChatCompletionStreamResponseDelta::new(
+  content? : String,
+  function_call? : ChatCompletionStreamResponseDeltaFunctionCall,
+  tool_calls? : Array[ChatCompletionMessageToolCallChunk],
+  role? : ChatCompletionStreamResponseDeltaRole,
+  refusal? : String,
+) -> ChatCompletionStreamResponseDelta {
+  {
+    content: @sdkjson.Presence::from_option(content),
+    function_call,
+    tool_calls,
+    role,
+    refusal: @sdkjson.Presence::from_option(refusal),
+  }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend ChatCompletionStreamResponseDelta with ToJson::{to_json}
+
+///|
+pub impl ToJson for ChatCompletionStreamResponseDelta with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .presence("content", self.content)
+  .opt("function_call", self.function_call)
+  .opt("tool_calls", self.tool_calls)
+  .opt("role", self.role)
+  .presence("refusal", self.refusal)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend ChatCompletionStreamResponseDelta with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for ChatCompletionStreamResponseDelta with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    content: @sdkjson.presence_field(obj, "content", path),
+    function_call: @sdkjson.opt_field(obj, "function_call", path),
+    tool_calls: @sdkjson.opt_field(obj, "tool_calls", path),
+    role: @sdkjson.opt_field(obj, "role", path),
+    refusal: @sdkjson.presence_field(obj, "refusal", path),
+  }
+}
+
+///|
+///
+/// Generated representation of ChatCompletionTokenLogprobTopLogprobsItem.
+pub(all) struct ChatCompletionTokenLogprobTopLogprobsItem {
+  token : String
+  logprob : Double
+  bytes : Array[Int]?
+}
+
+///|
+///
+/// Creates a ChatCompletionTokenLogprobTopLogprobsItem with omitted optional fields absent.
+pub fn ChatCompletionTokenLogprobTopLogprobsItem::new(
+  token~ : String,
+  logprob~ : Double,
+  bytes? : Array[Int],
+) -> ChatCompletionTokenLogprobTopLogprobsItem {
+  { token, logprob, bytes, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend ChatCompletionTokenLogprobTopLogprobsItem with ToJson::{to_json}
+
+///|
+pub impl ToJson for ChatCompletionTokenLogprobTopLogprobsItem with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .field("token", self.token)
+  .field("logprob", self.logprob)
+  .presence("bytes", nullable_presence(self.bytes.map(value => value)))
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend ChatCompletionTokenLogprobTopLogprobsItem with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for ChatCompletionTokenLogprobTopLogprobsItem with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    token: required_field(obj, "token", path),
+    logprob: required_field(obj, "logprob", path),
+    bytes: decode_nullable_field(obj, "bytes", path),
+  }
+}
+
+///|
+///
+/// Generated representation of ChatCompletionTokenLogprob.
+pub(all) struct ChatCompletionTokenLogprob {
+  token : String
+  logprob : Double
+  bytes : Array[Int]?
+  top_logprobs : Array[ChatCompletionTokenLogprobTopLogprobsItem]
+}
+
+///|
+///
+/// Creates a ChatCompletionTokenLogprob with omitted optional fields absent.
+pub fn ChatCompletionTokenLogprob::new(
+  token~ : String,
+  logprob~ : Double,
+  top_logprobs~ : Array[ChatCompletionTokenLogprobTopLogprobsItem],
+  bytes? : Array[Int],
+) -> ChatCompletionTokenLogprob {
+  { token, logprob, bytes, top_logprobs, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend ChatCompletionTokenLogprob with ToJson::{to_json}
+
+///|
+pub impl ToJson for ChatCompletionTokenLogprob with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("token", self.token)
+  .field("logprob", self.logprob)
+  .presence("bytes", nullable_presence(self.bytes.map(value => value)))
+  .field("top_logprobs", self.top_logprobs)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend ChatCompletionTokenLogprob with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for ChatCompletionTokenLogprob with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    token: required_field(obj, "token", path),
+    logprob: required_field(obj, "logprob", path),
+    bytes: decode_nullable_field(obj, "bytes", path),
+    top_logprobs: required_field(obj, "top_logprobs", path),
+  }
+}
+
+///|
+///
+/// Generated representation of FunctionObject.
+pub(all) struct FunctionObject {
+  description : String?
+  name : String
+  parameters : Json?
+  strict : @sdkjson.Presence[Bool]
+}
+
+///|
+///
+/// Creates a FunctionObject with omitted optional fields absent.
+pub fn FunctionObject::new(
+  name~ : String,
+  description? : String,
+  parameters? : Json,
+  strict? : Bool,
+) -> FunctionObject {
+  {
+    description,
+    name,
+    parameters,
+    strict: @sdkjson.Presence::from_option(strict),
+  }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend FunctionObject with ToJson::{to_json}
+
+///|
+pub impl ToJson for FunctionObject with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .opt("description", self.description)
+  .field("name", self.name)
+  .opt("parameters", self.parameters)
+  .presence("strict", self.strict)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend FunctionObject with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for FunctionObject with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    description: @sdkjson.opt_field(obj, "description", path),
+    name: required_field(obj, "name", path),
+    parameters: @sdkjson.opt_field(obj, "parameters", path),
+    strict: @sdkjson.presence_field(obj, "strict", path),
+  }
+}
+
+///|
+///
+/// Generated representation of ChatCompletionTool.
+pub(all) struct ChatCompletionTool {
+  function : FunctionObject
+}
+
+///|
+///
+/// Creates a ChatCompletionTool with omitted optional fields absent.
+pub fn ChatCompletionTool::new(
+  function~ : FunctionObject,
+) -> ChatCompletionTool {
+  { function, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend ChatCompletionTool with ToJson::{to_json}
+
+///|
+pub impl ToJson for ChatCompletionTool with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("type", "function")
+  .field("function", self.function)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend ChatCompletionTool with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for ChatCompletionTool with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  { function: required_field(obj, "function", path), }
+}
+
+///|
+///
+/// `none` means the model will not call any tool and instead generates a message. `auto` means the model can pick between generating a message or calling one or more tools. `required` means the model must call one or more tools.
+pub(all) enum ChatCompletionToolChoiceOptionText {
+  None
+  Auto
+  Required
+  Custom(String)
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend ChatCompletionToolChoiceOptionText with ToJson::{to_json}
+
+///|
+pub impl ToJson for ChatCompletionToolChoiceOptionText with fn to_json(self) {
+  let raw = match self {
+    None => "none"
+    Auto => "auto"
+    Required => "required"
+    Custom(raw) => raw
+  }
+  raw.to_json()
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend ChatCompletionToolChoiceOptionText with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for ChatCompletionToolChoiceOptionText with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "none" => Some(None)
+        "auto" => Some(Auto)
+        "required" => Some(Required)
+        _ => None
+      }
+    },
+    raw => Custom(raw),
+  )
+}
+
+///|
+///
+/// Controls which (if any) tool is called by the model. `none` means the model will not call any tool and instead generates a message. `auto` means the model can pick between generating a message or calling one or more tools. `required` means the model must call one or more tools. Specifying a particular tool via `{"type": "function", "function": {"name": "my_function"}}` forces the model to call that tool. `none` is the default when no tools are present. `auto` is the default if tools are present.
+pub(all) enum ChatCompletionToolChoiceOption {
+  Text(ChatCompletionToolChoiceOptionText)
+  ChatCompletionNamedToolChoice(ChatCompletionNamedToolChoice)
+}
+
+///|
+///
+/// Encodes this union as JSON.
+pub extend ChatCompletionToolChoiceOption with ToJson::{to_json}
+
+///|
+pub impl ToJson for ChatCompletionToolChoiceOption with fn to_json(self) {
+  match self {
+    Text(value) => value.to_json()
+    ChatCompletionNamedToolChoice(value) => value.to_json()
+  }
+}
+
+///|
+///
+/// Decodes this union from JSON.
+pub extend ChatCompletionToolChoiceOption with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for ChatCompletionToolChoiceOption with fn from_json(
+  value,
+  path,
+) {
+  if value is String(_) {
+    let decoded : ChatCompletionToolChoiceOptionText = @json.from_json(
+      value,
+      path~,
+    )
+    return Text(decoded)
+  }
+  if value is Object(_) {
+    let decoded : ChatCompletionNamedToolChoice = @json.from_json(value, path~)
+    return ChatCompletionNamedToolChoice(decoded)
+  }
+  raise @json.JsonDecodeError(
+    (
+      path, "JSON shape does not match any ChatCompletionToolChoiceOption variant",
+    ),
+  )
+}
+
+///|
+///
 /// Indicates which mouse button was pressed during the click. One of `left`, `right`, `wheel`, `back`, or `forward`.
 pub(all) enum ClickButton {
   Left
@@ -597,6 +3287,188 @@ pub impl @json.FromJson for CodeInterpreterToolCall with fn from_json(
     code: required_field(obj, "code", path),
     status: required_field(obj, "status", path),
     results: required_field(obj, "results", path),
+  }
+}
+
+///|
+///
+/// Breakdown of tokens used in a completion.
+pub(all) struct CompletionUsageCompletionTokensDetails {
+  accepted_prediction_tokens : Int?
+  audio_tokens : Int?
+  reasoning_tokens : Int?
+  rejected_prediction_tokens : Int?
+}
+
+///|
+///
+/// Creates a CompletionUsageCompletionTokensDetails with omitted optional fields absent.
+pub fn CompletionUsageCompletionTokensDetails::new(
+  accepted_prediction_tokens? : Int,
+  audio_tokens? : Int,
+  reasoning_tokens? : Int,
+  rejected_prediction_tokens? : Int,
+) -> CompletionUsageCompletionTokensDetails {
+  {
+    accepted_prediction_tokens,
+    audio_tokens,
+    reasoning_tokens,
+    rejected_prediction_tokens,
+  }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend CompletionUsageCompletionTokensDetails with ToJson::{to_json}
+
+///|
+pub impl ToJson for CompletionUsageCompletionTokensDetails with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .opt("accepted_prediction_tokens", self.accepted_prediction_tokens)
+  .opt("audio_tokens", self.audio_tokens)
+  .opt("reasoning_tokens", self.reasoning_tokens)
+  .opt("rejected_prediction_tokens", self.rejected_prediction_tokens)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend CompletionUsageCompletionTokensDetails with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for CompletionUsageCompletionTokensDetails with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    accepted_prediction_tokens: @sdkjson.opt_field(
+      obj, "accepted_prediction_tokens", path,
+    ),
+    audio_tokens: @sdkjson.opt_field(obj, "audio_tokens", path),
+    reasoning_tokens: @sdkjson.opt_field(obj, "reasoning_tokens", path),
+    rejected_prediction_tokens: @sdkjson.opt_field(
+      obj, "rejected_prediction_tokens", path,
+    ),
+  }
+}
+
+///|
+///
+/// Breakdown of tokens used in the prompt.
+pub(all) struct CompletionUsagePromptTokensDetails {
+  audio_tokens : Int?
+  cached_tokens : Int?
+}
+
+///|
+///
+/// Creates a CompletionUsagePromptTokensDetails with omitted optional fields absent.
+pub fn CompletionUsagePromptTokensDetails::new(
+  audio_tokens? : Int,
+  cached_tokens? : Int,
+) -> CompletionUsagePromptTokensDetails {
+  { audio_tokens, cached_tokens, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend CompletionUsagePromptTokensDetails with ToJson::{to_json}
+
+///|
+pub impl ToJson for CompletionUsagePromptTokensDetails with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .opt("audio_tokens", self.audio_tokens)
+  .opt("cached_tokens", self.cached_tokens)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend CompletionUsagePromptTokensDetails with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for CompletionUsagePromptTokensDetails with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    audio_tokens: @sdkjson.opt_field(obj, "audio_tokens", path),
+    cached_tokens: @sdkjson.opt_field(obj, "cached_tokens", path),
+  }
+}
+
+///|
+///
+/// Usage statistics for the completion request.
+pub(all) struct CompletionUsage {
+  completion_tokens : Int
+  prompt_tokens : Int
+  total_tokens : Int
+  completion_tokens_details : CompletionUsageCompletionTokensDetails?
+  prompt_tokens_details : CompletionUsagePromptTokensDetails?
+}
+
+///|
+///
+/// Creates a CompletionUsage with omitted optional fields absent.
+pub fn CompletionUsage::new(
+  completion_tokens~ : Int,
+  prompt_tokens~ : Int,
+  total_tokens~ : Int,
+  completion_tokens_details? : CompletionUsageCompletionTokensDetails,
+  prompt_tokens_details? : CompletionUsagePromptTokensDetails,
+) -> CompletionUsage {
+  {
+    completion_tokens,
+    prompt_tokens,
+    total_tokens,
+    completion_tokens_details,
+    prompt_tokens_details,
+  }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend CompletionUsage with ToJson::{to_json}
+
+///|
+pub impl ToJson for CompletionUsage with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("completion_tokens", self.completion_tokens)
+  .field("prompt_tokens", self.prompt_tokens)
+  .field("total_tokens", self.total_tokens)
+  .opt("completion_tokens_details", self.completion_tokens_details)
+  .opt("prompt_tokens_details", self.prompt_tokens_details)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend CompletionUsage with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for CompletionUsage with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    completion_tokens: required_field(obj, "completion_tokens", path),
+    prompt_tokens: required_field(obj, "prompt_tokens", path),
+    total_tokens: required_field(obj, "total_tokens", path),
+    completion_tokens_details: @sdkjson.opt_field(
+      obj, "completion_tokens_details", path,
+    ),
+    prompt_tokens_details: @sdkjson.opt_field(
+      obj, "prompt_tokens_details", path,
+    ),
   }
 }
 
@@ -1254,6 +4126,1700 @@ pub impl @json.FromJson for ComputerToolCall with fn from_json(value, path) {
 
 ///|
 ///
+/// Specifies the latency tier to use for processing the request. This parameter is relevant for customers subscribed to the scale tier service: - If set to 'auto', and the Project is Scale tier enabled, the system will utilize scale tier credits until they are exhausted. - If set to 'auto', and the Project is not Scale tier enabled, the request will be processed using the default service tier with a lower uptime SLA and no latency guarentee. - If set to 'default', the request will be processed using the default service tier with a lower uptime SLA and no latency guarentee. - If set to 'flex', the request will be processed with the Flex Processing service tier. [Learn more](/docs/guides/flex-processing). - When not set, the default behavior is 'auto'. When this parameter is set, the response body will include the `service_tier` utilized.
+pub(all) enum ServiceTier {
+  Auto
+  Default
+  Flex
+  Unknown(String)
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend ServiceTier with ToJson::{to_json}
+
+///|
+pub impl ToJson for ServiceTier with fn to_json(self) {
+  let raw = match self {
+    Auto => "auto"
+    Default => "default"
+    Flex => "flex"
+    Unknown(raw) => raw
+  }
+  raw.to_json()
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend ServiceTier with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for ServiceTier with fn from_json(value, path) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "auto" => Some(Auto)
+        "default" => Some(Default)
+        "flex" => Some(Flex)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated string enum ResponseModalitiesItem.
+pub(all) enum ResponseModalitiesItem {
+  Text
+  Audio
+  Custom(String)
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend ResponseModalitiesItem with ToJson::{to_json}
+
+///|
+pub impl ToJson for ResponseModalitiesItem with fn to_json(self) {
+  let raw = match self {
+    Text => "text"
+    Audio => "audio"
+    Custom(raw) => raw
+  }
+  raw.to_json()
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend ResponseModalitiesItem with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for ResponseModalitiesItem with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "text" => Some(Text)
+        "audio" => Some(Audio)
+        _ => None
+      }
+    },
+    raw => Custom(raw),
+  )
+}
+
+///|
+///
+/// **o-series models only** Constrains effort on reasoning for [reasoning models](https://platform.openai.com/docs/guides/reasoning). Currently supported values are `low`, `medium`, and `high`. Reducing reasoning effort can result in faster responses and fewer tokens used on reasoning in a response.
+pub(all) enum ReasoningEffort {
+  Low
+  Medium
+  High
+  Unknown(String)
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend ReasoningEffort with ToJson::{to_json}
+
+///|
+pub impl ToJson for ReasoningEffort with fn to_json(self) {
+  let raw = match self {
+    Low => "low"
+    Medium => "medium"
+    High => "high"
+    Unknown(raw) => raw
+  }
+  raw.to_json()
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend ReasoningEffort with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for ReasoningEffort with fn from_json(value, path) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "low" => Some(Low)
+        "medium" => Some(Medium)
+        "high" => Some(High)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Approximate location parameters for the search.
+pub(all) struct WebSearchLocation {
+  country : String?
+  region : String?
+  city : String?
+  timezone : String?
+}
+
+///|
+///
+/// Creates a WebSearchLocation with omitted optional fields absent.
+pub fn WebSearchLocation::new(
+  country? : String,
+  region? : String,
+  city? : String,
+  timezone? : String,
+) -> WebSearchLocation {
+  { country, region, city, timezone, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend WebSearchLocation with ToJson::{to_json}
+
+///|
+pub impl ToJson for WebSearchLocation with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .opt("country", self.country)
+  .opt("region", self.region)
+  .opt("city", self.city)
+  .opt("timezone", self.timezone)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend WebSearchLocation with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for WebSearchLocation with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    country: @sdkjson.opt_field(obj, "country", path),
+    region: @sdkjson.opt_field(obj, "region", path),
+    city: @sdkjson.opt_field(obj, "city", path),
+    timezone: @sdkjson.opt_field(obj, "timezone", path),
+  }
+}
+
+///|
+///
+/// Approximate location parameters for the search.
+pub(all) struct CreateChatCompletionRequestWebSearchOptionsUserLocation {
+  approximate : WebSearchLocation
+}
+
+///|
+///
+/// Creates a CreateChatCompletionRequestWebSearchOptionsUserLocation with omitted optional fields absent.
+pub fn CreateChatCompletionRequestWebSearchOptionsUserLocation::new(
+  approximate~ : WebSearchLocation,
+) -> CreateChatCompletionRequestWebSearchOptionsUserLocation {
+  { approximate, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend CreateChatCompletionRequestWebSearchOptionsUserLocation with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for CreateChatCompletionRequestWebSearchOptionsUserLocation with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .field("type", "approximate")
+  .field("approximate", self.approximate)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend CreateChatCompletionRequestWebSearchOptionsUserLocation with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for CreateChatCompletionRequestWebSearchOptionsUserLocation with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  { approximate: required_field(obj, "approximate", path), }
+}
+
+///|
+///
+/// High level guidance for the amount of context window space to use for the search. One of `low`, `medium`, or `high`. `medium` is the default.
+pub(all) enum WebSearchContextSize {
+  Low
+  Medium
+  High
+  Custom(String)
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend WebSearchContextSize with ToJson::{to_json}
+
+///|
+pub impl ToJson for WebSearchContextSize with fn to_json(self) {
+  let raw = match self {
+    Low => "low"
+    Medium => "medium"
+    High => "high"
+    Custom(raw) => raw
+  }
+  raw.to_json()
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend WebSearchContextSize with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for WebSearchContextSize with fn from_json(value, path) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "low" => Some(Low)
+        "medium" => Some(Medium)
+        "high" => Some(High)
+        _ => None
+      }
+    },
+    raw => Custom(raw),
+  )
+}
+
+///|
+///
+/// This tool searches the web for relevant results to use in a response. Learn more about the [web search tool](/docs/guides/tools-web-search?api-mode=chat).
+pub(all) struct CreateChatCompletionRequestWebSearchOptions {
+  user_location : @sdkjson.Presence[
+    CreateChatCompletionRequestWebSearchOptionsUserLocation,
+  ]
+  search_context_size : WebSearchContextSize?
+}
+
+///|
+///
+/// Creates a CreateChatCompletionRequestWebSearchOptions with omitted optional fields absent.
+pub fn CreateChatCompletionRequestWebSearchOptions::new(
+  user_location? : CreateChatCompletionRequestWebSearchOptionsUserLocation,
+  search_context_size? : WebSearchContextSize,
+) -> CreateChatCompletionRequestWebSearchOptions {
+  {
+    user_location: @sdkjson.Presence::from_option(user_location),
+    search_context_size,
+  }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend CreateChatCompletionRequestWebSearchOptions with ToJson::{to_json}
+
+///|
+pub impl ToJson for CreateChatCompletionRequestWebSearchOptions with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .presence("user_location", self.user_location)
+  .opt("search_context_size", self.search_context_size)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend CreateChatCompletionRequestWebSearchOptions with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for CreateChatCompletionRequestWebSearchOptions with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    user_location: @sdkjson.presence_field(obj, "user_location", path),
+    search_context_size: @sdkjson.opt_field(obj, "search_context_size", path),
+  }
+}
+
+///|
+///
+/// Default response format. Used to generate text responses.
+pub(all) struct ResponseFormatText {
+  type_ : String
+}
+
+///|
+///
+/// Creates a ResponseFormatText with omitted optional fields absent.
+pub fn ResponseFormatText::new(type_~ : String) -> ResponseFormatText {
+  { type_, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend ResponseFormatText with ToJson::{to_json}
+
+///|
+pub impl ToJson for ResponseFormatText with fn to_json(self) {
+  @sdkjson.ObjBuilder::new().field("type", self.type_).build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend ResponseFormatText with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for ResponseFormatText with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  { type_: required_field(obj, "type", path), }
+}
+
+///|
+///
+/// Structured Outputs configuration options, including a JSON Schema.
+pub(all) struct ResponseFormatJsonSchemaJsonSchema {
+  description : String?
+  name : String
+  schema : Json?
+  strict : @sdkjson.Presence[Bool]
+}
+
+///|
+///
+/// Creates a ResponseFormatJsonSchemaJsonSchema with omitted optional fields absent.
+pub fn ResponseFormatJsonSchemaJsonSchema::new(
+  name~ : String,
+  description? : String,
+  schema? : Json,
+  strict? : Bool,
+) -> ResponseFormatJsonSchemaJsonSchema {
+  { description, name, schema, strict: @sdkjson.Presence::from_option(strict), }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend ResponseFormatJsonSchemaJsonSchema with ToJson::{to_json}
+
+///|
+pub impl ToJson for ResponseFormatJsonSchemaJsonSchema with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .opt("description", self.description)
+  .field("name", self.name)
+  .opt("schema", self.schema)
+  .presence("strict", self.strict)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend ResponseFormatJsonSchemaJsonSchema with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for ResponseFormatJsonSchemaJsonSchema with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    description: @sdkjson.opt_field(obj, "description", path),
+    name: required_field(obj, "name", path),
+    schema: @sdkjson.opt_field(obj, "schema", path),
+    strict: @sdkjson.presence_field(obj, "strict", path),
+  }
+}
+
+///|
+///
+/// JSON Schema response format. Used to generate structured JSON responses. Learn more about [Structured Outputs](/docs/guides/structured-outputs).
+pub(all) struct ResponseFormatJsonSchema {
+  type_ : String
+  json_schema : ResponseFormatJsonSchemaJsonSchema
+}
+
+///|
+///
+/// Creates a ResponseFormatJsonSchema with omitted optional fields absent.
+pub fn ResponseFormatJsonSchema::new(
+  type_~ : String,
+  json_schema~ : ResponseFormatJsonSchemaJsonSchema,
+) -> ResponseFormatJsonSchema {
+  { type_, json_schema, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend ResponseFormatJsonSchema with ToJson::{to_json}
+
+///|
+pub impl ToJson for ResponseFormatJsonSchema with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("type", self.type_)
+  .field("json_schema", self.json_schema)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend ResponseFormatJsonSchema with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for ResponseFormatJsonSchema with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    type_: required_field(obj, "type", path),
+    json_schema: required_field(obj, "json_schema", path),
+  }
+}
+
+///|
+///
+/// JSON object response format. An older method of generating JSON responses. Using `json_schema` is recommended for models that support it. Note that the model will not generate JSON without a system or user message instructing it to do so.
+pub(all) struct ResponseFormatJsonObject {
+  type_ : String
+}
+
+///|
+///
+/// Creates a ResponseFormatJsonObject with omitted optional fields absent.
+pub fn ResponseFormatJsonObject::new(
+  type_~ : String,
+) -> ResponseFormatJsonObject {
+  { type_, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend ResponseFormatJsonObject with ToJson::{to_json}
+
+///|
+pub impl ToJson for ResponseFormatJsonObject with fn to_json(self) {
+  @sdkjson.ObjBuilder::new().field("type", self.type_).build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend ResponseFormatJsonObject with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for ResponseFormatJsonObject with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  { type_: required_field(obj, "type", path), }
+}
+
+///|
+///
+/// An object specifying the format that the model must output. Setting to `{ "type": "json_schema", "json_schema": {...} }` enables Structured Outputs which ensures the model will match your supplied JSON schema. Learn more in the [Structured Outputs guide](/docs/guides/structured-outputs). Setting to `{ "type": "json_object" }` enables the older JSON mode, which ensures the message the model generates is valid JSON. Using `json_schema` is preferred for models that support it.
+pub(all) enum CreateChatCompletionRequestResponseFormat {
+  Text(ResponseFormatText)
+  JsonSchema(ResponseFormatJsonSchema)
+  JsonObject(ResponseFormatJsonObject)
+  Unknown(String, Json)
+}
+
+///|
+///
+/// Encodes this tagged union as JSON.
+pub extend CreateChatCompletionRequestResponseFormat with ToJson::{to_json}
+
+///|
+pub impl ToJson for CreateChatCompletionRequestResponseFormat with fn to_json(
+  self,
+) {
+  match self {
+    Text(value) => value.to_json()
+    JsonSchema(value) => value.to_json()
+    JsonObject(value) => value.to_json()
+    Unknown(_, value) => value
+  }
+}
+
+///|
+///
+/// Decodes this tagged union from JSON.
+pub extend CreateChatCompletionRequestResponseFormat with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for CreateChatCompletionRequestResponseFormat with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  let tag : String = required_field(obj, "type", path)
+  match tag {
+    "text" => Text(@json.from_json(value, path~))
+    "json_schema" => JsonSchema(@json.from_json(value, path~))
+    "json_object" => JsonObject(@json.from_json(value, path~))
+    other => Unknown(other, value)
+  }
+}
+
+///|
+///
+/// Specifies the output audio format. Must be one of `wav`, `mp3`, `flac`, `opus`, or `pcm16`.
+pub(all) enum CreateChatCompletionRequestAudioFormat {
+  Wav
+  Aac
+  Mp3
+  Flac
+  Opus
+  Pcm16
+  Custom(String)
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend CreateChatCompletionRequestAudioFormat with ToJson::{to_json}
+
+///|
+pub impl ToJson for CreateChatCompletionRequestAudioFormat with fn to_json(self) {
+  let raw = match self {
+    Wav => "wav"
+    Aac => "aac"
+    Mp3 => "mp3"
+    Flac => "flac"
+    Opus => "opus"
+    Pcm16 => "pcm16"
+    Custom(raw) => raw
+  }
+  raw.to_json()
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend CreateChatCompletionRequestAudioFormat with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for CreateChatCompletionRequestAudioFormat with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "wav" => Some(Wav)
+        "aac" => Some(Aac)
+        "mp3" => Some(Mp3)
+        "flac" => Some(Flac)
+        "opus" => Some(Opus)
+        "pcm16" => Some(Pcm16)
+        _ => None
+      }
+    },
+    raw => Custom(raw),
+  )
+}
+
+///|
+///
+/// Parameters for audio output. Required when audio output is requested with `modalities: ["audio"]`. [Learn more](/docs/guides/audio).
+pub(all) struct CreateChatCompletionRequestAudio {
+  voice : String
+  format : CreateChatCompletionRequestAudioFormat
+}
+
+///|
+///
+/// Creates a CreateChatCompletionRequestAudio with omitted optional fields absent.
+pub fn CreateChatCompletionRequestAudio::new(
+  voice~ : String,
+  format~ : CreateChatCompletionRequestAudioFormat,
+) -> CreateChatCompletionRequestAudio {
+  { voice, format, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend CreateChatCompletionRequestAudio with ToJson::{to_json}
+
+///|
+pub impl ToJson for CreateChatCompletionRequestAudio with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("voice", self.voice)
+  .field("format", self.format)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend CreateChatCompletionRequestAudio with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for CreateChatCompletionRequestAudio with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    voice: required_field(obj, "voice", path),
+    format: required_field(obj, "format", path),
+  }
+}
+
+///|
+///
+/// Not supported with latest reasoning models `o3` and `o4-mini`. Up to 4 sequences where the API will stop generating further tokens. The returned text will not contain the stop sequence.
+pub(all) enum StopConfiguration {
+  Text(String)
+  TextArray(Array[String])
+}
+
+///|
+///
+/// Encodes this union as JSON.
+pub extend StopConfiguration with ToJson::{to_json}
+
+///|
+pub impl ToJson for StopConfiguration with fn to_json(self) {
+  match self {
+    Text(value) => value.to_json()
+    TextArray(value) => value.to_json()
+  }
+}
+
+///|
+///
+/// Decodes this union from JSON.
+pub extend StopConfiguration with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for StopConfiguration with fn from_json(value, path) {
+  if value is String(_) {
+    let decoded : String = @json.from_json(value, path~)
+    return Text(decoded)
+  }
+  if json_array_matches(value, item => item is String(_)) {
+    let decoded : Array[String] = @json.from_json(value, path~)
+    return TextArray(decoded)
+  }
+  raise @json.JsonDecodeError(
+    (path, "JSON shape does not match any StopConfiguration variant"),
+  )
+}
+
+///|
+///
+/// The content that should be matched when generating a model response. If generated tokens would match this content, the entire model response can be returned much more quickly.
+pub(all) enum PredictionContentContent {
+  Text(String)
+  ChatCompletionRequestMessageContentPartTextArray(
+    Array[ChatCompletionRequestMessageContentPartText]
+  )
+}
+
+///|
+///
+/// Encodes this union as JSON.
+pub extend PredictionContentContent with ToJson::{to_json}
+
+///|
+pub impl ToJson for PredictionContentContent with fn to_json(self) {
+  match self {
+    Text(value) => value.to_json()
+    ChatCompletionRequestMessageContentPartTextArray(value) => value.to_json()
+  }
+}
+
+///|
+///
+/// Decodes this union from JSON.
+pub extend PredictionContentContent with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for PredictionContentContent with fn from_json(
+  value,
+  path,
+) {
+  if value is String(_) {
+    let decoded : String = @json.from_json(value, path~)
+    return Text(decoded)
+  }
+  if json_array_matches(value, item => item is Object(_)) {
+    let decoded : Array[ChatCompletionRequestMessageContentPartText] = @json.from_json(
+      value,
+      path~,
+    )
+    return ChatCompletionRequestMessageContentPartTextArray(decoded)
+  }
+  raise @json.JsonDecodeError(
+    (path, "JSON shape does not match any PredictionContentContent variant"),
+  )
+}
+
+///|
+///
+/// Static predicted output content, such as the content of a text file that is being regenerated.
+pub(all) struct PredictionContent {
+  type_ : String
+  content : PredictionContentContent
+}
+
+///|
+///
+/// Creates a PredictionContent with omitted optional fields absent.
+pub fn PredictionContent::new(
+  type_~ : String,
+  content~ : PredictionContentContent,
+) -> PredictionContent {
+  { type_, content, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend PredictionContent with ToJson::{to_json}
+
+///|
+pub impl ToJson for PredictionContent with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("type", self.type_)
+  .field("content", self.content)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend PredictionContent with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for PredictionContent with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    type_: required_field(obj, "type", path),
+    content: required_field(obj, "content", path),
+  }
+}
+
+///|
+///
+/// Configuration for a [Predicted Output](/docs/guides/predicted-outputs), which can greatly improve response times when large parts of the model response are known ahead of time. This is most common when you are regenerating a file with only minor changes to most of the content.
+pub(all) enum CreateChatCompletionRequestPrediction {
+  Content(PredictionContent)
+  Unknown(String, Json)
+}
+
+///|
+///
+/// Encodes this tagged union as JSON.
+pub extend CreateChatCompletionRequestPrediction with ToJson::{to_json}
+
+///|
+pub impl ToJson for CreateChatCompletionRequestPrediction with fn to_json(self) {
+  match self {
+    Content(value) => value.to_json()
+    Unknown(_, value) => value
+  }
+}
+
+///|
+///
+/// Decodes this tagged union from JSON.
+pub extend CreateChatCompletionRequestPrediction with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for CreateChatCompletionRequestPrediction with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  let tag : String = required_field(obj, "type", path)
+  match tag {
+    "content" => Content(@json.from_json(value, path~))
+    other => Unknown(other, value)
+  }
+}
+
+///|
+///
+/// `none` means the model will not call a function and instead generates a message. `auto` means the model can pick between generating a message or calling a function.
+pub(all) enum CreateChatCompletionRequestFunctionCallText {
+  None
+  Auto
+  Custom(String)
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend CreateChatCompletionRequestFunctionCallText with ToJson::{to_json}
+
+///|
+pub impl ToJson for CreateChatCompletionRequestFunctionCallText with fn to_json(
+  self,
+) {
+  let raw = match self {
+    None => "none"
+    Auto => "auto"
+    Custom(raw) => raw
+  }
+  raw.to_json()
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend CreateChatCompletionRequestFunctionCallText with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for CreateChatCompletionRequestFunctionCallText with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "none" => Some(None)
+        "auto" => Some(Auto)
+        _ => None
+      }
+    },
+    raw => Custom(raw),
+  )
+}
+
+///|
+///
+/// Deprecated in favor of `tool_choice`. Controls which (if any) function is called by the model. `none` means the model will not call a function and instead generates a message. `auto` means the model can pick between generating a message or calling a function. Specifying a particular function via `{"name": "my_function"}` forces the model to call that function. `none` is the default when no functions are present. `auto` is the default if functions are present.
+pub(all) enum CreateChatCompletionRequestFunctionCall {
+  Text(CreateChatCompletionRequestFunctionCallText)
+  ChatCompletionFunctionCallOption(ChatCompletionFunctionCallOption)
+}
+
+///|
+///
+/// Encodes this union as JSON.
+pub extend CreateChatCompletionRequestFunctionCall with ToJson::{to_json}
+
+///|
+pub impl ToJson for CreateChatCompletionRequestFunctionCall with fn to_json(
+  self,
+) {
+  match self {
+    Text(value) => value.to_json()
+    ChatCompletionFunctionCallOption(value) => value.to_json()
+  }
+}
+
+///|
+///
+/// Decodes this union from JSON.
+pub extend CreateChatCompletionRequestFunctionCall with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for CreateChatCompletionRequestFunctionCall with fn from_json(
+  value,
+  path,
+) {
+  if value is String(_) {
+    let decoded : CreateChatCompletionRequestFunctionCallText = @json.from_json(
+      value,
+      path~,
+    )
+    return Text(decoded)
+  }
+  if value is Object(_) {
+    let decoded : ChatCompletionFunctionCallOption = @json.from_json(
+      value,
+      path~,
+    )
+    return ChatCompletionFunctionCallOption(decoded)
+  }
+  raise @json.JsonDecodeError(
+    (
+      path, "JSON shape does not match any CreateChatCompletionRequestFunctionCall variant",
+    ),
+  )
+}
+
+///|
+///
+/// Generated representation of CreateChatCompletionRequest.
+pub(all) struct CreateChatCompletionRequest {
+  metadata : @sdkjson.Presence[Map[String, String]]
+  temperature : @sdkjson.Presence[Double]
+  top_p : @sdkjson.Presence[Double]
+  user : String?
+  service_tier : @sdkjson.Presence[ServiceTier]
+  messages : Array[ChatCompletionRequestMessage]
+  model : String
+  modalities : @sdkjson.Presence[Array[ResponseModalitiesItem]]
+  reasoning_effort : @sdkjson.Presence[ReasoningEffort]
+  max_completion_tokens : @sdkjson.Presence[Int]
+  frequency_penalty : @sdkjson.Presence[Double]
+  presence_penalty : @sdkjson.Presence[Double]
+  web_search_options : CreateChatCompletionRequestWebSearchOptions?
+  top_logprobs : @sdkjson.Presence[Int]
+  response_format : CreateChatCompletionRequestResponseFormat?
+  audio : @sdkjson.Presence[CreateChatCompletionRequestAudio]
+  store : @sdkjson.Presence[Bool]
+  stream : @sdkjson.Presence[Bool]
+  stop : @sdkjson.Presence[StopConfiguration]
+  logit_bias : @sdkjson.Presence[Map[String, Int]]
+  logprobs : @sdkjson.Presence[Bool]
+  max_tokens : @sdkjson.Presence[Int]
+  n : @sdkjson.Presence[Int]
+  prediction : @sdkjson.Presence[CreateChatCompletionRequestPrediction]
+  seed : @sdkjson.Presence[Int]
+  stream_options : @sdkjson.Presence[ChatCompletionStreamOptions]
+  tools : Array[ChatCompletionTool]?
+  tool_choice : ChatCompletionToolChoiceOption?
+  parallel_tool_calls : Bool?
+  function_call : CreateChatCompletionRequestFunctionCall?
+  functions : Array[ChatCompletionFunctions]?
+}
+
+///|
+///
+/// Creates a CreateChatCompletionRequest with omitted optional fields absent.
+pub fn CreateChatCompletionRequest::new(
+  messages~ : Array[ChatCompletionRequestMessage],
+  model~ : String,
+  metadata? : Map[String, String],
+  temperature? : Double,
+  top_p? : Double,
+  user? : String,
+  service_tier? : ServiceTier,
+  modalities? : Array[ResponseModalitiesItem],
+  reasoning_effort? : ReasoningEffort,
+  max_completion_tokens? : Int,
+  frequency_penalty? : Double,
+  presence_penalty? : Double,
+  web_search_options? : CreateChatCompletionRequestWebSearchOptions,
+  top_logprobs? : Int,
+  response_format? : CreateChatCompletionRequestResponseFormat,
+  audio? : CreateChatCompletionRequestAudio,
+  store? : Bool,
+  stream? : Bool,
+  stop? : StopConfiguration,
+  logit_bias? : Map[String, Int],
+  logprobs? : Bool,
+  max_tokens? : Int,
+  n? : Int,
+  prediction? : CreateChatCompletionRequestPrediction,
+  seed? : Int,
+  stream_options? : ChatCompletionStreamOptions,
+  tools? : Array[ChatCompletionTool],
+  tool_choice? : ChatCompletionToolChoiceOption,
+  parallel_tool_calls? : Bool,
+  function_call? : CreateChatCompletionRequestFunctionCall,
+  functions? : Array[ChatCompletionFunctions],
+) -> CreateChatCompletionRequest {
+  {
+    metadata: @sdkjson.Presence::from_option(metadata),
+    temperature: @sdkjson.Presence::from_option(temperature),
+    top_p: @sdkjson.Presence::from_option(top_p),
+    user,
+    service_tier: @sdkjson.Presence::from_option(service_tier),
+    messages,
+    model,
+    modalities: @sdkjson.Presence::from_option(modalities),
+    reasoning_effort: @sdkjson.Presence::from_option(reasoning_effort),
+    max_completion_tokens: @sdkjson.Presence::from_option(max_completion_tokens),
+    frequency_penalty: @sdkjson.Presence::from_option(frequency_penalty),
+    presence_penalty: @sdkjson.Presence::from_option(presence_penalty),
+    web_search_options,
+    top_logprobs: @sdkjson.Presence::from_option(top_logprobs),
+    response_format,
+    audio: @sdkjson.Presence::from_option(audio),
+    store: @sdkjson.Presence::from_option(store),
+    stream: @sdkjson.Presence::from_option(stream),
+    stop: @sdkjson.Presence::from_option(stop),
+    logit_bias: @sdkjson.Presence::from_option(logit_bias),
+    logprobs: @sdkjson.Presence::from_option(logprobs),
+    max_tokens: @sdkjson.Presence::from_option(max_tokens),
+    n: @sdkjson.Presence::from_option(n),
+    prediction: @sdkjson.Presence::from_option(prediction),
+    seed: @sdkjson.Presence::from_option(seed),
+    stream_options: @sdkjson.Presence::from_option(stream_options),
+    tools,
+    tool_choice,
+    parallel_tool_calls,
+    function_call,
+    functions,
+  }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend CreateChatCompletionRequest with ToJson::{to_json}
+
+///|
+pub impl ToJson for CreateChatCompletionRequest with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .presence("metadata", self.metadata.map(value => json_map_to_json(value)))
+  .presence("temperature", self.temperature)
+  .presence("top_p", self.top_p)
+  .opt("user", self.user)
+  .presence("service_tier", self.service_tier)
+  .field("messages", self.messages)
+  .field("model", self.model)
+  .presence("modalities", self.modalities)
+  .presence("reasoning_effort", self.reasoning_effort)
+  .presence("max_completion_tokens", self.max_completion_tokens)
+  .presence("frequency_penalty", self.frequency_penalty)
+  .presence("presence_penalty", self.presence_penalty)
+  .opt("web_search_options", self.web_search_options)
+  .presence("top_logprobs", self.top_logprobs)
+  .opt("response_format", self.response_format)
+  .presence("audio", self.audio)
+  .presence("store", self.store)
+  .presence("stream", self.stream)
+  .presence("stop", self.stop)
+  .presence("logit_bias", self.logit_bias.map(value => json_map_to_json(value)))
+  .presence("logprobs", self.logprobs)
+  .presence("max_tokens", self.max_tokens)
+  .presence("n", self.n)
+  .presence("prediction", self.prediction)
+  .presence("seed", self.seed)
+  .presence("stream_options", self.stream_options)
+  .opt("tools", self.tools)
+  .opt("tool_choice", self.tool_choice)
+  .opt("parallel_tool_calls", self.parallel_tool_calls)
+  .opt("function_call", self.function_call)
+  .opt("functions", self.functions)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend CreateChatCompletionRequest with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for CreateChatCompletionRequest with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    metadata: decode_presence_json_map(obj, "metadata", path),
+    temperature: @sdkjson.presence_field(obj, "temperature", path),
+    top_p: @sdkjson.presence_field(obj, "top_p", path),
+    user: @sdkjson.opt_field(obj, "user", path),
+    service_tier: @sdkjson.presence_field(obj, "service_tier", path),
+    messages: required_field(obj, "messages", path),
+    model: required_field(obj, "model", path),
+    modalities: @sdkjson.presence_field(obj, "modalities", path),
+    reasoning_effort: @sdkjson.presence_field(obj, "reasoning_effort", path),
+    max_completion_tokens: @sdkjson.presence_field(
+      obj, "max_completion_tokens", path,
+    ),
+    frequency_penalty: @sdkjson.presence_field(obj, "frequency_penalty", path),
+    presence_penalty: @sdkjson.presence_field(obj, "presence_penalty", path),
+    web_search_options: @sdkjson.opt_field(obj, "web_search_options", path),
+    top_logprobs: @sdkjson.presence_field(obj, "top_logprobs", path),
+    response_format: @sdkjson.opt_field(obj, "response_format", path),
+    audio: @sdkjson.presence_field(obj, "audio", path),
+    store: @sdkjson.presence_field(obj, "store", path),
+    stream: @sdkjson.presence_field(obj, "stream", path),
+    stop: @sdkjson.presence_field(obj, "stop", path),
+    logit_bias: decode_presence_json_map(obj, "logit_bias", path),
+    logprobs: @sdkjson.presence_field(obj, "logprobs", path),
+    max_tokens: @sdkjson.presence_field(obj, "max_tokens", path),
+    n: @sdkjson.presence_field(obj, "n", path),
+    prediction: @sdkjson.presence_field(obj, "prediction", path),
+    seed: @sdkjson.presence_field(obj, "seed", path),
+    stream_options: @sdkjson.presence_field(obj, "stream_options", path),
+    tools: @sdkjson.opt_field(obj, "tools", path),
+    tool_choice: @sdkjson.opt_field(obj, "tool_choice", path),
+    parallel_tool_calls: @sdkjson.opt_field(obj, "parallel_tool_calls", path),
+    function_call: @sdkjson.opt_field(obj, "function_call", path),
+    functions: @sdkjson.opt_field(obj, "functions", path),
+  }
+}
+
+///|
+///
+/// The reason the model stopped generating tokens. This will be `stop` if the model hit a natural stop point or a provided stop sequence, `length` if the maximum number of tokens specified in the request was reached, `content_filter` if content was omitted due to a flag from our content filters, `tool_calls` if the model called a tool, or `function_call` (deprecated) if the model called a function.
+pub(all) enum CreateChatCompletionResponseChoicesItemFinishReason {
+  Stop
+  Length
+  ToolCalls
+  ContentFilter
+  FunctionCall
+  Unknown(String)
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend CreateChatCompletionResponseChoicesItemFinishReason with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for CreateChatCompletionResponseChoicesItemFinishReason with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Stop => "stop"
+    Length => "length"
+    ToolCalls => "tool_calls"
+    ContentFilter => "content_filter"
+    FunctionCall => "function_call"
+    Unknown(raw) => raw
+  }
+  raw.to_json()
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend CreateChatCompletionResponseChoicesItemFinishReason with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for CreateChatCompletionResponseChoicesItemFinishReason with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "stop" => Some(Stop)
+        "length" => Some(Length)
+        "tool_calls" => Some(ToolCalls)
+        "content_filter" => Some(ContentFilter)
+        "function_call" => Some(FunctionCall)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Log probability information for the choice.
+pub(all) struct CreateChatCompletionResponseChoicesItemLogprobs {
+  content : Array[ChatCompletionTokenLogprob]?
+  refusal : Array[ChatCompletionTokenLogprob]?
+}
+
+///|
+///
+/// Creates a CreateChatCompletionResponseChoicesItemLogprobs with omitted optional fields absent.
+pub fn CreateChatCompletionResponseChoicesItemLogprobs::new(
+  content? : Array[ChatCompletionTokenLogprob],
+  refusal? : Array[ChatCompletionTokenLogprob],
+) -> CreateChatCompletionResponseChoicesItemLogprobs {
+  { content, refusal, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend CreateChatCompletionResponseChoicesItemLogprobs with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for CreateChatCompletionResponseChoicesItemLogprobs with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .presence("content", nullable_presence(self.content.map(value => value)))
+  .presence("refusal", nullable_presence(self.refusal.map(value => value)))
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend CreateChatCompletionResponseChoicesItemLogprobs with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for CreateChatCompletionResponseChoicesItemLogprobs with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    content: decode_nullable_field(obj, "content", path),
+    refusal: decode_nullable_field(obj, "refusal", path),
+  }
+}
+
+///|
+///
+/// Generated representation of CreateChatCompletionResponseChoicesItem.
+pub(all) struct CreateChatCompletionResponseChoicesItem {
+  finish_reason : CreateChatCompletionResponseChoicesItemFinishReason
+  index : Int
+  message : ChatCompletionResponseMessage
+  logprobs : @sdkjson.Presence[CreateChatCompletionResponseChoicesItemLogprobs]
+}
+
+///|
+///
+/// Creates a CreateChatCompletionResponseChoicesItem with omitted optional fields absent.
+pub fn CreateChatCompletionResponseChoicesItem::new(
+  finish_reason~ : CreateChatCompletionResponseChoicesItemFinishReason,
+  index~ : Int,
+  message~ : ChatCompletionResponseMessage,
+  logprobs? : CreateChatCompletionResponseChoicesItemLogprobs,
+) -> CreateChatCompletionResponseChoicesItem {
+  {
+    finish_reason,
+    index,
+    message,
+    logprobs: @sdkjson.Presence::from_option(logprobs),
+  }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend CreateChatCompletionResponseChoicesItem with ToJson::{to_json}
+
+///|
+pub impl ToJson for CreateChatCompletionResponseChoicesItem with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .field("finish_reason", self.finish_reason)
+  .field("index", self.index)
+  .field("message", self.message)
+  .presence("logprobs", self.logprobs)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend CreateChatCompletionResponseChoicesItem with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for CreateChatCompletionResponseChoicesItem with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    finish_reason: required_field(obj, "finish_reason", path),
+    index: required_field(obj, "index", path),
+    message: required_field(obj, "message", path),
+    logprobs: @sdkjson.presence_field(obj, "logprobs", path),
+  }
+}
+
+///|
+///
+/// Represents a chat completion response returned by model, based on the provided input.
+pub(all) struct CreateChatCompletionResponse {
+  id : String
+  choices : Array[CreateChatCompletionResponseChoicesItem]
+  created : Int
+  model : String
+  service_tier : @sdkjson.Presence[ServiceTier]
+  system_fingerprint : String?
+  usage : CompletionUsage?
+}
+
+///|
+///
+/// Creates a CreateChatCompletionResponse with omitted optional fields absent.
+pub fn CreateChatCompletionResponse::new(
+  id~ : String,
+  choices~ : Array[CreateChatCompletionResponseChoicesItem],
+  created~ : Int,
+  model~ : String,
+  service_tier? : ServiceTier,
+  system_fingerprint? : String,
+  usage? : CompletionUsage,
+) -> CreateChatCompletionResponse {
+  {
+    id,
+    choices,
+    created,
+    model,
+    service_tier: @sdkjson.Presence::from_option(service_tier),
+    system_fingerprint,
+    usage,
+  }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend CreateChatCompletionResponse with ToJson::{to_json}
+
+///|
+pub impl ToJson for CreateChatCompletionResponse with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("id", self.id)
+  .field("choices", self.choices)
+  .field("created", self.created)
+  .field("model", self.model)
+  .presence("service_tier", self.service_tier)
+  .opt("system_fingerprint", self.system_fingerprint)
+  .field("object", "chat.completion")
+  .opt("usage", self.usage)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend CreateChatCompletionResponse with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for CreateChatCompletionResponse with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    id: required_field(obj, "id", path),
+    choices: required_field(obj, "choices", path),
+    created: required_field(obj, "created", path),
+    model: required_field(obj, "model", path),
+    service_tier: @sdkjson.presence_field(obj, "service_tier", path),
+    system_fingerprint: @sdkjson.opt_field(obj, "system_fingerprint", path),
+    usage: @sdkjson.opt_field(obj, "usage", path),
+  }
+}
+
+///|
+///
+/// Log probability information for the choice.
+pub(all) struct CreateChatCompletionStreamResponseChoicesItemLogprobs {
+  content : Array[ChatCompletionTokenLogprob]?
+  refusal : Array[ChatCompletionTokenLogprob]?
+}
+
+///|
+///
+/// Creates a CreateChatCompletionStreamResponseChoicesItemLogprobs with omitted optional fields absent.
+pub fn CreateChatCompletionStreamResponseChoicesItemLogprobs::new(
+  content? : Array[ChatCompletionTokenLogprob],
+  refusal? : Array[ChatCompletionTokenLogprob],
+) -> CreateChatCompletionStreamResponseChoicesItemLogprobs {
+  { content, refusal, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend CreateChatCompletionStreamResponseChoicesItemLogprobs with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for CreateChatCompletionStreamResponseChoicesItemLogprobs with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .presence("content", nullable_presence(self.content.map(value => value)))
+  .presence("refusal", nullable_presence(self.refusal.map(value => value)))
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend CreateChatCompletionStreamResponseChoicesItemLogprobs with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for CreateChatCompletionStreamResponseChoicesItemLogprobs with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    content: decode_nullable_field(obj, "content", path),
+    refusal: decode_nullable_field(obj, "refusal", path),
+  }
+}
+
+///|
+///
+/// The reason the model stopped generating tokens. This will be `stop` if the model hit a natural stop point or a provided stop sequence, `length` if the maximum number of tokens specified in the request was reached, `content_filter` if content was omitted due to a flag from our content filters, `tool_calls` if the model called a tool, or `function_call` (deprecated) if the model called a function.
+pub(all) enum CreateChatCompletionStreamResponseChoicesItemFinishReason {
+  Stop
+  Length
+  ToolCalls
+  ContentFilter
+  FunctionCall
+  Unknown(String)
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend CreateChatCompletionStreamResponseChoicesItemFinishReason with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for CreateChatCompletionStreamResponseChoicesItemFinishReason with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Stop => "stop"
+    Length => "length"
+    ToolCalls => "tool_calls"
+    ContentFilter => "content_filter"
+    FunctionCall => "function_call"
+    Unknown(raw) => raw
+  }
+  raw.to_json()
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend CreateChatCompletionStreamResponseChoicesItemFinishReason with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for CreateChatCompletionStreamResponseChoicesItemFinishReason with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "stop" => Some(Stop)
+        "length" => Some(Length)
+        "tool_calls" => Some(ToolCalls)
+        "content_filter" => Some(ContentFilter)
+        "function_call" => Some(FunctionCall)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of CreateChatCompletionStreamResponseChoicesItem.
+pub(all) struct CreateChatCompletionStreamResponseChoicesItem {
+  delta : ChatCompletionStreamResponseDelta
+  logprobs : @sdkjson.Presence[
+    CreateChatCompletionStreamResponseChoicesItemLogprobs,
+  ]
+  finish_reason : CreateChatCompletionStreamResponseChoicesItemFinishReason?
+  index : Int
+}
+
+///|
+///
+/// Creates a CreateChatCompletionStreamResponseChoicesItem with omitted optional fields absent.
+pub fn CreateChatCompletionStreamResponseChoicesItem::new(
+  delta~ : ChatCompletionStreamResponseDelta,
+  index~ : Int,
+  logprobs? : CreateChatCompletionStreamResponseChoicesItemLogprobs,
+  finish_reason? : CreateChatCompletionStreamResponseChoicesItemFinishReason,
+) -> CreateChatCompletionStreamResponseChoicesItem {
+  {
+    delta,
+    logprobs: @sdkjson.Presence::from_option(logprobs),
+    finish_reason,
+    index,
+  }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend CreateChatCompletionStreamResponseChoicesItem with ToJson::{to_json}
+
+///|
+pub impl ToJson for CreateChatCompletionStreamResponseChoicesItem with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .field("delta", self.delta)
+  .presence("logprobs", self.logprobs)
+  .presence(
+    "finish_reason",
+    nullable_presence(self.finish_reason.map(value => value)),
+  )
+  .field("index", self.index)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend CreateChatCompletionStreamResponseChoicesItem with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for CreateChatCompletionStreamResponseChoicesItem with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    delta: required_field(obj, "delta", path),
+    logprobs: @sdkjson.presence_field(obj, "logprobs", path),
+    finish_reason: decode_nullable_field(obj, "finish_reason", path),
+    index: required_field(obj, "index", path),
+  }
+}
+
+///|
+///
+/// Represents a streamed chunk of a chat completion response returned by the model, based on the provided input. [Learn more](/docs/guides/streaming-responses).
+pub(all) struct CreateChatCompletionStreamResponse {
+  id : String
+  choices : Array[CreateChatCompletionStreamResponseChoicesItem]
+  created : Int
+  model : String
+  service_tier : @sdkjson.Presence[ServiceTier]
+  system_fingerprint : String?
+  usage : @sdkjson.Presence[CompletionUsage]
+}
+
+///|
+///
+/// Creates a CreateChatCompletionStreamResponse with omitted optional fields absent.
+pub fn CreateChatCompletionStreamResponse::new(
+  id~ : String,
+  choices~ : Array[CreateChatCompletionStreamResponseChoicesItem],
+  created~ : Int,
+  model~ : String,
+  service_tier? : ServiceTier,
+  system_fingerprint? : String,
+  usage? : CompletionUsage,
+) -> CreateChatCompletionStreamResponse {
+  {
+    id,
+    choices,
+    created,
+    model,
+    service_tier: @sdkjson.Presence::from_option(service_tier),
+    system_fingerprint,
+    usage: @sdkjson.Presence::from_option(usage),
+  }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend CreateChatCompletionStreamResponse with ToJson::{to_json}
+
+///|
+pub impl ToJson for CreateChatCompletionStreamResponse with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("id", self.id)
+  .field("choices", self.choices)
+  .field("created", self.created)
+  .field("model", self.model)
+  .presence("service_tier", self.service_tier)
+  .opt("system_fingerprint", self.system_fingerprint)
+  .field("object", "chat.completion.chunk")
+  .presence("usage", self.usage)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend CreateChatCompletionStreamResponse with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for CreateChatCompletionStreamResponse with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    id: required_field(obj, "id", path),
+    choices: required_field(obj, "choices", path),
+    created: required_field(obj, "created", path),
+    model: required_field(obj, "model", path),
+    service_tier: @sdkjson.presence_field(obj, "service_tier", path),
+    system_fingerprint: @sdkjson.opt_field(obj, "system_fingerprint", path),
+    usage: @sdkjson.presence_field(obj, "usage", path),
+  }
+}
+
+///|
+///
 /// Input text to embed, encoded as a string or array of tokens. To embed multiple inputs in a single request, pass an array of strings or array of token arrays. The input must not exceed the max input tokens for the model (8192 tokens for `text-embedding-ada-002`), cannot be an empty string, and any array must be 2048 dimensions or less. [Example Python code](https://cookbook.openai.com/examples/how_to_count_tokens_with_tiktoken) for counting tokens. Some models may also impose a limit on total number of tokens summed across inputs.
 pub(all) enum CreateEmbeddingRequestInput {
   Text(String)
@@ -1564,54 +6130,6 @@ pub impl @json.FromJson for CreateEmbeddingResponse with fn from_json(
 
 ///|
 ///
-/// Specifies the latency tier to use for processing the request. This parameter is relevant for customers subscribed to the scale tier service: - If set to 'auto', and the Project is Scale tier enabled, the system will utilize scale tier credits until they are exhausted. - If set to 'auto', and the Project is not Scale tier enabled, the request will be processed using the default service tier with a lower uptime SLA and no latency guarentee. - If set to 'default', the request will be processed using the default service tier with a lower uptime SLA and no latency guarentee. - If set to 'flex', the request will be processed with the Flex Processing service tier. [Learn more](/docs/guides/flex-processing). - When not set, the default behavior is 'auto'. When this parameter is set, the response body will include the `service_tier` utilized.
-pub(all) enum ServiceTier {
-  Auto
-  Default
-  Flex
-  Unknown(String)
-}
-
-///|
-///
-/// Encodes this string enum as JSON.
-pub extend ServiceTier with ToJson::{to_json}
-
-///|
-pub impl ToJson for ServiceTier with fn to_json(self) {
-  let raw = match self {
-    Auto => "auto"
-    Default => "default"
-    Flex => "flex"
-    Unknown(raw) => raw
-  }
-  raw.to_json()
-}
-
-///|
-///
-/// Decodes this string enum from JSON.
-pub extend ServiceTier with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for ServiceTier with fn from_json(value, path) {
-  @sdkjson.open_string(
-    value,
-    path,
-    raw => {
-      match raw {
-        "auto" => Some(Auto)
-        "default" => Some(Default)
-        "flex" => Some(Flex)
-        _ => None
-      }
-    },
-    raw => Unknown(raw),
-  )
-}
-
-///|
-///
 /// Generated representation of ModelResponseProperties.
 pub(all) struct ModelResponseProperties {
   metadata : @sdkjson.Presence[Map[String, String]]
@@ -1674,54 +6192,6 @@ pub impl @json.FromJson for ModelResponseProperties with fn from_json(
     user: @sdkjson.opt_field(obj, "user", path),
     service_tier: @sdkjson.presence_field(obj, "service_tier", path),
   }
-}
-
-///|
-///
-/// **o-series models only** Constrains effort on reasoning for [reasoning models](https://platform.openai.com/docs/guides/reasoning). Currently supported values are `low`, `medium`, and `high`. Reducing reasoning effort can result in faster responses and fewer tokens used on reasoning in a response.
-pub(all) enum ReasoningEffort {
-  Low
-  Medium
-  High
-  Unknown(String)
-}
-
-///|
-///
-/// Encodes this string enum as JSON.
-pub extend ReasoningEffort with ToJson::{to_json}
-
-///|
-pub impl ToJson for ReasoningEffort with fn to_json(self) {
-  let raw = match self {
-    Low => "low"
-    Medium => "medium"
-    High => "high"
-    Unknown(raw) => raw
-  }
-  raw.to_json()
-}
-
-///|
-///
-/// Decodes this string enum from JSON.
-pub extend ReasoningEffort with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for ReasoningEffort with fn from_json(value, path) {
-  @sdkjson.open_string(
-    value,
-    path,
-    raw => {
-      match raw {
-        "low" => Some(Low)
-        "medium" => Some(Medium)
-        "high" => Some(High)
-        _ => None
-      }
-    },
-    raw => Unknown(raw),
-  )
 }
 
 ///|
@@ -1878,41 +6348,6 @@ pub impl @json.FromJson for Reasoning with fn from_json(value, path) {
 
 ///|
 ///
-/// Default response format. Used to generate text responses.
-pub(all) struct ResponseFormatText {
-  type_ : String
-}
-
-///|
-///
-/// Creates a ResponseFormatText with omitted optional fields absent.
-pub fn ResponseFormatText::new(type_~ : String) -> ResponseFormatText {
-  { type_, }
-}
-
-///|
-///
-/// Encodes this value as JSON.
-pub extend ResponseFormatText with ToJson::{to_json}
-
-///|
-pub impl ToJson for ResponseFormatText with fn to_json(self) {
-  @sdkjson.ObjBuilder::new().field("type", self.type_).build()
-}
-
-///|
-///
-/// Decodes this value from JSON.
-pub extend ResponseFormatText with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for ResponseFormatText with fn from_json(value, path) {
-  let obj = @sdkjson.expect_object(value, path)
-  { type_: required_field(obj, "type", path), }
-}
-
-///|
-///
 /// JSON Schema response format. Used to generate structured JSON responses. Learn more about [Structured Outputs](/docs/guides/structured-outputs).
 pub(all) struct TextResponseFormatJsonSchema {
   type_ : String
@@ -1975,46 +6410,6 @@ pub impl @json.FromJson for TextResponseFormatJsonSchema with fn from_json(
     schema: required_field(obj, "schema", path),
     strict: @sdkjson.presence_field(obj, "strict", path),
   }
-}
-
-///|
-///
-/// JSON object response format. An older method of generating JSON responses. Using `json_schema` is recommended for models that support it. Note that the model will not generate JSON without a system or user message instructing it to do so.
-pub(all) struct ResponseFormatJsonObject {
-  type_ : String
-}
-
-///|
-///
-/// Creates a ResponseFormatJsonObject with omitted optional fields absent.
-pub fn ResponseFormatJsonObject::new(
-  type_~ : String,
-) -> ResponseFormatJsonObject {
-  { type_, }
-}
-
-///|
-///
-/// Encodes this value as JSON.
-pub extend ResponseFormatJsonObject with ToJson::{to_json}
-
-///|
-pub impl ToJson for ResponseFormatJsonObject with fn to_json(self) {
-  @sdkjson.ObjBuilder::new().field("type", self.type_).build()
-}
-
-///|
-///
-/// Decodes this value from JSON.
-pub extend ResponseFormatJsonObject with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for ResponseFormatJsonObject with fn from_json(
-  value,
-  path,
-) {
-  let obj = @sdkjson.expect_object(value, path)
-  { type_: required_field(obj, "type", path), }
 }
 
 ///|

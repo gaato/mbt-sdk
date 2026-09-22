@@ -25,3 +25,6 @@ actions:
     update:
       items:
         type: integer
+  - target: "$['paths']['/organization/certificates/{certificate_id}']['get']['parameters'][0]['name']"
+    description: The path template uses certificate_id while its required path parameter is named cert_id, so the declared parameter cannot bind to the template placeholder.
+    update: certificate_id

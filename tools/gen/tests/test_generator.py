@@ -264,7 +264,7 @@ class IRTests(unittest.TestCase):
         self.assertEqual(event.variants[0].tag, "wire_tag")
         self.assertTrue(any("mapping inferred" in note.message for note in builder.notes))
 
-    def test_implicit_discriminator_requires_unique_single_values(self):
+    def test_implicit_discriminator_supports_disjoint_value_sets(self):
         def object_schema(value):
             tag = {"type": "string", "enum": value if isinstance(value, list) else [value]}
             return {"type": "object", "properties": {"type": tag}, "required": ["type"]}
@@ -272,9 +272,32 @@ class IRTests(unittest.TestCase):
         good = {"oneOf": [object_schema("left"), object_schema("right")]}
         ir = IRBuilder(document(operation(response=good)), "example/gen").build()
         self.assertIsInstance(declaration(ir, "TestOperationResponse"), TaggedUnion)
+        schemas = {
+            "Comparison": object_schema(["eq", "ne", "gt"]),
+            "Compound": object_schema(["and", "or"]),
+            "Filter": {
+                "oneOf": [
+                    {"$ref": "#/components/schemas/Comparison"},
+                    {"$ref": "#/components/schemas/Compound"},
+                ]
+            },
+        }
+        ir = IRBuilder(
+            document(operation(response={"$ref": "#/components/schemas/Filter"}), schemas),
+            "example/gen",
+        ).build()
+        filter_type = declaration(ir, "Filter")
+        self.assertEqual(
+            [(variant.name, variant.tags) for variant in filter_type.variants],
+            [("Comparison", ("eq", "ne", "gt")), ("Compound", ("and", "or"))],
+        )
+        source = emit(ir)["types.mbt"]
+        self.assertIn('"ne" => Comparison', source)
+        self.assertIn('"or" => Compound', source)
+        self.assertIn("Unknown(String, Json)", source)
         cases = [
             ([object_schema("same"), object_schema("same")], "indistinguishable required sets"),
-            ([object_schema(["one", "two"]), object_schema("right")], "no common single-value property"),
+            ([object_schema(["one", "two"]), object_schema(["two", "right"])], "no common single-value property"),
         ]
         for choices, message in cases:
             with self.subTest(choices=choices), self.assertRaises(GenerationError) as caught:
@@ -632,6 +655,27 @@ class IRTests(unittest.TestCase):
         # Japanese text, ampersands, and equals signs uniformly.
         self.assertIn("byte == b'~'", source)
 
+    def test_deep_object_query_serializes_bracketed_map_keys(self):
+        parameter = {
+            "name": "filter",
+            "in": "query",
+            "required": False,
+            "style": "deepObject",
+            "explode": True,
+            "schema": {
+                "type": "object",
+                "additionalProperties": {"type": "string"},
+            },
+        }
+        ir = IRBuilder(
+            document(operation(parameters=[parameter])),
+            "example/gen",
+        ).build()
+        self.assertEqual(ir.operations[0].parameters[0].style, "deepObject")
+        source = emit(ir)["operations.mbt"]
+        self.assertIn('\"filter\" + "[" + key + "]"', source)
+        self.assertIn("parameter_value(value)", source)
+
     def test_header_parameter_is_labelled_and_stringified(self):
         parameters = [
             {"name": "X-Count", "in": "header", "required": True, "schema": {"type": "integer"}},
@@ -692,12 +736,57 @@ class IRTests(unittest.TestCase):
             (operation(parameters=[{"name": "q", "in": "query", "style": "deepObject", "schema": {"type": "string"}}]), "deepObject"),
             (operation(parameters=[{"name": "Authorization", "in": "header", "schema": {"type": "string"}}]), "reserved header"),
             (operation(request_content={"application/x-www-form-urlencoded": {"schema": {"type": "object"}}}), "urlencoded"),
-            (operation(request_content={"multipart/form-data": {"schema": {"type": "object"}}}), "multipart"),
         ]
         for op, fragment in cases:
             with self.subTest(fragment=fragment), self.assertRaises(GenerationError) as caught:
                 IRBuilder(document(op), "example/gen").build()
             self.assertIn(fragment, str(caught.exception))
+
+    def test_multipart_request_emits_text_json_and_file_parts(self):
+        schema = {
+            "type": "object",
+            "properties": {
+                "file": {"type": "string", "format": "binary"},
+                "images": {
+                    "type": "array",
+                    "items": {"type": "string", "format": "binary"},
+                },
+                "title": {"type": "string"},
+                "tags": {"type": "array", "items": {"type": "string"}},
+                "metadata": {
+                    "type": "object",
+                    "properties": {"ok": {"type": "boolean"}},
+                },
+            },
+            "required": ["file", "title"],
+        }
+        ir = IRBuilder(
+            document(
+                operation(
+                    request_content={"multipart/form-data": {"schema": schema}}
+                )
+            ),
+            "example/gen",
+        ).build()
+        fields = ir.operations[0].multipart_fields
+        self.assertEqual(
+            [(field.json_name, field.kind, field.required) for field in fields],
+            [
+                ("file", "file", True),
+                ("images", "file_array", False),
+                ("title", "text", True),
+                ("tags", "text_array", False),
+                ("metadata", "json", False),
+            ],
+        )
+        generated = emit(ir)
+        source = generated["operations.mbt"]
+        self.assertIn("boundary : String", source)
+        self.assertIn("@multipart.Part::file(\"file\", file_filename, file_content_type, file)", source)
+        self.assertIn("@multipart.Part::text(\"title\", parameter_value(title))", source)
+        self.assertIn("@multipart.Part::json(\"metadata\", value.to_json())", source)
+        self.assertIn("@multipart.apply(request, parts, boundary)", source)
+        self.assertIn('"gaato/sdk-runtime/multipart" @multipart', generated["moon.pkg"])
 
     def test_json_body_wins_when_form_is_an_alternative(self):
         content = {

@@ -86,6 +86,7 @@ class TaggedVariant:
     secondary_discriminator: str | None = None
     secondary_tag: str | None = None
     required_fields: tuple[str, ...] = ()
+    tags: tuple[str, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -113,6 +114,17 @@ class Parameter:
     type: TypeRef
     location: str
     required: bool
+    style: str = ""
+    description: str = ""
+
+
+@dataclass(frozen=True)
+class MultipartField:
+    json_name: str
+    moon_name: str
+    type: TypeRef | None
+    kind: str
+    required: bool
     description: str = ""
 
 
@@ -124,6 +136,7 @@ class Operation:
     path: str
     parameters: tuple[Parameter, ...]
     request_type: TypeRef | None
+    multipart_fields: tuple[MultipartField, ...]
     response_type: TypeRef | None
     description: str = ""
 
@@ -163,12 +176,14 @@ RESERVED = {
     "let",
     "loop",
     "match",
+    "method",
     "mut",
     "priv",
     "pub",
     "raise",
     "return",
     "struct",
+    "static",
     "suberror",
     "test",
     "trait",
@@ -193,6 +208,11 @@ def pascal_case(value: str) -> str:
     if result[0].isdigit():
         result = "Value" + result
     return result
+
+
+def type_name(value: str) -> str:
+    result = pascal_case(value)
+    return result + "Value" if result == "Error" else result
 
 
 def pointer_join(pointer: str, part: str | int) -> str:
@@ -353,6 +373,8 @@ class IRBuilder:
 
     def _properties(self, schema: dict[str, Any]) -> dict[str, Any] | None:
         """Collect object properties, using allOf's later-wins rule."""
+        if schema.get("$recursiveRef") == "#" and self._building_stack:
+            schema = self.doc["components"]["schemas"][self._building_stack[-1]]
         try:
             schema = self._dereference(schema)
         except (KeyError, TypeError):
@@ -440,6 +462,18 @@ class IRBuilder:
             return values[0]
         return None
 
+    @staticmethod
+    def _string_value_set(schema: Any) -> tuple[str, ...] | None:
+        if not isinstance(schema, dict):
+            return None
+        schema, _ = _split_nullable(schema)
+        if isinstance(schema.get("const"), str):
+            return (schema["const"],)
+        values = schema.get("enum")
+        if isinstance(values, list) and values and all(isinstance(value, str) for value in values):
+            return tuple(dict.fromkeys(values))
+        return None
+
     def _single_value_property(
         self,
         choices: list[dict[str, Any]],
@@ -467,11 +501,42 @@ class IRBuilder:
     def _implicit_tags(self, choices: list[dict[str, Any]]) -> tuple[str, list[str]] | None:
         return self._single_value_property(choices, require_unique=False)
 
+    def _set_value_property(
+        self,
+        choices: list[dict[str, Any]],
+        *,
+        exclude: set[str] | None = None,
+    ) -> tuple[str, list[tuple[str, ...]]] | None:
+        properties = [self._properties(choice) for choice in choices]
+        if any(item is None for item in properties):
+            return None
+        assert properties and all(item is not None for item in properties)
+        candidates = [name for name in properties[0] if name not in (exclude or set())]
+        if "type" in candidates:
+            candidates.remove("type")
+            candidates.insert(0, "type")
+        for property_name in candidates:
+            value_sets = [self._string_value_set(item.get(property_name)) for item in properties]
+            if not all(values is not None for values in value_sets):
+                continue
+            concrete = [values for values in value_sets if values is not None]
+            if not any(len(values) > 1 for values in concrete):
+                continue
+            if all(
+                set(left).isdisjoint(right)
+                for index, left in enumerate(concrete)
+                for right in concrete[index + 1 :]
+            ):
+                return property_name, concrete
+        return None
+
     def _required_fields(
         self,
         schema: dict[str, Any],
         seen_refs: set[str] | None = None,
     ) -> set[str] | None:
+        if schema.get("$recursiveRef") == "#" and self._building_stack:
+            schema = self.doc["components"]["schemas"][self._building_stack[-1]]
         ref = schema.get("$ref")
         if isinstance(ref, str):
             visited = seen_refs or set()
@@ -551,7 +616,11 @@ class IRBuilder:
                 property_name = discriminator.get("propertyName") if isinstance(discriminator, dict) else None
                 if not isinstance(property_name, str):
                     implicit = self._implicit_tags(choices)
-                    property_name = implicit[0] if implicit is not None else None
+                    if implicit is not None:
+                        property_name = implicit[0]
+                    else:
+                        set_valued = self._set_value_property(choices)
+                        property_name = set_valued[0] if set_valued is not None else None
                 if isinstance(property_name, str):
                     properties = [self._properties(choice) for choice in choices]
                     primary_values = [
@@ -643,6 +712,68 @@ class IRBuilder:
                 if isinstance(schema, dict):
                     yield schema, "response"
 
+    def _multipart_object(self, schema: dict[str, Any], pointer: str) -> dict[str, Any] | None:
+        try:
+            schema = self._dereference(schema)
+        except (KeyError, TypeError):
+            self.add_diag(pointer, "multipart request schema has an unresolved reference", "fix the local schema reference")
+            return None
+        if "allOf" in schema:
+            from .normalize import merge_all_of
+
+            diagnostics: list[Diagnostic] = []
+            schema = merge_all_of(schema, pointer, self.doc, diagnostics)
+            self.diagnostics.extend(diagnostics)
+        if schema.get("type") != "object" and "properties" not in schema:
+            self.add_diag(pointer, "multipart request schema must be an object", "describe multipart fields as object properties")
+            return None
+        return schema
+
+    def _binary_kind(self, schema: dict[str, Any], seen: set[str] | None = None) -> str | None:
+        schema, _ = _split_nullable(schema)
+        ref = schema.get("$ref")
+        if isinstance(ref, str):
+            visited = seen or set()
+            if ref in visited:
+                return None
+            try:
+                return self._binary_kind(self.resolve(ref), visited | {ref})
+            except (KeyError, TypeError):
+                return None
+        if schema.get("type") == "string" and schema.get("format") == "binary":
+            return "file"
+        if schema.get("type") == "array" and isinstance(schema.get("items"), dict):
+            return "file_array" if self._binary_kind(schema["items"], seen) == "file" else None
+        choices = schema.get("oneOf") or schema.get("anyOf")
+        if isinstance(choices, list) and choices:
+            kinds = [self._binary_kind(choice, seen) for choice in choices if isinstance(choice, dict)]
+            if len(kinds) == len(choices) and all(kind in {"file", "file_array"} for kind in kinds):
+                return "file_array" if "file_array" in kinds else "file"
+        return None
+
+    def _multipart_text_kind(self, schema: dict[str, Any], seen: set[str] | None = None) -> str:
+        schema, _ = _split_nullable(schema)
+        ref = schema.get("$ref")
+        if isinstance(ref, str):
+            visited = seen or set()
+            if ref not in visited:
+                try:
+                    return self._multipart_text_kind(self.resolve(ref), visited | {ref})
+                except (KeyError, TypeError):
+                    pass
+        if schema.get("type") in {"string", "integer", "number", "boolean"}:
+            return "text"
+        if schema.get("type") == "array" and isinstance(schema.get("items"), dict):
+            item_kind = self._multipart_text_kind(schema["items"], seen)
+            return "text_array" if item_kind == "text" else "json"
+        choices = schema.get("oneOf") or schema.get("anyOf")
+        if isinstance(choices, list) and choices and all(
+            isinstance(choice, dict) and self._multipart_text_kind(choice, seen) == "text"
+            for choice in choices
+        ):
+            return "text"
+        return "json"
+
     @staticmethod
     def _parameters(path_item: dict[str, Any], operation: dict[str, Any]) -> list[dict[str, Any]]:
         """Return path parameters followed by operation overrides."""
@@ -670,6 +801,14 @@ class IRBuilder:
                 selected.append((path, method, operation, parameters))
                 for schema, usage in self._operation_schemas(operation):
                     self._walk_refs(schema, usage, seen)
+                multipart = operation.get("requestBody", {}).get("content", {}).get("multipart/form-data", {}).get("schema")
+                if isinstance(multipart, dict):
+                    multipart_pointer = pointer_join(pointer_join(pointer_join(pointer_join(f"/paths/{path.replace('~', '~0').replace('/', '~1')}/{method}", "requestBody"), "content"), "multipart/form-data"), "schema")
+                    multipart_object = self._multipart_object(multipart, multipart_pointer)
+                    if multipart_object is not None:
+                        for field_schema in multipart_object.get("properties", {}).values():
+                            if isinstance(field_schema, dict) and self._binary_kind(field_schema) is None:
+                                self._walk_refs(field_schema, "request", seen)
                 for parameter in parameters:
                     schema = parameter.get("schema")
                     if isinstance(schema, dict):
@@ -722,6 +861,8 @@ class IRBuilder:
             if expanded:
                 choices = expanded
         entries: list[tuple[str, dict[str, Any], int]] = []
+        entry_tags: dict[int, tuple[str, ...]] = {}
+        set_valued = False
         if isinstance(discriminator, dict):
             property_name = discriminator.get("propertyName")
             if not isinstance(property_name, str) or not property_name:
@@ -741,6 +882,7 @@ class IRBuilder:
                         )
                         continue
                     entries.append((tag, {"$ref": ref}, index))
+                    entry_tags[index] = (tag,)
             elif mapping is not None:
                 self.add_diag(
                     pointer_join(pointer_join(pointer, "discriminator"), "mapping"),
@@ -770,20 +912,31 @@ class IRBuilder:
                     if tag is None:
                         tag = snake_case(ref.rsplit("/", 1)[-1].replace("~1", "/").replace("~0", "~"))
                     entries.append((tag, choice, index))
+                    entry_tags[index] = (tag,)
         else:
             implicit = self._implicit_tags(choices)
             if implicit is None:
-                self.add_diag(
-                    pointer_join(pointer, key),
-                    f"object union has {len(choices)} candidates and no common single-value property",
-                    "set x-moonbit-json: true only if raw JSON is intentional",
-                )
-                return TypeRef("Json")
-            property_name, tags = implicit
-            entries = [
-                (tag, choice, index)
-                for index, (tag, choice) in enumerate(zip(tags, choices, strict=True))
-            ]
+                set_property = self._set_value_property(choices)
+                if set_property is None:
+                    self.add_diag(
+                        pointer_join(pointer, key),
+                        f"object union has {len(choices)} candidates and no common single-value property",
+                        "set x-moonbit-json: true only if raw JSON is intentional",
+                    )
+                    return TypeRef("Json")
+                property_name, tag_sets = set_property
+                set_valued = True
+                for index, (tags, choice) in enumerate(zip(tag_sets, choices, strict=True)):
+                    entries.append((tags[0], choice, index))
+                    entry_tags[index] = tags
+            else:
+                property_name, tags = implicit
+                entries = [
+                    (tag, choice, index)
+                    for index, (tag, choice) in enumerate(zip(tags, choices, strict=True))
+                ]
+                for index, tag in enumerate(tags):
+                    entry_tags[index] = (tag,)
 
         groups: dict[str, list[int]] = {}
         for position, (tag, _, _) in enumerate(entries):
@@ -893,8 +1046,9 @@ class IRBuilder:
         for position in ordered_positions:
             tag, choice, original_index = entries[position]
             properties = self._properties(choice)
-            constant = self._single_string_value(properties.get(property_name)) if properties is not None else None
-            if constant != tag:
+            payload_tags = self._string_value_set(properties.get(property_name)) if properties is not None else None
+            accepted_tags = entry_tags.get(original_index, (tag,))
+            if payload_tags is None or (set_valued and set(payload_tags) != set(accepted_tags)) or (not set_valued and tag not in payload_tags):
                 self.add_diag(
                     pointer_join(pointer_join(pointer, key), original_index),
                     f"discriminator field {property_name!r} must be const or a single-value string enum equal to {tag!r}",
@@ -903,6 +1057,8 @@ class IRBuilder:
             second_name, second_value = secondary.get(position, (None, None))
             if second_value is not None:
                 suggested: Any = pascal_case(tag) + pascal_case(second_value)
+            elif set_valued:
+                suggested = self._choice_name(choice, original_index)
             elif len(groups[tag]) > 1:
                 choice_name = self._choice_name(choice, original_index)
                 suggested = choice_name if not choice_name.isdigit() else f"{tag}_{int(choice_name) + 1}"
@@ -941,6 +1097,7 @@ class IRBuilder:
                     second_name,
                     second_value,
                     required_fields.get(position, ()),
+                    accepted_tags,
                 )
             )
         self._add_declaration(
@@ -1111,13 +1268,13 @@ class IRBuilder:
         if name in self._component_types:
             return self._component_types[name]
         if name in self._building:
-            return TypeRef("named", name=pascal_case(name))
+            return TypeRef("named", name=type_name(name))
         self._building.add(name)
         self._building_stack.append(name)
         schema = self.doc["components"]["schemas"][name]
         result = self.compile_type(
             schema,
-            pascal_case(name),
+            type_name(name),
             self.component_usage.get(name, set()),
             pointer,
             named_component=True,
@@ -1156,7 +1313,7 @@ class IRBuilder:
                 ),
                 self._building_stack[-1],
             )
-            return TypeRef("named", name=pascal_case(component))
+            return TypeRef("named", name=type_name(component))
         if "allOf" in schema:
             from .normalize import merge_all_of
 
@@ -1269,8 +1426,8 @@ class IRBuilder:
             if location == "query":
                 style = parameter.get("style", "form")
                 explode = parameter.get("explode", True)
-                if style != "form" or explode is not True:
-                    self.add_diag(parameter_pointer, f"query parameter style={style!r}, explode={explode!r} is not supported", "use style: form with explode: true")
+                if style not in {"form", "deepObject"} or explode is not True:
+                    self.add_diag(parameter_pointer, f"query parameter style={style!r}, explode={explode!r} is not supported", "use style: form or deepObject with explode: true")
                     continue
             if location == "header":
                 style = parameter.get("style", "simple")
@@ -1290,18 +1447,60 @@ class IRBuilder:
                 continue
             parameter_names.add(moon_name)
             param_type = self.compile_type(schema, pascal_case(operation_id) + pascal_case(parameter.get("name", "parameter")), {"request"}, pointer_join(parameter_pointer, "schema"))
+            if location == "query" and parameter.get("style", "form") == "deepObject" and param_type.kind != "map":
+                self.add_diag(
+                    parameter_pointer,
+                    "deepObject query parameters require a typed string-keyed map schema",
+                    "use type: object with typed additionalProperties",
+                )
             required = parameter.get("required") is True or location == "path"
-            parameters.append(Parameter(parameter["name"], moon_name, param_type, location, required, parameter.get("description", "")))
+            parameters.append(Parameter(parameter["name"], moon_name, param_type, location, required, str(parameter.get("style", "")), parameter.get("description", "")))
         request_content = operation.get("requestBody", {}).get("content", {})
         request_schema = request_content.get("application/json", {}).get("schema")
         request_type = None
+        multipart_fields: list[MultipartField] = []
         if isinstance(request_schema, dict):
             request_pointer = pointer_join(pointer_join(pointer_join(pointer_join(pointer, "requestBody"), "content"), "application/json"), "schema")
             request_type = self.compile_type(request_schema, pascal_case(operation_id) + "Request", {"request"}, request_pointer)
         elif "application/x-www-form-urlencoded" in request_content:
             self.add_diag(pointer_join(pointer_join(pointer, "requestBody"), "content"), "application/x-www-form-urlencoded request bodies are not supported", "use application/json or remove the operation from x-moonbit-include")
         elif "multipart/form-data" in request_content:
-            self.add_diag(pointer_join(pointer_join(pointer, "requestBody"), "content"), "multipart/form-data request bodies are not supported", "use handwritten multipart support or remove the operation from x-moonbit-include")
+            multipart_schema = request_content.get("multipart/form-data", {}).get("schema")
+            multipart_pointer = pointer_join(pointer_join(pointer_join(pointer_join(pointer, "requestBody"), "content"), "multipart/form-data"), "schema")
+            if not isinstance(multipart_schema, dict):
+                self.add_diag(multipart_pointer, "multipart request has no schema", "add an object schema for its fields")
+            else:
+                multipart_object = self._multipart_object(multipart_schema, multipart_pointer)
+                if multipart_object is not None:
+                    required_fields = set(multipart_object.get("required", []))
+                    for json_name, field_schema in multipart_object.get("properties", {}).items():
+                        field_pointer = pointer_join(pointer_join(multipart_pointer, "properties"), json_name)
+                        if not isinstance(field_schema, dict):
+                            self.add_diag(field_pointer, "multipart field has no schema", "add a supported field schema")
+                            continue
+                        moon_name = snake_case(json_name)
+                        binary_kind = self._binary_kind(field_schema)
+                        if binary_kind is not None:
+                            field_type = None
+                            kind = binary_kind
+                        else:
+                            field_type = self.compile_type(
+                                _split_nullable(field_schema)[0],
+                                pascal_case(operation_id) + pascal_case(json_name),
+                                {"request"},
+                                field_pointer,
+                            )
+                            kind = self._multipart_text_kind(field_schema)
+                        multipart_fields.append(
+                            MultipartField(
+                                json_name,
+                                moon_name,
+                                field_type,
+                                kind,
+                                json_name in required_fields,
+                                field_schema.get("description", ""),
+                            )
+                        )
         response_schemas: list[tuple[dict[str, Any], str]] = []
         for status, response in operation.get("responses", {}).items():
             if str(status).startswith("2"):
@@ -1315,7 +1514,7 @@ class IRBuilder:
             response_type = self.compile_type(response_schemas[0][0], pascal_case(operation_id) + "Response", {"response"}, response_schemas[0][1])
             if any(schema != response_schemas[0][0] for schema, _ in response_schemas[1:]):
                 self.add_diag(pointer_join(pointer, "responses"), "multiple distinct success response schemas are not supported", "make the success schemas consistent in overlays/fix.yaml")
-        return Operation(operation_id, snake_case(operation_id), method.upper(), path, tuple(parameters), request_type, response_type, operation.get("summary", operation.get("description", "")))
+        return Operation(operation_id, snake_case(operation_id), method.upper(), path, tuple(parameters), request_type, tuple(multipart_fields), response_type, operation.get("summary", operation.get("description", "")))
 
     def build(self) -> IR:
         selected = self.discover()

@@ -55,6 +55,33 @@ fn[T : @json.FromJson] decode_response(
 
 ///|
 ///
+/// **Starting a new project?** We recommend trying [Responses](/docs/api-reference/responses) to take advantage of the latest OpenAI platform features. Compare [Chat Completions with Responses](/docs/guides/responses-vs-chat-completions?api-mode=responses). --- Creates a model response for the given chat conversation. Learn more in the [text generation](/docs/guides/text-generation), [vision](/docs/guides/vision), and [audio](/docs/guides/audio) guides. Parameter support can differ depending on the model used to generate the response, particularly for newer reasoning models. Parameters that are only supported for reasoning models are noted below. For the current state of unsupported parameters in reasoning models, [refer to the reasoning guide](/docs/guides/reasoning).
+pub fn create_chat_completion_request(
+  body : CreateChatCompletionRequest,
+) -> @http.Request {
+  @http.Request::post("/chat/completions").json_body(body.to_json())
+}
+
+///|
+///
+/// Decodes a parsed successful createChatCompletion response.
+pub fn create_chat_completion_decode_json(
+  value : Json,
+) -> CreateChatCompletionResponse raise @json.JsonDecodeError {
+  @json.from_json(value)
+}
+
+///|
+///
+/// Decodes a successful createChatCompletion response.
+pub fn create_chat_completion_decode(
+  response : @http.Response,
+) -> CreateChatCompletionResponse raise @runtime.SdkError {
+  decode_response(response)
+}
+
+///|
+///
 /// Creates an embedding vector representing the input text.
 pub fn create_embedding_request(body : CreateEmbeddingRequest) -> @http.Request {
   @http.Request::post("/embeddings").json_body(body.to_json())

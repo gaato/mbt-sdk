@@ -19,6 +19,61 @@ fn embedding_response_from_generated(
 }
 
 ///|
+/// Creates and buffers one Chat Completions response.
+pub async fn OpenAI::chat_completion(
+  self : OpenAI,
+  request : ChatRequest,
+) -> ChatCompletion raise @runtime.SdkError {
+  let (generated, body) = chat_parts(request, false)
+  let response = self.client.send(
+    @gen.create_chat_completion_request(generated).json_body(body),
+    bucket="chat",
+  )
+  decode_chat_completion(response)
+}
+
+///|
+fn decode_chat_stream_data(
+  data : String,
+) -> Array[ChatEvent] raise @runtime.SdkError {
+  let body = @utf8.encode(data)
+  let raw = parse_json_body(body) catch {
+    error => raise @runtime.Decode(message=error.to_string(), body~)
+  }
+  decode_chat_chunk(raw) catch {
+    error => raise @runtime.Decode(message=error.to_string(), body~)
+  }
+}
+
+///|
+/// Creates a streaming Chat Completions response and dispatches events in wire order.
+/// The request enables the final usage chunk and the stream is always closed.
+pub async fn[E : Error] OpenAI::stream_chat_completion(
+  self : OpenAI,
+  request : ChatRequest,
+  f : async (ChatEvent) -> Unit raise E,
+) -> Unit {
+  let (generated, body) = chat_parts(request, true)
+  let (_, stream) = self.client.send_stream(
+    @gen.create_chat_completion_request(generated)
+    .header("accept", "text/event-stream")
+    .json_body(body),
+    bucket="chat",
+  )
+  @sse.each_event(stream, event => {
+    if event.data == "[DONE]" {
+      raise StreamDone
+    }
+    for decoded in decode_chat_stream_data(event.data) {
+      f(decoded)
+    }
+  }) catch {
+    StreamDone => ()
+    error => raise error
+  }
+}
+
+///|
 /// Lists the models visible to the configured account.
 pub async fn OpenAI::list_models(
   self : OpenAI,

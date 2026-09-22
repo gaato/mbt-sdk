@@ -24,6 +24,53 @@ pub fn ApiErrorBody::equal(Self, Self) -> Bool
 pub fn ApiErrorBody::not_equal(Self, Self) -> Bool
 pub fn ApiErrorBody::to_repr(Self) -> @debug.Repr
 
+pub(all) struct ChatCompletion {
+  id : String
+  model : String
+  text : String
+  finish_reason : FinishReason?
+  usage : Usage?
+  raw : Json
+} derive(Eq, @debug.Debug)
+pub fn ChatCompletion::equal(Self, Self) -> Bool
+pub fn ChatCompletion::not_equal(Self, Self) -> Bool
+pub fn ChatCompletion::to_repr(Self) -> @debug.Repr
+
+pub(all) enum ChatEvent {
+  Delta(String)
+  ReasoningDelta(String)
+  Finished(FinishReason)
+  Usage(Usage)
+  Other(String, Json)
+} derive(Eq, @debug.Debug)
+pub fn ChatEvent::equal(Self, Self) -> Bool
+pub fn ChatEvent::not_equal(Self, Self) -> Bool
+pub fn ChatEvent::to_repr(Self) -> @debug.Repr
+
+pub(all) struct ChatMessage {
+  role : String
+  content : String
+  name : String?
+} derive(Eq, @debug.Debug)
+pub fn ChatMessage::assistant(String) -> Self
+pub fn ChatMessage::equal(Self, Self) -> Bool
+pub fn ChatMessage::not_equal(Self, Self) -> Bool
+pub fn ChatMessage::system(String) -> Self
+pub fn ChatMessage::to_repr(Self) -> @debug.Repr
+pub fn ChatMessage::user(String) -> Self
+
+pub(all) struct ChatRequest {
+  model : String
+  messages : Array[ChatMessage]
+  max_tokens : Int?
+  temperature : Double?
+  extra : Map[String, Json]
+} derive(Eq, @debug.Debug)
+pub fn ChatRequest::equal(Self, Self) -> Bool
+pub fn ChatRequest::new(model~ : String, messages~ : Array[ChatMessage], max_tokens? : Int, temperature? : Double, extra? : Map[String, Json]) -> Self
+pub fn ChatRequest::not_equal(Self, Self) -> Bool
+pub fn ChatRequest::to_repr(Self) -> @debug.Repr
+
 pub(all) struct Embedding {
   index : Int
   embedding : Array[Double]
@@ -53,6 +100,17 @@ pub fn EmbeddingResponse::equal(Self, Self) -> Bool
 pub fn EmbeddingResponse::not_equal(Self, Self) -> Bool
 pub fn EmbeddingResponse::to_repr(Self) -> @debug.Repr
 
+pub(all) enum FinishReason {
+  Stop
+  Length
+  ToolCalls
+  ContentFilter
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+pub fn FinishReason::equal(Self, Self) -> Bool
+pub fn FinishReason::not_equal(Self, Self) -> Bool
+pub fn FinishReason::to_repr(Self) -> @debug.Repr
+
 pub(all) struct Model {
   id : String
   created : Int64?
@@ -65,12 +123,14 @@ pub fn Model::to_repr(Self) -> @debug.Repr
 pub struct OpenAI {
   // private fields
 }
+pub async fn OpenAI::chat_completion(Self, ChatRequest) -> ChatCompletion raise @sdk-runtime.SdkError
 pub async fn OpenAI::create_embeddings(Self, EmbeddingRequest) -> EmbeddingResponse raise @sdk-runtime.SdkError
 pub async fn OpenAI::create_response(Self, ResponseRequest) -> Response raise @sdk-runtime.SdkError
 pub fn OpenAI::from_client(@sdk-runtime.Client) -> Self
 pub async fn OpenAI::list_models(Self) -> Array[Model] raise @sdk-runtime.SdkError
 pub fn OpenAI::new(api_key~ : String, &@http.Transport, &@clock.Clock, base_url? : String, organization? : String, project? : String, retry? : @sdk-runtime.RetryPolicy) -> Self
 pub async fn OpenAI::retrieve_model(Self, String) -> Model raise @sdk-runtime.SdkError
+pub async fn[E : Error] OpenAI::stream_chat_completion(Self, ChatRequest, async (ChatEvent) -> Unit raise E) -> Unit
 pub async fn[E : Error] OpenAI::stream_response(Self, ResponseRequest, async (ResponseEvent) -> Unit raise E) -> Unit
 pub fn OpenAI::to_repr(Self) -> @debug.Repr
 pub impl @debug.Debug for OpenAI

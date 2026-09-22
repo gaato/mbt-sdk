@@ -11,7 +11,7 @@ Status: experimental, unpublished. Module names are provisional.
 | `gaato/http` | Sans-IO HTTP vocabulary: `Request`, `Response`, `Headers`, the `Transport` and `BodyStream` traits, middleware, a `Clock` trait, an incremental WHATWG-conformant SSE parser, and a scripted `FakeTransport` / `FakeClock` for tests | nothing (runs on wasm-gc, wasm, js, native) |
 | `gaato/http-async` | `AsyncTransport` and `AsyncClock` over `moonbitlang/async` (native and js) | `gaato/http`, `moonbitlang/async` |
 | `gaato/sdk-runtime` | API-agnostic client runtime: error taxonomy, `Retry-After` / `retry-after-ms`, backoff, retry policy, rate limiting, pagination, auth, tri-state JSON fields, open enums, multipart writer | `gaato/http` |
-| `gaato/openai` | First consumer: a stable hand-written facade for models, embeddings, and responses (buffered and streaming), backed by types and operations generated from the vendored OpenAPI spec | `gaato/http`, `gaato/sdk-runtime` |
+| `gaato/openai` | First consumer: a stable hand-written facade for models, embeddings, Responses, and Chat Completions (buffered and streaming), backed by types and operations generated from the vendored OpenAPI spec | `gaato/http`, `gaato/sdk-runtime` |
 | `gaato/anthropic` | Second consumer: Anthropic-compatible messages (buffered and streaming), including open content blocks and stream events | `gaato/http`, `gaato/sdk-runtime` |
 | `runtime-tests/` | Unpublished. Executes the async behaviour of the modules above (a module without an async runtime cannot run `async test`) | everything |
 
@@ -26,6 +26,8 @@ openai.stream_response(@openai.ResponseRequest::new(model="gpt-5.6-sol", input="
 })
 ```
 
+For OpenAI-compatible servers that implement Chat Completions, use `ChatRequest` with `chat_completion` or `stream_chat_completion`. The opt-in live suite also accepts `OPENAI_COMPAT_BASE_URL` and `OPENAI_COMPAT_MODEL`; `OPENAI_COMPAT_API_KEY` is optional for local servers.
+
 ## Generation pipeline
 
 ```
@@ -34,7 +36,7 @@ openai/spec/openai.yaml → overlays/fix.yaml → overlays/moonbit.yaml → norm
 ```
 
 - Overlays follow the [OpenAPI Overlay Specification](https://spec.openapis.org/overlay/latest.html). `tools/apply_overlay.py` fails on actions that match nothing or change nothing, so stale corrections surface instead of silently doing nothing.
-- The generator refuses what it does not support (with a JSON pointer and the overlay annotation that would resolve it) instead of degrading to `Json`.
+- The generator supports JSON and multipart request bodies, form and deep-object query parameters, and tagged unions including disjoint tag-value sets. It refuses unsupported shapes (with a JSON pointer and an overlay annotation) instead of silently degrading to `Json`.
 - Generated code is committed; users do not need Python.
 
 ```sh

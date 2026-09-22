@@ -60,6 +60,166 @@ pub extend Usage with Eq::{equal, not_equal}
 pub extend Usage with @debug.Debug::{to_repr}
 
 ///|
+/// One text message sent to the Chat Completions API.
+///
+/// ```mbt check
+/// test {
+///   let message = @openai.ChatMessage::user("hello")
+///   assert_eq(message.role, "user")
+///   assert_eq(message.content, "hello")
+/// }
+/// ```
+pub(all) struct ChatMessage {
+  role : String
+  content : String
+  name : String?
+} derive(Eq, Debug)
+
+///|
+/// Compares chat messages field by field.
+pub extend ChatMessage with Eq::{equal, not_equal}
+
+///|
+/// Debug representation of a chat message.
+pub extend ChatMessage with @debug.Debug::{to_repr}
+
+///|
+/// Creates a system chat message.
+///
+/// ```mbt check
+/// test {
+///   assert_eq(@openai.ChatMessage::system("Be concise").role, "system")
+/// }
+/// ```
+pub fn ChatMessage::system(content : String) -> ChatMessage {
+  { role: "system", content, name: None, }
+}
+
+///|
+/// Creates a user chat message.
+///
+/// ```mbt check
+/// test {
+///   assert_eq(@openai.ChatMessage::user("hello").role, "user")
+/// }
+/// ```
+pub fn ChatMessage::user(content : String) -> ChatMessage {
+  { role: "user", content, name: None, }
+}
+
+///|
+/// Creates an assistant chat message.
+///
+/// ```mbt check
+/// test {
+///   assert_eq(@openai.ChatMessage::assistant("hello").role, "assistant")
+/// }
+/// ```
+pub fn ChatMessage::assistant(content : String) -> ChatMessage {
+  { role: "assistant", content, name: None, }
+}
+
+///|
+/// Input accepted by buffered and streaming Chat Completions operations.
+pub(all) struct ChatRequest {
+  model : String
+  messages : Array[ChatMessage]
+  max_tokens : Int?
+  temperature : Double?
+  extra : Map[String, Json]
+} derive(Eq, Debug)
+
+///|
+/// Compares chat requests field by field.
+pub extend ChatRequest with Eq::{equal, not_equal}
+
+///|
+/// Debug representation of a chat request.
+pub extend ChatRequest with @debug.Debug::{to_repr}
+
+///|
+/// Creates a chat request and snapshots mutable inputs.
+///
+/// ```mbt check
+/// test {
+///   let request = @openai.ChatRequest::new(model="gpt-4o-mini", messages=[
+///     @openai.ChatMessage::user("hello"),
+///   ])
+///   assert_eq(request.messages.length(), 1)
+/// }
+/// ```
+pub fn ChatRequest::new(
+  model~ : String,
+  messages~ : Array[ChatMessage],
+  max_tokens? : Int,
+  temperature? : Double,
+  extra? : Map[String, Json],
+) -> ChatRequest {
+  {
+    model,
+    messages: messages.copy(),
+    max_tokens,
+    temperature,
+    extra: extra.map(Map::copy).unwrap_or({}),
+  }
+}
+
+///|
+/// Why a chat completion stopped. Unknown values are retained.
+pub(all) enum FinishReason {
+  Stop
+  Length
+  ToolCalls
+  ContentFilter
+  Unknown(String)
+} derive(Eq, Debug)
+
+///|
+/// Compares finish reasons, including unknown raw values.
+pub extend FinishReason with Eq::{equal, not_equal}
+
+///|
+/// Debug representation of a finish reason.
+pub extend FinishReason with @debug.Debug::{to_repr}
+
+///|
+/// A buffered chat completion together with its original JSON value.
+pub(all) struct ChatCompletion {
+  id : String
+  model : String
+  text : String
+  finish_reason : FinishReason?
+  usage : Usage?
+  raw : Json
+} derive(Eq, Debug)
+
+///|
+/// Compares chat completions field by field.
+pub extend ChatCompletion with Eq::{equal, not_equal}
+
+///|
+/// Debug representation of a chat completion.
+pub extend ChatCompletion with @debug.Debug::{to_repr}
+
+///|
+/// One event from a streaming chat completion. Unknown chunks retain raw JSON.
+pub(all) enum ChatEvent {
+  Delta(String)
+  ReasoningDelta(String)
+  Finished(FinishReason)
+  Usage(Usage)
+  Other(String, Json)
+} derive(Eq, Debug)
+
+///|
+/// Compares chat events, including retained unknown JSON.
+pub extend ChatEvent with Eq::{equal, not_equal}
+
+///|
+/// Debug representation of a chat event.
+pub extend ChatEvent with @debug.Debug::{to_repr}
+
+///|
 /// Input accepted by the embeddings operation.
 pub(all) struct EmbeddingRequest {
   model : String

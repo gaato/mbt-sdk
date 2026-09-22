@@ -165,3 +165,64 @@ test "request body builder uses generated JSON and rejects every known extra col
     }
   }
 }
+
+///|
+test "chat request conversion validates roles and maps tool names to tool_call_id" {
+  let tool : ChatMessage = {
+    role: "tool",
+    content: "result",
+    name: Some("call_1"),
+  }
+  assert_eq(
+    chat_parts(
+      ChatRequest::new(model="g", messages=[tool], extra={ "seed": 2 }),
+      true,
+    ).1,
+    {
+      "model": "g",
+      "messages": [
+        { "role": "tool", "content": "result", "tool_call_id": "call_1" },
+      ],
+      "stream": true,
+      "stream_options": { "include_usage": true },
+      "seed": 2,
+    },
+  )
+  for
+    key in [
+      "model", "messages", "max_tokens", "temperature", "stream", "stream_options",
+    ] {
+    try
+      ignore(
+        chat_parts(
+          ChatRequest::new(
+            model="g",
+            messages=[ChatMessage::user("hello")],
+            extra=Map::from_array([(key, Json::null())]),
+          ),
+          false,
+        ),
+      )
+    catch {
+      @runtime.Config(message) => assert_true(message.contains(key))
+      _ => fail("expected Config")
+    } noraise {
+      _ => fail("known chat key must fail")
+    }
+  }
+  try
+    ignore(
+      chat_parts(
+        ChatRequest::new(model="g", messages=[
+          { role: "future", content: "hello", name: None, },
+        ]),
+        false,
+      ),
+    )
+  catch {
+    @runtime.Config(message) => assert_true(message.contains("future"))
+    _ => fail("expected Config")
+  } noraise {
+    _ => fail("unknown role must fail")
+  }
+}

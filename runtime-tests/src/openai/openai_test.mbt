@@ -169,6 +169,168 @@ async test "OpenAI operations send exact requests and decode spec examples" {
 }
 
 ///|
+fn chat_fixture(
+  content : String,
+  finish_reason : String,
+  usage? : String = "null",
+) -> String {
+  "{\"id\":\"chatcmpl-1\",\"object\":\"chat.completion\",\"created\":1750000000,\"model\":\"gpt-chat\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":" +
+  content +
+  ",\"refusal\":null},\"finish_reason\":\"" +
+  finish_reason +
+  "\",\"logprobs\":null}],\"usage\":" +
+  usage +
+  "}"
+}
+
+///|
+async test "chat completions send exact JSON and retain nullable and unknown response values" {
+  bounded(() => {
+    let transport = @mock.FakeTransport::new()
+    transport.expect(
+      "POST",
+      "/v1/chat/completions",
+      json_response(
+        chat_fixture(
+          "\"Hello.\"",
+          "stop",
+          usage="{\"prompt_tokens\":3,\"completion_tokens\":2,\"total_tokens\":5}",
+        ),
+      ),
+    )
+    transport.expect(
+      "POST",
+      "/v1/chat/completions",
+      json_response(chat_fixture("null", "length")),
+    )
+    transport.expect(
+      "POST",
+      "/v1/chat/completions",
+      json_response(chat_fixture("\"future\"", "future_reason")),
+    )
+    let client = @openai_sdk.OpenAI::new(
+      api_key="test-key",
+      transport,
+      @mock.FakeClock::new(),
+    )
+    let normal = client.chat_completion(
+      @openai_sdk.ChatRequest::new(
+        model="gpt-chat",
+        messages=[
+          @openai_sdk.ChatMessage::system("Be concise."),
+          @openai_sdk.ChatMessage::user("Hello"),
+        ],
+        max_tokens=16,
+        temperature=0.25,
+        extra={ "seed": 7 },
+      ),
+    )
+    assert_eq(normal.id, "chatcmpl-1")
+    assert_eq(normal.model, "gpt-chat")
+    assert_eq(normal.text, "Hello.")
+    assert_eq(normal.finish_reason, Some(@openai_sdk.Stop))
+    assert_eq(
+      normal.usage,
+      Some({ input_tokens: 3, output_tokens: 2, total_tokens: 5, }),
+    )
+    assert_eq(
+      normal.raw,
+      @json.parse(
+        chat_fixture(
+          "\"Hello.\"",
+          "stop",
+          usage="{\"prompt_tokens\":3,\"completion_tokens\":2,\"total_tokens\":5}",
+        ),
+      ),
+    )
+    let null_content = client.chat_completion(
+      @openai_sdk.ChatRequest::new(model="gpt-chat", messages=[
+        @openai_sdk.ChatMessage::user("Hello"),
+      ]),
+    )
+    assert_eq(null_content.text, "")
+    assert_eq(null_content.finish_reason, Some(@openai_sdk.Length))
+    let unknown = client.chat_completion(
+      @openai_sdk.ChatRequest::new(model="gpt-chat", messages=[
+        @openai_sdk.ChatMessage::user("Hello"),
+      ]),
+    )
+    assert_eq(unknown.finish_reason, Some(@openai_sdk.Unknown("future_reason")))
+    let sent = transport.sent()
+    assert_eq(@json.parse(@utf8.decode(sent[0].body)), {
+      "model": "gpt-chat",
+      "messages": [
+        { "role": "system", "content": "Be concise." },
+        { "role": "user", "content": "Hello" },
+      ],
+      "temperature": 0.25,
+      "max_tokens": 16,
+      "seed": 7,
+    })
+    assert_eq(sent[0].headers.get("content-type"), Some("application/json"))
+    transport.assert_complete()
+  })
+}
+
+///|
+async test "chat completion streaming handles split reasoning usage and DONE" {
+  bounded(() => {
+    let chunk1 = "{\"id\":\"chatcmpl-1\",\"object\":\"chat.completion.chunk\",\"created\":1750000000,\"model\":\"gpt-chat\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"Hel\",\"reasoning_content\":\"Think\"},\"finish_reason\":null}]}"
+    let chunk2 = "{\"id\":\"chatcmpl-1\",\"object\":\"chat.completion.chunk\",\"created\":1750000000,\"model\":\"gpt-chat\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning\":\" more\"},\"finish_reason\":null}]}"
+    let chunk3 = "{\"id\":\"chatcmpl-1\",\"object\":\"chat.completion.chunk\",\"created\":1750000000,\"model\":\"gpt-chat\",\"choices\":[{\"index\":0,\"delta\":{},\"finish_reason\":\"stop\"}]}"
+    let usage = "{\"id\":\"chatcmpl-1\",\"object\":\"chat.completion.chunk\",\"created\":1750000000,\"model\":\"gpt-chat\",\"choices\":[],\"usage\":{\"prompt_tokens\":4,\"completion_tokens\":2,\"total_tokens\":6}}"
+    let sse = "data: " +
+      chunk1 +
+      "\n\ndata: " +
+      chunk2 +
+      "\n\ndata: " +
+      chunk3 +
+      "\n\ndata: " +
+      usage +
+      "\n\ndata: [DONE]\n\ndata: not-json\n\n"
+    let transport = @mock.FakeTransport::new()
+    transport.expect_stream(
+      "POST",
+      "/chat/completions",
+      { status: 200, headers: @http.Headers::new(), },
+      split_chunks(sse, [1, 5, 17, 61, 157, 311]),
+    )
+    let client = @openai_sdk.OpenAI::from_client(
+      @runtime.Client::new(
+        transport,
+        @mock.FakeClock::new(),
+        base_url="https://api.test",
+      ),
+    )
+    let events : Array[@openai_sdk.ChatEvent] = []
+    client.stream_chat_completion(
+      @openai_sdk.ChatRequest::new(model="gpt-chat", messages=[
+        @openai_sdk.ChatMessage::user("Hello"),
+      ]),
+      event => events.push(event),
+    )
+    assert_eq(events, [
+      @openai_sdk.Delta("Hel"),
+      @openai_sdk.ReasoningDelta("Think"),
+      @openai_sdk.ReasoningDelta(" more"),
+      @openai_sdk.Finished(@openai_sdk.Stop),
+      @openai_sdk.Usage({ input_tokens: 4, output_tokens: 2, total_tokens: 6, }),
+    ])
+    assert_eq(transport.streams_closed(), 1)
+    let sent = transport.sent()
+    assert_eq(sent.length(), 1)
+    assert_eq(sent[0].headers.get("accept"), Some("text/event-stream"))
+    assert_eq(@json.parse(@utf8.decode(sent[0].body)), {
+      "model": "gpt-chat",
+      "messages": [{ "role": "user", "content": "Hello" }],
+      "stream": true,
+      "stream_options": { "include_usage": true },
+    })
+    transport.assert_complete()
+  })
+}
+
+///|
 priv struct RecordingLimiter {
   acquired : Array[String]
   observed : Array[String]
@@ -215,9 +377,20 @@ async test "OpenAI assigns the contract bucket to every operation" {
       "/responses",
       json_response(response_fixture("r", "completed", "g", "[]")),
     )
+    transport.expect(
+      "POST",
+      "/chat/completions",
+      json_response(chat_fixture("\"ok\"", "stop")),
+    )
     transport.expect_stream(
       "POST",
       "/responses",
+      { status: 200, headers: @http.Headers::new(), },
+      [b"data: [DONE]\n\n"],
+    )
+    transport.expect_stream(
+      "POST",
+      "/chat/completions",
       { status: 200, headers: @http.Headers::new(), },
       [b"data: [DONE]\n\n"],
     )
@@ -242,12 +415,25 @@ async test "OpenAI assigns the contract bucket to every operation" {
         @openai_sdk.ResponseRequest::new(model="g", input="i"),
       ),
     )
+    ignore(
+      client.chat_completion(
+        @openai_sdk.ChatRequest::new(model="g", messages=[
+          @openai_sdk.ChatMessage::user("i"),
+        ]),
+      ),
+    )
     client.stream_response(
       @openai_sdk.ResponseRequest::new(model="g", input="i"),
       _ => (),
     )
+    client.stream_chat_completion(
+      @openai_sdk.ChatRequest::new(model="g", messages=[
+        @openai_sdk.ChatMessage::user("i"),
+      ]),
+      _ => (),
+    )
     assert_eq(limiter.acquired, [
-      "models", "models", "embeddings", "responses", "responses",
+      "models", "models", "embeddings", "responses", "chat", "responses", "chat",
     ])
     assert_eq(limiter.observed, limiter.acquired)
     limiter.acquire("direct-check")
@@ -259,7 +445,7 @@ async test "OpenAI assigns the contract bucket to every operation" {
     )
     assert_eq(limiter.acquired.last(), Some("direct-check"))
     assert_eq(limiter.observed.last(), Some("direct-check"))
-    assert_eq(transport.streams_closed(), 1)
+    assert_eq(transport.streams_closed(), 2)
     transport.assert_complete()
   })
 }

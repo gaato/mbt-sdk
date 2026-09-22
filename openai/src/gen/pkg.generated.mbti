@@ -7,6 +7,12 @@ import {
 }
 
 // Values
+pub fn create_chat_completion_decode(@http.Response) -> CreateChatCompletionResponse raise @sdk-runtime.SdkError
+
+pub fn create_chat_completion_decode_json(Json) -> CreateChatCompletionResponse raise @moonbitlang/core/json.JsonDecodeError
+
+pub fn create_chat_completion_request(CreateChatCompletionRequest) -> @http.Request
+
 pub fn create_embedding_decode(@http.Response) -> CreateEmbeddingResponse raise @sdk-runtime.SdkError
 
 pub fn create_embedding_decode_json(Json) -> CreateEmbeddingResponse raise @moonbitlang/core/json.JsonDecodeError
@@ -56,6 +62,529 @@ pub fn ApproximateLocation::new(country? : String, region? : String, city? : Str
 pub fn ApproximateLocation::to_json(Self) -> Json
 pub impl ToJson for ApproximateLocation
 pub impl @moonbitlang/core/json.FromJson for ApproximateLocation
+
+pub(all) struct ChatCompletionFunctionCallOption {
+  name : String
+}
+pub fn ChatCompletionFunctionCallOption::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ChatCompletionFunctionCallOption::new(name~ : String) -> Self
+pub fn ChatCompletionFunctionCallOption::to_json(Self) -> Json
+pub impl ToJson for ChatCompletionFunctionCallOption
+pub impl @moonbitlang/core/json.FromJson for ChatCompletionFunctionCallOption
+
+pub(all) struct ChatCompletionFunctions {
+  description : String?
+  name : String
+  parameters : Json?
+}
+pub fn ChatCompletionFunctions::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ChatCompletionFunctions::new(name~ : String, description? : String, parameters? : Json) -> Self
+pub fn ChatCompletionFunctions::to_json(Self) -> Json
+pub impl ToJson for ChatCompletionFunctions
+pub impl @moonbitlang/core/json.FromJson for ChatCompletionFunctions
+
+pub(all) struct ChatCompletionMessageToolCall {
+  id : String
+  function : ChatCompletionMessageToolCallFunction
+}
+pub fn ChatCompletionMessageToolCall::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ChatCompletionMessageToolCall::new(id~ : String, function~ : ChatCompletionMessageToolCallFunction) -> Self
+pub fn ChatCompletionMessageToolCall::to_json(Self) -> Json
+pub impl ToJson for ChatCompletionMessageToolCall
+pub impl @moonbitlang/core/json.FromJson for ChatCompletionMessageToolCall
+
+pub(all) struct ChatCompletionMessageToolCallChunk {
+  index : Int
+  id : String?
+  function : ChatCompletionMessageToolCallChunkFunction?
+}
+pub fn ChatCompletionMessageToolCallChunk::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ChatCompletionMessageToolCallChunk::new(index~ : Int, id? : String, function? : ChatCompletionMessageToolCallChunkFunction) -> Self
+pub fn ChatCompletionMessageToolCallChunk::to_json(Self) -> Json
+pub impl ToJson for ChatCompletionMessageToolCallChunk
+pub impl @moonbitlang/core/json.FromJson for ChatCompletionMessageToolCallChunk
+
+pub(all) struct ChatCompletionMessageToolCallChunkFunction {
+  name : String?
+  arguments : String?
+}
+pub fn ChatCompletionMessageToolCallChunkFunction::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ChatCompletionMessageToolCallChunkFunction::new(name? : String, arguments? : String) -> Self
+pub fn ChatCompletionMessageToolCallChunkFunction::to_json(Self) -> Json
+pub impl ToJson for ChatCompletionMessageToolCallChunkFunction
+pub impl @moonbitlang/core/json.FromJson for ChatCompletionMessageToolCallChunkFunction
+
+pub(all) struct ChatCompletionMessageToolCallFunction {
+  name : String
+  arguments : String
+}
+pub fn ChatCompletionMessageToolCallFunction::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ChatCompletionMessageToolCallFunction::new(name~ : String, arguments~ : String) -> Self
+pub fn ChatCompletionMessageToolCallFunction::to_json(Self) -> Json
+pub impl ToJson for ChatCompletionMessageToolCallFunction
+pub impl @moonbitlang/core/json.FromJson for ChatCompletionMessageToolCallFunction
+
+pub(all) struct ChatCompletionNamedToolChoice {
+  function : ChatCompletionNamedToolChoiceFunction
+}
+pub fn ChatCompletionNamedToolChoice::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ChatCompletionNamedToolChoice::new(function~ : ChatCompletionNamedToolChoiceFunction) -> Self
+pub fn ChatCompletionNamedToolChoice::to_json(Self) -> Json
+pub impl ToJson for ChatCompletionNamedToolChoice
+pub impl @moonbitlang/core/json.FromJson for ChatCompletionNamedToolChoice
+
+pub(all) struct ChatCompletionNamedToolChoiceFunction {
+  name : String
+}
+pub fn ChatCompletionNamedToolChoiceFunction::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ChatCompletionNamedToolChoiceFunction::new(name~ : String) -> Self
+pub fn ChatCompletionNamedToolChoiceFunction::to_json(Self) -> Json
+pub impl ToJson for ChatCompletionNamedToolChoiceFunction
+pub impl @moonbitlang/core/json.FromJson for ChatCompletionNamedToolChoiceFunction
+
+pub(all) struct ChatCompletionRequestAssistantMessage {
+  content : @gaato/sdk-runtime/json.Presence[ChatCompletionRequestAssistantMessageContent]
+  refusal : @gaato/sdk-runtime/json.Presence[String]
+  role : String
+  name : String?
+  audio : @gaato/sdk-runtime/json.Presence[ChatCompletionRequestAssistantMessageAudio]
+  tool_calls : Array[ChatCompletionMessageToolCall]?
+  function_call : @gaato/sdk-runtime/json.Presence[ChatCompletionRequestAssistantMessageFunctionCall]
+}
+pub fn ChatCompletionRequestAssistantMessage::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ChatCompletionRequestAssistantMessage::new(role~ : String, content? : ChatCompletionRequestAssistantMessageContent, refusal? : String, name? : String, audio? : ChatCompletionRequestAssistantMessageAudio, tool_calls? : Array[ChatCompletionMessageToolCall], function_call? : ChatCompletionRequestAssistantMessageFunctionCall) -> Self
+pub fn ChatCompletionRequestAssistantMessage::to_json(Self) -> Json
+pub impl ToJson for ChatCompletionRequestAssistantMessage
+pub impl @moonbitlang/core/json.FromJson for ChatCompletionRequestAssistantMessage
+
+pub(all) struct ChatCompletionRequestAssistantMessageAudio {
+  id : String
+}
+pub fn ChatCompletionRequestAssistantMessageAudio::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ChatCompletionRequestAssistantMessageAudio::new(id~ : String) -> Self
+pub fn ChatCompletionRequestAssistantMessageAudio::to_json(Self) -> Json
+pub impl ToJson for ChatCompletionRequestAssistantMessageAudio
+pub impl @moonbitlang/core/json.FromJson for ChatCompletionRequestAssistantMessageAudio
+
+pub(all) enum ChatCompletionRequestAssistantMessageContent {
+  Text(String)
+  ChatCompletionRequestAssistantMessageContentPartArray(Array[ChatCompletionRequestAssistantMessageContentPart])
+}
+pub fn ChatCompletionRequestAssistantMessageContent::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ChatCompletionRequestAssistantMessageContent::to_json(Self) -> Json
+pub impl ToJson for ChatCompletionRequestAssistantMessageContent
+pub impl @moonbitlang/core/json.FromJson for ChatCompletionRequestAssistantMessageContent
+
+pub(all) enum ChatCompletionRequestAssistantMessageContentPart {
+  Text(ChatCompletionRequestMessageContentPartText)
+  Refusal(ChatCompletionRequestMessageContentPartRefusal)
+  Unknown(String, Json)
+}
+pub fn ChatCompletionRequestAssistantMessageContentPart::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ChatCompletionRequestAssistantMessageContentPart::to_json(Self) -> Json
+pub impl ToJson for ChatCompletionRequestAssistantMessageContentPart
+pub impl @moonbitlang/core/json.FromJson for ChatCompletionRequestAssistantMessageContentPart
+
+pub(all) struct ChatCompletionRequestAssistantMessageFunctionCall {
+  arguments : String
+  name : String
+}
+pub fn ChatCompletionRequestAssistantMessageFunctionCall::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ChatCompletionRequestAssistantMessageFunctionCall::new(arguments~ : String, name~ : String) -> Self
+pub fn ChatCompletionRequestAssistantMessageFunctionCall::to_json(Self) -> Json
+pub impl ToJson for ChatCompletionRequestAssistantMessageFunctionCall
+pub impl @moonbitlang/core/json.FromJson for ChatCompletionRequestAssistantMessageFunctionCall
+
+pub(all) struct ChatCompletionRequestDeveloperMessage {
+  content : ChatCompletionRequestDeveloperMessageContent
+  role : String
+  name : String?
+}
+pub fn ChatCompletionRequestDeveloperMessage::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ChatCompletionRequestDeveloperMessage::new(content~ : ChatCompletionRequestDeveloperMessageContent, role~ : String, name? : String) -> Self
+pub fn ChatCompletionRequestDeveloperMessage::to_json(Self) -> Json
+pub impl ToJson for ChatCompletionRequestDeveloperMessage
+pub impl @moonbitlang/core/json.FromJson for ChatCompletionRequestDeveloperMessage
+
+pub(all) enum ChatCompletionRequestDeveloperMessageContent {
+  Text(String)
+  ChatCompletionRequestMessageContentPartTextArray(Array[ChatCompletionRequestMessageContentPartText])
+}
+pub fn ChatCompletionRequestDeveloperMessageContent::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ChatCompletionRequestDeveloperMessageContent::to_json(Self) -> Json
+pub impl ToJson for ChatCompletionRequestDeveloperMessageContent
+pub impl @moonbitlang/core/json.FromJson for ChatCompletionRequestDeveloperMessageContent
+
+pub(all) struct ChatCompletionRequestFunctionMessage {
+  role : String
+  content : String?
+  name : String
+}
+pub fn ChatCompletionRequestFunctionMessage::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ChatCompletionRequestFunctionMessage::new(role~ : String, name~ : String, content? : String) -> Self
+pub fn ChatCompletionRequestFunctionMessage::to_json(Self) -> Json
+pub impl ToJson for ChatCompletionRequestFunctionMessage
+pub impl @moonbitlang/core/json.FromJson for ChatCompletionRequestFunctionMessage
+
+pub(all) enum ChatCompletionRequestMessage {
+  Developer(ChatCompletionRequestDeveloperMessage)
+  System(ChatCompletionRequestSystemMessage)
+  User(ChatCompletionRequestUserMessage)
+  Assistant(ChatCompletionRequestAssistantMessage)
+  Tool(ChatCompletionRequestToolMessage)
+  Function(ChatCompletionRequestFunctionMessage)
+  Unknown(String, Json)
+}
+pub fn ChatCompletionRequestMessage::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ChatCompletionRequestMessage::to_json(Self) -> Json
+pub impl ToJson for ChatCompletionRequestMessage
+pub impl @moonbitlang/core/json.FromJson for ChatCompletionRequestMessage
+
+pub(all) struct ChatCompletionRequestMessageContentPartAudio {
+  type_ : String
+  input_audio : ChatCompletionRequestMessageContentPartAudioInputAudio
+}
+pub fn ChatCompletionRequestMessageContentPartAudio::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ChatCompletionRequestMessageContentPartAudio::new(type_~ : String, input_audio~ : ChatCompletionRequestMessageContentPartAudioInputAudio) -> Self
+pub fn ChatCompletionRequestMessageContentPartAudio::to_json(Self) -> Json
+pub impl ToJson for ChatCompletionRequestMessageContentPartAudio
+pub impl @moonbitlang/core/json.FromJson for ChatCompletionRequestMessageContentPartAudio
+
+pub(all) struct ChatCompletionRequestMessageContentPartAudioInputAudio {
+  data : String
+  format : ChatCompletionRequestMessageContentPartAudioInputAudioFormat
+}
+pub fn ChatCompletionRequestMessageContentPartAudioInputAudio::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ChatCompletionRequestMessageContentPartAudioInputAudio::new(data~ : String, format~ : ChatCompletionRequestMessageContentPartAudioInputAudioFormat) -> Self
+pub fn ChatCompletionRequestMessageContentPartAudioInputAudio::to_json(Self) -> Json
+pub impl ToJson for ChatCompletionRequestMessageContentPartAudioInputAudio
+pub impl @moonbitlang/core/json.FromJson for ChatCompletionRequestMessageContentPartAudioInputAudio
+
+pub(all) enum ChatCompletionRequestMessageContentPartAudioInputAudioFormat {
+  Wav
+  Mp3
+  Custom(String)
+}
+pub fn ChatCompletionRequestMessageContentPartAudioInputAudioFormat::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ChatCompletionRequestMessageContentPartAudioInputAudioFormat::to_json(Self) -> Json
+pub impl ToJson for ChatCompletionRequestMessageContentPartAudioInputAudioFormat
+pub impl @moonbitlang/core/json.FromJson for ChatCompletionRequestMessageContentPartAudioInputAudioFormat
+
+pub(all) struct ChatCompletionRequestMessageContentPartFile {
+  type_ : String
+  file : ChatCompletionRequestMessageContentPartFileFile
+}
+pub fn ChatCompletionRequestMessageContentPartFile::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ChatCompletionRequestMessageContentPartFile::new(type_~ : String, file~ : ChatCompletionRequestMessageContentPartFileFile) -> Self
+pub fn ChatCompletionRequestMessageContentPartFile::to_json(Self) -> Json
+pub impl ToJson for ChatCompletionRequestMessageContentPartFile
+pub impl @moonbitlang/core/json.FromJson for ChatCompletionRequestMessageContentPartFile
+
+pub(all) struct ChatCompletionRequestMessageContentPartFileFile {
+  filename : String?
+  file_data : String?
+  file_id : String?
+}
+pub fn ChatCompletionRequestMessageContentPartFileFile::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ChatCompletionRequestMessageContentPartFileFile::new(filename? : String, file_data? : String, file_id? : String) -> Self
+pub fn ChatCompletionRequestMessageContentPartFileFile::to_json(Self) -> Json
+pub impl ToJson for ChatCompletionRequestMessageContentPartFileFile
+pub impl @moonbitlang/core/json.FromJson for ChatCompletionRequestMessageContentPartFileFile
+
+pub(all) struct ChatCompletionRequestMessageContentPartImage {
+  type_ : String
+  image_url : ChatCompletionRequestMessageContentPartImageImageUrl
+}
+pub fn ChatCompletionRequestMessageContentPartImage::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ChatCompletionRequestMessageContentPartImage::new(type_~ : String, image_url~ : ChatCompletionRequestMessageContentPartImageImageUrl) -> Self
+pub fn ChatCompletionRequestMessageContentPartImage::to_json(Self) -> Json
+pub impl ToJson for ChatCompletionRequestMessageContentPartImage
+pub impl @moonbitlang/core/json.FromJson for ChatCompletionRequestMessageContentPartImage
+
+pub(all) struct ChatCompletionRequestMessageContentPartImageImageUrl {
+  url : String
+  detail : ChatCompletionRequestMessageContentPartImageImageUrlDetail?
+}
+pub fn ChatCompletionRequestMessageContentPartImageImageUrl::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ChatCompletionRequestMessageContentPartImageImageUrl::new(url~ : String, detail? : ChatCompletionRequestMessageContentPartImageImageUrlDetail) -> Self
+pub fn ChatCompletionRequestMessageContentPartImageImageUrl::to_json(Self) -> Json
+pub impl ToJson for ChatCompletionRequestMessageContentPartImageImageUrl
+pub impl @moonbitlang/core/json.FromJson for ChatCompletionRequestMessageContentPartImageImageUrl
+
+pub(all) enum ChatCompletionRequestMessageContentPartImageImageUrlDetail {
+  Auto
+  Low
+  High
+  Custom(String)
+}
+pub fn ChatCompletionRequestMessageContentPartImageImageUrlDetail::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ChatCompletionRequestMessageContentPartImageImageUrlDetail::to_json(Self) -> Json
+pub impl ToJson for ChatCompletionRequestMessageContentPartImageImageUrlDetail
+pub impl @moonbitlang/core/json.FromJson for ChatCompletionRequestMessageContentPartImageImageUrlDetail
+
+pub(all) struct ChatCompletionRequestMessageContentPartRefusal {
+  type_ : String
+  refusal : String
+}
+pub fn ChatCompletionRequestMessageContentPartRefusal::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ChatCompletionRequestMessageContentPartRefusal::new(type_~ : String, refusal~ : String) -> Self
+pub fn ChatCompletionRequestMessageContentPartRefusal::to_json(Self) -> Json
+pub impl ToJson for ChatCompletionRequestMessageContentPartRefusal
+pub impl @moonbitlang/core/json.FromJson for ChatCompletionRequestMessageContentPartRefusal
+
+pub(all) struct ChatCompletionRequestMessageContentPartText {
+  type_ : String
+  text : String
+}
+pub fn ChatCompletionRequestMessageContentPartText::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ChatCompletionRequestMessageContentPartText::new(type_~ : String, text~ : String) -> Self
+pub fn ChatCompletionRequestMessageContentPartText::to_json(Self) -> Json
+pub impl ToJson for ChatCompletionRequestMessageContentPartText
+pub impl @moonbitlang/core/json.FromJson for ChatCompletionRequestMessageContentPartText
+
+pub(all) struct ChatCompletionRequestSystemMessage {
+  content : ChatCompletionRequestSystemMessageContent
+  role : String
+  name : String?
+}
+pub fn ChatCompletionRequestSystemMessage::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ChatCompletionRequestSystemMessage::new(content~ : ChatCompletionRequestSystemMessageContent, role~ : String, name? : String) -> Self
+pub fn ChatCompletionRequestSystemMessage::to_json(Self) -> Json
+pub impl ToJson for ChatCompletionRequestSystemMessage
+pub impl @moonbitlang/core/json.FromJson for ChatCompletionRequestSystemMessage
+
+pub(all) enum ChatCompletionRequestSystemMessageContent {
+  Text(String)
+  ChatCompletionRequestSystemMessageContentPartArray(Array[ChatCompletionRequestSystemMessageContentPart])
+}
+pub fn ChatCompletionRequestSystemMessageContent::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ChatCompletionRequestSystemMessageContent::to_json(Self) -> Json
+pub impl ToJson for ChatCompletionRequestSystemMessageContent
+pub impl @moonbitlang/core/json.FromJson for ChatCompletionRequestSystemMessageContent
+
+pub(all) enum ChatCompletionRequestSystemMessageContentPart {
+  Text(ChatCompletionRequestMessageContentPartText)
+  Unknown(String, Json)
+}
+pub fn ChatCompletionRequestSystemMessageContentPart::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ChatCompletionRequestSystemMessageContentPart::to_json(Self) -> Json
+pub impl ToJson for ChatCompletionRequestSystemMessageContentPart
+pub impl @moonbitlang/core/json.FromJson for ChatCompletionRequestSystemMessageContentPart
+
+pub(all) struct ChatCompletionRequestToolMessage {
+  role : String
+  content : ChatCompletionRequestToolMessageContent
+  tool_call_id : String
+}
+pub fn ChatCompletionRequestToolMessage::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ChatCompletionRequestToolMessage::new(role~ : String, content~ : ChatCompletionRequestToolMessageContent, tool_call_id~ : String) -> Self
+pub fn ChatCompletionRequestToolMessage::to_json(Self) -> Json
+pub impl ToJson for ChatCompletionRequestToolMessage
+pub impl @moonbitlang/core/json.FromJson for ChatCompletionRequestToolMessage
+
+pub(all) enum ChatCompletionRequestToolMessageContent {
+  Text(String)
+  ChatCompletionRequestToolMessageContentPartArray(Array[ChatCompletionRequestToolMessageContentPart])
+}
+pub fn ChatCompletionRequestToolMessageContent::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ChatCompletionRequestToolMessageContent::to_json(Self) -> Json
+pub impl ToJson for ChatCompletionRequestToolMessageContent
+pub impl @moonbitlang/core/json.FromJson for ChatCompletionRequestToolMessageContent
+
+pub(all) enum ChatCompletionRequestToolMessageContentPart {
+  Text(ChatCompletionRequestMessageContentPartText)
+  Unknown(String, Json)
+}
+pub fn ChatCompletionRequestToolMessageContentPart::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ChatCompletionRequestToolMessageContentPart::to_json(Self) -> Json
+pub impl ToJson for ChatCompletionRequestToolMessageContentPart
+pub impl @moonbitlang/core/json.FromJson for ChatCompletionRequestToolMessageContentPart
+
+pub(all) struct ChatCompletionRequestUserMessage {
+  content : ChatCompletionRequestUserMessageContent
+  role : String
+  name : String?
+}
+pub fn ChatCompletionRequestUserMessage::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ChatCompletionRequestUserMessage::new(content~ : ChatCompletionRequestUserMessageContent, role~ : String, name? : String) -> Self
+pub fn ChatCompletionRequestUserMessage::to_json(Self) -> Json
+pub impl ToJson for ChatCompletionRequestUserMessage
+pub impl @moonbitlang/core/json.FromJson for ChatCompletionRequestUserMessage
+
+pub(all) enum ChatCompletionRequestUserMessageContent {
+  Text(String)
+  ChatCompletionRequestUserMessageContentPartArray(Array[ChatCompletionRequestUserMessageContentPart])
+}
+pub fn ChatCompletionRequestUserMessageContent::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ChatCompletionRequestUserMessageContent::to_json(Self) -> Json
+pub impl ToJson for ChatCompletionRequestUserMessageContent
+pub impl @moonbitlang/core/json.FromJson for ChatCompletionRequestUserMessageContent
+
+pub(all) enum ChatCompletionRequestUserMessageContentPart {
+  Text(ChatCompletionRequestMessageContentPartText)
+  ImageUrl(ChatCompletionRequestMessageContentPartImage)
+  InputAudio(ChatCompletionRequestMessageContentPartAudio)
+  File(ChatCompletionRequestMessageContentPartFile)
+  Unknown(String, Json)
+}
+pub fn ChatCompletionRequestUserMessageContentPart::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ChatCompletionRequestUserMessageContentPart::to_json(Self) -> Json
+pub impl ToJson for ChatCompletionRequestUserMessageContentPart
+pub impl @moonbitlang/core/json.FromJson for ChatCompletionRequestUserMessageContentPart
+
+pub(all) struct ChatCompletionResponseMessage {
+  content : String?
+  refusal : @gaato/sdk-runtime/json.Presence[String]
+  tool_calls : Array[ChatCompletionMessageToolCall]?
+  annotations : Array[ChatCompletionResponseMessageAnnotationsItem]?
+  function_call : ChatCompletionResponseMessageFunctionCall?
+  audio : @gaato/sdk-runtime/json.Presence[ChatCompletionResponseMessageAudio]
+}
+pub fn ChatCompletionResponseMessage::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ChatCompletionResponseMessage::new(content? : String, refusal? : String, tool_calls? : Array[ChatCompletionMessageToolCall], annotations? : Array[ChatCompletionResponseMessageAnnotationsItem], function_call? : ChatCompletionResponseMessageFunctionCall, audio? : ChatCompletionResponseMessageAudio) -> Self
+pub fn ChatCompletionResponseMessage::to_json(Self) -> Json
+pub impl ToJson for ChatCompletionResponseMessage
+pub impl @moonbitlang/core/json.FromJson for ChatCompletionResponseMessage
+
+pub(all) struct ChatCompletionResponseMessageAnnotationsItem {
+  url_citation : ChatCompletionResponseMessageAnnotationsItemUrlCitation
+}
+pub fn ChatCompletionResponseMessageAnnotationsItem::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ChatCompletionResponseMessageAnnotationsItem::new(url_citation~ : ChatCompletionResponseMessageAnnotationsItemUrlCitation) -> Self
+pub fn ChatCompletionResponseMessageAnnotationsItem::to_json(Self) -> Json
+pub impl ToJson for ChatCompletionResponseMessageAnnotationsItem
+pub impl @moonbitlang/core/json.FromJson for ChatCompletionResponseMessageAnnotationsItem
+
+pub(all) struct ChatCompletionResponseMessageAnnotationsItemUrlCitation {
+  end_index : Int
+  start_index : Int
+  url : String
+  title : String
+}
+pub fn ChatCompletionResponseMessageAnnotationsItemUrlCitation::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ChatCompletionResponseMessageAnnotationsItemUrlCitation::new(end_index~ : Int, start_index~ : Int, url~ : String, title~ : String) -> Self
+pub fn ChatCompletionResponseMessageAnnotationsItemUrlCitation::to_json(Self) -> Json
+pub impl ToJson for ChatCompletionResponseMessageAnnotationsItemUrlCitation
+pub impl @moonbitlang/core/json.FromJson for ChatCompletionResponseMessageAnnotationsItemUrlCitation
+
+pub(all) struct ChatCompletionResponseMessageAudio {
+  id : String
+  expires_at : Int
+  data : String
+  transcript : String
+}
+pub fn ChatCompletionResponseMessageAudio::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ChatCompletionResponseMessageAudio::new(id~ : String, expires_at~ : Int, data~ : String, transcript~ : String) -> Self
+pub fn ChatCompletionResponseMessageAudio::to_json(Self) -> Json
+pub impl ToJson for ChatCompletionResponseMessageAudio
+pub impl @moonbitlang/core/json.FromJson for ChatCompletionResponseMessageAudio
+
+pub(all) struct ChatCompletionResponseMessageFunctionCall {
+  arguments : String
+  name : String
+}
+pub fn ChatCompletionResponseMessageFunctionCall::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ChatCompletionResponseMessageFunctionCall::new(arguments~ : String, name~ : String) -> Self
+pub fn ChatCompletionResponseMessageFunctionCall::to_json(Self) -> Json
+pub impl ToJson for ChatCompletionResponseMessageFunctionCall
+pub impl @moonbitlang/core/json.FromJson for ChatCompletionResponseMessageFunctionCall
+
+pub(all) struct ChatCompletionStreamOptions {
+  include_usage : Bool?
+}
+pub fn ChatCompletionStreamOptions::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ChatCompletionStreamOptions::new(include_usage? : Bool) -> Self
+pub fn ChatCompletionStreamOptions::to_json(Self) -> Json
+pub impl ToJson for ChatCompletionStreamOptions
+pub impl @moonbitlang/core/json.FromJson for ChatCompletionStreamOptions
+
+pub(all) struct ChatCompletionStreamResponseDelta {
+  content : @gaato/sdk-runtime/json.Presence[String]
+  function_call : ChatCompletionStreamResponseDeltaFunctionCall?
+  tool_calls : Array[ChatCompletionMessageToolCallChunk]?
+  role : ChatCompletionStreamResponseDeltaRole?
+  refusal : @gaato/sdk-runtime/json.Presence[String]
+}
+pub fn ChatCompletionStreamResponseDelta::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ChatCompletionStreamResponseDelta::new(content? : String, function_call? : ChatCompletionStreamResponseDeltaFunctionCall, tool_calls? : Array[ChatCompletionMessageToolCallChunk], role? : ChatCompletionStreamResponseDeltaRole, refusal? : String) -> Self
+pub fn ChatCompletionStreamResponseDelta::to_json(Self) -> Json
+pub impl ToJson for ChatCompletionStreamResponseDelta
+pub impl @moonbitlang/core/json.FromJson for ChatCompletionStreamResponseDelta
+
+pub(all) struct ChatCompletionStreamResponseDeltaFunctionCall {
+  arguments : String?
+  name : String?
+}
+pub fn ChatCompletionStreamResponseDeltaFunctionCall::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ChatCompletionStreamResponseDeltaFunctionCall::new(arguments? : String, name? : String) -> Self
+pub fn ChatCompletionStreamResponseDeltaFunctionCall::to_json(Self) -> Json
+pub impl ToJson for ChatCompletionStreamResponseDeltaFunctionCall
+pub impl @moonbitlang/core/json.FromJson for ChatCompletionStreamResponseDeltaFunctionCall
+
+pub(all) enum ChatCompletionStreamResponseDeltaRole {
+  Developer
+  System
+  User
+  Assistant
+  Tool
+  Unknown(String)
+}
+pub fn ChatCompletionStreamResponseDeltaRole::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ChatCompletionStreamResponseDeltaRole::to_json(Self) -> Json
+pub impl ToJson for ChatCompletionStreamResponseDeltaRole
+pub impl @moonbitlang/core/json.FromJson for ChatCompletionStreamResponseDeltaRole
+
+pub(all) struct ChatCompletionTokenLogprob {
+  token : String
+  logprob : Double
+  bytes : Array[Int]?
+  top_logprobs : Array[ChatCompletionTokenLogprobTopLogprobsItem]
+}
+pub fn ChatCompletionTokenLogprob::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ChatCompletionTokenLogprob::new(token~ : String, logprob~ : Double, top_logprobs~ : Array[ChatCompletionTokenLogprobTopLogprobsItem], bytes? : Array[Int]) -> Self
+pub fn ChatCompletionTokenLogprob::to_json(Self) -> Json
+pub impl ToJson for ChatCompletionTokenLogprob
+pub impl @moonbitlang/core/json.FromJson for ChatCompletionTokenLogprob
+
+pub(all) struct ChatCompletionTokenLogprobTopLogprobsItem {
+  token : String
+  logprob : Double
+  bytes : Array[Int]?
+}
+pub fn ChatCompletionTokenLogprobTopLogprobsItem::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ChatCompletionTokenLogprobTopLogprobsItem::new(token~ : String, logprob~ : Double, bytes? : Array[Int]) -> Self
+pub fn ChatCompletionTokenLogprobTopLogprobsItem::to_json(Self) -> Json
+pub impl ToJson for ChatCompletionTokenLogprobTopLogprobsItem
+pub impl @moonbitlang/core/json.FromJson for ChatCompletionTokenLogprobTopLogprobsItem
+
+pub(all) struct ChatCompletionTool {
+  function : FunctionObject
+}
+pub fn ChatCompletionTool::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ChatCompletionTool::new(function~ : FunctionObject) -> Self
+pub fn ChatCompletionTool::to_json(Self) -> Json
+pub impl ToJson for ChatCompletionTool
+pub impl @moonbitlang/core/json.FromJson for ChatCompletionTool
+
+pub(all) enum ChatCompletionToolChoiceOption {
+  Text(ChatCompletionToolChoiceOptionText)
+  ChatCompletionNamedToolChoice(ChatCompletionNamedToolChoice)
+}
+pub fn ChatCompletionToolChoiceOption::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ChatCompletionToolChoiceOption::to_json(Self) -> Json
+pub impl ToJson for ChatCompletionToolChoiceOption
+pub impl @moonbitlang/core/json.FromJson for ChatCompletionToolChoiceOption
+
+pub(all) enum ChatCompletionToolChoiceOptionText {
+  None
+  Auto
+  Required
+  Custom(String)
+}
+pub fn ChatCompletionToolChoiceOptionText::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ChatCompletionToolChoiceOptionText::to_json(Self) -> Json
+pub impl ToJson for ChatCompletionToolChoiceOptionText
+pub impl @moonbitlang/core/json.FromJson for ChatCompletionToolChoiceOptionText
 
 pub(all) struct Click {
   type_ : String
@@ -144,6 +673,41 @@ pub fn CodeInterpreterToolOutput::from_json(Json, @moonbitlang/core/json.JsonPat
 pub fn CodeInterpreterToolOutput::to_json(Self) -> Json
 pub impl ToJson for CodeInterpreterToolOutput
 pub impl @moonbitlang/core/json.FromJson for CodeInterpreterToolOutput
+
+pub(all) struct CompletionUsage {
+  completion_tokens : Int
+  prompt_tokens : Int
+  total_tokens : Int
+  completion_tokens_details : CompletionUsageCompletionTokensDetails?
+  prompt_tokens_details : CompletionUsagePromptTokensDetails?
+}
+pub fn CompletionUsage::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn CompletionUsage::new(completion_tokens~ : Int, prompt_tokens~ : Int, total_tokens~ : Int, completion_tokens_details? : CompletionUsageCompletionTokensDetails, prompt_tokens_details? : CompletionUsagePromptTokensDetails) -> Self
+pub fn CompletionUsage::to_json(Self) -> Json
+pub impl ToJson for CompletionUsage
+pub impl @moonbitlang/core/json.FromJson for CompletionUsage
+
+pub(all) struct CompletionUsageCompletionTokensDetails {
+  accepted_prediction_tokens : Int?
+  audio_tokens : Int?
+  reasoning_tokens : Int?
+  rejected_prediction_tokens : Int?
+}
+pub fn CompletionUsageCompletionTokensDetails::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn CompletionUsageCompletionTokensDetails::new(accepted_prediction_tokens? : Int, audio_tokens? : Int, reasoning_tokens? : Int, rejected_prediction_tokens? : Int) -> Self
+pub fn CompletionUsageCompletionTokensDetails::to_json(Self) -> Json
+pub impl ToJson for CompletionUsageCompletionTokensDetails
+pub impl @moonbitlang/core/json.FromJson for CompletionUsageCompletionTokensDetails
+
+pub(all) struct CompletionUsagePromptTokensDetails {
+  audio_tokens : Int?
+  cached_tokens : Int?
+}
+pub fn CompletionUsagePromptTokensDetails::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn CompletionUsagePromptTokensDetails::new(audio_tokens? : Int, cached_tokens? : Int) -> Self
+pub fn CompletionUsagePromptTokensDetails::to_json(Self) -> Json
+pub impl ToJson for CompletionUsagePromptTokensDetails
+pub impl @moonbitlang/core/json.FromJson for CompletionUsagePromptTokensDetails
 
 pub(all) enum ComputerAction {
   Click(Click)
@@ -278,6 +842,227 @@ pub fn Coordinate::new(x~ : Int, y~ : Int) -> Self
 pub fn Coordinate::to_json(Self) -> Json
 pub impl ToJson for Coordinate
 pub impl @moonbitlang/core/json.FromJson for Coordinate
+
+pub(all) struct CreateChatCompletionRequest {
+  metadata : @gaato/sdk-runtime/json.Presence[Map[String, String]]
+  temperature : @gaato/sdk-runtime/json.Presence[Double]
+  top_p : @gaato/sdk-runtime/json.Presence[Double]
+  user : String?
+  service_tier : @gaato/sdk-runtime/json.Presence[ServiceTier]
+  messages : Array[ChatCompletionRequestMessage]
+  model : String
+  modalities : @gaato/sdk-runtime/json.Presence[Array[ResponseModalitiesItem]]
+  reasoning_effort : @gaato/sdk-runtime/json.Presence[ReasoningEffort]
+  max_completion_tokens : @gaato/sdk-runtime/json.Presence[Int]
+  frequency_penalty : @gaato/sdk-runtime/json.Presence[Double]
+  presence_penalty : @gaato/sdk-runtime/json.Presence[Double]
+  web_search_options : CreateChatCompletionRequestWebSearchOptions?
+  top_logprobs : @gaato/sdk-runtime/json.Presence[Int]
+  response_format : CreateChatCompletionRequestResponseFormat?
+  audio : @gaato/sdk-runtime/json.Presence[CreateChatCompletionRequestAudio]
+  store : @gaato/sdk-runtime/json.Presence[Bool]
+  stream : @gaato/sdk-runtime/json.Presence[Bool]
+  stop : @gaato/sdk-runtime/json.Presence[StopConfiguration]
+  logit_bias : @gaato/sdk-runtime/json.Presence[Map[String, Int]]
+  logprobs : @gaato/sdk-runtime/json.Presence[Bool]
+  max_tokens : @gaato/sdk-runtime/json.Presence[Int]
+  n : @gaato/sdk-runtime/json.Presence[Int]
+  prediction : @gaato/sdk-runtime/json.Presence[CreateChatCompletionRequestPrediction]
+  seed : @gaato/sdk-runtime/json.Presence[Int]
+  stream_options : @gaato/sdk-runtime/json.Presence[ChatCompletionStreamOptions]
+  tools : Array[ChatCompletionTool]?
+  tool_choice : ChatCompletionToolChoiceOption?
+  parallel_tool_calls : Bool?
+  function_call : CreateChatCompletionRequestFunctionCall?
+  functions : Array[ChatCompletionFunctions]?
+}
+pub fn CreateChatCompletionRequest::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn CreateChatCompletionRequest::new(messages~ : Array[ChatCompletionRequestMessage], model~ : String, metadata? : Map[String, String], temperature? : Double, top_p? : Double, user? : String, service_tier? : ServiceTier, modalities? : Array[ResponseModalitiesItem], reasoning_effort? : ReasoningEffort, max_completion_tokens? : Int, frequency_penalty? : Double, presence_penalty? : Double, web_search_options? : CreateChatCompletionRequestWebSearchOptions, top_logprobs? : Int, response_format? : CreateChatCompletionRequestResponseFormat, audio? : CreateChatCompletionRequestAudio, store? : Bool, stream? : Bool, stop? : StopConfiguration, logit_bias? : Map[String, Int], logprobs? : Bool, max_tokens? : Int, n? : Int, prediction? : CreateChatCompletionRequestPrediction, seed? : Int, stream_options? : ChatCompletionStreamOptions, tools? : Array[ChatCompletionTool], tool_choice? : ChatCompletionToolChoiceOption, parallel_tool_calls? : Bool, function_call? : CreateChatCompletionRequestFunctionCall, functions? : Array[ChatCompletionFunctions]) -> Self
+pub fn CreateChatCompletionRequest::to_json(Self) -> Json
+pub impl ToJson for CreateChatCompletionRequest
+pub impl @moonbitlang/core/json.FromJson for CreateChatCompletionRequest
+
+pub(all) struct CreateChatCompletionRequestAudio {
+  voice : String
+  format : CreateChatCompletionRequestAudioFormat
+}
+pub fn CreateChatCompletionRequestAudio::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn CreateChatCompletionRequestAudio::new(voice~ : String, format~ : CreateChatCompletionRequestAudioFormat) -> Self
+pub fn CreateChatCompletionRequestAudio::to_json(Self) -> Json
+pub impl ToJson for CreateChatCompletionRequestAudio
+pub impl @moonbitlang/core/json.FromJson for CreateChatCompletionRequestAudio
+
+pub(all) enum CreateChatCompletionRequestAudioFormat {
+  Wav
+  Aac
+  Mp3
+  Flac
+  Opus
+  Pcm16
+  Custom(String)
+}
+pub fn CreateChatCompletionRequestAudioFormat::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn CreateChatCompletionRequestAudioFormat::to_json(Self) -> Json
+pub impl ToJson for CreateChatCompletionRequestAudioFormat
+pub impl @moonbitlang/core/json.FromJson for CreateChatCompletionRequestAudioFormat
+
+pub(all) enum CreateChatCompletionRequestFunctionCall {
+  Text(CreateChatCompletionRequestFunctionCallText)
+  ChatCompletionFunctionCallOption(ChatCompletionFunctionCallOption)
+}
+pub fn CreateChatCompletionRequestFunctionCall::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn CreateChatCompletionRequestFunctionCall::to_json(Self) -> Json
+pub impl ToJson for CreateChatCompletionRequestFunctionCall
+pub impl @moonbitlang/core/json.FromJson for CreateChatCompletionRequestFunctionCall
+
+pub(all) enum CreateChatCompletionRequestFunctionCallText {
+  None
+  Auto
+  Custom(String)
+}
+pub fn CreateChatCompletionRequestFunctionCallText::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn CreateChatCompletionRequestFunctionCallText::to_json(Self) -> Json
+pub impl ToJson for CreateChatCompletionRequestFunctionCallText
+pub impl @moonbitlang/core/json.FromJson for CreateChatCompletionRequestFunctionCallText
+
+pub(all) enum CreateChatCompletionRequestPrediction {
+  Content(PredictionContent)
+  Unknown(String, Json)
+}
+pub fn CreateChatCompletionRequestPrediction::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn CreateChatCompletionRequestPrediction::to_json(Self) -> Json
+pub impl ToJson for CreateChatCompletionRequestPrediction
+pub impl @moonbitlang/core/json.FromJson for CreateChatCompletionRequestPrediction
+
+pub(all) enum CreateChatCompletionRequestResponseFormat {
+  Text(ResponseFormatText)
+  JsonSchema(ResponseFormatJsonSchema)
+  JsonObject(ResponseFormatJsonObject)
+  Unknown(String, Json)
+}
+pub fn CreateChatCompletionRequestResponseFormat::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn CreateChatCompletionRequestResponseFormat::to_json(Self) -> Json
+pub impl ToJson for CreateChatCompletionRequestResponseFormat
+pub impl @moonbitlang/core/json.FromJson for CreateChatCompletionRequestResponseFormat
+
+pub(all) struct CreateChatCompletionRequestWebSearchOptions {
+  user_location : @gaato/sdk-runtime/json.Presence[CreateChatCompletionRequestWebSearchOptionsUserLocation]
+  search_context_size : WebSearchContextSize?
+}
+pub fn CreateChatCompletionRequestWebSearchOptions::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn CreateChatCompletionRequestWebSearchOptions::new(user_location? : CreateChatCompletionRequestWebSearchOptionsUserLocation, search_context_size? : WebSearchContextSize) -> Self
+pub fn CreateChatCompletionRequestWebSearchOptions::to_json(Self) -> Json
+pub impl ToJson for CreateChatCompletionRequestWebSearchOptions
+pub impl @moonbitlang/core/json.FromJson for CreateChatCompletionRequestWebSearchOptions
+
+pub(all) struct CreateChatCompletionRequestWebSearchOptionsUserLocation {
+  approximate : WebSearchLocation
+}
+pub fn CreateChatCompletionRequestWebSearchOptionsUserLocation::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn CreateChatCompletionRequestWebSearchOptionsUserLocation::new(approximate~ : WebSearchLocation) -> Self
+pub fn CreateChatCompletionRequestWebSearchOptionsUserLocation::to_json(Self) -> Json
+pub impl ToJson for CreateChatCompletionRequestWebSearchOptionsUserLocation
+pub impl @moonbitlang/core/json.FromJson for CreateChatCompletionRequestWebSearchOptionsUserLocation
+
+pub(all) struct CreateChatCompletionResponse {
+  id : String
+  choices : Array[CreateChatCompletionResponseChoicesItem]
+  created : Int
+  model : String
+  service_tier : @gaato/sdk-runtime/json.Presence[ServiceTier]
+  system_fingerprint : String?
+  usage : CompletionUsage?
+}
+pub fn CreateChatCompletionResponse::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn CreateChatCompletionResponse::new(id~ : String, choices~ : Array[CreateChatCompletionResponseChoicesItem], created~ : Int, model~ : String, service_tier? : ServiceTier, system_fingerprint? : String, usage? : CompletionUsage) -> Self
+pub fn CreateChatCompletionResponse::to_json(Self) -> Json
+pub impl ToJson for CreateChatCompletionResponse
+pub impl @moonbitlang/core/json.FromJson for CreateChatCompletionResponse
+
+pub(all) struct CreateChatCompletionResponseChoicesItem {
+  finish_reason : CreateChatCompletionResponseChoicesItemFinishReason
+  index : Int
+  message : ChatCompletionResponseMessage
+  logprobs : @gaato/sdk-runtime/json.Presence[CreateChatCompletionResponseChoicesItemLogprobs]
+}
+pub fn CreateChatCompletionResponseChoicesItem::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn CreateChatCompletionResponseChoicesItem::new(finish_reason~ : CreateChatCompletionResponseChoicesItemFinishReason, index~ : Int, message~ : ChatCompletionResponseMessage, logprobs? : CreateChatCompletionResponseChoicesItemLogprobs) -> Self
+pub fn CreateChatCompletionResponseChoicesItem::to_json(Self) -> Json
+pub impl ToJson for CreateChatCompletionResponseChoicesItem
+pub impl @moonbitlang/core/json.FromJson for CreateChatCompletionResponseChoicesItem
+
+pub(all) enum CreateChatCompletionResponseChoicesItemFinishReason {
+  Stop
+  Length
+  ToolCalls
+  ContentFilter
+  FunctionCall
+  Unknown(String)
+}
+pub fn CreateChatCompletionResponseChoicesItemFinishReason::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn CreateChatCompletionResponseChoicesItemFinishReason::to_json(Self) -> Json
+pub impl ToJson for CreateChatCompletionResponseChoicesItemFinishReason
+pub impl @moonbitlang/core/json.FromJson for CreateChatCompletionResponseChoicesItemFinishReason
+
+pub(all) struct CreateChatCompletionResponseChoicesItemLogprobs {
+  content : Array[ChatCompletionTokenLogprob]?
+  refusal : Array[ChatCompletionTokenLogprob]?
+}
+pub fn CreateChatCompletionResponseChoicesItemLogprobs::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn CreateChatCompletionResponseChoicesItemLogprobs::new(content? : Array[ChatCompletionTokenLogprob], refusal? : Array[ChatCompletionTokenLogprob]) -> Self
+pub fn CreateChatCompletionResponseChoicesItemLogprobs::to_json(Self) -> Json
+pub impl ToJson for CreateChatCompletionResponseChoicesItemLogprobs
+pub impl @moonbitlang/core/json.FromJson for CreateChatCompletionResponseChoicesItemLogprobs
+
+pub(all) struct CreateChatCompletionStreamResponse {
+  id : String
+  choices : Array[CreateChatCompletionStreamResponseChoicesItem]
+  created : Int
+  model : String
+  service_tier : @gaato/sdk-runtime/json.Presence[ServiceTier]
+  system_fingerprint : String?
+  usage : @gaato/sdk-runtime/json.Presence[CompletionUsage]
+}
+pub fn CreateChatCompletionStreamResponse::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn CreateChatCompletionStreamResponse::new(id~ : String, choices~ : Array[CreateChatCompletionStreamResponseChoicesItem], created~ : Int, model~ : String, service_tier? : ServiceTier, system_fingerprint? : String, usage? : CompletionUsage) -> Self
+pub fn CreateChatCompletionStreamResponse::to_json(Self) -> Json
+pub impl ToJson for CreateChatCompletionStreamResponse
+pub impl @moonbitlang/core/json.FromJson for CreateChatCompletionStreamResponse
+
+pub(all) struct CreateChatCompletionStreamResponseChoicesItem {
+  delta : ChatCompletionStreamResponseDelta
+  logprobs : @gaato/sdk-runtime/json.Presence[CreateChatCompletionStreamResponseChoicesItemLogprobs]
+  finish_reason : CreateChatCompletionStreamResponseChoicesItemFinishReason?
+  index : Int
+}
+pub fn CreateChatCompletionStreamResponseChoicesItem::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn CreateChatCompletionStreamResponseChoicesItem::new(delta~ : ChatCompletionStreamResponseDelta, index~ : Int, logprobs? : CreateChatCompletionStreamResponseChoicesItemLogprobs, finish_reason? : CreateChatCompletionStreamResponseChoicesItemFinishReason) -> Self
+pub fn CreateChatCompletionStreamResponseChoicesItem::to_json(Self) -> Json
+pub impl ToJson for CreateChatCompletionStreamResponseChoicesItem
+pub impl @moonbitlang/core/json.FromJson for CreateChatCompletionStreamResponseChoicesItem
+
+pub(all) enum CreateChatCompletionStreamResponseChoicesItemFinishReason {
+  Stop
+  Length
+  ToolCalls
+  ContentFilter
+  FunctionCall
+  Unknown(String)
+}
+pub fn CreateChatCompletionStreamResponseChoicesItemFinishReason::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn CreateChatCompletionStreamResponseChoicesItemFinishReason::to_json(Self) -> Json
+pub impl ToJson for CreateChatCompletionStreamResponseChoicesItemFinishReason
+pub impl @moonbitlang/core/json.FromJson for CreateChatCompletionStreamResponseChoicesItemFinishReason
+
+pub(all) struct CreateChatCompletionStreamResponseChoicesItemLogprobs {
+  content : Array[ChatCompletionTokenLogprob]?
+  refusal : Array[ChatCompletionTokenLogprob]?
+}
+pub fn CreateChatCompletionStreamResponseChoicesItemLogprobs::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn CreateChatCompletionStreamResponseChoicesItemLogprobs::new(content? : Array[ChatCompletionTokenLogprob], refusal? : Array[ChatCompletionTokenLogprob]) -> Self
+pub fn CreateChatCompletionStreamResponseChoicesItemLogprobs::to_json(Self) -> Json
+pub impl ToJson for CreateChatCompletionStreamResponseChoicesItemLogprobs
+pub impl @moonbitlang/core/json.FromJson for CreateChatCompletionStreamResponseChoicesItemLogprobs
 
 pub(all) struct CreateEmbeddingRequest {
   input : CreateEmbeddingRequestInput
@@ -549,6 +1334,18 @@ pub fn FunctionCallOutputItemParamStatus::from_json(Json, @moonbitlang/core/json
 pub fn FunctionCallOutputItemParamStatus::to_json(Self) -> Json
 pub impl ToJson for FunctionCallOutputItemParamStatus
 pub impl @moonbitlang/core/json.FromJson for FunctionCallOutputItemParamStatus
+
+pub(all) struct FunctionObject {
+  description : String?
+  name : String
+  parameters : Json?
+  strict : @gaato/sdk-runtime/json.Presence[Bool]
+}
+pub fn FunctionObject::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn FunctionObject::new(name~ : String, description? : String, parameters? : Json, strict? : Bool) -> Self
+pub fn FunctionObject::to_json(Self) -> Json
+pub impl ToJson for FunctionObject
+pub impl @moonbitlang/core/json.FromJson for FunctionObject
 
 pub(all) struct FunctionTool {
   type_ : String
@@ -846,6 +1643,25 @@ pub fn OutputTextContent::new(type_~ : String, text~ : String, annotations? : Ar
 pub fn OutputTextContent::to_json(Self) -> Json
 pub impl ToJson for OutputTextContent
 pub impl @moonbitlang/core/json.FromJson for OutputTextContent
+
+pub(all) struct PredictionContent {
+  type_ : String
+  content : PredictionContentContent
+}
+pub fn PredictionContent::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn PredictionContent::new(type_~ : String, content~ : PredictionContentContent) -> Self
+pub fn PredictionContent::to_json(Self) -> Json
+pub impl ToJson for PredictionContent
+pub impl @moonbitlang/core/json.FromJson for PredictionContent
+
+pub(all) enum PredictionContentContent {
+  Text(String)
+  ChatCompletionRequestMessageContentPartTextArray(Array[ChatCompletionRequestMessageContentPartText])
+}
+pub fn PredictionContentContent::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn PredictionContentContent::to_json(Self) -> Json
+pub impl ToJson for PredictionContentContent
+pub impl @moonbitlang/core/json.FromJson for PredictionContentContent
 
 pub(all) struct RankingOptions {
   ranker : RankingOptionsRanker?
@@ -1233,6 +2049,28 @@ pub fn ResponseFormatJsonObject::to_json(Self) -> Json
 pub impl ToJson for ResponseFormatJsonObject
 pub impl @moonbitlang/core/json.FromJson for ResponseFormatJsonObject
 
+pub(all) struct ResponseFormatJsonSchema {
+  type_ : String
+  json_schema : ResponseFormatJsonSchemaJsonSchema
+}
+pub fn ResponseFormatJsonSchema::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ResponseFormatJsonSchema::new(type_~ : String, json_schema~ : ResponseFormatJsonSchemaJsonSchema) -> Self
+pub fn ResponseFormatJsonSchema::to_json(Self) -> Json
+pub impl ToJson for ResponseFormatJsonSchema
+pub impl @moonbitlang/core/json.FromJson for ResponseFormatJsonSchema
+
+pub(all) struct ResponseFormatJsonSchemaJsonSchema {
+  description : String?
+  name : String
+  schema : Json?
+  strict : @gaato/sdk-runtime/json.Presence[Bool]
+}
+pub fn ResponseFormatJsonSchemaJsonSchema::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ResponseFormatJsonSchemaJsonSchema::new(name~ : String, description? : String, schema? : Json, strict? : Bool) -> Self
+pub fn ResponseFormatJsonSchemaJsonSchema::to_json(Self) -> Json
+pub impl ToJson for ResponseFormatJsonSchemaJsonSchema
+pub impl @moonbitlang/core/json.FromJson for ResponseFormatJsonSchemaJsonSchema
+
 pub(all) struct ResponseFormatText {
   type_ : String
 }
@@ -1304,6 +2142,16 @@ pub fn ResponseIncompleteEvent::new(type_~ : String, response~ : Response) -> Se
 pub fn ResponseIncompleteEvent::to_json(Self) -> Json
 pub impl ToJson for ResponseIncompleteEvent
 pub impl @moonbitlang/core/json.FromJson for ResponseIncompleteEvent
+
+pub(all) enum ResponseModalitiesItem {
+  Text
+  Audio
+  Custom(String)
+}
+pub fn ResponseModalitiesItem::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ResponseModalitiesItem::to_json(Self) -> Json
+pub impl ToJson for ResponseModalitiesItem
+pub impl @moonbitlang/core/json.FromJson for ResponseModalitiesItem
 
 pub(all) struct ResponseOutputItemAddedEvent {
   type_ : String
@@ -1671,6 +2519,15 @@ pub fn ServiceTier::to_json(Self) -> Json
 pub impl ToJson for ServiceTier
 pub impl @moonbitlang/core/json.FromJson for ServiceTier
 
+pub(all) enum StopConfiguration {
+  Text(String)
+  TextArray(Array[String])
+}
+pub fn StopConfiguration::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn StopConfiguration::to_json(Self) -> Json
+pub impl ToJson for StopConfiguration
+pub impl @moonbitlang/core/json.FromJson for StopConfiguration
+
 pub(all) enum TextResponseFormatConfiguration {
   Text(ResponseFormatText)
   JsonSchema(TextResponseFormatJsonSchema)
@@ -1748,6 +2605,29 @@ pub fn Wait::new(type_~ : String) -> Self
 pub fn Wait::to_json(Self) -> Json
 pub impl ToJson for Wait
 pub impl @moonbitlang/core/json.FromJson for Wait
+
+pub(all) enum WebSearchContextSize {
+  Low
+  Medium
+  High
+  Custom(String)
+}
+pub fn WebSearchContextSize::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn WebSearchContextSize::to_json(Self) -> Json
+pub impl ToJson for WebSearchContextSize
+pub impl @moonbitlang/core/json.FromJson for WebSearchContextSize
+
+pub(all) struct WebSearchLocation {
+  country : String?
+  region : String?
+  city : String?
+  timezone : String?
+}
+pub fn WebSearchLocation::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn WebSearchLocation::new(country? : String, region? : String, city? : String, timezone? : String) -> Self
+pub fn WebSearchLocation::to_json(Self) -> Json
+pub impl ToJson for WebSearchLocation
+pub impl @moonbitlang/core/json.FromJson for WebSearchLocation
 
 pub(all) struct WebSearchPreviewTool {
   type_ : String

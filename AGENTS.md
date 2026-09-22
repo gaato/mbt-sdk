@@ -71,12 +71,13 @@ moon -C runtime-tests test --target native     # runs loopback socket tests of o
 .venv/bin/python tools/gen/main.py --spec openai/spec/openai.yaml --overlay openai/overlays/moonbit.yaml --out openai/src/gen --package gaato/openai/gen --check
 .venv/bin/python tools/gen/census.py specs/badhttp/openapi.json badhttp --expect-zero
 .venv/bin/python tools/gen/census.py specs/petstore3/openapi.json petstore3 --expect-zero
+.venv/bin/python tools/gen/census.py openai/spec/openai.yaml openai --derive-operation-ids --overlay openai/overlays/fix.yaml --overlay openai/overlays/moonbit.yaml --expect-zero
 scripts/generate.sh --check
 moon fmt --check
 moon info
 ```
 
-Generator census の診断ゼロを要求するのは、上記の badhttp / petstore3 全操作と、`scripts/generate.sh --check` が生成する OpenAI include 済み閉包だけ。型を特定できない schema を暗黙に `Json` へ落としてはならず、raw JSON は overlay の明示的な `x-moonbit-json: true` がある場合だけ許可する。次の census は数を `docs/census.md` に記録する report-only コマンドであり、`--expect-zero` を付けない。
+Generator census の診断ゼロを要求するのは、上記の badhttp / petstore3 全操作、`fix.yaml` と `moonbit.yaml` を適用した OpenAI 全操作、および `scripts/generate.sh --check` が生成する OpenAI include 済み閉包。型を特定できない schema を暗黙に `Json` へ落としてはならず、raw JSON は overlay の明示的な `x-moonbit-json: true` がある場合だけ許可する。次の upstream OpenAI と OpenRouter の census は数を `docs/census.md` に記録する report-only コマンドであり、`--expect-zero` を付けない。
 
 ```sh
 .venv/bin/python tools/gen/census.py openai/spec/openai.yaml openai --derive-operation-ids

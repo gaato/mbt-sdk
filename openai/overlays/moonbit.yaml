@@ -19,6 +19,10 @@ actions:
     description: Include the createResponse operation now that M4c supports nullable and tagged unions.
     update:
       x-moonbit-include: true
+  - target: "$['paths']['/chat/completions']['post']"
+    description: Include chat completions for OpenAI-compatible servers as required by the M4f public facade.
+    update:
+      x-moonbit-include: true
   - target: "$['components']['schemas']['Model']['properties']['created']"
     description: Preserve Model.created beyond the MoonBit Int range.
     update:
@@ -80,3 +84,51 @@ actions:
   - target: "$['components']['schemas']['Model']['required'][?@ == 'owned_by']"
     description: OpenAI-compatible servers (OpenRouter's /models) omit owned_by; the hand-written Model type treats it as optional, so the generated decoder must too.
     remove: true
+  - target: "$['components']['schemas']['ChatCompletionResponseMessage']['required'][?@ == 'refusal']"
+    description: "refusal is required-but-nullable upstream; OpenAI-compatible servers (Ollama 0.34) omit it instead of sending null. Same pattern as owned_by."
+    remove: true
+  - target: "$['components']['schemas']['CreateChatCompletionResponse']['properties']['choices']['items']['required'][?@ == 'logprobs']"
+    description: "logprobs is required-but-nullable upstream; OpenAI-compatible servers (Ollama 0.34) omit it unless requested. Same pattern as owned_by."
+    remove: true
+  - target: "$['components']['schemas']['CreateAssistantRequest']['properties']['tool_resources']['properties']['file_search']"
+    description: The API accepts two legacy file_search resource shapes with no discriminator; preserving raw JSON is the only lossless boundary.
+    update:
+      x-moonbit-json: true
+  - target: "$['components']['schemas']['CreateEvalCompletionsRunDataSource']['properties']['input_messages']['oneOf'][0]['properties']['template']['items']"
+    description: EasyInputMessage and EvalItem both use the message tag and identical required fields; prefer the simpler documented input message before the richer eval item.
+    update:
+      x-moonbit-order:
+        - EasyInputMessage
+        - EvalItem
+  - target: "$['components']['schemas']['CreateEvalItem']"
+    description: The inline simple message and EvalItem have overlapping unconstrained object shapes, so the authored eval item JSON must remain lossless.
+    update:
+      x-moonbit-json: true
+  - target: "$['components']['schemas']['CreateEvalResponsesRunDataSource']['properties']['input_messages']['oneOf'][0]['properties']['template']['items']"
+    description: The inline chat message and EvalItem overlap without a discriminator; preserve the template item as raw JSON.
+    update:
+      x-moonbit-json: true
+  - target: "$['components']['schemas']['CreateEvalRunRequest']['properties']['data_source']"
+    description: The completions and responses run sources share the completions tag and identical required fields; use the specification order explicitly.
+    update:
+      x-moonbit-order:
+        - CreateEvalCompletionsRunDataSource
+        - CreateEvalResponsesRunDataSource
+  - target: "$['components']['schemas']['CreateThreadRequest']['properties']['tool_resources']['properties']['file_search']"
+    description: The API accepts two legacy thread file_search resource shapes with no discriminator; preserving raw JSON is the only lossless boundary.
+    update:
+      x-moonbit-json: true
+  - target: "$['components']['schemas']['EvalRun']['properties']['data_source']"
+    description: Decoded eval runs use the same ambiguous completions tag for completions and responses sources; use the specification order explicitly.
+    update:
+      x-moonbit-order:
+        - CreateEvalCompletionsRunDataSource
+        - CreateEvalResponsesRunDataSource
+  - target: "$['paths']['/audio/transcriptions']['post']['responses']['200']['content']['application/json']['schema']"
+    description: The response format selects two overlapping transcription objects without a wire discriminator; preserve the selected response JSON losslessly.
+    update:
+      x-moonbit-json: true
+  - target: "$['paths']['/audio/translations']['post']['responses']['200']['content']['application/json']['schema']"
+    description: The response format selects two overlapping translation objects without a wire discriminator; preserve the selected response JSON losslessly.
+    update:
+      x-moonbit-json: true

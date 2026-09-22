@@ -26,6 +26,14 @@ fn credential(name : String, provider : String) -> String? {
 }
 
 ///|
+fn optional_setting(name : String) -> String? {
+  match @env.get_env_var(name) {
+    Some(value) if !value.trim().is_empty() => Some(value)
+    _ => None
+  }
+}
+
+///|
 fn runtime_client(api_key : String, base_url : String) -> @runtime.Client {
   @runtime.Client::new(
     @adapter.AsyncTransport::new(timeout_ms=45000),
@@ -340,6 +348,87 @@ async test "live OpenRouter Anthropic-compatible Messages API" {
         "OpenRouter/Anthropic streaming",
         stream_model,
         "expected MessageStart -> delta -> MessageStop order; got \{stream_order.0}, \{stream_order.1}, \{stream_order.2}",
+      )
+    }
+  })
+}
+
+///|
+async test "live local OpenAI-compatible Chat Completions API" {
+  bounded(() => {
+    let base_url = optional_setting("OPENAI_COMPAT_BASE_URL")
+    let model = optional_setting("OPENAI_COMPAT_MODEL")
+    guard base_url is Some(base_url) && model is Some(model) else {
+      println(
+        "skip: local OpenAI-compatible: OPENAI_COMPAT_BASE_URL and OPENAI_COMPAT_MODEL are both required",
+      )
+      return
+    }
+    let auth = match optional_setting("OPENAI_COMPAT_API_KEY") {
+      Some(key) => @runtime.Bearer(key)
+      None => @runtime.NoAuth
+    }
+    let client = @openai_sdk.OpenAI::from_client(
+      @runtime.Client::new(
+        @adapter.AsyncTransport::new(timeout_ms=45000),
+        @adapter.AsyncClock::new(),
+        base_url~,
+        auth~,
+        retry=live_retry(),
+      ),
+    )
+    let models = one_call("local OpenAI-compatible", "<list>", () => {
+      client.list_models()
+    })
+    if models.is_empty() {
+      validation_failure(
+        "local OpenAI-compatible", "<list>", "model list was empty",
+      )
+    }
+    let completion = one_call("local OpenAI-compatible", model, () => {
+      client.chat_completion(
+        @openai_sdk.ChatRequest::new(
+          model~,
+          messages=[@openai_sdk.ChatMessage::user("Reply with one short word.")],
+          max_tokens=64,
+        ),
+      )
+    })
+    if completion.text.is_empty() {
+      validation_failure(
+        "local OpenAI-compatible", model, "buffered chat completion text was empty",
+      )
+    }
+    let mut delta_count = 0
+    let mut finished = false
+    let mut finished_was_last_non_usage = false
+    one_call("local OpenAI-compatible", model, () => {
+      client.stream_chat_completion(
+        @openai_sdk.ChatRequest::new(
+          model~,
+          messages=[@openai_sdk.ChatMessage::user("Reply with one short word.")],
+          max_tokens=64,
+        ),
+        event => {
+          match event {
+            @openai_sdk.Delta(_) => {
+              delta_count += 1
+              finished_was_last_non_usage = false
+            }
+            @openai_sdk.ReasoningDelta(_) | @openai_sdk.Other(_, _) =>
+              finished_was_last_non_usage = false
+            @openai_sdk.Finished(_) => {
+              finished = true
+              finished_was_last_non_usage = true
+            }
+            @openai_sdk.Usage(_) => ()
+          }
+        },
+      )
+    })
+    if delta_count < 1 || !finished || !finished_was_last_non_usage {
+      validation_failure(
+        "local OpenAI-compatible", model, "stream lacked Delta or did not end its choice events with Finished",
       )
     }
   })

@@ -17,6 +17,17 @@ test "constructors snapshot mutable inputs and OpenAI Debug redacts the key" {
   )
   extra["later"] = true
   assert_eq(response.extra, { "metadata": { "source": "test" } })
+  let messages = [@openai.ChatMessage::user("hello")]
+  let chat_extra : Map[String, Json] = { "seed": 1 }
+  let chat = @openai.ChatRequest::new(
+    model="gpt-4o-mini",
+    messages~,
+    extra=chat_extra,
+  )
+  messages.push(@openai.ChatMessage::assistant("later"))
+  chat_extra["later"] = true
+  assert_eq(chat.messages, [@openai.ChatMessage::user("hello")])
+  assert_eq(chat.extra, { "seed": 1 })
 
   let key = "sk-key-that-must-not-leak"
   let client = @openai.OpenAI::new(

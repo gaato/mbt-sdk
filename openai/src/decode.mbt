@@ -26,6 +26,125 @@ fn response_status_from_generated(
 }
 
 ///|
+fn chat_usage_from_generated(usage : @gen.CompletionUsage) -> Usage {
+  {
+    input_tokens: usage.prompt_tokens,
+    output_tokens: usage.completion_tokens,
+    total_tokens: usage.total_tokens,
+  }
+}
+
+///|
+fn chat_finish_reason(
+  reason : @gen.CreateChatCompletionResponseChoicesItemFinishReason,
+) -> FinishReason {
+  match reason {
+    @gen.Stop => Stop
+    @gen.Length => Length
+    @gen.ToolCalls => ToolCalls
+    @gen.ContentFilter => ContentFilter
+    @gen.FunctionCall => Unknown("function_call")
+    @gen.Unknown(value) => Unknown(value)
+  }
+}
+
+///|
+fn chat_stream_finish_reason(
+  reason : @gen.CreateChatCompletionStreamResponseChoicesItemFinishReason,
+) -> FinishReason {
+  match reason {
+    @gen.Stop => Stop
+    @gen.Length => Length
+    @gen.ToolCalls => ToolCalls
+    @gen.ContentFilter => ContentFilter
+    @gen.FunctionCall => Unknown("function_call")
+    @gen.Unknown(value) => Unknown(value)
+  }
+}
+
+///|
+fn decode_chat_completion(
+  response : @http.Response,
+) -> ChatCompletion raise @runtime.SdkError {
+  let raw = response.json() catch {
+    error =>
+      raise @runtime.Decode(message=error.to_string(), body=response.body)
+  }
+  let generated = @gen.create_chat_completion_decode_json(raw) catch {
+    error =>
+      raise @runtime.Decode(message=error.to_string(), body=response.body)
+  }
+  guard generated.choices.get(0) is Some(choice) else {
+    raise @runtime.Decode(
+      message="chat completion has no choices",
+      body=response.body,
+    )
+  }
+  {
+    id: generated.id,
+    model: generated.model,
+    text: choice.message.content.unwrap_or(""),
+    finish_reason: Some(chat_finish_reason(choice.finish_reason)),
+    usage: generated.usage.map(chat_usage_from_generated),
+    raw,
+  }
+}
+
+///|
+fn reasoning_delta_at(value : Json, index : Int) -> String? {
+  guard value is Object(root) else { return None }
+  guard root.get("choices") is Some(Array(choices)) else { return None }
+  guard choices.get(index) is Some(Object(choice)) else { return None }
+  guard choice.get("delta") is Some(Object(delta)) else { return None }
+  match delta.get("reasoning_content") {
+    Some(String(text)) => Some(text)
+    _ =>
+      match delta.get("reasoning") {
+        Some(String(text)) => Some(text)
+        _ => None
+      }
+  }
+}
+
+///|
+fn chat_chunk_kind(value : Json) -> String {
+  guard value is Object(root) else { return "chat.completion.chunk" }
+  match root.get("object") {
+    Some(String(kind)) => kind
+    _ => "chat.completion.chunk"
+  }
+}
+
+///|
+fn decode_chat_chunk(
+  value : Json,
+) -> Array[ChatEvent] raise @json.JsonDecodeError {
+  let chunk : @gen.CreateChatCompletionStreamResponse = @json.from_json(value)
+  let events : Array[ChatEvent] = []
+  for index, choice in chunk.choices {
+    match choice.delta.content {
+      @sdkjson.Value(text) => events.push(Delta(text))
+      _ => ()
+    }
+    if reasoning_delta_at(value, index) is Some(text) {
+      events.push(ReasoningDelta(text))
+    }
+    if choice.finish_reason is Some(reason) {
+      events.push(Finished(chat_stream_finish_reason(reason)))
+    }
+  }
+  match chunk.usage {
+    @sdkjson.Value(usage) =>
+      events.push(Usage(chat_usage_from_generated(usage)))
+    _ => ()
+  }
+  if events.is_empty() {
+    events.push(Other(chat_chunk_kind(value), value))
+  }
+  events
+}
+
+///|
 fn output_text_from_generated(output : Array[@gen.OutputItem]) -> String {
   let result = StringBuilder()
   for item in output {
