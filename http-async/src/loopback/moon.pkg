@@ -8,8 +8,11 @@ import {
   "moonbitlang/async/io",
 } for "test"
 
-supported_targets = "native"
+supported_targets = "native + wasm"
 
 options(
-  targets: { "loopback_test.mbt": [ "native" ], "pool_test.mbt": [ "native" ] },
+  targets: {
+    "loopback_test.mbt": [ "native", "wasm" ],
+    "pool_test.mbt": [ "native", "wasm" ],
+  },
 )

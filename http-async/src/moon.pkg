@@ -11,11 +11,11 @@ import {
   "gaato/http/sse",
 } for "test"
 
-supported_targets = "js + native"
+supported_targets = "js + native + wasm"
 
 options(
   targets: {
-    "head_error.native.mbt": [ "native" ],
+    "head_error.native.mbt": [ "native", "wasm" ],
     "head_error.js.mbt": [ "js" ],
   },
 )

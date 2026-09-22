@@ -14,7 +14,7 @@ repository = "https://github.com/gaato/mbt-sdk"
 
 keywords = [ "http", "transport", "async", "client" ]
 
-description = "gaato/http Transport over moonbitlang/async. Native and js targets."
+description = "gaato/http Transport over moonbitlang/async. Native, JS, and moonrun Wasm targets."
 
 source = "src"
 
