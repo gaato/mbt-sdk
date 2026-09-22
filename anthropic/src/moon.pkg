@@ -1,4 +1,5 @@
 import {
+  "gaato/anthropic/gen" @gen,
   "gaato/http",
   "gaato/http/clock",
   "gaato/http/sse",
@@ -10,5 +11,6 @@ import {
 }
 
 import {
+  "gaato/anthropic/gen" @gen,
   "gaato/http/mock",
 } for "test"

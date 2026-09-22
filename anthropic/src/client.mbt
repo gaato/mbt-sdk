@@ -1,5 +1,9 @@
 ///|
-/// A thin Anthropic Messages client backed by the transport-independent SDK runtime.
+/// An Anthropic API client backed by the transport-independent SDK runtime.
+///
+/// Request and response shapes come from the generated `gen` package, which is
+/// produced from the vendored first-party OpenAPI document; this facade adds a
+/// small stable vocabulary on top of it.
 pub struct Anthropic {
   priv client : @runtime.Client
   priv version : String
@@ -19,11 +23,15 @@ pub impl @debug.Debug for Anthropic with fn to_repr(_self) {
 
 ///|
 /// Creates an Anthropic client with the selected authentication header.
+///
+/// `base_url` is the server root: generated paths already start with `/v1`,
+/// so an Anthropic-compatible gateway is addressed by its root as well
+/// (for example `https://openrouter.ai/api`).
 pub fn Anthropic::new(
   api_key~ : String,
   transport : &@http.Transport,
   clock : &@clock.Clock,
-  base_url? : String = "https://api.anthropic.com/v1",
+  base_url? : String = "https://api.anthropic.com",
   version? : String = "2023-06-01",
   auth_header? : AuthHeader = XApiKey,
   retry? : @runtime.RetryPolicy,

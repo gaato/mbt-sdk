@@ -1,126 +1,93 @@
 ///|
-fn role(
-  value : Json,
-  path : @json.JsonPath,
-) -> Role raise @json.JsonDecodeError {
-  guard value is String(raw) else {
-    raise @json.JsonDecodeError((path, "expected string"))
-  }
-  match raw {
-    "user" => User
-    "assistant" => Assistant
-    _ => raise @json.JsonDecodeError((path, "unknown role: " + raw))
-  }
-}
-
-///|
-fn stop_reason(
-  value : Json,
-  path : @json.JsonPath,
-) -> StopReason raise @json.JsonDecodeError {
-  @sdkjson.open_string(
-    value,
-    path,
-    raw => {
-      match raw {
-        "end_turn" => Some(EndTurn)
-        "max_tokens" => Some(MaxTokens)
-        "stop_sequence" => Some(StopSequence)
-        "tool_use" => Some(ToolUse)
-        "refusal" => Some(Refusal)
-        _ => None
+fn content_block_from_generated(block : @gen.ContentBlock) -> ContentBlock {
+  match block {
+    @gen.ContentBlock::Text(text) => Text(text.text)
+    @gen.ContentBlock::Thinking(thinking) =>
+      Thinking(thinking=thinking.thinking, signature=thinking.signature)
+    @gen.ContentBlock::RedactedThinking(redacted) =>
+      RedactedThinking(redacted.data)
+    @gen.ContentBlock::ToolUse(tool_use) =>
+      ToolUse(id=tool_use.id, name=tool_use.name, input=tool_use.input)
+    @gen.ContentBlock::Unknown(kind, value) => Other(kind, value)
+    other => {
+      let value = other.to_json()
+      let kind = match value {
+        Object(fields) =>
+          match fields.get("type") {
+            Some(String(kind)) => kind
+            _ => ""
+          }
+        _ => ""
       }
-    },
-    raw => Unknown(raw),
-  )
-}
-
-///|
-fn content_block(
-  value : Json,
-  path : @json.JsonPath,
-) -> ContentBlock raise @json.JsonDecodeError {
-  let obj = @sdkjson.expect_object(value, path)
-  let kind : String = @sdkjson.field(obj, "type", path)
-  match kind {
-    "text" => Text(@sdkjson.field(obj, "text", path))
-    "thinking" => Thinking(@sdkjson.field(obj, "thinking", path))
-    "tool_use" =>
-      ToolUse(
-        id=@sdkjson.field(obj, "id", path),
-        name=@sdkjson.field(obj, "name", path),
-        input=@sdkjson.field(obj, "input", path),
-      )
-    _ => Other(kind, value)
+      Other(kind, value)
+    }
   }
 }
 
 ///|
-priv struct ContentBlockJson(ContentBlock)
-
-///|
-impl @json.FromJson for ContentBlockJson with fn from_json(value, path) {
-  ContentBlockJson(content_block(value, path))
-}
-
-///|
-priv struct UsageJson(Usage)
-
-///|
-impl @json.FromJson for UsageJson with fn from_json(value, path) {
-  let obj = @sdkjson.expect_object(value, path)
-  UsageJson({
-    input_tokens: @sdkjson.field(obj, "input_tokens", path),
-    output_tokens: @sdkjson.field(obj, "output_tokens", path),
-  })
-}
-
-///|
-priv struct MessageResponseJson(MessageResponse)
-
-///|
-impl @json.FromJson for MessageResponseJson with fn from_json(value, path) {
-  let obj = @sdkjson.expect_object(value, path)
-  let raw_role : Json = @sdkjson.field(obj, "role", path)
-  let raw_content : Array[ContentBlockJson] = @sdkjson.field(
-    obj, "content", path,
-  )
-  let raw_stop_reason : Json? = @sdkjson.opt_field(obj, "stop_reason", path)
-  let usage : UsageJson = @sdkjson.field(obj, "usage", path)
-  MessageResponseJson({
-    id: @sdkjson.field(obj, "id", path),
-    model: @sdkjson.field(obj, "model", path),
-    role: role(raw_role, path.add_key("role")),
-    content: raw_content.map(block => block.0),
-    stop_reason: raw_stop_reason.map(value => {
-      stop_reason(value, path.add_key("stop_reason"))
-    }),
-    usage: usage.0,
-    raw: value,
-  })
+fn message_response_from_generated(
+  message : @gen.Message,
+  raw : Json,
+) -> MessageResponse {
+  {
+    id: message.id,
+    model: message.model,
+    role: Assistant,
+    content: message.content.map(content_block_from_generated),
+    stop_reason: message.stop_reason,
+    usage: message.usage,
+    message,
+    raw,
+  }
 }
 
 ///|
 fn decode_message_response(
   value : Json,
 ) -> MessageResponse raise @json.JsonDecodeError {
-  let decoded : MessageResponseJson = @json.from_json(value)
-  decoded.0
+  let message : @gen.Message = @json.from_json(value)
+  message_response_from_generated(message, value)
 }
 
 ///|
-priv struct ApiErrorJson(ApiErrorBody)
-
-///|
-impl @json.FromJson for ApiErrorJson with fn from_json(value, path) {
-  let obj = @sdkjson.expect_object(value, path)
-  ApiErrorJson({
-    type_: @sdkjson.field(obj, "type", path),
-    message: @sdkjson.field(obj, "message", path),
-  })
+fn api_error_from_generated(error : @gen.ErrorResponseError) -> ApiErrorBody {
+  match error {
+    @gen.ErrorResponseError::ApiError(body) =>
+      { type_: body.type_, message: body.message }
+    @gen.ErrorResponseError::AuthenticationError(body) =>
+      { type_: body.type_, message: body.message }
+    @gen.ErrorResponseError::BillingError(body) =>
+      { type_: body.type_, message: body.message }
+    @gen.ErrorResponseError::InvalidRequestError(body) =>
+      { type_: body.type_, message: body.message }
+    @gen.ErrorResponseError::NotFoundError(body) =>
+      { type_: body.type_, message: body.message }
+    @gen.ErrorResponseError::OverloadedError(body) =>
+      { type_: body.type_, message: body.message }
+    @gen.ErrorResponseError::PermissionError(body) =>
+      { type_: body.type_, message: body.message }
+    @gen.ErrorResponseError::RateLimitError(body) =>
+      { type_: body.type_, message: body.message }
+    @gen.ErrorResponseError::TimeoutError(body) =>
+      { type_: body.type_, message: body.message }
+    @gen.ErrorResponseError::Unknown(kind, value) => {
+      let message = match value {
+        Object(fields) =>
+          match fields.get("message") {
+            Some(String(message)) => message
+            _ => ""
+          }
+        _ => ""
+      }
+      { type_: kind, message }
+    }
+  }
 }
 
 ///|
+/// `{"type":"error","error":{...}}`: the body of every HTTP error and of the
+/// stream `error` event. The generated `ErrorResponse` elides the constant
+/// `type`, so the envelope is checked here before its `error` is decoded.
 priv struct ApiErrorEnvelopeJson(ApiErrorBody)
 
 ///|
@@ -130,110 +97,79 @@ impl @json.FromJson for ApiErrorEnvelopeJson with fn from_json(value, path) {
   if kind != "error" {
     raise @json.JsonDecodeError((path.add_key("type"), "expected error"))
   }
-  let error : ApiErrorJson = @sdkjson.field(obj, "error", path)
-  ApiErrorEnvelopeJson(error.0)
+  let error : @gen.ErrorResponseError = @sdkjson.field(obj, "error", path)
+  ApiErrorEnvelopeJson(api_error_from_generated(error))
 }
 
 ///|
-fn event_api_error(
-  obj : Map[String, Json],
-  path : @json.JsonPath,
-) -> ApiErrorBody raise @json.JsonDecodeError {
-  let error : ApiErrorJson = @sdkjson.field(obj, "error", path)
-  error.0
-}
-
-///|
-fn event_stop_reason(
-  obj : Map[String, Json],
-  path : @json.JsonPath,
-) -> StopReason? raise @json.JsonDecodeError {
-  let value : Json? = @sdkjson.opt_field(obj, "stop_reason", path)
-  value.map(value => stop_reason(value, path.add_key("stop_reason")))
-}
-
-///|
-fn message_delta(
-  obj : Map[String, Json],
-  path : @json.JsonPath,
-) -> MessageEvent raise @json.JsonDecodeError {
-  let delta_value : Json = @sdkjson.field(obj, "delta", path)
-  let delta_path = path.add_key("delta")
-  let delta = @sdkjson.expect_object(delta_value, delta_path)
-  let usage : Json? = @sdkjson.opt_field(obj, "usage", path)
-  let output_tokens = match usage {
-    None => None
-    Some(value) => {
-      let usage_path = path.add_key("usage")
-      let usage_obj = @sdkjson.expect_object(value, usage_path)
-      @sdkjson.opt_field(usage_obj, "output_tokens", usage_path)
-    }
-  }
-  MessageDelta(stop_reason=event_stop_reason(delta, delta_path), output_tokens~)
-}
-
-///|
-fn content_block_delta(
+fn decode_error_envelope(
   value : Json,
-  obj : Map[String, Json],
-  path : @json.JsonPath,
-) -> MessageEvent raise @json.JsonDecodeError {
-  let index : Int = @sdkjson.field(obj, "index", path)
-  let delta_value : Json = @sdkjson.field(obj, "delta", path)
-  let delta_path = path.add_key("delta")
-  let delta = @sdkjson.expect_object(delta_value, delta_path)
-  let kind : String = @sdkjson.field(delta, "type", delta_path)
-  match kind {
-    "text_delta" =>
-      TextDelta(index~, text=@sdkjson.field(delta, "text", delta_path))
-    "thinking_delta" =>
-      ThinkingDelta(
-        index~,
-        thinking=@sdkjson.field(delta, "thinking", delta_path),
-      )
-    "input_json_delta" =>
-      InputJsonDelta(
-        index~,
-        partial_json=@sdkjson.field(delta, "partial_json", delta_path),
-      )
-    _ => Other("content_block_delta", value)
+) -> ApiErrorBody raise @json.JsonDecodeError {
+  let envelope : ApiErrorEnvelopeJson = @json.from_json(value)
+  envelope.0
+}
+
+///|
+fn json_field(value : Json, key : String) -> Json? {
+  match value {
+    Object(fields) => fields.get(key)
+    _ => None
   }
 }
 
 ///|
-priv struct MessageEventJson(MessageEvent)
-
-///|
-impl @json.FromJson for MessageEventJson with fn from_json(value, path) {
-  let obj = @sdkjson.expect_object(value, path)
-  let kind : String = @sdkjson.field(obj, "type", path)
-  let event = match kind {
-    "message_start" => {
-      let message : MessageResponseJson = @sdkjson.field(obj, "message", path)
-      MessageStart(message.0)
+fn message_event_from_generated(
+  event : MessageStreamEvent,
+  raw : Json,
+) -> MessageEvent raise @json.JsonDecodeError {
+  match event {
+    @gen.MessageStreamEvent::MessageStart(start) => {
+      let raw_message = json_field(raw, "message").unwrap_or(
+        start.message.to_json(),
+      )
+      MessageStart(message_response_from_generated(start.message, raw_message))
     }
-    "content_block_start" => {
-      let block : ContentBlockJson = @sdkjson.field(obj, "content_block", path)
-      ContentBlockStart(index=@sdkjson.field(obj, "index", path), block=block.0)
+    @gen.MessageStreamEvent::ContentBlockStart(start) => {
+      let block : @gen.ContentBlock = @json.from_json(
+        start.content_block.to_json(),
+      )
+      ContentBlockStart(
+        index=start.index,
+        block=content_block_from_generated(block),
+      )
     }
-    "content_block_delta" => content_block_delta(value, obj, path)
-    "content_block_stop" =>
-      ContentBlockStop(index=@sdkjson.field(obj, "index", path))
-    "message_delta" => message_delta(obj, path)
-    "message_stop" => MessageStop
-    "ping" => Ping
-    "error" => Error(event_api_error(obj, path))
-    _ => Other(kind, value)
+    @gen.MessageStreamEvent::ContentBlockDelta(delta) =>
+      match delta.delta {
+        @gen.ContentBlockDeltaEventDelta::TextDelta(text) =>
+          TextDelta(index=delta.index, text=text.text)
+        @gen.ContentBlockDeltaEventDelta::ThinkingDelta(thinking) =>
+          ThinkingDelta(index=delta.index, thinking=thinking.thinking)
+        @gen.ContentBlockDeltaEventDelta::SignatureDelta(signature) =>
+          SignatureDelta(index=delta.index, signature=signature.signature)
+        @gen.ContentBlockDeltaEventDelta::InputJsonDelta(json) =>
+          InputJsonDelta(index=delta.index, partial_json=json.partial_json)
+        @gen.ContentBlockDeltaEventDelta::CitationsDelta(_)
+        | @gen.ContentBlockDeltaEventDelta::Unknown(_, _) =>
+          Other("content_block_delta", raw)
+      }
+    @gen.MessageStreamEvent::ContentBlockStop(stop) =>
+      ContentBlockStop(index=stop.index)
+    @gen.MessageStreamEvent::MessageDelta(delta) =>
+      MessageDelta(delta=delta.delta, usage=delta.usage)
+    @gen.MessageStreamEvent::MessageStop(_) => MessageStop
+    @gen.MessageStreamEvent::Unknown("ping", _) => Ping
+    @gen.MessageStreamEvent::Unknown("error", _) =>
+      Error(decode_error_envelope(raw))
+    @gen.MessageStreamEvent::Unknown(kind, _) => Other(kind, raw)
   }
-  MessageEventJson(event)
 }
 
 ///|
 fn decode_message_event(
   value : Json,
 ) -> MessageEvent raise @json.JsonDecodeError {
-  let decoded : MessageEventJson = @json.from_json(value)
-  decoded.0
+  let event : MessageStreamEvent = @json.from_json(value)
+  message_event_from_generated(event, value)
 }
 
 ///|
@@ -243,8 +179,7 @@ fn parse_json_body(body : Bytes) -> Json raise {
 
 ///|
 fn decode_api_error_body(body : Bytes) -> ApiErrorBody raise {
-  let envelope : ApiErrorEnvelopeJson = @json.from_json(parse_json_body(body))
-  envelope.0
+  decode_error_envelope(parse_json_body(body))
 }
 
 ///|

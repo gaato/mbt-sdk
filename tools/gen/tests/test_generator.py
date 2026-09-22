@@ -209,6 +209,50 @@ class IRTests(unittest.TestCase):
         self.assertIn("pub extend Shape with @debug.Debug::{to_repr}", types)
         self.assertIn('"moonbitlang/core/debug"', emit(IRBuilder(doc, "example/gen").build())["moon.pkg"])
 
+    def test_required_nullable_field_decodes_when_absent(self):
+        schema = {"type": "object", "properties": {"id": {"type": "string"}, "note": {"type": "string", "nullable": True}}, "required": ["id", "note"]}
+        ir = IRBuilder(document(operation(response=schema)), "example/gen").build()
+        field = next(field for field in declaration(ir, "TestOperationResponse").fields if field.moon_name == "note")
+        self.assertEqual(field.presence, Presence.NULLABLE_REQUIRED)
+        types = emit(ir)["types.mbt"]
+        self.assertIn('note: decode_nullable_field(obj, "note", path)', types)
+        self.assertIn("None | Some(Null) => None", types)
+
+    def test_optional_discriminator_selects_a_default_variant(self):
+        # Anthropic's client `Tool.type` is `null | "custom"` and not required; a tool without it is still a Tool.
+        schemas = {
+            "Custom": {"type": "object", "properties": {"type": {"anyOf": [{"type": "null"}, {"const": "custom", "type": "string"}]}, "name": {"type": "string"}}, "required": ["name"]},
+            "Bash": {"type": "object", "properties": {"type": {"type": "string", "enum": ["bash"]}, "name": {"type": "string"}}, "required": ["type", "name"]},
+            "Item": {"oneOf": [{"$ref": "#/components/schemas/Custom"}, {"$ref": "#/components/schemas/Bash"}], "discriminator": {"propertyName": "type", "mapping": {"custom": "#/components/schemas/Custom", "bash": "#/components/schemas/Bash"}}},
+        }
+        doc = document(operation(request={"$ref": "#/components/schemas/Item"}), schemas)
+        ir = IRBuilder(doc, "example/gen").build()
+        union = declaration(ir, "Item")
+        self.assertIsInstance(union, TaggedUnion)
+        self.assertEqual(union.default_variant, "Custom")
+        types = emit(ir)["types.mbt"]
+        self.assertIn('None | Some(Null) => "custom"', types)
+        # Two payloads without a required discriminator are ambiguous: the tag stays required on decode.
+        schemas["Bash"]["required"] = ["name"]
+        ir = IRBuilder(document(operation(request={"$ref": "#/components/schemas/Item"}), schemas), "example/gen").build()
+        self.assertIsNone(declaration(ir, "Item").default_variant)
+        self.assertIn('required_field(obj, "type", path)', emit(ir)["types.mbt"])
+
+    def test_required_field_with_default_decodes_when_absent(self):
+        schemas = {
+            "Caller": {"type": "object", "properties": {"type": {"type": "string", "enum": ["direct", "server"]}}, "required": ["type"]},
+            "Block": {"type": "object", "properties": {"id": {"type": "string"}, "caller": {"$ref": "#/components/schemas/Caller", "default": {"type": "direct"}}, "count": {"type": "integer", "default": 0}, "big": {"type": "integer", "format": "int64", "default": 0}}, "required": ["id", "caller", "count", "big"]},
+        }
+        ir = IRBuilder(document(operation(response={"$ref": "#/components/schemas/Block"}), schemas), "example/gen").build()
+        fields = {field.moon_name: field for field in declaration(ir, "Block").fields}
+        self.assertEqual(fields["caller"].default, {"type": "direct"})
+        self.assertEqual(fields["count"].default, 0)
+        self.assertIsNone(fields["big"].default)
+        types = emit(ir)["types.mbt"]
+        self.assertIn('caller: decode_defaulted_field(obj, "caller", path, { "type": "direct" })', types)
+        self.assertIn('count: decode_defaulted_field(obj, "count", path, 0)', types)
+        self.assertIn('big: json_int64(required_field(obj, "big", path)', types)
+
     def test_emission_is_byte_deterministic(self):
         schema = {"type": "object", "properties": {"z": {"type": "integer"}, "a": {"type": "string"}}, "required": ["z", "a"]}
         first = emit(IRBuilder(document(operation(request=schema)), "example/gen").build())

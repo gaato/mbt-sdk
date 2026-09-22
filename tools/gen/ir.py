@@ -41,6 +41,8 @@ class Field:
     presence: Presence
     description: str = ""
     constant: Any | None = None
+    # A required field with a non-null `default`: absent on decode means this value.
+    default: Any | None = None
 
 
 @dataclass(frozen=True)
@@ -95,6 +97,9 @@ class TaggedUnion:
     discriminator: str
     variants: tuple[TaggedVariant, ...]
     description: str = ""
+    # The variant a payload without the discriminator decodes to: the one variant
+    # whose payload does not require the discriminator property (or allows null).
+    default_variant: str | None = None
 
 
 @dataclass(frozen=True)
@@ -396,6 +401,27 @@ class IRBuilder:
             isinstance(part, dict) and self._schema_nullable(part, seen)
             for part in parts
         )
+
+    def _discriminator_optional(self, choice: dict[str, Any], property_name: str) -> bool:
+        """True when the payload may omit (or null) its discriminator property."""
+        try:
+            resolved = self._dereference(choice)
+        except (KeyError, TypeError):
+            return False
+        properties = self._properties(resolved) or {}
+        property_schema = properties.get(property_name)
+        if not isinstance(property_schema, dict):
+            return False
+        required: list[Any] = list(resolved.get("required", []))
+        for part in resolved.get("allOf", []):
+            if isinstance(part, dict):
+                try:
+                    required.extend(self._dereference(part).get("required", []))
+                except (KeyError, TypeError):
+                    pass
+        if property_name not in required:
+            return True
+        return self._schema_nullable(property_schema)
 
     def _properties(self, schema: dict[str, Any]) -> dict[str, Any] | None:
         """Collect object properties, using allOf's later-wins rule."""
@@ -1073,6 +1099,7 @@ class IRBuilder:
         annotations = schema.get("x-moonbit-variants")
         variants: list[TaggedVariant] = []
         names: set[str] = set()
+        optional_tag_variants: list[str] = []
         for position in ordered_positions:
             tag, choice, original_index = entries[position]
             properties = self._properties(choice)
@@ -1130,8 +1157,19 @@ class IRBuilder:
                     accepted_tags,
                 )
             )
+            if self._discriminator_optional(choice, property_name):
+                optional_tag_variants.append(variant_name)
+        default_variant = None
+        if len(optional_tag_variants) == 1:
+            default_variant = optional_tag_variants[0]
+        elif len(optional_tag_variants) > 1:
+            # Ambiguous: keep the discriminator required on decode, as before.
+            self.add_note(
+                pointer,
+                f"discriminator {property_name!r} is optional in several variants ({', '.join(optional_tag_variants)}); a payload without it does not decode",
+            )
         self._add_declaration(
-            TaggedUnion(name, property_name, tuple(variants), schema.get("description", "")),
+            TaggedUnion(name, property_name, tuple(variants), schema.get("description", ""), default_variant),
             pointer,
         )
         return TypeRef("named", name=name)
@@ -1289,7 +1327,10 @@ class IRBuilder:
                     "direct recursive struct field must be nullable or optional",
                     "make the field nullable/optional or place the recursive value behind an array",
                 )
-            fields.append(Field(json_name, snake_case(json_name), field_type, presence, field_schema.get("description", "")))
+            default = None
+            if presence == Presence.REQUIRED and field_schema.get("default") is not None and field_type.kind != "map" and field_type.moon_type() != "Int64":
+                default = field_schema["default"]
+            fields.append(Field(json_name, snake_case(json_name), field_type, presence, field_schema.get("description", ""), None, default))
         self._add_declaration(Struct(name, tuple(fields), schema.get("description", "")), pointer)
         return TypeRef("named", name=name)
 

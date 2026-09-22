@@ -3,6 +3,7 @@ import {
   "gaato/http/mock",
   "gaato/sdk-runtime" @runtime,
   "gaato/anthropic" @anthropic_sdk,
+  "gaato/anthropic/gen" @anthropic_gen,
   "moonbitlang/async",
   "moonbitlang/core/encoding/utf8",
   "moonbitlang/core/json",

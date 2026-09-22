@@ -1,29 +1,38 @@
 ///|
 test "constructors snapshot mutable inputs and Anthropic Debug redacts the key" {
-  let blocks : Array[Json] = [{ "type": "image", "source": { "data": "x" } }]
+  let blocks : Array[@anthropic.InputContentBlock] = [
+    @anthropic.InputContentBlock::Unknown("image", {
+      "type": "image",
+      "source": { "data": "x" },
+    }),
+  ]
   let messages : Array[@anthropic.Message] = [
     { role: @anthropic.User, content: @anthropic.Blocks(blocks), },
   ]
   let stops = ["END"]
-  let extra : Map[String, Json] = { "metadata": { "source": "test" } }
+  let extra : Map[String, Json] = { "top_p": 0.5 }
   let request = @anthropic.MessageRequest::new(
-    model="claude-sonnet-4-5",
+    model="claude-opus-5",
     max_tokens=64,
     messages~,
     stop_sequences=stops,
     extra~,
   )
-  blocks.push({ "type": "text", "text": "later" })
+  blocks.push(
+    @anthropic.InputContentBlock::Text(
+      @gen.RequestTextBlock::new(text="later", type_="text"),
+    ),
+  )
   messages.push(@anthropic.Message::user("later"))
   stops.push("LATER")
   extra["later"] = true
   assert_eq(request.messages.length(), 1)
   guard request.messages[0].content is @anthropic.Blocks(saved) else {
-    fail("expected raw blocks")
+    fail("expected blocks")
   }
   assert_eq(saved.length(), 1)
   assert_eq(request.stop_sequences, Some(["END"]))
-  assert_eq(request.extra, { "metadata": { "source": "test" } })
+  assert_eq(request.extra, { "top_p": 0.5 })
 
   let key = "anthropic-key-that-must-not-leak"
   let client = @anthropic.Anthropic::new(
@@ -37,7 +46,7 @@ test "constructors snapshot mutable inputs and Anthropic Debug redacts the key" 
 }
 
 ///|
-test "message constructors and response text preserve order" {
+test "message constructors, generated params and response text" {
   assert_eq(@anthropic.Message::user("question"), {
     role: @anthropic.User,
     content: @anthropic.Text("question"),
@@ -46,26 +55,53 @@ test "message constructors and response text preserve order" {
     role: @anthropic.Assistant,
     content: @anthropic.Text("answer"),
   })
+  let request = @anthropic.MessageRequest::new(
+    model="claude-opus-5",
+    max_tokens=8,
+    messages=[@anthropic.Message::user("hi")],
+    system="be brief",
+  )
+  let params = request.to_params()
+  assert_eq(params.model, "claude-opus-5")
+  assert_eq(params.stream, None)
+  assert_eq(request.to_params(stream=true).stream, Some(true))
+  assert_eq(
+    params.system,
+    Some(@gen.CreateMessageParamsSystem::Text("be brief")),
+  )
+  let message = @gen.Message::new(
+    id="msg_1",
+    model="claude-opus-5",
+    content=[
+      @gen.ContentBlock::Text(
+        @gen.ResponseTextBlock::new(text="hello ", type_="text"),
+      ),
+    ],
+    usage=@gen.Usage::new(input_tokens=3, output_tokens=4),
+    stop_reason=@anthropic.StopReason::EndTurn,
+  )
   let response : @anthropic.MessageResponse = {
     id: "msg_1",
-    model: "claude-sonnet-4-5",
+    model: "claude-opus-5",
     role: @anthropic.Assistant,
     content: [
       @anthropic.Text("hello "),
-      @anthropic.Thinking("hidden"),
+      @anthropic.Thinking(thinking="hidden", signature="sig"),
       @anthropic.ToolUse(id="tool_1", name="lookup", input={ "q": "x" }),
       @anthropic.Text("world"),
     ],
-    stop_reason: Some(@anthropic.EndTurn),
-    usage: { input_tokens: 3, output_tokens: 4, },
+    stop_reason: Some(@anthropic.StopReason::EndTurn),
+    usage: message.usage,
+    message,
     raw: null,
   }
   assert_eq(response.text(), "hello world")
+  assert_eq(response.tool_uses(), [("tool_1", "lookup", { "q": "x" })])
 }
 
 ///|
 test "api_error extracts only valid status and rate-limit envelopes" {
-  let body = b"{\"type\":\"error\",\"error\":{\"type\":\"authentication_error\",\"message\":\"bad key\"}}"
+  let body = b"{\"type\":\"error\",\"error\":{\"type\":\"authentication_error\",\"message\":\"bad key\"},\"request_id\":\"req_1\"}"
   let expected : @anthropic.ApiErrorBody = {
     type_: "authentication_error",
     message: "bad key",

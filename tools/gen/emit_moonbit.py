@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import re
+from typing import Any
 
 from .ir import ExternalUnion, Field, IR, MultipartField, Newtype, Operation, Presence, StringEnum, Struct, TaggedUnion, TypeRef, UntaggedUnion
 
@@ -18,6 +19,25 @@ def _doc(text: str, fallback: str) -> list[str]:
 
 def _moon_string(value: str) -> str:
     return json.dumps(value, ensure_ascii=False)
+
+
+def _json_literal(value: Any) -> str:
+    """A MoonBit `Json` literal for a JSON value (spec defaults)."""
+    if value is None:
+        return "Null"
+    if value is True:
+        return "true"
+    if value is False:
+        return "false"
+    if isinstance(value, (int, float)):
+        return json.dumps(value)
+    if isinstance(value, str):
+        return _moon_string(value)
+    if isinstance(value, list):
+        return "[" + ", ".join(_json_literal(item) for item in value) + "]"
+    if isinstance(value, dict):
+        return "{ " + ", ".join(f"{_moon_string(str(key))}: {_json_literal(item)}" for key, item in value.items()) + " }"
+    raise TypeError(f"unsupported JSON default {value!r}")
 
 
 def _field_type(field: Field) -> str:
@@ -151,6 +171,8 @@ def _struct(declaration: Struct) -> str:
                 expression = f"decode_optional_int64(obj, {key}, path)"
             else:
                 expression = f"decode_presence_int64(obj, {key}, path)"
+        elif field.presence == Presence.REQUIRED and field.default is not None:
+            expression = f"decode_defaulted_field(obj, {key}, path, {_json_literal(field.default)})"
         elif field.presence == Presence.REQUIRED:
             expression = f"required_field(obj, {key}, path)"
         elif field.presence == Presence.NULLABLE_REQUIRED:
@@ -279,10 +301,22 @@ def _tagged_union(declaration: TaggedUnion) -> str:
             "///|",
             f"pub impl @json.FromJson for {declaration.name} with fn from_json(value, path) {{",
             "  let obj = @sdkjson.expect_object(value, path)",
-            f"  let tag : String = required_field(obj, {_moon_string(declaration.discriminator)}, path)",
-            "  match tag {",
         ]
     )
+    if declaration.default_variant is None:
+        lines.append(f"  let tag : String = required_field(obj, {_moon_string(declaration.discriminator)}, path)")
+    else:
+        default_tag = next(variant.tag for variant in declaration.variants if variant.name == declaration.default_variant)
+        lines.extend(
+            [
+                f"  // A missing or null {_moon_string(declaration.discriminator)} selects {declaration.default_variant}, the one variant whose payload does not require it.",
+                f"  let tag : String = match obj.get({_moon_string(declaration.discriminator)}) {{",
+                f"    None | Some(Null) => {_moon_string(default_tag)}",
+                f"    Some(raw) => @json.from_json(raw, path=path.add_key({_moon_string(declaration.discriminator)}))",
+                "  }",
+            ]
+        )
+    lines.append("  match tag {")
     groups: dict[str, list] = {}
     for variant in declaration.variants:
         for tag in variant.tags or (variant.tag,):
@@ -504,15 +538,31 @@ fn[T] nullable_presence(value : T?) -> @sdkjson.Presence[T] {
 }
 
 ///|
+/// A required field with a non-null default in the spec: absent decodes as that default.
+fn[T : @json.FromJson] decode_defaulted_field(
+  obj : Map[String, Json],
+  key : String,
+  path : @json.JsonPath,
+  default : Json,
+) -> T raise @json.JsonDecodeError {
+  match obj.get(key) {
+    Some(value) => @json.from_json(value, path=path.add_key(key))
+    None => @json.from_json(default, path=path.add_key(key))
+  }
+}
+
+///|
+/// A required-but-nullable field. Null and absent both decode as None: servers
+/// that implement a spec (and compatible gateways) routinely omit a field whose
+/// only other value would be null, and the two carry the same information.
 fn[T : @json.FromJson] decode_nullable_field(
   obj : Map[String, Json],
   key : String,
   path : @json.JsonPath,
 ) -> T? raise @json.JsonDecodeError {
-  let raw : Json = required_field(obj, key, path)
-  match raw {
-    Null => None
-    value => Some(@json.from_json(value, path=path.add_key(key)))
+  match obj.get(key) {
+    None | Some(Null) => None
+    Some(value) => Some(@json.from_json(value, path=path.add_key(key)))
   }
 }'''
 

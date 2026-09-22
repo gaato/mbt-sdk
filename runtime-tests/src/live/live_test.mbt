@@ -319,7 +319,7 @@ async test "live OpenRouter Anthropic-compatible Messages API" {
       api_key=key,
       @adapter.AsyncTransport::new(timeout_ms=45000),
       @adapter.AsyncClock::new(),
-      base_url="https://openrouter.ai/api/v1",
+      base_url="https://openrouter.ai/api",
       auth_header=@anthropic_sdk.Bearer,
     )
     let (buffered_model, response) = with_model_fallback(
@@ -682,6 +682,64 @@ async test "live OpenAI official minimal operations" {
       validation_failure(
         "OpenAI", preferred, "stream lacked OutputTextDelta or Completed",
       )
+    }
+  })
+}
+
+///|
+async test "live Anthropic official minimal operations" {
+  bounded(() => {
+    guard credential("ANTHROPIC_API_KEY", "Anthropic") is Some(key) else { return }
+    let client = @anthropic_sdk.Anthropic::new(
+      api_key=key,
+      @adapter.AsyncTransport::new(timeout_ms=45000),
+      @adapter.AsyncClock::new(),
+    )
+    let models = one_anthropic_call("Anthropic", "<list>", () => {
+      client.list_models(limit=5)
+    })
+    if models.data.is_empty() {
+      validation_failure("Anthropic", "<list>", "model list was empty")
+    }
+    let model = "claude-haiku-4-5"
+    let retrieved = one_anthropic_call("Anthropic", model, () => {
+      client.retrieve_model(model)
+    })
+    if retrieved.id.is_empty() {
+      validation_failure("Anthropic", model, "retrieve_model returned an empty id")
+    }
+    let request = @anthropic_sdk.MessageRequest::new(
+      model~,
+      max_tokens=16,
+      messages=[@anthropic_sdk.Message::user("Reply with one word.")],
+    )
+    let counted = one_anthropic_call("Anthropic", model, () => {
+      client.count_tokens(request)
+    })
+    if counted <= 0 {
+      validation_failure("Anthropic", model, "count_tokens returned \{counted}")
+    }
+    let response = one_anthropic_call("Anthropic", model, () => {
+      client.create_message(request)
+    })
+    if response.text().is_empty() || response.usage.output_tokens <= 0 {
+      validation_failure(
+        "Anthropic", model, "buffered message had no text or no output tokens",
+      )
+    }
+    let mut delta_count = 0
+    let mut stopped = false
+    one_anthropic_call("Anthropic", model, () => {
+      client.stream_message(request, event => {
+        match event {
+          @anthropic_sdk.TextDelta(..) => delta_count += 1
+          @anthropic_sdk.MessageStop => stopped = true
+          _ => ()
+        }
+      })
+    })
+    if delta_count < 1 || !stopped {
+      validation_failure("Anthropic", model, "stream lacked TextDelta or MessageStop")
     }
   })
 }
