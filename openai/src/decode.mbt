@@ -1,82 +1,83 @@
 ///|
-priv struct UsageJson(Usage)
+priv struct RequiredResponseStatusJson(String)
 
 ///|
-impl @json.FromJson for UsageJson with fn from_json(value, path) {
+impl @json.FromJson for RequiredResponseStatusJson with fn from_json(
+  value,
+  path,
+) {
   let obj = @sdkjson.expect_object(value, path)
-  UsageJson({
-    input_tokens: @sdkjson.field(obj, "input_tokens", path),
-    output_tokens: @sdkjson.field(obj, "output_tokens", path),
-    total_tokens: @sdkjson.field(obj, "total_tokens", path),
-  })
+  RequiredResponseStatusJson(@sdkjson.field(obj, "status", path))
 }
 
 ///|
-fn response_status(
-  value : Json,
-  path : @json.JsonPath,
-) -> ResponseStatus raise @json.JsonDecodeError {
-  @sdkjson.open_string(
-    value,
-    path,
-    raw => {
-      match raw {
-        "completed" => Some(Completed)
-        "failed" => Some(Failed)
-        "in_progress" => Some(InProgress)
-        "incomplete" => Some(Incomplete)
-        "cancelled" => Some(Cancelled)
-        "queued" => Some(Queued)
-        _ => None
-      }
-    },
-    raw => Unknown(raw),
-  )
+fn response_status_from_generated(
+  status : @gen.ResponseStatus?,
+  raw : String,
+) -> ResponseStatus {
+  match status {
+    Some(@gen.Completed) => Completed
+    Some(@gen.Failed) => Failed
+    Some(@gen.InProgress) => InProgress
+    Some(@gen.Incomplete) => Incomplete
+    Some(@gen.Unknown(value)) => Unknown(value)
+    None => Unknown(raw)
+  }
 }
 
 ///|
-fn output_text(
-  output : Array[Json],
-  path : @json.JsonPath,
-) -> String raise @json.JsonDecodeError {
+fn output_text_from_generated(output : Array[@gen.OutputItem]) -> String {
   let result = StringBuilder()
-  for index, item in output {
-    let item_path = path.add_index(index)
-    let obj = @sdkjson.expect_object(item, item_path)
-    let kind : String = @sdkjson.field(obj, "type", item_path)
-    if kind == "message" {
-      let content : Array[Json] = @sdkjson.field(obj, "content", item_path)
-      for content_index, part in content {
-        let part_path = item_path.add_key("content").add_index(content_index)
-        let part_obj = @sdkjson.expect_object(part, part_path)
-        let part_kind : String = @sdkjson.field(part_obj, "type", part_path)
-        if part_kind == "output_text" {
-          let text : String = @sdkjson.field(part_obj, "text", part_path)
-          result.write_string(text)
+  for item in output {
+    match item {
+      @gen.Message(message) =>
+        for content in message.content {
+          if content is @gen.OutputText(part) {
+            result.write_string(part.text)
+          }
         }
-      }
+      _ => ()
     }
   }
   result.to_string()
 }
 
 ///|
-priv struct ResponseJson(Response)
+fn response_from_generated(
+  response : @gen.Response,
+  raw : Json,
+) -> Response raise @json.JsonDecodeError {
+  let status : RequiredResponseStatusJson = @json.from_json(raw)
+  {
+    id: response.id,
+    status: response_status_from_generated(response.status, status.0),
+    model: response.model,
+    output_text: output_text_from_generated(response.output),
+    usage: response.usage.map(usage => {
+      input_tokens: usage.input_tokens,
+      output_tokens: usage.output_tokens,
+      total_tokens: usage.total_tokens,
+    }),
+    raw,
+  }
+}
 
 ///|
-impl @json.FromJson for ResponseJson with fn from_json(value, path) {
+priv struct ResponseEventJson(Json)
+
+///|
+impl @json.FromJson for ResponseEventJson with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
-  let raw_status : Json = @sdkjson.field(obj, "status", path)
-  let output : Array[Json] = @sdkjson.field(obj, "output", path)
-  let usage : UsageJson? = @sdkjson.opt_field(obj, "usage", path)
-  ResponseJson({
-    id: @sdkjson.field(obj, "id", path),
-    status: response_status(raw_status, path.add_key("status")),
-    model: @sdkjson.field(obj, "model", path),
-    output_text: output_text(output, path.add_key("output")),
-    usage: usage.map(value => value.0),
-    raw: value,
-  })
+  ResponseEventJson(@sdkjson.field(obj, "response", path))
+}
+
+///|
+priv struct ResponseEventTypeJson(String)
+
+///|
+impl @json.FromJson for ResponseEventTypeJson with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  ResponseEventTypeJson(@sdkjson.field(obj, "type", path))
 }
 
 ///|
@@ -104,68 +105,69 @@ impl @json.FromJson for ApiErrorEnvelopeJson with fn from_json(value, path) {
 }
 
 ///|
-fn decode_response(value : Json) -> Response raise @json.JsonDecodeError {
-  let decoded : ResponseJson = @json.from_json(value)
-  decoded.0
-}
-
-///|
-fn stream_error(
-  obj : Map[String, Json],
-  path : @json.JsonPath,
-) -> ApiErrorBody raise @json.JsonDecodeError {
-  {
-    message: @sdkjson.field(obj, "message", path),
-    type_: None,
-    param: @sdkjson.opt_field(obj, "param", path),
-    code: @sdkjson.opt_field(obj, "code", path),
+fn decode_response(
+  response : @http.Response,
+) -> Response raise @runtime.SdkError {
+  let generated = @gen.create_response_decode(response)
+  let raw = parse_json_body(response.body) catch {
+    error =>
+      raise @runtime.Decode(message=error.to_string(), body=response.body)
+  }
+  response_from_generated(generated, raw) catch {
+    error =>
+      raise @runtime.Decode(message=error.to_string(), body=response.body)
   }
 }
 
 ///|
-priv struct ResponseEventJson(ResponseEvent)
-
-///|
-impl @json.FromJson for ResponseEventJson with fn from_json(value, path) {
-  let obj = @sdkjson.expect_object(value, path)
-  let kind : String = @sdkjson.field(obj, "type", path)
-  let event = match kind {
-    "response.created" => {
-      let response : ResponseJson = @sdkjson.field(obj, "response", path)
-      Created(response.0)
+fn response_event_from_generated(
+  event : @gen.ResponseStreamEvent,
+  raw : Json,
+) -> ResponseEvent raise @json.JsonDecodeError {
+  match event {
+    @gen.ResponseCreated(event) => {
+      let response : ResponseEventJson = @json.from_json(raw)
+      Created(response_from_generated(event.response, response.0))
     }
-    "response.in_progress" => {
-      let response : ResponseJson = @sdkjson.field(obj, "response", path)
-      InProgress(response.0)
+    @gen.ResponseInProgress(event) => {
+      let response : ResponseEventJson = @json.from_json(raw)
+      InProgress(response_from_generated(event.response, response.0))
     }
-    "response.output_text.delta" =>
-      OutputTextDelta(@sdkjson.field(obj, "delta", path))
-    "response.output_text.done" =>
-      OutputTextDone(@sdkjson.field(obj, "text", path))
-    "response.completed" => {
-      let response : ResponseJson = @sdkjson.field(obj, "response", path)
-      Completed(response.0)
+    @gen.ResponseCompleted(event) => {
+      let response : ResponseEventJson = @json.from_json(raw)
+      Completed(response_from_generated(event.response, response.0))
     }
-    "response.failed" => {
-      let response : ResponseJson = @sdkjson.field(obj, "response", path)
-      Failed(response.0)
+    @gen.ResponseFailed(event) => {
+      let response : ResponseEventJson = @json.from_json(raw)
+      Failed(response_from_generated(event.response, response.0))
     }
-    "response.incomplete" => {
-      let response : ResponseJson = @sdkjson.field(obj, "response", path)
-      Incomplete(response.0)
+    @gen.ResponseIncomplete(event) => {
+      let response : ResponseEventJson = @json.from_json(raw)
+      Incomplete(response_from_generated(event.response, response.0))
     }
-    "error" => Error(stream_error(obj, path))
-    _ => Other(kind, value)
+    @gen.ResponseOutputTextDelta(event) => OutputTextDelta(event.delta)
+    @gen.ResponseOutputTextDone(event) => OutputTextDone(event.text)
+    @gen.Error(event) =>
+      Error({
+        message: event.message,
+        type_: None,
+        param: event.param,
+        code: event.code,
+      })
+    @gen.Unknown(kind, unknown_raw) => Other(kind, unknown_raw)
+    _ => {
+      let kind : ResponseEventTypeJson = @json.from_json(raw)
+      Other(kind.0, raw)
+    }
   }
-  ResponseEventJson(event)
 }
 
 ///|
 fn decode_response_event(
   value : Json,
 ) -> ResponseEvent raise @json.JsonDecodeError {
-  let decoded : ResponseEventJson = @json.from_json(value)
-  decoded.0
+  let generated : @gen.ResponseStreamEvent = @json.from_json(value)
+  response_event_from_generated(generated, value)
 }
 
 ///|

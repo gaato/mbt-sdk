@@ -11,7 +11,7 @@ Status: experimental, unpublished. Module names are provisional.
 | `gaato/http` | Sans-IO HTTP vocabulary: `Request`, `Response`, `Headers`, the `Transport` and `BodyStream` traits, middleware, a `Clock` trait, an incremental WHATWG-conformant SSE parser, and a scripted `FakeTransport` / `FakeClock` for tests | nothing (runs on wasm-gc, wasm, js, native) |
 | `gaato/http-async` | `AsyncTransport` and `AsyncClock` over `moonbitlang/async` (native and js) | `gaato/http`, `moonbitlang/async` |
 | `gaato/sdk-runtime` | API-agnostic client runtime: error taxonomy, `Retry-After` / `retry-after-ms`, backoff, retry policy, rate limiting, pagination, auth, tri-state JSON fields, open enums, multipart writer | `gaato/http` |
-| `gaato/openai` | First consumer: models, embeddings, responses (buffered and streaming). Partly generated from the vendored OpenAPI spec | `gaato/http`, `gaato/sdk-runtime` |
+| `gaato/openai` | First consumer: a stable hand-written facade for models, embeddings, and responses (buffered and streaming), backed by types and operations generated from the vendored OpenAPI spec | `gaato/http`, `gaato/sdk-runtime` |
 | `gaato/anthropic` | Second consumer: Anthropic-compatible messages (buffered and streaming), including open content blocks and stream events | `gaato/http`, `gaato/sdk-runtime` |
 | `runtime-tests/` | Unpublished. Executes the async behaviour of the modules above (a module without an async runtime cannot run `async test`) | everything |
 

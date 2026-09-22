@@ -1,15 +1,4 @@
 ///|
-fn[T] decode_http_response(
-  response : @http.Response,
-  decode : (Json) -> T raise @json.JsonDecodeError,
-) -> T raise @runtime.SdkError {
-  decode(parse_json_body(response.body)) catch {
-    error =>
-      raise @runtime.Decode(message=error.to_string(), body=response.body)
-  }
-}
-
-///|
 fn model_from_generated(model : @gen.Model) -> Model {
   { id: model.id, created: Some(model.created), owned_by: model.owned_by, }
 }
@@ -64,9 +53,8 @@ pub async fn OpenAI::create_embeddings(
     dimensions: request.dimensions,
     user: request.user,
   }
-  let generated_request = @gen.create_embedding_request(body)
   let response = self.client.send(
-    generated_request.json_body(embedding_body(request)),
+    @gen.create_embedding_request(body),
     bucket="embeddings",
   )
   embedding_response_from_generated(@gen.create_embedding_decode(response))
@@ -78,12 +66,12 @@ pub async fn OpenAI::create_response(
   self : OpenAI,
   request : ResponseRequest,
 ) -> Response raise @runtime.SdkError {
-  let body = response_body(request, false)
+  let (generated, body) = response_parts(request, false)
   let response = self.client.send(
-    @http.Request::post("/responses").json_body(body),
+    @gen.create_response_request(generated).json_body(body),
     bucket="responses",
   )
-  decode_http_response(response, decode_response)
+  decode_response(response)
 }
 
 ///|
@@ -107,9 +95,9 @@ pub async fn[E : Error] OpenAI::stream_response(
   request : ResponseRequest,
   f : async (ResponseEvent) -> Unit raise E,
 ) -> Unit {
-  let body = response_body(request, true)
+  let (generated, body) = response_parts(request, true)
   let (_, stream) = self.client.send_stream(
-    @http.Request::post("/responses")
+    @gen.create_response_request(generated)
     .header("accept", "text/event-stream")
     .json_body(body),
     bucket="responses",

@@ -8,6 +8,27 @@ fn json_response(
 }
 
 ///|
+fn response_fixture(
+  id : String,
+  status : String,
+  model : String,
+  output : String,
+  usage? : String = "null",
+) -> String {
+  "{\"metadata\":{},\"temperature\":1.0,\"top_p\":1.0,\"previous_response_id\":null,\"model\":\"" +
+  model +
+  "\",\"reasoning\":null,\"max_output_tokens\":null,\"instructions\":null,\"tools\":[],\"tool_choice\":\"auto\",\"id\":\"" +
+  id +
+  "\",\"object\":\"response\",\"status\":\"" +
+  status +
+  "\",\"created_at\":1750000000,\"error\":null,\"incomplete_details\":null,\"output\":" +
+  output +
+  ",\"usage\":" +
+  usage +
+  ",\"parallel_tool_calls\":true}"
+}
+
+///|
 async fn bounded(f : async () -> Unit) -> Unit {
   @async.with_timeout(5000, f)
 }
@@ -46,7 +67,13 @@ async test "OpenAI operations send exact requests and decode spec examples" {
       "POST",
       "/v1/responses",
       json_response(
-        "{\"id\":\"resp_67ccd2\",\"object\":\"response\",\"status\":\"completed\",\"model\":\"gpt-4.1-2025-04-14\",\"output\":[{\"type\":\"message\",\"content\":[{\"type\":\"output_text\",\"text\":\"A short story.\"}]}],\"usage\":{\"input_tokens\":36,\"output_tokens\":87,\"total_tokens\":123},\"future\":true}",
+        response_fixture(
+          "resp_67ccd2",
+          "completed",
+          "gpt-4.1-2025-04-14",
+          "[{\"type\":\"reasoning\",\"id\":\"reasoning-1\",\"summary\":[],\"content\":[{\"type\":\"reasoning_text\",\"text\":\"Think.\"}]},{\"type\":\"message\",\"id\":\"message-1\",\"status\":\"completed\",\"content\":[{\"type\":\"output_text\",\"text\":\"A short story.\"}]}]",
+          usage="{\"input_tokens\":36,\"input_tokens_details\":{\"cached_tokens\":0},\"output_tokens\":87,\"output_tokens_details\":{\"reasoning_tokens\":1},\"total_tokens\":123}",
+        ),
       ),
     )
     let clock = @mock.FakeClock::new()
@@ -119,19 +146,22 @@ async test "OpenAI operations send exact requests and decode spec examples" {
     assert_eq(sent[0].headers.get("content-type"), None)
     assert_eq(sent[1].http_method, "GET")
     assert_eq(sent[1].url, "https://api.openai.com/v1/models/gpt-4o-mini")
-    assert_eq(
-      sent[2].body,
-      @utf8.encode(
-        "{\"model\":\"text-embedding-ada-002\",\"input\":[\"The food was delicious\"],\"dimensions\":2,\"user\":\"user-1234\"}",
-      ),
-    )
+    assert_eq(@json.parse(@utf8.decode(sent[2].body)), {
+      "input": ["The food was delicious"],
+      "model": "text-embedding-ada-002",
+      "dimensions": 2,
+      "user": "user-1234",
+    })
     assert_eq(sent[2].headers.get("content-type"), Some("application/json"))
-    assert_eq(
-      sent[3].body,
-      @utf8.encode(
-        "{\"model\":\"gpt-4.1\",\"input\":\"Tell me a short story.\",\"instructions\":\"Three sentences.\",\"max_output_tokens\":100,\"temperature\":0.5,\"previous_response_id\":\"resp_previous\",\"metadata\":{\"source\":\"test\"}}",
-      ),
-    )
+    assert_eq(@json.parse(@utf8.decode(sent[3].body)), {
+      "temperature": 0.5,
+      "previous_response_id": "resp_previous",
+      "model": "gpt-4.1",
+      "max_output_tokens": 100,
+      "instructions": "Three sentences.",
+      "input": "Tell me a short story.",
+      "metadata": { "source": "test" },
+    })
     assert_eq(sent[3].headers.get("content-type"), Some("application/json"))
     assert_eq(clock.slept(), [])
     transport.assert_complete()
@@ -183,9 +213,7 @@ async test "OpenAI assigns the contract bucket to every operation" {
     transport.expect(
       "POST",
       "/responses",
-      json_response(
-        "{\"id\":\"r\",\"status\":\"completed\",\"model\":\"g\",\"output\":[]}",
-      ),
+      json_response(response_fixture("r", "completed", "g", "[]")),
     )
     transport.expect_stream(
       "POST",
@@ -344,12 +372,18 @@ fn split_chunks(text : String, ends : Array[Int]) -> Array[Bytes] {
 ///|
 async test "streaming decodes spec events across chunks and stops at DONE" {
   bounded(() => {
-    let created = "{\"type\":\"response.created\",\"response\":{\"id\":\"resp_123\",\"status\":\"in_progress\",\"model\":\"gpt-4o\",\"output\":[]}}"
+    let created = "{\"type\":\"response.created\",\"response\":" +
+      response_fixture("resp_123", "in_progress", "gpt-4o", "[]") +
+      "}"
     let delta = "{\"type\":\"response.output_text.delta\",\"item_id\":\"msg_123\",\"output_index\":0,\"content_index\":0,\"delta\":\"In\"}"
     let done = "{\"type\":\"response.output_text.done\",\"item_id\":\"msg_123\",\"output_index\":0,\"content_index\":0,\"text\":\"In a grove.\"}"
     let unknown = "{\"type\":\"response.future\",\"value\":7}"
     let event_error = "{\"type\":\"error\",\"code\":\"ERR_SOMETHING\",\"message\":\"Something went wrong\",\"param\":null}"
-    let completed = "{\"type\":\"response.completed\",\"response\":{\"id\":\"resp_123\",\"status\":\"completed\",\"model\":\"gpt-4o\",\"output\":[{\"type\":\"message\",\"content\":[{\"type\":\"output_text\",\"text\":\"In a grove.\"}]}]}}"
+    let completed = "{\"type\":\"response.completed\",\"response\":" +
+      response_fixture(
+        "resp_123", "completed", "gpt-4o", "[{\"type\":\"message\",\"id\":\"message-1\",\"status\":\"completed\",\"content\":[{\"type\":\"output_text\",\"text\":\"In a grove.\"}]}]",
+      ) +
+      "}"
     let sse = "event: misleading\ndata: " +
       created +
       "\n\ndata: " +
@@ -412,10 +446,11 @@ async test "streaming decodes spec events across chunks and stops at DONE" {
     assert_auth_header(sent[0])
     assert_eq(sent[0].headers.get("accept"), Some("text/event-stream"))
     assert_eq(sent[0].headers.get("content-type"), Some("application/json"))
-    assert_eq(
-      sent[0].body,
-      @utf8.encode("{\"model\":\"gpt-4o\",\"input\":\"story\",\"stream\":true}"),
-    )
+    assert_eq(@json.parse(@utf8.decode(sent[0].body)), {
+      "model": "gpt-4o",
+      "input": "story",
+      "stream": true,
+    })
     transport.assert_complete()
   })
 }
@@ -428,7 +463,9 @@ priv suberror CallbackFailure {
 ///|
 async test "streaming closes on callback and decode errors" {
   bounded(() => {
-    let created = "{\"type\":\"response.created\",\"response\":{\"id\":\"r\",\"status\":\"in_progress\",\"model\":\"g\",\"output\":[]}}"
+    let created = "{\"type\":\"response.created\",\"response\":" +
+      response_fixture("r", "in_progress", "g", "[]") +
+      "}"
     let callback_transport = @mock.FakeTransport::new()
     callback_transport.expect_stream(
       "POST",
@@ -460,7 +497,9 @@ async test "streaming closes on callback and decode errors" {
       "POST",
       "/responses",
       { status: 200, headers: @http.Headers::new(), },
-      [b"data: {\n\n"],
+      [
+        b"data: {\"type\":\"response.output_text.delta\",\"delta\":\"missing generated fields\"}\n\n",
+      ],
     )
     let decode_client = @openai_sdk.OpenAI::new(
       api_key="key",
@@ -473,8 +512,11 @@ async test "streaming closes on callback and decode errors" {
         _ => (),
       )
     catch {
-      @runtime.Decode(body=b"{", ..) => ()
-      _ => fail("invalid event data must become Decode")
+      @runtime.Decode(
+        body=b"{\"type\":\"response.output_text.delta\",\"delta\":\"missing generated fields\"}",
+        ..
+      ) => ()
+      _ => fail("invalid generated event payload must become Decode")
     } noraise {
       _ => fail("invalid event data must fail")
     }

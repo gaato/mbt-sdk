@@ -1,14 +1,4 @@
 ///|
-fn embedding_body(request : EmbeddingRequest) -> Json {
-  @sdkjson.ObjBuilder::new()
-  .field("model", request.model)
-  .field("input", request.input)
-  .opt("dimensions", request.dimensions)
-  .opt("user", request.user)
-  .build()
-}
-
-///|
 fn is_response_key(key : String) -> Bool {
   match key {
     "model"
@@ -23,27 +13,48 @@ fn is_response_key(key : String) -> Bool {
 }
 
 ///|
-fn response_body(
+fn response_parts(
   request : ResponseRequest,
   stream : Bool,
-) -> Json raise @runtime.SdkError {
+) -> (@gen.CreateResponse, Json) raise @runtime.SdkError {
   for key, _ in request.extra {
     if is_response_key(key) {
       raise @runtime.Config("extra parameter collides with known key: " + key)
     }
   }
-  let builder = @sdkjson.ObjBuilder::new()
-    .field("model", request.model)
-    .field("input", request.input)
-    .opt("instructions", request.instructions)
-    .opt("max_output_tokens", request.max_output_tokens)
-    .opt("temperature", request.temperature)
-    .opt("previous_response_id", request.previous_response_id)
-  if stream {
-    ignore(builder.field("stream", true))
+  let generated : @gen.CreateResponse = {
+    metadata: @sdkjson.Absent,
+    temperature: @sdkjson.Presence::from_option(request.temperature),
+    top_p: @sdkjson.Absent,
+    user: None,
+    service_tier: @sdkjson.Absent,
+    previous_response_id: @sdkjson.Presence::from_option(
+      request.previous_response_id,
+    ),
+    model: request.model,
+    reasoning: @sdkjson.Absent,
+    max_output_tokens: @sdkjson.Presence::from_option(request.max_output_tokens),
+    instructions: @sdkjson.Presence::from_option(request.instructions),
+    text: None,
+    tools: None,
+    tool_choice: None,
+    truncation: @sdkjson.Absent,
+    input: @gen.Text(request.input),
+    include_: @sdkjson.Absent,
+    parallel_tool_calls: @sdkjson.Absent,
+    store: @sdkjson.Absent,
+    stream: if stream {
+      @sdkjson.Value(true)
+    } else {
+      @sdkjson.Absent
+    },
+  }
+  let body = generated.to_json()
+  guard body is Object(fields) else {
+    raise @runtime.Config("generated response request must be an object")
   }
   for key, value in request.extra {
-    ignore(builder.field(key, value))
+    fields[key] = value
   }
-  builder.build()
+  (generated, body)
 }

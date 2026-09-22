@@ -186,3 +186,13 @@ M3 の手書きの `list_models` / `retrieve_model` / `create_embeddings` は、
 
 ### タグ衝突(次段 M4e の設計。ここでは実装しない)
 census で (c) に分類した「同じ判別値を複数候補が宣言する」ケース(OpenAI `InputItem` / `Item` / `ItemResource` の `message`、OpenRouter `Inputs` の `message` / `reasoning` / `function_call`)は、上流の誤りではなく「同じ `type` で形が違う」という設計で、他の SDK は候補を順に試している。対応案: (1) 第 2 の判別子(候補間で値が異なる単一値プロパティ、例 `role`)を自動検出して 2 段の tagged enum にする、(2) 無ければ `x-moonbit-order: [...]` で試行順を overlay に書かせ、required プロパティの有無で最初に合う候補を選ぶ。どちらも `Unknown` を残す。
+
+## M4d の判断
+
+- `ResponseRequest` は最初に全 `extra` key の衝突を検査し、その後で `@gen.CreateResponse` を構築する。公開 API の optional field は `Presence::from_option` で omission にし、streaming のときだけ `stream = Value(true)` にする。生成型の `to_json()` が返した object に衝突のない `extra` を追加し、method / path / content-type は `create_response_request` から受け取る。
+- buffered response は `create_response_decode` で型付き decode した後、元の body も JSON として読む。生成 `Response` は未知 field を保持しないため、公開 `Response.raw` を wire JSON のまま保つにはこの 2 回目の parse が必要である。`output_text` は生成 `OutputItem::Message` の `OutputContent::OutputText` だけを順に連結し、`Reasoning` と `Unknown` を含む他 item は飛ばす。
+- 生成 `Response.status` は optional だが、M3 の公開契約では必須なので、元 JSON に string の `status` が無い場合は `SdkError::Decode` を維持する。生成側の `ResponseStatus::Unknown(raw)` は M4d 契約どおり公開側の `ResponseStatus::Unknown(raw)` にそのまま写す。
+- stream event は raw JSON を `@gen.ResponseStreamEvent` で decode してから公開 event に写す。response を持つ event の `Response.raw` には event 全体ではなく元の `response` field を渡す。公開 API が表現する 8 種以外は、生成側で既知の event も `Other(type, raw)` にする。生成側の `Unknown(type, raw)` も同じく `Other` にする。
+- 生成 event が要求する field が欠けた、または型が違う payload は `SdkError::Decode` とし、元の SSE `data` bytes を error body に残す。`@sse.each_event` に close の所有権を残したため、EOF / `[DONE]` / generated decode failure / callback failure の全経路で close される。
+- M4a の byte-order 互換用 embedding body 再構築と `m3_compat_wbtest.mbt` は削除した。request body のテストは parse 後の JSON 等価を契約にし、generator の決定的な field 順を公開 facade の契約にはしない。
+- M4e 向けに記したタグ衝突処理は実装していない。
