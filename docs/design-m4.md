@@ -236,3 +236,27 @@ M4d の差し替えで見えた生成型の使いにくさと、census の (c) �
 - 生成 struct の `new` は required non-null field だけを必須 label にし、`T?` は `None`、`Presence[T]` は `Absent` を既定にする。JSON field `new` は constructor と衝突するため診断する。手書き OpenAI request 層はこの constructor を使い、未使用 optional field の列挙をやめた。
 - `<op>_decode_json` は parse 済み `Json` から `JsonDecodeError` を返す。手書き `create_response` は `Response::json()` を一度だけ呼び、元 body を保持したまま decode error を `SdkError::Decode` へ写す。
 - OpenRouter `createMessages` は (a) の Fusion plugin parameter value だけ `x-moonbit-json` で明示したが、(b) 3 件と (c) 2 件が残ったため再び exclude した。未生成の fixture を `moon.work` や gate に加えて成功扱いにはしない。
+
+## M4f: chat/completions・multipart・deepObject・raw JSON 境界(契約)
+
+背景: 「OpenAI 互換」を名乗るサーバ(Ollama / llama.cpp / vLLM / LM Studio / Groq など)が確実に実装しているのは `chat/completions` `models` `embeddings` + SSE で、`responses` は vLLM と OpenRouter など一部。`gaato/openai` は互換サーバ向けに `chat/completions` を持つべき。
+
+1. `openai/overlays/moonbit.yaml` に `createChatCompletion` の include を足し、閉包を診断ゼロにする。残る診断は census.md の (a) 分類に従って `x-moonbit-json` / `x-moonbit-order` / `x-moonbit-variants` を根拠付きで注釈する(`ChatCompletionRequestMessage` は暗黙 tagged union で `role` が判別子のはず。`content` の string | array は既存の untagged 規則)。
+2. 手書き層に `chat_completion` と `stream_chat_completion` を足す。公開 API(契約、M3 と同じ流儀):
+```moonbit
+pub(all) struct ChatMessage { role : String; content : String; name : String? }   // role は "system" | "user" | "assistant" | "tool"。生成型への変換で検証
+pub fn ChatMessage::system(String) -> ChatMessage;  ::user;  ::assistant
+pub(all) struct ChatRequest { model : String; messages : Array[ChatMessage]; max_tokens : Int?; temperature : Double?; extra : Map[String, Json] }
+pub fn ChatRequest::new(model~, messages~, max_tokens?, temperature?, extra?) -> ChatRequest
+pub(all) enum FinishReason { Stop; Length; ToolCalls; ContentFilter; Unknown(String) }
+pub(all) struct ChatCompletion { id : String; model : String; text : String; finish_reason : FinishReason?; usage : Usage?; raw : Json }   // text は choices[0].message.content(null なら "")
+pub async fn OpenAI::chat_completion(Self, ChatRequest) -> ChatCompletion raise @runtime.SdkError
+pub(all) enum ChatEvent { Delta(String); ReasoningDelta(String); Finished(FinishReason); Usage(Usage); Other(String, Json) }   // reasoning_content / reasoning は互換サーバの拡張。chunk に無ければ出さない
+pub async fn[E : Error] OpenAI::stream_chat_completion(Self, ChatRequest, async (ChatEvent) -> Unit raise E) -> Unit   // stream_options.include_usage=true を送る。[DONE] で終了
+```
+   `Usage` は既存の公開型(`input_tokens` / `output_tokens` / `total_tokens` に `prompt_tokens` / `completion_tokens` を写す)。バケットは `"chat"`。
+3. ジェネレータ: `multipart/form-data` の要求本文。`<op>_request` は `Array[@multipart.Part]` を組み立てて `@multipart.apply` する(境界は引数 `boundary : String` で受け取る。乱数は呼び出し側)。`type: string, format: binary` は `Part::file`(ファイル名と content type は引数)、それ以外は `Part::text`(JSON 値は `Part::json`)。目標: OpenAI の `createTranscription` `createTranslation` `createFile` `createImageEdit` `createImageVariation` `uploadFile`(6 件の (b))が診断ゼロ。
+4. ジェネレータ: query の `style: deepObject`(`filter[key]=value`)。
+5. ジェネレータ: set-valued discriminator(候補の `type` が複数値 enum で、候補間で値集合が交わらない)を tagged union として扱う(OpenAI `CompoundFilter` / OpenRouter `FileSearchServerTool.filters`)。
+6. census: OpenAI 全操作の残りを (a) は注釈、(b) は上の実装で消し、**OpenAI 全操作(fix.yaml 適用後)を診断ゼロにして CI ゲートに加える**。無理なものは理由を census.md に残す。
+7. 実 API テスト: `runtime-tests/src/live/` に「OpenAI 互換のローカルサーバ」用のテストを足す。`OPENAI_COMPAT_BASE_URL`(例 `http://127.0.0.1:11434/v1`)と `OPENAI_COMPAT_MODEL`(例 `qwen3:0.6b`)が両方あるときだけ実行、無ければ skip。内容: `list_models`、`chat_completion`、`stream_chat_completion`(Delta が 1 回以上、Finished で終わる)。認証は `Auth::NoAuth`(`OPENAI_COMPAT_API_KEY` があれば Bearer)。`scripts/live.sh` は env ファイルの変数をそのまま渡す(変更不要)。
