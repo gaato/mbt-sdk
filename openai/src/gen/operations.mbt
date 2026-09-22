@@ -100,3 +100,19 @@ pub fn retrieve_model_decode(
 ) -> Model raise @runtime.SdkError {
   decode_response(response)
 }
+
+///|
+///
+/// Creates a model response. Provide [text](/docs/guides/text) or [image](/docs/guides/images) inputs to generate [text](/docs/guides/text) or [JSON](/docs/guides/structured-outputs) outputs. Have the model call your own [custom code](/docs/guides/function-calling) or use built-in [tools](/docs/guides/tools) like [web search](/docs/guides/tools-web-search) or [file search](/docs/guides/tools-file-search) to use your own data as input for the model's response.
+pub fn create_response_request(body : CreateResponse) -> @http.Request {
+  @http.Request::post("/responses").json_body(body.to_json())
+}
+
+///|
+///
+/// Decodes a successful createResponse response.
+pub fn create_response_decode(
+  response : @http.Response,
+) -> Response raise @runtime.SdkError {
+  decode_response(response)
+}

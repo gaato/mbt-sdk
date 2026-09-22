@@ -31,7 +31,14 @@ def resolve_local(doc: dict[str, Any], ref: str) -> Any:
     return node
 
 
-def _merge_objects(parts: list[dict[str, Any]], base: dict[str, Any], pointer: str, doc: dict[str, Any], diagnostics: list[Diagnostic]) -> dict[str, Any]:
+def _merge_objects(
+    parts: list[dict[str, Any]],
+    base: dict[str, Any],
+    pointer: str,
+    doc: dict[str, Any],
+    diagnostics: list[Diagnostic],
+    notes: list[tuple[str, str]] | None = None,
+) -> dict[str, Any]:
     result = {key: copy.deepcopy(value) for key, value in base.items() if key != "allOf"}
     properties = copy.deepcopy(result.get("properties", {}))
     required = list(result.get("required", []))
@@ -42,15 +49,20 @@ def _merge_objects(parts: list[dict[str, Any]], base: dict[str, Any], pointer: s
         except (KeyError, TypeError):
             diagnostics.append(Diagnostic(part_pointer, f"unresolved local $ref {raw.get('$ref')}", "fix the reference in overlays/fix.yaml"))
             continue
-        part = merge_all_of(part, part_pointer, doc, diagnostics)
+        part = merge_all_of(part, part_pointer, doc, diagnostics, notes)
         if not isinstance(part, dict) or not (part.get("type") == "object" or "properties" in part):
             diagnostics.append(Diagnostic(part_pointer, "allOf member is not an object schema", "replace or remove the allOf member in overlays/fix.yaml"))
             continue
         for name, value in part.get("properties", {}).items():
             if name in properties and properties[name] != value:
-                diagnostics.append(Diagnostic(_pointer_join(_pointer_join(part_pointer, "properties"), name), "allOf defines the same property differently", "resolve the property conflict in overlays/fix.yaml"))
-            else:
-                properties[name] = copy.deepcopy(value)
+                if notes is not None:
+                    notes.append(
+                        (
+                            _pointer_join(_pointer_join(part_pointer, "properties"), name),
+                            "allOf property conflict resolved with the later definition",
+                        )
+                    )
+            properties[name] = copy.deepcopy(value)
         for name in part.get("required", []):
             if name not in required:
                 required.append(name)
@@ -67,19 +79,34 @@ def _merge_objects(parts: list[dict[str, Any]], base: dict[str, Any], pointer: s
     return result
 
 
-def merge_all_of(schema: Any, pointer: str, doc: dict[str, Any], diagnostics: list[Diagnostic]) -> Any:
+def merge_all_of(
+    schema: Any,
+    pointer: str,
+    doc: dict[str, Any],
+    diagnostics: list[Diagnostic],
+    notes: list[tuple[str, str]] | None = None,
+) -> Any:
     if isinstance(schema, list):
-        return [merge_all_of(value, _pointer_join(pointer, index), doc, diagnostics) for index, value in enumerate(schema)]
+        return [
+            merge_all_of(value, _pointer_join(pointer, index), doc, diagnostics, notes)
+            for index, value in enumerate(schema)
+        ]
     if not isinstance(schema, dict):
         return schema
     if "allOf" in schema:
-        schema = _merge_objects(schema["allOf"], schema, pointer, doc, diagnostics)
+        schema = _merge_objects(schema["allOf"], schema, pointer, doc, diagnostics, notes)
     result: dict[str, Any] = {}
     for key, value in schema.items():
         if key == "$ref":
             result[key] = value
         else:
-            result[key] = merge_all_of(value, _pointer_join(pointer, key), doc, diagnostics)
+            result[key] = merge_all_of(
+                value,
+                _pointer_join(pointer, key),
+                doc,
+                diagnostics,
+                notes,
+            )
     return result
 
 

@@ -5,13 +5,14 @@ import io
 from pathlib import Path
 import tempfile
 import unittest
-from contextlib import redirect_stderr
+from contextlib import redirect_stderr, redirect_stdout
 
 import yaml
 
 from tools.gen.diagnostics import GenerationError
+from tools.gen.census import run as census_run
 from tools.gen.emit_moonbit import emit
-from tools.gen.ir import IRBuilder, Newtype, Presence, StringEnum, Struct, UntaggedUnion
+from tools.gen.ir import IRBuilder, Newtype, Presence, StringEnum, Struct, TaggedUnion, UntaggedUnion
 from tools.gen.main import run
 from tools.gen.normalize import merge_all_of, normalize_spec
 
@@ -154,6 +155,16 @@ class IRTests(unittest.TestCase):
         self.assertEqual([field.type.moon_type() for field in response.fields], ["Int64", "Int64"])
         self.assertIn("fn json_int64(", emit(ir)["types.mbt"])
 
+    def test_optional_int64_emits_encoder_and_decoder_helpers(self):
+        schema = {
+            "type": "object",
+            "properties": {"id": {"type": "integer", "format": "int64"}},
+        }
+        ir = IRBuilder(document(operation(response=schema)), "example/gen").build()
+        source = emit(ir)["types.mbt"]
+        self.assertIn("fn json_int64_to_json(", source)
+        self.assertIn("fn decode_optional_int64(", source)
+
     def test_explicit_json_escape_hatch(self):
         schema = {"type": "object", "additionalProperties": True, "x-moonbit-json": True}
         ir = IRBuilder(document(operation(request=schema)), "example/gen").build()
@@ -166,11 +177,238 @@ class IRTests(unittest.TestCase):
         self.assertEqual(first, second)
         self.assertLess(first["types.mbt"].index("z : Int"), first["types.mbt"].index("a : String"))
 
-    def test_discriminator_is_still_a_diagnostic(self):
-        schema = {"oneOf": [{"type": "string"}], "discriminator": {"propertyName": "type"}}
+    def test_explicit_discriminator_emits_tagged_enum_and_keeps_tag_fields(self):
+        schemas = {
+            "Cat": {
+                "type": "object",
+                "properties": {"kind": {"type": "string", "const": "cat"}, "name": {"type": "string"}},
+                "required": ["kind", "name"],
+            },
+            "Dog": {
+                "type": "object",
+                "properties": {"kind": {"type": "string", "enum": ["dog"]}, "name": {"type": "string"}},
+                "required": ["kind", "name"],
+            },
+            "Pet": {
+                "oneOf": [{"$ref": "#/components/schemas/Cat"}, {"$ref": "#/components/schemas/Dog"}],
+                "discriminator": {
+                    "propertyName": "kind",
+                    "mapping": {"cat": "#/components/schemas/Cat", "dog": "#/components/schemas/Dog"},
+                },
+            },
+        }
+        ir = IRBuilder(document(operation(response={"$ref": "#/components/schemas/Pet"}), schemas), "example/gen").build()
+        pet = declaration(ir, "Pet")
+        self.assertIsInstance(pet, TaggedUnion)
+        self.assertEqual([(item.name, item.tag) for item in pet.variants], [("Cat", "cat"), ("Dog", "dog")])
+        self.assertIn("kind", [field.json_name for field in declaration(ir, "Cat").fields if field.constant is None])
+        source = emit(ir)["types.mbt"]
+        self.assertIn("Unknown(String, Json)", source)
+        self.assertIn('other => Unknown(other, value)', source)
+
+    def test_discriminator_without_mapping_uses_payload_constant_and_notes_inference(self):
+        schemas = {
+            "OddName": {
+                "type": "object",
+                "properties": {"type": {"type": "string", "enum": ["wire_tag"]}},
+                "required": ["type"],
+            },
+            "Event": {
+                "oneOf": [{"$ref": "#/components/schemas/OddName"}],
+                "discriminator": {"propertyName": "type"},
+            },
+        }
+        builder = IRBuilder(document(operation(response={"$ref": "#/components/schemas/Event"}), schemas), "example/gen")
+        event = declaration(builder.build(), "Event")
+        self.assertEqual(event.variants[0].tag, "wire_tag")
+        self.assertTrue(any("mapping inferred" in note.message for note in builder.notes))
+
+    def test_implicit_discriminator_requires_unique_single_values(self):
+        def object_schema(value):
+            tag = {"type": "string", "enum": value if isinstance(value, list) else [value]}
+            return {"type": "object", "properties": {"type": tag}, "required": ["type"]}
+
+        good = {"oneOf": [object_schema("left"), object_schema("right")]}
+        ir = IRBuilder(document(operation(response=good)), "example/gen").build()
+        self.assertIsInstance(declaration(ir, "TestOperationResponse"), TaggedUnion)
+        for choices in [
+            [object_schema("same"), object_schema("same")],
+            [object_schema(["one", "two"]), object_schema("right")],
+        ]:
+            with self.subTest(choices=choices), self.assertRaises(GenerationError) as caught:
+                IRBuilder(document(operation(response={"oneOf": choices})), "example/gen").build()
+            self.assertIn("no common single-value property", str(caught.exception))
+
+    def test_implicit_discriminator_flattens_refs_all_of_and_nested_unions(self):
+        tagged = lambda value: {
+            "type": "object",
+            "properties": {"type": {"type": "string", "enum": [value]}},
+            "required": ["type"],
+        }
+        schemas = {
+            "Left": tagged("left"),
+            "RightBase": tagged("right"),
+            "Right": {
+                "allOf": [
+                    {"$ref": "#/components/schemas/RightBase"},
+                    {"type": "object", "properties": {"value": {"type": "integer"}}},
+                ]
+            },
+            "Nested": {
+                "oneOf": [
+                    {"$ref": "#/components/schemas/Left"},
+                    {"$ref": "#/components/schemas/Right"},
+                ]
+            },
+            "Outer": {
+                "anyOf": [
+                    {"$ref": "#/components/schemas/Nested"},
+                    tagged("final"),
+                ]
+            },
+        }
+        ir = IRBuilder(document(operation(response={"$ref": "#/components/schemas/Outer"}), schemas), "example/gen").build()
+        outer = declaration(ir, "Outer")
+        self.assertIsInstance(outer, TaggedUnion)
+        self.assertEqual([variant.tag for variant in outer.variants], ["left", "right", "final"])
+
+    def test_nested_implicit_discriminator_still_rejects_duplicate_tags(self):
+        tagged = lambda value: {
+            "type": "object",
+            "properties": {"type": {"type": "string", "enum": [value]}},
+            "required": ["type"],
+        }
+        schemas = {
+            "Nested": {"oneOf": [tagged("same"), tagged("other")]},
+            "Outer": {
+                "oneOf": [
+                    {"$ref": "#/components/schemas/Nested"},
+                    tagged("same"),
+                ]
+            },
+        }
         with self.assertRaises(GenerationError) as caught:
-            IRBuilder(document(operation(request=schema)), "example/gen").build()
-        self.assertIn("discriminator", str(caught.exception))
+            IRBuilder(document(operation(response={"$ref": "#/components/schemas/Outer"}), schemas), "example/gen").build()
+        self.assertIn("no common single-value property", str(caught.exception))
+
+    def test_implicit_discriminator_flattening_stops_at_recursive_refs(self):
+        tagged = lambda value: {
+            "type": "object",
+            "properties": {"type": {"type": "string", "enum": [value]}},
+            "required": ["type"],
+        }
+        schemas = {
+            "Recursive": {
+                "allOf": [
+                    tagged("recursive"),
+                    {
+                        "type": "object",
+                        "properties": {
+                            "children": {
+                                "type": "array",
+                                "items": {"$ref": "#/components/schemas/Recursive"},
+                            }
+                        },
+                    },
+                ]
+            },
+            "Outer": {
+                "oneOf": [
+                    {"$ref": "#/components/schemas/Recursive"},
+                    tagged("leaf"),
+                ]
+            },
+        }
+        ir = IRBuilder(
+            document(operation(response={"$ref": "#/components/schemas/Outer"}), schemas),
+            "example/gen",
+        ).build()
+        outer = declaration(ir, "Outer")
+        self.assertIsInstance(outer, TaggedUnion)
+        self.assertEqual([variant.tag for variant in outer.variants], ["recursive", "leaf"])
+
+    def test_nullable_31_forms_are_normalized_for_fields(self):
+        schema = {
+            "type": "object",
+            "properties": {
+                "type_array": {"type": ["string", "null"]},
+                "union_ref": {"anyOf": [{"$ref": "#/components/schemas/Value"}, {"type": "null"}]},
+                "optional_union": {"oneOf": [{"type": "integer"}, {"type": "null"}]},
+            },
+            "required": ["type_array", "union_ref"],
+        }
+        schemas = {"Value": {"type": "string"}}
+        ir = IRBuilder(document(operation(response=schema), schemas), "example/gen").build()
+        fields = declaration(ir, "TestOperationResponse").fields
+        self.assertEqual([field.type.moon_type() for field in fields], ["String", "String", "Int"])
+        self.assertEqual(
+            [field.presence for field in fields],
+            [Presence.NULLABLE_REQUIRED, Presence.NULLABLE_REQUIRED, Presence.PRESENCE],
+        )
+
+    def test_empty_and_description_only_schemas_are_json_notes(self):
+        for schema in [{}, {"description": "intentionally unconstrained"}]:
+            with self.subTest(schema=schema):
+                builder = IRBuilder(document(operation(request=schema)), "example/gen")
+                ir = builder.build()
+                self.assertEqual(ir.operations[0].request_type.moon_type(), "Json")
+                self.assertIn("empty schema mapped to Json", builder.notes[0].message)
+
+    def test_all_of_reference_wrapper_and_primitive_constraints(self):
+        schemas = {"Name": {"type": "string"}}
+        wrapped = {"allOf": [{"$ref": "#/components/schemas/Name"}], "description": "docs", "nullable": True}
+        ir = IRBuilder(document(operation(response=wrapped), schemas), "example/gen").build()
+        self.assertEqual(ir.operations[0].response_type.moon_type(), "String")
+        same = {"allOf": [{"type": "integer", "minimum": 0}, {"type": "integer", "maximum": 10}]}
+        ir = IRBuilder(document(operation(response=same)), "example/gen").build()
+        self.assertEqual(ir.operations[0].response_type.moon_type(), "Int")
+        different = {"allOf": [{"type": "integer"}, {"type": "string"}]}
+        with self.assertRaises(GenerationError) as caught:
+            IRBuilder(document(operation(response=different)), "example/gen").build()
+        self.assertIn("different types", str(caught.exception))
+
+    def test_all_of_property_conflict_is_later_wins_note(self):
+        schema = {
+            "allOf": [
+                {"type": "object", "properties": {"value": {"type": "string"}}},
+                {"type": "object", "properties": {"value": {"type": "integer"}}},
+            ]
+        }
+        builder = IRBuilder(document(operation(response=schema)), "example/gen")
+        ir = builder.build()
+        self.assertEqual(declaration(ir, "TestOperationResponse").fields[0].type.moon_type(), "Int")
+        self.assertTrue(any("later definition" in note.message for note in builder.notes))
+
+    def test_integer_enum_stays_int(self):
+        schema = {"type": "integer", "enum": [1, 2, 3]}
+        ir = IRBuilder(document(operation(request=schema)), "example/gen").build()
+        self.assertEqual(ir.operations[0].request_type.moon_type(), "Int")
+
+    def test_recursive_refs_allow_array_or_nullable_but_not_direct_required(self):
+        safe_schemas = {
+            "Tree": {
+                "type": "object",
+                "properties": {
+                    "children": {"type": "array", "items": {"$ref": "#/components/schemas/Tree"}},
+                    "next": {"anyOf": [{"$ref": "#/components/schemas/Tree"}, {"type": "null"}]},
+                },
+                "required": ["children", "next"],
+            }
+        }
+        ir = IRBuilder(document(operation(response={"$ref": "#/components/schemas/Tree"}), safe_schemas), "example/gen").build()
+        tree = declaration(ir, "Tree")
+        self.assertEqual(tree.fields[0].type.moon_type(), "Array[Tree]")
+        self.assertEqual(tree.fields[1].presence, Presence.NULLABLE_REQUIRED)
+        bad_schemas = {
+            "Node": {
+                "type": "object",
+                "properties": {"next": {"$ref": "#/components/schemas/Node"}},
+                "required": ["next"],
+            }
+        }
+        with self.assertRaises(GenerationError) as caught:
+            IRBuilder(document(operation(response={"$ref": "#/components/schemas/Node"}), bad_schemas), "example/gen").build()
+        self.assertIn("direct recursive struct field", str(caught.exception))
 
     def test_schema_less_objects_are_json_with_a_verbose_note(self):
         for schema in [
@@ -293,6 +531,24 @@ class IRTests(unittest.TestCase):
 
 
 class CLITests(unittest.TestCase):
+    def test_census_ops_selects_only_requested_operation_ids(self):
+        doc = {
+            "openapi": "3.1.0",
+            "paths": {
+                "/one": {"get": operation(operation_id="one")},
+                "/two": {"get": operation(operation_id="two")},
+            },
+            "components": {"schemas": {}},
+        }
+        with tempfile.TemporaryDirectory() as directory:
+            spec = Path(directory) / "spec.json"
+            spec.write_text(json.dumps(doc), encoding="utf-8")
+            stdout = io.StringIO()
+            with redirect_stdout(stdout):
+                code = census_run([str(spec), "sample", "--ops", "two", "--expect-zero"])
+        self.assertEqual(code, 0)
+        self.assertIn("operations=1 diagnostics=0", stdout.getvalue())
+
     def test_check_exit_codes_and_ir_output(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)

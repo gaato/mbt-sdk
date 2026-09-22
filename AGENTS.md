@@ -76,6 +76,14 @@ moon fmt --check
 moon info
 ```
 
+Generator census の診断ゼロを要求するのは、上記の badhttp / petstore3 全操作と、`scripts/generate.sh --check` が生成する OpenAI include 済み閉包だけ。型を特定できない schema を暗黙に `Json` へ落としてはならず、raw JSON は overlay の明示的な `x-moonbit-json: true` がある場合だけ許可する。次の census は数を `docs/census.md` に記録する report-only コマンドであり、`--expect-zero` を付けない。
+
+```sh
+.venv/bin/python tools/gen/census.py openai/spec/openai.yaml openai --derive-operation-ids
+.venv/bin/python tools/gen/census.py specs/openrouter/openapi.json openrouter --ops createMessages,createResponses,getModels,createEmbeddings
+.venv/bin/python tools/gen/census.py specs/openrouter/openapi.json openrouter
+```
+
 Loopback socket tests live in `http-async/src/loopback` (native only). They need permission to open sockets on 127.0.0.1; a sandbox that forbids sockets cannot run them, so say so instead of reporting them as passed.
 
 `runtime-tests/src/badhttp` talks to the public https://badhttp.dev (opt-in, `scripts/conformance.sh`, needs the network, ~30 requests against a 100-per-10-s limit). It is not a gate; do not add it to CI.

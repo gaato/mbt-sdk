@@ -137,7 +137,7 @@ M3 の手書きの `list_models` / `retrieve_model` / `create_embeddings` は、
 
 ## M4c: union・nullable・discriminator(契約)
 
-目的: OpenAI の残り 107 件と OpenRouter の 813 件の診断を、**型の意味を落とさずに**減らす。ゴールの数字は「OpenAI 全体で診断ゼロ」「OpenRouter は `createMessages` / `createResponses` / `getModels` / `createEmbeddings` の閉包が診断ゼロ」(全体ゼロは求めない)。その上で `openai/overlays/moonbit.yaml` に `createResponse` の include を戻し、生成された `CreateResponse` / `Response` / `ResponseStreamEvent` 系の型が 3 ターゲットで `--deny-warn` を通ること。M3 の手書き `create_response` / `stream_response` の内部を生成物に差し替えるのは M4d(次)で、ここでは型が生成されるところまで。
+目的: OpenAI の残り 107 件と OpenRouter の 813 件の診断を、**型の意味を落とさずに**減らす。診断ゼロのゲートは `specs/badhttp` と `specs/petstore3` の全操作、および OpenAI の include 済み閉包(`scripts/generate.sh --check`)とする。OpenAI 全操作、OpenRouter の `createMessages` / `createResponses` / `getModels` / `createEmbeddings` の閉包、OpenRouter 全操作は census を記録するがゲートにはしない。その上で `openai/overlays/moonbit.yaml` に `createResponse` の include を戻し、生成された `CreateResponse` / `Response` / `ResponseStreamEvent` 系の型が 3 ターゲットで `--deny-warn` を通ること。M3 の手書き `create_response` / `stream_response` の内部を生成物に差し替えるのは M4d(次)で、ここでは型が生成されるところまで。
 
 ### 型の写し方(追記)
 
@@ -147,7 +147,7 @@ M3 の手書きの `list_models` / `retrieve_model` / `create_embeddings` は、
 | 3.1 の `type: [T, "null"]` | 正規化で `type: T` + nullable に畳む |
 | `anyOf` / `oneOf` の候補に `{type: "null"}` がある | その候補を外して nullable にする。残りが 1 個ならその型(`$ref` でも同じ)。残りが複数なら以下の union 規則 |
 | `nullable: true`(3.0) | 従来どおり(required かつ nullable → `T?`、任意かつ nullable → `Presence[T]`) |
-| `oneOf` + `discriminator`(`propertyName` と `mapping`) | **tagged enum**。バリアント名は mapping のキーを PascalCase にしたもの(`x-moonbit-variants` で上書き可)、ペイロードは mapping 先の struct。デコードは `propertyName` の値で分岐し、未知の値は `Unknown(String, Json)` バリアント(必ず生成する。open enum と同じ思想)。エンコードは struct 側が判別子フィールドを持つのでそのまま。`mapping` が無い場合は `$ref` の末尾名を snake_case にして推定し、注記を出す。判別子の値が `const` / 単一値 enum で struct に書かれていることを検証し、無ければ診断 |
+| `oneOf` + `discriminator`(`propertyName` と `mapping`) | **tagged enum**。バリアント名は mapping のキーを PascalCase にしたもの(`x-moonbit-variants` で上書き可)、ペイロードは mapping 先の struct。デコードは `propertyName` の値で分岐し、未知の値は `Unknown(String, Json)` バリアント(必ず生成する。open enum と同じ思想)。エンコードは struct 側が判別子フィールドを持つのでそのまま。`mapping` が無い場合は候補を `$ref` / `allOf` まで解決して、ペイロードの `const` / 単一値 enum を優先し、無い場合だけ `$ref` の末尾名を snake_case にして推定する(注記を出す)。推定値とペイロードが矛盾すれば診断 |
 | discriminator の無い `oneOf` / `anyOf` で、候補が全部 object | 各候補が「単一値 enum の同名プロパティ(典型は `type`)」を持ち、値が互いに異なるなら、そのプロパティを暗黙の判別子として **tagged enum**(上と同じ)。そうでなければ従来どおり JSON の形で区別を試み、できなければ診断。診断メッセージには「候補 N 個、共通の単一値プロパティ無し」と、`x-moonbit-json: true` で逃がす案を書く |
 | `anyOf: [string, string-enum]`(既知の値つき文字列) | 従来どおり `String` に畳む |
 | `allOf` に `$ref` 1 個 + `description` / `nullable` だけの追加 | 参照先の型(3.0 の「$ref に説明を足す」慣用句) |
@@ -163,7 +163,15 @@ M3 の手書きの `list_models` / `retrieve_model` / `create_embeddings` は、
 
 ### census と検証
 
-- `docs/census.md` を更新。OpenAI が 0、OpenRouter の 4 操作の閉包が 0 であることを `tools/gen/census.py --ops <id,...> --expect-zero` で CI のゲートにする(`--ops` を足す)。
+- `docs/census.md` を更新。診断ゼロのゲートは badhttp / petstore3 の全操作と、`createResponse` を含む OpenAI の include 済み閉包。OpenAI 全操作、OpenRouter の 4 操作の閉包(`tools/gen/census.py --ops <id,...>`)、OpenRouter 全操作は数を記録するが `--expect-zero` を付けない。
 - 単体テスト: 上の表の各行。特に tagged enum の未知の判別子、暗黙の判別子の検出条件(値の重複・単一値でない場合は不採用)、3.1 null 畳み込み、再帰型。
 - 生成物のテスト(`openai/src/gen/*_test.mbt`、手書き): `Response` の実応答 fixture(M5 の実 API テストで得た OpenRouter の応答と、spec の例)をデコードし、`output` の `message` / `reasoning` 両方が読めること。未知の `output` 型が `Unknown` になること。ストリームイベント `response.output_text.delta` などの型が生成され、fixture からデコードできること。
 - サイズの記録: 生成後の `openai/src/gen/` の行数と `moon check` の時間を `docs/census.md` に書く(巨大化の監視。DkStdRestApis の轍を踏まない)。
+
+## M4c の判断
+
+- 型を特定できない schema は暗黙に `Json` へ落とさない。raw JSON が契約として意図される箇所だけ、overlay の `x-moonbit-json: true` で明示する。空 schema `{}` と description だけの schema は表の規則どおり例外で、verbose note を出して `Json` にする。
+- 暗黙 discriminator の探索は候補の `$ref` を解決し、`allOf` のプロパティを後勝ちで平坦化してから行う。親 union の候補に、タグ付き object だけからなる nested `oneOf` / `anyOf` がある場合は、タグが全体で一意なときだけ親へ展開する。衝突や複数値の `type` は推測せず診断にする。
+- mapping 無しの明示 discriminator は component 名より payload の実際の単一タグを優先する。OpenAI の component 名と wire tag が一致しない型を、型安全なまま扱うためである。
+- OpenAI の include 済み閉包には upstream の曖昧な request union が含まれるため、`InputItem`、`Filters`、`ResponseProperties.tool_choice` にだけ明示的な `x-moonbit-json: true` を置く。これは自動 fallback ではなく、lossy boundary のレビュー可能な宣言である。
+- all-operation census の残件は失敗ではなく、overlay 判断、将来実装、upstream 修正候補を分けて `docs/census.md` に残す。これにより public runtime API を M4c で拡張せず、M4d 以降の判断材料を保つ。

@@ -15,10 +15,57 @@ actions:
     description: Include the createEmbedding operation in the M4 MoonBit generator slice.
     update:
       x-moonbit-include: true
+  - target: "$['paths']['/responses']['post']"
+    description: Include the createResponse operation now that M4c supports nullable and tagged unions.
+    update:
+      x-moonbit-include: true
   - target: "$['components']['schemas']['Model']['properties']['created']"
     description: Preserve Model.created beyond the MoonBit Int range.
     update:
       x-moonbit-type: Int64
+  - target: "$['components']['schemas']['InputItem']"
+    description: InputItem contains a nested discriminator union with duplicate message tags; keep that request-only boundary explicit as raw JSON until M4d chooses a public input API.
+    update:
+      x-moonbit-json: true
+  - target: "$['components']['schemas']['Filters']"
+    description: Recursive filter alternatives have no unique single-value discriminator; use the documented raw JSON escape hatch.
+    update:
+      x-moonbit-json: true
+  - target: "$['components']['schemas']['ResponseProperties']['properties']['tool_choice']"
+    description: Hosted tool choice accepts several discriminator values in one payload schema and is not a tagged union under the M4c contract.
+    update:
+      x-moonbit-json: true
+  - target: "$['components']['schemas']['ReasoningItem']['properties']"
+    description: Accept OpenRouter's Responses reasoning_text content extension without changing the hand-written client path.
+    update:
+      content:
+        type: array
+        items:
+          type: object
+          properties:
+            type:
+              type: string
+              enum:
+                - reasoning_text
+            text:
+              type: string
+          required:
+            - type
+            - text
+  - target: "$['components']['schemas']['OutputTextContent']['required'][?@ == 'annotations']"
+    description: OpenRouter Responses output_text items may omit annotations.
+    remove: true
+  - target: "$['components']['schemas']['Tool']['discriminator']"
+    description: Make every accepted Tool discriminator value explicit, including the dated web-search alias that shares a payload type.
+    update:
+      mapping:
+        file_search: "#/components/schemas/FileSearchTool"
+        function: "#/components/schemas/FunctionTool"
+        web_search_preview: "#/components/schemas/WebSearchPreviewTool"
+        computer_use_preview: "#/components/schemas/ComputerUsePreviewTool"
+  - target: "$['components']['schemas']['WebSearchPreviewTool']['properties']['type']['enum'][?@ == 'web_search_preview_2025_03_11']"
+    description: Select the canonical tag for the typed Tool branch; the dated alias remains losslessly represented by Tool.Unknown.
+    remove: true
   - target: "$['components']['schemas']['CreateEmbeddingRequest']['properties']['input']"
     description: Name the four JSON-shape-distinguishable embedding input variants so the generated API is stable even if upstream titles change.
     update:

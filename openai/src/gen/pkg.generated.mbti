@@ -4,13 +4,16 @@ package "gaato/openai/gen"
 import {
   "gaato/http",
   "gaato/sdk-runtime",
-  "moonbitlang/core/json",
 }
 
 // Values
 pub fn create_embedding_decode(@http.Response) -> CreateEmbeddingResponse raise @sdk-runtime.SdkError
 
 pub fn create_embedding_request(CreateEmbeddingRequest) -> @http.Request
+
+pub fn create_response_decode(@http.Response) -> Response raise @sdk-runtime.SdkError
+
+pub fn create_response_request(CreateResponse) -> @http.Request
 
 pub fn list_models_decode(@http.Response) -> ListModelsResponse raise @sdk-runtime.SdkError
 
@@ -23,6 +26,195 @@ pub fn retrieve_model_request(String) -> @http.Request
 // Errors
 
 // Types and methods
+pub(all) enum Annotation {
+  FileCitation(FileCitationBody)
+  UrlCitation(UrlCitationBody)
+  FilePath(FilePath)
+  Unknown(String, Json)
+}
+pub fn Annotation::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn Annotation::to_json(Self) -> Json
+pub impl ToJson for Annotation
+pub impl @moonbitlang/core/json.FromJson for Annotation
+
+pub(all) struct ApproximateLocation {
+  country : @gaato/sdk-runtime/json.Presence[String]
+  region : @gaato/sdk-runtime/json.Presence[String]
+  city : @gaato/sdk-runtime/json.Presence[String]
+  timezone : @gaato/sdk-runtime/json.Presence[String]
+}
+pub fn ApproximateLocation::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ApproximateLocation::to_json(Self) -> Json
+pub impl ToJson for ApproximateLocation
+pub impl @moonbitlang/core/json.FromJson for ApproximateLocation
+
+pub(all) struct Click {
+  type_ : String
+  button : ClickButton
+  x : Int
+  y : Int
+}
+pub fn Click::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn Click::to_json(Self) -> Json
+pub impl ToJson for Click
+pub impl @moonbitlang/core/json.FromJson for Click
+
+pub(all) enum ClickButton {
+  Left
+  Right
+  Wheel
+  Back
+  Forward
+  Unknown(String)
+}
+pub fn ClickButton::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ClickButton::to_json(Self) -> Json
+pub impl ToJson for ClickButton
+pub impl @moonbitlang/core/json.FromJson for ClickButton
+
+pub(all) struct CodeInterpreterFileOutput {
+  type_ : String
+  files : Array[CodeInterpreterFileOutputFilesItem]
+}
+pub fn CodeInterpreterFileOutput::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn CodeInterpreterFileOutput::to_json(Self) -> Json
+pub impl ToJson for CodeInterpreterFileOutput
+pub impl @moonbitlang/core/json.FromJson for CodeInterpreterFileOutput
+
+pub(all) struct CodeInterpreterFileOutputFilesItem {
+  mime_type : String
+  file_id : String
+}
+pub fn CodeInterpreterFileOutputFilesItem::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn CodeInterpreterFileOutputFilesItem::to_json(Self) -> Json
+pub impl ToJson for CodeInterpreterFileOutputFilesItem
+pub impl @moonbitlang/core/json.FromJson for CodeInterpreterFileOutputFilesItem
+
+pub(all) struct CodeInterpreterTextOutput {
+  type_ : String
+  logs : String
+}
+pub fn CodeInterpreterTextOutput::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn CodeInterpreterTextOutput::to_json(Self) -> Json
+pub impl ToJson for CodeInterpreterTextOutput
+pub impl @moonbitlang/core/json.FromJson for CodeInterpreterTextOutput
+
+pub(all) struct CodeInterpreterToolCall {
+  id : String
+  code : String
+  status : CodeInterpreterToolCallStatus
+  results : Array[CodeInterpreterToolOutput]
+}
+pub fn CodeInterpreterToolCall::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn CodeInterpreterToolCall::to_json(Self) -> Json
+pub impl ToJson for CodeInterpreterToolCall
+pub impl @moonbitlang/core/json.FromJson for CodeInterpreterToolCall
+
+pub(all) enum CodeInterpreterToolCallStatus {
+  InProgress
+  Interpreting
+  Completed
+  Unknown(String)
+}
+pub fn CodeInterpreterToolCallStatus::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn CodeInterpreterToolCallStatus::to_json(Self) -> Json
+pub impl ToJson for CodeInterpreterToolCallStatus
+pub impl @moonbitlang/core/json.FromJson for CodeInterpreterToolCallStatus
+
+pub(all) enum CodeInterpreterToolOutput {
+  Logs(CodeInterpreterTextOutput)
+  Files(CodeInterpreterFileOutput)
+  Unknown(String, Json)
+}
+pub fn CodeInterpreterToolOutput::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn CodeInterpreterToolOutput::to_json(Self) -> Json
+pub impl ToJson for CodeInterpreterToolOutput
+pub impl @moonbitlang/core/json.FromJson for CodeInterpreterToolOutput
+
+pub(all) enum ComputerAction {
+  Click(Click)
+  DoubleClick(DoubleClick)
+  Drag(Drag)
+  Keypress(KeyPress)
+  Move(Move)
+  Screenshot(Screenshot)
+  Scroll(Scroll)
+  Type(Type)
+  Wait(Wait)
+  Unknown(String, Json)
+}
+pub fn ComputerAction::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ComputerAction::to_json(Self) -> Json
+pub impl ToJson for ComputerAction
+pub impl @moonbitlang/core/json.FromJson for ComputerAction
+
+pub(all) struct ComputerToolCall {
+  type_ : String
+  id : String
+  call_id : String
+  action : ComputerAction
+  pending_safety_checks : Array[ComputerToolCallSafetyCheck]
+  status : ComputerToolCallStatus
+}
+pub fn ComputerToolCall::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ComputerToolCall::to_json(Self) -> Json
+pub impl ToJson for ComputerToolCall
+pub impl @moonbitlang/core/json.FromJson for ComputerToolCall
+
+pub(all) struct ComputerToolCallSafetyCheck {
+  id : String
+  code : String
+  message : String
+}
+pub fn ComputerToolCallSafetyCheck::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ComputerToolCallSafetyCheck::to_json(Self) -> Json
+pub impl ToJson for ComputerToolCallSafetyCheck
+pub impl @moonbitlang/core/json.FromJson for ComputerToolCallSafetyCheck
+
+pub(all) enum ComputerToolCallStatus {
+  InProgress
+  Completed
+  Incomplete
+  Unknown(String)
+}
+pub fn ComputerToolCallStatus::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ComputerToolCallStatus::to_json(Self) -> Json
+pub impl ToJson for ComputerToolCallStatus
+pub impl @moonbitlang/core/json.FromJson for ComputerToolCallStatus
+
+pub(all) struct ComputerUsePreviewTool {
+  type_ : String
+  environment : ComputerUsePreviewToolEnvironment
+  display_width : Int
+  display_height : Int
+}
+pub fn ComputerUsePreviewTool::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ComputerUsePreviewTool::to_json(Self) -> Json
+pub impl ToJson for ComputerUsePreviewTool
+pub impl @moonbitlang/core/json.FromJson for ComputerUsePreviewTool
+
+pub(all) enum ComputerUsePreviewToolEnvironment {
+  Windows
+  Mac
+  Linux
+  Ubuntu
+  Browser
+  Unknown(String)
+}
+pub fn ComputerUsePreviewToolEnvironment::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ComputerUsePreviewToolEnvironment::to_json(Self) -> Json
+pub impl ToJson for ComputerUsePreviewToolEnvironment
+pub impl @moonbitlang/core/json.FromJson for ComputerUsePreviewToolEnvironment
+
+pub(all) struct Coordinate {
+  x : Int
+  y : Int
+}
+pub fn Coordinate::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn Coordinate::to_json(Self) -> Json
+pub impl ToJson for Coordinate
+pub impl @moonbitlang/core/json.FromJson for Coordinate
+
 pub(all) struct CreateEmbeddingRequest {
   input : CreateEmbeddingRequestInput
   model : String
@@ -30,20 +222,20 @@ pub(all) struct CreateEmbeddingRequest {
   dimensions : Int?
   user : String?
 }
-pub fn CreateEmbeddingRequest::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn CreateEmbeddingRequest::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
 pub fn CreateEmbeddingRequest::to_json(Self) -> Json
 pub impl ToJson for CreateEmbeddingRequest
-pub impl @json.FromJson for CreateEmbeddingRequest
+pub impl @moonbitlang/core/json.FromJson for CreateEmbeddingRequest
 
 pub(all) enum CreateEmbeddingRequestEncodingFormat {
   Float
   Base64
   Custom(String)
 }
-pub fn CreateEmbeddingRequestEncodingFormat::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn CreateEmbeddingRequestEncodingFormat::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
 pub fn CreateEmbeddingRequestEncodingFormat::to_json(Self) -> Json
 pub impl ToJson for CreateEmbeddingRequestEncodingFormat
-pub impl @json.FromJson for CreateEmbeddingRequestEncodingFormat
+pub impl @moonbitlang/core/json.FromJson for CreateEmbeddingRequestEncodingFormat
 
 pub(all) enum CreateEmbeddingRequestInput {
   Text(String)
@@ -51,56 +243,1215 @@ pub(all) enum CreateEmbeddingRequestInput {
   IntArray(Array[Int])
   IntArrayArray(Array[Array[Int]])
 }
-pub fn CreateEmbeddingRequestInput::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn CreateEmbeddingRequestInput::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
 pub fn CreateEmbeddingRequestInput::to_json(Self) -> Json
 pub impl ToJson for CreateEmbeddingRequestInput
-pub impl @json.FromJson for CreateEmbeddingRequestInput
+pub impl @moonbitlang/core/json.FromJson for CreateEmbeddingRequestInput
 
 pub(all) struct CreateEmbeddingResponse {
   data : Array[Embedding]
   model : String
   usage : CreateEmbeddingResponseUsage
 }
-pub fn CreateEmbeddingResponse::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn CreateEmbeddingResponse::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
 pub fn CreateEmbeddingResponse::to_json(Self) -> Json
 pub impl ToJson for CreateEmbeddingResponse
-pub impl @json.FromJson for CreateEmbeddingResponse
+pub impl @moonbitlang/core/json.FromJson for CreateEmbeddingResponse
 
 pub(all) struct CreateEmbeddingResponseUsage {
   prompt_tokens : Int
   total_tokens : Int
 }
-pub fn CreateEmbeddingResponseUsage::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn CreateEmbeddingResponseUsage::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
 pub fn CreateEmbeddingResponseUsage::to_json(Self) -> Json
 pub impl ToJson for CreateEmbeddingResponseUsage
-pub impl @json.FromJson for CreateEmbeddingResponseUsage
+pub impl @moonbitlang/core/json.FromJson for CreateEmbeddingResponseUsage
+
+pub(all) struct CreateResponse {
+  metadata : @gaato/sdk-runtime/json.Presence[Map[String, String]]
+  temperature : @gaato/sdk-runtime/json.Presence[Double]
+  top_p : @gaato/sdk-runtime/json.Presence[Double]
+  user : String?
+  service_tier : @gaato/sdk-runtime/json.Presence[ServiceTier]
+  previous_response_id : @gaato/sdk-runtime/json.Presence[String]
+  model : String
+  reasoning : @gaato/sdk-runtime/json.Presence[Reasoning]
+  max_output_tokens : @gaato/sdk-runtime/json.Presence[Int]
+  instructions : @gaato/sdk-runtime/json.Presence[String]
+  text : CreateResponseText?
+  tools : Array[Tool]?
+  tool_choice : Json?
+  truncation : @gaato/sdk-runtime/json.Presence[CreateResponseTruncation]
+  input : CreateResponseInput
+  include_ : @gaato/sdk-runtime/json.Presence[Array[Includable]]
+  parallel_tool_calls : @gaato/sdk-runtime/json.Presence[Bool]
+  store : @gaato/sdk-runtime/json.Presence[Bool]
+  stream : @gaato/sdk-runtime/json.Presence[Bool]
+}
+pub fn CreateResponse::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn CreateResponse::to_json(Self) -> Json
+pub impl ToJson for CreateResponse
+pub impl @moonbitlang/core/json.FromJson for CreateResponse
+
+pub(all) enum CreateResponseInput {
+  Text(String)
+  InputItemArray(Array[Json])
+}
+pub fn CreateResponseInput::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn CreateResponseInput::to_json(Self) -> Json
+pub impl ToJson for CreateResponseInput
+pub impl @moonbitlang/core/json.FromJson for CreateResponseInput
+
+pub(all) struct CreateResponseText {
+  format : TextResponseFormatConfiguration?
+}
+pub fn CreateResponseText::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn CreateResponseText::to_json(Self) -> Json
+pub impl ToJson for CreateResponseText
+pub impl @moonbitlang/core/json.FromJson for CreateResponseText
+
+pub(all) enum CreateResponseTruncation {
+  Auto
+  Disabled
+  Custom(String)
+}
+pub fn CreateResponseTruncation::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn CreateResponseTruncation::to_json(Self) -> Json
+pub impl ToJson for CreateResponseTruncation
+pub impl @moonbitlang/core/json.FromJson for CreateResponseTruncation
+
+pub(all) struct DoubleClick {
+  type_ : String
+  x : Int
+  y : Int
+}
+pub fn DoubleClick::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn DoubleClick::to_json(Self) -> Json
+pub impl ToJson for DoubleClick
+pub impl @moonbitlang/core/json.FromJson for DoubleClick
+
+pub(all) struct Drag {
+  type_ : String
+  path : Array[Coordinate]
+}
+pub fn Drag::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn Drag::to_json(Self) -> Json
+pub impl ToJson for Drag
+pub impl @moonbitlang/core/json.FromJson for Drag
 
 pub(all) struct Embedding {
   index : Int
   embedding : Array[Double]
 }
-pub fn Embedding::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn Embedding::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
 pub fn Embedding::to_json(Self) -> Json
 pub impl ToJson for Embedding
-pub impl @json.FromJson for Embedding
+pub impl @moonbitlang/core/json.FromJson for Embedding
+
+pub(all) struct FileCitationBody {
+  type_ : String
+  file_id : String
+  index : Int
+}
+pub fn FileCitationBody::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn FileCitationBody::to_json(Self) -> Json
+pub impl ToJson for FileCitationBody
+pub impl @moonbitlang/core/json.FromJson for FileCitationBody
+
+pub(all) struct FilePath {
+  type_ : String
+  file_id : String
+  index : Int
+}
+pub fn FilePath::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn FilePath::to_json(Self) -> Json
+pub impl ToJson for FilePath
+pub impl @moonbitlang/core/json.FromJson for FilePath
+
+pub(all) struct FileSearchTool {
+  type_ : String
+  vector_store_ids : Array[String]
+  max_num_results : Int?
+  ranking_options : RankingOptions?
+  filters : @gaato/sdk-runtime/json.Presence[Json]
+}
+pub fn FileSearchTool::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn FileSearchTool::to_json(Self) -> Json
+pub impl ToJson for FileSearchTool
+pub impl @moonbitlang/core/json.FromJson for FileSearchTool
+
+pub(all) struct FileSearchToolCall {
+  id : String
+  type_ : String
+  status : FileSearchToolCallStatus
+  queries : Array[String]
+  results : @gaato/sdk-runtime/json.Presence[Array[FileSearchToolCallResultsItem]]
+}
+pub fn FileSearchToolCall::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn FileSearchToolCall::to_json(Self) -> Json
+pub impl ToJson for FileSearchToolCall
+pub impl @moonbitlang/core/json.FromJson for FileSearchToolCall
+
+pub(all) struct FileSearchToolCallResultsItem {
+  file_id : String?
+  text : String?
+  filename : String?
+  attributes : @gaato/sdk-runtime/json.Presence[Map[String, VectorStoreFileAttributesValue]]
+  score : Double?
+}
+pub fn FileSearchToolCallResultsItem::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn FileSearchToolCallResultsItem::to_json(Self) -> Json
+pub impl ToJson for FileSearchToolCallResultsItem
+pub impl @moonbitlang/core/json.FromJson for FileSearchToolCallResultsItem
+
+pub(all) enum FileSearchToolCallStatus {
+  InProgress
+  Searching
+  Completed
+  Incomplete
+  Failed
+  Unknown(String)
+}
+pub fn FileSearchToolCallStatus::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn FileSearchToolCallStatus::to_json(Self) -> Json
+pub impl ToJson for FileSearchToolCallStatus
+pub impl @moonbitlang/core/json.FromJson for FileSearchToolCallStatus
+
+pub(all) struct FunctionTool {
+  type_ : String
+  name : String
+  description : @gaato/sdk-runtime/json.Presence[String]
+  parameters : Json?
+  strict : Bool?
+}
+pub fn FunctionTool::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn FunctionTool::to_json(Self) -> Json
+pub impl ToJson for FunctionTool
+pub impl @moonbitlang/core/json.FromJson for FunctionTool
+
+pub(all) struct FunctionToolCall {
+  id : String?
+  type_ : String
+  call_id : String
+  name : String
+  arguments : String
+  status : FunctionToolCallStatus?
+}
+pub fn FunctionToolCall::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn FunctionToolCall::to_json(Self) -> Json
+pub impl ToJson for FunctionToolCall
+pub impl @moonbitlang/core/json.FromJson for FunctionToolCall
+
+pub(all) enum FunctionToolCallStatus {
+  InProgress
+  Completed
+  Incomplete
+  Unknown(String)
+}
+pub fn FunctionToolCallStatus::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn FunctionToolCallStatus::to_json(Self) -> Json
+pub impl ToJson for FunctionToolCallStatus
+pub impl @moonbitlang/core/json.FromJson for FunctionToolCallStatus
+
+pub(all) enum Includable {
+  FileSearchCallResults
+  MessageInputImageImageUrl
+  ComputerCallOutputOutputImageUrl
+  Custom(String)
+}
+pub fn Includable::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn Includable::to_json(Self) -> Json
+pub impl ToJson for Includable
+pub impl @moonbitlang/core/json.FromJson for Includable
+
+pub(all) struct KeyPress {
+  type_ : String
+  keys : Array[String]
+}
+pub fn KeyPress::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn KeyPress::to_json(Self) -> Json
+pub impl ToJson for KeyPress
+pub impl @moonbitlang/core/json.FromJson for KeyPress
 
 pub(all) struct ListModelsResponse {
   data : Array[Model]
 }
-pub fn ListModelsResponse::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ListModelsResponse::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
 pub fn ListModelsResponse::to_json(Self) -> Json
 pub impl ToJson for ListModelsResponse
-pub impl @json.FromJson for ListModelsResponse
+pub impl @moonbitlang/core/json.FromJson for ListModelsResponse
 
 pub(all) struct Model {
   id : String
   created : Int64
   owned_by : String?
 }
-pub fn Model::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn Model::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
 pub fn Model::to_json(Self) -> Json
 pub impl ToJson for Model
-pub impl @json.FromJson for Model
+pub impl @moonbitlang/core/json.FromJson for Model
+
+pub(all) struct ModelResponseProperties {
+  metadata : @gaato/sdk-runtime/json.Presence[Map[String, String]]
+  temperature : @gaato/sdk-runtime/json.Presence[Double]
+  top_p : @gaato/sdk-runtime/json.Presence[Double]
+  user : String?
+  service_tier : @gaato/sdk-runtime/json.Presence[ServiceTier]
+}
+pub fn ModelResponseProperties::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ModelResponseProperties::to_json(Self) -> Json
+pub impl ToJson for ModelResponseProperties
+pub impl @moonbitlang/core/json.FromJson for ModelResponseProperties
+
+pub(all) struct Move {
+  type_ : String
+  x : Int
+  y : Int
+}
+pub fn Move::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn Move::to_json(Self) -> Json
+pub impl ToJson for Move
+pub impl @moonbitlang/core/json.FromJson for Move
+
+pub(all) enum OutputContent {
+  OutputText(OutputTextContent)
+  Refusal(RefusalContent)
+  Unknown(String, Json)
+}
+pub fn OutputContent::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn OutputContent::to_json(Self) -> Json
+pub impl ToJson for OutputContent
+pub impl @moonbitlang/core/json.FromJson for OutputContent
+
+pub(all) enum OutputItem {
+  Message(OutputMessage)
+  FileSearchCall(FileSearchToolCall)
+  FunctionCall(FunctionToolCall)
+  WebSearchCall(WebSearchToolCall)
+  ComputerCall(ComputerToolCall)
+  Reasoning(ReasoningItem)
+  Unknown(String, Json)
+}
+pub fn OutputItem::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn OutputItem::to_json(Self) -> Json
+pub impl ToJson for OutputItem
+pub impl @moonbitlang/core/json.FromJson for OutputItem
+
+pub(all) struct OutputMessage {
+  id : String
+  type_ : String
+  content : Array[OutputContent]
+  status : OutputMessageStatus
+}
+pub fn OutputMessage::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn OutputMessage::to_json(Self) -> Json
+pub impl ToJson for OutputMessage
+pub impl @moonbitlang/core/json.FromJson for OutputMessage
+
+pub(all) enum OutputMessageStatus {
+  InProgress
+  Completed
+  Incomplete
+  Unknown(String)
+}
+pub fn OutputMessageStatus::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn OutputMessageStatus::to_json(Self) -> Json
+pub impl ToJson for OutputMessageStatus
+pub impl @moonbitlang/core/json.FromJson for OutputMessageStatus
+
+pub(all) struct OutputTextContent {
+  type_ : String
+  text : String
+  annotations : Array[Annotation]?
+}
+pub fn OutputTextContent::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn OutputTextContent::to_json(Self) -> Json
+pub impl ToJson for OutputTextContent
+pub impl @moonbitlang/core/json.FromJson for OutputTextContent
+
+pub(all) struct RankingOptions {
+  ranker : RankingOptionsRanker?
+  score_threshold : Double?
+}
+pub fn RankingOptions::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn RankingOptions::to_json(Self) -> Json
+pub impl ToJson for RankingOptions
+pub impl @moonbitlang/core/json.FromJson for RankingOptions
+
+pub(all) enum RankingOptionsRanker {
+  Auto
+  Default20241115
+  Unknown(String)
+}
+pub fn RankingOptionsRanker::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn RankingOptionsRanker::to_json(Self) -> Json
+pub impl ToJson for RankingOptionsRanker
+pub impl @moonbitlang/core/json.FromJson for RankingOptionsRanker
+
+pub(all) struct Reasoning {
+  effort : @gaato/sdk-runtime/json.Presence[ReasoningEffort]
+  summary : @gaato/sdk-runtime/json.Presence[ReasoningSummary]
+  generate_summary : @gaato/sdk-runtime/json.Presence[ReasoningGenerateSummary]
+}
+pub fn Reasoning::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn Reasoning::to_json(Self) -> Json
+pub impl ToJson for Reasoning
+pub impl @moonbitlang/core/json.FromJson for Reasoning
+
+pub(all) enum ReasoningEffort {
+  Low
+  Medium
+  High
+  Unknown(String)
+}
+pub fn ReasoningEffort::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ReasoningEffort::to_json(Self) -> Json
+pub impl ToJson for ReasoningEffort
+pub impl @moonbitlang/core/json.FromJson for ReasoningEffort
+
+pub(all) enum ReasoningGenerateSummary {
+  Auto
+  Concise
+  Detailed
+  Unknown(String)
+}
+pub fn ReasoningGenerateSummary::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ReasoningGenerateSummary::to_json(Self) -> Json
+pub impl ToJson for ReasoningGenerateSummary
+pub impl @moonbitlang/core/json.FromJson for ReasoningGenerateSummary
+
+pub(all) struct ReasoningItem {
+  type_ : String
+  id : String
+  summary : Array[ReasoningItemSummaryItem]
+  status : ReasoningItemStatus?
+  content : Array[ReasoningItemContentItem]?
+}
+pub fn ReasoningItem::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ReasoningItem::to_json(Self) -> Json
+pub impl ToJson for ReasoningItem
+pub impl @moonbitlang/core/json.FromJson for ReasoningItem
+
+pub(all) struct ReasoningItemContentItem {
+  text : String
+}
+pub fn ReasoningItemContentItem::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ReasoningItemContentItem::to_json(Self) -> Json
+pub impl ToJson for ReasoningItemContentItem
+pub impl @moonbitlang/core/json.FromJson for ReasoningItemContentItem
+
+pub(all) enum ReasoningItemStatus {
+  InProgress
+  Completed
+  Incomplete
+  Unknown(String)
+}
+pub fn ReasoningItemStatus::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ReasoningItemStatus::to_json(Self) -> Json
+pub impl ToJson for ReasoningItemStatus
+pub impl @moonbitlang/core/json.FromJson for ReasoningItemStatus
+
+pub(all) struct ReasoningItemSummaryItem {
+  text : String
+}
+pub fn ReasoningItemSummaryItem::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ReasoningItemSummaryItem::to_json(Self) -> Json
+pub impl ToJson for ReasoningItemSummaryItem
+pub impl @moonbitlang/core/json.FromJson for ReasoningItemSummaryItem
+
+pub(all) enum ReasoningSummary {
+  Auto
+  Concise
+  Detailed
+  Unknown(String)
+}
+pub fn ReasoningSummary::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ReasoningSummary::to_json(Self) -> Json
+pub impl ToJson for ReasoningSummary
+pub impl @moonbitlang/core/json.FromJson for ReasoningSummary
+
+pub(all) struct RefusalContent {
+  type_ : String
+  refusal : String
+}
+pub fn RefusalContent::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn RefusalContent::to_json(Self) -> Json
+pub impl ToJson for RefusalContent
+pub impl @moonbitlang/core/json.FromJson for RefusalContent
+
+pub(all) struct Response {
+  metadata : Map[String, String]?
+  temperature : Double?
+  top_p : Double?
+  user : String?
+  service_tier : @gaato/sdk-runtime/json.Presence[ServiceTier]
+  previous_response_id : @gaato/sdk-runtime/json.Presence[String]
+  model : String
+  reasoning : @gaato/sdk-runtime/json.Presence[Reasoning]
+  max_output_tokens : @gaato/sdk-runtime/json.Presence[Int]
+  instructions : String?
+  text : ResponseText?
+  tools : Array[Tool]
+  tool_choice : Json
+  truncation : @gaato/sdk-runtime/json.Presence[ResponseTruncation]
+  id : String
+  status : ResponseStatus?
+  created_at : Double
+  error : ResponseError?
+  incomplete_details : ResponseIncompleteDetails?
+  output : Array[OutputItem]
+  output_text : @gaato/sdk-runtime/json.Presence[String]
+  usage : ResponseUsage?
+  parallel_tool_calls : Bool
+}
+pub fn Response::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn Response::to_json(Self) -> Json
+pub impl ToJson for Response
+pub impl @moonbitlang/core/json.FromJson for Response
+
+pub(all) struct ResponseAudioDeltaEvent {
+  type_ : String
+  delta : String
+}
+pub fn ResponseAudioDeltaEvent::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ResponseAudioDeltaEvent::to_json(Self) -> Json
+pub impl ToJson for ResponseAudioDeltaEvent
+pub impl @moonbitlang/core/json.FromJson for ResponseAudioDeltaEvent
+
+pub(all) struct ResponseAudioDoneEvent {
+  type_ : String
+}
+pub fn ResponseAudioDoneEvent::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ResponseAudioDoneEvent::to_json(Self) -> Json
+pub impl ToJson for ResponseAudioDoneEvent
+pub impl @moonbitlang/core/json.FromJson for ResponseAudioDoneEvent
+
+pub(all) struct ResponseAudioTranscriptDeltaEvent {
+  type_ : String
+  delta : String
+}
+pub fn ResponseAudioTranscriptDeltaEvent::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ResponseAudioTranscriptDeltaEvent::to_json(Self) -> Json
+pub impl ToJson for ResponseAudioTranscriptDeltaEvent
+pub impl @moonbitlang/core/json.FromJson for ResponseAudioTranscriptDeltaEvent
+
+pub(all) struct ResponseAudioTranscriptDoneEvent {
+  type_ : String
+}
+pub fn ResponseAudioTranscriptDoneEvent::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ResponseAudioTranscriptDoneEvent::to_json(Self) -> Json
+pub impl ToJson for ResponseAudioTranscriptDoneEvent
+pub impl @moonbitlang/core/json.FromJson for ResponseAudioTranscriptDoneEvent
+
+pub(all) struct ResponseCodeInterpreterCallCodeDeltaEvent {
+  type_ : String
+  output_index : Int
+  delta : String
+}
+pub fn ResponseCodeInterpreterCallCodeDeltaEvent::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ResponseCodeInterpreterCallCodeDeltaEvent::to_json(Self) -> Json
+pub impl ToJson for ResponseCodeInterpreterCallCodeDeltaEvent
+pub impl @moonbitlang/core/json.FromJson for ResponseCodeInterpreterCallCodeDeltaEvent
+
+pub(all) struct ResponseCodeInterpreterCallCodeDoneEvent {
+  type_ : String
+  output_index : Int
+  code : String
+}
+pub fn ResponseCodeInterpreterCallCodeDoneEvent::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ResponseCodeInterpreterCallCodeDoneEvent::to_json(Self) -> Json
+pub impl ToJson for ResponseCodeInterpreterCallCodeDoneEvent
+pub impl @moonbitlang/core/json.FromJson for ResponseCodeInterpreterCallCodeDoneEvent
+
+pub(all) struct ResponseCodeInterpreterCallCompletedEvent {
+  type_ : String
+  output_index : Int
+  code_interpreter_call : CodeInterpreterToolCall
+}
+pub fn ResponseCodeInterpreterCallCompletedEvent::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ResponseCodeInterpreterCallCompletedEvent::to_json(Self) -> Json
+pub impl ToJson for ResponseCodeInterpreterCallCompletedEvent
+pub impl @moonbitlang/core/json.FromJson for ResponseCodeInterpreterCallCompletedEvent
+
+pub(all) struct ResponseCodeInterpreterCallInProgressEvent {
+  type_ : String
+  output_index : Int
+  code_interpreter_call : CodeInterpreterToolCall
+}
+pub fn ResponseCodeInterpreterCallInProgressEvent::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ResponseCodeInterpreterCallInProgressEvent::to_json(Self) -> Json
+pub impl ToJson for ResponseCodeInterpreterCallInProgressEvent
+pub impl @moonbitlang/core/json.FromJson for ResponseCodeInterpreterCallInProgressEvent
+
+pub(all) struct ResponseCodeInterpreterCallInterpretingEvent {
+  type_ : String
+  output_index : Int
+  code_interpreter_call : CodeInterpreterToolCall
+}
+pub fn ResponseCodeInterpreterCallInterpretingEvent::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ResponseCodeInterpreterCallInterpretingEvent::to_json(Self) -> Json
+pub impl ToJson for ResponseCodeInterpreterCallInterpretingEvent
+pub impl @moonbitlang/core/json.FromJson for ResponseCodeInterpreterCallInterpretingEvent
+
+pub(all) struct ResponseCompletedEvent {
+  type_ : String
+  response : Response
+}
+pub fn ResponseCompletedEvent::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ResponseCompletedEvent::to_json(Self) -> Json
+pub impl ToJson for ResponseCompletedEvent
+pub impl @moonbitlang/core/json.FromJson for ResponseCompletedEvent
+
+pub(all) struct ResponseContentPartAddedEvent {
+  type_ : String
+  item_id : String
+  output_index : Int
+  content_index : Int
+  part : OutputContent
+}
+pub fn ResponseContentPartAddedEvent::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ResponseContentPartAddedEvent::to_json(Self) -> Json
+pub impl ToJson for ResponseContentPartAddedEvent
+pub impl @moonbitlang/core/json.FromJson for ResponseContentPartAddedEvent
+
+pub(all) struct ResponseContentPartDoneEvent {
+  type_ : String
+  item_id : String
+  output_index : Int
+  content_index : Int
+  part : OutputContent
+}
+pub fn ResponseContentPartDoneEvent::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ResponseContentPartDoneEvent::to_json(Self) -> Json
+pub impl ToJson for ResponseContentPartDoneEvent
+pub impl @moonbitlang/core/json.FromJson for ResponseContentPartDoneEvent
+
+pub(all) struct ResponseCreatedEvent {
+  type_ : String
+  response : Response
+}
+pub fn ResponseCreatedEvent::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ResponseCreatedEvent::to_json(Self) -> Json
+pub impl ToJson for ResponseCreatedEvent
+pub impl @moonbitlang/core/json.FromJson for ResponseCreatedEvent
+
+pub(all) struct ResponseError {
+  code : ResponseErrorCode
+  message : String
+}
+pub fn ResponseError::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ResponseError::to_json(Self) -> Json
+pub impl ToJson for ResponseError
+pub impl @moonbitlang/core/json.FromJson for ResponseError
+
+pub(all) enum ResponseErrorCode {
+  ServerError
+  RateLimitExceeded
+  InvalidPrompt
+  VectorStoreTimeout
+  InvalidImage
+  InvalidImageFormat
+  InvalidBase64Image
+  InvalidImageUrl
+  ImageTooLarge
+  ImageTooSmall
+  ImageParseError
+  ImageContentPolicyViolation
+  InvalidImageMode
+  ImageFileTooLarge
+  UnsupportedImageMediaType
+  EmptyImageFile
+  FailedToDownloadImage
+  ImageFileNotFound
+  Unknown(String)
+}
+pub fn ResponseErrorCode::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ResponseErrorCode::to_json(Self) -> Json
+pub impl ToJson for ResponseErrorCode
+pub impl @moonbitlang/core/json.FromJson for ResponseErrorCode
+
+pub(all) struct ResponseErrorEvent {
+  type_ : String
+  code : String?
+  message : String
+  param : String?
+}
+pub fn ResponseErrorEvent::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ResponseErrorEvent::to_json(Self) -> Json
+pub impl ToJson for ResponseErrorEvent
+pub impl @moonbitlang/core/json.FromJson for ResponseErrorEvent
+
+pub(all) struct ResponseFailedEvent {
+  type_ : String
+  response : Response
+}
+pub fn ResponseFailedEvent::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ResponseFailedEvent::to_json(Self) -> Json
+pub impl ToJson for ResponseFailedEvent
+pub impl @moonbitlang/core/json.FromJson for ResponseFailedEvent
+
+pub(all) struct ResponseFileSearchCallCompletedEvent {
+  type_ : String
+  output_index : Int
+  item_id : String
+}
+pub fn ResponseFileSearchCallCompletedEvent::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ResponseFileSearchCallCompletedEvent::to_json(Self) -> Json
+pub impl ToJson for ResponseFileSearchCallCompletedEvent
+pub impl @moonbitlang/core/json.FromJson for ResponseFileSearchCallCompletedEvent
+
+pub(all) struct ResponseFileSearchCallInProgressEvent {
+  type_ : String
+  output_index : Int
+  item_id : String
+}
+pub fn ResponseFileSearchCallInProgressEvent::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ResponseFileSearchCallInProgressEvent::to_json(Self) -> Json
+pub impl ToJson for ResponseFileSearchCallInProgressEvent
+pub impl @moonbitlang/core/json.FromJson for ResponseFileSearchCallInProgressEvent
+
+pub(all) struct ResponseFileSearchCallSearchingEvent {
+  type_ : String
+  output_index : Int
+  item_id : String
+}
+pub fn ResponseFileSearchCallSearchingEvent::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ResponseFileSearchCallSearchingEvent::to_json(Self) -> Json
+pub impl ToJson for ResponseFileSearchCallSearchingEvent
+pub impl @moonbitlang/core/json.FromJson for ResponseFileSearchCallSearchingEvent
+
+pub(all) struct ResponseFormatJsonObject {
+  type_ : String
+}
+pub fn ResponseFormatJsonObject::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ResponseFormatJsonObject::to_json(Self) -> Json
+pub impl ToJson for ResponseFormatJsonObject
+pub impl @moonbitlang/core/json.FromJson for ResponseFormatJsonObject
+
+pub(all) struct ResponseFormatText {
+  type_ : String
+}
+pub fn ResponseFormatText::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ResponseFormatText::to_json(Self) -> Json
+pub impl ToJson for ResponseFormatText
+pub impl @moonbitlang/core/json.FromJson for ResponseFormatText
+
+pub(all) struct ResponseFunctionCallArgumentsDeltaEvent {
+  type_ : String
+  item_id : String
+  output_index : Int
+  delta : String
+}
+pub fn ResponseFunctionCallArgumentsDeltaEvent::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ResponseFunctionCallArgumentsDeltaEvent::to_json(Self) -> Json
+pub impl ToJson for ResponseFunctionCallArgumentsDeltaEvent
+pub impl @moonbitlang/core/json.FromJson for ResponseFunctionCallArgumentsDeltaEvent
+
+pub(all) struct ResponseFunctionCallArgumentsDoneEvent {
+  type_ : String
+  item_id : String
+  output_index : Int
+  arguments : String
+}
+pub fn ResponseFunctionCallArgumentsDoneEvent::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ResponseFunctionCallArgumentsDoneEvent::to_json(Self) -> Json
+pub impl ToJson for ResponseFunctionCallArgumentsDoneEvent
+pub impl @moonbitlang/core/json.FromJson for ResponseFunctionCallArgumentsDoneEvent
+
+pub(all) struct ResponseInProgressEvent {
+  type_ : String
+  response : Response
+}
+pub fn ResponseInProgressEvent::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ResponseInProgressEvent::to_json(Self) -> Json
+pub impl ToJson for ResponseInProgressEvent
+pub impl @moonbitlang/core/json.FromJson for ResponseInProgressEvent
+
+pub(all) struct ResponseIncompleteDetails {
+  reason : ResponseIncompleteDetailsReason?
+}
+pub fn ResponseIncompleteDetails::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ResponseIncompleteDetails::to_json(Self) -> Json
+pub impl ToJson for ResponseIncompleteDetails
+pub impl @moonbitlang/core/json.FromJson for ResponseIncompleteDetails
+
+pub(all) enum ResponseIncompleteDetailsReason {
+  MaxOutputTokens
+  ContentFilter
+  Unknown(String)
+}
+pub fn ResponseIncompleteDetailsReason::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ResponseIncompleteDetailsReason::to_json(Self) -> Json
+pub impl ToJson for ResponseIncompleteDetailsReason
+pub impl @moonbitlang/core/json.FromJson for ResponseIncompleteDetailsReason
+
+pub(all) struct ResponseIncompleteEvent {
+  type_ : String
+  response : Response
+}
+pub fn ResponseIncompleteEvent::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ResponseIncompleteEvent::to_json(Self) -> Json
+pub impl ToJson for ResponseIncompleteEvent
+pub impl @moonbitlang/core/json.FromJson for ResponseIncompleteEvent
+
+pub(all) struct ResponseOutputItemAddedEvent {
+  type_ : String
+  output_index : Int
+  item : OutputItem
+}
+pub fn ResponseOutputItemAddedEvent::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ResponseOutputItemAddedEvent::to_json(Self) -> Json
+pub impl ToJson for ResponseOutputItemAddedEvent
+pub impl @moonbitlang/core/json.FromJson for ResponseOutputItemAddedEvent
+
+pub(all) struct ResponseOutputItemDoneEvent {
+  type_ : String
+  output_index : Int
+  item : OutputItem
+}
+pub fn ResponseOutputItemDoneEvent::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ResponseOutputItemDoneEvent::to_json(Self) -> Json
+pub impl ToJson for ResponseOutputItemDoneEvent
+pub impl @moonbitlang/core/json.FromJson for ResponseOutputItemDoneEvent
+
+pub(all) struct ResponseProperties {
+  previous_response_id : @gaato/sdk-runtime/json.Presence[String]
+  model : String?
+  reasoning : @gaato/sdk-runtime/json.Presence[Reasoning]
+  max_output_tokens : @gaato/sdk-runtime/json.Presence[Int]
+  instructions : @gaato/sdk-runtime/json.Presence[String]
+  text : ResponsePropertiesText?
+  tools : Array[Tool]?
+  tool_choice : Json?
+  truncation : @gaato/sdk-runtime/json.Presence[ResponsePropertiesTruncation]
+}
+pub fn ResponseProperties::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ResponseProperties::to_json(Self) -> Json
+pub impl ToJson for ResponseProperties
+pub impl @moonbitlang/core/json.FromJson for ResponseProperties
+
+pub(all) struct ResponsePropertiesText {
+  format : TextResponseFormatConfiguration?
+}
+pub fn ResponsePropertiesText::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ResponsePropertiesText::to_json(Self) -> Json
+pub impl ToJson for ResponsePropertiesText
+pub impl @moonbitlang/core/json.FromJson for ResponsePropertiesText
+
+pub(all) enum ResponsePropertiesTruncation {
+  Auto
+  Disabled
+  Unknown(String)
+}
+pub fn ResponsePropertiesTruncation::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ResponsePropertiesTruncation::to_json(Self) -> Json
+pub impl ToJson for ResponsePropertiesTruncation
+pub impl @moonbitlang/core/json.FromJson for ResponsePropertiesTruncation
+
+pub(all) struct ResponseReasoningSummaryPartAddedEvent {
+  type_ : String
+  item_id : String
+  output_index : Int
+  summary_index : Int
+  part : ResponseReasoningSummaryPartAddedEventPart
+}
+pub fn ResponseReasoningSummaryPartAddedEvent::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ResponseReasoningSummaryPartAddedEvent::to_json(Self) -> Json
+pub impl ToJson for ResponseReasoningSummaryPartAddedEvent
+pub impl @moonbitlang/core/json.FromJson for ResponseReasoningSummaryPartAddedEvent
+
+pub(all) struct ResponseReasoningSummaryPartAddedEventPart {
+  text : String
+}
+pub fn ResponseReasoningSummaryPartAddedEventPart::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ResponseReasoningSummaryPartAddedEventPart::to_json(Self) -> Json
+pub impl ToJson for ResponseReasoningSummaryPartAddedEventPart
+pub impl @moonbitlang/core/json.FromJson for ResponseReasoningSummaryPartAddedEventPart
+
+pub(all) struct ResponseReasoningSummaryPartDoneEvent {
+  type_ : String
+  item_id : String
+  output_index : Int
+  summary_index : Int
+  part : ResponseReasoningSummaryPartDoneEventPart
+}
+pub fn ResponseReasoningSummaryPartDoneEvent::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ResponseReasoningSummaryPartDoneEvent::to_json(Self) -> Json
+pub impl ToJson for ResponseReasoningSummaryPartDoneEvent
+pub impl @moonbitlang/core/json.FromJson for ResponseReasoningSummaryPartDoneEvent
+
+pub(all) struct ResponseReasoningSummaryPartDoneEventPart {
+  text : String
+}
+pub fn ResponseReasoningSummaryPartDoneEventPart::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ResponseReasoningSummaryPartDoneEventPart::to_json(Self) -> Json
+pub impl ToJson for ResponseReasoningSummaryPartDoneEventPart
+pub impl @moonbitlang/core/json.FromJson for ResponseReasoningSummaryPartDoneEventPart
+
+pub(all) struct ResponseReasoningSummaryTextDeltaEvent {
+  type_ : String
+  item_id : String
+  output_index : Int
+  summary_index : Int
+  delta : String
+}
+pub fn ResponseReasoningSummaryTextDeltaEvent::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ResponseReasoningSummaryTextDeltaEvent::to_json(Self) -> Json
+pub impl ToJson for ResponseReasoningSummaryTextDeltaEvent
+pub impl @moonbitlang/core/json.FromJson for ResponseReasoningSummaryTextDeltaEvent
+
+pub(all) struct ResponseReasoningSummaryTextDoneEvent {
+  type_ : String
+  item_id : String
+  output_index : Int
+  summary_index : Int
+  text : String
+}
+pub fn ResponseReasoningSummaryTextDoneEvent::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ResponseReasoningSummaryTextDoneEvent::to_json(Self) -> Json
+pub impl ToJson for ResponseReasoningSummaryTextDoneEvent
+pub impl @moonbitlang/core/json.FromJson for ResponseReasoningSummaryTextDoneEvent
+
+pub(all) struct ResponseRefusalDeltaEvent {
+  type_ : String
+  item_id : String
+  output_index : Int
+  content_index : Int
+  delta : String
+}
+pub fn ResponseRefusalDeltaEvent::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ResponseRefusalDeltaEvent::to_json(Self) -> Json
+pub impl ToJson for ResponseRefusalDeltaEvent
+pub impl @moonbitlang/core/json.FromJson for ResponseRefusalDeltaEvent
+
+pub(all) struct ResponseRefusalDoneEvent {
+  type_ : String
+  item_id : String
+  output_index : Int
+  content_index : Int
+  refusal : String
+}
+pub fn ResponseRefusalDoneEvent::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ResponseRefusalDoneEvent::to_json(Self) -> Json
+pub impl ToJson for ResponseRefusalDoneEvent
+pub impl @moonbitlang/core/json.FromJson for ResponseRefusalDoneEvent
+
+pub(all) enum ResponseStatus {
+  Completed
+  Failed
+  InProgress
+  Incomplete
+  Unknown(String)
+}
+pub fn ResponseStatus::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ResponseStatus::to_json(Self) -> Json
+pub impl ToJson for ResponseStatus
+pub impl @moonbitlang/core/json.FromJson for ResponseStatus
+
+pub(all) enum ResponseStreamEvent {
+  ResponseAudioDelta(ResponseAudioDeltaEvent)
+  ResponseAudioDone(ResponseAudioDoneEvent)
+  ResponseAudioTranscriptDelta(ResponseAudioTranscriptDeltaEvent)
+  ResponseAudioTranscriptDone(ResponseAudioTranscriptDoneEvent)
+  ResponseCodeInterpreterCallCodeDelta(ResponseCodeInterpreterCallCodeDeltaEvent)
+  ResponseCodeInterpreterCallCodeDone(ResponseCodeInterpreterCallCodeDoneEvent)
+  ResponseCodeInterpreterCallCompleted(ResponseCodeInterpreterCallCompletedEvent)
+  ResponseCodeInterpreterCallInProgress(ResponseCodeInterpreterCallInProgressEvent)
+  ResponseCodeInterpreterCallInterpreting(ResponseCodeInterpreterCallInterpretingEvent)
+  ResponseCompleted(ResponseCompletedEvent)
+  ResponseContentPartAdded(ResponseContentPartAddedEvent)
+  ResponseContentPartDone(ResponseContentPartDoneEvent)
+  ResponseCreated(ResponseCreatedEvent)
+  Error(ResponseErrorEvent)
+  ResponseFileSearchCallCompleted(ResponseFileSearchCallCompletedEvent)
+  ResponseFileSearchCallInProgress(ResponseFileSearchCallInProgressEvent)
+  ResponseFileSearchCallSearching(ResponseFileSearchCallSearchingEvent)
+  ResponseFunctionCallArgumentsDelta(ResponseFunctionCallArgumentsDeltaEvent)
+  ResponseFunctionCallArgumentsDone(ResponseFunctionCallArgumentsDoneEvent)
+  ResponseInProgress(ResponseInProgressEvent)
+  ResponseFailed(ResponseFailedEvent)
+  ResponseIncomplete(ResponseIncompleteEvent)
+  ResponseOutputItemAdded(ResponseOutputItemAddedEvent)
+  ResponseOutputItemDone(ResponseOutputItemDoneEvent)
+  ResponseReasoningSummaryPartAdded(ResponseReasoningSummaryPartAddedEvent)
+  ResponseReasoningSummaryPartDone(ResponseReasoningSummaryPartDoneEvent)
+  ResponseReasoningSummaryTextDelta(ResponseReasoningSummaryTextDeltaEvent)
+  ResponseReasoningSummaryTextDone(ResponseReasoningSummaryTextDoneEvent)
+  ResponseRefusalDelta(ResponseRefusalDeltaEvent)
+  ResponseRefusalDone(ResponseRefusalDoneEvent)
+  ResponseOutputTextAnnotationAdded(ResponseTextAnnotationDeltaEvent)
+  ResponseOutputTextDelta(ResponseTextDeltaEvent)
+  ResponseOutputTextDone(ResponseTextDoneEvent)
+  ResponseWebSearchCallCompleted(ResponseWebSearchCallCompletedEvent)
+  ResponseWebSearchCallInProgress(ResponseWebSearchCallInProgressEvent)
+  ResponseWebSearchCallSearching(ResponseWebSearchCallSearchingEvent)
+  Unknown(String, Json)
+}
+pub fn ResponseStreamEvent::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ResponseStreamEvent::to_json(Self) -> Json
+pub impl ToJson for ResponseStreamEvent
+pub impl @moonbitlang/core/json.FromJson for ResponseStreamEvent
+
+pub(all) struct ResponseText {
+  format : TextResponseFormatConfiguration?
+}
+pub fn ResponseText::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ResponseText::to_json(Self) -> Json
+pub impl ToJson for ResponseText
+pub impl @moonbitlang/core/json.FromJson for ResponseText
+
+pub(all) struct ResponseTextAnnotationDeltaEvent {
+  type_ : String
+  item_id : String
+  output_index : Int
+  content_index : Int
+  annotation_index : Int
+  annotation : Annotation
+}
+pub fn ResponseTextAnnotationDeltaEvent::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ResponseTextAnnotationDeltaEvent::to_json(Self) -> Json
+pub impl ToJson for ResponseTextAnnotationDeltaEvent
+pub impl @moonbitlang/core/json.FromJson for ResponseTextAnnotationDeltaEvent
+
+pub(all) struct ResponseTextDeltaEvent {
+  type_ : String
+  item_id : String
+  output_index : Int
+  content_index : Int
+  delta : String
+}
+pub fn ResponseTextDeltaEvent::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ResponseTextDeltaEvent::to_json(Self) -> Json
+pub impl ToJson for ResponseTextDeltaEvent
+pub impl @moonbitlang/core/json.FromJson for ResponseTextDeltaEvent
+
+pub(all) struct ResponseTextDoneEvent {
+  type_ : String
+  item_id : String
+  output_index : Int
+  content_index : Int
+  text : String
+}
+pub fn ResponseTextDoneEvent::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ResponseTextDoneEvent::to_json(Self) -> Json
+pub impl ToJson for ResponseTextDoneEvent
+pub impl @moonbitlang/core/json.FromJson for ResponseTextDoneEvent
+
+pub(all) enum ResponseTruncation {
+  Auto
+  Disabled
+  Unknown(String)
+}
+pub fn ResponseTruncation::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ResponseTruncation::to_json(Self) -> Json
+pub impl ToJson for ResponseTruncation
+pub impl @moonbitlang/core/json.FromJson for ResponseTruncation
+
+pub(all) struct ResponseUsage {
+  input_tokens : Int
+  input_tokens_details : ResponseUsageInputTokensDetails
+  output_tokens : Int
+  output_tokens_details : ResponseUsageOutputTokensDetails
+  total_tokens : Int
+}
+pub fn ResponseUsage::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ResponseUsage::to_json(Self) -> Json
+pub impl ToJson for ResponseUsage
+pub impl @moonbitlang/core/json.FromJson for ResponseUsage
+
+pub(all) struct ResponseUsageInputTokensDetails {
+  cached_tokens : Int
+}
+pub fn ResponseUsageInputTokensDetails::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ResponseUsageInputTokensDetails::to_json(Self) -> Json
+pub impl ToJson for ResponseUsageInputTokensDetails
+pub impl @moonbitlang/core/json.FromJson for ResponseUsageInputTokensDetails
+
+pub(all) struct ResponseUsageOutputTokensDetails {
+  reasoning_tokens : Int
+}
+pub fn ResponseUsageOutputTokensDetails::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ResponseUsageOutputTokensDetails::to_json(Self) -> Json
+pub impl ToJson for ResponseUsageOutputTokensDetails
+pub impl @moonbitlang/core/json.FromJson for ResponseUsageOutputTokensDetails
+
+pub(all) struct ResponseWebSearchCallCompletedEvent {
+  type_ : String
+  output_index : Int
+  item_id : String
+}
+pub fn ResponseWebSearchCallCompletedEvent::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ResponseWebSearchCallCompletedEvent::to_json(Self) -> Json
+pub impl ToJson for ResponseWebSearchCallCompletedEvent
+pub impl @moonbitlang/core/json.FromJson for ResponseWebSearchCallCompletedEvent
+
+pub(all) struct ResponseWebSearchCallInProgressEvent {
+  type_ : String
+  output_index : Int
+  item_id : String
+}
+pub fn ResponseWebSearchCallInProgressEvent::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ResponseWebSearchCallInProgressEvent::to_json(Self) -> Json
+pub impl ToJson for ResponseWebSearchCallInProgressEvent
+pub impl @moonbitlang/core/json.FromJson for ResponseWebSearchCallInProgressEvent
+
+pub(all) struct ResponseWebSearchCallSearchingEvent {
+  type_ : String
+  output_index : Int
+  item_id : String
+}
+pub fn ResponseWebSearchCallSearchingEvent::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ResponseWebSearchCallSearchingEvent::to_json(Self) -> Json
+pub impl ToJson for ResponseWebSearchCallSearchingEvent
+pub impl @moonbitlang/core/json.FromJson for ResponseWebSearchCallSearchingEvent
+
+pub(all) struct Screenshot {
+  type_ : String
+}
+pub fn Screenshot::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn Screenshot::to_json(Self) -> Json
+pub impl ToJson for Screenshot
+pub impl @moonbitlang/core/json.FromJson for Screenshot
+
+pub(all) struct Scroll {
+  type_ : String
+  x : Int
+  y : Int
+  scroll_x : Int
+  scroll_y : Int
+}
+pub fn Scroll::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn Scroll::to_json(Self) -> Json
+pub impl ToJson for Scroll
+pub impl @moonbitlang/core/json.FromJson for Scroll
+
+pub(all) enum ServiceTier {
+  Auto
+  Default
+  Flex
+  Unknown(String)
+}
+pub fn ServiceTier::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ServiceTier::to_json(Self) -> Json
+pub impl ToJson for ServiceTier
+pub impl @moonbitlang/core/json.FromJson for ServiceTier
+
+pub(all) enum TextResponseFormatConfiguration {
+  Text(ResponseFormatText)
+  JsonSchema(TextResponseFormatJsonSchema)
+  JsonObject(ResponseFormatJsonObject)
+  Unknown(String, Json)
+}
+pub fn TextResponseFormatConfiguration::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn TextResponseFormatConfiguration::to_json(Self) -> Json
+pub impl ToJson for TextResponseFormatConfiguration
+pub impl @moonbitlang/core/json.FromJson for TextResponseFormatConfiguration
+
+pub(all) struct TextResponseFormatJsonSchema {
+  type_ : String
+  description : String?
+  name : String
+  schema : Json
+  strict : @gaato/sdk-runtime/json.Presence[Bool]
+}
+pub fn TextResponseFormatJsonSchema::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn TextResponseFormatJsonSchema::to_json(Self) -> Json
+pub impl ToJson for TextResponseFormatJsonSchema
+pub impl @moonbitlang/core/json.FromJson for TextResponseFormatJsonSchema
+
+pub(all) enum Tool {
+  FileSearch(FileSearchTool)
+  Function(FunctionTool)
+  WebSearchPreview(WebSearchPreviewTool)
+  ComputerUsePreview(ComputerUsePreviewTool)
+  Unknown(String, Json)
+}
+pub fn Tool::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn Tool::to_json(Self) -> Json
+pub impl ToJson for Tool
+pub impl @moonbitlang/core/json.FromJson for Tool
+
+pub(all) struct Type {
+  type_ : String
+  text : String
+}
+pub fn Type::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn Type::to_json(Self) -> Json
+pub impl ToJson for Type
+pub impl @moonbitlang/core/json.FromJson for Type
+
+pub(all) struct UrlCitationBody {
+  type_ : String
+  url : String
+  start_index : Int
+  end_index : Int
+  title : String
+}
+pub fn UrlCitationBody::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn UrlCitationBody::to_json(Self) -> Json
+pub impl ToJson for UrlCitationBody
+pub impl @moonbitlang/core/json.FromJson for UrlCitationBody
+
+pub(all) enum VectorStoreFileAttributesValue {
+  Text(String)
+  Number(Double)
+  Bool(Bool)
+}
+pub fn VectorStoreFileAttributesValue::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn VectorStoreFileAttributesValue::to_json(Self) -> Json
+pub impl ToJson for VectorStoreFileAttributesValue
+pub impl @moonbitlang/core/json.FromJson for VectorStoreFileAttributesValue
+
+pub(all) struct Wait {
+  type_ : String
+}
+pub fn Wait::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn Wait::to_json(Self) -> Json
+pub impl ToJson for Wait
+pub impl @moonbitlang/core/json.FromJson for Wait
+
+pub(all) struct WebSearchPreviewTool {
+  type_ : String
+  user_location : @gaato/sdk-runtime/json.Presence[ApproximateLocation]
+  search_context_size : WebSearchPreviewToolSearchContextSize?
+}
+pub fn WebSearchPreviewTool::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn WebSearchPreviewTool::to_json(Self) -> Json
+pub impl ToJson for WebSearchPreviewTool
+pub impl @moonbitlang/core/json.FromJson for WebSearchPreviewTool
+
+pub(all) enum WebSearchPreviewToolSearchContextSize {
+  Low
+  Medium
+  High
+  Unknown(String)
+}
+pub fn WebSearchPreviewToolSearchContextSize::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn WebSearchPreviewToolSearchContextSize::to_json(Self) -> Json
+pub impl ToJson for WebSearchPreviewToolSearchContextSize
+pub impl @moonbitlang/core/json.FromJson for WebSearchPreviewToolSearchContextSize
+
+pub(all) struct WebSearchToolCall {
+  id : String
+  type_ : String
+  status : WebSearchToolCallStatus
+}
+pub fn WebSearchToolCall::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn WebSearchToolCall::to_json(Self) -> Json
+pub impl ToJson for WebSearchToolCall
+pub impl @moonbitlang/core/json.FromJson for WebSearchToolCall
+
+pub(all) enum WebSearchToolCallStatus {
+  InProgress
+  Searching
+  Completed
+  Failed
+  Unknown(String)
+}
+pub fn WebSearchToolCallStatus::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn WebSearchToolCallStatus::to_json(Self) -> Json
+pub impl ToJson for WebSearchToolCallStatus
+pub impl @moonbitlang/core/json.FromJson for WebSearchToolCallStatus
 
 // Type aliases
 

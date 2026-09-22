@@ -115,6 +115,931 @@ fn json_int64_to_json(value : Int64) -> Json {
 }
 
 ///|
+fn[T] nullable_presence(value : T?) -> @sdkjson.Presence[T] {
+  match value {
+    Some(value) => @sdkjson.Value(value)
+    None => @sdkjson.Null
+  }
+}
+
+///|
+fn[T : @json.FromJson] decode_nullable_field(
+  obj : Map[String, Json],
+  key : String,
+  path : @json.JsonPath,
+) -> T? raise @json.JsonDecodeError {
+  let raw : Json = @sdkjson.field(obj, key, path)
+  match raw {
+    Null => None
+    value => Some(@json.from_json(value, path=path.add_key(key)))
+  }
+}
+
+///|
+fn[T : ToJson] json_map_to_json(value : Map[String, T]) -> Json {
+  let result : Map[String, Json] = Map([])
+  for key, item in value {
+    result[key] = item.to_json()
+  }
+  Json::object(result)
+}
+
+///|
+fn[T : @json.FromJson] decode_json_map(
+  value : Json,
+  path : @json.JsonPath,
+) -> Map[String, T] raise @json.JsonDecodeError {
+  let obj = @sdkjson.expect_object(value, path)
+  let result : Map[String, T] = Map([])
+  for key, item in obj {
+    result[key] = @json.from_json(item, path=path.add_key(key))
+  }
+  result
+}
+
+///|
+fn[T : @json.FromJson] decode_nullable_json_map(
+  obj : Map[String, Json],
+  key : String,
+  path : @json.JsonPath,
+) -> Map[String, T]? raise @json.JsonDecodeError {
+  let raw : Json = @sdkjson.field(obj, key, path)
+  match raw {
+    Null => None
+    value => Some(decode_json_map(value, path.add_key(key)))
+  }
+}
+
+///|
+fn[T : @json.FromJson] decode_presence_json_map(
+  obj : Map[String, Json],
+  key : String,
+  path : @json.JsonPath,
+) -> @sdkjson.Presence[Map[String, T]] raise @json.JsonDecodeError {
+  match obj.get(key) {
+    None => @sdkjson.Absent
+    Some(Null) => @sdkjson.Null
+    Some(value) => @sdkjson.Value(decode_json_map(value, path.add_key(key)))
+  }
+}
+
+///|
+///
+/// Indicates which mouse button was pressed during the click. One of `left`, `right`, `wheel`, `back`, or `forward`.
+pub(all) enum ClickButton {
+  Left
+  Right
+  Wheel
+  Back
+  Forward
+  Unknown(String)
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend ClickButton with ToJson::{to_json}
+
+///|
+pub impl ToJson for ClickButton with fn to_json(self) {
+  let raw = match self {
+    Left => "left"
+    Right => "right"
+    Wheel => "wheel"
+    Back => "back"
+    Forward => "forward"
+    Unknown(raw) => raw
+  }
+  raw.to_json()
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend ClickButton with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for ClickButton with fn from_json(value, path) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "left" => Some(Left)
+        "right" => Some(Right)
+        "wheel" => Some(Wheel)
+        "back" => Some(Back)
+        "forward" => Some(Forward)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// A click action.
+pub(all) struct Click {
+  type_ : String
+  button : ClickButton
+  x : Int
+  y : Int
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend Click with ToJson::{to_json}
+
+///|
+pub impl ToJson for Click with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("type", self.type_)
+  .field("button", self.button)
+  .field("x", self.x)
+  .field("y", self.y)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend Click with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for Click with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    type_: @sdkjson.field(obj, "type", path),
+    button: @sdkjson.field(obj, "button", path),
+    x: @sdkjson.field(obj, "x", path),
+    y: @sdkjson.field(obj, "y", path),
+  }
+}
+
+///|
+///
+/// Generated representation of CodeInterpreterFileOutputFilesItem.
+pub(all) struct CodeInterpreterFileOutputFilesItem {
+  mime_type : String
+  file_id : String
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend CodeInterpreterFileOutputFilesItem with ToJson::{to_json}
+
+///|
+pub impl ToJson for CodeInterpreterFileOutputFilesItem with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("mime_type", self.mime_type)
+  .field("file_id", self.file_id)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend CodeInterpreterFileOutputFilesItem with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for CodeInterpreterFileOutputFilesItem with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    mime_type: @sdkjson.field(obj, "mime_type", path),
+    file_id: @sdkjson.field(obj, "file_id", path),
+  }
+}
+
+///|
+///
+/// The output of a code interpreter tool call that is a file.
+pub(all) struct CodeInterpreterFileOutput {
+  type_ : String
+  files : Array[CodeInterpreterFileOutputFilesItem]
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend CodeInterpreterFileOutput with ToJson::{to_json}
+
+///|
+pub impl ToJson for CodeInterpreterFileOutput with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("type", self.type_)
+  .field("files", self.files)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend CodeInterpreterFileOutput with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for CodeInterpreterFileOutput with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    type_: @sdkjson.field(obj, "type", path),
+    files: @sdkjson.field(obj, "files", path),
+  }
+}
+
+///|
+///
+/// The output of a code interpreter tool call that is text.
+pub(all) struct CodeInterpreterTextOutput {
+  type_ : String
+  logs : String
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend CodeInterpreterTextOutput with ToJson::{to_json}
+
+///|
+pub impl ToJson for CodeInterpreterTextOutput with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("type", self.type_)
+  .field("logs", self.logs)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend CodeInterpreterTextOutput with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for CodeInterpreterTextOutput with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    type_: @sdkjson.field(obj, "type", path),
+    logs: @sdkjson.field(obj, "logs", path),
+  }
+}
+
+///|
+///
+/// The status of the code interpreter tool call.
+pub(all) enum CodeInterpreterToolCallStatus {
+  InProgress
+  Interpreting
+  Completed
+  Unknown(String)
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend CodeInterpreterToolCallStatus with ToJson::{to_json}
+
+///|
+pub impl ToJson for CodeInterpreterToolCallStatus with fn to_json(self) {
+  let raw = match self {
+    InProgress => "in_progress"
+    Interpreting => "interpreting"
+    Completed => "completed"
+    Unknown(raw) => raw
+  }
+  raw.to_json()
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend CodeInterpreterToolCallStatus with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for CodeInterpreterToolCallStatus with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "in_progress" => Some(InProgress)
+        "interpreting" => Some(Interpreting)
+        "completed" => Some(Completed)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated tagged union CodeInterpreterToolOutput.
+pub(all) enum CodeInterpreterToolOutput {
+  Logs(CodeInterpreterTextOutput)
+  Files(CodeInterpreterFileOutput)
+  Unknown(String, Json)
+}
+
+///|
+///
+/// Encodes this tagged union as JSON.
+pub extend CodeInterpreterToolOutput with ToJson::{to_json}
+
+///|
+pub impl ToJson for CodeInterpreterToolOutput with fn to_json(self) {
+  match self {
+    Logs(value) => value.to_json()
+    Files(value) => value.to_json()
+    Unknown(_, value) => value
+  }
+}
+
+///|
+///
+/// Decodes this tagged union from JSON.
+pub extend CodeInterpreterToolOutput with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for CodeInterpreterToolOutput with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  let tag : String = @sdkjson.field(obj, "type", path)
+  match tag {
+    "logs" => Logs(@json.from_json(value, path~))
+    "files" => Files(@json.from_json(value, path~))
+    other => Unknown(other, value)
+  }
+}
+
+///|
+///
+/// A tool call to run code.
+pub(all) struct CodeInterpreterToolCall {
+  id : String
+  code : String
+  status : CodeInterpreterToolCallStatus
+  results : Array[CodeInterpreterToolOutput]
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend CodeInterpreterToolCall with ToJson::{to_json}
+
+///|
+pub impl ToJson for CodeInterpreterToolCall with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("id", self.id)
+  .field("type", "code_interpreter_call")
+  .field("code", self.code)
+  .field("status", self.status)
+  .field("results", self.results)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend CodeInterpreterToolCall with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for CodeInterpreterToolCall with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    id: @sdkjson.field(obj, "id", path),
+    code: @sdkjson.field(obj, "code", path),
+    status: @sdkjson.field(obj, "status", path),
+    results: @sdkjson.field(obj, "results", path),
+  }
+}
+
+///|
+///
+/// A double click action.
+pub(all) struct DoubleClick {
+  type_ : String
+  x : Int
+  y : Int
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend DoubleClick with ToJson::{to_json}
+
+///|
+pub impl ToJson for DoubleClick with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("type", self.type_)
+  .field("x", self.x)
+  .field("y", self.y)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend DoubleClick with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for DoubleClick with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    type_: @sdkjson.field(obj, "type", path),
+    x: @sdkjson.field(obj, "x", path),
+    y: @sdkjson.field(obj, "y", path),
+  }
+}
+
+///|
+///
+/// An x/y coordinate pair, e.g. `{ x: 100, y: 200 }`.
+pub(all) struct Coordinate {
+  x : Int
+  y : Int
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend Coordinate with ToJson::{to_json}
+
+///|
+pub impl ToJson for Coordinate with fn to_json(self) {
+  @sdkjson.ObjBuilder::new().field("x", self.x).field("y", self.y).build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend Coordinate with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for Coordinate with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  { x: @sdkjson.field(obj, "x", path), y: @sdkjson.field(obj, "y", path), }
+}
+
+///|
+///
+/// A drag action.
+pub(all) struct Drag {
+  type_ : String
+  path : Array[Coordinate]
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend Drag with ToJson::{to_json}
+
+///|
+pub impl ToJson for Drag with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("type", self.type_)
+  .field("path", self.path)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend Drag with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for Drag with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    type_: @sdkjson.field(obj, "type", path),
+    path: @sdkjson.field(obj, "path", path),
+  }
+}
+
+///|
+///
+/// A collection of keypresses the model would like to perform.
+pub(all) struct KeyPress {
+  type_ : String
+  keys : Array[String]
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend KeyPress with ToJson::{to_json}
+
+///|
+pub impl ToJson for KeyPress with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("type", self.type_)
+  .field("keys", self.keys)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend KeyPress with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for KeyPress with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    type_: @sdkjson.field(obj, "type", path),
+    keys: @sdkjson.field(obj, "keys", path),
+  }
+}
+
+///|
+///
+/// A mouse move action.
+pub(all) struct Move {
+  type_ : String
+  x : Int
+  y : Int
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend Move with ToJson::{to_json}
+
+///|
+pub impl ToJson for Move with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("type", self.type_)
+  .field("x", self.x)
+  .field("y", self.y)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend Move with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for Move with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    type_: @sdkjson.field(obj, "type", path),
+    x: @sdkjson.field(obj, "x", path),
+    y: @sdkjson.field(obj, "y", path),
+  }
+}
+
+///|
+///
+/// A screenshot action.
+pub(all) struct Screenshot {
+  type_ : String
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend Screenshot with ToJson::{to_json}
+
+///|
+pub impl ToJson for Screenshot with fn to_json(self) {
+  @sdkjson.ObjBuilder::new().field("type", self.type_).build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend Screenshot with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for Screenshot with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  { type_: @sdkjson.field(obj, "type", path), }
+}
+
+///|
+///
+/// A scroll action.
+pub(all) struct Scroll {
+  type_ : String
+  x : Int
+  y : Int
+  scroll_x : Int
+  scroll_y : Int
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend Scroll with ToJson::{to_json}
+
+///|
+pub impl ToJson for Scroll with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("type", self.type_)
+  .field("x", self.x)
+  .field("y", self.y)
+  .field("scroll_x", self.scroll_x)
+  .field("scroll_y", self.scroll_y)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend Scroll with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for Scroll with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    type_: @sdkjson.field(obj, "type", path),
+    x: @sdkjson.field(obj, "x", path),
+    y: @sdkjson.field(obj, "y", path),
+    scroll_x: @sdkjson.field(obj, "scroll_x", path),
+    scroll_y: @sdkjson.field(obj, "scroll_y", path),
+  }
+}
+
+///|
+///
+/// An action to type in text.
+pub(all) struct Type {
+  type_ : String
+  text : String
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend Type with ToJson::{to_json}
+
+///|
+pub impl ToJson for Type with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("type", self.type_)
+  .field("text", self.text)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend Type with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for Type with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    type_: @sdkjson.field(obj, "type", path),
+    text: @sdkjson.field(obj, "text", path),
+  }
+}
+
+///|
+///
+/// A wait action.
+pub(all) struct Wait {
+  type_ : String
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend Wait with ToJson::{to_json}
+
+///|
+pub impl ToJson for Wait with fn to_json(self) {
+  @sdkjson.ObjBuilder::new().field("type", self.type_).build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend Wait with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for Wait with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  { type_: @sdkjson.field(obj, "type", path), }
+}
+
+///|
+///
+/// Generated tagged union ComputerAction.
+pub(all) enum ComputerAction {
+  Click(Click)
+  DoubleClick(DoubleClick)
+  Drag(Drag)
+  Keypress(KeyPress)
+  Move(Move)
+  Screenshot(Screenshot)
+  Scroll(Scroll)
+  Type(Type)
+  Wait(Wait)
+  Unknown(String, Json)
+}
+
+///|
+///
+/// Encodes this tagged union as JSON.
+pub extend ComputerAction with ToJson::{to_json}
+
+///|
+pub impl ToJson for ComputerAction with fn to_json(self) {
+  match self {
+    Click(value) => value.to_json()
+    DoubleClick(value) => value.to_json()
+    Drag(value) => value.to_json()
+    Keypress(value) => value.to_json()
+    Move(value) => value.to_json()
+    Screenshot(value) => value.to_json()
+    Scroll(value) => value.to_json()
+    Type(value) => value.to_json()
+    Wait(value) => value.to_json()
+    Unknown(_, value) => value
+  }
+}
+
+///|
+///
+/// Decodes this tagged union from JSON.
+pub extend ComputerAction with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for ComputerAction with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  let tag : String = @sdkjson.field(obj, "type", path)
+  match tag {
+    "click" => Click(@json.from_json(value, path~))
+    "double_click" => DoubleClick(@json.from_json(value, path~))
+    "drag" => Drag(@json.from_json(value, path~))
+    "keypress" => Keypress(@json.from_json(value, path~))
+    "move" => Move(@json.from_json(value, path~))
+    "screenshot" => Screenshot(@json.from_json(value, path~))
+    "scroll" => Scroll(@json.from_json(value, path~))
+    "type" => Type(@json.from_json(value, path~))
+    "wait" => Wait(@json.from_json(value, path~))
+    other => Unknown(other, value)
+  }
+}
+
+///|
+///
+/// A pending safety check for the computer call.
+pub(all) struct ComputerToolCallSafetyCheck {
+  id : String
+  code : String
+  message : String
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend ComputerToolCallSafetyCheck with ToJson::{to_json}
+
+///|
+pub impl ToJson for ComputerToolCallSafetyCheck with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("id", self.id)
+  .field("code", self.code)
+  .field("message", self.message)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend ComputerToolCallSafetyCheck with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for ComputerToolCallSafetyCheck with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    id: @sdkjson.field(obj, "id", path),
+    code: @sdkjson.field(obj, "code", path),
+    message: @sdkjson.field(obj, "message", path),
+  }
+}
+
+///|
+///
+/// The status of the item. One of `in_progress`, `completed`, or `incomplete`. Populated when items are returned via API.
+pub(all) enum ComputerToolCallStatus {
+  InProgress
+  Completed
+  Incomplete
+  Unknown(String)
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend ComputerToolCallStatus with ToJson::{to_json}
+
+///|
+pub impl ToJson for ComputerToolCallStatus with fn to_json(self) {
+  let raw = match self {
+    InProgress => "in_progress"
+    Completed => "completed"
+    Incomplete => "incomplete"
+    Unknown(raw) => raw
+  }
+  raw.to_json()
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend ComputerToolCallStatus with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for ComputerToolCallStatus with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "in_progress" => Some(InProgress)
+        "completed" => Some(Completed)
+        "incomplete" => Some(Incomplete)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// A tool call to a computer use tool. See the [computer use guide](/docs/guides/tools-computer-use) for more information.
+pub(all) struct ComputerToolCall {
+  type_ : String
+  id : String
+  call_id : String
+  action : ComputerAction
+  pending_safety_checks : Array[ComputerToolCallSafetyCheck]
+  status : ComputerToolCallStatus
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend ComputerToolCall with ToJson::{to_json}
+
+///|
+pub impl ToJson for ComputerToolCall with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("type", self.type_)
+  .field("id", self.id)
+  .field("call_id", self.call_id)
+  .field("action", self.action)
+  .field("pending_safety_checks", self.pending_safety_checks)
+  .field("status", self.status)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend ComputerToolCall with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for ComputerToolCall with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    type_: @sdkjson.field(obj, "type", path),
+    id: @sdkjson.field(obj, "id", path),
+    call_id: @sdkjson.field(obj, "call_id", path),
+    action: @sdkjson.field(obj, "action", path),
+    pending_safety_checks: @sdkjson.field(obj, "pending_safety_checks", path),
+    status: @sdkjson.field(obj, "status", path),
+  }
+}
+
+///|
 ///
 /// Input text to embed, encoded as a string or array of tokens. To embed multiple inputs in a single request, pass an array of strings or array of token arrays. The input must not exceed the max input tokens for the model (8192 tokens for `text-embedding-ada-002`), cannot be an empty string, and any array must be 2048 dimensions or less. [Example Python code](https://cookbook.openai.com/examples/how_to_count_tokens_with_tiktoken) for counting tokens. Some models may also impose a limit on total number of tokens summed across inputs.
 pub(all) enum CreateEmbeddingRequestInput {
@@ -385,6 +1310,1479 @@ pub impl @json.FromJson for CreateEmbeddingResponse with fn from_json(
 
 ///|
 ///
+/// Specifies the latency tier to use for processing the request. This parameter is relevant for customers subscribed to the scale tier service: - If set to 'auto', and the Project is Scale tier enabled, the system will utilize scale tier credits until they are exhausted. - If set to 'auto', and the Project is not Scale tier enabled, the request will be processed using the default service tier with a lower uptime SLA and no latency guarentee. - If set to 'default', the request will be processed using the default service tier with a lower uptime SLA and no latency guarentee. - If set to 'flex', the request will be processed with the Flex Processing service tier. [Learn more](/docs/guides/flex-processing). - When not set, the default behavior is 'auto'. When this parameter is set, the response body will include the `service_tier` utilized.
+pub(all) enum ServiceTier {
+  Auto
+  Default
+  Flex
+  Unknown(String)
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend ServiceTier with ToJson::{to_json}
+
+///|
+pub impl ToJson for ServiceTier with fn to_json(self) {
+  let raw = match self {
+    Auto => "auto"
+    Default => "default"
+    Flex => "flex"
+    Unknown(raw) => raw
+  }
+  raw.to_json()
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend ServiceTier with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for ServiceTier with fn from_json(value, path) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "auto" => Some(Auto)
+        "default" => Some(Default)
+        "flex" => Some(Flex)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of ModelResponseProperties.
+pub(all) struct ModelResponseProperties {
+  metadata : @sdkjson.Presence[Map[String, String]]
+  temperature : @sdkjson.Presence[Double]
+  top_p : @sdkjson.Presence[Double]
+  user : String?
+  service_tier : @sdkjson.Presence[ServiceTier]
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend ModelResponseProperties with ToJson::{to_json}
+
+///|
+pub impl ToJson for ModelResponseProperties with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .presence("metadata", self.metadata.map(value => json_map_to_json(value)))
+  .presence("temperature", self.temperature)
+  .presence("top_p", self.top_p)
+  .opt("user", self.user)
+  .presence("service_tier", self.service_tier)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend ModelResponseProperties with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for ModelResponseProperties with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    metadata: decode_presence_json_map(obj, "metadata", path),
+    temperature: @sdkjson.presence_field(obj, "temperature", path),
+    top_p: @sdkjson.presence_field(obj, "top_p", path),
+    user: @sdkjson.opt_field(obj, "user", path),
+    service_tier: @sdkjson.presence_field(obj, "service_tier", path),
+  }
+}
+
+///|
+///
+/// **o-series models only** Constrains effort on reasoning for [reasoning models](https://platform.openai.com/docs/guides/reasoning). Currently supported values are `low`, `medium`, and `high`. Reducing reasoning effort can result in faster responses and fewer tokens used on reasoning in a response.
+pub(all) enum ReasoningEffort {
+  Low
+  Medium
+  High
+  Unknown(String)
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend ReasoningEffort with ToJson::{to_json}
+
+///|
+pub impl ToJson for ReasoningEffort with fn to_json(self) {
+  let raw = match self {
+    Low => "low"
+    Medium => "medium"
+    High => "high"
+    Unknown(raw) => raw
+  }
+  raw.to_json()
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend ReasoningEffort with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for ReasoningEffort with fn from_json(value, path) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "low" => Some(Low)
+        "medium" => Some(Medium)
+        "high" => Some(High)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// A summary of the reasoning performed by the model. This can be useful for debugging and understanding the model's reasoning process. One of `auto`, `concise`, or `detailed`.
+pub(all) enum ReasoningSummary {
+  Auto
+  Concise
+  Detailed
+  Unknown(String)
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend ReasoningSummary with ToJson::{to_json}
+
+///|
+pub impl ToJson for ReasoningSummary with fn to_json(self) {
+  let raw = match self {
+    Auto => "auto"
+    Concise => "concise"
+    Detailed => "detailed"
+    Unknown(raw) => raw
+  }
+  raw.to_json()
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend ReasoningSummary with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for ReasoningSummary with fn from_json(value, path) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "auto" => Some(Auto)
+        "concise" => Some(Concise)
+        "detailed" => Some(Detailed)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// **Deprecated:** use `summary` instead. A summary of the reasoning performed by the model. This can be useful for debugging and understanding the model's reasoning process. One of `auto`, `concise`, or `detailed`.
+pub(all) enum ReasoningGenerateSummary {
+  Auto
+  Concise
+  Detailed
+  Unknown(String)
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend ReasoningGenerateSummary with ToJson::{to_json}
+
+///|
+pub impl ToJson for ReasoningGenerateSummary with fn to_json(self) {
+  let raw = match self {
+    Auto => "auto"
+    Concise => "concise"
+    Detailed => "detailed"
+    Unknown(raw) => raw
+  }
+  raw.to_json()
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend ReasoningGenerateSummary with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for ReasoningGenerateSummary with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "auto" => Some(Auto)
+        "concise" => Some(Concise)
+        "detailed" => Some(Detailed)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// **o-series models only** Configuration options for [reasoning models](https://platform.openai.com/docs/guides/reasoning).
+pub(all) struct Reasoning {
+  effort : @sdkjson.Presence[ReasoningEffort]
+  summary : @sdkjson.Presence[ReasoningSummary]
+  generate_summary : @sdkjson.Presence[ReasoningGenerateSummary]
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend Reasoning with ToJson::{to_json}
+
+///|
+pub impl ToJson for Reasoning with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .presence("effort", self.effort)
+  .presence("summary", self.summary)
+  .presence("generate_summary", self.generate_summary)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend Reasoning with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for Reasoning with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    effort: @sdkjson.presence_field(obj, "effort", path),
+    summary: @sdkjson.presence_field(obj, "summary", path),
+    generate_summary: @sdkjson.presence_field(obj, "generate_summary", path),
+  }
+}
+
+///|
+///
+/// Default response format. Used to generate text responses.
+pub(all) struct ResponseFormatText {
+  type_ : String
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend ResponseFormatText with ToJson::{to_json}
+
+///|
+pub impl ToJson for ResponseFormatText with fn to_json(self) {
+  @sdkjson.ObjBuilder::new().field("type", self.type_).build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend ResponseFormatText with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for ResponseFormatText with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  { type_: @sdkjson.field(obj, "type", path), }
+}
+
+///|
+///
+/// JSON Schema response format. Used to generate structured JSON responses. Learn more about [Structured Outputs](/docs/guides/structured-outputs).
+pub(all) struct TextResponseFormatJsonSchema {
+  type_ : String
+  description : String?
+  name : String
+  schema : Json
+  strict : @sdkjson.Presence[Bool]
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend TextResponseFormatJsonSchema with ToJson::{to_json}
+
+///|
+pub impl ToJson for TextResponseFormatJsonSchema with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("type", self.type_)
+  .opt("description", self.description)
+  .field("name", self.name)
+  .field("schema", self.schema)
+  .presence("strict", self.strict)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend TextResponseFormatJsonSchema with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for TextResponseFormatJsonSchema with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    type_: @sdkjson.field(obj, "type", path),
+    description: @sdkjson.opt_field(obj, "description", path),
+    name: @sdkjson.field(obj, "name", path),
+    schema: @sdkjson.field(obj, "schema", path),
+    strict: @sdkjson.presence_field(obj, "strict", path),
+  }
+}
+
+///|
+///
+/// JSON object response format. An older method of generating JSON responses. Using `json_schema` is recommended for models that support it. Note that the model will not generate JSON without a system or user message instructing it to do so.
+pub(all) struct ResponseFormatJsonObject {
+  type_ : String
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend ResponseFormatJsonObject with ToJson::{to_json}
+
+///|
+pub impl ToJson for ResponseFormatJsonObject with fn to_json(self) {
+  @sdkjson.ObjBuilder::new().field("type", self.type_).build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend ResponseFormatJsonObject with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for ResponseFormatJsonObject with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  { type_: @sdkjson.field(obj, "type", path), }
+}
+
+///|
+///
+/// An object specifying the format that the model must output. Configuring `{ "type": "json_schema" }` enables Structured Outputs, which ensures the model will match your supplied JSON schema. Learn more in the [Structured Outputs guide](/docs/guides/structured-outputs). The default format is `{ "type": "text" }` with no additional options. **Not recommended for gpt-4o and newer models:** Setting to `{ "type": "json_object" }` enables the older JSON mode, which ensures the message the model generates is valid JSON. Using `json_schema` is preferred for models that support it.
+pub(all) enum TextResponseFormatConfiguration {
+  Text(ResponseFormatText)
+  JsonSchema(TextResponseFormatJsonSchema)
+  JsonObject(ResponseFormatJsonObject)
+  Unknown(String, Json)
+}
+
+///|
+///
+/// Encodes this tagged union as JSON.
+pub extend TextResponseFormatConfiguration with ToJson::{to_json}
+
+///|
+pub impl ToJson for TextResponseFormatConfiguration with fn to_json(self) {
+  match self {
+    Text(value) => value.to_json()
+    JsonSchema(value) => value.to_json()
+    JsonObject(value) => value.to_json()
+    Unknown(_, value) => value
+  }
+}
+
+///|
+///
+/// Decodes this tagged union from JSON.
+pub extend TextResponseFormatConfiguration with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for TextResponseFormatConfiguration with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  let tag : String = @sdkjson.field(obj, "type", path)
+  match tag {
+    "text" => Text(@json.from_json(value, path~))
+    "json_schema" => JsonSchema(@json.from_json(value, path~))
+    "json_object" => JsonObject(@json.from_json(value, path~))
+    other => Unknown(other, value)
+  }
+}
+
+///|
+///
+/// Configuration options for a text response from the model. Can be plain text or structured JSON data. Learn more: - [Text inputs and outputs](/docs/guides/text) - [Structured Outputs](/docs/guides/structured-outputs)
+pub(all) struct CreateResponseText {
+  format : TextResponseFormatConfiguration?
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend CreateResponseText with ToJson::{to_json}
+
+///|
+pub impl ToJson for CreateResponseText with fn to_json(self) {
+  @sdkjson.ObjBuilder::new().opt("format", self.format).build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend CreateResponseText with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for CreateResponseText with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  { format: @sdkjson.opt_field(obj, "format", path), }
+}
+
+///|
+///
+/// The ranker to use for the file search.
+pub(all) enum RankingOptionsRanker {
+  Auto
+  Default20241115
+  Unknown(String)
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend RankingOptionsRanker with ToJson::{to_json}
+
+///|
+pub impl ToJson for RankingOptionsRanker with fn to_json(self) {
+  let raw = match self {
+    Auto => "auto"
+    Default20241115 => "default-2024-11-15"
+    Unknown(raw) => raw
+  }
+  raw.to_json()
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend RankingOptionsRanker with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for RankingOptionsRanker with fn from_json(value, path) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "auto" => Some(Auto)
+        "default-2024-11-15" => Some(Default20241115)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of RankingOptions.
+pub(all) struct RankingOptions {
+  ranker : RankingOptionsRanker?
+  score_threshold : Double?
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend RankingOptions with ToJson::{to_json}
+
+///|
+pub impl ToJson for RankingOptions with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .opt("ranker", self.ranker)
+  .opt("score_threshold", self.score_threshold)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend RankingOptions with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for RankingOptions with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    ranker: @sdkjson.opt_field(obj, "ranker", path),
+    score_threshold: @sdkjson.opt_field(obj, "score_threshold", path),
+  }
+}
+
+///|
+///
+/// A tool that searches for relevant content from uploaded files. Learn more about the [file search tool](https://platform.openai.com/docs/guides/tools-file-search).
+pub(all) struct FileSearchTool {
+  type_ : String
+  vector_store_ids : Array[String]
+  max_num_results : Int?
+  ranking_options : RankingOptions?
+  filters : @sdkjson.Presence[Json]
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend FileSearchTool with ToJson::{to_json}
+
+///|
+pub impl ToJson for FileSearchTool with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("type", self.type_)
+  .field("vector_store_ids", self.vector_store_ids)
+  .opt("max_num_results", self.max_num_results)
+  .opt("ranking_options", self.ranking_options)
+  .presence("filters", self.filters)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend FileSearchTool with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for FileSearchTool with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    type_: @sdkjson.field(obj, "type", path),
+    vector_store_ids: @sdkjson.field(obj, "vector_store_ids", path),
+    max_num_results: @sdkjson.opt_field(obj, "max_num_results", path),
+    ranking_options: @sdkjson.opt_field(obj, "ranking_options", path),
+    filters: @sdkjson.presence_field(obj, "filters", path),
+  }
+}
+
+///|
+///
+/// Defines a function in your own code the model can choose to call. Learn more about [function calling](https://platform.openai.com/docs/guides/function-calling).
+pub(all) struct FunctionTool {
+  type_ : String
+  name : String
+  description : @sdkjson.Presence[String]
+  parameters : Json?
+  strict : Bool?
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend FunctionTool with ToJson::{to_json}
+
+///|
+pub impl ToJson for FunctionTool with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("type", self.type_)
+  .field("name", self.name)
+  .presence("description", self.description)
+  .presence(
+    "parameters",
+    nullable_presence(self.parameters.map(value => value)),
+  )
+  .presence("strict", nullable_presence(self.strict.map(value => value)))
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend FunctionTool with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for FunctionTool with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    type_: @sdkjson.field(obj, "type", path),
+    name: @sdkjson.field(obj, "name", path),
+    description: @sdkjson.presence_field(obj, "description", path),
+    parameters: decode_nullable_field(obj, "parameters", path),
+    strict: decode_nullable_field(obj, "strict", path),
+  }
+}
+
+///|
+///
+/// Generated representation of ApproximateLocation.
+pub(all) struct ApproximateLocation {
+  country : @sdkjson.Presence[String]
+  region : @sdkjson.Presence[String]
+  city : @sdkjson.Presence[String]
+  timezone : @sdkjson.Presence[String]
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend ApproximateLocation with ToJson::{to_json}
+
+///|
+pub impl ToJson for ApproximateLocation with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("type", "approximate")
+  .presence("country", self.country)
+  .presence("region", self.region)
+  .presence("city", self.city)
+  .presence("timezone", self.timezone)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend ApproximateLocation with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for ApproximateLocation with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    country: @sdkjson.presence_field(obj, "country", path),
+    region: @sdkjson.presence_field(obj, "region", path),
+    city: @sdkjson.presence_field(obj, "city", path),
+    timezone: @sdkjson.presence_field(obj, "timezone", path),
+  }
+}
+
+///|
+///
+/// High level guidance for the amount of context window space to use for the search. One of `low`, `medium`, or `high`. `medium` is the default.
+pub(all) enum WebSearchPreviewToolSearchContextSize {
+  Low
+  Medium
+  High
+  Unknown(String)
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend WebSearchPreviewToolSearchContextSize with ToJson::{to_json}
+
+///|
+pub impl ToJson for WebSearchPreviewToolSearchContextSize with fn to_json(self) {
+  let raw = match self {
+    Low => "low"
+    Medium => "medium"
+    High => "high"
+    Unknown(raw) => raw
+  }
+  raw.to_json()
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend WebSearchPreviewToolSearchContextSize with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for WebSearchPreviewToolSearchContextSize with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "low" => Some(Low)
+        "medium" => Some(Medium)
+        "high" => Some(High)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// This tool searches the web for relevant results to use in a response. Learn more about the [web search tool](https://platform.openai.com/docs/guides/tools-web-search).
+pub(all) struct WebSearchPreviewTool {
+  type_ : String
+  user_location : @sdkjson.Presence[ApproximateLocation]
+  search_context_size : WebSearchPreviewToolSearchContextSize?
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend WebSearchPreviewTool with ToJson::{to_json}
+
+///|
+pub impl ToJson for WebSearchPreviewTool with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("type", self.type_)
+  .presence("user_location", self.user_location)
+  .opt("search_context_size", self.search_context_size)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend WebSearchPreviewTool with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for WebSearchPreviewTool with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    type_: @sdkjson.field(obj, "type", path),
+    user_location: @sdkjson.presence_field(obj, "user_location", path),
+    search_context_size: @sdkjson.opt_field(obj, "search_context_size", path),
+  }
+}
+
+///|
+///
+/// The type of computer environment to control.
+pub(all) enum ComputerUsePreviewToolEnvironment {
+  Windows
+  Mac
+  Linux
+  Ubuntu
+  Browser
+  Unknown(String)
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend ComputerUsePreviewToolEnvironment with ToJson::{to_json}
+
+///|
+pub impl ToJson for ComputerUsePreviewToolEnvironment with fn to_json(self) {
+  let raw = match self {
+    Windows => "windows"
+    Mac => "mac"
+    Linux => "linux"
+    Ubuntu => "ubuntu"
+    Browser => "browser"
+    Unknown(raw) => raw
+  }
+  raw.to_json()
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend ComputerUsePreviewToolEnvironment with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for ComputerUsePreviewToolEnvironment with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "windows" => Some(Windows)
+        "mac" => Some(Mac)
+        "linux" => Some(Linux)
+        "ubuntu" => Some(Ubuntu)
+        "browser" => Some(Browser)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// A tool that controls a virtual computer. Learn more about the [computer tool](https://platform.openai.com/docs/guides/tools-computer-use).
+pub(all) struct ComputerUsePreviewTool {
+  type_ : String
+  environment : ComputerUsePreviewToolEnvironment
+  display_width : Int
+  display_height : Int
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend ComputerUsePreviewTool with ToJson::{to_json}
+
+///|
+pub impl ToJson for ComputerUsePreviewTool with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("type", self.type_)
+  .field("environment", self.environment)
+  .field("display_width", self.display_width)
+  .field("display_height", self.display_height)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend ComputerUsePreviewTool with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for ComputerUsePreviewTool with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    type_: @sdkjson.field(obj, "type", path),
+    environment: @sdkjson.field(obj, "environment", path),
+    display_width: @sdkjson.field(obj, "display_width", path),
+    display_height: @sdkjson.field(obj, "display_height", path),
+  }
+}
+
+///|
+///
+/// Generated tagged union Tool.
+pub(all) enum Tool {
+  FileSearch(FileSearchTool)
+  Function(FunctionTool)
+  WebSearchPreview(WebSearchPreviewTool)
+  ComputerUsePreview(ComputerUsePreviewTool)
+  Unknown(String, Json)
+}
+
+///|
+///
+/// Encodes this tagged union as JSON.
+pub extend Tool with ToJson::{to_json}
+
+///|
+pub impl ToJson for Tool with fn to_json(self) {
+  match self {
+    FileSearch(value) => value.to_json()
+    Function(value) => value.to_json()
+    WebSearchPreview(value) => value.to_json()
+    ComputerUsePreview(value) => value.to_json()
+    Unknown(_, value) => value
+  }
+}
+
+///|
+///
+/// Decodes this tagged union from JSON.
+pub extend Tool with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for Tool with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  let tag : String = @sdkjson.field(obj, "type", path)
+  match tag {
+    "file_search" => FileSearch(@json.from_json(value, path~))
+    "function" => Function(@json.from_json(value, path~))
+    "web_search_preview" => WebSearchPreview(@json.from_json(value, path~))
+    "computer_use_preview" => ComputerUsePreview(@json.from_json(value, path~))
+    other => Unknown(other, value)
+  }
+}
+
+///|
+///
+/// The truncation strategy to use for the model response. - `auto`: If the context of this response and previous ones exceeds the model's context window size, the model will truncate the response to fit the context window by dropping input items in the middle of the conversation. - `disabled` (default): If a model response will exceed the context window size for a model, the request will fail with a 400 error.
+pub(all) enum CreateResponseTruncation {
+  Auto
+  Disabled
+  Custom(String)
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend CreateResponseTruncation with ToJson::{to_json}
+
+///|
+pub impl ToJson for CreateResponseTruncation with fn to_json(self) {
+  let raw = match self {
+    Auto => "auto"
+    Disabled => "disabled"
+    Custom(raw) => raw
+  }
+  raw.to_json()
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend CreateResponseTruncation with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for CreateResponseTruncation with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "auto" => Some(Auto)
+        "disabled" => Some(Disabled)
+        _ => None
+      }
+    },
+    raw => Custom(raw),
+  )
+}
+
+///|
+///
+/// Text, image, or file inputs to the model, used to generate a response. Learn more: - [Text inputs and outputs](/docs/guides/text) - [Image inputs](/docs/guides/images) - [File inputs](/docs/guides/pdf-files) - [Conversation state](/docs/guides/conversation-state) - [Function calling](/docs/guides/function-calling)
+pub(all) enum CreateResponseInput {
+  Text(String)
+  InputItemArray(Array[Json])
+}
+
+///|
+///
+/// Encodes this union as JSON.
+pub extend CreateResponseInput with ToJson::{to_json}
+
+///|
+pub impl ToJson for CreateResponseInput with fn to_json(self) {
+  match self {
+    Text(value) => value.to_json()
+    InputItemArray(value) => value.to_json()
+  }
+}
+
+///|
+///
+/// Decodes this union from JSON.
+pub extend CreateResponseInput with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for CreateResponseInput with fn from_json(value, path) {
+  if value is String(_) {
+    let decoded : String = @json.from_json(value, path~)
+    return Text(decoded)
+  }
+  if json_array_matches(value, item => item is Object(_)) {
+    let decoded : Array[Json] = @json.from_json(value, path~)
+    return InputItemArray(decoded)
+  }
+  raise @json.JsonDecodeError(
+    (path, "JSON shape does not match any CreateResponseInput variant"),
+  )
+}
+
+///|
+///
+/// Specify additional output data to include in the model response. Currently supported values are: - `file_search_call.results`: Include the search results of the file search tool call. - `message.input_image.image_url`: Include image urls from the input message. - `computer_call_output.output.image_url`: Include image urls from the computer call output.
+pub(all) enum Includable {
+  FileSearchCallResults
+  MessageInputImageImageUrl
+  ComputerCallOutputOutputImageUrl
+  Custom(String)
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend Includable with ToJson::{to_json}
+
+///|
+pub impl ToJson for Includable with fn to_json(self) {
+  let raw = match self {
+    FileSearchCallResults => "file_search_call.results"
+    MessageInputImageImageUrl => "message.input_image.image_url"
+    ComputerCallOutputOutputImageUrl => "computer_call_output.output.image_url"
+    Custom(raw) => raw
+  }
+  raw.to_json()
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend Includable with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for Includable with fn from_json(value, path) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "file_search_call.results" => Some(FileSearchCallResults)
+        "message.input_image.image_url" => Some(MessageInputImageImageUrl)
+        "computer_call_output.output.image_url" =>
+          Some(ComputerCallOutputOutputImageUrl)
+        _ => None
+      }
+    },
+    raw => Custom(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of CreateResponse.
+pub(all) struct CreateResponse {
+  metadata : @sdkjson.Presence[Map[String, String]]
+  temperature : @sdkjson.Presence[Double]
+  top_p : @sdkjson.Presence[Double]
+  user : String?
+  service_tier : @sdkjson.Presence[ServiceTier]
+  previous_response_id : @sdkjson.Presence[String]
+  model : String
+  reasoning : @sdkjson.Presence[Reasoning]
+  max_output_tokens : @sdkjson.Presence[Int]
+  instructions : @sdkjson.Presence[String]
+  text : CreateResponseText?
+  tools : Array[Tool]?
+  tool_choice : Json?
+  truncation : @sdkjson.Presence[CreateResponseTruncation]
+  input : CreateResponseInput
+  include_ : @sdkjson.Presence[Array[Includable]]
+  parallel_tool_calls : @sdkjson.Presence[Bool]
+  store : @sdkjson.Presence[Bool]
+  stream : @sdkjson.Presence[Bool]
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend CreateResponse with ToJson::{to_json}
+
+///|
+pub impl ToJson for CreateResponse with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .presence("metadata", self.metadata.map(value => json_map_to_json(value)))
+  .presence("temperature", self.temperature)
+  .presence("top_p", self.top_p)
+  .opt("user", self.user)
+  .presence("service_tier", self.service_tier)
+  .presence("previous_response_id", self.previous_response_id)
+  .field("model", self.model)
+  .presence("reasoning", self.reasoning)
+  .presence("max_output_tokens", self.max_output_tokens)
+  .presence("instructions", self.instructions)
+  .opt("text", self.text)
+  .opt("tools", self.tools)
+  .opt("tool_choice", self.tool_choice)
+  .presence("truncation", self.truncation)
+  .field("input", self.input)
+  .presence("include", self.include_)
+  .presence("parallel_tool_calls", self.parallel_tool_calls)
+  .presence("store", self.store)
+  .presence("stream", self.stream)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend CreateResponse with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for CreateResponse with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    metadata: decode_presence_json_map(obj, "metadata", path),
+    temperature: @sdkjson.presence_field(obj, "temperature", path),
+    top_p: @sdkjson.presence_field(obj, "top_p", path),
+    user: @sdkjson.opt_field(obj, "user", path),
+    service_tier: @sdkjson.presence_field(obj, "service_tier", path),
+    previous_response_id: @sdkjson.presence_field(
+      obj, "previous_response_id", path,
+    ),
+    model: @sdkjson.field(obj, "model", path),
+    reasoning: @sdkjson.presence_field(obj, "reasoning", path),
+    max_output_tokens: @sdkjson.presence_field(obj, "max_output_tokens", path),
+    instructions: @sdkjson.presence_field(obj, "instructions", path),
+    text: @sdkjson.opt_field(obj, "text", path),
+    tools: @sdkjson.opt_field(obj, "tools", path),
+    tool_choice: @sdkjson.opt_field(obj, "tool_choice", path),
+    truncation: @sdkjson.presence_field(obj, "truncation", path),
+    input: @sdkjson.field(obj, "input", path),
+    include_: @sdkjson.presence_field(obj, "include", path),
+    parallel_tool_calls: @sdkjson.presence_field(
+      obj, "parallel_tool_calls", path,
+    ),
+    store: @sdkjson.presence_field(obj, "store", path),
+    stream: @sdkjson.presence_field(obj, "stream", path),
+  }
+}
+
+///|
+///
+/// A path to a file.
+pub(all) struct FilePath {
+  type_ : String
+  file_id : String
+  index : Int
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend FilePath with ToJson::{to_json}
+
+///|
+pub impl ToJson for FilePath with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("type", self.type_)
+  .field("file_id", self.file_id)
+  .field("index", self.index)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend FilePath with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for FilePath with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    type_: @sdkjson.field(obj, "type", path),
+    file_id: @sdkjson.field(obj, "file_id", path),
+    index: @sdkjson.field(obj, "index", path),
+  }
+}
+
+///|
+///
+/// The status of the file search tool call. One of `in_progress`, `searching`, `incomplete` or `failed`,
+pub(all) enum FileSearchToolCallStatus {
+  InProgress
+  Searching
+  Completed
+  Incomplete
+  Failed
+  Unknown(String)
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend FileSearchToolCallStatus with ToJson::{to_json}
+
+///|
+pub impl ToJson for FileSearchToolCallStatus with fn to_json(self) {
+  let raw = match self {
+    InProgress => "in_progress"
+    Searching => "searching"
+    Completed => "completed"
+    Incomplete => "incomplete"
+    Failed => "failed"
+    Unknown(raw) => raw
+  }
+  raw.to_json()
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend FileSearchToolCallStatus with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for FileSearchToolCallStatus with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "in_progress" => Some(InProgress)
+        "searching" => Some(Searching)
+        "completed" => Some(Completed)
+        "incomplete" => Some(Incomplete)
+        "failed" => Some(Failed)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated untagged union VectorStoreFileAttributesValue.
+pub(all) enum VectorStoreFileAttributesValue {
+  Text(String)
+  Number(Double)
+  Bool(Bool)
+}
+
+///|
+///
+/// Encodes this union as JSON.
+pub extend VectorStoreFileAttributesValue with ToJson::{to_json}
+
+///|
+pub impl ToJson for VectorStoreFileAttributesValue with fn to_json(self) {
+  match self {
+    Text(value) => value.to_json()
+    Number(value) => value.to_json()
+    Bool(value) => value.to_json()
+  }
+}
+
+///|
+///
+/// Decodes this union from JSON.
+pub extend VectorStoreFileAttributesValue with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for VectorStoreFileAttributesValue with fn from_json(
+  value,
+  path,
+) {
+  if value is String(_) {
+    let decoded : String = @json.from_json(value, path~)
+    return Text(decoded)
+  }
+  if value is Number(_, ..) {
+    let decoded : Double = @json.from_json(value, path~)
+    return Number(decoded)
+  }
+  if value is True || value is False {
+    let decoded : Bool = @json.from_json(value, path~)
+    return Bool(decoded)
+  }
+  raise @json.JsonDecodeError(
+    (
+      path, "JSON shape does not match any VectorStoreFileAttributesValue variant",
+    ),
+  )
+}
+
+///|
+///
+/// Generated representation of FileSearchToolCallResultsItem.
+pub(all) struct FileSearchToolCallResultsItem {
+  file_id : String?
+  text : String?
+  filename : String?
+  attributes : @sdkjson.Presence[Map[String, VectorStoreFileAttributesValue]]
+  score : Double?
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend FileSearchToolCallResultsItem with ToJson::{to_json}
+
+///|
+pub impl ToJson for FileSearchToolCallResultsItem with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .opt("file_id", self.file_id)
+  .opt("text", self.text)
+  .opt("filename", self.filename)
+  .presence("attributes", self.attributes.map(value => json_map_to_json(value)))
+  .opt("score", self.score)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend FileSearchToolCallResultsItem with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for FileSearchToolCallResultsItem with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    file_id: @sdkjson.opt_field(obj, "file_id", path),
+    text: @sdkjson.opt_field(obj, "text", path),
+    filename: @sdkjson.opt_field(obj, "filename", path),
+    attributes: decode_presence_json_map(obj, "attributes", path),
+    score: @sdkjson.opt_field(obj, "score", path),
+  }
+}
+
+///|
+///
+/// The results of a file search tool call. See the [file search guide](/docs/guides/tools-file-search) for more information.
+pub(all) struct FileSearchToolCall {
+  id : String
+  type_ : String
+  status : FileSearchToolCallStatus
+  queries : Array[String]
+  results : @sdkjson.Presence[Array[FileSearchToolCallResultsItem]]
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend FileSearchToolCall with ToJson::{to_json}
+
+///|
+pub impl ToJson for FileSearchToolCall with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("id", self.id)
+  .field("type", self.type_)
+  .field("status", self.status)
+  .field("queries", self.queries)
+  .presence("results", self.results)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend FileSearchToolCall with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for FileSearchToolCall with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    id: @sdkjson.field(obj, "id", path),
+    type_: @sdkjson.field(obj, "type", path),
+    status: @sdkjson.field(obj, "status", path),
+    queries: @sdkjson.field(obj, "queries", path),
+    results: @sdkjson.presence_field(obj, "results", path),
+  }
+}
+
+///|
+///
+/// The status of the item. One of `in_progress`, `completed`, or `incomplete`. Populated when items are returned via API.
+pub(all) enum FunctionToolCallStatus {
+  InProgress
+  Completed
+  Incomplete
+  Unknown(String)
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend FunctionToolCallStatus with ToJson::{to_json}
+
+///|
+pub impl ToJson for FunctionToolCallStatus with fn to_json(self) {
+  let raw = match self {
+    InProgress => "in_progress"
+    Completed => "completed"
+    Incomplete => "incomplete"
+    Unknown(raw) => raw
+  }
+  raw.to_json()
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend FunctionToolCallStatus with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for FunctionToolCallStatus with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "in_progress" => Some(InProgress)
+        "completed" => Some(Completed)
+        "incomplete" => Some(Incomplete)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// A tool call to run a function. See the [function calling guide](/docs/guides/function-calling) for more information.
+pub(all) struct FunctionToolCall {
+  id : String?
+  type_ : String
+  call_id : String
+  name : String
+  arguments : String
+  status : FunctionToolCallStatus?
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend FunctionToolCall with ToJson::{to_json}
+
+///|
+pub impl ToJson for FunctionToolCall with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .opt("id", self.id)
+  .field("type", self.type_)
+  .field("call_id", self.call_id)
+  .field("name", self.name)
+  .field("arguments", self.arguments)
+  .opt("status", self.status)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend FunctionToolCall with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for FunctionToolCall with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    id: @sdkjson.opt_field(obj, "id", path),
+    type_: @sdkjson.field(obj, "type", path),
+    call_id: @sdkjson.field(obj, "call_id", path),
+    name: @sdkjson.field(obj, "name", path),
+    arguments: @sdkjson.field(obj, "arguments", path),
+    status: @sdkjson.opt_field(obj, "status", path),
+  }
+}
+
+///|
+///
 /// Describes an OpenAI model offering that can be used with the API.
 pub(all) struct Model {
   id : String
@@ -454,4 +2852,3112 @@ pub extend ListModelsResponse with @json.FromJson::{from_json}
 pub impl @json.FromJson for ListModelsResponse with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
   { data: @sdkjson.field(obj, "data", path), }
+}
+
+///|
+///
+/// A citation to a file.
+pub(all) struct FileCitationBody {
+  type_ : String
+  file_id : String
+  index : Int
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend FileCitationBody with ToJson::{to_json}
+
+///|
+pub impl ToJson for FileCitationBody with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("type", self.type_)
+  .field("file_id", self.file_id)
+  .field("index", self.index)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend FileCitationBody with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for FileCitationBody with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    type_: @sdkjson.field(obj, "type", path),
+    file_id: @sdkjson.field(obj, "file_id", path),
+    index: @sdkjson.field(obj, "index", path),
+  }
+}
+
+///|
+///
+/// A citation for a web resource used to generate a model response.
+pub(all) struct UrlCitationBody {
+  type_ : String
+  url : String
+  start_index : Int
+  end_index : Int
+  title : String
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend UrlCitationBody with ToJson::{to_json}
+
+///|
+pub impl ToJson for UrlCitationBody with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("type", self.type_)
+  .field("url", self.url)
+  .field("start_index", self.start_index)
+  .field("end_index", self.end_index)
+  .field("title", self.title)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend UrlCitationBody with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for UrlCitationBody with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    type_: @sdkjson.field(obj, "type", path),
+    url: @sdkjson.field(obj, "url", path),
+    start_index: @sdkjson.field(obj, "start_index", path),
+    end_index: @sdkjson.field(obj, "end_index", path),
+    title: @sdkjson.field(obj, "title", path),
+  }
+}
+
+///|
+///
+/// Generated tagged union Annotation.
+pub(all) enum Annotation {
+  FileCitation(FileCitationBody)
+  UrlCitation(UrlCitationBody)
+  FilePath(FilePath)
+  Unknown(String, Json)
+}
+
+///|
+///
+/// Encodes this tagged union as JSON.
+pub extend Annotation with ToJson::{to_json}
+
+///|
+pub impl ToJson for Annotation with fn to_json(self) {
+  match self {
+    FileCitation(value) => value.to_json()
+    UrlCitation(value) => value.to_json()
+    FilePath(value) => value.to_json()
+    Unknown(_, value) => value
+  }
+}
+
+///|
+///
+/// Decodes this tagged union from JSON.
+pub extend Annotation with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for Annotation with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  let tag : String = @sdkjson.field(obj, "type", path)
+  match tag {
+    "file_citation" => FileCitation(@json.from_json(value, path~))
+    "url_citation" => UrlCitation(@json.from_json(value, path~))
+    "file_path" => FilePath(@json.from_json(value, path~))
+    other => Unknown(other, value)
+  }
+}
+
+///|
+///
+/// A text output from the model.
+pub(all) struct OutputTextContent {
+  type_ : String
+  text : String
+  annotations : Array[Annotation]?
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend OutputTextContent with ToJson::{to_json}
+
+///|
+pub impl ToJson for OutputTextContent with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("type", self.type_)
+  .field("text", self.text)
+  .opt("annotations", self.annotations)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend OutputTextContent with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for OutputTextContent with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    type_: @sdkjson.field(obj, "type", path),
+    text: @sdkjson.field(obj, "text", path),
+    annotations: @sdkjson.opt_field(obj, "annotations", path),
+  }
+}
+
+///|
+///
+/// A refusal from the model.
+pub(all) struct RefusalContent {
+  type_ : String
+  refusal : String
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend RefusalContent with ToJson::{to_json}
+
+///|
+pub impl ToJson for RefusalContent with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("type", self.type_)
+  .field("refusal", self.refusal)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend RefusalContent with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for RefusalContent with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    type_: @sdkjson.field(obj, "type", path),
+    refusal: @sdkjson.field(obj, "refusal", path),
+  }
+}
+
+///|
+///
+/// Generated tagged union OutputContent.
+pub(all) enum OutputContent {
+  OutputText(OutputTextContent)
+  Refusal(RefusalContent)
+  Unknown(String, Json)
+}
+
+///|
+///
+/// Encodes this tagged union as JSON.
+pub extend OutputContent with ToJson::{to_json}
+
+///|
+pub impl ToJson for OutputContent with fn to_json(self) {
+  match self {
+    OutputText(value) => value.to_json()
+    Refusal(value) => value.to_json()
+    Unknown(_, value) => value
+  }
+}
+
+///|
+///
+/// Decodes this tagged union from JSON.
+pub extend OutputContent with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for OutputContent with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  let tag : String = @sdkjson.field(obj, "type", path)
+  match tag {
+    "output_text" => OutputText(@json.from_json(value, path~))
+    "refusal" => Refusal(@json.from_json(value, path~))
+    other => Unknown(other, value)
+  }
+}
+
+///|
+///
+/// The status of the message input. One of `in_progress`, `completed`, or `incomplete`. Populated when input items are returned via API.
+pub(all) enum OutputMessageStatus {
+  InProgress
+  Completed
+  Incomplete
+  Unknown(String)
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend OutputMessageStatus with ToJson::{to_json}
+
+///|
+pub impl ToJson for OutputMessageStatus with fn to_json(self) {
+  let raw = match self {
+    InProgress => "in_progress"
+    Completed => "completed"
+    Incomplete => "incomplete"
+    Unknown(raw) => raw
+  }
+  raw.to_json()
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend OutputMessageStatus with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for OutputMessageStatus with fn from_json(value, path) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "in_progress" => Some(InProgress)
+        "completed" => Some(Completed)
+        "incomplete" => Some(Incomplete)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// An output message from the model.
+pub(all) struct OutputMessage {
+  id : String
+  type_ : String
+  content : Array[OutputContent]
+  status : OutputMessageStatus
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend OutputMessage with ToJson::{to_json}
+
+///|
+pub impl ToJson for OutputMessage with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("id", self.id)
+  .field("type", self.type_)
+  .field("role", "assistant")
+  .field("content", self.content)
+  .field("status", self.status)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend OutputMessage with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for OutputMessage with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    id: @sdkjson.field(obj, "id", path),
+    type_: @sdkjson.field(obj, "type", path),
+    content: @sdkjson.field(obj, "content", path),
+    status: @sdkjson.field(obj, "status", path),
+  }
+}
+
+///|
+///
+/// The status of the web search tool call.
+pub(all) enum WebSearchToolCallStatus {
+  InProgress
+  Searching
+  Completed
+  Failed
+  Unknown(String)
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend WebSearchToolCallStatus with ToJson::{to_json}
+
+///|
+pub impl ToJson for WebSearchToolCallStatus with fn to_json(self) {
+  let raw = match self {
+    InProgress => "in_progress"
+    Searching => "searching"
+    Completed => "completed"
+    Failed => "failed"
+    Unknown(raw) => raw
+  }
+  raw.to_json()
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend WebSearchToolCallStatus with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for WebSearchToolCallStatus with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "in_progress" => Some(InProgress)
+        "searching" => Some(Searching)
+        "completed" => Some(Completed)
+        "failed" => Some(Failed)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// The results of a web search tool call. See the [web search guide](/docs/guides/tools-web-search) for more information.
+pub(all) struct WebSearchToolCall {
+  id : String
+  type_ : String
+  status : WebSearchToolCallStatus
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend WebSearchToolCall with ToJson::{to_json}
+
+///|
+pub impl ToJson for WebSearchToolCall with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("id", self.id)
+  .field("type", self.type_)
+  .field("status", self.status)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend WebSearchToolCall with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for WebSearchToolCall with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    id: @sdkjson.field(obj, "id", path),
+    type_: @sdkjson.field(obj, "type", path),
+    status: @sdkjson.field(obj, "status", path),
+  }
+}
+
+///|
+///
+/// Generated representation of ReasoningItemSummaryItem.
+pub(all) struct ReasoningItemSummaryItem {
+  text : String
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend ReasoningItemSummaryItem with ToJson::{to_json}
+
+///|
+pub impl ToJson for ReasoningItemSummaryItem with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("type", "summary_text")
+  .field("text", self.text)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend ReasoningItemSummaryItem with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for ReasoningItemSummaryItem with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  { text: @sdkjson.field(obj, "text", path), }
+}
+
+///|
+///
+/// The status of the item. One of `in_progress`, `completed`, or `incomplete`. Populated when items are returned via API.
+pub(all) enum ReasoningItemStatus {
+  InProgress
+  Completed
+  Incomplete
+  Unknown(String)
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend ReasoningItemStatus with ToJson::{to_json}
+
+///|
+pub impl ToJson for ReasoningItemStatus with fn to_json(self) {
+  let raw = match self {
+    InProgress => "in_progress"
+    Completed => "completed"
+    Incomplete => "incomplete"
+    Unknown(raw) => raw
+  }
+  raw.to_json()
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend ReasoningItemStatus with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for ReasoningItemStatus with fn from_json(value, path) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "in_progress" => Some(InProgress)
+        "completed" => Some(Completed)
+        "incomplete" => Some(Incomplete)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of ReasoningItemContentItem.
+pub(all) struct ReasoningItemContentItem {
+  text : String
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend ReasoningItemContentItem with ToJson::{to_json}
+
+///|
+pub impl ToJson for ReasoningItemContentItem with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("type", "reasoning_text")
+  .field("text", self.text)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend ReasoningItemContentItem with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for ReasoningItemContentItem with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  { text: @sdkjson.field(obj, "text", path), }
+}
+
+///|
+///
+/// A description of the chain of thought used by a reasoning model while generating a response.
+pub(all) struct ReasoningItem {
+  type_ : String
+  id : String
+  summary : Array[ReasoningItemSummaryItem]
+  status : ReasoningItemStatus?
+  content : Array[ReasoningItemContentItem]?
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend ReasoningItem with ToJson::{to_json}
+
+///|
+pub impl ToJson for ReasoningItem with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("type", self.type_)
+  .field("id", self.id)
+  .field("summary", self.summary)
+  .opt("status", self.status)
+  .opt("content", self.content)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend ReasoningItem with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for ReasoningItem with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    type_: @sdkjson.field(obj, "type", path),
+    id: @sdkjson.field(obj, "id", path),
+    summary: @sdkjson.field(obj, "summary", path),
+    status: @sdkjson.opt_field(obj, "status", path),
+    content: @sdkjson.opt_field(obj, "content", path),
+  }
+}
+
+///|
+///
+/// Generated tagged union OutputItem.
+pub(all) enum OutputItem {
+  Message(OutputMessage)
+  FileSearchCall(FileSearchToolCall)
+  FunctionCall(FunctionToolCall)
+  WebSearchCall(WebSearchToolCall)
+  ComputerCall(ComputerToolCall)
+  Reasoning(ReasoningItem)
+  Unknown(String, Json)
+}
+
+///|
+///
+/// Encodes this tagged union as JSON.
+pub extend OutputItem with ToJson::{to_json}
+
+///|
+pub impl ToJson for OutputItem with fn to_json(self) {
+  match self {
+    Message(value) => value.to_json()
+    FileSearchCall(value) => value.to_json()
+    FunctionCall(value) => value.to_json()
+    WebSearchCall(value) => value.to_json()
+    ComputerCall(value) => value.to_json()
+    Reasoning(value) => value.to_json()
+    Unknown(_, value) => value
+  }
+}
+
+///|
+///
+/// Decodes this tagged union from JSON.
+pub extend OutputItem with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for OutputItem with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  let tag : String = @sdkjson.field(obj, "type", path)
+  match tag {
+    "message" => Message(@json.from_json(value, path~))
+    "file_search_call" => FileSearchCall(@json.from_json(value, path~))
+    "function_call" => FunctionCall(@json.from_json(value, path~))
+    "web_search_call" => WebSearchCall(@json.from_json(value, path~))
+    "computer_call" => ComputerCall(@json.from_json(value, path~))
+    "reasoning" => Reasoning(@json.from_json(value, path~))
+    other => Unknown(other, value)
+  }
+}
+
+///|
+///
+/// Configuration options for a text response from the model. Can be plain text or structured JSON data. Learn more: - [Text inputs and outputs](/docs/guides/text) - [Structured Outputs](/docs/guides/structured-outputs)
+pub(all) struct ResponseText {
+  format : TextResponseFormatConfiguration?
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend ResponseText with ToJson::{to_json}
+
+///|
+pub impl ToJson for ResponseText with fn to_json(self) {
+  @sdkjson.ObjBuilder::new().opt("format", self.format).build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend ResponseText with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for ResponseText with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  { format: @sdkjson.opt_field(obj, "format", path), }
+}
+
+///|
+///
+/// The truncation strategy to use for the model response. - `auto`: If the context of this response and previous ones exceeds the model's context window size, the model will truncate the response to fit the context window by dropping input items in the middle of the conversation. - `disabled` (default): If a model response will exceed the context window size for a model, the request will fail with a 400 error.
+pub(all) enum ResponseTruncation {
+  Auto
+  Disabled
+  Unknown(String)
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend ResponseTruncation with ToJson::{to_json}
+
+///|
+pub impl ToJson for ResponseTruncation with fn to_json(self) {
+  let raw = match self {
+    Auto => "auto"
+    Disabled => "disabled"
+    Unknown(raw) => raw
+  }
+  raw.to_json()
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend ResponseTruncation with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for ResponseTruncation with fn from_json(value, path) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "auto" => Some(Auto)
+        "disabled" => Some(Disabled)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// The status of the response generation. One of `completed`, `failed`, `in_progress`, or `incomplete`.
+pub(all) enum ResponseStatus {
+  Completed
+  Failed
+  InProgress
+  Incomplete
+  Unknown(String)
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend ResponseStatus with ToJson::{to_json}
+
+///|
+pub impl ToJson for ResponseStatus with fn to_json(self) {
+  let raw = match self {
+    Completed => "completed"
+    Failed => "failed"
+    InProgress => "in_progress"
+    Incomplete => "incomplete"
+    Unknown(raw) => raw
+  }
+  raw.to_json()
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend ResponseStatus with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for ResponseStatus with fn from_json(value, path) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "completed" => Some(Completed)
+        "failed" => Some(Failed)
+        "in_progress" => Some(InProgress)
+        "incomplete" => Some(Incomplete)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// The error code for the response.
+pub(all) enum ResponseErrorCode {
+  ServerError
+  RateLimitExceeded
+  InvalidPrompt
+  VectorStoreTimeout
+  InvalidImage
+  InvalidImageFormat
+  InvalidBase64Image
+  InvalidImageUrl
+  ImageTooLarge
+  ImageTooSmall
+  ImageParseError
+  ImageContentPolicyViolation
+  InvalidImageMode
+  ImageFileTooLarge
+  UnsupportedImageMediaType
+  EmptyImageFile
+  FailedToDownloadImage
+  ImageFileNotFound
+  Unknown(String)
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend ResponseErrorCode with ToJson::{to_json}
+
+///|
+pub impl ToJson for ResponseErrorCode with fn to_json(self) {
+  let raw = match self {
+    ServerError => "server_error"
+    RateLimitExceeded => "rate_limit_exceeded"
+    InvalidPrompt => "invalid_prompt"
+    VectorStoreTimeout => "vector_store_timeout"
+    InvalidImage => "invalid_image"
+    InvalidImageFormat => "invalid_image_format"
+    InvalidBase64Image => "invalid_base64_image"
+    InvalidImageUrl => "invalid_image_url"
+    ImageTooLarge => "image_too_large"
+    ImageTooSmall => "image_too_small"
+    ImageParseError => "image_parse_error"
+    ImageContentPolicyViolation => "image_content_policy_violation"
+    InvalidImageMode => "invalid_image_mode"
+    ImageFileTooLarge => "image_file_too_large"
+    UnsupportedImageMediaType => "unsupported_image_media_type"
+    EmptyImageFile => "empty_image_file"
+    FailedToDownloadImage => "failed_to_download_image"
+    ImageFileNotFound => "image_file_not_found"
+    Unknown(raw) => raw
+  }
+  raw.to_json()
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend ResponseErrorCode with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for ResponseErrorCode with fn from_json(value, path) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "server_error" => Some(ServerError)
+        "rate_limit_exceeded" => Some(RateLimitExceeded)
+        "invalid_prompt" => Some(InvalidPrompt)
+        "vector_store_timeout" => Some(VectorStoreTimeout)
+        "invalid_image" => Some(InvalidImage)
+        "invalid_image_format" => Some(InvalidImageFormat)
+        "invalid_base64_image" => Some(InvalidBase64Image)
+        "invalid_image_url" => Some(InvalidImageUrl)
+        "image_too_large" => Some(ImageTooLarge)
+        "image_too_small" => Some(ImageTooSmall)
+        "image_parse_error" => Some(ImageParseError)
+        "image_content_policy_violation" => Some(ImageContentPolicyViolation)
+        "invalid_image_mode" => Some(InvalidImageMode)
+        "image_file_too_large" => Some(ImageFileTooLarge)
+        "unsupported_image_media_type" => Some(UnsupportedImageMediaType)
+        "empty_image_file" => Some(EmptyImageFile)
+        "failed_to_download_image" => Some(FailedToDownloadImage)
+        "image_file_not_found" => Some(ImageFileNotFound)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// An error object returned when the model fails to generate a Response.
+pub(all) struct ResponseError {
+  code : ResponseErrorCode
+  message : String
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend ResponseError with ToJson::{to_json}
+
+///|
+pub impl ToJson for ResponseError with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("code", self.code)
+  .field("message", self.message)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend ResponseError with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for ResponseError with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    code: @sdkjson.field(obj, "code", path),
+    message: @sdkjson.field(obj, "message", path),
+  }
+}
+
+///|
+///
+/// The reason why the response is incomplete.
+pub(all) enum ResponseIncompleteDetailsReason {
+  MaxOutputTokens
+  ContentFilter
+  Unknown(String)
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend ResponseIncompleteDetailsReason with ToJson::{to_json}
+
+///|
+pub impl ToJson for ResponseIncompleteDetailsReason with fn to_json(self) {
+  let raw = match self {
+    MaxOutputTokens => "max_output_tokens"
+    ContentFilter => "content_filter"
+    Unknown(raw) => raw
+  }
+  raw.to_json()
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend ResponseIncompleteDetailsReason with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for ResponseIncompleteDetailsReason with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "max_output_tokens" => Some(MaxOutputTokens)
+        "content_filter" => Some(ContentFilter)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Details about why the response is incomplete.
+pub(all) struct ResponseIncompleteDetails {
+  reason : ResponseIncompleteDetailsReason?
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend ResponseIncompleteDetails with ToJson::{to_json}
+
+///|
+pub impl ToJson for ResponseIncompleteDetails with fn to_json(self) {
+  @sdkjson.ObjBuilder::new().opt("reason", self.reason).build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend ResponseIncompleteDetails with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for ResponseIncompleteDetails with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  { reason: @sdkjson.opt_field(obj, "reason", path), }
+}
+
+///|
+///
+/// A detailed breakdown of the input tokens.
+pub(all) struct ResponseUsageInputTokensDetails {
+  cached_tokens : Int
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend ResponseUsageInputTokensDetails with ToJson::{to_json}
+
+///|
+pub impl ToJson for ResponseUsageInputTokensDetails with fn to_json(self) {
+  @sdkjson.ObjBuilder::new().field("cached_tokens", self.cached_tokens).build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend ResponseUsageInputTokensDetails with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for ResponseUsageInputTokensDetails with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  { cached_tokens: @sdkjson.field(obj, "cached_tokens", path), }
+}
+
+///|
+///
+/// A detailed breakdown of the output tokens.
+pub(all) struct ResponseUsageOutputTokensDetails {
+  reasoning_tokens : Int
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend ResponseUsageOutputTokensDetails with ToJson::{to_json}
+
+///|
+pub impl ToJson for ResponseUsageOutputTokensDetails with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("reasoning_tokens", self.reasoning_tokens)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend ResponseUsageOutputTokensDetails with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for ResponseUsageOutputTokensDetails with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  { reasoning_tokens: @sdkjson.field(obj, "reasoning_tokens", path), }
+}
+
+///|
+///
+/// Represents token usage details including input tokens, output tokens, a breakdown of output tokens, and the total tokens used.
+pub(all) struct ResponseUsage {
+  input_tokens : Int
+  input_tokens_details : ResponseUsageInputTokensDetails
+  output_tokens : Int
+  output_tokens_details : ResponseUsageOutputTokensDetails
+  total_tokens : Int
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend ResponseUsage with ToJson::{to_json}
+
+///|
+pub impl ToJson for ResponseUsage with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("input_tokens", self.input_tokens)
+  .field("input_tokens_details", self.input_tokens_details)
+  .field("output_tokens", self.output_tokens)
+  .field("output_tokens_details", self.output_tokens_details)
+  .field("total_tokens", self.total_tokens)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend ResponseUsage with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for ResponseUsage with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    input_tokens: @sdkjson.field(obj, "input_tokens", path),
+    input_tokens_details: @sdkjson.field(obj, "input_tokens_details", path),
+    output_tokens: @sdkjson.field(obj, "output_tokens", path),
+    output_tokens_details: @sdkjson.field(obj, "output_tokens_details", path),
+    total_tokens: @sdkjson.field(obj, "total_tokens", path),
+  }
+}
+
+///|
+///
+/// Generated representation of Response.
+pub(all) struct Response {
+  metadata : Map[String, String]?
+  temperature : Double?
+  top_p : Double?
+  user : String?
+  service_tier : @sdkjson.Presence[ServiceTier]
+  previous_response_id : @sdkjson.Presence[String]
+  model : String
+  reasoning : @sdkjson.Presence[Reasoning]
+  max_output_tokens : @sdkjson.Presence[Int]
+  instructions : String?
+  text : ResponseText?
+  tools : Array[Tool]
+  tool_choice : Json
+  truncation : @sdkjson.Presence[ResponseTruncation]
+  id : String
+  status : ResponseStatus?
+  created_at : Double
+  error : ResponseError?
+  incomplete_details : ResponseIncompleteDetails?
+  output : Array[OutputItem]
+  output_text : @sdkjson.Presence[String]
+  usage : ResponseUsage?
+  parallel_tool_calls : Bool
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend Response with ToJson::{to_json}
+
+///|
+pub impl ToJson for Response with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .presence(
+    "metadata",
+    nullable_presence(self.metadata.map(value => json_map_to_json(value))),
+  )
+  .presence(
+    "temperature",
+    nullable_presence(self.temperature.map(value => value)),
+  )
+  .presence("top_p", nullable_presence(self.top_p.map(value => value)))
+  .opt("user", self.user)
+  .presence("service_tier", self.service_tier)
+  .presence("previous_response_id", self.previous_response_id)
+  .field("model", self.model)
+  .presence("reasoning", self.reasoning)
+  .presence("max_output_tokens", self.max_output_tokens)
+  .presence(
+    "instructions",
+    nullable_presence(self.instructions.map(value => value)),
+  )
+  .opt("text", self.text)
+  .field("tools", self.tools)
+  .field("tool_choice", self.tool_choice)
+  .presence("truncation", self.truncation)
+  .field("id", self.id)
+  .field("object", "response")
+  .opt("status", self.status)
+  .field("created_at", self.created_at)
+  .presence("error", nullable_presence(self.error.map(value => value)))
+  .presence(
+    "incomplete_details",
+    nullable_presence(self.incomplete_details.map(value => value)),
+  )
+  .field("output", self.output)
+  .presence("output_text", self.output_text)
+  .opt("usage", self.usage)
+  .field("parallel_tool_calls", self.parallel_tool_calls)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend Response with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for Response with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    metadata: decode_nullable_json_map(obj, "metadata", path),
+    temperature: decode_nullable_field(obj, "temperature", path),
+    top_p: decode_nullable_field(obj, "top_p", path),
+    user: @sdkjson.opt_field(obj, "user", path),
+    service_tier: @sdkjson.presence_field(obj, "service_tier", path),
+    previous_response_id: @sdkjson.presence_field(
+      obj, "previous_response_id", path,
+    ),
+    model: @sdkjson.field(obj, "model", path),
+    reasoning: @sdkjson.presence_field(obj, "reasoning", path),
+    max_output_tokens: @sdkjson.presence_field(obj, "max_output_tokens", path),
+    instructions: decode_nullable_field(obj, "instructions", path),
+    text: @sdkjson.opt_field(obj, "text", path),
+    tools: @sdkjson.field(obj, "tools", path),
+    tool_choice: @sdkjson.field(obj, "tool_choice", path),
+    truncation: @sdkjson.presence_field(obj, "truncation", path),
+    id: @sdkjson.field(obj, "id", path),
+    status: @sdkjson.opt_field(obj, "status", path),
+    created_at: @sdkjson.field(obj, "created_at", path),
+    error: decode_nullable_field(obj, "error", path),
+    incomplete_details: decode_nullable_field(obj, "incomplete_details", path),
+    output: @sdkjson.field(obj, "output", path),
+    output_text: @sdkjson.presence_field(obj, "output_text", path),
+    usage: @sdkjson.opt_field(obj, "usage", path),
+    parallel_tool_calls: @sdkjson.field(obj, "parallel_tool_calls", path),
+  }
+}
+
+///|
+///
+/// Emitted when there is a partial audio response.
+pub(all) struct ResponseAudioDeltaEvent {
+  type_ : String
+  delta : String
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend ResponseAudioDeltaEvent with ToJson::{to_json}
+
+///|
+pub impl ToJson for ResponseAudioDeltaEvent with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("type", self.type_)
+  .field("delta", self.delta)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend ResponseAudioDeltaEvent with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for ResponseAudioDeltaEvent with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    type_: @sdkjson.field(obj, "type", path),
+    delta: @sdkjson.field(obj, "delta", path),
+  }
+}
+
+///|
+///
+/// Emitted when the audio response is complete.
+pub(all) struct ResponseAudioDoneEvent {
+  type_ : String
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend ResponseAudioDoneEvent with ToJson::{to_json}
+
+///|
+pub impl ToJson for ResponseAudioDoneEvent with fn to_json(self) {
+  @sdkjson.ObjBuilder::new().field("type", self.type_).build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend ResponseAudioDoneEvent with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for ResponseAudioDoneEvent with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  { type_: @sdkjson.field(obj, "type", path), }
+}
+
+///|
+///
+/// Emitted when there is a partial transcript of audio.
+pub(all) struct ResponseAudioTranscriptDeltaEvent {
+  type_ : String
+  delta : String
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend ResponseAudioTranscriptDeltaEvent with ToJson::{to_json}
+
+///|
+pub impl ToJson for ResponseAudioTranscriptDeltaEvent with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("type", self.type_)
+  .field("delta", self.delta)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend ResponseAudioTranscriptDeltaEvent with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for ResponseAudioTranscriptDeltaEvent with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    type_: @sdkjson.field(obj, "type", path),
+    delta: @sdkjson.field(obj, "delta", path),
+  }
+}
+
+///|
+///
+/// Emitted when the full audio transcript is completed.
+pub(all) struct ResponseAudioTranscriptDoneEvent {
+  type_ : String
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend ResponseAudioTranscriptDoneEvent with ToJson::{to_json}
+
+///|
+pub impl ToJson for ResponseAudioTranscriptDoneEvent with fn to_json(self) {
+  @sdkjson.ObjBuilder::new().field("type", self.type_).build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend ResponseAudioTranscriptDoneEvent with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for ResponseAudioTranscriptDoneEvent with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  { type_: @sdkjson.field(obj, "type", path), }
+}
+
+///|
+///
+/// Emitted when a partial code snippet is added by the code interpreter.
+pub(all) struct ResponseCodeInterpreterCallCodeDeltaEvent {
+  type_ : String
+  output_index : Int
+  delta : String
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend ResponseCodeInterpreterCallCodeDeltaEvent with ToJson::{to_json}
+
+///|
+pub impl ToJson for ResponseCodeInterpreterCallCodeDeltaEvent with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .field("type", self.type_)
+  .field("output_index", self.output_index)
+  .field("delta", self.delta)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend ResponseCodeInterpreterCallCodeDeltaEvent with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for ResponseCodeInterpreterCallCodeDeltaEvent with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    type_: @sdkjson.field(obj, "type", path),
+    output_index: @sdkjson.field(obj, "output_index", path),
+    delta: @sdkjson.field(obj, "delta", path),
+  }
+}
+
+///|
+///
+/// Emitted when code snippet output is finalized by the code interpreter.
+pub(all) struct ResponseCodeInterpreterCallCodeDoneEvent {
+  type_ : String
+  output_index : Int
+  code : String
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend ResponseCodeInterpreterCallCodeDoneEvent with ToJson::{to_json}
+
+///|
+pub impl ToJson for ResponseCodeInterpreterCallCodeDoneEvent with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .field("type", self.type_)
+  .field("output_index", self.output_index)
+  .field("code", self.code)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend ResponseCodeInterpreterCallCodeDoneEvent with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for ResponseCodeInterpreterCallCodeDoneEvent with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    type_: @sdkjson.field(obj, "type", path),
+    output_index: @sdkjson.field(obj, "output_index", path),
+    code: @sdkjson.field(obj, "code", path),
+  }
+}
+
+///|
+///
+/// Emitted when the code interpreter call is completed.
+pub(all) struct ResponseCodeInterpreterCallCompletedEvent {
+  type_ : String
+  output_index : Int
+  code_interpreter_call : CodeInterpreterToolCall
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend ResponseCodeInterpreterCallCompletedEvent with ToJson::{to_json}
+
+///|
+pub impl ToJson for ResponseCodeInterpreterCallCompletedEvent with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .field("type", self.type_)
+  .field("output_index", self.output_index)
+  .field("code_interpreter_call", self.code_interpreter_call)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend ResponseCodeInterpreterCallCompletedEvent with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for ResponseCodeInterpreterCallCompletedEvent with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    type_: @sdkjson.field(obj, "type", path),
+    output_index: @sdkjson.field(obj, "output_index", path),
+    code_interpreter_call: @sdkjson.field(obj, "code_interpreter_call", path),
+  }
+}
+
+///|
+///
+/// Emitted when a code interpreter call is in progress.
+pub(all) struct ResponseCodeInterpreterCallInProgressEvent {
+  type_ : String
+  output_index : Int
+  code_interpreter_call : CodeInterpreterToolCall
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend ResponseCodeInterpreterCallInProgressEvent with ToJson::{to_json}
+
+///|
+pub impl ToJson for ResponseCodeInterpreterCallInProgressEvent with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .field("type", self.type_)
+  .field("output_index", self.output_index)
+  .field("code_interpreter_call", self.code_interpreter_call)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend ResponseCodeInterpreterCallInProgressEvent with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for ResponseCodeInterpreterCallInProgressEvent with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    type_: @sdkjson.field(obj, "type", path),
+    output_index: @sdkjson.field(obj, "output_index", path),
+    code_interpreter_call: @sdkjson.field(obj, "code_interpreter_call", path),
+  }
+}
+
+///|
+///
+/// Emitted when the code interpreter is actively interpreting the code snippet.
+pub(all) struct ResponseCodeInterpreterCallInterpretingEvent {
+  type_ : String
+  output_index : Int
+  code_interpreter_call : CodeInterpreterToolCall
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend ResponseCodeInterpreterCallInterpretingEvent with ToJson::{to_json}
+
+///|
+pub impl ToJson for ResponseCodeInterpreterCallInterpretingEvent with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .field("type", self.type_)
+  .field("output_index", self.output_index)
+  .field("code_interpreter_call", self.code_interpreter_call)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend ResponseCodeInterpreterCallInterpretingEvent with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for ResponseCodeInterpreterCallInterpretingEvent with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    type_: @sdkjson.field(obj, "type", path),
+    output_index: @sdkjson.field(obj, "output_index", path),
+    code_interpreter_call: @sdkjson.field(obj, "code_interpreter_call", path),
+  }
+}
+
+///|
+///
+/// Emitted when the model response is complete.
+pub(all) struct ResponseCompletedEvent {
+  type_ : String
+  response : Response
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend ResponseCompletedEvent with ToJson::{to_json}
+
+///|
+pub impl ToJson for ResponseCompletedEvent with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("type", self.type_)
+  .field("response", self.response)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend ResponseCompletedEvent with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for ResponseCompletedEvent with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    type_: @sdkjson.field(obj, "type", path),
+    response: @sdkjson.field(obj, "response", path),
+  }
+}
+
+///|
+///
+/// Emitted when a new content part is added.
+pub(all) struct ResponseContentPartAddedEvent {
+  type_ : String
+  item_id : String
+  output_index : Int
+  content_index : Int
+  part : OutputContent
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend ResponseContentPartAddedEvent with ToJson::{to_json}
+
+///|
+pub impl ToJson for ResponseContentPartAddedEvent with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("type", self.type_)
+  .field("item_id", self.item_id)
+  .field("output_index", self.output_index)
+  .field("content_index", self.content_index)
+  .field("part", self.part)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend ResponseContentPartAddedEvent with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for ResponseContentPartAddedEvent with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    type_: @sdkjson.field(obj, "type", path),
+    item_id: @sdkjson.field(obj, "item_id", path),
+    output_index: @sdkjson.field(obj, "output_index", path),
+    content_index: @sdkjson.field(obj, "content_index", path),
+    part: @sdkjson.field(obj, "part", path),
+  }
+}
+
+///|
+///
+/// Emitted when a content part is done.
+pub(all) struct ResponseContentPartDoneEvent {
+  type_ : String
+  item_id : String
+  output_index : Int
+  content_index : Int
+  part : OutputContent
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend ResponseContentPartDoneEvent with ToJson::{to_json}
+
+///|
+pub impl ToJson for ResponseContentPartDoneEvent with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("type", self.type_)
+  .field("item_id", self.item_id)
+  .field("output_index", self.output_index)
+  .field("content_index", self.content_index)
+  .field("part", self.part)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend ResponseContentPartDoneEvent with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for ResponseContentPartDoneEvent with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    type_: @sdkjson.field(obj, "type", path),
+    item_id: @sdkjson.field(obj, "item_id", path),
+    output_index: @sdkjson.field(obj, "output_index", path),
+    content_index: @sdkjson.field(obj, "content_index", path),
+    part: @sdkjson.field(obj, "part", path),
+  }
+}
+
+///|
+///
+/// An event that is emitted when a response is created.
+pub(all) struct ResponseCreatedEvent {
+  type_ : String
+  response : Response
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend ResponseCreatedEvent with ToJson::{to_json}
+
+///|
+pub impl ToJson for ResponseCreatedEvent with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("type", self.type_)
+  .field("response", self.response)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend ResponseCreatedEvent with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for ResponseCreatedEvent with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    type_: @sdkjson.field(obj, "type", path),
+    response: @sdkjson.field(obj, "response", path),
+  }
+}
+
+///|
+///
+/// Emitted when an error occurs.
+pub(all) struct ResponseErrorEvent {
+  type_ : String
+  code : String?
+  message : String
+  param : String?
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend ResponseErrorEvent with ToJson::{to_json}
+
+///|
+pub impl ToJson for ResponseErrorEvent with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("type", self.type_)
+  .presence("code", nullable_presence(self.code.map(value => value)))
+  .field("message", self.message)
+  .presence("param", nullable_presence(self.param.map(value => value)))
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend ResponseErrorEvent with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for ResponseErrorEvent with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    type_: @sdkjson.field(obj, "type", path),
+    code: decode_nullable_field(obj, "code", path),
+    message: @sdkjson.field(obj, "message", path),
+    param: decode_nullable_field(obj, "param", path),
+  }
+}
+
+///|
+///
+/// An event that is emitted when a response fails.
+pub(all) struct ResponseFailedEvent {
+  type_ : String
+  response : Response
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend ResponseFailedEvent with ToJson::{to_json}
+
+///|
+pub impl ToJson for ResponseFailedEvent with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("type", self.type_)
+  .field("response", self.response)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend ResponseFailedEvent with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for ResponseFailedEvent with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    type_: @sdkjson.field(obj, "type", path),
+    response: @sdkjson.field(obj, "response", path),
+  }
+}
+
+///|
+///
+/// Emitted when a file search call is completed (results found).
+pub(all) struct ResponseFileSearchCallCompletedEvent {
+  type_ : String
+  output_index : Int
+  item_id : String
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend ResponseFileSearchCallCompletedEvent with ToJson::{to_json}
+
+///|
+pub impl ToJson for ResponseFileSearchCallCompletedEvent with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("type", self.type_)
+  .field("output_index", self.output_index)
+  .field("item_id", self.item_id)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend ResponseFileSearchCallCompletedEvent with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for ResponseFileSearchCallCompletedEvent with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    type_: @sdkjson.field(obj, "type", path),
+    output_index: @sdkjson.field(obj, "output_index", path),
+    item_id: @sdkjson.field(obj, "item_id", path),
+  }
+}
+
+///|
+///
+/// Emitted when a file search call is initiated.
+pub(all) struct ResponseFileSearchCallInProgressEvent {
+  type_ : String
+  output_index : Int
+  item_id : String
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend ResponseFileSearchCallInProgressEvent with ToJson::{to_json}
+
+///|
+pub impl ToJson for ResponseFileSearchCallInProgressEvent with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("type", self.type_)
+  .field("output_index", self.output_index)
+  .field("item_id", self.item_id)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend ResponseFileSearchCallInProgressEvent with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for ResponseFileSearchCallInProgressEvent with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    type_: @sdkjson.field(obj, "type", path),
+    output_index: @sdkjson.field(obj, "output_index", path),
+    item_id: @sdkjson.field(obj, "item_id", path),
+  }
+}
+
+///|
+///
+/// Emitted when a file search is currently searching.
+pub(all) struct ResponseFileSearchCallSearchingEvent {
+  type_ : String
+  output_index : Int
+  item_id : String
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend ResponseFileSearchCallSearchingEvent with ToJson::{to_json}
+
+///|
+pub impl ToJson for ResponseFileSearchCallSearchingEvent with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("type", self.type_)
+  .field("output_index", self.output_index)
+  .field("item_id", self.item_id)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend ResponseFileSearchCallSearchingEvent with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for ResponseFileSearchCallSearchingEvent with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    type_: @sdkjson.field(obj, "type", path),
+    output_index: @sdkjson.field(obj, "output_index", path),
+    item_id: @sdkjson.field(obj, "item_id", path),
+  }
+}
+
+///|
+///
+/// Emitted when there is a partial function-call arguments delta.
+pub(all) struct ResponseFunctionCallArgumentsDeltaEvent {
+  type_ : String
+  item_id : String
+  output_index : Int
+  delta : String
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend ResponseFunctionCallArgumentsDeltaEvent with ToJson::{to_json}
+
+///|
+pub impl ToJson for ResponseFunctionCallArgumentsDeltaEvent with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .field("type", self.type_)
+  .field("item_id", self.item_id)
+  .field("output_index", self.output_index)
+  .field("delta", self.delta)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend ResponseFunctionCallArgumentsDeltaEvent with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for ResponseFunctionCallArgumentsDeltaEvent with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    type_: @sdkjson.field(obj, "type", path),
+    item_id: @sdkjson.field(obj, "item_id", path),
+    output_index: @sdkjson.field(obj, "output_index", path),
+    delta: @sdkjson.field(obj, "delta", path),
+  }
+}
+
+///|
+///
+/// Emitted when function-call arguments are finalized.
+pub(all) struct ResponseFunctionCallArgumentsDoneEvent {
+  type_ : String
+  item_id : String
+  output_index : Int
+  arguments : String
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend ResponseFunctionCallArgumentsDoneEvent with ToJson::{to_json}
+
+///|
+pub impl ToJson for ResponseFunctionCallArgumentsDoneEvent with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("type", self.type_)
+  .field("item_id", self.item_id)
+  .field("output_index", self.output_index)
+  .field("arguments", self.arguments)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend ResponseFunctionCallArgumentsDoneEvent with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for ResponseFunctionCallArgumentsDoneEvent with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    type_: @sdkjson.field(obj, "type", path),
+    item_id: @sdkjson.field(obj, "item_id", path),
+    output_index: @sdkjson.field(obj, "output_index", path),
+    arguments: @sdkjson.field(obj, "arguments", path),
+  }
+}
+
+///|
+///
+/// Emitted when the response is in progress.
+pub(all) struct ResponseInProgressEvent {
+  type_ : String
+  response : Response
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend ResponseInProgressEvent with ToJson::{to_json}
+
+///|
+pub impl ToJson for ResponseInProgressEvent with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("type", self.type_)
+  .field("response", self.response)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend ResponseInProgressEvent with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for ResponseInProgressEvent with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    type_: @sdkjson.field(obj, "type", path),
+    response: @sdkjson.field(obj, "response", path),
+  }
+}
+
+///|
+///
+/// An event that is emitted when a response finishes as incomplete.
+pub(all) struct ResponseIncompleteEvent {
+  type_ : String
+  response : Response
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend ResponseIncompleteEvent with ToJson::{to_json}
+
+///|
+pub impl ToJson for ResponseIncompleteEvent with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("type", self.type_)
+  .field("response", self.response)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend ResponseIncompleteEvent with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for ResponseIncompleteEvent with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    type_: @sdkjson.field(obj, "type", path),
+    response: @sdkjson.field(obj, "response", path),
+  }
+}
+
+///|
+///
+/// Emitted when a new output item is added.
+pub(all) struct ResponseOutputItemAddedEvent {
+  type_ : String
+  output_index : Int
+  item : OutputItem
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend ResponseOutputItemAddedEvent with ToJson::{to_json}
+
+///|
+pub impl ToJson for ResponseOutputItemAddedEvent with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("type", self.type_)
+  .field("output_index", self.output_index)
+  .field("item", self.item)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend ResponseOutputItemAddedEvent with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for ResponseOutputItemAddedEvent with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    type_: @sdkjson.field(obj, "type", path),
+    output_index: @sdkjson.field(obj, "output_index", path),
+    item: @sdkjson.field(obj, "item", path),
+  }
+}
+
+///|
+///
+/// Emitted when an output item is marked done.
+pub(all) struct ResponseOutputItemDoneEvent {
+  type_ : String
+  output_index : Int
+  item : OutputItem
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend ResponseOutputItemDoneEvent with ToJson::{to_json}
+
+///|
+pub impl ToJson for ResponseOutputItemDoneEvent with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("type", self.type_)
+  .field("output_index", self.output_index)
+  .field("item", self.item)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend ResponseOutputItemDoneEvent with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for ResponseOutputItemDoneEvent with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    type_: @sdkjson.field(obj, "type", path),
+    output_index: @sdkjson.field(obj, "output_index", path),
+    item: @sdkjson.field(obj, "item", path),
+  }
+}
+
+///|
+///
+/// Configuration options for a text response from the model. Can be plain text or structured JSON data. Learn more: - [Text inputs and outputs](/docs/guides/text) - [Structured Outputs](/docs/guides/structured-outputs)
+pub(all) struct ResponsePropertiesText {
+  format : TextResponseFormatConfiguration?
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend ResponsePropertiesText with ToJson::{to_json}
+
+///|
+pub impl ToJson for ResponsePropertiesText with fn to_json(self) {
+  @sdkjson.ObjBuilder::new().opt("format", self.format).build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend ResponsePropertiesText with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for ResponsePropertiesText with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  { format: @sdkjson.opt_field(obj, "format", path), }
+}
+
+///|
+///
+/// The truncation strategy to use for the model response. - `auto`: If the context of this response and previous ones exceeds the model's context window size, the model will truncate the response to fit the context window by dropping input items in the middle of the conversation. - `disabled` (default): If a model response will exceed the context window size for a model, the request will fail with a 400 error.
+pub(all) enum ResponsePropertiesTruncation {
+  Auto
+  Disabled
+  Unknown(String)
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend ResponsePropertiesTruncation with ToJson::{to_json}
+
+///|
+pub impl ToJson for ResponsePropertiesTruncation with fn to_json(self) {
+  let raw = match self {
+    Auto => "auto"
+    Disabled => "disabled"
+    Unknown(raw) => raw
+  }
+  raw.to_json()
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend ResponsePropertiesTruncation with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for ResponsePropertiesTruncation with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "auto" => Some(Auto)
+        "disabled" => Some(Disabled)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of ResponseProperties.
+pub(all) struct ResponseProperties {
+  previous_response_id : @sdkjson.Presence[String]
+  model : String?
+  reasoning : @sdkjson.Presence[Reasoning]
+  max_output_tokens : @sdkjson.Presence[Int]
+  instructions : @sdkjson.Presence[String]
+  text : ResponsePropertiesText?
+  tools : Array[Tool]?
+  tool_choice : Json?
+  truncation : @sdkjson.Presence[ResponsePropertiesTruncation]
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend ResponseProperties with ToJson::{to_json}
+
+///|
+pub impl ToJson for ResponseProperties with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .presence("previous_response_id", self.previous_response_id)
+  .opt("model", self.model)
+  .presence("reasoning", self.reasoning)
+  .presence("max_output_tokens", self.max_output_tokens)
+  .presence("instructions", self.instructions)
+  .opt("text", self.text)
+  .opt("tools", self.tools)
+  .opt("tool_choice", self.tool_choice)
+  .presence("truncation", self.truncation)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend ResponseProperties with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for ResponseProperties with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    previous_response_id: @sdkjson.presence_field(
+      obj, "previous_response_id", path,
+    ),
+    model: @sdkjson.opt_field(obj, "model", path),
+    reasoning: @sdkjson.presence_field(obj, "reasoning", path),
+    max_output_tokens: @sdkjson.presence_field(obj, "max_output_tokens", path),
+    instructions: @sdkjson.presence_field(obj, "instructions", path),
+    text: @sdkjson.opt_field(obj, "text", path),
+    tools: @sdkjson.opt_field(obj, "tools", path),
+    tool_choice: @sdkjson.opt_field(obj, "tool_choice", path),
+    truncation: @sdkjson.presence_field(obj, "truncation", path),
+  }
+}
+
+///|
+///
+/// The summary part that was added.
+pub(all) struct ResponseReasoningSummaryPartAddedEventPart {
+  text : String
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend ResponseReasoningSummaryPartAddedEventPart with ToJson::{to_json}
+
+///|
+pub impl ToJson for ResponseReasoningSummaryPartAddedEventPart with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .field("type", "summary_text")
+  .field("text", self.text)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend ResponseReasoningSummaryPartAddedEventPart with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for ResponseReasoningSummaryPartAddedEventPart with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  { text: @sdkjson.field(obj, "text", path), }
+}
+
+///|
+///
+/// Emitted when a new reasoning summary part is added.
+pub(all) struct ResponseReasoningSummaryPartAddedEvent {
+  type_ : String
+  item_id : String
+  output_index : Int
+  summary_index : Int
+  part : ResponseReasoningSummaryPartAddedEventPart
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend ResponseReasoningSummaryPartAddedEvent with ToJson::{to_json}
+
+///|
+pub impl ToJson for ResponseReasoningSummaryPartAddedEvent with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("type", self.type_)
+  .field("item_id", self.item_id)
+  .field("output_index", self.output_index)
+  .field("summary_index", self.summary_index)
+  .field("part", self.part)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend ResponseReasoningSummaryPartAddedEvent with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for ResponseReasoningSummaryPartAddedEvent with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    type_: @sdkjson.field(obj, "type", path),
+    item_id: @sdkjson.field(obj, "item_id", path),
+    output_index: @sdkjson.field(obj, "output_index", path),
+    summary_index: @sdkjson.field(obj, "summary_index", path),
+    part: @sdkjson.field(obj, "part", path),
+  }
+}
+
+///|
+///
+/// The completed summary part.
+pub(all) struct ResponseReasoningSummaryPartDoneEventPart {
+  text : String
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend ResponseReasoningSummaryPartDoneEventPart with ToJson::{to_json}
+
+///|
+pub impl ToJson for ResponseReasoningSummaryPartDoneEventPart with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .field("type", "summary_text")
+  .field("text", self.text)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend ResponseReasoningSummaryPartDoneEventPart with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for ResponseReasoningSummaryPartDoneEventPart with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  { text: @sdkjson.field(obj, "text", path), }
+}
+
+///|
+///
+/// Emitted when a reasoning summary part is completed.
+pub(all) struct ResponseReasoningSummaryPartDoneEvent {
+  type_ : String
+  item_id : String
+  output_index : Int
+  summary_index : Int
+  part : ResponseReasoningSummaryPartDoneEventPart
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend ResponseReasoningSummaryPartDoneEvent with ToJson::{to_json}
+
+///|
+pub impl ToJson for ResponseReasoningSummaryPartDoneEvent with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("type", self.type_)
+  .field("item_id", self.item_id)
+  .field("output_index", self.output_index)
+  .field("summary_index", self.summary_index)
+  .field("part", self.part)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend ResponseReasoningSummaryPartDoneEvent with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for ResponseReasoningSummaryPartDoneEvent with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    type_: @sdkjson.field(obj, "type", path),
+    item_id: @sdkjson.field(obj, "item_id", path),
+    output_index: @sdkjson.field(obj, "output_index", path),
+    summary_index: @sdkjson.field(obj, "summary_index", path),
+    part: @sdkjson.field(obj, "part", path),
+  }
+}
+
+///|
+///
+/// Emitted when a delta is added to a reasoning summary text.
+pub(all) struct ResponseReasoningSummaryTextDeltaEvent {
+  type_ : String
+  item_id : String
+  output_index : Int
+  summary_index : Int
+  delta : String
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend ResponseReasoningSummaryTextDeltaEvent with ToJson::{to_json}
+
+///|
+pub impl ToJson for ResponseReasoningSummaryTextDeltaEvent with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("type", self.type_)
+  .field("item_id", self.item_id)
+  .field("output_index", self.output_index)
+  .field("summary_index", self.summary_index)
+  .field("delta", self.delta)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend ResponseReasoningSummaryTextDeltaEvent with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for ResponseReasoningSummaryTextDeltaEvent with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    type_: @sdkjson.field(obj, "type", path),
+    item_id: @sdkjson.field(obj, "item_id", path),
+    output_index: @sdkjson.field(obj, "output_index", path),
+    summary_index: @sdkjson.field(obj, "summary_index", path),
+    delta: @sdkjson.field(obj, "delta", path),
+  }
+}
+
+///|
+///
+/// Emitted when a reasoning summary text is completed.
+pub(all) struct ResponseReasoningSummaryTextDoneEvent {
+  type_ : String
+  item_id : String
+  output_index : Int
+  summary_index : Int
+  text : String
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend ResponseReasoningSummaryTextDoneEvent with ToJson::{to_json}
+
+///|
+pub impl ToJson for ResponseReasoningSummaryTextDoneEvent with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("type", self.type_)
+  .field("item_id", self.item_id)
+  .field("output_index", self.output_index)
+  .field("summary_index", self.summary_index)
+  .field("text", self.text)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend ResponseReasoningSummaryTextDoneEvent with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for ResponseReasoningSummaryTextDoneEvent with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    type_: @sdkjson.field(obj, "type", path),
+    item_id: @sdkjson.field(obj, "item_id", path),
+    output_index: @sdkjson.field(obj, "output_index", path),
+    summary_index: @sdkjson.field(obj, "summary_index", path),
+    text: @sdkjson.field(obj, "text", path),
+  }
+}
+
+///|
+///
+/// Emitted when there is a partial refusal text.
+pub(all) struct ResponseRefusalDeltaEvent {
+  type_ : String
+  item_id : String
+  output_index : Int
+  content_index : Int
+  delta : String
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend ResponseRefusalDeltaEvent with ToJson::{to_json}
+
+///|
+pub impl ToJson for ResponseRefusalDeltaEvent with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("type", self.type_)
+  .field("item_id", self.item_id)
+  .field("output_index", self.output_index)
+  .field("content_index", self.content_index)
+  .field("delta", self.delta)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend ResponseRefusalDeltaEvent with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for ResponseRefusalDeltaEvent with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    type_: @sdkjson.field(obj, "type", path),
+    item_id: @sdkjson.field(obj, "item_id", path),
+    output_index: @sdkjson.field(obj, "output_index", path),
+    content_index: @sdkjson.field(obj, "content_index", path),
+    delta: @sdkjson.field(obj, "delta", path),
+  }
+}
+
+///|
+///
+/// Emitted when refusal text is finalized.
+pub(all) struct ResponseRefusalDoneEvent {
+  type_ : String
+  item_id : String
+  output_index : Int
+  content_index : Int
+  refusal : String
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend ResponseRefusalDoneEvent with ToJson::{to_json}
+
+///|
+pub impl ToJson for ResponseRefusalDoneEvent with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("type", self.type_)
+  .field("item_id", self.item_id)
+  .field("output_index", self.output_index)
+  .field("content_index", self.content_index)
+  .field("refusal", self.refusal)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend ResponseRefusalDoneEvent with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for ResponseRefusalDoneEvent with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    type_: @sdkjson.field(obj, "type", path),
+    item_id: @sdkjson.field(obj, "item_id", path),
+    output_index: @sdkjson.field(obj, "output_index", path),
+    content_index: @sdkjson.field(obj, "content_index", path),
+    refusal: @sdkjson.field(obj, "refusal", path),
+  }
+}
+
+///|
+///
+/// Emitted when a text annotation is added.
+pub(all) struct ResponseTextAnnotationDeltaEvent {
+  type_ : String
+  item_id : String
+  output_index : Int
+  content_index : Int
+  annotation_index : Int
+  annotation : Annotation
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend ResponseTextAnnotationDeltaEvent with ToJson::{to_json}
+
+///|
+pub impl ToJson for ResponseTextAnnotationDeltaEvent with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("type", self.type_)
+  .field("item_id", self.item_id)
+  .field("output_index", self.output_index)
+  .field("content_index", self.content_index)
+  .field("annotation_index", self.annotation_index)
+  .field("annotation", self.annotation)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend ResponseTextAnnotationDeltaEvent with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for ResponseTextAnnotationDeltaEvent with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    type_: @sdkjson.field(obj, "type", path),
+    item_id: @sdkjson.field(obj, "item_id", path),
+    output_index: @sdkjson.field(obj, "output_index", path),
+    content_index: @sdkjson.field(obj, "content_index", path),
+    annotation_index: @sdkjson.field(obj, "annotation_index", path),
+    annotation: @sdkjson.field(obj, "annotation", path),
+  }
+}
+
+///|
+///
+/// Emitted when there is an additional text delta.
+pub(all) struct ResponseTextDeltaEvent {
+  type_ : String
+  item_id : String
+  output_index : Int
+  content_index : Int
+  delta : String
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend ResponseTextDeltaEvent with ToJson::{to_json}
+
+///|
+pub impl ToJson for ResponseTextDeltaEvent with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("type", self.type_)
+  .field("item_id", self.item_id)
+  .field("output_index", self.output_index)
+  .field("content_index", self.content_index)
+  .field("delta", self.delta)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend ResponseTextDeltaEvent with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for ResponseTextDeltaEvent with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    type_: @sdkjson.field(obj, "type", path),
+    item_id: @sdkjson.field(obj, "item_id", path),
+    output_index: @sdkjson.field(obj, "output_index", path),
+    content_index: @sdkjson.field(obj, "content_index", path),
+    delta: @sdkjson.field(obj, "delta", path),
+  }
+}
+
+///|
+///
+/// Emitted when text content is finalized.
+pub(all) struct ResponseTextDoneEvent {
+  type_ : String
+  item_id : String
+  output_index : Int
+  content_index : Int
+  text : String
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend ResponseTextDoneEvent with ToJson::{to_json}
+
+///|
+pub impl ToJson for ResponseTextDoneEvent with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("type", self.type_)
+  .field("item_id", self.item_id)
+  .field("output_index", self.output_index)
+  .field("content_index", self.content_index)
+  .field("text", self.text)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend ResponseTextDoneEvent with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for ResponseTextDoneEvent with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    type_: @sdkjson.field(obj, "type", path),
+    item_id: @sdkjson.field(obj, "item_id", path),
+    output_index: @sdkjson.field(obj, "output_index", path),
+    content_index: @sdkjson.field(obj, "content_index", path),
+    text: @sdkjson.field(obj, "text", path),
+  }
+}
+
+///|
+///
+/// Emitted when a web search call is completed.
+pub(all) struct ResponseWebSearchCallCompletedEvent {
+  type_ : String
+  output_index : Int
+  item_id : String
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend ResponseWebSearchCallCompletedEvent with ToJson::{to_json}
+
+///|
+pub impl ToJson for ResponseWebSearchCallCompletedEvent with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("type", self.type_)
+  .field("output_index", self.output_index)
+  .field("item_id", self.item_id)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend ResponseWebSearchCallCompletedEvent with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for ResponseWebSearchCallCompletedEvent with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    type_: @sdkjson.field(obj, "type", path),
+    output_index: @sdkjson.field(obj, "output_index", path),
+    item_id: @sdkjson.field(obj, "item_id", path),
+  }
+}
+
+///|
+///
+/// Emitted when a web search call is initiated.
+pub(all) struct ResponseWebSearchCallInProgressEvent {
+  type_ : String
+  output_index : Int
+  item_id : String
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend ResponseWebSearchCallInProgressEvent with ToJson::{to_json}
+
+///|
+pub impl ToJson for ResponseWebSearchCallInProgressEvent with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("type", self.type_)
+  .field("output_index", self.output_index)
+  .field("item_id", self.item_id)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend ResponseWebSearchCallInProgressEvent with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for ResponseWebSearchCallInProgressEvent with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    type_: @sdkjson.field(obj, "type", path),
+    output_index: @sdkjson.field(obj, "output_index", path),
+    item_id: @sdkjson.field(obj, "item_id", path),
+  }
+}
+
+///|
+///
+/// Emitted when a web search call is executing.
+pub(all) struct ResponseWebSearchCallSearchingEvent {
+  type_ : String
+  output_index : Int
+  item_id : String
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend ResponseWebSearchCallSearchingEvent with ToJson::{to_json}
+
+///|
+pub impl ToJson for ResponseWebSearchCallSearchingEvent with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("type", self.type_)
+  .field("output_index", self.output_index)
+  .field("item_id", self.item_id)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend ResponseWebSearchCallSearchingEvent with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for ResponseWebSearchCallSearchingEvent with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    type_: @sdkjson.field(obj, "type", path),
+    output_index: @sdkjson.field(obj, "output_index", path),
+    item_id: @sdkjson.field(obj, "item_id", path),
+  }
+}
+
+///|
+///
+/// Generated tagged union ResponseStreamEvent.
+pub(all) enum ResponseStreamEvent {
+  ResponseAudioDelta(ResponseAudioDeltaEvent)
+  ResponseAudioDone(ResponseAudioDoneEvent)
+  ResponseAudioTranscriptDelta(ResponseAudioTranscriptDeltaEvent)
+  ResponseAudioTranscriptDone(ResponseAudioTranscriptDoneEvent)
+  ResponseCodeInterpreterCallCodeDelta(
+    ResponseCodeInterpreterCallCodeDeltaEvent
+  )
+  ResponseCodeInterpreterCallCodeDone(ResponseCodeInterpreterCallCodeDoneEvent)
+  ResponseCodeInterpreterCallCompleted(
+    ResponseCodeInterpreterCallCompletedEvent
+  )
+  ResponseCodeInterpreterCallInProgress(
+    ResponseCodeInterpreterCallInProgressEvent
+  )
+  ResponseCodeInterpreterCallInterpreting(
+    ResponseCodeInterpreterCallInterpretingEvent
+  )
+  ResponseCompleted(ResponseCompletedEvent)
+  ResponseContentPartAdded(ResponseContentPartAddedEvent)
+  ResponseContentPartDone(ResponseContentPartDoneEvent)
+  ResponseCreated(ResponseCreatedEvent)
+  Error(ResponseErrorEvent)
+  ResponseFileSearchCallCompleted(ResponseFileSearchCallCompletedEvent)
+  ResponseFileSearchCallInProgress(ResponseFileSearchCallInProgressEvent)
+  ResponseFileSearchCallSearching(ResponseFileSearchCallSearchingEvent)
+  ResponseFunctionCallArgumentsDelta(ResponseFunctionCallArgumentsDeltaEvent)
+  ResponseFunctionCallArgumentsDone(ResponseFunctionCallArgumentsDoneEvent)
+  ResponseInProgress(ResponseInProgressEvent)
+  ResponseFailed(ResponseFailedEvent)
+  ResponseIncomplete(ResponseIncompleteEvent)
+  ResponseOutputItemAdded(ResponseOutputItemAddedEvent)
+  ResponseOutputItemDone(ResponseOutputItemDoneEvent)
+  ResponseReasoningSummaryPartAdded(ResponseReasoningSummaryPartAddedEvent)
+  ResponseReasoningSummaryPartDone(ResponseReasoningSummaryPartDoneEvent)
+  ResponseReasoningSummaryTextDelta(ResponseReasoningSummaryTextDeltaEvent)
+  ResponseReasoningSummaryTextDone(ResponseReasoningSummaryTextDoneEvent)
+  ResponseRefusalDelta(ResponseRefusalDeltaEvent)
+  ResponseRefusalDone(ResponseRefusalDoneEvent)
+  ResponseOutputTextAnnotationAdded(ResponseTextAnnotationDeltaEvent)
+  ResponseOutputTextDelta(ResponseTextDeltaEvent)
+  ResponseOutputTextDone(ResponseTextDoneEvent)
+  ResponseWebSearchCallCompleted(ResponseWebSearchCallCompletedEvent)
+  ResponseWebSearchCallInProgress(ResponseWebSearchCallInProgressEvent)
+  ResponseWebSearchCallSearching(ResponseWebSearchCallSearchingEvent)
+  Unknown(String, Json)
+}
+
+///|
+///
+/// Encodes this tagged union as JSON.
+pub extend ResponseStreamEvent with ToJson::{to_json}
+
+///|
+pub impl ToJson for ResponseStreamEvent with fn to_json(self) {
+  match self {
+    ResponseAudioDelta(value) => value.to_json()
+    ResponseAudioDone(value) => value.to_json()
+    ResponseAudioTranscriptDelta(value) => value.to_json()
+    ResponseAudioTranscriptDone(value) => value.to_json()
+    ResponseCodeInterpreterCallCodeDelta(value) => value.to_json()
+    ResponseCodeInterpreterCallCodeDone(value) => value.to_json()
+    ResponseCodeInterpreterCallCompleted(value) => value.to_json()
+    ResponseCodeInterpreterCallInProgress(value) => value.to_json()
+    ResponseCodeInterpreterCallInterpreting(value) => value.to_json()
+    ResponseCompleted(value) => value.to_json()
+    ResponseContentPartAdded(value) => value.to_json()
+    ResponseContentPartDone(value) => value.to_json()
+    ResponseCreated(value) => value.to_json()
+    Error(value) => value.to_json()
+    ResponseFileSearchCallCompleted(value) => value.to_json()
+    ResponseFileSearchCallInProgress(value) => value.to_json()
+    ResponseFileSearchCallSearching(value) => value.to_json()
+    ResponseFunctionCallArgumentsDelta(value) => value.to_json()
+    ResponseFunctionCallArgumentsDone(value) => value.to_json()
+    ResponseInProgress(value) => value.to_json()
+    ResponseFailed(value) => value.to_json()
+    ResponseIncomplete(value) => value.to_json()
+    ResponseOutputItemAdded(value) => value.to_json()
+    ResponseOutputItemDone(value) => value.to_json()
+    ResponseReasoningSummaryPartAdded(value) => value.to_json()
+    ResponseReasoningSummaryPartDone(value) => value.to_json()
+    ResponseReasoningSummaryTextDelta(value) => value.to_json()
+    ResponseReasoningSummaryTextDone(value) => value.to_json()
+    ResponseRefusalDelta(value) => value.to_json()
+    ResponseRefusalDone(value) => value.to_json()
+    ResponseOutputTextAnnotationAdded(value) => value.to_json()
+    ResponseOutputTextDelta(value) => value.to_json()
+    ResponseOutputTextDone(value) => value.to_json()
+    ResponseWebSearchCallCompleted(value) => value.to_json()
+    ResponseWebSearchCallInProgress(value) => value.to_json()
+    ResponseWebSearchCallSearching(value) => value.to_json()
+    Unknown(_, value) => value
+  }
+}
+
+///|
+///
+/// Decodes this tagged union from JSON.
+pub extend ResponseStreamEvent with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for ResponseStreamEvent with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  let tag : String = @sdkjson.field(obj, "type", path)
+  match tag {
+    "response.audio.delta" => ResponseAudioDelta(@json.from_json(value, path~))
+    "response.audio.done" => ResponseAudioDone(@json.from_json(value, path~))
+    "response.audio.transcript.delta" =>
+      ResponseAudioTranscriptDelta(@json.from_json(value, path~))
+    "response.audio.transcript.done" =>
+      ResponseAudioTranscriptDone(@json.from_json(value, path~))
+    "response.code_interpreter_call.code.delta" =>
+      ResponseCodeInterpreterCallCodeDelta(@json.from_json(value, path~))
+    "response.code_interpreter_call.code.done" =>
+      ResponseCodeInterpreterCallCodeDone(@json.from_json(value, path~))
+    "response.code_interpreter_call.completed" =>
+      ResponseCodeInterpreterCallCompleted(@json.from_json(value, path~))
+    "response.code_interpreter_call.in_progress" =>
+      ResponseCodeInterpreterCallInProgress(@json.from_json(value, path~))
+    "response.code_interpreter_call.interpreting" =>
+      ResponseCodeInterpreterCallInterpreting(@json.from_json(value, path~))
+    "response.completed" => ResponseCompleted(@json.from_json(value, path~))
+    "response.content_part.added" =>
+      ResponseContentPartAdded(@json.from_json(value, path~))
+    "response.content_part.done" =>
+      ResponseContentPartDone(@json.from_json(value, path~))
+    "response.created" => ResponseCreated(@json.from_json(value, path~))
+    "error" => Error(@json.from_json(value, path~))
+    "response.file_search_call.completed" =>
+      ResponseFileSearchCallCompleted(@json.from_json(value, path~))
+    "response.file_search_call.in_progress" =>
+      ResponseFileSearchCallInProgress(@json.from_json(value, path~))
+    "response.file_search_call.searching" =>
+      ResponseFileSearchCallSearching(@json.from_json(value, path~))
+    "response.function_call_arguments.delta" =>
+      ResponseFunctionCallArgumentsDelta(@json.from_json(value, path~))
+    "response.function_call_arguments.done" =>
+      ResponseFunctionCallArgumentsDone(@json.from_json(value, path~))
+    "response.in_progress" => ResponseInProgress(@json.from_json(value, path~))
+    "response.failed" => ResponseFailed(@json.from_json(value, path~))
+    "response.incomplete" => ResponseIncomplete(@json.from_json(value, path~))
+    "response.output_item.added" =>
+      ResponseOutputItemAdded(@json.from_json(value, path~))
+    "response.output_item.done" =>
+      ResponseOutputItemDone(@json.from_json(value, path~))
+    "response.reasoning_summary_part.added" =>
+      ResponseReasoningSummaryPartAdded(@json.from_json(value, path~))
+    "response.reasoning_summary_part.done" =>
+      ResponseReasoningSummaryPartDone(@json.from_json(value, path~))
+    "response.reasoning_summary_text.delta" =>
+      ResponseReasoningSummaryTextDelta(@json.from_json(value, path~))
+    "response.reasoning_summary_text.done" =>
+      ResponseReasoningSummaryTextDone(@json.from_json(value, path~))
+    "response.refusal.delta" =>
+      ResponseRefusalDelta(@json.from_json(value, path~))
+    "response.refusal.done" =>
+      ResponseRefusalDone(@json.from_json(value, path~))
+    "response.output_text.annotation.added" =>
+      ResponseOutputTextAnnotationAdded(@json.from_json(value, path~))
+    "response.output_text.delta" =>
+      ResponseOutputTextDelta(@json.from_json(value, path~))
+    "response.output_text.done" =>
+      ResponseOutputTextDone(@json.from_json(value, path~))
+    "response.web_search_call.completed" =>
+      ResponseWebSearchCallCompleted(@json.from_json(value, path~))
+    "response.web_search_call.in_progress" =>
+      ResponseWebSearchCallInProgress(@json.from_json(value, path~))
+    "response.web_search_call.searching" =>
+      ResponseWebSearchCallSearching(@json.from_json(value, path~))
+    other => Unknown(other, value)
+  }
 }

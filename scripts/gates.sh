@@ -34,6 +34,8 @@ run timeout 120 moon -C runtime-tests test --target wasm-gc
 [ "$js" = 1 ] && run timeout 120 moon -C runtime-tests test --target js
 [ "$native_tests" = 1 ] && run timeout 120 moon -C runtime-tests test --target native
 
+run .venv/bin/python -m unittest discover -s tools/gen/tests -v
+run scripts/generate.sh --check
 run moon fmt --check
 run moon info
 run .venv/bin/python tools/gen/census.py specs/badhttp/openapi.json badhttp --expect-zero

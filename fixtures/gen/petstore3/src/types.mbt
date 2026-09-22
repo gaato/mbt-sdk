@@ -102,6 +102,11 @@ fn json_int64(
 }
 
 ///|
+fn json_int64_to_json(value : Int64) -> Json {
+  try! @json.parse(value.to_string())
+}
+
+///|
 fn decode_optional_int64(
   obj : Map[String, Json],
   key : String,
@@ -182,8 +187,8 @@ pub extend Order with ToJson::{to_json}
 ///|
 pub impl ToJson for Order with fn to_json(self) {
   @sdkjson.ObjBuilder::new()
-  .opt("id", self.id)
-  .opt("petId", self.pet_id)
+  .opt("id", self.id.map(value => json_int64_to_json(value)))
+  .opt("petId", self.pet_id.map(value => json_int64_to_json(value)))
   .opt("quantity", self.quantity)
   .opt("shipDate", self.ship_date)
   .opt("status", self.status)
@@ -224,7 +229,10 @@ pub extend Category with ToJson::{to_json}
 
 ///|
 pub impl ToJson for Category with fn to_json(self) {
-  @sdkjson.ObjBuilder::new().opt("id", self.id).opt("name", self.name).build()
+  @sdkjson.ObjBuilder::new()
+  .opt("id", self.id.map(value => json_int64_to_json(value)))
+  .opt("name", self.name)
+  .build()
 }
 
 ///|
@@ -263,7 +271,7 @@ pub extend User with ToJson::{to_json}
 ///|
 pub impl ToJson for User with fn to_json(self) {
   @sdkjson.ObjBuilder::new()
-  .opt("id", self.id)
+  .opt("id", self.id.map(value => json_int64_to_json(value)))
   .opt("username", self.username)
   .opt("firstName", self.first_name)
   .opt("lastName", self.last_name)
@@ -309,7 +317,10 @@ pub extend Tag with ToJson::{to_json}
 
 ///|
 pub impl ToJson for Tag with fn to_json(self) {
-  @sdkjson.ObjBuilder::new().opt("id", self.id).opt("name", self.name).build()
+  @sdkjson.ObjBuilder::new()
+  .opt("id", self.id.map(value => json_int64_to_json(value)))
+  .opt("name", self.name)
+  .build()
 }
 
 ///|
@@ -394,7 +405,7 @@ pub extend Pet with ToJson::{to_json}
 ///|
 pub impl ToJson for Pet with fn to_json(self) {
   @sdkjson.ObjBuilder::new()
-  .opt("id", self.id)
+  .opt("id", self.id.map(value => json_int64_to_json(value)))
   .field("name", self.name)
   .opt("category", self.category)
   .field("photoUrls", self.photo_urls)

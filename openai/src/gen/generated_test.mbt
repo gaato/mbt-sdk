@@ -96,3 +96,128 @@ test "retrieve model request percent-encodes every non-unreserved path byte" {
   assert_eq(request.http_method, "GET")
   assert_eq(request.url, "/models/model%2Fid%20with%20space")
 }
+
+///|
+fn responses_fixture() -> String {
+  let fixture =
+    #|{
+    #|  "metadata": {},
+    #|  "temperature": 1.0,
+    #|  "top_p": 1.0,
+    #|  "previous_response_id": null,
+    #|  "model": "openai/gpt-5",
+    #|  "reasoning": null,
+    #|  "max_output_tokens": null,
+    #|  "instructions": null,
+    #|  "tools": [],
+    #|  "tool_choice": "auto",
+    #|  "id": "resp_openrouter_fixture",
+    #|  "object": "response",
+    #|  "status": "completed",
+    #|  "created_at": 1750000000,
+    #|  "error": null,
+    #|  "incomplete_details": null,
+    #|  "output": [
+    #|    {
+    #|      "type": "reasoning",
+    #|      "id": "reasoning-1",
+    #|      "summary": [],
+    #|      "content": [{"type":"reasoning_text","text":"Think carefully."}]
+    #|    },
+    #|    {
+    #|      "type": "message",
+    #|      "id": "message-1",
+    #|      "role": "assistant",
+    #|      "status": "completed",
+    #|      "content": [{"type":"output_text","text":"Done."}]
+    #|    }
+    #|  ],
+    #|  "usage": {
+    #|    "input_tokens": 11,
+    #|    "input_tokens_details": {"cached_tokens": 2},
+    #|    "output_tokens": 7,
+    #|    "output_tokens_details": {"reasoning_tokens": 3},
+    #|    "total_tokens": 18
+    #|  },
+    #|  "parallel_tool_calls": true
+    #|}
+  fixture
+}
+
+///|
+test "generated Responses decoder reads OpenRouter reasoning and message items" {
+  let decoded = @gen.create_response_decode(response(responses_fixture()))
+  assert_eq(decoded.output.length(), 2)
+  match decoded.output[0] {
+    @gen.Reasoning(item) =>
+      match item.content {
+        Some([first, ..]) => assert_eq(first.text, "Think carefully.")
+        _ => fail("expected reasoning_text content")
+      }
+    _ => fail("expected reasoning output item")
+  }
+  match decoded.output[1] {
+    @gen.Message(item) =>
+      match item.content[0] {
+        @gen.OutputText(content) => assert_eq(content.text, "Done.")
+        _ => fail("expected output_text content")
+      }
+    _ => fail("expected message output item")
+  }
+  match decoded.usage {
+    Some(usage) => {
+      assert_eq(usage.input_tokens_details.cached_tokens, 2)
+      assert_eq(usage.output_tokens_details.reasoning_tokens, 3)
+    }
+    None => fail("expected usage")
+  }
+}
+
+///|
+test "unknown Responses output item retains its tag and JSON" {
+  let decoded : @gen.OutputItem = @json.from_json(
+    @json.parse("{\"type\":\"future_output\",\"value\":42}"),
+  )
+  match decoded {
+    @gen.Unknown(tag, raw) => {
+      assert_eq(tag, "future_output")
+      assert_eq(raw.stringify(), "{\"type\":\"future_output\",\"value\":42}")
+    }
+    _ => fail("expected unknown output item")
+  }
+}
+
+///|
+test "generated Responses stream event variants decode inline fixtures" {
+  let created : @gen.ResponseStreamEvent = @json.from_json(
+    @json.parse(
+      "{\"type\":\"response.created\",\"response\":" + responses_fixture() + "}",
+    ),
+  )
+  match created {
+    @gen.ResponseCreated(event) =>
+      assert_eq(event.response.id, "resp_openrouter_fixture")
+    _ => fail("expected response.created")
+  }
+  let delta : @gen.ResponseStreamEvent = @json.from_json(
+    @json.parse(
+      "{\"type\":\"response.output_text.delta\",\"item_id\":\"message-1\",\"output_index\":1,\"content_index\":0,\"delta\":\"Done\"}",
+    ),
+  )
+  match delta {
+    @gen.ResponseOutputTextDelta(event) => assert_eq(event.delta, "Done")
+    _ => fail("expected response.output_text.delta")
+  }
+  let completed : @gen.ResponseStreamEvent = @json.from_json(
+    @json.parse(
+      "{\"type\":\"response.completed\",\"response\":" +
+      responses_fixture() +
+      "}",
+    ),
+  )
+  match completed {
+    @gen.ResponseCompleted(event) =>
+      assert_eq(event.response.output.length(), 2)
+    _ => fail("expected response.completed")
+  }
+}
