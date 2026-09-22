@@ -36,7 +36,7 @@ jobs:
       - name: Trust the workspace (container runs as a different user)
         run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
 
-      - name: Dry run, then publish
+      - name: Publish
         env:
           MOONCAKES_TOKEN: ${{ secrets.MOONCAKES_TOKEN }}
           MOONCAKES_USERNAME: ${{ secrets.MOONCAKES_USERNAME }}
