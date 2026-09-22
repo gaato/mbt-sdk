@@ -143,7 +143,13 @@ pub(all) enum OrderStatus {
   Approved
   Delivered
   Unknown(String)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend OrderStatus with Eq::{equal, not_equal}
+
+///|
+pub extend OrderStatus with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -193,7 +199,13 @@ pub(all) struct Order {
   ship_date : String?
   status : OrderStatus?
   complete : Bool?
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend Order with Eq::{equal, not_equal}
+
+///|
+pub extend Order with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -250,7 +262,13 @@ pub impl @json.FromJson for Order with fn from_json(value, path) {
 pub(all) struct Category {
   id : Int64?
   name : String?
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend Category with Eq::{equal, not_equal}
+
+///|
+pub extend Category with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -298,7 +316,13 @@ pub(all) struct User {
   password : String?
   phone : String?
   user_status : Int?
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend User with Eq::{equal, not_equal}
+
+///|
+pub extend User with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -361,7 +385,13 @@ pub impl @json.FromJson for User with fn from_json(value, path) {
 pub(all) struct Tag {
   id : Int64?
   name : String?
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend Tag with Eq::{equal, not_equal}
+
+///|
+pub extend Tag with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -405,7 +435,13 @@ pub(all) enum PetStatus {
   Pending
   Sold
   Unknown(String)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend PetStatus with Eq::{equal, not_equal}
+
+///|
+pub extend PetStatus with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -455,7 +491,13 @@ pub(all) struct Pet {
   photo_urls : Array[String]
   tags : Array[Tag]?
   status : PetStatus?
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend Pet with Eq::{equal, not_equal}
+
+///|
+pub extend Pet with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -513,7 +555,13 @@ pub(all) struct ApiResponse {
   code : Int?
   type_ : String?
   message : String?
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ApiResponse with Eq::{equal, not_equal}
+
+///|
+pub extend ApiResponse with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -563,7 +611,13 @@ pub(all) enum FindPetsByStatusStatus {
   Pending
   Sold
   Custom(String)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend FindPetsByStatusStatus with Eq::{equal, not_equal}
+
+///|
+pub extend FindPetsByStatusStatus with @debug.Debug::{to_repr}
 
 ///|
 ///

@@ -4,7 +4,13 @@
 /// An unsigned 64-bit integer encoded as a JSON number, not a JSON string.
 pub(all) struct UInt64Number {
   value : UInt64
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend UInt64Number with Eq::{equal, not_equal}
+
+///|
+pub extend UInt64Number with @debug.Debug::{to_repr}
 
 ///|
 pub extend UInt64Number with ToJson::{to_json}

@@ -4,6 +4,7 @@ package "gaato/fixture-petstore3"
 import {
   "gaato/http",
   "gaato/sdk-runtime",
+  "moonbitlang/core/debug",
   "moonbitlang/core/json",
 }
 
@@ -109,20 +110,26 @@ pub(all) struct ApiResponse {
   code : Int?
   type_ : String?
   message : String?
-}
+} derive(Eq, @debug.Debug)
+pub fn ApiResponse::equal(Self, Self) -> Bool
 pub fn ApiResponse::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn ApiResponse::new(code? : Int, type_? : String, message? : String) -> Self
+pub fn ApiResponse::not_equal(Self, Self) -> Bool
 pub fn ApiResponse::to_json(Self) -> Json
+pub fn ApiResponse::to_repr(Self) -> @debug.Repr
 pub impl ToJson for ApiResponse
 pub impl @json.FromJson for ApiResponse
 
 pub(all) struct Category {
   id : Int64?
   name : String?
-}
+} derive(Eq, @debug.Debug)
+pub fn Category::equal(Self, Self) -> Bool
 pub fn Category::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn Category::new(id? : Int64, name? : String) -> Self
+pub fn Category::not_equal(Self, Self) -> Bool
 pub fn Category::to_json(Self) -> Json
+pub fn Category::to_repr(Self) -> @debug.Repr
 pub impl ToJson for Category
 pub impl @json.FromJson for Category
 
@@ -131,9 +138,12 @@ pub(all) enum FindPetsByStatusStatus {
   Pending
   Sold
   Custom(String)
-}
+} derive(Eq, @debug.Debug)
+pub fn FindPetsByStatusStatus::equal(Self, Self) -> Bool
 pub fn FindPetsByStatusStatus::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn FindPetsByStatusStatus::not_equal(Self, Self) -> Bool
 pub fn FindPetsByStatusStatus::to_json(Self) -> Json
+pub fn FindPetsByStatusStatus::to_repr(Self) -> @debug.Repr
 pub impl ToJson for FindPetsByStatusStatus
 pub impl @json.FromJson for FindPetsByStatusStatus
 
@@ -144,10 +154,13 @@ pub(all) struct Order {
   ship_date : String?
   status : OrderStatus?
   complete : Bool?
-}
+} derive(Eq, @debug.Debug)
+pub fn Order::equal(Self, Self) -> Bool
 pub fn Order::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn Order::new(id? : Int64, pet_id? : Int64, quantity? : Int, ship_date? : String, status? : OrderStatus, complete? : Bool) -> Self
+pub fn Order::not_equal(Self, Self) -> Bool
 pub fn Order::to_json(Self) -> Json
+pub fn Order::to_repr(Self) -> @debug.Repr
 pub impl ToJson for Order
 pub impl @json.FromJson for Order
 
@@ -156,9 +169,12 @@ pub(all) enum OrderStatus {
   Approved
   Delivered
   Unknown(String)
-}
+} derive(Eq, @debug.Debug)
+pub fn OrderStatus::equal(Self, Self) -> Bool
 pub fn OrderStatus::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn OrderStatus::not_equal(Self, Self) -> Bool
 pub fn OrderStatus::to_json(Self) -> Json
+pub fn OrderStatus::to_repr(Self) -> @debug.Repr
 pub impl ToJson for OrderStatus
 pub impl @json.FromJson for OrderStatus
 
@@ -169,10 +185,13 @@ pub(all) struct Pet {
   photo_urls : Array[String]
   tags : Array[Tag]?
   status : PetStatus?
-}
+} derive(Eq, @debug.Debug)
+pub fn Pet::equal(Self, Self) -> Bool
 pub fn Pet::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn Pet::new(name~ : String, photo_urls~ : Array[String], id? : Int64, category? : Category, tags? : Array[Tag], status? : PetStatus) -> Self
+pub fn Pet::not_equal(Self, Self) -> Bool
 pub fn Pet::to_json(Self) -> Json
+pub fn Pet::to_repr(Self) -> @debug.Repr
 pub impl ToJson for Pet
 pub impl @json.FromJson for Pet
 
@@ -181,19 +200,25 @@ pub(all) enum PetStatus {
   Pending
   Sold
   Unknown(String)
-}
+} derive(Eq, @debug.Debug)
+pub fn PetStatus::equal(Self, Self) -> Bool
 pub fn PetStatus::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn PetStatus::not_equal(Self, Self) -> Bool
 pub fn PetStatus::to_json(Self) -> Json
+pub fn PetStatus::to_repr(Self) -> @debug.Repr
 pub impl ToJson for PetStatus
 pub impl @json.FromJson for PetStatus
 
 pub(all) struct Tag {
   id : Int64?
   name : String?
-}
+} derive(Eq, @debug.Debug)
+pub fn Tag::equal(Self, Self) -> Bool
 pub fn Tag::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn Tag::new(id? : Int64, name? : String) -> Self
+pub fn Tag::not_equal(Self, Self) -> Bool
 pub fn Tag::to_json(Self) -> Json
+pub fn Tag::to_repr(Self) -> @debug.Repr
 pub impl ToJson for Tag
 pub impl @json.FromJson for Tag
 
@@ -206,10 +231,13 @@ pub(all) struct User {
   password : String?
   phone : String?
   user_status : Int?
-}
+} derive(Eq, @debug.Debug)
+pub fn User::equal(Self, Self) -> Bool
 pub fn User::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn User::new(id? : Int64, username? : String, first_name? : String, last_name? : String, email? : String, password? : String, phone? : String, user_status? : Int) -> Self
+pub fn User::not_equal(Self, Self) -> Bool
 pub fn User::to_json(Self) -> Json
+pub fn User::to_repr(Self) -> @debug.Repr
 pub impl ToJson for User
 pub impl @json.FromJson for User
 

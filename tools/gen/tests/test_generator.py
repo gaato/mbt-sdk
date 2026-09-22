@@ -198,6 +198,17 @@ class IRTests(unittest.TestCase):
         ir = IRBuilder(document(operation(request=schema)), "example/gen").build()
         self.assertEqual(ir.operations[0].request_type.moon_type(), "Json")
 
+    def test_every_declaration_derives_eq_and_debug(self):
+        schemas = {
+            "Shape": {"type": "object", "properties": {"kind": {"type": "string", "enum": ["a", "b"]}, "size": {"oneOf": [{"type": "string"}, {"type": "integer"}]}}, "required": ["kind"]},
+        }
+        doc = document(operation(request={"$ref": "#/components/schemas/Shape"}, response={"$ref": "#/components/schemas/Shape"}), schemas)
+        types = emit(IRBuilder(doc, "example/gen").build())["types.mbt"]
+        self.assertEqual(types.count("} derive(Eq, @debug.Debug)"), 3)
+        self.assertIn("pub extend Shape with Eq::{equal, not_equal}", types)
+        self.assertIn("pub extend Shape with @debug.Debug::{to_repr}", types)
+        self.assertIn('"moonbitlang/core/debug"', emit(IRBuilder(doc, "example/gen").build())["moon.pkg"])
+
     def test_emission_is_byte_deterministic(self):
         schema = {"type": "object", "properties": {"z": {"type": "integer"}, "a": {"type": "string"}}, "required": ["z", "a"]}
         first = emit(IRBuilder(document(operation(request=schema)), "example/gen").build())

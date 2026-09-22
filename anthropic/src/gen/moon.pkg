@@ -3,6 +3,7 @@ import {
   "gaato/http",
   "gaato/sdk-runtime" @runtime,
   "gaato/sdk-runtime/json" @sdkjson,
+  "moonbitlang/core/debug",
   "moonbitlang/core/encoding/utf8",
   "moonbitlang/core/json",
 }

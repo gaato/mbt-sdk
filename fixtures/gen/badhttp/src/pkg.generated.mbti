@@ -4,6 +4,7 @@ package "gaato/fixture-badhttp"
 import {
   "gaato/http",
   "gaato/sdk-runtime",
+  "moonbitlang/core/debug",
   "moonbitlang/core/json",
 }
 
@@ -211,9 +212,12 @@ pub(all) enum Get402BrokenFlavorFlavor {
   MissingHeader
   V1Body
   Custom(String)
-}
+} derive(Eq, @debug.Debug)
+pub fn Get402BrokenFlavorFlavor::equal(Self, Self) -> Bool
 pub fn Get402BrokenFlavorFlavor::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn Get402BrokenFlavorFlavor::not_equal(Self, Self) -> Bool
 pub fn Get402BrokenFlavorFlavor::to_json(Self) -> Json
+pub fn Get402BrokenFlavorFlavor::to_repr(Self) -> @debug.Repr
 pub impl ToJson for Get402BrokenFlavorFlavor
 pub impl @json.FromJson for Get402BrokenFlavorFlavor
 
@@ -221,9 +225,12 @@ pub(all) enum Get402BrokenFlavorNetwork {
   BaseSepolia
   Base
   Custom(String)
-}
+} derive(Eq, @debug.Debug)
+pub fn Get402BrokenFlavorNetwork::equal(Self, Self) -> Bool
 pub fn Get402BrokenFlavorNetwork::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn Get402BrokenFlavorNetwork::not_equal(Self, Self) -> Bool
 pub fn Get402BrokenFlavorNetwork::to_json(Self) -> Json
+pub fn Get402BrokenFlavorNetwork::to_repr(Self) -> @debug.Repr
 pub impl ToJson for Get402BrokenFlavorNetwork
 pub impl @json.FromJson for Get402BrokenFlavorNetwork
 
@@ -231,9 +238,12 @@ pub(all) enum Get402PayNetwork {
   BaseSepolia
   Base
   Custom(String)
-}
+} derive(Eq, @debug.Debug)
+pub fn Get402PayNetwork::equal(Self, Self) -> Bool
 pub fn Get402PayNetwork::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn Get402PayNetwork::not_equal(Self, Self) -> Bool
 pub fn Get402PayNetwork::to_json(Self) -> Json
+pub fn Get402PayNetwork::to_repr(Self) -> @debug.Repr
 pub impl ToJson for Get402PayNetwork
 pub impl @json.FromJson for Get402PayNetwork
 
@@ -241,9 +251,12 @@ pub(all) enum Get402ScenarioNetwork {
   BaseSepolia
   Base
   Custom(String)
-}
+} derive(Eq, @debug.Debug)
+pub fn Get402ScenarioNetwork::equal(Self, Self) -> Bool
 pub fn Get402ScenarioNetwork::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn Get402ScenarioNetwork::not_equal(Self, Self) -> Bool
 pub fn Get402ScenarioNetwork::to_json(Self) -> Json
+pub fn Get402ScenarioNetwork::to_repr(Self) -> @debug.Repr
 pub impl ToJson for Get402ScenarioNetwork
 pub impl @json.FromJson for Get402ScenarioNetwork
 
@@ -256,9 +269,12 @@ pub(all) enum Get402ScenarioScenario {
   Overpriced
   WrongNetwork
   Custom(String)
-}
+} derive(Eq, @debug.Debug)
+pub fn Get402ScenarioScenario::equal(Self, Self) -> Bool
 pub fn Get402ScenarioScenario::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn Get402ScenarioScenario::not_equal(Self, Self) -> Bool
 pub fn Get402ScenarioScenario::to_json(Self) -> Json
+pub fn Get402ScenarioScenario::to_repr(Self) -> @debug.Repr
 pub impl ToJson for Get402ScenarioScenario
 pub impl @json.FromJson for Get402ScenarioScenario
 
@@ -282,9 +298,12 @@ pub(all) enum GetAuthFlavorFlavor {
   Proxy
   Redirect
   Custom(String)
-}
+} derive(Eq, @debug.Debug)
+pub fn GetAuthFlavorFlavor::equal(Self, Self) -> Bool
 pub fn GetAuthFlavorFlavor::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn GetAuthFlavorFlavor::not_equal(Self, Self) -> Bool
 pub fn GetAuthFlavorFlavor::to_json(Self) -> Json
+pub fn GetAuthFlavorFlavor::to_repr(Self) -> @debug.Repr
 pub impl ToJson for GetAuthFlavorFlavor
 pub impl @json.FromJson for GetAuthFlavorFlavor
 
@@ -306,9 +325,12 @@ pub(all) enum GetBadjsonFlavorFlavor {
   Deep
   Utf16
   Custom(String)
-}
+} derive(Eq, @debug.Debug)
+pub fn GetBadjsonFlavorFlavor::equal(Self, Self) -> Bool
 pub fn GetBadjsonFlavorFlavor::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn GetBadjsonFlavorFlavor::not_equal(Self, Self) -> Bool
 pub fn GetBadjsonFlavorFlavor::to_json(Self) -> Json
+pub fn GetBadjsonFlavorFlavor::to_repr(Self) -> @debug.Repr
 pub impl ToJson for GetBadjsonFlavorFlavor
 pub impl @json.FromJson for GetBadjsonFlavorFlavor
 
@@ -335,9 +357,12 @@ pub(all) enum GetCompressFlavorFlavor {
   GzipFile
   Bomb
   Custom(String)
-}
+} derive(Eq, @debug.Debug)
+pub fn GetCompressFlavorFlavor::equal(Self, Self) -> Bool
 pub fn GetCompressFlavorFlavor::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn GetCompressFlavorFlavor::not_equal(Self, Self) -> Bool
 pub fn GetCompressFlavorFlavor::to_json(Self) -> Json
+pub fn GetCompressFlavorFlavor::to_repr(Self) -> @debug.Repr
 pub impl ToJson for GetCompressFlavorFlavor
 pub impl @json.FromJson for GetCompressFlavorFlavor
 
@@ -362,9 +387,12 @@ pub(all) enum GetCookiesFlavorFlavor {
   Nameless
   Huge
   Custom(String)
-}
+} derive(Eq, @debug.Debug)
+pub fn GetCookiesFlavorFlavor::equal(Self, Self) -> Bool
 pub fn GetCookiesFlavorFlavor::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn GetCookiesFlavorFlavor::not_equal(Self, Self) -> Bool
 pub fn GetCookiesFlavorFlavor::to_json(Self) -> Json
+pub fn GetCookiesFlavorFlavor::to_repr(Self) -> @debug.Repr
 pub impl ToJson for GetCookiesFlavorFlavor
 pub impl @json.FromJson for GetCookiesFlavorFlavor
 
@@ -379,9 +407,12 @@ pub(all) enum GetCrosshostFlavorFlavor {
   RelativeAuthority
   Jar
   Custom(String)
-}
+} derive(Eq, @debug.Debug)
+pub fn GetCrosshostFlavorFlavor::equal(Self, Self) -> Bool
 pub fn GetCrosshostFlavorFlavor::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn GetCrosshostFlavorFlavor::not_equal(Self, Self) -> Bool
 pub fn GetCrosshostFlavorFlavor::to_json(Self) -> Json
+pub fn GetCrosshostFlavorFlavor::to_repr(Self) -> @debug.Repr
 pub impl ToJson for GetCrosshostFlavorFlavor
 pub impl @json.FromJson for GetCrosshostFlavorFlavor
 
@@ -397,9 +428,12 @@ pub(all) enum GetEtagFlavorFlavor {
   BadDate
   Future
   Custom(String)
-}
+} derive(Eq, @debug.Debug)
+pub fn GetEtagFlavorFlavor::equal(Self, Self) -> Bool
 pub fn GetEtagFlavorFlavor::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn GetEtagFlavorFlavor::not_equal(Self, Self) -> Bool
 pub fn GetEtagFlavorFlavor::to_json(Self) -> Json
+pub fn GetEtagFlavorFlavor::to_repr(Self) -> @debug.Repr
 pub impl ToJson for GetEtagFlavorFlavor
 pub impl @json.FromJson for GetEtagFlavorFlavor
 
@@ -419,18 +453,24 @@ pub(all) enum GetRangeFlavorFlavor {
   UnknownTotal
   IfRangeIgnored
   Custom(String)
-}
+} derive(Eq, @debug.Debug)
+pub fn GetRangeFlavorFlavor::equal(Self, Self) -> Bool
 pub fn GetRangeFlavorFlavor::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn GetRangeFlavorFlavor::not_equal(Self, Self) -> Bool
 pub fn GetRangeFlavorFlavor::to_json(Self) -> Json
+pub fn GetRangeFlavorFlavor::to_repr(Self) -> @debug.Repr
 pub impl ToJson for GetRangeFlavorFlavor
 pub impl @json.FromJson for GetRangeFlavorFlavor
 
 pub(all) enum GetRedirectHopsHops {
   Int(Int)
   Text(String)
-}
+} derive(Eq, @debug.Debug)
+pub fn GetRedirectHopsHops::equal(Self, Self) -> Bool
 pub fn GetRedirectHopsHops::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn GetRedirectHopsHops::not_equal(Self, Self) -> Bool
 pub fn GetRedirectHopsHops::to_json(Self) -> Json
+pub fn GetRedirectHopsHops::to_repr(Self) -> @debug.Repr
 pub impl ToJson for GetRedirectHopsHops
 pub impl @json.FromJson for GetRedirectHopsHops
 
@@ -450,9 +490,12 @@ pub(all) enum GetSseFlavorFlavor {
   Big
   Resume
   Custom(String)
-}
+} derive(Eq, @debug.Debug)
+pub fn GetSseFlavorFlavor::equal(Self, Self) -> Bool
 pub fn GetSseFlavorFlavor::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn GetSseFlavorFlavor::not_equal(Self, Self) -> Bool
 pub fn GetSseFlavorFlavor::to_json(Self) -> Json
+pub fn GetSseFlavorFlavor::to_repr(Self) -> @debug.Repr
 pub impl ToJson for GetSseFlavorFlavor
 pub impl @json.FromJson for GetSseFlavorFlavor
 

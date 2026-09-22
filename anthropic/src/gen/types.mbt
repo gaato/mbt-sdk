@@ -51,7 +51,13 @@ fn[T : @json.FromJson] decode_nullable_field(
 pub(all) struct APIError {
   message : String
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend APIError with Eq::{equal, not_equal}
+
+///|
+pub extend APIError with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -96,7 +102,13 @@ pub(all) enum AllowedCaller {
   CodeExecution20260120
   CodeExecution20260521
   Custom(String)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AllowedCaller with Eq::{equal, not_equal}
+
+///|
+pub extend AllowedCaller with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -144,7 +156,13 @@ pub impl @json.FromJson for AllowedCaller with fn from_json(value, path) {
 pub(all) struct AuthenticationError {
   message : String
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AuthenticationError with Eq::{equal, not_equal}
+
+///|
+pub extend AuthenticationError with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -192,7 +210,13 @@ pub(all) enum Base64ImageSourceMediaType {
   ImageGif
   ImageWebp
   Custom(String)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend Base64ImageSourceMediaType with Eq::{equal, not_equal}
+
+///|
+pub extend Base64ImageSourceMediaType with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -244,7 +268,13 @@ pub(all) struct Base64ImageSource {
   data : String
   media_type : Base64ImageSourceMediaType
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend Base64ImageSource with Eq::{equal, not_equal}
+
+///|
+pub extend Base64ImageSource with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -292,7 +322,13 @@ pub impl @json.FromJson for Base64ImageSource with fn from_json(value, path) {
 pub(all) struct Base64PDFSource {
   data : String
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend Base64PDFSource with Eq::{equal, not_equal}
+
+///|
+pub extend Base64PDFSource with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -339,7 +375,13 @@ pub(all) enum BashCodeExecutionToolResultErrorCode {
   ExecutionTimeExceeded
   OutputFileTooLarge
   Unknown(String)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend BashCodeExecutionToolResultErrorCode with Eq::{equal, not_equal}
+
+///|
+pub extend BashCodeExecutionToolResultErrorCode with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -393,7 +435,13 @@ pub(all) enum CacheControlEphemeralTtl {
   Value5m
   Value1h
   Custom(String)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend CacheControlEphemeralTtl with Eq::{equal, not_equal}
+
+///|
+pub extend CacheControlEphemeralTtl with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -440,7 +488,13 @@ pub impl @json.FromJson for CacheControlEphemeralTtl with fn from_json(
 pub(all) struct CacheControlEphemeral {
   ttl : CacheControlEphemeralTtl?
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend CacheControlEphemeral with Eq::{equal, not_equal}
+
+///|
+pub extend CacheControlEphemeral with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -485,7 +539,13 @@ pub impl @json.FromJson for CacheControlEphemeral with fn from_json(value, path)
 pub(all) enum BashTool20250124CacheControl {
   Ephemeral(CacheControlEphemeral)
   Unknown(String, Json)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend BashTool20250124CacheControl with Eq::{equal, not_equal}
+
+///|
+pub extend BashTool20250124CacheControl with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -528,7 +588,13 @@ pub(all) struct BashTool20250124 {
   input_examples : Array[Map[String, Json]]?
   strict : Bool?
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend BashTool20250124 with Eq::{equal, not_equal}
+
+///|
+pub extend BashTool20250124 with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -593,7 +659,13 @@ pub impl @json.FromJson for BashTool20250124 with fn from_json(value, path) {
 pub(all) struct BillingError {
   message : String
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend BillingError with Eq::{equal, not_equal}
+
+///|
+pub extend BillingError with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -635,7 +707,13 @@ pub impl @json.FromJson for BillingError with fn from_json(value, path) {
 pub(all) struct BrowserCloseTabConfig {
   defer_loading : @sdkjson.Presence[Bool]
   enabled : @sdkjson.Presence[Bool]
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend BrowserCloseTabConfig with Eq::{equal, not_equal}
+
+///|
+pub extend BrowserCloseTabConfig with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -683,7 +761,13 @@ pub impl @json.FromJson for BrowserCloseTabConfig with fn from_json(value, path)
 pub(all) struct BrowserDoubleClickConfig {
   defer_loading : @sdkjson.Presence[Bool]
   enabled : @sdkjson.Presence[Bool]
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend BrowserDoubleClickConfig with Eq::{equal, not_equal}
+
+///|
+pub extend BrowserDoubleClickConfig with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -734,7 +818,13 @@ pub impl @json.FromJson for BrowserDoubleClickConfig with fn from_json(
 pub(all) struct BrowserFileUploadConfig {
   defer_loading : @sdkjson.Presence[Bool]
   enabled : @sdkjson.Presence[Bool]
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend BrowserFileUploadConfig with Eq::{equal, not_equal}
+
+///|
+pub extend BrowserFileUploadConfig with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -785,7 +875,13 @@ pub impl @json.FromJson for BrowserFileUploadConfig with fn from_json(
 pub(all) struct BrowserFindConfig {
   defer_loading : @sdkjson.Presence[Bool]
   enabled : @sdkjson.Presence[Bool]
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend BrowserFindConfig with Eq::{equal, not_equal}
+
+///|
+pub extend BrowserFindConfig with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -833,7 +929,13 @@ pub impl @json.FromJson for BrowserFindConfig with fn from_json(value, path) {
 pub(all) struct BrowserFormInputConfig {
   defer_loading : @sdkjson.Presence[Bool]
   enabled : @sdkjson.Presence[Bool]
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend BrowserFormInputConfig with Eq::{equal, not_equal}
+
+///|
+pub extend BrowserFormInputConfig with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -884,7 +986,13 @@ pub impl @json.FromJson for BrowserFormInputConfig with fn from_json(
 pub(all) struct BrowserGetPageTextConfig {
   defer_loading : @sdkjson.Presence[Bool]
   enabled : @sdkjson.Presence[Bool]
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend BrowserGetPageTextConfig with Eq::{equal, not_equal}
+
+///|
+pub extend BrowserGetPageTextConfig with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -935,7 +1043,13 @@ pub impl @json.FromJson for BrowserGetPageTextConfig with fn from_json(
 pub(all) struct BrowserHoldKeyConfig {
   defer_loading : @sdkjson.Presence[Bool]
   enabled : @sdkjson.Presence[Bool]
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend BrowserHoldKeyConfig with Eq::{equal, not_equal}
+
+///|
+pub extend BrowserHoldKeyConfig with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -983,7 +1097,13 @@ pub impl @json.FromJson for BrowserHoldKeyConfig with fn from_json(value, path) 
 pub(all) struct BrowserHoverConfig {
   defer_loading : @sdkjson.Presence[Bool]
   enabled : @sdkjson.Presence[Bool]
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend BrowserHoverConfig with Eq::{equal, not_equal}
+
+///|
+pub extend BrowserHoverConfig with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -1031,7 +1151,13 @@ pub impl @json.FromJson for BrowserHoverConfig with fn from_json(value, path) {
 pub(all) struct BrowserJavascriptExecConfig {
   defer_loading : @sdkjson.Presence[Bool]
   enabled : @sdkjson.Presence[Bool]
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend BrowserJavascriptExecConfig with Eq::{equal, not_equal}
+
+///|
+pub extend BrowserJavascriptExecConfig with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -1082,7 +1208,13 @@ pub impl @json.FromJson for BrowserJavascriptExecConfig with fn from_json(
 pub(all) struct BrowserKeyConfig {
   defer_loading : @sdkjson.Presence[Bool]
   enabled : @sdkjson.Presence[Bool]
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend BrowserKeyConfig with Eq::{equal, not_equal}
+
+///|
+pub extend BrowserKeyConfig with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -1130,7 +1262,13 @@ pub impl @json.FromJson for BrowserKeyConfig with fn from_json(value, path) {
 pub(all) struct BrowserLeftClickConfig {
   defer_loading : @sdkjson.Presence[Bool]
   enabled : @sdkjson.Presence[Bool]
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend BrowserLeftClickConfig with Eq::{equal, not_equal}
+
+///|
+pub extend BrowserLeftClickConfig with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -1181,7 +1319,13 @@ pub impl @json.FromJson for BrowserLeftClickConfig with fn from_json(
 pub(all) struct BrowserLeftClickDragConfig {
   defer_loading : @sdkjson.Presence[Bool]
   enabled : @sdkjson.Presence[Bool]
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend BrowserLeftClickDragConfig with Eq::{equal, not_equal}
+
+///|
+pub extend BrowserLeftClickDragConfig with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -1232,7 +1376,13 @@ pub impl @json.FromJson for BrowserLeftClickDragConfig with fn from_json(
 pub(all) struct BrowserLeftMouseDownConfig {
   defer_loading : @sdkjson.Presence[Bool]
   enabled : @sdkjson.Presence[Bool]
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend BrowserLeftMouseDownConfig with Eq::{equal, not_equal}
+
+///|
+pub extend BrowserLeftMouseDownConfig with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -1283,7 +1433,13 @@ pub impl @json.FromJson for BrowserLeftMouseDownConfig with fn from_json(
 pub(all) struct BrowserLeftMouseUpConfig {
   defer_loading : @sdkjson.Presence[Bool]
   enabled : @sdkjson.Presence[Bool]
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend BrowserLeftMouseUpConfig with Eq::{equal, not_equal}
+
+///|
+pub extend BrowserLeftMouseUpConfig with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -1334,7 +1490,13 @@ pub impl @json.FromJson for BrowserLeftMouseUpConfig with fn from_json(
 pub(all) struct BrowserListTabsConfig {
   defer_loading : @sdkjson.Presence[Bool]
   enabled : @sdkjson.Presence[Bool]
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend BrowserListTabsConfig with Eq::{equal, not_equal}
+
+///|
+pub extend BrowserListTabsConfig with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -1382,7 +1544,13 @@ pub impl @json.FromJson for BrowserListTabsConfig with fn from_json(value, path)
 pub(all) struct BrowserMiddleClickConfig {
   defer_loading : @sdkjson.Presence[Bool]
   enabled : @sdkjson.Presence[Bool]
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend BrowserMiddleClickConfig with Eq::{equal, not_equal}
+
+///|
+pub extend BrowserMiddleClickConfig with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -1433,7 +1601,13 @@ pub impl @json.FromJson for BrowserMiddleClickConfig with fn from_json(
 pub(all) struct BrowserMouseMoveConfig {
   defer_loading : @sdkjson.Presence[Bool]
   enabled : @sdkjson.Presence[Bool]
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend BrowserMouseMoveConfig with Eq::{equal, not_equal}
+
+///|
+pub extend BrowserMouseMoveConfig with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -1484,7 +1658,13 @@ pub impl @json.FromJson for BrowserMouseMoveConfig with fn from_json(
 pub(all) struct BrowserNavigateConfig {
   defer_loading : @sdkjson.Presence[Bool]
   enabled : @sdkjson.Presence[Bool]
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend BrowserNavigateConfig with Eq::{equal, not_equal}
+
+///|
+pub extend BrowserNavigateConfig with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -1532,7 +1712,13 @@ pub impl @json.FromJson for BrowserNavigateConfig with fn from_json(value, path)
 pub(all) struct BrowserNewTabConfig {
   defer_loading : @sdkjson.Presence[Bool]
   enabled : @sdkjson.Presence[Bool]
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend BrowserNewTabConfig with Eq::{equal, not_equal}
+
+///|
+pub extend BrowserNewTabConfig with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -1580,7 +1766,13 @@ pub impl @json.FromJson for BrowserNewTabConfig with fn from_json(value, path) {
 pub(all) struct BrowserReadConsoleConfig {
   defer_loading : @sdkjson.Presence[Bool]
   enabled : @sdkjson.Presence[Bool]
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend BrowserReadConsoleConfig with Eq::{equal, not_equal}
+
+///|
+pub extend BrowserReadConsoleConfig with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -1631,7 +1823,13 @@ pub impl @json.FromJson for BrowserReadConsoleConfig with fn from_json(
 pub(all) struct BrowserReadNetworkConfig {
   defer_loading : @sdkjson.Presence[Bool]
   enabled : @sdkjson.Presence[Bool]
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend BrowserReadNetworkConfig with Eq::{equal, not_equal}
+
+///|
+pub extend BrowserReadNetworkConfig with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -1682,7 +1880,13 @@ pub impl @json.FromJson for BrowserReadNetworkConfig with fn from_json(
 pub(all) struct BrowserReadPageConfig {
   defer_loading : @sdkjson.Presence[Bool]
   enabled : @sdkjson.Presence[Bool]
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend BrowserReadPageConfig with Eq::{equal, not_equal}
+
+///|
+pub extend BrowserReadPageConfig with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -1730,7 +1934,13 @@ pub impl @json.FromJson for BrowserReadPageConfig with fn from_json(value, path)
 pub(all) struct BrowserRightClickConfig {
   defer_loading : @sdkjson.Presence[Bool]
   enabled : @sdkjson.Presence[Bool]
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend BrowserRightClickConfig with Eq::{equal, not_equal}
+
+///|
+pub extend BrowserRightClickConfig with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -1781,7 +1991,13 @@ pub impl @json.FromJson for BrowserRightClickConfig with fn from_json(
 pub(all) struct BrowserScreenshotConfig {
   defer_loading : @sdkjson.Presence[Bool]
   enabled : @sdkjson.Presence[Bool]
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend BrowserScreenshotConfig with Eq::{equal, not_equal}
+
+///|
+pub extend BrowserScreenshotConfig with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -1832,7 +2048,13 @@ pub impl @json.FromJson for BrowserScreenshotConfig with fn from_json(
 pub(all) struct BrowserScrollConfig {
   defer_loading : @sdkjson.Presence[Bool]
   enabled : @sdkjson.Presence[Bool]
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend BrowserScrollConfig with Eq::{equal, not_equal}
+
+///|
+pub extend BrowserScrollConfig with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -1880,7 +2102,13 @@ pub impl @json.FromJson for BrowserScrollConfig with fn from_json(value, path) {
 pub(all) struct BrowserScrollToConfig {
   defer_loading : @sdkjson.Presence[Bool]
   enabled : @sdkjson.Presence[Bool]
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend BrowserScrollToConfig with Eq::{equal, not_equal}
+
+///|
+pub extend BrowserScrollToConfig with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -1931,7 +2159,13 @@ pub(all) struct BrowserStateChangeDownloadCompleted {
   size_bytes : @sdkjson.Presence[Int]
   type_ : String
   url : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend BrowserStateChangeDownloadCompleted with Eq::{equal, not_equal}
+
+///|
+pub extend BrowserStateChangeDownloadCompleted with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -1996,7 +2230,13 @@ pub(all) struct BrowserStateChangeDownloadFailed {
   error : @sdkjson.Presence[String]
   type_ : String
   url : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend BrowserStateChangeDownloadFailed with Eq::{equal, not_equal}
+
+///|
+pub extend BrowserStateChangeDownloadFailed with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -2051,7 +2291,13 @@ pub(all) struct BrowserStateChangeDownloadStarted {
   download_id : String
   type_ : String
   url : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend BrowserStateChangeDownloadStarted with Eq::{equal, not_equal}
+
+///|
+pub extend BrowserStateChangeDownloadStarted with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -2102,7 +2348,13 @@ pub impl @json.FromJson for BrowserStateChangeDownloadStarted with fn from_json(
 pub(all) struct BrowserStateChangeTabOpened {
   tab_id : String
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend BrowserStateChangeTabOpened with Eq::{equal, not_equal}
+
+///|
+pub extend BrowserStateChangeTabOpened with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -2152,7 +2404,13 @@ pub(all) struct BrowserStateTabEntry {
   tab_id : String
   title : String
   url : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend BrowserStateTabEntry with Eq::{equal, not_equal}
+
+///|
+pub extend BrowserStateTabEntry with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -2203,7 +2461,13 @@ pub impl @json.FromJson for BrowserStateTabEntry with fn from_json(value, path) 
 pub(all) struct BrowserSwitchTabConfig {
   defer_loading : @sdkjson.Presence[Bool]
   enabled : @sdkjson.Presence[Bool]
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend BrowserSwitchTabConfig with Eq::{equal, not_equal}
+
+///|
+pub extend BrowserSwitchTabConfig with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -2254,7 +2518,13 @@ pub impl @json.FromJson for BrowserSwitchTabConfig with fn from_json(
 pub(all) struct BrowserTripleClickConfig {
   defer_loading : @sdkjson.Presence[Bool]
   enabled : @sdkjson.Presence[Bool]
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend BrowserTripleClickConfig with Eq::{equal, not_equal}
+
+///|
+pub extend BrowserTripleClickConfig with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -2305,7 +2575,13 @@ pub impl @json.FromJson for BrowserTripleClickConfig with fn from_json(
 pub(all) struct BrowserTypeConfig {
   defer_loading : @sdkjson.Presence[Bool]
   enabled : @sdkjson.Presence[Bool]
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend BrowserTypeConfig with Eq::{equal, not_equal}
+
+///|
+pub extend BrowserTypeConfig with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -2353,7 +2629,13 @@ pub impl @json.FromJson for BrowserTypeConfig with fn from_json(value, path) {
 pub(all) struct BrowserWaitConfig {
   defer_loading : @sdkjson.Presence[Bool]
   enabled : @sdkjson.Presence[Bool]
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend BrowserWaitConfig with Eq::{equal, not_equal}
+
+///|
+pub extend BrowserWaitConfig with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -2401,7 +2683,13 @@ pub impl @json.FromJson for BrowserWaitConfig with fn from_json(value, path) {
 pub(all) struct BrowserZoomConfig {
   defer_loading : @sdkjson.Presence[Bool]
   enabled : @sdkjson.Presence[Bool]
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend BrowserZoomConfig with Eq::{equal, not_equal}
+
+///|
+pub extend BrowserZoomConfig with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -2478,7 +2766,13 @@ pub(all) struct BrowserToolsetConfigs {
   type_ : @sdkjson.Presence[BrowserTypeConfig]
   wait : @sdkjson.Presence[BrowserWaitConfig]
   zoom : @sdkjson.Presence[BrowserZoomConfig]
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend BrowserToolsetConfigs with Eq::{equal, not_equal}
+
+///|
+pub extend BrowserToolsetConfigs with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -2642,7 +2936,13 @@ pub impl @json.FromJson for BrowserToolsetConfigs with fn from_json(value, path)
 pub(all) enum BrowserToolset20260801CacheControl {
   Ephemeral(CacheControlEphemeral)
   Unknown(String, Json)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend BrowserToolset20260801CacheControl with Eq::{equal, not_equal}
+
+///|
+pub extend BrowserToolset20260801CacheControl with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -2682,7 +2982,13 @@ pub(all) struct BrowserToolset20260801 {
   cache_control : @sdkjson.Presence[BrowserToolset20260801CacheControl]
   configs : @sdkjson.Presence[BrowserToolsetConfigs]
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend BrowserToolset20260801 with Eq::{equal, not_equal}
+
+///|
+pub extend BrowserToolset20260801 with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -2737,7 +3043,13 @@ pub impl @json.FromJson for BrowserToolset20260801 with fn from_json(
 pub(all) struct CacheCreation {
   ephemeral_1h_input_tokens : Int
   ephemeral_5m_input_tokens : Int
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend CacheCreation with Eq::{equal, not_equal}
+
+///|
+pub extend CacheCreation with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -2785,7 +3097,13 @@ pub impl @json.FromJson for CacheCreation with fn from_json(value, path) {
 /// Indicates whether a capability is supported.
 pub(all) struct CapabilitySupport {
   supported : Bool
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend CapabilitySupport with Eq::{equal, not_equal}
+
+///|
+pub extend CapabilitySupport with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -2826,7 +3144,13 @@ pub(all) struct ResponseCharLocationCitation {
   file_id : String?
   start_char_index : Int
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ResponseCharLocationCitation with Eq::{equal, not_equal}
+
+///|
+pub extend ResponseCharLocationCitation with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -2905,7 +3229,13 @@ pub(all) struct ResponseContentBlockLocationCitation {
   file_id : String?
   start_block_index : Int
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ResponseContentBlockLocationCitation with Eq::{equal, not_equal}
+
+///|
+pub extend ResponseContentBlockLocationCitation with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -2984,7 +3314,13 @@ pub(all) struct ResponsePageLocationCitation {
   file_id : String?
   start_page_number : Int
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ResponsePageLocationCitation with Eq::{equal, not_equal}
+
+///|
+pub extend ResponsePageLocationCitation with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -3063,7 +3399,13 @@ pub(all) struct ResponseSearchResultLocationCitation {
   start_block_index : Int
   title : String?
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ResponseSearchResultLocationCitation with Eq::{equal, not_equal}
+
+///|
+pub extend ResponseSearchResultLocationCitation with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -3137,7 +3479,13 @@ pub(all) struct ResponseWebSearchResultLocationCitation {
   title : String?
   type_ : String
   url : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ResponseWebSearchResultLocationCitation with Eq::{equal, not_equal}
+
+///|
+pub extend ResponseWebSearchResultLocationCitation with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -3202,7 +3550,13 @@ pub(all) enum CitationsDeltaCitation {
   SearchResultLocation(ResponseSearchResultLocationCitation)
   WebSearchResultLocation(ResponseWebSearchResultLocationCitation)
   Unknown(String, Json)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend CitationsDeltaCitation with Eq::{equal, not_equal}
+
+///|
+pub extend CitationsDeltaCitation with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -3252,7 +3606,13 @@ pub impl @json.FromJson for CitationsDeltaCitation with fn from_json(
 pub(all) struct CitationsDelta {
   citation : CitationsDeltaCitation
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend CitationsDelta with Eq::{equal, not_equal}
+
+///|
+pub extend CitationsDelta with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -3300,7 +3660,13 @@ pub(all) enum CodeExecutionToolResultErrorCode {
   TooManyRequests
   ExecutionTimeExceeded
   Unknown(String)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend CodeExecutionToolResultErrorCode with Eq::{equal, not_equal}
+
+///|
+pub extend CodeExecutionToolResultErrorCode with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -3351,7 +3717,13 @@ pub impl @json.FromJson for CodeExecutionToolResultErrorCode with fn from_json(
 pub(all) enum CodeExecutionTool20250522CacheControl {
   Ephemeral(CacheControlEphemeral)
   Unknown(String, Json)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend CodeExecutionTool20250522CacheControl with Eq::{equal, not_equal}
+
+///|
+pub extend CodeExecutionTool20250522CacheControl with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -3395,7 +3767,13 @@ pub(all) struct CodeExecutionTool20250522 {
   defer_loading : Bool?
   strict : Bool?
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend CodeExecutionTool20250522 with Eq::{equal, not_equal}
+
+///|
+pub extend CodeExecutionTool20250522 with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -3459,7 +3837,13 @@ pub impl @json.FromJson for CodeExecutionTool20250522 with fn from_json(
 pub(all) enum CodeExecutionTool20250825CacheControl {
   Ephemeral(CacheControlEphemeral)
   Unknown(String, Json)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend CodeExecutionTool20250825CacheControl with Eq::{equal, not_equal}
+
+///|
+pub extend CodeExecutionTool20250825CacheControl with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -3503,7 +3887,13 @@ pub(all) struct CodeExecutionTool20250825 {
   defer_loading : Bool?
   strict : Bool?
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend CodeExecutionTool20250825 with Eq::{equal, not_equal}
+
+///|
+pub extend CodeExecutionTool20250825 with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -3567,7 +3957,13 @@ pub impl @json.FromJson for CodeExecutionTool20250825 with fn from_json(
 pub(all) enum CodeExecutionTool20260120CacheControl {
   Ephemeral(CacheControlEphemeral)
   Unknown(String, Json)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend CodeExecutionTool20260120CacheControl with Eq::{equal, not_equal}
+
+///|
+pub extend CodeExecutionTool20260120CacheControl with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -3611,7 +4007,13 @@ pub(all) struct CodeExecutionTool20260120 {
   defer_loading : Bool?
   strict : Bool?
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend CodeExecutionTool20260120 with Eq::{equal, not_equal}
+
+///|
+pub extend CodeExecutionTool20260120 with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -3675,7 +4077,13 @@ pub impl @json.FromJson for CodeExecutionTool20260120 with fn from_json(
 pub(all) enum CodeExecutionTool20260521CacheControl {
   Ephemeral(CacheControlEphemeral)
   Unknown(String, Json)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend CodeExecutionTool20260521CacheControl with Eq::{equal, not_equal}
+
+///|
+pub extend CodeExecutionTool20260521CacheControl with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -3719,7 +4127,13 @@ pub(all) struct CodeExecutionTool20260521 {
   defer_loading : Bool?
   strict : Bool?
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend CodeExecutionTool20260521 with Eq::{equal, not_equal}
+
+///|
+pub extend CodeExecutionTool20260521 with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -3783,7 +4197,13 @@ pub impl @json.FromJson for CodeExecutionTool20260521 with fn from_json(
 pub(all) struct ComputerCursorPositionConfig {
   defer_loading : @sdkjson.Presence[Bool]
   enabled : @sdkjson.Presence[Bool]
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ComputerCursorPositionConfig with Eq::{equal, not_equal}
+
+///|
+pub extend ComputerCursorPositionConfig with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -3834,7 +4254,13 @@ pub impl @json.FromJson for ComputerCursorPositionConfig with fn from_json(
 pub(all) struct ComputerDoubleClickConfig {
   defer_loading : @sdkjson.Presence[Bool]
   enabled : @sdkjson.Presence[Bool]
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ComputerDoubleClickConfig with Eq::{equal, not_equal}
+
+///|
+pub extend ComputerDoubleClickConfig with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -3885,7 +4311,13 @@ pub impl @json.FromJson for ComputerDoubleClickConfig with fn from_json(
 pub(all) struct ComputerHoldKeyConfig {
   defer_loading : @sdkjson.Presence[Bool]
   enabled : @sdkjson.Presence[Bool]
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ComputerHoldKeyConfig with Eq::{equal, not_equal}
+
+///|
+pub extend ComputerHoldKeyConfig with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -3933,7 +4365,13 @@ pub impl @json.FromJson for ComputerHoldKeyConfig with fn from_json(value, path)
 pub(all) struct ComputerKeyConfig {
   defer_loading : @sdkjson.Presence[Bool]
   enabled : @sdkjson.Presence[Bool]
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ComputerKeyConfig with Eq::{equal, not_equal}
+
+///|
+pub extend ComputerKeyConfig with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -3981,7 +4419,13 @@ pub impl @json.FromJson for ComputerKeyConfig with fn from_json(value, path) {
 pub(all) struct ComputerLeftClickConfig {
   defer_loading : @sdkjson.Presence[Bool]
   enabled : @sdkjson.Presence[Bool]
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ComputerLeftClickConfig with Eq::{equal, not_equal}
+
+///|
+pub extend ComputerLeftClickConfig with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -4032,7 +4476,13 @@ pub impl @json.FromJson for ComputerLeftClickConfig with fn from_json(
 pub(all) struct ComputerLeftClickDragConfig {
   defer_loading : @sdkjson.Presence[Bool]
   enabled : @sdkjson.Presence[Bool]
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ComputerLeftClickDragConfig with Eq::{equal, not_equal}
+
+///|
+pub extend ComputerLeftClickDragConfig with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -4083,7 +4533,13 @@ pub impl @json.FromJson for ComputerLeftClickDragConfig with fn from_json(
 pub(all) struct ComputerLeftMouseDownConfig {
   defer_loading : @sdkjson.Presence[Bool]
   enabled : @sdkjson.Presence[Bool]
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ComputerLeftMouseDownConfig with Eq::{equal, not_equal}
+
+///|
+pub extend ComputerLeftMouseDownConfig with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -4134,7 +4590,13 @@ pub impl @json.FromJson for ComputerLeftMouseDownConfig with fn from_json(
 pub(all) struct ComputerLeftMouseUpConfig {
   defer_loading : @sdkjson.Presence[Bool]
   enabled : @sdkjson.Presence[Bool]
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ComputerLeftMouseUpConfig with Eq::{equal, not_equal}
+
+///|
+pub extend ComputerLeftMouseUpConfig with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -4185,7 +4647,13 @@ pub impl @json.FromJson for ComputerLeftMouseUpConfig with fn from_json(
 pub(all) struct ComputerMiddleClickConfig {
   defer_loading : @sdkjson.Presence[Bool]
   enabled : @sdkjson.Presence[Bool]
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ComputerMiddleClickConfig with Eq::{equal, not_equal}
+
+///|
+pub extend ComputerMiddleClickConfig with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -4236,7 +4704,13 @@ pub impl @json.FromJson for ComputerMiddleClickConfig with fn from_json(
 pub(all) struct ComputerMouseMoveConfig {
   defer_loading : @sdkjson.Presence[Bool]
   enabled : @sdkjson.Presence[Bool]
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ComputerMouseMoveConfig with Eq::{equal, not_equal}
+
+///|
+pub extend ComputerMouseMoveConfig with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -4287,7 +4761,13 @@ pub impl @json.FromJson for ComputerMouseMoveConfig with fn from_json(
 pub(all) struct ComputerRightClickConfig {
   defer_loading : @sdkjson.Presence[Bool]
   enabled : @sdkjson.Presence[Bool]
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ComputerRightClickConfig with Eq::{equal, not_equal}
+
+///|
+pub extend ComputerRightClickConfig with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -4338,7 +4818,13 @@ pub impl @json.FromJson for ComputerRightClickConfig with fn from_json(
 pub(all) struct ComputerScreenshotConfig {
   defer_loading : @sdkjson.Presence[Bool]
   enabled : @sdkjson.Presence[Bool]
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ComputerScreenshotConfig with Eq::{equal, not_equal}
+
+///|
+pub extend ComputerScreenshotConfig with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -4389,7 +4875,13 @@ pub impl @json.FromJson for ComputerScreenshotConfig with fn from_json(
 pub(all) struct ComputerScrollConfig {
   defer_loading : @sdkjson.Presence[Bool]
   enabled : @sdkjson.Presence[Bool]
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ComputerScrollConfig with Eq::{equal, not_equal}
+
+///|
+pub extend ComputerScrollConfig with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -4437,7 +4929,13 @@ pub impl @json.FromJson for ComputerScrollConfig with fn from_json(value, path) 
 pub(all) struct ComputerTripleClickConfig {
   defer_loading : @sdkjson.Presence[Bool]
   enabled : @sdkjson.Presence[Bool]
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ComputerTripleClickConfig with Eq::{equal, not_equal}
+
+///|
+pub extend ComputerTripleClickConfig with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -4488,7 +4986,13 @@ pub impl @json.FromJson for ComputerTripleClickConfig with fn from_json(
 pub(all) struct ComputerTypeConfig {
   defer_loading : @sdkjson.Presence[Bool]
   enabled : @sdkjson.Presence[Bool]
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ComputerTypeConfig with Eq::{equal, not_equal}
+
+///|
+pub extend ComputerTypeConfig with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -4536,7 +5040,13 @@ pub impl @json.FromJson for ComputerTypeConfig with fn from_json(value, path) {
 pub(all) struct ComputerWaitConfig {
   defer_loading : @sdkjson.Presence[Bool]
   enabled : @sdkjson.Presence[Bool]
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ComputerWaitConfig with Eq::{equal, not_equal}
+
+///|
+pub extend ComputerWaitConfig with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -4584,7 +5094,13 @@ pub impl @json.FromJson for ComputerWaitConfig with fn from_json(value, path) {
 pub(all) struct ComputerZoomConfig {
   defer_loading : @sdkjson.Presence[Bool]
   enabled : @sdkjson.Presence[Bool]
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ComputerZoomConfig with Eq::{equal, not_equal}
+
+///|
+pub extend ComputerZoomConfig with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -4647,7 +5163,13 @@ pub(all) struct ComputerToolsetConfigs {
   type_ : @sdkjson.Presence[ComputerTypeConfig]
   wait : @sdkjson.Presence[ComputerWaitConfig]
   zoom : @sdkjson.Presence[ComputerZoomConfig]
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ComputerToolsetConfigs with Eq::{equal, not_equal}
+
+///|
+pub extend ComputerToolsetConfigs with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -4758,7 +5280,13 @@ pub impl @json.FromJson for ComputerToolsetConfigs with fn from_json(
 pub(all) enum ComputerToolset20260801CacheControl {
   Ephemeral(CacheControlEphemeral)
   Unknown(String, Json)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ComputerToolset20260801CacheControl with Eq::{equal, not_equal}
+
+///|
+pub extend ComputerToolset20260801CacheControl with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -4798,7 +5326,13 @@ pub(all) struct ComputerToolset20260801 {
   cache_control : @sdkjson.Presence[ComputerToolset20260801CacheControl]
   configs : @sdkjson.Presence[ComputerToolsetConfigs]
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ComputerToolset20260801 with Eq::{equal, not_equal}
+
+///|
+pub extend ComputerToolset20260801 with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -4854,7 +5388,13 @@ pub(all) enum ContainerSkillType {
   Anthropic
   Custom
   Unknown(String)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ContainerSkillType with Eq::{equal, not_equal}
+
+///|
+pub extend ContainerSkillType with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -4899,7 +5439,13 @@ pub(all) struct ContainerSkill {
   skill_id : String
   type_ : ContainerSkillType
   version : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ContainerSkill with Eq::{equal, not_equal}
+
+///|
+pub extend ContainerSkill with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -4948,7 +5494,13 @@ pub(all) struct Container {
   expires_at : String
   id : String
   skills : Array[ContainerSkill]?
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend Container with Eq::{equal, not_equal}
+
+///|
+pub extend Container with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -4997,7 +5549,13 @@ pub(all) enum SkillParamsType {
   Anthropic
   CustomSkill
   Custom(String)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend SkillParamsType with Eq::{equal, not_equal}
+
+///|
+pub extend SkillParamsType with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -5042,7 +5600,13 @@ pub(all) struct SkillParams {
   skill_id : String
   type_ : SkillParamsType
   version : String?
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend SkillParams with Eq::{equal, not_equal}
+
+///|
+pub extend SkillParams with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -5090,7 +5654,13 @@ pub impl @json.FromJson for SkillParams with fn from_json(value, path) {
 pub(all) struct ContainerParams {
   id : @sdkjson.Presence[String]
   skills : @sdkjson.Presence[Array[SkillParams]]
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ContainerParams with Eq::{equal, not_equal}
+
+///|
+pub extend ContainerParams with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -5138,7 +5708,13 @@ pub impl @json.FromJson for ContainerParams with fn from_json(value, path) {
 pub(all) struct InputJsonContentBlockDelta {
   partial_json : String
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend InputJsonContentBlockDelta with Eq::{equal, not_equal}
+
+///|
+pub extend InputJsonContentBlockDelta with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -5186,7 +5762,13 @@ pub impl @json.FromJson for InputJsonContentBlockDelta with fn from_json(
 pub(all) struct SignatureContentBlockDelta {
   signature : String
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend SignatureContentBlockDelta with Eq::{equal, not_equal}
+
+///|
+pub extend SignatureContentBlockDelta with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -5234,7 +5816,13 @@ pub impl @json.FromJson for SignatureContentBlockDelta with fn from_json(
 pub(all) struct TextContentBlockDelta {
   text : String
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend TextContentBlockDelta with Eq::{equal, not_equal}
+
+///|
+pub extend TextContentBlockDelta with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -5279,7 +5867,13 @@ pub impl @json.FromJson for TextContentBlockDelta with fn from_json(value, path)
 pub(all) struct ThinkingContentBlockDelta {
   thinking : String
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ThinkingContentBlockDelta with Eq::{equal, not_equal}
+
+///|
+pub extend ThinkingContentBlockDelta with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -5331,7 +5925,13 @@ pub(all) enum ContentBlockDeltaEventDelta {
   TextDelta(TextContentBlockDelta)
   ThinkingDelta(ThinkingContentBlockDelta)
   Unknown(String, Json)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ContentBlockDeltaEventDelta with Eq::{equal, not_equal}
+
+///|
+pub extend ContentBlockDeltaEventDelta with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -5379,7 +5979,13 @@ pub(all) struct ContentBlockDeltaEvent {
   delta : ContentBlockDeltaEventDelta
   index : Int
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ContentBlockDeltaEvent with Eq::{equal, not_equal}
+
+///|
+pub extend ContentBlockDeltaEvent with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -5430,7 +6036,13 @@ pub impl @json.FromJson for ContentBlockDeltaEvent with fn from_json(
 pub(all) enum RequestImageBlockCacheControl {
   Ephemeral(CacheControlEphemeral)
   Unknown(String, Json)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestImageBlockCacheControl with Eq::{equal, not_equal}
+
+///|
+pub extend RequestImageBlockCacheControl with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -5469,7 +6081,13 @@ pub impl @json.FromJson for RequestImageBlockCacheControl with fn from_json(
 pub(all) struct FileImageSource {
   file_id : String
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend FileImageSource with Eq::{equal, not_equal}
+
+///|
+pub extend FileImageSource with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -5514,7 +6132,13 @@ pub impl @json.FromJson for FileImageSource with fn from_json(value, path) {
 pub(all) struct URLImageSource {
   type_ : String
   url : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend URLImageSource with Eq::{equal, not_equal}
+
+///|
+pub extend URLImageSource with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -5558,7 +6182,13 @@ pub(all) enum RequestImageBlockSource {
   File(FileImageSource)
   Url(URLImageSource)
   Unknown(String, Json)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestImageBlockSource with Eq::{equal, not_equal}
+
+///|
+pub extend RequestImageBlockSource with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -5602,6 +6232,14 @@ pub(all) enum RequestImageTransformationsOversizedImage {
   Downsize
   Error
   Custom(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestImageTransformationsOversizedImage with Eq::{equal, not_equal}
+
+///|
+pub extend RequestImageTransformationsOversizedImage with @debug.Debug::{
+  to_repr,
 }
 
 ///|
@@ -5652,7 +6290,13 @@ pub impl @json.FromJson for RequestImageTransformationsOversizedImage with fn fr
 /// Configures the transformations the server applies to this image before the model observes it. Each key names a condition the server transforms images for; its value selects the transformation applied. Omitted keys keep their default behavior, and an empty object is equivalent to omitting the field.
 pub(all) struct RequestImageTransformations {
   oversized_image : RequestImageTransformationsOversizedImage?
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestImageTransformations with Eq::{equal, not_equal}
+
+///|
+pub extend RequestImageTransformations with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -5697,7 +6341,13 @@ pub(all) struct RequestImageBlock {
   source : RequestImageBlockSource
   transformations : @sdkjson.Presence[RequestImageTransformations]
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestImageBlock with Eq::{equal, not_equal}
+
+///|
+pub extend RequestImageBlock with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -5753,7 +6403,13 @@ pub impl @json.FromJson for RequestImageBlock with fn from_json(value, path) {
 pub(all) enum RequestTextBlockCacheControl {
   Ephemeral(CacheControlEphemeral)
   Unknown(String, Json)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestTextBlockCacheControl with Eq::{equal, not_equal}
+
+///|
+pub extend RequestTextBlockCacheControl with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -5796,7 +6452,13 @@ pub(all) struct RequestCharLocationCitation {
   end_char_index : Int
   start_char_index : Int
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestCharLocationCitation with Eq::{equal, not_equal}
+
+///|
+pub extend RequestCharLocationCitation with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -5870,7 +6532,13 @@ pub(all) struct RequestContentBlockLocationCitation {
   end_block_index : Int
   start_block_index : Int
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestContentBlockLocationCitation with Eq::{equal, not_equal}
+
+///|
+pub extend RequestContentBlockLocationCitation with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -5944,7 +6612,13 @@ pub(all) struct RequestPageLocationCitation {
   end_page_number : Int
   start_page_number : Int
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestPageLocationCitation with Eq::{equal, not_equal}
+
+///|
+pub extend RequestPageLocationCitation with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -6019,7 +6693,13 @@ pub(all) struct RequestSearchResultLocationCitation {
   start_block_index : Int
   title : String?
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestSearchResultLocationCitation with Eq::{equal, not_equal}
+
+///|
+pub extend RequestSearchResultLocationCitation with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -6093,7 +6773,13 @@ pub(all) struct RequestWebSearchResultLocationCitation {
   title : String?
   type_ : String
   url : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestWebSearchResultLocationCitation with Eq::{equal, not_equal}
+
+///|
+pub extend RequestWebSearchResultLocationCitation with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -6156,7 +6842,13 @@ pub(all) enum RequestTextBlockCitationsItem {
   SearchResultLocation(RequestSearchResultLocationCitation)
   WebSearchResultLocation(RequestWebSearchResultLocationCitation)
   Unknown(String, Json)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestTextBlockCitationsItem with Eq::{equal, not_equal}
+
+///|
+pub extend RequestTextBlockCitationsItem with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -6208,7 +6900,13 @@ pub(all) struct RequestTextBlock {
   citations : @sdkjson.Presence[Array[RequestTextBlockCitationsItem]]
   text : String
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestTextBlock with Eq::{equal, not_equal}
+
+///|
+pub extend RequestTextBlock with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -6265,7 +6963,13 @@ pub(all) enum ContentBlockSourceContentValueArrayItem {
   Image(RequestImageBlock)
   Text(RequestTextBlock)
   Unknown(String, Json)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ContentBlockSourceContentValueArrayItem with Eq::{equal, not_equal}
+
+///|
+pub extend ContentBlockSourceContentValueArrayItem with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -6310,7 +7014,13 @@ pub impl @json.FromJson for ContentBlockSourceContentValueArrayItem with fn from
 pub(all) enum ContentBlockSourceContent {
   Text(String)
   ValueArray(Array[ContentBlockSourceContentValueArrayItem])
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ContentBlockSourceContent with Eq::{equal, not_equal}
+
+///|
+pub extend ContentBlockSourceContent with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -6357,7 +7067,13 @@ pub impl @json.FromJson for ContentBlockSourceContent with fn from_json(
 pub(all) struct ContentBlockSource {
   content : ContentBlockSourceContent
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ContentBlockSource with Eq::{equal, not_equal}
+
+///|
+pub extend ContentBlockSource with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -6402,7 +7118,13 @@ pub impl @json.FromJson for ContentBlockSource with fn from_json(value, path) {
 pub(all) struct ResponseBashCodeExecutionToolResultError {
   error_code : BashCodeExecutionToolResultErrorCode
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ResponseBashCodeExecutionToolResultError with Eq::{equal, not_equal}
+
+///|
+pub extend ResponseBashCodeExecutionToolResultError with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -6453,7 +7175,13 @@ pub impl @json.FromJson for ResponseBashCodeExecutionToolResultError with fn fro
 /// Generated representation of ResponseBashCodeExecutionOutputBlock.
 pub(all) struct ResponseBashCodeExecutionOutputBlock {
   file_id : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ResponseBashCodeExecutionOutputBlock with Eq::{equal, not_equal}
+
+///|
+pub extend ResponseBashCodeExecutionOutputBlock with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -6500,7 +7228,13 @@ pub(all) struct ResponseBashCodeExecutionResultBlock {
   stderr : String
   stdout : String
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ResponseBashCodeExecutionResultBlock with Eq::{equal, not_equal}
+
+///|
+pub extend ResponseBashCodeExecutionResultBlock with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -6558,6 +7292,17 @@ pub(all) enum ResponseBashCodeExecutionToolResultBlockContent {
   BashCodeExecutionToolResultError(ResponseBashCodeExecutionToolResultError)
   BashCodeExecutionResult(ResponseBashCodeExecutionResultBlock)
   Unknown(String, Json)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ResponseBashCodeExecutionToolResultBlockContent with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend ResponseBashCodeExecutionToolResultBlockContent with @debug.Debug::{
+  to_repr,
 }
 
 ///|
@@ -6608,7 +7353,13 @@ pub(all) struct ResponseBashCodeExecutionToolResultBlock {
   content : ResponseBashCodeExecutionToolResultBlockContent
   tool_use_id : String
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ResponseBashCodeExecutionToolResultBlock with Eq::{equal, not_equal}
+
+///|
+pub extend ResponseBashCodeExecutionToolResultBlock with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -6663,7 +7414,13 @@ pub impl @json.FromJson for ResponseBashCodeExecutionToolResultBlock with fn fro
 pub(all) struct ResponseCodeExecutionToolResultError {
   error_code : CodeExecutionToolResultErrorCode
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ResponseCodeExecutionToolResultError with Eq::{equal, not_equal}
+
+///|
+pub extend ResponseCodeExecutionToolResultError with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -6710,7 +7467,13 @@ pub impl @json.FromJson for ResponseCodeExecutionToolResultError with fn from_js
 /// Generated representation of ResponseCodeExecutionOutputBlock.
 pub(all) struct ResponseCodeExecutionOutputBlock {
   file_id : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ResponseCodeExecutionOutputBlock with Eq::{equal, not_equal}
+
+///|
+pub extend ResponseCodeExecutionOutputBlock with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -6757,7 +7520,13 @@ pub(all) struct ResponseCodeExecutionResultBlock {
   stderr : String
   stdout : String
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ResponseCodeExecutionResultBlock with Eq::{equal, not_equal}
+
+///|
+pub extend ResponseCodeExecutionResultBlock with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -6817,6 +7586,14 @@ pub(all) struct ResponseEncryptedCodeExecutionResultBlock {
   return_code : Int
   stderr : String
   type_ : String
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ResponseEncryptedCodeExecutionResultBlock with Eq::{equal, not_equal}
+
+///|
+pub extend ResponseEncryptedCodeExecutionResultBlock with @debug.Debug::{
+  to_repr,
 }
 
 ///|
@@ -6880,6 +7657,17 @@ pub(all) enum ResponseCodeExecutionToolResultBlockContent {
   CodeExecutionResult(ResponseCodeExecutionResultBlock)
   EncryptedCodeExecutionResult(ResponseEncryptedCodeExecutionResultBlock)
   Unknown(String, Json)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ResponseCodeExecutionToolResultBlockContent with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend ResponseCodeExecutionToolResultBlockContent with @debug.Debug::{
+  to_repr,
 }
 
 ///|
@@ -6931,7 +7719,13 @@ pub(all) struct ResponseCodeExecutionToolResultBlock {
   content : ResponseCodeExecutionToolResultBlockContent
   tool_use_id : String
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ResponseCodeExecutionToolResultBlock with Eq::{equal, not_equal}
+
+///|
+pub extend ResponseCodeExecutionToolResultBlock with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -6982,7 +7776,13 @@ pub impl @json.FromJson for ResponseCodeExecutionToolResultBlock with fn from_js
 pub(all) struct ResponseContainerUploadBlock {
   file_id : String
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ResponseContainerUploadBlock with Eq::{equal, not_equal}
+
+///|
+pub extend ResponseContainerUploadBlock with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -7030,7 +7830,13 @@ pub impl @json.FromJson for ResponseContainerUploadBlock with fn from_json(
 pub(all) struct ResponseRedactedThinkingBlock {
   data : String
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ResponseRedactedThinkingBlock with Eq::{equal, not_equal}
+
+///|
+pub extend ResponseRedactedThinkingBlock with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -7078,7 +7884,13 @@ pub impl @json.FromJson for ResponseRedactedThinkingBlock with fn from_json(
 pub(all) struct ServerToolCaller {
   tool_id : String
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ServerToolCaller with Eq::{equal, not_equal}
+
+///|
+pub extend ServerToolCaller with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -7123,7 +7935,13 @@ pub impl @json.FromJson for ServerToolCaller with fn from_json(value, path) {
 pub(all) struct ServerToolCaller20260120 {
   tool_id : String
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ServerToolCaller20260120 with Eq::{equal, not_equal}
+
+///|
+pub extend ServerToolCaller20260120 with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -7170,7 +7988,13 @@ pub impl @json.FromJson for ServerToolCaller20260120 with fn from_json(
 /// Tool invocation directly from the model.
 pub(all) struct DirectCaller {
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend DirectCaller with Eq::{equal, not_equal}
+
+///|
+pub extend DirectCaller with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -7208,7 +8032,13 @@ pub(all) enum ResponseServerToolUseBlockCaller {
   CodeExecution20260120(ServerToolCaller20260120)
   Direct(DirectCaller)
   Unknown(String, Json)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ResponseServerToolUseBlockCaller with Eq::{equal, not_equal}
+
+///|
+pub extend ResponseServerToolUseBlockCaller with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -7259,7 +8089,13 @@ pub(all) enum ResponseServerToolUseBlockName {
   ToolSearchToolRegex
   ToolSearchToolBm25
   Unknown(String)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ResponseServerToolUseBlockName with Eq::{equal, not_equal}
+
+///|
+pub extend ResponseServerToolUseBlockName with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -7319,7 +8155,13 @@ pub(all) struct ResponseServerToolUseBlock {
   input : Json
   name : ResponseServerToolUseBlockName
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ResponseServerToolUseBlock with Eq::{equal, not_equal}
+
+///|
+pub extend ResponseServerToolUseBlock with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -7380,7 +8222,13 @@ pub(all) enum ResponseTextBlockCitationsItem {
   SearchResultLocation(ResponseSearchResultLocationCitation)
   WebSearchResultLocation(ResponseWebSearchResultLocationCitation)
   Unknown(String, Json)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ResponseTextBlockCitationsItem with Eq::{equal, not_equal}
+
+///|
+pub extend ResponseTextBlockCitationsItem with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -7431,7 +8279,13 @@ pub(all) struct ResponseTextBlock {
   citations : Array[ResponseTextBlockCitationsItem]?
   text : String
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ResponseTextBlock with Eq::{equal, not_equal}
+
+///|
+pub extend ResponseTextBlock with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -7483,6 +8337,17 @@ pub(all) enum TextEditorCodeExecutionToolResultErrorCode {
   ExecutionTimeExceeded
   FileNotFound
   Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend TextEditorCodeExecutionToolResultErrorCode with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend TextEditorCodeExecutionToolResultErrorCode with @debug.Debug::{
+  to_repr,
 }
 
 ///|
@@ -7541,6 +8406,17 @@ pub(all) struct ResponseTextEditorCodeExecutionToolResultError {
   error_code : TextEditorCodeExecutionToolResultErrorCode
   error_message : String?
   type_ : String
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ResponseTextEditorCodeExecutionToolResultError with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend ResponseTextEditorCodeExecutionToolResultError with @debug.Debug::{
+  to_repr,
 }
 
 ///|
@@ -7601,6 +8477,17 @@ pub(all) enum ResponseTextEditorCodeExecutionViewResultBlockFileType {
   Image
   Pdf
   Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ResponseTextEditorCodeExecutionViewResultBlockFileType with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend ResponseTextEditorCodeExecutionViewResultBlockFileType with @debug.Debug::{
+  to_repr,
 }
 
 ///|
@@ -7660,6 +8547,17 @@ pub(all) struct ResponseTextEditorCodeExecutionViewResultBlock {
   start_line : Int?
   total_lines : Int?
   type_ : String
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ResponseTextEditorCodeExecutionViewResultBlock with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend ResponseTextEditorCodeExecutionViewResultBlock with @debug.Debug::{
+  to_repr,
 }
 
 ///|
@@ -7730,6 +8628,17 @@ pub impl @json.FromJson for ResponseTextEditorCodeExecutionViewResultBlock with 
 pub(all) struct ResponseTextEditorCodeExecutionCreateResultBlock {
   is_file_update : Bool
   type_ : String
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ResponseTextEditorCodeExecutionCreateResultBlock with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend ResponseTextEditorCodeExecutionCreateResultBlock with @debug.Debug::{
+  to_repr,
 }
 
 ///|
@@ -7788,6 +8697,17 @@ pub(all) struct ResponseTextEditorCodeExecutionStrReplaceResultBlock {
   old_lines : Int?
   old_start : Int?
   type_ : String
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ResponseTextEditorCodeExecutionStrReplaceResultBlock with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend ResponseTextEditorCodeExecutionStrReplaceResultBlock with @debug.Debug::{
+  to_repr,
 }
 
 ///|
@@ -7865,6 +8785,17 @@ pub(all) enum ResponseTextEditorCodeExecutionToolResultBlockContent {
     ResponseTextEditorCodeExecutionStrReplaceResultBlock
   )
   Unknown(String, Json)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ResponseTextEditorCodeExecutionToolResultBlockContent with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend ResponseTextEditorCodeExecutionToolResultBlockContent with @debug.Debug::{
+  to_repr,
 }
 
 ///|
@@ -7921,6 +8852,17 @@ pub(all) struct ResponseTextEditorCodeExecutionToolResultBlock {
   content : ResponseTextEditorCodeExecutionToolResultBlockContent
   tool_use_id : String
   type_ : String
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ResponseTextEditorCodeExecutionToolResultBlock with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend ResponseTextEditorCodeExecutionToolResultBlock with @debug.Debug::{
+  to_repr,
 }
 
 ///|
@@ -7977,7 +8919,13 @@ pub(all) struct ResponseThinkingBlock {
   signature : String
   thinking : String
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ResponseThinkingBlock with Eq::{equal, not_equal}
+
+///|
+pub extend ResponseThinkingBlock with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -8028,7 +8976,13 @@ pub(all) enum ToolSearchToolResultErrorCode {
   TooManyRequests
   ExecutionTimeExceeded
   Unknown(String)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ToolSearchToolResultErrorCode with Eq::{equal, not_equal}
+
+///|
+pub extend ToolSearchToolResultErrorCode with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -8080,7 +9034,13 @@ pub(all) struct ResponseToolSearchToolResultError {
   error_code : ToolSearchToolResultErrorCode
   error_message : String?
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ResponseToolSearchToolResultError with Eq::{equal, not_equal}
+
+///|
+pub extend ResponseToolSearchToolResultError with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -8133,7 +9093,13 @@ pub impl @json.FromJson for ResponseToolSearchToolResultError with fn from_json(
 /// Generated representation of ResponseToolReferenceBlock.
 pub(all) struct ResponseToolReferenceBlock {
   tool_name : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ResponseToolReferenceBlock with Eq::{equal, not_equal}
+
+///|
+pub extend ResponseToolReferenceBlock with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -8177,7 +9143,13 @@ pub impl @json.FromJson for ResponseToolReferenceBlock with fn from_json(
 pub(all) struct ResponseToolSearchToolSearchResultBlock {
   tool_references : Array[ResponseToolReferenceBlock]
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ResponseToolSearchToolSearchResultBlock with Eq::{equal, not_equal}
+
+///|
+pub extend ResponseToolSearchToolSearchResultBlock with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -8230,7 +9202,13 @@ pub(all) enum ResponseToolSearchToolResultBlockContent {
   ToolSearchToolResultError(ResponseToolSearchToolResultError)
   ToolSearchToolSearchResult(ResponseToolSearchToolSearchResultBlock)
   Unknown(String, Json)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ResponseToolSearchToolResultBlockContent with Eq::{equal, not_equal}
+
+///|
+pub extend ResponseToolSearchToolResultBlockContent with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -8278,7 +9256,13 @@ pub(all) struct ResponseToolSearchToolResultBlock {
   content : ResponseToolSearchToolResultBlockContent
   tool_use_id : String
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ResponseToolSearchToolResultBlock with Eq::{equal, not_equal}
+
+///|
+pub extend ResponseToolSearchToolResultBlock with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -8331,7 +9315,13 @@ pub(all) enum ResponseToolUseBlockCaller {
   CodeExecution20260120(ServerToolCaller20260120)
   Direct(DirectCaller)
   Unknown(String, Json)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ResponseToolUseBlockCaller with Eq::{equal, not_equal}
+
+///|
+pub extend ResponseToolUseBlockCaller with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -8380,7 +9370,13 @@ pub(all) struct ResponseToolUseBlock {
   name : String
   toolset_name : @sdkjson.Presence[String]
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ResponseToolUseBlock with Eq::{equal, not_equal}
+
+///|
+pub extend ResponseToolUseBlock with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -8446,7 +9442,13 @@ pub(all) enum ResponseWebFetchToolResultBlockCaller {
   CodeExecution20260120(ServerToolCaller20260120)
   Direct(DirectCaller)
   Unknown(String, Json)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ResponseWebFetchToolResultBlockCaller with Eq::{equal, not_equal}
+
+///|
+pub extend ResponseWebFetchToolResultBlockCaller with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -8502,7 +9504,13 @@ pub(all) enum WebFetchToolResultErrorCode {
   Unavailable
   ContentTooLarge
   Unknown(String)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend WebFetchToolResultErrorCode with Eq::{equal, not_equal}
+
+///|
+pub extend WebFetchToolResultErrorCode with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -8565,7 +9573,13 @@ pub impl @json.FromJson for WebFetchToolResultErrorCode with fn from_json(
 pub(all) struct ResponseWebFetchToolResultError {
   error_code : WebFetchToolResultErrorCode
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ResponseWebFetchToolResultError with Eq::{equal, not_equal}
+
+///|
+pub extend ResponseWebFetchToolResultError with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -8612,7 +9626,13 @@ pub impl @json.FromJson for ResponseWebFetchToolResultError with fn from_json(
 /// Generated representation of ResponseCitationsConfig.
 pub(all) struct ResponseCitationsConfig {
   enabled : Bool
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ResponseCitationsConfig with Eq::{equal, not_equal}
+
+///|
+pub extend ResponseCitationsConfig with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -8651,7 +9671,13 @@ pub impl @json.FromJson for ResponseCitationsConfig with fn from_json(
 pub(all) struct PlainTextSource {
   data : String
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend PlainTextSource with Eq::{equal, not_equal}
+
+///|
+pub extend PlainTextSource with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -8695,7 +9721,13 @@ pub(all) enum ResponseDocumentBlockSource {
   Base64(Base64PDFSource)
   Text(PlainTextSource)
   Unknown(String, Json)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ResponseDocumentBlockSource with Eq::{equal, not_equal}
+
+///|
+pub extend ResponseDocumentBlockSource with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -8737,7 +9769,13 @@ pub(all) struct ResponseDocumentBlock {
   citations : ResponseCitationsConfig?
   source : ResponseDocumentBlockSource
   title : String?
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ResponseDocumentBlock with Eq::{equal, not_equal}
+
+///|
+pub extend ResponseDocumentBlock with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -8788,7 +9826,13 @@ pub(all) struct ResponseWebFetchResultBlock {
   retrieved_at : String?
   type_ : String
   url : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ResponseWebFetchResultBlock with Eq::{equal, not_equal}
+
+///|
+pub extend ResponseWebFetchResultBlock with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -8846,7 +9890,13 @@ pub(all) enum ResponseWebFetchToolResultBlockContent {
   WebFetchToolResultError(ResponseWebFetchToolResultError)
   WebFetchResult(ResponseWebFetchResultBlock)
   Unknown(String, Json)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ResponseWebFetchToolResultBlockContent with Eq::{equal, not_equal}
+
+///|
+pub extend ResponseWebFetchToolResultBlockContent with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -8892,7 +9942,13 @@ pub(all) struct ResponseWebFetchToolResultBlock {
   content : ResponseWebFetchToolResultBlockContent
   tool_use_id : String
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ResponseWebFetchToolResultBlock with Eq::{equal, not_equal}
+
+///|
+pub extend ResponseWebFetchToolResultBlock with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -8948,7 +10004,13 @@ pub(all) enum ResponseWebSearchToolResultBlockCaller {
   CodeExecution20260120(ServerToolCaller20260120)
   Direct(DirectCaller)
   Unknown(String, Json)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ResponseWebSearchToolResultBlockCaller with Eq::{equal, not_equal}
+
+///|
+pub extend ResponseWebSearchToolResultBlockCaller with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -9000,7 +10062,13 @@ pub(all) enum WebSearchToolResultErrorCode {
   QueryTooLong
   RequestTooLarge
   Unknown(String)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend WebSearchToolResultErrorCode with Eq::{equal, not_equal}
+
+///|
+pub extend WebSearchToolResultErrorCode with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -9054,7 +10122,13 @@ pub impl @json.FromJson for WebSearchToolResultErrorCode with fn from_json(
 /// Generated representation of ResponseWebSearchToolResultError.
 pub(all) struct ResponseWebSearchToolResultError {
   error_code : WebSearchToolResultErrorCode
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ResponseWebSearchToolResultError with Eq::{equal, not_equal}
+
+///|
+pub extend ResponseWebSearchToolResultError with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -9100,7 +10174,13 @@ pub(all) struct ResponseWebSearchResultBlock {
   page_age : String?
   title : String
   url : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ResponseWebSearchResultBlock with Eq::{equal, not_equal}
+
+///|
+pub extend ResponseWebSearchResultBlock with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -9155,7 +10235,13 @@ pub impl @json.FromJson for ResponseWebSearchResultBlock with fn from_json(
 pub(all) enum ResponseWebSearchToolResultBlockContent {
   ResponseWebSearchToolResultError(ResponseWebSearchToolResultError)
   ResponseWebSearchResultBlockArray(Array[ResponseWebSearchResultBlock])
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ResponseWebSearchToolResultBlockContent with Eq::{equal, not_equal}
+
+///|
+pub extend ResponseWebSearchToolResultBlockContent with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -9213,7 +10299,13 @@ pub(all) struct ResponseWebSearchToolResultBlock {
   content : ResponseWebSearchToolResultBlockContent
   tool_use_id : String
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ResponseWebSearchToolResultBlock with Eq::{equal, not_equal}
+
+///|
+pub extend ResponseWebSearchToolResultBlock with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -9280,7 +10372,13 @@ pub(all) enum ContentBlockStartEventContentBlock {
   WebFetchToolResult(ResponseWebFetchToolResultBlock)
   WebSearchToolResult(ResponseWebSearchToolResultBlock)
   Unknown(String, Json)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ContentBlockStartEventContentBlock with Eq::{equal, not_equal}
+
+///|
+pub extend ContentBlockStartEventContentBlock with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -9347,7 +10445,13 @@ pub(all) struct ContentBlockStartEvent {
   content_block : ContentBlockStartEventContentBlock
   index : Int
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ContentBlockStartEvent with Eq::{equal, not_equal}
+
+///|
+pub extend ContentBlockStartEvent with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -9398,7 +10502,13 @@ pub impl @json.FromJson for ContentBlockStartEvent with fn from_json(
 pub(all) struct ContentBlockStopEvent {
   index : Int
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ContentBlockStopEvent with Eq::{equal, not_equal}
+
+///|
+pub extend ContentBlockStopEvent with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -9445,7 +10555,13 @@ pub(all) struct ContextManagementCapability {
   clear_tool_uses_20250919 : CapabilitySupport?
   compact_20260112 : CapabilitySupport?
   supported : Bool
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ContextManagementCapability with Eq::{equal, not_equal}
+
+///|
+pub extend ContextManagementCapability with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -9517,7 +10633,13 @@ pub impl @json.FromJson for ContextManagementCapability with fn from_json(
 pub(all) enum CountMessageTokensParamsCacheControl {
   Ephemeral(CacheControlEphemeral)
   Unknown(String, Json)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend CountMessageTokensParamsCacheControl with Eq::{equal, not_equal}
+
+///|
+pub extend CountMessageTokensParamsCacheControl with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -9556,6 +10678,17 @@ pub impl @json.FromJson for CountMessageTokensParamsCacheControl with fn from_js
 pub(all) enum RequestBashCodeExecutionToolResultBlockCacheControl {
   Ephemeral(CacheControlEphemeral)
   Unknown(String, Json)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestBashCodeExecutionToolResultBlockCacheControl with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend RequestBashCodeExecutionToolResultBlockCacheControl with @debug.Debug::{
+  to_repr,
 }
 
 ///|
@@ -9601,7 +10734,13 @@ pub impl @json.FromJson for RequestBashCodeExecutionToolResultBlockCacheControl 
 pub(all) struct RequestBashCodeExecutionToolResultError {
   error_code : BashCodeExecutionToolResultErrorCode
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestBashCodeExecutionToolResultError with Eq::{equal, not_equal}
+
+///|
+pub extend RequestBashCodeExecutionToolResultError with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -9652,7 +10791,13 @@ pub impl @json.FromJson for RequestBashCodeExecutionToolResultError with fn from
 /// Generated representation of RequestBashCodeExecutionOutputBlock.
 pub(all) struct RequestBashCodeExecutionOutputBlock {
   file_id : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestBashCodeExecutionOutputBlock with Eq::{equal, not_equal}
+
+///|
+pub extend RequestBashCodeExecutionOutputBlock with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -9699,7 +10844,13 @@ pub(all) struct RequestBashCodeExecutionResultBlock {
   stderr : String
   stdout : String
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestBashCodeExecutionResultBlock with Eq::{equal, not_equal}
+
+///|
+pub extend RequestBashCodeExecutionResultBlock with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -9757,6 +10908,17 @@ pub(all) enum RequestBashCodeExecutionToolResultBlockContent {
   BashCodeExecutionToolResultError(RequestBashCodeExecutionToolResultError)
   BashCodeExecutionResult(RequestBashCodeExecutionResultBlock)
   Unknown(String, Json)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestBashCodeExecutionToolResultBlockContent with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend RequestBashCodeExecutionToolResultBlockContent with @debug.Debug::{
+  to_repr,
 }
 
 ///|
@@ -9808,7 +10970,13 @@ pub(all) struct RequestBashCodeExecutionToolResultBlock {
   content : RequestBashCodeExecutionToolResultBlockContent
   tool_use_id : String
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestBashCodeExecutionToolResultBlock with Eq::{equal, not_equal}
+
+///|
+pub extend RequestBashCodeExecutionToolResultBlock with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -9871,6 +11039,17 @@ pub impl @json.FromJson for RequestBashCodeExecutionToolResultBlock with fn from
 pub(all) enum RequestCodeExecutionToolResultBlockCacheControl {
   Ephemeral(CacheControlEphemeral)
   Unknown(String, Json)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestCodeExecutionToolResultBlockCacheControl with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend RequestCodeExecutionToolResultBlockCacheControl with @debug.Debug::{
+  to_repr,
 }
 
 ///|
@@ -9916,7 +11095,13 @@ pub impl @json.FromJson for RequestCodeExecutionToolResultBlockCacheControl with
 pub(all) struct RequestCodeExecutionToolResultError {
   error_code : CodeExecutionToolResultErrorCode
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestCodeExecutionToolResultError with Eq::{equal, not_equal}
+
+///|
+pub extend RequestCodeExecutionToolResultError with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -9963,7 +11148,13 @@ pub impl @json.FromJson for RequestCodeExecutionToolResultError with fn from_jso
 /// Generated representation of RequestCodeExecutionOutputBlock.
 pub(all) struct RequestCodeExecutionOutputBlock {
   file_id : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestCodeExecutionOutputBlock with Eq::{equal, not_equal}
+
+///|
+pub extend RequestCodeExecutionOutputBlock with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -10010,7 +11201,13 @@ pub(all) struct RequestCodeExecutionResultBlock {
   stderr : String
   stdout : String
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestCodeExecutionResultBlock with Eq::{equal, not_equal}
+
+///|
+pub extend RequestCodeExecutionResultBlock with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -10070,7 +11267,13 @@ pub(all) struct RequestEncryptedCodeExecutionResultBlock {
   return_code : Int
   stderr : String
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestEncryptedCodeExecutionResultBlock with Eq::{equal, not_equal}
+
+///|
+pub extend RequestEncryptedCodeExecutionResultBlock with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -10133,6 +11336,17 @@ pub(all) enum RequestCodeExecutionToolResultBlockContent {
   CodeExecutionResult(RequestCodeExecutionResultBlock)
   EncryptedCodeExecutionResult(RequestEncryptedCodeExecutionResultBlock)
   Unknown(String, Json)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestCodeExecutionToolResultBlockContent with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend RequestCodeExecutionToolResultBlockContent with @debug.Debug::{
+  to_repr,
 }
 
 ///|
@@ -10187,7 +11401,13 @@ pub(all) struct RequestCodeExecutionToolResultBlock {
   content : RequestCodeExecutionToolResultBlockContent
   tool_use_id : String
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestCodeExecutionToolResultBlock with Eq::{equal, not_equal}
+
+///|
+pub extend RequestCodeExecutionToolResultBlock with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -10246,7 +11466,13 @@ pub impl @json.FromJson for RequestCodeExecutionToolResultBlock with fn from_jso
 pub(all) enum RequestContainerUploadBlockCacheControl {
   Ephemeral(CacheControlEphemeral)
   Unknown(String, Json)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestContainerUploadBlockCacheControl with Eq::{equal, not_equal}
+
+///|
+pub extend RequestContainerUploadBlockCacheControl with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -10290,7 +11516,13 @@ pub(all) struct RequestContainerUploadBlock {
   cache_control : @sdkjson.Presence[RequestContainerUploadBlockCacheControl]
   file_id : String
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestContainerUploadBlock with Eq::{equal, not_equal}
+
+///|
+pub extend RequestContainerUploadBlock with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -10345,7 +11577,13 @@ pub impl @json.FromJson for RequestContainerUploadBlock with fn from_json(
 pub(all) enum RequestDocumentBlockCacheControl {
   Ephemeral(CacheControlEphemeral)
   Unknown(String, Json)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestDocumentBlockCacheControl with Eq::{equal, not_equal}
+
+///|
+pub extend RequestDocumentBlockCacheControl with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -10383,7 +11621,13 @@ pub impl @json.FromJson for RequestDocumentBlockCacheControl with fn from_json(
 /// Generated representation of RequestCitationsConfig.
 pub(all) struct RequestCitationsConfig {
   enabled : Bool?
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestCitationsConfig with Eq::{equal, not_equal}
+
+///|
+pub extend RequestCitationsConfig with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -10422,7 +11666,13 @@ pub impl @json.FromJson for RequestCitationsConfig with fn from_json(
 pub(all) struct FileDocumentSource {
   file_id : String
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend FileDocumentSource with Eq::{equal, not_equal}
+
+///|
+pub extend FileDocumentSource with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -10467,7 +11717,13 @@ pub impl @json.FromJson for FileDocumentSource with fn from_json(value, path) {
 pub(all) struct URLPDFSource {
   type_ : String
   url : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend URLPDFSource with Eq::{equal, not_equal}
+
+///|
+pub extend URLPDFSource with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -10513,7 +11769,13 @@ pub(all) enum RequestDocumentBlockSource {
   Text(PlainTextSource)
   Url(URLPDFSource)
   Unknown(String, Json)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestDocumentBlockSource with Eq::{equal, not_equal}
+
+///|
+pub extend RequestDocumentBlockSource with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -10564,7 +11826,13 @@ pub(all) struct RequestDocumentBlock {
   source : RequestDocumentBlockSource
   title : @sdkjson.Presence[String]
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestDocumentBlock with Eq::{equal, not_equal}
+
+///|
+pub extend RequestDocumentBlock with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -10628,7 +11896,13 @@ pub impl @json.FromJson for RequestDocumentBlock with fn from_json(value, path) 
 pub(all) struct RequestRedactedThinkingBlock {
   data : String
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestRedactedThinkingBlock with Eq::{equal, not_equal}
+
+///|
+pub extend RequestRedactedThinkingBlock with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -10676,7 +11950,13 @@ pub impl @json.FromJson for RequestRedactedThinkingBlock with fn from_json(
 pub(all) enum RequestSearchResultBlockCacheControl {
   Ephemeral(CacheControlEphemeral)
   Unknown(String, Json)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestSearchResultBlockCacheControl with Eq::{equal, not_equal}
+
+///|
+pub extend RequestSearchResultBlockCacheControl with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -10719,7 +11999,13 @@ pub(all) struct RequestSearchResultBlock {
   source : String
   title : String
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestSearchResultBlock with Eq::{equal, not_equal}
+
+///|
+pub extend RequestSearchResultBlock with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -10786,7 +12072,13 @@ pub impl @json.FromJson for RequestSearchResultBlock with fn from_json(
 pub(all) enum RequestServerToolUseBlockCacheControl {
   Ephemeral(CacheControlEphemeral)
   Unknown(String, Json)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestServerToolUseBlockCacheControl with Eq::{equal, not_equal}
+
+///|
+pub extend RequestServerToolUseBlockCacheControl with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -10829,7 +12121,13 @@ pub(all) enum RequestServerToolUseBlockCaller {
   CodeExecution20260120(ServerToolCaller20260120)
   Direct(DirectCaller)
   Unknown(String, Json)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestServerToolUseBlockCaller with Eq::{equal, not_equal}
+
+///|
+pub extend RequestServerToolUseBlockCaller with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -10880,7 +12178,13 @@ pub(all) enum RequestServerToolUseBlockName {
   ToolSearchToolRegex
   ToolSearchToolBm25
   Custom(String)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestServerToolUseBlockName with Eq::{equal, not_equal}
+
+///|
+pub extend RequestServerToolUseBlockName with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -10941,7 +12245,13 @@ pub(all) struct RequestServerToolUseBlock {
   input : Json
   name : RequestServerToolUseBlockName
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestServerToolUseBlock with Eq::{equal, not_equal}
+
+///|
+pub extend RequestServerToolUseBlock with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -11008,6 +12318,17 @@ pub impl @json.FromJson for RequestServerToolUseBlock with fn from_json(
 pub(all) enum RequestTextEditorCodeExecutionToolResultBlockCacheControl {
   Ephemeral(CacheControlEphemeral)
   Unknown(String, Json)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestTextEditorCodeExecutionToolResultBlockCacheControl with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend RequestTextEditorCodeExecutionToolResultBlockCacheControl with @debug.Debug::{
+  to_repr,
 }
 
 ///|
@@ -11054,6 +12375,17 @@ pub(all) struct RequestTextEditorCodeExecutionToolResultError {
   error_code : TextEditorCodeExecutionToolResultErrorCode
   error_message : @sdkjson.Presence[String]
   type_ : String
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestTextEditorCodeExecutionToolResultError with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend RequestTextEditorCodeExecutionToolResultError with @debug.Debug::{
+  to_repr,
 }
 
 ///|
@@ -11115,6 +12447,17 @@ pub(all) enum RequestTextEditorCodeExecutionViewResultBlockFileType {
   Image
   Pdf
   Custom(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestTextEditorCodeExecutionViewResultBlockFileType with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend RequestTextEditorCodeExecutionViewResultBlockFileType with @debug.Debug::{
+  to_repr,
 }
 
 ///|
@@ -11174,6 +12517,17 @@ pub(all) struct RequestTextEditorCodeExecutionViewResultBlock {
   start_line : @sdkjson.Presence[Int]
   total_lines : @sdkjson.Presence[Int]
   type_ : String
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestTextEditorCodeExecutionViewResultBlock with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend RequestTextEditorCodeExecutionViewResultBlock with @debug.Debug::{
+  to_repr,
 }
 
 ///|
@@ -11245,6 +12599,17 @@ pub impl @json.FromJson for RequestTextEditorCodeExecutionViewResultBlock with f
 pub(all) struct RequestTextEditorCodeExecutionCreateResultBlock {
   is_file_update : Bool
   type_ : String
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestTextEditorCodeExecutionCreateResultBlock with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend RequestTextEditorCodeExecutionCreateResultBlock with @debug.Debug::{
+  to_repr,
 }
 
 ///|
@@ -11303,6 +12668,17 @@ pub(all) struct RequestTextEditorCodeExecutionStrReplaceResultBlock {
   old_lines : @sdkjson.Presence[Int]
   old_start : @sdkjson.Presence[Int]
   type_ : String
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestTextEditorCodeExecutionStrReplaceResultBlock with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend RequestTextEditorCodeExecutionStrReplaceResultBlock with @debug.Debug::{
+  to_repr,
 }
 
 ///|
@@ -11387,6 +12763,17 @@ pub(all) enum RequestTextEditorCodeExecutionToolResultBlockContent {
     RequestTextEditorCodeExecutionStrReplaceResultBlock
   )
   Unknown(String, Json)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestTextEditorCodeExecutionToolResultBlockContent with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend RequestTextEditorCodeExecutionToolResultBlockContent with @debug.Debug::{
+  to_repr,
 }
 
 ///|
@@ -11446,6 +12833,17 @@ pub(all) struct RequestTextEditorCodeExecutionToolResultBlock {
   content : RequestTextEditorCodeExecutionToolResultBlockContent
   tool_use_id : String
   type_ : String
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestTextEditorCodeExecutionToolResultBlock with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend RequestTextEditorCodeExecutionToolResultBlock with @debug.Debug::{
+  to_repr,
 }
 
 ///|
@@ -11510,7 +12908,13 @@ pub(all) struct RequestThinkingBlock {
   signature : String
   thinking : String
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestThinkingBlock with Eq::{equal, not_equal}
+
+///|
+pub extend RequestThinkingBlock with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -11558,7 +12962,13 @@ pub impl @json.FromJson for RequestThinkingBlock with fn from_json(value, path) 
 pub(all) enum RequestToolResultBlockCacheControl {
   Ephemeral(CacheControlEphemeral)
   Unknown(String, Json)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestToolResultBlockCacheControl with Eq::{equal, not_equal}
+
+///|
+pub extend RequestToolResultBlockCacheControl with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -11597,7 +13007,13 @@ pub impl @json.FromJson for RequestToolResultBlockCacheControl with fn from_json
 pub(all) enum RequestBrowserStateBlockCacheControl {
   Ephemeral(CacheControlEphemeral)
   Unknown(String, Json)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestBrowserStateBlockCacheControl with Eq::{equal, not_equal}
+
+///|
+pub extend RequestBrowserStateBlockCacheControl with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -11639,7 +13055,13 @@ pub(all) enum RequestBrowserStateBlockStateChangesItem {
   DownloadStarted(BrowserStateChangeDownloadStarted)
   TabOpened(BrowserStateChangeTabOpened)
   Unknown(String, Json)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestBrowserStateBlockStateChangesItem with Eq::{equal, not_equal}
+
+///|
+pub extend RequestBrowserStateBlockStateChangesItem with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -11692,7 +13114,13 @@ pub(all) struct RequestBrowserStateBlock {
   ]
   tabs : Array[BrowserStateTabEntry]
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestBrowserStateBlock with Eq::{equal, not_equal}
+
+///|
+pub extend RequestBrowserStateBlock with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -11751,7 +13179,13 @@ pub impl @json.FromJson for RequestBrowserStateBlock with fn from_json(
 pub(all) enum RequestToolReferenceBlockCacheControl {
   Ephemeral(CacheControlEphemeral)
   Unknown(String, Json)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestToolReferenceBlockCacheControl with Eq::{equal, not_equal}
+
+///|
+pub extend RequestToolReferenceBlockCacheControl with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -11793,7 +13227,13 @@ pub(all) struct RequestToolReferenceBlock {
   cache_control : @sdkjson.Presence[RequestToolReferenceBlockCacheControl]
   tool_name : String
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestToolReferenceBlock with Eq::{equal, not_equal}
+
+///|
+pub extend RequestToolReferenceBlock with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -11853,6 +13293,17 @@ pub(all) enum RequestToolResultBlockContentValueArrayItem {
   Text(RequestTextBlock)
   ToolReference(RequestToolReferenceBlock)
   Unknown(String, Json)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestToolResultBlockContentValueArrayItem with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend RequestToolResultBlockContentValueArrayItem with @debug.Debug::{
+  to_repr,
 }
 
 ///|
@@ -11906,7 +13357,13 @@ pub impl @json.FromJson for RequestToolResultBlockContentValueArrayItem with fn 
 pub(all) enum RequestToolResultBlockContent {
   Text(String)
   ValueArray(Array[RequestToolResultBlockContentValueArrayItem])
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestToolResultBlockContent with Eq::{equal, not_equal}
+
+///|
+pub extend RequestToolResultBlockContent with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -11959,7 +13416,13 @@ pub(all) struct RequestToolResultBlock {
   tool_use_id : String
   toolset_name : @sdkjson.Presence[String]
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestToolResultBlock with Eq::{equal, not_equal}
+
+///|
+pub extend RequestToolResultBlock with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -12026,6 +13489,17 @@ pub impl @json.FromJson for RequestToolResultBlock with fn from_json(
 pub(all) enum RequestToolSearchToolResultBlockCacheControl {
   Ephemeral(CacheControlEphemeral)
   Unknown(String, Json)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestToolSearchToolResultBlockCacheControl with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend RequestToolSearchToolResultBlockCacheControl with @debug.Debug::{
+  to_repr,
 }
 
 ///|
@@ -12070,7 +13544,13 @@ pub(all) struct RequestToolSearchToolResultError {
   error_code : ToolSearchToolResultErrorCode
   error_message : @sdkjson.Presence[String]
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestToolSearchToolResultError with Eq::{equal, not_equal}
+
+///|
+pub extend RequestToolSearchToolResultError with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -12125,7 +13605,13 @@ pub impl @json.FromJson for RequestToolSearchToolResultError with fn from_json(
 pub(all) struct RequestToolSearchToolSearchResultBlock {
   tool_references : Array[RequestToolReferenceBlock]
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestToolSearchToolSearchResultBlock with Eq::{equal, not_equal}
+
+///|
+pub extend RequestToolSearchToolSearchResultBlock with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -12176,7 +13662,13 @@ pub(all) enum RequestToolSearchToolResultBlockContent {
   ToolSearchToolResultError(RequestToolSearchToolResultError)
   ToolSearchToolSearchResult(RequestToolSearchToolSearchResultBlock)
   Unknown(String, Json)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestToolSearchToolResultBlockContent with Eq::{equal, not_equal}
+
+///|
+pub extend RequestToolSearchToolResultBlockContent with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -12227,7 +13719,13 @@ pub(all) struct RequestToolSearchToolResultBlock {
   content : RequestToolSearchToolResultBlockContent
   tool_use_id : String
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestToolSearchToolResultBlock with Eq::{equal, not_equal}
+
+///|
+pub extend RequestToolSearchToolResultBlock with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -12286,7 +13784,13 @@ pub impl @json.FromJson for RequestToolSearchToolResultBlock with fn from_json(
 pub(all) enum RequestToolUseBlockCacheControl {
   Ephemeral(CacheControlEphemeral)
   Unknown(String, Json)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestToolUseBlockCacheControl with Eq::{equal, not_equal}
+
+///|
+pub extend RequestToolUseBlockCacheControl with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -12327,7 +13831,13 @@ pub(all) enum RequestToolUseBlockCaller {
   CodeExecution20260120(ServerToolCaller20260120)
   Direct(DirectCaller)
   Unknown(String, Json)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestToolUseBlockCaller with Eq::{equal, not_equal}
+
+///|
+pub extend RequestToolUseBlockCaller with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -12377,7 +13887,13 @@ pub(all) struct RequestToolUseBlock {
   name : String
   toolset_name : @sdkjson.Presence[String]
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestToolUseBlock with Eq::{equal, not_equal}
+
+///|
+pub extend RequestToolUseBlock with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -12445,6 +13961,17 @@ pub impl @json.FromJson for RequestToolUseBlock with fn from_json(value, path) {
 pub(all) enum RequestWebFetchToolResultBlockCacheControl {
   Ephemeral(CacheControlEphemeral)
   Unknown(String, Json)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestWebFetchToolResultBlockCacheControl with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend RequestWebFetchToolResultBlockCacheControl with @debug.Debug::{
+  to_repr,
 }
 
 ///|
@@ -12490,7 +14017,13 @@ pub(all) enum RequestWebFetchToolResultBlockCaller {
   CodeExecution20260120(ServerToolCaller20260120)
   Direct(DirectCaller)
   Unknown(String, Json)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestWebFetchToolResultBlockCaller with Eq::{equal, not_equal}
+
+///|
+pub extend RequestWebFetchToolResultBlockCaller with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -12535,7 +14068,13 @@ pub impl @json.FromJson for RequestWebFetchToolResultBlockCaller with fn from_js
 pub(all) struct RequestWebFetchToolResultError {
   error_code : WebFetchToolResultErrorCode
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestWebFetchToolResultError with Eq::{equal, not_equal}
+
+///|
+pub extend RequestWebFetchToolResultError with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -12585,7 +14124,13 @@ pub(all) struct RequestWebFetchResultBlock {
   retrieved_at : @sdkjson.Presence[String]
   type_ : String
   url : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestWebFetchResultBlock with Eq::{equal, not_equal}
+
+///|
+pub extend RequestWebFetchResultBlock with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -12645,7 +14190,13 @@ pub(all) enum RequestWebFetchToolResultBlockContent {
   WebFetchToolResultError(RequestWebFetchToolResultError)
   WebFetchResult(RequestWebFetchResultBlock)
   Unknown(String, Json)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestWebFetchToolResultBlockContent with Eq::{equal, not_equal}
+
+///|
+pub extend RequestWebFetchToolResultBlockContent with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -12692,7 +14243,13 @@ pub(all) struct RequestWebFetchToolResultBlock {
   content : RequestWebFetchToolResultBlockContent
   tool_use_id : String
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestWebFetchToolResultBlock with Eq::{equal, not_equal}
+
+///|
+pub extend RequestWebFetchToolResultBlock with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -12755,6 +14312,17 @@ pub impl @json.FromJson for RequestWebFetchToolResultBlock with fn from_json(
 pub(all) enum RequestWebSearchToolResultBlockCacheControl {
   Ephemeral(CacheControlEphemeral)
   Unknown(String, Json)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestWebSearchToolResultBlockCacheControl with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend RequestWebSearchToolResultBlockCacheControl with @debug.Debug::{
+  to_repr,
 }
 
 ///|
@@ -12800,7 +14368,13 @@ pub(all) enum RequestWebSearchToolResultBlockCaller {
   CodeExecution20260120(ServerToolCaller20260120)
   Direct(DirectCaller)
   Unknown(String, Json)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestWebSearchToolResultBlockCaller with Eq::{equal, not_equal}
+
+///|
+pub extend RequestWebSearchToolResultBlockCaller with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -12849,7 +14423,13 @@ pub(all) struct RequestWebSearchResultBlock {
   page_age : @sdkjson.Presence[String]
   title : String
   url : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestWebSearchResultBlock with Eq::{equal, not_equal}
+
+///|
+pub extend RequestWebSearchResultBlock with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -12908,7 +14488,13 @@ pub impl @json.FromJson for RequestWebSearchResultBlock with fn from_json(
 /// Generated representation of RequestWebSearchToolResultError.
 pub(all) struct RequestWebSearchToolResultError {
   error_code : WebSearchToolResultErrorCode
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestWebSearchToolResultError with Eq::{equal, not_equal}
+
+///|
+pub extend RequestWebSearchToolResultError with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -12952,7 +14538,13 @@ pub impl @json.FromJson for RequestWebSearchToolResultError with fn from_json(
 pub(all) enum RequestWebSearchToolResultBlockContent {
   RequestWebSearchResultBlockArray(Array[RequestWebSearchResultBlock])
   RequestWebSearchToolResultError(RequestWebSearchToolResultError)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestWebSearchToolResultBlockContent with Eq::{equal, not_equal}
+
+///|
+pub extend RequestWebSearchToolResultBlockContent with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -13009,7 +14601,13 @@ pub(all) struct RequestWebSearchToolResultBlock {
   content : RequestWebSearchToolResultBlockContent
   tool_use_id : String
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestWebSearchToolResultBlock with Eq::{equal, not_equal}
+
+///|
+pub extend RequestWebSearchToolResultBlock with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -13089,7 +14687,13 @@ pub(all) enum InputContentBlock {
   WebFetchToolResult(RequestWebFetchToolResultBlock)
   WebSearchToolResult(RequestWebSearchToolResultBlock)
   Unknown(String, Json)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend InputContentBlock with Eq::{equal, not_equal}
+
+///|
+pub extend InputContentBlock with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -13160,7 +14764,13 @@ pub impl @json.FromJson for InputContentBlock with fn from_json(value, path) {
 pub(all) enum InputMessageContent {
   Text(String)
   InputContentBlockArray(Array[InputContentBlock])
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend InputMessageContent with Eq::{equal, not_equal}
+
+///|
+pub extend InputMessageContent with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -13203,7 +14813,13 @@ pub(all) enum InputMessageRole {
   Assistant
   System
   Custom(String)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend InputMessageRole with Eq::{equal, not_equal}
+
+///|
+pub extend InputMessageRole with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -13249,7 +14865,13 @@ pub impl @json.FromJson for InputMessageRole with fn from_json(value, path) {
 pub(all) struct InputMessage {
   content : InputMessageContent
   role : InputMessageRole
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend InputMessage with Eq::{equal, not_equal}
+
+///|
+pub extend InputMessage with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -13298,7 +14920,13 @@ pub(all) enum EffortLevel {
   Xhigh
   Max
   Custom(String)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend EffortLevel with Eq::{equal, not_equal}
+
+///|
+pub extend EffortLevel with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -13347,7 +14975,13 @@ pub impl @json.FromJson for EffortLevel with fn from_json(value, path) {
 /// Generated representation of JsonOutputFormat.
 pub(all) struct JsonOutputFormat {
   schema : Json
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend JsonOutputFormat with Eq::{equal, not_equal}
+
+///|
+pub extend JsonOutputFormat with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -13386,7 +15020,13 @@ pub impl @json.FromJson for JsonOutputFormat with fn from_json(value, path) {
 pub(all) struct OutputConfig {
   effort : @sdkjson.Presence[EffortLevel]
   format : @sdkjson.Presence[JsonOutputFormat]
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend OutputConfig with Eq::{equal, not_equal}
+
+///|
+pub extend OutputConfig with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -13434,7 +15074,13 @@ pub impl @json.FromJson for OutputConfig with fn from_json(value, path) {
 pub(all) enum CountMessageTokensParamsSystem {
   Text(String)
   RequestTextBlockArray(Array[RequestTextBlock])
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend CountMessageTokensParamsSystem with Eq::{equal, not_equal}
+
+///|
+pub extend CountMessageTokensParamsSystem with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -13481,7 +15127,13 @@ pub(all) enum ThinkingDisplayMode {
   Summarized
   Omitted
   Custom(String)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ThinkingDisplayMode with Eq::{equal, not_equal}
+
+///|
+pub extend ThinkingDisplayMode with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -13525,7 +15177,13 @@ pub impl @json.FromJson for ThinkingDisplayMode with fn from_json(value, path) {
 pub(all) struct ThinkingConfigAdaptive {
   display : @sdkjson.Presence[ThinkingDisplayMode]
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ThinkingConfigAdaptive with Eq::{equal, not_equal}
+
+///|
+pub extend ThinkingConfigAdaptive with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -13572,7 +15230,13 @@ pub impl @json.FromJson for ThinkingConfigAdaptive with fn from_json(
 /// Generated representation of ThinkingConfigDisabled.
 pub(all) struct ThinkingConfigDisabled {
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ThinkingConfigDisabled with Eq::{equal, not_equal}
+
+///|
+pub extend ThinkingConfigDisabled with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -13612,7 +15276,13 @@ pub(all) struct ThinkingConfigEnabled {
   budget_tokens : Int
   display : @sdkjson.Presence[ThinkingDisplayMode]
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ThinkingConfigEnabled with Eq::{equal, not_equal}
+
+///|
+pub extend ThinkingConfigEnabled with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -13662,7 +15332,13 @@ pub(all) enum ThinkingConfigParam {
   Disabled(ThinkingConfigDisabled)
   Enabled(ThinkingConfigEnabled)
   Unknown(String, Json)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ThinkingConfigParam with Eq::{equal, not_equal}
+
+///|
+pub extend ThinkingConfigParam with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -13702,7 +15378,13 @@ pub impl @json.FromJson for ThinkingConfigParam with fn from_json(value, path) {
 pub(all) struct ToolChoiceAny {
   disable_parallel_tool_use : Bool?
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ToolChoiceAny with Eq::{equal, not_equal}
+
+///|
+pub extend ToolChoiceAny with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -13749,7 +15431,13 @@ pub impl @json.FromJson for ToolChoiceAny with fn from_json(value, path) {
 pub(all) struct ToolChoiceAuto {
   disable_parallel_tool_use : Bool?
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ToolChoiceAuto with Eq::{equal, not_equal}
+
+///|
+pub extend ToolChoiceAuto with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -13795,7 +15483,13 @@ pub impl @json.FromJson for ToolChoiceAuto with fn from_json(value, path) {
 /// The model will not be allowed to use tools.
 pub(all) struct ToolChoiceNone {
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ToolChoiceNone with Eq::{equal, not_equal}
+
+///|
+pub extend ToolChoiceNone with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -13832,7 +15526,13 @@ pub(all) struct ToolChoiceTool {
   disable_parallel_tool_use : Bool?
   name : String
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ToolChoiceTool with Eq::{equal, not_equal}
+
+///|
+pub extend ToolChoiceTool with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -13885,7 +15585,13 @@ pub(all) enum ToolChoice {
   None(ToolChoiceNone)
   Tool(ToolChoiceTool)
   Unknown(String, Json)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ToolChoice with Eq::{equal, not_equal}
+
+///|
+pub extend ToolChoice with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -13927,7 +15633,13 @@ pub impl @json.FromJson for ToolChoice with fn from_json(value, path) {
 pub(all) enum ToolCacheControl {
   Ephemeral(CacheControlEphemeral)
   Unknown(String, Json)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ToolCacheControl with Eq::{equal, not_equal}
+
+///|
+pub extend ToolCacheControl with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -13971,7 +15683,13 @@ pub(all) struct Tool {
   allowed_callers : Array[AllowedCaller]?
   defer_loading : Bool?
   input_examples : Array[Map[String, Json]]?
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend Tool with Eq::{equal, not_equal}
+
+///|
+pub extend Tool with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -14053,7 +15771,13 @@ pub impl @json.FromJson for Tool with fn from_json(value, path) {
 pub(all) enum MemoryTool20250818CacheControl {
   Ephemeral(CacheControlEphemeral)
   Unknown(String, Json)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend MemoryTool20250818CacheControl with Eq::{equal, not_equal}
+
+///|
+pub extend MemoryTool20250818CacheControl with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -14096,7 +15820,13 @@ pub(all) struct MemoryTool20250818 {
   input_examples : Array[Map[String, Json]]?
   strict : Bool?
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend MemoryTool20250818 with Eq::{equal, not_equal}
+
+///|
+pub extend MemoryTool20250818 with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -14161,7 +15891,13 @@ pub impl @json.FromJson for MemoryTool20250818 with fn from_json(value, path) {
 pub(all) enum TextEditor20250124CacheControl {
   Ephemeral(CacheControlEphemeral)
   Unknown(String, Json)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend TextEditor20250124CacheControl with Eq::{equal, not_equal}
+
+///|
+pub extend TextEditor20250124CacheControl with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -14204,7 +15940,13 @@ pub(all) struct TextEditor20250124 {
   input_examples : Array[Map[String, Json]]?
   strict : Bool?
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend TextEditor20250124 with Eq::{equal, not_equal}
+
+///|
+pub extend TextEditor20250124 with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -14269,7 +16011,13 @@ pub impl @json.FromJson for TextEditor20250124 with fn from_json(value, path) {
 pub(all) enum TextEditor20250429CacheControl {
   Ephemeral(CacheControlEphemeral)
   Unknown(String, Json)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend TextEditor20250429CacheControl with Eq::{equal, not_equal}
+
+///|
+pub extend TextEditor20250429CacheControl with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -14312,7 +16060,13 @@ pub(all) struct TextEditor20250429 {
   input_examples : Array[Map[String, Json]]?
   strict : Bool?
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend TextEditor20250429 with Eq::{equal, not_equal}
+
+///|
+pub extend TextEditor20250429 with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -14377,7 +16131,13 @@ pub impl @json.FromJson for TextEditor20250429 with fn from_json(value, path) {
 pub(all) enum TextEditor20250728CacheControl {
   Ephemeral(CacheControlEphemeral)
   Unknown(String, Json)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend TextEditor20250728CacheControl with Eq::{equal, not_equal}
+
+///|
+pub extend TextEditor20250728CacheControl with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -14421,7 +16181,13 @@ pub(all) struct TextEditor20250728 {
   max_characters : @sdkjson.Presence[Int]
   strict : Bool?
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend TextEditor20250728 with Eq::{equal, not_equal}
+
+///|
+pub extend TextEditor20250728 with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -14490,7 +16256,13 @@ pub impl @json.FromJson for TextEditor20250728 with fn from_json(value, path) {
 pub(all) enum WebSearchTool20250305CacheControl {
   Ephemeral(CacheControlEphemeral)
   Unknown(String, Json)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend WebSearchTool20250305CacheControl with Eq::{equal, not_equal}
+
+///|
+pub extend WebSearchTool20250305CacheControl with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -14531,7 +16303,13 @@ pub(all) struct UserLocation {
   country : @sdkjson.Presence[String]
   region : @sdkjson.Presence[String]
   timezone : @sdkjson.Presence[String]
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend UserLocation with Eq::{equal, not_equal}
+
+///|
+pub extend UserLocation with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -14595,7 +16373,13 @@ pub(all) struct WebSearchTool20250305 {
   strict : Bool?
   type_ : String
   user_location : @sdkjson.Presence[UserLocation]
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend WebSearchTool20250305 with Eq::{equal, not_equal}
+
+///|
+pub extend WebSearchTool20250305 with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -14672,7 +16456,13 @@ pub impl @json.FromJson for WebSearchTool20250305 with fn from_json(value, path)
 pub(all) enum WebFetchTool20250910CacheControl {
   Ephemeral(CacheControlEphemeral)
   Unknown(String, Json)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend WebFetchTool20250910CacheControl with Eq::{equal, not_equal}
+
+///|
+pub extend WebFetchTool20250910CacheControl with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -14710,7 +16500,13 @@ pub impl @json.FromJson for WebFetchTool20250910CacheControl with fn from_json(
 /// The ``url_sources`` variant under which a source contributes in full: every result of the tool filter's source, or all user input.
 pub(all) struct WebFetchUrlSourceAll {
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend WebFetchUrlSourceAll with Eq::{equal, not_equal}
+
+///|
+pub extend WebFetchUrlSourceAll with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -14745,7 +16541,13 @@ pub impl @json.FromJson for WebFetchUrlSourceAll with fn from_json(value, path) 
 /// One entry of a tool filter's ``tools``: it must name a tool declared in this request's ``tools[]``.
 pub(all) struct WebFetchUrlSourceToolReference {
   name : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend WebFetchUrlSourceToolReference with Eq::{equal, not_equal}
+
+///|
+pub extend WebFetchUrlSourceToolReference with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -14789,7 +16591,13 @@ pub impl @json.FromJson for WebFetchUrlSourceToolReference with fn from_json(
 pub(all) struct WebFetchUrlSourceExcept {
   tools : Array[WebFetchUrlSourceToolReference]
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend WebFetchUrlSourceExcept with Eq::{equal, not_equal}
+
+///|
+pub extend WebFetchUrlSourceExcept with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -14836,7 +16644,13 @@ pub impl @json.FromJson for WebFetchUrlSourceExcept with fn from_json(
 /// The ``url_sources`` variant under which a source contributes nothing: no result of the tool filter's source, or no user input.
 pub(all) struct WebFetchUrlSourceNone {
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend WebFetchUrlSourceNone with Eq::{equal, not_equal}
+
+///|
+pub extend WebFetchUrlSourceNone with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -14872,7 +16686,13 @@ pub impl @json.FromJson for WebFetchUrlSourceNone with fn from_json(value, path)
 pub(all) struct WebFetchUrlSourceOnly {
   tools : Array[WebFetchUrlSourceToolReference]
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend WebFetchUrlSourceOnly with Eq::{equal, not_equal}
+
+///|
+pub extend WebFetchUrlSourceOnly with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -14920,7 +16740,13 @@ pub(all) enum WebFetchUrlSourcesClientToolResults {
   None(WebFetchUrlSourceNone)
   Only(WebFetchUrlSourceOnly)
   Unknown(String, Json)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend WebFetchUrlSourcesClientToolResults with Eq::{equal, not_equal}
+
+///|
+pub extend WebFetchUrlSourcesClientToolResults with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -14968,7 +16794,13 @@ pub(all) enum WebFetchUrlSourcesServerToolResults {
   None(WebFetchUrlSourceNone)
   Only(WebFetchUrlSourceOnly)
   Unknown(String, Json)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend WebFetchUrlSourcesServerToolResults with Eq::{equal, not_equal}
+
+///|
+pub extend WebFetchUrlSourcesServerToolResults with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -15014,7 +16846,13 @@ pub(all) enum WebFetchUrlSourcesUserInput {
   All(WebFetchUrlSourceAll)
   None(WebFetchUrlSourceNone)
   Unknown(String, Json)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend WebFetchUrlSourcesUserInput with Eq::{equal, not_equal}
+
+///|
+pub extend WebFetchUrlSourcesUserInput with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -15056,7 +16894,13 @@ pub(all) struct WebFetchUrlSources {
   client_tool_results : WebFetchUrlSourcesClientToolResults?
   server_tool_results : WebFetchUrlSourcesServerToolResults?
   user_input : WebFetchUrlSourcesUserInput?
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend WebFetchUrlSources with Eq::{equal, not_equal}
+
+///|
+pub extend WebFetchUrlSources with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -15113,7 +16957,13 @@ pub(all) struct WebFetchTool20250910 {
   strict : Bool?
   type_ : String
   url_sources : @sdkjson.Presence[WebFetchUrlSources]
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend WebFetchTool20250910 with Eq::{equal, not_equal}
+
+///|
+pub extend WebFetchTool20250910 with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -15198,7 +17048,13 @@ pub impl @json.FromJson for WebFetchTool20250910 with fn from_json(value, path) 
 pub(all) enum WebSearchTool20260209CacheControl {
   Ephemeral(CacheControlEphemeral)
   Unknown(String, Json)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend WebSearchTool20260209CacheControl with Eq::{equal, not_equal}
+
+///|
+pub extend WebSearchTool20260209CacheControl with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -15244,7 +17100,13 @@ pub(all) struct WebSearchTool20260209 {
   strict : Bool?
   type_ : String
   user_location : @sdkjson.Presence[UserLocation]
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend WebSearchTool20260209 with Eq::{equal, not_equal}
+
+///|
+pub extend WebSearchTool20260209 with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -15321,7 +17183,13 @@ pub impl @json.FromJson for WebSearchTool20260209 with fn from_json(value, path)
 pub(all) enum WebFetchTool20260209CacheControl {
   Ephemeral(CacheControlEphemeral)
   Unknown(String, Json)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend WebFetchTool20260209CacheControl with Eq::{equal, not_equal}
+
+///|
+pub extend WebFetchTool20260209CacheControl with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -15369,7 +17237,13 @@ pub(all) struct WebFetchTool20260209 {
   strict : Bool?
   type_ : String
   url_sources : @sdkjson.Presence[WebFetchUrlSources]
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend WebFetchTool20260209 with Eq::{equal, not_equal}
+
+///|
+pub extend WebFetchTool20260209 with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -15454,7 +17328,13 @@ pub impl @json.FromJson for WebFetchTool20260209 with fn from_json(value, path) 
 pub(all) enum WebFetchTool20260309CacheControl {
   Ephemeral(CacheControlEphemeral)
   Unknown(String, Json)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend WebFetchTool20260309CacheControl with Eq::{equal, not_equal}
+
+///|
+pub extend WebFetchTool20260309CacheControl with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -15503,7 +17383,13 @@ pub(all) struct WebFetchTool20260309 {
   type_ : String
   url_sources : @sdkjson.Presence[WebFetchUrlSources]
   use_cache : Bool?
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend WebFetchTool20260309 with Eq::{equal, not_equal}
+
+///|
+pub extend WebFetchTool20260309 with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -15592,7 +17478,13 @@ pub impl @json.FromJson for WebFetchTool20260309 with fn from_json(value, path) 
 pub(all) enum WebSearchTool20260318CacheControl {
   Ephemeral(CacheControlEphemeral)
   Unknown(String, Json)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend WebSearchTool20260318CacheControl with Eq::{equal, not_equal}
+
+///|
+pub extend WebSearchTool20260318CacheControl with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -15632,7 +17524,13 @@ pub(all) enum WebSearchTool20260318ResponseInclusion {
   Full
   Excluded
   Custom(String)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend WebSearchTool20260318ResponseInclusion with Eq::{equal, not_equal}
+
+///|
+pub extend WebSearchTool20260318ResponseInclusion with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -15689,7 +17587,13 @@ pub(all) struct WebSearchTool20260318 {
   strict : Bool?
   type_ : String
   user_location : @sdkjson.Presence[UserLocation]
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend WebSearchTool20260318 with Eq::{equal, not_equal}
+
+///|
+pub extend WebSearchTool20260318 with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -15770,7 +17674,13 @@ pub impl @json.FromJson for WebSearchTool20260318 with fn from_json(value, path)
 pub(all) enum WebFetchTool20260318CacheControl {
   Ephemeral(CacheControlEphemeral)
   Unknown(String, Json)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend WebFetchTool20260318CacheControl with Eq::{equal, not_equal}
+
+///|
+pub extend WebFetchTool20260318CacheControl with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -15810,7 +17720,13 @@ pub(all) enum WebFetchTool20260318ResponseInclusion {
   Full
   Excluded
   Custom(String)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend WebFetchTool20260318ResponseInclusion with Eq::{equal, not_equal}
+
+///|
+pub extend WebFetchTool20260318ResponseInclusion with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -15870,7 +17786,13 @@ pub(all) struct WebFetchTool20260318 {
   type_ : String
   url_sources : @sdkjson.Presence[WebFetchUrlSources]
   use_cache : Bool?
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend WebFetchTool20260318 with Eq::{equal, not_equal}
+
+///|
+pub extend WebFetchTool20260318 with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -15963,7 +17885,13 @@ pub impl @json.FromJson for WebFetchTool20260318 with fn from_json(value, path) 
 pub(all) enum ToolSearchToolBM2520251119CacheControl {
   Ephemeral(CacheControlEphemeral)
   Unknown(String, Json)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ToolSearchToolBM2520251119CacheControl with Eq::{equal, not_equal}
+
+///|
+pub extend ToolSearchToolBM2520251119CacheControl with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -16005,7 +17933,13 @@ pub(all) enum ToolSearchToolBM2520251119Type {
   ToolSearchToolBm2520251119
   ToolSearchToolBm25
   Custom(String)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ToolSearchToolBM2520251119Type with Eq::{equal, not_equal}
+
+///|
+pub extend ToolSearchToolBM2520251119Type with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -16055,7 +17989,13 @@ pub(all) struct ToolSearchToolBM2520251119 {
   defer_loading : Bool?
   strict : Bool?
   type_ : ToolSearchToolBM2520251119Type
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ToolSearchToolBM2520251119 with Eq::{equal, not_equal}
+
+///|
+pub extend ToolSearchToolBM2520251119 with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -16119,7 +18059,13 @@ pub impl @json.FromJson for ToolSearchToolBM2520251119 with fn from_json(
 pub(all) enum ToolSearchToolRegex20251119CacheControl {
   Ephemeral(CacheControlEphemeral)
   Unknown(String, Json)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ToolSearchToolRegex20251119CacheControl with Eq::{equal, not_equal}
+
+///|
+pub extend ToolSearchToolRegex20251119CacheControl with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -16163,7 +18109,13 @@ pub(all) enum ToolSearchToolRegex20251119Type {
   ToolSearchToolRegex20251119
   ToolSearchToolRegex
   Custom(String)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ToolSearchToolRegex20251119Type with Eq::{equal, not_equal}
+
+///|
+pub extend ToolSearchToolRegex20251119Type with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -16213,7 +18165,13 @@ pub(all) struct ToolSearchToolRegex20251119 {
   defer_loading : Bool?
   strict : Bool?
   type_ : ToolSearchToolRegex20251119Type
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ToolSearchToolRegex20251119 with Eq::{equal, not_equal}
+
+///|
+pub extend ToolSearchToolRegex20251119 with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -16297,7 +18255,13 @@ pub(all) enum CountMessageTokensParamsToolsItem {
   ToolSearchToolBM2520251119(ToolSearchToolBM2520251119)
   ToolSearchToolRegex20251119(ToolSearchToolRegex20251119)
   Unknown(String, Json)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend CountMessageTokensParamsToolsItem with Eq::{equal, not_equal}
+
+///|
+pub extend CountMessageTokensParamsToolsItem with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -16397,7 +18361,13 @@ pub(all) struct CountMessageTokensParams {
   thinking : ThinkingConfigParam?
   tool_choice : ToolChoice?
   tools : Array[CountMessageTokensParamsToolsItem]?
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend CountMessageTokensParams with Eq::{equal, not_equal}
+
+///|
+pub extend CountMessageTokensParams with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -16471,7 +18441,13 @@ pub impl @json.FromJson for CountMessageTokensParams with fn from_json(
 /// Generated representation of CountMessageTokensResponse.
 pub(all) struct CountMessageTokensResponse {
   input_tokens : Int
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend CountMessageTokensResponse with Eq::{equal, not_equal}
+
+///|
+pub extend CountMessageTokensResponse with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -16512,7 +18488,13 @@ pub impl @json.FromJson for CountMessageTokensResponse with fn from_json(
 pub(all) enum CreateMessageParamsCacheControl {
   Ephemeral(CacheControlEphemeral)
   Unknown(String, Json)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend CreateMessageParamsCacheControl with Eq::{equal, not_equal}
+
+///|
+pub extend CreateMessageParamsCacheControl with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -16551,7 +18533,13 @@ pub impl @json.FromJson for CreateMessageParamsCacheControl with fn from_json(
 pub(all) enum CreateMessageParamsContainer {
   ContainerParams(ContainerParams)
   Text(String)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend CreateMessageParamsContainer with Eq::{equal, not_equal}
+
+///|
+pub extend CreateMessageParamsContainer with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -16594,7 +18582,13 @@ pub impl @json.FromJson for CreateMessageParamsContainer with fn from_json(
 /// Generated representation of Metadata.
 pub(all) struct Metadata {
   user_id : @sdkjson.Presence[String]
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend Metadata with Eq::{equal, not_equal}
+
+///|
+pub extend Metadata with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -16631,7 +18625,13 @@ pub(all) enum CreateMessageParamsServiceTier {
   Auto
   StandardOnly
   Custom(String)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend CreateMessageParamsServiceTier with Eq::{equal, not_equal}
+
+///|
+pub extend CreateMessageParamsServiceTier with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -16678,7 +18678,13 @@ pub impl @json.FromJson for CreateMessageParamsServiceTier with fn from_json(
 pub(all) enum CreateMessageParamsSystem {
   Text(String)
   RequestTextBlockArray(Array[RequestTextBlock])
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend CreateMessageParamsSystem with Eq::{equal, not_equal}
+
+///|
+pub extend CreateMessageParamsSystem with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -16742,7 +18748,13 @@ pub(all) enum CreateMessageParamsToolsItem {
   ToolSearchToolBM2520251119(ToolSearchToolBM2520251119)
   ToolSearchToolRegex20251119(ToolSearchToolRegex20251119)
   Unknown(String, Json)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend CreateMessageParamsToolsItem with Eq::{equal, not_equal}
+
+///|
+pub extend CreateMessageParamsToolsItem with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -16852,7 +18864,13 @@ pub(all) struct CreateMessageParams {
   tools : Array[CreateMessageParamsToolsItem]?
   top_k : Int?
   top_p : Double?
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend CreateMessageParams with Eq::{equal, not_equal}
+
+///|
+pub extend CreateMessageParams with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -16968,7 +18986,13 @@ pub(all) struct EffortCapability {
   medium : CapabilitySupport
   supported : Bool
   xhigh : CapabilitySupport?
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend EffortCapability with Eq::{equal, not_equal}
+
+///|
+pub extend EffortCapability with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -17025,7 +19049,13 @@ pub impl @json.FromJson for EffortCapability with fn from_json(value, path) {
 pub(all) struct InvalidRequestError {
   message : String
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend InvalidRequestError with Eq::{equal, not_equal}
+
+///|
+pub extend InvalidRequestError with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -17070,7 +19100,13 @@ pub impl @json.FromJson for InvalidRequestError with fn from_json(value, path) {
 pub(all) struct NotFoundError {
   message : String
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend NotFoundError with Eq::{equal, not_equal}
+
+///|
+pub extend NotFoundError with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -17112,7 +19148,13 @@ pub impl @json.FromJson for NotFoundError with fn from_json(value, path) {
 pub(all) struct OverloadedError {
   message : String
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend OverloadedError with Eq::{equal, not_equal}
+
+///|
+pub extend OverloadedError with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -17157,7 +19199,13 @@ pub impl @json.FromJson for OverloadedError with fn from_json(value, path) {
 pub(all) struct PermissionError {
   message : String
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend PermissionError with Eq::{equal, not_equal}
+
+///|
+pub extend PermissionError with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -17202,7 +19250,13 @@ pub impl @json.FromJson for PermissionError with fn from_json(value, path) {
 pub(all) struct RateLimitError {
   message : String
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RateLimitError with Eq::{equal, not_equal}
+
+///|
+pub extend RateLimitError with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -17247,7 +19301,13 @@ pub impl @json.FromJson for RateLimitError with fn from_json(value, path) {
 pub(all) struct GatewayTimeoutError {
   message : String
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend GatewayTimeoutError with Eq::{equal, not_equal}
+
+///|
+pub extend GatewayTimeoutError with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -17300,7 +19360,13 @@ pub(all) enum ErrorResponseError {
   RateLimitError(RateLimitError)
   TimeoutError(GatewayTimeoutError)
   Unknown(String, Json)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ErrorResponseError with Eq::{equal, not_equal}
+
+///|
+pub extend ErrorResponseError with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -17353,7 +19419,13 @@ pub impl @json.FromJson for ErrorResponseError with fn from_json(value, path) {
 pub(all) struct ErrorResponse {
   error : ErrorResponseError
   request_id : String?
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ErrorResponse with Eq::{equal, not_equal}
+
+///|
+pub extend ErrorResponse with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -17402,7 +19474,13 @@ pub impl @json.FromJson for ErrorResponse with fn from_json(value, path) {
 pub(all) struct ThinkingTypes {
   adaptive : CapabilitySupport
   enabled : CapabilitySupport
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ThinkingTypes with Eq::{equal, not_equal}
+
+///|
+pub extend ThinkingTypes with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -17447,7 +19525,13 @@ pub impl @json.FromJson for ThinkingTypes with fn from_json(value, path) {
 pub(all) struct ThinkingCapability {
   supported : Bool
   types : ThinkingTypes
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ThinkingCapability with Eq::{equal, not_equal}
+
+///|
+pub extend ThinkingCapability with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -17499,7 +19583,13 @@ pub(all) struct ModelCapabilities {
   pdf_input : CapabilitySupport
   structured_outputs : CapabilitySupport
   thinking : ThinkingCapability
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ModelCapabilities with Eq::{equal, not_equal}
+
+///|
+pub extend ModelCapabilities with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -17579,7 +19669,13 @@ pub(all) struct ModelInfo {
   id : String
   max_input_tokens : Int?
   max_tokens : Int?
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ModelInfo with Eq::{equal, not_equal}
+
+///|
+pub extend ModelInfo with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -17648,7 +19744,13 @@ pub(all) struct ListResponseModelInfo {
   first_id : String?
   has_more : Bool
   last_id : String?
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ListResponseModelInfo with Eq::{equal, not_equal}
+
+///|
+pub extend ListResponseModelInfo with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -17712,7 +19814,13 @@ pub(all) enum ContentBlock {
   WebFetchToolResult(ResponseWebFetchToolResultBlock)
   WebSearchToolResult(ResponseWebSearchToolResultBlock)
   Unknown(String, Json)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ContentBlock with Eq::{equal, not_equal}
+
+///|
+pub extend ContentBlock with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -17781,7 +19889,13 @@ pub(all) enum StopReason {
   Refusal
   ModelContextWindowExceeded
   Unknown(String)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend StopReason with Eq::{equal, not_equal}
+
+///|
+pub extend StopReason with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -17839,7 +19953,13 @@ pub(all) enum RefusalCategory {
   ReasoningExtraction
   GeneralHarms
   Unknown(String)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RefusalCategory with Eq::{equal, not_equal}
+
+///|
+pub extend RefusalCategory with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -17889,7 +20009,13 @@ pub impl @json.FromJson for RefusalCategory with fn from_json(value, path) {
 pub(all) struct RefusalStopDetails {
   category : RefusalCategory?
   explanation : String?
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RefusalStopDetails with Eq::{equal, not_equal}
+
+///|
+pub extend RefusalStopDetails with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -17937,7 +20063,13 @@ pub impl @json.FromJson for RefusalStopDetails with fn from_json(value, path) {
 /// Generated representation of OutputTokensDetails.
 pub(all) struct OutputTokensDetails {
   thinking_tokens : Int
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend OutputTokensDetails with Eq::{equal, not_equal}
+
+///|
+pub extend OutputTokensDetails with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -17975,7 +20107,13 @@ pub impl @json.FromJson for OutputTokensDetails with fn from_json(value, path) {
 pub(all) struct ServerToolUsage {
   web_fetch_requests : Int
   web_search_requests : Int
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ServerToolUsage with Eq::{equal, not_equal}
+
+///|
+pub extend ServerToolUsage with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -18022,7 +20160,13 @@ pub(all) enum UsageServiceTier {
   Priority
   Batch
   Unknown(String)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend UsageServiceTier with Eq::{equal, not_equal}
+
+///|
+pub extend UsageServiceTier with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -18075,7 +20219,13 @@ pub(all) struct Usage {
   output_tokens_details : OutputTokensDetails?
   server_tool_use : ServerToolUsage?
   service_tier : UsageServiceTier?
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend Usage with Eq::{equal, not_equal}
+
+///|
+pub extend Usage with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -18184,7 +20334,13 @@ pub(all) struct Message {
   stop_details : RefusalStopDetails?
   usage : Usage
   container : Container?
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend Message with Eq::{equal, not_equal}
+
+///|
+pub extend Message with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -18269,7 +20425,13 @@ pub(all) struct MessageDelta {
   stop_details : RefusalStopDetails?
   stop_reason : StopReason?
   stop_sequence : String?
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend MessageDelta with Eq::{equal, not_equal}
+
+///|
+pub extend MessageDelta with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -18333,7 +20495,13 @@ pub(all) struct MessageDeltaUsage {
   output_tokens : Int
   output_tokens_details : OutputTokensDetails?
   server_tool_use : ServerToolUsage?
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend MessageDeltaUsage with Eq::{equal, not_equal}
+
+///|
+pub extend MessageDeltaUsage with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -18419,7 +20587,13 @@ pub(all) struct MessageDeltaEvent {
   delta : MessageDelta
   type_ : String
   usage : MessageDeltaUsage
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend MessageDeltaEvent with Eq::{equal, not_equal}
+
+///|
+pub extend MessageDeltaEvent with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -18467,7 +20641,13 @@ pub impl @json.FromJson for MessageDeltaEvent with fn from_json(value, path) {
 pub(all) struct MessageStartEvent {
   message : Message
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend MessageStartEvent with Eq::{equal, not_equal}
+
+///|
+pub extend MessageStartEvent with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -18511,7 +20691,13 @@ pub impl @json.FromJson for MessageStartEvent with fn from_json(value, path) {
 /// Generated representation of MessageStopEvent.
 pub(all) struct MessageStopEvent {
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend MessageStopEvent with Eq::{equal, not_equal}
+
+///|
+pub extend MessageStopEvent with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -18552,7 +20738,13 @@ pub(all) enum MessageStreamEvent {
   MessageStart(MessageStartEvent)
   MessageStop(MessageStopEvent)
   Unknown(String, Json)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend MessageStreamEvent with Eq::{equal, not_equal}
+
+///|
+pub extend MessageStreamEvent with @debug.Debug::{to_repr}
 
 ///|
 ///

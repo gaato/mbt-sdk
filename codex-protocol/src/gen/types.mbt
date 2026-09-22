@@ -197,7 +197,13 @@ pub(all) struct InitializeCapabilities {
   mcp_server_openai_form_elicitation : Bool?
   opt_out_notification_methods : @sdkjson.Presence[Array[String]]
   request_attestation : Bool?
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend InitializeCapabilities with Eq::{equal, not_equal}
+
+///|
+pub extend InitializeCapabilities with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -270,7 +276,13 @@ pub(all) struct ClientInfo {
   name : String
   title : @sdkjson.Presence[String]
   version : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ClientInfo with Eq::{equal, not_equal}
+
+///|
+pub extend ClientInfo with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -318,7 +330,13 @@ pub impl @json.FromJson for ClientInfo with fn from_json(value, path) {
 pub(all) struct InitializeParams {
   capabilities : @sdkjson.Presence[InitializeCapabilities]
   client_info : ClientInfo
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend InitializeParams with Eq::{equal, not_equal}
+
+///|
+pub extend InitializeParams with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -365,7 +383,13 @@ pub(all) struct InitializeResponse {
   platform_family : String
   platform_os : String
   user_agent : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend InitializeResponse with Eq::{equal, not_equal}
+
+///|
+pub extend InitializeResponse with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -419,7 +443,13 @@ pub(all) struct AskForApprovalGranular {
   rules : Bool
   sandbox_approval : Bool
   skill_approval : Bool?
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AskForApprovalGranular with Eq::{equal, not_equal}
+
+///|
+pub extend AskForApprovalGranular with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -485,7 +515,13 @@ pub(all) enum AskForApproval {
   Never
   Granular(AskForApprovalGranular)
   UnknownValue(Json)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AskForApproval with Eq::{equal, not_equal}
+
+///|
+pub extend AskForApproval with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -540,7 +576,13 @@ pub(all) enum ApprovalsReviewer {
   AutoReview
   GuardianSubagent
   Unknown(String)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ApprovalsReviewer with Eq::{equal, not_equal}
+
+///|
+pub extend ApprovalsReviewer with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -588,7 +630,13 @@ pub(all) enum Personality {
   Friendly
   Pragmatic
   Custom(String)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend Personality with Eq::{equal, not_equal}
+
+///|
+pub extend Personality with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -636,7 +684,13 @@ pub(all) enum SandboxMode {
   WorkspaceWrite
   DangerFullAccess
   Custom(String)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend SandboxMode with Eq::{equal, not_equal}
+
+///|
+pub extend SandboxMode with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -683,7 +737,13 @@ pub(all) enum ThreadStartSource {
   Startup
   Clear
   Custom(String)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ThreadStartSource with Eq::{equal, not_equal}
+
+///|
+pub extend ThreadStartSource with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -740,7 +800,13 @@ pub(all) struct ThreadStartParams {
   service_tier : @sdkjson.Presence[String]
   session_start_source : @sdkjson.Presence[ThreadStartSource]
   thread_source : @sdkjson.Presence[String]
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ThreadStartParams with Eq::{equal, not_equal}
+
+///|
+pub extend ThreadStartParams with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -845,7 +911,13 @@ pub impl @json.FromJson for ThreadStartParams with fn from_json(value, path) {
 /// Generated representation of SandboxPolicyDangerFullAccess.
 pub(all) struct SandboxPolicyDangerFullAccess {
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend SandboxPolicyDangerFullAccess with Eq::{equal, not_equal}
+
+///|
+pub extend SandboxPolicyDangerFullAccess with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -886,7 +958,13 @@ pub impl @json.FromJson for SandboxPolicyDangerFullAccess with fn from_json(
 pub(all) struct SandboxPolicyReadOnly {
   network_access : Bool?
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend SandboxPolicyReadOnly with Eq::{equal, not_equal}
+
+///|
+pub extend SandboxPolicyReadOnly with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -932,7 +1010,13 @@ pub(all) enum NetworkAccess {
   Restricted
   Enabled
   Unknown(String)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend NetworkAccess with Eq::{equal, not_equal}
+
+///|
+pub extend NetworkAccess with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -976,7 +1060,13 @@ pub impl @json.FromJson for NetworkAccess with fn from_json(value, path) {
 pub(all) struct SandboxPolicyExternalSandbox {
   network_access : NetworkAccess?
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend SandboxPolicyExternalSandbox with Eq::{equal, not_equal}
+
+///|
+pub extend SandboxPolicyExternalSandbox with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -1027,7 +1117,13 @@ pub(all) struct SandboxPolicyWorkspaceWrite {
   network_access : Bool?
   type_ : String
   writable_roots : Array[String]?
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend SandboxPolicyWorkspaceWrite with Eq::{equal, not_equal}
+
+///|
+pub extend SandboxPolicyWorkspaceWrite with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -1093,7 +1189,13 @@ pub(all) enum SandboxPolicy {
   ExternalSandbox(SandboxPolicyExternalSandbox)
   WorkspaceWrite(SandboxPolicyWorkspaceWrite)
   Unknown(String, Json)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend SandboxPolicy with Eq::{equal, not_equal}
+
+///|
+pub extend SandboxPolicy with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -1136,7 +1238,13 @@ pub(all) struct GitInfo {
   branch : @sdkjson.Presence[String]
   origin_url : @sdkjson.Presence[String]
   sha : @sdkjson.Presence[String]
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend GitInfo with Eq::{equal, not_equal}
+
+///|
+pub extend GitInfo with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -1189,7 +1297,13 @@ pub(all) enum ThreadHistoryMode {
   Legacy
   Paginated
   Unknown(String)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ThreadHistoryMode with Eq::{equal, not_equal}
+
+///|
+pub extend ThreadHistoryMode with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -1233,7 +1347,13 @@ pub impl @json.FromJson for ThreadHistoryMode with fn from_json(value, path) {
 pub(all) struct ThreadSectionAppearance {
   color : @sdkjson.Presence[String]
   icon : @sdkjson.Presence[String]
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ThreadSectionAppearance with Eq::{equal, not_equal}
+
+///|
+pub extend ThreadSectionAppearance with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -1285,7 +1405,13 @@ pub(all) struct ThreadSection {
   appearance : @sdkjson.Presence[ThreadSectionAppearance]
   id : String
   name : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ThreadSection with Eq::{equal, not_equal}
+
+///|
+pub extend ThreadSection with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -1336,7 +1462,13 @@ pub(all) struct SubAgentSourceThreadSpawn {
   agent_role : @sdkjson.Presence[String]
   depth : Int
   parent_thread_id : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend SubAgentSourceThreadSpawn with Eq::{equal, not_equal}
+
+///|
+pub extend SubAgentSourceThreadSpawn with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -1403,7 +1535,13 @@ pub(all) enum SubAgentSource {
   ThreadSpawn(SubAgentSourceThreadSpawn)
   Other(String)
   UnknownValue(Json)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend SubAgentSource with Eq::{equal, not_equal}
+
+///|
+pub extend SubAgentSource with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -1468,7 +1606,13 @@ pub(all) enum SessionSource {
   Custom(String)
   SubAgent(SubAgentSource)
   UnknownValue(Json)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend SessionSource with Eq::{equal, not_equal}
+
+///|
+pub extend SessionSource with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -1528,7 +1672,13 @@ pub impl @json.FromJson for SessionSource with fn from_json(value, path) {
 /// Generated representation of ThreadStatusNotLoaded.
 pub(all) struct ThreadStatusNotLoaded {
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ThreadStatusNotLoaded with Eq::{equal, not_equal}
+
+///|
+pub extend ThreadStatusNotLoaded with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -1563,7 +1713,13 @@ pub impl @json.FromJson for ThreadStatusNotLoaded with fn from_json(value, path)
 /// Generated representation of ThreadStatusIdle.
 pub(all) struct ThreadStatusIdle {
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ThreadStatusIdle with Eq::{equal, not_equal}
+
+///|
+pub extend ThreadStatusIdle with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -1598,7 +1754,13 @@ pub impl @json.FromJson for ThreadStatusIdle with fn from_json(value, path) {
 /// Generated representation of ThreadStatusSystemError.
 pub(all) struct ThreadStatusSystemError {
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ThreadStatusSystemError with Eq::{equal, not_equal}
+
+///|
+pub extend ThreadStatusSystemError with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -1638,7 +1800,13 @@ pub(all) enum ThreadActiveFlag {
   WaitingOnApproval
   WaitingOnUserInput
   Unknown(String)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ThreadActiveFlag with Eq::{equal, not_equal}
+
+///|
+pub extend ThreadActiveFlag with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -1682,7 +1850,13 @@ pub impl @json.FromJson for ThreadActiveFlag with fn from_json(value, path) {
 pub(all) struct ThreadStatusActive {
   active_flags : Array[ThreadActiveFlag]
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ThreadStatusActive with Eq::{equal, not_equal}
+
+///|
+pub extend ThreadStatusActive with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -1730,7 +1904,13 @@ pub(all) enum ThreadStatus {
   SystemError(ThreadStatusSystemError)
   Active(ThreadStatusActive)
   Unknown(String, Json)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ThreadStatus with Eq::{equal, not_equal}
+
+///|
+pub extend ThreadStatus with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -1771,7 +1951,13 @@ pub impl @json.FromJson for ThreadStatus with fn from_json(value, path) {
 /// Generated representation of CodexErrorInfoHttpConnectionFailed.
 pub(all) struct CodexErrorInfoHttpConnectionFailed {
   http_status_code : @sdkjson.Presence[Int]
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend CodexErrorInfoHttpConnectionFailed with Eq::{equal, not_equal}
+
+///|
+pub extend CodexErrorInfoHttpConnectionFailed with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -1813,6 +1999,17 @@ pub impl @json.FromJson for CodexErrorInfoHttpConnectionFailed with fn from_json
 /// Generated representation of CodexErrorInfoResponseStreamConnectionFailed.
 pub(all) struct CodexErrorInfoResponseStreamConnectionFailed {
   http_status_code : @sdkjson.Presence[Int]
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend CodexErrorInfoResponseStreamConnectionFailed with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend CodexErrorInfoResponseStreamConnectionFailed with @debug.Debug::{
+  to_repr,
 }
 
 ///|
@@ -1859,7 +2056,13 @@ pub impl @json.FromJson for CodexErrorInfoResponseStreamConnectionFailed with fn
 /// Generated representation of CodexErrorInfoResponseStreamDisconnected.
 pub(all) struct CodexErrorInfoResponseStreamDisconnected {
   http_status_code : @sdkjson.Presence[Int]
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend CodexErrorInfoResponseStreamDisconnected with Eq::{equal, not_equal}
+
+///|
+pub extend CodexErrorInfoResponseStreamDisconnected with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -1905,6 +2108,17 @@ pub impl @json.FromJson for CodexErrorInfoResponseStreamDisconnected with fn fro
 /// Generated representation of CodexErrorInfoResponseTooManyFailedAttempts.
 pub(all) struct CodexErrorInfoResponseTooManyFailedAttempts {
   http_status_code : @sdkjson.Presence[Int]
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend CodexErrorInfoResponseTooManyFailedAttempts with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend CodexErrorInfoResponseTooManyFailedAttempts with @debug.Debug::{
+  to_repr,
 }
 
 ///|
@@ -1953,7 +2167,13 @@ pub(all) enum NonSteerableTurnKind {
   Review
   Compact
   Unknown(String)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend NonSteerableTurnKind with Eq::{equal, not_equal}
+
+///|
+pub extend NonSteerableTurnKind with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -1996,7 +2216,13 @@ pub impl @json.FromJson for NonSteerableTurnKind with fn from_json(value, path) 
 /// Generated representation of CodexErrorInfoActiveTurnNotSteerable.
 pub(all) struct CodexErrorInfoActiveTurnNotSteerable {
   turn_kind : NonSteerableTurnKind
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend CodexErrorInfoActiveTurnNotSteerable with Eq::{equal, not_equal}
+
+///|
+pub extend CodexErrorInfoActiveTurnNotSteerable with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -2054,7 +2280,13 @@ pub(all) enum CodexErrorInfo {
   ResponseTooManyFailedAttempts(CodexErrorInfoResponseTooManyFailedAttempts)
   ActiveTurnNotSteerable(CodexErrorInfoActiveTurnNotSteerable)
   UnknownValue(Json)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend CodexErrorInfo with Eq::{equal, not_equal}
+
+///|
+pub extend CodexErrorInfo with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -2171,7 +2403,13 @@ pub impl @json.FromJson for CodexErrorInfo with fn from_json(value, path) {
 /// Generated representation of MisalignmentSteer.
 pub(all) struct MisalignmentSteer {
   message : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend MisalignmentSteer with Eq::{equal, not_equal}
+
+///|
+pub extend MisalignmentSteer with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -2208,7 +2446,13 @@ pub(all) struct MisalignmentErrorDetails {
   detailed_explanation : @sdkjson.Presence[String]
   error_type : @sdkjson.Presence[String]
   steer : @sdkjson.Presence[MisalignmentSteer]
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend MisalignmentErrorDetails with Eq::{equal, not_equal}
+
+///|
+pub extend MisalignmentErrorDetails with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -2267,7 +2511,13 @@ pub(all) struct TurnError {
   codex_error_info : @sdkjson.Presence[CodexErrorInfo]
   message : String
   misalignment : @sdkjson.Presence[MisalignmentErrorDetails]
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend TurnError with Eq::{equal, not_equal}
+
+///|
+pub extend TurnError with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -2323,7 +2573,13 @@ pub impl @json.FromJson for TurnError with fn from_json(value, path) {
 pub(all) struct ByteRange {
   end : UInt64Number
   start : UInt64Number
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ByteRange with Eq::{equal, not_equal}
+
+///|
+pub extend ByteRange with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -2365,7 +2621,13 @@ pub impl @json.FromJson for ByteRange with fn from_json(value, path) {
 pub(all) struct TextElement {
   byte_range : ByteRange
   placeholder : @sdkjson.Presence[String]
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend TextElement with Eq::{equal, not_equal}
+
+///|
+pub extend TextElement with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -2411,7 +2673,13 @@ pub(all) struct UserInputText {
   text : String
   text_elements : Array[TextElement]?
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend UserInputText with Eq::{equal, not_equal}
+
+///|
+pub extend UserInputText with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -2462,7 +2730,13 @@ pub(all) enum ImageDetail {
   High
   Original
   Unknown(String)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ImageDetail with Eq::{equal, not_equal}
+
+///|
+pub extend ImageDetail with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -2511,7 +2785,13 @@ pub(all) struct UserInputImage {
   detail : @sdkjson.Presence[ImageDetail]
   type_ : String
   url : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend UserInputImage with Eq::{equal, not_equal}
+
+///|
+pub extend UserInputImage with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -2560,7 +2840,13 @@ pub(all) struct UserInputLocalImage {
   detail : @sdkjson.Presence[ImageDetail]
   path : String
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend UserInputLocalImage with Eq::{equal, not_equal}
+
+///|
+pub extend UserInputLocalImage with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -2608,7 +2894,13 @@ pub impl @json.FromJson for UserInputLocalImage with fn from_json(value, path) {
 pub(all) struct UserInputAudio {
   type_ : String
   url : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend UserInputAudio with Eq::{equal, not_equal}
+
+///|
+pub extend UserInputAudio with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -2650,7 +2942,13 @@ pub impl @json.FromJson for UserInputAudio with fn from_json(value, path) {
 pub(all) struct UserInputLocalAudio {
   path : String
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend UserInputLocalAudio with Eq::{equal, not_equal}
+
+///|
+pub extend UserInputLocalAudio with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -2696,7 +2994,13 @@ pub(all) struct UserInputSkill {
   name : String
   path : String
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend UserInputSkill with Eq::{equal, not_equal}
+
+///|
+pub extend UserInputSkill with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -2745,7 +3049,13 @@ pub(all) struct UserInputMention {
   name : String
   path : String
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend UserInputMention with Eq::{equal, not_equal}
+
+///|
+pub extend UserInputMention with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -2799,7 +3109,13 @@ pub(all) enum UserInput {
   Skill(UserInputSkill)
   Mention(UserInputMention)
   Unknown(String, Json)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend UserInput with Eq::{equal, not_equal}
+
+///|
+pub extend UserInput with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -2849,7 +3165,13 @@ pub(all) struct ThreadItemUserMessage {
   content : Array[UserInput]
   id : String
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ThreadItemUserMessage with Eq::{equal, not_equal}
+
+///|
+pub extend ThreadItemUserMessage with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -2900,7 +3222,13 @@ pub impl @json.FromJson for ThreadItemUserMessage with fn from_json(value, path)
 pub(all) struct HookPromptFragment {
   hook_run_id : String
   text : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend HookPromptFragment with Eq::{equal, not_equal}
+
+///|
+pub extend HookPromptFragment with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -2946,7 +3274,13 @@ pub(all) struct ThreadItemHookPrompt {
   fragments : Array[HookPromptFragment]
   id : String
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ThreadItemHookPrompt with Eq::{equal, not_equal}
+
+///|
+pub extend ThreadItemHookPrompt with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -2996,7 +3330,13 @@ pub(all) struct MemoryCitationEntry {
   line_start : UInt
   note : String
   path : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend MemoryCitationEntry with Eq::{equal, not_equal}
+
+///|
+pub extend MemoryCitationEntry with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -3047,7 +3387,13 @@ pub impl @json.FromJson for MemoryCitationEntry with fn from_json(value, path) {
 pub(all) struct MemoryCitation {
   entries : Array[MemoryCitationEntry]
   thread_ids : Array[String]
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend MemoryCitation with Eq::{equal, not_equal}
+
+///|
+pub extend MemoryCitation with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -3093,7 +3439,13 @@ pub(all) enum MessagePhase {
   Commentary
   FinalAnswer
   Unknown(String)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend MessagePhase with Eq::{equal, not_equal}
+
+///|
+pub extend MessagePhase with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -3137,7 +3489,13 @@ pub impl @json.FromJson for MessagePhase with fn from_json(value, path) {
 pub(all) struct AsyncUserInputQuestion {
   options : @sdkjson.Presence[Array[String]]
   title : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AsyncUserInputQuestion with Eq::{equal, not_equal}
+
+///|
+pub extend AsyncUserInputQuestion with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -3190,7 +3548,13 @@ pub(all) struct ThreadItemAgentMessage {
   questions : @sdkjson.Presence[Array[AsyncUserInputQuestion]]
   text : String
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ThreadItemAgentMessage with Eq::{equal, not_equal}
+
+///|
+pub extend ThreadItemAgentMessage with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -3261,7 +3625,13 @@ pub impl @json.FromJson for ThreadItemAgentMessage with fn from_json(
 pub(all) struct FunctionCallOutputContentItemInputText {
   text : String
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend FunctionCallOutputContentItemInputText with Eq::{equal, not_equal}
+
+///|
+pub extend FunctionCallOutputContentItemInputText with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -3312,7 +3682,13 @@ pub(all) struct FunctionCallOutputContentItemInputImage {
   detail : @sdkjson.Presence[ImageDetail]
   image_url : String
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend FunctionCallOutputContentItemInputImage with Eq::{equal, not_equal}
+
+///|
+pub extend FunctionCallOutputContentItemInputImage with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -3367,7 +3743,13 @@ pub impl @json.FromJson for FunctionCallOutputContentItemInputImage with fn from
 pub(all) struct FunctionCallOutputContentItemInputAudio {
   audio_url : String
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend FunctionCallOutputContentItemInputAudio with Eq::{equal, not_equal}
+
+///|
+pub extend FunctionCallOutputContentItemInputAudio with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -3419,6 +3801,17 @@ pub impl @json.FromJson for FunctionCallOutputContentItemInputAudio with fn from
 pub(all) struct FunctionCallOutputContentItemEncryptedContent {
   encrypted_content : String
   type_ : String
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend FunctionCallOutputContentItemEncryptedContent with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend FunctionCallOutputContentItemEncryptedContent with @debug.Debug::{
+  to_repr,
 }
 
 ///|
@@ -3474,7 +3867,13 @@ pub(all) enum FunctionCallOutputContentItem {
   InputAudio(FunctionCallOutputContentItemInputAudio)
   EncryptedContent(FunctionCallOutputContentItemEncryptedContent)
   Unknown(String, Json)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend FunctionCallOutputContentItem with Eq::{equal, not_equal}
+
+///|
+pub extend FunctionCallOutputContentItem with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -3519,7 +3918,13 @@ pub impl @json.FromJson for FunctionCallOutputContentItem with fn from_json(
 pub(all) enum FunctionCallOutputBody {
   Text(String)
   FunctionCallOutputContentItemArray(Array[FunctionCallOutputContentItem])
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend FunctionCallOutputBody with Eq::{equal, not_equal}
+
+///|
+pub extend FunctionCallOutputBody with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -3569,7 +3974,13 @@ pub(all) struct ThreadItemFunctionCallOutput {
   namespace_ : @sdkjson.Presence[String]
   output : FunctionCallOutputBody
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ThreadItemFunctionCallOutput with Eq::{equal, not_equal}
+
+///|
+pub extend ThreadItemFunctionCallOutput with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -3633,7 +4044,13 @@ pub(all) struct ThreadItemPlan {
   id : String
   text : String
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ThreadItemPlan with Eq::{equal, not_equal}
+
+///|
+pub extend ThreadItemPlan with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -3683,7 +4100,13 @@ pub(all) struct ThreadItemReasoning {
   id : String
   summary : Array[String]?
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ThreadItemReasoning with Eq::{equal, not_equal}
+
+///|
+pub extend ThreadItemReasoning with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -3736,7 +4159,13 @@ pub(all) struct CommandActionRead {
   name : String
   path : String
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend CommandActionRead with Eq::{equal, not_equal}
+
+///|
+pub extend CommandActionRead with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -3788,7 +4217,13 @@ pub(all) struct CommandActionListFiles {
   command : String
   path : @sdkjson.Presence[String]
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend CommandActionListFiles with Eq::{equal, not_equal}
+
+///|
+pub extend CommandActionListFiles with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -3841,7 +4276,13 @@ pub(all) struct CommandActionSearch {
   path : @sdkjson.Presence[String]
   query : @sdkjson.Presence[String]
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend CommandActionSearch with Eq::{equal, not_equal}
+
+///|
+pub extend CommandActionSearch with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -3897,7 +4338,13 @@ pub impl @json.FromJson for CommandActionSearch with fn from_json(value, path) {
 pub(all) struct CommandActionKnownUnknown {
   command : String
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend CommandActionKnownUnknown with Eq::{equal, not_equal}
+
+///|
+pub extend CommandActionKnownUnknown with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -3948,7 +4395,13 @@ pub(all) enum CommandAction {
   Search(CommandActionSearch)
   KnownUnknown(CommandActionKnownUnknown)
   Unknown(String, Json)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend CommandAction with Eq::{equal, not_equal}
+
+///|
+pub extend CommandAction with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -3993,7 +4446,13 @@ pub(all) enum CommandExecutionSource {
   UnifiedExecStartup
   UnifiedExecInteraction
   Unknown(String)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend CommandExecutionSource with Eq::{equal, not_equal}
+
+///|
+pub extend CommandExecutionSource with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -4047,7 +4506,13 @@ pub(all) enum CommandExecutionStatus {
   Failed
   Declined
   Unknown(String)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend CommandExecutionStatus with Eq::{equal, not_equal}
+
+///|
+pub extend CommandExecutionStatus with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -4109,7 +4574,13 @@ pub(all) struct ThreadItemCommandExecution {
   source : CommandExecutionSource?
   status : CommandExecutionStatus
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ThreadItemCommandExecution with Eq::{equal, not_equal}
+
+///|
+pub extend ThreadItemCommandExecution with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -4206,7 +4677,13 @@ pub impl @json.FromJson for ThreadItemCommandExecution with fn from_json(
 /// Generated representation of PatchChangeKindAdd.
 pub(all) struct PatchChangeKindAdd {
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend PatchChangeKindAdd with Eq::{equal, not_equal}
+
+///|
+pub extend PatchChangeKindAdd with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -4241,7 +4718,13 @@ pub impl @json.FromJson for PatchChangeKindAdd with fn from_json(value, path) {
 /// Generated representation of PatchChangeKindDelete.
 pub(all) struct PatchChangeKindDelete {
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend PatchChangeKindDelete with Eq::{equal, not_equal}
+
+///|
+pub extend PatchChangeKindDelete with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -4277,7 +4760,13 @@ pub impl @json.FromJson for PatchChangeKindDelete with fn from_json(value, path)
 pub(all) struct PatchChangeKindUpdate {
   move_path : @sdkjson.Presence[String]
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend PatchChangeKindUpdate with Eq::{equal, not_equal}
+
+///|
+pub extend PatchChangeKindUpdate with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -4324,7 +4813,13 @@ pub(all) enum PatchChangeKind {
   Delete(PatchChangeKindDelete)
   Update(PatchChangeKindUpdate)
   Unknown(String, Json)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend PatchChangeKind with Eq::{equal, not_equal}
+
+///|
+pub extend PatchChangeKind with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -4365,7 +4860,13 @@ pub(all) struct FileUpdateChange {
   diff : String
   kind : PatchChangeKind
   path : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend FileUpdateChange with Eq::{equal, not_equal}
+
+///|
+pub extend FileUpdateChange with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -4416,7 +4917,13 @@ pub(all) enum PatchApplyStatus {
   Failed
   Declined
   Unknown(String)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend PatchApplyStatus with Eq::{equal, not_equal}
+
+///|
+pub extend PatchApplyStatus with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -4466,7 +4973,13 @@ pub(all) struct ThreadItemFileChange {
   id : String
   status : PatchApplyStatus
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ThreadItemFileChange with Eq::{equal, not_equal}
+
+///|
+pub extend ThreadItemFileChange with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -4520,7 +5033,13 @@ pub(all) struct McpToolCallAppContext {
   connector_id : String
   link_id : @sdkjson.Presence[String]
   resource_uri : @sdkjson.Presence[String]
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend McpToolCallAppContext with Eq::{equal, not_equal}
+
+///|
+pub extend McpToolCallAppContext with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -4579,7 +5098,13 @@ pub impl @json.FromJson for McpToolCallAppContext with fn from_json(value, path)
 /// Generated representation of McpToolCallError.
 pub(all) struct McpToolCallError {
   message : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend McpToolCallError with Eq::{equal, not_equal}
+
+///|
+pub extend McpToolCallError with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -4616,7 +5141,13 @@ pub(all) struct McpToolCallResult {
   meta : @sdkjson.Presence[Json]
   content : Array[Json]
   structured_content : @sdkjson.Presence[Json]
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend McpToolCallResult with Eq::{equal, not_equal}
+
+///|
+pub extend McpToolCallResult with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -4670,7 +5201,13 @@ pub(all) enum McpToolCallStatus {
   Completed
   Failed
   Unknown(String)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend McpToolCallStatus with Eq::{equal, not_equal}
+
+///|
+pub extend McpToolCallStatus with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -4727,7 +5264,13 @@ pub(all) struct ThreadItemMcpToolCall {
   status : McpToolCallStatus
   tool : String
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ThreadItemMcpToolCall with Eq::{equal, not_equal}
+
+///|
+pub extend ThreadItemMcpToolCall with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -4824,6 +5367,14 @@ pub impl @json.FromJson for ThreadItemMcpToolCall with fn from_json(value, path)
 pub(all) struct DynamicToolCallOutputContentItemInputText {
   text : String
   type_ : String
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend DynamicToolCallOutputContentItemInputText with Eq::{equal, not_equal}
+
+///|
+pub extend DynamicToolCallOutputContentItemInputText with @debug.Debug::{
+  to_repr,
 }
 
 ///|
@@ -4876,6 +5427,17 @@ pub impl @json.FromJson for DynamicToolCallOutputContentItemInputText with fn fr
 pub(all) struct DynamicToolCallOutputContentItemInputImage {
   image_url : String
   type_ : String
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend DynamicToolCallOutputContentItemInputImage with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend DynamicToolCallOutputContentItemInputImage with @debug.Debug::{
+  to_repr,
 }
 
 ///|
@@ -4928,6 +5490,17 @@ pub impl @json.FromJson for DynamicToolCallOutputContentItemInputImage with fn f
 pub(all) struct DynamicToolCallOutputContentItemInputAudio {
   audio_url : String
   type_ : String
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend DynamicToolCallOutputContentItemInputAudio with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend DynamicToolCallOutputContentItemInputAudio with @debug.Debug::{
+  to_repr,
 }
 
 ///|
@@ -4982,7 +5555,13 @@ pub(all) enum DynamicToolCallOutputContentItem {
   InputImage(DynamicToolCallOutputContentItemInputImage)
   InputAudio(DynamicToolCallOutputContentItemInputAudio)
   Unknown(String, Json)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend DynamicToolCallOutputContentItem with Eq::{equal, not_equal}
+
+///|
+pub extend DynamicToolCallOutputContentItem with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -5027,7 +5606,13 @@ pub(all) enum DynamicToolCallStatus {
   Completed
   Failed
   Unknown(String)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend DynamicToolCallStatus with Eq::{equal, not_equal}
+
+///|
+pub extend DynamicToolCallStatus with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -5080,7 +5665,13 @@ pub(all) struct ThreadItemDynamicToolCall {
   success : @sdkjson.Presence[Bool]
   tool : String
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ThreadItemDynamicToolCall with Eq::{equal, not_equal}
+
+///|
+pub extend ThreadItemDynamicToolCall with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -5168,7 +5759,13 @@ pub(all) enum CollabAgentStatus {
   Shutdown
   NotFound
   Unknown(String)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend CollabAgentStatus with Eq::{equal, not_equal}
+
+///|
+pub extend CollabAgentStatus with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -5222,7 +5819,13 @@ pub impl @json.FromJson for CollabAgentStatus with fn from_json(value, path) {
 pub(all) struct CollabAgentState {
   message : @sdkjson.Presence[String]
   status : CollabAgentStatus
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend CollabAgentState with Eq::{equal, not_equal}
+
+///|
+pub extend CollabAgentState with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -5270,7 +5873,13 @@ pub(all) enum CollabAgentToolCallStatus {
   Failed
   Interrupted
   Unknown(String)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend CollabAgentToolCallStatus with Eq::{equal, not_equal}
+
+///|
+pub extend CollabAgentToolCallStatus with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -5329,7 +5938,13 @@ pub(all) enum CollabAgentTool {
   InterruptAgent
   ListAgents
   Unknown(String)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend CollabAgentTool with Eq::{equal, not_equal}
+
+///|
+pub extend CollabAgentTool with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -5395,7 +6010,13 @@ pub(all) struct ThreadItemCollabAgentToolCall {
   status : CollabAgentToolCallStatus
   tool : CollabAgentTool
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ThreadItemCollabAgentToolCall with Eq::{equal, not_equal}
+
+///|
+pub extend ThreadItemCollabAgentToolCall with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -5484,7 +6105,13 @@ pub(all) enum SubAgentActivityKind {
   Interrupted
   Completed
   Unknown(String)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend SubAgentActivityKind with Eq::{equal, not_equal}
+
+///|
+pub extend SubAgentActivityKind with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -5535,7 +6162,13 @@ pub(all) struct ThreadItemSubAgentActivity {
   id : String
   kind : SubAgentActivityKind
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ThreadItemSubAgentActivity with Eq::{equal, not_equal}
+
+///|
+pub extend ThreadItemSubAgentActivity with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -5593,7 +6226,13 @@ pub(all) struct WebSearchActionSearch {
   queries : @sdkjson.Presence[Array[String]]
   query : @sdkjson.Presence[String]
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend WebSearchActionSearch with Eq::{equal, not_equal}
+
+///|
+pub extend WebSearchActionSearch with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -5645,7 +6284,13 @@ pub impl @json.FromJson for WebSearchActionSearch with fn from_json(value, path)
 pub(all) struct WebSearchActionOpenPage {
   type_ : String
   url : @sdkjson.Presence[String]
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend WebSearchActionOpenPage with Eq::{equal, not_equal}
+
+///|
+pub extend WebSearchActionOpenPage with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -5694,7 +6339,13 @@ pub(all) struct WebSearchActionFindInPage {
   pattern : @sdkjson.Presence[String]
   type_ : String
   url : @sdkjson.Presence[String]
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend WebSearchActionFindInPage with Eq::{equal, not_equal}
+
+///|
+pub extend WebSearchActionFindInPage with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -5748,7 +6399,13 @@ pub impl @json.FromJson for WebSearchActionFindInPage with fn from_json(
 /// Generated representation of WebSearchActionOther.
 pub(all) struct WebSearchActionOther {
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend WebSearchActionOther with Eq::{equal, not_equal}
+
+///|
+pub extend WebSearchActionOther with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -5787,7 +6444,13 @@ pub(all) enum WebSearchAction {
   FindInPage(WebSearchActionFindInPage)
   Other(WebSearchActionOther)
   Unknown(String, Json)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend WebSearchAction with Eq::{equal, not_equal}
+
+///|
+pub extend WebSearchAction with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -5832,7 +6495,13 @@ pub(all) struct ThreadItemWebSearch {
   query : String
   results : @sdkjson.Presence[Array[Json]]
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ThreadItemWebSearch with Eq::{equal, not_equal}
+
+///|
+pub extend ThreadItemWebSearch with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -5893,7 +6562,13 @@ pub(all) struct ThreadItemImageView {
   id : String
   path : String
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ThreadItemImageView with Eq::{equal, not_equal}
+
+///|
+pub extend ThreadItemImageView with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -5942,7 +6617,13 @@ pub(all) struct ThreadItemSleep {
   duration_ms : UInt64Number
   id : String
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ThreadItemSleep with Eq::{equal, not_equal}
+
+///|
+pub extend ThreadItemSleep with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -5991,7 +6672,13 @@ pub(all) struct ImageGenerationFailureUsageLimitExceeded {
   limit_id : String
   resets_at : @sdkjson.Presence[Int64]
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ImageGenerationFailureUsageLimitExceeded with Eq::{equal, not_equal}
+
+///|
+pub extend ImageGenerationFailureUsageLimitExceeded with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -6046,7 +6733,13 @@ pub impl @json.FromJson for ImageGenerationFailureUsageLimitExceeded with fn fro
 pub(all) enum ImageGenerationFailure {
   UsageLimitExceeded(ImageGenerationFailureUsageLimitExceeded)
   Unknown(String, Json)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ImageGenerationFailure with Eq::{equal, not_equal}
+
+///|
+pub extend ImageGenerationFailure with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -6091,7 +6784,13 @@ pub(all) struct ThreadItemImageGeneration {
   status : String
   transparent_background : @sdkjson.Presence[Bool]
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ThreadItemImageGeneration with Eq::{equal, not_equal}
+
+///|
+pub extend ThreadItemImageGeneration with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -6171,7 +6870,13 @@ pub(all) struct ThreadItemEnteredReviewMode {
   id : String
   review : String
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ThreadItemEnteredReviewMode with Eq::{equal, not_equal}
+
+///|
+pub extend ThreadItemEnteredReviewMode with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -6223,7 +6928,13 @@ pub(all) struct ThreadItemExitedReviewMode {
   id : String
   review : String
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ThreadItemExitedReviewMode with Eq::{equal, not_equal}
+
+///|
+pub extend ThreadItemExitedReviewMode with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -6274,7 +6985,13 @@ pub impl @json.FromJson for ThreadItemExitedReviewMode with fn from_json(
 pub(all) struct ThreadItemContextCompaction {
   id : String
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ThreadItemContextCompaction with Eq::{equal, not_equal}
+
+///|
+pub extend ThreadItemContextCompaction with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -6340,7 +7057,13 @@ pub(all) enum ThreadItem {
   ExitedReviewMode(ThreadItemExitedReviewMode)
   ContextCompaction(ThreadItemContextCompaction)
   Unknown(String, Json)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ThreadItem with Eq::{equal, not_equal}
+
+///|
+pub extend ThreadItem with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -6414,7 +7137,13 @@ pub(all) enum TurnItemsView {
   Summary
   Full
   Unknown(String)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend TurnItemsView with Eq::{equal, not_equal}
+
+///|
+pub extend TurnItemsView with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -6463,7 +7192,13 @@ pub(all) enum TurnStatus {
   Failed
   InProgress
   Unknown(String)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend TurnStatus with Eq::{equal, not_equal}
+
+///|
+pub extend TurnStatus with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -6517,7 +7252,13 @@ pub(all) struct Turn {
   items_view : TurnItemsView?
   started_at : @sdkjson.Presence[Int64]
   status : TurnStatus
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend Turn with Eq::{equal, not_equal}
+
+///|
+pub extend Turn with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -6624,7 +7365,13 @@ pub(all) struct Thread {
   thread_source : @sdkjson.Presence[String]
   turns : Array[Turn]
   updated_at : Int64
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend Thread with Eq::{equal, not_equal}
+
+///|
+pub extend Thread with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -6796,7 +7543,13 @@ pub(all) struct ThreadStartResponse {
   sandbox : SandboxPolicy
   service_tier : @sdkjson.Presence[String]
   thread : Thread
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ThreadStartResponse with Eq::{equal, not_equal}
+
+///|
+pub extend ThreadStartResponse with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -6887,7 +7640,13 @@ pub(all) struct ThreadResumeParams {
   sandbox : @sdkjson.Presence[SandboxMode]
   service_tier : @sdkjson.Presence[String]
   thread_id : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ThreadResumeParams with Eq::{equal, not_equal}
+
+///|
+pub extend ThreadResumeParams with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -6993,7 +7752,13 @@ pub(all) struct ThreadResumeResponse {
   service_tier : @sdkjson.Presence[String]
   thread : Thread
   turns_backwards_cursor : @sdkjson.Presence[String]
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ThreadResumeResponse with Eq::{equal, not_equal}
+
+///|
+pub extend ThreadResumeResponse with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -7092,7 +7857,13 @@ pub(all) enum ReasoningSummary {
   Detailed
   None
   Custom(String)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ReasoningSummary with Eq::{equal, not_equal}
+
+///|
+pub extend ReasoningSummary with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -7141,7 +7912,13 @@ pub(all) struct TurnToolOutput {
   name : String
   namespace_ : @sdkjson.Presence[String]
   output : FunctionCallOutputBody
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend TurnToolOutput with Eq::{equal, not_equal}
+
+///|
+pub extend TurnToolOutput with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -7203,7 +7980,13 @@ pub(all) struct TurnStartParams {
   thread_id : String
   tool_output : @sdkjson.Presence[TurnToolOutput]
   turn_trigger : @sdkjson.Presence[String]
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend TurnStartParams with Eq::{equal, not_equal}
+
+///|
+pub extend TurnStartParams with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -7312,7 +8095,13 @@ pub impl @json.FromJson for TurnStartParams with fn from_json(value, path) {
 /// Generated representation of TurnStartResponse.
 pub(all) struct TurnStartResponse {
   turn : Turn
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend TurnStartResponse with Eq::{equal, not_equal}
+
+///|
+pub extend TurnStartResponse with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -7348,7 +8137,13 @@ pub impl @json.FromJson for TurnStartResponse with fn from_json(value, path) {
 pub(all) struct TurnInterruptParams {
   thread_id : String
   turn_id : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend TurnInterruptParams with Eq::{equal, not_equal}
+
+///|
+pub extend TurnInterruptParams with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -7394,7 +8189,13 @@ pub(all) enum CommandExecutionApprovalKind {
   Command
   WriteStdin
   Unknown(String)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend CommandExecutionApprovalKind with Eq::{equal, not_equal}
+
+///|
+pub extend CommandExecutionApprovalKind with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -7444,7 +8245,13 @@ pub(all) enum NetworkApprovalProtocol {
   Socks5Tcp
   Socks5Udp
   Unknown(String)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend NetworkApprovalProtocol with Eq::{equal, not_equal}
+
+///|
+pub extend NetworkApprovalProtocol with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -7495,7 +8302,13 @@ pub impl @json.FromJson for NetworkApprovalProtocol with fn from_json(
 pub(all) struct NetworkApprovalContext {
   host : String
   protocol : NetworkApprovalProtocol
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend NetworkApprovalContext with Eq::{equal, not_equal}
+
+///|
+pub extend NetworkApprovalContext with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -7544,7 +8357,13 @@ pub(all) enum NetworkPolicyRuleAction {
   Allow
   Deny
   Unknown(String)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend NetworkPolicyRuleAction with Eq::{equal, not_equal}
+
+///|
+pub extend NetworkPolicyRuleAction with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -7591,7 +8410,13 @@ pub impl @json.FromJson for NetworkPolicyRuleAction with fn from_json(
 pub(all) struct NetworkPolicyAmendment {
   action : NetworkPolicyRuleAction
   host : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend NetworkPolicyAmendment with Eq::{equal, not_equal}
+
+///|
+pub extend NetworkPolicyAmendment with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -7653,7 +8478,13 @@ pub(all) struct CommandExecutionRequestApprovalParams {
   started_at_ms : Int64
   thread_id : String
   turn_id : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend CommandExecutionRequestApprovalParams with Eq::{equal, not_equal}
+
+///|
+pub extend CommandExecutionRequestApprovalParams with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -7771,6 +8602,17 @@ pub impl @json.FromJson for CommandExecutionRequestApprovalParams with fn from_j
 /// Generated representation of CommandExecutionApprovalDecisionAcceptWithExecpolicyAmendment.
 pub(all) struct CommandExecutionApprovalDecisionAcceptWithExecpolicyAmendment {
   execpolicy_amendment : Array[String]
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend CommandExecutionApprovalDecisionAcceptWithExecpolicyAmendment with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend CommandExecutionApprovalDecisionAcceptWithExecpolicyAmendment with @debug.Debug::{
+  to_repr,
 }
 
 ///|
@@ -7819,6 +8661,17 @@ pub impl @json.FromJson for CommandExecutionApprovalDecisionAcceptWithExecpolicy
 /// Generated representation of CommandExecutionApprovalDecisionApplyNetworkPolicyAmendment.
 pub(all) struct CommandExecutionApprovalDecisionApplyNetworkPolicyAmendment {
   network_policy_amendment : NetworkPolicyAmendment
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend CommandExecutionApprovalDecisionApplyNetworkPolicyAmendment with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend CommandExecutionApprovalDecisionApplyNetworkPolicyAmendment with @debug.Debug::{
+  to_repr,
 }
 
 ///|
@@ -7881,7 +8734,13 @@ pub(all) enum CommandExecutionApprovalDecision {
   Decline
   Cancel
   UnknownValue(Json)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend CommandExecutionApprovalDecision with Eq::{equal, not_equal}
+
+///|
+pub extend CommandExecutionApprovalDecision with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -7957,7 +8816,13 @@ pub impl @json.FromJson for CommandExecutionApprovalDecision with fn from_json(
 /// Generated representation of CommandExecutionRequestApprovalResponse.
 pub(all) struct CommandExecutionRequestApprovalResponse {
   decision : CommandExecutionApprovalDecision
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend CommandExecutionRequestApprovalResponse with Eq::{equal, not_equal}
+
+///|
+pub extend CommandExecutionRequestApprovalResponse with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -8006,7 +8871,13 @@ pub(all) struct FileChangeRequestApprovalParams {
   started_at_ms : Int64
   thread_id : String
   turn_id : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend FileChangeRequestApprovalParams with Eq::{equal, not_equal}
+
+///|
+pub extend FileChangeRequestApprovalParams with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -8079,7 +8950,13 @@ pub(all) enum FileChangeApprovalDecision {
   Decline
   Cancel
   Custom(String)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend FileChangeApprovalDecision with Eq::{equal, not_equal}
+
+///|
+pub extend FileChangeApprovalDecision with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -8129,7 +9006,13 @@ pub impl @json.FromJson for FileChangeApprovalDecision with fn from_json(
 /// Generated representation of FileChangeRequestApprovalResponse.
 pub(all) struct FileChangeRequestApprovalResponse {
   decision : FileChangeApprovalDecision
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend FileChangeRequestApprovalResponse with Eq::{equal, not_equal}
+
+///|
+pub extend FileChangeRequestApprovalResponse with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -8172,7 +9055,13 @@ pub(all) enum FileSystemAccessMode {
   Write
   Deny
   Unknown(String)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend FileSystemAccessMode with Eq::{equal, not_equal}
+
+///|
+pub extend FileSystemAccessMode with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -8218,7 +9107,13 @@ pub impl @json.FromJson for FileSystemAccessMode with fn from_json(value, path) 
 pub(all) struct FileSystemPathPath {
   path : String
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend FileSystemPathPath with Eq::{equal, not_equal}
+
+///|
+pub extend FileSystemPathPath with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -8263,7 +9158,13 @@ pub impl @json.FromJson for FileSystemPathPath with fn from_json(value, path) {
 pub(all) struct FileSystemPathGlobPattern {
   pattern : String
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend FileSystemPathGlobPattern with Eq::{equal, not_equal}
+
+///|
+pub extend FileSystemPathGlobPattern with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -8310,7 +9211,13 @@ pub impl @json.FromJson for FileSystemPathGlobPattern with fn from_json(
 /// Generated representation of FileSystemSpecialPathRoot.
 pub(all) struct FileSystemSpecialPathRoot {
   kind : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend FileSystemSpecialPathRoot with Eq::{equal, not_equal}
+
+///|
+pub extend FileSystemSpecialPathRoot with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -8350,7 +9257,13 @@ pub impl @json.FromJson for FileSystemSpecialPathRoot with fn from_json(
 /// Generated representation of FileSystemSpecialPathMinimal.
 pub(all) struct FileSystemSpecialPathMinimal {
   kind : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend FileSystemSpecialPathMinimal with Eq::{equal, not_equal}
+
+///|
+pub extend FileSystemSpecialPathMinimal with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -8391,7 +9304,13 @@ pub impl @json.FromJson for FileSystemSpecialPathMinimal with fn from_json(
 pub(all) struct FileSystemSpecialPathProjectRoots {
   kind : String
   subpath : @sdkjson.Presence[String]
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend FileSystemSpecialPathProjectRoots with Eq::{equal, not_equal}
+
+///|
+pub extend FileSystemSpecialPathProjectRoots with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -8438,7 +9357,13 @@ pub impl @json.FromJson for FileSystemSpecialPathProjectRoots with fn from_json(
 /// Generated representation of FileSystemSpecialPathTmpdir.
 pub(all) struct FileSystemSpecialPathTmpdir {
   kind : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend FileSystemSpecialPathTmpdir with Eq::{equal, not_equal}
+
+///|
+pub extend FileSystemSpecialPathTmpdir with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -8478,7 +9403,13 @@ pub impl @json.FromJson for FileSystemSpecialPathTmpdir with fn from_json(
 /// Generated representation of FileSystemSpecialPathSlashTmp.
 pub(all) struct FileSystemSpecialPathSlashTmp {
   kind : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend FileSystemSpecialPathSlashTmp with Eq::{equal, not_equal}
+
+///|
+pub extend FileSystemSpecialPathSlashTmp with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -8520,7 +9451,13 @@ pub(all) struct FileSystemSpecialPathKnownUnknown {
   kind : String
   path : String
   subpath : @sdkjson.Presence[String]
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend FileSystemSpecialPathKnownUnknown with Eq::{equal, not_equal}
+
+///|
+pub extend FileSystemSpecialPathKnownUnknown with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -8576,7 +9513,13 @@ pub(all) enum FileSystemSpecialPath {
   SlashTmp(FileSystemSpecialPathSlashTmp)
   KnownUnknown(FileSystemSpecialPathKnownUnknown)
   Unknown(String, Json)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend FileSystemSpecialPath with Eq::{equal, not_equal}
+
+///|
+pub extend FileSystemSpecialPath with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -8622,7 +9565,13 @@ pub impl @json.FromJson for FileSystemSpecialPath with fn from_json(value, path)
 pub(all) struct FileSystemPathSpecial {
   type_ : String
   value : FileSystemSpecialPath
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend FileSystemPathSpecial with Eq::{equal, not_equal}
+
+///|
+pub extend FileSystemPathSpecial with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -8669,7 +9618,13 @@ pub(all) enum FileSystemPath {
   GlobPattern(FileSystemPathGlobPattern)
   Special(FileSystemPathSpecial)
   Unknown(String, Json)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend FileSystemPath with Eq::{equal, not_equal}
+
+///|
+pub extend FileSystemPath with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -8709,7 +9664,13 @@ pub impl @json.FromJson for FileSystemPath with fn from_json(value, path) {
 pub(all) struct FileSystemSandboxEntry {
   access : FileSystemAccessMode
   path : FileSystemPath
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend FileSystemSandboxEntry with Eq::{equal, not_equal}
+
+///|
+pub extend FileSystemSandboxEntry with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -8759,7 +9720,13 @@ pub(all) struct AdditionalFileSystemPermissions {
   glob_scan_max_depth : @sdkjson.Presence[UInt64Number]
   read : @sdkjson.Presence[Array[String]]
   write : @sdkjson.Presence[Array[String]]
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AdditionalFileSystemPermissions with Eq::{equal, not_equal}
+
+///|
+pub extend AdditionalFileSystemPermissions with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -8817,7 +9784,13 @@ pub impl @json.FromJson for AdditionalFileSystemPermissions with fn from_json(
 /// Generated representation of AdditionalNetworkPermissions.
 pub(all) struct AdditionalNetworkPermissions {
   enabled : @sdkjson.Presence[Bool]
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AdditionalNetworkPermissions with Eq::{equal, not_equal}
+
+///|
+pub extend AdditionalNetworkPermissions with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -8858,7 +9831,13 @@ pub impl @json.FromJson for AdditionalNetworkPermissions with fn from_json(
 pub(all) struct RequestPermissionProfile {
   file_system : @sdkjson.Presence[AdditionalFileSystemPermissions]
   network : @sdkjson.Presence[AdditionalNetworkPermissions]
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestPermissionProfile with Eq::{equal, not_equal}
+
+///|
+pub extend RequestPermissionProfile with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -8915,7 +9894,13 @@ pub(all) struct PermissionsRequestApprovalParams {
   started_at_ms : Int64
   thread_id : String
   turn_id : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend PermissionsRequestApprovalParams with Eq::{equal, not_equal}
+
+///|
+pub extend PermissionsRequestApprovalParams with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -8993,7 +9978,13 @@ pub impl @json.FromJson for PermissionsRequestApprovalParams with fn from_json(
 pub(all) struct GrantedPermissionProfile {
   file_system : @sdkjson.Presence[AdditionalFileSystemPermissions]
   network : @sdkjson.Presence[AdditionalNetworkPermissions]
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend GrantedPermissionProfile with Eq::{equal, not_equal}
+
+///|
+pub extend GrantedPermissionProfile with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -9045,7 +10036,13 @@ pub(all) enum PermissionGrantScope {
   Turn
   Session
   Custom(String)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend PermissionGrantScope with Eq::{equal, not_equal}
+
+///|
+pub extend PermissionGrantScope with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -9090,7 +10087,13 @@ pub(all) struct PermissionsRequestApprovalResponse {
   permissions : GrantedPermissionProfile
   scope : PermissionGrantScope?
   strict_auto_review : @sdkjson.Presence[Bool]
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend PermissionsRequestApprovalResponse with Eq::{equal, not_equal}
+
+///|
+pub extend PermissionsRequestApprovalResponse with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -9145,7 +10148,13 @@ pub impl @json.FromJson for PermissionsRequestApprovalResponse with fn from_json
 pub(all) struct ToolRequestUserInputOption {
   description : String
   label : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ToolRequestUserInputOption with Eq::{equal, not_equal}
+
+///|
+pub extend ToolRequestUserInputOption with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -9197,7 +10206,13 @@ pub(all) struct ToolRequestUserInputQuestion {
   is_secret : Bool?
   options : @sdkjson.Presence[Array[ToolRequestUserInputOption]]
   question : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ToolRequestUserInputQuestion with Eq::{equal, not_equal}
+
+///|
+pub extend ToolRequestUserInputQuestion with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -9268,7 +10283,13 @@ pub(all) struct ToolRequestUserInputParams {
   questions : Array[ToolRequestUserInputQuestion]
   thread_id : String
   turn_id : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ToolRequestUserInputParams with Eq::{equal, not_equal}
+
+///|
+pub extend ToolRequestUserInputParams with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -9334,7 +10355,13 @@ pub impl @json.FromJson for ToolRequestUserInputParams with fn from_json(
 /// EXPERIMENTAL. Captures a user's answer to a request_user_input question.
 pub(all) struct ToolRequestUserInputAnswer {
   answers : Array[String]
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ToolRequestUserInputAnswer with Eq::{equal, not_equal}
+
+///|
+pub extend ToolRequestUserInputAnswer with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -9374,7 +10401,13 @@ pub impl @json.FromJson for ToolRequestUserInputAnswer with fn from_json(
 /// EXPERIMENTAL. Response payload mapping question ids to answers.
 pub(all) struct ToolRequestUserInputResponse {
   answers : Map[String, ToolRequestUserInputAnswer]
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ToolRequestUserInputResponse with Eq::{equal, not_equal}
+
+///|
+pub extend ToolRequestUserInputResponse with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -9424,7 +10457,13 @@ pub(all) struct ErrorNotification {
   thread_id : String
   turn_id : String
   will_retry : Bool
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ErrorNotification with Eq::{equal, not_equal}
+
+///|
+pub extend ErrorNotification with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -9474,7 +10513,13 @@ pub impl @json.FromJson for ErrorNotification with fn from_json(value, path) {
 /// Generated representation of ThreadStartedNotification.
 pub(all) struct ThreadStartedNotification {
   thread : Thread
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ThreadStartedNotification with Eq::{equal, not_equal}
+
+///|
+pub extend ThreadStartedNotification with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -9515,7 +10560,13 @@ pub impl @json.FromJson for ThreadStartedNotification with fn from_json(
 pub(all) struct TurnStartedNotification {
   thread_id : String
   turn : Turn
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend TurnStartedNotification with Eq::{equal, not_equal}
+
+///|
+pub extend TurnStartedNotification with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -9563,7 +10614,13 @@ pub impl @json.FromJson for TurnStartedNotification with fn from_json(
 pub(all) struct TurnCompletedNotification {
   thread_id : String
   turn : Turn
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend TurnCompletedNotification with Eq::{equal, not_equal}
+
+///|
+pub extend TurnCompletedNotification with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -9613,7 +10670,13 @@ pub(all) struct ItemStartedNotification {
   started_at_ms : Int64
   thread_id : String
   turn_id : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ItemStartedNotification with Eq::{equal, not_equal}
+
+///|
+pub extend ItemStartedNotification with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -9672,7 +10735,13 @@ pub(all) struct ItemCompletedNotification {
   item : ThreadItem
   thread_id : String
   turn_id : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ItemCompletedNotification with Eq::{equal, not_equal}
+
+///|
+pub extend ItemCompletedNotification with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -9731,7 +10800,13 @@ pub(all) struct AgentMessageDeltaNotification {
   item_id : String
   thread_id : String
   turn_id : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentMessageDeltaNotification with Eq::{equal, not_equal}
+
+///|
+pub extend AgentMessageDeltaNotification with @debug.Debug::{to_repr}
 
 ///|
 ///

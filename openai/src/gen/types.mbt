@@ -204,7 +204,13 @@ fn[T : @json.FromJson] decode_presence_json_map(
 /// Specifying a particular function via `{"name": "my_function"}` forces the model to call that function.
 pub(all) struct ChatCompletionFunctionCallOption {
   name : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ChatCompletionFunctionCallOption with Eq::{equal, not_equal}
+
+///|
+pub extend ChatCompletionFunctionCallOption with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -246,7 +252,13 @@ pub(all) struct ChatCompletionFunctions {
   description : String?
   name : String
   parameters : Json?
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ChatCompletionFunctions with Eq::{equal, not_equal}
+
+///|
+pub extend ChatCompletionFunctions with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -297,7 +309,13 @@ pub impl @json.FromJson for ChatCompletionFunctions with fn from_json(
 pub(all) struct ChatCompletionMessageToolCallFunction {
   name : String
   arguments : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ChatCompletionMessageToolCallFunction with Eq::{equal, not_equal}
+
+///|
+pub extend ChatCompletionMessageToolCallFunction with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -347,7 +365,13 @@ pub impl @json.FromJson for ChatCompletionMessageToolCallFunction with fn from_j
 pub(all) struct ChatCompletionMessageToolCall {
   id : String
   function : ChatCompletionMessageToolCallFunction
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ChatCompletionMessageToolCall with Eq::{equal, not_equal}
+
+///|
+pub extend ChatCompletionMessageToolCall with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -396,6 +420,17 @@ pub impl @json.FromJson for ChatCompletionMessageToolCall with fn from_json(
 pub(all) struct ChatCompletionMessageToolCallChunkFunction {
   name : String?
   arguments : String?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ChatCompletionMessageToolCallChunkFunction with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend ChatCompletionMessageToolCallChunkFunction with @debug.Debug::{
+  to_repr,
 }
 
 ///|
@@ -449,7 +484,13 @@ pub(all) struct ChatCompletionMessageToolCallChunk {
   index : Int
   id : String?
   function : ChatCompletionMessageToolCallChunkFunction?
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ChatCompletionMessageToolCallChunk with Eq::{equal, not_equal}
+
+///|
+pub extend ChatCompletionMessageToolCallChunk with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -500,7 +541,13 @@ pub impl @json.FromJson for ChatCompletionMessageToolCallChunk with fn from_json
 /// Generated representation of ChatCompletionNamedToolChoiceFunction.
 pub(all) struct ChatCompletionNamedToolChoiceFunction {
   name : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ChatCompletionNamedToolChoiceFunction with Eq::{equal, not_equal}
+
+///|
+pub extend ChatCompletionNamedToolChoiceFunction with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -542,7 +589,13 @@ pub impl @json.FromJson for ChatCompletionNamedToolChoiceFunction with fn from_j
 /// Specifies a tool the model should use. Use to force the model to call a specific function.
 pub(all) struct ChatCompletionNamedToolChoice {
   function : ChatCompletionNamedToolChoiceFunction
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ChatCompletionNamedToolChoice with Eq::{equal, not_equal}
+
+///|
+pub extend ChatCompletionNamedToolChoice with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -586,6 +639,17 @@ pub impl @json.FromJson for ChatCompletionNamedToolChoice with fn from_json(
 pub(all) struct ChatCompletionRequestMessageContentPartText {
   type_ : String
   text : String
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ChatCompletionRequestMessageContentPartText with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend ChatCompletionRequestMessageContentPartText with @debug.Debug::{
+  to_repr,
 }
 
 ///|
@@ -638,6 +702,17 @@ pub impl @json.FromJson for ChatCompletionRequestMessageContentPartText with fn 
 pub(all) struct ChatCompletionRequestMessageContentPartRefusal {
   type_ : String
   refusal : String
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ChatCompletionRequestMessageContentPartRefusal with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend ChatCompletionRequestMessageContentPartRefusal with @debug.Debug::{
+  to_repr,
 }
 
 ///|
@@ -691,6 +766,17 @@ pub(all) enum ChatCompletionRequestAssistantMessageContentPart {
   Text(ChatCompletionRequestMessageContentPartText)
   Refusal(ChatCompletionRequestMessageContentPartRefusal)
   Unknown(String, Json)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ChatCompletionRequestAssistantMessageContentPart with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend ChatCompletionRequestAssistantMessageContentPart with @debug.Debug::{
+  to_repr,
 }
 
 ///|
@@ -740,6 +826,17 @@ pub(all) enum ChatCompletionRequestAssistantMessageContent {
   ChatCompletionRequestAssistantMessageContentPartArray(
     Array[ChatCompletionRequestAssistantMessageContentPart]
   )
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ChatCompletionRequestAssistantMessageContent with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend ChatCompletionRequestAssistantMessageContent with @debug.Debug::{
+  to_repr,
 }
 
 ///|
@@ -793,6 +890,17 @@ pub impl @json.FromJson for ChatCompletionRequestAssistantMessageContent with fn
 /// Data about a previous audio response from the model. [Learn more](/docs/guides/audio).
 pub(all) struct ChatCompletionRequestAssistantMessageAudio {
   id : String
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ChatCompletionRequestAssistantMessageAudio with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend ChatCompletionRequestAssistantMessageAudio with @debug.Debug::{
+  to_repr,
 }
 
 ///|
@@ -838,6 +946,17 @@ pub impl @json.FromJson for ChatCompletionRequestAssistantMessageAudio with fn f
 pub(all) struct ChatCompletionRequestAssistantMessageFunctionCall {
   arguments : String
   name : String
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ChatCompletionRequestAssistantMessageFunctionCall with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend ChatCompletionRequestAssistantMessageFunctionCall with @debug.Debug::{
+  to_repr,
 }
 
 ///|
@@ -899,7 +1018,13 @@ pub(all) struct ChatCompletionRequestAssistantMessage {
   function_call : @sdkjson.Presence[
     ChatCompletionRequestAssistantMessageFunctionCall,
   ]
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ChatCompletionRequestAssistantMessage with Eq::{equal, not_equal}
+
+///|
+pub extend ChatCompletionRequestAssistantMessage with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -974,6 +1099,17 @@ pub(all) enum ChatCompletionRequestDeveloperMessageContent {
   ChatCompletionRequestMessageContentPartTextArray(
     Array[ChatCompletionRequestMessageContentPartText]
   )
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ChatCompletionRequestDeveloperMessageContent with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend ChatCompletionRequestDeveloperMessageContent with @debug.Debug::{
+  to_repr,
 }
 
 ///|
@@ -1028,7 +1164,13 @@ pub(all) struct ChatCompletionRequestDeveloperMessage {
   content : ChatCompletionRequestDeveloperMessageContent
   role : String
   name : String?
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ChatCompletionRequestDeveloperMessage with Eq::{equal, not_equal}
+
+///|
+pub extend ChatCompletionRequestDeveloperMessage with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -1082,7 +1224,13 @@ pub(all) struct ChatCompletionRequestFunctionMessage {
   role : String
   content : String?
   name : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ChatCompletionRequestFunctionMessage with Eq::{equal, not_equal}
+
+///|
+pub extend ChatCompletionRequestFunctionMessage with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -1133,6 +1281,17 @@ pub impl @json.FromJson for ChatCompletionRequestFunctionMessage with fn from_js
 pub(all) enum ChatCompletionRequestSystemMessageContentPart {
   Text(ChatCompletionRequestMessageContentPartText)
   Unknown(String, Json)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ChatCompletionRequestSystemMessageContentPart with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend ChatCompletionRequestSystemMessageContentPart with @debug.Debug::{
+  to_repr,
 }
 
 ///|
@@ -1178,6 +1337,14 @@ pub(all) enum ChatCompletionRequestSystemMessageContent {
   ChatCompletionRequestSystemMessageContentPartArray(
     Array[ChatCompletionRequestSystemMessageContentPart]
   )
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ChatCompletionRequestSystemMessageContent with Eq::{equal, not_equal}
+
+///|
+pub extend ChatCompletionRequestSystemMessageContent with @debug.Debug::{
+  to_repr,
 }
 
 ///|
@@ -1232,7 +1399,13 @@ pub(all) struct ChatCompletionRequestSystemMessage {
   content : ChatCompletionRequestSystemMessageContent
   role : String
   name : String?
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ChatCompletionRequestSystemMessage with Eq::{equal, not_equal}
+
+///|
+pub extend ChatCompletionRequestSystemMessage with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -1285,6 +1458,17 @@ pub(all) enum ChatCompletionRequestMessageContentPartImageImageUrlDetail {
   Low
   High
   Custom(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ChatCompletionRequestMessageContentPartImageImageUrlDetail with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend ChatCompletionRequestMessageContentPartImageImageUrlDetail with @debug.Debug::{
+  to_repr,
 }
 
 ///|
@@ -1340,6 +1524,17 @@ pub impl @json.FromJson for ChatCompletionRequestMessageContentPartImageImageUrl
 pub(all) struct ChatCompletionRequestMessageContentPartImageImageUrl {
   url : String
   detail : ChatCompletionRequestMessageContentPartImageImageUrlDetail?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ChatCompletionRequestMessageContentPartImageImageUrl with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend ChatCompletionRequestMessageContentPartImageImageUrl with @debug.Debug::{
+  to_repr,
 }
 
 ///|
@@ -1394,6 +1589,17 @@ pub impl @json.FromJson for ChatCompletionRequestMessageContentPartImageImageUrl
 pub(all) struct ChatCompletionRequestMessageContentPartImage {
   type_ : String
   image_url : ChatCompletionRequestMessageContentPartImageImageUrl
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ChatCompletionRequestMessageContentPartImage with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend ChatCompletionRequestMessageContentPartImage with @debug.Debug::{
+  to_repr,
 }
 
 ///|
@@ -1447,6 +1653,17 @@ pub(all) enum ChatCompletionRequestMessageContentPartAudioInputAudioFormat {
   Wav
   Mp3
   Custom(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ChatCompletionRequestMessageContentPartAudioInputAudioFormat with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend ChatCompletionRequestMessageContentPartAudioInputAudioFormat with @debug.Debug::{
+  to_repr,
 }
 
 ///|
@@ -1500,6 +1717,17 @@ pub impl @json.FromJson for ChatCompletionRequestMessageContentPartAudioInputAud
 pub(all) struct ChatCompletionRequestMessageContentPartAudioInputAudio {
   data : String
   format : ChatCompletionRequestMessageContentPartAudioInputAudioFormat
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ChatCompletionRequestMessageContentPartAudioInputAudio with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend ChatCompletionRequestMessageContentPartAudioInputAudio with @debug.Debug::{
+  to_repr,
 }
 
 ///|
@@ -1554,6 +1782,17 @@ pub impl @json.FromJson for ChatCompletionRequestMessageContentPartAudioInputAud
 pub(all) struct ChatCompletionRequestMessageContentPartAudio {
   type_ : String
   input_audio : ChatCompletionRequestMessageContentPartAudioInputAudio
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ChatCompletionRequestMessageContentPartAudio with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend ChatCompletionRequestMessageContentPartAudio with @debug.Debug::{
+  to_repr,
 }
 
 ///|
@@ -1607,6 +1846,17 @@ pub(all) struct ChatCompletionRequestMessageContentPartFileFile {
   filename : String?
   file_data : String?
   file_id : String?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ChatCompletionRequestMessageContentPartFileFile with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend ChatCompletionRequestMessageContentPartFileFile with @debug.Debug::{
+  to_repr,
 }
 
 ///|
@@ -1664,6 +1914,17 @@ pub impl @json.FromJson for ChatCompletionRequestMessageContentPartFileFile with
 pub(all) struct ChatCompletionRequestMessageContentPartFile {
   type_ : String
   file : ChatCompletionRequestMessageContentPartFileFile
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ChatCompletionRequestMessageContentPartFile with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend ChatCompletionRequestMessageContentPartFile with @debug.Debug::{
+  to_repr,
 }
 
 ///|
@@ -1719,6 +1980,17 @@ pub(all) enum ChatCompletionRequestUserMessageContentPart {
   InputAudio(ChatCompletionRequestMessageContentPartAudio)
   File(ChatCompletionRequestMessageContentPartFile)
   Unknown(String, Json)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ChatCompletionRequestUserMessageContentPart with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend ChatCompletionRequestUserMessageContentPart with @debug.Debug::{
+  to_repr,
 }
 
 ///|
@@ -1770,7 +2042,13 @@ pub(all) enum ChatCompletionRequestUserMessageContent {
   ChatCompletionRequestUserMessageContentPartArray(
     Array[ChatCompletionRequestUserMessageContentPart]
   )
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ChatCompletionRequestUserMessageContent with Eq::{equal, not_equal}
+
+///|
+pub extend ChatCompletionRequestUserMessageContent with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -1824,7 +2102,13 @@ pub(all) struct ChatCompletionRequestUserMessage {
   content : ChatCompletionRequestUserMessageContent
   role : String
   name : String?
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ChatCompletionRequestUserMessage with Eq::{equal, not_equal}
+
+///|
+pub extend ChatCompletionRequestUserMessage with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -1875,6 +2159,17 @@ pub impl @json.FromJson for ChatCompletionRequestUserMessage with fn from_json(
 pub(all) enum ChatCompletionRequestToolMessageContentPart {
   Text(ChatCompletionRequestMessageContentPartText)
   Unknown(String, Json)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ChatCompletionRequestToolMessageContentPart with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend ChatCompletionRequestToolMessageContentPart with @debug.Debug::{
+  to_repr,
 }
 
 ///|
@@ -1920,7 +2215,13 @@ pub(all) enum ChatCompletionRequestToolMessageContent {
   ChatCompletionRequestToolMessageContentPartArray(
     Array[ChatCompletionRequestToolMessageContentPart]
   )
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ChatCompletionRequestToolMessageContent with Eq::{equal, not_equal}
+
+///|
+pub extend ChatCompletionRequestToolMessageContent with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -1974,7 +2275,13 @@ pub(all) struct ChatCompletionRequestToolMessage {
   role : String
   content : ChatCompletionRequestToolMessageContent
   tool_call_id : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ChatCompletionRequestToolMessage with Eq::{equal, not_equal}
+
+///|
+pub extend ChatCompletionRequestToolMessage with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -2030,7 +2337,13 @@ pub(all) enum ChatCompletionRequestMessage {
   Tool(ChatCompletionRequestToolMessage)
   Function(ChatCompletionRequestFunctionMessage)
   Unknown(String, Json)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ChatCompletionRequestMessage with Eq::{equal, not_equal}
+
+///|
+pub extend ChatCompletionRequestMessage with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -2081,6 +2394,17 @@ pub(all) struct ChatCompletionResponseMessageAnnotationsItemUrlCitation {
   start_index : Int
   url : String
   title : String
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ChatCompletionResponseMessageAnnotationsItemUrlCitation with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend ChatCompletionResponseMessageAnnotationsItemUrlCitation with @debug.Debug::{
+  to_repr,
 }
 
 ///|
@@ -2140,6 +2464,17 @@ pub impl @json.FromJson for ChatCompletionResponseMessageAnnotationsItemUrlCitat
 /// A URL citation when using web search.
 pub(all) struct ChatCompletionResponseMessageAnnotationsItem {
   url_citation : ChatCompletionResponseMessageAnnotationsItemUrlCitation
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ChatCompletionResponseMessageAnnotationsItem with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend ChatCompletionResponseMessageAnnotationsItem with @debug.Debug::{
+  to_repr,
 }
 
 ///|
@@ -2188,6 +2523,14 @@ pub impl @json.FromJson for ChatCompletionResponseMessageAnnotationsItem with fn
 pub(all) struct ChatCompletionResponseMessageFunctionCall {
   arguments : String
   name : String
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ChatCompletionResponseMessageFunctionCall with Eq::{equal, not_equal}
+
+///|
+pub extend ChatCompletionResponseMessageFunctionCall with @debug.Debug::{
+  to_repr,
 }
 
 ///|
@@ -2242,7 +2585,13 @@ pub(all) struct ChatCompletionResponseMessageAudio {
   expires_at : Int
   data : String
   transcript : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ChatCompletionResponseMessageAudio with Eq::{equal, not_equal}
+
+///|
+pub extend ChatCompletionResponseMessageAudio with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -2300,7 +2649,13 @@ pub(all) struct ChatCompletionResponseMessage {
   annotations : Array[ChatCompletionResponseMessageAnnotationsItem]?
   function_call : ChatCompletionResponseMessageFunctionCall?
   audio : @sdkjson.Presence[ChatCompletionResponseMessageAudio]
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ChatCompletionResponseMessage with Eq::{equal, not_equal}
+
+///|
+pub extend ChatCompletionResponseMessage with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -2367,7 +2722,13 @@ pub impl @json.FromJson for ChatCompletionResponseMessage with fn from_json(
 /// Options for streaming response. Only set this when you set `stream: true`.
 pub(all) struct ChatCompletionStreamOptions {
   include_usage : Bool?
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ChatCompletionStreamOptions with Eq::{equal, not_equal}
+
+///|
+pub extend ChatCompletionStreamOptions with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -2408,6 +2769,17 @@ pub impl @json.FromJson for ChatCompletionStreamOptions with fn from_json(
 pub(all) struct ChatCompletionStreamResponseDeltaFunctionCall {
   arguments : String?
   name : String?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ChatCompletionStreamResponseDeltaFunctionCall with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend ChatCompletionStreamResponseDeltaFunctionCall with @debug.Debug::{
+  to_repr,
 }
 
 ///|
@@ -2464,7 +2836,13 @@ pub(all) enum ChatCompletionStreamResponseDeltaRole {
   Assistant
   Tool
   Unknown(String)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ChatCompletionStreamResponseDeltaRole with Eq::{equal, not_equal}
+
+///|
+pub extend ChatCompletionStreamResponseDeltaRole with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -2522,7 +2900,13 @@ pub(all) struct ChatCompletionStreamResponseDelta {
   tool_calls : Array[ChatCompletionMessageToolCallChunk]?
   role : ChatCompletionStreamResponseDeltaRole?
   refusal : @sdkjson.Presence[String]
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ChatCompletionStreamResponseDelta with Eq::{equal, not_equal}
+
+///|
+pub extend ChatCompletionStreamResponseDelta with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -2586,6 +2970,14 @@ pub(all) struct ChatCompletionTokenLogprobTopLogprobsItem {
   token : String
   logprob : Double
   bytes : Array[Int]?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ChatCompletionTokenLogprobTopLogprobsItem with Eq::{equal, not_equal}
+
+///|
+pub extend ChatCompletionTokenLogprobTopLogprobsItem with @debug.Debug::{
+  to_repr,
 }
 
 ///|
@@ -2643,7 +3035,13 @@ pub(all) struct ChatCompletionTokenLogprob {
   logprob : Double
   bytes : Array[Int]?
   top_logprobs : Array[ChatCompletionTokenLogprobTopLogprobsItem]
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ChatCompletionTokenLogprob with Eq::{equal, not_equal}
+
+///|
+pub extend ChatCompletionTokenLogprob with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -2699,7 +3097,13 @@ pub(all) struct FunctionObject {
   name : String
   parameters : Json?
   strict : @sdkjson.Presence[Bool]
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend FunctionObject with Eq::{equal, not_equal}
+
+///|
+pub extend FunctionObject with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -2754,7 +3158,13 @@ pub impl @json.FromJson for FunctionObject with fn from_json(value, path) {
 /// Generated representation of ChatCompletionTool.
 pub(all) struct ChatCompletionTool {
   function : FunctionObject
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ChatCompletionTool with Eq::{equal, not_equal}
+
+///|
+pub extend ChatCompletionTool with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -2797,7 +3207,13 @@ pub(all) enum ChatCompletionToolChoiceOptionText {
   Auto
   Required
   Custom(String)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ChatCompletionToolChoiceOptionText with Eq::{equal, not_equal}
+
+///|
+pub extend ChatCompletionToolChoiceOptionText with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -2846,7 +3262,13 @@ pub impl @json.FromJson for ChatCompletionToolChoiceOptionText with fn from_json
 pub(all) enum ChatCompletionToolChoiceOption {
   Text(ChatCompletionToolChoiceOptionText)
   ChatCompletionNamedToolChoice(ChatCompletionNamedToolChoice)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ChatCompletionToolChoiceOption with Eq::{equal, not_equal}
+
+///|
+pub extend ChatCompletionToolChoiceOption with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -2899,7 +3321,13 @@ pub(all) enum ClickButton {
   Back
   Forward
   Unknown(String)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ClickButton with Eq::{equal, not_equal}
+
+///|
+pub extend ClickButton with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -2951,7 +3379,13 @@ pub(all) struct Click {
   button : ClickButton
   x : Int
   y : Int
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend Click with Eq::{equal, not_equal}
+
+///|
+pub extend Click with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -3002,7 +3436,13 @@ pub impl @json.FromJson for Click with fn from_json(value, path) {
 pub(all) struct CodeInterpreterFileOutputFilesItem {
   mime_type : String
   file_id : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend CodeInterpreterFileOutputFilesItem with Eq::{equal, not_equal}
+
+///|
+pub extend CodeInterpreterFileOutputFilesItem with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -3050,7 +3490,13 @@ pub impl @json.FromJson for CodeInterpreterFileOutputFilesItem with fn from_json
 pub(all) struct CodeInterpreterFileOutput {
   type_ : String
   files : Array[CodeInterpreterFileOutputFilesItem]
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend CodeInterpreterFileOutput with Eq::{equal, not_equal}
+
+///|
+pub extend CodeInterpreterFileOutput with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -3098,7 +3544,13 @@ pub impl @json.FromJson for CodeInterpreterFileOutput with fn from_json(
 pub(all) struct CodeInterpreterTextOutput {
   type_ : String
   logs : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend CodeInterpreterTextOutput with Eq::{equal, not_equal}
+
+///|
+pub extend CodeInterpreterTextOutput with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -3148,7 +3600,13 @@ pub(all) enum CodeInterpreterToolCallStatus {
   Interpreting
   Completed
   Unknown(String)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend CodeInterpreterToolCallStatus with Eq::{equal, not_equal}
+
+///|
+pub extend CodeInterpreterToolCallStatus with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -3198,7 +3656,13 @@ pub(all) enum CodeInterpreterToolOutput {
   Logs(CodeInterpreterTextOutput)
   Files(CodeInterpreterFileOutput)
   Unknown(String, Json)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend CodeInterpreterToolOutput with Eq::{equal, not_equal}
+
+///|
+pub extend CodeInterpreterToolOutput with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -3241,7 +3705,13 @@ pub(all) struct CodeInterpreterToolCall {
   code : String
   status : CodeInterpreterToolCallStatus
   results : Array[CodeInterpreterToolOutput]
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend CodeInterpreterToolCall with Eq::{equal, not_equal}
+
+///|
+pub extend CodeInterpreterToolCall with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -3298,7 +3768,13 @@ pub(all) struct CompletionUsageCompletionTokensDetails {
   audio_tokens : Int?
   reasoning_tokens : Int?
   rejected_prediction_tokens : Int?
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend CompletionUsageCompletionTokensDetails with Eq::{equal, not_equal}
+
+///|
+pub extend CompletionUsageCompletionTokensDetails with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -3363,7 +3839,13 @@ pub impl @json.FromJson for CompletionUsageCompletionTokensDetails with fn from_
 pub(all) struct CompletionUsagePromptTokensDetails {
   audio_tokens : Int?
   cached_tokens : Int?
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend CompletionUsagePromptTokensDetails with Eq::{equal, not_equal}
+
+///|
+pub extend CompletionUsagePromptTokensDetails with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -3414,7 +3896,13 @@ pub(all) struct CompletionUsage {
   total_tokens : Int
   completion_tokens_details : CompletionUsageCompletionTokensDetails?
   prompt_tokens_details : CompletionUsagePromptTokensDetails?
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend CompletionUsage with Eq::{equal, not_equal}
+
+///|
+pub extend CompletionUsage with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -3479,7 +3967,13 @@ pub(all) struct DoubleClick {
   type_ : String
   x : Int
   y : Int
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend DoubleClick with Eq::{equal, not_equal}
+
+///|
+pub extend DoubleClick with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -3523,7 +4017,13 @@ pub impl @json.FromJson for DoubleClick with fn from_json(value, path) {
 pub(all) struct Coordinate {
   x : Int
   y : Int
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend Coordinate with Eq::{equal, not_equal}
+
+///|
+pub extend Coordinate with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -3559,7 +4059,13 @@ pub impl @json.FromJson for Coordinate with fn from_json(value, path) {
 pub(all) struct Drag {
   type_ : String
   path : Array[Coordinate]
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend Drag with Eq::{equal, not_equal}
+
+///|
+pub extend Drag with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -3601,7 +4107,13 @@ pub impl @json.FromJson for Drag with fn from_json(value, path) {
 pub(all) struct KeyPress {
   type_ : String
   keys : Array[String]
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend KeyPress with Eq::{equal, not_equal}
+
+///|
+pub extend KeyPress with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -3644,7 +4156,13 @@ pub(all) struct Move {
   type_ : String
   x : Int
   y : Int
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend Move with Eq::{equal, not_equal}
+
+///|
+pub extend Move with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -3687,7 +4205,13 @@ pub impl @json.FromJson for Move with fn from_json(value, path) {
 /// A screenshot action.
 pub(all) struct Screenshot {
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend Screenshot with Eq::{equal, not_equal}
+
+///|
+pub extend Screenshot with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -3726,7 +4250,13 @@ pub(all) struct Scroll {
   y : Int
   scroll_x : Int
   scroll_y : Int
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend Scroll with Eq::{equal, not_equal}
+
+///|
+pub extend Scroll with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -3780,7 +4310,13 @@ pub impl @json.FromJson for Scroll with fn from_json(value, path) {
 pub(all) struct Type {
   type_ : String
   text : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend Type with Eq::{equal, not_equal}
+
+///|
+pub extend Type with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -3821,7 +4357,13 @@ pub impl @json.FromJson for Type with fn from_json(value, path) {
 /// A wait action.
 pub(all) struct Wait {
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend Wait with Eq::{equal, not_equal}
+
+///|
+pub extend Wait with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -3865,7 +4407,13 @@ pub(all) enum ComputerAction {
   Type(Type)
   Wait(Wait)
   Unknown(String, Json)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ComputerAction with Eq::{equal, not_equal}
+
+///|
+pub extend ComputerAction with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -3917,7 +4465,13 @@ pub impl @json.FromJson for ComputerAction with fn from_json(value, path) {
 pub(all) struct ComputerScreenshotImage {
   image_url : String?
   file_id : String?
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ComputerScreenshotImage with Eq::{equal, not_equal}
+
+///|
+pub extend ComputerScreenshotImage with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -3967,7 +4521,13 @@ pub(all) struct ComputerToolCallSafetyCheck {
   id : String
   code : String
   message : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ComputerToolCallSafetyCheck with Eq::{equal, not_equal}
+
+///|
+pub extend ComputerToolCallSafetyCheck with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -4020,7 +4580,13 @@ pub(all) enum ComputerToolCallStatus {
   Completed
   Incomplete
   Unknown(String)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ComputerToolCallStatus with Eq::{equal, not_equal}
+
+///|
+pub extend ComputerToolCallStatus with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -4073,7 +4639,13 @@ pub(all) struct ComputerToolCall {
   action : ComputerAction
   pending_safety_checks : Array[ComputerToolCallSafetyCheck]
   status : ComputerToolCallStatus
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ComputerToolCall with Eq::{equal, not_equal}
+
+///|
+pub extend ComputerToolCall with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -4132,7 +4704,13 @@ pub(all) enum ServiceTier {
   Default
   Flex
   Unknown(String)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ServiceTier with Eq::{equal, not_equal}
+
+///|
+pub extend ServiceTier with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -4179,7 +4757,13 @@ pub(all) enum ResponseModalitiesItem {
   Text
   Audio
   Custom(String)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ResponseModalitiesItem with Eq::{equal, not_equal}
+
+///|
+pub extend ResponseModalitiesItem with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -4228,7 +4812,13 @@ pub(all) enum ReasoningEffort {
   Medium
   High
   Unknown(String)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ReasoningEffort with Eq::{equal, not_equal}
+
+///|
+pub extend ReasoningEffort with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -4276,7 +4866,13 @@ pub(all) struct WebSearchLocation {
   region : String?
   city : String?
   timezone : String?
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend WebSearchLocation with Eq::{equal, not_equal}
+
+///|
+pub extend WebSearchLocation with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -4326,6 +4922,17 @@ pub impl @json.FromJson for WebSearchLocation with fn from_json(value, path) {
 /// Approximate location parameters for the search.
 pub(all) struct CreateChatCompletionRequestWebSearchOptionsUserLocation {
   approximate : WebSearchLocation
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend CreateChatCompletionRequestWebSearchOptionsUserLocation with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend CreateChatCompletionRequestWebSearchOptionsUserLocation with @debug.Debug::{
+  to_repr,
 }
 
 ///|
@@ -4378,7 +4985,13 @@ pub(all) enum WebSearchContextSize {
   Medium
   High
   Custom(String)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend WebSearchContextSize with Eq::{equal, not_equal}
+
+///|
+pub extend WebSearchContextSize with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -4426,6 +5039,17 @@ pub(all) struct CreateChatCompletionRequestWebSearchOptions {
     CreateChatCompletionRequestWebSearchOptionsUserLocation,
   ]
   search_context_size : WebSearchContextSize?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend CreateChatCompletionRequestWebSearchOptions with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend CreateChatCompletionRequestWebSearchOptions with @debug.Debug::{
+  to_repr,
 }
 
 ///|
@@ -4480,7 +5104,13 @@ pub impl @json.FromJson for CreateChatCompletionRequestWebSearchOptions with fn 
 /// Default response format. Used to generate text responses.
 pub(all) struct ResponseFormatText {
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ResponseFormatText with Eq::{equal, not_equal}
+
+///|
+pub extend ResponseFormatText with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -4518,7 +5148,13 @@ pub(all) struct ResponseFormatJsonSchemaJsonSchema {
   name : String
   schema : Json?
   strict : @sdkjson.Presence[Bool]
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ResponseFormatJsonSchemaJsonSchema with Eq::{equal, not_equal}
+
+///|
+pub extend ResponseFormatJsonSchemaJsonSchema with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -4572,7 +5208,13 @@ pub impl @json.FromJson for ResponseFormatJsonSchemaJsonSchema with fn from_json
 pub(all) struct ResponseFormatJsonSchema {
   type_ : String
   json_schema : ResponseFormatJsonSchemaJsonSchema
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ResponseFormatJsonSchema with Eq::{equal, not_equal}
+
+///|
+pub extend ResponseFormatJsonSchema with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -4619,7 +5261,13 @@ pub impl @json.FromJson for ResponseFormatJsonSchema with fn from_json(
 /// JSON object response format. An older method of generating JSON responses. Using `json_schema` is recommended for models that support it. Note that the model will not generate JSON without a system or user message instructing it to do so.
 pub(all) struct ResponseFormatJsonObject {
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ResponseFormatJsonObject with Eq::{equal, not_equal}
+
+///|
+pub extend ResponseFormatJsonObject with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -4662,6 +5310,14 @@ pub(all) enum CreateChatCompletionRequestResponseFormat {
   JsonSchema(ResponseFormatJsonSchema)
   JsonObject(ResponseFormatJsonObject)
   Unknown(String, Json)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend CreateChatCompletionRequestResponseFormat with Eq::{equal, not_equal}
+
+///|
+pub extend CreateChatCompletionRequestResponseFormat with @debug.Debug::{
+  to_repr,
 }
 
 ///|
@@ -4714,7 +5370,13 @@ pub(all) enum CreateChatCompletionRequestAudioFormat {
   Opus
   Pcm16
   Custom(String)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend CreateChatCompletionRequestAudioFormat with Eq::{equal, not_equal}
+
+///|
+pub extend CreateChatCompletionRequestAudioFormat with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -4771,7 +5433,13 @@ pub impl @json.FromJson for CreateChatCompletionRequestAudioFormat with fn from_
 pub(all) struct CreateChatCompletionRequestAudio {
   voice : String
   format : CreateChatCompletionRequestAudioFormat
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend CreateChatCompletionRequestAudio with Eq::{equal, not_equal}
+
+///|
+pub extend CreateChatCompletionRequestAudio with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -4819,7 +5487,13 @@ pub impl @json.FromJson for CreateChatCompletionRequestAudio with fn from_json(
 pub(all) enum StopConfiguration {
   Text(String)
   TextArray(Array[String])
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend StopConfiguration with Eq::{equal, not_equal}
+
+///|
+pub extend StopConfiguration with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -4862,7 +5536,13 @@ pub(all) enum PredictionContentContent {
   ChatCompletionRequestMessageContentPartTextArray(
     Array[ChatCompletionRequestMessageContentPartText]
   )
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend PredictionContentContent with Eq::{equal, not_equal}
+
+///|
+pub extend PredictionContentContent with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -4909,7 +5589,13 @@ pub impl @json.FromJson for PredictionContentContent with fn from_json(
 pub(all) struct PredictionContent {
   type_ : String
   content : PredictionContentContent
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend PredictionContent with Eq::{equal, not_equal}
+
+///|
+pub extend PredictionContent with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -4954,7 +5640,13 @@ pub impl @json.FromJson for PredictionContent with fn from_json(value, path) {
 pub(all) enum CreateChatCompletionRequestPrediction {
   Content(PredictionContent)
   Unknown(String, Json)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend CreateChatCompletionRequestPrediction with Eq::{equal, not_equal}
+
+///|
+pub extend CreateChatCompletionRequestPrediction with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -4996,6 +5688,17 @@ pub(all) enum CreateChatCompletionRequestFunctionCallText {
   None
   Auto
   Custom(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend CreateChatCompletionRequestFunctionCallText with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend CreateChatCompletionRequestFunctionCallText with @debug.Debug::{
+  to_repr,
 }
 
 ///|
@@ -5047,7 +5750,13 @@ pub impl @json.FromJson for CreateChatCompletionRequestFunctionCallText with fn 
 pub(all) enum CreateChatCompletionRequestFunctionCall {
   Text(CreateChatCompletionRequestFunctionCallText)
   ChatCompletionFunctionCallOption(ChatCompletionFunctionCallOption)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend CreateChatCompletionRequestFunctionCall with Eq::{equal, not_equal}
+
+///|
+pub extend CreateChatCompletionRequestFunctionCall with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -5132,7 +5841,13 @@ pub(all) struct CreateChatCompletionRequest {
   parallel_tool_calls : Bool?
   function_call : CreateChatCompletionRequestFunctionCall?
   functions : Array[ChatCompletionFunctions]?
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend CreateChatCompletionRequest with Eq::{equal, not_equal}
+
+///|
+pub extend CreateChatCompletionRequest with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -5305,6 +6020,17 @@ pub(all) enum CreateChatCompletionResponseChoicesItemFinishReason {
   ContentFilter
   FunctionCall
   Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend CreateChatCompletionResponseChoicesItemFinishReason with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend CreateChatCompletionResponseChoicesItemFinishReason with @debug.Debug::{
+  to_repr,
 }
 
 ///|
@@ -5364,6 +6090,17 @@ pub impl @json.FromJson for CreateChatCompletionResponseChoicesItemFinishReason 
 pub(all) struct CreateChatCompletionResponseChoicesItemLogprobs {
   content : Array[ChatCompletionTokenLogprob]?
   refusal : Array[ChatCompletionTokenLogprob]?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend CreateChatCompletionResponseChoicesItemLogprobs with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend CreateChatCompletionResponseChoicesItemLogprobs with @debug.Debug::{
+  to_repr,
 }
 
 ///|
@@ -5420,7 +6157,13 @@ pub(all) struct CreateChatCompletionResponseChoicesItem {
   index : Int
   message : ChatCompletionResponseMessage
   logprobs : @sdkjson.Presence[CreateChatCompletionResponseChoicesItemLogprobs]
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend CreateChatCompletionResponseChoicesItem with Eq::{equal, not_equal}
+
+///|
+pub extend CreateChatCompletionResponseChoicesItem with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -5488,7 +6231,13 @@ pub(all) struct CreateChatCompletionResponse {
   service_tier : @sdkjson.Presence[ServiceTier]
   system_fingerprint : String?
   usage : CompletionUsage?
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend CreateChatCompletionResponse with Eq::{equal, not_equal}
+
+///|
+pub extend CreateChatCompletionResponse with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -5560,6 +6309,17 @@ pub impl @json.FromJson for CreateChatCompletionResponse with fn from_json(
 pub(all) struct CreateChatCompletionStreamResponseChoicesItemLogprobs {
   content : Array[ChatCompletionTokenLogprob]?
   refusal : Array[ChatCompletionTokenLogprob]?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend CreateChatCompletionStreamResponseChoicesItemLogprobs with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend CreateChatCompletionStreamResponseChoicesItemLogprobs with @debug.Debug::{
+  to_repr,
 }
 
 ///|
@@ -5618,6 +6378,17 @@ pub(all) enum CreateChatCompletionStreamResponseChoicesItemFinishReason {
   ContentFilter
   FunctionCall
   Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend CreateChatCompletionStreamResponseChoicesItemFinishReason with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend CreateChatCompletionStreamResponseChoicesItemFinishReason with @debug.Debug::{
+  to_repr,
 }
 
 ///|
@@ -5681,6 +6452,17 @@ pub(all) struct CreateChatCompletionStreamResponseChoicesItem {
   ]
   finish_reason : CreateChatCompletionStreamResponseChoicesItemFinishReason?
   index : Int
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend CreateChatCompletionStreamResponseChoicesItem with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend CreateChatCompletionStreamResponseChoicesItem with @debug.Debug::{
+  to_repr,
 }
 
 ///|
@@ -5752,7 +6534,13 @@ pub(all) struct CreateChatCompletionStreamResponse {
   service_tier : @sdkjson.Presence[ServiceTier]
   system_fingerprint : String?
   usage : @sdkjson.Presence[CompletionUsage]
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend CreateChatCompletionStreamResponse with Eq::{equal, not_equal}
+
+///|
+pub extend CreateChatCompletionStreamResponse with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -5826,7 +6614,13 @@ pub(all) enum CreateEmbeddingRequestInput {
   TextArray(Array[String])
   IntArray(Array[Int])
   IntArrayArray(Array[Array[Int]])
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend CreateEmbeddingRequestInput with Eq::{equal, not_equal}
+
+///|
+pub extend CreateEmbeddingRequestInput with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -5883,7 +6677,13 @@ pub(all) enum CreateEmbeddingRequestEncodingFormat {
   Float
   Base64
   Custom(String)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend CreateEmbeddingRequestEncodingFormat with Eq::{equal, not_equal}
+
+///|
+pub extend CreateEmbeddingRequestEncodingFormat with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -5933,7 +6733,13 @@ pub(all) struct CreateEmbeddingRequest {
   encoding_format : CreateEmbeddingRequestEncodingFormat?
   dimensions : Int?
   user : String?
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend CreateEmbeddingRequest with Eq::{equal, not_equal}
+
+///|
+pub extend CreateEmbeddingRequest with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -5990,7 +6796,13 @@ pub impl @json.FromJson for CreateEmbeddingRequest with fn from_json(
 pub(all) struct Embedding {
   index : Int
   embedding : Array[Double]
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend Embedding with Eq::{equal, not_equal}
+
+///|
+pub extend Embedding with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -6033,7 +6845,13 @@ pub impl @json.FromJson for Embedding with fn from_json(value, path) {
 pub(all) struct CreateEmbeddingResponseUsage {
   prompt_tokens : Int
   total_tokens : Int
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend CreateEmbeddingResponseUsage with Eq::{equal, not_equal}
+
+///|
+pub extend CreateEmbeddingResponseUsage with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -6082,7 +6900,13 @@ pub(all) struct CreateEmbeddingResponse {
   data : Array[Embedding]
   model : String
   usage : CreateEmbeddingResponseUsage
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend CreateEmbeddingResponse with Eq::{equal, not_equal}
+
+///|
+pub extend CreateEmbeddingResponse with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -6137,7 +6961,13 @@ pub(all) struct ModelResponseProperties {
   top_p : @sdkjson.Presence[Double]
   user : String?
   service_tier : @sdkjson.Presence[ServiceTier]
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ModelResponseProperties with Eq::{equal, not_equal}
+
+///|
+pub extend ModelResponseProperties with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -6202,7 +7032,13 @@ pub(all) enum ReasoningSummary {
   Concise
   Detailed
   Unknown(String)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ReasoningSummary with Eq::{equal, not_equal}
+
+///|
+pub extend ReasoningSummary with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -6250,7 +7086,13 @@ pub(all) enum ReasoningGenerateSummary {
   Concise
   Detailed
   Unknown(String)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ReasoningGenerateSummary with Eq::{equal, not_equal}
+
+///|
+pub extend ReasoningGenerateSummary with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -6300,7 +7142,13 @@ pub(all) struct Reasoning {
   effort : @sdkjson.Presence[ReasoningEffort]
   summary : @sdkjson.Presence[ReasoningSummary]
   generate_summary : @sdkjson.Presence[ReasoningGenerateSummary]
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend Reasoning with Eq::{equal, not_equal}
+
+///|
+pub extend Reasoning with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -6355,7 +7203,13 @@ pub(all) struct TextResponseFormatJsonSchema {
   name : String
   schema : Json
   strict : @sdkjson.Presence[Bool]
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend TextResponseFormatJsonSchema with Eq::{equal, not_equal}
+
+///|
+pub extend TextResponseFormatJsonSchema with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -6420,7 +7274,13 @@ pub(all) enum TextResponseFormatConfiguration {
   JsonSchema(TextResponseFormatJsonSchema)
   JsonObject(ResponseFormatJsonObject)
   Unknown(String, Json)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend TextResponseFormatConfiguration with Eq::{equal, not_equal}
+
+///|
+pub extend TextResponseFormatConfiguration with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -6462,7 +7322,13 @@ pub impl @json.FromJson for TextResponseFormatConfiguration with fn from_json(
 /// Configuration options for a text response from the model. Can be plain text or structured JSON data. Learn more: - [Text inputs and outputs](/docs/guides/text) - [Structured Outputs](/docs/guides/structured-outputs)
 pub(all) struct CreateResponseText {
   format : TextResponseFormatConfiguration?
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend CreateResponseText with Eq::{equal, not_equal}
+
+///|
+pub extend CreateResponseText with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -6501,7 +7367,13 @@ pub(all) enum RankingOptionsRanker {
   Auto
   Default20241115
   Unknown(String)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RankingOptionsRanker with Eq::{equal, not_equal}
+
+///|
+pub extend RankingOptionsRanker with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -6545,7 +7417,13 @@ pub impl @json.FromJson for RankingOptionsRanker with fn from_json(value, path) 
 pub(all) struct RankingOptions {
   ranker : RankingOptionsRanker?
   score_threshold : Double?
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RankingOptions with Eq::{equal, not_equal}
+
+///|
+pub extend RankingOptions with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -6593,7 +7471,13 @@ pub(all) struct FileSearchTool {
   max_num_results : Int?
   ranking_options : RankingOptions?
   filters : @sdkjson.Presence[Json]
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend FileSearchTool with Eq::{equal, not_equal}
+
+///|
+pub extend FileSearchTool with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -6656,7 +7540,13 @@ pub(all) struct FunctionTool {
   description : @sdkjson.Presence[String]
   parameters : Json?
   strict : Bool?
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend FunctionTool with Eq::{equal, not_equal}
+
+///|
+pub extend FunctionTool with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -6721,7 +7611,13 @@ pub(all) struct ApproximateLocation {
   region : @sdkjson.Presence[String]
   city : @sdkjson.Presence[String]
   timezone : @sdkjson.Presence[String]
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ApproximateLocation with Eq::{equal, not_equal}
+
+///|
+pub extend ApproximateLocation with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -6780,7 +7676,13 @@ pub(all) enum WebSearchPreviewToolSearchContextSize {
   Medium
   High
   Unknown(String)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend WebSearchPreviewToolSearchContextSize with Eq::{equal, not_equal}
+
+///|
+pub extend WebSearchPreviewToolSearchContextSize with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -6832,7 +7734,13 @@ pub(all) struct WebSearchPreviewTool {
   type_ : String
   user_location : @sdkjson.Presence[ApproximateLocation]
   search_context_size : WebSearchPreviewToolSearchContextSize?
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend WebSearchPreviewTool with Eq::{equal, not_equal}
+
+///|
+pub extend WebSearchPreviewTool with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -6888,7 +7796,13 @@ pub(all) enum ComputerUsePreviewToolEnvironment {
   Ubuntu
   Browser
   Unknown(String)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ComputerUsePreviewToolEnvironment with Eq::{equal, not_equal}
+
+///|
+pub extend ComputerUsePreviewToolEnvironment with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -6943,7 +7857,13 @@ pub(all) struct ComputerUsePreviewTool {
   environment : ComputerUsePreviewToolEnvironment
   display_width : Int
   display_height : Int
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ComputerUsePreviewTool with Eq::{equal, not_equal}
+
+///|
+pub extend ComputerUsePreviewTool with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -7000,7 +7920,13 @@ pub(all) enum Tool {
   WebSearchPreview(WebSearchPreviewTool)
   ComputerUsePreview(ComputerUsePreviewTool)
   Unknown(String, Json)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend Tool with Eq::{equal, not_equal}
+
+///|
+pub extend Tool with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -7043,7 +7969,13 @@ pub(all) enum CreateResponseTruncation {
   Auto
   Disabled
   Custom(String)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend CreateResponseTruncation with Eq::{equal, not_equal}
+
+///|
+pub extend CreateResponseTruncation with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -7091,7 +8023,13 @@ pub(all) struct FileCitationBody {
   type_ : String
   file_id : String
   index : Int
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend FileCitationBody with Eq::{equal, not_equal}
+
+///|
+pub extend FileCitationBody with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -7142,7 +8080,13 @@ pub(all) struct UrlCitationBody {
   start_index : Int
   end_index : Int
   title : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend UrlCitationBody with Eq::{equal, not_equal}
+
+///|
+pub extend UrlCitationBody with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -7197,7 +8141,13 @@ pub(all) struct FilePath {
   type_ : String
   file_id : String
   index : Int
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend FilePath with Eq::{equal, not_equal}
+
+///|
+pub extend FilePath with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -7247,7 +8197,13 @@ pub(all) enum Annotation {
   UrlCitation(UrlCitationBody)
   FilePath(FilePath)
   Unknown(String, Json)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend Annotation with Eq::{equal, not_equal}
+
+///|
+pub extend Annotation with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -7288,7 +8244,13 @@ pub(all) struct OutputTextContent {
   type_ : String
   text : String
   annotations : Array[Annotation]?
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend OutputTextContent with Eq::{equal, not_equal}
+
+///|
+pub extend OutputTextContent with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -7336,7 +8298,13 @@ pub impl @json.FromJson for OutputTextContent with fn from_json(value, path) {
 pub(all) struct RefusalContent {
   type_ : String
   refusal : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RefusalContent with Eq::{equal, not_equal}
+
+///|
+pub extend RefusalContent with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -7382,7 +8350,13 @@ pub(all) enum OutputContent {
   OutputText(OutputTextContent)
   Refusal(RefusalContent)
   Unknown(String, Json)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend OutputContent with Eq::{equal, not_equal}
+
+///|
+pub extend OutputContent with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -7422,7 +8396,13 @@ pub(all) enum OutputMessageStatus {
   Completed
   Incomplete
   Unknown(String)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend OutputMessageStatus with Eq::{equal, not_equal}
+
+///|
+pub extend OutputMessageStatus with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -7470,7 +8450,13 @@ pub(all) struct OutputMessage {
   type_ : String
   content : Array[OutputContent]
   status : OutputMessageStatus
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend OutputMessage with Eq::{equal, not_equal}
+
+///|
+pub extend OutputMessage with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -7525,7 +8511,13 @@ pub(all) enum EasyInputMessageRole {
   System
   Developer
   Custom(String)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend EasyInputMessageRole with Eq::{equal, not_equal}
+
+///|
+pub extend EasyInputMessageRole with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -7573,7 +8565,13 @@ pub impl @json.FromJson for EasyInputMessageRole with fn from_json(value, path) 
 pub(all) struct InputTextContent {
   type_ : String
   text : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend InputTextContent with Eq::{equal, not_equal}
+
+///|
+pub extend InputTextContent with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -7620,7 +8618,13 @@ pub(all) enum InputImageContentDetail {
   High
   Auto
   Custom(String)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend InputImageContentDetail with Eq::{equal, not_equal}
+
+///|
+pub extend InputImageContentDetail with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -7671,7 +8675,13 @@ pub(all) struct InputImageContent {
   image_url : @sdkjson.Presence[String]
   file_id : @sdkjson.Presence[String]
   detail : InputImageContentDetail
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend InputImageContent with Eq::{equal, not_equal}
+
+///|
+pub extend InputImageContent with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -7729,7 +8739,13 @@ pub(all) struct InputFileContent {
   file_id : @sdkjson.Presence[String]
   filename : String?
   file_data : String?
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend InputFileContent with Eq::{equal, not_equal}
+
+///|
+pub extend InputFileContent with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -7787,7 +8803,13 @@ pub(all) enum InputContent {
   InputImage(InputImageContent)
   InputFile(InputFileContent)
   Unknown(String, Json)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend InputContent with Eq::{equal, not_equal}
+
+///|
+pub extend InputContent with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -7827,7 +8849,13 @@ pub impl @json.FromJson for InputContent with fn from_json(value, path) {
 pub(all) enum EasyInputMessageContent {
   Text(String)
   InputMessageContentList(Array[InputContent])
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend EasyInputMessageContent with Eq::{equal, not_equal}
+
+///|
+pub extend EasyInputMessageContent with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -7872,7 +8900,13 @@ pub(all) struct EasyInputMessage {
   role : EasyInputMessageRole
   content : EasyInputMessageContent
   type_ : String?
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend EasyInputMessage with Eq::{equal, not_equal}
+
+///|
+pub extend EasyInputMessage with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -7922,7 +8956,13 @@ pub(all) enum InputMessageRole {
   System
   Developer
   Custom(String)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend InputMessageRole with Eq::{equal, not_equal}
+
+///|
+pub extend InputMessageRole with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -7970,7 +9010,13 @@ pub(all) enum InputMessageStatus {
   Completed
   Incomplete
   Custom(String)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend InputMessageStatus with Eq::{equal, not_equal}
+
+///|
+pub extend InputMessageStatus with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -8018,7 +9064,13 @@ pub(all) struct InputMessage {
   role : InputMessageRole
   status : InputMessageStatus?
   content : Array[InputContent]
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend InputMessage with Eq::{equal, not_equal}
+
+///|
+pub extend InputMessage with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -8073,7 +9125,13 @@ pub(all) enum FileSearchToolCallStatus {
   Incomplete
   Failed
   Unknown(String)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend FileSearchToolCallStatus with Eq::{equal, not_equal}
+
+///|
+pub extend FileSearchToolCallStatus with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -8127,7 +9185,13 @@ pub(all) enum VectorStoreFileAttributesValue {
   Text(String)
   Number(Double)
   Bool(Bool)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend VectorStoreFileAttributesValue with Eq::{equal, not_equal}
+
+///|
+pub extend VectorStoreFileAttributesValue with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -8181,7 +9245,13 @@ pub(all) struct FileSearchToolCallResultsItem {
   filename : String?
   attributes : @sdkjson.Presence[Map[String, VectorStoreFileAttributesValue]]
   score : Double?
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend FileSearchToolCallResultsItem with Eq::{equal, not_equal}
+
+///|
+pub extend FileSearchToolCallResultsItem with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -8247,7 +9317,13 @@ pub(all) struct FileSearchToolCall {
   status : FileSearchToolCallStatus
   queries : Array[String]
   results : @sdkjson.Presence[Array[FileSearchToolCallResultsItem]]
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend FileSearchToolCall with Eq::{equal, not_equal}
+
+///|
+pub extend FileSearchToolCall with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -8308,7 +9384,13 @@ pub(all) struct ComputerCallSafetyCheckParam {
   id : String
   code : @sdkjson.Presence[String]
   message : @sdkjson.Presence[String]
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ComputerCallSafetyCheckParam with Eq::{equal, not_equal}
+
+///|
+pub extend ComputerCallSafetyCheckParam with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -8365,7 +9447,13 @@ pub(all) enum ComputerCallOutputItemParamStatus {
   Completed
   Incomplete
   Custom(String)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ComputerCallOutputItemParamStatus with Eq::{equal, not_equal}
+
+///|
+pub extend ComputerCallOutputItemParamStatus with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -8420,7 +9508,13 @@ pub(all) struct ComputerCallOutputItemParam {
     Array[ComputerCallSafetyCheckParam],
   ]
   status : @sdkjson.Presence[ComputerCallOutputItemParamStatus]
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ComputerCallOutputItemParam with Eq::{equal, not_equal}
+
+///|
+pub extend ComputerCallOutputItemParam with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -8494,7 +9588,13 @@ pub(all) enum WebSearchToolCallStatus {
   Completed
   Failed
   Unknown(String)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend WebSearchToolCallStatus with Eq::{equal, not_equal}
+
+///|
+pub extend WebSearchToolCallStatus with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -8546,7 +9646,13 @@ pub(all) struct WebSearchToolCall {
   id : String
   type_ : String
   status : WebSearchToolCallStatus
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend WebSearchToolCall with Eq::{equal, not_equal}
+
+///|
+pub extend WebSearchToolCall with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -8596,7 +9702,13 @@ pub(all) enum FunctionToolCallStatus {
   Completed
   Incomplete
   Unknown(String)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend FunctionToolCallStatus with Eq::{equal, not_equal}
+
+///|
+pub extend FunctionToolCallStatus with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -8649,7 +9761,13 @@ pub(all) struct FunctionToolCall {
   name : String
   arguments : String
   status : FunctionToolCallStatus?
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend FunctionToolCall with Eq::{equal, not_equal}
+
+///|
+pub extend FunctionToolCall with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -8708,7 +9826,13 @@ pub(all) enum FunctionCallOutputItemParamStatus {
   Completed
   Incomplete
   Custom(String)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend FunctionCallOutputItemParamStatus with Eq::{equal, not_equal}
+
+///|
+pub extend FunctionCallOutputItemParamStatus with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -8760,7 +9884,13 @@ pub(all) struct FunctionCallOutputItemParam {
   type_ : String
   output : String
   status : @sdkjson.Presence[FunctionCallOutputItemParamStatus]
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend FunctionCallOutputItemParam with Eq::{equal, not_equal}
+
+///|
+pub extend FunctionCallOutputItemParam with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -8822,7 +9952,13 @@ pub impl @json.FromJson for FunctionCallOutputItemParam with fn from_json(
 /// Generated representation of ReasoningItemSummaryItem.
 pub(all) struct ReasoningItemSummaryItem {
   text : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ReasoningItemSummaryItem with Eq::{equal, not_equal}
+
+///|
+pub extend ReasoningItemSummaryItem with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -8868,7 +10004,13 @@ pub(all) enum ReasoningItemStatus {
   Completed
   Incomplete
   Unknown(String)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ReasoningItemStatus with Eq::{equal, not_equal}
+
+///|
+pub extend ReasoningItemStatus with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -8913,7 +10055,13 @@ pub impl @json.FromJson for ReasoningItemStatus with fn from_json(value, path) {
 /// Generated representation of ReasoningItemContentItem.
 pub(all) struct ReasoningItemContentItem {
   text : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ReasoningItemContentItem with Eq::{equal, not_equal}
+
+///|
+pub extend ReasoningItemContentItem with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -8960,7 +10108,13 @@ pub(all) struct ReasoningItem {
   summary : Array[ReasoningItemSummaryItem]
   status : ReasoningItemStatus?
   content : Array[ReasoningItemContentItem]?
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ReasoningItem with Eq::{equal, not_equal}
+
+///|
+pub extend ReasoningItem with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -9014,7 +10168,13 @@ pub impl @json.FromJson for ReasoningItem with fn from_json(value, path) {
 pub(all) struct ItemReferenceParam {
   type_ : @sdkjson.Presence[String]
   id : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ItemReferenceParam with Eq::{equal, not_equal}
+
+///|
+pub extend ItemReferenceParam with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -9069,7 +10229,13 @@ pub(all) enum InputItem {
   Reasoning(ReasoningItem)
   ItemReference(ItemReferenceParam)
   Unknown(String, Json)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend InputItem with Eq::{equal, not_equal}
+
+///|
+pub extend InputItem with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -9136,7 +10302,13 @@ pub impl @json.FromJson for InputItem with fn from_json(value, path) {
 pub(all) enum CreateResponseInput {
   Text(String)
   InputItemArray(Array[InputItem])
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend CreateResponseInput with Eq::{equal, not_equal}
+
+///|
+pub extend CreateResponseInput with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -9179,7 +10351,13 @@ pub(all) enum Includable {
   MessageInputImageImageUrl
   ComputerCallOutputOutputImageUrl
   Custom(String)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend Includable with Eq::{equal, not_equal}
+
+///|
+pub extend Includable with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -9243,7 +10421,13 @@ pub(all) struct CreateResponse {
   parallel_tool_calls : @sdkjson.Presence[Bool]
   store : @sdkjson.Presence[Bool]
   stream : @sdkjson.Presence[Bool]
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend CreateResponse with Eq::{equal, not_equal}
+
+///|
+pub extend CreateResponse with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -9371,7 +10555,13 @@ pub(all) enum Item {
   FunctionCallOutput(FunctionCallOutputItemParam)
   Reasoning(ReasoningItem)
   Unknown(String, Json)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend Item with Eq::{equal, not_equal}
+
+///|
+pub extend Item with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -9434,7 +10624,13 @@ pub(all) struct Model {
   id : String
   created : Int64
   owned_by : String?
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend Model with Eq::{equal, not_equal}
+
+///|
+pub extend Model with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -9481,7 +10677,13 @@ pub impl @json.FromJson for Model with fn from_json(value, path) {
 /// Generated representation of ListModelsResponse.
 pub(all) struct ListModelsResponse {
   data : Array[Model]
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ListModelsResponse with Eq::{equal, not_equal}
+
+///|
+pub extend ListModelsResponse with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -9525,7 +10727,13 @@ pub(all) enum OutputItem {
   ComputerCall(ComputerToolCall)
   Reasoning(ReasoningItem)
   Unknown(String, Json)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend OutputItem with Eq::{equal, not_equal}
+
+///|
+pub extend OutputItem with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -9570,7 +10778,13 @@ pub impl @json.FromJson for OutputItem with fn from_json(value, path) {
 /// Configuration options for a text response from the model. Can be plain text or structured JSON data. Learn more: - [Text inputs and outputs](/docs/guides/text) - [Structured Outputs](/docs/guides/structured-outputs)
 pub(all) struct ResponseText {
   format : TextResponseFormatConfiguration?
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ResponseText with Eq::{equal, not_equal}
+
+///|
+pub extend ResponseText with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -9609,7 +10823,13 @@ pub(all) enum ResponseTruncation {
   Auto
   Disabled
   Unknown(String)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ResponseTruncation with Eq::{equal, not_equal}
+
+///|
+pub extend ResponseTruncation with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -9656,7 +10876,13 @@ pub(all) enum ResponseStatus {
   InProgress
   Incomplete
   Unknown(String)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ResponseStatus with Eq::{equal, not_equal}
+
+///|
+pub extend ResponseStatus with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -9721,7 +10947,13 @@ pub(all) enum ResponseErrorCode {
   FailedToDownloadImage
   ImageFileNotFound
   Unknown(String)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ResponseErrorCode with Eq::{equal, not_equal}
+
+///|
+pub extend ResponseErrorCode with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -9797,7 +11029,13 @@ pub impl @json.FromJson for ResponseErrorCode with fn from_json(value, path) {
 pub(all) struct ResponseError {
   code : ResponseErrorCode
   message : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ResponseError with Eq::{equal, not_equal}
+
+///|
+pub extend ResponseError with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -9843,7 +11081,13 @@ pub(all) enum ResponseIncompleteDetailsReason {
   MaxOutputTokens
   ContentFilter
   Unknown(String)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ResponseIncompleteDetailsReason with Eq::{equal, not_equal}
+
+///|
+pub extend ResponseIncompleteDetailsReason with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -9889,7 +11133,13 @@ pub impl @json.FromJson for ResponseIncompleteDetailsReason with fn from_json(
 /// Details about why the response is incomplete.
 pub(all) struct ResponseIncompleteDetails {
   reason : ResponseIncompleteDetailsReason?
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ResponseIncompleteDetails with Eq::{equal, not_equal}
+
+///|
+pub extend ResponseIncompleteDetails with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -9929,7 +11179,13 @@ pub impl @json.FromJson for ResponseIncompleteDetails with fn from_json(
 /// A detailed breakdown of the input tokens.
 pub(all) struct ResponseUsageInputTokensDetails {
   cached_tokens : Int
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ResponseUsageInputTokensDetails with Eq::{equal, not_equal}
+
+///|
+pub extend ResponseUsageInputTokensDetails with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -9969,7 +11225,13 @@ pub impl @json.FromJson for ResponseUsageInputTokensDetails with fn from_json(
 /// A detailed breakdown of the output tokens.
 pub(all) struct ResponseUsageOutputTokensDetails {
   reasoning_tokens : Int
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ResponseUsageOutputTokensDetails with Eq::{equal, not_equal}
+
+///|
+pub extend ResponseUsageOutputTokensDetails with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -10015,7 +11277,13 @@ pub(all) struct ResponseUsage {
   output_tokens : Int
   output_tokens_details : ResponseUsageOutputTokensDetails
   total_tokens : Int
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ResponseUsage with Eq::{equal, not_equal}
+
+///|
+pub extend ResponseUsage with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -10096,7 +11364,13 @@ pub(all) struct Response {
   output_text : @sdkjson.Presence[String]
   usage : ResponseUsage?
   parallel_tool_calls : Bool
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend Response with Eq::{equal, not_equal}
+
+///|
+pub extend Response with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -10243,7 +11517,13 @@ pub impl @json.FromJson for Response with fn from_json(value, path) {
 pub(all) struct ResponseAudioDeltaEvent {
   type_ : String
   delta : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ResponseAudioDeltaEvent with Eq::{equal, not_equal}
+
+///|
+pub extend ResponseAudioDeltaEvent with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -10290,7 +11570,13 @@ pub impl @json.FromJson for ResponseAudioDeltaEvent with fn from_json(
 /// Emitted when the audio response is complete.
 pub(all) struct ResponseAudioDoneEvent {
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ResponseAudioDoneEvent with Eq::{equal, not_equal}
+
+///|
+pub extend ResponseAudioDoneEvent with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -10329,7 +11615,13 @@ pub impl @json.FromJson for ResponseAudioDoneEvent with fn from_json(
 pub(all) struct ResponseAudioTranscriptDeltaEvent {
   type_ : String
   delta : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ResponseAudioTranscriptDeltaEvent with Eq::{equal, not_equal}
+
+///|
+pub extend ResponseAudioTranscriptDeltaEvent with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -10376,7 +11668,13 @@ pub impl @json.FromJson for ResponseAudioTranscriptDeltaEvent with fn from_json(
 /// Emitted when the full audio transcript is completed.
 pub(all) struct ResponseAudioTranscriptDoneEvent {
   type_ : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ResponseAudioTranscriptDoneEvent with Eq::{equal, not_equal}
+
+///|
+pub extend ResponseAudioTranscriptDoneEvent with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -10418,6 +11716,14 @@ pub(all) struct ResponseCodeInterpreterCallCodeDeltaEvent {
   type_ : String
   output_index : Int
   delta : String
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ResponseCodeInterpreterCallCodeDeltaEvent with Eq::{equal, not_equal}
+
+///|
+pub extend ResponseCodeInterpreterCallCodeDeltaEvent with @debug.Debug::{
+  to_repr,
 }
 
 ///|
@@ -10474,7 +11780,13 @@ pub(all) struct ResponseCodeInterpreterCallCodeDoneEvent {
   type_ : String
   output_index : Int
   code : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ResponseCodeInterpreterCallCodeDoneEvent with Eq::{equal, not_equal}
+
+///|
+pub extend ResponseCodeInterpreterCallCodeDoneEvent with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -10530,6 +11842,14 @@ pub(all) struct ResponseCodeInterpreterCallCompletedEvent {
   type_ : String
   output_index : Int
   code_interpreter_call : CodeInterpreterToolCall
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ResponseCodeInterpreterCallCompletedEvent with Eq::{equal, not_equal}
+
+///|
+pub extend ResponseCodeInterpreterCallCompletedEvent with @debug.Debug::{
+  to_repr,
 }
 
 ///|
@@ -10586,6 +11906,17 @@ pub(all) struct ResponseCodeInterpreterCallInProgressEvent {
   type_ : String
   output_index : Int
   code_interpreter_call : CodeInterpreterToolCall
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ResponseCodeInterpreterCallInProgressEvent with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend ResponseCodeInterpreterCallInProgressEvent with @debug.Debug::{
+  to_repr,
 }
 
 ///|
@@ -10642,6 +11973,17 @@ pub(all) struct ResponseCodeInterpreterCallInterpretingEvent {
   type_ : String
   output_index : Int
   code_interpreter_call : CodeInterpreterToolCall
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ResponseCodeInterpreterCallInterpretingEvent with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend ResponseCodeInterpreterCallInterpretingEvent with @debug.Debug::{
+  to_repr,
 }
 
 ///|
@@ -10697,7 +12039,13 @@ pub impl @json.FromJson for ResponseCodeInterpreterCallInterpretingEvent with fn
 pub(all) struct ResponseCompletedEvent {
   type_ : String
   response : Response
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ResponseCompletedEvent with Eq::{equal, not_equal}
+
+///|
+pub extend ResponseCompletedEvent with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -10748,7 +12096,13 @@ pub(all) struct ResponseContentPartAddedEvent {
   output_index : Int
   content_index : Int
   part : OutputContent
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ResponseContentPartAddedEvent with Eq::{equal, not_equal}
+
+///|
+pub extend ResponseContentPartAddedEvent with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -10808,7 +12162,13 @@ pub(all) struct ResponseContentPartDoneEvent {
   output_index : Int
   content_index : Int
   part : OutputContent
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ResponseContentPartDoneEvent with Eq::{equal, not_equal}
+
+///|
+pub extend ResponseContentPartDoneEvent with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -10865,7 +12225,13 @@ pub impl @json.FromJson for ResponseContentPartDoneEvent with fn from_json(
 pub(all) struct ResponseCreatedEvent {
   type_ : String
   response : Response
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ResponseCreatedEvent with Eq::{equal, not_equal}
+
+///|
+pub extend ResponseCreatedEvent with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -10912,7 +12278,13 @@ pub(all) struct ResponseErrorEvent {
   code : String?
   message : String
   param : String?
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ResponseErrorEvent with Eq::{equal, not_equal}
+
+///|
+pub extend ResponseErrorEvent with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -10963,7 +12335,13 @@ pub impl @json.FromJson for ResponseErrorEvent with fn from_json(value, path) {
 pub(all) struct ResponseFailedEvent {
   type_ : String
   response : Response
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ResponseFailedEvent with Eq::{equal, not_equal}
+
+///|
+pub extend ResponseFailedEvent with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -11009,7 +12387,13 @@ pub(all) struct ResponseFileSearchCallCompletedEvent {
   type_ : String
   output_index : Int
   item_id : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ResponseFileSearchCallCompletedEvent with Eq::{equal, not_equal}
+
+///|
+pub extend ResponseFileSearchCallCompletedEvent with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -11061,7 +12445,13 @@ pub(all) struct ResponseFileSearchCallInProgressEvent {
   type_ : String
   output_index : Int
   item_id : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ResponseFileSearchCallInProgressEvent with Eq::{equal, not_equal}
+
+///|
+pub extend ResponseFileSearchCallInProgressEvent with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -11115,7 +12505,13 @@ pub(all) struct ResponseFileSearchCallSearchingEvent {
   type_ : String
   output_index : Int
   item_id : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ResponseFileSearchCallSearchingEvent with Eq::{equal, not_equal}
+
+///|
+pub extend ResponseFileSearchCallSearchingEvent with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -11168,7 +12564,13 @@ pub(all) struct ResponseFunctionCallArgumentsDeltaEvent {
   item_id : String
   output_index : Int
   delta : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ResponseFunctionCallArgumentsDeltaEvent with Eq::{equal, not_equal}
+
+///|
+pub extend ResponseFunctionCallArgumentsDeltaEvent with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -11228,7 +12630,13 @@ pub(all) struct ResponseFunctionCallArgumentsDoneEvent {
   item_id : String
   output_index : Int
   arguments : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ResponseFunctionCallArgumentsDoneEvent with Eq::{equal, not_equal}
+
+///|
+pub extend ResponseFunctionCallArgumentsDoneEvent with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -11284,7 +12692,13 @@ pub impl @json.FromJson for ResponseFunctionCallArgumentsDoneEvent with fn from_
 pub(all) struct ResponseInProgressEvent {
   type_ : String
   response : Response
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ResponseInProgressEvent with Eq::{equal, not_equal}
+
+///|
+pub extend ResponseInProgressEvent with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -11332,7 +12746,13 @@ pub impl @json.FromJson for ResponseInProgressEvent with fn from_json(
 pub(all) struct ResponseIncompleteEvent {
   type_ : String
   response : Response
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ResponseIncompleteEvent with Eq::{equal, not_equal}
+
+///|
+pub extend ResponseIncompleteEvent with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -11381,7 +12801,13 @@ pub(all) struct ResponseOutputItemAddedEvent {
   type_ : String
   output_index : Int
   item : OutputItem
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ResponseOutputItemAddedEvent with Eq::{equal, not_equal}
+
+///|
+pub extend ResponseOutputItemAddedEvent with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -11433,7 +12859,13 @@ pub(all) struct ResponseOutputItemDoneEvent {
   type_ : String
   output_index : Int
   item : OutputItem
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ResponseOutputItemDoneEvent with Eq::{equal, not_equal}
+
+///|
+pub extend ResponseOutputItemDoneEvent with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -11483,7 +12915,13 @@ pub impl @json.FromJson for ResponseOutputItemDoneEvent with fn from_json(
 /// Configuration options for a text response from the model. Can be plain text or structured JSON data. Learn more: - [Text inputs and outputs](/docs/guides/text) - [Structured Outputs](/docs/guides/structured-outputs)
 pub(all) struct ResponsePropertiesText {
   format : TextResponseFormatConfiguration?
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ResponsePropertiesText with Eq::{equal, not_equal}
+
+///|
+pub extend ResponsePropertiesText with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -11525,7 +12963,13 @@ pub(all) enum ResponsePropertiesTruncation {
   Auto
   Disabled
   Unknown(String)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ResponsePropertiesTruncation with Eq::{equal, not_equal}
+
+///|
+pub extend ResponsePropertiesTruncation with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -11579,7 +13023,13 @@ pub(all) struct ResponseProperties {
   tools : Array[Tool]?
   tool_choice : Json?
   truncation : @sdkjson.Presence[ResponsePropertiesTruncation]
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ResponseProperties with Eq::{equal, not_equal}
+
+///|
+pub extend ResponseProperties with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -11656,6 +13106,17 @@ pub impl @json.FromJson for ResponseProperties with fn from_json(value, path) {
 /// The summary part that was added.
 pub(all) struct ResponseReasoningSummaryPartAddedEventPart {
   text : String
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ResponseReasoningSummaryPartAddedEventPart with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend ResponseReasoningSummaryPartAddedEventPart with @debug.Debug::{
+  to_repr,
 }
 
 ///|
@@ -11707,7 +13168,13 @@ pub(all) struct ResponseReasoningSummaryPartAddedEvent {
   output_index : Int
   summary_index : Int
   part : ResponseReasoningSummaryPartAddedEventPart
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ResponseReasoningSummaryPartAddedEvent with Eq::{equal, not_equal}
+
+///|
+pub extend ResponseReasoningSummaryPartAddedEvent with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -11765,6 +13232,14 @@ pub impl @json.FromJson for ResponseReasoningSummaryPartAddedEvent with fn from_
 /// The completed summary part.
 pub(all) struct ResponseReasoningSummaryPartDoneEventPart {
   text : String
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ResponseReasoningSummaryPartDoneEventPart with Eq::{equal, not_equal}
+
+///|
+pub extend ResponseReasoningSummaryPartDoneEventPart with @debug.Debug::{
+  to_repr,
 }
 
 ///|
@@ -11816,7 +13291,13 @@ pub(all) struct ResponseReasoningSummaryPartDoneEvent {
   output_index : Int
   summary_index : Int
   part : ResponseReasoningSummaryPartDoneEventPart
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ResponseReasoningSummaryPartDoneEvent with Eq::{equal, not_equal}
+
+///|
+pub extend ResponseReasoningSummaryPartDoneEvent with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -11878,7 +13359,13 @@ pub(all) struct ResponseReasoningSummaryTextDeltaEvent {
   output_index : Int
   summary_index : Int
   delta : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ResponseReasoningSummaryTextDeltaEvent with Eq::{equal, not_equal}
+
+///|
+pub extend ResponseReasoningSummaryTextDeltaEvent with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -11940,7 +13427,13 @@ pub(all) struct ResponseReasoningSummaryTextDoneEvent {
   output_index : Int
   summary_index : Int
   text : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ResponseReasoningSummaryTextDoneEvent with Eq::{equal, not_equal}
+
+///|
+pub extend ResponseReasoningSummaryTextDoneEvent with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -12002,7 +13495,13 @@ pub(all) struct ResponseRefusalDeltaEvent {
   output_index : Int
   content_index : Int
   delta : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ResponseRefusalDeltaEvent with Eq::{equal, not_equal}
+
+///|
+pub extend ResponseRefusalDeltaEvent with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -12062,7 +13561,13 @@ pub(all) struct ResponseRefusalDoneEvent {
   output_index : Int
   content_index : Int
   refusal : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ResponseRefusalDoneEvent with Eq::{equal, not_equal}
+
+///|
+pub extend ResponseRefusalDoneEvent with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -12123,7 +13628,13 @@ pub(all) struct ResponseTextAnnotationDeltaEvent {
   content_index : Int
   annotation_index : Int
   annotation : Annotation
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ResponseTextAnnotationDeltaEvent with Eq::{equal, not_equal}
+
+///|
+pub extend ResponseTextAnnotationDeltaEvent with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -12186,7 +13697,13 @@ pub(all) struct ResponseTextDeltaEvent {
   output_index : Int
   content_index : Int
   delta : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ResponseTextDeltaEvent with Eq::{equal, not_equal}
+
+///|
+pub extend ResponseTextDeltaEvent with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -12246,7 +13763,13 @@ pub(all) struct ResponseTextDoneEvent {
   output_index : Int
   content_index : Int
   text : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ResponseTextDoneEvent with Eq::{equal, not_equal}
+
+///|
+pub extend ResponseTextDoneEvent with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -12301,7 +13824,13 @@ pub(all) struct ResponseWebSearchCallCompletedEvent {
   type_ : String
   output_index : Int
   item_id : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ResponseWebSearchCallCompletedEvent with Eq::{equal, not_equal}
+
+///|
+pub extend ResponseWebSearchCallCompletedEvent with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -12353,7 +13882,13 @@ pub(all) struct ResponseWebSearchCallInProgressEvent {
   type_ : String
   output_index : Int
   item_id : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ResponseWebSearchCallInProgressEvent with Eq::{equal, not_equal}
+
+///|
+pub extend ResponseWebSearchCallInProgressEvent with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -12405,7 +13940,13 @@ pub(all) struct ResponseWebSearchCallSearchingEvent {
   type_ : String
   output_index : Int
   item_id : String
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ResponseWebSearchCallSearchingEvent with Eq::{equal, not_equal}
+
+///|
+pub extend ResponseWebSearchCallSearchingEvent with @debug.Debug::{to_repr}
 
 ///|
 ///
@@ -12499,7 +14040,13 @@ pub(all) enum ResponseStreamEvent {
   ResponseWebSearchCallInProgress(ResponseWebSearchCallInProgressEvent)
   ResponseWebSearchCallSearching(ResponseWebSearchCallSearchingEvent)
   Unknown(String, Json)
-}
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ResponseStreamEvent with Eq::{equal, not_equal}
+
+///|
+pub extend ResponseStreamEvent with @debug.Debug::{to_repr}
 
 ///|
 ///
