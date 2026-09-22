@@ -1,6 +1,8 @@
 members = [
   "http",
   "http-async",
+  "jsonrpc",
+  "jsonrpc-async",
   "sdk-runtime",
   "openai",
   "anthropic",

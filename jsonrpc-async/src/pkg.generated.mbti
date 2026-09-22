@@ -1,0 +1,46 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "gaato/jsonrpc-async"
+
+import {
+  "gaato/jsonrpc",
+  "moonbitlang/async",
+  "moonbitlang/async/io",
+  "moonbitlang/async/process",
+  "moonbitlang/core/debug",
+}
+
+// Values
+pub async fn[X] spawn_child(@async.TaskGroup[X], String, Array[String], cwd? : String, extra_env? : Map[String, String], stderr? : &@process.ProcessOutput, envelope? : @jsonrpc.Envelope, max_line? : Int, on_request? : async (String, Json?) -> Result[Json, @jsonrpc.RpcError], on_notification? : async (String, Json?) -> Unit) -> Child
+
+// Errors
+pub(all) suberror RpcFailure {
+  Remote(@jsonrpc.RpcError)
+  Transport(String)
+  Timeout(Int)
+  Closed
+} derive(@debug.Debug)
+pub fn RpcFailure::to_repr(Self) -> @debug.Repr
+
+// Types and methods
+pub struct Child {
+  connection : Connection
+  process : @process.Process
+}
+pub async fn Child::shutdown(Self, timeout_ms? : Int) -> Int
+
+pub struct Connection {
+  // private fields
+}
+pub async fn Connection::call(Self, String, params? : Json, timeout_ms? : Int) -> Json raise RpcFailure
+pub fn Connection::close(Self) -> Unit
+pub fn Connection::decode_errors(Self) -> Int
+pub fn Connection::is_closed(Self) -> Bool
+pub async fn Connection::notify(Self, String, params? : Json) -> Unit raise RpcFailure
+pub fn[X] Connection::start(@async.TaskGroup[X], &@io.Reader, &@io.Writer, close_writer? : () -> Unit, envelope? : @jsonrpc.Envelope, max_line? : Int, on_request? : async (String, Json?) -> Result[Json, @jsonrpc.RpcError], on_notification? : async (String, Json?) -> Unit) -> Self
+
+// Type aliases
+pub type NotificationHandler = async (String, Json?) -> Unit
+
+pub type RequestHandler = async (String, Json?) -> Result[Json, @jsonrpc.RpcError]
+
+// Traits

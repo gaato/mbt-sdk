@@ -1,0 +1,87 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "gaato/jsonrpc"
+
+import {
+  "moonbitlang/core/debug",
+  "moonbitlang/core/json",
+}
+
+// Values
+pub fn decode_line(Bytes, envelope~ : Envelope) -> Message raise DecodeError
+
+// Errors
+pub(all) suberror DecodeError {
+  InvalidJson(String)
+  InvalidMessage(String)
+  LineTooLong(Int)
+} derive(Eq, @debug.Debug)
+pub fn DecodeError::equal(Self, Self) -> Bool
+pub fn DecodeError::not_equal(Self, Self) -> Bool
+pub fn DecodeError::to_repr(Self) -> @debug.Repr
+
+// Types and methods
+pub(all) enum Envelope {
+  Strict
+  Bare
+} derive(Eq, @debug.Debug)
+pub fn Envelope::equal(Self, Self) -> Bool
+pub fn Envelope::not_equal(Self, Self) -> Bool
+pub fn Envelope::to_repr(Self) -> @debug.Repr
+
+pub struct LineFramer {
+  // private fields
+}
+pub fn LineFramer::feed(Self, Bytes) -> Array[Bytes] raise DecodeError
+pub fn LineFramer::finish(Self) -> Bytes?
+pub fn LineFramer::new(max_line? : Int) -> Self
+
+pub(all) enum Message {
+  Request(id~ : RequestId, name~ : String, params~ : Json?)
+  Notification(name~ : String, params~ : Json?)
+  Response(id~ : RequestId, result~ : Json)
+  Failure(id~ : RequestId, error~ : RpcError)
+} derive(Eq, @debug.Debug)
+pub fn Message::encode(Self, envelope~ : Envelope) -> Bytes
+pub fn Message::equal(Self, Self) -> Bool
+pub fn Message::from_json(Json, envelope~ : Envelope) -> Self raise DecodeError
+pub fn Message::not_equal(Self, Self) -> Bool
+pub fn Message::to_json(Self, envelope~ : Envelope) -> Json
+pub fn Message::to_repr(Self) -> @debug.Repr
+
+pub(all) enum RequestId {
+  Number(Int64)
+  Str(String)
+  Null
+} derive(Eq, Hash, @debug.Debug)
+pub fn RequestId::equal(Self, Self) -> Bool
+pub fn RequestId::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn RequestId::hash(Self) -> Int
+pub fn RequestId::hash_combine(Self, Hasher) -> Unit
+pub fn RequestId::not_equal(Self, Self) -> Bool
+pub fn RequestId::to_json(Self) -> Json
+pub fn RequestId::to_repr(Self) -> @debug.Repr
+pub impl ToJson for RequestId
+pub impl @json.FromJson for RequestId
+
+pub(all) struct RpcError {
+  code : Int
+  message : String
+  data : Json?
+} derive(Eq, @debug.Debug)
+pub fn RpcError::equal(Self, Self) -> Bool
+pub fn RpcError::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn RpcError::internal_error(message? : String) -> Self
+pub fn RpcError::invalid_params(message? : String) -> Self
+pub fn RpcError::invalid_request(message? : String) -> Self
+pub fn RpcError::method_not_found(String) -> Self
+pub fn RpcError::new(code~ : Int, message~ : String, data? : Json) -> Self
+pub fn RpcError::not_equal(Self, Self) -> Bool
+pub fn RpcError::parse_error(message? : String) -> Self
+pub fn RpcError::to_json(Self) -> Json
+pub fn RpcError::to_repr(Self) -> @debug.Repr
+pub impl ToJson for RpcError
+pub impl @json.FromJson for RpcError
+
+// Type aliases
+
+// Traits
