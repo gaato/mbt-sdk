@@ -11,11 +11,7 @@ fn[T] decode_http_response(
 
 ///|
 fn model_from_generated(model : @gen.Model) -> Model {
-  {
-    id: model.id,
-    created: Some(model.created),
-    owned_by: Some(model.owned_by),
-  }
+  { id: model.id, created: Some(model.created), owned_by: model.owned_by, }
 }
 
 ///|

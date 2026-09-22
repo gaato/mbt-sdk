@@ -27,3 +27,6 @@ actions:
         - TextArray
         - IntArray
         - IntArrayArray
+  - target: "$['components']['schemas']['Model']['required'][?@ == 'owned_by']"
+    description: OpenAI-compatible servers (OpenRouter's /models) omit owned_by; the hand-written Model type treats it as optional, so the generated decoder must too.
+    remove: true

@@ -50,6 +50,12 @@ moon -C openai check src/gen --deny-warn --target js
 moon -C openai test src/gen --target wasm-gc
 moon -C openai test src/gen --target native
 moon -C openai test src/gen --target js
+moon -C anthropic check --deny-warn --target wasm-gc
+moon -C anthropic check --deny-warn --target native
+moon -C anthropic check --deny-warn --target js
+moon -C anthropic test --target wasm-gc
+moon -C anthropic test --target native
+moon -C anthropic test --target js
 moon -C fixtures/gen/badhttp check --deny-warn --target wasm-gc
 moon -C fixtures/gen/badhttp check --deny-warn --target native
 moon -C fixtures/gen/badhttp check --deny-warn --target js
@@ -73,6 +79,8 @@ moon info
 Loopback socket tests live in `http-async/src/loopback` (native only). They need permission to open sockets on 127.0.0.1; a sandbox that forbids sockets cannot run them, so say so instead of reporting them as passed.
 
 `runtime-tests/src/badhttp` talks to the public https://badhttp.dev (opt-in, `scripts/conformance.sh`, needs the network, ~30 requests against a 100-per-10-s limit). It is not a gate; do not add it to CI.
+
+`runtime-tests/src/live` talks to the real OpenAI and OpenRouter APIs (opt-in, `scripts/live.sh`, needs the network and provider keys). It is never a gate; do not add it to CI or run it without explicit authorization.
 
 ## Hard limits for agents
 

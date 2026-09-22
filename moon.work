@@ -3,6 +3,7 @@ members = [
   "http-async",
   "sdk-runtime",
   "openai",
+  "anthropic",
   "runtime-tests",
   "fixtures/gen/badhttp",
   "fixtures/gen/petstore3",

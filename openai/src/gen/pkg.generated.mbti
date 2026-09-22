@@ -95,7 +95,7 @@ pub impl @json.FromJson for ListModelsResponse
 pub(all) struct Model {
   id : String
   created : Int64
-  owned_by : String
+  owned_by : String?
 }
 pub fn Model::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn Model::to_json(Self) -> Json

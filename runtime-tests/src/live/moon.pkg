@@ -1,0 +1,13 @@
+// Opt-in tests against real LLM APIs. They need credentials and the network and
+// are never part of the gates: run them with scripts/live.sh.
+import {
+  "gaato/http-async" @adapter,
+  "gaato/sdk-runtime" @runtime,
+  "gaato/openai" @openai_sdk,
+  "gaato/anthropic" @anthropic_sdk,
+  "moonbitlang/async",
+  "moonbitlang/core/debug",
+  "moonbitlang/core/env",
+} for "test"
+
+supported_targets = "native"

@@ -389,7 +389,7 @@ pub impl @json.FromJson for CreateEmbeddingResponse with fn from_json(
 pub(all) struct Model {
   id : String
   created : Int64
-  owned_by : String
+  owned_by : String?
 }
 
 ///|
@@ -403,7 +403,7 @@ pub impl ToJson for Model with fn to_json(self) {
   .field("id", self.id)
   .field("created", json_int64_to_json(self.created))
   .field("object", "model")
-  .field("owned_by", self.owned_by)
+  .opt("owned_by", self.owned_by)
   .build()
 }
 
@@ -421,7 +421,7 @@ pub impl @json.FromJson for Model with fn from_json(value, path) {
       @sdkjson.field(obj, "created", path),
       path.add_key("created"),
     ),
-    owned_by: @sdkjson.field(obj, "owned_by", path),
+    owned_by: @sdkjson.opt_field(obj, "owned_by", path),
   }
 }
 

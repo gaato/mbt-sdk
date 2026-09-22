@@ -1,0 +1,10 @@
+import {
+  "gaato/http",
+  "gaato/http/mock",
+  "gaato/sdk-runtime" @runtime,
+  "gaato/anthropic" @anthropic_sdk,
+  "moonbitlang/async",
+  "moonbitlang/core/encoding/utf8",
+} for "test"
+
+supported_targets = "js + native"

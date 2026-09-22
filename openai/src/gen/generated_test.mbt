@@ -13,7 +13,7 @@ test "generated model decoders accept spec fixtures and Int64 above Int32" {
   assert_eq(listed.data.length(), 1)
   assert_eq(listed.data[0].id, "model-id-0")
   assert_eq(listed.data[0].created, 2147483648L)
-  assert_eq(listed.data[0].owned_by, "organization-owner")
+  assert_eq(listed.data[0].owned_by, Some("organization-owner"))
 
   let model = @gen.retrieve_model_decode(
     response(

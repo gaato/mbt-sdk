@@ -12,6 +12,7 @@ Status: experimental, unpublished. Module names are provisional.
 | `gaato/http-async` | `AsyncTransport` and `AsyncClock` over `moonbitlang/async` (native and js) | `gaato/http`, `moonbitlang/async` |
 | `gaato/sdk-runtime` | API-agnostic client runtime: error taxonomy, `Retry-After` / `retry-after-ms`, backoff, retry policy, rate limiting, pagination, auth, tri-state JSON fields, open enums, multipart writer | `gaato/http` |
 | `gaato/openai` | First consumer: models, embeddings, responses (buffered and streaming). Partly generated from the vendored OpenAPI spec | `gaato/http`, `gaato/sdk-runtime` |
+| `gaato/anthropic` | Second consumer: Anthropic-compatible messages (buffered and streaming), including open content blocks and stream events | `gaato/http`, `gaato/sdk-runtime` |
 | `runtime-tests/` | Unpublished. Executes the async behaviour of the modules above (a module without an async runtime cannot run `async test`) | everything |
 
 SDK modules never import an async runtime: the caller passes a `Transport` and a `Clock`. That keeps them portable and makes retry, rate-limit and streaming logic testable with fakes and a fake clock.
@@ -41,6 +42,7 @@ scripts/generate.sh          # apply overlays and regenerate
 scripts/generate.sh --check  # CI: fail if the committed output is stale
 scripts/gates.sh             # every check and test (native tests open loopback sockets)
 scripts/conformance.sh       # opt-in: the SSE parser, transport and runtime against https://badhttp.dev
+scripts/live.sh              # opt-in: OpenAI and OpenRouter live API tests (never a gate)
 ```
 
 ## Automation
@@ -49,7 +51,7 @@ scripts/conformance.sh       # opt-in: the SSE parser, transport and runtime aga
 - `canary.yml` — the same gates daily on `:latest`; red here with green CI means the language moved.
 - `spec-watch.yml` — daily upstream spec check; on change it re-vendors, regenerates, runs the gates and opens a PR.
 
-Design notes (Japanese): `docs/design.md` (M1), `docs/design-m2.md`, `docs/design-m3.md`, `docs/design-m4.md`. Release procedure: `docs/release.md`. Conventions for coding agents: `AGENTS.md`.
+Design notes (Japanese): `docs/design.md` (M1), `docs/design-m2.md`, `docs/design-m3.md`, `docs/design-m4.md`, `docs/design-m5.md`. Release procedure: `docs/release.md`. Conventions for coding agents: `AGENTS.md`.
 
 ## License
 

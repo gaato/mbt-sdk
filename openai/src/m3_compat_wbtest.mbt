@@ -4,7 +4,7 @@ fn decode_model(value : Json) -> Model raise @json.JsonDecodeError {
   {
     id: decoded.id,
     created: Some(decoded.created),
-    owned_by: Some(decoded.owned_by),
+    owned_by: decoded.owned_by,
   }
 }
 

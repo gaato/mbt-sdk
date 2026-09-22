@@ -1,0 +1,146 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "gaato/anthropic"
+
+import {
+  "gaato/http",
+  "gaato/http/clock",
+  "gaato/sdk-runtime",
+  "moonbitlang/core/debug",
+}
+
+// Values
+pub fn api_error(@sdk-runtime.SdkError) -> ApiErrorBody?
+
+// Errors
+
+// Types and methods
+pub struct Anthropic {
+  // private fields
+}
+pub async fn Anthropic::create_message(Self, MessageRequest) -> MessageResponse raise @sdk-runtime.SdkError
+pub fn Anthropic::from_client(@sdk-runtime.Client, version? : String) -> Self
+pub fn Anthropic::new(api_key~ : String, &@http.Transport, &@clock.Clock, base_url? : String, version? : String, auth_header? : AuthHeader, retry? : @sdk-runtime.RetryPolicy) -> Self
+pub async fn[E : Error] Anthropic::stream_message(Self, MessageRequest, async (MessageEvent) -> Unit raise E) -> Unit
+pub fn Anthropic::to_repr(Self) -> @debug.Repr
+pub impl @debug.Debug for Anthropic
+
+pub(all) struct ApiErrorBody {
+  type_ : String
+  message : String
+} derive(Eq, @debug.Debug)
+pub fn ApiErrorBody::equal(Self, Self) -> Bool
+pub fn ApiErrorBody::not_equal(Self, Self) -> Bool
+pub fn ApiErrorBody::to_repr(Self) -> @debug.Repr
+
+pub(all) enum AuthHeader {
+  XApiKey
+  Bearer
+} derive(Eq, @debug.Debug)
+pub fn AuthHeader::equal(Self, Self) -> Bool
+pub fn AuthHeader::not_equal(Self, Self) -> Bool
+pub fn AuthHeader::to_repr(Self) -> @debug.Repr
+
+pub(all) enum ContentBlock {
+  Text(String)
+  Thinking(String)
+  ToolUse(id~ : String, name~ : String, input~ : Json)
+  Other(String, Json)
+} derive(Eq, @debug.Debug)
+pub fn ContentBlock::equal(Self, Self) -> Bool
+pub fn ContentBlock::not_equal(Self, Self) -> Bool
+pub fn ContentBlock::to_repr(Self) -> @debug.Repr
+
+pub(all) enum InputContent {
+  Text(String)
+  Blocks(Array[Json])
+} derive(Eq, @debug.Debug)
+pub fn InputContent::equal(Self, Self) -> Bool
+pub fn InputContent::not_equal(Self, Self) -> Bool
+pub fn InputContent::to_repr(Self) -> @debug.Repr
+
+pub(all) struct Message {
+  role : Role
+  content : InputContent
+} derive(Eq, @debug.Debug)
+pub fn Message::assistant(String) -> Self
+pub fn Message::equal(Self, Self) -> Bool
+pub fn Message::not_equal(Self, Self) -> Bool
+pub fn Message::to_repr(Self) -> @debug.Repr
+pub fn Message::user(String) -> Self
+
+pub(all) enum MessageEvent {
+  MessageStart(MessageResponse)
+  ContentBlockStart(index~ : Int, block~ : ContentBlock)
+  TextDelta(index~ : Int, text~ : String)
+  ThinkingDelta(index~ : Int, thinking~ : String)
+  InputJsonDelta(index~ : Int, partial_json~ : String)
+  ContentBlockStop(index~ : Int)
+  MessageDelta(stop_reason~ : StopReason?, output_tokens~ : Int?)
+  MessageStop
+  Ping
+  Error(ApiErrorBody)
+  Other(String, Json)
+} derive(Eq, @debug.Debug)
+pub fn MessageEvent::equal(Self, Self) -> Bool
+pub fn MessageEvent::not_equal(Self, Self) -> Bool
+pub fn MessageEvent::to_repr(Self) -> @debug.Repr
+
+pub(all) struct MessageRequest {
+  model : String
+  max_tokens : Int
+  messages : Array[Message]
+  system : String?
+  temperature : Double?
+  stop_sequences : Array[String]?
+  extra : Map[String, Json]
+} derive(Eq, @debug.Debug)
+pub fn MessageRequest::equal(Self, Self) -> Bool
+pub fn MessageRequest::new(model~ : String, max_tokens~ : Int, messages~ : Array[Message], system? : String, temperature? : Double, stop_sequences? : Array[String], extra? : Map[String, Json]) -> Self
+pub fn MessageRequest::not_equal(Self, Self) -> Bool
+pub fn MessageRequest::to_repr(Self) -> @debug.Repr
+
+pub(all) struct MessageResponse {
+  id : String
+  model : String
+  role : Role
+  content : Array[ContentBlock]
+  stop_reason : StopReason?
+  usage : Usage
+  raw : Json
+} derive(Eq, @debug.Debug)
+pub fn MessageResponse::equal(Self, Self) -> Bool
+pub fn MessageResponse::not_equal(Self, Self) -> Bool
+pub fn MessageResponse::text(Self) -> String
+pub fn MessageResponse::to_repr(Self) -> @debug.Repr
+
+pub(all) enum Role {
+  User
+  Assistant
+} derive(Eq, @debug.Debug)
+pub fn Role::equal(Self, Self) -> Bool
+pub fn Role::not_equal(Self, Self) -> Bool
+pub fn Role::to_repr(Self) -> @debug.Repr
+
+pub(all) enum StopReason {
+  EndTurn
+  MaxTokens
+  StopSequence
+  ToolUse
+  Refusal
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+pub fn StopReason::equal(Self, Self) -> Bool
+pub fn StopReason::not_equal(Self, Self) -> Bool
+pub fn StopReason::to_repr(Self) -> @debug.Repr
+
+pub(all) struct Usage {
+  input_tokens : Int
+  output_tokens : Int
+} derive(Eq, @debug.Debug)
+pub fn Usage::equal(Self, Self) -> Bool
+pub fn Usage::not_equal(Self, Self) -> Bool
+pub fn Usage::to_repr(Self) -> @debug.Repr
+
+// Type aliases
+
+// Traits
