@@ -196,3 +196,30 @@ census で (c) に分類した「同じ判別値を複数候補が宣言する�
 - 生成 event が要求する field が欠けた、または型が違う payload は `SdkError::Decode` とし、元の SSE `data` bytes を error body に残す。`@sse.each_event` に close の所有権を残したため、EOF / `[DONE]` / generated decode failure / callback failure の全経路で close される。
 - M4a の byte-order 互換用 embedding body 再構築と `m3_compat_wbtest.mbt` は削除した。request body のテストは parse 後の JSON 等価を契約にし、generator の決定的な field 順を公開 facade の契約にはしない。
 - M4e 向けに記したタグ衝突処理は実装していない。
+
+## M4e: タグ衝突・コンストラクタ・互換 API の緩さ(契約)
+
+M4d の差し替えで見えた生成型の使いにくさと、census の (c) を扱う。
+
+### 1. 同じタグを複数候補が宣言する union
+- 検出: tagged union(明示 discriminator か暗黙の単一値 `type`)で、同じタグ値を持つ候補が 2 個以上あるとき。
+- 第 2 の判別子の自動検出: その候補群の中で「全候補が持ち、各候補で単一値(const / 単一値 enum)で、値が互いに異なる」プロパティがあれば、それで 2 段目に分岐する。バリアント名は `Tag + 第2の値`(例 `MessageUser`、`MessageAssistant`)。`x-moonbit-variants` で上書き可。
+- 無ければ、必須プロパティの集合で区別する: 候補ごとの `required` 集合が互いに包含関係にないなら、デコード時に「required が全部そろう候補」を spec の出現順で最初に採る(注記を出す)。包含関係にある(片方が他方の部分集合)なら、より多く required を持つ候補を先に試す。それでも区別できない候補が残るなら診断(`x-moonbit-order` で試行順を明示させる。`x-moonbit-json` で逃がすのは最後)。
+- どの経路でも `Unknown(String, Json)` は残す。エンコードは候補 struct の `to_json` そのまま。
+- 目標: OpenAI 全操作の (c) 20 件のうち衝突系を解消し、`InputItem` / `Item` / `ItemResource` が生成できること。OpenRouter の `Inputs`(51)/`BaseInputs`(11)/`MessagesContentBlockStartEvent.content_block`(17)も同様。数字を census.md に反映。
+
+### 2. 生成 struct のコンストラクタ
+- すべての生成 struct に `pub fn T::new(required1~, required2~, optional1? , ...) -> T` を生成する。required はラベル付き必須引数、`T?` / `Presence[T]` のフィールドはラベル付き任意引数(既定 `None` / `Absent`)。フィールドが 0 個なら生成しない。名前が `new` と衝突するフィールドが無いことを確認する(衝突したら診断)。
+- 目的: M4d で「`CreateResponse` の未使用 optional を全部書く必要があった」問題の解消。
+
+### 3. 応答側の `required` を緩める規則
+- 互換 API(OpenRouter)は spec の `required` を満たさないことがある(M5 の `owned_by`)。**応答にだけ現れる** struct のフィールドで、`required` かつ非 nullable のものは、`x-moonbit-strict: true` が無い限り `T?` に緩めない。代わりに、デコード失敗のメッセージに「required だが欠落: <path>」を必ず含め、overlay の `remove` で `required` から外す手順を `docs/design-m4.md` に書く(今回の `owned_by` がその例)。判断: 自動で緩めると型の意味が落ちる。欠落は互換 API ごとの事実なので overlay に書く。
+- ただし `status` のように、手書き契約が必須にしていて spec が任意のものはそのまま(M4d の判断を維持)。
+
+### 4. `raw` の保持
+- 生成 struct に `raw` は持たせない(型の意味を壊す)。手書き層が必要なら `Response::json()` を 1 回だけ parse して、生成 decode には parse 済みの `Json` を渡せるよう、`<op>_decode_json(Json) -> T` を `<op>_decode(Response)` と並べて生成する。二重 parse の解消。
+
+### テスト
+- 単体: 第 2 判別子の検出(あり / 値が重複して不採用 / 単一値でなく不採用)、required 集合の順序付け、包含関係、`x-moonbit-order`、コンストラクタの生成と名前衝突、`_decode_json`。
+- 生成物: `InputItem` の `message` 候補(user 入力 / assistant 出力)の往復、未知タグ → `Unknown`。
+- 既存の全テストと `scripts/generate.sh --check` の安定性。
