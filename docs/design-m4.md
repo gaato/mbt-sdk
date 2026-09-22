@@ -134,3 +134,36 @@ M3 の手書きの `list_models` / `retrieve_model` / `create_embeddings` は、
 - `application/octet-stream` など M4b が対応も診断も指定していない request content は body 引数を生成しない。Petstore の `uploadFile` は URL と query を作る request builder になり、binary body は caller が `Request` に追加する。
 - security scheme / operation security は IR に入れない。認証 header は従来どおり runtime の `Auth` が送信時に担当する。
 - union / nullable / discriminator の lowering は変更しない。M4b で必要になった parameter の値変換と helper の必要時生成だけを emitter に追加した。
+
+## M4c: union・nullable・discriminator(契約)
+
+目的: OpenAI の残り 107 件と OpenRouter の 813 件の診断を、**型の意味を落とさずに**減らす。ゴールの数字は「OpenAI 全体で診断ゼロ」「OpenRouter は `createMessages` / `createResponses` / `getModels` / `createEmbeddings` の閉包が診断ゼロ」(全体ゼロは求めない)。その上で `openai/overlays/moonbit.yaml` に `createResponse` の include を戻し、生成された `CreateResponse` / `Response` / `ResponseStreamEvent` 系の型が 3 ターゲットで `--deny-warn` を通ること。M3 の手書き `create_response` / `stream_response` の内部を生成物に差し替えるのは M4d(次)で、ここでは型が生成されるところまで。
+
+### 型の写し方(追記)
+
+| OpenAPI | MoonBit |
+|---|---|
+| 空のスキーマ `{}`、`description` だけのスキーマ | `Json`(注記。スキーマなし object と同じ扱い) |
+| 3.1 の `type: [T, "null"]` | 正規化で `type: T` + nullable に畳む |
+| `anyOf` / `oneOf` の候補に `{type: "null"}` がある | その候補を外して nullable にする。残りが 1 個ならその型(`$ref` でも同じ)。残りが複数なら以下の union 規則 |
+| `nullable: true`(3.0) | 従来どおり(required かつ nullable → `T?`、任意かつ nullable → `Presence[T]`) |
+| `oneOf` + `discriminator`(`propertyName` と `mapping`) | **tagged enum**。バリアント名は mapping のキーを PascalCase にしたもの(`x-moonbit-variants` で上書き可)、ペイロードは mapping 先の struct。デコードは `propertyName` の値で分岐し、未知の値は `Unknown(String, Json)` バリアント(必ず生成する。open enum と同じ思想)。エンコードは struct 側が判別子フィールドを持つのでそのまま。`mapping` が無い場合は `$ref` の末尾名を snake_case にして推定し、注記を出す。判別子の値が `const` / 単一値 enum で struct に書かれていることを検証し、無ければ診断 |
+| discriminator の無い `oneOf` / `anyOf` で、候補が全部 object | 各候補が「単一値 enum の同名プロパティ(典型は `type`)」を持ち、値が互いに異なるなら、そのプロパティを暗黙の判別子として **tagged enum**(上と同じ)。そうでなければ従来どおり JSON の形で区別を試み、できなければ診断。診断メッセージには「候補 N 個、共通の単一値プロパティ無し」と、`x-moonbit-json: true` で逃がす案を書く |
+| `anyOf: [string, string-enum]`(既知の値つき文字列) | 従来どおり `String` に畳む |
+| `allOf` に `$ref` 1 個 + `description` / `nullable` だけの追加 | 参照先の型(3.0 の「$ref に説明を足す」慣用句) |
+| `allOf` の要素が object 以外 | 要素が全部同じプリミティブ型なら制約の合成として素の型。それ以外は診断 |
+| `allOf` で同名プロパティの定義が食い違う | 後勝ちにして注記(診断ではなく) |
+| 整数 enum | `Int` のまま(既存の判断を維持) |
+| 再帰する `$ref`(例: `ChatMessage` → `content` → `ChatMessage`) | MoonBit の enum / struct は再帰できるので、そのまま。ただし `Array[T]` を介さない直接の自己参照 struct フィールドは `T?` か `Presence[T]` でなければ診断 |
+
+### 生成物の形
+
+- tagged enum: `pub(all) enum Tool { Function(FunctionTool); FileSearch(FileSearchTool); Unknown(String, Json) }`。`ToJson` は各ペイロードの `to_json()`、`FromJson` は判別子の値で `match`。
+- 判別子フィールドは struct から**消さない**(spec どおりの struct を保つ。enum の側で読む)。
+
+### census と検証
+
+- `docs/census.md` を更新。OpenAI が 0、OpenRouter の 4 操作の閉包が 0 であることを `tools/gen/census.py --ops <id,...> --expect-zero` で CI のゲートにする(`--ops` を足す)。
+- 単体テスト: 上の表の各行。特に tagged enum の未知の判別子、暗黙の判別子の検出条件(値の重複・単一値でない場合は不採用)、3.1 null 畳み込み、再帰型。
+- 生成物のテスト(`openai/src/gen/*_test.mbt`、手書き): `Response` の実応答 fixture(M5 の実 API テストで得た OpenRouter の応答と、spec の例)をデコードし、`output` の `message` / `reasoning` 両方が読めること。未知の `output` 型が `Unknown` になること。ストリームイベント `response.output_text.delta` などの型が生成され、fixture からデコードできること。
+- サイズの記録: 生成後の `openai/src/gen/` の行数と `moon check` の時間を `docs/census.md` に書く(巨大化の監視。DkStdRestApis の轍を踏まない)。
