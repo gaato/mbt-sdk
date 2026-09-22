@@ -197,8 +197,8 @@ test "chat request conversion validates roles and uses explicit tool_call_id" {
   )
   for
     key in [
-      "model", "messages", "max_tokens", "temperature", "tools", "tool_choice", "stream",
-      "stream_options",
+      "model", "messages", "max_tokens", "temperature", "reasoning_effort", "tools",
+      "tool_choice", "stream", "stream_options",
     ] {
     try
       ignore(
@@ -389,4 +389,26 @@ test "chat decoding retains invalid tool argument JSON as raw text" {
   } noraise {
     _ => fail("invalid arguments_json must fail only when parsed explicitly")
   }
+}
+
+///|
+test "reasoning_effort passes through the open enum, including values newer than the spec" {
+  for effort in ["low", "xhigh", "none"] {
+    let (_, body) = chat_parts(
+      ChatRequest::new(
+        model="g",
+        messages=[ChatMessage::user("hi")],
+        reasoning_effort=effort,
+      ),
+      false,
+    )
+    guard body is Object(fields) else { fail("object body") }
+    assert_eq(fields.get("reasoning_effort"), Some(effort.to_json()))
+  }
+  let (_, body) = chat_parts(
+    ChatRequest::new(model="g", messages=[ChatMessage::user("hi")]),
+    false,
+  )
+  guard body is Object(fields) else { fail("object body") }
+  assert_false(fields.contains("reasoning_effort"))
 }

@@ -249,6 +249,9 @@ pub(all) struct ChatRequest {
   messages : Array[ChatMessage]
   max_tokens : Int?
   temperature : Double?
+  /// Wire value of `reasoning_effort` (`low`, `high`, `xhigh`, ...). Passed
+  /// through as an open enum, so values newer than the vendored spec work.
+  reasoning_effort : String?
   tools : Array[ToolDef]?
   tool_choice : Json?
   extra : Map[String, Json]
@@ -278,6 +281,7 @@ pub fn ChatRequest::new(
   messages~ : Array[ChatMessage],
   max_tokens? : Int,
   temperature? : Double,
+  reasoning_effort? : String,
   tools? : Array[ToolDef],
   tool_choice? : Json,
   extra? : Map[String, Json],
@@ -287,6 +291,7 @@ pub fn ChatRequest::new(
     messages: messages.map(copy_chat_message),
     max_tokens,
     temperature,
+    reasoning_effort,
     tools: tools.map(Array::copy),
     tool_choice,
     extra: extra.map(Map::copy).unwrap_or({}),

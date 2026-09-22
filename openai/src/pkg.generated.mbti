@@ -71,12 +71,13 @@ pub(all) struct ChatRequest {
   messages : Array[ChatMessage]
   max_tokens : Int?
   temperature : Double?
+  reasoning_effort : String?
   tools : Array[ToolDef]?
   tool_choice : Json?
   extra : Map[String, Json]
 } derive(Eq, @debug.Debug)
 pub fn ChatRequest::equal(Self, Self) -> Bool
-pub fn ChatRequest::new(model~ : String, messages~ : Array[ChatMessage], max_tokens? : Int, temperature? : Double, tools? : Array[ToolDef], tool_choice? : Json, extra? : Map[String, Json]) -> Self
+pub fn ChatRequest::new(model~ : String, messages~ : Array[ChatMessage], max_tokens? : Int, temperature? : Double, reasoning_effort? : String, tools? : Array[ToolDef], tool_choice? : Json, extra? : Map[String, Json]) -> Self
 pub fn ChatRequest::not_equal(Self, Self) -> Bool
 pub fn ChatRequest::to_repr(Self) -> @debug.Repr
 

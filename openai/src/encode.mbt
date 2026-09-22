@@ -21,6 +21,7 @@ fn is_chat_key(key : String) -> Bool {
     | "messages"
     | "max_tokens"
     | "temperature"
+    | "reasoning_effort"
     | "tools"
     | "tool_choice"
     | "stream"
@@ -125,6 +126,9 @@ fn chat_parts(
   }
   if request.temperature is Some(value) {
     fields["temperature"] = value.to_json()
+  }
+  if request.reasoning_effort is Some(value) {
+    fields["reasoning_effort"] = value.to_json()
   }
   if request.tools is Some(tools) {
     fields["tools"] = tools.map(chat_tool_json).to_json()
