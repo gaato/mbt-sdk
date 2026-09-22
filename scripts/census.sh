@@ -10,4 +10,4 @@ for spec in specs/*/openapi.json; do
   name="$(basename "$(dirname "$spec")")"
   "${py[@]}" tools/gen/census.py "$spec" "$name"
 done
-"${py[@]}" tools/gen/census.py openai/spec/openai.yaml openai
+"${py[@]}" tools/gen/census.py openai/spec/openai.yaml openai --overlay openai/overlays/fix.yaml

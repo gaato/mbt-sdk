@@ -114,3 +114,14 @@ OpenAI 30 件の内訳は (a) 13、(b) 9、(c) 8。OpenRouter 4-op 14 件の内�
 `openai/src/gen` は M4e 後に合計 **10,468 行**。内訳は `types.mbt` 8,233、`operations.mbt` 154、`generated_test.mbt` 274、`pkg.generated.mbti` 1,799、`moon.pkg` 8。全 struct の constructor と `InputItem` の型生成を含み、15,000 行の監視閾値を下回る。
 
 `moon clean` の直後に実行した `moon -C openai check --target wasm-gc` は **0.31 秒** (`/usr/bin/time` の wall time、28 tasks)。
+
+## fix.yaml の効果(2026-09-22)
+
+`openai/overlays/fix.yaml` は spec 自身が矛盾している箇所だけを直す(各 action に根拠)。census は `--overlay` で適用後の数字も出せる:
+
+| | diagnostics |
+|---|---:|
+| OpenAI all ops、上流のまま | 30 |
+| OpenAI all ops、fix.yaml 適用後 | 24 |
+
+直したもの: Realtime*Session* の `modalities` に欠けていた `type: array`(4 箇所、JSONPath のフィルタで一括)、Transcript*Event の `logprobs.items.bytes` に欠けていた `items: {type: integer}`(2 箇所、`ChatCompletionTokenLogprob.bytes` と説明文が根拠)。`Tool` の discriminator と `WebSearchPreviewTool.type` の食い違い(mapping なし・値が 2 個の enum)は spec の意図が判然としないので直していない。上流が直せば apply_overlay.py が no-op を検出して落ちるので、そのとき action を消す。

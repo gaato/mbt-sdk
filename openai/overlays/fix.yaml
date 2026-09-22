@@ -1,0 +1,27 @@
+# Corrections to the vendored upstream spec. Language-independent: every action
+# names a defect that the spec itself contradicts. tools/apply_overlay.py fails
+# when an action matches nothing or changes nothing, so a fix that upstream has
+# since made surfaces here as an error and must be removed.
+overlay: 1.0.0
+info:
+  title: Upstream corrections for the OpenAI OpenAPI spec (manual_spec branch)
+  version: 0.1.0
+actions:
+  - target: "$['components']['schemas'][?@.properties.modalities.items && !@.properties.modalities.type]['properties']['modalities']"
+    description: >-
+      Realtime*Session* `modalities` declares `items` (and its description says "set this to ["text"]")
+      but omits `type: array`, so the property has no JSON type at all.
+    update:
+      type: array
+  - target: "$['components']['schemas']['TranscriptTextDeltaEvent']['properties']['logprobs']['items']['properties']['bytes']"
+    description: >-
+      `bytes` is `type: array` with no `items`. The sibling chat-completion logprobs schema (ChatCompletionTokenLogprob.bytes)
+      declares `items: {type: integer}`, and the description says these are the UTF-8 bytes of the token.
+    update:
+      items:
+        type: integer
+  - target: "$['components']['schemas']['TranscriptTextDoneEvent']['properties']['logprobs']['items']['properties']['bytes']"
+    description: Same defect as TranscriptTextDeltaEvent.logprobs.items.bytes.
+    update:
+      items:
+        type: integer

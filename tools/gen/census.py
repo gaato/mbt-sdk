@@ -35,9 +35,11 @@ def diagnostic_kind(diagnostic: Diagnostic) -> str:
     return re.sub(r"\[[^\]]*\]", "[...]", diagnostic.reason)
 
 
-def census(spec: str | Path, name: str, *, ops: set[str] | None = None) -> CensusResult:
+def census(
+    spec: str | Path, name: str, *, ops: set[str] | None = None, overlays: list[str] | None = None
+) -> CensusResult:
     """Run the selected-operations generator census without writing files."""
-    doc = normalize_spec(spec, [])
+    doc = normalize_spec(spec, list(overlays or []))
     if ops is None:
         operations = include_all_operations(doc)
     else:
@@ -68,6 +70,7 @@ def parser() -> argparse.ArgumentParser:
     result.add_argument("--expect-zero", action="store_true")
     result.add_argument("--derive-operation-ids", action="store_true")
     result.add_argument("--ops", help="comma-separated operationIds to include")
+    result.add_argument("--overlay", action="append", default=[], help="overlay to apply first (repeatable)")
     return result
 
 
@@ -79,7 +82,7 @@ def run(argv: list[str] | None = None) -> int:
         if not ops:
             parser().error("--ops requires at least one operationId")
     try:
-        result = census(args.spec, args.name, ops=ops)
+        result = census(args.spec, args.name, ops=ops, overlays=args.overlay)
     except ValueError as error:
         parser().error(str(error))
     if args.as_json:
