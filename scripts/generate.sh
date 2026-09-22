@@ -14,3 +14,4 @@ overlays=(); for o in openai/overlays/*.yaml; do overlays+=(--overlay "$o"); don
 "${py[@]}" tools/gen/main.py --spec specs/petstore3/openapi.json \
   --include-all --derive-operation-ids --out fixtures/gen/petstore3/src \
   --package gaato/fixture-petstore3 "$@"
+"${py[@]}" tools/gen/codex.py "$@"

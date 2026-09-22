@@ -1,0 +1,45 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "gaato/codex-app-server"
+
+import {
+  "gaato/codex-protocol/gen",
+  "gaato/jsonrpc",
+  "moonbitlang/async",
+  "moonbitlang/async/io",
+}
+
+// Values
+pub async fn[X] connect(@async.TaskGroup[X], &@io.Reader, &@io.Writer, @gen.InitializeParams, close_writer~ : () -> Unit, handlers? : Handlers, on_event? : async (@gen.Event) -> Unit, timeout_ms? : Int) -> Client
+
+pub async fn[X] spawn(@async.TaskGroup[X], @gen.InitializeParams, program? : String, cwd? : String, extra_env? : Map[String, String], handlers? : Handlers, on_event? : async (@gen.Event) -> Unit, timeout_ms? : Int) -> Session
+
+// Errors
+pub(all) suberror ClientError {
+  AlreadyInitialized
+  InvalidResult(String, String)
+}
+
+// Types and methods
+pub struct Client {
+  info : @gen.InitializeResponse
+  // private fields
+}
+pub async fn[T] Client::call(Self, @gen.Call[T], timeout_ms? : Int) -> T
+pub fn Client::close(Self) -> Unit
+pub fn Client::is_closed(Self) -> Bool
+
+pub struct Handlers {
+  // private fields
+}
+pub fn Handlers::new(command? : async (@gen.CommandExecutionRequestApprovalParams) -> Result[@gen.CommandExecutionRequestApprovalResponse, @jsonrpc.RpcError], file_change? : async (@gen.FileChangeRequestApprovalParams) -> Result[@gen.FileChangeRequestApprovalResponse, @jsonrpc.RpcError], permissions? : async (@gen.PermissionsRequestApprovalParams) -> Result[@gen.PermissionsRequestApprovalResponse, @jsonrpc.RpcError], user_input? : async (@gen.ToolRequestUserInputParams) -> Result[@gen.ToolRequestUserInputResponse, @jsonrpc.RpcError]) -> Self
+
+pub struct Session {
+  client : Client
+  // private fields
+}
+pub async fn Session::shutdown(Self, timeout_ms? : Int) -> Int
+
+// Type aliases
+pub type EventHandler = async (@gen.Event) -> Unit
+
+// Traits

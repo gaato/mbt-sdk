@@ -3,6 +3,8 @@ members = [
   "http-async",
   "jsonrpc",
   "jsonrpc-async",
+  "codex-protocol",
+  "codex-app-server",
   "sdk-runtime",
   "openai",
   "anthropic",

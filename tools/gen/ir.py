@@ -104,7 +104,21 @@ class Newtype:
     description: str = ""
 
 
-Declaration = Struct | StringEnum | UntaggedUnion | TaggedUnion | Newtype
+@dataclass(frozen=True)
+class ExternalVariant:
+    name: str
+    tag: str
+    type: TypeRef | None
+
+
+@dataclass(frozen=True)
+class ExternalUnion:
+    name: str
+    variants: tuple[ExternalVariant, ...]
+    description: str = ""
+
+
+Declaration = Struct | StringEnum | UntaggedUnion | TaggedUnion | ExternalUnion | Newtype
 
 
 @dataclass(frozen=True)
@@ -158,6 +172,7 @@ class IR:
 
 
 RESERVED = {
+    "namespace",
     "as",
     "async",
     "break",

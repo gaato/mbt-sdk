@@ -12,12 +12,14 @@ Status: experimental, unpublished. Module names are provisional.
 | `gaato/http-async` | `AsyncTransport` and `AsyncClock` over `moonbitlang/async` (native and js) | `gaato/http`, `moonbitlang/async` |
 | `gaato/jsonrpc` | Sans-IO JSON-RPC 2.0 vocabulary: `Message`, `RequestId`, `RpcError`, strict (`"jsonrpc":"2.0"`) and bare (codex app-server) envelopes, NDJSON encoding, an incremental `LineFramer` | nothing (runs on wasm-gc, wasm, js, native) |
 | `gaato/jsonrpc-async` | Bidirectional `Connection` over any `moonbitlang/async` reader/writer pair, plus `spawn_child` for JSON-RPC over a child process's stdio (native); the base for ACP and codex app-server clients | `gaato/jsonrpc`, `moonbitlang/async` |
+| `gaato/codex-protocol` | Codex app-server v2 types, typed calls and events generated from a pinned CLI JSON Schema | `gaato/sdk-runtime` (JSON helpers only) |
+| `gaato/codex-app-server` | Initialized Codex connections, native stdio sessions, progress events and explicit approval/user-input handlers; [usage and scope](codex-app-server/README.md) | `gaato/codex-protocol`, `gaato/jsonrpc-async`, `moonbitlang/async` |
 | `gaato/sdk-runtime` | API-agnostic client runtime: error taxonomy, `Retry-After` / `retry-after-ms`, backoff, retry policy, rate limiting, pagination, auth, tri-state JSON fields, open enums, multipart writer | `gaato/http` |
 | `gaato/openai` | First consumer: a stable hand-written facade for models, embeddings, Responses, and Chat Completions (buffered and streaming), backed by types and operations generated from the vendored OpenAPI spec | `gaato/http`, `gaato/sdk-runtime` |
 | `gaato/anthropic` | Second consumer: Anthropic-compatible messages (buffered and streaming), including open content blocks and stream events | `gaato/http`, `gaato/sdk-runtime` |
 | `runtime-tests/` | Unpublished. Executes the async behaviour of the modules above (a module without an async runtime cannot run `async test`) | everything |
 
-SDK modules never import an async runtime: the caller passes a `Transport` and a `Clock`. That keeps them portable and makes retry, rate-limit and streaming logic testable with fakes and a fake clock.
+HTTP SDK modules never import an async runtime: the caller passes a `Transport` and a `Clock`. That keeps them portable and makes retry, rate-limit and streaming logic testable with fakes and a fake clock. The Codex SDK keeps generated protocol types portable and puts connection/process ownership in a separate async module.
 
 ```moonbit
 let transport = @http_async.AsyncTransport::new()
@@ -40,6 +42,7 @@ openai/spec/openai.yaml → overlays/fix.yaml → overlays/moonbit.yaml → norm
 - Overlays follow the [OpenAPI Overlay Specification](https://spec.openapis.org/overlay/latest.html). `tools/apply_overlay.py` fails on actions that match nothing or change nothing, so stale corrections surface instead of silently doing nothing.
 - The generator supports JSON and multipart request bodies, form and deep-object query parameters, and tagged unions including disjoint tag-value sets. It refuses unsupported shapes (with a JSON pointer and an overlay annotation) instead of silently degrading to `Json`.
 - Generated code is committed; users do not need Python.
+- Codex uses `codex-protocol/spec/schema.json` → selected JSON Schema reference closure → shared IR/emitter → `codex-protocol/src/gen`. The schema is pinned to CLI 0.155.1; regeneration is offline and is covered by the same `--check` gate.
 
 ```fish
 scripts/generate.sh          # apply overlays and regenerate

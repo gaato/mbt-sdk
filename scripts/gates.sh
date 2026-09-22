@@ -19,13 +19,13 @@ io_targets=(native); [ "$js" = 1 ] && io_targets+=(js)
 run() { echo "+ $*"; "$@"; }
 
 run moon update
-for m in http jsonrpc sdk-runtime openai anthropic; do
+for m in http jsonrpc sdk-runtime openai anthropic codex-protocol; do
   for t in "${all_targets[@]}"; do run moon -C "$m" check --deny-warn --target "$t"; done
 done
 for m in fixtures/gen/badhttp fixtures/gen/petstore3; do
   for t in "${all_targets[@]}"; do run moon -C "$m" check --deny-warn --target "$t"; done
 done
-for m in http-async jsonrpc-async runtime-tests; do
+for m in http-async jsonrpc-async codex-app-server runtime-tests; do
   for t in "${io_targets[@]}"; do run moon -C "$m" check --deny-warn --target "$t"; done
 done
 

@@ -1,0 +1,19 @@
+supported_targets = "js + native"
+
+import {
+  "gaato/codex-protocol/gen" @protocol,
+  "gaato/jsonrpc",
+  "gaato/jsonrpc-async" @rpc,
+  "moonbitlang/async",
+  "moonbitlang/async/io",
+  "moonbitlang/core/json",
+}
+
+import {
+  "gaato/codex-app-server" @codex,
+  "moonbitlang/async/aqueue",
+} for "test"
+
+options(
+  targets: { "child.mbt": [ "native" ], "child_test.mbt": [ "native" ] },
+)

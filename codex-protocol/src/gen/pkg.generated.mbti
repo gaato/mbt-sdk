@@ -1,0 +1,2096 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "gaato/codex-protocol/gen"
+
+// Values
+pub fn initialize(InitializeParams) -> Call[InitializeResponse]
+
+pub fn thread_resume(ThreadResumeParams) -> Call[ThreadResumeResponse]
+
+pub fn thread_start(ThreadStartParams) -> Call[ThreadStartResponse]
+
+pub fn turn_interrupt(TurnInterruptParams) -> Call[Json]
+
+pub fn turn_start(TurnStartParams) -> Call[TurnStartResponse]
+
+// Errors
+
+// Types and methods
+pub(all) struct AdditionalFileSystemPermissions {
+  entries : @gaato/sdk-runtime/json.Presence[Array[FileSystemSandboxEntry]]
+  glob_scan_max_depth : @gaato/sdk-runtime/json.Presence[UInt64Number]
+  read : @gaato/sdk-runtime/json.Presence[Array[String]]
+  write : @gaato/sdk-runtime/json.Presence[Array[String]]
+}
+pub fn AdditionalFileSystemPermissions::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn AdditionalFileSystemPermissions::new(entries? : Array[FileSystemSandboxEntry], glob_scan_max_depth? : UInt64Number, read? : Array[String], write? : Array[String]) -> Self
+pub fn AdditionalFileSystemPermissions::to_json(Self) -> Json
+pub impl ToJson for AdditionalFileSystemPermissions
+pub impl @moonbitlang/core/json.FromJson for AdditionalFileSystemPermissions
+
+pub(all) struct AdditionalNetworkPermissions {
+  enabled : @gaato/sdk-runtime/json.Presence[Bool]
+}
+pub fn AdditionalNetworkPermissions::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn AdditionalNetworkPermissions::new(enabled? : Bool) -> Self
+pub fn AdditionalNetworkPermissions::to_json(Self) -> Json
+pub impl ToJson for AdditionalNetworkPermissions
+pub impl @moonbitlang/core/json.FromJson for AdditionalNetworkPermissions
+
+pub(all) struct AgentMessageDeltaNotification {
+  delta : String
+  item_id : String
+  thread_id : String
+  turn_id : String
+}
+pub fn AgentMessageDeltaNotification::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn AgentMessageDeltaNotification::new(delta~ : String, item_id~ : String, thread_id~ : String, turn_id~ : String) -> Self
+pub fn AgentMessageDeltaNotification::to_json(Self) -> Json
+pub impl ToJson for AgentMessageDeltaNotification
+pub impl @moonbitlang/core/json.FromJson for AgentMessageDeltaNotification
+
+pub(all) enum ApprovalsReviewer {
+  User
+  AutoReview
+  GuardianSubagent
+  Unknown(String)
+}
+pub fn ApprovalsReviewer::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ApprovalsReviewer::to_json(Self) -> Json
+pub impl ToJson for ApprovalsReviewer
+pub impl @moonbitlang/core/json.FromJson for ApprovalsReviewer
+
+pub(all) enum AskForApproval {
+  Untrusted
+  OnRequest
+  Never
+  Granular(AskForApprovalGranular)
+  UnknownValue(Json)
+}
+pub fn AskForApproval::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn AskForApproval::to_json(Self) -> Json
+pub impl ToJson for AskForApproval
+pub impl @moonbitlang/core/json.FromJson for AskForApproval
+
+pub(all) struct AskForApprovalGranular {
+  mcp_elicitations : Bool
+  request_permissions : Bool?
+  rules : Bool
+  sandbox_approval : Bool
+  skill_approval : Bool?
+}
+pub fn AskForApprovalGranular::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn AskForApprovalGranular::new(mcp_elicitations~ : Bool, rules~ : Bool, sandbox_approval~ : Bool, request_permissions? : Bool, skill_approval? : Bool) -> Self
+pub fn AskForApprovalGranular::to_json(Self) -> Json
+pub impl ToJson for AskForApprovalGranular
+pub impl @moonbitlang/core/json.FromJson for AskForApprovalGranular
+
+pub(all) struct AsyncUserInputQuestion {
+  options : @gaato/sdk-runtime/json.Presence[Array[String]]
+  title : String
+}
+pub fn AsyncUserInputQuestion::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn AsyncUserInputQuestion::new(title~ : String, options? : Array[String]) -> Self
+pub fn AsyncUserInputQuestion::to_json(Self) -> Json
+pub impl ToJson for AsyncUserInputQuestion
+pub impl @moonbitlang/core/json.FromJson for AsyncUserInputQuestion
+
+pub(all) struct ByteRange {
+  end : UInt64Number
+  start : UInt64Number
+}
+pub fn ByteRange::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ByteRange::new(end~ : UInt64Number, start~ : UInt64Number) -> Self
+pub fn ByteRange::to_json(Self) -> Json
+pub impl ToJson for ByteRange
+pub impl @moonbitlang/core/json.FromJson for ByteRange
+
+pub struct Call[T] {
+  name : String
+  params : Json
+  decode : (Json) -> T raise @moonbitlang/core/json.JsonDecodeError
+}
+
+pub(all) struct ClientInfo {
+  name : String
+  title : @gaato/sdk-runtime/json.Presence[String]
+  version : String
+}
+pub fn ClientInfo::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ClientInfo::new(name~ : String, version~ : String, title? : String) -> Self
+pub fn ClientInfo::to_json(Self) -> Json
+pub impl ToJson for ClientInfo
+pub impl @moonbitlang/core/json.FromJson for ClientInfo
+
+pub(all) enum CodexErrorInfo {
+  ContextWindowExceeded
+  SessionBudgetExceeded
+  UsageLimitExceeded
+  RateLimitExceeded
+  ServerOverloaded
+  CyberPolicy
+  MisalignmentPolicyViolation
+  InternalServerError
+  Unauthorized
+  BadRequest
+  ThreadRollbackFailed
+  SandboxError
+  Other
+  HttpConnectionFailed(CodexErrorInfoHttpConnectionFailed)
+  ResponseStreamConnectionFailed(CodexErrorInfoResponseStreamConnectionFailed)
+  ResponseStreamDisconnected(CodexErrorInfoResponseStreamDisconnected)
+  ResponseTooManyFailedAttempts(CodexErrorInfoResponseTooManyFailedAttempts)
+  ActiveTurnNotSteerable(CodexErrorInfoActiveTurnNotSteerable)
+  UnknownValue(Json)
+}
+pub fn CodexErrorInfo::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn CodexErrorInfo::to_json(Self) -> Json
+pub impl ToJson for CodexErrorInfo
+pub impl @moonbitlang/core/json.FromJson for CodexErrorInfo
+
+pub(all) struct CodexErrorInfoActiveTurnNotSteerable {
+  turn_kind : NonSteerableTurnKind
+}
+pub fn CodexErrorInfoActiveTurnNotSteerable::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn CodexErrorInfoActiveTurnNotSteerable::new(turn_kind~ : NonSteerableTurnKind) -> Self
+pub fn CodexErrorInfoActiveTurnNotSteerable::to_json(Self) -> Json
+pub impl ToJson for CodexErrorInfoActiveTurnNotSteerable
+pub impl @moonbitlang/core/json.FromJson for CodexErrorInfoActiveTurnNotSteerable
+
+pub(all) struct CodexErrorInfoHttpConnectionFailed {
+  http_status_code : @gaato/sdk-runtime/json.Presence[Int]
+}
+pub fn CodexErrorInfoHttpConnectionFailed::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn CodexErrorInfoHttpConnectionFailed::new(http_status_code? : Int) -> Self
+pub fn CodexErrorInfoHttpConnectionFailed::to_json(Self) -> Json
+pub impl ToJson for CodexErrorInfoHttpConnectionFailed
+pub impl @moonbitlang/core/json.FromJson for CodexErrorInfoHttpConnectionFailed
+
+pub(all) struct CodexErrorInfoResponseStreamConnectionFailed {
+  http_status_code : @gaato/sdk-runtime/json.Presence[Int]
+}
+pub fn CodexErrorInfoResponseStreamConnectionFailed::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn CodexErrorInfoResponseStreamConnectionFailed::new(http_status_code? : Int) -> Self
+pub fn CodexErrorInfoResponseStreamConnectionFailed::to_json(Self) -> Json
+pub impl ToJson for CodexErrorInfoResponseStreamConnectionFailed
+pub impl @moonbitlang/core/json.FromJson for CodexErrorInfoResponseStreamConnectionFailed
+
+pub(all) struct CodexErrorInfoResponseStreamDisconnected {
+  http_status_code : @gaato/sdk-runtime/json.Presence[Int]
+}
+pub fn CodexErrorInfoResponseStreamDisconnected::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn CodexErrorInfoResponseStreamDisconnected::new(http_status_code? : Int) -> Self
+pub fn CodexErrorInfoResponseStreamDisconnected::to_json(Self) -> Json
+pub impl ToJson for CodexErrorInfoResponseStreamDisconnected
+pub impl @moonbitlang/core/json.FromJson for CodexErrorInfoResponseStreamDisconnected
+
+pub(all) struct CodexErrorInfoResponseTooManyFailedAttempts {
+  http_status_code : @gaato/sdk-runtime/json.Presence[Int]
+}
+pub fn CodexErrorInfoResponseTooManyFailedAttempts::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn CodexErrorInfoResponseTooManyFailedAttempts::new(http_status_code? : Int) -> Self
+pub fn CodexErrorInfoResponseTooManyFailedAttempts::to_json(Self) -> Json
+pub impl ToJson for CodexErrorInfoResponseTooManyFailedAttempts
+pub impl @moonbitlang/core/json.FromJson for CodexErrorInfoResponseTooManyFailedAttempts
+
+pub(all) struct CollabAgentState {
+  message : @gaato/sdk-runtime/json.Presence[String]
+  status : CollabAgentStatus
+}
+pub fn CollabAgentState::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn CollabAgentState::new(status~ : CollabAgentStatus, message? : String) -> Self
+pub fn CollabAgentState::to_json(Self) -> Json
+pub impl ToJson for CollabAgentState
+pub impl @moonbitlang/core/json.FromJson for CollabAgentState
+
+pub(all) enum CollabAgentStatus {
+  PendingInit
+  Running
+  Interrupted
+  Completed
+  Errored
+  Shutdown
+  NotFound
+  Unknown(String)
+}
+pub fn CollabAgentStatus::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn CollabAgentStatus::to_json(Self) -> Json
+pub impl ToJson for CollabAgentStatus
+pub impl @moonbitlang/core/json.FromJson for CollabAgentStatus
+
+pub(all) enum CollabAgentTool {
+  SpawnAgent
+  SendInput
+  ResumeAgent
+  Wait
+  CloseAgent
+  SendMessage
+  FollowupTask
+  InterruptAgent
+  ListAgents
+  Unknown(String)
+}
+pub fn CollabAgentTool::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn CollabAgentTool::to_json(Self) -> Json
+pub impl ToJson for CollabAgentTool
+pub impl @moonbitlang/core/json.FromJson for CollabAgentTool
+
+pub(all) enum CollabAgentToolCallStatus {
+  InProgress
+  Completed
+  Failed
+  Interrupted
+  Unknown(String)
+}
+pub fn CollabAgentToolCallStatus::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn CollabAgentToolCallStatus::to_json(Self) -> Json
+pub impl ToJson for CollabAgentToolCallStatus
+pub impl @moonbitlang/core/json.FromJson for CollabAgentToolCallStatus
+
+pub(all) enum CommandAction {
+  Read(CommandActionRead)
+  ListFiles(CommandActionListFiles)
+  Search(CommandActionSearch)
+  KnownUnknown(CommandActionKnownUnknown)
+  Unknown(String, Json)
+}
+pub fn CommandAction::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn CommandAction::to_json(Self) -> Json
+pub impl ToJson for CommandAction
+pub impl @moonbitlang/core/json.FromJson for CommandAction
+
+pub(all) struct CommandActionKnownUnknown {
+  command : String
+  type_ : String
+}
+pub fn CommandActionKnownUnknown::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn CommandActionKnownUnknown::new(command~ : String, type_~ : String) -> Self
+pub fn CommandActionKnownUnknown::to_json(Self) -> Json
+pub impl ToJson for CommandActionKnownUnknown
+pub impl @moonbitlang/core/json.FromJson for CommandActionKnownUnknown
+
+pub(all) struct CommandActionListFiles {
+  command : String
+  path : @gaato/sdk-runtime/json.Presence[String]
+  type_ : String
+}
+pub fn CommandActionListFiles::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn CommandActionListFiles::new(command~ : String, type_~ : String, path? : String) -> Self
+pub fn CommandActionListFiles::to_json(Self) -> Json
+pub impl ToJson for CommandActionListFiles
+pub impl @moonbitlang/core/json.FromJson for CommandActionListFiles
+
+pub(all) struct CommandActionRead {
+  command : String
+  name : String
+  path : String
+  type_ : String
+}
+pub fn CommandActionRead::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn CommandActionRead::new(command~ : String, name~ : String, path~ : String, type_~ : String) -> Self
+pub fn CommandActionRead::to_json(Self) -> Json
+pub impl ToJson for CommandActionRead
+pub impl @moonbitlang/core/json.FromJson for CommandActionRead
+
+pub(all) struct CommandActionSearch {
+  command : String
+  path : @gaato/sdk-runtime/json.Presence[String]
+  query : @gaato/sdk-runtime/json.Presence[String]
+  type_ : String
+}
+pub fn CommandActionSearch::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn CommandActionSearch::new(command~ : String, type_~ : String, path? : String, query? : String) -> Self
+pub fn CommandActionSearch::to_json(Self) -> Json
+pub impl ToJson for CommandActionSearch
+pub impl @moonbitlang/core/json.FromJson for CommandActionSearch
+
+pub(all) enum CommandExecutionApprovalDecision {
+  Accept
+  AcceptForSession
+  AcceptWithExecpolicyAmendment(CommandExecutionApprovalDecisionAcceptWithExecpolicyAmendment)
+  ApplyNetworkPolicyAmendment(CommandExecutionApprovalDecisionApplyNetworkPolicyAmendment)
+  Decline
+  Cancel
+  UnknownValue(Json)
+}
+pub fn CommandExecutionApprovalDecision::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn CommandExecutionApprovalDecision::to_json(Self) -> Json
+pub impl ToJson for CommandExecutionApprovalDecision
+pub impl @moonbitlang/core/json.FromJson for CommandExecutionApprovalDecision
+
+pub(all) struct CommandExecutionApprovalDecisionAcceptWithExecpolicyAmendment {
+  execpolicy_amendment : Array[String]
+}
+pub fn CommandExecutionApprovalDecisionAcceptWithExecpolicyAmendment::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn CommandExecutionApprovalDecisionAcceptWithExecpolicyAmendment::new(execpolicy_amendment~ : Array[String]) -> Self
+pub fn CommandExecutionApprovalDecisionAcceptWithExecpolicyAmendment::to_json(Self) -> Json
+pub impl ToJson for CommandExecutionApprovalDecisionAcceptWithExecpolicyAmendment
+pub impl @moonbitlang/core/json.FromJson for CommandExecutionApprovalDecisionAcceptWithExecpolicyAmendment
+
+pub(all) struct CommandExecutionApprovalDecisionApplyNetworkPolicyAmendment {
+  network_policy_amendment : NetworkPolicyAmendment
+}
+pub fn CommandExecutionApprovalDecisionApplyNetworkPolicyAmendment::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn CommandExecutionApprovalDecisionApplyNetworkPolicyAmendment::new(network_policy_amendment~ : NetworkPolicyAmendment) -> Self
+pub fn CommandExecutionApprovalDecisionApplyNetworkPolicyAmendment::to_json(Self) -> Json
+pub impl ToJson for CommandExecutionApprovalDecisionApplyNetworkPolicyAmendment
+pub impl @moonbitlang/core/json.FromJson for CommandExecutionApprovalDecisionApplyNetworkPolicyAmendment
+
+pub(all) enum CommandExecutionApprovalKind {
+  Command
+  WriteStdin
+  Unknown(String)
+}
+pub fn CommandExecutionApprovalKind::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn CommandExecutionApprovalKind::to_json(Self) -> Json
+pub impl ToJson for CommandExecutionApprovalKind
+pub impl @moonbitlang/core/json.FromJson for CommandExecutionApprovalKind
+
+pub(all) struct CommandExecutionRequestApprovalParams {
+  approval_id : @gaato/sdk-runtime/json.Presence[String]
+  command : @gaato/sdk-runtime/json.Presence[String]
+  command_actions : @gaato/sdk-runtime/json.Presence[Array[CommandAction]]
+  cwd : @gaato/sdk-runtime/json.Presence[String]
+  environment_id : @gaato/sdk-runtime/json.Presence[String]
+  item_id : String
+  kind : CommandExecutionApprovalKind?
+  network_approval_context : @gaato/sdk-runtime/json.Presence[NetworkApprovalContext]
+  proposed_execpolicy_amendment : @gaato/sdk-runtime/json.Presence[Array[String]]
+  proposed_network_policy_amendments : @gaato/sdk-runtime/json.Presence[Array[NetworkPolicyAmendment]]
+  reason : @gaato/sdk-runtime/json.Presence[String]
+  started_at_ms : Int64
+  thread_id : String
+  turn_id : String
+}
+pub fn CommandExecutionRequestApprovalParams::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn CommandExecutionRequestApprovalParams::new(item_id~ : String, started_at_ms~ : Int64, thread_id~ : String, turn_id~ : String, approval_id? : String, command? : String, command_actions? : Array[CommandAction], cwd? : String, environment_id? : String, kind? : CommandExecutionApprovalKind, network_approval_context? : NetworkApprovalContext, proposed_execpolicy_amendment? : Array[String], proposed_network_policy_amendments? : Array[NetworkPolicyAmendment], reason? : String) -> Self
+pub fn CommandExecutionRequestApprovalParams::to_json(Self) -> Json
+pub impl ToJson for CommandExecutionRequestApprovalParams
+pub impl @moonbitlang/core/json.FromJson for CommandExecutionRequestApprovalParams
+
+pub(all) struct CommandExecutionRequestApprovalResponse {
+  decision : CommandExecutionApprovalDecision
+}
+pub fn CommandExecutionRequestApprovalResponse::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn CommandExecutionRequestApprovalResponse::new(decision~ : CommandExecutionApprovalDecision) -> Self
+pub fn CommandExecutionRequestApprovalResponse::to_json(Self) -> Json
+pub impl ToJson for CommandExecutionRequestApprovalResponse
+pub impl @moonbitlang/core/json.FromJson for CommandExecutionRequestApprovalResponse
+
+pub(all) enum CommandExecutionSource {
+  Agent
+  UserShell
+  UnifiedExecStartup
+  UnifiedExecInteraction
+  Unknown(String)
+}
+pub fn CommandExecutionSource::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn CommandExecutionSource::to_json(Self) -> Json
+pub impl ToJson for CommandExecutionSource
+pub impl @moonbitlang/core/json.FromJson for CommandExecutionSource
+
+pub(all) enum CommandExecutionStatus {
+  InProgress
+  Completed
+  Failed
+  Declined
+  Unknown(String)
+}
+pub fn CommandExecutionStatus::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn CommandExecutionStatus::to_json(Self) -> Json
+pub impl ToJson for CommandExecutionStatus
+pub impl @moonbitlang/core/json.FromJson for CommandExecutionStatus
+
+pub(all) enum DynamicToolCallOutputContentItem {
+  InputText(DynamicToolCallOutputContentItemInputText)
+  InputImage(DynamicToolCallOutputContentItemInputImage)
+  InputAudio(DynamicToolCallOutputContentItemInputAudio)
+  Unknown(String, Json)
+}
+pub fn DynamicToolCallOutputContentItem::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn DynamicToolCallOutputContentItem::to_json(Self) -> Json
+pub impl ToJson for DynamicToolCallOutputContentItem
+pub impl @moonbitlang/core/json.FromJson for DynamicToolCallOutputContentItem
+
+pub(all) struct DynamicToolCallOutputContentItemInputAudio {
+  audio_url : String
+  type_ : String
+}
+pub fn DynamicToolCallOutputContentItemInputAudio::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn DynamicToolCallOutputContentItemInputAudio::new(audio_url~ : String, type_~ : String) -> Self
+pub fn DynamicToolCallOutputContentItemInputAudio::to_json(Self) -> Json
+pub impl ToJson for DynamicToolCallOutputContentItemInputAudio
+pub impl @moonbitlang/core/json.FromJson for DynamicToolCallOutputContentItemInputAudio
+
+pub(all) struct DynamicToolCallOutputContentItemInputImage {
+  image_url : String
+  type_ : String
+}
+pub fn DynamicToolCallOutputContentItemInputImage::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn DynamicToolCallOutputContentItemInputImage::new(image_url~ : String, type_~ : String) -> Self
+pub fn DynamicToolCallOutputContentItemInputImage::to_json(Self) -> Json
+pub impl ToJson for DynamicToolCallOutputContentItemInputImage
+pub impl @moonbitlang/core/json.FromJson for DynamicToolCallOutputContentItemInputImage
+
+pub(all) struct DynamicToolCallOutputContentItemInputText {
+  text : String
+  type_ : String
+}
+pub fn DynamicToolCallOutputContentItemInputText::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn DynamicToolCallOutputContentItemInputText::new(text~ : String, type_~ : String) -> Self
+pub fn DynamicToolCallOutputContentItemInputText::to_json(Self) -> Json
+pub impl ToJson for DynamicToolCallOutputContentItemInputText
+pub impl @moonbitlang/core/json.FromJson for DynamicToolCallOutputContentItemInputText
+
+pub(all) enum DynamicToolCallStatus {
+  InProgress
+  Completed
+  Failed
+  Unknown(String)
+}
+pub fn DynamicToolCallStatus::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn DynamicToolCallStatus::to_json(Self) -> Json
+pub impl ToJson for DynamicToolCallStatus
+pub impl @moonbitlang/core/json.FromJson for DynamicToolCallStatus
+
+pub(all) struct ErrorNotification {
+  error : TurnError
+  thread_id : String
+  turn_id : String
+  will_retry : Bool
+}
+pub fn ErrorNotification::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ErrorNotification::new(error~ : TurnError, thread_id~ : String, turn_id~ : String, will_retry~ : Bool) -> Self
+pub fn ErrorNotification::to_json(Self) -> Json
+pub impl ToJson for ErrorNotification
+pub impl @moonbitlang/core/json.FromJson for ErrorNotification
+
+pub(all) enum Event {
+  Error(ErrorNotification)
+  ThreadStarted(ThreadStartedNotification)
+  TurnStarted(TurnStartedNotification)
+  TurnCompleted(TurnCompletedNotification)
+  ItemStarted(ItemStartedNotification)
+  ItemCompleted(ItemCompletedNotification)
+  ItemAgentMessageDelta(AgentMessageDeltaNotification)
+  Unknown(String, Json?)
+}
+pub fn Event::decode(String, Json?) -> Self raise @moonbitlang/core/json.JsonDecodeError
+
+pub(all) enum FileChangeApprovalDecision {
+  Accept
+  AcceptForSession
+  Decline
+  Cancel
+  Custom(String)
+}
+pub fn FileChangeApprovalDecision::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn FileChangeApprovalDecision::to_json(Self) -> Json
+pub impl ToJson for FileChangeApprovalDecision
+pub impl @moonbitlang/core/json.FromJson for FileChangeApprovalDecision
+
+pub(all) struct FileChangeRequestApprovalParams {
+  grant_root : @gaato/sdk-runtime/json.Presence[String]
+  item_id : String
+  reason : @gaato/sdk-runtime/json.Presence[String]
+  started_at_ms : Int64
+  thread_id : String
+  turn_id : String
+}
+pub fn FileChangeRequestApprovalParams::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn FileChangeRequestApprovalParams::new(item_id~ : String, started_at_ms~ : Int64, thread_id~ : String, turn_id~ : String, grant_root? : String, reason? : String) -> Self
+pub fn FileChangeRequestApprovalParams::to_json(Self) -> Json
+pub impl ToJson for FileChangeRequestApprovalParams
+pub impl @moonbitlang/core/json.FromJson for FileChangeRequestApprovalParams
+
+pub(all) struct FileChangeRequestApprovalResponse {
+  decision : FileChangeApprovalDecision
+}
+pub fn FileChangeRequestApprovalResponse::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn FileChangeRequestApprovalResponse::new(decision~ : FileChangeApprovalDecision) -> Self
+pub fn FileChangeRequestApprovalResponse::to_json(Self) -> Json
+pub impl ToJson for FileChangeRequestApprovalResponse
+pub impl @moonbitlang/core/json.FromJson for FileChangeRequestApprovalResponse
+
+pub(all) enum FileSystemAccessMode {
+  Read
+  Write
+  Deny
+  Unknown(String)
+}
+pub fn FileSystemAccessMode::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn FileSystemAccessMode::to_json(Self) -> Json
+pub impl ToJson for FileSystemAccessMode
+pub impl @moonbitlang/core/json.FromJson for FileSystemAccessMode
+
+pub(all) enum FileSystemPath {
+  Path(FileSystemPathPath)
+  GlobPattern(FileSystemPathGlobPattern)
+  Special(FileSystemPathSpecial)
+  Unknown(String, Json)
+}
+pub fn FileSystemPath::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn FileSystemPath::to_json(Self) -> Json
+pub impl ToJson for FileSystemPath
+pub impl @moonbitlang/core/json.FromJson for FileSystemPath
+
+pub(all) struct FileSystemPathGlobPattern {
+  pattern : String
+  type_ : String
+}
+pub fn FileSystemPathGlobPattern::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn FileSystemPathGlobPattern::new(pattern~ : String, type_~ : String) -> Self
+pub fn FileSystemPathGlobPattern::to_json(Self) -> Json
+pub impl ToJson for FileSystemPathGlobPattern
+pub impl @moonbitlang/core/json.FromJson for FileSystemPathGlobPattern
+
+pub(all) struct FileSystemPathPath {
+  path : String
+  type_ : String
+}
+pub fn FileSystemPathPath::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn FileSystemPathPath::new(path~ : String, type_~ : String) -> Self
+pub fn FileSystemPathPath::to_json(Self) -> Json
+pub impl ToJson for FileSystemPathPath
+pub impl @moonbitlang/core/json.FromJson for FileSystemPathPath
+
+pub(all) struct FileSystemPathSpecial {
+  type_ : String
+  value : FileSystemSpecialPath
+}
+pub fn FileSystemPathSpecial::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn FileSystemPathSpecial::new(type_~ : String, value~ : FileSystemSpecialPath) -> Self
+pub fn FileSystemPathSpecial::to_json(Self) -> Json
+pub impl ToJson for FileSystemPathSpecial
+pub impl @moonbitlang/core/json.FromJson for FileSystemPathSpecial
+
+pub(all) struct FileSystemSandboxEntry {
+  access : FileSystemAccessMode
+  path : FileSystemPath
+}
+pub fn FileSystemSandboxEntry::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn FileSystemSandboxEntry::new(access~ : FileSystemAccessMode, path~ : FileSystemPath) -> Self
+pub fn FileSystemSandboxEntry::to_json(Self) -> Json
+pub impl ToJson for FileSystemSandboxEntry
+pub impl @moonbitlang/core/json.FromJson for FileSystemSandboxEntry
+
+pub(all) enum FileSystemSpecialPath {
+  Root(FileSystemSpecialPathRoot)
+  Minimal(FileSystemSpecialPathMinimal)
+  ProjectRoots(FileSystemSpecialPathProjectRoots)
+  Tmpdir(FileSystemSpecialPathTmpdir)
+  SlashTmp(FileSystemSpecialPathSlashTmp)
+  KnownUnknown(FileSystemSpecialPathKnownUnknown)
+  Unknown(String, Json)
+}
+pub fn FileSystemSpecialPath::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn FileSystemSpecialPath::to_json(Self) -> Json
+pub impl ToJson for FileSystemSpecialPath
+pub impl @moonbitlang/core/json.FromJson for FileSystemSpecialPath
+
+pub(all) struct FileSystemSpecialPathKnownUnknown {
+  kind : String
+  path : String
+  subpath : @gaato/sdk-runtime/json.Presence[String]
+}
+pub fn FileSystemSpecialPathKnownUnknown::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn FileSystemSpecialPathKnownUnknown::new(kind~ : String, path~ : String, subpath? : String) -> Self
+pub fn FileSystemSpecialPathKnownUnknown::to_json(Self) -> Json
+pub impl ToJson for FileSystemSpecialPathKnownUnknown
+pub impl @moonbitlang/core/json.FromJson for FileSystemSpecialPathKnownUnknown
+
+pub(all) struct FileSystemSpecialPathMinimal {
+  kind : String
+}
+pub fn FileSystemSpecialPathMinimal::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn FileSystemSpecialPathMinimal::new(kind~ : String) -> Self
+pub fn FileSystemSpecialPathMinimal::to_json(Self) -> Json
+pub impl ToJson for FileSystemSpecialPathMinimal
+pub impl @moonbitlang/core/json.FromJson for FileSystemSpecialPathMinimal
+
+pub(all) struct FileSystemSpecialPathProjectRoots {
+  kind : String
+  subpath : @gaato/sdk-runtime/json.Presence[String]
+}
+pub fn FileSystemSpecialPathProjectRoots::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn FileSystemSpecialPathProjectRoots::new(kind~ : String, subpath? : String) -> Self
+pub fn FileSystemSpecialPathProjectRoots::to_json(Self) -> Json
+pub impl ToJson for FileSystemSpecialPathProjectRoots
+pub impl @moonbitlang/core/json.FromJson for FileSystemSpecialPathProjectRoots
+
+pub(all) struct FileSystemSpecialPathRoot {
+  kind : String
+}
+pub fn FileSystemSpecialPathRoot::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn FileSystemSpecialPathRoot::new(kind~ : String) -> Self
+pub fn FileSystemSpecialPathRoot::to_json(Self) -> Json
+pub impl ToJson for FileSystemSpecialPathRoot
+pub impl @moonbitlang/core/json.FromJson for FileSystemSpecialPathRoot
+
+pub(all) struct FileSystemSpecialPathSlashTmp {
+  kind : String
+}
+pub fn FileSystemSpecialPathSlashTmp::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn FileSystemSpecialPathSlashTmp::new(kind~ : String) -> Self
+pub fn FileSystemSpecialPathSlashTmp::to_json(Self) -> Json
+pub impl ToJson for FileSystemSpecialPathSlashTmp
+pub impl @moonbitlang/core/json.FromJson for FileSystemSpecialPathSlashTmp
+
+pub(all) struct FileSystemSpecialPathTmpdir {
+  kind : String
+}
+pub fn FileSystemSpecialPathTmpdir::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn FileSystemSpecialPathTmpdir::new(kind~ : String) -> Self
+pub fn FileSystemSpecialPathTmpdir::to_json(Self) -> Json
+pub impl ToJson for FileSystemSpecialPathTmpdir
+pub impl @moonbitlang/core/json.FromJson for FileSystemSpecialPathTmpdir
+
+pub(all) struct FileUpdateChange {
+  diff : String
+  kind : PatchChangeKind
+  path : String
+}
+pub fn FileUpdateChange::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn FileUpdateChange::new(diff~ : String, kind~ : PatchChangeKind, path~ : String) -> Self
+pub fn FileUpdateChange::to_json(Self) -> Json
+pub impl ToJson for FileUpdateChange
+pub impl @moonbitlang/core/json.FromJson for FileUpdateChange
+
+pub(all) enum FunctionCallOutputBody {
+  Text(String)
+  FunctionCallOutputContentItemArray(Array[FunctionCallOutputContentItem])
+}
+pub fn FunctionCallOutputBody::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn FunctionCallOutputBody::to_json(Self) -> Json
+pub impl ToJson for FunctionCallOutputBody
+pub impl @moonbitlang/core/json.FromJson for FunctionCallOutputBody
+
+pub(all) enum FunctionCallOutputContentItem {
+  InputText(FunctionCallOutputContentItemInputText)
+  InputImage(FunctionCallOutputContentItemInputImage)
+  InputAudio(FunctionCallOutputContentItemInputAudio)
+  EncryptedContent(FunctionCallOutputContentItemEncryptedContent)
+  Unknown(String, Json)
+}
+pub fn FunctionCallOutputContentItem::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn FunctionCallOutputContentItem::to_json(Self) -> Json
+pub impl ToJson for FunctionCallOutputContentItem
+pub impl @moonbitlang/core/json.FromJson for FunctionCallOutputContentItem
+
+pub(all) struct FunctionCallOutputContentItemEncryptedContent {
+  encrypted_content : String
+  type_ : String
+}
+pub fn FunctionCallOutputContentItemEncryptedContent::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn FunctionCallOutputContentItemEncryptedContent::new(encrypted_content~ : String, type_~ : String) -> Self
+pub fn FunctionCallOutputContentItemEncryptedContent::to_json(Self) -> Json
+pub impl ToJson for FunctionCallOutputContentItemEncryptedContent
+pub impl @moonbitlang/core/json.FromJson for FunctionCallOutputContentItemEncryptedContent
+
+pub(all) struct FunctionCallOutputContentItemInputAudio {
+  audio_url : String
+  type_ : String
+}
+pub fn FunctionCallOutputContentItemInputAudio::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn FunctionCallOutputContentItemInputAudio::new(audio_url~ : String, type_~ : String) -> Self
+pub fn FunctionCallOutputContentItemInputAudio::to_json(Self) -> Json
+pub impl ToJson for FunctionCallOutputContentItemInputAudio
+pub impl @moonbitlang/core/json.FromJson for FunctionCallOutputContentItemInputAudio
+
+pub(all) struct FunctionCallOutputContentItemInputImage {
+  detail : @gaato/sdk-runtime/json.Presence[ImageDetail]
+  image_url : String
+  type_ : String
+}
+pub fn FunctionCallOutputContentItemInputImage::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn FunctionCallOutputContentItemInputImage::new(image_url~ : String, type_~ : String, detail? : ImageDetail) -> Self
+pub fn FunctionCallOutputContentItemInputImage::to_json(Self) -> Json
+pub impl ToJson for FunctionCallOutputContentItemInputImage
+pub impl @moonbitlang/core/json.FromJson for FunctionCallOutputContentItemInputImage
+
+pub(all) struct FunctionCallOutputContentItemInputText {
+  text : String
+  type_ : String
+}
+pub fn FunctionCallOutputContentItemInputText::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn FunctionCallOutputContentItemInputText::new(text~ : String, type_~ : String) -> Self
+pub fn FunctionCallOutputContentItemInputText::to_json(Self) -> Json
+pub impl ToJson for FunctionCallOutputContentItemInputText
+pub impl @moonbitlang/core/json.FromJson for FunctionCallOutputContentItemInputText
+
+pub(all) struct GitInfo {
+  branch : @gaato/sdk-runtime/json.Presence[String]
+  origin_url : @gaato/sdk-runtime/json.Presence[String]
+  sha : @gaato/sdk-runtime/json.Presence[String]
+}
+pub fn GitInfo::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn GitInfo::new(branch? : String, origin_url? : String, sha? : String) -> Self
+pub fn GitInfo::to_json(Self) -> Json
+pub impl ToJson for GitInfo
+pub impl @moonbitlang/core/json.FromJson for GitInfo
+
+pub(all) struct GrantedPermissionProfile {
+  file_system : @gaato/sdk-runtime/json.Presence[AdditionalFileSystemPermissions]
+  network : @gaato/sdk-runtime/json.Presence[AdditionalNetworkPermissions]
+}
+pub fn GrantedPermissionProfile::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn GrantedPermissionProfile::new(file_system? : AdditionalFileSystemPermissions, network? : AdditionalNetworkPermissions) -> Self
+pub fn GrantedPermissionProfile::to_json(Self) -> Json
+pub impl ToJson for GrantedPermissionProfile
+pub impl @moonbitlang/core/json.FromJson for GrantedPermissionProfile
+
+pub(all) struct HookPromptFragment {
+  hook_run_id : String
+  text : String
+}
+pub fn HookPromptFragment::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn HookPromptFragment::new(hook_run_id~ : String, text~ : String) -> Self
+pub fn HookPromptFragment::to_json(Self) -> Json
+pub impl ToJson for HookPromptFragment
+pub impl @moonbitlang/core/json.FromJson for HookPromptFragment
+
+pub(all) enum ImageDetail {
+  Auto
+  Low
+  High
+  Original
+  Unknown(String)
+}
+pub fn ImageDetail::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ImageDetail::to_json(Self) -> Json
+pub impl ToJson for ImageDetail
+pub impl @moonbitlang/core/json.FromJson for ImageDetail
+
+pub(all) enum ImageGenerationFailure {
+  UsageLimitExceeded(ImageGenerationFailureUsageLimitExceeded)
+  Unknown(String, Json)
+}
+pub fn ImageGenerationFailure::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ImageGenerationFailure::to_json(Self) -> Json
+pub impl ToJson for ImageGenerationFailure
+pub impl @moonbitlang/core/json.FromJson for ImageGenerationFailure
+
+pub(all) struct ImageGenerationFailureUsageLimitExceeded {
+  limit_id : String
+  resets_at : @gaato/sdk-runtime/json.Presence[Int64]
+  type_ : String
+}
+pub fn ImageGenerationFailureUsageLimitExceeded::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ImageGenerationFailureUsageLimitExceeded::new(limit_id~ : String, type_~ : String, resets_at? : Int64) -> Self
+pub fn ImageGenerationFailureUsageLimitExceeded::to_json(Self) -> Json
+pub impl ToJson for ImageGenerationFailureUsageLimitExceeded
+pub impl @moonbitlang/core/json.FromJson for ImageGenerationFailureUsageLimitExceeded
+
+pub(all) struct InitializeCapabilities {
+  experimental_api : Bool?
+  extensions : @gaato/sdk-runtime/json.Presence[Json]
+  mcp_server_openai_form_elicitation : Bool?
+  opt_out_notification_methods : @gaato/sdk-runtime/json.Presence[Array[String]]
+  request_attestation : Bool?
+}
+pub fn InitializeCapabilities::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn InitializeCapabilities::new(experimental_api? : Bool, extensions? : Json, mcp_server_openai_form_elicitation? : Bool, opt_out_notification_methods? : Array[String], request_attestation? : Bool) -> Self
+pub fn InitializeCapabilities::to_json(Self) -> Json
+pub impl ToJson for InitializeCapabilities
+pub impl @moonbitlang/core/json.FromJson for InitializeCapabilities
+
+pub(all) struct InitializeParams {
+  capabilities : @gaato/sdk-runtime/json.Presence[InitializeCapabilities]
+  client_info : ClientInfo
+}
+pub fn InitializeParams::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn InitializeParams::new(client_info~ : ClientInfo, capabilities? : InitializeCapabilities) -> Self
+pub fn InitializeParams::to_json(Self) -> Json
+pub impl ToJson for InitializeParams
+pub impl @moonbitlang/core/json.FromJson for InitializeParams
+
+pub(all) struct InitializeResponse {
+  codex_home : String
+  platform_family : String
+  platform_os : String
+  user_agent : String
+}
+pub fn InitializeResponse::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn InitializeResponse::new(codex_home~ : String, platform_family~ : String, platform_os~ : String, user_agent~ : String) -> Self
+pub fn InitializeResponse::to_json(Self) -> Json
+pub impl ToJson for InitializeResponse
+pub impl @moonbitlang/core/json.FromJson for InitializeResponse
+
+pub(all) struct ItemCompletedNotification {
+  completed_at_ms : Int64
+  item : ThreadItem
+  thread_id : String
+  turn_id : String
+}
+pub fn ItemCompletedNotification::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ItemCompletedNotification::new(completed_at_ms~ : Int64, item~ : ThreadItem, thread_id~ : String, turn_id~ : String) -> Self
+pub fn ItemCompletedNotification::to_json(Self) -> Json
+pub impl ToJson for ItemCompletedNotification
+pub impl @moonbitlang/core/json.FromJson for ItemCompletedNotification
+
+pub(all) struct ItemStartedNotification {
+  item : ThreadItem
+  started_at_ms : Int64
+  thread_id : String
+  turn_id : String
+}
+pub fn ItemStartedNotification::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ItemStartedNotification::new(item~ : ThreadItem, started_at_ms~ : Int64, thread_id~ : String, turn_id~ : String) -> Self
+pub fn ItemStartedNotification::to_json(Self) -> Json
+pub impl ToJson for ItemStartedNotification
+pub impl @moonbitlang/core/json.FromJson for ItemStartedNotification
+
+pub(all) struct McpToolCallAppContext {
+  action_name : @gaato/sdk-runtime/json.Presence[String]
+  app_name : @gaato/sdk-runtime/json.Presence[String]
+  connector_id : String
+  link_id : @gaato/sdk-runtime/json.Presence[String]
+  resource_uri : @gaato/sdk-runtime/json.Presence[String]
+}
+pub fn McpToolCallAppContext::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn McpToolCallAppContext::new(connector_id~ : String, action_name? : String, app_name? : String, link_id? : String, resource_uri? : String) -> Self
+pub fn McpToolCallAppContext::to_json(Self) -> Json
+pub impl ToJson for McpToolCallAppContext
+pub impl @moonbitlang/core/json.FromJson for McpToolCallAppContext
+
+pub(all) struct McpToolCallError {
+  message : String
+}
+pub fn McpToolCallError::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn McpToolCallError::new(message~ : String) -> Self
+pub fn McpToolCallError::to_json(Self) -> Json
+pub impl ToJson for McpToolCallError
+pub impl @moonbitlang/core/json.FromJson for McpToolCallError
+
+pub(all) struct McpToolCallResult {
+  meta : @gaato/sdk-runtime/json.Presence[Json]
+  content : Array[Json]
+  structured_content : @gaato/sdk-runtime/json.Presence[Json]
+}
+pub fn McpToolCallResult::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn McpToolCallResult::new(content~ : Array[Json], meta? : Json, structured_content? : Json) -> Self
+pub fn McpToolCallResult::to_json(Self) -> Json
+pub impl ToJson for McpToolCallResult
+pub impl @moonbitlang/core/json.FromJson for McpToolCallResult
+
+pub(all) enum McpToolCallStatus {
+  InProgress
+  Completed
+  Failed
+  Unknown(String)
+}
+pub fn McpToolCallStatus::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn McpToolCallStatus::to_json(Self) -> Json
+pub impl ToJson for McpToolCallStatus
+pub impl @moonbitlang/core/json.FromJson for McpToolCallStatus
+
+pub(all) struct MemoryCitation {
+  entries : Array[MemoryCitationEntry]
+  thread_ids : Array[String]
+}
+pub fn MemoryCitation::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn MemoryCitation::new(entries~ : Array[MemoryCitationEntry], thread_ids~ : Array[String]) -> Self
+pub fn MemoryCitation::to_json(Self) -> Json
+pub impl ToJson for MemoryCitation
+pub impl @moonbitlang/core/json.FromJson for MemoryCitation
+
+pub(all) struct MemoryCitationEntry {
+  line_end : UInt
+  line_start : UInt
+  note : String
+  path : String
+}
+pub fn MemoryCitationEntry::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn MemoryCitationEntry::new(line_end~ : UInt, line_start~ : UInt, note~ : String, path~ : String) -> Self
+pub fn MemoryCitationEntry::to_json(Self) -> Json
+pub impl ToJson for MemoryCitationEntry
+pub impl @moonbitlang/core/json.FromJson for MemoryCitationEntry
+
+pub(all) enum MessagePhase {
+  Commentary
+  FinalAnswer
+  Unknown(String)
+}
+pub fn MessagePhase::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn MessagePhase::to_json(Self) -> Json
+pub impl ToJson for MessagePhase
+pub impl @moonbitlang/core/json.FromJson for MessagePhase
+
+pub(all) struct MisalignmentErrorDetails {
+  detailed_explanation : @gaato/sdk-runtime/json.Presence[String]
+  error_type : @gaato/sdk-runtime/json.Presence[String]
+  steer : @gaato/sdk-runtime/json.Presence[MisalignmentSteer]
+}
+pub fn MisalignmentErrorDetails::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn MisalignmentErrorDetails::new(detailed_explanation? : String, error_type? : String, steer? : MisalignmentSteer) -> Self
+pub fn MisalignmentErrorDetails::to_json(Self) -> Json
+pub impl ToJson for MisalignmentErrorDetails
+pub impl @moonbitlang/core/json.FromJson for MisalignmentErrorDetails
+
+pub(all) struct MisalignmentSteer {
+  message : String
+}
+pub fn MisalignmentSteer::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn MisalignmentSteer::new(message~ : String) -> Self
+pub fn MisalignmentSteer::to_json(Self) -> Json
+pub impl ToJson for MisalignmentSteer
+pub impl @moonbitlang/core/json.FromJson for MisalignmentSteer
+
+pub(all) enum NetworkAccess {
+  Restricted
+  Enabled
+  Unknown(String)
+}
+pub fn NetworkAccess::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn NetworkAccess::to_json(Self) -> Json
+pub impl ToJson for NetworkAccess
+pub impl @moonbitlang/core/json.FromJson for NetworkAccess
+
+pub(all) struct NetworkApprovalContext {
+  host : String
+  protocol : NetworkApprovalProtocol
+}
+pub fn NetworkApprovalContext::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn NetworkApprovalContext::new(host~ : String, protocol~ : NetworkApprovalProtocol) -> Self
+pub fn NetworkApprovalContext::to_json(Self) -> Json
+pub impl ToJson for NetworkApprovalContext
+pub impl @moonbitlang/core/json.FromJson for NetworkApprovalContext
+
+pub(all) enum NetworkApprovalProtocol {
+  Http
+  Https
+  Socks5Tcp
+  Socks5Udp
+  Unknown(String)
+}
+pub fn NetworkApprovalProtocol::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn NetworkApprovalProtocol::to_json(Self) -> Json
+pub impl ToJson for NetworkApprovalProtocol
+pub impl @moonbitlang/core/json.FromJson for NetworkApprovalProtocol
+
+pub(all) struct NetworkPolicyAmendment {
+  action : NetworkPolicyRuleAction
+  host : String
+}
+pub fn NetworkPolicyAmendment::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn NetworkPolicyAmendment::new(action~ : NetworkPolicyRuleAction, host~ : String) -> Self
+pub fn NetworkPolicyAmendment::to_json(Self) -> Json
+pub impl ToJson for NetworkPolicyAmendment
+pub impl @moonbitlang/core/json.FromJson for NetworkPolicyAmendment
+
+pub(all) enum NetworkPolicyRuleAction {
+  Allow
+  Deny
+  Unknown(String)
+}
+pub fn NetworkPolicyRuleAction::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn NetworkPolicyRuleAction::to_json(Self) -> Json
+pub impl ToJson for NetworkPolicyRuleAction
+pub impl @moonbitlang/core/json.FromJson for NetworkPolicyRuleAction
+
+pub(all) enum NonSteerableTurnKind {
+  Review
+  Compact
+  Unknown(String)
+}
+pub fn NonSteerableTurnKind::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn NonSteerableTurnKind::to_json(Self) -> Json
+pub impl ToJson for NonSteerableTurnKind
+pub impl @moonbitlang/core/json.FromJson for NonSteerableTurnKind
+
+pub(all) enum PatchApplyStatus {
+  InProgress
+  Completed
+  Failed
+  Declined
+  Unknown(String)
+}
+pub fn PatchApplyStatus::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn PatchApplyStatus::to_json(Self) -> Json
+pub impl ToJson for PatchApplyStatus
+pub impl @moonbitlang/core/json.FromJson for PatchApplyStatus
+
+pub(all) enum PatchChangeKind {
+  Add(PatchChangeKindAdd)
+  Delete(PatchChangeKindDelete)
+  Update(PatchChangeKindUpdate)
+  Unknown(String, Json)
+}
+pub fn PatchChangeKind::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn PatchChangeKind::to_json(Self) -> Json
+pub impl ToJson for PatchChangeKind
+pub impl @moonbitlang/core/json.FromJson for PatchChangeKind
+
+pub(all) struct PatchChangeKindAdd {
+  type_ : String
+}
+pub fn PatchChangeKindAdd::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn PatchChangeKindAdd::new(type_~ : String) -> Self
+pub fn PatchChangeKindAdd::to_json(Self) -> Json
+pub impl ToJson for PatchChangeKindAdd
+pub impl @moonbitlang/core/json.FromJson for PatchChangeKindAdd
+
+pub(all) struct PatchChangeKindDelete {
+  type_ : String
+}
+pub fn PatchChangeKindDelete::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn PatchChangeKindDelete::new(type_~ : String) -> Self
+pub fn PatchChangeKindDelete::to_json(Self) -> Json
+pub impl ToJson for PatchChangeKindDelete
+pub impl @moonbitlang/core/json.FromJson for PatchChangeKindDelete
+
+pub(all) struct PatchChangeKindUpdate {
+  move_path : @gaato/sdk-runtime/json.Presence[String]
+  type_ : String
+}
+pub fn PatchChangeKindUpdate::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn PatchChangeKindUpdate::new(type_~ : String, move_path? : String) -> Self
+pub fn PatchChangeKindUpdate::to_json(Self) -> Json
+pub impl ToJson for PatchChangeKindUpdate
+pub impl @moonbitlang/core/json.FromJson for PatchChangeKindUpdate
+
+pub(all) enum PermissionGrantScope {
+  Turn
+  Session
+  Custom(String)
+}
+pub fn PermissionGrantScope::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn PermissionGrantScope::to_json(Self) -> Json
+pub impl ToJson for PermissionGrantScope
+pub impl @moonbitlang/core/json.FromJson for PermissionGrantScope
+
+pub(all) struct PermissionsRequestApprovalParams {
+  cwd : String
+  environment_id : @gaato/sdk-runtime/json.Presence[String]
+  item_id : String
+  permissions : RequestPermissionProfile
+  reason : @gaato/sdk-runtime/json.Presence[String]
+  started_at_ms : Int64
+  thread_id : String
+  turn_id : String
+}
+pub fn PermissionsRequestApprovalParams::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn PermissionsRequestApprovalParams::new(cwd~ : String, item_id~ : String, permissions~ : RequestPermissionProfile, started_at_ms~ : Int64, thread_id~ : String, turn_id~ : String, environment_id? : String, reason? : String) -> Self
+pub fn PermissionsRequestApprovalParams::to_json(Self) -> Json
+pub impl ToJson for PermissionsRequestApprovalParams
+pub impl @moonbitlang/core/json.FromJson for PermissionsRequestApprovalParams
+
+pub(all) struct PermissionsRequestApprovalResponse {
+  permissions : GrantedPermissionProfile
+  scope : PermissionGrantScope?
+  strict_auto_review : @gaato/sdk-runtime/json.Presence[Bool]
+}
+pub fn PermissionsRequestApprovalResponse::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn PermissionsRequestApprovalResponse::new(permissions~ : GrantedPermissionProfile, scope? : PermissionGrantScope, strict_auto_review? : Bool) -> Self
+pub fn PermissionsRequestApprovalResponse::to_json(Self) -> Json
+pub impl ToJson for PermissionsRequestApprovalResponse
+pub impl @moonbitlang/core/json.FromJson for PermissionsRequestApprovalResponse
+
+pub(all) enum Personality {
+  None
+  Friendly
+  Pragmatic
+  Custom(String)
+}
+pub fn Personality::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn Personality::to_json(Self) -> Json
+pub impl ToJson for Personality
+pub impl @moonbitlang/core/json.FromJson for Personality
+
+pub(all) enum ReasoningSummary {
+  Auto
+  Concise
+  Detailed
+  None
+  Custom(String)
+}
+pub fn ReasoningSummary::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ReasoningSummary::to_json(Self) -> Json
+pub impl ToJson for ReasoningSummary
+pub impl @moonbitlang/core/json.FromJson for ReasoningSummary
+
+pub(all) struct RequestPermissionProfile {
+  file_system : @gaato/sdk-runtime/json.Presence[AdditionalFileSystemPermissions]
+  network : @gaato/sdk-runtime/json.Presence[AdditionalNetworkPermissions]
+}
+pub fn RequestPermissionProfile::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn RequestPermissionProfile::new(file_system? : AdditionalFileSystemPermissions, network? : AdditionalNetworkPermissions) -> Self
+pub fn RequestPermissionProfile::to_json(Self) -> Json
+pub impl ToJson for RequestPermissionProfile
+pub impl @moonbitlang/core/json.FromJson for RequestPermissionProfile
+
+pub(all) enum SandboxMode {
+  ReadOnly
+  WorkspaceWrite
+  DangerFullAccess
+  Custom(String)
+}
+pub fn SandboxMode::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn SandboxMode::to_json(Self) -> Json
+pub impl ToJson for SandboxMode
+pub impl @moonbitlang/core/json.FromJson for SandboxMode
+
+pub(all) enum SandboxPolicy {
+  DangerFullAccess(SandboxPolicyDangerFullAccess)
+  ReadOnly(SandboxPolicyReadOnly)
+  ExternalSandbox(SandboxPolicyExternalSandbox)
+  WorkspaceWrite(SandboxPolicyWorkspaceWrite)
+  Unknown(String, Json)
+}
+pub fn SandboxPolicy::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn SandboxPolicy::to_json(Self) -> Json
+pub impl ToJson for SandboxPolicy
+pub impl @moonbitlang/core/json.FromJson for SandboxPolicy
+
+pub(all) struct SandboxPolicyDangerFullAccess {
+  type_ : String
+}
+pub fn SandboxPolicyDangerFullAccess::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn SandboxPolicyDangerFullAccess::new(type_~ : String) -> Self
+pub fn SandboxPolicyDangerFullAccess::to_json(Self) -> Json
+pub impl ToJson for SandboxPolicyDangerFullAccess
+pub impl @moonbitlang/core/json.FromJson for SandboxPolicyDangerFullAccess
+
+pub(all) struct SandboxPolicyExternalSandbox {
+  network_access : NetworkAccess?
+  type_ : String
+}
+pub fn SandboxPolicyExternalSandbox::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn SandboxPolicyExternalSandbox::new(type_~ : String, network_access? : NetworkAccess) -> Self
+pub fn SandboxPolicyExternalSandbox::to_json(Self) -> Json
+pub impl ToJson for SandboxPolicyExternalSandbox
+pub impl @moonbitlang/core/json.FromJson for SandboxPolicyExternalSandbox
+
+pub(all) struct SandboxPolicyReadOnly {
+  network_access : Bool?
+  type_ : String
+}
+pub fn SandboxPolicyReadOnly::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn SandboxPolicyReadOnly::new(type_~ : String, network_access? : Bool) -> Self
+pub fn SandboxPolicyReadOnly::to_json(Self) -> Json
+pub impl ToJson for SandboxPolicyReadOnly
+pub impl @moonbitlang/core/json.FromJson for SandboxPolicyReadOnly
+
+pub(all) struct SandboxPolicyWorkspaceWrite {
+  exclude_slash_tmp : Bool?
+  exclude_tmpdir_env_var : Bool?
+  network_access : Bool?
+  type_ : String
+  writable_roots : Array[String]?
+}
+pub fn SandboxPolicyWorkspaceWrite::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn SandboxPolicyWorkspaceWrite::new(type_~ : String, exclude_slash_tmp? : Bool, exclude_tmpdir_env_var? : Bool, network_access? : Bool, writable_roots? : Array[String]) -> Self
+pub fn SandboxPolicyWorkspaceWrite::to_json(Self) -> Json
+pub impl ToJson for SandboxPolicyWorkspaceWrite
+pub impl @moonbitlang/core/json.FromJson for SandboxPolicyWorkspaceWrite
+
+pub(all) enum SessionSource {
+  Cli
+  Vscode
+  Exec
+  AppServer
+  Unknown
+  Custom(String)
+  SubAgent(SubAgentSource)
+  UnknownValue(Json)
+}
+pub fn SessionSource::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn SessionSource::to_json(Self) -> Json
+pub impl ToJson for SessionSource
+pub impl @moonbitlang/core/json.FromJson for SessionSource
+
+pub(all) enum SubAgentActivityKind {
+  Started
+  Interacted
+  Interrupted
+  Completed
+  Unknown(String)
+}
+pub fn SubAgentActivityKind::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn SubAgentActivityKind::to_json(Self) -> Json
+pub impl ToJson for SubAgentActivityKind
+pub impl @moonbitlang/core/json.FromJson for SubAgentActivityKind
+
+pub(all) enum SubAgentSource {
+  Review
+  Compact
+  MemoryConsolidation
+  ThreadSpawn(SubAgentSourceThreadSpawn)
+  Other(String)
+  UnknownValue(Json)
+}
+pub fn SubAgentSource::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn SubAgentSource::to_json(Self) -> Json
+pub impl ToJson for SubAgentSource
+pub impl @moonbitlang/core/json.FromJson for SubAgentSource
+
+pub(all) struct SubAgentSourceThreadSpawn {
+  agent_nickname : @gaato/sdk-runtime/json.Presence[String]
+  agent_path : @gaato/sdk-runtime/json.Presence[String]
+  agent_role : @gaato/sdk-runtime/json.Presence[String]
+  depth : Int
+  parent_thread_id : String
+}
+pub fn SubAgentSourceThreadSpawn::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn SubAgentSourceThreadSpawn::new(depth~ : Int, parent_thread_id~ : String, agent_nickname? : String, agent_path? : String, agent_role? : String) -> Self
+pub fn SubAgentSourceThreadSpawn::to_json(Self) -> Json
+pub impl ToJson for SubAgentSourceThreadSpawn
+pub impl @moonbitlang/core/json.FromJson for SubAgentSourceThreadSpawn
+
+pub(all) struct TextElement {
+  byte_range : ByteRange
+  placeholder : @gaato/sdk-runtime/json.Presence[String]
+}
+pub fn TextElement::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn TextElement::new(byte_range~ : ByteRange, placeholder? : String) -> Self
+pub fn TextElement::to_json(Self) -> Json
+pub impl ToJson for TextElement
+pub impl @moonbitlang/core/json.FromJson for TextElement
+
+pub(all) struct Thread {
+  agent_nickname : @gaato/sdk-runtime/json.Presence[String]
+  agent_role : @gaato/sdk-runtime/json.Presence[String]
+  cli_version : String
+  created_at : Int64
+  cwd : String
+  ephemeral : Bool
+  forked_from_id : @gaato/sdk-runtime/json.Presence[String]
+  git_info : @gaato/sdk-runtime/json.Presence[GitInfo]
+  history_mode : ThreadHistoryMode?
+  id : String
+  model : @gaato/sdk-runtime/json.Presence[String]
+  model_provider : String
+  name : @gaato/sdk-runtime/json.Presence[String]
+  originator : @gaato/sdk-runtime/json.Presence[String]
+  parent_thread_id : @gaato/sdk-runtime/json.Presence[String]
+  path : @gaato/sdk-runtime/json.Presence[String]
+  preview : String
+  project_id : String?
+  reasoning_effort : @gaato/sdk-runtime/json.Presence[String]
+  recency_at : @gaato/sdk-runtime/json.Presence[Int64]
+  section : @gaato/sdk-runtime/json.Presence[ThreadSection]
+  section_entered_at : @gaato/sdk-runtime/json.Presence[Int64]
+  session_id : String
+  source : SessionSource
+  status : ThreadStatus
+  thread_source : @gaato/sdk-runtime/json.Presence[String]
+  turns : Array[Turn]
+  updated_at : Int64
+}
+pub fn Thread::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn Thread::new(cli_version~ : String, created_at~ : Int64, cwd~ : String, ephemeral~ : Bool, id~ : String, model_provider~ : String, preview~ : String, session_id~ : String, source~ : SessionSource, status~ : ThreadStatus, turns~ : Array[Turn], updated_at~ : Int64, agent_nickname? : String, agent_role? : String, forked_from_id? : String, git_info? : GitInfo, history_mode? : ThreadHistoryMode, model? : String, name? : String, originator? : String, parent_thread_id? : String, path? : String, project_id? : String, reasoning_effort? : String, recency_at? : Int64, section? : ThreadSection, section_entered_at? : Int64, thread_source? : String) -> Self
+pub fn Thread::to_json(Self) -> Json
+pub impl ToJson for Thread
+pub impl @moonbitlang/core/json.FromJson for Thread
+
+pub(all) enum ThreadActiveFlag {
+  WaitingOnApproval
+  WaitingOnUserInput
+  Unknown(String)
+}
+pub fn ThreadActiveFlag::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ThreadActiveFlag::to_json(Self) -> Json
+pub impl ToJson for ThreadActiveFlag
+pub impl @moonbitlang/core/json.FromJson for ThreadActiveFlag
+
+pub(all) enum ThreadHistoryMode {
+  Legacy
+  Paginated
+  Unknown(String)
+}
+pub fn ThreadHistoryMode::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ThreadHistoryMode::to_json(Self) -> Json
+pub impl ToJson for ThreadHistoryMode
+pub impl @moonbitlang/core/json.FromJson for ThreadHistoryMode
+
+pub(all) enum ThreadItem {
+  UserMessage(ThreadItemUserMessage)
+  HookPrompt(ThreadItemHookPrompt)
+  AgentMessage(ThreadItemAgentMessage)
+  FunctionCallOutput(ThreadItemFunctionCallOutput)
+  Plan(ThreadItemPlan)
+  Reasoning(ThreadItemReasoning)
+  CommandExecution(ThreadItemCommandExecution)
+  FileChange(ThreadItemFileChange)
+  McpToolCall(ThreadItemMcpToolCall)
+  DynamicToolCall(ThreadItemDynamicToolCall)
+  CollabAgentToolCall(ThreadItemCollabAgentToolCall)
+  SubAgentActivity(ThreadItemSubAgentActivity)
+  WebSearch(ThreadItemWebSearch)
+  ImageView(ThreadItemImageView)
+  Sleep(ThreadItemSleep)
+  ImageGeneration(ThreadItemImageGeneration)
+  EnteredReviewMode(ThreadItemEnteredReviewMode)
+  ExitedReviewMode(ThreadItemExitedReviewMode)
+  ContextCompaction(ThreadItemContextCompaction)
+  Unknown(String, Json)
+}
+pub fn ThreadItem::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ThreadItem::to_json(Self) -> Json
+pub impl ToJson for ThreadItem
+pub impl @moonbitlang/core/json.FromJson for ThreadItem
+
+pub(all) struct ThreadItemAgentMessage {
+  delivery : @gaato/sdk-runtime/json.Presence[String]
+  id : String
+  memory_citation : @gaato/sdk-runtime/json.Presence[MemoryCitation]
+  phase : @gaato/sdk-runtime/json.Presence[MessagePhase]
+  questions : @gaato/sdk-runtime/json.Presence[Array[AsyncUserInputQuestion]]
+  text : String
+  type_ : String
+}
+pub fn ThreadItemAgentMessage::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ThreadItemAgentMessage::new(id~ : String, text~ : String, type_~ : String, delivery? : String, memory_citation? : MemoryCitation, phase? : MessagePhase, questions? : Array[AsyncUserInputQuestion]) -> Self
+pub fn ThreadItemAgentMessage::to_json(Self) -> Json
+pub impl ToJson for ThreadItemAgentMessage
+pub impl @moonbitlang/core/json.FromJson for ThreadItemAgentMessage
+
+pub(all) struct ThreadItemCollabAgentToolCall {
+  agents_states : Map[String, CollabAgentState]
+  id : String
+  model : @gaato/sdk-runtime/json.Presence[String]
+  prompt : @gaato/sdk-runtime/json.Presence[String]
+  reasoning_effort : @gaato/sdk-runtime/json.Presence[String]
+  receiver_thread_ids : Array[String]
+  sender_thread_id : String
+  status : CollabAgentToolCallStatus
+  tool : CollabAgentTool
+  type_ : String
+}
+pub fn ThreadItemCollabAgentToolCall::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ThreadItemCollabAgentToolCall::new(agents_states~ : Map[String, CollabAgentState], id~ : String, receiver_thread_ids~ : Array[String], sender_thread_id~ : String, status~ : CollabAgentToolCallStatus, tool~ : CollabAgentTool, type_~ : String, model? : String, prompt? : String, reasoning_effort? : String) -> Self
+pub fn ThreadItemCollabAgentToolCall::to_json(Self) -> Json
+pub impl ToJson for ThreadItemCollabAgentToolCall
+pub impl @moonbitlang/core/json.FromJson for ThreadItemCollabAgentToolCall
+
+pub(all) struct ThreadItemCommandExecution {
+  aggregated_output : @gaato/sdk-runtime/json.Presence[String]
+  command : String
+  command_actions : Array[CommandAction]
+  cwd : String
+  duration_ms : @gaato/sdk-runtime/json.Presence[Int64]
+  exit_code : @gaato/sdk-runtime/json.Presence[Int]
+  id : String
+  plugin_id : @gaato/sdk-runtime/json.Presence[String]
+  process_id : @gaato/sdk-runtime/json.Presence[String]
+  script_path : @gaato/sdk-runtime/json.Presence[String]
+  source : CommandExecutionSource?
+  status : CommandExecutionStatus
+  type_ : String
+}
+pub fn ThreadItemCommandExecution::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ThreadItemCommandExecution::new(command~ : String, command_actions~ : Array[CommandAction], cwd~ : String, id~ : String, status~ : CommandExecutionStatus, type_~ : String, aggregated_output? : String, duration_ms? : Int64, exit_code? : Int, plugin_id? : String, process_id? : String, script_path? : String, source? : CommandExecutionSource) -> Self
+pub fn ThreadItemCommandExecution::to_json(Self) -> Json
+pub impl ToJson for ThreadItemCommandExecution
+pub impl @moonbitlang/core/json.FromJson for ThreadItemCommandExecution
+
+pub(all) struct ThreadItemContextCompaction {
+  id : String
+  type_ : String
+}
+pub fn ThreadItemContextCompaction::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ThreadItemContextCompaction::new(id~ : String, type_~ : String) -> Self
+pub fn ThreadItemContextCompaction::to_json(Self) -> Json
+pub impl ToJson for ThreadItemContextCompaction
+pub impl @moonbitlang/core/json.FromJson for ThreadItemContextCompaction
+
+pub(all) struct ThreadItemDynamicToolCall {
+  arguments : Json?
+  content_items : @gaato/sdk-runtime/json.Presence[Array[DynamicToolCallOutputContentItem]]
+  duration_ms : @gaato/sdk-runtime/json.Presence[Int64]
+  id : String
+  namespace_ : @gaato/sdk-runtime/json.Presence[String]
+  status : DynamicToolCallStatus
+  success : @gaato/sdk-runtime/json.Presence[Bool]
+  tool : String
+  type_ : String
+}
+pub fn ThreadItemDynamicToolCall::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ThreadItemDynamicToolCall::new(id~ : String, status~ : DynamicToolCallStatus, tool~ : String, type_~ : String, arguments? : Json, content_items? : Array[DynamicToolCallOutputContentItem], duration_ms? : Int64, namespace_? : String, success? : Bool) -> Self
+pub fn ThreadItemDynamicToolCall::to_json(Self) -> Json
+pub impl ToJson for ThreadItemDynamicToolCall
+pub impl @moonbitlang/core/json.FromJson for ThreadItemDynamicToolCall
+
+pub(all) struct ThreadItemEnteredReviewMode {
+  id : String
+  review : String
+  type_ : String
+}
+pub fn ThreadItemEnteredReviewMode::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ThreadItemEnteredReviewMode::new(id~ : String, review~ : String, type_~ : String) -> Self
+pub fn ThreadItemEnteredReviewMode::to_json(Self) -> Json
+pub impl ToJson for ThreadItemEnteredReviewMode
+pub impl @moonbitlang/core/json.FromJson for ThreadItemEnteredReviewMode
+
+pub(all) struct ThreadItemExitedReviewMode {
+  id : String
+  review : String
+  type_ : String
+}
+pub fn ThreadItemExitedReviewMode::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ThreadItemExitedReviewMode::new(id~ : String, review~ : String, type_~ : String) -> Self
+pub fn ThreadItemExitedReviewMode::to_json(Self) -> Json
+pub impl ToJson for ThreadItemExitedReviewMode
+pub impl @moonbitlang/core/json.FromJson for ThreadItemExitedReviewMode
+
+pub(all) struct ThreadItemFileChange {
+  changes : Array[FileUpdateChange]
+  id : String
+  status : PatchApplyStatus
+  type_ : String
+}
+pub fn ThreadItemFileChange::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ThreadItemFileChange::new(changes~ : Array[FileUpdateChange], id~ : String, status~ : PatchApplyStatus, type_~ : String) -> Self
+pub fn ThreadItemFileChange::to_json(Self) -> Json
+pub impl ToJson for ThreadItemFileChange
+pub impl @moonbitlang/core/json.FromJson for ThreadItemFileChange
+
+pub(all) struct ThreadItemFunctionCallOutput {
+  id : String
+  name : String
+  namespace_ : @gaato/sdk-runtime/json.Presence[String]
+  output : FunctionCallOutputBody
+  type_ : String
+}
+pub fn ThreadItemFunctionCallOutput::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ThreadItemFunctionCallOutput::new(id~ : String, name~ : String, output~ : FunctionCallOutputBody, type_~ : String, namespace_? : String) -> Self
+pub fn ThreadItemFunctionCallOutput::to_json(Self) -> Json
+pub impl ToJson for ThreadItemFunctionCallOutput
+pub impl @moonbitlang/core/json.FromJson for ThreadItemFunctionCallOutput
+
+pub(all) struct ThreadItemHookPrompt {
+  fragments : Array[HookPromptFragment]
+  id : String
+  type_ : String
+}
+pub fn ThreadItemHookPrompt::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ThreadItemHookPrompt::new(fragments~ : Array[HookPromptFragment], id~ : String, type_~ : String) -> Self
+pub fn ThreadItemHookPrompt::to_json(Self) -> Json
+pub impl ToJson for ThreadItemHookPrompt
+pub impl @moonbitlang/core/json.FromJson for ThreadItemHookPrompt
+
+pub(all) struct ThreadItemImageGeneration {
+  failure : @gaato/sdk-runtime/json.Presence[ImageGenerationFailure]
+  id : String
+  result : String
+  revised_prompt : @gaato/sdk-runtime/json.Presence[String]
+  saved_path : @gaato/sdk-runtime/json.Presence[String]
+  status : String
+  transparent_background : @gaato/sdk-runtime/json.Presence[Bool]
+  type_ : String
+}
+pub fn ThreadItemImageGeneration::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ThreadItemImageGeneration::new(id~ : String, result~ : String, status~ : String, type_~ : String, failure? : ImageGenerationFailure, revised_prompt? : String, saved_path? : String, transparent_background? : Bool) -> Self
+pub fn ThreadItemImageGeneration::to_json(Self) -> Json
+pub impl ToJson for ThreadItemImageGeneration
+pub impl @moonbitlang/core/json.FromJson for ThreadItemImageGeneration
+
+pub(all) struct ThreadItemImageView {
+  id : String
+  path : String
+  type_ : String
+}
+pub fn ThreadItemImageView::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ThreadItemImageView::new(id~ : String, path~ : String, type_~ : String) -> Self
+pub fn ThreadItemImageView::to_json(Self) -> Json
+pub impl ToJson for ThreadItemImageView
+pub impl @moonbitlang/core/json.FromJson for ThreadItemImageView
+
+pub(all) struct ThreadItemMcpToolCall {
+  app_context : @gaato/sdk-runtime/json.Presence[McpToolCallAppContext]
+  arguments : Json?
+  duration_ms : @gaato/sdk-runtime/json.Presence[Int64]
+  error : @gaato/sdk-runtime/json.Presence[McpToolCallError]
+  id : String
+  mcp_app_resource_uri : @gaato/sdk-runtime/json.Presence[String]
+  plugin_id : @gaato/sdk-runtime/json.Presence[String]
+  read_only_hint : @gaato/sdk-runtime/json.Presence[Bool]
+  result : @gaato/sdk-runtime/json.Presence[McpToolCallResult]
+  server : String
+  status : McpToolCallStatus
+  tool : String
+  type_ : String
+}
+pub fn ThreadItemMcpToolCall::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ThreadItemMcpToolCall::new(id~ : String, server~ : String, status~ : McpToolCallStatus, tool~ : String, type_~ : String, app_context? : McpToolCallAppContext, arguments? : Json, duration_ms? : Int64, error? : McpToolCallError, mcp_app_resource_uri? : String, plugin_id? : String, read_only_hint? : Bool, result? : McpToolCallResult) -> Self
+pub fn ThreadItemMcpToolCall::to_json(Self) -> Json
+pub impl ToJson for ThreadItemMcpToolCall
+pub impl @moonbitlang/core/json.FromJson for ThreadItemMcpToolCall
+
+pub(all) struct ThreadItemPlan {
+  id : String
+  text : String
+  type_ : String
+}
+pub fn ThreadItemPlan::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ThreadItemPlan::new(id~ : String, text~ : String, type_~ : String) -> Self
+pub fn ThreadItemPlan::to_json(Self) -> Json
+pub impl ToJson for ThreadItemPlan
+pub impl @moonbitlang/core/json.FromJson for ThreadItemPlan
+
+pub(all) struct ThreadItemReasoning {
+  content : Array[String]?
+  id : String
+  summary : Array[String]?
+  type_ : String
+}
+pub fn ThreadItemReasoning::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ThreadItemReasoning::new(id~ : String, type_~ : String, content? : Array[String], summary? : Array[String]) -> Self
+pub fn ThreadItemReasoning::to_json(Self) -> Json
+pub impl ToJson for ThreadItemReasoning
+pub impl @moonbitlang/core/json.FromJson for ThreadItemReasoning
+
+pub(all) struct ThreadItemSleep {
+  duration_ms : UInt64Number
+  id : String
+  type_ : String
+}
+pub fn ThreadItemSleep::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ThreadItemSleep::new(duration_ms~ : UInt64Number, id~ : String, type_~ : String) -> Self
+pub fn ThreadItemSleep::to_json(Self) -> Json
+pub impl ToJson for ThreadItemSleep
+pub impl @moonbitlang/core/json.FromJson for ThreadItemSleep
+
+pub(all) struct ThreadItemSubAgentActivity {
+  agent_path : String
+  agent_thread_id : String
+  id : String
+  kind : SubAgentActivityKind
+  type_ : String
+}
+pub fn ThreadItemSubAgentActivity::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ThreadItemSubAgentActivity::new(agent_path~ : String, agent_thread_id~ : String, id~ : String, kind~ : SubAgentActivityKind, type_~ : String) -> Self
+pub fn ThreadItemSubAgentActivity::to_json(Self) -> Json
+pub impl ToJson for ThreadItemSubAgentActivity
+pub impl @moonbitlang/core/json.FromJson for ThreadItemSubAgentActivity
+
+pub(all) struct ThreadItemUserMessage {
+  client_id : @gaato/sdk-runtime/json.Presence[String]
+  content : Array[UserInput]
+  id : String
+  type_ : String
+}
+pub fn ThreadItemUserMessage::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ThreadItemUserMessage::new(content~ : Array[UserInput], id~ : String, type_~ : String, client_id? : String) -> Self
+pub fn ThreadItemUserMessage::to_json(Self) -> Json
+pub impl ToJson for ThreadItemUserMessage
+pub impl @moonbitlang/core/json.FromJson for ThreadItemUserMessage
+
+pub(all) struct ThreadItemWebSearch {
+  action : @gaato/sdk-runtime/json.Presence[WebSearchAction]
+  id : String
+  query : String
+  results : @gaato/sdk-runtime/json.Presence[Array[Json]]
+  type_ : String
+}
+pub fn ThreadItemWebSearch::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ThreadItemWebSearch::new(id~ : String, query~ : String, type_~ : String, action? : WebSearchAction, results? : Array[Json]) -> Self
+pub fn ThreadItemWebSearch::to_json(Self) -> Json
+pub impl ToJson for ThreadItemWebSearch
+pub impl @moonbitlang/core/json.FromJson for ThreadItemWebSearch
+
+pub(all) struct ThreadResumeParams {
+  approval_policy : @gaato/sdk-runtime/json.Presence[AskForApproval]
+  approvals_reviewer : @gaato/sdk-runtime/json.Presence[ApprovalsReviewer]
+  base_instructions : @gaato/sdk-runtime/json.Presence[String]
+  config : @gaato/sdk-runtime/json.Presence[Json]
+  cwd : @gaato/sdk-runtime/json.Presence[String]
+  developer_instructions : @gaato/sdk-runtime/json.Presence[String]
+  exclude_turns : Bool?
+  model : @gaato/sdk-runtime/json.Presence[String]
+  model_provider : @gaato/sdk-runtime/json.Presence[String]
+  personality : @gaato/sdk-runtime/json.Presence[Personality]
+  sandbox : @gaato/sdk-runtime/json.Presence[SandboxMode]
+  service_tier : @gaato/sdk-runtime/json.Presence[String]
+  thread_id : String
+}
+pub fn ThreadResumeParams::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ThreadResumeParams::new(thread_id~ : String, approval_policy? : AskForApproval, approvals_reviewer? : ApprovalsReviewer, base_instructions? : String, config? : Json, cwd? : String, developer_instructions? : String, exclude_turns? : Bool, model? : String, model_provider? : String, personality? : Personality, sandbox? : SandboxMode, service_tier? : String) -> Self
+pub fn ThreadResumeParams::to_json(Self) -> Json
+pub impl ToJson for ThreadResumeParams
+pub impl @moonbitlang/core/json.FromJson for ThreadResumeParams
+
+pub(all) struct ThreadResumeResponse {
+  approval_policy : AskForApproval
+  approvals_reviewer : ApprovalsReviewer
+  cwd : String
+  instruction_sources : Array[String]?
+  items_backwards_cursor : @gaato/sdk-runtime/json.Presence[String]
+  model : String
+  model_provider : String
+  reasoning_effort : @gaato/sdk-runtime/json.Presence[String]
+  sandbox : SandboxPolicy
+  service_tier : @gaato/sdk-runtime/json.Presence[String]
+  thread : Thread
+  turns_backwards_cursor : @gaato/sdk-runtime/json.Presence[String]
+}
+pub fn ThreadResumeResponse::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ThreadResumeResponse::new(approval_policy~ : AskForApproval, approvals_reviewer~ : ApprovalsReviewer, cwd~ : String, model~ : String, model_provider~ : String, sandbox~ : SandboxPolicy, thread~ : Thread, instruction_sources? : Array[String], items_backwards_cursor? : String, reasoning_effort? : String, service_tier? : String, turns_backwards_cursor? : String) -> Self
+pub fn ThreadResumeResponse::to_json(Self) -> Json
+pub impl ToJson for ThreadResumeResponse
+pub impl @moonbitlang/core/json.FromJson for ThreadResumeResponse
+
+pub(all) struct ThreadSection {
+  appearance : @gaato/sdk-runtime/json.Presence[ThreadSectionAppearance]
+  id : String
+  name : String
+}
+pub fn ThreadSection::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ThreadSection::new(id~ : String, name~ : String, appearance? : ThreadSectionAppearance) -> Self
+pub fn ThreadSection::to_json(Self) -> Json
+pub impl ToJson for ThreadSection
+pub impl @moonbitlang/core/json.FromJson for ThreadSection
+
+pub(all) struct ThreadSectionAppearance {
+  color : @gaato/sdk-runtime/json.Presence[String]
+  icon : @gaato/sdk-runtime/json.Presence[String]
+}
+pub fn ThreadSectionAppearance::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ThreadSectionAppearance::new(color? : String, icon? : String) -> Self
+pub fn ThreadSectionAppearance::to_json(Self) -> Json
+pub impl ToJson for ThreadSectionAppearance
+pub impl @moonbitlang/core/json.FromJson for ThreadSectionAppearance
+
+pub(all) struct ThreadStartParams {
+  approval_policy : @gaato/sdk-runtime/json.Presence[AskForApproval]
+  approvals_reviewer : @gaato/sdk-runtime/json.Presence[ApprovalsReviewer]
+  base_instructions : @gaato/sdk-runtime/json.Presence[String]
+  config : @gaato/sdk-runtime/json.Presence[Json]
+  cwd : @gaato/sdk-runtime/json.Presence[String]
+  developer_instructions : @gaato/sdk-runtime/json.Presence[String]
+  ephemeral : @gaato/sdk-runtime/json.Presence[Bool]
+  model : @gaato/sdk-runtime/json.Presence[String]
+  model_provider : @gaato/sdk-runtime/json.Presence[String]
+  personality : @gaato/sdk-runtime/json.Presence[Personality]
+  sandbox : @gaato/sdk-runtime/json.Presence[SandboxMode]
+  service_name : @gaato/sdk-runtime/json.Presence[String]
+  service_tier : @gaato/sdk-runtime/json.Presence[String]
+  session_start_source : @gaato/sdk-runtime/json.Presence[ThreadStartSource]
+  thread_source : @gaato/sdk-runtime/json.Presence[String]
+}
+pub fn ThreadStartParams::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ThreadStartParams::new(approval_policy? : AskForApproval, approvals_reviewer? : ApprovalsReviewer, base_instructions? : String, config? : Json, cwd? : String, developer_instructions? : String, ephemeral? : Bool, model? : String, model_provider? : String, personality? : Personality, sandbox? : SandboxMode, service_name? : String, service_tier? : String, session_start_source? : ThreadStartSource, thread_source? : String) -> Self
+pub fn ThreadStartParams::to_json(Self) -> Json
+pub impl ToJson for ThreadStartParams
+pub impl @moonbitlang/core/json.FromJson for ThreadStartParams
+
+pub(all) struct ThreadStartResponse {
+  approval_policy : AskForApproval
+  approvals_reviewer : ApprovalsReviewer
+  cwd : String
+  instruction_sources : Array[String]?
+  model : String
+  model_provider : String
+  reasoning_effort : @gaato/sdk-runtime/json.Presence[String]
+  sandbox : SandboxPolicy
+  service_tier : @gaato/sdk-runtime/json.Presence[String]
+  thread : Thread
+}
+pub fn ThreadStartResponse::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ThreadStartResponse::new(approval_policy~ : AskForApproval, approvals_reviewer~ : ApprovalsReviewer, cwd~ : String, model~ : String, model_provider~ : String, sandbox~ : SandboxPolicy, thread~ : Thread, instruction_sources? : Array[String], reasoning_effort? : String, service_tier? : String) -> Self
+pub fn ThreadStartResponse::to_json(Self) -> Json
+pub impl ToJson for ThreadStartResponse
+pub impl @moonbitlang/core/json.FromJson for ThreadStartResponse
+
+pub(all) enum ThreadStartSource {
+  Startup
+  Clear
+  Custom(String)
+}
+pub fn ThreadStartSource::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ThreadStartSource::to_json(Self) -> Json
+pub impl ToJson for ThreadStartSource
+pub impl @moonbitlang/core/json.FromJson for ThreadStartSource
+
+pub(all) struct ThreadStartedNotification {
+  thread : Thread
+}
+pub fn ThreadStartedNotification::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ThreadStartedNotification::new(thread~ : Thread) -> Self
+pub fn ThreadStartedNotification::to_json(Self) -> Json
+pub impl ToJson for ThreadStartedNotification
+pub impl @moonbitlang/core/json.FromJson for ThreadStartedNotification
+
+pub(all) enum ThreadStatus {
+  NotLoaded(ThreadStatusNotLoaded)
+  Idle(ThreadStatusIdle)
+  SystemError(ThreadStatusSystemError)
+  Active(ThreadStatusActive)
+  Unknown(String, Json)
+}
+pub fn ThreadStatus::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ThreadStatus::to_json(Self) -> Json
+pub impl ToJson for ThreadStatus
+pub impl @moonbitlang/core/json.FromJson for ThreadStatus
+
+pub(all) struct ThreadStatusActive {
+  active_flags : Array[ThreadActiveFlag]
+  type_ : String
+}
+pub fn ThreadStatusActive::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ThreadStatusActive::new(active_flags~ : Array[ThreadActiveFlag], type_~ : String) -> Self
+pub fn ThreadStatusActive::to_json(Self) -> Json
+pub impl ToJson for ThreadStatusActive
+pub impl @moonbitlang/core/json.FromJson for ThreadStatusActive
+
+pub(all) struct ThreadStatusIdle {
+  type_ : String
+}
+pub fn ThreadStatusIdle::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ThreadStatusIdle::new(type_~ : String) -> Self
+pub fn ThreadStatusIdle::to_json(Self) -> Json
+pub impl ToJson for ThreadStatusIdle
+pub impl @moonbitlang/core/json.FromJson for ThreadStatusIdle
+
+pub(all) struct ThreadStatusNotLoaded {
+  type_ : String
+}
+pub fn ThreadStatusNotLoaded::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ThreadStatusNotLoaded::new(type_~ : String) -> Self
+pub fn ThreadStatusNotLoaded::to_json(Self) -> Json
+pub impl ToJson for ThreadStatusNotLoaded
+pub impl @moonbitlang/core/json.FromJson for ThreadStatusNotLoaded
+
+pub(all) struct ThreadStatusSystemError {
+  type_ : String
+}
+pub fn ThreadStatusSystemError::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ThreadStatusSystemError::new(type_~ : String) -> Self
+pub fn ThreadStatusSystemError::to_json(Self) -> Json
+pub impl ToJson for ThreadStatusSystemError
+pub impl @moonbitlang/core/json.FromJson for ThreadStatusSystemError
+
+pub(all) struct ToolRequestUserInputAnswer {
+  answers : Array[String]
+}
+pub fn ToolRequestUserInputAnswer::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ToolRequestUserInputAnswer::new(answers~ : Array[String]) -> Self
+pub fn ToolRequestUserInputAnswer::to_json(Self) -> Json
+pub impl ToJson for ToolRequestUserInputAnswer
+pub impl @moonbitlang/core/json.FromJson for ToolRequestUserInputAnswer
+
+pub(all) struct ToolRequestUserInputOption {
+  description : String
+  label : String
+}
+pub fn ToolRequestUserInputOption::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ToolRequestUserInputOption::new(description~ : String, label~ : String) -> Self
+pub fn ToolRequestUserInputOption::to_json(Self) -> Json
+pub impl ToJson for ToolRequestUserInputOption
+pub impl @moonbitlang/core/json.FromJson for ToolRequestUserInputOption
+
+pub(all) struct ToolRequestUserInputParams {
+  auto_resolution_ms : @gaato/sdk-runtime/json.Presence[UInt64Number]
+  is_blocking : Bool
+  item_id : String
+  questions : Array[ToolRequestUserInputQuestion]
+  thread_id : String
+  turn_id : String
+}
+pub fn ToolRequestUserInputParams::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ToolRequestUserInputParams::new(is_blocking~ : Bool, item_id~ : String, questions~ : Array[ToolRequestUserInputQuestion], thread_id~ : String, turn_id~ : String, auto_resolution_ms? : UInt64Number) -> Self
+pub fn ToolRequestUserInputParams::to_json(Self) -> Json
+pub impl ToJson for ToolRequestUserInputParams
+pub impl @moonbitlang/core/json.FromJson for ToolRequestUserInputParams
+
+pub(all) struct ToolRequestUserInputQuestion {
+  header : String
+  id : String
+  is_other : Bool?
+  is_secret : Bool?
+  options : @gaato/sdk-runtime/json.Presence[Array[ToolRequestUserInputOption]]
+  question : String
+}
+pub fn ToolRequestUserInputQuestion::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ToolRequestUserInputQuestion::new(header~ : String, id~ : String, question~ : String, is_other? : Bool, is_secret? : Bool, options? : Array[ToolRequestUserInputOption]) -> Self
+pub fn ToolRequestUserInputQuestion::to_json(Self) -> Json
+pub impl ToJson for ToolRequestUserInputQuestion
+pub impl @moonbitlang/core/json.FromJson for ToolRequestUserInputQuestion
+
+pub(all) struct ToolRequestUserInputResponse {
+  answers : Map[String, ToolRequestUserInputAnswer]
+}
+pub fn ToolRequestUserInputResponse::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ToolRequestUserInputResponse::new(answers~ : Map[String, ToolRequestUserInputAnswer]) -> Self
+pub fn ToolRequestUserInputResponse::to_json(Self) -> Json
+pub impl ToJson for ToolRequestUserInputResponse
+pub impl @moonbitlang/core/json.FromJson for ToolRequestUserInputResponse
+
+pub(all) struct Turn {
+  completed_at : @gaato/sdk-runtime/json.Presence[Int64]
+  duration_ms : @gaato/sdk-runtime/json.Presence[Int64]
+  error : @gaato/sdk-runtime/json.Presence[TurnError]
+  id : String
+  items : Array[ThreadItem]
+  items_view : TurnItemsView?
+  started_at : @gaato/sdk-runtime/json.Presence[Int64]
+  status : TurnStatus
+}
+pub fn Turn::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn Turn::new(id~ : String, items~ : Array[ThreadItem], status~ : TurnStatus, completed_at? : Int64, duration_ms? : Int64, error? : TurnError, items_view? : TurnItemsView, started_at? : Int64) -> Self
+pub fn Turn::to_json(Self) -> Json
+pub impl ToJson for Turn
+pub impl @moonbitlang/core/json.FromJson for Turn
+
+pub(all) struct TurnCompletedNotification {
+  thread_id : String
+  turn : Turn
+}
+pub fn TurnCompletedNotification::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn TurnCompletedNotification::new(thread_id~ : String, turn~ : Turn) -> Self
+pub fn TurnCompletedNotification::to_json(Self) -> Json
+pub impl ToJson for TurnCompletedNotification
+pub impl @moonbitlang/core/json.FromJson for TurnCompletedNotification
+
+pub(all) struct TurnError {
+  additional_details : @gaato/sdk-runtime/json.Presence[String]
+  codex_error_info : @gaato/sdk-runtime/json.Presence[CodexErrorInfo]
+  message : String
+  misalignment : @gaato/sdk-runtime/json.Presence[MisalignmentErrorDetails]
+}
+pub fn TurnError::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn TurnError::new(message~ : String, additional_details? : String, codex_error_info? : CodexErrorInfo, misalignment? : MisalignmentErrorDetails) -> Self
+pub fn TurnError::to_json(Self) -> Json
+pub impl ToJson for TurnError
+pub impl @moonbitlang/core/json.FromJson for TurnError
+
+pub(all) struct TurnInterruptParams {
+  thread_id : String
+  turn_id : String
+}
+pub fn TurnInterruptParams::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn TurnInterruptParams::new(thread_id~ : String, turn_id~ : String) -> Self
+pub fn TurnInterruptParams::to_json(Self) -> Json
+pub impl ToJson for TurnInterruptParams
+pub impl @moonbitlang/core/json.FromJson for TurnInterruptParams
+
+pub(all) enum TurnItemsView {
+  NotLoaded
+  Summary
+  Full
+  Unknown(String)
+}
+pub fn TurnItemsView::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn TurnItemsView::to_json(Self) -> Json
+pub impl ToJson for TurnItemsView
+pub impl @moonbitlang/core/json.FromJson for TurnItemsView
+
+pub(all) struct TurnStartParams {
+  approval_policy : @gaato/sdk-runtime/json.Presence[AskForApproval]
+  approvals_reviewer : @gaato/sdk-runtime/json.Presence[ApprovalsReviewer]
+  client_user_message_id : @gaato/sdk-runtime/json.Presence[String]
+  cwd : @gaato/sdk-runtime/json.Presence[String]
+  effort : @gaato/sdk-runtime/json.Presence[String]
+  input : Array[UserInput]
+  model : @gaato/sdk-runtime/json.Presence[String]
+  output_schema : @gaato/sdk-runtime/json.Presence[Json]
+  personality : @gaato/sdk-runtime/json.Presence[Personality]
+  sandbox_policy : @gaato/sdk-runtime/json.Presence[SandboxPolicy]
+  service_tier : @gaato/sdk-runtime/json.Presence[String]
+  service_tier_for_turn : @gaato/sdk-runtime/json.Presence[String]
+  summary : @gaato/sdk-runtime/json.Presence[ReasoningSummary]
+  thread_id : String
+  tool_output : @gaato/sdk-runtime/json.Presence[TurnToolOutput]
+  turn_trigger : @gaato/sdk-runtime/json.Presence[String]
+}
+pub fn TurnStartParams::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn TurnStartParams::new(input~ : Array[UserInput], thread_id~ : String, approval_policy? : AskForApproval, approvals_reviewer? : ApprovalsReviewer, client_user_message_id? : String, cwd? : String, effort? : String, model? : String, output_schema? : Json, personality? : Personality, sandbox_policy? : SandboxPolicy, service_tier? : String, service_tier_for_turn? : String, summary? : ReasoningSummary, tool_output? : TurnToolOutput, turn_trigger? : String) -> Self
+pub fn TurnStartParams::to_json(Self) -> Json
+pub impl ToJson for TurnStartParams
+pub impl @moonbitlang/core/json.FromJson for TurnStartParams
+
+pub(all) struct TurnStartResponse {
+  turn : Turn
+}
+pub fn TurnStartResponse::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn TurnStartResponse::new(turn~ : Turn) -> Self
+pub fn TurnStartResponse::to_json(Self) -> Json
+pub impl ToJson for TurnStartResponse
+pub impl @moonbitlang/core/json.FromJson for TurnStartResponse
+
+pub(all) struct TurnStartedNotification {
+  thread_id : String
+  turn : Turn
+}
+pub fn TurnStartedNotification::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn TurnStartedNotification::new(thread_id~ : String, turn~ : Turn) -> Self
+pub fn TurnStartedNotification::to_json(Self) -> Json
+pub impl ToJson for TurnStartedNotification
+pub impl @moonbitlang/core/json.FromJson for TurnStartedNotification
+
+pub(all) enum TurnStatus {
+  Completed
+  Interrupted
+  Failed
+  InProgress
+  Unknown(String)
+}
+pub fn TurnStatus::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn TurnStatus::to_json(Self) -> Json
+pub impl ToJson for TurnStatus
+pub impl @moonbitlang/core/json.FromJson for TurnStatus
+
+pub(all) struct TurnToolOutput {
+  name : String
+  namespace_ : @gaato/sdk-runtime/json.Presence[String]
+  output : FunctionCallOutputBody
+}
+pub fn TurnToolOutput::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn TurnToolOutput::new(name~ : String, output~ : FunctionCallOutputBody, namespace_? : String) -> Self
+pub fn TurnToolOutput::to_json(Self) -> Json
+pub impl ToJson for TurnToolOutput
+pub impl @moonbitlang/core/json.FromJson for TurnToolOutput
+
+pub(all) struct UInt64Number {
+  value : UInt64
+}
+pub fn UInt64Number::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn UInt64Number::to_json(Self) -> Json
+pub impl ToJson for UInt64Number
+pub impl @moonbitlang/core/json.FromJson for UInt64Number
+
+pub(all) enum UserInput {
+  Text(UserInputText)
+  Image(UserInputImage)
+  LocalImage(UserInputLocalImage)
+  Audio(UserInputAudio)
+  LocalAudio(UserInputLocalAudio)
+  Skill(UserInputSkill)
+  Mention(UserInputMention)
+  Unknown(String, Json)
+}
+pub fn UserInput::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn UserInput::to_json(Self) -> Json
+pub impl ToJson for UserInput
+pub impl @moonbitlang/core/json.FromJson for UserInput
+
+pub(all) struct UserInputAudio {
+  type_ : String
+  url : String
+}
+pub fn UserInputAudio::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn UserInputAudio::new(type_~ : String, url~ : String) -> Self
+pub fn UserInputAudio::to_json(Self) -> Json
+pub impl ToJson for UserInputAudio
+pub impl @moonbitlang/core/json.FromJson for UserInputAudio
+
+pub(all) struct UserInputImage {
+  detail : @gaato/sdk-runtime/json.Presence[ImageDetail]
+  type_ : String
+  url : String
+}
+pub fn UserInputImage::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn UserInputImage::new(type_~ : String, url~ : String, detail? : ImageDetail) -> Self
+pub fn UserInputImage::to_json(Self) -> Json
+pub impl ToJson for UserInputImage
+pub impl @moonbitlang/core/json.FromJson for UserInputImage
+
+pub(all) struct UserInputLocalAudio {
+  path : String
+  type_ : String
+}
+pub fn UserInputLocalAudio::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn UserInputLocalAudio::new(path~ : String, type_~ : String) -> Self
+pub fn UserInputLocalAudio::to_json(Self) -> Json
+pub impl ToJson for UserInputLocalAudio
+pub impl @moonbitlang/core/json.FromJson for UserInputLocalAudio
+
+pub(all) struct UserInputLocalImage {
+  detail : @gaato/sdk-runtime/json.Presence[ImageDetail]
+  path : String
+  type_ : String
+}
+pub fn UserInputLocalImage::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn UserInputLocalImage::new(path~ : String, type_~ : String, detail? : ImageDetail) -> Self
+pub fn UserInputLocalImage::to_json(Self) -> Json
+pub impl ToJson for UserInputLocalImage
+pub impl @moonbitlang/core/json.FromJson for UserInputLocalImage
+
+pub(all) struct UserInputMention {
+  name : String
+  path : String
+  type_ : String
+}
+pub fn UserInputMention::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn UserInputMention::new(name~ : String, path~ : String, type_~ : String) -> Self
+pub fn UserInputMention::to_json(Self) -> Json
+pub impl ToJson for UserInputMention
+pub impl @moonbitlang/core/json.FromJson for UserInputMention
+
+pub(all) struct UserInputSkill {
+  name : String
+  path : String
+  type_ : String
+}
+pub fn UserInputSkill::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn UserInputSkill::new(name~ : String, path~ : String, type_~ : String) -> Self
+pub fn UserInputSkill::to_json(Self) -> Json
+pub impl ToJson for UserInputSkill
+pub impl @moonbitlang/core/json.FromJson for UserInputSkill
+
+pub(all) struct UserInputText {
+  text : String
+  text_elements : Array[TextElement]?
+  type_ : String
+}
+pub fn UserInputText::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn UserInputText::new(text~ : String, type_~ : String, text_elements? : Array[TextElement]) -> Self
+pub fn UserInputText::to_json(Self) -> Json
+pub impl ToJson for UserInputText
+pub impl @moonbitlang/core/json.FromJson for UserInputText
+
+pub(all) enum WebSearchAction {
+  Search(WebSearchActionSearch)
+  OpenPage(WebSearchActionOpenPage)
+  FindInPage(WebSearchActionFindInPage)
+  Other(WebSearchActionOther)
+  Unknown(String, Json)
+}
+pub fn WebSearchAction::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn WebSearchAction::to_json(Self) -> Json
+pub impl ToJson for WebSearchAction
+pub impl @moonbitlang/core/json.FromJson for WebSearchAction
+
+pub(all) struct WebSearchActionFindInPage {
+  pattern : @gaato/sdk-runtime/json.Presence[String]
+  type_ : String
+  url : @gaato/sdk-runtime/json.Presence[String]
+}
+pub fn WebSearchActionFindInPage::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn WebSearchActionFindInPage::new(type_~ : String, pattern? : String, url? : String) -> Self
+pub fn WebSearchActionFindInPage::to_json(Self) -> Json
+pub impl ToJson for WebSearchActionFindInPage
+pub impl @moonbitlang/core/json.FromJson for WebSearchActionFindInPage
+
+pub(all) struct WebSearchActionOpenPage {
+  type_ : String
+  url : @gaato/sdk-runtime/json.Presence[String]
+}
+pub fn WebSearchActionOpenPage::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn WebSearchActionOpenPage::new(type_~ : String, url? : String) -> Self
+pub fn WebSearchActionOpenPage::to_json(Self) -> Json
+pub impl ToJson for WebSearchActionOpenPage
+pub impl @moonbitlang/core/json.FromJson for WebSearchActionOpenPage
+
+pub(all) struct WebSearchActionOther {
+  type_ : String
+}
+pub fn WebSearchActionOther::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn WebSearchActionOther::new(type_~ : String) -> Self
+pub fn WebSearchActionOther::to_json(Self) -> Json
+pub impl ToJson for WebSearchActionOther
+pub impl @moonbitlang/core/json.FromJson for WebSearchActionOther
+
+pub(all) struct WebSearchActionSearch {
+  queries : @gaato/sdk-runtime/json.Presence[Array[String]]
+  query : @gaato/sdk-runtime/json.Presence[String]
+  type_ : String
+}
+pub fn WebSearchActionSearch::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn WebSearchActionSearch::new(type_~ : String, queries? : Array[String], query? : String) -> Self
+pub fn WebSearchActionSearch::to_json(Self) -> Json
+pub impl ToJson for WebSearchActionSearch
+pub impl @moonbitlang/core/json.FromJson for WebSearchActionSearch
+
+// Type aliases
+
+// Traits

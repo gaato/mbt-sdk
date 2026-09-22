@@ -1,0 +1,19 @@
+{
+  "requests": {
+    "initialize": "InitializeResponse",
+    "thread/start": "v2/ThreadStartResponse",
+    "thread/resume": "v2/ThreadResumeResponse",
+    "turn/start": "v2/TurnStartResponse",
+    "turn/interrupt": "v2/TurnInterruptResponse"
+  },
+  "notifications": [
+    "error", "thread/started", "turn/started", "turn/completed",
+    "item/started", "item/completed", "item/agentMessage/delta"
+  ],
+  "server_requests": {
+    "item/commandExecution/requestApproval": "CommandExecutionRequestApprovalResponse",
+    "item/fileChange/requestApproval": "FileChangeRequestApprovalResponse",
+    "item/permissions/requestApproval": "PermissionsRequestApprovalResponse",
+    "item/tool/requestUserInput": "ToolRequestUserInputResponse"
+  }
+}

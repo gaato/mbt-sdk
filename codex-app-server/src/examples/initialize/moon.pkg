@@ -1,0 +1,10 @@
+supported_targets = "native"
+
+import {
+  "gaato/codex-app-server" @codex,
+  "gaato/codex-protocol/gen" @protocol,
+  "moonbitlang/async",
+  "moonbitlang/core/env",
+}
+
+pkgtype(kind: "executable")
