@@ -108,8 +108,11 @@ impl @json.FromJson for ApiErrorEnvelopeJson with fn from_json(value, path) {
 fn decode_response(
   response : @http.Response,
 ) -> Response raise @runtime.SdkError {
-  let generated = @gen.create_response_decode(response)
-  let raw = parse_json_body(response.body) catch {
+  let raw = response.json() catch {
+    error =>
+      raise @runtime.Decode(message=error.to_string(), body=response.body)
+  }
+  let generated = @gen.create_response_decode_json(raw) catch {
     error =>
       raise @runtime.Decode(message=error.to_string(), body=response.body)
   }

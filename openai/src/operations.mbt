@@ -46,13 +46,12 @@ pub async fn OpenAI::create_embeddings(
   self : OpenAI,
   request : EmbeddingRequest,
 ) -> EmbeddingResponse raise @runtime.SdkError {
-  let body : @gen.CreateEmbeddingRequest = {
-    model: request.model,
-    input: @gen.TextArray(request.input.copy()),
-    encoding_format: None,
-    dimensions: request.dimensions,
-    user: request.user,
-  }
+  let body = @gen.CreateEmbeddingRequest::new(
+    model=request.model,
+    input=@gen.TextArray(request.input.copy()),
+    dimensions?=request.dimensions,
+    user?=request.user,
+  )
   let response = self.client.send(
     @gen.create_embedding_request(body),
     bucket="embeddings",

@@ -1,0 +1,13 @@
+overlay: 1.0.0
+info:
+  title: OpenRouter MoonBit generation slice
+  version: 0.1.0
+actions:
+  - target: "$['paths']['/messages']['post']"
+    description: Keep createMessages excluded after the bounded M4e attempt; five true generator gaps remain after the reviewed raw-JSON boundary below.
+    update:
+      x-moonbit-include: false
+  - target: "$['components']['schemas']['FusionPlugin']['properties']['tools']['items']['properties']['parameters']['additionalProperties']"
+    description: Fusion plugin parameter values intentionally accept arbitrary heterogeneous JSON, so preserve this reviewed value boundary as raw JSON.
+    update:
+      x-moonbit-json: true

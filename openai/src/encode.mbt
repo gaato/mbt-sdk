@@ -22,33 +22,15 @@ fn response_parts(
       raise @runtime.Config("extra parameter collides with known key: " + key)
     }
   }
-  let generated : @gen.CreateResponse = {
-    metadata: @sdkjson.Absent,
-    temperature: @sdkjson.Presence::from_option(request.temperature),
-    top_p: @sdkjson.Absent,
-    user: None,
-    service_tier: @sdkjson.Absent,
-    previous_response_id: @sdkjson.Presence::from_option(
-      request.previous_response_id,
-    ),
-    model: request.model,
-    reasoning: @sdkjson.Absent,
-    max_output_tokens: @sdkjson.Presence::from_option(request.max_output_tokens),
-    instructions: @sdkjson.Presence::from_option(request.instructions),
-    text: None,
-    tools: None,
-    tool_choice: None,
-    truncation: @sdkjson.Absent,
-    input: @gen.Text(request.input),
-    include_: @sdkjson.Absent,
-    parallel_tool_calls: @sdkjson.Absent,
-    store: @sdkjson.Absent,
-    stream: if stream {
-      @sdkjson.Value(true)
-    } else {
-      @sdkjson.Absent
-    },
-  }
+  let generated = @gen.CreateResponse::new(
+    model=request.model,
+    input=@gen.Text(request.input),
+    temperature?=request.temperature,
+    previous_response_id?=request.previous_response_id,
+    max_output_tokens?=request.max_output_tokens,
+    instructions?=request.instructions,
+    stream?=if stream { Some(true) } else { None },
+  )
   let body = generated.to_json()
   guard body is Object(fields) else {
     raise @runtime.Config("generated response request must be an object")

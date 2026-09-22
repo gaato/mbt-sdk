@@ -82,8 +82,11 @@ test "missing required generated response field becomes SdkError Decode" {
       response("{\"created\":1,\"owned_by\":\"openai\"}"),
     )
   catch {
-    @runtime.Decode(body~, ..) =>
+    @runtime.Decode(message~, body~) => {
       assert_eq(body, b"{\"created\":1,\"owned_by\":\"openai\"}")
+      assert_true(message.contains("required だが欠落: "))
+      assert_true(message.contains("id"))
+    }
     _ => fail("expected SdkError::Decode")
   } noraise {
     _ => fail("missing id must fail")
@@ -184,6 +187,54 @@ test "unknown Responses output item retains its tag and JSON" {
       assert_eq(raw.stringify(), "{\"type\":\"future_output\",\"value\":42}")
     }
     _ => fail("expected unknown output item")
+  }
+}
+
+///|
+test "InputItem message candidates round-trip and unknown tags stay raw" {
+  let user = @gen.InputItem::EasyInputMessage(
+    @gen.EasyInputMessage::new(
+      role=@gen.EasyInputMessageRole::User,
+      content=@gen.EasyInputMessageContent::Text("hello"),
+      type_="message",
+    ),
+  )
+  let user_json = user.to_json()
+  let decoded_user : @gen.InputItem = @json.from_json(user_json)
+  match decoded_user {
+    @gen.EasyInputMessage(message) =>
+      match message.content {
+        @gen.Text(text) => assert_eq(text, "hello")
+        _ => fail("expected text input")
+      }
+    _ => fail("expected easy user input message")
+  }
+  assert_eq(decoded_user.to_json(), user_json)
+
+  let assistant = @gen.InputItem::OutputMessage(
+    @gen.OutputMessage::new(
+      id="message-1",
+      type_="message",
+      content=[],
+      status=@gen.OutputMessageStatus::Completed,
+    ),
+  )
+  let assistant_json = assistant.to_json()
+  let decoded_assistant : @gen.InputItem = @json.from_json(assistant_json)
+  match decoded_assistant {
+    @gen.OutputMessage(message) => assert_eq(message.id, "message-1")
+    _ => fail("expected assistant output message")
+  }
+  assert_eq(decoded_assistant.to_json(), assistant_json)
+
+  let future = @json.parse("{\"type\":\"future_item\",\"value\":1}")
+  let decoded_future : @gen.InputItem = @json.from_json(future)
+  match decoded_future {
+    @gen.Unknown(tag, raw) => {
+      assert_eq(tag, "future_item")
+      assert_eq(raw, future)
+    }
+    _ => fail("expected unknown InputItem")
   }
 }
 

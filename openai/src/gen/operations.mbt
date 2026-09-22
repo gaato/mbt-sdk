@@ -62,6 +62,15 @@ pub fn create_embedding_request(body : CreateEmbeddingRequest) -> @http.Request 
 
 ///|
 ///
+/// Decodes a parsed successful createEmbedding response.
+pub fn create_embedding_decode_json(
+  value : Json,
+) -> CreateEmbeddingResponse raise @json.JsonDecodeError {
+  @json.from_json(value)
+}
+
+///|
+///
 /// Decodes a successful createEmbedding response.
 pub fn create_embedding_decode(
   response : @http.Response,
@@ -74,6 +83,15 @@ pub fn create_embedding_decode(
 /// Lists the currently available models, and provides basic information about each one such as the owner and availability.
 pub fn list_models_request() -> @http.Request {
   @http.Request::get("/models")
+}
+
+///|
+///
+/// Decodes a parsed successful listModels response.
+pub fn list_models_decode_json(
+  value : Json,
+) -> ListModelsResponse raise @json.JsonDecodeError {
+  @json.from_json(value)
 }
 
 ///|
@@ -94,6 +112,15 @@ pub fn retrieve_model_request(model : String) -> @http.Request {
 
 ///|
 ///
+/// Decodes a parsed successful retrieveModel response.
+pub fn retrieve_model_decode_json(
+  value : Json,
+) -> Model raise @json.JsonDecodeError {
+  @json.from_json(value)
+}
+
+///|
+///
 /// Decodes a successful retrieveModel response.
 pub fn retrieve_model_decode(
   response : @http.Response,
@@ -106,6 +133,15 @@ pub fn retrieve_model_decode(
 /// Creates a model response. Provide [text](/docs/guides/text) or [image](/docs/guides/images) inputs to generate [text](/docs/guides/text) or [JSON](/docs/guides/structured-outputs) outputs. Have the model call your own [custom code](/docs/guides/function-calling) or use built-in [tools](/docs/guides/tools) like [web search](/docs/guides/tools-web-search) or [file search](/docs/guides/tools-file-search) to use your own data as input for the model's response.
 pub fn create_response_request(body : CreateResponse) -> @http.Request {
   @http.Request::post("/responses").json_body(body.to_json())
+}
+
+///|
+///
+/// Decodes a parsed successful createResponse response.
+pub fn create_response_decode_json(
+  value : Json,
+) -> Response raise @json.JsonDecodeError {
+  @json.from_json(value)
 }
 
 ///|

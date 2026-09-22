@@ -83,6 +83,9 @@ class TaggedVariant:
     name: str
     tag: str
     type: TypeRef
+    secondary_discriminator: str | None = None
+    secondary_tag: str | None = None
+    required_fields: tuple[str, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -437,21 +440,86 @@ class IRBuilder:
             return values[0]
         return None
 
-    def _implicit_tags(self, choices: list[dict[str, Any]]) -> tuple[str, list[str]] | None:
+    def _single_value_property(
+        self,
+        choices: list[dict[str, Any]],
+        *,
+        exclude: set[str] | None = None,
+        require_unique: bool = False,
+    ) -> tuple[str, list[str]] | None:
         properties = [self._properties(choice) for choice in choices]
         if any(item is None for item in properties):
             return None
         assert properties and all(item is not None for item in properties)
         first = properties[0]
-        candidates = list(first)
+        candidates = [name for name in first if name not in (exclude or set())]
         if "type" in candidates:
             candidates.remove("type")
             candidates.insert(0, "type")
         for property_name in candidates:
             values = [self._single_string_value(item.get(property_name)) for item in properties]
-            if all(value is not None for value in values) and len(set(values)) == len(values):
+            if all(value is not None for value in values) and (
+                not require_unique or len(set(values)) == len(values)
+            ):
                 return property_name, [value for value in values if value is not None]
         return None
+
+    def _implicit_tags(self, choices: list[dict[str, Any]]) -> tuple[str, list[str]] | None:
+        return self._single_value_property(choices, require_unique=False)
+
+    def _required_fields(
+        self,
+        schema: dict[str, Any],
+        seen_refs: set[str] | None = None,
+    ) -> set[str] | None:
+        ref = schema.get("$ref")
+        if isinstance(ref, str):
+            visited = seen_refs or set()
+            if ref in visited:
+                return set()
+            try:
+                return self._required_fields(self.resolve(ref), visited | {ref})
+            except (KeyError, TypeError):
+                return None
+        required = {
+            value for value in schema.get("required", []) if isinstance(value, str)
+        }
+        parts = schema.get("allOf")
+        if isinstance(parts, list):
+            for part in parts:
+                if not isinstance(part, dict):
+                    return None
+                nested = self._required_fields(part, seen_refs)
+                if nested is None:
+                    return None
+                required.update(nested)
+        return required
+
+    @staticmethod
+    def _choice_name(choice: dict[str, Any], index: int) -> str:
+        ref = choice.get("$ref")
+        if isinstance(ref, str) and ref.startswith("#/components/schemas/"):
+            return ref.rsplit("/", 1)[-1].replace("~1", "/").replace("~0", "~")
+        return str(index)
+
+    @staticmethod
+    def _required_order(required: list[set[str]]) -> list[int]:
+        """Stable topological order for strict-superset-before-subset edges."""
+        remaining = list(range(len(required)))
+        result: list[int] = []
+        while remaining:
+            ready = next(
+                index
+                for index in remaining
+                if not any(
+                    required[other] > required[index]
+                    for other in remaining
+                    if other != index
+                )
+            )
+            result.append(ready)
+            remaining.remove(ready)
+        return result
 
     def _scan_discriminator_fields(self) -> None:
         """Mark component discriminator fields before declaration order matters."""
@@ -470,12 +538,43 @@ class IRBuilder:
             seen.add(identity)
             choices = schema.get("oneOf") or schema.get("anyOf")
             if isinstance(choices, list) and all(isinstance(item, dict) for item in choices):
+                expanded: list[dict[str, Any]] = []
+                for choice in choices:
+                    nested = self._expand_object_choices(choice)
+                    if nested is None:
+                        expanded = []
+                        break
+                    expanded.extend(nested)
+                if expanded:
+                    choices = expanded
                 discriminator = schema.get("discriminator")
                 property_name = discriminator.get("propertyName") if isinstance(discriminator, dict) else None
                 if not isinstance(property_name, str):
                     implicit = self._implicit_tags(choices)
                     property_name = implicit[0] if implicit is not None else None
                 if isinstance(property_name, str):
+                    properties = [self._properties(choice) for choice in choices]
+                    primary_values = [
+                        self._single_string_value(item.get(property_name))
+                        if item is not None
+                        else None
+                        for item in properties
+                    ]
+                    secondary_fields: set[str] = set()
+                    for value in {item for item in primary_values if item is not None}:
+                        indexes = [
+                            index for index, item in enumerate(primary_values) if item == value
+                        ]
+                        if len(indexes) < 2:
+                            continue
+                        group = [choices[index] for index in indexes]
+                        secondary = self._single_value_property(
+                            group,
+                            exclude={property_name},
+                            require_unique=True,
+                        )
+                        if secondary is not None:
+                            secondary_fields.add(secondary[0])
                     refs = [item.get("$ref") for item in choices]
                     mapping = discriminator.get("mapping") if isinstance(discriminator, dict) else None
                     if isinstance(mapping, dict):
@@ -484,6 +583,7 @@ class IRBuilder:
                         if isinstance(ref, str) and ref.startswith("#/components/schemas/"):
                             component = ref.rsplit("/", 1)[-1].replace("~1", "/").replace("~0", "~")
                             self._discriminator_fields.setdefault(component, set()).add(property_name)
+                            self._discriminator_fields[component].update(secondary_fields)
             ref = schema.get("$ref")
             if isinstance(ref, str) and ref.startswith("#/components/schemas/"):
                 try:
@@ -621,7 +721,7 @@ class IRBuilder:
                 expanded.extend(nested)
             if expanded:
                 choices = expanded
-        entries: list[tuple[str, dict[str, Any]]] = []
+        entries: list[tuple[str, dict[str, Any], int]] = []
         if isinstance(discriminator, dict):
             property_name = discriminator.get("propertyName")
             if not isinstance(property_name, str) or not property_name:
@@ -632,7 +732,7 @@ class IRBuilder:
                 )
                 return TypeRef("Json")
             if isinstance(mapping, dict):
-                for tag, ref in mapping.items():
+                for index, (tag, ref) in enumerate(mapping.items()):
                     if not isinstance(tag, str) or not isinstance(ref, str) or not ref.startswith("#/components/schemas/"):
                         self.add_diag(
                             pointer_join(pointer_join(pointer, "discriminator"), "mapping"),
@@ -640,7 +740,7 @@ class IRBuilder:
                             "map each string tag to #/components/schemas/<name>",
                         )
                         continue
-                    entries.append((tag, {"$ref": ref}))
+                    entries.append((tag, {"$ref": ref}, index))
             elif mapping is not None:
                 self.add_diag(
                     pointer_join(pointer_join(pointer, "discriminator"), "mapping"),
@@ -669,7 +769,7 @@ class IRBuilder:
                     )
                     if tag is None:
                         tag = snake_case(ref.rsplit("/", 1)[-1].replace("~1", "/").replace("~0", "~"))
-                    entries.append((tag, choice))
+                    entries.append((tag, choice, index))
         else:
             implicit = self._implicit_tags(choices)
             if implicit is None:
@@ -680,41 +780,169 @@ class IRBuilder:
                 )
                 return TypeRef("Json")
             property_name, tags = implicit
-            entries = list(zip(tags, choices, strict=True))
+            entries = [
+                (tag, choice, index)
+                for index, (tag, choice) in enumerate(zip(tags, choices, strict=True))
+            ]
+
+        groups: dict[str, list[int]] = {}
+        for position, (tag, _, _) in enumerate(entries):
+            groups.setdefault(tag, []).append(position)
+        secondary: dict[int, tuple[str, str]] = {}
+        required_fields: dict[int, tuple[str, ...]] = {}
+        group_order: dict[str, list[int]] = {}
+        order_hint = schema.get("x-moonbit-order")
+        hint_names: list[str] | None = None
+        if order_hint is not None:
+            if not isinstance(order_hint, list) or not all(
+                isinstance(item, str) for item in order_hint
+            ):
+                self.add_diag(
+                    pointer_join(pointer, "x-moonbit-order"),
+                    "x-moonbit-order must be an array of component schema names",
+                    "list each colliding component schema once in decode order",
+                )
+            elif len(set(order_hint)) != len(order_hint):
+                self.add_diag(
+                    pointer_join(pointer, "x-moonbit-order"),
+                    "x-moonbit-order contains duplicate entries",
+                    "list each colliding component schema exactly once",
+                )
+            else:
+                hint_names = order_hint
+        for tag, positions in groups.items():
+            if len(positions) < 2:
+                group_order[tag] = positions
+                continue
+            group_choices = [entries[position][1] for position in positions]
+            second = self._single_value_property(
+                group_choices,
+                exclude={property_name},
+                require_unique=True,
+            )
+            if second is not None:
+                second_name, second_values = second
+                for position, value in zip(positions, second_values, strict=True):
+                    secondary[position] = (second_name, value)
+                group_order[tag] = positions
+                continue
+            required = [self._required_fields(choice) for choice in group_choices]
+            if any(item is None for item in required):
+                self.add_diag(
+                    pointer,
+                    f"tagged union discriminator value collision: {tag!r}",
+                    "set x-moonbit-order to colliding component schema names",
+                )
+                group_order[tag] = positions
+                continue
+            concrete = [item for item in required if item is not None]
+            names = [
+                self._choice_name(entries[position][1], entries[position][2])
+                for position in positions
+            ]
+            if hint_names is not None:
+                missing = [name for name in names if name not in hint_names]
+                unknown = [name for name in hint_names if name not in {
+                    self._choice_name(choice, original_index)
+                    for _, choice, original_index in entries
+                }]
+                if missing or unknown or len(set(names)) != len(names):
+                    self.add_diag(
+                        pointer_join(pointer, "x-moonbit-order"),
+                        f"x-moonbit-order does not uniquely order tag {tag!r}",
+                        "list every colliding local component schema name exactly once",
+                    )
+                    ordered = list(range(len(positions)))
+                else:
+                    ordered = sorted(
+                        range(len(positions)),
+                        key=lambda index: hint_names.index(names[index]),
+                    )
+            else:
+                duplicates = len({frozenset(item) for item in concrete}) != len(concrete)
+                if duplicates:
+                    self.add_diag(
+                        pointer,
+                        f"tagged union discriminator value collision: {tag!r} has indistinguishable required sets",
+                        "set x-moonbit-order to colliding component schema names, or x-moonbit-json: true as a last resort",
+                    )
+                ordered = self._required_order(concrete)
+                if any(
+                    not (left <= right or right <= left)
+                    for index, left in enumerate(concrete)
+                    for right in concrete[index + 1 :]
+                ):
+                    self.add_note(
+                        pointer,
+                        f"tag {tag!r} uses specification order for incomparable required sets",
+                    )
+            group_order[tag] = [positions[index] for index in ordered]
+            for local_index, position in enumerate(positions):
+                required_fields[position] = tuple(sorted(concrete[local_index]))
+
+        ordered_positions: list[int] = []
+        emitted_tags: set[str] = set()
+        for tag, _, _ in entries:
+            if tag not in emitted_tags:
+                ordered_positions.extend(group_order[tag])
+                emitted_tags.add(tag)
 
         annotations = schema.get("x-moonbit-variants")
         variants: list[TaggedVariant] = []
         names: set[str] = set()
-        tags: set[str] = set()
-        for index, (tag, choice) in enumerate(entries):
+        for position in ordered_positions:
+            tag, choice, original_index = entries[position]
             properties = self._properties(choice)
             constant = self._single_string_value(properties.get(property_name)) if properties is not None else None
             if constant != tag:
                 self.add_diag(
-                    pointer_join(pointer_join(pointer, key), index),
+                    pointer_join(pointer_join(pointer, key), original_index),
                     f"discriminator field {property_name!r} must be const or a single-value string enum equal to {tag!r}",
                     "fix the payload discriminator property or mapping",
                 )
-            suggested: Any = tag
-            if isinstance(annotations, list) and index < len(annotations):
-                suggested = annotations[index]
-            elif isinstance(annotations, dict) and tag in annotations:
-                suggested = annotations[tag]
+            second_name, second_value = secondary.get(position, (None, None))
+            if second_value is not None:
+                suggested: Any = pascal_case(tag) + pascal_case(second_value)
+            elif len(groups[tag]) > 1:
+                choice_name = self._choice_name(choice, original_index)
+                suggested = choice_name if not choice_name.isdigit() else f"{tag}_{int(choice_name) + 1}"
+            else:
+                suggested = tag
+            if isinstance(annotations, list) and original_index < len(annotations):
+                suggested = annotations[original_index]
+            elif isinstance(annotations, dict):
+                composite = f"{tag}:{second_value}" if second_value is not None else None
+                choice_name = self._choice_name(choice, original_index)
+                if composite is not None and composite in annotations:
+                    suggested = annotations[composite]
+                elif choice_name in annotations:
+                    suggested = annotations[choice_name]
+                elif len(groups[tag]) == 1 and tag in annotations:
+                    suggested = annotations[tag]
             variant_name = pascal_case(str(suggested))
             if variant_name == "Unknown" or variant_name in names:
                 self.add_diag(pointer, f"tagged union variant name collision: {variant_name}", "set x-moonbit-variants to unique names other than Unknown")
-            if tag in tags:
-                self.add_diag(pointer, f"tagged union discriminator value collision: {tag!r}", "make discriminator values unique")
             names.add(variant_name)
-            tags.add(tag)
+            preserved = {property_name}
+            if second_name is not None:
+                preserved.add(second_name)
             item_type = self.compile_type(
                 choice,
                 name + variant_name,
                 usage,
-                pointer_join(pointer_join(pointer, key), index),
-                preserve_constants={property_name},
+                pointer_join(pointer_join(pointer, key), original_index),
+                preserve_constants=preserved,
             )
-            variants.append(TaggedVariant(variant_name, tag, item_type))
+            variants.append(
+                TaggedVariant(
+                    variant_name,
+                    tag,
+                    item_type,
+                    second_name,
+                    second_value,
+                    required_fields.get(position, ()),
+                )
+            )
         self._add_declaration(
             TaggedUnion(name, property_name, tuple(variants), schema.get("description", "")),
             pointer,
@@ -849,6 +1077,12 @@ class IRBuilder:
         properties = schema.get("properties", {})
         for json_name, field_schema in properties.items():
             field_pointer = pointer_join(pointer_join(pointer, "properties"), json_name)
+            if snake_case(json_name) == "new":
+                self.add_diag(
+                    field_pointer,
+                    "generated struct field name collides with constructor new",
+                    "rename the field with an overlay before generating constructors",
+                )
             normalized_field, _ = _split_nullable(field_schema)
             nullable = self._schema_nullable(field_schema)
             values = normalized_field.get("enum")

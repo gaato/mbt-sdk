@@ -9,6 +9,22 @@ fn json_array_matches(value : Json, predicate : (Json) -> Bool) -> Bool {
 }
 
 ///|
+fn[T : @json.FromJson] required_field(
+  obj : Map[String, Json],
+  key : String,
+  path : @json.JsonPath,
+) -> T raise @json.JsonDecodeError {
+  let field_path = path.add_key(key)
+  match obj.get(key) {
+    None =>
+      raise @json.JsonDecodeError(
+        (field_path, "required だが欠落: " + field_path.to_string()),
+      )
+    Some(value) => @json.from_json(value, path=field_path)
+  }
+}
+
+///|
 fn parse_plain_int64(text : String) -> Int64? {
   if text.length() == 0 {
     return None
@@ -128,7 +144,7 @@ fn[T : @json.FromJson] decode_nullable_field(
   key : String,
   path : @json.JsonPath,
 ) -> T? raise @json.JsonDecodeError {
-  let raw : Json = @sdkjson.field(obj, key, path)
+  let raw : Json = required_field(obj, key, path)
   match raw {
     Null => None
     value => Some(@json.from_json(value, path=path.add_key(key)))
@@ -163,7 +179,7 @@ fn[T : @json.FromJson] decode_nullable_json_map(
   key : String,
   path : @json.JsonPath,
 ) -> Map[String, T]? raise @json.JsonDecodeError {
-  let raw : Json = @sdkjson.field(obj, key, path)
+  let raw : Json = required_field(obj, key, path)
   match raw {
     Null => None
     value => Some(decode_json_map(value, path.add_key(key)))
@@ -249,6 +265,18 @@ pub(all) struct Click {
 
 ///|
 ///
+/// Creates a Click with omitted optional fields absent.
+pub fn Click::new(
+  type_~ : String,
+  button~ : ClickButton,
+  x~ : Int,
+  y~ : Int,
+) -> Click {
+  { type_, button, x, y, }
+}
+
+///|
+///
 /// Encodes this value as JSON.
 pub extend Click with ToJson::{to_json}
 
@@ -271,10 +299,10 @@ pub extend Click with @json.FromJson::{from_json}
 pub impl @json.FromJson for Click with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    type_: @sdkjson.field(obj, "type", path),
-    button: @sdkjson.field(obj, "button", path),
-    x: @sdkjson.field(obj, "x", path),
-    y: @sdkjson.field(obj, "y", path),
+    type_: required_field(obj, "type", path),
+    button: required_field(obj, "button", path),
+    x: required_field(obj, "x", path),
+    y: required_field(obj, "y", path),
   }
 }
 
@@ -284,6 +312,16 @@ pub impl @json.FromJson for Click with fn from_json(value, path) {
 pub(all) struct CodeInterpreterFileOutputFilesItem {
   mime_type : String
   file_id : String
+}
+
+///|
+///
+/// Creates a CodeInterpreterFileOutputFilesItem with omitted optional fields absent.
+pub fn CodeInterpreterFileOutputFilesItem::new(
+  mime_type~ : String,
+  file_id~ : String,
+) -> CodeInterpreterFileOutputFilesItem {
+  { mime_type, file_id, }
 }
 
 ///|
@@ -311,8 +349,8 @@ pub impl @json.FromJson for CodeInterpreterFileOutputFilesItem with fn from_json
 ) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    mime_type: @sdkjson.field(obj, "mime_type", path),
-    file_id: @sdkjson.field(obj, "file_id", path),
+    mime_type: required_field(obj, "mime_type", path),
+    file_id: required_field(obj, "file_id", path),
   }
 }
 
@@ -322,6 +360,16 @@ pub impl @json.FromJson for CodeInterpreterFileOutputFilesItem with fn from_json
 pub(all) struct CodeInterpreterFileOutput {
   type_ : String
   files : Array[CodeInterpreterFileOutputFilesItem]
+}
+
+///|
+///
+/// Creates a CodeInterpreterFileOutput with omitted optional fields absent.
+pub fn CodeInterpreterFileOutput::new(
+  type_~ : String,
+  files~ : Array[CodeInterpreterFileOutputFilesItem],
+) -> CodeInterpreterFileOutput {
+  { type_, files, }
 }
 
 ///|
@@ -349,8 +397,8 @@ pub impl @json.FromJson for CodeInterpreterFileOutput with fn from_json(
 ) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    type_: @sdkjson.field(obj, "type", path),
-    files: @sdkjson.field(obj, "files", path),
+    type_: required_field(obj, "type", path),
+    files: required_field(obj, "files", path),
   }
 }
 
@@ -360,6 +408,16 @@ pub impl @json.FromJson for CodeInterpreterFileOutput with fn from_json(
 pub(all) struct CodeInterpreterTextOutput {
   type_ : String
   logs : String
+}
+
+///|
+///
+/// Creates a CodeInterpreterTextOutput with omitted optional fields absent.
+pub fn CodeInterpreterTextOutput::new(
+  type_~ : String,
+  logs~ : String,
+) -> CodeInterpreterTextOutput {
+  { type_, logs, }
 }
 
 ///|
@@ -387,8 +445,8 @@ pub impl @json.FromJson for CodeInterpreterTextOutput with fn from_json(
 ) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    type_: @sdkjson.field(obj, "type", path),
-    logs: @sdkjson.field(obj, "logs", path),
+    type_: required_field(obj, "type", path),
+    logs: required_field(obj, "logs", path),
   }
 }
 
@@ -477,7 +535,7 @@ pub impl @json.FromJson for CodeInterpreterToolOutput with fn from_json(
   path,
 ) {
   let obj = @sdkjson.expect_object(value, path)
-  let tag : String = @sdkjson.field(obj, "type", path)
+  let tag : String = required_field(obj, "type", path)
   match tag {
     "logs" => Logs(@json.from_json(value, path~))
     "files" => Files(@json.from_json(value, path~))
@@ -493,6 +551,18 @@ pub(all) struct CodeInterpreterToolCall {
   code : String
   status : CodeInterpreterToolCallStatus
   results : Array[CodeInterpreterToolOutput]
+}
+
+///|
+///
+/// Creates a CodeInterpreterToolCall with omitted optional fields absent.
+pub fn CodeInterpreterToolCall::new(
+  id~ : String,
+  code~ : String,
+  status~ : CodeInterpreterToolCallStatus,
+  results~ : Array[CodeInterpreterToolOutput],
+) -> CodeInterpreterToolCall {
+  { id, code, status, results, }
 }
 
 ///|
@@ -523,10 +593,10 @@ pub impl @json.FromJson for CodeInterpreterToolCall with fn from_json(
 ) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    id: @sdkjson.field(obj, "id", path),
-    code: @sdkjson.field(obj, "code", path),
-    status: @sdkjson.field(obj, "status", path),
-    results: @sdkjson.field(obj, "results", path),
+    id: required_field(obj, "id", path),
+    code: required_field(obj, "code", path),
+    status: required_field(obj, "status", path),
+    results: required_field(obj, "results", path),
   }
 }
 
@@ -537,6 +607,13 @@ pub(all) struct DoubleClick {
   type_ : String
   x : Int
   y : Int
+}
+
+///|
+///
+/// Creates a DoubleClick with omitted optional fields absent.
+pub fn DoubleClick::new(type_~ : String, x~ : Int, y~ : Int) -> DoubleClick {
+  { type_, x, y, }
 }
 
 ///|
@@ -562,9 +639,9 @@ pub extend DoubleClick with @json.FromJson::{from_json}
 pub impl @json.FromJson for DoubleClick with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    type_: @sdkjson.field(obj, "type", path),
-    x: @sdkjson.field(obj, "x", path),
-    y: @sdkjson.field(obj, "y", path),
+    type_: required_field(obj, "type", path),
+    x: required_field(obj, "x", path),
+    y: required_field(obj, "y", path),
   }
 }
 
@@ -574,6 +651,13 @@ pub impl @json.FromJson for DoubleClick with fn from_json(value, path) {
 pub(all) struct Coordinate {
   x : Int
   y : Int
+}
+
+///|
+///
+/// Creates a Coordinate with omitted optional fields absent.
+pub fn Coordinate::new(x~ : Int, y~ : Int) -> Coordinate {
+  { x, y, }
 }
 
 ///|
@@ -594,7 +678,7 @@ pub extend Coordinate with @json.FromJson::{from_json}
 ///|
 pub impl @json.FromJson for Coordinate with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
-  { x: @sdkjson.field(obj, "x", path), y: @sdkjson.field(obj, "y", path), }
+  { x: required_field(obj, "x", path), y: required_field(obj, "y", path), }
 }
 
 ///|
@@ -603,6 +687,13 @@ pub impl @json.FromJson for Coordinate with fn from_json(value, path) {
 pub(all) struct Drag {
   type_ : String
   path : Array[Coordinate]
+}
+
+///|
+///
+/// Creates a Drag with omitted optional fields absent.
+pub fn Drag::new(type_~ : String, path~ : Array[Coordinate]) -> Drag {
+  { type_, path, }
 }
 
 ///|
@@ -627,8 +718,8 @@ pub extend Drag with @json.FromJson::{from_json}
 pub impl @json.FromJson for Drag with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    type_: @sdkjson.field(obj, "type", path),
-    path: @sdkjson.field(obj, "path", path),
+    type_: required_field(obj, "type", path),
+    path: required_field(obj, "path", path),
   }
 }
 
@@ -638,6 +729,13 @@ pub impl @json.FromJson for Drag with fn from_json(value, path) {
 pub(all) struct KeyPress {
   type_ : String
   keys : Array[String]
+}
+
+///|
+///
+/// Creates a KeyPress with omitted optional fields absent.
+pub fn KeyPress::new(type_~ : String, keys~ : Array[String]) -> KeyPress {
+  { type_, keys, }
 }
 
 ///|
@@ -662,8 +760,8 @@ pub extend KeyPress with @json.FromJson::{from_json}
 pub impl @json.FromJson for KeyPress with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    type_: @sdkjson.field(obj, "type", path),
-    keys: @sdkjson.field(obj, "keys", path),
+    type_: required_field(obj, "type", path),
+    keys: required_field(obj, "keys", path),
   }
 }
 
@@ -674,6 +772,13 @@ pub(all) struct Move {
   type_ : String
   x : Int
   y : Int
+}
+
+///|
+///
+/// Creates a Move with omitted optional fields absent.
+pub fn Move::new(type_~ : String, x~ : Int, y~ : Int) -> Move {
+  { type_, x, y, }
 }
 
 ///|
@@ -699,9 +804,9 @@ pub extend Move with @json.FromJson::{from_json}
 pub impl @json.FromJson for Move with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    type_: @sdkjson.field(obj, "type", path),
-    x: @sdkjson.field(obj, "x", path),
-    y: @sdkjson.field(obj, "y", path),
+    type_: required_field(obj, "type", path),
+    x: required_field(obj, "x", path),
+    y: required_field(obj, "y", path),
   }
 }
 
@@ -710,6 +815,13 @@ pub impl @json.FromJson for Move with fn from_json(value, path) {
 /// A screenshot action.
 pub(all) struct Screenshot {
   type_ : String
+}
+
+///|
+///
+/// Creates a Screenshot with omitted optional fields absent.
+pub fn Screenshot::new(type_~ : String) -> Screenshot {
+  { type_, }
 }
 
 ///|
@@ -730,7 +842,7 @@ pub extend Screenshot with @json.FromJson::{from_json}
 ///|
 pub impl @json.FromJson for Screenshot with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
-  { type_: @sdkjson.field(obj, "type", path), }
+  { type_: required_field(obj, "type", path), }
 }
 
 ///|
@@ -742,6 +854,19 @@ pub(all) struct Scroll {
   y : Int
   scroll_x : Int
   scroll_y : Int
+}
+
+///|
+///
+/// Creates a Scroll with omitted optional fields absent.
+pub fn Scroll::new(
+  type_~ : String,
+  x~ : Int,
+  y~ : Int,
+  scroll_x~ : Int,
+  scroll_y~ : Int,
+) -> Scroll {
+  { type_, x, y, scroll_x, scroll_y, }
 }
 
 ///|
@@ -769,11 +894,11 @@ pub extend Scroll with @json.FromJson::{from_json}
 pub impl @json.FromJson for Scroll with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    type_: @sdkjson.field(obj, "type", path),
-    x: @sdkjson.field(obj, "x", path),
-    y: @sdkjson.field(obj, "y", path),
-    scroll_x: @sdkjson.field(obj, "scroll_x", path),
-    scroll_y: @sdkjson.field(obj, "scroll_y", path),
+    type_: required_field(obj, "type", path),
+    x: required_field(obj, "x", path),
+    y: required_field(obj, "y", path),
+    scroll_x: required_field(obj, "scroll_x", path),
+    scroll_y: required_field(obj, "scroll_y", path),
   }
 }
 
@@ -783,6 +908,13 @@ pub impl @json.FromJson for Scroll with fn from_json(value, path) {
 pub(all) struct Type {
   type_ : String
   text : String
+}
+
+///|
+///
+/// Creates a Type with omitted optional fields absent.
+pub fn Type::new(type_~ : String, text~ : String) -> Type {
+  { type_, text, }
 }
 
 ///|
@@ -807,8 +939,8 @@ pub extend Type with @json.FromJson::{from_json}
 pub impl @json.FromJson for Type with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    type_: @sdkjson.field(obj, "type", path),
-    text: @sdkjson.field(obj, "text", path),
+    type_: required_field(obj, "type", path),
+    text: required_field(obj, "text", path),
   }
 }
 
@@ -817,6 +949,13 @@ pub impl @json.FromJson for Type with fn from_json(value, path) {
 /// A wait action.
 pub(all) struct Wait {
   type_ : String
+}
+
+///|
+///
+/// Creates a Wait with omitted optional fields absent.
+pub fn Wait::new(type_~ : String) -> Wait {
+  { type_, }
 }
 
 ///|
@@ -837,7 +976,7 @@ pub extend Wait with @json.FromJson::{from_json}
 ///|
 pub impl @json.FromJson for Wait with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
-  { type_: @sdkjson.field(obj, "type", path), }
+  { type_: required_field(obj, "type", path), }
 }
 
 ///|
@@ -885,7 +1024,7 @@ pub extend ComputerAction with @json.FromJson::{from_json}
 ///|
 pub impl @json.FromJson for ComputerAction with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
-  let tag : String = @sdkjson.field(obj, "type", path)
+  let tag : String = required_field(obj, "type", path)
   match tag {
     "click" => Click(@json.from_json(value, path~))
     "double_click" => DoubleClick(@json.from_json(value, path~))
@@ -902,11 +1041,71 @@ pub impl @json.FromJson for ComputerAction with fn from_json(value, path) {
 
 ///|
 ///
+/// A computer screenshot image used with the computer use tool.
+pub(all) struct ComputerScreenshotImage {
+  image_url : String?
+  file_id : String?
+}
+
+///|
+///
+/// Creates a ComputerScreenshotImage with omitted optional fields absent.
+pub fn ComputerScreenshotImage::new(
+  image_url? : String,
+  file_id? : String,
+) -> ComputerScreenshotImage {
+  { image_url, file_id, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend ComputerScreenshotImage with ToJson::{to_json}
+
+///|
+pub impl ToJson for ComputerScreenshotImage with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("type", "computer_screenshot")
+  .opt("image_url", self.image_url)
+  .opt("file_id", self.file_id)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend ComputerScreenshotImage with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for ComputerScreenshotImage with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    image_url: @sdkjson.opt_field(obj, "image_url", path),
+    file_id: @sdkjson.opt_field(obj, "file_id", path),
+  }
+}
+
+///|
+///
 /// A pending safety check for the computer call.
 pub(all) struct ComputerToolCallSafetyCheck {
   id : String
   code : String
   message : String
+}
+
+///|
+///
+/// Creates a ComputerToolCallSafetyCheck with omitted optional fields absent.
+pub fn ComputerToolCallSafetyCheck::new(
+  id~ : String,
+  code~ : String,
+  message~ : String,
+) -> ComputerToolCallSafetyCheck {
+  { id, code, message, }
 }
 
 ///|
@@ -935,9 +1134,9 @@ pub impl @json.FromJson for ComputerToolCallSafetyCheck with fn from_json(
 ) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    id: @sdkjson.field(obj, "id", path),
-    code: @sdkjson.field(obj, "code", path),
-    message: @sdkjson.field(obj, "message", path),
+    id: required_field(obj, "id", path),
+    code: required_field(obj, "code", path),
+    message: required_field(obj, "message", path),
   }
 }
 
@@ -1006,6 +1205,20 @@ pub(all) struct ComputerToolCall {
 
 ///|
 ///
+/// Creates a ComputerToolCall with omitted optional fields absent.
+pub fn ComputerToolCall::new(
+  type_~ : String,
+  id~ : String,
+  call_id~ : String,
+  action~ : ComputerAction,
+  pending_safety_checks~ : Array[ComputerToolCallSafetyCheck],
+  status~ : ComputerToolCallStatus,
+) -> ComputerToolCall {
+  { type_, id, call_id, action, pending_safety_checks, status, }
+}
+
+///|
+///
 /// Encodes this value as JSON.
 pub extend ComputerToolCall with ToJson::{to_json}
 
@@ -1030,12 +1243,12 @@ pub extend ComputerToolCall with @json.FromJson::{from_json}
 pub impl @json.FromJson for ComputerToolCall with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    type_: @sdkjson.field(obj, "type", path),
-    id: @sdkjson.field(obj, "id", path),
-    call_id: @sdkjson.field(obj, "call_id", path),
-    action: @sdkjson.field(obj, "action", path),
-    pending_safety_checks: @sdkjson.field(obj, "pending_safety_checks", path),
-    status: @sdkjson.field(obj, "status", path),
+    type_: required_field(obj, "type", path),
+    id: required_field(obj, "id", path),
+    call_id: required_field(obj, "call_id", path),
+    action: required_field(obj, "action", path),
+    pending_safety_checks: required_field(obj, "pending_safety_checks", path),
+    status: required_field(obj, "status", path),
   }
 }
 
@@ -1158,6 +1371,19 @@ pub(all) struct CreateEmbeddingRequest {
 
 ///|
 ///
+/// Creates a CreateEmbeddingRequest with omitted optional fields absent.
+pub fn CreateEmbeddingRequest::new(
+  input~ : CreateEmbeddingRequestInput,
+  model~ : String,
+  encoding_format? : CreateEmbeddingRequestEncodingFormat,
+  dimensions? : Int,
+  user? : String,
+) -> CreateEmbeddingRequest {
+  { input, model, encoding_format, dimensions, user, }
+}
+
+///|
+///
 /// Encodes this value as JSON.
 pub extend CreateEmbeddingRequest with ToJson::{to_json}
 
@@ -1184,8 +1410,8 @@ pub impl @json.FromJson for CreateEmbeddingRequest with fn from_json(
 ) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    input: @sdkjson.field(obj, "input", path),
-    model: @sdkjson.field(obj, "model", path),
+    input: required_field(obj, "input", path),
+    model: required_field(obj, "model", path),
     encoding_format: @sdkjson.opt_field(obj, "encoding_format", path),
     dimensions: @sdkjson.opt_field(obj, "dimensions", path),
     user: @sdkjson.opt_field(obj, "user", path),
@@ -1198,6 +1424,13 @@ pub impl @json.FromJson for CreateEmbeddingRequest with fn from_json(
 pub(all) struct Embedding {
   index : Int
   embedding : Array[Double]
+}
+
+///|
+///
+/// Creates a Embedding with omitted optional fields absent.
+pub fn Embedding::new(index~ : Int, embedding~ : Array[Double]) -> Embedding {
+  { index, embedding, }
 }
 
 ///|
@@ -1223,8 +1456,8 @@ pub extend Embedding with @json.FromJson::{from_json}
 pub impl @json.FromJson for Embedding with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    index: @sdkjson.field(obj, "index", path),
-    embedding: @sdkjson.field(obj, "embedding", path),
+    index: required_field(obj, "index", path),
+    embedding: required_field(obj, "embedding", path),
   }
 }
 
@@ -1234,6 +1467,16 @@ pub impl @json.FromJson for Embedding with fn from_json(value, path) {
 pub(all) struct CreateEmbeddingResponseUsage {
   prompt_tokens : Int
   total_tokens : Int
+}
+
+///|
+///
+/// Creates a CreateEmbeddingResponseUsage with omitted optional fields absent.
+pub fn CreateEmbeddingResponseUsage::new(
+  prompt_tokens~ : Int,
+  total_tokens~ : Int,
+) -> CreateEmbeddingResponseUsage {
+  { prompt_tokens, total_tokens, }
 }
 
 ///|
@@ -1261,8 +1504,8 @@ pub impl @json.FromJson for CreateEmbeddingResponseUsage with fn from_json(
 ) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    prompt_tokens: @sdkjson.field(obj, "prompt_tokens", path),
-    total_tokens: @sdkjson.field(obj, "total_tokens", path),
+    prompt_tokens: required_field(obj, "prompt_tokens", path),
+    total_tokens: required_field(obj, "total_tokens", path),
   }
 }
 
@@ -1273,6 +1516,17 @@ pub(all) struct CreateEmbeddingResponse {
   data : Array[Embedding]
   model : String
   usage : CreateEmbeddingResponseUsage
+}
+
+///|
+///
+/// Creates a CreateEmbeddingResponse with omitted optional fields absent.
+pub fn CreateEmbeddingResponse::new(
+  data~ : Array[Embedding],
+  model~ : String,
+  usage~ : CreateEmbeddingResponseUsage,
+) -> CreateEmbeddingResponse {
+  { data, model, usage, }
 }
 
 ///|
@@ -1302,9 +1556,9 @@ pub impl @json.FromJson for CreateEmbeddingResponse with fn from_json(
 ) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    data: @sdkjson.field(obj, "data", path),
-    model: @sdkjson.field(obj, "model", path),
-    usage: @sdkjson.field(obj, "usage", path),
+    data: required_field(obj, "data", path),
+    model: required_field(obj, "model", path),
+    usage: required_field(obj, "usage", path),
   }
 }
 
@@ -1365,6 +1619,25 @@ pub(all) struct ModelResponseProperties {
   top_p : @sdkjson.Presence[Double]
   user : String?
   service_tier : @sdkjson.Presence[ServiceTier]
+}
+
+///|
+///
+/// Creates a ModelResponseProperties with omitted optional fields absent.
+pub fn ModelResponseProperties::new(
+  metadata? : Map[String, String],
+  temperature? : Double,
+  top_p? : Double,
+  user? : String,
+  service_tier? : ServiceTier,
+) -> ModelResponseProperties {
+  {
+    metadata: @sdkjson.Presence::from_option(metadata),
+    temperature: @sdkjson.Presence::from_option(temperature),
+    top_p: @sdkjson.Presence::from_option(top_p),
+    user,
+    service_tier: @sdkjson.Presence::from_option(service_tier),
+  }
 }
 
 ///|
@@ -1561,6 +1834,21 @@ pub(all) struct Reasoning {
 
 ///|
 ///
+/// Creates a Reasoning with omitted optional fields absent.
+pub fn Reasoning::new(
+  effort? : ReasoningEffort,
+  summary? : ReasoningSummary,
+  generate_summary? : ReasoningGenerateSummary,
+) -> Reasoning {
+  {
+    effort: @sdkjson.Presence::from_option(effort),
+    summary: @sdkjson.Presence::from_option(summary),
+    generate_summary: @sdkjson.Presence::from_option(generate_summary),
+  }
+}
+
+///|
+///
 /// Encodes this value as JSON.
 pub extend Reasoning with ToJson::{to_json}
 
@@ -1597,6 +1885,13 @@ pub(all) struct ResponseFormatText {
 
 ///|
 ///
+/// Creates a ResponseFormatText with omitted optional fields absent.
+pub fn ResponseFormatText::new(type_~ : String) -> ResponseFormatText {
+  { type_, }
+}
+
+///|
+///
 /// Encodes this value as JSON.
 pub extend ResponseFormatText with ToJson::{to_json}
 
@@ -1613,7 +1908,7 @@ pub extend ResponseFormatText with @json.FromJson::{from_json}
 ///|
 pub impl @json.FromJson for ResponseFormatText with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
-  { type_: @sdkjson.field(obj, "type", path), }
+  { type_: required_field(obj, "type", path), }
 }
 
 ///|
@@ -1625,6 +1920,25 @@ pub(all) struct TextResponseFormatJsonSchema {
   name : String
   schema : Json
   strict : @sdkjson.Presence[Bool]
+}
+
+///|
+///
+/// Creates a TextResponseFormatJsonSchema with omitted optional fields absent.
+pub fn TextResponseFormatJsonSchema::new(
+  type_~ : String,
+  name~ : String,
+  schema~ : Json,
+  description? : String,
+  strict? : Bool,
+) -> TextResponseFormatJsonSchema {
+  {
+    type_,
+    description,
+    name,
+    schema,
+    strict: @sdkjson.Presence::from_option(strict),
+  }
 }
 
 ///|
@@ -1655,10 +1969,10 @@ pub impl @json.FromJson for TextResponseFormatJsonSchema with fn from_json(
 ) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    type_: @sdkjson.field(obj, "type", path),
+    type_: required_field(obj, "type", path),
     description: @sdkjson.opt_field(obj, "description", path),
-    name: @sdkjson.field(obj, "name", path),
-    schema: @sdkjson.field(obj, "schema", path),
+    name: required_field(obj, "name", path),
+    schema: required_field(obj, "schema", path),
     strict: @sdkjson.presence_field(obj, "strict", path),
   }
 }
@@ -1668,6 +1982,15 @@ pub impl @json.FromJson for TextResponseFormatJsonSchema with fn from_json(
 /// JSON object response format. An older method of generating JSON responses. Using `json_schema` is recommended for models that support it. Note that the model will not generate JSON without a system or user message instructing it to do so.
 pub(all) struct ResponseFormatJsonObject {
   type_ : String
+}
+
+///|
+///
+/// Creates a ResponseFormatJsonObject with omitted optional fields absent.
+pub fn ResponseFormatJsonObject::new(
+  type_~ : String,
+) -> ResponseFormatJsonObject {
+  { type_, }
 }
 
 ///|
@@ -1691,7 +2014,7 @@ pub impl @json.FromJson for ResponseFormatJsonObject with fn from_json(
   path,
 ) {
   let obj = @sdkjson.expect_object(value, path)
-  { type_: @sdkjson.field(obj, "type", path), }
+  { type_: required_field(obj, "type", path), }
 }
 
 ///|
@@ -1730,7 +2053,7 @@ pub impl @json.FromJson for TextResponseFormatConfiguration with fn from_json(
   path,
 ) {
   let obj = @sdkjson.expect_object(value, path)
-  let tag : String = @sdkjson.field(obj, "type", path)
+  let tag : String = required_field(obj, "type", path)
   match tag {
     "text" => Text(@json.from_json(value, path~))
     "json_schema" => JsonSchema(@json.from_json(value, path~))
@@ -1744,6 +2067,15 @@ pub impl @json.FromJson for TextResponseFormatConfiguration with fn from_json(
 /// Configuration options for a text response from the model. Can be plain text or structured JSON data. Learn more: - [Text inputs and outputs](/docs/guides/text) - [Structured Outputs](/docs/guides/structured-outputs)
 pub(all) struct CreateResponseText {
   format : TextResponseFormatConfiguration?
+}
+
+///|
+///
+/// Creates a CreateResponseText with omitted optional fields absent.
+pub fn CreateResponseText::new(
+  format? : TextResponseFormatConfiguration,
+) -> CreateResponseText {
+  { format, }
 }
 
 ///|
@@ -1822,6 +2154,16 @@ pub(all) struct RankingOptions {
 
 ///|
 ///
+/// Creates a RankingOptions with omitted optional fields absent.
+pub fn RankingOptions::new(
+  ranker? : RankingOptionsRanker,
+  score_threshold? : Double,
+) -> RankingOptions {
+  { ranker, score_threshold, }
+}
+
+///|
+///
 /// Encodes this value as JSON.
 pub extend RankingOptions with ToJson::{to_json}
 
@@ -1860,6 +2202,25 @@ pub(all) struct FileSearchTool {
 
 ///|
 ///
+/// Creates a FileSearchTool with omitted optional fields absent.
+pub fn FileSearchTool::new(
+  type_~ : String,
+  vector_store_ids~ : Array[String],
+  max_num_results? : Int,
+  ranking_options? : RankingOptions,
+  filters? : Json,
+) -> FileSearchTool {
+  {
+    type_,
+    vector_store_ids,
+    max_num_results,
+    ranking_options,
+    filters: @sdkjson.Presence::from_option(filters),
+  }
+}
+
+///|
+///
 /// Encodes this value as JSON.
 pub extend FileSearchTool with ToJson::{to_json}
 
@@ -1883,8 +2244,8 @@ pub extend FileSearchTool with @json.FromJson::{from_json}
 pub impl @json.FromJson for FileSearchTool with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    type_: @sdkjson.field(obj, "type", path),
-    vector_store_ids: @sdkjson.field(obj, "vector_store_ids", path),
+    type_: required_field(obj, "type", path),
+    vector_store_ids: required_field(obj, "vector_store_ids", path),
     max_num_results: @sdkjson.opt_field(obj, "max_num_results", path),
     ranking_options: @sdkjson.opt_field(obj, "ranking_options", path),
     filters: @sdkjson.presence_field(obj, "filters", path),
@@ -1900,6 +2261,25 @@ pub(all) struct FunctionTool {
   description : @sdkjson.Presence[String]
   parameters : Json?
   strict : Bool?
+}
+
+///|
+///
+/// Creates a FunctionTool with omitted optional fields absent.
+pub fn FunctionTool::new(
+  type_~ : String,
+  name~ : String,
+  description? : String,
+  parameters? : Json,
+  strict? : Bool,
+) -> FunctionTool {
+  {
+    type_,
+    name,
+    description: @sdkjson.Presence::from_option(description),
+    parameters,
+    strict,
+  }
 }
 
 ///|
@@ -1930,8 +2310,8 @@ pub extend FunctionTool with @json.FromJson::{from_json}
 pub impl @json.FromJson for FunctionTool with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    type_: @sdkjson.field(obj, "type", path),
-    name: @sdkjson.field(obj, "name", path),
+    type_: required_field(obj, "type", path),
+    name: required_field(obj, "name", path),
     description: @sdkjson.presence_field(obj, "description", path),
     parameters: decode_nullable_field(obj, "parameters", path),
     strict: decode_nullable_field(obj, "strict", path),
@@ -1946,6 +2326,23 @@ pub(all) struct ApproximateLocation {
   region : @sdkjson.Presence[String]
   city : @sdkjson.Presence[String]
   timezone : @sdkjson.Presence[String]
+}
+
+///|
+///
+/// Creates a ApproximateLocation with omitted optional fields absent.
+pub fn ApproximateLocation::new(
+  country? : String,
+  region? : String,
+  city? : String,
+  timezone? : String,
+) -> ApproximateLocation {
+  {
+    country: @sdkjson.Presence::from_option(country),
+    region: @sdkjson.Presence::from_option(region),
+    city: @sdkjson.Presence::from_option(city),
+    timezone: @sdkjson.Presence::from_option(timezone),
+  }
 }
 
 ///|
@@ -2044,6 +2441,21 @@ pub(all) struct WebSearchPreviewTool {
 
 ///|
 ///
+/// Creates a WebSearchPreviewTool with omitted optional fields absent.
+pub fn WebSearchPreviewTool::new(
+  type_~ : String,
+  user_location? : ApproximateLocation,
+  search_context_size? : WebSearchPreviewToolSearchContextSize,
+) -> WebSearchPreviewTool {
+  {
+    type_,
+    user_location: @sdkjson.Presence::from_option(user_location),
+    search_context_size,
+  }
+}
+
+///|
+///
 /// Encodes this value as JSON.
 pub extend WebSearchPreviewTool with ToJson::{to_json}
 
@@ -2065,7 +2477,7 @@ pub extend WebSearchPreviewTool with @json.FromJson::{from_json}
 pub impl @json.FromJson for WebSearchPreviewTool with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    type_: @sdkjson.field(obj, "type", path),
+    type_: required_field(obj, "type", path),
     user_location: @sdkjson.presence_field(obj, "user_location", path),
     search_context_size: @sdkjson.opt_field(obj, "search_context_size", path),
   }
@@ -2140,6 +2552,18 @@ pub(all) struct ComputerUsePreviewTool {
 
 ///|
 ///
+/// Creates a ComputerUsePreviewTool with omitted optional fields absent.
+pub fn ComputerUsePreviewTool::new(
+  type_~ : String,
+  environment~ : ComputerUsePreviewToolEnvironment,
+  display_width~ : Int,
+  display_height~ : Int,
+) -> ComputerUsePreviewTool {
+  { type_, environment, display_width, display_height, }
+}
+
+///|
+///
 /// Encodes this value as JSON.
 pub extend ComputerUsePreviewTool with ToJson::{to_json}
 
@@ -2165,10 +2589,10 @@ pub impl @json.FromJson for ComputerUsePreviewTool with fn from_json(
 ) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    type_: @sdkjson.field(obj, "type", path),
-    environment: @sdkjson.field(obj, "environment", path),
-    display_width: @sdkjson.field(obj, "display_width", path),
-    display_height: @sdkjson.field(obj, "display_height", path),
+    type_: required_field(obj, "type", path),
+    environment: required_field(obj, "environment", path),
+    display_width: required_field(obj, "display_width", path),
+    display_height: required_field(obj, "display_height", path),
   }
 }
 
@@ -2207,7 +2631,7 @@ pub extend Tool with @json.FromJson::{from_json}
 ///|
 pub impl @json.FromJson for Tool with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
-  let tag : String = @sdkjson.field(obj, "type", path)
+  let tag : String = required_field(obj, "type", path)
   match tag {
     "file_search" => FileSearch(@json.from_json(value, path~))
     "function" => Function(@json.from_json(value, path~))
@@ -2267,181 +2691,107 @@ pub impl @json.FromJson for CreateResponseTruncation with fn from_json(
 
 ///|
 ///
-/// Text, image, or file inputs to the model, used to generate a response. Learn more: - [Text inputs and outputs](/docs/guides/text) - [Image inputs](/docs/guides/images) - [File inputs](/docs/guides/pdf-files) - [Conversation state](/docs/guides/conversation-state) - [Function calling](/docs/guides/function-calling)
-pub(all) enum CreateResponseInput {
-  Text(String)
-  InputItemArray(Array[Json])
+/// A citation to a file.
+pub(all) struct FileCitationBody {
+  type_ : String
+  file_id : String
+  index : Int
 }
 
 ///|
 ///
-/// Encodes this union as JSON.
-pub extend CreateResponseInput with ToJson::{to_json}
-
-///|
-pub impl ToJson for CreateResponseInput with fn to_json(self) {
-  match self {
-    Text(value) => value.to_json()
-    InputItemArray(value) => value.to_json()
-  }
-}
-
-///|
-///
-/// Decodes this union from JSON.
-pub extend CreateResponseInput with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for CreateResponseInput with fn from_json(value, path) {
-  if value is String(_) {
-    let decoded : String = @json.from_json(value, path~)
-    return Text(decoded)
-  }
-  if json_array_matches(value, item => item is Object(_)) {
-    let decoded : Array[Json] = @json.from_json(value, path~)
-    return InputItemArray(decoded)
-  }
-  raise @json.JsonDecodeError(
-    (path, "JSON shape does not match any CreateResponseInput variant"),
-  )
-}
-
-///|
-///
-/// Specify additional output data to include in the model response. Currently supported values are: - `file_search_call.results`: Include the search results of the file search tool call. - `message.input_image.image_url`: Include image urls from the input message. - `computer_call_output.output.image_url`: Include image urls from the computer call output.
-pub(all) enum Includable {
-  FileSearchCallResults
-  MessageInputImageImageUrl
-  ComputerCallOutputOutputImageUrl
-  Custom(String)
-}
-
-///|
-///
-/// Encodes this string enum as JSON.
-pub extend Includable with ToJson::{to_json}
-
-///|
-pub impl ToJson for Includable with fn to_json(self) {
-  let raw = match self {
-    FileSearchCallResults => "file_search_call.results"
-    MessageInputImageImageUrl => "message.input_image.image_url"
-    ComputerCallOutputOutputImageUrl => "computer_call_output.output.image_url"
-    Custom(raw) => raw
-  }
-  raw.to_json()
-}
-
-///|
-///
-/// Decodes this string enum from JSON.
-pub extend Includable with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for Includable with fn from_json(value, path) {
-  @sdkjson.open_string(
-    value,
-    path,
-    raw => {
-      match raw {
-        "file_search_call.results" => Some(FileSearchCallResults)
-        "message.input_image.image_url" => Some(MessageInputImageImageUrl)
-        "computer_call_output.output.image_url" =>
-          Some(ComputerCallOutputOutputImageUrl)
-        _ => None
-      }
-    },
-    raw => Custom(raw),
-  )
-}
-
-///|
-///
-/// Generated representation of CreateResponse.
-pub(all) struct CreateResponse {
-  metadata : @sdkjson.Presence[Map[String, String]]
-  temperature : @sdkjson.Presence[Double]
-  top_p : @sdkjson.Presence[Double]
-  user : String?
-  service_tier : @sdkjson.Presence[ServiceTier]
-  previous_response_id : @sdkjson.Presence[String]
-  model : String
-  reasoning : @sdkjson.Presence[Reasoning]
-  max_output_tokens : @sdkjson.Presence[Int]
-  instructions : @sdkjson.Presence[String]
-  text : CreateResponseText?
-  tools : Array[Tool]?
-  tool_choice : Json?
-  truncation : @sdkjson.Presence[CreateResponseTruncation]
-  input : CreateResponseInput
-  include_ : @sdkjson.Presence[Array[Includable]]
-  parallel_tool_calls : @sdkjson.Presence[Bool]
-  store : @sdkjson.Presence[Bool]
-  stream : @sdkjson.Presence[Bool]
+/// Creates a FileCitationBody with omitted optional fields absent.
+pub fn FileCitationBody::new(
+  type_~ : String,
+  file_id~ : String,
+  index~ : Int,
+) -> FileCitationBody {
+  { type_, file_id, index, }
 }
 
 ///|
 ///
 /// Encodes this value as JSON.
-pub extend CreateResponse with ToJson::{to_json}
+pub extend FileCitationBody with ToJson::{to_json}
 
 ///|
-pub impl ToJson for CreateResponse with fn to_json(self) {
+pub impl ToJson for FileCitationBody with fn to_json(self) {
   @sdkjson.ObjBuilder::new()
-  .presence("metadata", self.metadata.map(value => json_map_to_json(value)))
-  .presence("temperature", self.temperature)
-  .presence("top_p", self.top_p)
-  .opt("user", self.user)
-  .presence("service_tier", self.service_tier)
-  .presence("previous_response_id", self.previous_response_id)
-  .field("model", self.model)
-  .presence("reasoning", self.reasoning)
-  .presence("max_output_tokens", self.max_output_tokens)
-  .presence("instructions", self.instructions)
-  .opt("text", self.text)
-  .opt("tools", self.tools)
-  .opt("tool_choice", self.tool_choice)
-  .presence("truncation", self.truncation)
-  .field("input", self.input)
-  .presence("include", self.include_)
-  .presence("parallel_tool_calls", self.parallel_tool_calls)
-  .presence("store", self.store)
-  .presence("stream", self.stream)
+  .field("type", self.type_)
+  .field("file_id", self.file_id)
+  .field("index", self.index)
   .build()
 }
 
 ///|
 ///
 /// Decodes this value from JSON.
-pub extend CreateResponse with @json.FromJson::{from_json}
+pub extend FileCitationBody with @json.FromJson::{from_json}
 
 ///|
-pub impl @json.FromJson for CreateResponse with fn from_json(value, path) {
+pub impl @json.FromJson for FileCitationBody with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    metadata: decode_presence_json_map(obj, "metadata", path),
-    temperature: @sdkjson.presence_field(obj, "temperature", path),
-    top_p: @sdkjson.presence_field(obj, "top_p", path),
-    user: @sdkjson.opt_field(obj, "user", path),
-    service_tier: @sdkjson.presence_field(obj, "service_tier", path),
-    previous_response_id: @sdkjson.presence_field(
-      obj, "previous_response_id", path,
-    ),
-    model: @sdkjson.field(obj, "model", path),
-    reasoning: @sdkjson.presence_field(obj, "reasoning", path),
-    max_output_tokens: @sdkjson.presence_field(obj, "max_output_tokens", path),
-    instructions: @sdkjson.presence_field(obj, "instructions", path),
-    text: @sdkjson.opt_field(obj, "text", path),
-    tools: @sdkjson.opt_field(obj, "tools", path),
-    tool_choice: @sdkjson.opt_field(obj, "tool_choice", path),
-    truncation: @sdkjson.presence_field(obj, "truncation", path),
-    input: @sdkjson.field(obj, "input", path),
-    include_: @sdkjson.presence_field(obj, "include", path),
-    parallel_tool_calls: @sdkjson.presence_field(
-      obj, "parallel_tool_calls", path,
-    ),
-    store: @sdkjson.presence_field(obj, "store", path),
-    stream: @sdkjson.presence_field(obj, "stream", path),
+    type_: required_field(obj, "type", path),
+    file_id: required_field(obj, "file_id", path),
+    index: required_field(obj, "index", path),
+  }
+}
+
+///|
+///
+/// A citation for a web resource used to generate a model response.
+pub(all) struct UrlCitationBody {
+  type_ : String
+  url : String
+  start_index : Int
+  end_index : Int
+  title : String
+}
+
+///|
+///
+/// Creates a UrlCitationBody with omitted optional fields absent.
+pub fn UrlCitationBody::new(
+  type_~ : String,
+  url~ : String,
+  start_index~ : Int,
+  end_index~ : Int,
+  title~ : String,
+) -> UrlCitationBody {
+  { type_, url, start_index, end_index, title, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend UrlCitationBody with ToJson::{to_json}
+
+///|
+pub impl ToJson for UrlCitationBody with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("type", self.type_)
+  .field("url", self.url)
+  .field("start_index", self.start_index)
+  .field("end_index", self.end_index)
+  .field("title", self.title)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend UrlCitationBody with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for UrlCitationBody with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    type_: required_field(obj, "type", path),
+    url: required_field(obj, "url", path),
+    start_index: required_field(obj, "start_index", path),
+    end_index: required_field(obj, "end_index", path),
+    title: required_field(obj, "title", path),
   }
 }
 
@@ -2452,6 +2802,17 @@ pub(all) struct FilePath {
   type_ : String
   file_id : String
   index : Int
+}
+
+///|
+///
+/// Creates a FilePath with omitted optional fields absent.
+pub fn FilePath::new(
+  type_~ : String,
+  file_id~ : String,
+  index~ : Int,
+) -> FilePath {
+  { type_, file_id, index, }
 }
 
 ///|
@@ -2477,9 +2838,833 @@ pub extend FilePath with @json.FromJson::{from_json}
 pub impl @json.FromJson for FilePath with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    type_: @sdkjson.field(obj, "type", path),
-    file_id: @sdkjson.field(obj, "file_id", path),
-    index: @sdkjson.field(obj, "index", path),
+    type_: required_field(obj, "type", path),
+    file_id: required_field(obj, "file_id", path),
+    index: required_field(obj, "index", path),
+  }
+}
+
+///|
+///
+/// Generated tagged union Annotation.
+pub(all) enum Annotation {
+  FileCitation(FileCitationBody)
+  UrlCitation(UrlCitationBody)
+  FilePath(FilePath)
+  Unknown(String, Json)
+}
+
+///|
+///
+/// Encodes this tagged union as JSON.
+pub extend Annotation with ToJson::{to_json}
+
+///|
+pub impl ToJson for Annotation with fn to_json(self) {
+  match self {
+    FileCitation(value) => value.to_json()
+    UrlCitation(value) => value.to_json()
+    FilePath(value) => value.to_json()
+    Unknown(_, value) => value
+  }
+}
+
+///|
+///
+/// Decodes this tagged union from JSON.
+pub extend Annotation with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for Annotation with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  let tag : String = required_field(obj, "type", path)
+  match tag {
+    "file_citation" => FileCitation(@json.from_json(value, path~))
+    "url_citation" => UrlCitation(@json.from_json(value, path~))
+    "file_path" => FilePath(@json.from_json(value, path~))
+    other => Unknown(other, value)
+  }
+}
+
+///|
+///
+/// A text output from the model.
+pub(all) struct OutputTextContent {
+  type_ : String
+  text : String
+  annotations : Array[Annotation]?
+}
+
+///|
+///
+/// Creates a OutputTextContent with omitted optional fields absent.
+pub fn OutputTextContent::new(
+  type_~ : String,
+  text~ : String,
+  annotations? : Array[Annotation],
+) -> OutputTextContent {
+  { type_, text, annotations, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend OutputTextContent with ToJson::{to_json}
+
+///|
+pub impl ToJson for OutputTextContent with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("type", self.type_)
+  .field("text", self.text)
+  .opt("annotations", self.annotations)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend OutputTextContent with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for OutputTextContent with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    type_: required_field(obj, "type", path),
+    text: required_field(obj, "text", path),
+    annotations: @sdkjson.opt_field(obj, "annotations", path),
+  }
+}
+
+///|
+///
+/// A refusal from the model.
+pub(all) struct RefusalContent {
+  type_ : String
+  refusal : String
+}
+
+///|
+///
+/// Creates a RefusalContent with omitted optional fields absent.
+pub fn RefusalContent::new(
+  type_~ : String,
+  refusal~ : String,
+) -> RefusalContent {
+  { type_, refusal, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend RefusalContent with ToJson::{to_json}
+
+///|
+pub impl ToJson for RefusalContent with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("type", self.type_)
+  .field("refusal", self.refusal)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend RefusalContent with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for RefusalContent with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    type_: required_field(obj, "type", path),
+    refusal: required_field(obj, "refusal", path),
+  }
+}
+
+///|
+///
+/// Generated tagged union OutputContent.
+pub(all) enum OutputContent {
+  OutputText(OutputTextContent)
+  Refusal(RefusalContent)
+  Unknown(String, Json)
+}
+
+///|
+///
+/// Encodes this tagged union as JSON.
+pub extend OutputContent with ToJson::{to_json}
+
+///|
+pub impl ToJson for OutputContent with fn to_json(self) {
+  match self {
+    OutputText(value) => value.to_json()
+    Refusal(value) => value.to_json()
+    Unknown(_, value) => value
+  }
+}
+
+///|
+///
+/// Decodes this tagged union from JSON.
+pub extend OutputContent with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for OutputContent with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  let tag : String = required_field(obj, "type", path)
+  match tag {
+    "output_text" => OutputText(@json.from_json(value, path~))
+    "refusal" => Refusal(@json.from_json(value, path~))
+    other => Unknown(other, value)
+  }
+}
+
+///|
+///
+/// The status of the message input. One of `in_progress`, `completed`, or `incomplete`. Populated when input items are returned via API.
+pub(all) enum OutputMessageStatus {
+  InProgress
+  Completed
+  Incomplete
+  Unknown(String)
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend OutputMessageStatus with ToJson::{to_json}
+
+///|
+pub impl ToJson for OutputMessageStatus with fn to_json(self) {
+  let raw = match self {
+    InProgress => "in_progress"
+    Completed => "completed"
+    Incomplete => "incomplete"
+    Unknown(raw) => raw
+  }
+  raw.to_json()
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend OutputMessageStatus with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for OutputMessageStatus with fn from_json(value, path) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "in_progress" => Some(InProgress)
+        "completed" => Some(Completed)
+        "incomplete" => Some(Incomplete)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// An output message from the model.
+pub(all) struct OutputMessage {
+  id : String
+  type_ : String
+  content : Array[OutputContent]
+  status : OutputMessageStatus
+}
+
+///|
+///
+/// Creates a OutputMessage with omitted optional fields absent.
+pub fn OutputMessage::new(
+  id~ : String,
+  type_~ : String,
+  content~ : Array[OutputContent],
+  status~ : OutputMessageStatus,
+) -> OutputMessage {
+  { id, type_, content, status, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend OutputMessage with ToJson::{to_json}
+
+///|
+pub impl ToJson for OutputMessage with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("id", self.id)
+  .field("type", self.type_)
+  .field("role", "assistant")
+  .field("content", self.content)
+  .field("status", self.status)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend OutputMessage with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for OutputMessage with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    id: required_field(obj, "id", path),
+    type_: required_field(obj, "type", path),
+    content: required_field(obj, "content", path),
+    status: required_field(obj, "status", path),
+  }
+}
+
+///|
+///
+/// The role of the message input. One of `user`, `assistant`, `system`, or `developer`.
+pub(all) enum EasyInputMessageRole {
+  User
+  Assistant
+  System
+  Developer
+  Custom(String)
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend EasyInputMessageRole with ToJson::{to_json}
+
+///|
+pub impl ToJson for EasyInputMessageRole with fn to_json(self) {
+  let raw = match self {
+    User => "user"
+    Assistant => "assistant"
+    System => "system"
+    Developer => "developer"
+    Custom(raw) => raw
+  }
+  raw.to_json()
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend EasyInputMessageRole with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for EasyInputMessageRole with fn from_json(value, path) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "user" => Some(User)
+        "assistant" => Some(Assistant)
+        "system" => Some(System)
+        "developer" => Some(Developer)
+        _ => None
+      }
+    },
+    raw => Custom(raw),
+  )
+}
+
+///|
+///
+/// A text input to the model.
+pub(all) struct InputTextContent {
+  type_ : String
+  text : String
+}
+
+///|
+///
+/// Creates a InputTextContent with omitted optional fields absent.
+pub fn InputTextContent::new(
+  type_~ : String,
+  text~ : String,
+) -> InputTextContent {
+  { type_, text, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend InputTextContent with ToJson::{to_json}
+
+///|
+pub impl ToJson for InputTextContent with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("type", self.type_)
+  .field("text", self.text)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend InputTextContent with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for InputTextContent with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    type_: required_field(obj, "type", path),
+    text: required_field(obj, "text", path),
+  }
+}
+
+///|
+///
+/// The detail level of the image to be sent to the model. One of `high`, `low`, or `auto`. Defaults to `auto`.
+pub(all) enum InputImageContentDetail {
+  Low
+  High
+  Auto
+  Custom(String)
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend InputImageContentDetail with ToJson::{to_json}
+
+///|
+pub impl ToJson for InputImageContentDetail with fn to_json(self) {
+  let raw = match self {
+    Low => "low"
+    High => "high"
+    Auto => "auto"
+    Custom(raw) => raw
+  }
+  raw.to_json()
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend InputImageContentDetail with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for InputImageContentDetail with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "low" => Some(Low)
+        "high" => Some(High)
+        "auto" => Some(Auto)
+        _ => None
+      }
+    },
+    raw => Custom(raw),
+  )
+}
+
+///|
+///
+/// An image input to the model. Learn about [image inputs](/docs/guides/vision).
+pub(all) struct InputImageContent {
+  type_ : String
+  image_url : @sdkjson.Presence[String]
+  file_id : @sdkjson.Presence[String]
+  detail : InputImageContentDetail
+}
+
+///|
+///
+/// Creates a InputImageContent with omitted optional fields absent.
+pub fn InputImageContent::new(
+  type_~ : String,
+  detail~ : InputImageContentDetail,
+  image_url? : String,
+  file_id? : String,
+) -> InputImageContent {
+  {
+    type_,
+    image_url: @sdkjson.Presence::from_option(image_url),
+    file_id: @sdkjson.Presence::from_option(file_id),
+    detail,
+  }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend InputImageContent with ToJson::{to_json}
+
+///|
+pub impl ToJson for InputImageContent with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("type", self.type_)
+  .presence("image_url", self.image_url)
+  .presence("file_id", self.file_id)
+  .field("detail", self.detail)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend InputImageContent with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for InputImageContent with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    type_: required_field(obj, "type", path),
+    image_url: @sdkjson.presence_field(obj, "image_url", path),
+    file_id: @sdkjson.presence_field(obj, "file_id", path),
+    detail: required_field(obj, "detail", path),
+  }
+}
+
+///|
+///
+/// A file input to the model.
+pub(all) struct InputFileContent {
+  type_ : String
+  file_id : @sdkjson.Presence[String]
+  filename : String?
+  file_data : String?
+}
+
+///|
+///
+/// Creates a InputFileContent with omitted optional fields absent.
+pub fn InputFileContent::new(
+  type_~ : String,
+  file_id? : String,
+  filename? : String,
+  file_data? : String,
+) -> InputFileContent {
+  {
+    type_,
+    file_id: @sdkjson.Presence::from_option(file_id),
+    filename,
+    file_data,
+  }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend InputFileContent with ToJson::{to_json}
+
+///|
+pub impl ToJson for InputFileContent with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("type", self.type_)
+  .presence("file_id", self.file_id)
+  .opt("filename", self.filename)
+  .opt("file_data", self.file_data)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend InputFileContent with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for InputFileContent with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    type_: required_field(obj, "type", path),
+    file_id: @sdkjson.presence_field(obj, "file_id", path),
+    filename: @sdkjson.opt_field(obj, "filename", path),
+    file_data: @sdkjson.opt_field(obj, "file_data", path),
+  }
+}
+
+///|
+///
+/// Generated tagged union InputContent.
+pub(all) enum InputContent {
+  InputText(InputTextContent)
+  InputImage(InputImageContent)
+  InputFile(InputFileContent)
+  Unknown(String, Json)
+}
+
+///|
+///
+/// Encodes this tagged union as JSON.
+pub extend InputContent with ToJson::{to_json}
+
+///|
+pub impl ToJson for InputContent with fn to_json(self) {
+  match self {
+    InputText(value) => value.to_json()
+    InputImage(value) => value.to_json()
+    InputFile(value) => value.to_json()
+    Unknown(_, value) => value
+  }
+}
+
+///|
+///
+/// Decodes this tagged union from JSON.
+pub extend InputContent with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for InputContent with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  let tag : String = required_field(obj, "type", path)
+  match tag {
+    "input_text" => InputText(@json.from_json(value, path~))
+    "input_image" => InputImage(@json.from_json(value, path~))
+    "input_file" => InputFile(@json.from_json(value, path~))
+    other => Unknown(other, value)
+  }
+}
+
+///|
+///
+/// Text, image, or audio input to the model, used to generate a response. Can also contain previous assistant responses.
+pub(all) enum EasyInputMessageContent {
+  Text(String)
+  InputMessageContentList(Array[InputContent])
+}
+
+///|
+///
+/// Encodes this union as JSON.
+pub extend EasyInputMessageContent with ToJson::{to_json}
+
+///|
+pub impl ToJson for EasyInputMessageContent with fn to_json(self) {
+  match self {
+    Text(value) => value.to_json()
+    InputMessageContentList(value) => value.to_json()
+  }
+}
+
+///|
+///
+/// Decodes this union from JSON.
+pub extend EasyInputMessageContent with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for EasyInputMessageContent with fn from_json(
+  value,
+  path,
+) {
+  if value is String(_) {
+    let decoded : String = @json.from_json(value, path~)
+    return Text(decoded)
+  }
+  if json_array_matches(value, item => item is Object(_)) {
+    let decoded : Array[InputContent] = @json.from_json(value, path~)
+    return InputMessageContentList(decoded)
+  }
+  raise @json.JsonDecodeError(
+    (path, "JSON shape does not match any EasyInputMessageContent variant"),
+  )
+}
+
+///|
+///
+/// A message input to the model with a role indicating instruction following hierarchy. Instructions given with the `developer` or `system` role take precedence over instructions given with the `user` role. Messages with the `assistant` role are presumed to have been generated by the model in previous interactions.
+pub(all) struct EasyInputMessage {
+  role : EasyInputMessageRole
+  content : EasyInputMessageContent
+  type_ : String?
+}
+
+///|
+///
+/// Creates a EasyInputMessage with omitted optional fields absent.
+pub fn EasyInputMessage::new(
+  role~ : EasyInputMessageRole,
+  content~ : EasyInputMessageContent,
+  type_? : String,
+) -> EasyInputMessage {
+  { role, content, type_, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend EasyInputMessage with ToJson::{to_json}
+
+///|
+pub impl ToJson for EasyInputMessage with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("role", self.role)
+  .field("content", self.content)
+  .opt("type", self.type_)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend EasyInputMessage with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for EasyInputMessage with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    role: required_field(obj, "role", path),
+    content: required_field(obj, "content", path),
+    type_: @sdkjson.opt_field(obj, "type", path),
+  }
+}
+
+///|
+///
+/// The role of the message input. One of `user`, `system`, or `developer`.
+pub(all) enum InputMessageRole {
+  User
+  System
+  Developer
+  Custom(String)
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend InputMessageRole with ToJson::{to_json}
+
+///|
+pub impl ToJson for InputMessageRole with fn to_json(self) {
+  let raw = match self {
+    User => "user"
+    System => "system"
+    Developer => "developer"
+    Custom(raw) => raw
+  }
+  raw.to_json()
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend InputMessageRole with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for InputMessageRole with fn from_json(value, path) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "user" => Some(User)
+        "system" => Some(System)
+        "developer" => Some(Developer)
+        _ => None
+      }
+    },
+    raw => Custom(raw),
+  )
+}
+
+///|
+///
+/// The status of item. One of `in_progress`, `completed`, or `incomplete`. Populated when items are returned via API.
+pub(all) enum InputMessageStatus {
+  InProgress
+  Completed
+  Incomplete
+  Custom(String)
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend InputMessageStatus with ToJson::{to_json}
+
+///|
+pub impl ToJson for InputMessageStatus with fn to_json(self) {
+  let raw = match self {
+    InProgress => "in_progress"
+    Completed => "completed"
+    Incomplete => "incomplete"
+    Custom(raw) => raw
+  }
+  raw.to_json()
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend InputMessageStatus with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for InputMessageStatus with fn from_json(value, path) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "in_progress" => Some(InProgress)
+        "completed" => Some(Completed)
+        "incomplete" => Some(Incomplete)
+        _ => None
+      }
+    },
+    raw => Custom(raw),
+  )
+}
+
+///|
+///
+/// A message input to the model with a role indicating instruction following hierarchy. Instructions given with the `developer` or `system` role take precedence over instructions given with the `user` role.
+pub(all) struct InputMessage {
+  type_ : String?
+  role : InputMessageRole
+  status : InputMessageStatus?
+  content : Array[InputContent]
+}
+
+///|
+///
+/// Creates a InputMessage with omitted optional fields absent.
+pub fn InputMessage::new(
+  role~ : InputMessageRole,
+  content~ : Array[InputContent],
+  type_? : String,
+  status? : InputMessageStatus,
+) -> InputMessage {
+  { type_, role, status, content, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend InputMessage with ToJson::{to_json}
+
+///|
+pub impl ToJson for InputMessage with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .opt("type", self.type_)
+  .field("role", self.role)
+  .opt("status", self.status)
+  .field("content", self.content)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend InputMessage with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for InputMessage with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    type_: @sdkjson.opt_field(obj, "type", path),
+    role: required_field(obj, "role", path),
+    status: @sdkjson.opt_field(obj, "status", path),
+    content: required_field(obj, "content", path),
   }
 }
 
@@ -2605,6 +3790,25 @@ pub(all) struct FileSearchToolCallResultsItem {
 
 ///|
 ///
+/// Creates a FileSearchToolCallResultsItem with omitted optional fields absent.
+pub fn FileSearchToolCallResultsItem::new(
+  file_id? : String,
+  text? : String,
+  filename? : String,
+  attributes? : Map[String, VectorStoreFileAttributesValue],
+  score? : Double,
+) -> FileSearchToolCallResultsItem {
+  {
+    file_id,
+    text,
+    filename,
+    attributes: @sdkjson.Presence::from_option(attributes),
+    score,
+  }
+}
+
+///|
+///
 /// Encodes this value as JSON.
 pub extend FileSearchToolCallResultsItem with ToJson::{to_json}
 
@@ -2652,6 +3856,25 @@ pub(all) struct FileSearchToolCall {
 
 ///|
 ///
+/// Creates a FileSearchToolCall with omitted optional fields absent.
+pub fn FileSearchToolCall::new(
+  id~ : String,
+  type_~ : String,
+  status~ : FileSearchToolCallStatus,
+  queries~ : Array[String],
+  results? : Array[FileSearchToolCallResultsItem],
+) -> FileSearchToolCall {
+  {
+    id,
+    type_,
+    status,
+    queries,
+    results: @sdkjson.Presence::from_option(results),
+  }
+}
+
+///|
+///
 /// Encodes this value as JSON.
 pub extend FileSearchToolCall with ToJson::{to_json}
 
@@ -2675,36 +3898,92 @@ pub extend FileSearchToolCall with @json.FromJson::{from_json}
 pub impl @json.FromJson for FileSearchToolCall with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    id: @sdkjson.field(obj, "id", path),
-    type_: @sdkjson.field(obj, "type", path),
-    status: @sdkjson.field(obj, "status", path),
-    queries: @sdkjson.field(obj, "queries", path),
+    id: required_field(obj, "id", path),
+    type_: required_field(obj, "type", path),
+    status: required_field(obj, "status", path),
+    queries: required_field(obj, "queries", path),
     results: @sdkjson.presence_field(obj, "results", path),
   }
 }
 
 ///|
 ///
-/// The status of the item. One of `in_progress`, `completed`, or `incomplete`. Populated when items are returned via API.
-pub(all) enum FunctionToolCallStatus {
+/// A pending safety check for the computer call.
+pub(all) struct ComputerCallSafetyCheckParam {
+  id : String
+  code : @sdkjson.Presence[String]
+  message : @sdkjson.Presence[String]
+}
+
+///|
+///
+/// Creates a ComputerCallSafetyCheckParam with omitted optional fields absent.
+pub fn ComputerCallSafetyCheckParam::new(
+  id~ : String,
+  code? : String,
+  message? : String,
+) -> ComputerCallSafetyCheckParam {
+  {
+    id,
+    code: @sdkjson.Presence::from_option(code),
+    message: @sdkjson.Presence::from_option(message),
+  }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend ComputerCallSafetyCheckParam with ToJson::{to_json}
+
+///|
+pub impl ToJson for ComputerCallSafetyCheckParam with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("id", self.id)
+  .presence("code", self.code)
+  .presence("message", self.message)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend ComputerCallSafetyCheckParam with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for ComputerCallSafetyCheckParam with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    id: required_field(obj, "id", path),
+    code: @sdkjson.presence_field(obj, "code", path),
+    message: @sdkjson.presence_field(obj, "message", path),
+  }
+}
+
+///|
+///
+/// The status of the message input. One of `in_progress`, `completed`, or `incomplete`. Populated when input items are returned via API.
+pub(all) enum ComputerCallOutputItemParamStatus {
   InProgress
   Completed
   Incomplete
-  Unknown(String)
+  Custom(String)
 }
 
 ///|
 ///
 /// Encodes this string enum as JSON.
-pub extend FunctionToolCallStatus with ToJson::{to_json}
+pub extend ComputerCallOutputItemParamStatus with ToJson::{to_json}
 
 ///|
-pub impl ToJson for FunctionToolCallStatus with fn to_json(self) {
+pub impl ToJson for ComputerCallOutputItemParamStatus with fn to_json(self) {
   let raw = match self {
     InProgress => "in_progress"
     Completed => "completed"
     Incomplete => "incomplete"
-    Unknown(raw) => raw
+    Custom(raw) => raw
   }
   raw.to_json()
 }
@@ -2712,10 +3991,10 @@ pub impl ToJson for FunctionToolCallStatus with fn to_json(self) {
 ///|
 ///
 /// Decodes this string enum from JSON.
-pub extend FunctionToolCallStatus with @json.FromJson::{from_json}
+pub extend ComputerCallOutputItemParamStatus with @json.FromJson::{from_json}
 
 ///|
-pub impl @json.FromJson for FunctionToolCallStatus with fn from_json(
+pub impl @json.FromJson for ComputerCallOutputItemParamStatus with fn from_json(
   value,
   path,
 ) {
@@ -2730,453 +4009,84 @@ pub impl @json.FromJson for FunctionToolCallStatus with fn from_json(
         _ => None
       }
     },
-    raw => Unknown(raw),
+    raw => Custom(raw),
   )
 }
 
 ///|
 ///
-/// A tool call to run a function. See the [function calling guide](/docs/guides/function-calling) for more information.
-pub(all) struct FunctionToolCall {
-  id : String?
-  type_ : String
+/// The output of a computer tool call.
+pub(all) struct ComputerCallOutputItemParam {
+  id : @sdkjson.Presence[String]
   call_id : String
-  name : String
-  arguments : String
-  status : FunctionToolCallStatus?
+  type_ : String
+  output : ComputerScreenshotImage
+  acknowledged_safety_checks : @sdkjson.Presence[
+    Array[ComputerCallSafetyCheckParam],
+  ]
+  status : @sdkjson.Presence[ComputerCallOutputItemParamStatus]
 }
 
 ///|
 ///
-/// Encodes this value as JSON.
-pub extend FunctionToolCall with ToJson::{to_json}
-
-///|
-pub impl ToJson for FunctionToolCall with fn to_json(self) {
-  @sdkjson.ObjBuilder::new()
-  .opt("id", self.id)
-  .field("type", self.type_)
-  .field("call_id", self.call_id)
-  .field("name", self.name)
-  .field("arguments", self.arguments)
-  .opt("status", self.status)
-  .build()
-}
-
-///|
-///
-/// Decodes this value from JSON.
-pub extend FunctionToolCall with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for FunctionToolCall with fn from_json(value, path) {
-  let obj = @sdkjson.expect_object(value, path)
+/// Creates a ComputerCallOutputItemParam with omitted optional fields absent.
+pub fn ComputerCallOutputItemParam::new(
+  call_id~ : String,
+  type_~ : String,
+  output~ : ComputerScreenshotImage,
+  id? : String,
+  acknowledged_safety_checks? : Array[ComputerCallSafetyCheckParam],
+  status? : ComputerCallOutputItemParamStatus,
+) -> ComputerCallOutputItemParam {
   {
-    id: @sdkjson.opt_field(obj, "id", path),
-    type_: @sdkjson.field(obj, "type", path),
-    call_id: @sdkjson.field(obj, "call_id", path),
-    name: @sdkjson.field(obj, "name", path),
-    arguments: @sdkjson.field(obj, "arguments", path),
-    status: @sdkjson.opt_field(obj, "status", path),
-  }
-}
-
-///|
-///
-/// Describes an OpenAI model offering that can be used with the API.
-pub(all) struct Model {
-  id : String
-  created : Int64
-  owned_by : String?
-}
-
-///|
-///
-/// Encodes this value as JSON.
-pub extend Model with ToJson::{to_json}
-
-///|
-pub impl ToJson for Model with fn to_json(self) {
-  @sdkjson.ObjBuilder::new()
-  .field("id", self.id)
-  .field("created", json_int64_to_json(self.created))
-  .field("object", "model")
-  .opt("owned_by", self.owned_by)
-  .build()
-}
-
-///|
-///
-/// Decodes this value from JSON.
-pub extend Model with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for Model with fn from_json(value, path) {
-  let obj = @sdkjson.expect_object(value, path)
-  {
-    id: @sdkjson.field(obj, "id", path),
-    created: json_int64(
-      @sdkjson.field(obj, "created", path),
-      path.add_key("created"),
+    id: @sdkjson.Presence::from_option(id),
+    call_id,
+    type_,
+    output,
+    acknowledged_safety_checks: @sdkjson.Presence::from_option(
+      acknowledged_safety_checks,
     ),
-    owned_by: @sdkjson.opt_field(obj, "owned_by", path),
+    status: @sdkjson.Presence::from_option(status),
   }
 }
 
 ///|
 ///
-/// Generated representation of ListModelsResponse.
-pub(all) struct ListModelsResponse {
-  data : Array[Model]
-}
-
-///|
-///
 /// Encodes this value as JSON.
-pub extend ListModelsResponse with ToJson::{to_json}
+pub extend ComputerCallOutputItemParam with ToJson::{to_json}
 
 ///|
-pub impl ToJson for ListModelsResponse with fn to_json(self) {
+pub impl ToJson for ComputerCallOutputItemParam with fn to_json(self) {
   @sdkjson.ObjBuilder::new()
-  .field("object", "list")
-  .field("data", self.data)
-  .build()
-}
-
-///|
-///
-/// Decodes this value from JSON.
-pub extend ListModelsResponse with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for ListModelsResponse with fn from_json(value, path) {
-  let obj = @sdkjson.expect_object(value, path)
-  { data: @sdkjson.field(obj, "data", path), }
-}
-
-///|
-///
-/// A citation to a file.
-pub(all) struct FileCitationBody {
-  type_ : String
-  file_id : String
-  index : Int
-}
-
-///|
-///
-/// Encodes this value as JSON.
-pub extend FileCitationBody with ToJson::{to_json}
-
-///|
-pub impl ToJson for FileCitationBody with fn to_json(self) {
-  @sdkjson.ObjBuilder::new()
+  .presence("id", self.id)
+  .field("call_id", self.call_id)
   .field("type", self.type_)
-  .field("file_id", self.file_id)
-  .field("index", self.index)
+  .field("output", self.output)
+  .presence("acknowledged_safety_checks", self.acknowledged_safety_checks)
+  .presence("status", self.status)
   .build()
 }
 
 ///|
 ///
 /// Decodes this value from JSON.
-pub extend FileCitationBody with @json.FromJson::{from_json}
+pub extend ComputerCallOutputItemParam with @json.FromJson::{from_json}
 
 ///|
-pub impl @json.FromJson for FileCitationBody with fn from_json(value, path) {
+pub impl @json.FromJson for ComputerCallOutputItemParam with fn from_json(
+  value,
+  path,
+) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    type_: @sdkjson.field(obj, "type", path),
-    file_id: @sdkjson.field(obj, "file_id", path),
-    index: @sdkjson.field(obj, "index", path),
-  }
-}
-
-///|
-///
-/// A citation for a web resource used to generate a model response.
-pub(all) struct UrlCitationBody {
-  type_ : String
-  url : String
-  start_index : Int
-  end_index : Int
-  title : String
-}
-
-///|
-///
-/// Encodes this value as JSON.
-pub extend UrlCitationBody with ToJson::{to_json}
-
-///|
-pub impl ToJson for UrlCitationBody with fn to_json(self) {
-  @sdkjson.ObjBuilder::new()
-  .field("type", self.type_)
-  .field("url", self.url)
-  .field("start_index", self.start_index)
-  .field("end_index", self.end_index)
-  .field("title", self.title)
-  .build()
-}
-
-///|
-///
-/// Decodes this value from JSON.
-pub extend UrlCitationBody with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for UrlCitationBody with fn from_json(value, path) {
-  let obj = @sdkjson.expect_object(value, path)
-  {
-    type_: @sdkjson.field(obj, "type", path),
-    url: @sdkjson.field(obj, "url", path),
-    start_index: @sdkjson.field(obj, "start_index", path),
-    end_index: @sdkjson.field(obj, "end_index", path),
-    title: @sdkjson.field(obj, "title", path),
-  }
-}
-
-///|
-///
-/// Generated tagged union Annotation.
-pub(all) enum Annotation {
-  FileCitation(FileCitationBody)
-  UrlCitation(UrlCitationBody)
-  FilePath(FilePath)
-  Unknown(String, Json)
-}
-
-///|
-///
-/// Encodes this tagged union as JSON.
-pub extend Annotation with ToJson::{to_json}
-
-///|
-pub impl ToJson for Annotation with fn to_json(self) {
-  match self {
-    FileCitation(value) => value.to_json()
-    UrlCitation(value) => value.to_json()
-    FilePath(value) => value.to_json()
-    Unknown(_, value) => value
-  }
-}
-
-///|
-///
-/// Decodes this tagged union from JSON.
-pub extend Annotation with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for Annotation with fn from_json(value, path) {
-  let obj = @sdkjson.expect_object(value, path)
-  let tag : String = @sdkjson.field(obj, "type", path)
-  match tag {
-    "file_citation" => FileCitation(@json.from_json(value, path~))
-    "url_citation" => UrlCitation(@json.from_json(value, path~))
-    "file_path" => FilePath(@json.from_json(value, path~))
-    other => Unknown(other, value)
-  }
-}
-
-///|
-///
-/// A text output from the model.
-pub(all) struct OutputTextContent {
-  type_ : String
-  text : String
-  annotations : Array[Annotation]?
-}
-
-///|
-///
-/// Encodes this value as JSON.
-pub extend OutputTextContent with ToJson::{to_json}
-
-///|
-pub impl ToJson for OutputTextContent with fn to_json(self) {
-  @sdkjson.ObjBuilder::new()
-  .field("type", self.type_)
-  .field("text", self.text)
-  .opt("annotations", self.annotations)
-  .build()
-}
-
-///|
-///
-/// Decodes this value from JSON.
-pub extend OutputTextContent with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for OutputTextContent with fn from_json(value, path) {
-  let obj = @sdkjson.expect_object(value, path)
-  {
-    type_: @sdkjson.field(obj, "type", path),
-    text: @sdkjson.field(obj, "text", path),
-    annotations: @sdkjson.opt_field(obj, "annotations", path),
-  }
-}
-
-///|
-///
-/// A refusal from the model.
-pub(all) struct RefusalContent {
-  type_ : String
-  refusal : String
-}
-
-///|
-///
-/// Encodes this value as JSON.
-pub extend RefusalContent with ToJson::{to_json}
-
-///|
-pub impl ToJson for RefusalContent with fn to_json(self) {
-  @sdkjson.ObjBuilder::new()
-  .field("type", self.type_)
-  .field("refusal", self.refusal)
-  .build()
-}
-
-///|
-///
-/// Decodes this value from JSON.
-pub extend RefusalContent with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for RefusalContent with fn from_json(value, path) {
-  let obj = @sdkjson.expect_object(value, path)
-  {
-    type_: @sdkjson.field(obj, "type", path),
-    refusal: @sdkjson.field(obj, "refusal", path),
-  }
-}
-
-///|
-///
-/// Generated tagged union OutputContent.
-pub(all) enum OutputContent {
-  OutputText(OutputTextContent)
-  Refusal(RefusalContent)
-  Unknown(String, Json)
-}
-
-///|
-///
-/// Encodes this tagged union as JSON.
-pub extend OutputContent with ToJson::{to_json}
-
-///|
-pub impl ToJson for OutputContent with fn to_json(self) {
-  match self {
-    OutputText(value) => value.to_json()
-    Refusal(value) => value.to_json()
-    Unknown(_, value) => value
-  }
-}
-
-///|
-///
-/// Decodes this tagged union from JSON.
-pub extend OutputContent with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for OutputContent with fn from_json(value, path) {
-  let obj = @sdkjson.expect_object(value, path)
-  let tag : String = @sdkjson.field(obj, "type", path)
-  match tag {
-    "output_text" => OutputText(@json.from_json(value, path~))
-    "refusal" => Refusal(@json.from_json(value, path~))
-    other => Unknown(other, value)
-  }
-}
-
-///|
-///
-/// The status of the message input. One of `in_progress`, `completed`, or `incomplete`. Populated when input items are returned via API.
-pub(all) enum OutputMessageStatus {
-  InProgress
-  Completed
-  Incomplete
-  Unknown(String)
-}
-
-///|
-///
-/// Encodes this string enum as JSON.
-pub extend OutputMessageStatus with ToJson::{to_json}
-
-///|
-pub impl ToJson for OutputMessageStatus with fn to_json(self) {
-  let raw = match self {
-    InProgress => "in_progress"
-    Completed => "completed"
-    Incomplete => "incomplete"
-    Unknown(raw) => raw
-  }
-  raw.to_json()
-}
-
-///|
-///
-/// Decodes this string enum from JSON.
-pub extend OutputMessageStatus with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for OutputMessageStatus with fn from_json(value, path) {
-  @sdkjson.open_string(
-    value,
-    path,
-    raw => {
-      match raw {
-        "in_progress" => Some(InProgress)
-        "completed" => Some(Completed)
-        "incomplete" => Some(Incomplete)
-        _ => None
-      }
-    },
-    raw => Unknown(raw),
-  )
-}
-
-///|
-///
-/// An output message from the model.
-pub(all) struct OutputMessage {
-  id : String
-  type_ : String
-  content : Array[OutputContent]
-  status : OutputMessageStatus
-}
-
-///|
-///
-/// Encodes this value as JSON.
-pub extend OutputMessage with ToJson::{to_json}
-
-///|
-pub impl ToJson for OutputMessage with fn to_json(self) {
-  @sdkjson.ObjBuilder::new()
-  .field("id", self.id)
-  .field("type", self.type_)
-  .field("role", "assistant")
-  .field("content", self.content)
-  .field("status", self.status)
-  .build()
-}
-
-///|
-///
-/// Decodes this value from JSON.
-pub extend OutputMessage with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for OutputMessage with fn from_json(value, path) {
-  let obj = @sdkjson.expect_object(value, path)
-  {
-    id: @sdkjson.field(obj, "id", path),
-    type_: @sdkjson.field(obj, "type", path),
-    content: @sdkjson.field(obj, "content", path),
-    status: @sdkjson.field(obj, "status", path),
+    id: @sdkjson.presence_field(obj, "id", path),
+    call_id: required_field(obj, "call_id", path),
+    type_: required_field(obj, "type", path),
+    output: required_field(obj, "output", path),
+    acknowledged_safety_checks: @sdkjson.presence_field(
+      obj, "acknowledged_safety_checks", path,
+    ),
+    status: @sdkjson.presence_field(obj, "status", path),
   }
 }
 
@@ -3245,6 +4155,17 @@ pub(all) struct WebSearchToolCall {
 
 ///|
 ///
+/// Creates a WebSearchToolCall with omitted optional fields absent.
+pub fn WebSearchToolCall::new(
+  id~ : String,
+  type_~ : String,
+  status~ : WebSearchToolCallStatus,
+) -> WebSearchToolCall {
+  { id, type_, status, }
+}
+
+///|
+///
 /// Encodes this value as JSON.
 pub extend WebSearchToolCall with ToJson::{to_json}
 
@@ -3266,9 +4187,238 @@ pub extend WebSearchToolCall with @json.FromJson::{from_json}
 pub impl @json.FromJson for WebSearchToolCall with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    id: @sdkjson.field(obj, "id", path),
-    type_: @sdkjson.field(obj, "type", path),
-    status: @sdkjson.field(obj, "status", path),
+    id: required_field(obj, "id", path),
+    type_: required_field(obj, "type", path),
+    status: required_field(obj, "status", path),
+  }
+}
+
+///|
+///
+/// The status of the item. One of `in_progress`, `completed`, or `incomplete`. Populated when items are returned via API.
+pub(all) enum FunctionToolCallStatus {
+  InProgress
+  Completed
+  Incomplete
+  Unknown(String)
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend FunctionToolCallStatus with ToJson::{to_json}
+
+///|
+pub impl ToJson for FunctionToolCallStatus with fn to_json(self) {
+  let raw = match self {
+    InProgress => "in_progress"
+    Completed => "completed"
+    Incomplete => "incomplete"
+    Unknown(raw) => raw
+  }
+  raw.to_json()
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend FunctionToolCallStatus with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for FunctionToolCallStatus with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "in_progress" => Some(InProgress)
+        "completed" => Some(Completed)
+        "incomplete" => Some(Incomplete)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// A tool call to run a function. See the [function calling guide](/docs/guides/function-calling) for more information.
+pub(all) struct FunctionToolCall {
+  id : String?
+  type_ : String
+  call_id : String
+  name : String
+  arguments : String
+  status : FunctionToolCallStatus?
+}
+
+///|
+///
+/// Creates a FunctionToolCall with omitted optional fields absent.
+pub fn FunctionToolCall::new(
+  type_~ : String,
+  call_id~ : String,
+  name~ : String,
+  arguments~ : String,
+  id? : String,
+  status? : FunctionToolCallStatus,
+) -> FunctionToolCall {
+  { id, type_, call_id, name, arguments, status, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend FunctionToolCall with ToJson::{to_json}
+
+///|
+pub impl ToJson for FunctionToolCall with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .opt("id", self.id)
+  .field("type", self.type_)
+  .field("call_id", self.call_id)
+  .field("name", self.name)
+  .field("arguments", self.arguments)
+  .opt("status", self.status)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend FunctionToolCall with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for FunctionToolCall with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    id: @sdkjson.opt_field(obj, "id", path),
+    type_: required_field(obj, "type", path),
+    call_id: required_field(obj, "call_id", path),
+    name: required_field(obj, "name", path),
+    arguments: required_field(obj, "arguments", path),
+    status: @sdkjson.opt_field(obj, "status", path),
+  }
+}
+
+///|
+///
+/// The status of the item. One of `in_progress`, `completed`, or `incomplete`. Populated when items are returned via API.
+pub(all) enum FunctionCallOutputItemParamStatus {
+  InProgress
+  Completed
+  Incomplete
+  Custom(String)
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend FunctionCallOutputItemParamStatus with ToJson::{to_json}
+
+///|
+pub impl ToJson for FunctionCallOutputItemParamStatus with fn to_json(self) {
+  let raw = match self {
+    InProgress => "in_progress"
+    Completed => "completed"
+    Incomplete => "incomplete"
+    Custom(raw) => raw
+  }
+  raw.to_json()
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend FunctionCallOutputItemParamStatus with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for FunctionCallOutputItemParamStatus with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "in_progress" => Some(InProgress)
+        "completed" => Some(Completed)
+        "incomplete" => Some(Incomplete)
+        _ => None
+      }
+    },
+    raw => Custom(raw),
+  )
+}
+
+///|
+///
+/// The output of a function tool call.
+pub(all) struct FunctionCallOutputItemParam {
+  id : @sdkjson.Presence[String]
+  call_id : String
+  type_ : String
+  output : String
+  status : @sdkjson.Presence[FunctionCallOutputItemParamStatus]
+}
+
+///|
+///
+/// Creates a FunctionCallOutputItemParam with omitted optional fields absent.
+pub fn FunctionCallOutputItemParam::new(
+  call_id~ : String,
+  type_~ : String,
+  output~ : String,
+  id? : String,
+  status? : FunctionCallOutputItemParamStatus,
+) -> FunctionCallOutputItemParam {
+  {
+    id: @sdkjson.Presence::from_option(id),
+    call_id,
+    type_,
+    output,
+    status: @sdkjson.Presence::from_option(status),
+  }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend FunctionCallOutputItemParam with ToJson::{to_json}
+
+///|
+pub impl ToJson for FunctionCallOutputItemParam with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .presence("id", self.id)
+  .field("call_id", self.call_id)
+  .field("type", self.type_)
+  .field("output", self.output)
+  .presence("status", self.status)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend FunctionCallOutputItemParam with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for FunctionCallOutputItemParam with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    id: @sdkjson.presence_field(obj, "id", path),
+    call_id: required_field(obj, "call_id", path),
+    type_: required_field(obj, "type", path),
+    output: required_field(obj, "output", path),
+    status: @sdkjson.presence_field(obj, "status", path),
   }
 }
 
@@ -3277,6 +4427,15 @@ pub impl @json.FromJson for WebSearchToolCall with fn from_json(value, path) {
 /// Generated representation of ReasoningItemSummaryItem.
 pub(all) struct ReasoningItemSummaryItem {
   text : String
+}
+
+///|
+///
+/// Creates a ReasoningItemSummaryItem with omitted optional fields absent.
+pub fn ReasoningItemSummaryItem::new(
+  text~ : String,
+) -> ReasoningItemSummaryItem {
+  { text, }
 }
 
 ///|
@@ -3303,7 +4462,7 @@ pub impl @json.FromJson for ReasoningItemSummaryItem with fn from_json(
   path,
 ) {
   let obj = @sdkjson.expect_object(value, path)
-  { text: @sdkjson.field(obj, "text", path), }
+  { text: required_field(obj, "text", path), }
 }
 
 ///|
@@ -3363,6 +4522,15 @@ pub(all) struct ReasoningItemContentItem {
 
 ///|
 ///
+/// Creates a ReasoningItemContentItem with omitted optional fields absent.
+pub fn ReasoningItemContentItem::new(
+  text~ : String,
+) -> ReasoningItemContentItem {
+  { text, }
+}
+
+///|
+///
 /// Encodes this value as JSON.
 pub extend ReasoningItemContentItem with ToJson::{to_json}
 
@@ -3385,7 +4553,7 @@ pub impl @json.FromJson for ReasoningItemContentItem with fn from_json(
   path,
 ) {
   let obj = @sdkjson.expect_object(value, path)
-  { text: @sdkjson.field(obj, "text", path), }
+  { text: required_field(obj, "text", path), }
 }
 
 ///|
@@ -3397,6 +4565,19 @@ pub(all) struct ReasoningItem {
   summary : Array[ReasoningItemSummaryItem]
   status : ReasoningItemStatus?
   content : Array[ReasoningItemContentItem]?
+}
+
+///|
+///
+/// Creates a ReasoningItem with omitted optional fields absent.
+pub fn ReasoningItem::new(
+  type_~ : String,
+  id~ : String,
+  summary~ : Array[ReasoningItemSummaryItem],
+  status? : ReasoningItemStatus,
+  content? : Array[ReasoningItemContentItem],
+) -> ReasoningItem {
+  { type_, id, summary, status, content, }
 }
 
 ///|
@@ -3424,12 +4605,518 @@ pub extend ReasoningItem with @json.FromJson::{from_json}
 pub impl @json.FromJson for ReasoningItem with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    type_: @sdkjson.field(obj, "type", path),
-    id: @sdkjson.field(obj, "id", path),
-    summary: @sdkjson.field(obj, "summary", path),
+    type_: required_field(obj, "type", path),
+    id: required_field(obj, "id", path),
+    summary: required_field(obj, "summary", path),
     status: @sdkjson.opt_field(obj, "status", path),
     content: @sdkjson.opt_field(obj, "content", path),
   }
+}
+
+///|
+///
+/// An internal identifier for an item to reference.
+pub(all) struct ItemReferenceParam {
+  type_ : @sdkjson.Presence[String]
+  id : String
+}
+
+///|
+///
+/// Creates a ItemReferenceParam with omitted optional fields absent.
+pub fn ItemReferenceParam::new(
+  id~ : String,
+  type_? : String,
+) -> ItemReferenceParam {
+  { type_: @sdkjson.Presence::from_option(type_), id, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend ItemReferenceParam with ToJson::{to_json}
+
+///|
+pub impl ToJson for ItemReferenceParam with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .presence("type", self.type_)
+  .field("id", self.id)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend ItemReferenceParam with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for ItemReferenceParam with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    type_: @sdkjson.presence_field(obj, "type", path),
+    id: required_field(obj, "id", path),
+  }
+}
+
+///|
+///
+/// Generated tagged union InputItem.
+pub(all) enum InputItem {
+  OutputMessage(OutputMessage)
+  EasyInputMessage(EasyInputMessage)
+  InputMessage(InputMessage)
+  FileSearchCall(FileSearchToolCall)
+  ComputerCall(ComputerToolCall)
+  ComputerCallOutput(ComputerCallOutputItemParam)
+  WebSearchCall(WebSearchToolCall)
+  FunctionCall(FunctionToolCall)
+  FunctionCallOutput(FunctionCallOutputItemParam)
+  Reasoning(ReasoningItem)
+  ItemReference(ItemReferenceParam)
+  Unknown(String, Json)
+}
+
+///|
+///
+/// Encodes this tagged union as JSON.
+pub extend InputItem with ToJson::{to_json}
+
+///|
+pub impl ToJson for InputItem with fn to_json(self) {
+  match self {
+    OutputMessage(value) => value.to_json()
+    EasyInputMessage(value) => value.to_json()
+    InputMessage(value) => value.to_json()
+    FileSearchCall(value) => value.to_json()
+    ComputerCall(value) => value.to_json()
+    ComputerCallOutput(value) => value.to_json()
+    WebSearchCall(value) => value.to_json()
+    FunctionCall(value) => value.to_json()
+    FunctionCallOutput(value) => value.to_json()
+    Reasoning(value) => value.to_json()
+    ItemReference(value) => value.to_json()
+    Unknown(_, value) => value
+  }
+}
+
+///|
+///
+/// Decodes this tagged union from JSON.
+pub extend InputItem with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for InputItem with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  let tag : String = required_field(obj, "type", path)
+  match tag {
+    "message" =>
+      if obj.contains("content") &&
+        obj.contains("id") &&
+        obj.contains("role") &&
+        obj.contains("status") &&
+        obj.contains("type") {
+        OutputMessage(@json.from_json(value, path~))
+      } else if obj.contains("content") && obj.contains("role") {
+        EasyInputMessage(@json.from_json(value, path~))
+      } else if obj.contains("content") && obj.contains("role") {
+        InputMessage(@json.from_json(value, path~))
+      } else {
+        Unknown(tag, value)
+      }
+    "file_search_call" => FileSearchCall(@json.from_json(value, path~))
+    "computer_call" => ComputerCall(@json.from_json(value, path~))
+    "computer_call_output" => ComputerCallOutput(@json.from_json(value, path~))
+    "web_search_call" => WebSearchCall(@json.from_json(value, path~))
+    "function_call" => FunctionCall(@json.from_json(value, path~))
+    "function_call_output" => FunctionCallOutput(@json.from_json(value, path~))
+    "reasoning" => Reasoning(@json.from_json(value, path~))
+    "item_reference" => ItemReference(@json.from_json(value, path~))
+    other => Unknown(other, value)
+  }
+}
+
+///|
+///
+/// Text, image, or file inputs to the model, used to generate a response. Learn more: - [Text inputs and outputs](/docs/guides/text) - [Image inputs](/docs/guides/images) - [File inputs](/docs/guides/pdf-files) - [Conversation state](/docs/guides/conversation-state) - [Function calling](/docs/guides/function-calling)
+pub(all) enum CreateResponseInput {
+  Text(String)
+  InputItemArray(Array[InputItem])
+}
+
+///|
+///
+/// Encodes this union as JSON.
+pub extend CreateResponseInput with ToJson::{to_json}
+
+///|
+pub impl ToJson for CreateResponseInput with fn to_json(self) {
+  match self {
+    Text(value) => value.to_json()
+    InputItemArray(value) => value.to_json()
+  }
+}
+
+///|
+///
+/// Decodes this union from JSON.
+pub extend CreateResponseInput with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for CreateResponseInput with fn from_json(value, path) {
+  if value is String(_) {
+    let decoded : String = @json.from_json(value, path~)
+    return Text(decoded)
+  }
+  if json_array_matches(value, item => item is Object(_)) {
+    let decoded : Array[InputItem] = @json.from_json(value, path~)
+    return InputItemArray(decoded)
+  }
+  raise @json.JsonDecodeError(
+    (path, "JSON shape does not match any CreateResponseInput variant"),
+  )
+}
+
+///|
+///
+/// Specify additional output data to include in the model response. Currently supported values are: - `file_search_call.results`: Include the search results of the file search tool call. - `message.input_image.image_url`: Include image urls from the input message. - `computer_call_output.output.image_url`: Include image urls from the computer call output.
+pub(all) enum Includable {
+  FileSearchCallResults
+  MessageInputImageImageUrl
+  ComputerCallOutputOutputImageUrl
+  Custom(String)
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend Includable with ToJson::{to_json}
+
+///|
+pub impl ToJson for Includable with fn to_json(self) {
+  let raw = match self {
+    FileSearchCallResults => "file_search_call.results"
+    MessageInputImageImageUrl => "message.input_image.image_url"
+    ComputerCallOutputOutputImageUrl => "computer_call_output.output.image_url"
+    Custom(raw) => raw
+  }
+  raw.to_json()
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend Includable with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for Includable with fn from_json(value, path) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "file_search_call.results" => Some(FileSearchCallResults)
+        "message.input_image.image_url" => Some(MessageInputImageImageUrl)
+        "computer_call_output.output.image_url" =>
+          Some(ComputerCallOutputOutputImageUrl)
+        _ => None
+      }
+    },
+    raw => Custom(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of CreateResponse.
+pub(all) struct CreateResponse {
+  metadata : @sdkjson.Presence[Map[String, String]]
+  temperature : @sdkjson.Presence[Double]
+  top_p : @sdkjson.Presence[Double]
+  user : String?
+  service_tier : @sdkjson.Presence[ServiceTier]
+  previous_response_id : @sdkjson.Presence[String]
+  model : String
+  reasoning : @sdkjson.Presence[Reasoning]
+  max_output_tokens : @sdkjson.Presence[Int]
+  instructions : @sdkjson.Presence[String]
+  text : CreateResponseText?
+  tools : Array[Tool]?
+  tool_choice : Json?
+  truncation : @sdkjson.Presence[CreateResponseTruncation]
+  input : CreateResponseInput
+  include_ : @sdkjson.Presence[Array[Includable]]
+  parallel_tool_calls : @sdkjson.Presence[Bool]
+  store : @sdkjson.Presence[Bool]
+  stream : @sdkjson.Presence[Bool]
+}
+
+///|
+///
+/// Creates a CreateResponse with omitted optional fields absent.
+pub fn CreateResponse::new(
+  model~ : String,
+  input~ : CreateResponseInput,
+  metadata? : Map[String, String],
+  temperature? : Double,
+  top_p? : Double,
+  user? : String,
+  service_tier? : ServiceTier,
+  previous_response_id? : String,
+  reasoning? : Reasoning,
+  max_output_tokens? : Int,
+  instructions? : String,
+  text? : CreateResponseText,
+  tools? : Array[Tool],
+  tool_choice? : Json,
+  truncation? : CreateResponseTruncation,
+  include_? : Array[Includable],
+  parallel_tool_calls? : Bool,
+  store? : Bool,
+  stream? : Bool,
+) -> CreateResponse {
+  {
+    metadata: @sdkjson.Presence::from_option(metadata),
+    temperature: @sdkjson.Presence::from_option(temperature),
+    top_p: @sdkjson.Presence::from_option(top_p),
+    user,
+    service_tier: @sdkjson.Presence::from_option(service_tier),
+    previous_response_id: @sdkjson.Presence::from_option(previous_response_id),
+    model,
+    reasoning: @sdkjson.Presence::from_option(reasoning),
+    max_output_tokens: @sdkjson.Presence::from_option(max_output_tokens),
+    instructions: @sdkjson.Presence::from_option(instructions),
+    text,
+    tools,
+    tool_choice,
+    truncation: @sdkjson.Presence::from_option(truncation),
+    input,
+    include_: @sdkjson.Presence::from_option(include_),
+    parallel_tool_calls: @sdkjson.Presence::from_option(parallel_tool_calls),
+    store: @sdkjson.Presence::from_option(store),
+    stream: @sdkjson.Presence::from_option(stream),
+  }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend CreateResponse with ToJson::{to_json}
+
+///|
+pub impl ToJson for CreateResponse with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .presence("metadata", self.metadata.map(value => json_map_to_json(value)))
+  .presence("temperature", self.temperature)
+  .presence("top_p", self.top_p)
+  .opt("user", self.user)
+  .presence("service_tier", self.service_tier)
+  .presence("previous_response_id", self.previous_response_id)
+  .field("model", self.model)
+  .presence("reasoning", self.reasoning)
+  .presence("max_output_tokens", self.max_output_tokens)
+  .presence("instructions", self.instructions)
+  .opt("text", self.text)
+  .opt("tools", self.tools)
+  .opt("tool_choice", self.tool_choice)
+  .presence("truncation", self.truncation)
+  .field("input", self.input)
+  .presence("include", self.include_)
+  .presence("parallel_tool_calls", self.parallel_tool_calls)
+  .presence("store", self.store)
+  .presence("stream", self.stream)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend CreateResponse with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for CreateResponse with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    metadata: decode_presence_json_map(obj, "metadata", path),
+    temperature: @sdkjson.presence_field(obj, "temperature", path),
+    top_p: @sdkjson.presence_field(obj, "top_p", path),
+    user: @sdkjson.opt_field(obj, "user", path),
+    service_tier: @sdkjson.presence_field(obj, "service_tier", path),
+    previous_response_id: @sdkjson.presence_field(
+      obj, "previous_response_id", path,
+    ),
+    model: required_field(obj, "model", path),
+    reasoning: @sdkjson.presence_field(obj, "reasoning", path),
+    max_output_tokens: @sdkjson.presence_field(obj, "max_output_tokens", path),
+    instructions: @sdkjson.presence_field(obj, "instructions", path),
+    text: @sdkjson.opt_field(obj, "text", path),
+    tools: @sdkjson.opt_field(obj, "tools", path),
+    tool_choice: @sdkjson.opt_field(obj, "tool_choice", path),
+    truncation: @sdkjson.presence_field(obj, "truncation", path),
+    input: required_field(obj, "input", path),
+    include_: @sdkjson.presence_field(obj, "include", path),
+    parallel_tool_calls: @sdkjson.presence_field(
+      obj, "parallel_tool_calls", path,
+    ),
+    store: @sdkjson.presence_field(obj, "store", path),
+    stream: @sdkjson.presence_field(obj, "stream", path),
+  }
+}
+
+///|
+///
+/// Content item used to generate a response.
+pub(all) enum Item {
+  OutputMessage(OutputMessage)
+  InputMessage(InputMessage)
+  FileSearchCall(FileSearchToolCall)
+  ComputerCall(ComputerToolCall)
+  ComputerCallOutput(ComputerCallOutputItemParam)
+  WebSearchCall(WebSearchToolCall)
+  FunctionCall(FunctionToolCall)
+  FunctionCallOutput(FunctionCallOutputItemParam)
+  Reasoning(ReasoningItem)
+  Unknown(String, Json)
+}
+
+///|
+///
+/// Encodes this tagged union as JSON.
+pub extend Item with ToJson::{to_json}
+
+///|
+pub impl ToJson for Item with fn to_json(self) {
+  match self {
+    OutputMessage(value) => value.to_json()
+    InputMessage(value) => value.to_json()
+    FileSearchCall(value) => value.to_json()
+    ComputerCall(value) => value.to_json()
+    ComputerCallOutput(value) => value.to_json()
+    WebSearchCall(value) => value.to_json()
+    FunctionCall(value) => value.to_json()
+    FunctionCallOutput(value) => value.to_json()
+    Reasoning(value) => value.to_json()
+    Unknown(_, value) => value
+  }
+}
+
+///|
+///
+/// Decodes this tagged union from JSON.
+pub extend Item with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for Item with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  let tag : String = required_field(obj, "type", path)
+  match tag {
+    "message" =>
+      if obj.contains("content") &&
+        obj.contains("id") &&
+        obj.contains("role") &&
+        obj.contains("status") &&
+        obj.contains("type") {
+        OutputMessage(@json.from_json(value, path~))
+      } else if obj.contains("content") && obj.contains("role") {
+        InputMessage(@json.from_json(value, path~))
+      } else {
+        Unknown(tag, value)
+      }
+    "file_search_call" => FileSearchCall(@json.from_json(value, path~))
+    "computer_call" => ComputerCall(@json.from_json(value, path~))
+    "computer_call_output" => ComputerCallOutput(@json.from_json(value, path~))
+    "web_search_call" => WebSearchCall(@json.from_json(value, path~))
+    "function_call" => FunctionCall(@json.from_json(value, path~))
+    "function_call_output" => FunctionCallOutput(@json.from_json(value, path~))
+    "reasoning" => Reasoning(@json.from_json(value, path~))
+    other => Unknown(other, value)
+  }
+}
+
+///|
+///
+/// Describes an OpenAI model offering that can be used with the API.
+pub(all) struct Model {
+  id : String
+  created : Int64
+  owned_by : String?
+}
+
+///|
+///
+/// Creates a Model with omitted optional fields absent.
+pub fn Model::new(id~ : String, created~ : Int64, owned_by? : String) -> Model {
+  { id, created, owned_by, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend Model with ToJson::{to_json}
+
+///|
+pub impl ToJson for Model with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("id", self.id)
+  .field("created", json_int64_to_json(self.created))
+  .field("object", "model")
+  .opt("owned_by", self.owned_by)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend Model with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for Model with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    id: required_field(obj, "id", path),
+    created: json_int64(
+      required_field(obj, "created", path),
+      path.add_key("created"),
+    ),
+    owned_by: @sdkjson.opt_field(obj, "owned_by", path),
+  }
+}
+
+///|
+///
+/// Generated representation of ListModelsResponse.
+pub(all) struct ListModelsResponse {
+  data : Array[Model]
+}
+
+///|
+///
+/// Creates a ListModelsResponse with omitted optional fields absent.
+pub fn ListModelsResponse::new(data~ : Array[Model]) -> ListModelsResponse {
+  { data, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend ListModelsResponse with ToJson::{to_json}
+
+///|
+pub impl ToJson for ListModelsResponse with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("object", "list")
+  .field("data", self.data)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend ListModelsResponse with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for ListModelsResponse with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  { data: required_field(obj, "data", path), }
 }
 
 ///|
@@ -3471,7 +5158,7 @@ pub extend OutputItem with @json.FromJson::{from_json}
 ///|
 pub impl @json.FromJson for OutputItem with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
-  let tag : String = @sdkjson.field(obj, "type", path)
+  let tag : String = required_field(obj, "type", path)
   match tag {
     "message" => Message(@json.from_json(value, path~))
     "file_search_call" => FileSearchCall(@json.from_json(value, path~))
@@ -3488,6 +5175,15 @@ pub impl @json.FromJson for OutputItem with fn from_json(value, path) {
 /// Configuration options for a text response from the model. Can be plain text or structured JSON data. Learn more: - [Text inputs and outputs](/docs/guides/text) - [Structured Outputs](/docs/guides/structured-outputs)
 pub(all) struct ResponseText {
   format : TextResponseFormatConfiguration?
+}
+
+///|
+///
+/// Creates a ResponseText with omitted optional fields absent.
+pub fn ResponseText::new(
+  format? : TextResponseFormatConfiguration,
+) -> ResponseText {
+  { format, }
 }
 
 ///|
@@ -3710,6 +5406,16 @@ pub(all) struct ResponseError {
 
 ///|
 ///
+/// Creates a ResponseError with omitted optional fields absent.
+pub fn ResponseError::new(
+  code~ : ResponseErrorCode,
+  message~ : String,
+) -> ResponseError {
+  { code, message, }
+}
+
+///|
+///
 /// Encodes this value as JSON.
 pub extend ResponseError with ToJson::{to_json}
 
@@ -3730,8 +5436,8 @@ pub extend ResponseError with @json.FromJson::{from_json}
 pub impl @json.FromJson for ResponseError with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    code: @sdkjson.field(obj, "code", path),
-    message: @sdkjson.field(obj, "message", path),
+    code: required_field(obj, "code", path),
+    message: required_field(obj, "message", path),
   }
 }
 
@@ -3792,6 +5498,15 @@ pub(all) struct ResponseIncompleteDetails {
 
 ///|
 ///
+/// Creates a ResponseIncompleteDetails with omitted optional fields absent.
+pub fn ResponseIncompleteDetails::new(
+  reason? : ResponseIncompleteDetailsReason,
+) -> ResponseIncompleteDetails {
+  { reason, }
+}
+
+///|
+///
 /// Encodes this value as JSON.
 pub extend ResponseIncompleteDetails with ToJson::{to_json}
 
@@ -3823,6 +5538,15 @@ pub(all) struct ResponseUsageInputTokensDetails {
 
 ///|
 ///
+/// Creates a ResponseUsageInputTokensDetails with omitted optional fields absent.
+pub fn ResponseUsageInputTokensDetails::new(
+  cached_tokens~ : Int,
+) -> ResponseUsageInputTokensDetails {
+  { cached_tokens, }
+}
+
+///|
+///
 /// Encodes this value as JSON.
 pub extend ResponseUsageInputTokensDetails with ToJson::{to_json}
 
@@ -3842,7 +5566,7 @@ pub impl @json.FromJson for ResponseUsageInputTokensDetails with fn from_json(
   path,
 ) {
   let obj = @sdkjson.expect_object(value, path)
-  { cached_tokens: @sdkjson.field(obj, "cached_tokens", path), }
+  { cached_tokens: required_field(obj, "cached_tokens", path), }
 }
 
 ///|
@@ -3850,6 +5574,15 @@ pub impl @json.FromJson for ResponseUsageInputTokensDetails with fn from_json(
 /// A detailed breakdown of the output tokens.
 pub(all) struct ResponseUsageOutputTokensDetails {
   reasoning_tokens : Int
+}
+
+///|
+///
+/// Creates a ResponseUsageOutputTokensDetails with omitted optional fields absent.
+pub fn ResponseUsageOutputTokensDetails::new(
+  reasoning_tokens~ : Int,
+) -> ResponseUsageOutputTokensDetails {
+  { reasoning_tokens, }
 }
 
 ///|
@@ -3875,7 +5608,7 @@ pub impl @json.FromJson for ResponseUsageOutputTokensDetails with fn from_json(
   path,
 ) {
   let obj = @sdkjson.expect_object(value, path)
-  { reasoning_tokens: @sdkjson.field(obj, "reasoning_tokens", path), }
+  { reasoning_tokens: required_field(obj, "reasoning_tokens", path), }
 }
 
 ///|
@@ -3887,6 +5620,25 @@ pub(all) struct ResponseUsage {
   output_tokens : Int
   output_tokens_details : ResponseUsageOutputTokensDetails
   total_tokens : Int
+}
+
+///|
+///
+/// Creates a ResponseUsage with omitted optional fields absent.
+pub fn ResponseUsage::new(
+  input_tokens~ : Int,
+  input_tokens_details~ : ResponseUsageInputTokensDetails,
+  output_tokens~ : Int,
+  output_tokens_details~ : ResponseUsageOutputTokensDetails,
+  total_tokens~ : Int,
+) -> ResponseUsage {
+  {
+    input_tokens,
+    input_tokens_details,
+    output_tokens,
+    output_tokens_details,
+    total_tokens,
+  }
 }
 
 ///|
@@ -3914,11 +5666,11 @@ pub extend ResponseUsage with @json.FromJson::{from_json}
 pub impl @json.FromJson for ResponseUsage with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    input_tokens: @sdkjson.field(obj, "input_tokens", path),
-    input_tokens_details: @sdkjson.field(obj, "input_tokens_details", path),
-    output_tokens: @sdkjson.field(obj, "output_tokens", path),
-    output_tokens_details: @sdkjson.field(obj, "output_tokens_details", path),
-    total_tokens: @sdkjson.field(obj, "total_tokens", path),
+    input_tokens: required_field(obj, "input_tokens", path),
+    input_tokens_details: required_field(obj, "input_tokens_details", path),
+    output_tokens: required_field(obj, "output_tokens", path),
+    output_tokens_details: required_field(obj, "output_tokens_details", path),
+    total_tokens: required_field(obj, "total_tokens", path),
   }
 }
 
@@ -3949,6 +5701,61 @@ pub(all) struct Response {
   output_text : @sdkjson.Presence[String]
   usage : ResponseUsage?
   parallel_tool_calls : Bool
+}
+
+///|
+///
+/// Creates a Response with omitted optional fields absent.
+pub fn Response::new(
+  model~ : String,
+  tools~ : Array[Tool],
+  tool_choice~ : Json,
+  id~ : String,
+  created_at~ : Double,
+  output~ : Array[OutputItem],
+  parallel_tool_calls~ : Bool,
+  metadata? : Map[String, String],
+  temperature? : Double,
+  top_p? : Double,
+  user? : String,
+  service_tier? : ServiceTier,
+  previous_response_id? : String,
+  reasoning? : Reasoning,
+  max_output_tokens? : Int,
+  instructions? : String,
+  text? : ResponseText,
+  truncation? : ResponseTruncation,
+  status? : ResponseStatus,
+  error? : ResponseError,
+  incomplete_details? : ResponseIncompleteDetails,
+  output_text? : String,
+  usage? : ResponseUsage,
+) -> Response {
+  {
+    metadata,
+    temperature,
+    top_p,
+    user,
+    service_tier: @sdkjson.Presence::from_option(service_tier),
+    previous_response_id: @sdkjson.Presence::from_option(previous_response_id),
+    model,
+    reasoning: @sdkjson.Presence::from_option(reasoning),
+    max_output_tokens: @sdkjson.Presence::from_option(max_output_tokens),
+    instructions,
+    text,
+    tools,
+    tool_choice,
+    truncation: @sdkjson.Presence::from_option(truncation),
+    id,
+    status,
+    created_at,
+    error,
+    incomplete_details,
+    output,
+    output_text: @sdkjson.Presence::from_option(output_text),
+    usage,
+    parallel_tool_calls,
+  }
 }
 
 ///|
@@ -4015,23 +5822,23 @@ pub impl @json.FromJson for Response with fn from_json(value, path) {
     previous_response_id: @sdkjson.presence_field(
       obj, "previous_response_id", path,
     ),
-    model: @sdkjson.field(obj, "model", path),
+    model: required_field(obj, "model", path),
     reasoning: @sdkjson.presence_field(obj, "reasoning", path),
     max_output_tokens: @sdkjson.presence_field(obj, "max_output_tokens", path),
     instructions: decode_nullable_field(obj, "instructions", path),
     text: @sdkjson.opt_field(obj, "text", path),
-    tools: @sdkjson.field(obj, "tools", path),
-    tool_choice: @sdkjson.field(obj, "tool_choice", path),
+    tools: required_field(obj, "tools", path),
+    tool_choice: required_field(obj, "tool_choice", path),
     truncation: @sdkjson.presence_field(obj, "truncation", path),
-    id: @sdkjson.field(obj, "id", path),
+    id: required_field(obj, "id", path),
     status: @sdkjson.opt_field(obj, "status", path),
-    created_at: @sdkjson.field(obj, "created_at", path),
+    created_at: required_field(obj, "created_at", path),
     error: decode_nullable_field(obj, "error", path),
     incomplete_details: decode_nullable_field(obj, "incomplete_details", path),
-    output: @sdkjson.field(obj, "output", path),
+    output: required_field(obj, "output", path),
     output_text: @sdkjson.presence_field(obj, "output_text", path),
     usage: @sdkjson.opt_field(obj, "usage", path),
-    parallel_tool_calls: @sdkjson.field(obj, "parallel_tool_calls", path),
+    parallel_tool_calls: required_field(obj, "parallel_tool_calls", path),
   }
 }
 
@@ -4041,6 +5848,16 @@ pub impl @json.FromJson for Response with fn from_json(value, path) {
 pub(all) struct ResponseAudioDeltaEvent {
   type_ : String
   delta : String
+}
+
+///|
+///
+/// Creates a ResponseAudioDeltaEvent with omitted optional fields absent.
+pub fn ResponseAudioDeltaEvent::new(
+  type_~ : String,
+  delta~ : String,
+) -> ResponseAudioDeltaEvent {
+  { type_, delta, }
 }
 
 ///|
@@ -4068,8 +5885,8 @@ pub impl @json.FromJson for ResponseAudioDeltaEvent with fn from_json(
 ) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    type_: @sdkjson.field(obj, "type", path),
-    delta: @sdkjson.field(obj, "delta", path),
+    type_: required_field(obj, "type", path),
+    delta: required_field(obj, "delta", path),
   }
 }
 
@@ -4078,6 +5895,13 @@ pub impl @json.FromJson for ResponseAudioDeltaEvent with fn from_json(
 /// Emitted when the audio response is complete.
 pub(all) struct ResponseAudioDoneEvent {
   type_ : String
+}
+
+///|
+///
+/// Creates a ResponseAudioDoneEvent with omitted optional fields absent.
+pub fn ResponseAudioDoneEvent::new(type_~ : String) -> ResponseAudioDoneEvent {
+  { type_, }
 }
 
 ///|
@@ -4101,7 +5925,7 @@ pub impl @json.FromJson for ResponseAudioDoneEvent with fn from_json(
   path,
 ) {
   let obj = @sdkjson.expect_object(value, path)
-  { type_: @sdkjson.field(obj, "type", path), }
+  { type_: required_field(obj, "type", path), }
 }
 
 ///|
@@ -4110,6 +5934,16 @@ pub impl @json.FromJson for ResponseAudioDoneEvent with fn from_json(
 pub(all) struct ResponseAudioTranscriptDeltaEvent {
   type_ : String
   delta : String
+}
+
+///|
+///
+/// Creates a ResponseAudioTranscriptDeltaEvent with omitted optional fields absent.
+pub fn ResponseAudioTranscriptDeltaEvent::new(
+  type_~ : String,
+  delta~ : String,
+) -> ResponseAudioTranscriptDeltaEvent {
+  { type_, delta, }
 }
 
 ///|
@@ -4137,8 +5971,8 @@ pub impl @json.FromJson for ResponseAudioTranscriptDeltaEvent with fn from_json(
 ) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    type_: @sdkjson.field(obj, "type", path),
-    delta: @sdkjson.field(obj, "delta", path),
+    type_: required_field(obj, "type", path),
+    delta: required_field(obj, "delta", path),
   }
 }
 
@@ -4147,6 +5981,15 @@ pub impl @json.FromJson for ResponseAudioTranscriptDeltaEvent with fn from_json(
 /// Emitted when the full audio transcript is completed.
 pub(all) struct ResponseAudioTranscriptDoneEvent {
   type_ : String
+}
+
+///|
+///
+/// Creates a ResponseAudioTranscriptDoneEvent with omitted optional fields absent.
+pub fn ResponseAudioTranscriptDoneEvent::new(
+  type_~ : String,
+) -> ResponseAudioTranscriptDoneEvent {
+  { type_, }
 }
 
 ///|
@@ -4170,7 +6013,7 @@ pub impl @json.FromJson for ResponseAudioTranscriptDoneEvent with fn from_json(
   path,
 ) {
   let obj = @sdkjson.expect_object(value, path)
-  { type_: @sdkjson.field(obj, "type", path), }
+  { type_: required_field(obj, "type", path), }
 }
 
 ///|
@@ -4180,6 +6023,17 @@ pub(all) struct ResponseCodeInterpreterCallCodeDeltaEvent {
   type_ : String
   output_index : Int
   delta : String
+}
+
+///|
+///
+/// Creates a ResponseCodeInterpreterCallCodeDeltaEvent with omitted optional fields absent.
+pub fn ResponseCodeInterpreterCallCodeDeltaEvent::new(
+  type_~ : String,
+  output_index~ : Int,
+  delta~ : String,
+) -> ResponseCodeInterpreterCallCodeDeltaEvent {
+  { type_, output_index, delta, }
 }
 
 ///|
@@ -4212,9 +6066,9 @@ pub impl @json.FromJson for ResponseCodeInterpreterCallCodeDeltaEvent with fn fr
 ) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    type_: @sdkjson.field(obj, "type", path),
-    output_index: @sdkjson.field(obj, "output_index", path),
-    delta: @sdkjson.field(obj, "delta", path),
+    type_: required_field(obj, "type", path),
+    output_index: required_field(obj, "output_index", path),
+    delta: required_field(obj, "delta", path),
   }
 }
 
@@ -4225,6 +6079,17 @@ pub(all) struct ResponseCodeInterpreterCallCodeDoneEvent {
   type_ : String
   output_index : Int
   code : String
+}
+
+///|
+///
+/// Creates a ResponseCodeInterpreterCallCodeDoneEvent with omitted optional fields absent.
+pub fn ResponseCodeInterpreterCallCodeDoneEvent::new(
+  type_~ : String,
+  output_index~ : Int,
+  code~ : String,
+) -> ResponseCodeInterpreterCallCodeDoneEvent {
+  { type_, output_index, code, }
 }
 
 ///|
@@ -4257,9 +6122,9 @@ pub impl @json.FromJson for ResponseCodeInterpreterCallCodeDoneEvent with fn fro
 ) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    type_: @sdkjson.field(obj, "type", path),
-    output_index: @sdkjson.field(obj, "output_index", path),
-    code: @sdkjson.field(obj, "code", path),
+    type_: required_field(obj, "type", path),
+    output_index: required_field(obj, "output_index", path),
+    code: required_field(obj, "code", path),
   }
 }
 
@@ -4270,6 +6135,17 @@ pub(all) struct ResponseCodeInterpreterCallCompletedEvent {
   type_ : String
   output_index : Int
   code_interpreter_call : CodeInterpreterToolCall
+}
+
+///|
+///
+/// Creates a ResponseCodeInterpreterCallCompletedEvent with omitted optional fields absent.
+pub fn ResponseCodeInterpreterCallCompletedEvent::new(
+  type_~ : String,
+  output_index~ : Int,
+  code_interpreter_call~ : CodeInterpreterToolCall,
+) -> ResponseCodeInterpreterCallCompletedEvent {
+  { type_, output_index, code_interpreter_call, }
 }
 
 ///|
@@ -4302,9 +6178,9 @@ pub impl @json.FromJson for ResponseCodeInterpreterCallCompletedEvent with fn fr
 ) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    type_: @sdkjson.field(obj, "type", path),
-    output_index: @sdkjson.field(obj, "output_index", path),
-    code_interpreter_call: @sdkjson.field(obj, "code_interpreter_call", path),
+    type_: required_field(obj, "type", path),
+    output_index: required_field(obj, "output_index", path),
+    code_interpreter_call: required_field(obj, "code_interpreter_call", path),
   }
 }
 
@@ -4315,6 +6191,17 @@ pub(all) struct ResponseCodeInterpreterCallInProgressEvent {
   type_ : String
   output_index : Int
   code_interpreter_call : CodeInterpreterToolCall
+}
+
+///|
+///
+/// Creates a ResponseCodeInterpreterCallInProgressEvent with omitted optional fields absent.
+pub fn ResponseCodeInterpreterCallInProgressEvent::new(
+  type_~ : String,
+  output_index~ : Int,
+  code_interpreter_call~ : CodeInterpreterToolCall,
+) -> ResponseCodeInterpreterCallInProgressEvent {
+  { type_, output_index, code_interpreter_call, }
 }
 
 ///|
@@ -4347,9 +6234,9 @@ pub impl @json.FromJson for ResponseCodeInterpreterCallInProgressEvent with fn f
 ) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    type_: @sdkjson.field(obj, "type", path),
-    output_index: @sdkjson.field(obj, "output_index", path),
-    code_interpreter_call: @sdkjson.field(obj, "code_interpreter_call", path),
+    type_: required_field(obj, "type", path),
+    output_index: required_field(obj, "output_index", path),
+    code_interpreter_call: required_field(obj, "code_interpreter_call", path),
   }
 }
 
@@ -4360,6 +6247,17 @@ pub(all) struct ResponseCodeInterpreterCallInterpretingEvent {
   type_ : String
   output_index : Int
   code_interpreter_call : CodeInterpreterToolCall
+}
+
+///|
+///
+/// Creates a ResponseCodeInterpreterCallInterpretingEvent with omitted optional fields absent.
+pub fn ResponseCodeInterpreterCallInterpretingEvent::new(
+  type_~ : String,
+  output_index~ : Int,
+  code_interpreter_call~ : CodeInterpreterToolCall,
+) -> ResponseCodeInterpreterCallInterpretingEvent {
+  { type_, output_index, code_interpreter_call, }
 }
 
 ///|
@@ -4392,9 +6290,9 @@ pub impl @json.FromJson for ResponseCodeInterpreterCallInterpretingEvent with fn
 ) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    type_: @sdkjson.field(obj, "type", path),
-    output_index: @sdkjson.field(obj, "output_index", path),
-    code_interpreter_call: @sdkjson.field(obj, "code_interpreter_call", path),
+    type_: required_field(obj, "type", path),
+    output_index: required_field(obj, "output_index", path),
+    code_interpreter_call: required_field(obj, "code_interpreter_call", path),
   }
 }
 
@@ -4404,6 +6302,16 @@ pub impl @json.FromJson for ResponseCodeInterpreterCallInterpretingEvent with fn
 pub(all) struct ResponseCompletedEvent {
   type_ : String
   response : Response
+}
+
+///|
+///
+/// Creates a ResponseCompletedEvent with omitted optional fields absent.
+pub fn ResponseCompletedEvent::new(
+  type_~ : String,
+  response~ : Response,
+) -> ResponseCompletedEvent {
+  { type_, response, }
 }
 
 ///|
@@ -4431,8 +6339,8 @@ pub impl @json.FromJson for ResponseCompletedEvent with fn from_json(
 ) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    type_: @sdkjson.field(obj, "type", path),
-    response: @sdkjson.field(obj, "response", path),
+    type_: required_field(obj, "type", path),
+    response: required_field(obj, "response", path),
   }
 }
 
@@ -4445,6 +6353,19 @@ pub(all) struct ResponseContentPartAddedEvent {
   output_index : Int
   content_index : Int
   part : OutputContent
+}
+
+///|
+///
+/// Creates a ResponseContentPartAddedEvent with omitted optional fields absent.
+pub fn ResponseContentPartAddedEvent::new(
+  type_~ : String,
+  item_id~ : String,
+  output_index~ : Int,
+  content_index~ : Int,
+  part~ : OutputContent,
+) -> ResponseContentPartAddedEvent {
+  { type_, item_id, output_index, content_index, part, }
 }
 
 ///|
@@ -4475,11 +6396,11 @@ pub impl @json.FromJson for ResponseContentPartAddedEvent with fn from_json(
 ) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    type_: @sdkjson.field(obj, "type", path),
-    item_id: @sdkjson.field(obj, "item_id", path),
-    output_index: @sdkjson.field(obj, "output_index", path),
-    content_index: @sdkjson.field(obj, "content_index", path),
-    part: @sdkjson.field(obj, "part", path),
+    type_: required_field(obj, "type", path),
+    item_id: required_field(obj, "item_id", path),
+    output_index: required_field(obj, "output_index", path),
+    content_index: required_field(obj, "content_index", path),
+    part: required_field(obj, "part", path),
   }
 }
 
@@ -4492,6 +6413,19 @@ pub(all) struct ResponseContentPartDoneEvent {
   output_index : Int
   content_index : Int
   part : OutputContent
+}
+
+///|
+///
+/// Creates a ResponseContentPartDoneEvent with omitted optional fields absent.
+pub fn ResponseContentPartDoneEvent::new(
+  type_~ : String,
+  item_id~ : String,
+  output_index~ : Int,
+  content_index~ : Int,
+  part~ : OutputContent,
+) -> ResponseContentPartDoneEvent {
+  { type_, item_id, output_index, content_index, part, }
 }
 
 ///|
@@ -4522,11 +6456,11 @@ pub impl @json.FromJson for ResponseContentPartDoneEvent with fn from_json(
 ) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    type_: @sdkjson.field(obj, "type", path),
-    item_id: @sdkjson.field(obj, "item_id", path),
-    output_index: @sdkjson.field(obj, "output_index", path),
-    content_index: @sdkjson.field(obj, "content_index", path),
-    part: @sdkjson.field(obj, "part", path),
+    type_: required_field(obj, "type", path),
+    item_id: required_field(obj, "item_id", path),
+    output_index: required_field(obj, "output_index", path),
+    content_index: required_field(obj, "content_index", path),
+    part: required_field(obj, "part", path),
   }
 }
 
@@ -4536,6 +6470,16 @@ pub impl @json.FromJson for ResponseContentPartDoneEvent with fn from_json(
 pub(all) struct ResponseCreatedEvent {
   type_ : String
   response : Response
+}
+
+///|
+///
+/// Creates a ResponseCreatedEvent with omitted optional fields absent.
+pub fn ResponseCreatedEvent::new(
+  type_~ : String,
+  response~ : Response,
+) -> ResponseCreatedEvent {
+  { type_, response, }
 }
 
 ///|
@@ -4560,8 +6504,8 @@ pub extend ResponseCreatedEvent with @json.FromJson::{from_json}
 pub impl @json.FromJson for ResponseCreatedEvent with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    type_: @sdkjson.field(obj, "type", path),
-    response: @sdkjson.field(obj, "response", path),
+    type_: required_field(obj, "type", path),
+    response: required_field(obj, "response", path),
   }
 }
 
@@ -4573,6 +6517,18 @@ pub(all) struct ResponseErrorEvent {
   code : String?
   message : String
   param : String?
+}
+
+///|
+///
+/// Creates a ResponseErrorEvent with omitted optional fields absent.
+pub fn ResponseErrorEvent::new(
+  type_~ : String,
+  message~ : String,
+  code? : String,
+  param? : String,
+) -> ResponseErrorEvent {
+  { type_, code, message, param, }
 }
 
 ///|
@@ -4599,9 +6555,9 @@ pub extend ResponseErrorEvent with @json.FromJson::{from_json}
 pub impl @json.FromJson for ResponseErrorEvent with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    type_: @sdkjson.field(obj, "type", path),
+    type_: required_field(obj, "type", path),
     code: decode_nullable_field(obj, "code", path),
-    message: @sdkjson.field(obj, "message", path),
+    message: required_field(obj, "message", path),
     param: decode_nullable_field(obj, "param", path),
   }
 }
@@ -4612,6 +6568,16 @@ pub impl @json.FromJson for ResponseErrorEvent with fn from_json(value, path) {
 pub(all) struct ResponseFailedEvent {
   type_ : String
   response : Response
+}
+
+///|
+///
+/// Creates a ResponseFailedEvent with omitted optional fields absent.
+pub fn ResponseFailedEvent::new(
+  type_~ : String,
+  response~ : Response,
+) -> ResponseFailedEvent {
+  { type_, response, }
 }
 
 ///|
@@ -4636,8 +6602,8 @@ pub extend ResponseFailedEvent with @json.FromJson::{from_json}
 pub impl @json.FromJson for ResponseFailedEvent with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    type_: @sdkjson.field(obj, "type", path),
-    response: @sdkjson.field(obj, "response", path),
+    type_: required_field(obj, "type", path),
+    response: required_field(obj, "response", path),
   }
 }
 
@@ -4648,6 +6614,17 @@ pub(all) struct ResponseFileSearchCallCompletedEvent {
   type_ : String
   output_index : Int
   item_id : String
+}
+
+///|
+///
+/// Creates a ResponseFileSearchCallCompletedEvent with omitted optional fields absent.
+pub fn ResponseFileSearchCallCompletedEvent::new(
+  type_~ : String,
+  output_index~ : Int,
+  item_id~ : String,
+) -> ResponseFileSearchCallCompletedEvent {
+  { type_, output_index, item_id, }
 }
 
 ///|
@@ -4676,9 +6653,9 @@ pub impl @json.FromJson for ResponseFileSearchCallCompletedEvent with fn from_js
 ) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    type_: @sdkjson.field(obj, "type", path),
-    output_index: @sdkjson.field(obj, "output_index", path),
-    item_id: @sdkjson.field(obj, "item_id", path),
+    type_: required_field(obj, "type", path),
+    output_index: required_field(obj, "output_index", path),
+    item_id: required_field(obj, "item_id", path),
   }
 }
 
@@ -4689,6 +6666,17 @@ pub(all) struct ResponseFileSearchCallInProgressEvent {
   type_ : String
   output_index : Int
   item_id : String
+}
+
+///|
+///
+/// Creates a ResponseFileSearchCallInProgressEvent with omitted optional fields absent.
+pub fn ResponseFileSearchCallInProgressEvent::new(
+  type_~ : String,
+  output_index~ : Int,
+  item_id~ : String,
+) -> ResponseFileSearchCallInProgressEvent {
+  { type_, output_index, item_id, }
 }
 
 ///|
@@ -4719,9 +6707,9 @@ pub impl @json.FromJson for ResponseFileSearchCallInProgressEvent with fn from_j
 ) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    type_: @sdkjson.field(obj, "type", path),
-    output_index: @sdkjson.field(obj, "output_index", path),
-    item_id: @sdkjson.field(obj, "item_id", path),
+    type_: required_field(obj, "type", path),
+    output_index: required_field(obj, "output_index", path),
+    item_id: required_field(obj, "item_id", path),
   }
 }
 
@@ -4732,6 +6720,17 @@ pub(all) struct ResponseFileSearchCallSearchingEvent {
   type_ : String
   output_index : Int
   item_id : String
+}
+
+///|
+///
+/// Creates a ResponseFileSearchCallSearchingEvent with omitted optional fields absent.
+pub fn ResponseFileSearchCallSearchingEvent::new(
+  type_~ : String,
+  output_index~ : Int,
+  item_id~ : String,
+) -> ResponseFileSearchCallSearchingEvent {
+  { type_, output_index, item_id, }
 }
 
 ///|
@@ -4760,9 +6759,9 @@ pub impl @json.FromJson for ResponseFileSearchCallSearchingEvent with fn from_js
 ) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    type_: @sdkjson.field(obj, "type", path),
-    output_index: @sdkjson.field(obj, "output_index", path),
-    item_id: @sdkjson.field(obj, "item_id", path),
+    type_: required_field(obj, "type", path),
+    output_index: required_field(obj, "output_index", path),
+    item_id: required_field(obj, "item_id", path),
   }
 }
 
@@ -4774,6 +6773,18 @@ pub(all) struct ResponseFunctionCallArgumentsDeltaEvent {
   item_id : String
   output_index : Int
   delta : String
+}
+
+///|
+///
+/// Creates a ResponseFunctionCallArgumentsDeltaEvent with omitted optional fields absent.
+pub fn ResponseFunctionCallArgumentsDeltaEvent::new(
+  type_~ : String,
+  item_id~ : String,
+  output_index~ : Int,
+  delta~ : String,
+) -> ResponseFunctionCallArgumentsDeltaEvent {
+  { type_, item_id, output_index, delta, }
 }
 
 ///|
@@ -4807,10 +6818,10 @@ pub impl @json.FromJson for ResponseFunctionCallArgumentsDeltaEvent with fn from
 ) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    type_: @sdkjson.field(obj, "type", path),
-    item_id: @sdkjson.field(obj, "item_id", path),
-    output_index: @sdkjson.field(obj, "output_index", path),
-    delta: @sdkjson.field(obj, "delta", path),
+    type_: required_field(obj, "type", path),
+    item_id: required_field(obj, "item_id", path),
+    output_index: required_field(obj, "output_index", path),
+    delta: required_field(obj, "delta", path),
   }
 }
 
@@ -4822,6 +6833,18 @@ pub(all) struct ResponseFunctionCallArgumentsDoneEvent {
   item_id : String
   output_index : Int
   arguments : String
+}
+
+///|
+///
+/// Creates a ResponseFunctionCallArgumentsDoneEvent with omitted optional fields absent.
+pub fn ResponseFunctionCallArgumentsDoneEvent::new(
+  type_~ : String,
+  item_id~ : String,
+  output_index~ : Int,
+  arguments~ : String,
+) -> ResponseFunctionCallArgumentsDoneEvent {
+  { type_, item_id, output_index, arguments, }
 }
 
 ///|
@@ -4853,10 +6876,10 @@ pub impl @json.FromJson for ResponseFunctionCallArgumentsDoneEvent with fn from_
 ) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    type_: @sdkjson.field(obj, "type", path),
-    item_id: @sdkjson.field(obj, "item_id", path),
-    output_index: @sdkjson.field(obj, "output_index", path),
-    arguments: @sdkjson.field(obj, "arguments", path),
+    type_: required_field(obj, "type", path),
+    item_id: required_field(obj, "item_id", path),
+    output_index: required_field(obj, "output_index", path),
+    arguments: required_field(obj, "arguments", path),
   }
 }
 
@@ -4866,6 +6889,16 @@ pub impl @json.FromJson for ResponseFunctionCallArgumentsDoneEvent with fn from_
 pub(all) struct ResponseInProgressEvent {
   type_ : String
   response : Response
+}
+
+///|
+///
+/// Creates a ResponseInProgressEvent with omitted optional fields absent.
+pub fn ResponseInProgressEvent::new(
+  type_~ : String,
+  response~ : Response,
+) -> ResponseInProgressEvent {
+  { type_, response, }
 }
 
 ///|
@@ -4893,8 +6926,8 @@ pub impl @json.FromJson for ResponseInProgressEvent with fn from_json(
 ) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    type_: @sdkjson.field(obj, "type", path),
-    response: @sdkjson.field(obj, "response", path),
+    type_: required_field(obj, "type", path),
+    response: required_field(obj, "response", path),
   }
 }
 
@@ -4904,6 +6937,16 @@ pub impl @json.FromJson for ResponseInProgressEvent with fn from_json(
 pub(all) struct ResponseIncompleteEvent {
   type_ : String
   response : Response
+}
+
+///|
+///
+/// Creates a ResponseIncompleteEvent with omitted optional fields absent.
+pub fn ResponseIncompleteEvent::new(
+  type_~ : String,
+  response~ : Response,
+) -> ResponseIncompleteEvent {
+  { type_, response, }
 }
 
 ///|
@@ -4931,8 +6974,8 @@ pub impl @json.FromJson for ResponseIncompleteEvent with fn from_json(
 ) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    type_: @sdkjson.field(obj, "type", path),
-    response: @sdkjson.field(obj, "response", path),
+    type_: required_field(obj, "type", path),
+    response: required_field(obj, "response", path),
   }
 }
 
@@ -4943,6 +6986,17 @@ pub(all) struct ResponseOutputItemAddedEvent {
   type_ : String
   output_index : Int
   item : OutputItem
+}
+
+///|
+///
+/// Creates a ResponseOutputItemAddedEvent with omitted optional fields absent.
+pub fn ResponseOutputItemAddedEvent::new(
+  type_~ : String,
+  output_index~ : Int,
+  item~ : OutputItem,
+) -> ResponseOutputItemAddedEvent {
+  { type_, output_index, item, }
 }
 
 ///|
@@ -4971,9 +7025,9 @@ pub impl @json.FromJson for ResponseOutputItemAddedEvent with fn from_json(
 ) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    type_: @sdkjson.field(obj, "type", path),
-    output_index: @sdkjson.field(obj, "output_index", path),
-    item: @sdkjson.field(obj, "item", path),
+    type_: required_field(obj, "type", path),
+    output_index: required_field(obj, "output_index", path),
+    item: required_field(obj, "item", path),
   }
 }
 
@@ -4984,6 +7038,17 @@ pub(all) struct ResponseOutputItemDoneEvent {
   type_ : String
   output_index : Int
   item : OutputItem
+}
+
+///|
+///
+/// Creates a ResponseOutputItemDoneEvent with omitted optional fields absent.
+pub fn ResponseOutputItemDoneEvent::new(
+  type_~ : String,
+  output_index~ : Int,
+  item~ : OutputItem,
+) -> ResponseOutputItemDoneEvent {
+  { type_, output_index, item, }
 }
 
 ///|
@@ -5012,9 +7077,9 @@ pub impl @json.FromJson for ResponseOutputItemDoneEvent with fn from_json(
 ) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    type_: @sdkjson.field(obj, "type", path),
-    output_index: @sdkjson.field(obj, "output_index", path),
-    item: @sdkjson.field(obj, "item", path),
+    type_: required_field(obj, "type", path),
+    output_index: required_field(obj, "output_index", path),
+    item: required_field(obj, "item", path),
   }
 }
 
@@ -5023,6 +7088,15 @@ pub impl @json.FromJson for ResponseOutputItemDoneEvent with fn from_json(
 /// Configuration options for a text response from the model. Can be plain text or structured JSON data. Learn more: - [Text inputs and outputs](/docs/guides/text) - [Structured Outputs](/docs/guides/structured-outputs)
 pub(all) struct ResponsePropertiesText {
   format : TextResponseFormatConfiguration?
+}
+
+///|
+///
+/// Creates a ResponsePropertiesText with omitted optional fields absent.
+pub fn ResponsePropertiesText::new(
+  format? : TextResponseFormatConfiguration,
+) -> ResponsePropertiesText {
+  { format, }
 }
 
 ///|
@@ -5114,6 +7188,33 @@ pub(all) struct ResponseProperties {
 
 ///|
 ///
+/// Creates a ResponseProperties with omitted optional fields absent.
+pub fn ResponseProperties::new(
+  previous_response_id? : String,
+  model? : String,
+  reasoning? : Reasoning,
+  max_output_tokens? : Int,
+  instructions? : String,
+  text? : ResponsePropertiesText,
+  tools? : Array[Tool],
+  tool_choice? : Json,
+  truncation? : ResponsePropertiesTruncation,
+) -> ResponseProperties {
+  {
+    previous_response_id: @sdkjson.Presence::from_option(previous_response_id),
+    model,
+    reasoning: @sdkjson.Presence::from_option(reasoning),
+    max_output_tokens: @sdkjson.Presence::from_option(max_output_tokens),
+    instructions: @sdkjson.Presence::from_option(instructions),
+    text,
+    tools,
+    tool_choice,
+    truncation: @sdkjson.Presence::from_option(truncation),
+  }
+}
+
+///|
+///
 /// Encodes this value as JSON.
 pub extend ResponseProperties with ToJson::{to_json}
 
@@ -5164,6 +7265,15 @@ pub(all) struct ResponseReasoningSummaryPartAddedEventPart {
 
 ///|
 ///
+/// Creates a ResponseReasoningSummaryPartAddedEventPart with omitted optional fields absent.
+pub fn ResponseReasoningSummaryPartAddedEventPart::new(
+  text~ : String,
+) -> ResponseReasoningSummaryPartAddedEventPart {
+  { text, }
+}
+
+///|
+///
 /// Encodes this value as JSON.
 pub extend ResponseReasoningSummaryPartAddedEventPart with ToJson::{to_json}
 
@@ -5190,7 +7300,7 @@ pub impl @json.FromJson for ResponseReasoningSummaryPartAddedEventPart with fn f
   path,
 ) {
   let obj = @sdkjson.expect_object(value, path)
-  { text: @sdkjson.field(obj, "text", path), }
+  { text: required_field(obj, "text", path), }
 }
 
 ///|
@@ -5202,6 +7312,19 @@ pub(all) struct ResponseReasoningSummaryPartAddedEvent {
   output_index : Int
   summary_index : Int
   part : ResponseReasoningSummaryPartAddedEventPart
+}
+
+///|
+///
+/// Creates a ResponseReasoningSummaryPartAddedEvent with omitted optional fields absent.
+pub fn ResponseReasoningSummaryPartAddedEvent::new(
+  type_~ : String,
+  item_id~ : String,
+  output_index~ : Int,
+  summary_index~ : Int,
+  part~ : ResponseReasoningSummaryPartAddedEventPart,
+) -> ResponseReasoningSummaryPartAddedEvent {
+  { type_, item_id, output_index, summary_index, part, }
 }
 
 ///|
@@ -5234,11 +7357,11 @@ pub impl @json.FromJson for ResponseReasoningSummaryPartAddedEvent with fn from_
 ) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    type_: @sdkjson.field(obj, "type", path),
-    item_id: @sdkjson.field(obj, "item_id", path),
-    output_index: @sdkjson.field(obj, "output_index", path),
-    summary_index: @sdkjson.field(obj, "summary_index", path),
-    part: @sdkjson.field(obj, "part", path),
+    type_: required_field(obj, "type", path),
+    item_id: required_field(obj, "item_id", path),
+    output_index: required_field(obj, "output_index", path),
+    summary_index: required_field(obj, "summary_index", path),
+    part: required_field(obj, "part", path),
   }
 }
 
@@ -5247,6 +7370,15 @@ pub impl @json.FromJson for ResponseReasoningSummaryPartAddedEvent with fn from_
 /// The completed summary part.
 pub(all) struct ResponseReasoningSummaryPartDoneEventPart {
   text : String
+}
+
+///|
+///
+/// Creates a ResponseReasoningSummaryPartDoneEventPart with omitted optional fields absent.
+pub fn ResponseReasoningSummaryPartDoneEventPart::new(
+  text~ : String,
+) -> ResponseReasoningSummaryPartDoneEventPart {
+  { text, }
 }
 
 ///|
@@ -5277,7 +7409,7 @@ pub impl @json.FromJson for ResponseReasoningSummaryPartDoneEventPart with fn fr
   path,
 ) {
   let obj = @sdkjson.expect_object(value, path)
-  { text: @sdkjson.field(obj, "text", path), }
+  { text: required_field(obj, "text", path), }
 }
 
 ///|
@@ -5289,6 +7421,19 @@ pub(all) struct ResponseReasoningSummaryPartDoneEvent {
   output_index : Int
   summary_index : Int
   part : ResponseReasoningSummaryPartDoneEventPart
+}
+
+///|
+///
+/// Creates a ResponseReasoningSummaryPartDoneEvent with omitted optional fields absent.
+pub fn ResponseReasoningSummaryPartDoneEvent::new(
+  type_~ : String,
+  item_id~ : String,
+  output_index~ : Int,
+  summary_index~ : Int,
+  part~ : ResponseReasoningSummaryPartDoneEventPart,
+) -> ResponseReasoningSummaryPartDoneEvent {
+  { type_, item_id, output_index, summary_index, part, }
 }
 
 ///|
@@ -5321,11 +7466,11 @@ pub impl @json.FromJson for ResponseReasoningSummaryPartDoneEvent with fn from_j
 ) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    type_: @sdkjson.field(obj, "type", path),
-    item_id: @sdkjson.field(obj, "item_id", path),
-    output_index: @sdkjson.field(obj, "output_index", path),
-    summary_index: @sdkjson.field(obj, "summary_index", path),
-    part: @sdkjson.field(obj, "part", path),
+    type_: required_field(obj, "type", path),
+    item_id: required_field(obj, "item_id", path),
+    output_index: required_field(obj, "output_index", path),
+    summary_index: required_field(obj, "summary_index", path),
+    part: required_field(obj, "part", path),
   }
 }
 
@@ -5338,6 +7483,19 @@ pub(all) struct ResponseReasoningSummaryTextDeltaEvent {
   output_index : Int
   summary_index : Int
   delta : String
+}
+
+///|
+///
+/// Creates a ResponseReasoningSummaryTextDeltaEvent with omitted optional fields absent.
+pub fn ResponseReasoningSummaryTextDeltaEvent::new(
+  type_~ : String,
+  item_id~ : String,
+  output_index~ : Int,
+  summary_index~ : Int,
+  delta~ : String,
+) -> ResponseReasoningSummaryTextDeltaEvent {
+  { type_, item_id, output_index, summary_index, delta, }
 }
 
 ///|
@@ -5370,11 +7528,11 @@ pub impl @json.FromJson for ResponseReasoningSummaryTextDeltaEvent with fn from_
 ) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    type_: @sdkjson.field(obj, "type", path),
-    item_id: @sdkjson.field(obj, "item_id", path),
-    output_index: @sdkjson.field(obj, "output_index", path),
-    summary_index: @sdkjson.field(obj, "summary_index", path),
-    delta: @sdkjson.field(obj, "delta", path),
+    type_: required_field(obj, "type", path),
+    item_id: required_field(obj, "item_id", path),
+    output_index: required_field(obj, "output_index", path),
+    summary_index: required_field(obj, "summary_index", path),
+    delta: required_field(obj, "delta", path),
   }
 }
 
@@ -5387,6 +7545,19 @@ pub(all) struct ResponseReasoningSummaryTextDoneEvent {
   output_index : Int
   summary_index : Int
   text : String
+}
+
+///|
+///
+/// Creates a ResponseReasoningSummaryTextDoneEvent with omitted optional fields absent.
+pub fn ResponseReasoningSummaryTextDoneEvent::new(
+  type_~ : String,
+  item_id~ : String,
+  output_index~ : Int,
+  summary_index~ : Int,
+  text~ : String,
+) -> ResponseReasoningSummaryTextDoneEvent {
+  { type_, item_id, output_index, summary_index, text, }
 }
 
 ///|
@@ -5419,11 +7590,11 @@ pub impl @json.FromJson for ResponseReasoningSummaryTextDoneEvent with fn from_j
 ) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    type_: @sdkjson.field(obj, "type", path),
-    item_id: @sdkjson.field(obj, "item_id", path),
-    output_index: @sdkjson.field(obj, "output_index", path),
-    summary_index: @sdkjson.field(obj, "summary_index", path),
-    text: @sdkjson.field(obj, "text", path),
+    type_: required_field(obj, "type", path),
+    item_id: required_field(obj, "item_id", path),
+    output_index: required_field(obj, "output_index", path),
+    summary_index: required_field(obj, "summary_index", path),
+    text: required_field(obj, "text", path),
   }
 }
 
@@ -5436,6 +7607,19 @@ pub(all) struct ResponseRefusalDeltaEvent {
   output_index : Int
   content_index : Int
   delta : String
+}
+
+///|
+///
+/// Creates a ResponseRefusalDeltaEvent with omitted optional fields absent.
+pub fn ResponseRefusalDeltaEvent::new(
+  type_~ : String,
+  item_id~ : String,
+  output_index~ : Int,
+  content_index~ : Int,
+  delta~ : String,
+) -> ResponseRefusalDeltaEvent {
+  { type_, item_id, output_index, content_index, delta, }
 }
 
 ///|
@@ -5466,11 +7650,11 @@ pub impl @json.FromJson for ResponseRefusalDeltaEvent with fn from_json(
 ) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    type_: @sdkjson.field(obj, "type", path),
-    item_id: @sdkjson.field(obj, "item_id", path),
-    output_index: @sdkjson.field(obj, "output_index", path),
-    content_index: @sdkjson.field(obj, "content_index", path),
-    delta: @sdkjson.field(obj, "delta", path),
+    type_: required_field(obj, "type", path),
+    item_id: required_field(obj, "item_id", path),
+    output_index: required_field(obj, "output_index", path),
+    content_index: required_field(obj, "content_index", path),
+    delta: required_field(obj, "delta", path),
   }
 }
 
@@ -5483,6 +7667,19 @@ pub(all) struct ResponseRefusalDoneEvent {
   output_index : Int
   content_index : Int
   refusal : String
+}
+
+///|
+///
+/// Creates a ResponseRefusalDoneEvent with omitted optional fields absent.
+pub fn ResponseRefusalDoneEvent::new(
+  type_~ : String,
+  item_id~ : String,
+  output_index~ : Int,
+  content_index~ : Int,
+  refusal~ : String,
+) -> ResponseRefusalDoneEvent {
+  { type_, item_id, output_index, content_index, refusal, }
 }
 
 ///|
@@ -5513,11 +7710,11 @@ pub impl @json.FromJson for ResponseRefusalDoneEvent with fn from_json(
 ) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    type_: @sdkjson.field(obj, "type", path),
-    item_id: @sdkjson.field(obj, "item_id", path),
-    output_index: @sdkjson.field(obj, "output_index", path),
-    content_index: @sdkjson.field(obj, "content_index", path),
-    refusal: @sdkjson.field(obj, "refusal", path),
+    type_: required_field(obj, "type", path),
+    item_id: required_field(obj, "item_id", path),
+    output_index: required_field(obj, "output_index", path),
+    content_index: required_field(obj, "content_index", path),
+    refusal: required_field(obj, "refusal", path),
   }
 }
 
@@ -5531,6 +7728,20 @@ pub(all) struct ResponseTextAnnotationDeltaEvent {
   content_index : Int
   annotation_index : Int
   annotation : Annotation
+}
+
+///|
+///
+/// Creates a ResponseTextAnnotationDeltaEvent with omitted optional fields absent.
+pub fn ResponseTextAnnotationDeltaEvent::new(
+  type_~ : String,
+  item_id~ : String,
+  output_index~ : Int,
+  content_index~ : Int,
+  annotation_index~ : Int,
+  annotation~ : Annotation,
+) -> ResponseTextAnnotationDeltaEvent {
+  { type_, item_id, output_index, content_index, annotation_index, annotation, }
 }
 
 ///|
@@ -5562,12 +7773,12 @@ pub impl @json.FromJson for ResponseTextAnnotationDeltaEvent with fn from_json(
 ) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    type_: @sdkjson.field(obj, "type", path),
-    item_id: @sdkjson.field(obj, "item_id", path),
-    output_index: @sdkjson.field(obj, "output_index", path),
-    content_index: @sdkjson.field(obj, "content_index", path),
-    annotation_index: @sdkjson.field(obj, "annotation_index", path),
-    annotation: @sdkjson.field(obj, "annotation", path),
+    type_: required_field(obj, "type", path),
+    item_id: required_field(obj, "item_id", path),
+    output_index: required_field(obj, "output_index", path),
+    content_index: required_field(obj, "content_index", path),
+    annotation_index: required_field(obj, "annotation_index", path),
+    annotation: required_field(obj, "annotation", path),
   }
 }
 
@@ -5580,6 +7791,19 @@ pub(all) struct ResponseTextDeltaEvent {
   output_index : Int
   content_index : Int
   delta : String
+}
+
+///|
+///
+/// Creates a ResponseTextDeltaEvent with omitted optional fields absent.
+pub fn ResponseTextDeltaEvent::new(
+  type_~ : String,
+  item_id~ : String,
+  output_index~ : Int,
+  content_index~ : Int,
+  delta~ : String,
+) -> ResponseTextDeltaEvent {
+  { type_, item_id, output_index, content_index, delta, }
 }
 
 ///|
@@ -5610,11 +7834,11 @@ pub impl @json.FromJson for ResponseTextDeltaEvent with fn from_json(
 ) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    type_: @sdkjson.field(obj, "type", path),
-    item_id: @sdkjson.field(obj, "item_id", path),
-    output_index: @sdkjson.field(obj, "output_index", path),
-    content_index: @sdkjson.field(obj, "content_index", path),
-    delta: @sdkjson.field(obj, "delta", path),
+    type_: required_field(obj, "type", path),
+    item_id: required_field(obj, "item_id", path),
+    output_index: required_field(obj, "output_index", path),
+    content_index: required_field(obj, "content_index", path),
+    delta: required_field(obj, "delta", path),
   }
 }
 
@@ -5627,6 +7851,19 @@ pub(all) struct ResponseTextDoneEvent {
   output_index : Int
   content_index : Int
   text : String
+}
+
+///|
+///
+/// Creates a ResponseTextDoneEvent with omitted optional fields absent.
+pub fn ResponseTextDoneEvent::new(
+  type_~ : String,
+  item_id~ : String,
+  output_index~ : Int,
+  content_index~ : Int,
+  text~ : String,
+) -> ResponseTextDoneEvent {
+  { type_, item_id, output_index, content_index, text, }
 }
 
 ///|
@@ -5654,11 +7891,11 @@ pub extend ResponseTextDoneEvent with @json.FromJson::{from_json}
 pub impl @json.FromJson for ResponseTextDoneEvent with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    type_: @sdkjson.field(obj, "type", path),
-    item_id: @sdkjson.field(obj, "item_id", path),
-    output_index: @sdkjson.field(obj, "output_index", path),
-    content_index: @sdkjson.field(obj, "content_index", path),
-    text: @sdkjson.field(obj, "text", path),
+    type_: required_field(obj, "type", path),
+    item_id: required_field(obj, "item_id", path),
+    output_index: required_field(obj, "output_index", path),
+    content_index: required_field(obj, "content_index", path),
+    text: required_field(obj, "text", path),
   }
 }
 
@@ -5669,6 +7906,17 @@ pub(all) struct ResponseWebSearchCallCompletedEvent {
   type_ : String
   output_index : Int
   item_id : String
+}
+
+///|
+///
+/// Creates a ResponseWebSearchCallCompletedEvent with omitted optional fields absent.
+pub fn ResponseWebSearchCallCompletedEvent::new(
+  type_~ : String,
+  output_index~ : Int,
+  item_id~ : String,
+) -> ResponseWebSearchCallCompletedEvent {
+  { type_, output_index, item_id, }
 }
 
 ///|
@@ -5697,9 +7945,9 @@ pub impl @json.FromJson for ResponseWebSearchCallCompletedEvent with fn from_jso
 ) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    type_: @sdkjson.field(obj, "type", path),
-    output_index: @sdkjson.field(obj, "output_index", path),
-    item_id: @sdkjson.field(obj, "item_id", path),
+    type_: required_field(obj, "type", path),
+    output_index: required_field(obj, "output_index", path),
+    item_id: required_field(obj, "item_id", path),
   }
 }
 
@@ -5710,6 +7958,17 @@ pub(all) struct ResponseWebSearchCallInProgressEvent {
   type_ : String
   output_index : Int
   item_id : String
+}
+
+///|
+///
+/// Creates a ResponseWebSearchCallInProgressEvent with omitted optional fields absent.
+pub fn ResponseWebSearchCallInProgressEvent::new(
+  type_~ : String,
+  output_index~ : Int,
+  item_id~ : String,
+) -> ResponseWebSearchCallInProgressEvent {
+  { type_, output_index, item_id, }
 }
 
 ///|
@@ -5738,9 +7997,9 @@ pub impl @json.FromJson for ResponseWebSearchCallInProgressEvent with fn from_js
 ) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    type_: @sdkjson.field(obj, "type", path),
-    output_index: @sdkjson.field(obj, "output_index", path),
-    item_id: @sdkjson.field(obj, "item_id", path),
+    type_: required_field(obj, "type", path),
+    output_index: required_field(obj, "output_index", path),
+    item_id: required_field(obj, "item_id", path),
   }
 }
 
@@ -5751,6 +8010,17 @@ pub(all) struct ResponseWebSearchCallSearchingEvent {
   type_ : String
   output_index : Int
   item_id : String
+}
+
+///|
+///
+/// Creates a ResponseWebSearchCallSearchingEvent with omitted optional fields absent.
+pub fn ResponseWebSearchCallSearchingEvent::new(
+  type_~ : String,
+  output_index~ : Int,
+  item_id~ : String,
+) -> ResponseWebSearchCallSearchingEvent {
+  { type_, output_index, item_id, }
 }
 
 ///|
@@ -5779,9 +8049,9 @@ pub impl @json.FromJson for ResponseWebSearchCallSearchingEvent with fn from_jso
 ) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    type_: @sdkjson.field(obj, "type", path),
-    output_index: @sdkjson.field(obj, "output_index", path),
-    item_id: @sdkjson.field(obj, "item_id", path),
+    type_: required_field(obj, "type", path),
+    output_index: required_field(obj, "output_index", path),
+    item_id: required_field(obj, "item_id", path),
   }
 }
 
@@ -5892,7 +8162,7 @@ pub extend ResponseStreamEvent with @json.FromJson::{from_json}
 ///|
 pub impl @json.FromJson for ResponseStreamEvent with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
-  let tag : String = @sdkjson.field(obj, "type", path)
+  let tag : String = required_field(obj, "type", path)
   match tag {
     "response.audio.delta" => ResponseAudioDelta(@json.from_json(value, path~))
     "response.audio.done" => ResponseAudioDone(@json.from_json(value, path~))

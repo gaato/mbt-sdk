@@ -68,6 +68,13 @@ pub fn update_pet_request(body : Pet) -> @http.Request {
 
 ///|
 ///
+/// Decodes a parsed successful updatePet response.
+pub fn update_pet_decode_json(value : Json) -> Pet raise @json.JsonDecodeError {
+  @json.from_json(value)
+}
+
+///|
+///
 /// Decodes a successful updatePet response.
 pub fn update_pet_decode(
   response : @http.Response,
@@ -80,6 +87,13 @@ pub fn update_pet_decode(
 /// Add a new pet to the store.
 pub fn add_pet_request(body : Pet) -> @http.Request {
   @http.Request::post("/pet").json_body(body.to_json())
+}
+
+///|
+///
+/// Decodes a parsed successful addPet response.
+pub fn add_pet_decode_json(value : Json) -> Pet raise @json.JsonDecodeError {
+  @json.from_json(value)
 }
 
 ///|
@@ -98,6 +112,15 @@ pub fn find_pets_by_status_request(
   let mut url = "/pet/findByStatus"
   url = append_query(url, "status", parameter_value(status))
   @http.Request::get(url)
+}
+
+///|
+///
+/// Decodes a parsed successful findPetsByStatus response.
+pub fn find_pets_by_status_decode_json(
+  value : Json,
+) -> Array[Pet] raise @json.JsonDecodeError {
+  @json.from_json(value)
 }
 
 ///|
@@ -122,6 +145,15 @@ pub fn find_pets_by_tags_request(tags : Array[String]) -> @http.Request {
 
 ///|
 ///
+/// Decodes a parsed successful findPetsByTags response.
+pub fn find_pets_by_tags_decode_json(
+  value : Json,
+) -> Array[Pet] raise @json.JsonDecodeError {
+  @json.from_json(value)
+}
+
+///|
+///
 /// Decodes a successful findPetsByTags response.
 pub fn find_pets_by_tags_decode(
   response : @http.Response,
@@ -134,6 +166,15 @@ pub fn find_pets_by_tags_decode(
 /// Find pet by ID.
 pub fn get_pet_by_id_request(pet_id : Int64) -> @http.Request {
   @http.Request::get("/pet/" + percent_encode(parameter_value(pet_id)))
+}
+
+///|
+///
+/// Decodes a parsed successful getPetById response.
+pub fn get_pet_by_id_decode_json(
+  value : Json,
+) -> Pet raise @json.JsonDecodeError {
+  @json.from_json(value)
 }
 
 ///|
@@ -163,6 +204,15 @@ pub fn update_pet_with_form_request(
     None => ()
   }
   @http.Request::post(url)
+}
+
+///|
+///
+/// Decodes a parsed successful updatePetWithForm response.
+pub fn update_pet_with_form_decode_json(
+  value : Json,
+) -> Pet raise @json.JsonDecodeError {
+  @json.from_json(value)
 }
 
 ///|
@@ -208,6 +258,15 @@ pub fn upload_file_request(
 
 ///|
 ///
+/// Decodes a parsed successful uploadFile response.
+pub fn upload_file_decode_json(
+  value : Json,
+) -> ApiResponse raise @json.JsonDecodeError {
+  @json.from_json(value)
+}
+
+///|
+///
 /// Decodes a successful uploadFile response.
 pub fn upload_file_decode(
   response : @http.Response,
@@ -220,6 +279,15 @@ pub fn upload_file_decode(
 /// Returns pet inventories by status.
 pub fn get_inventory_request() -> @http.Request {
   @http.Request::get("/store/inventory")
+}
+
+///|
+///
+/// Decodes a parsed successful getInventory response.
+pub fn get_inventory_decode_json(
+  value : Json,
+) -> Map[String, Int] raise @json.JsonDecodeError {
+  @json.from_json(value)
 }
 
 ///|
@@ -240,6 +308,15 @@ pub fn place_order_request(body : Order) -> @http.Request {
 
 ///|
 ///
+/// Decodes a parsed successful placeOrder response.
+pub fn place_order_decode_json(
+  value : Json,
+) -> Order raise @json.JsonDecodeError {
+  @json.from_json(value)
+}
+
+///|
+///
 /// Decodes a successful placeOrder response.
 pub fn place_order_decode(
   response : @http.Response,
@@ -254,6 +331,15 @@ pub fn get_order_by_id_request(order_id : Int64) -> @http.Request {
   @http.Request::get(
     "/store/order/" + percent_encode(parameter_value(order_id)),
   )
+}
+
+///|
+///
+/// Decodes a parsed successful getOrderById response.
+pub fn get_order_by_id_decode_json(
+  value : Json,
+) -> Order raise @json.JsonDecodeError {
+  @json.from_json(value)
 }
 
 ///|
@@ -283,6 +369,15 @@ pub fn create_user_request(body : User) -> @http.Request {
 
 ///|
 ///
+/// Decodes a parsed successful createUser response.
+pub fn create_user_decode_json(
+  value : Json,
+) -> User raise @json.JsonDecodeError {
+  @json.from_json(value)
+}
+
+///|
+///
 /// Decodes a successful createUser response.
 pub fn create_user_decode(
   response : @http.Response,
@@ -297,6 +392,15 @@ pub fn create_users_with_list_input_request(
   body : Array[User],
 ) -> @http.Request {
   @http.Request::post("/user/createWithList").json_body(body.to_json())
+}
+
+///|
+///
+/// Decodes a parsed successful createUsersWithListInput response.
+pub fn create_users_with_list_input_decode_json(
+  value : Json,
+) -> User raise @json.JsonDecodeError {
+  @json.from_json(value)
 }
 
 ///|
@@ -329,6 +433,15 @@ pub fn login_user_request(
 
 ///|
 ///
+/// Decodes a parsed successful loginUser response.
+pub fn login_user_decode_json(
+  value : Json,
+) -> String raise @json.JsonDecodeError {
+  @json.from_json(value)
+}
+
+///|
+///
 /// Decodes a successful loginUser response.
 pub fn login_user_decode(
   response : @http.Response,
@@ -348,6 +461,15 @@ pub fn logout_user_request() -> @http.Request {
 /// Get user by user name.
 pub fn get_user_by_name_request(username : String) -> @http.Request {
   @http.Request::get("/user/" + percent_encode(parameter_value(username)))
+}
+
+///|
+///
+/// Decodes a parsed successful getUserByName response.
+pub fn get_user_by_name_decode_json(
+  value : Json,
+) -> User raise @json.JsonDecodeError {
+  @json.from_json(value)
 }
 
 ///|

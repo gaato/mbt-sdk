@@ -223,3 +223,16 @@ M4d の差し替えで見えた生成型の使いにくさと、census の (c) �
 - 単体: 第 2 判別子の検出(あり / 値が重複して不採用 / 単一値でなく不採用)、required 集合の順序付け、包含関係、`x-moonbit-order`、コンストラクタの生成と名前衝突、`_decode_json`。
 - 生成物: `InputItem` の `message` 候補(user 入力 / assistant 出力)の往復、未知タグ → `Unknown`。
 - 既存の全テストと `scripts/generate.sh --check` の安定性。
+
+### 互換 API で required field が欠ける場合の overlay 手順
+
+生成 decoder は required field の欠落を `required だが欠落: <JSON path>` として報告する。実際の互換 API で欠落を確認した場合も generator は自動で optional にしない。まず応答 fixture で欠落 path を固定し、対象 spec の `required` 配列からその field だけを overlay の `remove: true` で外し、理由に provider と観測した応答を記す。`openai/overlays/moonbit.yaml` の `Model.required` から `owned_by` を外す action が実例である。変更後は生成型が `T?` になったことと、正規 provider の応答も引き続き decode できることをテストする。
+
+## M4e の判断
+
+- 同一 primary tag の候補は、primary 以外で全候補が持つ単一値 property が全て異なる場合だけ二段目の discriminator にする。無い場合は required 集合の strict superset を先にする stable topological order とし、比較不能な集合は spec 順を保つ。同一 required 集合は自動選択せず診断する。
+- `x-moonbit-order` は同じ tag で衝突する local component schema 名を decode 順に列挙する。これは同一 required 集合を意図的に先勝ちにする annotation であり、`x-moonbit-json` より先に検討する。OpenAI `InputItem` は `OutputMessage`, `EasyInputMessage`, `InputMessage` の順を理由付き overlay で固定した。
+- 衝突を解けた union も `Unknown(String, Json)` を維持する。OpenAI `Item` / `ItemResource` は自動順序で解決し、`InputItem` は上記 overlay により生成可能になった。
+- 生成 struct の `new` は required non-null field だけを必須 label にし、`T?` は `None`、`Presence[T]` は `Absent` を既定にする。JSON field `new` は constructor と衝突するため診断する。手書き OpenAI request 層はこの constructor を使い、未使用 optional field の列挙をやめた。
+- `<op>_decode_json` は parse 済み `Json` から `JsonDecodeError` を返す。手書き `create_response` は `Response::json()` を一度だけ呼び、元 body を保持したまま decode error を `SdkError::Decode` へ写す。
+- OpenRouter `createMessages` は (a) の Fusion plugin parameter value だけ `x-moonbit-json` で明示したが、(b) 3 件と (c) 2 件が残ったため再び exclude した。未生成の fixture を `moon.work` や gate に加えて成功扱いにはしない。

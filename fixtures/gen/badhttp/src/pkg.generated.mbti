@@ -10,11 +10,15 @@ import {
 // Values
 pub fn delete_echo_decode(@http.Response) -> Json raise @sdk-runtime.SdkError
 
+pub fn delete_echo_decode_json(Json) -> Json raise @json.JsonDecodeError
+
 pub fn delete_echo_request() -> @http.Request
 
 pub fn get_402_broken_flavor_request(Get402BrokenFlavorFlavor, network? : Get402BrokenFlavorNetwork, amount? : Double) -> @http.Request
 
 pub fn get_402_decode(@http.Response) -> Json raise @sdk-runtime.SdkError
+
+pub fn get_402_decode_json(Json) -> Json raise @json.JsonDecodeError
 
 pub fn get_402_pay_base_request(amount? : Double) -> @http.Request
 
@@ -28,7 +32,11 @@ pub fn get_402_scenario_request(Get402ScenarioScenario, network? : Get402Scenari
 
 pub fn get_auth_decode(@http.Response) -> Json raise @sdk-runtime.SdkError
 
+pub fn get_auth_decode_json(Json) -> Json raise @json.JsonDecodeError
+
 pub fn get_auth_flavor_decode(@http.Response) -> Json raise @sdk-runtime.SdkError
+
+pub fn get_auth_flavor_decode_json(Json) -> Json raise @json.JsonDecodeError
 
 pub fn get_auth_flavor_request(GetAuthFlavorFlavor) -> @http.Request
 
@@ -38,9 +46,13 @@ pub fn get_badjson_flavor_request(GetBadjsonFlavorFlavor, code? : Int) -> @http.
 
 pub fn get_books_json_decode(@http.Response) -> Json raise @sdk-runtime.SdkError
 
+pub fn get_books_json_decode_json(Json) -> Json raise @json.JsonDecodeError
+
 pub fn get_books_json_request() -> @http.Request
 
 pub fn get_clients_decode(@http.Response) -> Json raise @sdk-runtime.SdkError
+
+pub fn get_clients_decode_json(Json) -> Json raise @json.JsonDecodeError
 
 pub fn get_clients_jsonl_request() -> @http.Request
 
@@ -48,13 +60,19 @@ pub fn get_clients_request() -> @http.Request
 
 pub fn get_compress_decode(@http.Response) -> Json raise @sdk-runtime.SdkError
 
+pub fn get_compress_decode_json(Json) -> Json raise @json.JsonDecodeError
+
 pub fn get_compress_flavor_request(GetCompressFlavorFlavor, length? : Int, code? : Int, size? : Int, accept_encoding? : String) -> @http.Request
 
 pub fn get_compress_request() -> @http.Request
 
 pub fn get_cookies_decode(@http.Response) -> Json raise @sdk-runtime.SdkError
 
+pub fn get_cookies_decode_json(Json) -> Json raise @json.JsonDecodeError
+
 pub fn get_cookies_flavor_decode(@http.Response) -> Json raise @sdk-runtime.SdkError
+
+pub fn get_cookies_flavor_decode_json(Json) -> Json raise @json.JsonDecodeError
 
 pub fn get_cookies_flavor_request(GetCookiesFlavorFlavor, count? : Int, bytes? : Int, cookie? : String) -> @http.Request
 
@@ -62,21 +80,29 @@ pub fn get_cookies_request() -> @http.Request
 
 pub fn get_corpus_decode(@http.Response) -> Json raise @sdk-runtime.SdkError
 
+pub fn get_corpus_decode_json(Json) -> Json raise @json.JsonDecodeError
+
 pub fn get_corpus_jsonl_request() -> @http.Request
 
 pub fn get_corpus_request() -> @http.Request
 
 pub fn get_crosshost_decode(@http.Response) -> Json raise @sdk-runtime.SdkError
 
+pub fn get_crosshost_decode_json(Json) -> Json raise @json.JsonDecodeError
+
 pub fn get_crosshost_flavor_request(GetCrosshostFlavorFlavor) -> @http.Request
 
 pub fn get_crosshost_land_decode(@http.Response) -> Json raise @sdk-runtime.SdkError
+
+pub fn get_crosshost_land_decode_json(Json) -> Json raise @json.JsonDecodeError
 
 pub fn get_crosshost_land_request() -> @http.Request
 
 pub fn get_crosshost_request() -> @http.Request
 
 pub fn get_delay_seconds_decode(@http.Response) -> Json raise @sdk-runtime.SdkError
+
+pub fn get_delay_seconds_decode_json(Json) -> Json raise @json.JsonDecodeError
 
 pub fn get_delay_seconds_request(Double) -> @http.Request
 
@@ -86,27 +112,39 @@ pub fn get_echo_request() -> @http.Request
 
 pub fn get_etag_decode(@http.Response) -> Json raise @sdk-runtime.SdkError
 
+pub fn get_etag_decode_json(Json) -> Json raise @json.JsonDecodeError
+
 pub fn get_etag_flavor_request(GetEtagFlavorFlavor, if_none_match? : String, if_modified_since? : String, if_match? : String, if_unmodified_since? : String) -> @http.Request
 
 pub fn get_etag_request() -> @http.Request
 
 pub fn get_flaky_percent_decode(@http.Response) -> Json raise @sdk-runtime.SdkError
 
+pub fn get_flaky_percent_decode_json(Json) -> Json raise @json.JsonDecodeError
+
 pub fn get_flaky_percent_request(Int, fail? : Int, seed? : String, i? : Int) -> @http.Request
 
 pub fn get_funding_json_decode(@http.Response) -> Json raise @sdk-runtime.SdkError
+
+pub fn get_funding_json_decode_json(Json) -> Json raise @json.JsonDecodeError
 
 pub fn get_funding_json_request() -> @http.Request
 
 pub fn get_headers_decode(@http.Response) -> Json raise @sdk-runtime.SdkError
 
+pub fn get_headers_decode_json(Json) -> Json raise @json.JsonDecodeError
+
 pub fn get_headers_request() -> @http.Request
 
 pub fn get_health_decode(@http.Response) -> Json raise @sdk-runtime.SdkError
 
+pub fn get_health_decode_json(Json) -> Json raise @json.JsonDecodeError
+
 pub fn get_health_request() -> @http.Request
 
 pub fn get_license_decode(@http.Response) -> Json raise @sdk-runtime.SdkError
+
+pub fn get_license_decode_json(Json) -> Json raise @json.JsonDecodeError
 
 pub fn get_license_request() -> @http.Request
 
@@ -114,15 +152,21 @@ pub fn get_llms_txt_request() -> @http.Request
 
 pub fn get_range_decode(@http.Response) -> Json raise @sdk-runtime.SdkError
 
+pub fn get_range_decode_json(Json) -> Json raise @json.JsonDecodeError
+
 pub fn get_range_flavor_request(GetRangeFlavorFlavor, length? : Int, range? : String, if_range? : String) -> @http.Request
 
 pub fn get_range_request() -> @http.Request
 
 pub fn get_redirect_hops_decode(@http.Response) -> Json raise @sdk-runtime.SdkError
 
+pub fn get_redirect_hops_decode_json(Json) -> Json raise @json.JsonDecodeError
+
 pub fn get_redirect_hops_request(GetRedirectHopsHops, code? : Int, absolute? : Bool) -> @http.Request
 
 pub fn get_sse_decode(@http.Response) -> Json raise @sdk-runtime.SdkError
+
+pub fn get_sse_decode_json(Json) -> Json raise @json.JsonDecodeError
 
 pub fn get_sse_flavor_request(GetSseFlavorFlavor, events? : Int, interval? : Int, seconds? : Double, bytes? : Int, last_event_id? : String) -> @http.Request
 
@@ -136,13 +180,19 @@ pub fn head_echo_request() -> @http.Request
 
 pub fn patch_echo_decode(@http.Response) -> Json raise @sdk-runtime.SdkError
 
+pub fn patch_echo_decode_json(Json) -> Json raise @json.JsonDecodeError
+
 pub fn patch_echo_request() -> @http.Request
 
 pub fn post_echo_decode(@http.Response) -> Json raise @sdk-runtime.SdkError
 
+pub fn post_echo_decode_json(Json) -> Json raise @json.JsonDecodeError
+
 pub fn post_echo_request() -> @http.Request
 
 pub fn put_echo_decode(@http.Response) -> Json raise @sdk-runtime.SdkError
+
+pub fn put_echo_decode_json(Json) -> Json raise @json.JsonDecodeError
 
 pub fn put_echo_request() -> @http.Request
 

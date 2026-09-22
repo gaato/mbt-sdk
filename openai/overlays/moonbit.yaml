@@ -24,9 +24,12 @@ actions:
     update:
       x-moonbit-type: Int64
   - target: "$['components']['schemas']['InputItem']"
-    description: InputItem contains a nested discriminator union with duplicate message tags; keep that request-only boundary explicit as raw JSON until M4d chooses a public input API.
+    description: InputItem has three message payloads; try the response payload first because its required set is larger, then preserve the upstream request-message order for the two equal required sets.
     update:
-      x-moonbit-json: true
+      x-moonbit-order:
+        - OutputMessage
+        - EasyInputMessage
+        - InputMessage
   - target: "$['components']['schemas']['Filters']"
     description: Recursive filter alternatives have no unique single-value discriminator; use the documented raw JSON escape hatch.
     update:

@@ -10,13 +10,19 @@ import {
 // Values
 pub fn add_pet_decode(@http.Response) -> Pet raise @sdk-runtime.SdkError
 
+pub fn add_pet_decode_json(Json) -> Pet raise @json.JsonDecodeError
+
 pub fn add_pet_request(Pet) -> @http.Request
 
 pub fn create_user_decode(@http.Response) -> User raise @sdk-runtime.SdkError
 
+pub fn create_user_decode_json(Json) -> User raise @json.JsonDecodeError
+
 pub fn create_user_request(User) -> @http.Request
 
 pub fn create_users_with_list_input_decode(@http.Response) -> User raise @sdk-runtime.SdkError
+
+pub fn create_users_with_list_input_decode_json(Json) -> User raise @json.JsonDecodeError
 
 pub fn create_users_with_list_input_request(Array[User]) -> @http.Request
 
@@ -28,29 +34,43 @@ pub fn delete_user_request(String) -> @http.Request
 
 pub fn find_pets_by_status_decode(@http.Response) -> Array[Pet] raise @sdk-runtime.SdkError
 
+pub fn find_pets_by_status_decode_json(Json) -> Array[Pet] raise @json.JsonDecodeError
+
 pub fn find_pets_by_status_request(FindPetsByStatusStatus) -> @http.Request
 
 pub fn find_pets_by_tags_decode(@http.Response) -> Array[Pet] raise @sdk-runtime.SdkError
+
+pub fn find_pets_by_tags_decode_json(Json) -> Array[Pet] raise @json.JsonDecodeError
 
 pub fn find_pets_by_tags_request(Array[String]) -> @http.Request
 
 pub fn get_inventory_decode(@http.Response) -> Map[String, Int] raise @sdk-runtime.SdkError
 
+pub fn get_inventory_decode_json(Json) -> Map[String, Int] raise @json.JsonDecodeError
+
 pub fn get_inventory_request() -> @http.Request
 
 pub fn get_order_by_id_decode(@http.Response) -> Order raise @sdk-runtime.SdkError
+
+pub fn get_order_by_id_decode_json(Json) -> Order raise @json.JsonDecodeError
 
 pub fn get_order_by_id_request(Int64) -> @http.Request
 
 pub fn get_pet_by_id_decode(@http.Response) -> Pet raise @sdk-runtime.SdkError
 
+pub fn get_pet_by_id_decode_json(Json) -> Pet raise @json.JsonDecodeError
+
 pub fn get_pet_by_id_request(Int64) -> @http.Request
 
 pub fn get_user_by_name_decode(@http.Response) -> User raise @sdk-runtime.SdkError
 
+pub fn get_user_by_name_decode_json(Json) -> User raise @json.JsonDecodeError
+
 pub fn get_user_by_name_request(String) -> @http.Request
 
 pub fn login_user_decode(@http.Response) -> String raise @sdk-runtime.SdkError
+
+pub fn login_user_decode_json(Json) -> String raise @json.JsonDecodeError
 
 pub fn login_user_request(username? : String, password? : String) -> @http.Request
 
@@ -58,19 +78,27 @@ pub fn logout_user_request() -> @http.Request
 
 pub fn place_order_decode(@http.Response) -> Order raise @sdk-runtime.SdkError
 
+pub fn place_order_decode_json(Json) -> Order raise @json.JsonDecodeError
+
 pub fn place_order_request(Order) -> @http.Request
 
 pub fn update_pet_decode(@http.Response) -> Pet raise @sdk-runtime.SdkError
 
+pub fn update_pet_decode_json(Json) -> Pet raise @json.JsonDecodeError
+
 pub fn update_pet_request(Pet) -> @http.Request
 
 pub fn update_pet_with_form_decode(@http.Response) -> Pet raise @sdk-runtime.SdkError
+
+pub fn update_pet_with_form_decode_json(Json) -> Pet raise @json.JsonDecodeError
 
 pub fn update_pet_with_form_request(Int64, name? : String, status? : String) -> @http.Request
 
 pub fn update_user_request(String, User) -> @http.Request
 
 pub fn upload_file_decode(@http.Response) -> ApiResponse raise @sdk-runtime.SdkError
+
+pub fn upload_file_decode_json(Json) -> ApiResponse raise @json.JsonDecodeError
 
 pub fn upload_file_request(Int64, additional_metadata? : String) -> @http.Request
 
@@ -83,6 +111,7 @@ pub(all) struct ApiResponse {
   message : String?
 }
 pub fn ApiResponse::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ApiResponse::new(code? : Int, type_? : String, message? : String) -> Self
 pub fn ApiResponse::to_json(Self) -> Json
 pub impl ToJson for ApiResponse
 pub impl @json.FromJson for ApiResponse
@@ -92,6 +121,7 @@ pub(all) struct Category {
   name : String?
 }
 pub fn Category::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn Category::new(id? : Int64, name? : String) -> Self
 pub fn Category::to_json(Self) -> Json
 pub impl ToJson for Category
 pub impl @json.FromJson for Category
@@ -116,6 +146,7 @@ pub(all) struct Order {
   complete : Bool?
 }
 pub fn Order::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn Order::new(id? : Int64, pet_id? : Int64, quantity? : Int, ship_date? : String, status? : OrderStatus, complete? : Bool) -> Self
 pub fn Order::to_json(Self) -> Json
 pub impl ToJson for Order
 pub impl @json.FromJson for Order
@@ -140,6 +171,7 @@ pub(all) struct Pet {
   status : PetStatus?
 }
 pub fn Pet::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn Pet::new(name~ : String, photo_urls~ : Array[String], id? : Int64, category? : Category, tags? : Array[Tag], status? : PetStatus) -> Self
 pub fn Pet::to_json(Self) -> Json
 pub impl ToJson for Pet
 pub impl @json.FromJson for Pet
@@ -160,6 +192,7 @@ pub(all) struct Tag {
   name : String?
 }
 pub fn Tag::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn Tag::new(id? : Int64, name? : String) -> Self
 pub fn Tag::to_json(Self) -> Json
 pub impl ToJson for Tag
 pub impl @json.FromJson for Tag
@@ -175,6 +208,7 @@ pub(all) struct User {
   user_status : Int?
 }
 pub fn User::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn User::new(id? : Int64, username? : String, first_name? : String, last_name? : String, email? : String, password? : String, phone? : String, user_status? : Int) -> Self
 pub fn User::to_json(Self) -> Json
 pub impl ToJson for User
 pub impl @json.FromJson for User

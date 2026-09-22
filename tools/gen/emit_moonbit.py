@@ -56,10 +56,36 @@ def _encoded_value(type_ref: TypeRef, value: str) -> str:
 def _struct(declaration: Struct) -> str:
     lines = _doc(declaration.description, f"Generated representation of {declaration.name}.")
     lines.append(f"pub(all) struct {declaration.name} {{")
-    for field in declaration.fields:
-        if field.constant is None:
-            lines.append(f"  {field.moon_name} : {_field_type(field)}")
+    fields = [field for field in declaration.fields if field.constant is None]
+    for field in fields:
+        lines.append(f"  {field.moon_name} : {_field_type(field)}")
     lines.append("}")
+    if fields:
+        required = [field for field in fields if field.presence == Presence.REQUIRED]
+        optional = [field for field in fields if field.presence != Presence.REQUIRED]
+        parameters = [
+            f"{field.moon_name}~ : {field.type.moon_type()}" for field in required
+        ]
+        parameters.extend(
+            f"{field.moon_name}? : {field.type.moon_type()}" for field in optional
+        )
+        lines.extend(
+            _doc(
+                f"Creates a {declaration.name} with omitted optional fields absent.",
+                "",
+            )
+        )
+        lines.append(f"pub fn {declaration.name}::new(")
+        lines.extend(f"  {parameter}," for parameter in parameters)
+        lines.extend([f") -> {declaration.name} {{", "  {"])
+        for field in fields:
+            if field.presence == Presence.PRESENCE:
+                lines.append(
+                    f"    {field.moon_name}: @sdkjson.Presence::from_option({field.moon_name}),"
+                )
+            else:
+                lines.append(f"    {field.moon_name},")
+        lines.extend(["  }", "}"])
     lines.extend(_doc("Encodes this value as JSON.", ""))
     lines.append(f"pub extend {declaration.name} with ToJson::{{to_json}}")
     lines.extend(["///|", f"pub impl ToJson for {declaration.name} with fn to_json(self) {{", "  @sdkjson.ObjBuilder::new()"])
@@ -95,7 +121,7 @@ def _struct(declaration: Struct) -> str:
         if field.type.kind == "map":
             decoder = "decode_json_map"
             if field.presence == Presence.REQUIRED:
-                expression = f"{decoder}(@sdkjson.field(obj, {key}, path), {path})"
+                expression = f"{decoder}(required_field(obj, {key}, path), {path})"
             elif field.presence == Presence.NULLABLE_REQUIRED:
                 expression = f"decode_nullable_json_map(obj, {key}, path)"
             elif field.presence == Presence.OPTIONAL:
@@ -104,7 +130,7 @@ def _struct(declaration: Struct) -> str:
                 expression = f"decode_presence_json_map(obj, {key}, path)"
         elif _is_int64(field.type):
             if field.presence == Presence.REQUIRED:
-                expression = f"json_int64(@sdkjson.field(obj, {key}, path), {path})"
+                expression = f"json_int64(required_field(obj, {key}, path), {path})"
             elif field.presence == Presence.NULLABLE_REQUIRED:
                 expression = f"decode_nullable_field(obj, {key}, path).map(value => json_int64(value, {path}))"
             elif field.presence == Presence.OPTIONAL:
@@ -112,7 +138,7 @@ def _struct(declaration: Struct) -> str:
             else:
                 expression = f"decode_presence_int64(obj, {key}, path)"
         elif field.presence == Presence.REQUIRED:
-            expression = f"@sdkjson.field(obj, {key}, path)"
+            expression = f"required_field(obj, {key}, path)"
         elif field.presence == Presence.NULLABLE_REQUIRED:
             expression = f"decode_nullable_field(obj, {key}, path)"
         elif field.presence == Presence.OPTIONAL:
@@ -202,14 +228,49 @@ def _tagged_union(declaration: TaggedUnion) -> str:
             "///|",
             f"pub impl @json.FromJson for {declaration.name} with fn from_json(value, path) {{",
             "  let obj = @sdkjson.expect_object(value, path)",
-            f"  let tag : String = @sdkjson.field(obj, {_moon_string(declaration.discriminator)}, path)",
+            f"  let tag : String = required_field(obj, {_moon_string(declaration.discriminator)}, path)",
             "  match tag {",
         ]
     )
-    lines.extend(
-        f"    {_moon_string(variant.tag)} => {variant.name}(@json.from_json(value, path~))"
-        for variant in declaration.variants
-    )
+    groups: dict[str, list] = {}
+    for variant in declaration.variants:
+        groups.setdefault(variant.tag, []).append(variant)
+    for tag, variants in groups.items():
+        if len(variants) == 1:
+            variant = variants[0]
+            lines.append(
+                f"    {_moon_string(tag)} => {variant.name}(@json.from_json(value, path~))"
+            )
+            continue
+        secondary = variants[0].secondary_discriminator
+        if secondary is not None and all(
+            variant.secondary_discriminator == secondary
+            and variant.secondary_tag is not None
+            for variant in variants
+        ):
+            lines.extend(
+                [
+                    f"    {_moon_string(tag)} =>",
+                    f"      match obj.get({_moon_string(secondary)}) {{",
+                ]
+            )
+            for variant in variants:
+                lines.append(
+                    f"        Some(String({_moon_string(variant.secondary_tag or '')})) => {variant.name}(@json.from_json(value, path~))"
+                )
+            lines.extend(["        _ => Unknown(tag, value)", "      }"])
+            continue
+        lines.append(f"    {_moon_string(tag)} =>")
+        for index, variant in enumerate(variants):
+            condition = " && ".join(
+                f"obj.contains({_moon_string(field)})"
+                for field in variant.required_fields
+            ) or "true"
+            keyword = "if" if index == 0 else "else if"
+            lines.append(
+                f"      {keyword} {condition} {{ {variant.name}(@json.from_json(value, path~)) }}"
+            )
+        lines.append("      else { Unknown(tag, value) }")
     lines.extend(["    other => Unknown(other, value)", "  }", "}"])
     return "\n".join(lines)
 
@@ -224,6 +285,23 @@ def _newtype(declaration: Newtype) -> str:
     lines.append(f"pub extend {declaration.name} with @json.FromJson::{{from_json}}")
     lines.extend(["///|", f"pub impl @json.FromJson for {declaration.name} with fn from_json(value, path) {{", f"  let inner : {declaration.inner.moon_type()} = @json.from_json(value, path~)", f"  {declaration.name}(inner)", "}"])
     return "\n".join(lines)
+
+
+REQUIRED_FIELD_HELPER = r'''///|
+fn[T : @json.FromJson] required_field(
+  obj : Map[String, Json],
+  key : String,
+  path : @json.JsonPath,
+) -> T raise @json.JsonDecodeError {
+  let field_path = path.add_key(key)
+  match obj.get(key) {
+    None =>
+      raise @json.JsonDecodeError(
+        (field_path, "required だが欠落: " + field_path.to_string()),
+      )
+    Some(value) => @json.from_json(value, path=field_path)
+  }
+}'''
 
 
 HELPERS = r'''///|
@@ -378,7 +456,7 @@ fn[T : @json.FromJson] decode_nullable_field(
   key : String,
   path : @json.JsonPath,
 ) -> T? raise @json.JsonDecodeError {
-  let raw : Json = @sdkjson.field(obj, key, path)
+  let raw : Json = required_field(obj, key, path)
   match raw {
     Null => None
     value => Some(@json.from_json(value, path=path.add_key(key)))
@@ -415,7 +493,7 @@ fn[T : @json.FromJson] decode_nullable_json_map(
   key : String,
   path : @json.JsonPath,
 ) -> Map[String, T]? raise @json.JsonDecodeError {
-  let raw : Json = @sdkjson.field(obj, key, path)
+  let raw : Json = required_field(obj, key, path)
   match raw {
     Null => None
     value => Some(decode_json_map(value, path.add_key(key)))
@@ -524,6 +602,17 @@ def _operation(operation: Operation) -> str:
     else:
         lines.extend([f"  {expression}", "}"])
     if operation.response_type is not None:
+        json_decode_name = operation.moon_name + "_decode_json"
+        lines.extend(_doc(f"Decodes a parsed successful {operation.operation_id} response.", ""))
+        lines.extend(
+            [
+                f"pub fn {json_decode_name}(",
+                "  value : Json,",
+                f") -> {operation.response_type.moon_type()} raise @json.JsonDecodeError {{",
+                "  @json.from_json(value)",
+                "}",
+            ]
+        )
         lines.extend(_doc(f"Decodes a successful {operation.operation_id} response.", ""))
         lines.extend([f"pub fn {decode_name}(", "  response : @http.Response,", f") -> {operation.response_type.moon_type()} raise @runtime.SdkError {{", "  decode_response(response)", "}"])
     return "\n".join(lines)
@@ -603,9 +692,15 @@ def emit(ir: IR) -> dict[str, str]:
     has_nullable_map = False
     has_optional_map = False
     has_presence_map = False
+    needs_required_field = False
     for declaration in ir.declarations:
         if isinstance(declaration, Struct):
             declarations.append(_struct(declaration))
+            needs_required_field = needs_required_field or any(
+                field.constant is None
+                and field.presence in (Presence.REQUIRED, Presence.NULLABLE_REQUIRED)
+                for field in declaration.fields
+            )
             has_int64 = has_int64 or any(field.type.kind == "Int64" for field in declaration.fields)
             has_optional_int64 = has_optional_int64 or any(
                 field.type.kind == "Int64" and field.presence in (Presence.OPTIONAL, Presence.NULLABLE_REQUIRED)
@@ -640,9 +735,12 @@ def emit(ir: IR) -> dict[str, str]:
             has_union = True
         elif isinstance(declaration, TaggedUnion):
             declarations.append(_tagged_union(declaration))
+            needs_required_field = True
         elif isinstance(declaration, Newtype):
             declarations.append(_newtype(declaration))
     helpers: list[str] = []
+    if needs_required_field:
+        helpers.append(REQUIRED_FIELD_HELPER)
     if has_int64:
         helpers.append(HELPERS)
         helpers.append(INT64_TO_JSON_HELPER)

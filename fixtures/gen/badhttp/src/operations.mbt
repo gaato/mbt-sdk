@@ -84,6 +84,15 @@ pub fn get_delay_seconds_request(seconds : Double) -> @http.Request {
 
 ///|
 ///
+/// Decodes a parsed successful get_delay_seconds response.
+pub fn get_delay_seconds_decode_json(
+  value : Json,
+) -> Json raise @json.JsonDecodeError {
+  @json.from_json(value)
+}
+
+///|
+///
 /// Decodes a successful get_delay_seconds response.
 pub fn get_delay_seconds_decode(
   response : @http.Response,
@@ -155,6 +164,13 @@ pub fn get_sse_request() -> @http.Request {
 
 ///|
 ///
+/// Decodes a parsed successful get_sse response.
+pub fn get_sse_decode_json(value : Json) -> Json raise @json.JsonDecodeError {
+  @json.from_json(value)
+}
+
+///|
+///
 /// Decodes a successful get_sse response.
 pub fn get_sse_decode(
   response : @http.Response,
@@ -208,6 +224,13 @@ pub fn get_range_request() -> @http.Request {
 
 ///|
 ///
+/// Decodes a parsed successful get_range response.
+pub fn get_range_decode_json(value : Json) -> Json raise @json.JsonDecodeError {
+  @json.from_json(value)
+}
+
+///|
+///
 /// Decodes a successful get_range response.
 pub fn get_range_decode(
   response : @http.Response,
@@ -246,6 +269,13 @@ pub fn get_range_flavor_request(
 /// Index of the conditional-request flavors and the caching model (no-cache: store, revalidate every use)
 pub fn get_etag_request() -> @http.Request {
   @http.Request::get("/etag")
+}
+
+///|
+///
+/// Decodes a parsed successful get_etag response.
+pub fn get_etag_decode_json(value : Json) -> Json raise @json.JsonDecodeError {
+  @json.from_json(value)
 }
 
 ///|
@@ -301,6 +331,15 @@ pub fn get_cookies_request() -> @http.Request {
 
 ///|
 ///
+/// Decodes a parsed successful get_cookies response.
+pub fn get_cookies_decode_json(
+  value : Json,
+) -> Json raise @json.JsonDecodeError {
+  @json.from_json(value)
+}
+
+///|
+///
 /// Decodes a successful get_cookies response.
 pub fn get_cookies_decode(
   response : @http.Response,
@@ -336,6 +375,15 @@ pub fn get_cookies_flavor_request(
 
 ///|
 ///
+/// Decodes a parsed successful get_cookies_flavor response.
+pub fn get_cookies_flavor_decode_json(
+  value : Json,
+) -> Json raise @json.JsonDecodeError {
+  @json.from_json(value)
+}
+
+///|
+///
 /// Decodes a successful get_cookies_flavor response.
 pub fn get_cookies_flavor_decode(
   response : @http.Response,
@@ -348,6 +396,13 @@ pub fn get_cookies_flavor_decode(
 /// Index of the HTTP-authentication flavors, the public fake test credentials, the safety warning, and the witness block: what eight real clients did at every flavor, derived from the /clients.jsonl auth rows
 pub fn get_auth_request() -> @http.Request {
   @http.Request::get("/auth")
+}
+
+///|
+///
+/// Decodes a parsed successful get_auth response.
+pub fn get_auth_decode_json(value : Json) -> Json raise @json.JsonDecodeError {
+  @json.from_json(value)
 }
 
 ///|
@@ -368,6 +423,15 @@ pub fn get_auth_flavor_request(flavor : GetAuthFlavorFlavor) -> @http.Request {
 
 ///|
 ///
+/// Decodes a parsed successful get_auth_flavor response.
+pub fn get_auth_flavor_decode_json(
+  value : Json,
+) -> Json raise @json.JsonDecodeError {
+  @json.from_json(value)
+}
+
+///|
+///
 /// Decodes a successful get_auth_flavor response.
 pub fn get_auth_flavor_decode(
   response : @http.Response,
@@ -384,6 +448,15 @@ pub fn get_crosshost_request() -> @http.Request {
 
 ///|
 ///
+/// Decodes a parsed successful get_crosshost response.
+pub fn get_crosshost_decode_json(
+  value : Json,
+) -> Json raise @json.JsonDecodeError {
+  @json.from_json(value)
+}
+
+///|
+///
 /// Decodes a successful get_crosshost response.
 pub fn get_crosshost_decode(
   response : @http.Response,
@@ -396,6 +469,15 @@ pub fn get_crosshost_decode(
 /// The oracle: reports which credential headers reached this hop, without ever echoing their values. Served on both badhttp.dev and alt.badhttp.dev.
 pub fn get_crosshost_land_request() -> @http.Request {
   @http.Request::get("/crosshost/land")
+}
+
+///|
+///
+/// Decodes a parsed successful get_crosshost_land response.
+pub fn get_crosshost_land_decode_json(
+  value : Json,
+) -> Json raise @json.JsonDecodeError {
+  @json.from_json(value)
 }
 
 ///|
@@ -421,6 +503,15 @@ pub fn get_crosshost_flavor_request(
 /// Index of the content-coding flavors: the document, the verification headers, what the edge makes of each flavor for a client without gzip, and the Accept-Encoding the edge reports for you
 pub fn get_compress_request() -> @http.Request {
   @http.Request::get("/compress")
+}
+
+///|
+///
+/// Decodes a parsed successful get_compress response.
+pub fn get_compress_decode_json(
+  value : Json,
+) -> Json raise @json.JsonDecodeError {
+  @json.from_json(value)
 }
 
 ///|
@@ -491,6 +582,15 @@ pub fn get_flaky_percent_request(
 
 ///|
 ///
+/// Decodes a parsed successful get_flaky_percent response.
+pub fn get_flaky_percent_decode_json(
+  value : Json,
+) -> Json raise @json.JsonDecodeError {
+  @json.from_json(value)
+}
+
+///|
+///
 /// Decodes a successful get_flaky_percent response.
 pub fn get_flaky_percent_decode(
   response : @http.Response,
@@ -520,6 +620,15 @@ pub fn get_redirect_hops_request(
 
 ///|
 ///
+/// Decodes a parsed successful get_redirect_hops response.
+pub fn get_redirect_hops_decode_json(
+  value : Json,
+) -> Json raise @json.JsonDecodeError {
+  @json.from_json(value)
+}
+
+///|
+///
 /// Decodes a successful get_redirect_hops response.
 pub fn get_redirect_hops_decode(
   response : @http.Response,
@@ -532,6 +641,15 @@ pub fn get_redirect_hops_decode(
 /// Echo the request headers as JSON
 pub fn get_headers_request() -> @http.Request {
   @http.Request::get("/headers")
+}
+
+///|
+///
+/// Decodes a parsed successful get_headers response.
+pub fn get_headers_decode_json(
+  value : Json,
+) -> Json raise @json.JsonDecodeError {
+  @json.from_json(value)
 }
 
 ///|
@@ -552,6 +670,13 @@ pub fn post_echo_request() -> @http.Request {
 
 ///|
 ///
+/// Decodes a parsed successful post_echo response.
+pub fn post_echo_decode_json(value : Json) -> Json raise @json.JsonDecodeError {
+  @json.from_json(value)
+}
+
+///|
+///
 /// Decodes a successful post_echo response.
 pub fn post_echo_decode(
   response : @http.Response,
@@ -564,6 +689,13 @@ pub fn post_echo_decode(
 /// Echo method, path, query, headers and body (16 KB cap) as JSON
 pub fn put_echo_request() -> @http.Request {
   @http.Request::put("/echo")
+}
+
+///|
+///
+/// Decodes a parsed successful put_echo response.
+pub fn put_echo_decode_json(value : Json) -> Json raise @json.JsonDecodeError {
+  @json.from_json(value)
 }
 
 ///|
@@ -584,6 +716,13 @@ pub fn patch_echo_request() -> @http.Request {
 
 ///|
 ///
+/// Decodes a parsed successful patch_echo response.
+pub fn patch_echo_decode_json(value : Json) -> Json raise @json.JsonDecodeError {
+  @json.from_json(value)
+}
+
+///|
+///
 /// Decodes a successful patch_echo response.
 pub fn patch_echo_decode(
   response : @http.Response,
@@ -596,6 +735,15 @@ pub fn patch_echo_decode(
 /// Echo method, path, query, headers and body (16 KB cap) as JSON
 pub fn delete_echo_request() -> @http.Request {
   @http.Request::delete("/echo")
+}
+
+///|
+///
+/// Decodes a parsed successful delete_echo response.
+pub fn delete_echo_decode_json(
+  value : Json,
+) -> Json raise @json.JsonDecodeError {
+  @json.from_json(value)
 }
 
 ///|
@@ -626,6 +774,13 @@ pub fn head_echo_request() -> @http.Request {
 /// Index of the x402 payment scenarios: networks, price limits, pay-to address, facilitators
 pub fn get_402_request() -> @http.Request {
   @http.Request::get("/402")
+}
+
+///|
+///
+/// Decodes a parsed successful get_402 response.
+pub fn get_402_decode_json(value : Json) -> Json raise @json.JsonDecodeError {
+  @json.from_json(value)
 }
 
 ///|
@@ -739,6 +894,15 @@ pub fn get_books_json_request() -> @http.Request {
 
 ///|
 ///
+/// Decodes a parsed successful get_books_json response.
+pub fn get_books_json_decode_json(
+  value : Json,
+) -> Json raise @json.JsonDecodeError {
+  @json.from_json(value)
+}
+
+///|
+///
 /// Decodes a successful get_books_json response.
 pub fn get_books_json_decode(
   response : @http.Response,
@@ -762,6 +926,13 @@ pub fn get_health_request() -> @http.Request {
 
 ///|
 ///
+/// Decodes a parsed successful get_health response.
+pub fn get_health_decode_json(value : Json) -> Json raise @json.JsonDecodeError {
+  @json.from_json(value)
+}
+
+///|
+///
 /// Decodes a successful get_health response.
 pub fn get_health_decode(
   response : @http.Response,
@@ -774,6 +945,13 @@ pub fn get_health_decode(
 /// The catalogue as data: an index over every documented DEFECT behaviour (what_is_not_a_row names what is deliberately excluded), with the licence, the self_check block recording that every row was replayed and its fields compared to the wire, the capture notes, and what this service does NOT cover (RFC 9112 message syntax — it emits none, and cannot, because a CDN re-serializes every response)
 pub fn get_corpus_request() -> @http.Request {
   @http.Request::get("/corpus")
+}
+
+///|
+///
+/// Decodes a parsed successful get_corpus response.
+pub fn get_corpus_decode_json(value : Json) -> Json raise @json.JsonDecodeError {
+  @json.from_json(value)
 }
 
 ///|
@@ -801,6 +979,15 @@ pub fn get_clients_request() -> @http.Request {
 
 ///|
 ///
+/// Decodes a parsed successful get_clients response.
+pub fn get_clients_decode_json(
+  value : Json,
+) -> Json raise @json.JsonDecodeError {
+  @json.from_json(value)
+}
+
+///|
+///
 /// Decodes a successful get_clients response.
 pub fn get_clients_decode(
   response : @http.Response,
@@ -824,6 +1011,15 @@ pub fn get_funding_json_request() -> @http.Request {
 
 ///|
 ///
+/// Decodes a parsed successful get_funding_json response.
+pub fn get_funding_json_decode_json(
+  value : Json,
+) -> Json raise @json.JsonDecodeError {
+  @json.from_json(value)
+}
+
+///|
+///
 /// Decodes a successful get_funding_json response.
 pub fn get_funding_json_decode(
   response : @http.Response,
@@ -836,6 +1032,15 @@ pub fn get_funding_json_decode(
 /// Licensing, stated separately for the two things people confuse: CC0-1.0 for everything this server emits, MIT for the Worker source
 pub fn get_license_request() -> @http.Request {
   @http.Request::get("/license")
+}
+
+///|
+///
+/// Decodes a parsed successful get_license response.
+pub fn get_license_decode_json(
+  value : Json,
+) -> Json raise @json.JsonDecodeError {
+  @json.from_json(value)
 }
 
 ///|

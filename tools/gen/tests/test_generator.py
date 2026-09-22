@@ -177,6 +177,47 @@ class IRTests(unittest.TestCase):
         self.assertEqual(first, second)
         self.assertLess(first["types.mbt"].index("z : Int"), first["types.mbt"].index("a : String"))
 
+    def test_struct_constructors_require_values_and_default_optional_fields(self):
+        schema = {
+            "type": "object",
+            "properties": {
+                "id": {"type": "string"},
+                "nullable": {"type": "string", "nullable": True},
+                "note": {"type": "string"},
+                "maybe": {"type": "string", "nullable": True},
+            },
+            "required": ["id", "nullable"],
+        }
+        source = emit(IRBuilder(document(operation(request=schema)), "example/gen").build())["types.mbt"]
+        self.assertIn("pub fn TestOperationRequest::new(", source)
+        self.assertIn("id~ : String", source)
+        self.assertIn("nullable? : String", source)
+        self.assertIn("note? : String", source)
+        self.assertIn("maybe? : String", source)
+        self.assertIn("maybe: @sdkjson.Presence::from_option(maybe)", source)
+
+    def test_struct_constructor_name_collision_is_a_diagnostic(self):
+        schema = {
+            "type": "object",
+            "properties": {"new": {"type": "string"}},
+        }
+        with self.assertRaises(GenerationError) as caught:
+            IRBuilder(document(operation(request=schema)), "example/gen").build()
+        self.assertIn("collides with constructor new", str(caught.exception))
+
+    def test_operation_emits_decode_json_and_precise_missing_required_message(self):
+        schema = {
+            "type": "object",
+            "properties": {"id": {"type": "string"}},
+            "required": ["id"],
+        }
+        emitted = emit(IRBuilder(document(operation(response=schema)), "example/gen").build())
+        operations = emitted["operations.mbt"]
+        self.assertIn("pub fn test_operation_decode_json(", operations)
+        self.assertIn("value : Json", operations)
+        self.assertIn("raise @json.JsonDecodeError", operations)
+        self.assertIn("required だが欠落: ", emitted["types.mbt"])
+
     def test_explicit_discriminator_emits_tagged_enum_and_keeps_tag_fields(self):
         schemas = {
             "Cat": {
@@ -231,13 +272,158 @@ class IRTests(unittest.TestCase):
         good = {"oneOf": [object_schema("left"), object_schema("right")]}
         ir = IRBuilder(document(operation(response=good)), "example/gen").build()
         self.assertIsInstance(declaration(ir, "TestOperationResponse"), TaggedUnion)
-        for choices in [
-            [object_schema("same"), object_schema("same")],
-            [object_schema(["one", "two"]), object_schema("right")],
-        ]:
+        cases = [
+            ([object_schema("same"), object_schema("same")], "indistinguishable required sets"),
+            ([object_schema(["one", "two"]), object_schema("right")], "no common single-value property"),
+        ]
+        for choices, message in cases:
             with self.subTest(choices=choices), self.assertRaises(GenerationError) as caught:
                 IRBuilder(document(operation(response={"oneOf": choices})), "example/gen").build()
-            self.assertIn("no common single-value property", str(caught.exception))
+            self.assertIn(message, str(caught.exception))
+
+    def test_colliding_tags_use_second_discriminator_and_composite_names(self):
+        schemas = {
+            "UserMessage": {
+                "type": "object",
+                "properties": {
+                    "type": {"type": "string", "enum": ["message"]},
+                    "role": {"type": "string", "const": "user"},
+                    "content": {"type": "string"},
+                },
+                "required": ["type", "role", "content"],
+            },
+            "AssistantMessage": {
+                "type": "object",
+                "properties": {
+                    "type": {"type": "string", "enum": ["message"]},
+                    "role": {"type": "string", "const": "assistant"},
+                    "content": {"type": "string"},
+                },
+                "required": ["type", "role", "content"],
+            },
+            "Item": {
+                "oneOf": [
+                    {"$ref": "#/components/schemas/UserMessage"},
+                    {"$ref": "#/components/schemas/AssistantMessage"},
+                ]
+            },
+        }
+        ir = IRBuilder(
+            document(operation(response={"$ref": "#/components/schemas/Item"}), schemas),
+            "example/gen",
+        ).build()
+        item = declaration(ir, "Item")
+        self.assertEqual(
+            [(variant.name, variant.tag, variant.secondary_discriminator, variant.secondary_tag) for variant in item.variants],
+            [
+                ("MessageUser", "message", "role", "user"),
+                ("MessageAssistant", "message", "role", "assistant"),
+            ],
+        )
+        self.assertIn("role", [field.json_name for field in declaration(ir, "UserMessage").fields])
+        source = emit(ir)["types.mbt"]
+        self.assertIn('match obj.get("role")', source)
+        self.assertIn('Some(String("assistant")) => MessageAssistant', source)
+        self.assertIn("_ => Unknown(tag, value)", source)
+
+    def test_rejected_second_discriminator_values_fall_back_to_required_sets(self):
+        for roles in [
+            (["shared"], ["shared"]),
+            (["user", "system"], ["assistant"]),
+        ]:
+            schemas = {
+                "Left": {
+                    "type": "object",
+                    "properties": {
+                        "type": {"type": "string", "enum": ["message"]},
+                        "role": {"type": "string", "enum": roles[0]},
+                        "left": {"type": "string"},
+                    },
+                    "required": ["type", "left"],
+                },
+                "Right": {
+                    "type": "object",
+                    "properties": {
+                        "type": {"type": "string", "enum": ["message"]},
+                        "role": {"type": "string", "enum": roles[1]},
+                        "right": {"type": "string"},
+                    },
+                    "required": ["type", "right"],
+                },
+                "Item": {
+                    "oneOf": [
+                        {"$ref": "#/components/schemas/Left"},
+                        {"$ref": "#/components/schemas/Right"},
+                    ]
+                },
+            }
+            with self.subTest(roles=roles):
+                builder = IRBuilder(
+                    document(operation(response={"$ref": "#/components/schemas/Item"}), schemas),
+                    "example/gen",
+                )
+                ir = builder.build()
+                item = declaration(ir, "Item")
+                self.assertEqual([variant.name for variant in item.variants], ["Left", "Right"])
+                self.assertEqual(item.variants[0].secondary_discriminator, None)
+                self.assertTrue(any("specification order" in note.message for note in builder.notes))
+
+    def test_colliding_tag_required_sets_use_inclusion_order(self):
+        schemas = {
+            "Base": {
+                "type": "object",
+                "properties": {"type": {"type": "string", "enum": ["event"]}},
+                "required": ["type"],
+            },
+            "Detailed": {
+                "type": "object",
+                "properties": {
+                    "type": {"type": "string", "enum": ["event"]},
+                    "detail": {"type": "string"},
+                },
+                "required": ["type", "detail"],
+            },
+            "Event": {
+                "oneOf": [
+                    {"$ref": "#/components/schemas/Base"},
+                    {"$ref": "#/components/schemas/Detailed"},
+                ]
+            },
+        }
+        ir = IRBuilder(
+            document(operation(response={"$ref": "#/components/schemas/Event"}), schemas),
+            "example/gen",
+        ).build()
+        event = declaration(ir, "Event")
+        self.assertEqual([variant.name for variant in event.variants], ["Detailed", "Base"])
+        source = emit(ir)["types.mbt"]
+        self.assertLess(source.index("Detailed(@json.from_json"), source.index("Base(@json.from_json"))
+
+    def test_x_moonbit_order_resolves_equal_required_sets(self):
+        schemas = {
+            name: {
+                "type": "object",
+                "properties": {"type": {"type": "string", "enum": ["same"]}},
+                "required": ["type"],
+            }
+            for name in ["First", "Second"]
+        }
+        schemas["Choice"] = {
+            "oneOf": [
+                {"$ref": "#/components/schemas/First"},
+                {"$ref": "#/components/schemas/Second"},
+            ]
+        }
+        doc = document(operation(response={"$ref": "#/components/schemas/Choice"}), schemas)
+        with self.assertRaises(GenerationError) as caught:
+            IRBuilder(doc, "example/gen").build()
+        self.assertIn("indistinguishable required sets", str(caught.exception))
+        schemas["Choice"]["x-moonbit-order"] = ["Second", "First"]
+        ir = IRBuilder(doc, "example/gen").build()
+        self.assertEqual(
+            [variant.name for variant in declaration(ir, "Choice").variants],
+            ["Second", "First"],
+        )
 
     def test_implicit_discriminator_flattens_refs_all_of_and_nested_unions(self):
         tagged = lambda value: {
@@ -289,7 +475,7 @@ class IRTests(unittest.TestCase):
         }
         with self.assertRaises(GenerationError) as caught:
             IRBuilder(document(operation(response={"$ref": "#/components/schemas/Outer"}), schemas), "example/gen").build()
-        self.assertIn("no common single-value property", str(caught.exception))
+        self.assertIn("indistinguishable required sets", str(caught.exception))
 
     def test_implicit_discriminator_flattening_stops_at_recursive_refs(self):
         tagged = lambda value: {
