@@ -6,6 +6,7 @@ target/
 # overlay applier cache
 __pycache__/
 openai/spec/*.patched.json
+anthropic/spec/*.patched.json
 .venv/
 
 # local secrets never belong here

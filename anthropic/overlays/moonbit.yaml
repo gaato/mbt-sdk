@@ -1,0 +1,36 @@
+overlay: 1.0.0
+info:
+  title: MoonBit generation slice for the Anthropic API
+  version: 0.1.0
+actions:
+  - target: "$['paths']['/v1/messages']['post']"
+    description: Include Messages creation, the core of the SDK.
+    update:
+      x-moonbit-include: true
+  - target: "$['paths']['/v1/messages']['post']['responses']['200']['content']"
+    description: >-
+      With `stream: true` the same endpoint answers with server-sent events whose `data` is a
+      MessageStreamEvent. The upstream spec documents only the buffered JSON body; declaring the
+      event-stream content pulls the stream event types into the generated closure.
+    update:
+      text/event-stream:
+        schema:
+          $ref: "#/components/schemas/MessageStreamEvent"
+  - target: "$['paths']['/v1/messages/count_tokens']['post']"
+    description: Include token counting; it shares the request vocabulary of Messages creation.
+    update:
+      x-moonbit-include: true
+  - target: "$['paths']['/v1/models']['get']"
+    description: Include the model list.
+    update:
+      x-moonbit-include: true
+  - target: "$['paths']['/v1/models/{model_id}']['get']"
+    description: Include model retrieval.
+    update:
+      x-moonbit-include: true
+  - target: "$['components']['schemas']['SkillParams']['properties']['type']"
+    description: The value `custom` would collide with the generator's Custom fallback constructor for closed string enums.
+    update:
+      x-moonbit-variants:
+        - Anthropic
+        - CustomSkill

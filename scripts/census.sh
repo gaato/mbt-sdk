@@ -11,3 +11,4 @@ for spec in specs/*/openapi.json; do
   "${py[@]}" tools/gen/census.py "$spec" "$name"
 done
 "${py[@]}" tools/gen/census.py openai/spec/openai.yaml openai --overlay openai/overlays/fix.yaml
+"${py[@]}" tools/gen/census.py anthropic/spec/anthropic.json anthropic
