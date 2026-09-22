@@ -175,3 +175,14 @@ M3 の手書きの `list_models` / `retrieve_model` / `create_embeddings` は、
 - mapping 無しの明示 discriminator は component 名より payload の実際の単一タグを優先する。OpenAI の component 名と wire tag が一致しない型を、型安全なまま扱うためである。
 - OpenAI の include 済み閉包には upstream の曖昧な request union が含まれるため、`InputItem`、`Filters`、`ResponseProperties.tool_choice` にだけ明示的な `x-moonbit-json: true` を置く。これは自動 fallback ではなく、lossy boundary のレビュー可能な宣言である。
 - all-operation census の残件は失敗ではなく、overlay 判断、将来実装、upstream 修正候補を分けて `docs/census.md` に残す。これにより public runtime API を M4c で拡張せず、M4d 以降の判断材料を保つ。
+
+## M4d: 手書き層の差し替えと、タグ衝突の扱い(契約)
+
+### 差し替え
+- `openai/src/` の手書き `create_response` / `stream_response` の内部を、生成された `create_response_request` / `create_response_decode` と生成型(`@gen.Response`、`@gen.ResponseStreamEvent` など)に差し替える。`gaato/openai` の公開 API(`pkg.generated.mbti`)は変えない。生成型 → 公開型(`Response`、`ResponseEvent`)の変換は手書き層に置く。
+- `ResponseRequest` の既知フィールドは生成型 `@gen.CreateResponse` に写して `to_json()` し、`extra` はその上に重ねる(衝突は従来どおり `Config`)。`output_text` の抽出、`Usage`、`ResponseStatus` の open enum は手書き層の規則のまま(生成型の `Unknown` を公開型の `Unknown` に写す)。
+- ストリーム: SSE の `data` を `@gen.ResponseStreamEvent` でデコードし、公開の `ResponseEvent` に写す。生成側が `Unknown(type, raw)` にしたものは `Other(type, raw)`。`[DONE]` の扱いは従来どおり。
+- M3 のオフラインテストと M5 の実 API テストがそのまま通ること。`m3_compat_wbtest.mbt` のような互換のための細工は、テストを JSON 比較に直して撤去する。
+
+### タグ衝突(次段 M4e の設計。ここでは実装しない)
+census で (c) に分類した「同じ判別値を複数候補が宣言する」ケース(OpenAI `InputItem` / `Item` / `ItemResource` の `message`、OpenRouter `Inputs` の `message` / `reasoning` / `function_call`)は、上流の誤りではなく「同じ `type` で形が違う」という設計で、他の SDK は候補を順に試している。対応案: (1) 第 2 の判別子(候補間で値が異なる単一値プロパティ、例 `role`)を自動検出して 2 段の tagged enum にする、(2) 無ければ `x-moonbit-order: [...]` で試行順を overlay に書かせ、required プロパティの有無で最初に合う候補を選ぶ。どちらも `Unknown` を残す。
