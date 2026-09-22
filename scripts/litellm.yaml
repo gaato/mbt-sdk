@@ -1,0 +1,9 @@
+# LiteLLM proxy config: exposes Anthropic-format /v1/messages (and OpenAI routes)
+# on top of a local Ollama. Used by scripts/compat-servers.sh and CI.
+model_list:
+  - model_name: tiny
+    litellm_params:
+      model: ollama_chat/smollm2:135m
+      api_base: http://127.0.0.1:11434
+general_settings:
+  master_key: sk-local-compat

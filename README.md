@@ -44,7 +44,8 @@ scripts/generate.sh          # apply overlays and regenerate
 scripts/generate.sh --check  # CI: fail if the committed output is stale
 scripts/gates.sh             # every check and test (native tests open loopback sockets)
 scripts/conformance.sh       # opt-in: the SSE parser, transport and runtime against https://badhttp.dev
-scripts/live.sh              # opt-in: OpenAI and OpenRouter live API tests (never a gate)
+scripts/live.sh              # opt-in: live API tests; remote providers need keys, local ones need the servers below
+scripts/compat-servers.sh    # start Ollama (~135M model) + a LiteLLM proxy speaking Anthropic /v1/messages; prints the *_COMPAT_* env
 ```
 
 ## Automation
@@ -52,6 +53,7 @@ scripts/live.sh              # opt-in: OpenAI and OpenRouter live API tests (nev
 - `ci.yml` — gates on a pinned toolchain image (`ghcr.io/gaato/moonbit:<version>`).
 - `canary.yml` — the same gates daily on `:latest`; red here with green CI means the language moved.
 - `spec-watch.yml` — daily upstream spec check; on change it re-vendors, regenerates, runs the gates and opens a PR.
+- `live-compat.yml` — the live suite against local, key-free OpenAI- and Anthropic-compatible servers (Ollama + LiteLLM, always their latest release, so a change in either shows up here). Remote providers skip without keys.
 
 Design notes (Japanese): `docs/design.md` (M1), `docs/design-m2.md`, `docs/design-m3.md`, `docs/design-m4.md`, `docs/design-m5.md`. Release procedure: `docs/release.md`. Conventions for coding agents: `AGENTS.md`.
 

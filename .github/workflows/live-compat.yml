@@ -1,0 +1,53 @@
+name: Live compat
+
+# Runs the live tests against local, key-free, CPU-only OpenAI- and
+# Anthropic-compatible servers (Ollama + LiteLLM with a ~135M model).
+# Nothing external is called, so this can block like CI does. Ollama and LiteLLM
+# are intentionally unpinned (latest): their releases changing behaviour is the
+# kind of drift these tests are for.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  compat:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Install MoonBit
+        shell: bash
+        run: |
+          curl --proto '=https' --tlsv1.2 --fail --show-error --silent --location \
+            https://cli.moonbitlang.com/install/unix.sh --output "$RUNNER_TEMP/install-moonbit.sh"
+          bash "$RUNNER_TEMP/install-moonbit.sh"
+          echo "$HOME/.moon/bin" >> "$GITHUB_PATH"
+
+      - name: Install Ollama (latest)
+        run: curl -fsSL https://ollama.com/install.sh | sh
+
+      - name: Cache Ollama models
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/.ollama/models
+          key: ollama-smollm2-135m
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
+
+      - name: Start compat servers
+        run: scripts/compat-servers.sh start | tee -a "$GITHUB_ENV"
+
+      - name: Live tests (compat servers only; remote providers skip without keys)
+        run: MBT_SDK_ENV=/dev/null scripts/live.sh

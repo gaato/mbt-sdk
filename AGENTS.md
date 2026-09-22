@@ -89,7 +89,7 @@ Loopback socket tests live in `http-async/src/loopback` (native only). They need
 
 `runtime-tests/src/badhttp` talks to the public https://badhttp.dev (opt-in, `scripts/conformance.sh`, needs the network, ~30 requests against a 100-per-10-s limit). It is not a gate; do not add it to CI.
 
-`runtime-tests/src/live` talks to the real OpenAI and OpenRouter APIs (opt-in, `scripts/live.sh`, needs the network and provider keys). It is never a gate; do not add it to CI or run it without explicit authorization.
+`runtime-tests/src/live` talks to the real OpenAI and OpenRouter APIs and, when `OPENAI_COMPAT_*` / `ANTHROPIC_COMPAT_*` are set, to local OpenAI-/Anthropic-compatible servers (opt-in, `scripts/live.sh`; `scripts/compat-servers.sh` starts the local ones). It is never a gate. The local part runs in `live-compat.yml`; the remote part needs provider keys and must not run without explicit authorization.
 
 ## Hard limits for agents
 
