@@ -50,6 +50,12 @@ moon -C openai check src/gen --deny-warn --target js
 moon -C openai test src/gen --target wasm-gc
 moon -C openai test src/gen --target native
 moon -C openai test src/gen --target js
+moon -C fixtures/gen/badhttp check --deny-warn --target wasm-gc
+moon -C fixtures/gen/badhttp check --deny-warn --target native
+moon -C fixtures/gen/badhttp check --deny-warn --target js
+moon -C fixtures/gen/petstore3 check --deny-warn --target wasm-gc
+moon -C fixtures/gen/petstore3 check --deny-warn --target native
+moon -C fixtures/gen/petstore3 check --deny-warn --target js
 moon -C runtime-tests check --deny-warn --target native
 moon -C runtime-tests check --deny-warn --target js
 moon -C runtime-tests test --target js
@@ -57,6 +63,9 @@ moon -C runtime-tests test --target native     # runs loopback socket tests of o
 .venv/bin/python tools/apply_overlay.py openai/spec/openai.yaml openai/spec/openai.patched.json openai/overlays/*.yaml
 .venv/bin/python -m unittest discover -s tools/gen/tests -v
 .venv/bin/python tools/gen/main.py --spec openai/spec/openai.yaml --overlay openai/overlays/moonbit.yaml --out openai/src/gen --package gaato/openai/gen --check
+.venv/bin/python tools/gen/census.py specs/badhttp/openapi.json badhttp --expect-zero
+.venv/bin/python tools/gen/census.py specs/petstore3/openapi.json petstore3 --expect-zero
+scripts/generate.sh --check
 moon fmt --check
 moon info
 ```

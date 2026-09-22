@@ -17,5 +17,6 @@ import {
   "gaato/http-async@0.1.0",
   "gaato/sdk-runtime@0.1.0",
   "gaato/openai@0.1.0",
+  "gaato/fixture-badhttp@0.0.0",
   "moonbitlang/async@0.22.1",
 }

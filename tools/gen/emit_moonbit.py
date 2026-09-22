@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
 import json
 import re
 
@@ -265,12 +264,13 @@ fn json_int64(
   }
   result
 }
+'''
 
-///|
+
+INT64_TO_JSON_HELPER = r'''///|
 fn json_int64_to_json(value : Int64) -> Json {
   try! @json.parse(value.to_string())
-}
-'''
+}'''
 
 
 OPTIONAL_INT64_HELPER = r'''///|
@@ -303,14 +303,14 @@ fn decode_presence_int64(
 
 
 def _path_expression(operation: Operation) -> str:
-    parameters = {"{" + item.json_name + "}": item for item in operation.parameters}
+    parameters = {"{" + item.json_name + "}": item for item in operation.parameters if item.location == "path"}
     parts = re.split(r"(\{[^}]+\})", operation.path)
     expressions: list[str] = []
     for part in parts:
         if not part:
             continue
         if part in parameters:
-            expressions.append(f"percent_encode({parameters[part].moon_name})")
+            expressions.append(f"percent_encode(parameter_value({parameters[part].moon_name}))")
         else:
             expressions.append(_moon_string(part))
     return " + ".join(expressions) if expressions else '""'
@@ -319,25 +319,69 @@ def _path_expression(operation: Operation) -> str:
 def _operation(operation: Operation) -> str:
     request_name = operation.moon_name + "_request"
     decode_name = operation.moon_name + "_decode"
-    parameters = [f"{parameter.moon_name} : {parameter.type.moon_type()}" for parameter in operation.parameters]
+    required = [parameter for parameter in operation.parameters if parameter.required]
+    optional = [parameter for parameter in operation.parameters if not parameter.required]
+    parameters = [f"{parameter.moon_name} : {parameter.type.moon_type()}" for parameter in required]
     if operation.request_type is not None:
         parameters.append(f"body : {operation.request_type.moon_type()}")
-    lines = _doc(operation.description, f"Builds the {operation.operation_id} request.")
+    parameters.extend(f"{parameter.moon_name}? : {parameter.type.moon_type()}" for parameter in optional)
+    fallback = f"Builds the {operation.operation_id} request."
+    if operation.response_type is None:
+        fallback += " The caller handles the response as @http.Response."
+    description = " ".join((operation.description, "The caller handles the response as @http.Response." if operation.response_type is None else "")).strip()
+    lines = _doc(description, fallback)
     lines.append(f"pub fn {request_name}({', '.join(parameters)}) -> @http.Request {{")
+    query_parameters = [parameter for parameter in operation.parameters if parameter.location == "query"]
+    if query_parameters:
+        lines.append(f"  let mut url = {_path_expression(operation)}")
+        for parameter in query_parameters:
+            name = _moon_string(parameter.json_name)
+            if parameter.type.kind == "array":
+                if parameter.required:
+                    lines.extend([f"  for value in {parameter.moon_name} {{", f"    url = append_query(url, {name}, parameter_value(value))", "  }"])
+                else:
+                    lines.extend([f"  match {parameter.moon_name} {{", "    Some(values) =>", "      for value in values {", f"        url = append_query(url, {name}, parameter_value(value))", "      }", "    None => ()", "  }"])
+            elif parameter.required:
+                lines.append(f"  url = append_query(url, {name}, parameter_value({parameter.moon_name}))")
+            else:
+                lines.extend([f"  match {parameter.moon_name} {{", f"    Some(value) => url = append_query(url, {name}, parameter_value(value))", "    None => ()", "  }"])
+        path_expression = "url"
+    else:
+        path_expression = _path_expression(operation)
     constructor = {"GET": "get", "POST": "post", "PUT": "put", "PATCH": "patch", "DELETE": "delete"}.get(operation.method)
     if constructor:
-        expression = f"@http.Request::{constructor}({_path_expression(operation)})"
+        expression = f"@http.Request::{constructor}({path_expression})"
     else:
-        expression = f"@http.Request::new({_moon_string(operation.method)}, {_path_expression(operation)})"
+        expression = f"@http.Request::new({_moon_string(operation.method)}, {path_expression})"
     if operation.request_type is not None:
         expression += ".json_body(body.to_json())"
-    lines.extend([f"  {expression}", "}"])
-    lines.extend(_doc(f"Decodes a successful {operation.operation_id} response.", ""))
-    lines.extend([f"pub fn {decode_name}(", "  response : @http.Response,", f") -> {operation.response_type.moon_type()} raise @runtime.SdkError {{", "  decode_response(response)", "}"])
+    header_parameters = [parameter for parameter in operation.parameters if parameter.location == "header"]
+    if header_parameters:
+        lines.append(f"  let mut request = {expression}")
+        for parameter in header_parameters:
+            name = _moon_string(parameter.json_name)
+            if parameter.type.kind == "array":
+                value = f'{parameter.moon_name}.map(value => parameter_value(value)).join(",")'
+            else:
+                value = f"parameter_value({parameter.moon_name})"
+            if parameter.required:
+                lines.append(f"  request = request.header({name}, {value})")
+            else:
+                if parameter.type.kind == "array":
+                    optional_value = 'values.map(value => parameter_value(value)).join(",")'
+                else:
+                    optional_value = "parameter_value(value)"
+                lines.extend([f"  match {parameter.moon_name} {{", f"    Some(value{'s' if parameter.type.kind == 'array' else ''}) => request = request.header({name}, {optional_value})", "    None => ()", "  }"])
+        lines.extend(["  request", "}"])
+    else:
+        lines.extend([f"  {expression}", "}"])
+    if operation.response_type is not None:
+        lines.extend(_doc(f"Decodes a successful {operation.operation_id} response.", ""))
+        lines.extend([f"pub fn {decode_name}(", "  response : @http.Response,", f") -> {operation.response_type.moon_type()} raise @runtime.SdkError {{", "  decode_response(response)", "}"])
     return "\n".join(lines)
 
 
-OPERATION_HELPERS = r'''///|
+PERCENT_ENCODE_HELPER = r'''///|
 fn percent_encode(value : String) -> String {
   let hex = b"0123456789ABCDEF"
   let output : Array[Byte] = []
@@ -358,9 +402,33 @@ fn percent_encode(value : String) -> String {
     }
   }
   try! @utf8.decode(Bytes::from_array(output))
-}
+}'''
 
-///|
+
+PARAMETER_VALUE_HELPER = r'''///|
+fn[T : ToJson] parameter_value(value : T) -> String {
+  match value.to_json() {
+    String(value) => value
+    True => "true"
+    False => "false"
+    Number(value, repr~) =>
+      match repr {
+        Some(text) => text
+        None => value.to_string()
+      }
+    other => other.stringify()
+  }
+}'''
+
+
+APPEND_QUERY_HELPER = r'''///|
+fn append_query(url : String, name : String, value : String) -> String {
+  let separator = if url.contains("?") { "&" } else { "?" }
+  url + separator + percent_encode(name) + "=" + percent_encode(value)
+}'''
+
+
+DECODE_HELPERS = r'''///|
 fn parse_json_body(body : Bytes) -> Json raise {
   @json.parse(@utf8.decode(body))
 }
@@ -376,16 +444,10 @@ fn[T : @json.FromJson] decode_response(
 }'''
 
 
-def _without_percent_encode(helpers: str) -> str:
-    """Drops the percent_encode helper (only path parameters use it)."""
-    start = helpers.index("///|\nfn percent_encode(")
-    end = helpers.index("///|", start + 4)
-    return helpers[:start] + helpers[end:]
-
-
 def emit(ir: IR) -> dict[str, str]:
     declarations: list[str] = []
     has_int64 = False
+    has_required_int64 = False
     has_union = False
     has_optional_int64 = False
     has_presence_int64 = False
@@ -393,6 +455,10 @@ def emit(ir: IR) -> dict[str, str]:
         if isinstance(declaration, Struct):
             declarations.append(_struct(declaration))
             has_int64 = has_int64 or any(field.type.kind == "Int64" for field in declaration.fields)
+            has_required_int64 = has_required_int64 or any(
+                field.type.kind == "Int64" and field.presence == Presence.REQUIRED
+                for field in declaration.fields
+            )
             has_optional_int64 = has_optional_int64 or any(
                 field.type.kind == "Int64" and field.presence in (Presence.OPTIONAL, Presence.NULLABLE_REQUIRED)
                 for field in declaration.fields
@@ -411,11 +477,18 @@ def emit(ir: IR) -> dict[str, str]:
     helpers: list[str] = []
     if has_int64:
         helpers.append(HELPERS)
+    if has_required_int64:
+        helpers.append(INT64_TO_JSON_HELPER)
     if has_optional_int64:
         helpers.append(OPTIONAL_INT64_HELPER)
     if has_presence_int64:
         helpers.append(PRESENCE_INT64_HELPER)
-    if has_union:
+    if has_union and any(
+        variant.shape.startswith("array:")
+        for declaration in ir.declarations
+        if isinstance(declaration, UntaggedUnion)
+        for variant in declaration.variants
+    ):
         helpers.insert(0, '''///|
 fn json_array_matches(
   value : Json,
@@ -428,12 +501,21 @@ fn json_array_matches(
 }''')
     types = HEADER + "\n\n".join(helpers + declarations) + "\n"
     operation_sources = [_operation(operation) for operation in ir.operations]
-    uses_percent_encode = any("percent_encode(" in source for source in operation_sources)
-    operation_helpers = OPERATION_HELPERS if uses_percent_encode else _without_percent_encode(OPERATION_HELPERS)
-    operations = HEADER + operation_helpers + "\n\n" + "\n\n".join(operation_sources) + "\n"
+    operation_helpers: list[str] = []
+    if any(operation.parameters for operation in ir.operations):
+        operation_helpers.append(PARAMETER_VALUE_HELPER)
+    if any(parameter.location in {"path", "query"} for operation in ir.operations for parameter in operation.parameters):
+        operation_helpers.append(PERCENT_ENCODE_HELPER)
+    if any(parameter.location == "query" for operation in ir.operations for parameter in operation.parameters):
+        operation_helpers.append(APPEND_QUERY_HELPER)
+    if any(operation.response_type is not None for operation in ir.operations):
+        operation_helpers.append(DECODE_HELPERS)
+    operations = HEADER + "\n\n".join(operation_helpers + operation_sources) + "\n"
     # Import only what the emitted code references: `--deny-warn` rejects unused packages.
     body = types + operations
-    imports = ['  "gaato/http",', '  "gaato/sdk-runtime" @runtime,']
+    imports = ['  "gaato/http",']
+    if "@runtime." in body:
+        imports.append('  "gaato/sdk-runtime" @runtime,')
     if "@sdkjson." in body:
         imports.append('  "gaato/sdk-runtime/json" @sdkjson,')
     if "@utf8." in body:

@@ -1,0 +1,411 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "gaato/fixture-badhttp"
+
+import {
+  "gaato/http",
+  "gaato/sdk-runtime",
+  "moonbitlang/core/json",
+}
+
+// Values
+pub fn delete_echo_decode(@http.Response) -> Json raise @sdk-runtime.SdkError
+
+pub fn delete_echo_request() -> @http.Request
+
+pub fn get_402_broken_flavor_request(Get402BrokenFlavorFlavor, network? : Get402BrokenFlavorNetwork, amount? : Double) -> @http.Request
+
+pub fn get_402_decode(@http.Response) -> Json raise @sdk-runtime.SdkError
+
+pub fn get_402_pay_base_request(amount? : Double) -> @http.Request
+
+pub fn get_402_pay_base_sepolia_request(amount? : Double) -> @http.Request
+
+pub fn get_402_pay_request(network? : Get402PayNetwork, amount? : Double) -> @http.Request
+
+pub fn get_402_request() -> @http.Request
+
+pub fn get_402_scenario_request(Get402ScenarioScenario, network? : Get402ScenarioNetwork, amount? : Double, reason? : String, seconds? : Double) -> @http.Request
+
+pub fn get_auth_decode(@http.Response) -> Json raise @sdk-runtime.SdkError
+
+pub fn get_auth_flavor_decode(@http.Response) -> Json raise @sdk-runtime.SdkError
+
+pub fn get_auth_flavor_request(GetAuthFlavorFlavor) -> @http.Request
+
+pub fn get_auth_request() -> @http.Request
+
+pub fn get_badjson_flavor_request(GetBadjsonFlavorFlavor, code? : Int) -> @http.Request
+
+pub fn get_books_json_decode(@http.Response) -> Json raise @sdk-runtime.SdkError
+
+pub fn get_books_json_request() -> @http.Request
+
+pub fn get_clients_decode(@http.Response) -> Json raise @sdk-runtime.SdkError
+
+pub fn get_clients_jsonl_request() -> @http.Request
+
+pub fn get_clients_request() -> @http.Request
+
+pub fn get_compress_decode(@http.Response) -> Json raise @sdk-runtime.SdkError
+
+pub fn get_compress_flavor_request(GetCompressFlavorFlavor, length? : Int, code? : Int, size? : Int, accept_encoding? : String) -> @http.Request
+
+pub fn get_compress_request() -> @http.Request
+
+pub fn get_cookies_decode(@http.Response) -> Json raise @sdk-runtime.SdkError
+
+pub fn get_cookies_flavor_decode(@http.Response) -> Json raise @sdk-runtime.SdkError
+
+pub fn get_cookies_flavor_request(GetCookiesFlavorFlavor, count? : Int, bytes? : Int, cookie? : String) -> @http.Request
+
+pub fn get_cookies_request() -> @http.Request
+
+pub fn get_corpus_decode(@http.Response) -> Json raise @sdk-runtime.SdkError
+
+pub fn get_corpus_jsonl_request() -> @http.Request
+
+pub fn get_corpus_request() -> @http.Request
+
+pub fn get_crosshost_decode(@http.Response) -> Json raise @sdk-runtime.SdkError
+
+pub fn get_crosshost_flavor_request(GetCrosshostFlavorFlavor) -> @http.Request
+
+pub fn get_crosshost_land_decode(@http.Response) -> Json raise @sdk-runtime.SdkError
+
+pub fn get_crosshost_land_request() -> @http.Request
+
+pub fn get_crosshost_request() -> @http.Request
+
+pub fn get_delay_seconds_decode(@http.Response) -> Json raise @sdk-runtime.SdkError
+
+pub fn get_delay_seconds_request(Double) -> @http.Request
+
+pub fn get_drip_request(duration? : Double, chunks? : Int, code? : Int) -> @http.Request
+
+pub fn get_echo_request() -> @http.Request
+
+pub fn get_etag_decode(@http.Response) -> Json raise @sdk-runtime.SdkError
+
+pub fn get_etag_flavor_request(GetEtagFlavorFlavor, if_none_match? : String, if_modified_since? : String, if_match? : String, if_unmodified_since? : String) -> @http.Request
+
+pub fn get_etag_request() -> @http.Request
+
+pub fn get_flaky_percent_decode(@http.Response) -> Json raise @sdk-runtime.SdkError
+
+pub fn get_flaky_percent_request(Int, fail? : Int, seed? : String, i? : Int) -> @http.Request
+
+pub fn get_funding_json_decode(@http.Response) -> Json raise @sdk-runtime.SdkError
+
+pub fn get_funding_json_request() -> @http.Request
+
+pub fn get_headers_decode(@http.Response) -> Json raise @sdk-runtime.SdkError
+
+pub fn get_headers_request() -> @http.Request
+
+pub fn get_health_decode(@http.Response) -> Json raise @sdk-runtime.SdkError
+
+pub fn get_health_request() -> @http.Request
+
+pub fn get_license_decode(@http.Response) -> Json raise @sdk-runtime.SdkError
+
+pub fn get_license_request() -> @http.Request
+
+pub fn get_llms_txt_request() -> @http.Request
+
+pub fn get_range_decode(@http.Response) -> Json raise @sdk-runtime.SdkError
+
+pub fn get_range_flavor_request(GetRangeFlavorFlavor, length? : Int, range? : String, if_range? : String) -> @http.Request
+
+pub fn get_range_request() -> @http.Request
+
+pub fn get_redirect_hops_decode(@http.Response) -> Json raise @sdk-runtime.SdkError
+
+pub fn get_redirect_hops_request(GetRedirectHopsHops, code? : Int, absolute? : Bool) -> @http.Request
+
+pub fn get_sse_decode(@http.Response) -> Json raise @sdk-runtime.SdkError
+
+pub fn get_sse_flavor_request(GetSseFlavorFlavor, events? : Int, interval? : Int, seconds? : Double, bytes? : Int, last_event_id? : String) -> @http.Request
+
+pub fn get_sse_request() -> @http.Request
+
+pub fn get_status_code_request(String, retry_after? : Int) -> @http.Request
+
+pub fn get_truncate_request(length? : Int, send? : Int) -> @http.Request
+
+pub fn head_echo_request() -> @http.Request
+
+pub fn patch_echo_decode(@http.Response) -> Json raise @sdk-runtime.SdkError
+
+pub fn patch_echo_request() -> @http.Request
+
+pub fn post_echo_decode(@http.Response) -> Json raise @sdk-runtime.SdkError
+
+pub fn post_echo_request() -> @http.Request
+
+pub fn put_echo_decode(@http.Response) -> Json raise @sdk-runtime.SdkError
+
+pub fn put_echo_request() -> @http.Request
+
+// Errors
+
+// Types and methods
+pub(all) enum Get402BrokenFlavorFlavor {
+  NotBase64
+  NotJson
+  NoAccepts
+  EmptyAccepts
+  NoExtra
+  NoResource
+  Version99
+  DecimalAmount
+  MissingHeader
+  V1Body
+  Custom(String)
+}
+pub fn Get402BrokenFlavorFlavor::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn Get402BrokenFlavorFlavor::to_json(Self) -> Json
+pub impl ToJson for Get402BrokenFlavorFlavor
+pub impl @json.FromJson for Get402BrokenFlavorFlavor
+
+pub(all) enum Get402BrokenFlavorNetwork {
+  BaseSepolia
+  Base
+  Custom(String)
+}
+pub fn Get402BrokenFlavorNetwork::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn Get402BrokenFlavorNetwork::to_json(Self) -> Json
+pub impl ToJson for Get402BrokenFlavorNetwork
+pub impl @json.FromJson for Get402BrokenFlavorNetwork
+
+pub(all) enum Get402PayNetwork {
+  BaseSepolia
+  Base
+  Custom(String)
+}
+pub fn Get402PayNetwork::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn Get402PayNetwork::to_json(Self) -> Json
+pub impl ToJson for Get402PayNetwork
+pub impl @json.FromJson for Get402PayNetwork
+
+pub(all) enum Get402ScenarioNetwork {
+  BaseSepolia
+  Base
+  Custom(String)
+}
+pub fn Get402ScenarioNetwork::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn Get402ScenarioNetwork::to_json(Self) -> Json
+pub impl ToJson for Get402ScenarioNetwork
+pub impl @json.FromJson for Get402ScenarioNetwork
+
+pub(all) enum Get402ScenarioScenario {
+  Never
+  Reject
+  Slow
+  Crash
+  BadReceipt
+  Overpriced
+  WrongNetwork
+  Custom(String)
+}
+pub fn Get402ScenarioScenario::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn Get402ScenarioScenario::to_json(Self) -> Json
+pub impl ToJson for Get402ScenarioScenario
+pub impl @json.FromJson for Get402ScenarioScenario
+
+pub(all) enum GetAuthFlavorFlavor {
+  Basic
+  Bearer
+  Digest
+  DigestSha256
+  None
+  BareScheme
+  UnknownScheme
+  Token68
+  Multi
+  Case
+  Quoted
+  Utf8
+  Always401
+  AcceptAny
+  Forbidden
+  Stale
+  Proxy
+  Redirect
+  Custom(String)
+}
+pub fn GetAuthFlavorFlavor::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn GetAuthFlavorFlavor::to_json(Self) -> Json
+pub impl ToJson for GetAuthFlavorFlavor
+pub impl @json.FromJson for GetAuthFlavorFlavor
+
+pub(all) enum GetBadjsonFlavorFlavor {
+  Truncated
+  TrailingComma
+  SingleQuotes
+  Nan
+  Bom
+  Html
+  Mislabeled
+  Empty
+  Unterminated
+  Bigint
+  DuplicateKeys
+  Comments
+  LeadingGarbage
+  Concatenated
+  Deep
+  Utf16
+  Custom(String)
+}
+pub fn GetBadjsonFlavorFlavor::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn GetBadjsonFlavorFlavor::to_json(Self) -> Json
+pub impl ToJson for GetBadjsonFlavorFlavor
+pub impl @json.FromJson for GetBadjsonFlavorFlavor
+
+pub(all) enum GetCompressFlavorFlavor {
+  Ok
+  Br
+  Zstd
+  Deflate
+  NotCompressed
+  Undeclared
+  Truncated
+  Corrupt
+  BadCrc
+  TrailingGarbage
+  MultiMember
+  Double
+  DoubleHidden
+  DeflateRaw
+  UnknownCoding
+  Uppercase
+  XGzip
+  Empty
+  WrongLength
+  GzipFile
+  Bomb
+  Custom(String)
+}
+pub fn GetCompressFlavorFlavor::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn GetCompressFlavorFlavor::to_json(Self) -> Json
+pub impl ToJson for GetCompressFlavorFlavor
+pub impl @json.FromJson for GetCompressFlavorFlavor
+
+pub(all) enum GetCookiesFlavorFlavor {
+  Ok
+  Echo
+  Folded
+  Many
+  Duplicate
+  OnRedirect
+  Delete
+  ConflictingExpiry
+  BadExpires
+  FarFuture
+  WrongDomain
+  PublicSuffix
+  Domain
+  PathPrefix
+  NamePrefixes
+  Quoted
+  Utf8
+  Nameless
+  Huge
+  Custom(String)
+}
+pub fn GetCookiesFlavorFlavor::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn GetCookiesFlavorFlavor::to_json(Self) -> Json
+pub impl ToJson for GetCookiesFlavorFlavor
+pub impl @json.FromJson for GetCookiesFlavorFlavor
+
+pub(all) enum GetCrosshostFlavorFlavor {
+  SameOrigin
+  ToSubdomain
+  FromSubdomain
+  Boomerang
+  SchemeUpgrade
+  SchemeDowngrade
+  PortChange
+  RelativeAuthority
+  Jar
+  Custom(String)
+}
+pub fn GetCrosshostFlavorFlavor::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn GetCrosshostFlavorFlavor::to_json(Self) -> Json
+pub impl ToJson for GetCrosshostFlavorFlavor
+pub impl @json.FromJson for GetCrosshostFlavorFlavor
+
+pub(all) enum GetEtagFlavorFlavor {
+  Ok
+  Weak
+  Changing
+  Ignore
+  Always304
+  Mismatch
+  NoValidator304
+  Unquoted
+  BadDate
+  Future
+  Custom(String)
+}
+pub fn GetEtagFlavorFlavor::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn GetEtagFlavorFlavor::to_json(Self) -> Json
+pub impl ToJson for GetEtagFlavorFlavor
+pub impl @json.FromJson for GetEtagFlavorFlavor
+
+pub(all) enum GetRangeFlavorFlavor {
+  Ok
+  Ignore
+  AdvertiseOnly
+  OffByOne
+  Shifted
+  SuffixAsPrefix
+  FromZero
+  WrongTotal
+  NoContentRange
+  Always206
+  Value200ContentRange
+  Always416
+  UnknownTotal
+  IfRangeIgnored
+  Custom(String)
+}
+pub fn GetRangeFlavorFlavor::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn GetRangeFlavorFlavor::to_json(Self) -> Json
+pub impl ToJson for GetRangeFlavorFlavor
+pub impl @json.FromJson for GetRangeFlavorFlavor
+
+pub(all) enum GetRedirectHopsHops {
+  Int(Int)
+  Text(String)
+}
+pub fn GetRedirectHopsHops::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn GetRedirectHopsHops::to_json(Self) -> Json
+pub impl ToJson for GetRedirectHopsHops
+pub impl @json.FromJson for GetRedirectHopsHops
+
+pub(all) enum GetSseFlavorFlavor {
+  Ok
+  Stall
+  Cut
+  Drop
+  Crlf
+  Cr
+  NoSpace
+  Multiline
+  Comments
+  SplitUtf8
+  WrongType
+  ErrorEvent
+  Big
+  Resume
+  Custom(String)
+}
+pub fn GetSseFlavorFlavor::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn GetSseFlavorFlavor::to_json(Self) -> Json
+pub impl ToJson for GetSseFlavorFlavor
+pub impl @json.FromJson for GetSseFlavorFlavor
+
+// Type aliases
+
+// Traits

@@ -28,8 +28,10 @@ class MinimalSliceTest(unittest.TestCase):
             out = os.path.join(tmp, "out")
             code = gen_main.run(["--spec", spec, "--out", out, "--package", "x/gen"])
             self.assertEqual(code, 0)
-            ops = open(os.path.join(out, "operations.mbt")).read()
-            pkg = open(os.path.join(out, "moon.pkg")).read()
+            with open(os.path.join(out, "operations.mbt"), encoding="utf-8") as stream:
+                ops = stream.read()
+            with open(os.path.join(out, "moon.pkg"), encoding="utf-8") as stream:
+                pkg = stream.read()
             self.assertNotIn("fn percent_encode", ops)
             self.assertNotIn("@sdkjson", pkg)
             self.assertIn("get_headers_decode", ops)

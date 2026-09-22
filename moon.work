@@ -4,4 +4,6 @@ members = [
   "sdk-runtime",
   "openai",
   "runtime-tests",
+  "fixtures/gen/badhttp",
+  "fixtures/gen/petstore3",
 ]

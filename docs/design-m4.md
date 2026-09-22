@@ -119,3 +119,18 @@ M3 の手書きの `list_models` / `retrieve_model` / `create_embeddings` は、
 - 単体テスト: query の必須/任意/配列/enum、percent-encode(空白・日本語・`&`・`=`)、header、`$ref` パラメータ、decode を生成しない条件、typed map の往復、properties と additionalProperties の併存が診断になること。
 - `specs/badhttp` と `specs/petstore3` を全操作で生成した結果を `fixtures/gen/{badhttp,petstore3}/` にコミットし、`scripts/generate.sh --check` で最新性を確認する。生成物は一時的な workspace メンバーとして 3 ターゲットで `check --deny-warn` を通す(`scripts/gates.sh` に組み込む: `fixtures/gen/<name>/moon.mod` を持たせ、moon.work に `fixtures/gen/badhttp` と `fixtures/gen/petstore3` を加える)。
 - 生成物を実サーバに対して動かす確認は `runtime-tests/src/badhttp` に 1 テスト足す(`get_headers` / `post_echo` / `get_status`(query の `retry-after`) を生成物経由で)。
+
+## M4b の判断
+
+- census と fixture の「全操作」は OpenAPI の 8 method (`get` / `put` / `post` / `delete` / `options` / `head` / `patch` / `trace`)とした。operationId の導出は既存 prototype と同じく `method + "_" + path` を英数字以外で区切る。そのため `/status/{code}` は `get_status_code` になる。通常生成では導出せず、`--derive-operation-ids` を明示した census / fixture だけで使う。
+- `components.parameters` の local `$ref` は normalize 時に deep copy で解決する。path-level parameter も対象にし、同じ `(name, in)` の operation-level parameter が path-level parameter を上書きする。外部 ref と未解決 ref は診断にする。
+- query は `style: form` / `explode: true` の組だけを受理する。省略時は OpenAPI の既定値を使う。配列は同じ名前を要素ごとに繰り返し、名前と値を UTF-8 byte 単位で RFC 3986 unreserved 以外 percent-encode する。空白は `+` ではなく `%20` になる。
+- parameter は path / query / header の required を位置引数、optional をラベル付き `?` 引数にする。値の文字列化は `ToJson` を通し、string enum の `Custom`、数値の表現、boolean を同じ経路で扱う。integer enum は M4b の対象である `Int` とし、string enum のような閉じた型は作らない。
+- header は既定の `simple` style を受理し、配列は comma 区切りにする。header は request body 設定後に `Request::header` で追加する。`content-length` / `host` / `authorization` は大文字小文字を無視して診断にする。
+- 2xx `application/json` schema が無い操作は request builder だけを生成する。doc comment に caller が `@http.Response` を扱うことを明記し、decode helper と不要 import も出さない。2xx JSON schema と default が共存するときは 2xx だけを decode 対象にする。
+- schema-less object と `additionalProperties: true` は `Json` にし、pointer を note として保持する。note は `--verbose` のときだけ stderr に出す。properties がある node の `x-moonbit-json: true` は従来どおり明示的 escape hatch とする。
+- typed `additionalProperties` は `Map[String, T]` にし、core の `ToJson` / `FromJson` を使って往復する。properties との併存は fixed field と map entry の衝突規則が contract に無いため診断にする。
+- request body に `application/json` があればそれを選び、同じ operation に列挙された form-urlencoded / multipart alternative は診断しない。JSON が無く form-urlencoded または multipart が選択肢にある場合は診断にする。これにより Petstore の JSON operation は生成でき、未対応形式だけの operation を黙って JSON 扱いしない。
+- `application/octet-stream` など M4b が対応も診断も指定していない request content は body 引数を生成しない。Petstore の `uploadFile` は URL と query を作る request builder になり、binary body は caller が `Request` に追加する。
+- security scheme / operation security は IR に入れない。認証 header は従来どおり runtime の `Auth` が送信時に担当する。
+- union / nullable / discriminator の lowering は変更しない。M4b で必要になった parameter の値変換と helper の必要時生成だけを emitter に追加した。

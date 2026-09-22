@@ -17,7 +17,7 @@ if __package__ in (None, ""):
 
 from tools.gen.diagnostics import GenerationError
 from tools.gen.emit_moonbit import HEADER, emit
-from tools.gen.ir import IRBuilder
+from tools.gen.ir import IRBuilder, include_all_operations
 from tools.gen.normalize import normalize_spec
 
 
@@ -29,6 +29,9 @@ def parser() -> argparse.ArgumentParser:
     result.add_argument("--package", required=True)
     result.add_argument("--check", action="store_true")
     result.add_argument("--ir-out")
+    result.add_argument("--derive-operation-ids", action="store_true")
+    result.add_argument("--include-all", action="store_true")
+    result.add_argument("--verbose", action="store_true")
     return result
 
 
@@ -103,13 +106,23 @@ def _write(out: Path, files: dict[str, str]) -> None:
 
 def run(argv: list[str] | None = None) -> int:
     args = parser().parse_args(argv)
+    builder = None
     try:
         doc = normalize_spec(args.spec, args.overlay)
-        ir = IRBuilder(doc, args.package).build()
+        if args.include_all:
+            include_all_operations(doc)
+        builder = IRBuilder(doc, args.package, derive_operation_ids=args.derive_operation_ids)
+        ir = builder.build()
     except GenerationError as error:
         for diagnostic in error.diagnostics:
             print(diagnostic.format(), file=sys.stderr)
+        if args.verbose and builder is not None:
+            for note in sorted(builder.notes, key=lambda item: (item.pointer, item.message)):
+                print(f"note: {note.pointer}: {note.message}", file=sys.stderr)
         return 2
+    if args.verbose:
+        for note in sorted(builder.notes, key=lambda item: (item.pointer, item.message)):
+            print(f"note: {note.pointer}: {note.message}", file=sys.stderr)
     try:
         files = _format(emit(ir))
     except GenerationError:

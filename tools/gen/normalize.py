@@ -90,10 +90,71 @@ def normalize_spec(spec_path: str | Path, overlay_paths: list[str | Path]) -> di
         overlay_problems.extend(apply_overlay.apply(doc, apply_overlay.load(str(path)), str(path)))
     if overlay_problems:
         raise GenerationError([Diagnostic("/", problem, "fix the overlay action target or update") for problem in overlay_problems])
+    _resolve_parameter_refs(doc)
     # allOf is merged lazily while lowering the selected schema closure.  The
     # vendored document contains unrelated unsupported constructs, which must
     # not make a deliberately narrow generator slice fail.
     return doc
+
+
+def _resolve_parameter_refs(doc: dict[str, Any]) -> None:
+    """Resolve local parameter references at path and operation level in place."""
+    diagnostics: list[Diagnostic] = []
+    methods = {"get", "put", "post", "delete", "options", "head", "patch", "trace"}
+
+    def resolve_parameter(parameter: Any, item_pointer: str, seen: set[str]) -> Any:
+        if not isinstance(parameter, dict) or "$ref" not in parameter:
+            return parameter
+        ref = parameter.get("$ref")
+        if not isinstance(ref, str) or not ref.startswith("#/components/parameters/"):
+            diagnostics.append(Diagnostic(item_pointer, f"unsupported parameter $ref {ref}", "use a local components.parameters reference"))
+            return parameter
+        if ref in seen:
+            diagnostics.append(Diagnostic(item_pointer, f"recursive parameter $ref {ref}", "break the parameter reference cycle"))
+            return parameter
+        try:
+            target = resolve_local(doc, ref)
+        except (KeyError, TypeError):
+            diagnostics.append(Diagnostic(item_pointer, f"unresolved local parameter $ref {ref}", "fix the reference in overlays/fix.yaml"))
+            return parameter
+        if not isinstance(target, dict):
+            diagnostics.append(Diagnostic(item_pointer, f"parameter $ref {ref} does not resolve to an object", "fix the referenced parameter"))
+            return parameter
+        resolved = resolve_parameter(copy.deepcopy(target), item_pointer, seen | {ref})
+        if not isinstance(resolved, dict):
+            return resolved
+        # OpenAPI 3.1 permits summary/description siblings on Reference
+        # Objects.  Keeping arbitrary siblings would silently change the
+        # parameter contract, so only those documentation fields overlay.
+        for key in ("summary", "description"):
+            if key in parameter:
+                resolved[key] = copy.deepcopy(parameter[key])
+        return resolved
+
+    def resolve_list(parameters: Any, pointer: str) -> list[Any]:
+        if not isinstance(parameters, list):
+            return parameters
+        result: list[Any] = []
+        for index, parameter in enumerate(parameters):
+            item_pointer = _pointer_join(pointer, index)
+            result.append(resolve_parameter(parameter, item_pointer, set()))
+        return result
+
+    for path, path_item in doc.get("paths", {}).items():
+        if not isinstance(path_item, dict):
+            continue
+        path_pointer = _pointer_join("/paths", path)
+        if "parameters" in path_item:
+            path_item["parameters"] = resolve_list(path_item["parameters"], _pointer_join(path_pointer, "parameters"))
+        for method, operation in path_item.items():
+            if method not in methods or not isinstance(operation, dict) or "parameters" not in operation:
+                continue
+            operation["parameters"] = resolve_list(
+                operation["parameters"],
+                _pointer_join(_pointer_join(path_pointer, method), "parameters"),
+            )
+    if diagnostics:
+        raise GenerationError(diagnostics)
 
 
 def closure_stats(doc: dict[str, Any], operation_id: str) -> ClosureStats:

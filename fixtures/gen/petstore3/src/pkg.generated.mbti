@@ -1,0 +1,184 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "gaato/fixture-petstore3"
+
+import {
+  "gaato/http",
+  "gaato/sdk-runtime",
+  "moonbitlang/core/json",
+}
+
+// Values
+pub fn add_pet_decode(@http.Response) -> Pet raise @sdk-runtime.SdkError
+
+pub fn add_pet_request(Pet) -> @http.Request
+
+pub fn create_user_decode(@http.Response) -> User raise @sdk-runtime.SdkError
+
+pub fn create_user_request(User) -> @http.Request
+
+pub fn create_users_with_list_input_decode(@http.Response) -> User raise @sdk-runtime.SdkError
+
+pub fn create_users_with_list_input_request(Array[User]) -> @http.Request
+
+pub fn delete_order_request(Int64) -> @http.Request
+
+pub fn delete_pet_request(Int64, api_key? : String) -> @http.Request
+
+pub fn delete_user_request(String) -> @http.Request
+
+pub fn find_pets_by_status_decode(@http.Response) -> Array[Pet] raise @sdk-runtime.SdkError
+
+pub fn find_pets_by_status_request(FindPetsByStatusStatus) -> @http.Request
+
+pub fn find_pets_by_tags_decode(@http.Response) -> Array[Pet] raise @sdk-runtime.SdkError
+
+pub fn find_pets_by_tags_request(Array[String]) -> @http.Request
+
+pub fn get_inventory_decode(@http.Response) -> Map[String, Int] raise @sdk-runtime.SdkError
+
+pub fn get_inventory_request() -> @http.Request
+
+pub fn get_order_by_id_decode(@http.Response) -> Order raise @sdk-runtime.SdkError
+
+pub fn get_order_by_id_request(Int64) -> @http.Request
+
+pub fn get_pet_by_id_decode(@http.Response) -> Pet raise @sdk-runtime.SdkError
+
+pub fn get_pet_by_id_request(Int64) -> @http.Request
+
+pub fn get_user_by_name_decode(@http.Response) -> User raise @sdk-runtime.SdkError
+
+pub fn get_user_by_name_request(String) -> @http.Request
+
+pub fn login_user_decode(@http.Response) -> String raise @sdk-runtime.SdkError
+
+pub fn login_user_request(username? : String, password? : String) -> @http.Request
+
+pub fn logout_user_request() -> @http.Request
+
+pub fn place_order_decode(@http.Response) -> Order raise @sdk-runtime.SdkError
+
+pub fn place_order_request(Order) -> @http.Request
+
+pub fn update_pet_decode(@http.Response) -> Pet raise @sdk-runtime.SdkError
+
+pub fn update_pet_request(Pet) -> @http.Request
+
+pub fn update_pet_with_form_decode(@http.Response) -> Pet raise @sdk-runtime.SdkError
+
+pub fn update_pet_with_form_request(Int64, name? : String, status? : String) -> @http.Request
+
+pub fn update_user_request(String, User) -> @http.Request
+
+pub fn upload_file_decode(@http.Response) -> ApiResponse raise @sdk-runtime.SdkError
+
+pub fn upload_file_request(Int64, additional_metadata? : String) -> @http.Request
+
+// Errors
+
+// Types and methods
+pub(all) struct ApiResponse {
+  code : Int?
+  type_ : String?
+  message : String?
+}
+pub fn ApiResponse::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ApiResponse::to_json(Self) -> Json
+pub impl ToJson for ApiResponse
+pub impl @json.FromJson for ApiResponse
+
+pub(all) struct Category {
+  id : Int64?
+  name : String?
+}
+pub fn Category::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn Category::to_json(Self) -> Json
+pub impl ToJson for Category
+pub impl @json.FromJson for Category
+
+pub(all) enum FindPetsByStatusStatus {
+  Available
+  Pending
+  Sold
+  Custom(String)
+}
+pub fn FindPetsByStatusStatus::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn FindPetsByStatusStatus::to_json(Self) -> Json
+pub impl ToJson for FindPetsByStatusStatus
+pub impl @json.FromJson for FindPetsByStatusStatus
+
+pub(all) struct Order {
+  id : Int64?
+  pet_id : Int64?
+  quantity : Int?
+  ship_date : String?
+  status : OrderStatus?
+  complete : Bool?
+}
+pub fn Order::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn Order::to_json(Self) -> Json
+pub impl ToJson for Order
+pub impl @json.FromJson for Order
+
+pub(all) enum OrderStatus {
+  Placed
+  Approved
+  Delivered
+  Unknown(String)
+}
+pub fn OrderStatus::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn OrderStatus::to_json(Self) -> Json
+pub impl ToJson for OrderStatus
+pub impl @json.FromJson for OrderStatus
+
+pub(all) struct Pet {
+  id : Int64?
+  name : String
+  category : Category?
+  photo_urls : Array[String]
+  tags : Array[Tag]?
+  status : PetStatus?
+}
+pub fn Pet::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn Pet::to_json(Self) -> Json
+pub impl ToJson for Pet
+pub impl @json.FromJson for Pet
+
+pub(all) enum PetStatus {
+  Available
+  Pending
+  Sold
+  Unknown(String)
+}
+pub fn PetStatus::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn PetStatus::to_json(Self) -> Json
+pub impl ToJson for PetStatus
+pub impl @json.FromJson for PetStatus
+
+pub(all) struct Tag {
+  id : Int64?
+  name : String?
+}
+pub fn Tag::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn Tag::to_json(Self) -> Json
+pub impl ToJson for Tag
+pub impl @json.FromJson for Tag
+
+pub(all) struct User {
+  id : Int64?
+  username : String?
+  first_name : String?
+  last_name : String?
+  email : String?
+  password : String?
+  phone : String?
+  user_status : Int?
+}
+pub fn User::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn User::to_json(Self) -> Json
+pub impl ToJson for User
+pub impl @json.FromJson for User
+
+// Type aliases
+
+// Traits

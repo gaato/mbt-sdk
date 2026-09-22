@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from dataclasses import asdict, dataclass, field
+from dataclasses import asdict, dataclass
 from enum import Enum
 import re
 from typing import Any, Iterable
@@ -27,6 +27,9 @@ class TypeRef:
         if self.kind == "array":
             assert self.item is not None
             return f"Array[{self.item.moon_type()}]"
+        if self.kind == "map":
+            assert self.item is not None
+            return f"Map[String, {self.item.moon_type()}]"
         return self.name or self.kind
 
 
@@ -103,8 +106,14 @@ class Operation:
     path: str
     parameters: tuple[Parameter, ...]
     request_type: TypeRef | None
-    response_type: TypeRef
+    response_type: TypeRef | None
     description: str = ""
+
+
+@dataclass(frozen=True)
+class Note:
+    pointer: str
+    message: str
 
 
 @dataclass(frozen=True)
@@ -231,10 +240,12 @@ def _shape_variant_name(schema: dict[str, Any], resolve: callable) -> str:
 
 
 class IRBuilder:
-    def __init__(self, doc: dict[str, Any], package: str):
+    def __init__(self, doc: dict[str, Any], package: str, *, derive_operation_ids: bool = False):
         self.doc = doc
         self.package = package
+        self.derive_operation_ids = derive_operation_ids
         self.diagnostics: list[Diagnostic] = []
+        self.notes: list[Note] = []
         self.declarations: list[Declaration] = []
         self.declaration_names: set[str] = set()
         self.component_usage: dict[str, set[str]] = {}
@@ -254,6 +265,11 @@ class IRBuilder:
 
     def add_diag(self, pointer: str, reason: str, hint: str) -> None:
         self.diagnostics.append(Diagnostic(pointer, reason, hint))
+
+    def add_note(self, pointer: str, message: str) -> None:
+        note = Note(pointer, message)
+        if note not in self.notes:
+            self.notes.append(note)
 
     def _walk_refs(self, schema: Any, usage: str, seen: set[tuple[str, str]]) -> None:
         if isinstance(schema, list):
@@ -298,17 +314,34 @@ class IRBuilder:
                 if isinstance(schema, dict):
                     yield schema, "response"
 
-    def discover(self) -> list[tuple[str, str, dict[str, Any]]]:
-        selected: list[tuple[str, str, dict[str, Any]]] = []
+    @staticmethod
+    def _parameters(path_item: dict[str, Any], operation: dict[str, Any]) -> list[dict[str, Any]]:
+        """Return path parameters followed by operation overrides."""
+        result: list[dict[str, Any]] = []
+        positions: dict[tuple[Any, Any], int] = {}
+        for parameter in [*path_item.get("parameters", []), *operation.get("parameters", [])]:
+            if not isinstance(parameter, dict):
+                continue
+            key = (parameter.get("name"), parameter.get("in"))
+            if key in positions:
+                result[positions[key]] = parameter
+            else:
+                positions[key] = len(result)
+                result.append(parameter)
+        return result
+
+    def discover(self) -> list[tuple[str, str, dict[str, Any], list[dict[str, Any]]]]:
+        selected: list[tuple[str, str, dict[str, Any], list[dict[str, Any]]]] = []
         seen: set[tuple[str, str]] = set()
         for path, path_item in self.doc.get("paths", {}).items():
             for method, operation in path_item.items():
                 if not isinstance(operation, dict) or operation.get("x-moonbit-include") is not True:
                     continue
-                selected.append((path, method, operation))
+                parameters = self._parameters(path_item, operation)
+                selected.append((path, method, operation, parameters))
                 for schema, usage in self._operation_schemas(operation):
                     self._walk_refs(schema, usage, seen)
-                for parameter in operation.get("parameters", []):
+                for parameter in parameters:
                     schema = parameter.get("schema")
                     if isinstance(schema, dict):
                         self._walk_refs(schema, "request", seen)
@@ -370,10 +403,23 @@ class IRBuilder:
         additional = schema.get("additionalProperties")
         if additional is True or (schema.get("type") == "object" and not schema.get("properties") and additional is None):
             location = pointer_join(pointer, "additionalProperties") if additional is True else pointer
-            self.add_diag(location, "bare additionalProperties/schema-less object is not supported", "add x-moonbit-json: true with a description justifying raw JSON")
+            self.add_note(location, "schema-less object mapped to Json")
             return TypeRef("Json")
         if isinstance(additional, dict):
-            self.add_diag(pointer_join(pointer, "additionalProperties"), "typed map schemas are not supported in M4a", "add x-moonbit-json: true if arbitrary JSON is intentional")
+            if schema.get("properties"):
+                self.add_diag(
+                    pointer_join(pointer, "additionalProperties"),
+                    "properties and typed additionalProperties cannot coexist",
+                    "split the fixed properties and map into separate schemas in overlays/fix.yaml",
+                )
+                return TypeRef("Json")
+            item = self.compile_type(
+                additional,
+                name + "Value",
+                usage,
+                pointer_join(pointer, "additionalProperties"),
+            )
+            return TypeRef("map", item=item)
         required = set(schema.get("required", []))
         fields: list[Field] = []
         properties = schema.get("properties", {})
@@ -425,7 +471,7 @@ class IRBuilder:
         if "oneOf" in schema or "anyOf" in schema:
             return self._union_type(schema, name, usage, pointer)
         enum = schema.get("enum")
-        if isinstance(enum, list) and len(enum) > 1:
+        if schema.get("type") == "string" and isinstance(enum, list) and len(enum) > 1:
             return self._enum_type(schema, name, usage, pointer)
         kind = schema.get("type")
         override = schema.get("x-moonbit-type")
@@ -450,32 +496,73 @@ class IRBuilder:
                 self.add_diag(pointer_join(pointer, "items"), "array has no item schema", "add items in overlays/fix.yaml or x-moonbit-json: true")
                 return TypeRef("Json")
             return TypeRef("array", item=self.compile_type(items, name + "Item", usage, pointer_join(pointer, "items")))
-        if kind == "object" or "properties" in schema:
+        if kind == "object" or "properties" in schema or "additionalProperties" in schema:
             return self._struct_type(schema, name, usage, pointer)
         self.add_diag(pointer, f"unsupported schema construct (type={kind!r})", "add an explicit supported type or x-moonbit-json: true with justification")
         return TypeRef("Json")
 
-    def _compile_operation(self, path: str, method: str, operation: dict[str, Any]) -> Operation | None:
+    def _compile_operation(
+        self,
+        path: str,
+        method: str,
+        operation: dict[str, Any],
+        raw_parameters: list[dict[str, Any]],
+    ) -> Operation | None:
         operation_id = operation.get("operationId")
         pointer = f"/paths/{path.replace('~', '~0').replace('/', '~1')}/{method}"
         if not isinstance(operation_id, str):
-            self.add_diag(pointer, "included operation has no operationId", "add operationId in overlays/fix.yaml")
-            return None
+            if self.derive_operation_ids:
+                operation_id = derive_operation_id(method, path)
+            else:
+                self.add_diag(pointer, "included operation has no operationId", "add operationId in overlays/fix.yaml or pass --derive-operation-ids")
+                return None
         parameters: list[Parameter] = []
-        for index, parameter in enumerate(operation.get("parameters", [])):
+        parameter_names: set[str] = set()
+        for index, parameter in enumerate(raw_parameters):
             location = parameter.get("in")
-            if location != "path":
-                self.add_diag(pointer_join(pointer_join(pointer, "parameters"), index), f"parameter location {location!r} is not supported in M4a", "remove the operation from x-moonbit-include or annotate a future parameter strategy")
-                continue
-            schema = parameter.get("schema", {})
             parameter_pointer = pointer_join(pointer_join(pointer, "parameters"), index)
+            if location == "cookie":
+                self.add_diag(parameter_pointer, "cookie parameters are not supported", "remove the operation from x-moonbit-include or model the Cookie header in handwritten code")
+                continue
+            if location not in {"path", "query", "header"}:
+                self.add_diag(parameter_pointer, f"parameter location {location!r} is not supported", "remove the operation from x-moonbit-include or use path, query, or header")
+                continue
+            if location == "query":
+                style = parameter.get("style", "form")
+                explode = parameter.get("explode", True)
+                if style != "form" or explode is not True:
+                    self.add_diag(parameter_pointer, f"query parameter style={style!r}, explode={explode!r} is not supported", "use style: form with explode: true")
+                    continue
+            if location == "header":
+                style = parameter.get("style", "simple")
+                if style != "simple":
+                    self.add_diag(parameter_pointer, f"header parameter style {style!r} is not supported", "use the default simple header style")
+                    continue
+                if str(parameter.get("name", "")).lower() in {"content-length", "host", "authorization"}:
+                    self.add_diag(parameter_pointer, f"reserved header parameter {parameter.get('name')!r} conflicts with the runtime", "remove it and configure transport or runtime Auth instead")
+                    continue
+            schema = parameter.get("schema", {})
+            if not isinstance(schema, dict):
+                self.add_diag(pointer_join(parameter_pointer, "schema"), "parameter has no schema", "add a supported schema")
+                continue
+            moon_name = snake_case(str(parameter.get("name", "parameter")))
+            if moon_name in parameter_names:
+                self.add_diag(parameter_pointer, f"parameter name collision after MoonBit normalization: {moon_name}", "rename one parameter in an overlay")
+                continue
+            parameter_names.add(moon_name)
             param_type = self.compile_type(schema, pascal_case(operation_id) + pascal_case(parameter.get("name", "parameter")), {"request"}, pointer_join(parameter_pointer, "schema"))
-            parameters.append(Parameter(parameter["name"], snake_case(parameter["name"]), param_type, location, parameter.get("required") is True, parameter.get("description", "")))
-        request_schema = operation.get("requestBody", {}).get("content", {}).get("application/json", {}).get("schema")
+            required = parameter.get("required") is True or location == "path"
+            parameters.append(Parameter(parameter["name"], moon_name, param_type, location, required, parameter.get("description", "")))
+        request_content = operation.get("requestBody", {}).get("content", {})
+        request_schema = request_content.get("application/json", {}).get("schema")
         request_type = None
         if isinstance(request_schema, dict):
             request_pointer = pointer_join(pointer_join(pointer_join(pointer_join(pointer, "requestBody"), "content"), "application/json"), "schema")
             request_type = self.compile_type(request_schema, pascal_case(operation_id) + "Request", {"request"}, request_pointer)
+        elif "application/x-www-form-urlencoded" in request_content:
+            self.add_diag(pointer_join(pointer_join(pointer, "requestBody"), "content"), "application/x-www-form-urlencoded request bodies are not supported", "use application/json or remove the operation from x-moonbit-include")
+        elif "multipart/form-data" in request_content:
+            self.add_diag(pointer_join(pointer_join(pointer, "requestBody"), "content"), "multipart/form-data request bodies are not supported", "use handwritten multipart support or remove the operation from x-moonbit-include")
         response_schemas: list[tuple[dict[str, Any], str]] = []
         for status, response in operation.get("responses", {}).items():
             if str(status).startswith("2"):
@@ -484,11 +571,11 @@ class IRBuilder:
                     response_pointer = pointer_join(pointer_join(pointer_join(pointer_join(pointer_join(pointer, "responses"), status), "content"), "application/json"), "schema")
                     response_schemas.append((schema, response_pointer))
         if not response_schemas:
-            self.add_diag(pointer_join(pointer, "responses"), "included operation has no 2xx application/json response schema", "add the response schema in overlays/fix.yaml")
-            return None
-        response_type = self.compile_type(response_schemas[0][0], pascal_case(operation_id) + "Response", {"response"}, response_schemas[0][1])
-        if any(schema != response_schemas[0][0] for schema, _ in response_schemas[1:]):
-            self.add_diag(pointer_join(pointer, "responses"), "multiple distinct success response schemas are not supported", "make the success schemas consistent in overlays/fix.yaml")
+            response_type = None
+        else:
+            response_type = self.compile_type(response_schemas[0][0], pascal_case(operation_id) + "Response", {"response"}, response_schemas[0][1])
+            if any(schema != response_schemas[0][0] for schema, _ in response_schemas[1:]):
+                self.add_diag(pointer_join(pointer, "responses"), "multiple distinct success response schemas are not supported", "make the success schemas consistent in overlays/fix.yaml")
         return Operation(operation_id, snake_case(operation_id), method.upper(), path, tuple(parameters), request_type, response_type, operation.get("summary", operation.get("description", "")))
 
     def build(self) -> IR:
@@ -497,7 +584,29 @@ class IRBuilder:
         for name in schemas:
             if name in self.component_usage:
                 self.compile_component(name)
-        operations = [item for path, method, operation in selected if (item := self._compile_operation(path, method, operation)) is not None]
+        operations = [item for path, method, operation, parameters in selected if (item := self._compile_operation(path, method, operation, parameters)) is not None]
         if self.diagnostics:
             raise GenerationError(self.diagnostics)
         return IR(self.package, tuple(self.declarations), tuple(operations))
+
+
+def derive_operation_id(method: str, path: str) -> str:
+    """Derive a stable operation id from an HTTP method and path template."""
+    return re.sub(r"[^A-Za-z0-9]+", "_", f"{method}_{path}").strip("_") or "operation"
+
+
+HTTP_METHODS = {"get", "put", "post", "delete", "options", "head", "patch", "trace"}
+
+
+def include_all_operations(doc: dict[str, Any]) -> int:
+    """Mark every OpenAPI operation for generation and return its count."""
+    count = 0
+    for path_item in doc.get("paths", {}).values():
+        if not isinstance(path_item, dict):
+            continue
+        for method, operation in path_item.items():
+            if method.lower() not in HTTP_METHODS or not isinstance(operation, dict):
+                continue
+            operation["x-moonbit-include"] = True
+            count += 1
+    return count
