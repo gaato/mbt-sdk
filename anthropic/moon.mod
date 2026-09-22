@@ -7,6 +7,10 @@ version = "0.1.0"
 
 license = "Apache-2.0"
 
+readme = "README.md"
+
+repository = "https://github.com/gaato/mbt-sdk"
+
 keywords = [ "anthropic", "llm", "sdk", "messages" ]
 
 description = "Thin Anthropic Messages API client for MoonBit built on gaato/http and gaato/sdk-runtime."

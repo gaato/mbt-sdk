@@ -9,6 +9,10 @@ version = "0.1.0"
 
 license = "Apache-2.0"
 
+readme = "README.md"
+
+repository = "https://github.com/gaato/mbt-sdk"
+
 keywords = [ "http", "sans-io", "transport", "sse", "client" ]
 
 description = "Sans-IO HTTP vocabulary for MoonBit SDKs: request/response types, a Transport trait, an incremental SSE parser and a scripted fake transport. No dependencies; runs on every backend."

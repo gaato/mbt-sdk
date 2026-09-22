@@ -9,6 +9,8 @@ version = "0.1.0"
 
 license = "Apache-2.0"
 
+repository = "https://github.com/gaato/mbt-sdk"
+
 keywords = [ "jsonrpc", "json-rpc", "sans-io", "ndjson", "acp" ]
 
 description = "Sans-IO JSON-RPC 2.0 vocabulary for MoonBit SDKs: message and error types, strict and bare envelopes, NDJSON encoding and an incremental line framer. No dependencies; runs on every backend."

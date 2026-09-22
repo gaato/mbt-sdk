@@ -1,0 +1,55 @@
+name: Release
+
+# Publishes to mooncakes.io after CI is green on main. Idempotent: modules whose
+# version is already in the registry index are skipped, so only a version bump
+# in moon.mod releases anything (scripts/release.sh).
+
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    environment: mooncakes
+    container:
+      image: ghcr.io/gaato/moonbit:0.10.14
+    steps:
+      - name: Check out the commit CI validated
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+          persist-credentials: false
+
+      - name: Trust the workspace (container runs as a different user)
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+
+      - name: Dry run
+        run: scripts/release.sh publish --dry-run
+
+      - name: Publish
+        env:
+          MOONCAKES_TOKEN: ${{ secrets.MOONCAKES_TOKEN }}
+          MOONCAKES_USERNAME: ${{ secrets.MOONCAKES_USERNAME }}
+        run: |
+          if [ -z "$MOONCAKES_TOKEN" ]; then
+            echo "MOONCAKES_TOKEN is not set; nothing published" >&2
+            exit 0
+          fi
+          mkdir -p "$HOME/.moon"
+          umask 077
+          printf '{"token":"%s","username":"%s"}\n' "$MOONCAKES_TOKEN" "$MOONCAKES_USERNAME" > "$HOME/.moon/credentials.json"
+          trap 'rm -f "$HOME/.moon/credentials.json"' EXIT
+          scripts/release.sh publish

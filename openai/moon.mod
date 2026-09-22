@@ -8,6 +8,10 @@ version = "0.1.0"
 
 license = "Apache-2.0"
 
+readme = "README.md"
+
+repository = "https://github.com/gaato/mbt-sdk"
+
 keywords = [ "openai", "llm", "sdk", "responses", "embeddings" ]
 
 description = "Thin OpenAI API client for MoonBit built on gaato/http and gaato/sdk-runtime: models, embeddings, responses (buffered and streaming)."

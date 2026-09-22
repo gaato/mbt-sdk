@@ -8,6 +8,10 @@ version = "0.1.0"
 
 license = "Apache-2.0"
 
+readme = "README.md"
+
+repository = "https://github.com/gaato/mbt-sdk"
+
 keywords = [ "sdk", "http", "retry", "rate-limit", "pagination", "json" ]
 
 description = "API-agnostic client runtime for MoonBit SDKs: error taxonomy, Retry-After and backoff, tri-state JSON fields, open enums. Built on gaato/http; no async runtime dependency."
