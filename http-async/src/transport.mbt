@@ -1,19 +1,37 @@
 ///|
-/// An HTTP transport with one client per request and bounded IO operations.
+/// An HTTP transport with bounded IO operations and a small keep-alive pool.
+///
+/// A connection returns to the pool only after its response body has been
+/// consumed in full and the server did not answer `Connection: close`. At most
+/// `max_idle_per_origin` connections are parked per origin, each for at most
+/// `idle_max_ms`; concurrent requests beyond that dial new connections and are
+/// never queued. When a reused connection fails before a response head, the
+/// request is sent once more on a fresh connection if it is idempotent or
+/// carries an `Idempotency-Key`; other requests surface the failure.
 pub struct AsyncTransport {
   priv timeout_ms : Int
+  priv max_idle_per_origin : Int
+  priv idle_max_ms : Int
+  priv idle : Map[String, Array[IdleConn]]
+  priv mut closed : Bool
 }
 
 ///|
 /// Creates a transport. Streaming reads each receive a fresh idle timeout.
+/// `max_idle_per_origin = 0` or `idle_max_ms = 0` disables connection reuse.
 ///
 /// ```mbt check
 /// test {
 ///   let _ = @adapter.AsyncTransport::new(timeout_ms=1000)
+///   let _ = @adapter.AsyncTransport::new(max_idle_per_origin=0)
 /// }
 /// ```
-pub fn AsyncTransport::new(timeout_ms? : Int = 30000) -> AsyncTransport {
-  { timeout_ms, }
+pub fn AsyncTransport::new(
+  timeout_ms? : Int = 30000,
+  max_idle_per_origin? : Int = 4,
+  idle_max_ms? : Int = 10000,
+) -> AsyncTransport {
+  { timeout_ms, max_idle_per_origin, idle_max_ms, idle: {}, closed: false, }
 }
 
 ///|
@@ -24,12 +42,17 @@ pub extend AsyncTransport with @http.Transport::{send, send_stream}
 /// Reads the entire response within one timeout, regardless of status.
 pub impl @http.Transport for AsyncTransport with fn send(self, request) {
   bounded(self.timeout_ms, () => {
-    let (head, client) = open_request(request)
-    defer client.close()
-    let body = client.read_all().binary() catch {
+    let opened = self.open_request(request)
+    errdefer opened.client.close()
+    let body = opened.client.read_all().binary() catch {
         error => raise @http.HttpError::Protocol(error.to_string())
       }
-    @http.Response::{ status: head.status, headers: head.headers, body, }
+    self.release(opened)
+    @http.Response::{
+      status: opened.head.status,
+      headers: opened.head.headers,
+      body,
+    }
   })
 }
 
@@ -40,14 +63,18 @@ pub impl @http.Transport for AsyncTransport with fn send_stream(self, request) {
   let mut opened : @ahttp.Client? = None
   errdefer (if opened is Some(client) { client.close() })
   bounded(self.timeout_ms, () => {
-    let (head, client) = open_request(request)
-    opened = Some(client)
+    let exchange = self.open_request(request)
+    opened = Some(exchange.client)
     let stream : &@http.BodyStream = ClientStream::{
-      client,
+      transport: self,
+      origin: exchange.origin,
+      client: exchange.client,
+      keep_alive: exchange.keep_alive,
       timeout_ms: self.timeout_ms,
+      finished: false,
       closed: false,
     }
-    (head, stream)
+    (exchange.head, stream)
   })
 }
 
@@ -73,16 +100,26 @@ async fn[X] bounded(
 
 ///|
 priv struct ClientStream {
+  transport : AsyncTransport
+  origin : String
   client : @ahttp.Client
+  keep_alive : Bool
   timeout_ms : Int
+  mut finished : Bool
   mut closed : Bool
 }
 
 ///|
+/// Parks the connection when the body was read to its end; closes it when
+/// the stream is abandoned early.
 impl @http.BodyStream for ClientStream with fn close(self) {
   if !self.closed {
     self.closed = true
-    self.client.close()
+    if self.finished && self.keep_alive {
+      self.transport.checkin(self.origin, self.client)
+    } else {
+      self.client.close()
+    }
   }
 }
 
@@ -98,15 +135,36 @@ impl @http.BodyStream for ClientStream with fn read_some(self) {
     }
   })
   if chunk is None {
+    self.finished = true
     @http.BodyStream::close(self)
   }
   chunk
 }
 
 ///|
-async fn open_request(
+/// One exchange whose response head has arrived; the body is still on `client`.
+priv struct Opened {
+  head : @http.ResponseHead
+  client : @ahttp.Client
+  origin : String
+  keep_alive : Bool
+}
+
+///|
+/// Parks or closes the connection of a fully consumed exchange.
+fn AsyncTransport::release(self : AsyncTransport, opened : Opened) -> Unit {
+  if opened.keep_alive {
+    self.checkin(opened.origin, opened.client)
+  } else {
+    opened.client.close()
+  }
+}
+
+///|
+async fn AsyncTransport::open_request(
+  self : AsyncTransport,
   request : @http.Request,
-) -> (@http.ResponseHead, @ahttp.Client) raise @http.HttpError {
+) -> Opened raise @http.HttpError {
   let meth = request_method(request.http_method)
   let (origin, path) = split_url(request.url)
   let headers : @ahttp.Headers = Map([])
@@ -120,22 +178,43 @@ async fn open_request(
       Some(previous) => previous + ", " + value
     }
   }
-  let client = @ahttp.Client(origin, headers~) catch {
-    @ahttp.URIParseError::InvalidFormat =>
-      raise @http.HttpError::Protocol("invalid URL")
-    @ahttp.URIParseError::UnsupportedProtocol(protocol) =>
-      raise @http.HttpError::Protocol("unsupported protocol: " + protocol)
-    error => raise @http.HttpError::Connect(error.to_string())
+  let mut fresh = false
+  for ;; {
+    let (client, reused) = self.checkout(origin, fresh~)
+    let response = exchange(client, meth, path, headers, request.body) catch {
+      error => {
+        if reused && replayable(request) {
+          // A parked connection the server had already dropped: replay once
+          // on a fresh one. `reused` is false on that second attempt.
+          fresh = true
+          continue
+        }
+        raise head_error(error)
+      }
+    }
+    return {
+      head: response_head(response),
+      client,
+      origin,
+      keep_alive: !connection_close(response),
+    }
   }
+}
+
+///|
+/// Writes one request and reads its response head. The connection is closed
+/// on any failure, including cancellation, which bypasses `catch`.
+async fn exchange(
+  client : @ahttp.Client,
+  meth : @ahttp.RequestMethod,
+  path : String,
+  headers : @ahttp.Headers,
+  body : Bytes,
+) -> @ahttp.Response {
   errdefer client.close()
-  let response = try {
-    client.request(meth, path)
-    client.write(request.body)
-    client.end_request()
-  } catch {
-    error => raise head_error(error)
-  }
-  (response_head(response), client)
+  client.request(meth, path, extra_headers=headers)
+  client.write(body)
+  client.end_request()
 }
 
 ///|

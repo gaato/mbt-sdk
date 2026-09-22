@@ -8,6 +8,10 @@ version = "0.1.0"
 
 license = "Apache-2.0"
 
+readme = "README.md"
+
+repository = "https://github.com/gaato/mbt-sdk"
+
 keywords = [ "http", "transport", "async", "client" ]
 
 description = "gaato/http Transport over moonbitlang/async. Native and js targets."

@@ -11,5 +11,5 @@ import {
 supported_targets = "native"
 
 options(
-  targets: { "loopback_test.mbt": [ "native" ] },
+  targets: { "loopback_test.mbt": [ "native" ], "pool_test.mbt": [ "native" ] },
 )

@@ -21,7 +21,9 @@ pub impl @clock.Clock for AsyncClock
 pub struct AsyncTransport {
   // private fields
 }
-pub fn AsyncTransport::new(timeout_ms? : Int) -> Self
+pub fn AsyncTransport::close(Self) -> Unit
+pub fn AsyncTransport::idle_connections(Self) -> Int
+pub fn AsyncTransport::new(timeout_ms? : Int, max_idle_per_origin? : Int, idle_max_ms? : Int) -> Self
 pub async fn AsyncTransport::send(Self, @http.Request) -> @http.Response raise @http.HttpError
 pub async fn AsyncTransport::send_stream(Self, @http.Request) -> (@http.ResponseHead, &@http.BodyStream) raise @http.HttpError
 pub impl @http.Transport for AsyncTransport

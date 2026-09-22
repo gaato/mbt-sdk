@@ -70,7 +70,7 @@ SSE の判断:
 
 `gaato/http/mock`: `FakeTransport::new()`、`.expect(method, url_suffix, Response)`、`.expect_stream(..., chunks : Array[Bytes])`、`.sent() -> Array[Request]`、`.assert_complete()`。不一致はその場で raise し、かつラッチして `assert_complete` でも落とす。
 
-`gaato/http-async`: `AsyncTransport::new(timeout_ms? = 30000)`。`impl Transport`。`@http.Client` を直接使い、`content-length` は async 側に任せる、応答ヘッダ名を小文字化、`send_stream` は `read_some` をそのまま `BodyStream` にする、`@async.with_timeout` でタイムアウト、キャンセル時はシグナルを伝播させつつ `defer` で接続を close。接続プールは M1 では持たない(1 リクエスト 1 接続)。
+`gaato/http-async`: `AsyncTransport::new(timeout_ms? = 30000)`。`impl Transport`。`@http.Client` を直接使い、`content-length` は async 側に任せる、応答ヘッダ名を小文字化、`send_stream` は `read_some` をそのまま `BodyStream` にする、`@async.with_timeout` でタイムアウト、キャンセル時はシグナルを伝播させつつ `defer` で接続を close。接続プールは M1 では持たなかった(1 リクエスト 1 接続)。2026-09-22 に keep-alive プールを追加: `AsyncTransport::new(max_idle_per_origin? = 4, idle_max_ms? = 10000)`。本文を最後まで読み `Connection: close` でない接続だけ origin ごとに保管し、同時実行は制限しない(空きが無ければ dial する)。再利用した接続が応答ヘッダ前に失敗したら、冪等メソッドか `Idempotency-Key` 付きの要求だけ新規接続で 1 回再送し、それ以外は失敗を返す(Go の net/http と同じ規則)。`AsyncTransport::close()` で保管中の接続を閉じる。移植元は discord.mbt の `internal/pool`。
 
 http-async の判断:
 - タイムアウトは `@async.with_timeout(ms, f, error=HttpError::Timeout(ms))` で掛ける。`timeout_ms <= 0` は接続せずに即 `Timeout`。`send` は接続から本文の読み切りまでを 1 つの期限で、`send_stream` は応答ヘッダまでを 1 つの期限で、その後は `read_some` 1 回ごとに新しい期限(アイドルタイムアウト)で縛る。
@@ -84,7 +84,7 @@ http-async の判断:
 
 M1 の既知の制限:
 - リクエスト本文は `Bytes` で全量バッファする(ストリーミング送信なし)。discord.mbt は multipart のパートを接続へ逐次書き込んでいるので、大きなファイル送信を移すなら `Transport` にストリーミング送信を足す必要がある。
-- 接続プールなし(1 リクエスト 1 接続)。SSE パーサに行長の上限なし。どちらも M2 で扱う。
+- SSE パーサに行長の上限なし。(接続プールは 2026-09-22 に追加済み。)
 
 ## 検証
 

@@ -9,7 +9,7 @@ Status: experimental, unpublished. Module names are provisional.
 | Module | What it is | Depends on |
 |---|---|---|
 | `gaato/http` | Sans-IO HTTP vocabulary: `Request`, `Response`, `Headers`, the `Transport` and `BodyStream` traits, middleware, a `Clock` trait, an incremental WHATWG-conformant SSE parser, and a scripted `FakeTransport` / `FakeClock` for tests | nothing (runs on wasm-gc, wasm, js, native) |
-| `gaato/http-async` | `AsyncTransport` and `AsyncClock` over `moonbitlang/async` (native and js) | `gaato/http`, `moonbitlang/async` |
+| `gaato/http-async` | `AsyncTransport` (with a small keep-alive pool per origin) and `AsyncClock` over `moonbitlang/async` (native and js) | `gaato/http`, `moonbitlang/async` |
 | `gaato/jsonrpc` | Sans-IO JSON-RPC 2.0 vocabulary: `Message`, `RequestId`, `RpcError`, strict (`"jsonrpc":"2.0"`) and bare (codex app-server) envelopes, NDJSON encoding, an incremental `LineFramer` | nothing (runs on wasm-gc, wasm, js, native) |
 | `gaato/jsonrpc-async` | Bidirectional `Connection` over any `moonbitlang/async` reader/writer pair, plus `spawn_child` for JSON-RPC over a child process's stdio (native); the base for ACP and codex app-server clients | `gaato/jsonrpc`, `moonbitlang/async` |
 | `gaato/codex-protocol` | Codex app-server v2 types, typed calls and events generated from a pinned CLI JSON Schema | `gaato/sdk-runtime` (JSON helpers only) |
