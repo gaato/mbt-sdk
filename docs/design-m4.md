@@ -78,3 +78,15 @@ M3 の手書きの `list_models` / `retrieve_model` / `create_embeddings` は、
 
 - `createResponse` は M4a の include から外した。request body と JSON / event-stream response から到達する component schema closure は **115 schemas**、その closure 内で discriminator の無い `oneOf` は **11 nodes** あり、object 同士を JSON shape だけで区別できない union と discriminator union を含む。これらに個別の raw `Json` annotation を大量に付けるのは「未対応を黙って Json に落とさない」という目的に反するため、discriminator と object union の方針を決める後続 milestone へ送る。
 - discriminator 付き union、同じ JSON shape の untagged union、recursive schema、query/header/cookie parameter、typed map、複数の異なる success response schema は診断にする。対応するまでは対象 operation を include しない。
+
+## badhttp.dev の OpenAPI で試した結果(2026-09-22)
+
+3.1.0、`components.schemas` が 0 個(全部インライン)、`operationId` なし、応答は `{"type": "object"}` か `default` だけ、という OpenAI とは正反対の spec。診断は意図どおり働き、ジェネレータの未対応がそのまま列挙された:
+- `operationId` が無い操作(overlay で `operationId` を足せば通る)
+- `query` / `header` パラメータ(未対応。`/status/{code}?retry-after=`、`/sse/{flavor}?events=` など)
+- 2xx の `application/json` スキーマが無い操作(`default` 応答のみ、`text/event-stream` のみ)
+- スキーマなしの `object`(`x-moonbit-json: true` を明示すれば通る)
+
+`/headers` と `POST /echo` を `x-moonbit-json` で通したところ、生成物は 3 ターゲットで `--deny-warn` を通り、`@runtime.Client` 経由で実サーバに対して動いた。見つかった不具合は 1 件: ヘルパ(`percent_encode`)と import(`@sdkjson`)を使わない場合でも無条件に出していて `--deny-warn` で落ちる → 使うときだけ出すよう修正(単体テストで固定)。
+
+次に足すべき対応(優先順): query パラメータ(`x-moonbit-*` なしで機械的に写せる)、`default` 応答の扱い、`text/event-stream` 応答を「ストリーム操作」として `<op>_request` だけ生成する形。
