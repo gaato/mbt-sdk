@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Runs the gate list from AGENTS.md. Usage: scripts/gates.sh [--no-js] [--no-native-tests]
+# Runs the repository validation suite. Usage: scripts/gates.sh [--no-js] [--no-native-tests]
 # --no-native-tests skips native test runs (they open loopback sockets, which some sandboxes forbid).
 set -euo pipefail
 cd "$(dirname "$0")/.."

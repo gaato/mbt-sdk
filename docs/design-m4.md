@@ -48,7 +48,7 @@ M3 の手書きの `list_models` / `retrieve_model` / `create_embeddings` は、
 
 ## CI(ファイルを置くだけ。M4 では push しない)
 
-- `.github/workflows/ci.yml`: push / PR。コンテナ `ghcr.io/gaato/moonbit:<固定版>` で AGENTS.md のゲート一式(js テストのために Node を入れる)、`uv run tools/gen/main.py ... --check`、overlay の適用確認。
+- `.github/workflows/ci.yml`: push / PR。コンテナ `ghcr.io/gaato/moonbit:<固定版>` で `scripts/gates.sh` のゲート一式(js テストのために Node を入れる)、`uv run tools/gen/main.py ... --check`、overlay の適用確認。
 - `.github/workflows/canary.yml`: 毎日。コンテナ `ghcr.io/gaato/moonbit:latest`(上流の最新リリースに自動追従)で同じゲート。失敗は「言語側の変更で壊れた」の合図。
 - `.github/workflows/spec-watch.yml`: 毎日。上流 spec を取得して sha256 を `spec/SOURCE.md` と比べ、変わっていたら vendoring を更新 → overlay 適用 → 再生成 → ゲート → PR を作る。ゼロ件マッチ / no-op の overlay action は PR 本文に載せる。
 - リリース(`moon publish`)の自動化は置かない: mooncakes の認証情報の扱いを gaato が決めてから。手順だけ `docs/release.md` に書く。

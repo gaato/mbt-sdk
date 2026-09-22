@@ -14,7 +14,6 @@
 ```
 mbt-sdk/
   moon.work                 members = ["http", "http-async"]
-  AGENTS.md                 規約(下記)
   docs/design.md            この計画の設計部分
   http/                     module gaato/http — 依存ゼロ、全ターゲット
     moon.mod                import なし、preferred_target = "wasm-gc"

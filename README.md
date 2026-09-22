@@ -41,14 +41,18 @@ openai/spec/openai.yaml → overlays/fix.yaml → overlays/moonbit.yaml → norm
 - The generator supports JSON and multipart request bodies, form and deep-object query parameters, and tagged unions including disjoint tag-value sets. It refuses unsupported shapes (with a JSON pointer and an overlay annotation) instead of silently degrading to `Json`.
 - Generated code is committed; users do not need Python.
 
-```sh
+```fish
 scripts/generate.sh          # apply overlays and regenerate
 scripts/generate.sh --check  # CI: fail if the committed output is stale
 scripts/gates.sh             # every check and test (native tests open loopback sockets)
 scripts/conformance.sh       # opt-in: the SSE parser, transport and runtime against https://badhttp.dev
 scripts/live.sh              # opt-in: live API tests; remote providers need keys, local ones need the servers below
-scripts/compat-servers.sh    # start Ollama (~135M model) + a LiteLLM proxy speaking Anthropic /v1/messages; prints the *_COMPAT_* env
+scripts/compat-servers.sh    # start Ollama (qwen2.5:0.5b, accepts tools) + a LiteLLM proxy speaking Anthropic /v1/messages; prints the *_COMPAT_* env
 ```
+
+`scripts/gates.sh` defines the validation suite, including target checks, tests, generation checks, formatting, and `moon info`. It accepts `--no-native-tests` when loopback sockets are unavailable and `--no-js` when Node is unavailable; those options skip coverage. Public interfaces (`pkg.generated.mbti`) are committed alongside the source and regenerated with `moon info` after API changes.
+
+`scripts/live.sh` reads provider settings from the environment or `~/.config/mbt-sdk/env`. Remote tests make actual provider requests and may incur charges. Providers without keys are skipped; `MBT_SDK_ENV=/dev/null` disables loading the settings file.
 
 ## Automation
 
@@ -57,7 +61,7 @@ scripts/compat-servers.sh    # start Ollama (~135M model) + a LiteLLM proxy spea
 - `spec-watch.yml` — daily upstream spec check; on change it re-vendors, regenerates, runs the gates and opens a PR.
 - `live-compat.yml` — the live suite against local, key-free OpenAI- and Anthropic-compatible servers (Ollama + LiteLLM, always their latest release, so a change in either shows up here). Remote providers skip without keys.
 
-Design notes (Japanese): `docs/design.md` (M1), `docs/design-m2.md`, `docs/design-m3.md`, `docs/design-m4.md`, `docs/design-m5.md`. Release procedure: `docs/release.md`. Conventions for coding agents: `AGENTS.md`.
+Design notes (Japanese): `docs/design.md` (M1), `docs/design-m2.md`, `docs/design-m3.md`, `docs/design-m4.md`, `docs/design-m5.md`, `docs/design-m6.md`, `docs/design-m7.md`. Release procedure: `docs/release.md`.
 
 ## License
 
