@@ -36,10 +36,7 @@ jobs:
       - name: Trust the workspace (container runs as a different user)
         run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
 
-      - name: Dry run
-        run: scripts/release.sh publish --dry-run
-
-      - name: Publish
+      - name: Dry run, then publish
         env:
           MOONCAKES_TOKEN: ${{ secrets.MOONCAKES_TOKEN }}
           MOONCAKES_USERNAME: ${{ secrets.MOONCAKES_USERNAME }}
@@ -48,8 +45,12 @@ jobs:
             echo "MOONCAKES_TOKEN is not set; nothing published" >&2
             exit 0
           fi
-          mkdir -p "$HOME/.moon"
+          # moon reads credentials from MOON_HOME (the toolchain image sets it),
+          # and needs them even for --dry-run.
+          moon_home="${MOON_HOME:-$HOME/.moon}"
+          mkdir -p "$moon_home"
           umask 077
-          printf '{"token":"%s","username":"%s"}\n' "$MOONCAKES_TOKEN" "$MOONCAKES_USERNAME" > "$HOME/.moon/credentials.json"
-          trap 'rm -f "$HOME/.moon/credentials.json"' EXIT
+          printf '{"token":"%s","username":"%s"}\n' "$MOONCAKES_TOKEN" "$MOONCAKES_USERNAME" > "$moon_home/credentials.json"
+          trap 'rm -f "$moon_home/credentials.json"' EXIT
+          scripts/release.sh publish --dry-run
           scripts/release.sh publish

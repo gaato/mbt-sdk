@@ -34,6 +34,9 @@ jobs:
           bash "$RUNNER_TEMP/install-moonbit.sh"
           echo "$HOME/.moon/bin" >> "$GITHUB_PATH"
 
+      - name: Update registry index
+        run: moon update
+
       - name: Install Ollama (latest)
         run: curl -fsSL https://ollama.com/install.sh | sh
 

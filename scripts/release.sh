@@ -19,8 +19,10 @@ PUBLISH_MODULES=(http http-async sdk-runtime openai anthropic)
 module_name() { sed -nE 's/^name = "(.*)"$/\1/p' "$1/moon.mod"; }
 module_version() { sed -nE 's/^version = "(.*)"$/\1/p' "$1/moon.mod"; }
 
+moon_home() { echo "${MOON_HOME:-$HOME/.moon}"; }
+
 index_has() { # <name> <version>
-  local file="$HOME/.moon/registry/index/user/$1.index"
+  local file="$(moon_home)/registry/index/user/$1.index"
   [ -f "$file" ] && grep -Eq "\"version\"[[:space:]]*:[[:space:]]*\"$2\"" "$file"
 }
 
