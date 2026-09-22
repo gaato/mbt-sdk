@@ -376,6 +376,13 @@ fn[T : @json.FromJson] decode_response(
 }'''
 
 
+def _without_percent_encode(helpers: str) -> str:
+    """Drops the percent_encode helper (only path parameters use it)."""
+    start = helpers.index("///|\nfn percent_encode(")
+    end = helpers.index("///|", start + 4)
+    return helpers[:start] + helpers[end:]
+
+
 def emit(ir: IR) -> dict[str, str]:
     declarations: list[str] = []
     has_int64 = False
@@ -420,13 +427,18 @@ fn json_array_matches(
   }
 }''')
     types = HEADER + "\n\n".join(helpers + declarations) + "\n"
-    operations = HEADER + OPERATION_HELPERS + "\n\n" + "\n\n".join(_operation(operation) for operation in ir.operations) + "\n"
-    moon_pkg = HEADER + '''import {
-  "gaato/http",
-  "gaato/sdk-runtime" @runtime,
-  "gaato/sdk-runtime/json" @sdkjson,
-  "moonbitlang/core/encoding/utf8",
-  "moonbitlang/core/json",
-}
-'''
+    operation_sources = [_operation(operation) for operation in ir.operations]
+    uses_percent_encode = any("percent_encode(" in source for source in operation_sources)
+    operation_helpers = OPERATION_HELPERS if uses_percent_encode else _without_percent_encode(OPERATION_HELPERS)
+    operations = HEADER + operation_helpers + "\n\n" + "\n\n".join(operation_sources) + "\n"
+    # Import only what the emitted code references: `--deny-warn` rejects unused packages.
+    body = types + operations
+    imports = ['  "gaato/http",', '  "gaato/sdk-runtime" @runtime,']
+    if "@sdkjson." in body:
+        imports.append('  "gaato/sdk-runtime/json" @sdkjson,')
+    if "@utf8." in body:
+        imports.append('  "moonbitlang/core/encoding/utf8",')
+    if "@json." in body:
+        imports.append('  "moonbitlang/core/json",')
+    moon_pkg = HEADER + "import {\n" + "\n".join(imports) + "\n}\n"
     return {"moon.pkg": moon_pkg, "types.mbt": types, "operations.mbt": operations}
