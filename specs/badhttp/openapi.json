@@ -1,0 +1,1879 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "badhttp",
+    "version": "0.19.0",
+    "summary": "The server that misbehaves on purpose.",
+    "description": "A stateless catalogue of HTTP edge cases for testing clients, SDKs and agents, including x402 paywalls (v2 and v1 in the same responses) that misbehave on purpose. No signup, no caller state. The only outbound requests are /402/pay's calls to an x402 facilitator and /books' cached reads of two of our own addresses: the receive address's balance and the project payer wallet's balance from a public Base RPC, and the receive address's itemized transfer list from a public Blockscout indexer. Every endpoint is deterministic unless documented otherwise.",
+    "license": {
+      "name": "CC0-1.0",
+      "identifier": "CC0-1.0",
+      "url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    },
+    "x-license": {
+      "responses": "CC0-1.0 — everything this server emits: response heads and bodies, catalogue documents, every JSON index, this document. No conditions, no attribution required.",
+      "source_code": "MIT — the Worker source that produces them. A different question with a different answer.",
+      "details": "https://badhttp.dev/license",
+      "corpus": "https://badhttp.dev/corpus.jsonl"
+    },
+    "contact": {
+      "name": "badhttp",
+      "url": "https://badhttp.dev/books",
+      "email": "ops@badhttp.dev"
+    },
+    "x-guidance": "Everything is free and stateless. Call any endpoint directly; no key, no signup. Only /402/pay settles a payment (x402 v2 in the PAYMENT-REQUIRED header and x402 v1 in the 402 JSON body, USDC; pay with PAYMENT-SIGNATURE or X-PAYMENT): test USDC on Base Sepolia by default; real USDC on Base mainnet only at /402/pay/base (or ?network=base). Every other /402 scenario is a paywall that misbehaves on purpose and never charges. Limits: /delay ≤ 10 s, /drip ≤ 20 s, /echo body ≤ 16 KB, /redirect ≤ 10 hops, /range documents ≤ 1 MiB, /cookies/many ≤ 20 Set-Cookie headers (the /cookies/delete cleanup sends 45 expirations), /compress documents ≤ 1 MiB and /compress/bomb ≤ 32 MiB inflated (send Accept-Encoding: gzip to receive /compress flavors as sent; the edge transcodes codings you did not list). /cookies tests your client's jar (Set-Cookie edge cases; /cookies/echo reads back what you sent). Accounts are public at /books.json. Rate limit: 100 requests per 10 s per IP at the zone (Cloudflare 429, error 1015) before the Worker runs. /sse streams last at most 20 s. A path template from this document requested literally, braces intact (e.g. /sse/{flavor}), answers 200 with the valid substitutions for its placeholder — any method except OPTIONS, which answers 204 with Allow as everywhere."
+  },
+  "x-agentcash-guidance": {
+    "llmsTxtUrl": "https://badhttp.dev/llms.txt"
+  },
+  "servers": [
+    {
+      "url": "https://badhttp.dev"
+    }
+  ],
+  "paths": {
+    "/status/{code}": {
+      "get": {
+        "security": [],
+        "summary": "Return the given status code (or a random one from a comma-separated list)",
+        "parameters": [
+          {
+            "name": "code",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "examples": [
+                "429",
+                "200,500,503"
+              ]
+            },
+            "description": "200–599, or a comma-separated list to pick from at random"
+          },
+          {
+            "name": "retry-after",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 86400
+            },
+            "description": "Adds a Retry-After header with this many seconds"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "The requested status; 204/205/304 have no body; 3xx carry Location: /redirect/0",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/delay/{seconds}": {
+      "get": {
+        "security": [],
+        "summary": "Wait before responding",
+        "parameters": [
+          {
+            "name": "seconds",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 10
+            },
+            "description": "Seconds to wait, decimals allowed"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "{requested_ms, actual_ms}",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/drip": {
+      "get": {
+        "security": [],
+        "summary": "Stream a chunked body slowly",
+        "parameters": [
+          {
+            "name": "duration",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 20,
+              "default": 5
+            },
+            "description": "Total seconds"
+          },
+          {
+            "name": "chunks",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 200,
+              "default": 10
+            },
+            "description": "Number of chunks"
+          },
+          {
+            "name": "code",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 200,
+              "maximum": 599,
+              "default": 200
+            },
+            "description": "Status code to use (not 204, 205 or 304: those forbid a body)"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "text/plain, one line per chunk, chunked transfer encoding"
+          }
+        }
+      }
+    },
+    "/truncate": {
+      "get": {
+        "security": [],
+        "summary": "Declare a Content-Length, then send fewer bytes and close",
+        "parameters": [
+          {
+            "name": "length",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 1048576,
+              "default": 1000
+            },
+            "description": "Declared Content-Length"
+          },
+          {
+            "name": "send",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 1048576
+            },
+            "description": "Bytes actually sent (default length/2)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "application/octet-stream with Content-Length: length; only send bytes arrive, then the connection closes (HTTP/1.1) or the stream is reset (HTTP/2)"
+          }
+        }
+      }
+    },
+    "/badjson/{flavor}": {
+      "get": {
+        "security": [],
+        "summary": "Serve a specific kind of broken or mislabeled JSON",
+        "parameters": [
+          {
+            "name": "flavor",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "truncated",
+                "trailing-comma",
+                "single-quotes",
+                "nan",
+                "bom",
+                "html",
+                "mislabeled",
+                "empty",
+                "unterminated",
+                "bigint",
+                "duplicate-keys",
+                "comments",
+                "leading-garbage",
+                "concatenated",
+                "deep",
+                "utf16"
+              ]
+            },
+            "description": "Which failure; GET /badjson lists them"
+          },
+          {
+            "name": "code",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 200,
+              "maximum": 599,
+              "default": 200
+            },
+            "description": "Status code to use (not 204, 205 or 304: those forbid a body)"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Content-Type: application/json (except \"mislabeled\"); body is intentionally broken"
+          }
+        }
+      }
+    },
+    "/sse": {
+      "get": {
+        "security": [],
+        "summary": "Index of the Server-Sent Events flavors, their limits and the reconnect rule",
+        "responses": {
+          "200": {
+            "description": "{flavors, usage, limits, reconnect}",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/sse/{flavor}": {
+      "get": {
+        "security": [],
+        "summary": "A Server-Sent Events stream that misbehaves in the chosen way; GET /sse lists the flavors",
+        "description": "text/event-stream (WHATWG HTML §9.2). Every stream starts with \"retry: 30000\" (resume alone sends \"retry: 1000\") and lasts at most 20 s. Any request carrying a Last-Event-ID header is answered 204 No Content (the spec's stop-reconnecting signal), except resume, which continues from it: ids 1–3, then 4–6 with Last-Event-ID: 3, then 204 with 6. HEAD returns the status and headers without streaming. drop carries a Content-Length and resets the connection mid-event.",
+        "parameters": [
+          {
+            "name": "flavor",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "ok",
+                "stall",
+                "cut",
+                "drop",
+                "crlf",
+                "cr",
+                "no-space",
+                "multiline",
+                "comments",
+                "split-utf8",
+                "wrong-type",
+                "error-event",
+                "big",
+                "resume"
+              ]
+            },
+            "description": "Which misbehaviour; GET /sse lists them"
+          },
+          {
+            "name": "events",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 5
+            },
+            "description": "ok only: number of events (events * interval must be at most 20000 ms)"
+          },
+          {
+            "name": "interval",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 5000,
+              "default": 250
+            },
+            "description": "ok only: milliseconds between events"
+          },
+          {
+            "name": "seconds",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 20,
+              "default": 10
+            },
+            "description": "stall only: seconds of silence after the first event"
+          },
+          {
+            "name": "bytes",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 1048576,
+              "default": 65536
+            },
+            "description": "big only: length of the single data: line"
+          },
+          {
+            "name": "Last-Event-ID",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "resume: the last id seen (integer; 6 or more ends the stream with a 204; non-integer is a 400). Every other flavor answers 204 when it is present."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "text/event-stream; charset=utf-8 (wrong-type: text/plain), cache-control: no-store, no-transform, x-badhttp-flavor. The body misbehaves as the flavor says.",
+            "content": {
+              "text/event-stream": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "204": {
+            "description": "Last-Event-ID was sent (or resume is over): stop reconnecting. x-badhttp-note says so."
+          },
+          "400": {
+            "description": "Bad events, interval, seconds, bytes or Last-Event-ID (checked before anything is written)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown flavor, with the list",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/range": {
+      "get": {
+        "security": [],
+        "summary": "Index of the range-request flavors: the self-describing document, limits, where If-Range is handled",
+        "responses": {
+          "200": {
+            "description": "{flavors, usage, document, limits, conditionals, multipart}",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/range/{flavor}": {
+      "get": {
+        "security": [],
+        "summary": "A resumable download that misbehaves in the chosen way; GET /range lists the flavors",
+        "description": "A deterministic, self-describing text document (64-byte lines, each starting with its own zero-padded offset), served with the chosen range misbehavior: Range ignored (with or without Accept-Ranges advertised), off-by-one or shifted bytes under a correct-looking Content-Range, a suffix range served as a prefix, a 206 that restarts from zero, a Content-Range that lies about the total or is missing, 206 without being asked, 200 with a Content-Range, 416 for everything, an unknown total, or If-Range ignored while the resource changes each request. \"ok\" is the fully correct control, including multipart/byteranges, If-Range, and the conditional headers (If-None-Match 304, If-Match 412); the misbehaving flavors ignore conditionals. Malformed or semantically invalid Range headers, more than 8 ranges, or a total span over 1 MiB are ignored (200 with the full body), as RFC 9110 allows. HEAD ignores Range (RFC 9110 §14.2) and returns the no-Range response's status, headers and Content-Length with no body.",
+        "parameters": [
+          {
+            "name": "flavor",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "ok",
+                "ignore",
+                "advertise-only",
+                "off-by-one",
+                "shifted",
+                "suffix-as-prefix",
+                "from-zero",
+                "wrong-total",
+                "no-content-range",
+                "always-206",
+                "200-content-range",
+                "always-416",
+                "unknown-total",
+                "if-range-ignored"
+              ]
+            },
+            "description": "Which misbehaviour; GET /range lists them"
+          },
+          {
+            "name": "length",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 1048576,
+              "default": 1000
+            },
+            "description": "Document size in bytes"
+          },
+          {
+            "name": "Range",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "examples": [
+                "bytes=128-255",
+                "bytes=-100",
+                "bytes=0-63,128-191"
+              ]
+            },
+            "description": "Up to 8 ranges; how it is honored depends on the flavor"
+          },
+          {
+            "name": "If-Range",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Honored by ok (strong validators only); deliberately ignored by if-range-ignored"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The full document (no Range sent, the flavor ignores Range, or If-Range was stale at ok); 200-content-range serves a partial body with a Content-Range under this status",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "206": {
+            "description": "A partial body; whether the bytes and the Content-Range are honest depends on the flavor. Several ranges come back as multipart/byteranges (boundary \"badhttp\"); always-206 sends this even without a Range header"
+          },
+          "304": {
+            "description": "ok only: If-None-Match matched (or If-Modified-Since, when no If-None-Match was sent). Other flavors ignore conditionals; the full conditional family is /etag"
+          },
+          "400": {
+            "description": "Bad length",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown flavor, with the list",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "ok only: If-Match (or If-Unmodified-Since) did not match",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "416": {
+            "description": "Every range unsatisfiable (or any Range header at always-416): Content-Range: bytes */{length} — except wrong-total, whose 416 lies with */{2×length}"
+          }
+        }
+      }
+    },
+    "/etag": {
+      "get": {
+        "security": [],
+        "summary": "Index of the conditional-request flavors and the caching model (no-cache: store, revalidate every use)",
+        "responses": {
+          "200": {
+            "description": "{flavors, usage, caching}",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/etag/{flavor}": {
+      "get": {
+        "security": [],
+        "summary": "A small document whose validators (ETag and Last-Modified) misbehave in the chosen way; GET /etag lists the flavors",
+        "description": "A fixed text document served with cache-control: no-cache, no-transform and validators that lie as the flavor says: an ETag that changes every response, conditionals ignored, 304 for a request with no conditionals, a 304 carrying the wrong ETag or none, an unquoted ETag, a Last-Modified in ISO 8601 or from the future. \"ok\" is the fully correct control (RFC 9110 §13.2.2): If-Match (strong comparison, * passes, 412 on mismatch), If-Unmodified-Since when If-Match is absent, then If-None-Match (weak comparison, lists and * supported, 304 on match for GET/HEAD), and If-Modified-Since only when If-None-Match is absent and only as a valid HTTP-date (IMF-fixdate, rfc850 or asctime; anything else is ignored). HEAD behaves as GET without the body.",
+        "parameters": [
+          {
+            "name": "flavor",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "ok",
+                "weak",
+                "changing",
+                "ignore",
+                "always-304",
+                "mismatch",
+                "no-validator-304",
+                "unquoted",
+                "bad-date",
+                "future"
+              ]
+            },
+            "description": "Which misbehaviour; GET /etag lists them"
+          },
+          {
+            "name": "If-None-Match",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Revalidation; what matches depends on the flavor"
+          },
+          {
+            "name": "If-Modified-Since",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Date revalidation; ignored when If-None-Match is present, and ignored unless it is a valid HTTP-date (except bad-date, which string-compares)"
+          },
+          {
+            "name": "If-Match",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Precondition; strong comparison at ok (* passes), so weak validators fail with 412"
+          },
+          {
+            "name": "If-Unmodified-Since",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Date precondition, evaluated when If-Match is absent: 412 if the document was modified after this date"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The document, with the flavor's validators",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "304": {
+            "description": "Revalidation \"matched\" (always-304 sends this unconditionally); which validators it carries depends on the flavor"
+          },
+          "404": {
+            "description": "Unknown flavor, with the list",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "If-Match (or If-Unmodified-Since) did not match — possible at every flavor that evaluates conditionals (all but ignore, always-304, unquoted and bad-date); at weak any non-* If-Match fails, since a weak validator never strong-matches"
+          }
+        }
+      }
+    },
+    "/cookies": {
+      "get": {
+        "security": [],
+        "summary": "Index of the Set-Cookie flavors, the politeness rules and the limits",
+        "responses": {
+          "200": {
+            "description": "{flavors, usage, politeness, observability, spec, limits}",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/cookies/{flavor}": {
+      "get": {
+        "security": [],
+        "summary": "Set-Cookie headers that misbehave in the chosen way; GET /cookies lists the flavors. /cookies/echo reads back what your client sent.",
+        "description": "Each flavor sets one or more fixed Set-Cookie headers of the chosen shape (folded into one header, duplicate names on different paths, set on a 302, Max-Age contradicting Expires, an unparseable Expires, Domain=example.com, Domain=dev (a public-suffix supercookie), Domain=.host vs Domain=host, a path one letter short of /cookies, valid and invalid __Host-/__Secure- prefixes, quoted values, raw UTF-8 bytes, nameless cookies, a cookie of exactly ?bytes= name+value bytes). The server is stateless; the state under test is the client's jar. The JSON body repeats every Set-Cookie value sent (set), one sentence of what a correct client does (expect), and what Cookie header the request carried (received). /cookies/echo sets nothing and returns the raw Cookie header (plus base64) and the parsed pairs, order and duplicates preserved. Cookie values are fixed strings, never derived from the request; no Max-Age/Expires runs past 3600 s except far-future, whose date is the test (bad-expires and the nameless pair live as session cookies); /cookies/delete sends an expiring Set-Cookie for every cookie the family can plant, exact attributes and all.",
+        "parameters": [
+          {
+            "name": "flavor",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "ok",
+                "echo",
+                "folded",
+                "many",
+                "duplicate",
+                "on-redirect",
+                "delete",
+                "conflicting-expiry",
+                "bad-expires",
+                "far-future",
+                "wrong-domain",
+                "public-suffix",
+                "domain",
+                "path-prefix",
+                "name-prefixes",
+                "quoted",
+                "utf8",
+                "nameless",
+                "huge"
+              ]
+            },
+            "description": "Which misbehaviour; GET /cookies lists them"
+          },
+          {
+            "name": "count",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 20,
+              "default": 10
+            },
+            "description": "many only: how many Set-Cookie headers"
+          },
+          {
+            "name": "bytes",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 64,
+              "maximum": 8192,
+              "default": 4096
+            },
+            "description": "huge only: the sum of cookie name and value lengths — the measure rfc6265bis §5.6 caps at 4096 (above it a conformant client MUST ignore the cookie)"
+          },
+          {
+            "name": "Cookie",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Echoed back in the body (received / echo), order and duplicates preserved"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "application/json {flavor, set, expect, received}; echo: {cookie_header, cookie_header_base64, cookies, count, note} (+ cookie_header_truncated past the 16 KB cap). The Set-Cookie headers are the product.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "302": {
+            "description": "on-redirect only: Location: /cookies/echo with the Set-Cookie on the 302 itself"
+          },
+          "400": {
+            "description": "Bad count or bytes (checked before any Set-Cookie is emitted)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown flavor, with the list",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth": {
+      "get": {
+        "security": [],
+        "summary": "Index of the HTTP-authentication flavors, the public fake test credentials, the safety warning, and the witness block: what eight real clients did at every flavor, derived from the /clients.jsonl auth rows",
+        "responses": {
+          "200": {
+            "description": "{flavors, usage, credentials, warning, witness: {measured, observations, data, data_note, what_this_is, clients[], findings[], what_the_oracle_cannot_tell_you, reproduce}}",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/{flavor}": {
+      "get": {
+        "security": [],
+        "summary": "HTTP authentication that misbehaves in the chosen way; GET /auth lists the flavors and the public fake test credentials",
+        "description": "Challenges (WWW-Authenticate / Proxy-Authenticate) and credential checks that misbehave as the flavor says: a 401 with no challenge at all, an unknown scheme, two challenges in one comma-joined header, a token68 challenge first in the list, case-tricks, a comma inside a quoted realm, a server that rejects everything or accepts anything, a 403 for valid credentials, the Digest stale=true dance, a 407 from an origin that is not your proxy, a 302 asking whether credentials follow a redirect. The controls (basic, bearer, digest, digest-sha256) are fully RFC-correct: RFC 7617 Basic (charset=\"UTF-8\"; /auth/utf8 accepts both encodings of its password and reports which arrived), RFC 6750 Bearer (invalid_request 400 / invalid_token 401 / insufficient_scope 403 with the challenge on the 403), RFC 7616 Digest (qop=\"auth\", cnonce and nc required, uri checked against the request-target, stale=true when the deterministic 5-minute nonce ages out, Authentication-Info with rspauth on success). The ONLY credentials ever accepted are the published fake ones: user \"agent\", password \"correct\" (utf8: \"sésame\"); Bearer badhttp-token-ok / badhttp-token-limited. NEVER send real credentials: nothing here is protected, and anything received is compared in memory and discarded — never stored, logged, or echoed. Any method is accepted and treated identically (the request body is never read); HEAD gets the same status and headers.",
+        "parameters": [
+          {
+            "name": "flavor",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "basic",
+                "bearer",
+                "digest",
+                "digest-sha256",
+                "none",
+                "bare-scheme",
+                "unknown-scheme",
+                "token68",
+                "multi",
+                "case",
+                "quoted",
+                "utf8",
+                "always-401",
+                "accept-any",
+                "forbidden",
+                "stale",
+                "proxy",
+                "redirect"
+              ]
+            },
+            "description": "Which misbehaviour; GET /auth lists them"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "{authenticated:true, flavor, scheme, user|token, method, note, warning}; accept-any adds checked:false; utf8 adds encoding; digest flavors carry Authentication-Info",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "302": {
+            "description": "redirect only: Location: /auth/basic — does your Authorization follow?"
+          },
+          "400": {
+            "description": "bearer: not token68-shaped (error=\"invalid_request\" in the challenge); digest: missing/improper parameters or a uri that does not match the request-target (RFC 7616)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "{error, flavor, hint, credentials, warning} with the flavor's WWW-Authenticate (none omits the header entirely — the violation being modeled)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "forbidden: valid credentials, no challenge on the 403; bearer with badhttp-token-limited: error=\"insufficient_scope\" WITH the challenge",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown flavor, with the list",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "407": {
+            "description": "proxy only: Proxy-Authenticate: Basic realm=\"badhttp-proxy\" from an origin server",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/crosshost": {
+      "get": {
+        "security": [],
+        "summary": "Index of the cross-host credential-boundary flavors: the two hosts, what each flavor crosses, the public test credentials, and the no-open-redirect statement",
+        "responses": {
+          "200": {
+            "description": "{family, about, hosts, no_open_redirect, oracle, test_credentials, edge_note, reading_this, witness: {measured, observations, data, data_note, what_this_is, clients[], findings[], what_the_oracle_cannot_tell_you, reproduce} — derived from the /clients.jsonl crosshost rows, prior_art_and_advisories: {note, redirect_credential_leaks[], not_reproducible_here}, specs, flavors}",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/crosshost/land": {
+      "get": {
+        "security": [],
+        "summary": "The oracle: reports which credential headers reached this hop, without ever echoing their values. Served on both badhttp.dev and alt.badhttp.dev.",
+        "description": "The landing endpoint every /crosshost flavor redirects to. It reports whether Authorization, Proxy-Authorization, Cookie and X-Api-Key arrived, which host and scheme the request landed on, and whether the credential was one of the published fake test values. It NEVER echoes what it received — not the value, not a prefix, and deliberately not a hash, because a digest of a weak credential is a cracking target rather than a mitigation. An Authorization scheme is named only when it is Basic, Bearer or Digest, so a bare secret sent as an entire header value never has its first token reflected back as a scheme name. Cookie names are listed only for cookies this server itself set (the badhttp_ prefix); any others are counted and never named. If a credential arrives that is not one of the documented public test values, the body and an x-badhttp-warning header say so and tell you to rotate it.",
+        "responses": {
+          "200": {
+            "description": "{landed_on, scheme, method, received:{authorization,proxy_authorization,cookie,x_api_key}, matches_documented_test_credential, transport_was_encrypted, warning, no_echo, reading_this, edge_note}",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/crosshost/{flavor}": {
+      "get": {
+        "security": [],
+        "summary": "A redirect that crosses a specific host, scheme or cookie boundary, landing on /crosshost/land; GET /crosshost lists the flavors and which host each starts on",
+        "description": "What your HTTP client does with credentials when a redirect crosses a host boundary. badhttp serves two hostnames from one Worker — badhttp.dev and alt.badhttp.dev, one label apart, covered by the same zone certificate — so the boundary is real DNS and a real certificate rather than a loopback listener. That distinction is the point: you cannot observe this from a listener on 127.0.0.1, because an agent framework's SSRF filter rejects a loopback target at hop zero and the code under test never runs. Flavors cross apex-to-subdomain, subdomain-to-apex, out-and-back to the origin the chain started from, http-to-https and https-to-http on one host, plus a hop that sets a host-only and a Domain-scoped cookie before crossing. THERE IS NO OPEN REDIRECT: every target is a complete absolute URL held in a frozen table of those two hosts, selected by flavor name, and checked against a fixed pattern before it is sent; no endpoint accepts a redirect target, or any part of one, from the caller, and there is no ?url=, ?next= or ?to= parameter. RFC 9110 section 15.4 says nothing about credentials on redirects, so what these flavors measure is per-client policy and convention rather than conformance, and several of the behaviours you can observe are deliberate documented choices by their authors. Two flavors do not start on https://badhttp.dev: from-subdomain starts on alt.badhttp.dev and scheme-upgrade starts over plaintext http, because the direction and the scheme are the measurement; requesting them on the wrong host or scheme answers 404 with the correct starting URL. Use the published fake credentials and nothing else.",
+        "parameters": [
+          {
+            "name": "flavor",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "same-origin",
+                "to-subdomain",
+                "from-subdomain",
+                "boomerang",
+                "scheme-upgrade",
+                "scheme-downgrade",
+                "port-change",
+                "relative-authority",
+                "jar"
+              ]
+            },
+            "description": "Which boundary to cross; GET /crosshost lists them and the host each starts on"
+          }
+        ],
+        "responses": {
+          "302": {
+            "description": "Location pointing at the next hop, always one of badhttp.dev or alt.badhttp.dev; x-badhttp-boundary names what is being crossed. The jar flavor also sets three cookies on the way out: badhttp_hostonly (no Domain), badhttp_domain (Domain=badhttp.dev) and __Host-badhttp_lock (Secure, Path=/, no Domain)."
+          },
+          "404": {
+            "description": "Unknown flavor, with the list; or a flavor requested on the wrong host or scheme, with the URL it must be started from and why",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "A target that failed this family's own Location guard: a bug in badhttp, never something a caller can cause",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/compress": {
+      "get": {
+        "security": [],
+        "summary": "Index of the content-coding flavors: the document, the verification headers, what the edge makes of each flavor for a client without gzip, and the Accept-Encoding the edge reports for you",
+        "responses": {
+          "200": {
+            "description": "{flavors, edge_transcoding, usage, document, verification, accept_encoding, edge, encodings, headers, limits, spec}",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/compress/{flavor}": {
+      "get": {
+        "security": [],
+        "summary": "A response whose content coding misbehaves in the chosen way; GET /compress lists the flavors. Send Accept-Encoding: gzip to receive the bytes as sent.",
+        "description": "A deterministic, self-describing text document (64-byte lines, each starting with its own zero-padded offset) served with the chosen content-coding misbehaviour: gzip declared on plain text, gzip with no header, a stream truncated inside the DEFLATE data, corrupted, with a wrong CRC-32, followed by junk, in two members, gzipped twice (declared as \"gzip, gzip\" or hidden under one \"gzip\"), raw DEFLATE as \"deflate\", an unknown coding, GZIP in capitals, the x-gzip alias, an empty gzip body, a Content-Length that counts the plaintext (then a reset), a .gz download served with Content-Encoding: gzip as well, and a declared decompression bomb; br and zstd pre-computed for the default document, zlib deflate as a reproducible edge observation; \"ok\" is the honest control (gzip or identity from the Accept-Encoding the edge reports, Vary: Accept-Encoding). Every flavor response is text/plain (gzip-file: application/gzip) with cache-control: no-store, no-transform and carries x-badhttp-plain-bytes and x-badhttp-plain-sha256 for the plaintext, so a client can prove what it decoded. Cloudflare's edge fronts this Worker: it removes one coding layer it recognizes (gzip, br, zstd) unless the client's normalized Accept-Encoding lists it, transcoding to identity — lossily for broken streams (the index's edge_transcoding says what each flavor became) — decoded zlib deflate for every client probed (2026-09-01), and passes unrecognized codings (x-gzip, badhttp) through untouched. HEAD returns the GET's headers and Content-Length as this Worker sends them; the edge strips Content-Length and Content-Encoding from a HEAD whose recognized coding the client did not list.",
+        "parameters": [
+          {
+            "name": "flavor",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "ok",
+                "br",
+                "zstd",
+                "deflate",
+                "not-compressed",
+                "undeclared",
+                "truncated",
+                "corrupt",
+                "bad-crc",
+                "trailing-garbage",
+                "multi-member",
+                "double",
+                "double-hidden",
+                "deflate-raw",
+                "unknown-coding",
+                "uppercase",
+                "x-gzip",
+                "empty",
+                "wrong-length",
+                "gzip-file",
+                "bomb"
+              ]
+            },
+            "description": "Which misbehaviour; GET /compress lists them"
+          },
+          {
+            "name": "length",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 1048576,
+              "default": 4096
+            },
+            "description": "Plaintext length in bytes (br and zstd accept only 4096, empty only 0, bomb none; wrong-length needs at least 128 so the gzip member is shorter than the length it claims)"
+          },
+          {
+            "name": "code",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 200,
+              "maximum": 599,
+              "default": 200
+            },
+            "description": "Status code to use on every flavor but bomb (not 204, 205 or 304: those forbid a body) — a compressed or mislabelled error body is its own bug class"
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 32,
+              "default": 8
+            },
+            "description": "bomb only: inflated size in MiB"
+          },
+          {
+            "name": "Accept-Encoding",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "examples": [
+                "gzip",
+                "br",
+                "zstd"
+              ]
+            },
+            "description": "What the edge lets through: a coding reaches you only if you list it (the edge removes one recognized layer otherwise); ok negotiates from the normalized set the edge reports (q-values dropped, zstd invisible); bomb is refused with a 406 unless that set lists gzip"
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Bad length, size or code; ?length= off its fixed value on br, zstd or empty; ?length= or ?code= on bomb; ?size= off bomb; wrong-length under 128 — checked before any body is sent",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown flavor, with the list",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Methods other than GET and HEAD",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "406": {
+            "description": "bomb only: the Accept-Encoding the edge reports for you does not list gzip, so the member is not sent (the edge would inflate it for you, testing no decoder); send Accept-Encoding: gzip",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "The document under the flavor's coding and headers, at ?code= (200 by default): text/plain; charset=utf-8 (gzip-file: application/gzip with Content-Disposition), cache-control: no-store, no-transform, x-badhttp-flavor, x-badhttp-plain-bytes, x-badhttp-plain-sha256, Content-Encoding as the flavor says or none. wrong-length declares the plaintext's Content-Length and then resets the connection.",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/flaky/{percent}": {
+      "get": {
+        "security": [],
+        "summary": "Fail a given percentage of the time",
+        "parameters": [
+          {
+            "name": "percent",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 100
+            },
+            "description": "Failure probability"
+          },
+          {
+            "name": "fail",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 400,
+              "maximum": 599,
+              "default": 500
+            },
+            "description": "Status code on failure"
+          },
+          {
+            "name": "seed",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "With seed, the outcome is a pure function of (seed, i)"
+          },
+          {
+            "name": "i",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0
+            },
+            "description": "Attempt index; increment it per retry"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "{failed:false, roll, threshold, mode}",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "{failed:true, roll, threshold, mode, status, reason}",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/redirect/{hops}": {
+      "get": {
+        "security": [],
+        "summary": "Redirect N times, then 200. Or /redirect/loop, which never ends.",
+        "parameters": [
+          {
+            "name": "hops",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "oneOf": [
+                {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 10
+                },
+                {
+                  "type": "string",
+                  "enum": [
+                    "loop"
+                  ]
+                }
+              ]
+            },
+            "description": "Remaining hops, or \"loop\""
+          },
+          {
+            "name": "code",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "enum": [
+                301,
+                302,
+                303,
+                307,
+                308
+              ],
+              "default": 302
+            },
+            "description": "Redirect status"
+          },
+          {
+            "name": "absolute",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "Use an absolute Location instead of a relative one"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "{redirects:\"done\"}",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "3XX": {
+            "description": "Location: /redirect/{hops-1}"
+          }
+        }
+      }
+    },
+    "/headers": {
+      "get": {
+        "security": [],
+        "summary": "Echo the request headers as JSON",
+        "responses": {
+          "200": {
+            "description": "{headers}",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/echo": {
+      "post": {
+        "security": [],
+        "summary": "Echo method, path, query, headers and body (16 KB cap) as JSON",
+        "responses": {
+          "200": {
+            "description": "{method, path, query, headers, body_bytes, body_truncated, body, json?}",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "security": [],
+        "summary": "Echo method, path, query, headers and body (16 KB cap) as JSON",
+        "responses": {
+          "200": {
+            "description": "{method, path, query, headers, body_bytes, body_truncated, body, json?}",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "security": [],
+        "summary": "Echo method, path, query, headers and body (16 KB cap) as JSON",
+        "responses": {
+          "200": {
+            "description": "{method, path, query, headers, body_bytes, body_truncated, body, json?}",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "security": [],
+        "summary": "Echo method, path, query, headers and body (16 KB cap) as JSON",
+        "responses": {
+          "200": {
+            "description": "{method, path, query, headers, body_bytes, body_truncated, body, json?}",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "security": [],
+        "summary": "Always 405 with an Allow header, so clients can practice handling it",
+        "responses": {
+          "405": {
+            "description": "{error}",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      },
+      "head": {
+        "security": [],
+        "summary": "Always 405 with an Allow header, so clients can practice handling it",
+        "responses": {
+          "405": {
+            "description": "{error}",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/402": {
+      "get": {
+        "security": [],
+        "summary": "Index of the x402 payment scenarios: networks, price limits, pay-to address, facilitators",
+        "responses": {
+          "200": {
+            "description": "{scenarios, networks, pay_to, price, facilitators}",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/402/pay": {
+      "get": {
+        "security": [],
+        "summary": "A real x402 paywall for testing clients, v2 and v1 in one response: pay 0.001–1.00 USDC (test USDC on Base Sepolia by default, ?network=base for real USDC) and get a 200 with a receipt and the transaction hash",
+        "description": "The only endpoint on this host that settles a payment. Without a payment header: 402 carrying the requirements twice — x402 v2, base64-encoded in a PAYMENT-REQUIRED header, and x402 v1, as the JSON body (x402Version 1, plain network names, maxAmountRequired in atomic units) for older clients that only read bodies. The requirements name one network: Base Sepolia (test USDC, free) unless you ask for Base mainnet (real USDC) with /402/pay/base or ?network=base; a client whose wallet is funded on mainnet must ask for it. With a valid PAYMENT-SIGNATURE (v2) or X-PAYMENT (v1): verified and settled through a third-party facilitator (GET /402 lists them in order, per generation, and its \"verified\" object says what has been exercised live so far); 200 plus a receipt in PAYMENT-RESPONSE (v2) or X-PAYMENT-RESPONSE (v1) on success. Nothing is sold except the receipt. Sibling endpoints under /402 misbehave on purpose and never settle.",
+        "x-payment-info": {
+          "price": {
+            "mode": "dynamic",
+            "currency": "USD",
+            "min": "0.001",
+            "max": "1.00"
+          },
+          "protocols": [
+            {
+              "x402": {}
+            }
+          ]
+        },
+        "parameters": [
+          {
+            "name": "network",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "base-sepolia",
+                "base"
+              ],
+              "default": "base-sepolia"
+            },
+            "description": "base-sepolia is test USDC (free, the default); base is real USDC on Base mainnet"
+          },
+          {
+            "name": "amount",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "minimum": 0.001,
+              "maximum": 1,
+              "default": 0.01
+            },
+            "description": "Price in USD"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Settled: {paid:true, transaction, payer, network, amount_usd, …} plus a receipt header, PAYMENT-RESPONSE for a v2 payment or X-PAYMENT-RESPONSE for a v1 payment (base64 JSON of the facilitator settle response)"
+          },
+          "202": {
+            "description": "The facilitator broadcast the transfer but gave up waiting for confirmation (settlement_pending): {paid:\"pending\", transaction} plus the receipt header, PAYMENT-RESPONSE for a v2 payment or X-PAYMENT-RESPONSE for a v1 payment. Do not pay again."
+          },
+          "400": {
+            "description": "Bad amount or network (checked before the first 402, so a client never signs against a URL that will then fail)"
+          },
+          "402": {
+            "description": "PAYMENT-REQUIRED header: base64 JSON {x402Version:2, resource:{url, description, mimeType, serviceName, tags}, accepts:[{scheme:\"exact\", network:\"eip155:84532\" (or \"eip155:8453\" with ?network=base), asset, amount, payTo, maxTimeoutSeconds, extra:{name, version, assetTransferMethod}}], extensions:{bazaar}, error?}. JSON body: the x402 v1 translation of the same requirements, {x402Version:1, error, accepts:[{scheme, network:\"base-sepolia\"|\"base\", maxAmountRequired, resource, description, mimeType, payTo, maxTimeoutSeconds, asset, extra:{name, version}}]}, plus human-oriented extra keys v1 clients ignore. Also the answer to an invalid or rejected payment, with error set."
+          },
+          "405": {
+            "description": "Methods other than GET, HEAD and POST. HEAD receives the 402 and never settles."
+          },
+          "502": {
+            "description": "No facilitator reachable, or the settle call failed after verification (charged: \"unknown\")"
+          }
+        }
+      }
+    },
+    "/402/pay/base": {
+      "get": {
+        "security": [],
+        "summary": "The same paywall, real USDC on Base mainnet only: the stable resource URL for a client or catalogue that wants mainnet",
+        "description": "Identical to /402/pay?network=base. Pay 0.001–1.00 USDC on Base mainnet (eip155:8453) and get a 200 with a receipt (PAYMENT-RESPONSE for a v2 payment, X-PAYMENT-RESPONSE for a v1 payment) and the transaction hash; that payment is this site's revenue and is booked at /books. Nothing else is sold.",
+        "x-payment-info": {
+          "price": {
+            "mode": "dynamic",
+            "currency": "USD",
+            "min": "0.001",
+            "max": "1.00"
+          },
+          "protocols": [
+            {
+              "x402": {}
+            }
+          ]
+        },
+        "parameters": [
+          {
+            "name": "amount",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "minimum": 0.001,
+              "maximum": 1,
+              "default": 0.01
+            },
+            "description": "Price in USD"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Settled on Base mainnet"
+          },
+          "202": {
+            "description": "settlement_pending; do not pay again"
+          },
+          "400": {
+            "description": "Bad amount"
+          },
+          "402": {
+            "description": "As /402/pay, with accepts[0].network eip155:8453"
+          },
+          "502": {
+            "description": "No facilitator reachable, or settle failed after verification"
+          }
+        }
+      }
+    },
+    "/402/pay/base-sepolia": {
+      "get": {
+        "security": [],
+        "summary": "The same paywall, test USDC on Base Sepolia only (what the bare /402/pay offers)",
+        "description": "Identical to /402/pay?network=base-sepolia and to the bare /402/pay. Free to exercise with test USDC; nothing real moves.",
+        "x-payment-info": {
+          "price": {
+            "mode": "dynamic",
+            "currency": "USD",
+            "min": "0.001",
+            "max": "1.00"
+          },
+          "protocols": [
+            {
+              "x402": {}
+            }
+          ]
+        },
+        "parameters": [
+          {
+            "name": "amount",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "minimum": 0.001,
+              "maximum": 1,
+              "default": 0.01
+            },
+            "description": "Price in USD"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Settled on Base Sepolia (test USDC)"
+          },
+          "402": {
+            "description": "As /402/pay, with accepts[0].network eip155:84532"
+          }
+        }
+      }
+    },
+    "/402/{scenario}": {
+      "get": {
+        "security": [],
+        "summary": "x402 paywalls that misbehave on purpose (v2 header + v1 body, like /402/pay). Every scenario here returns a valid-looking 402 and then never settles anything; the one that works is /402/pay.",
+        "description": "Without a payment header: 402 with the requirements base64-encoded in a PAYMENT-REQUIRED header (x402 v2) and translated into the JSON body (x402 v1, plain network names, maxAmountRequired) — except wrong-network, whose body stays v2-shaped because its nonexistent chain has no v1 name. With a PAYMENT-SIGNATURE or X-PAYMENT: each scenario answers as its name suggests (never: 402 again; reject: 402 with an error; slow: 504 after ?seconds=; crash: 500; bad-receipt: 200 with garbage in both receipt headers; overpriced and wrong-network: 402 explaining what your client should have refused). Nothing is ever charged. GET /402 lists them.",
+        "parameters": [
+          {
+            "name": "scenario",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "never",
+                "reject",
+                "slow",
+                "crash",
+                "bad-receipt",
+                "overpriced",
+                "wrong-network"
+              ]
+            },
+            "description": "Which misbehaving paywall"
+          },
+          {
+            "name": "network",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "base-sepolia",
+                "base"
+              ],
+              "default": "base-sepolia"
+            },
+            "description": "base-sepolia is test USDC (free); base is real USDC on Base mainnet"
+          },
+          {
+            "name": "amount",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "minimum": 0.001,
+              "maximum": 1,
+              "default": 0.01
+            },
+            "description": "Price in USD"
+          },
+          {
+            "name": "reason",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^[a-z0-9_]+$",
+              "maxLength": 64,
+              "default": "insufficient_funds"
+            },
+            "description": "/402/reject only: the error to reject with (snake_case)"
+          },
+          {
+            "name": "seconds",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 10,
+              "default": 8
+            },
+            "description": "/402/slow only: how long to sit on a paid request before the 504"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "/402/bad-receipt after payment: a 200 whose PAYMENT-RESPONSE and X-PAYMENT-RESPONSE headers are both garbage"
+          },
+          "400": {
+            "description": "Bad amount, network, reason or seconds (checked before the first 402, so a client never signs against a URL that will then fail)"
+          },
+          "402": {
+            "description": "PAYMENT-REQUIRED header: base64 JSON {x402Version:2, resource, accepts:[{scheme:\"exact\", network:\"eip155:…\", asset, amount, payTo, maxTimeoutSeconds, extra:{name, version, assetTransferMethod}}], error?}. JSON body: the x402 v1 translation of the same requirements (except wrong-network, v2-shaped). Nothing sent here is ever settled."
+          },
+          "405": {
+            "description": "Methods other than GET, HEAD and POST. HEAD receives the 402 and never settles."
+          },
+          "500": {
+            "description": "/402/crash after payment"
+          },
+          "504": {
+            "description": "/402/slow after payment"
+          }
+        }
+      }
+    },
+    "/402/broken/{flavor}": {
+      "get": {
+        "security": [],
+        "summary": "A malformed 402 of the chosen flavor; GET /402/broken lists them. Never settles.",
+        "parameters": [
+          {
+            "name": "flavor",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "not-base64",
+                "not-json",
+                "no-accepts",
+                "empty-accepts",
+                "no-extra",
+                "no-resource",
+                "version-99",
+                "decimal-amount",
+                "missing-header",
+                "v1-body"
+              ]
+            },
+            "description": "Which malformation"
+          },
+          {
+            "name": "network",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "base-sepolia",
+                "base"
+              ],
+              "default": "base-sepolia"
+            },
+            "description": "Network named in the (broken) requirements"
+          },
+          {
+            "name": "amount",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "minimum": 0.001,
+              "maximum": 1,
+              "default": 0.01
+            },
+            "description": "Price named in the (broken) requirements"
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Bad amount or network"
+          },
+          "402": {
+            "description": "Broken on purpose; see x-badhttp-flavor"
+          }
+        }
+      }
+    },
+    "/books.json": {
+      "get": {
+        "security": [],
+        "summary": "Public books: every dollar spent and earned by this service (hosting accrues on a clock and is computed, not listed in costs[]; totals.costs = totals.itemized_costs + totals.hosting_accrued), with the receive address's balance and itemized transfer list read live from chain and reconciled against the booked numbers, the measured basis for the hosting figure, and a solvency line reading the project payer wallet's balance live against the next bill",
+        "responses": {
+          "200": {
+            "description": "{costs[] — one-off spend only; hosting is derived, see hosting{} and totals.hosting_accrued, revenue[], commitments[] — owed but not yet spent, excluded from totals, hosting: {rate_usd_per_month, since, item, basis}, hosting_measured: {measured_on, window, source, requests, cpu_ms, subrequests, egress_bytes, cpu_ms_p50|p99|p999|max, days_in_window_exceeding_free_ceiling, plan{}} — the dated measurement behind the attributed hosting rate, hosting_usage: {requests_per_day, projected_requests_per_month, projected_cpu_ms_per_month, percent_of_paid_included_requests, percent_of_paid_included_cpu, usage_charge_on_existing_paid_plan_usd, free_plan_viable, free_plan_blocker, standalone_hosting_usd_per_year, incremental_hosting_usd_per_year} — all derived from hosting_measured, chain_movements[], totals: {costs, revenue, net, hosting_accrued, hosting_months, next_accrual, itemized_costs}, solvency: {payer_address, payer_usdc — read live from chain, registrar_credit_usd — stated and dated, assets_on_hand_usd, next_bill, days_until_next_bill, shortfall_usd, covers_next_bill, conversion_rail, reproduce, fetched_at|age_seconds|source|rpc — or solvency.error and null amounts when every RPC fails}, receive_address, chain: {balance_usdc, movements_in_usdc, movements_out_usdc, movements_net_usdc, booked_revenue_usdc, unbooked_usdc, status: reconciled|unbooked_receipts|bookkeeping_bug, status_note, fetched_at, age_seconds, source, rpc, reproduce, transfers: {items[] — every on-chain USDC transfer of the address, both directions, each labeled from the books by tx hash (an unmatched incoming row is \"unbooked\", an unmatched outgoing row is \"UNEXPLAINED WITHDRAWAL\"), itemized_net_usdc, matches_balance, unbooked_in_count, unexplained_out_count, truncated, source_api, reproduce — or transfers: {error, reproduce} while the indexer is unreachable or the first read at an edge location is still in progress}} — or chain: {error, reproduce} when every RPC fails and no cached copy exists}",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/llms.txt": {
+      "get": {
+        "security": [],
+        "summary": "Short guidance for agents (llms.txt)",
+        "responses": {
+          "200": {
+            "description": "text/markdown"
+          }
+        }
+      }
+    },
+    "/health": {
+      "get": {
+        "security": [],
+        "summary": "Liveness",
+        "responses": {
+          "200": {
+            "description": "{ok:true, version}",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/corpus": {
+      "get": {
+        "security": [],
+        "summary": "The catalogue as data: an index over every documented DEFECT behaviour (what_is_not_a_row names what is deliberately excluded), with the licence, the self_check block recording that every row was replayed and its fields compared to the wire, the capture notes, and what this service does NOT cover (RFC 9112 message syntax — it emits none, and cannot, because a CDN re-serializes every response)",
+        "responses": {
+          "200": {
+            "description": "{what, what_is_not_a_row, jsonl, format, count, by_layer, license, license_url, rfc9112_message_syntax: {emits_syntax_violations:false, probed, method, result, reproduce, why, what_this_means_for_you, where_we_do_misbehave}, how_to_use[], capture_notes, stability_legend, self_check: {method, script, last_run, rows_checked, result, what_this_does_not_check[]}, not_covered}",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/corpus.jsonl": {
+      "get": {
+        "security": [],
+        "summary": "One JSON object per line, one line per documented DEFECT behaviour: url, method, request_headers, defect, specs, layer, deterministic_bytes (true means the same request returns the same body bytes — re-derived from the wire on every deploy), varies_by, a ready-to-run capture curl, and the licence on every row",
+        "responses": {
+          "200": {
+            "description": "application/x-ndjson"
+          }
+        }
+      }
+    },
+    "/clients": {
+      "get": {
+        "security": [],
+        "summary": "What real HTTP clients did, as data: an index over 384 dated observations in three families — /compress (168: six decoding clients plus two non-decoding controls x 21 flavors), /crosshost (72: eight clients x 9 flavors — eight boundaries and a same-origin control) and /auth (144: the same eight clients x 18 flavors, each handed the documented fake credentials through its own mechanism) — each family with its own outcome legend, per-flavor disagreement count, client roster and the note that an outcome describes what the caller received and is never a verdict on the client",
+        "responses": {
+          "200": {
+            "description": "{what, why, jsonl, rows, families: {compress: {what, rows, flavors, observed, badhttp_version_observed, clients[], fields[], outcome_legend, reading_this, observation_counts_by_role, disagreement_by_flavor, freshness, reproduce}, crosshost: {what, rows, flavors, observed, badhttp_version_observed, worker_version, clients[], fields[], outcome_legend, reading_this, outcome_counts, disagreement_by_flavor, findings[], freshness, reproduce}, auth: {what, rows, flavors, observed, badhttp_version_observed, worker_version, clients[], fields[], mechanism_legend, outcome_legend, reading_this, outcome_counts, mechanism_counts, disagreement_by_flavor, findings[], freshness, reproduce}}, common_fields[], join, reading_this, license, license_url}",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/clients.jsonl": {
+      "get": {
+        "security": [],
+        "summary": "One JSON object per line, one line per observation, family on every row: the client and its version, what it received (compress: whether the bytes matched the flavor's documented plaintext; crosshost: which sent headers arrived after the redirect, on which host and port, over which transport, and which cookies under the badhttp_ prefix came back — the three the jar hop mints and the harness's own badhttp_witness; auth: how the documented fake credentials were handed to the client (mechanism_kind), how many requests it made, and the final /auth response's status and server-reported fields), what it reported, and corpus_id joining the row back to /corpus.jsonl. A dated capture, not a live measurement",
+        "responses": {
+          "200": {
+            "description": "application/x-ndjson"
+          }
+        }
+      }
+    },
+    "/funding.json": {
+      "get": {
+        "security": [],
+        "summary": "funding.json manifest (fundingjson.org v1.1.0): who runs this, what it costs to run for a year, and the one channel it can be funded through. Vouched for by /.well-known/funding-manifest-urls. projects[] names the one project with its public repository (added 2026-09-18, when the source was published)",
+        "responses": {
+          "200": {
+            "description": "{version:\"v1.1.0\", entity: {type, role, name, email, description, webpageUrl}, funding: {channels[], plans[]}}",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/license": {
+      "get": {
+        "security": [],
+        "summary": "Licensing, stated separately for the two things people confuse: CC0-1.0 for everything this server emits, MIT for the Worker source",
+        "responses": {
+          "200": {
+            "description": "{responses: {id:\"CC0-1.0\", name, url, covers, conditions, attribution, volume_cap, endpoints_to_avoid}, not_ours, source_code: {id:\"MIT\", ...}, contact, decided, applies_to, one_line}",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

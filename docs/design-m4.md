@@ -90,3 +90,32 @@ M3 の手書きの `list_models` / `retrieve_model` / `create_embeddings` は、
 `/headers` と `POST /echo` を `x-moonbit-json` で通したところ、生成物は 3 ターゲットで `--deny-warn` を通り、`@runtime.Client` 経由で実サーバに対して動いた。見つかった不具合は 1 件: ヘルパ(`percent_encode`)と import(`@sdkjson`)を使わない場合でも無条件に出していて `--deny-warn` で落ちる → 使うときだけ出すよう修正(単体テストで固定)。
 
 次に足すべき対応(優先順): query パラメータ(`x-moonbit-*` なしで機械的に写せる)、`default` 応答の扱い、`text/event-stream` 応答を「ストリーム操作」として `<op>_request` だけ生成する形。
+
+## M4b: パラメータ・応答・map の対応と census(契約)
+
+目的: `specs/badhttp` と `specs/petstore3` の**全操作**を診断ゼロで生成できるようにし、spec ごとの対応状況を数字で追えるようにする。union / nullable / discriminator は M4c で扱う(ここでは触らない)。
+
+### 追加する対応(型の写し方の表に追記)
+
+| OpenAPI | MoonBit |
+|---|---|
+| `parameters` の `$ref`(`components.parameters`) | 正規化で解決する |
+| `in: query` | `<op>_request` の引数。required は位置引数、任意はラベル付き `?` 引数。型は string / integer / number / boolean / それらの配列と、string enum(要求側なので閉じた enum + `Custom(String)`)。`style: form` + `explode: true`(既定)のみ対応、配列は `name=a&name=b`。それ以外の style は診断。値は RFC 3986 の query 用に percent-encode(unreserved 以外。空白は `%20`) |
+| `in: header` | 同様にラベル付き引数。値は文字列化して `Request::header`。`content-length` / `host` / `authorization` という名前の header パラメータは診断(runtime と衝突する) |
+| `in: cookie` | 診断 |
+| `default` 応答だけの操作、または 2xx に `application/json` が無い操作 | `<op>_request` だけを生成し、`<op>_decode` は生成しない(ドキュメントに「応答は呼び出し側が `Response` として扱う」と書く)。`text/event-stream` の 2xx も同じ扱い |
+| 2xx に `application/json` があり、`default` も別にある | 従来どおり(2xx を decode、default は runtime の `classify` に任せる) |
+| スキーマなしの object(`type: object` で properties なし、または `additionalProperties: true`)| `x-moonbit-json` が無くても `Json` に写してよい。ただし**診断ではなく注記**を出す(`--verbose` で「JSON に落とした箇所」一覧を stderr へ)。判断: スキーマなしは spec が「任意」と言っているのであって、劣化ではない。`x-moonbit-json: true` は「スキーマがあるのに raw JSON にしたい」場合に残す |
+| `additionalProperties: <schema>`(typed map) | `Map[String, T]`。properties と併存するときは診断 |
+| `application/x-www-form-urlencoded` の要求本文 | 診断(M4c 以降) |
+| `multipart/form-data` の要求本文 | 診断(M4c 以降。runtime の `multipart` パッケージがあるので次で対応できる) |
+| セキュリティ定義 | 生成に影響させない(runtime の `Auth` が担当) |
+
+### census
+
+`tools/gen/census.py <spec> <name>`: 全操作を include した overlay を作って生成を試み、`operations / diagnostics / 種類別の件数` を出す(M4b で入れた雛形を整えて、`--json` 出力を足す)。`specs/*/openapi.json` と `openai/spec/openai.yaml` を対象に `scripts/census.sh` で全部回し、結果を `docs/census.md` に表として書く(手で更新。CI では `specs/badhttp` と `specs/petstore3` が**診断ゼロ**であることだけをゲートにする: `tools/gen/census.py --expect-zero`)。
+
+### テスト
+- 単体テスト: query の必須/任意/配列/enum、percent-encode(空白・日本語・`&`・`=`)、header、`$ref` パラメータ、decode を生成しない条件、typed map の往復、properties と additionalProperties の併存が診断になること。
+- `specs/badhttp` と `specs/petstore3` を全操作で生成した結果を `fixtures/gen/{badhttp,petstore3}/` にコミットし、`scripts/generate.sh --check` で最新性を確認する。生成物は一時的な workspace メンバーとして 3 ターゲットで `check --deny-warn` を通す(`scripts/gates.sh` に組み込む: `fixtures/gen/<name>/moon.mod` を持たせ、moon.work に `fixtures/gen/badhttp` と `fixtures/gen/petstore3` を加える)。
+- 生成物を実サーバに対して動かす確認は `runtime-tests/src/badhttp` に 1 テスト足す(`get_headers` / `post_echo` / `get_status`(query の `retry-after`) を生成物経由で)。
