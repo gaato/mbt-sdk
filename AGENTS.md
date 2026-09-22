@@ -63,6 +63,8 @@ moon info
 
 Loopback socket tests live in `http-async/src/loopback` (native only). They need permission to open sockets on 127.0.0.1; a sandbox that forbids sockets cannot run them, so say so instead of reporting them as passed.
 
+`runtime-tests/src/badhttp` talks to the public https://badhttp.dev (opt-in, `scripts/conformance.sh`, needs the network, ~30 requests against a 100-per-10-s limit). It is not a gate; do not add it to CI.
+
 ## Hard limits for agents
 
 - Do not run jj or git. Do not publish. Do not create anything on GitHub. Network use is limited to `moon update` / `moon add`.

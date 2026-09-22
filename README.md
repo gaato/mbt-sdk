@@ -40,6 +40,7 @@ openai/spec/openai.yaml → overlays/fix.yaml → overlays/moonbit.yaml → norm
 scripts/generate.sh          # apply overlays and regenerate
 scripts/generate.sh --check  # CI: fail if the committed output is stale
 scripts/gates.sh             # every check and test (native tests open loopback sockets)
+scripts/conformance.sh       # opt-in: the SSE parser, transport and runtime against https://badhttp.dev
 ```
 
 ## Automation
