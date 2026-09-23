@@ -3,7 +3,7 @@
 
 name = "gaato/github"
 
-version = "0.1.0"
+version = "0.2.0"
 
 license = "Apache-2.0"
 
@@ -11,9 +11,9 @@ readme = "README.md"
 
 repository = "https://github.com/gaato/mbt-sdk"
 
-keywords = [ "github", "rest", "sdk", "openapi" ]
+keywords = [ "github", "rest", "graphql", "sdk", "openapi" ]
 
-description = "Thin GitHub REST API client for MoonBit built on gaato/http and gaato/sdk-runtime."
+description = "Thin GitHub API client for MoonBit built on gaato/http and gaato/sdk-runtime: the whole REST API generated, plus a GraphQL passthrough."
 
 source = "src"
 
