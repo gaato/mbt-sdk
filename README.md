@@ -24,6 +24,7 @@ Status: experimental. The HTTP, runtime and API modules are published on [moonca
 | `gaato/sdk-runtime` | [![mooncakes](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fmooncakes.io%2Fapi%2Fv0%2Fmodules%2Fgaato%2Fsdk-runtime&query=%24.version&label=mooncakes&prefix=v)](https://mooncakes.io/docs/gaato/sdk-runtime) | API-agnostic client runtime: error taxonomy, `Retry-After` / `retry-after-ms`, backoff, retry policy, rate limiting, pagination, auth, tri-state JSON fields, open enums, multipart writer | `gaato/http` |
 | `gaato/openai` | [![mooncakes](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fmooncakes.io%2Fapi%2Fv0%2Fmodules%2Fgaato%2Fopenai&query=%24.version&label=mooncakes&prefix=v)](https://mooncakes.io/docs/gaato/openai) | First consumer: a stable hand-written facade for models, embeddings, Responses, and Chat Completions (buffered and streaming), backed by types and operations generated from the vendored OpenAPI spec | `gaato/http`, `gaato/sdk-runtime` |
 | `gaato/anthropic` | [![mooncakes](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fmooncakes.io%2Fapi%2Fv0%2Fmodules%2Fgaato%2Fanthropic&query=%24.version&label=mooncakes&prefix=v)](https://mooncakes.io/docs/gaato/anthropic) | Messages (buffered and streaming), token counting, and Models, backed by generated first-party spec types and operations | `gaato/http`, `gaato/sdk-runtime` |
+| `gaato/github` | [![mooncakes](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fmooncakes.io%2Fapi%2Fv0%2Fmodules%2Fgaato%2Fgithub&query=%24.version&label=mooncakes&prefix=v)](https://mooncakes.io/docs/gaato/github) | The whole GitHub REST API: all 1,221 operations and their types generated from the first-party OpenAPI description, under a thin facade that sends, paginates and reads errors; [scope and usage](github/README.md) | `gaato/http`, `gaato/sdk-runtime` |
 | `runtime-tests/` | — | Unpublished. Executes the async behaviour of the modules above (a module without an async runtime cannot run `async test`) | everything |
 
 HTTP SDK modules never import an async runtime: the caller passes a `Transport` and a `Clock`. That keeps them portable and makes retry, rate-limit and streaming logic testable with fakes and a fake clock. The Codex SDK keeps generated protocol types portable and puts connection/process ownership in a separate async module.
@@ -41,6 +42,8 @@ For OpenAI-compatible servers that implement Chat Completions, use `ChatRequest`
 
 Anthropic now generates its Messages, token-counting, and Models types and operations from the official SDK's vendored OpenAPI document. See [the Anthropic module](anthropic/README.md) for scope and migration notes, including the `base_url` change.
 
+`gaato/github` is the first module that generates a whole API rather than a chosen slice, and the first consumer of the runtime's `Paginator`, `parse_link_next`, `WindowLimiter` and `rate_limit_headers`. Its facade stays thin on purpose: the generated types are the public surface, so no hand-written mirror has to follow 1,221 operations. See [the GitHub module](github/README.md) and `docs/design-m8.md`.
+
 ## Generation pipeline
 
 ```
@@ -51,6 +54,7 @@ openai/spec/openai.yaml → overlays/fix.yaml → overlays/moonbit.yaml → norm
 - Overlays follow the [OpenAPI Overlay Specification](https://spec.openapis.org/overlay/latest.html). `tools/apply_overlay.py` fails on actions that match nothing or change nothing, so stale corrections surface instead of silently doing nothing.
 - The generator supports JSON and multipart request bodies, form and deep-object query parameters, and tagged unions including disjoint tag-value sets. It refuses unsupported shapes (with a JSON pointer and an overlay annotation) instead of silently degrading to `Json`.
 - Generated code is committed; users do not need Python.
+- GitHub runs the same two stages over `github/spec/api.github.com.2022-11-28.yaml` with `--include-all`, so every operation in the document is generated; `github/overlays/fix.yaml` carries the upstream corrections and `github/overlays/moonbit.yaml` the MoonBit decisions. `docs/census.md` lists which responses stayed raw `Json` and why.
 - Codex uses `codex-protocol/spec/schema.json` → selected JSON Schema reference closure → shared IR/emitter → `codex-protocol/src/gen`. The schema is pinned to CLI 0.155.1; regeneration is offline and is covered by the same `--check` gate.
 
 ```fish
@@ -73,7 +77,7 @@ scripts/compat-servers.sh    # start Ollama (qwen2.5:0.5b, accepts tools) + a Li
 - `spec-watch.yml` — daily upstream spec check; on change it re-vendors, regenerates, runs the gates and opens a PR.
 - `live-compat.yml` — the live suite against local, key-free OpenAI- and Anthropic-compatible servers (Ollama + LiteLLM, always their latest release, so a change in either shows up here). Remote providers skip without keys.
 
-Design notes (Japanese): `docs/design.md` (M1), `docs/design-m2.md`, `docs/design-m3.md`, `docs/design-m4.md`, `docs/design-m5.md`, `docs/design-m6.md`, `docs/design-m7.md`. Release procedure: `docs/release.md`.
+Design notes (Japanese): `docs/design.md` (M1), `docs/design-m2.md`, `docs/design-m3.md`, `docs/design-m4.md`, `docs/design-m5.md`, `docs/design-m6.md`, `docs/design-m7.md`, `docs/design-m8.md`. Release procedure: `docs/release.md`.
 
 ## License
 

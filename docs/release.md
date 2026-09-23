@@ -4,7 +4,7 @@ A release is a version bump on `main`. `release.yml` runs after `CI` succeeds on
 
 ## Which modules
 
-`PUBLISH_MODULES` in `scripts/release.sh`: `http`, `http-async`, `sdk-runtime`, `openai`, `anthropic`. `jsonrpc`, `jsonrpc-async`, `codex-protocol` and `codex-app-server` stay unpublished until they have a consumer; `runtime-tests/` is never published.
+`PUBLISH_MODULES` in `scripts/release.sh`: `http`, `http-async`, `sdk-runtime`, `openai`, `anthropic`, `github`. `jsonrpc`, `jsonrpc-async`, `codex-protocol` and `codex-app-server` stay unpublished until they have a consumer; `runtime-tests/` is never published.
 
 ## Cutting a release
 

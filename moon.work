@@ -8,6 +8,7 @@ members = [
   "sdk-runtime",
   "openai",
   "anthropic",
+  "github",
   "runtime-tests",
   "fixtures/gen/badhttp",
   "fixtures/gen/petstore3",

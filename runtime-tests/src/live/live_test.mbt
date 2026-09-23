@@ -881,3 +881,195 @@ async test "live Anthropic official minimal operations" {
     }
   })
 }
+
+// -----------------------------------------------------------------------------
+// GitHub REST API.
+//
+// The switch is MBT_SDK_GITHUB_TOKEN, not GITHUB_TOKEN: GitHub Actions injects
+// GITHUB_TOKEN into every job, and an opt-in suite must not start itself there.
+// -----------------------------------------------------------------------------
+
+///|
+fn github_error(error : @runtime.SdkError) -> String {
+  @debug.to_string(@github_sdk.api_error(error))
+}
+
+///|
+fn github_failure(
+  operation : String,
+  hint : String,
+  error : @runtime.SdkError,
+) -> String {
+  "provider=GitHub op=\{operation} \{hint}api_error=\{github_error(error)} sdk_error=\{@debug.to_string(error)}"
+}
+
+///|
+async fn[X] one_github_call(
+  operation : String,
+  call : async () -> X,
+  hint? : String = "",
+) -> X {
+  call() catch {
+    @runtime.Transport(inner) =>
+      fail(github_failure(operation, hint, @runtime.Transport(inner)))
+    @runtime.Status(status~, headers~, body~) =>
+      fail(
+        github_failure(
+          operation,
+          hint,
+          @runtime.Status(status~, headers~, body~),
+        ),
+      )
+    @runtime.RateLimited(retry_after_ms~, headers~, body~) =>
+      fail(
+        github_failure(
+          operation,
+          hint,
+          @runtime.RateLimited(retry_after_ms~, headers~, body~),
+        ),
+      )
+    @runtime.Decode(message~, body~) =>
+      fail(github_failure(operation, hint, @runtime.Decode(message~, body~)))
+    @runtime.Config(message) =>
+      fail(github_failure(operation, hint, @runtime.Config(message)))
+    error => raise error
+  }
+}
+
+///|
+async test "live GitHub REST read paths, Link pagination, and rate limits" {
+  bounded(() => {
+    // The token gates the whole section because it is the opt-in switch, not
+    // because every check needs it: the first one is deliberately anonymous.
+    guard credential("MBT_SDK_GITHUB_TOKEN", "GitHub") is Some(token) else {
+      return
+    }
+
+    // 1. A public repository over the unauthenticated route. That route is
+    //    metered at 60 requests an hour, so it spends exactly one.
+    let public_repo = one_github_call("repos/get (unauthenticated)", () => {
+      @github_sdk.GitHub::new(
+        @adapter.AsyncTransport::new(timeout_ms=45000),
+        @adapter.AsyncClock::new(),
+        retry=live_retry(),
+      ).call(
+        @github_gen.repos_get_request("octocat", "Hello-World"),
+        @github_gen.repos_get_decode,
+      )
+    })
+    if public_repo.full_name != "octocat/Hello-World" {
+      validation_failure(
+        "GitHub",
+        "repos/get (unauthenticated)",
+        "expected octocat/Hello-World, got \{public_repo.full_name}",
+      )
+    }
+
+    // The authenticated client keeps its limiter in reach, so check 3 can read
+    // what the limiter made of the x-ratelimit-* headers it just saw.
+    let clock = @adapter.AsyncClock::new()
+    let limiter = @runtime.WindowLimiter::new(
+      clock,
+      @runtime.rate_limit_headers(
+        remaining="x-ratelimit-remaining",
+        reset_unix_seconds="x-ratelimit-reset",
+      ),
+    )
+    let gh = @github_sdk.GitHub::new(
+      @adapter.AsyncTransport::new(timeout_ms=45000),
+      clock,
+      token~,
+      retry=live_retry(),
+      limiter~,
+    )
+
+    // 2. Link pagination really follows the server's rel="next" to a second page.
+    let pages = gh.paginator(
+      @github_gen.repos_list_for_org_request("github", per_page=2),
+      @github_gen.repos_list_for_org_decode,
+    )
+    let first = one_github_call("repos/list-for-org page 1", () => {
+      pages.next_page()
+    })
+    let second = one_github_call("repos/list-for-org page 2", () => {
+      pages.next_page()
+    })
+    guard first is Some(first) && second is Some(second) else {
+      fail(
+        "provider=GitHub op=repos/list-for-org: expected at least two Link pages",
+      )
+    }
+    if first.is_empty() || second.is_empty() {
+      validation_failure(
+        "GitHub", "repos/list-for-org", "a Link page came back empty",
+      )
+    }
+    if second.any(repo => first.any(other => other.id == repo.id)) {
+      validation_failure(
+        "GitHub", "repos/list-for-org", "the second page repeated the first",
+      )
+    }
+
+    // 3. The limiter observed GitHub's rate limit headers.
+    guard limiter.state("core") is Some(state) else {
+      fail(
+        "provider=GitHub op=rate-limit: the limiter recorded no x-ratelimit-* state for the core bucket",
+      )
+    }
+    if state.reset_at_unix_ms <= clock.now_unix_ms() {
+      validation_failure(
+        "GitHub",
+        "rate-limit",
+        "x-ratelimit-reset was not in the future: \{state.reset_at_unix_ms} vs now \{clock.now_unix_ms()}",
+      )
+    }
+    if state.remaining < 0 {
+      validation_failure(
+        "GitHub",
+        "rate-limit",
+        "x-ratelimit-remaining was negative: \{state.remaining}",
+      )
+    }
+
+    // 4. A path parameter that contains a slash. The spec marks these with
+    //    x-multi-segment; overlays/moonbit.yaml turns that into
+    //    x-moonbit-path-segments, and the generator then percent-encodes each
+    //    segment and joins them with "/". The URL must keep the slash: escaping
+    //    it to %2F makes GitHub answer 404.
+    let content_path = "docs/census.md"
+    let content_request = @github_gen.repos_get_content_request(
+      "gaato", "mbt-sdk", content_path,
+    )
+    if !content_request.url.has_suffix("/contents/" + content_path) {
+      validation_failure(
+        "GitHub",
+        "repos/get-content",
+        "a multi-segment path parameter was not preserved: \{content_request.url}",
+      )
+    }
+    let content = one_github_call(
+      "repos/get-content",
+      () => gh.call(content_request, @github_gen.repos_get_content_decode),
+      hint="path=\{content_path} url=\{content_request.url}: a multi-segment path " +
+        "parameter did not resolve. ",
+    )
+    guard content is Object(File(file)) else {
+      validation_failure(
+        "GitHub",
+        "repos/get-content",
+        "expected a file object, got \{@debug.to_string(content)}",
+      )
+      return
+    }
+    if file.path != content_path {
+      validation_failure(
+        "GitHub",
+        "repos/get-content",
+        "expected path \{content_path}, got \{file.path}",
+      )
+    }
+    println(
+      "GitHub: unauthenticated repos/get, two Link pages, rate limit observation, and a multi-segment path all passed",
+    )
+  })
+}

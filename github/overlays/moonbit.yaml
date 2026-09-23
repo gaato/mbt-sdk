@@ -1,0 +1,326 @@
+# MoonBit generation decisions for the GitHub REST API description. Everything here
+# is a judgement about how a shape the upstream document describes correctly should be
+# rendered in MoonBit; language-independent defects live in fix.yaml and are applied
+# first. tools/apply_overlay.py fails on zero-match and no-op actions, so each decision
+# breaks loudly when the shape it was made about disappears upstream.
+overlay: 1.0.0
+info:
+  title: MoonBit generation decisions for the GitHub REST API
+  version: 0.1.0
+actions:
+
+  # --- multi-segment path parameters -------------------------------------------------
+  - target: "$['components']['parameters'][?@['x-multi-segment'] == true && @['in'] == 'path']"
+    description: >-
+      GitHub marks the path parameters that carry several path segments with
+      `x-multi-segment`. For `branch`, `commit-sha`, `commit-ref` and `git-ref-only` the value is a
+      ref such as `heads/featureA` or a comparison basehead, and percent-encoding the separators
+      turns `heads/featureA` into `heads%2FfeatureA`, which GitHub answers with 404. Tell the
+      generator to keep `/` literal in these. `ref-in-query` carries the same marker but is a query
+      parameter, where `/` is encoded normally, so the filter excludes it.
+    update:
+      x-moonbit-path-segments: true
+  - target: "$['paths']..[?@['x-multi-segment'] == true && @['in'] == 'path']"
+    description: >-
+      The same decision for the path parameters GitHub declares inline rather than in
+      `components.parameters` - the Contents API `{path}`, the compare `{basehead}` and the ref
+      endpoints. Without this the Contents API silently 404s for any file below the repository root.
+    update:
+      x-moonbit-path-segments: true
+
+  # --- "at least one of these properties" unions --------------------------------------
+  - target: "$['paths']..[?@['properties'] && @['anyOf'] && !@['discriminator']]['anyOf']"
+    description: >-
+      These request bodies are a complete object schema that carries every property, with an
+      `anyOf` bolted on whose branches hold nothing but a `required` list (and, for the two
+      check-run bodies, a `status` enum). The `anyOf` encodes "supply at least one of these" - or,
+      for check runs, "`conclusion` is required when `status` is `completed`", which the
+      `conclusion` description already states in prose. MoonBit's generated request structs cannot
+      express a conditional or disjunctive requirement, and keeping the union is actively wrong:
+      the generator compiles the union and discards the sibling `properties`, which today silently
+      strips `name`, `output`, `actions` and the rest from the check-run update body. Dropping the
+      `anyOf` keeps every property, typed, with the disjunction left to GitHub's 422.
+      Two branches name a property their schema never declares - `public` on the Pages update body
+      (removed from the API years ago) - so those branches are unusable anyway.
+    remove: true
+  - target: "$['paths']..[?@['properties'] && @['oneOf'] && !@['discriminator']]['oneOf']"
+    description: >-
+      The same shape spelled `oneOf`: campaigns, the two projectsV2 item bodies, the CodeQL
+      variant-analysis body and the check-run creation body all carry the full property set beside
+      a `oneOf` whose branches only restate requirements. The campaigns branch requiring
+      `secret_scanning_alerts` names a property the schema never declares, so that branch cannot be
+      satisfied at all. For check-run creation this action pairs with the `discriminator` removal in
+      fix.yaml - both have to go for the sibling object schema to survive.
+    remove: true
+  - target: "$['components']['schemas']..[?@['properties'] && @['anyOf'] && !@['discriminator']]['anyOf']"
+    description: >-
+      `code-quality-setup-update` and `secret-scanning-custom-pattern-to-update` use the same
+      "at least one of" idiom in `components.schemas`; the enclosing schema already declares every
+      property the branches require.
+    remove: true
+
+  # --- properties beside typed additionalProperties -----------------------------------
+  - target: "$['components']['schemas']['integration','nullable-integration']['properties']['permissions']['properties']"
+    description: >-
+      The permission set of a GitHub App is an open map from permission name to access level: the
+      schema declares `additionalProperties: {type: string}` and, beside it, five named properties
+      (`issues`, `checks`, `metadata`, `contents`, `deployments`) of exactly that same type. GitHub
+      grants roughly forty permissions and adds more over time, and the schema's own `example`
+      (`{"issues": "read", "deployments": "write"}`) shows only a subset, so the five names are
+      illustration, not structure. MoonBit has to choose between a struct and a map; dropping the
+      five illustrative properties makes this `Map[String, String]`, which loses nothing and covers
+      every permission rather than five of them.
+    remove: true
+
+  # --- picking one success response per operation --------------------------------------
+  - target: "$['paths']['/orgs/{org}/artifacts/metadata/deployment-record/cluster/{cluster}']['post']['responses']['207']['content']"
+    description: >-
+      200 is the outcome of the request as documented; the 207 body is returned only when the
+      caller opts in with `partial_success: true` and differs by carrying per-record failures. The
+      generator types one success body per operation, so type the unconditional one. The 207 status
+      stays documented in the spec; only its schema is dropped.
+    remove: true
+  - target: "$['paths']['/repos/{owner}/{repo}/code-quality/setup','/repos/{owner}/{repo}/code-scanning/default-setup']['patch']['responses']['200']['content']"
+    description: >-
+      Both endpoints answer 202 with `run_id`/`run_url` for the workflow run they kick off, and 200
+      with `empty-object` when there was nothing to run. The 202 body is the one callers need, and
+      every property on it is optional, so a 200 `{}` still decodes against it - choosing the other
+      way round would make the informative response undecodable.
+    remove: true
+  - target: "$['paths']['/repos/{owner}/{repo}/deployments']['post']['responses']['202']['content']"
+    description: >-
+      201 returns the created `deployment`, which is the point of the call. The 202 body is
+      `{message}` for the auto-merge case, where GitHub merged the base branch instead of creating
+      the deployment and asks the caller to retry; that is a control-flow signal, not a payload.
+    remove: true
+  - target: "$['paths']['/repos/{owner}/{repo}/pages/health']['get']['responses']['202']['content']"
+    description: >-
+      200 carries the `pages-health-check` result; 202 means the check is still running and its body
+      is `empty-object`. The health check is the payload, and `pages-health-check` has no required
+      properties, so a 202 `{}` still decodes.
+    remove: true
+  - target: "$['paths']['/users/{username}/attestations/{subject_digest}']['get']['responses']['201']['content']"
+    description: >-
+      200 returns the attestations. This GET also declares a 201 whose body is `empty-object`,
+      which a GET cannot produce and which the identical `/orgs/{org}/attestations/{subject_digest}`
+      and `/repos/{owner}/{repo}/attestations/{subject_digest}` endpoints do not declare; the 204 it
+      declares already has no body.
+    remove: true
+
+  # --- responses whose shape depends on the Accept header --------------------------------
+  - target: "$['paths']['/repos/{owner}/{repo}/stargazers']['get']['responses']['200']['content']['application/json']['schema']['anyOf']"
+    description: >-
+      The two branches are not alternative payloads but alternative media types: an array of
+      `simple-user` under the default `application/vnd.github+json`, and an array of `stargazer`
+      (user plus `starred_at`) only when the caller asks for `application/vnd.github.star+json`.
+      Nothing in the body distinguishes them, so this is a choice, not a union. `GitHub::new` sends
+      the default Accept, so drop the union and state the default shape directly - a one-branch
+      union would still generate a wrapper enum, and this response has to be an `Array` for
+      `GitHub::paginator` to walk it. A caller who overrides Accept decodes `stargazer` themselves.
+    remove: true
+  - target: "$['paths']['/repos/{owner}/{repo}/stargazers']['get']['responses']['200']['content']['application/json']['schema']"
+    description: The default-Accept shape the removed union's first branch declared, stated directly so the response type is `Array[SimpleUser]`.
+    update:
+      type: array
+      items:
+        $ref: "#/components/schemas/simple-user"
+  - target: "$['paths']['/users/{username}/starred']['get']['responses']['200']['content']['application/json']['schema']['anyOf']"
+    description: >-
+      Same Accept-dependent pair as stargazers, listed in the opposite order: branch 0 is the
+      `starred-repository` array returned only for `application/vnd.github.star+json`, branch 1 the
+      plain `repository` array returned by default. Keep the default one, for the same reasons.
+    remove: true
+  - target: "$['paths']['/users/{username}/starred']['get']['responses']['200']['content']['application/json']['schema']"
+    description: The default-Accept shape the removed union's second branch declared, stated directly so the response type is `Array[Repository]`.
+    update:
+      type: array
+      items:
+        $ref: "#/components/schemas/repository"
+
+  # --- unions that stay raw Json --------------------------------------------------------
+  # MoonBit's generated decoders pick a variant from the payload, so a union needs
+  # something in the payload to pick on. Each site below has candidates that no rule over
+  # the JSON can separate; typing them would mean inventing a discriminator the API does
+  # not send. `x-moonbit-json: true` hands the caller the raw `Json` instead of guessing.
+  # docs/census.md lists every one of these with its reason.
+
+  - target: "$['components']['schemas']['installation','integration-installation-request']['properties']['account']"
+    description: >-
+      The account an app is installed on is `simple-user` or `enterprise`, two unrelated resource
+      schemas with no shared tag. `simple-user.type` would be the natural tag but it is an
+      unconstrained string, and `enterprise` has no counterpart at all, so the only way to choose is
+      to sniff for `login` versus `slug` - a rule the document nowhere states.
+    update:
+      x-moonbit-json: true
+  - target: "$['components']['schemas']['integration','nullable-integration']['properties']['owner']"
+    description: Same `simple-user` or `enterprise` pair, as the owner of a GitHub App.
+    update:
+      x-moonbit-json: true
+  - target: "$['components']['schemas']['copilot-space']['properties']['owner']"
+    description: >-
+      `simple-user` or `organization-simple`. Both carry `login`, `id`, `node_id`, `avatar_url` and
+      the same URL family; the user-only fields are all optional, so an organization payload is a
+      subset of a user payload and no required-set rule separates them either.
+    update:
+      x-moonbit-json: true
+  - target: "$['components']['schemas']['pending-deployment','environment']..['reviewer']"
+    description: >-
+      A deployment reviewer is `simple-user` or `team`, untagged. Both schemas declare `type`, but
+      as an unconstrained string on the user and as the team privacy string on the team, so the one
+      property that looks like a tag would mislead. The two sites are the pending-deployment list
+      and the `required_reviewers` protection rule, which describe the same thing.
+    update:
+      x-moonbit-json: true
+  - target: "$['components']['schemas']['copilot-seat-details']['properties']['assigning_team']"
+    description: >-
+      `team` or `enterprise-team`, untagged. The two do overlap only partly (`group_id` and
+      `sync_to_organizations` are enterprise-only, `permission` and `parent` are organization-only),
+      but nothing marks which is which, and an enterprise team payload validates against `team` with
+      its optional fields absent.
+    update:
+      x-moonbit-json: true
+  - target: "$['components']['schemas']['commit']['properties']['author','committer']"
+    description: >-
+      `simple-user` or `empty-object`. The second branch is not another resource: GitHub returns
+      `{}` for a commit whose author or committer address it cannot match to an account, which is
+      common in imported history. Collapsing the union to `simple-user` would therefore make those
+      commits fail to decode, and `{}` carries nothing to tag on, so this stays `Json`. The typed
+      author information is still available untouched under `commit.commit.author`.
+    update:
+      x-moonbit-json: true
+  - target: "$['components']['schemas']['issue-event-for-issue','timeline-issue-events']"
+    description: >-
+      A catalogue of 26 and 35 event payloads respectively, sharing no tag: `event` is an
+      unconstrained string on every branch, and several branches have identical required sets.
+      Even with a tag this would add sixty-odd variants of the issue-event zoo to a general REST
+      client; a caller who wants a specific event shape is better served decoding it themselves.
+    update:
+      x-moonbit-json: true
+  - target: "$['components']['schemas']['event']['properties']['payload']"
+    description: >-
+      The Events API payload is 16 alternative event bodies. The event kind is on the sibling
+      `event.type` property, not inside `payload`, so a decoder looking only at the payload has
+      nothing to dispatch on.
+    update:
+      x-moonbit-json: true
+  - target: "$['components']['schemas']['secret-scanning-location']['properties']['details']"
+    description: >-
+      13 alternative location detail objects (commit, wiki commit, issue title, pull request
+      comment, discussion body, ...). The kind is on the sibling `secret-scanning-location.type`,
+      which is where a discriminator would have to live; `details` on its own is untagged and
+      several branches share required sets such as `{blob_sha, path, ...}`.
+    update:
+      x-moonbit-json: true
+  - target: "$['components']['schemas']['nullable-secret-scanning-first-detected-location']"
+    description: >-
+      The same 13 detail objects again, this time inlined as a schema of its own with no sibling
+      `type` at all, so not even a caller-side rule is available here.
+    update:
+      x-moonbit-json: true
+  - target: "$['components']['schemas']['actions-policy-repo-conditions','actions-policy-org-conditions','actions-policy-enterprise-conditions','org-ruleset-conditions']"
+    description: >-
+      Each branch selects repositories a different way - by `repository_name`, by `repository_id`,
+      by `repository_property` - while sharing the optional `ref_name` and `workflow_path`. Unlike
+      the request bodies above, the enclosing schema declares no properties of its own, so dropping
+      the union would leave an empty object rather than the full property set. The branches differ
+      only in which selector is required, which is not visible to a decoder that has to choose
+      before reading the fields.
+    update:
+      x-moonbit-json: true
+  - target: "$['components']['schemas']['actions-policy']['properties']['conditions']"
+    description: >-
+      An `anyOf` over the three condition schemas above, which expands to 11 indistinguishable
+      branches; it inherits their problem.
+    update:
+      x-moonbit-json: true
+  - target: "$['components']['schemas']['repository-ruleset']['properties']['conditions']"
+    description: >-
+      `repository-ruleset-conditions` (just `ref_name`) or `org-ruleset-conditions` (the three-way
+      selector union above). Every property on both sides is optional, so `{}` and
+      `{"ref_name": ...}` validate against both.
+    update:
+      x-moonbit-json: true
+  - target: "$['components']['schemas']['projects-v2-item-simple']['properties']['content']"
+    description: >-
+      `issue`, `pull-request-simple` or `projects-v2-draft-issue`. The sibling
+      `projects-v2-item-simple.content_type` is the tag, but it sits outside `content`, and issue
+      and pull-request payloads overlap almost completely (a pull request is an issue with extra
+      fields), so the required sets do not separate them either.
+    update:
+      x-moonbit-json: true
+  - target: "$['components']['schemas']['pull-request-merge-async-result']['properties']['details']"
+    description: >-
+      Three result shapes - the accepted merge request, a plain message, and a message with the
+      merge `sha`. Which one arrives follows from the sibling `status` enum
+      (`pending`/`merged`/`enqueued`/`failed`), again outside `details`; within `details` the
+      `{message}` branch is a subset of the other two.
+    update:
+      x-moonbit-json: true
+  - target: "$['paths']['/orgs/{org}/interaction-limits','/repos/{owner}/{repo}/interaction-limits','/user/interaction-limits']['get']['responses']['200']['content']['application/json']['schema']"
+    description: >-
+      `interaction-limit-response` or `{}`, where `{}` is what GitHub returns when no interaction
+      limit is set - the common case. Collapsing to `interaction-limit-response` would make that
+      answer fail to decode, since it requires `limit`, `origin` and `expires_at`, and `{}` has
+      nothing to tag on.
+    update:
+      x-moonbit-json: true
+  - target: "$['paths']['/orgs/{org}/attestations/delete-request','/users/{username}/attestations/delete-request']['post']['requestBody']['content']['application/json']['schema']"
+    description: >-
+      Delete either by `subject_digests` or by `attestation_ids`. This is the "at least one of"
+      idiom again, but here the enclosing schema declares no properties, so the property schemas
+      live inside the branches; removing the union would leave an empty body. Merging the branches
+      would mean copying their property schemas into this overlay, where upstream changes to them
+      would go unnoticed, which is what this repository's overlays are built to avoid.
+    update:
+      x-moonbit-json: true
+  - target: "$['paths']['/orgs/{org}/projectsV2/{project_number}/fields']['post']['requestBody']['content']['application/json']['schema']"
+    description: >-
+      Four ways to create a project field - adopt an existing issue field, or declare a new one
+      whose `data_type` decides whether `single_select_options` or `iteration_configuration` comes
+      with it. `data_type` is the tag, but it is a multi-value enum on every branch rather than a
+      single value per branch, and the enclosing schema declares no properties to fall back on.
+    update:
+      x-moonbit-json: true
+  - target: "$['paths']['/user/codespaces']['post']['requestBody']['content']['application/json']['schema']"
+    description: >-
+      Create from a repository (`repository_id`, plus `ref`, `devcontainer_path`, ...) or from a
+      pull request (`pull_request`). The two branches share ten optional properties and differ only
+      in which of the two entry points is required, with no property set on the enclosing schema.
+    update:
+      x-moonbit-json: true
+  - target: "$['paths']['/repos/{owner}/{repo}/issues/{issue_number}/labels']['put']['requestBody']['content']['application/json']['schema']"
+    description: >-
+      Five spellings of the same request - `{labels: [string]}`, `[string]`, `{labels: [{name}]}`,
+      `[{name}]`, and a bare string. Two pairs are both objects and two are both arrays, so JSON
+      shape cannot separate them, and the enclosing schema is nothing but the union.
+    update:
+      x-moonbit-json: true
+  - target: "$['paths']['/repos/{owner}/{repo}/actions/runs/{run_id}/deployment_protection_rule']['post']['requestBody']['content']['application/json']['schema']"
+    description: >-
+      `review-custom-gates-comment-required` or `review-custom-gates-state-required`; the second
+      declares every property of the first plus `state`, so a comment-only payload validates
+      against both and there is no enclosing property set to keep instead.
+    update:
+      x-moonbit-json: true
+  - target: "$['paths']['/orgs/{org}/copilot/content_exclusion']['put']['requestBody']['content']['application/json']['schema']['additionalProperties']['items']"
+    description: >-
+      A content-exclusion rule is a bare path string, `{ifAnyMatch: [...]}` or
+      `{ifNoneMatch: [...]}`. The string branch is separable by shape, but the two object branches
+      are not: both properties are optional in their own branch, so `{}` validates against both.
+    update:
+      x-moonbit-json: true
+  - target: "$['paths']..[?@['description'] == 'The entity who created this task']"
+    description: >-
+      The task creator on the agent-tasks endpoints is a `oneOf` with a single branch, `{id}`. A
+      one-branch union is the same as the branch itself, so there is nothing for the generator to
+      choose between, yet an overlay cannot unwrap it without copying the branch schema here and
+      losing the upstream link. Worth raising with GitHub; until then the object is `Json`.
+    update:
+      x-moonbit-json: true
+  - target: "$['paths']..['artifacts']['items']['properties']['data']"
+    description: >-
+      A task artifact is a GitHub resource (`{id, global_id}`) or a branch pair
+      (`{head_ref, base_ref}`). The sibling `artifacts[].type` enum (`pull`/`branch`) says which,
+      but it sits outside `data`, so the payload the decoder sees carries no tag.
+    update:
+      x-moonbit-json: true

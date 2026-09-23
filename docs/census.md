@@ -157,3 +157,51 @@ OpenAI 30 件の内訳は M4e 時点で (a) 13、(b) 9、(c) 8。M4f の現行�
 # Anthropic first-party slice (2026-09-23)
 
 The vendored `anthropic/spec/anthropic.json` contains 244 operations. With the Anthropic overlay, the shipped slice (`messages_post`, `messages_count_tokens_post`, `models_list`, `models_get`) has zero diagnostics. The full-spec census still has 13 diagnostics: six reserved authorization headers, four non-object allOf members, two fallback-constructor collisions, and one untagged object union. The gate checks the four shipped operations; this is not full Anthropic API coverage.
+
+# GitHub all operations (2026-09-24)
+
+`github/spec/api.github.com.2022-11-28.yaml` は vendored な first-party OpenAPI で、そこに書かれた **全 1,221 operation** を `--include-all` で生成する(タグ単位の間引きをしない最初のモジュール)。`fix.yaml` は言語非依存の上流不整合だけ、`moonbit.yaml` は MoonBit 向けの判断だけを持つ。
+
+| scope | operations | 素の spec | generator 修正後 | `fix.yaml` 後 | `fix` + `moonbit` 後 | gate |
+|---|---:|---:|---:|---:|---:|---|
+| GitHub all(`--include-all`) | 1221 | 99 | 76 | 65 | **0** | zero(`scripts/gates.sh`) |
+
+99 → 76 は overlay ではなく generator 修正による。`Unknown` / `Custom` fallback constructor の名前衝突 13 件(anthropic の `SkillParams` に当てた overlay と同じ問題の再発)と、reaction content の `+1` / `-1` が同じ variant 名に潰れる 10 件を `tools/gen` 側で直した。残る 76 件が overlay の「判断」で、`fix.yaml`(10 アクション)が 11 件、`moonbit.yaml`(39 アクション)が残り 65 件を 0 にする。
+
+```sh
+.venv/bin/python tools/gen/census.py github/spec/api.github.com.2022-11-28.yaml github
+.venv/bin/python tools/gen/census.py github/spec/api.github.com.2022-11-28.yaml github \
+  --overlay github/overlays/fix.yaml
+.venv/bin/python tools/gen/census.py github/spec/api.github.com.2022-11-28.yaml github \
+  --overlay github/overlays/fix.yaml --overlay github/overlays/moonbit.yaml --expect-zero
+```
+
+生成物は `types.mbt` 168,626 行 + `operations.mbt` 40,169 行 + `pkg.generated.mbti` 43,403 行。cold の `moon -C github check --deny-warn` は 2.6 秒 / ピーク RSS 527MB(判定基準は 60 秒以内)。
+
+## raw `Json` に落とした 43 箇所
+
+`x-moonbit-json: true` を当てた spec 上の位置は **43**、それを指す `moonbit.yaml` のアクションは **24**(1 アクションが JSONPath で複数箇所を覆う)。生成物ではこれが複数の field へ展開される(`types.mbt` で型に `Json` を含む field は 83、うち 60 は `Json` そのもの)。理由の全文は各アクションの `description` にある。
+
+MoonBit の生成 decoder は payload だけを見て variant を選ぶので、payload に選ぶ手がかりが無い union は型を付けられない。当て推量の discriminator を発明せず、`Json` を呼び出し側に渡す。
+
+| 分類 | 件数 | JSON pointer | 型を付けられない理由 |
+|---|---:|---|---|
+| 無関係な 2 リソースの untagged union | 8 | `/components/schemas/installation/properties/account`、`/components/schemas/integration-installation-request/properties/account`、`/components/schemas/integration/properties/owner`、`/components/schemas/nullable-integration/properties/owner`、`/components/schemas/copilot-space/properties/owner`、`/components/schemas/pending-deployment/properties/reviewers/items/properties/reviewer`、`/components/schemas/environment/properties/protection_rules/items/anyOf/1/properties/reviewers/items/properties/reviewer`、`/components/schemas/copilot-seat-details/properties/assigning_team` | `simple-user` 対 `enterprise`、`simple-user` 対 `organization-simple`、`simple-user` 対 `team`、`team` 対 `enterprise-team`。共通のタグが無く、`type` は片側で制約なしの `string`。organization / enterprise-team 側の payload は user / team 側の部分集合になるので required 集合でも分けられない |
+| リソース or `{}` | 5 | `/components/schemas/commit/properties/author`、`/components/schemas/commit/properties/committer`、`/paths//orgs/{org}/interaction-limits/get/…/schema`、`/paths//repos/{owner}/{repo}/interaction-limits/get/…/schema`、`/paths//user/interaction-limits/get/…/schema` | `{}` は別リソースではなく「該当なし」を表す(アカウントに紐づかない commit author、未設定の interaction limit)。片側に潰すと **その応答がデコードに失敗する**。`{}` にはタグにできるものが何も無い |
+| タグが union の外(sibling プロパティ)にある | 10 | `/components/schemas/event/properties/payload`、`/components/schemas/secret-scanning-location/properties/details`、`/components/schemas/nullable-secret-scanning-first-detected-location`、`/components/schemas/projects-v2-item-simple/properties/content`、`/components/schemas/pull-request-merge-async-result/properties/details`、`/paths//agents/…/artifacts/items/properties/data`(5 箇所) | 判別値はそれぞれ `event.type` / `secret-scanning-location.type` / `content_type` / `status` / `artifacts[].type` にあり、union の内側には無い。`nullable-secret-scanning-first-detected-location` に至っては sibling の `type` すら無い。**上流がこれを直せば raw `Json` が最も多く減る** |
+| イベントの巨大カタログ | 2 | `/components/schemas/issue-event-for-issue`、`/components/schemas/timeline-issue-events` | 26 / 35 候補。`event` はどの分岐でも制約なしの `string` で、required 集合が同じ分岐も複数ある。仮にタグがあっても汎用 REST クライアントに 60 個超の variant を足すことになる |
+| セレクタ違いの条件 union(enclosing にプロパティ無し) | 6 | `/components/schemas/actions-policy-repo-conditions`、`/components/schemas/actions-policy-org-conditions`、`/components/schemas/actions-policy-enterprise-conditions`、`/components/schemas/org-ruleset-conditions`、`/components/schemas/actions-policy/properties/conditions`、`/components/schemas/repository-ruleset/properties/conditions` | `repository_name` / `repository_id` / `repository_property` のどれで絞るかだけが違い、`ref_name` と `workflow_path` は共通で optional。enclosing schema が自分のプロパティを持たないので union を外すと空 object になる。`repository-ruleset.conditions` は両側の全プロパティが optional なので `{}` がどちらにも validate する |
+| 「いずれか一つ」request body(enclosing にプロパティ無し) | 7 | `/paths//orgs/{org}/attestations/delete-request/post/…/schema`、`/paths//users/{username}/attestations/delete-request/post/…/schema`、`/paths//orgs/{org}/projectsV2/{project_number}/fields/post/…/schema`、`/paths//user/codespaces/post/…/schema`、`/paths//repos/{owner}/{repo}/issues/{issue_number}/labels/put/…/schema`、`/paths//repos/{owner}/{repo}/actions/runs/{run_id}/deployment_protection_rule/post/…/schema`、`/paths//orgs/{org}/copilot/content_exclusion/put/…/additionalProperties/items` | 下の「union を外して型を保てた 33 件」と同じ「at least one of」の書き方だが、**enclosing schema がプロパティを 1 つも宣言していない**ので union を外すと空の body になる。分岐の property schema をこの overlay に写せば型は付くが、上流の変更が overlay に隠れて見えなくなる(このリポジトリの overlay が避けようとしている状態そのもの)。labels PUT は同じ要求の 5 通りの綴りで、2 組が object、2 組が array なので JSON の形でも分けられない |
+| 分岐が 1 つだけの `oneOf` | 5 | `/paths//agents/…/creator`(5 箇所、`description: The entity who created this task`) | 1 分岐の union は分岐そのものと同じで、generator が選ぶものが無い。overlay で unwrap するには分岐 schema をここに写す必要があり、上流へのリンクが切れる。上流に報告する価値のある形 |
+
+## union を外して型を保てた 33 件
+
+残り 33 件は `Json` に落とさずに済んだ。判断はほぼ一様で、**「union が何も判別していない」ことを示せた場合に union を外し、周りの typed な object schema を残す**。
+
+- `fix.yaml` が上流の不整合を直した結果 typed になったもの(11 件)。`user_view_type` に `enum` を補うと discriminator が実際に機能し、`environment.protection_rules` の `type` を `example` から `enum` に移すと 3 分岐が判別可能になり、contents の 200 は解決不能な `discriminator` を外すと「配列ならディレクトリ、object なら `type` タグ付き」で決まる。
+- 「at least one of」の idiom で、enclosing schema が全プロパティを宣言しているもの。union は条件付き必須(散文で既に書かれている)を encode しているだけなので、外しても失われる型情報が無い。むしろ union を残す方が有害で、生成器は union を採って sibling の `properties` を捨てるため、check-run 更新 body から `name` / `output` / `actions` が黙って消えていた。
+- `Accept` ヘッダで形が変わるだけのもの(`stargazers`、`users/{username}/starred`)。2 分岐は代替 payload ではなく代替メディアタイプで、本文には区別する材料が無い。`GitHub::new` が既定の `Accept` を送るのでその形を直接書き、`Accept` を上書きする呼び出し側は自分でデコードする。1 分岐 union を残すと無意味な wrapper enum が生まれ、`GitHub::paginator` が要求する `Array` でもなくなる。
+- 複数の 2xx 応答スキーマ(6 件)。生成器は operation ごとに 1 つの成功本文しか型にしないので、**無条件に返る方**を選び、もう片方の schema だけを外す(ステータス自体は spec に残す)。選んだ側で他方の payload もデコードできることを個別に確認した(例: `pages/health` の 202 は `empty-object` で、200 の `pages-health-check` は required プロパティを持たないので `{}` も通る)。
+- `integration.permissions` の 5 つの named property を外して `Map[String, String]` にしたもの。GitHub の権限は 40 個前後あって増えるので、5 つの struct field より map の方が情報を失わない。
+
+上流 spec の不具合 12 件の一覧は `docs/design-m8.md` の末尾にある。

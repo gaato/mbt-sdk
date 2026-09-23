@@ -1,0 +1,44 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "gaato/github"
+
+import {
+  "gaato/http",
+  "gaato/http/clock",
+  "gaato/sdk-runtime",
+  "moonbitlang/core/debug",
+}
+
+// Values
+pub fn api_error(@sdk-runtime.SdkError) -> ApiErrorBody?
+
+pub fn is_not_modified(@sdk-runtime.SdkError) -> Bool
+
+pub fn is_secondary_rate_limit(@sdk-runtime.SdkError) -> Bool
+
+// Errors
+
+// Types and methods
+pub(all) struct ApiErrorBody {
+  message : String
+  documentation_url : String?
+  status : String?
+  errors : Array[Json]?
+} derive(Eq, @debug.Debug)
+pub fn ApiErrorBody::equal(Self, Self) -> Bool
+pub fn ApiErrorBody::not_equal(Self, Self) -> Bool
+pub fn ApiErrorBody::to_repr(Self) -> @debug.Repr
+
+pub struct GitHub {
+  // private fields
+}
+pub async fn[T] GitHub::call(Self, @http.Request, (@http.Response) -> T raise @sdk-runtime.SdkError) -> T raise @sdk-runtime.SdkError
+pub fn GitHub::from_client(@sdk-runtime.Client) -> Self
+pub fn GitHub::new(&@http.Transport, &@clock.Clock, token? : String, base_url? : String, api_version? : String, user_agent? : String, retry? : @sdk-runtime.RetryPolicy, limiter? : &@sdk-runtime.RateLimiter) -> Self
+pub fn[T] GitHub::paginator(Self, @http.Request, (@http.Response) -> Array[T] raise @sdk-runtime.SdkError) -> @sdk-runtime.Paginator[T]
+pub async fn GitHub::send(Self, @http.Request) -> @http.Response raise @sdk-runtime.SdkError
+pub fn GitHub::to_repr(Self) -> @debug.Repr
+pub impl @debug.Debug for GitHub
+
+// Type aliases
+
+// Traits

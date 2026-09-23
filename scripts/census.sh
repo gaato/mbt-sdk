@@ -12,3 +12,4 @@ for spec in specs/*/openapi.json; do
 done
 "${py[@]}" tools/gen/census.py openai/spec/openai.yaml openai --overlay openai/overlays/fix.yaml
 "${py[@]}" tools/gen/census.py anthropic/spec/anthropic.json anthropic
+"${py[@]}" tools/gen/census.py github/spec/api.github.com.2022-11-28.yaml github --overlay github/overlays/fix.yaml --overlay github/overlays/moonbit.yaml

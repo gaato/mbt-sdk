@@ -1,6 +1,6 @@
 name: Spec watch
 
-# Fetches the upstream OpenAI and Anthropic specs daily. When changed: re-vendor, apply the
+# Fetches the upstream OpenAI, Anthropic and GitHub specs daily. When changed: re-vendor, apply the
 # overlays, regenerate, run the gates, and open a PR. Overlay actions that no
 # longer match (zero-match) or no longer change anything (no-op: upstream fixed
 # it) fail the overlay step; their messages go into the PR body so a human can
@@ -30,6 +30,9 @@ jobs:
           - provider: anthropic
             spec_file: anthropic.json
             spec_url: https://raw.githubusercontent.com/anthropics/anthropic-sdk-python/main/scripts/mock-spec.json.gz
+          - provider: github
+            spec_file: api.github.com.2022-11-28.yaml
+            spec_url: https://raw.githubusercontent.com/github/rest-api-description/main/descriptions/api.github.com/api.github.com.2022-11-28.yaml
     env:
       PROVIDER: ${{ matrix.provider }}
       SPEC_FILE: ${{ matrix.spec_file }}

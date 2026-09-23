@@ -1,0 +1,12 @@
+import {
+  "gaato/http",
+  "gaato/http/mock",
+  "gaato/sdk-runtime" @runtime,
+  "gaato/github" @github_sdk,
+  "gaato/github/gen",
+  "moonbitlang/async",
+  "moonbitlang/core/encoding/utf8",
+  "moonbitlang/core/debug",
+} for "test"
+
+supported_targets = "js + native"

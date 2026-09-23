@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Applies overlays and regenerates OpenAI, Anthropic and the all-operation fixtures.
+# Applies overlays and regenerates OpenAI, Anthropic, GitHub and the all-operation fixtures.
 # Pass --check to verify without writing.
 set -euo pipefail
 cd "$(dirname "$0")/.."
@@ -12,6 +12,10 @@ overlays=(); for o in openai/overlays/*.yaml; do overlays+=(--overlay "$o"); don
 overlays=(); for o in anthropic/overlays/*.yaml; do overlays+=(--overlay "$o"); done
 "${py[@]}" tools/gen/main.py --spec anthropic/spec/anthropic.json "${overlays[@]}" \
   --out anthropic/src/gen --package gaato/anthropic/gen "$@"
+"${py[@]}" tools/apply_overlay.py github/spec/api.github.com.2022-11-28.yaml github/spec/api.github.com.2022-11-28.patched.json github/overlays/*.yaml
+overlays=(); for o in github/overlays/*.yaml; do overlays+=(--overlay "$o"); done
+"${py[@]}" tools/gen/main.py --spec github/spec/api.github.com.2022-11-28.yaml "${overlays[@]}" \
+  --include-all --out github/src/gen --package gaato/github/gen "$@"
 "${py[@]}" tools/gen/main.py --spec specs/badhttp/openapi.json \
   --include-all --derive-operation-ids --out fixtures/gen/badhttp/src \
   --package gaato/fixture-badhttp "$@"

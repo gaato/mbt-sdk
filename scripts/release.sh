@@ -13,7 +13,7 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 
 # Bottom-up: a module is listed after everything it imports.
-PUBLISH_MODULES=(http http-async sdk-runtime openai anthropic)
+PUBLISH_MODULES=(http http-async sdk-runtime openai anthropic github)
 # Not published until they have a consumer: jsonrpc jsonrpc-async codex-protocol codex-app-server
 
 module_name() { sed -nE 's/^name = "(.*)"$/\1/p' "$1/moon.mod"; }

@@ -1,0 +1,19 @@
+import {
+  "gaato/http",
+  "gaato/http/clock",
+  "gaato/sdk-runtime" @runtime,
+  "gaato/sdk-runtime/json" @sdkjson,
+  "moonbitlang/core/debug",
+  "moonbitlang/core/encoding/utf8",
+  "moonbitlang/core/json",
+}
+
+import {
+  "gaato/github/gen",
+  "gaato/http",
+  "gaato/http/mock",
+  "gaato/sdk-runtime" @runtime,
+  "moonbitlang/core/debug",
+  "moonbitlang/core/encoding/utf8",
+  "moonbitlang/core/json",
+} for "test"

@@ -1,0 +1,83 @@
+# Corrections to the vendored upstream spec. Language-independent: every action
+# names a defect that the document itself contradicts, so the correction would be
+# just as necessary for any other OpenAPI consumer. tools/apply_overlay.py fails
+# when an action matches nothing or changes nothing, so a defect that GitHub has
+# since fixed surfaces here as an error and must be removed from this file.
+overlay: 1.0.0
+info:
+  title: Upstream corrections for the GitHub REST API description (2022-11-28)
+  version: 0.1.0
+actions:
+  - target: "$['components']['schemas']['code-security-default-configurations']['items']['properties']['default_for_new_repos']"
+    description: >-
+      The property lists three string values in `enum` but declares no `type`, so it has no JSON
+      type at all. Every sibling property of the same schema that carries an enum also carries
+      `type: string`; so do the identically named `default_for_new_repos` properties on
+      `code-security-configuration` and on the org configuration request bodies.
+    update:
+      type: string
+  - target: "$['components']['schemas']['private-user']['properties']['user_view_type']"
+    description: >-
+      `/user`, `/users/{username}` and `/user/{account_id}` answer with
+      `oneOf: [private-user, public-user]` plus `discriminator.propertyName: user_view_type` and an
+      explicit mapping of `private` to this schema. The mapping therefore asserts that a payload of
+      this shape carries `user_view_type: "private"`, but the property is declared as an
+      unconstrained string, so nothing in the document lets a consumer honour the mapping.
+    update:
+      enum: [private]
+  - target: "$['components']['schemas']['public-user']['properties']['user_view_type']"
+    description: Same defect as private-user.user_view_type; the same mapping asserts `public` here.
+    update:
+      enum: [public]
+  - target: "$['paths']['/repos/{owner}/{repo}/contents/{path}']['get']['responses']['200']['content']['application/json']['schema']['discriminator']"
+    description: >-
+      The discriminator maps the value `array` of a `type` property to `content-directory`, but
+      `content-directory` is `type: array` - a JSON array has no properties, so no payload of that
+      branch can ever carry the discriminator property the mapping promises. The other three
+      branches (content-file, content-symlink, content-submodule) already pin `type` to a
+      single-value enum, so once this impossible discriminator is gone the union is decidable
+      without it: a directory listing is an array, everything else is an object tagged by `type`.
+    remove: true
+  - target: "$['paths']['/repos/{owner}/{repo}/check-runs']['post']['requestBody']['content']['application/json']['schema']['discriminator']"
+    description: >-
+      `discriminator` with no `mapping` falls back to the implicit mapping, which names candidates
+      by their component schema name; both candidates here are inline schemas and so have no name.
+      The discriminator can never resolve. What the two branches actually encode is the conditional
+      requirement already stated in prose on `conclusion` ("Required if you provide `completed_at`
+      or a `status` of `completed`"); moonbit.yaml drops the `oneOf` for that reason.
+    remove: true
+  - target: "$['components']['schemas']['environment']['properties']['protection_rules']['items']['anyOf'][0]['properties']['type']"
+    description: >-
+      The three protection-rule branches differ only in optional properties (`wait_timer`;
+      `reviewers`/`prevent_self_review`; nothing), so every payload validates against all three and
+      the `anyOf` discriminates nothing for any consumer. The distinguishing value is in each
+      branch's `type` property, which the document records as `example` rather than `enum`;
+      GitHub's environments documentation lists exactly these three rule types.
+    update:
+      enum: [wait_timer]
+  - target: "$['components']['schemas']['environment']['properties']['protection_rules']['items']['anyOf'][1]['properties']['type']"
+    description: Same defect as anyOf[0]; this branch's example, and the reviewers payload, say `required_reviewers`.
+    update:
+      enum: [required_reviewers]
+  - target: "$['components']['schemas']['environment']['properties']['protection_rules']['items']['anyOf'][2]['properties']['type']"
+    description: Same defect as anyOf[0]; this branch's example says `branch_policy`.
+    update:
+      enum: [branch_policy]
+  - target: "$['components']['schemas']['issue-field-value']['properties']['value']['anyOf'][2]"
+    description: >-
+      `anyOf: [string, number, integer]`. Every JSON integer also validates against `number`, so the
+      third branch admits no instance the second does not and the `anyOf` is ambiguous for any
+      consumer that has to pick a branch. Dropping the subsumed `integer` branch leaves a union that
+      can actually be decided from the payload.
+    remove: true
+  - target: "$['components']['examples']['full-repository']['value']"
+    description: >-
+      `full-repository` lists `has_discussions` in `required`, and the `full-repository` example -
+      the one `repos/get` shows for its 200 - is the document's own payload for that schema and
+      omits it, so the document contradicts itself. The live API does send `has_discussions` on
+      `GET /repos/{owner}/{repo}`, and the property carries `example: true`, so the example is the
+      stale side; supply it rather than weakening the schema. Nothing in the generator reads
+      `components.examples`, so this changes no generated code - it keeps the vendored document
+      self-consistent and, like every action here, fails loudly once GitHub fixes it.
+    update:
+      has_discussions: true
