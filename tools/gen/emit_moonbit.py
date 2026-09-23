@@ -65,6 +65,13 @@ def _is_int64(type_ref: TypeRef) -> bool:
     return type_ref.kind == "Int64"
 
 
+def _to_json(type_ref: TypeRef, value: str) -> str:
+    """`value.to_json()`, elided on raw `Json` where that method is deprecated."""
+    if type_ref.kind == "Json":
+        return value
+    return f"{value}.to_json()"
+
+
 def _encoded_value(type_ref: TypeRef, value: str) -> str:
     if _is_int64(type_ref):
         return f"json_int64_to_json({value})"
@@ -122,7 +129,9 @@ def _struct(declaration: Struct) -> str:
         lines.extend(["  }", "}"])
     lines.extend(_doc("Encodes this value as JSON.", ""))
     lines.append(f"pub extend {declaration.name} with ToJson::{{to_json}}")
-    lines.extend(["///|", f"pub impl ToJson for {declaration.name} with fn to_json(self) {{", "  @sdkjson.ObjBuilder::new()"])
+    # Without an encodable field the receiver goes unread, which `--deny-warn` rejects.
+    receiver = "self" if fields else "_self"
+    lines.extend(["///|", f"pub impl ToJson for {declaration.name} with fn to_json({receiver}) {{", "  @sdkjson.ObjBuilder::new()"])
     for field in declaration.fields:
         if field.constant is not None:
             lines.append(f"  .field({_moon_string(field.json_name)}, {_constant(field.constant)})")
@@ -146,6 +155,19 @@ def _struct(declaration: Struct) -> str:
     lines.extend(["  .build()", "}"])
     lines.extend(_doc("Decodes this value from JSON.", ""))
     lines.append(f"pub extend {declaration.name} with @json.FromJson::{{from_json}}")
+    if not fields:
+        # `{}` alone parses as a Map literal, and `({} : T)` does not help either: the
+        # struct literal has to name its type. The object shape is still validated.
+        lines.extend(
+            [
+                "///|",
+                f"pub impl @json.FromJson for {declaration.name} with fn from_json(value, path) {{",
+                "  let _ = @sdkjson.expect_object(value, path)",
+                f"  {declaration.name}::{{}}",
+                "}",
+            ]
+        )
+        return "\n".join(lines)
     lines.extend(["///|", f"pub impl @json.FromJson for {declaration.name} with fn from_json(value, path) {{", "  let obj = @sdkjson.expect_object(value, path)", "  {"])
     for field in declaration.fields:
         if field.constant is not None:
@@ -190,14 +212,14 @@ def _string_enum(declaration: StringEnum) -> str:
     lines = _doc(declaration.description, f"Generated string enum {declaration.name}.")
     lines.append(f"pub(all) enum {declaration.name} {{")
     lines.extend(f"  {variant.name}" for variant in declaration.variants)
-    lines.append("  Unknown(String)" if declaration.open else "  Custom(String)")
+    lines.append(f"  {declaration.fallback}(String)")
     lines.append("}" + DERIVE)
     lines.extend(_derive_extends(declaration.name))
     lines.extend(_doc("Encodes this string enum as JSON.", ""))
     lines.append(f"pub extend {declaration.name} with ToJson::{{to_json}}")
     lines.extend(["///|", f"pub impl ToJson for {declaration.name} with fn to_json(self) {{", "  let raw = match self {"])
     lines.extend(f"    {variant.name} => {_moon_string(variant.value)}" for variant in declaration.variants)
-    tail = "Unknown(raw)" if declaration.open else "Custom(raw)"
+    tail = f"{declaration.fallback}(raw)"
     lines.extend([f"    {tail} => raw", "  }", "  raw.to_json()", "}"])
     lines.extend(_doc("Decodes this string enum from JSON.", ""))
     lines.append(f"pub extend {declaration.name} with @json.FromJson::{{from_json}}")
@@ -205,7 +227,7 @@ def _string_enum(declaration: StringEnum) -> str:
     lines.append("      match raw {")
     lines.extend(f"        {_moon_string(variant.value)} => Some({variant.name})" for variant in declaration.variants)
     lines.extend(["        _ => None", "      }", "    },"])
-    constructor = "raw => Unknown(raw)," if declaration.open else "raw => Custom(raw),"
+    constructor = f"raw => {declaration.fallback}(raw),"
     lines.extend([f"    {constructor}", "  )", "}"])
     return "\n".join(lines)
 
@@ -237,7 +259,7 @@ def _union(declaration: UntaggedUnion) -> str:
     lines.extend(_doc("Encodes this union as JSON.", ""))
     lines.append(f"pub extend {declaration.name} with ToJson::{{to_json}}")
     lines.extend(["///|", f"pub impl ToJson for {declaration.name} with fn to_json(self) {{", "  match self {"])
-    lines.extend(f"    {variant.name}(value) => value.to_json()" for variant in declaration.variants)
+    lines.extend(f"    {variant.name}(value) => {_to_json(variant.type, 'value')}" for variant in declaration.variants)
     lines.extend(["  }", "}"])
     lines.extend(_doc("Decodes this union from JSON.", ""))
     lines.append(f"pub extend {declaration.name} with @json.FromJson::{{from_json}}")
@@ -286,14 +308,14 @@ def _tagged_union(declaration: TaggedUnion) -> str:
     lines = _doc(declaration.description, f"Generated tagged union {declaration.name}.")
     lines.append(f"pub(all) enum {declaration.name} {{")
     lines.extend(f"  {variant.name}({variant.type.moon_type()})" for variant in declaration.variants)
-    lines.append("  Unknown(String, Json)")
+    lines.append(f"  {declaration.fallback}(String, Json)")
     lines.append("}" + DERIVE)
     lines.extend(_derive_extends(declaration.name))
     lines.extend(_doc("Encodes this tagged union as JSON.", ""))
     lines.append(f"pub extend {declaration.name} with ToJson::{{to_json}}")
     lines.extend(["///|", f"pub impl ToJson for {declaration.name} with fn to_json(self) {{", "  match self {"])
-    lines.extend(f"    {variant.name}(value) => value.to_json()" for variant in declaration.variants)
-    lines.extend(["    Unknown(_, value) => value", "  }", "}"])
+    lines.extend(f"    {variant.name}(value) => {_to_json(variant.type, 'value')}" for variant in declaration.variants)
+    lines.extend([f"    {declaration.fallback}(_, value) => value", "  }", "}"])
     lines.extend(_doc("Decodes this tagged union from JSON.", ""))
     lines.append(f"pub extend {declaration.name} with @json.FromJson::{{from_json}}")
     lines.extend(
@@ -344,7 +366,7 @@ def _tagged_union(declaration: TaggedUnion) -> str:
                 lines.append(
                     f"        Some(String({_moon_string(variant.secondary_tag or '')})) => {variant.name}(@json.from_json(value, path~))"
                 )
-            lines.extend(["        _ => Unknown(tag, value)", "      }"])
+            lines.extend([f"        _ => {declaration.fallback}(tag, value)", "      }"])
             continue
         lines.append(f"    {_moon_string(tag)} =>")
         for index, variant in enumerate(variants):
@@ -356,8 +378,8 @@ def _tagged_union(declaration: TaggedUnion) -> str:
             lines.append(
                 f"      {keyword} {condition} {{ {variant.name}(@json.from_json(value, path~)) }}"
             )
-        lines.append("      else { Unknown(tag, value) }")
-    lines.extend(["    other => Unknown(other, value)", "  }", "}"])
+        lines.append(f"      else {{ {declaration.fallback}(tag, value) }}")
+    lines.extend([f"    other => {declaration.fallback}(other, value)", "  }", "}"])
     return "\n".join(lines)
 
 
@@ -367,7 +389,7 @@ def _newtype(declaration: Newtype) -> str:
     lines.extend(_derive_extends(declaration.name))
     lines.extend(_doc("Encodes this newtype as JSON.", ""))
     lines.append(f"pub extend {declaration.name} with ToJson::{{to_json}}")
-    lines.extend(["///|", f"pub impl ToJson for {declaration.name} with fn to_json(self) {{", "  self.0.to_json()", "}"])
+    lines.extend(["///|", f"pub impl ToJson for {declaration.name} with fn to_json(self) {{", f"  {_to_json(declaration.inner, 'self.0')}", "}"])
     lines.extend(_doc("Decodes this newtype from JSON.", ""))
     lines.append(f"pub extend {declaration.name} with @json.FromJson::{{from_json}}")
     lines.extend(["///|", f"pub impl @json.FromJson for {declaration.name} with fn from_json(value, path) {{", f"  let inner : {declaration.inner.moon_type()} = @json.from_json(value, path~)", f"  {declaration.name}(inner)", "}"])
@@ -638,7 +660,9 @@ def _path_expression(operation: Operation) -> str:
         if not part:
             continue
         if part in parameters:
-            expressions.append(f"percent_encode(parameter_value({parameters[part].moon_name}))")
+            parameter = parameters[part]
+            encoder = "percent_encode_segments" if parameter.path_segments else "percent_encode"
+            expressions.append(f"{encoder}(parameter_value({parameter.moon_name}))")
         else:
             expressions.append(_moon_string(part))
     return " + ".join(expressions) if expressions else '""'
@@ -732,7 +756,7 @@ def _operation(operation: Operation) -> str:
     else:
         expression = f"@http.Request::new({_moon_string(operation.method)}, {path_expression})"
     if operation.request_type is not None:
-        expression += ".json_body(body.to_json())"
+        expression += f".json_body({_to_json(operation.request_type, 'body')})"
     header_parameters = [parameter for parameter in operation.parameters if parameter.location == "header"]
     if header_parameters or operation.multipart_fields:
         binding = "let mut" if header_parameters else "let"
@@ -812,9 +836,11 @@ def _operation(operation: Operation) -> str:
                         lines.append(f"  if {value} is Some(value) {{ parts.push(@multipart.Part::text({name}, parameter_value(value))) }}")
                 else:
                     if field.required:
-                        lines.append(f"  parts.push(@multipart.Part::json({name}, {value}.to_json()))")
+                        assert field.type is not None
+                        lines.append(f"  parts.push(@multipart.Part::json({name}, {_to_json(field.type, value)}))")
                     else:
-                        lines.append(f"  if {value} is Some(value) {{ parts.push(@multipart.Part::json({name}, value.to_json())) }}")
+                        assert field.type is not None
+                        lines.append(f"  if {value} is Some(value) {{ parts.push(@multipart.Part::json({name}, {_to_json(field.type, 'value')})) }}")
             lines.append("  @multipart.apply(request, parts, boundary)")
         else:
             lines.append("  request")
@@ -851,6 +877,33 @@ fn percent_encode(value : String) -> String {
       byte == b'.' ||
       byte == b'_' ||
       byte == b'~' {
+      output.push(byte)
+    } else {
+      output.push(b'%')
+      output.push(hex[code >> 4])
+      output.push(hex[code & 15])
+    }
+  }
+  try! @utf8.decode(Bytes::from_array(output))
+}'''
+
+
+PERCENT_ENCODE_SEGMENTS_HELPER = r'''///|
+/// Percent-encodes a multi-segment path parameter (x-moonbit-path-segments): `/` stays a
+/// path separator, everything outside the RFC 3986 unreserved set is escaped.
+fn percent_encode_segments(value : String) -> String {
+  let hex = b"0123456789ABCDEF"
+  let output : Array[Byte] = []
+  for byte in @utf8.encode(value) {
+    let code = byte.to_int()
+    if (code >= 65 && code <= 90) ||
+      (code >= 97 && code <= 122) ||
+      (code >= 48 && code <= 57) ||
+      byte == b'-' ||
+      byte == b'.' ||
+      byte == b'_' ||
+      byte == b'~' ||
+      byte == b'/' {
       output.push(byte)
     } else {
       output.push(b'%')
@@ -1003,8 +1056,14 @@ fn json_array_matches(
     operation_helpers: list[str] = []
     if any(operation.parameters or operation.multipart_fields for operation in ir.operations):
         operation_helpers.append(PARAMETER_VALUE_HELPER)
-    if any(parameter.location in {"path", "query"} for operation in ir.operations for parameter in operation.parameters):
+    if any(
+        parameter.location == "query" or (parameter.location == "path" and not parameter.path_segments)
+        for operation in ir.operations
+        for parameter in operation.parameters
+    ):
         operation_helpers.append(PERCENT_ENCODE_HELPER)
+    if any(parameter.path_segments for operation in ir.operations for parameter in operation.parameters):
+        operation_helpers.append(PERCENT_ENCODE_SEGMENTS_HELPER)
     if any(parameter.location == "query" for operation in ir.operations for parameter in operation.parameters):
         operation_helpers.append(APPEND_QUERY_HELPER)
     if any(operation.response_type is not None for operation in ir.operations):

@@ -64,6 +64,9 @@ class StringEnum:
     variants: tuple[EnumVariant, ...]
     open: bool
     description: str = ""
+    # The catch-all constructor. Normally Unknown (open) or Custom (closed), moved aside
+    # when a spec value already spells that name; see _enum_type.
+    fallback: str = "Unknown"
 
 
 @dataclass(frozen=True)
@@ -100,6 +103,8 @@ class TaggedUnion:
     # The variant a payload without the discriminator decodes to: the one variant
     # whose payload does not require the discriminator property (or allows null).
     default_variant: str | None = None
+    # The catch-all constructor, moved aside when a variant already spells Unknown.
+    fallback: str = "Unknown"
 
 
 @dataclass(frozen=True)
@@ -135,6 +140,9 @@ class Parameter:
     required: bool
     style: str = ""
     description: str = ""
+    # x-moonbit-path-segments: this path parameter carries several path segments, so `/`
+    # is a separator to keep rather than data to escape (GitHub's `contents/{path}`).
+    path_segments: bool = False
 
 
 @dataclass(frozen=True)
@@ -176,58 +184,127 @@ class IR:
         return asdict(self)
 
 
+# MoonBit keywords plus the words `moonc` rejects with warning 0035 (reserved_keyword),
+# checked against the compiler: an identifier here is escaped with a trailing underscore.
 RESERVED = {
-    "namespace",
+    "abstract",
+    "alias",
+    "and",
     "as",
+    "assert",
     "async",
+    "await",
     "break",
     "catch",
     "const",
     "continue",
+    "declare",
+    "defer",
     "derive",
+    "do",
+    "dyn",
     "else",
     "enum",
+    "extend",
+    "extern",
+    "final",
     "fn",
     "for",
+    "guard",
     "if",
-    "include",
     "impl",
+    "import",
     "in",
+    "include",
+    "is",
     "let",
+    "letrec",
+    "local",
     "loop",
+    "macro",
     "match",
     "method",
+    "module",
+    "move",
     "mut",
+    "namespace",
+    "override",
+    "package",
     "priv",
+    "protected",
     "pub",
     "raise",
+    "readonly",
+    "ref",
     "return",
-    "struct",
     "static",
+    "struct",
     "suberror",
+    "super",
     "test",
+    "throw",
     "trait",
     "try",
     "type",
+    "typeof",
+    "unsafe",
+    "use",
     "using",
+    "var",
+    "virtual",
+    "void",
+    "where",
     "while",
     "with",
+    "yield",
 }
 
 
+# A `+` or `-` that starts a word and is followed by a digit is a sign, not a separator:
+# GitHub's reaction values `+1` and `-1` otherwise both normalize to the same identifier,
+# which collides as a variant name and emits a bare `1` as a struct field name. A hyphen
+# between word characters (`gpt-4`, `claude-3-opus`) keeps its separator meaning.
+SIGN = re.compile(r"(?<![A-Za-z0-9])([+-])(?=[0-9])")
+SIGN_WORDS = {"+": ("Plus", "plus_"), "-": ("Minus", "minus_")}
+
+
+def _spell_signs(value: str, index: int) -> str:
+    return SIGN.sub(lambda match: SIGN_WORDS[match.group(1)][index], value)
+
+
 def snake_case(value: str) -> str:
+    value = _spell_signs(value, 1)
     value = re.sub(r"([A-Z]+)([A-Z][a-z])", r"\1_\2", value)
     value = re.sub(r"([a-z0-9])([A-Z])", r"\1_\2", value)
     value = re.sub(r"[^A-Za-z0-9]+", "_", value).strip("_").lower() or "value"
+    if value[0].isdigit():
+        value = "value_" + value
     return value + "_" if value in RESERVED else value
 
 
 def pascal_case(value: str) -> str:
+    value = _spell_signs(value, 0)
     words = re.findall(r"[A-Za-z0-9]+", re.sub(r"([a-z0-9])([A-Z])", r"\1 \2", value))
     result = "".join(word[:1].upper() + word[1:] for word in words) or "Value"
     if result[0].isdigit():
         result = "Value" + result
     return result
+
+
+def _fallback_name(preferred: str, used: set[str]) -> str:
+    """The catch-all constructor name, moved aside when a spec value already spells it.
+
+    Values such as `unknown` or `custom` are the spec's to name; the fallback is ours, so
+    it steps aside deterministically (Unknown -> UnknownValue -> UnknownValue2 -> ...).
+    """
+    if preferred not in used:
+        return preferred
+    candidate = preferred + "Value"
+    suffix = 2
+    while candidate in used:
+        candidate = f"{preferred}Value{suffix}"
+        suffix += 1
+    return candidate
 
 
 def type_name(value: str) -> str:
@@ -882,17 +959,17 @@ class IRBuilder:
         variants: list[EnumVariant] = []
         used: set[str] = set()
         open_enum = "response" in usage
-        fallback = "Unknown" if open_enum else "Custom"
         for index, value in enumerate(values):
             variant = annotations[index] if isinstance(annotations, list) and index < len(annotations) else pascal_case(value)
             variant = pascal_case(str(variant))
             if variant in used:
                 self.add_diag(pointer_join(pointer, "enum"), f"enum variant name collision for {value!r}", "set x-moonbit-variants to unique names")
-            if variant == fallback:
-                self.add_diag(pointer_join(pointer, "enum"), f"enum value {value!r} collides with the {fallback} fallback constructor", f"set x-moonbit-variants to a name other than {fallback}")
             used.add(variant)
             variants.append(EnumVariant(variant, value))
-        self._add_declaration(StringEnum(name, tuple(variants), open_enum, schema.get("description", "")), pointer)
+        self._add_declaration(
+            StringEnum(name, tuple(variants), open_enum, schema.get("description", ""), _fallback_name("Unknown" if open_enum else "Custom", used)),
+            pointer,
+        )
         return TypeRef("named", name=name)
 
     def _tagged_union_type(
@@ -1133,8 +1210,8 @@ class IRBuilder:
                 elif len(groups[tag]) == 1 and tag in annotations:
                     suggested = annotations[tag]
             variant_name = pascal_case(str(suggested))
-            if variant_name == "Unknown" or variant_name in names:
-                self.add_diag(pointer, f"tagged union variant name collision: {variant_name}", "set x-moonbit-variants to unique names other than Unknown")
+            if variant_name in names:
+                self.add_diag(pointer, f"tagged union variant name collision: {variant_name}", "set x-moonbit-variants to unique names")
             names.add(variant_name)
             preserved = {property_name}
             if second_name is not None:
@@ -1169,7 +1246,7 @@ class IRBuilder:
                 f"discriminator {property_name!r} is optional in several variants ({', '.join(optional_tag_variants)}); a payload without it does not decode",
             )
         self._add_declaration(
-            TaggedUnion(name, property_name, tuple(variants), schema.get("description", ""), default_variant),
+            TaggedUnion(name, property_name, tuple(variants), schema.get("description", ""), default_variant, _fallback_name("Unknown", names)),
             pointer,
         )
         return TypeRef("named", name=name)
@@ -1525,7 +1602,22 @@ class IRBuilder:
                     "use type: object with typed additionalProperties",
                 )
             required = parameter.get("required") is True or location == "path"
-            parameters.append(Parameter(parameter["name"], moon_name, param_type, location, required, str(parameter.get("style", "")), parameter.get("description", "")))
+            path_segments = parameter.get("x-moonbit-path-segments") is True
+            if path_segments and location != "path":
+                self.add_diag(parameter_pointer, "x-moonbit-path-segments applies to path parameters only", f"remove it from this {location} parameter")
+                path_segments = False
+            parameters.append(
+                Parameter(
+                    parameter["name"],
+                    moon_name,
+                    param_type,
+                    location,
+                    required,
+                    str(parameter.get("style", "")),
+                    parameter.get("description", ""),
+                    path_segments,
+                )
+            )
         request_content = operation.get("requestBody", {}).get("content", {})
         request_schema = request_content.get("application/json", {}).get("schema")
         request_type = None

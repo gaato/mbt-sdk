@@ -146,19 +146,58 @@ class IRTests(unittest.TestCase):
         self.assertIsInstance(enum, StringEnum)
         self.assertEqual([variant.value for variant in enum.variants], ["left", "right"])
 
-    def test_enum_value_colliding_with_fallback_constructor_is_a_diagnostic(self):
+    def test_enum_value_colliding_with_fallback_constructor_moves_the_fallback_aside(self):
         request_schema = {"type": "string", "enum": ["anthropic", "custom"]}
-        with self.assertRaises(GenerationError) as caught:
-            IRBuilder(document(operation(request=request_schema)), "example/gen").build()
-        self.assertIn("'custom' collides with the Custom fallback constructor", str(caught.exception))
+        ir = IRBuilder(document(operation(request=request_schema)), "example/gen").build()
+        enum = declaration(ir, "TestOperationRequest")
+        self.assertEqual([variant.name for variant in enum.variants], ["Anthropic", "Custom"])
+        self.assertEqual(enum.fallback, "CustomValue")
+        types = emit(ir)["types.mbt"]
+        self.assertIn("CustomValue(String)", types)
+        self.assertIn("raw => CustomValue(raw),", types)
         response_schema = {"type": "string", "enum": ["known", "unknown"]}
-        with self.assertRaises(GenerationError) as caught:
-            IRBuilder(document(operation(response=response_schema)), "example/gen").build()
-        self.assertIn("'unknown' collides with the Unknown fallback constructor", str(caught.exception))
+        ir = IRBuilder(document(operation(response=response_schema)), "example/gen").build()
+        self.assertEqual(declaration(ir, "TestOperationResponse").fallback, "UnknownValue")
+        # A value that spells the escape hatch too keeps the numbering deterministic.
+        crowded = {"type": "string", "enum": ["unknown", "unknownValue"]}
+        ir = IRBuilder(document(operation(response=crowded)), "example/gen").build()
+        self.assertEqual(declaration(ir, "TestOperationResponse").fallback, "UnknownValue2")
+        # An explicit x-moonbit-variants name still wins, and then nothing collides.
         renamed = {"type": "string", "enum": ["anthropic", "custom"], "x-moonbit-variants": ["Anthropic", "CustomSkill"]}
         ir = IRBuilder(document(operation(request=renamed)), "example/gen").build()
         self.assertEqual([variant.name for variant in declaration(ir, "TestOperationRequest").variants], ["Anthropic", "CustomSkill"])
+        self.assertEqual(declaration(ir, "TestOperationRequest").fallback, "Custom")
         self.assertIn("Custom(String)", emit(ir)["types.mbt"])
+
+    def test_signed_enum_values_keep_distinct_variant_and_field_names(self):
+        # GitHub's reaction content: `+1` and `-1` otherwise normalize to the same identifier.
+        reactions = {"type": "string", "enum": ["+1", "-1", "laugh"]}
+        ir = IRBuilder(document(operation(request=reactions)), "example/gen").build()
+        enum = declaration(ir, "TestOperationRequest")
+        self.assertEqual([variant.name for variant in enum.variants], ["Plus1", "Minus1", "Laugh"])
+        rollup = {
+            "type": "object",
+            "properties": {"+1": {"type": "integer"}, "-1": {"type": "integer"}, "total_count": {"type": "integer"}},
+            "required": ["+1", "-1", "total_count"],
+        }
+        ir = IRBuilder(document(operation(request=rollup)), "example/gen").build()
+        struct = declaration(ir, "TestOperationRequest")
+        self.assertEqual([field.moon_name for field in struct.fields], ["plus_1", "minus_1", "total_count"])
+        self.assertIn('.field("+1", self.plus_1)', emit(ir)["types.mbt"])
+        # A hyphen between word characters stays a separator.
+        models = {"type": "string", "enum": ["gpt-4", "claude-3-opus"]}
+        ir = IRBuilder(document(operation(request=models)), "example/gen").build()
+        self.assertEqual([variant.name for variant in declaration(ir, "TestOperationRequest").variants], ["Gpt4", "Claude3Opus"])
+
+    def test_reserved_and_digit_leading_names_are_escaped(self):
+        schema = {
+            "type": "object",
+            "properties": {"ref": {"type": "string"}, "package": {"type": "string"}, "protected": {"type": "boolean"}, "2fa": {"type": "boolean"}},
+            "required": ["ref", "package", "protected", "2fa"],
+        }
+        ir = IRBuilder(document(operation(request=schema)), "example/gen").build()
+        struct = declaration(ir, "TestOperationRequest")
+        self.assertEqual([field.moon_name for field in struct.fields], ["ref_", "package_", "protected_", "value_2fa"])
 
     def test_named_primitive_expands_without_annotation_and_newtypes_with_it(self):
         schemas = {
@@ -892,6 +931,77 @@ class IRTests(unittest.TestCase):
         self.assertIn("--derive-operation-ids", str(caught.exception))
         ir = IRBuilder(doc, "example/gen", derive_operation_ids=True).build()
         self.assertEqual(ir.operations[0].operation_id, "post_test")
+
+    def test_path_segments_parameter_keeps_slashes_and_escapes_the_rest(self):
+        # GitHub's `contents/{path}`: escaping `/` as %2F makes the request 404 silently.
+        def contents(path_segments):
+            parameters = [
+                {"name": "owner", "in": "path", "required": True, "schema": {"type": "string"}},
+                {"name": "path", "in": "path", "required": True, "schema": {"type": "string"}, **path_segments},
+            ]
+            return {
+                "openapi": "3.1.0",
+                "paths": {"/repos/{owner}/contents/{path}": {"get": operation(parameters=parameters, operation_id="reposGetContent")}},
+                "components": {"schemas": {}},
+            }
+
+        ir = IRBuilder(contents({"x-moonbit-path-segments": True}), "example/gen").build()
+        self.assertEqual([parameter.path_segments for parameter in ir.operations[0].parameters], [False, True])
+        source = emit(ir)["operations.mbt"]
+        self.assertIn('"/repos/" + percent_encode(parameter_value(owner)) + "/contents/" + percent_encode_segments(parameter_value(path))', source)
+        self.assertIn("fn percent_encode_segments(value : String) -> String {", source)
+        self.assertIn("byte == b'/'", source)
+        # Without the knob the same parameter escapes `/` like any other value.
+        plain = emit(IRBuilder(contents({}), "example/gen").build())["operations.mbt"]
+        self.assertNotIn("percent_encode_segments", plain)
+        self.assertIn('"/contents/" + percent_encode(parameter_value(path))', plain)
+
+    def test_path_segments_only_operation_omits_the_plain_encoder(self):
+        parameters = [{"name": "ref", "in": "path", "required": True, "schema": {"type": "string"}, "x-moonbit-path-segments": True}]
+        doc = {
+            "openapi": "3.1.0",
+            "paths": {"/git/ref/{ref}": {"get": operation(parameters=parameters, operation_id="gitGetRef")}},
+            "components": {"schemas": {}},
+        }
+        source = emit(IRBuilder(doc, "example/gen").build())["operations.mbt"]
+        # `--deny-warn` rejects an unused helper, so only the encoder in use is emitted.
+        self.assertNotIn("fn percent_encode(value : String) -> String {", source)
+        self.assertIn("fn percent_encode_segments(value : String) -> String {", source)
+
+    def test_path_segments_outside_a_path_parameter_is_a_diagnostic(self):
+        parameters = [{"name": "q", "in": "query", "required": True, "schema": {"type": "string"}, "x-moonbit-path-segments": True}]
+        with self.assertRaises(GenerationError) as caught:
+            IRBuilder(document(operation(parameters=parameters)), "example/gen").build()
+        self.assertIn("x-moonbit-path-segments applies to path parameters only", str(caught.exception))
+
+    def test_struct_without_fields_decodes_through_a_named_empty_literal(self):
+        schemas = {"EmptyObject": {"type": "object", "properties": {}, "additionalProperties": False}}
+        ir = IRBuilder(document(operation(request={"$ref": "#/components/schemas/EmptyObject"}), schemas), "example/gen").build()
+        types = emit(ir)["types.mbt"]
+        self.assertIn("pub(all) struct EmptyObject {\n}", types)
+        # A bare `{}` parses as a Map literal, and the unused receiver would be a warning.
+        self.assertIn("with fn to_json(_self) {", types)
+        self.assertIn("  let _ = @sdkjson.expect_object(value, path)\n  EmptyObject::{}\n}", types)
+        self.assertNotIn("EmptyObject with fn from_json(value, path) {\n  let obj", types)
+
+    def test_raw_json_values_skip_the_deprecated_to_json_method(self):
+        schemas = {
+            "Payload": {"type": "object", "x-moonbit-json": True},
+            "Mixed": {"oneOf": [{"type": "string"}, {"type": "object", "x-moonbit-json": True}]},
+        }
+        doc = {
+            "openapi": "3.1.0",
+            "paths": {
+                "/raw": {"post": operation(request={"$ref": "#/components/schemas/Payload"}, operation_id="postRaw")},
+                "/mixed": {"post": operation(request={"$ref": "#/components/schemas/Mixed"}, operation_id="postMixed")},
+            },
+            "components": {"schemas": schemas},
+        }
+        sources = emit(IRBuilder(doc, "example/gen").build())
+        self.assertIn('@http.Request::post("/raw").json_body(body)\n', sources["operations.mbt"])
+        # A named union body still needs the encode call.
+        self.assertIn('@http.Request::post("/mixed").json_body(body.to_json())\n', sources["operations.mbt"])
+        self.assertIn("    Text(value) => value.to_json()\n    Object(value) => value\n", sources["types.mbt"])
 
 
 class CLITests(unittest.TestCase):

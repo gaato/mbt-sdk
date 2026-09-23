@@ -9,9 +9,17 @@ from jsonpath_rfc9535 import JSONPathEnvironment
 
 ENV = JSONPathEnvironment()
 
+# The libyaml-backed loader is ~6x faster on large specs (GitHub's 9.8MB YAML: 13.0s -> 2.2s)
+# and reads the same YAML 1.1 subset; fall back to the pure-Python loader when PyYAML was
+# built without the C extension.
+try:
+    YAML_LOADER = yaml.CSafeLoader
+except AttributeError:  # pragma: no cover - depends on the PyYAML build
+    YAML_LOADER = yaml.SafeLoader
+
 def load(path):
     with open(path, encoding="utf-8") as f:
-        return yaml.safe_load(f) if path.endswith((".yaml", ".yml")) else json.load(f)
+        return yaml.load(f, Loader=YAML_LOADER) if path.endswith((".yaml", ".yml")) else json.load(f)
 
 def merge(target, update):
     if isinstance(target, dict) and isinstance(update, dict):
