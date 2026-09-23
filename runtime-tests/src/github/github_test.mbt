@@ -69,6 +69,26 @@ fn issue_page(numbers : Array[Int]) -> String {
 }
 
 ///|
+/// The `variables` a GraphQL request carried, read back off the wire.
+///
+/// The body is compared as JSON rather than as text because a variables map is
+/// rebuilt for every page after the first and its keys need not come back in
+/// the order they went in.
+fn sent_variables(request : @http.Request) -> Json? {
+  let body = @json.parse(sent_text(request)) catch { _ => return None }
+  guard body is Object(fields) else { return None }
+  fields.get("variables")
+}
+
+///|
+/// The body a request carried, as text.
+fn sent_text(request : @http.Request) -> String {
+  @utf8.decode(request.body) catch {
+    _ => ""
+  }
+}
+
+///|
 /// The headers a rate-limited GitHub response carries.
 fn rate_limit_headers(
   remaining : Int,
@@ -715,6 +735,345 @@ async test "a 422 validation body is readable through api_error" {
     }
     // A POST is not idempotent, so a failing one is never replayed.
     assert_eq(transport.sent().length(), 1)
+    transport.assert_complete()
+  })
+}
+
+// -----------------------------------------------------------------------------
+// 7. GraphQL.
+// -----------------------------------------------------------------------------
+
+///|
+async test "a graphql query leaves as a POST to the graphql endpoint" {
+  bounded(() => {
+    let transport = @mock.FakeTransport::new()
+    transport.expect(
+      "POST",
+      "https://api.github.com/graphql",
+      json_response("{\"data\":{\"viewer\":{\"login\":\"gaato\"}}}"),
+    )
+    let gh = @github_sdk.GitHub::new(
+      transport,
+      @mock.FakeClock::new(),
+      token="ghp_test",
+    )
+    let data = gh.graphql(
+      query="query($login: String!) { user(login: $login) { id } }",
+      variables={ "login": "gaato" },
+    )
+    // graphql unwraps the envelope: the caller sees data, not {data, errors}.
+    assert_eq(data, { "viewer": { "login": "gaato" } })
+    let sent = transport.sent()
+    assert_eq(sent.length(), 1)
+    assert_eq(
+      sent_text(sent[0]),
+      "{\"query\":\"query($login: String!) { user(login: $login) { id } }\",\"variables\":{\"login\":\"gaato\"}}",
+    )
+    // The REST media type is replaced, not sent alongside; content-type comes
+    // from json_body; the version header rides along and GraphQL ignores it.
+    assert_eq(sent[0].headers.get_all("accept"), ["application/json"])
+    assert_eq(sent[0].headers.get("content-type"), Some("application/json"))
+    assert_eq(sent[0].headers.get("authorization"), Some("Bearer ghp_test"))
+    assert_eq(sent[0].headers.get("x-github-api-version"), Some("2022-11-28"))
+    assert_eq(sent[0].headers.get("user-agent"), Some("gaato-mbt-sdk/0.1.0"))
+    assert_eq(sent[0].headers.length(), 5)
+    transport.assert_complete()
+  })
+}
+
+///|
+async test "operationName travels only when a document declares several" {
+  bounded(() => {
+    let transport = @mock.FakeTransport::new()
+    transport.expect(
+      "POST",
+      "https://api.github.com/graphql",
+      json_response("{\"data\":{\"viewer\":{\"login\":\"gaato\"}}}"),
+    )
+    transport.expect(
+      "POST",
+      "https://api.github.com/graphql",
+      json_response("{\"data\":{\"viewer\":{\"login\":\"gaato\"}}}"),
+    )
+    let gh = @github_sdk.GitHub::new(
+      transport,
+      @mock.FakeClock::new(),
+      token="ghp_test",
+    )
+    ignore(gh.graphql(query="{ viewer { login } }"))
+    ignore(
+      gh.graphql(query="query Me { viewer { login } }", operation_name="Me"),
+    )
+    let sent = transport.sent()
+    // An absent variables map and an absent operation name are omitted rather
+    // than sent as null, which GitHub rejects.
+    assert_eq(sent_text(sent[0]), "{\"query\":\"{ viewer { login } }\"}")
+    assert_eq(
+      sent_text(sent[1]),
+      "{\"query\":\"query Me { viewer { login } }\",\"operationName\":\"Me\"}",
+    )
+    transport.assert_complete()
+  })
+}
+
+///|
+async test "a 200 carrying errors fails instead of passing unnoticed" {
+  bounded(() => {
+    let envelope =
+      #|{"data":{"repository":null},"errors":[{"type":"NOT_FOUND","path":["repository"],"message":"Could not resolve to a Repository with the name 'gaato/nope'."}]}
+    let transport = @mock.FakeTransport::new()
+    transport.expect(
+      "POST",
+      "https://api.github.com/graphql",
+      json_response(envelope, headers=rate_limit_headers(4999, 3600)),
+    )
+    let clock = @mock.FakeClock::new()
+    let gh = @github_sdk.GitHub::new(transport, clock, token="ghp_test")
+    try
+      gh.graphql(
+        query="{ repository(owner: \"gaato\", name: \"nope\") { id } }",
+      )
+    catch {
+      error => {
+        // The HTTP exchange succeeded, so nothing here reports a status: a 200
+        // in SdkError::status would mislead every caller that branches on one.
+        assert_eq(error.status(), None)
+        assert_false(error.is_retryable())
+        guard @github_sdk.graphql_errors(error) is Some(errors) else {
+          fail("the raised error must carry the GraphQL errors array")
+        }
+        assert_eq(errors.length(), 1)
+        assert_eq(errors[0].type_, Some("NOT_FOUND"))
+        assert_eq(errors[0].path, Some(["repository"]))
+      }
+    } noraise {
+      _ => fail("a non-empty errors array must fail")
+    }
+    // Not retried, and the limiter still observed the window the call spent.
+    assert_eq(transport.sent().length(), 1)
+    assert_eq(clock.slept(), [])
+    transport.assert_complete()
+  })
+}
+
+///|
+async test "graphql_response keeps the partial data of a failed field" {
+  bounded(() => {
+    // GraphQL resolves field by field: one field can fail while the rest of the
+    // query succeeds, and both halves arrive in the same 200.
+    let envelope =
+      #|{"data":{"viewer":{"login":"gaato"},"repository":null},"errors":[{"type":"FORBIDDEN","message":"Resource not accessible."}]}
+    let transport = @mock.FakeTransport::new()
+    transport.expect(
+      "POST",
+      "https://api.github.com/graphql",
+      json_response(envelope),
+    )
+    let gh = @github_sdk.GitHub::new(
+      transport,
+      @mock.FakeClock::new(),
+      token="ghp_test",
+    )
+    let whole = gh.graphql_response(query="{ viewer { login } }")
+    guard whole is Object(fields) else { fail("envelope must be an object") }
+    assert_eq(
+      fields.get("data"),
+      Some({ "viewer": { "login": "gaato" }, "repository": Json::null() }),
+    )
+    assert_true(fields.get("errors") is Some(_))
+    transport.assert_complete()
+  })
+}
+
+///|
+async test "a graphql rate limit is not retried on the spot" {
+  bounded(() => {
+    // GitHub reports an exhausted point budget as an ordinary errors entry on a
+    // 200. It refills on the hour and carries no retry-after, so replaying it
+    // immediately would only spend the retry budget; the limiter has the reset.
+    let envelope =
+      #|{"errors":[{"type":"RATE_LIMITED","message":"API rate limit exceeded for user ID 1."}]}
+    let transport = @mock.FakeTransport::new()
+    transport.expect(
+      "POST",
+      "https://api.github.com/graphql",
+      json_response(envelope, headers=rate_limit_headers(0, 3600)),
+    )
+    let clock = @mock.FakeClock::new()
+    let gh = @github_sdk.GitHub::new(transport, clock, token="ghp_test")
+    try gh.graphql(query="{ viewer { login } }") catch {
+      error => {
+        assert_false(error.is_retryable())
+        guard @github_sdk.graphql_errors(error) is Some(errors) else {
+          fail("the raised error must carry the GraphQL errors array")
+        }
+        assert_eq(errors[0].type_, Some("RATE_LIMITED"))
+      }
+    } noraise {
+      _ => fail("RATE_LIMITED must fail")
+    }
+    assert_eq(transport.sent().length(), 1)
+    assert_eq(clock.slept(), [])
+    transport.assert_complete()
+  })
+}
+
+///|
+async test "graphql and core meter in separate buckets" {
+  bounded(() => {
+    let transport = @mock.FakeTransport::new()
+    transport.expect(
+      "GET",
+      "/repos/gaato/mbt-sdk",
+      json_response("{}", headers=rate_limit_headers(0, 60)),
+    )
+    transport.expect(
+      "POST",
+      "https://api.github.com/graphql",
+      json_response(
+        "{\"data\":{\"viewer\":{\"login\":\"gaato\"}}}",
+        headers=rate_limit_headers(4999, 3600),
+      ),
+    )
+    transport.expect(
+      "GET",
+      "/repos/gaato/mbt-sdk",
+      json_response("{}", headers=rate_limit_headers(4999, 3600)),
+    )
+    let clock = @mock.FakeClock::new()
+    let gh = @github_sdk.GitHub::new(transport, clock, token="ghp_test")
+    ignore(gh.send(@gen.repos_get_request("gaato", "mbt-sdk")))
+    // Exhausting the core window does not hold up a GraphQL call: GitHub meters
+    // GraphQL on a budget of its own and says so in x-ratelimit-resource.
+    ignore(gh.graphql(query="{ viewer { login } }"))
+    assert_eq(clock.slept(), [])
+    // The next core request still pays for the exhausted core window.
+    ignore(gh.send(@gen.repos_get_request("gaato", "mbt-sdk")))
+    assert_eq(clock.slept(), [60000])
+    transport.assert_complete()
+  })
+}
+
+///|
+async test "an enterprise server reaches graphql outside the rest mount" {
+  bounded(() => {
+    let transport = @mock.FakeTransport::new()
+    transport.expect(
+      "GET",
+      "https://ghe.example.com/api/v3/repos/gaato/mbt-sdk",
+      json_response("{}"),
+    )
+    transport.expect(
+      "POST",
+      "https://ghe.example.com/api/graphql",
+      json_response("{\"data\":{\"viewer\":{\"login\":\"gaato\"}}}"),
+    )
+    let gh = @github_sdk.GitHub::new(
+      transport,
+      @mock.FakeClock::new(),
+      token="ghp_test",
+      base_url="https://ghe.example.com/api/v3",
+    )
+    ignore(gh.send(@gen.repos_get_request("gaato", "mbt-sdk")))
+    // REST is mounted at /api/v3 and GraphQL at /api/graphql, so appending to
+    // the REST root would address an endpoint that does not exist.
+    ignore(gh.graphql(query="{ viewer { login } }"))
+    transport.assert_complete()
+  })
+}
+
+///|
+async test "a graphql paginator threads endCursor through the variables" {
+  bounded(() => {
+    let transport = @mock.FakeTransport::new()
+    let page = (number : Int, cursor : String?) => {
+      let nodes = "[{\"number\":" + number.to_string() + "}]"
+      let next = match cursor {
+        Some(cursor) =>
+          "{\"hasNextPage\":true,\"endCursor\":\"" + cursor + "\"}"
+        None => "{\"hasNextPage\":false,\"endCursor\":null}"
+      }
+      json_response(
+        "{\"data\":{\"repository\":{\"issues\":{\"nodes\":" +
+        nodes +
+        ",\"pageInfo\":" +
+        next +
+        "}}}}",
+      )
+    }
+    transport.expect(
+      "POST",
+      "https://api.github.com/graphql",
+      page(1, Some("c1")),
+    )
+    transport.expect(
+      "POST",
+      "https://api.github.com/graphql",
+      page(2, Some("c2")),
+    )
+    transport.expect("POST", "https://api.github.com/graphql", page(3, None))
+    let gh = @github_sdk.GitHub::new(
+      transport,
+      @mock.FakeClock::new(),
+      token="ghp_test",
+    )
+    let numbers = gh
+      .graphql_paginator(
+        data => {
+          // The extractor runs inside the paginator, so a shape it cannot read
+          // has to fail the way the rest of the call does.
+          guard data
+            is Object(
+              {
+                "repository": Object(
+                  {
+                    "issues": Object(
+                      { "nodes": Array(nodes), "pageInfo": Object(info), .. }
+                    ),
+                    ..
+                  }
+                ),
+                ..
+              }
+            ) else {
+            raise @runtime.Config("unexpected connection shape")
+          }
+          let items = nodes.map(node => {
+            match node {
+              Object({ "number": Number(number, ..), .. }) => number.to_int()
+              _ => raise @runtime.Config("unexpected node shape")
+            }
+          })
+          // The cursor is only meaningful while there is a page to fetch.
+          let next = if info.get("hasNextPage") is Some(True) {
+            match info.get("endCursor") {
+              Some(String(cursor)) => Some(cursor)
+              _ => None
+            }
+          } else {
+            None
+          }
+          (items, next)
+        },
+        query="query($cursor: String) { repository(owner: \"gaato\", name: \"mbt-sdk\") { issues(first: 1, after: $cursor) { nodes { number } pageInfo { hasNextPage endCursor } } } }",
+        variables={ "owner": "gaato" },
+        cursor_variable="cursor",
+      )
+      .collect(max=10)
+    assert_eq(numbers, [1, 2, 3])
+    let sent = transport.sent()
+    assert_eq(sent.length(), 3)
+    // The first page carries no cursor at all; every later one carries the
+    // cursor the previous page ended on, beside the caller's own variables.
+    assert_eq(sent_variables(sent[0]), Some({ "owner": "gaato" }))
+    assert_eq(
+      sent_variables(sent[1]),
+      Some({ "owner": "gaato", "cursor": "c1" }),
+    )
+    assert_eq(
+      sent_variables(sent[2]),
+      Some({ "owner": "gaato", "cursor": "c2" }),
+    )
     transport.assert_complete()
   })
 }

@@ -1073,3 +1073,140 @@ async test "live GitHub REST read paths, Link pagination, and rate limits" {
     )
   })
 }
+
+// -----------------------------------------------------------------------------
+// GitHub GraphQL API.
+//
+// The passthrough is the only part of gaato/github that no fixture can settle:
+// a GraphQL failure arrives as HTTP 200 with an errors array, and the shape of
+// that array is GitHub's, not the specification's. This section makes the real
+// server produce one.
+// -----------------------------------------------------------------------------
+
+///|
+async test "live GitHub GraphQL passthrough, error envelope, and point budget" {
+  bounded(() => {
+    guard credential("MBT_SDK_GITHUB_TOKEN", "GitHub") is Some(token) else {
+      return
+    }
+    let clock = @adapter.AsyncClock::new()
+    let limiter = @runtime.WindowLimiter::new(
+      clock,
+      @runtime.rate_limit_headers(
+        remaining="x-ratelimit-remaining",
+        reset_unix_seconds="x-ratelimit-reset",
+      ),
+    )
+    let gh = @github_sdk.GitHub::new(
+      @adapter.AsyncTransport::new(timeout_ms=45000),
+      clock,
+      token~,
+      retry=live_retry(),
+      limiter~,
+    )
+
+    // 1. A query that succeeds. GraphQL requires authentication: the same call
+    //    without a token is answered 403, not 401.
+    let viewer = one_github_call("graphql viewer", () => {
+      gh.graphql(query="query { viewer { login } }")
+    })
+    guard viewer
+      is Object({ "viewer": Object({ "login": String(login), .. }), .. }) else {
+      validation_failure(
+        "GitHub",
+        "graphql viewer",
+        "unexpected data shape: \{viewer.stringify()}",
+      )
+      return
+    }
+    if login.is_empty() {
+      validation_failure("GitHub", "graphql viewer", "viewer.login was empty")
+    }
+
+    // 2. A query that fails at the field level. GitHub answers 200 with a null
+    //    field and a typed entry in errors, which the facade must refuse to
+    //    return as a success.
+    let missing =
+      #|query { repository(owner: "gaato", name: "mbt-sdk-does-not-exist-4f2a9") { id } }
+    try gh.graphql(query=missing) catch {
+      error => {
+        if error.status() is Some(status) {
+          validation_failure(
+            "GitHub",
+            "graphql NOT_FOUND",
+            "a field-level GraphQL error reported HTTP status \{status}",
+          )
+        }
+        guard @github_sdk.graphql_errors(error) is Some(errors) else {
+          validation_failure(
+            "GitHub",
+            "graphql NOT_FOUND",
+            "the raised error carried no GraphQL errors array: \{@debug.to_string(error)}",
+          )
+          return
+        }
+        if errors.is_empty() {
+          validation_failure(
+            "GitHub", "graphql NOT_FOUND", "the errors array was empty",
+          )
+        } else if errors[0].type_ != Some("NOT_FOUND") {
+          validation_failure(
+            "GitHub",
+            "graphql NOT_FOUND",
+            "expected type NOT_FOUND, got \{@debug.to_string(errors[0])}",
+          )
+        }
+      }
+    } noraise {
+      _ =>
+        validation_failure(
+          "GitHub", "graphql NOT_FOUND", "a query naming a missing repository succeeded",
+        )
+    }
+
+    // 3. The same reply through graphql_response keeps its partial data, which
+    //    is the whole reason that entry point exists.
+    let envelope = one_github_call("graphql_response NOT_FOUND", () => {
+      gh.graphql_response(query=missing)
+    })
+    guard envelope is Object(fields) else {
+      validation_failure(
+        "GitHub", "graphql_response", "the envelope was not an object",
+      )
+      return
+    }
+    if !(fields.get("errors") is Some(_)) {
+      validation_failure(
+        "GitHub", "graphql_response", "the envelope carried no errors array",
+      )
+    }
+    if !(fields.get("data") is Some(_)) {
+      validation_failure(
+        "GitHub", "graphql_response", "the envelope carried no data field beside its errors",
+      )
+    }
+
+    // 4. GraphQL is budgeted apart from REST. The limiter must have a graphql
+    //    bucket, and it must not be the core one.
+    guard limiter.state("graphql") is Some(state) else {
+      fail(
+        "provider=GitHub op=graphql rate-limit: the limiter recorded no state for the graphql bucket",
+      )
+    }
+    if state.reset_at_unix_ms <= clock.now_unix_ms() {
+      validation_failure(
+        "GitHub",
+        "graphql rate-limit",
+        "x-ratelimit-reset was not in the future: \{state.reset_at_unix_ms}",
+      )
+    }
+    if limiter.state("core") is Some(_) {
+      validation_failure(
+        "GitHub", "graphql rate-limit", "a GraphQL call was metered against the core bucket",
+      )
+    }
+    println(
+      "GitHub GraphQL: a query, a field-level error envelope, partial data, and a separate point budget all passed",
+    )
+  })
+}

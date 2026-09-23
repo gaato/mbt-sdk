@@ -37,14 +37,23 @@ pub async fn GitHub::send(
 ///
 /// GitHub meters search separately from the rest of the REST API, and the two
 /// windows are far apart (30 requests per minute against 5,000 per hour), so
-/// they must not share a limiter bucket.
+/// they must not share a limiter bucket. GraphQL is a third window, budgeted in
+/// points rather than requests: the vendored specification lists `core`,
+/// `graphql`, `search` and the rest as separate resources of
+/// `/rate_limit`, and a GraphQL response names its own with
+/// `x-ratelimit-resource: graphql`.
 ///
 /// The URL is either the relative path a generated operation produced or the
 /// absolute `Link` target of a following page, so the scheme and authority are
 /// stripped first, along with the `/api/v3` mount a GitHub Enterprise Server
-/// deployment puts in front of every path.
+/// deployment puts in front of every path. GraphQL is not under that mount —
+/// Enterprise Server serves it from `/api/graphql` — so both spellings appear
+/// here.
 fn rate_limit_bucket(url : String) -> String {
-  if request_path(url).has_prefix("/search/") {
+  let path = request_path(url)
+  if path == "/graphql" || path == "/api/graphql" {
+    "graphql"
+  } else if path.has_prefix("/search/") {
     "search"
   } else {
     "core"

@@ -36,6 +36,8 @@ first-party の OpenAPI があること(`github/rest-api-description`)も条件�
 
 census が 99 → 76 に下がっているのは overlay ではなく generator 修正による。`Unknown` / `Custom` fallback constructor の名前衝突(13 件)と、`+1` / `-1` の variant 名が同じ名前に潰れる件(10 件)を `tools/gen` 側で直した。どちらも anthropic で一度 overlay を当てた問題の再発なので、overlay ではなく generator に置いた。残りの 76 件を overlay で処理した(`fix.yaml` が上流の不整合として 11 件、`moonbit.yaml` が MoonBit 側の判断として 65 件)。内訳と理由は `docs/census.md` に表で置いた。
 
+GraphQL は**この生成の対象外**で、型なしの素通しとして facade に置いた(0.2.0)。理由は「量が多いから」ではなく、生成すべき表が存在しないこと。OpenAPI ではレスポンスの形は operation の属性で、`operationId` → response schema が 1:1 に対応するから `tools/gen` はそれをコンパイルできる。GraphQL ではレスポンスの形は**呼び出し側が書いたクエリ文書**の属性で、スキーマは「何が可能か」しか言わない。スキーマ全体を型にしても応答は常に部分選択なので全フィールドが optional になり、`Json` と同じ保証しか得られない(実測: object type 1,026 / field 7,627 / nullable 率 58%)。クエリ文書から生成する道(graphql-codegen 方式)は本物の型が出るが、入力に利用者のコードが入るため生成器が consumer 側のビルドで走る必要があり、MoonBit のビルドシステムにそのフックが無い。
+
 ## facade を薄くした判断
 
 openai / anthropic は、生成型を安定した手書き facade 型へ写す(`*_from_generated`)。GitHub ではこれを**しない**。
@@ -49,10 +51,10 @@ openai / anthropic は、生成型を安定した手書き facade 型へ写す(`
 
 ## 公開 API(契約)
 
-配置は `github/`(module `gaato/github`、依存は `gaato/http` と `gaato/sdk-runtime` だけ)。`github/src/pkg.generated.mbti` の全量が以下で、これ以外は `gaato/github/gen` の生成物である。
+配置は `github/`(module `gaato/github`、依存は `gaato/http` と `gaato/sdk-runtime` だけ)。`github/src/pkg.generated.mbti` の全量が以下と次節の GraphQL 分で、これ以外は `gaato/github/gen` の生成物である。
 
 ```moonbit
-pub struct GitHub                                   // priv client : @runtime.Client
+pub struct GitHub                                   // priv client, priv graphql_url
 pub fn GitHub::new(
   &@http.Transport, &@clock.Clock,
   token? : String,                                  // 省略時 NoAuth(公開リソースは無認証で読める)
@@ -61,8 +63,11 @@ pub fn GitHub::new(
   user_agent? : String,                             // = "gaato-mbt-sdk/0.1.0"(GitHub は User-Agent 必須)
   retry? : @runtime.RetryPolicy,
   limiter? : &@runtime.RateLimiter,                 // 既定は下記の WindowLimiter
+  graphql_url? : String,                            // 省略時 base_url から導出(次節)
 ) -> Self
-pub fn GitHub::from_client(@runtime.Client) -> Self // GHES / プロキシ / テスト用の逃げ道
+pub fn GitHub::from_client(                         // GHES / プロキシ / テスト用の逃げ道
+  @runtime.Client, graphql_url? : String,
+) -> Self
 pub impl @debug.Debug for GitHub                    // 常に GitHub(<credentials redacted>)
 
 pub async fn[T] GitHub::call(
@@ -88,6 +93,42 @@ pub fn is_secondary_rate_limit(@runtime.SdkError) -> Bool
 - `paginator` の cursor は `Link` の `rel="next"` URL をそのまま入れる。`Client::prepare` は絶対 URL を素通しするので、2 ページ目以降を組み立て直す処理は facade に無い。`search_*` は `{items, total_count}` の封筒なので、`items` を返す decoder で包む必要がある。
 - `ApiErrorBody.status` が `String?` なのは GitHub が `"404"` と文字列で書くため。数値で来ても同じ形に読む(互換プロキシ対策)。
 - `Debug` は runtime 内部を辿らず、常に `GitHub(<credentials redacted>)` を返す。
+
+## GraphQL 素通し(0.2.0)
+
+```moonbit
+pub async fn GitHub::graphql(
+  Self, query~ : String, variables? : Json, operation_name? : String,
+) -> Json raise @runtime.SdkError                   // errors が非空なら raise し data を返す
+pub async fn GitHub::graphql_response(
+  Self, query~ : String, variables? : Json, operation_name? : String,
+) -> Json raise @runtime.SdkError                   // {data, errors, extensions} をそのまま
+pub fn[T] GitHub::graphql_paginator(
+  Self,
+  (Json) -> (Array[T], String?) raise @runtime.SdkError,
+  query~ : String, variables? : Json,
+  cursor_variable? : String,                        // = "after"
+  operation_name? : String,
+) -> @runtime.Paginator[T]
+
+pub(all) struct GraphqlError {
+  message : String; type_ : String?
+  path : Array[Json]?; locations : Array[Json]?; extensions : Json?
+} derive(Eq, @debug.Debug)
+pub fn graphql_errors(@runtime.SdkError) -> Array[GraphqlError]?
+```
+
+判断は 3 つ。
+
+**エラーを `Decode` に写す。** GraphQL の失敗は HTTP 200 のまま `{"data": …, "errors":[…]}` で来る。`sdk-runtime` の `classify` はステータスしか見ないので、何もしなければ `SdkError` が上がらず `api_error` にも届かず、完全に無言で落ちる。`errors` が非空なら `@runtime.Decode(message~, body~)` を raise する。`Status(status=200)` にしなかったのは `SdkError::status()` が `Some(200)` を返すようになり、ステータスで分岐している既存コードを騙すため。`Decode` を選べるのは、HTTP は成功したが求めた値が入っていなかった、という意味で `openai/src/decode.mbt` の「chat completion has no choices」と同じ形だから。`sdk-runtime` に variant を足す案は採らなかった(公開済み enum への追加は openai / anthropic まで巻き込む破壊的変更)。
+
+**`RATE_LIMITED` も特別扱いしない。** GraphQL のレート超過は `errors[].type == "RATE_LIMITED"` という普通のエントリで、`retry-after` は付かず、ポイント枠は毎時リセットされる。`RateLimited` に写せば `RetryPolicy` が自動再試行するが、秒単位のバックオフでは枠が戻らないまま再試行予算を使い切るだけ。`Decode` は retryable ではないので空振りが起きず、`x-ratelimit-reset` は `WindowLimiter` が既に観測しているので次のリクエストは正しく待つ。種別は `graphql_errors()` で読める。
+
+**部分成功は捨てない。** GraphQL はフィールド単位で解決するので `data` と `errors` が同時に来る。`graphql` は常に raise する(黙って落とす経路を作らない)が、封筒をそのまま返す `graphql_response` を別に置いて、部分データが要る呼び出し側の逃げ道にした。
+
+配線側は 2 点。バケットは `core` / `search` に `graphql` を足した(vendor 済み spec の `rate-limit-overview` が別 resource として並べており、実際の応答も `x-ratelimit-resource: graphql` を返す)。エンドポイントは `base_url` からの導出で、GHES は REST が `/api/v3`、GraphQL が `/api/graphql` と別マウントなので `/graphql` を足すだけでは 404 になる。
+
+ページングは `@runtime.Paginator` をそのまま使う。カーソル型が `String?` なので `pageInfo.endCursor` を載せられる。ただし `pageInfo` はクエリ次第で任意の深さに現れるためパスは受け取らず、呼び出し側の抽出関数に `(items, next)` を返してもらう形にした。
 
 ## spec を `2022-11-28` に pin した理由
 
@@ -124,6 +165,9 @@ multi-segment path parameter は live でしか壊れ方が見えないので、
 - **生成 op は `accept` を立てない**。diff / patch / sarif などの表現が要るときは呼び出し側が `.header("accept", ...)` を付ける。
 - 個別 op のラッパは無い。`call` / `paginator` に生成 op の 2 つ組を渡す形が唯一の呼び出し方。
 - 公開型が上流の schema 名と形に直結する(前述の取引)。
+- **GraphQL は型が付かない**。`graphql` の戻り値は `Json` で、デコードは呼び出し側の仕事。上の理由により生成では埋められない。
+- **`graphql_paginator` の抽出関数は型安全でない**。`pageInfo` の位置を間違えても静かに 1 ページで止まる。`hasNextPage` が false のとき `None` を返す約束は呼び出し側が守る。
+- `GraphqlError.type_` は `String?` のまま。GitHub が取り得る値の集合を文書化していないので enum にできない。
 
 ## 上流 spec の不具合 12 件
 
