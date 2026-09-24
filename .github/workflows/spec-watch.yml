@@ -1,10 +1,11 @@
 name: Spec watch
 
 # Fetches the upstream OpenAI, Anthropic and GitHub specs daily. When changed: re-vendor, apply the
-# overlays, regenerate, run the gates, and open a PR. Overlay actions that no
-# longer match (zero-match) or no longer change anything (no-op: upstream fixed
-# it) fail the overlay step; their messages go into the PR body so a human can
-# prune the overlay.
+# overlays, regenerate, run the gates, and open a PR. When generation, the gates
+# and CI all pass, the PR is merged here; otherwise it stays open for a human.
+# Overlay actions that no longer match (zero-match) or no longer change anything
+# (no-op: upstream fixed it) fail the overlay step; their messages go into the
+# PR body so a human can prune the overlay.
 
 on:
   schedule:
@@ -39,7 +40,7 @@ jobs:
       SPEC_FILE: ${{ matrix.spec_file }}
       SPEC_URL: ${{ matrix.spec_url }}
     runs-on: ubuntu-24.04
-    timeout-minutes: 30
+    timeout-minutes: 60
     steps:
       - name: Check out repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -110,19 +111,24 @@ jobs:
 
       - name: Open pull request
         if: steps.fetch.outputs.changed == 'true'
+        id: pr
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           hash="${{ steps.fetch.outputs.new }}"
           branch="spec-watch/$PROVIDER/${hash:0:20}"
-          # Same upstream hash as an earlier run: leave its branch and PR alone.
+          echo "branch=$branch" >> "$GITHUB_OUTPUT"
+          # Same upstream hash as an earlier run: reuse its PR (it may still be
+          # waiting for a merge), or stop if someone closed it.
           if git ls-remote --exit-code --heads origin "$branch" > /dev/null; then
-            if [ -n "$(gh pr list --head "$branch" --state open --json number --jq '.[].number')" ]; then
-              echo "An open PR already tracks $branch; nothing to do."
-              exit 0
+            pr="$(gh pr list --head "$branch" --state open --json number --jq '.[].number')"
+            if [ -z "$pr" ]; then
+              echo "::error::$branch exists without an open PR; delete the branch to regenerate it."
+              exit 1
             fi
-            echo "::error::$branch exists without an open PR; delete the branch to regenerate it."
-            exit 1
+            echo "An open PR (#$pr) already tracks $branch."
+            echo "number=$pr" >> "$GITHUB_OUTPUT"
+            exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -136,11 +142,47 @@ jobs:
             echo "- overlay + generator exit status: \`${{ steps.regen.outputs.generate_status }}\`"
             echo "- gates exit status: \`${{ steps.gates.outputs.gates_status }}\`"
             echo
+            echo "Spec watch merges this PR itself when both are \`0\` and CI passes; otherwise it waits for a human."
+            echo
             echo '<details><summary>generate.log</summary>'; echo; echo '```'; tail -n 80 "$RUNNER_TEMP/generate.log"; echo '```'; echo '</details>'
             echo '<details><summary>gates.log (tail)</summary>'; echo; echo '```'; tail -n 60 "$RUNNER_TEMP/gates.log"; echo '```'; echo '</details>'
           } > "$RUNNER_TEMP/body.md"
-          gh pr create --base main --head "$branch" \
-            --title "Update vendored $PROVIDER spec" --body-file "$RUNNER_TEMP/body.md"
-          # PRs opened with GITHUB_TOKEN do not trigger pull_request workflows,
-          # but workflow_dispatch is exempt; its checks land on the branch head.
-          gh workflow run ci.yml --ref "$branch"
+          url="$(gh pr create --base main --head "$branch" \
+            --title "Update vendored $PROVIDER spec" --body-file "$RUNNER_TEMP/body.md")"
+          echo "number=${url##*/}" >> "$GITHUB_OUTPUT"
+
+      # pull_request runs for PRs opened with GITHUB_TOKEN wait for approval, but
+      # workflow_dispatch runs start at once and report on the branch head.
+      - name: Merge when generation, gates and CI pass
+        if: steps.pr.outputs.number != '' && steps.regen.outputs.generate_status == '0' && steps.gates.outputs.gates_status == '0'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BRANCH: ${{ steps.pr.outputs.branch }}
+          PR: ${{ steps.pr.outputs.number }}
+        run: |
+          sha="$(gh pr view "$PR" --json headRefOid --jq .headRefOid)"
+          find_run() {
+            gh run list --workflow ci.yml --branch "$BRANCH" --event workflow_dispatch \
+              --json databaseId,headSha --jq "map(select(.headSha == \"$sha\"))[0].databaseId // empty"
+          }
+          run="$(find_run)"
+          if [ -z "$run" ]; then
+            gh workflow run ci.yml --ref "$BRANCH"
+            for _ in $(seq 30); do sleep 5; run="$(find_run)"; [ -n "$run" ] && break; done
+          fi
+          if [ -z "$run" ]; then
+            echo "::error::No CI run appeared for $BRANCH; leaving PR #$PR for review."
+            exit 1
+          fi
+          if ! gh run watch "$run" --exit-status > /dev/null; then
+            echo "::error::CI run $run failed; leaving PR #$PR for review."
+            exit 1
+          fi
+          gh pr merge "$PR" --squash --match-head-commit "$sha"
+          gh api -X DELETE "repos/$GITHUB_REPOSITORY/git/refs/heads/$BRANCH"
+
+      - name: Flag for review
+        if: steps.pr.outputs.number != '' && (steps.regen.outputs.generate_status != '0' || steps.gates.outputs.gates_status != '0')
+        run: |
+          echo "::error::Generation or gates failed; PR #${{ steps.pr.outputs.number }} needs a human."
+          exit 1
