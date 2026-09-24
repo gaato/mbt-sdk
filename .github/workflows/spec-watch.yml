@@ -12,6 +12,7 @@ on:
   workflow_dispatch:
 
 permissions:
+  actions: write
   contents: write
   pull-requests: write
 
@@ -94,6 +95,15 @@ jobs:
         run: |
           hash="${{ steps.fetch.outputs.new }}"
           branch="spec-watch/$PROVIDER/${hash:0:20}"
+          # Same upstream hash as an earlier run: leave its branch and PR alone.
+          if git ls-remote --exit-code --heads origin "$branch" > /dev/null; then
+            if [ -n "$(gh pr list --head "$branch" --state open --json number --jq '.[].number')" ]; then
+              echo "An open PR already tracks $branch; nothing to do."
+              exit 0
+            fi
+            echo "::error::$branch exists without an open PR; delete the branch to regenerate it."
+            exit 1
+          fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git switch -c "$branch"
@@ -111,3 +121,6 @@ jobs:
           } > "$RUNNER_TEMP/body.md"
           gh pr create --base main --head "$branch" \
             --title "Update vendored $PROVIDER spec" --body-file "$RUNNER_TEMP/body.md"
+          # PRs opened with GITHUB_TOKEN do not trigger pull_request workflows,
+          # but workflow_dispatch is exempt; its checks land on the branch head.
+          gh workflow run ci.yml --ref "$branch"
