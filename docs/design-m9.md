@@ -60,6 +60,14 @@ pub(open) trait RetryDecider {
 
 `encode` と同じ本文を、1 つの `Bytes` ではなく順序付きの断片の列で返す。各 part の本文はそのままの `Bytes` で 1 断片になり、コピーされない。discord.mbt の interaction callback は添付を含む応答を `ReadableStream` や socket へ断片ごとに流すので、大きな添付を一度連結する形にはできなかった。`encode` は `encode_segments` の連結として実装し、出力は 0.1.0 とバイト単位で同じ。
 
+### 遅延本文 `body?`(0.2.1)
+
+`send` / `send_json` / `send_stream` は `body? : () -> Bytes` を取る。与えると、各試行で limiter が admit した後に呼んで、その戻り値を本文にする。0.2.0 は `@http.Request` を完成させてから `acquire` で待つので、rate limit の待ち行列に並んだ multipart upload がそれぞれ符号化済みの本文を丸ごと 1 つ抱えていた。discord.mbt の旧実装は admit の後で符号化していたので、載せ替えで待機中のメモリが増えていた(Codex レビューで発覚)。
+
+- 本文だけを遅らせる。method・URL・headers(boundary 入りの `content-type` を含む)は最初に確定しているので、retry decider は本文なしの request を見る。decider が要るのは method と headers だけ。observer は実際に送った request を見る。
+- closure は raise しない。検証は admit の前に済ませる。multipart なら `encode_segments` を先に呼ぶと、boundary の衝突と header 値の検査が終わり、part の本文はコピーされずに断片として残る。closure はその連結だけをする。
+- 試行ごとに呼ぶので、429 の再送でも待機中に本文を抱えない。
+
 ### streaming の残課題
 
 `send_stream_once` は `release` の対を修正したが、middleware は今も通らない(`@http.send_with` が buffered 専用)。直すなら `gaato/http` 側で streaming 用の chain が要る。今回は触らない。

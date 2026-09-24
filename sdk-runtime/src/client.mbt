@@ -78,17 +78,24 @@ pub fn Client::new(
 /// `bucket` names the rate-limit bucket the request is admitted through and
 /// `global_exempt` keeps it out of an account-wide limit; both are passed to
 /// the limiter as they are.
+///
+/// `body`, when given, replaces the request's body: it is called once per
+/// attempt, after the limiter admits that attempt, so a request waiting for
+/// admission holds no encoded body (a multipart upload can keep only the
+/// segments from `@multipart.encode_segments` and join them here). The retry
+/// decider sees the request without it; the observer sees what was sent.
 pub async fn Client::send(
   self : Client,
   request : @http.Request,
   bucket? : String,
   global_exempt? : Bool = false,
+  body? : () -> Bytes,
 ) -> @http.Response raise SdkError {
   let request = self.prepare(request)
   let bucket = bucket.unwrap_or("")
   for attempt = 0; ; attempt = attempt + 1 {
     let outcome : Result[@http.Response, SdkError] = Ok(
-      self.send_once(request, bucket, global_exempt, attempt),
+      self.send_once(request, body, bucket, global_exempt, attempt),
     ) catch {
       error => Err(error)
     }
@@ -105,14 +112,16 @@ pub async fn Client::send(
 }
 
 ///|
-/// Sends and decodes JSON; an empty successful body is JSON null.
+/// Sends and decodes JSON; an empty successful body is JSON null. `body` is
+/// as for `send`.
 pub async fn Client::send_json(
   self : Client,
   request : @http.Request,
   bucket? : String,
   global_exempt? : Bool = false,
+  body? : () -> Bytes,
 ) -> Json raise SdkError {
-  let response = self.send(request, bucket?, global_exempt~)
+  let response = self.send(request, bucket?, global_exempt~, body?)
   if response.body.is_empty() {
     return Json::null()
   }
@@ -124,17 +133,19 @@ pub async fn Client::send_json(
 ///|
 /// Sends a streaming request. A successful body is returned to the caller;
 /// an unsuccessful body is read up to 1 MiB, closed, classified, and retried.
+/// `body` is as for `send`.
 pub async fn Client::send_stream(
   self : Client,
   request : @http.Request,
   bucket? : String,
   global_exempt? : Bool = false,
+  body? : () -> Bytes,
 ) -> (@http.ResponseHead, &@http.BodyStream) raise SdkError {
   let request = self.prepare(request)
   let bucket = bucket.unwrap_or("")
   for attempt = 0; ; attempt = attempt + 1 {
     let outcome : Result[(@http.ResponseHead, &@http.BodyStream), SdkError] = Ok(
-      self.send_stream_once(request, bucket, global_exempt, attempt),
+      self.send_stream_once(request, body, bucket, global_exempt, attempt),
     ) catch {
       error => Err(error)
     }
@@ -156,17 +167,17 @@ pub async fn Client::send_stream(
 async fn Client::send_once(
   self : Client,
   request : @http.Request,
+  body : (() -> Bytes)?,
   bucket : String,
   global_exempt : Bool,
   attempt : Int,
 ) -> @http.Response raise SdkError {
-  let request = request.body_bytes(request.body)
   let response = self.admit_and_exchange(
     bucket,
-    request,
     global_exempt,
     attempt,
-    () => send_buffered(self.transport, self.middleware, request),
+    () => attempt_request(request, body),
+    request => send_buffered(self.transport, self.middleware, request),
     response => (response.status, response.headers, response.body),
     _ => (),
   )
@@ -179,17 +190,17 @@ async fn Client::send_once(
 async fn Client::send_stream_once(
   self : Client,
   request : @http.Request,
+  body : (() -> Bytes)?,
   bucket : String,
   global_exempt : Bool,
   attempt : Int,
 ) -> (@http.ResponseHead, &@http.BodyStream) raise SdkError {
-  let request = request.body_bytes(request.body)
   let (head, stream) = self.admit_and_exchange(
     bucket,
-    request,
     global_exempt,
     attempt,
-    () => send_streaming(self.transport, request),
+    () => attempt_request(request, body),
+    request => send_streaming(self.transport, request),
     pair => (pair.0.status, pair.0.headers, b""),
     pair => pair.1.close(),
   )
@@ -207,8 +218,22 @@ async fn Client::send_stream_once(
 }
 
 ///|
+/// The request one attempt sends, as its own copy: with the deferred body
+/// built now when there is one, and with the request's own body otherwise.
+fn attempt_request(
+  request : @http.Request,
+  body : (() -> Bytes)?,
+) -> @http.Request {
+  match body {
+    Some(build) => request.body_bytes(build())
+    None => request.body_bytes(request.body)
+  }
+}
+
+///|
 /// Runs one exchange between the limiter's `acquire` and its `release`, and
-/// reports it to the observer.
+/// reports it to the observer. `build` makes the attempt's request once the
+/// limiter has admitted it, so nothing it allocates is held while waiting.
 ///
 /// Every exit after `acquire` returns releases exactly once: a response
 /// releases with its status, a transport failure releases with status `0`,
@@ -222,16 +247,17 @@ async fn Client::send_stream_once(
 async fn[T] Client::admit_and_exchange(
   self : Client,
   bucket : String,
-  request : @http.Request,
   global_exempt : Bool,
   attempt : Int,
-  exchange : async () -> T raise SdkError,
+  build : () -> @http.Request,
+  exchange : async (@http.Request) -> T raise SdkError,
   head : (T) -> (Int, @http.Headers, Bytes),
   discard : (T) -> Unit,
 ) -> T raise SdkError {
   self.limiter.acquire(bucket, global_exempt~) catch {
     error => raise Config("rate limiter acquire failed: \{error}")
   }
+  let request = build()
   let started_at = self.clock.now_unix_ms()
   let outcome = self.exchange_guarded(
     bucket, request, attempt, started_at, exchange,
@@ -279,7 +305,7 @@ async fn[T] Client::exchange_guarded(
   request : @http.Request,
   attempt : Int,
   started_at : Int64,
-  exchange : async () -> T raise SdkError,
+  exchange : async (@http.Request) -> T raise SdkError,
 ) -> Result[T, SdkError] noraise {
   errdefer self.settle_without_response(
     bucket,
@@ -288,7 +314,7 @@ async fn[T] Client::exchange_guarded(
     started_at,
     None,
   )
-  Ok(exchange()) catch {
+  Ok(exchange(request)) catch {
     error => Err(error)
   }
 }

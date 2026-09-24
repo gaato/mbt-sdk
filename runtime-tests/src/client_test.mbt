@@ -515,6 +515,83 @@ async test "Client closes a stream it cannot hand over after a failed release" {
 }
 
 ///|
+/// Logs `acquire` and `release` into a shared log, so a test can place other
+/// events between them.
+priv struct LoggingLimiter {
+  log : Array[String]
+}
+
+///|
+impl @runtime.RateLimiter for LoggingLimiter with fn acquire(
+  self,
+  _bucket,
+  global_exempt~,
+) {
+  ignore(global_exempt)
+  self.log.push("acquire")
+}
+
+///|
+impl @runtime.RateLimiter for LoggingLimiter with fn release(
+  self,
+  _bucket,
+  status~,
+  headers~,
+) {
+  ignore(headers)
+  self.log.push("release \{status}")
+}
+
+///|
+async test "Client builds a deferred body only after each admission" {
+  bounded(() => {
+    let transport = @mock.FakeTransport::new()
+    transport.expect(
+      "POST",
+      "/upload",
+      buffered_response(
+        429,
+        headers=@http.Headers::from_array([("retry-after", "1")]),
+      ),
+    )
+    transport.expect("POST", "/upload", buffered_response(200))
+    transport.expect_stream(
+      "POST",
+      "/upload",
+      { status: 200, headers: @http.Headers::new(), },
+      [b"ok"],
+    )
+    let log : Array[String] = []
+    let observed : Array[Bytes] = []
+    let client = @runtime.Client::new(
+      transport,
+      @mock.FakeClock::new(),
+      base_url="https://api.test",
+      limiter=LoggingLimiter::{ log, },
+      observer=attempt => observed.push(attempt.request.body),
+      random=() => 0.5,
+    )
+    let body = () => {
+      log.push("build")
+      b"encoded"
+    }
+    ignore(client.send(@http.Request::post("/upload"), body~))
+    assert_eq(log, [
+      "acquire", "build", "release 429", "acquire", "build", "release 200",
+    ])
+    log.clear()
+    let (_, stream) = client.send_stream(@http.Request::post("/upload"), body~)
+    stream.close()
+    assert_eq(log, ["acquire", "build", "release 200"])
+    assert_eq(transport.sent().map(request => request.body), [
+      b"encoded", b"encoded", b"encoded",
+    ])
+    assert_eq(observed, [b"encoded", b"encoded", b"encoded"])
+    transport.assert_complete()
+  })
+}
+
+///|
 async test "Client releases every attempt and observes them before retrying" {
   bounded(() => {
     let transport = @mock.FakeTransport::new()

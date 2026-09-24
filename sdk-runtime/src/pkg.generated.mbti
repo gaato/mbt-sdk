@@ -69,9 +69,9 @@ pub struct Client {
   // private fields
 }
 pub fn Client::new(&@http.Transport, &@clock.Clock, base_url~ : String, default_headers? : @http.Headers, auth? : Auth, retry? : &RetryDecider, limiter? : &RateLimiter, middleware? : Array[async (@http.Request, async (@http.Request) -> @http.Response raise @http.HttpError) -> @http.Response raise @http.HttpError], observer? : (Attempt) -> Unit, random? : () -> Double) -> Self
-pub async fn Client::send(Self, @http.Request, bucket? : String, global_exempt? : Bool) -> @http.Response raise SdkError
-pub async fn Client::send_json(Self, @http.Request, bucket? : String, global_exempt? : Bool) -> Json raise SdkError
-pub async fn Client::send_stream(Self, @http.Request, bucket? : String, global_exempt? : Bool) -> (@http.ResponseHead, &@http.BodyStream) raise SdkError
+pub async fn Client::send(Self, @http.Request, bucket? : String, global_exempt? : Bool, body? : () -> Bytes) -> @http.Response raise SdkError
+pub async fn Client::send_json(Self, @http.Request, bucket? : String, global_exempt? : Bool, body? : () -> Bytes) -> Json raise SdkError
+pub async fn Client::send_stream(Self, @http.Request, bucket? : String, global_exempt? : Bool, body? : () -> Bytes) -> (@http.ResponseHead, &@http.BodyStream) raise SdkError
 
 pub struct NoLimiter {
 }
