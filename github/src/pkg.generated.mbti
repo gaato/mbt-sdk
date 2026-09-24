@@ -36,10 +36,10 @@ pub struct GitHub {
 pub async fn[T] GitHub::call(Self, @http.Request, (@http.Response) -> T raise @sdk-runtime.SdkError) -> T raise @sdk-runtime.SdkError
 pub fn GitHub::from_client(@sdk-runtime.Client, graphql_url? : String) -> Self
 pub async fn GitHub::graphql(Self, query~ : String, variables? : Json, operation_name? : String) -> Json raise @sdk-runtime.SdkError
-pub fn[T] GitHub::graphql_paginator(Self, (Json) -> (Array[T], String?) raise @sdk-runtime.SdkError, query~ : String, variables? : Json, cursor_variable? : String, operation_name? : String) -> @sdk-runtime.Paginator[T]
+pub fn[T] GitHub::graphql_paginator(Self, (Json) -> (Array[T], String?) raise @sdk-runtime.SdkError, query~ : String, variables? : Json, cursor_variable? : String, operation_name? : String) -> @sdk-runtime.Paginator[T, @sdk-runtime.SdkError]
 pub async fn GitHub::graphql_response(Self, query~ : String, variables? : Json, operation_name? : String) -> Json raise @sdk-runtime.SdkError
 pub fn GitHub::new(&@http.Transport, &@clock.Clock, token? : String, base_url? : String, api_version? : String, user_agent? : String, retry? : @sdk-runtime.RetryPolicy, limiter? : &@sdk-runtime.RateLimiter, graphql_url? : String) -> Self
-pub fn[T] GitHub::paginator(Self, @http.Request, (@http.Response) -> Array[T] raise @sdk-runtime.SdkError) -> @sdk-runtime.Paginator[T]
+pub fn[T] GitHub::paginator(Self, @http.Request, (@http.Response) -> Array[T] raise @sdk-runtime.SdkError) -> @sdk-runtime.Paginator[T, @sdk-runtime.SdkError]
 pub async fn GitHub::send(Self, @http.Request) -> @http.Response raise @sdk-runtime.SdkError
 pub fn GitHub::to_repr(Self) -> @debug.Repr
 pub impl @debug.Debug for GitHub

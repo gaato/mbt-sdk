@@ -24,8 +24,8 @@ pub fn[T] GitHub::paginator(
   self : GitHub,
   first : @http.Request,
   decode : (@http.Response) -> Array[T] raise @runtime.SdkError,
-) -> @runtime.Paginator[T] {
-  @runtime.Paginator::new(cursor => {
+) -> @runtime.Paginator[T, @runtime.SdkError] {
+  @runtime.Paginator::with_cursor(cursor => {
     let request = match cursor {
       Some(url) => { ..first, url, }
       None => first

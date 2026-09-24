@@ -168,6 +168,36 @@ pub fn encode(
   parts : Array[Part],
   boundary : String,
 ) -> (String, Bytes) raise MultipartError {
+  let (content_type, segments) = encode_segments(parts, boundary)
+  let output : Array[Byte] = []
+  for segment in segments {
+    append_bytes(output, segment)
+  }
+  (content_type, Bytes::from_array(output))
+}
+
+///|
+/// Encodes fields like `encode`, but returns the body as ordered segments
+/// instead of one buffer: the framing between parts, and each part's body
+/// exactly as supplied, not copied. The segments concatenated are the body
+/// `encode` returns, so a host can stream a large upload without building it
+/// in memory first.
+///
+/// ```mbt check
+/// test {
+///   let file = b"\x00\x01"
+///   let (_, segments) = @multipart.encode_segments(
+///     [@multipart.Part::file("upload", "a.bin", "application/octet-stream", file)],
+///     "example",
+///   )
+///   assert_eq(segments.length(), 3)
+///   assert_true(physical_equal(segments[1], file))
+/// }
+/// ```
+pub fn encode_segments(
+  parts : Array[Part],
+  boundary : String,
+) -> (String, Array[Bytes]) raise MultipartError {
   validate_boundary(boundary)
   let delimiter = @utf8.encode("--" + boundary)
   let embedded = @utf8.encode("\r\n--" + boundary)
@@ -180,32 +210,38 @@ pub fn encode(
       raise BoundaryCollision
     }
   }
-  let output : Array[Byte] = []
+  let segments : Array[Bytes] = []
+  let framing : Array[Byte] = []
   for part in parts {
-    append_text(output, "--" + boundary + "\r\n")
-    append_text(output, "Content-Disposition: form-data; name=\"")
-    append_escaped_parameter(output, part.name)
-    append_text(output, "\"")
+    append_text(framing, "--" + boundary + "\r\n")
+    append_text(framing, "Content-Disposition: form-data; name=\"")
+    append_escaped_parameter(framing, part.name)
+    append_text(framing, "\"")
     if part.filename is Some(filename) {
-      append_text(output, "; filename=\"")
-      append_escaped_parameter(output, filename)
-      append_text(output, "\"")
+      append_text(framing, "; filename=\"")
+      append_escaped_parameter(framing, filename)
+      append_text(framing, "\"")
     }
-    append_text(output, "\r\n")
+    append_text(framing, "\r\n")
     if part.content_type is Some(content_type) {
-      append_text(output, "Content-Type: " + content_type + "\r\n")
+      append_text(framing, "Content-Type: " + content_type + "\r\n")
     }
-    append_text(output, "\r\n")
-    append_bytes(output, part.body)
-    append_text(output, "\r\n")
+    append_text(framing, "\r\n")
+    if !part.body.is_empty() {
+      segments.push(Bytes::from_array(framing))
+      framing.clear()
+      segments.push(part.body)
+    }
+    append_text(framing, "\r\n")
   }
-  append_text(output, "--" + boundary + "--\r\n")
+  append_text(framing, "--" + boundary + "--\r\n")
+  segments.push(Bytes::from_array(framing))
   let parameter = if boundary_needs_quotes(boundary) {
     "\"" + boundary + "\""
   } else {
     boundary
   }
-  ("multipart/form-data; boundary=" + parameter, Bytes::from_array(output))
+  ("multipart/form-data; boundary=" + parameter, segments)
 }
 
 ///|

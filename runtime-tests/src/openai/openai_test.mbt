@@ -470,21 +470,27 @@ priv struct RecordingLimiter {
 }
 
 ///|
-extend RecordingLimiter with @runtime.RateLimiter::{acquire, observe}
+extend RecordingLimiter with @runtime.RateLimiter::{acquire, release}
 
 ///|
-impl @runtime.RateLimiter for RecordingLimiter with fn acquire(self, bucket) {
+impl @runtime.RateLimiter for RecordingLimiter with fn acquire(
+  self,
+  bucket,
+  global_exempt~,
+) {
+  ignore(global_exempt)
   self.acquired.push(bucket)
 }
 
 ///|
-impl @runtime.RateLimiter for RecordingLimiter with fn observe(
+impl @runtime.RateLimiter for RecordingLimiter with fn release(
   self,
   bucket,
-  _status,
-  _headers,
-  _now_unix_ms,
+  status~,
+  headers~,
 ) {
+  ignore(status)
+  ignore(headers)
   self.observed.push(bucket)
 }
 
@@ -569,13 +575,8 @@ async test "OpenAI assigns the contract bucket to every operation" {
       "models", "models", "embeddings", "responses", "chat", "responses", "chat",
     ])
     assert_eq(limiter.observed, limiter.acquired)
-    limiter.acquire("direct-check")
-    limiter.observe(
-      "direct-check",
-      200,
-      @http.Headers::new(),
-      clock.now_unix_ms(),
-    )
+    limiter.acquire("direct-check", global_exempt=false)
+    limiter.release("direct-check", status=200, headers=@http.Headers::new())
     assert_eq(limiter.acquired.last(), Some("direct-check"))
     assert_eq(limiter.observed.last(), Some("direct-check"))
     assert_eq(transport.streams_closed(), 2)

@@ -13,6 +13,7 @@ fn transport() -> @adapter.AsyncTransport {
 
 ///|
 fn client(retry? : @runtime.RetryPolicy) -> @runtime.Client {
+  let retry : &@runtime.RetryDecider? = retry.map(policy => policy)
   @runtime.Client::new(
     transport(),
     @adapter.AsyncClock::new(),

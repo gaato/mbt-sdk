@@ -11,6 +11,8 @@ pub fn apply(@http.Request, Array[Part], String) -> @http.Request raise Multipar
 
 pub fn encode(Array[Part], String) -> (String, Bytes) raise MultipartError
 
+pub fn encode_segments(Array[Part], String) -> (String, Array[Bytes]) raise MultipartError
+
 pub fn make_boundary(() -> Double) -> String
 
 // Errors

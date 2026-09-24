@@ -198,3 +198,24 @@ test "all byte values round trip without transformation" {
     bytes[:],
   )
 }
+
+///|
+test "encode_segments concatenates to encode and keeps part bodies uncopied" {
+  let file = b"\x00\x01\x02"
+  let parts = [
+    @multipart.Part::json("payload_json", { "content": "hi" }),
+    @multipart.Part::text("empty", ""),
+    @multipart.Part::file("files[0]", "a.bin", "application/octet-stream", file),
+  ]
+  let (content_type, body) = @multipart.encode(parts, "B")
+  let (segment_type, segments) = @multipart.encode_segments(parts, "B")
+  assert_eq(segment_type, content_type)
+  let joined : Array[Byte] = []
+  for segment in segments {
+    joined.push_iter(segment.iter())
+  }
+  assert_eq(Bytes::from_array(joined), body)
+  assert_true(segments.iter().any(segment => physical_equal(segment, file)))
+  // An empty body contributes no segment of its own.
+  assert_false(segments.iter().any(segment => segment.is_empty()))
+}

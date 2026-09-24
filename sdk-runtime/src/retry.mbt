@@ -46,14 +46,33 @@ pub fn is_idempotent(request : @http.Request) -> Bool {
 }
 
 ///|
+/// Decides, after a failed attempt, whether the client sends the request
+/// again and how long it waits first.
+///
+/// `RetryPolicy` is the general-purpose implementation. An API with its own
+/// rules — one that must never resend a timed-out request because it may
+/// already have been processed, or that reads the delay from a response body —
+/// supplies its own implementation to `Client::new`.
+pub(open) trait RetryDecider {
+  /// The wait in milliseconds before the next attempt, or `None` to stop.
+  /// `attempt` counts the attempts already made, starting at `0` for the
+  /// first failure; `random` is in `[0, 1)` for jitter.
+  fn next_delay_ms(Self, SdkError, @http.Request, Int, Double) -> Int?
+}
+
+///|
+/// The policy's decision as a dot-callable method.
+pub extend RetryPolicy with RetryDecider::{next_delay_ms}
+
+///|
 /// Purely decides whether to retry and, if so, how long to wait.
-pub fn RetryPolicy::next_delay_ms(
-  self : RetryPolicy,
-  error : SdkError,
-  request : @http.Request,
-  attempt : Int,
-  random : Double,
-) -> Int? {
+pub impl RetryDecider for RetryPolicy with fn next_delay_ms(
+  self,
+  error,
+  request,
+  attempt,
+  random,
+) {
   if attempt >= self.max_retries || !error.is_retryable() {
     return None
   }

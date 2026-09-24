@@ -213,18 +213,24 @@ priv struct RecordingLimiter {
 }
 
 ///|
-impl @runtime.RateLimiter for RecordingLimiter with fn acquire(self, bucket) {
+impl @runtime.RateLimiter for RecordingLimiter with fn acquire(
+  self,
+  bucket,
+  global_exempt~,
+) {
+  ignore(global_exempt)
   self.acquired.push(bucket)
 }
 
 ///|
-impl @runtime.RateLimiter for RecordingLimiter with fn observe(
+impl @runtime.RateLimiter for RecordingLimiter with fn release(
   self,
   bucket,
-  _status,
-  _headers,
-  _now_unix_ms,
+  status~,
+  headers~,
 ) {
+  ignore(status)
+  ignore(headers)
   self.observed.push(bucket)
 }
 

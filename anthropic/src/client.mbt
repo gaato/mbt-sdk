@@ -40,6 +40,7 @@ pub fn Anthropic::new(
     XApiKey => @runtime.Header("x-api-key", api_key)
     Bearer => @runtime.Bearer(api_key)
   }
+  let retry : &@runtime.RetryDecider? = retry.map(policy => policy)
   {
     client: @runtime.Client::new(transport, clock, base_url~, auth~, retry?),
     version,

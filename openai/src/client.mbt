@@ -34,6 +34,7 @@ pub fn OpenAI::new(
   if project is Some(value) {
     headers.set("openai-project", value)
   }
+  let retry : &@runtime.RetryDecider? = retry.map(policy => policy)
   {
     client: @runtime.Client::new(
       transport,

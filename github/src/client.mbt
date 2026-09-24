@@ -74,6 +74,7 @@ pub fn GitHub::new(
     Some(url) => url
     None => default_graphql_url(base_url)
   }
+  let retry : &@runtime.RetryDecider? = retry.map(policy => policy)
   {
     client: @runtime.Client::new(
       transport,

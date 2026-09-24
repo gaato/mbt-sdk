@@ -14,16 +14,35 @@ pub extend RateLimitState with Eq::{equal, not_equal}
 pub extend RateLimitState with @debug.Debug::{to_repr}
 
 ///|
-/// A per-bucket admission policy updated from HTTP response headers.
+/// A per-bucket admission policy updated from HTTP responses.
+///
+/// `acquire` and `release` come in pairs: the client calls `release` exactly
+/// once for every `acquire` that returned, with the response's status and
+/// headers, or with status `0` and no headers when the attempt produced no
+/// response (a transport failure or a cancellation). A limiter that holds
+/// per-bucket state across the exchange, such as a gate that serialises one
+/// bucket, relies on that pairing; a stateless window limiter ignores the
+/// status-`0` calls.
+///
+/// A cancelled task still gets its `release`, but inside cancellation any
+/// further asynchronous work is cut short, so an implementation that talks to
+/// another process must recover on its own if that call does not complete
+/// (dropping its connection so the peer can clean up, for example).
 pub(open) trait RateLimiter {
-  /// Waits until one request may enter a bucket.
-  async fn acquire(Self, String) -> Unit noraise
-  /// Observes a response and updates one bucket.
-  fn observe(Self, String, Int, @http.Headers, Int64) -> Unit
+  /// Waits until one request may enter a bucket. `global_exempt` marks a
+  /// request that does not count toward an account-wide limit; a limiter
+  /// without such a limit ignores it. An error (a limiter in another process
+  /// that cannot be reached, say) fails the request before it is sent.
+  async fn acquire(Self, String, global_exempt~ : Bool) -> Unit
+  /// Reports the outcome of the request admitted by the matching `acquire`.
+  /// Status `0` means no response arrived. An error raised on the success
+  /// path reaches the caller; one raised while the attempt is already failing
+  /// is dropped.
+  async fn release(Self, String, status~ : Int, headers~ : @http.Headers) -> Unit
 }
 
 ///|
-/// A limiter that never delays requests and ignores observations.
+/// A limiter that never delays requests and ignores releases.
 pub struct NoLimiter {}
 
 ///|
@@ -34,24 +53,28 @@ pub fn NoLimiter::new() -> NoLimiter {
 
 ///|
 /// Explicit no-op limiter methods.
-pub extend NoLimiter with RateLimiter::{acquire, observe}
+pub extend NoLimiter with RateLimiter::{acquire, release}
 
 ///|
 /// Admits immediately.
-pub impl RateLimiter for NoLimiter with fn acquire(_self, _bucket) {
-  ()
+pub impl RateLimiter for NoLimiter with fn acquire(
+  _self,
+  _bucket,
+  global_exempt~,
+) {
+  ignore(global_exempt)
 }
 
 ///|
 /// Ignores response state.
-pub impl RateLimiter for NoLimiter with fn observe(
+pub impl RateLimiter for NoLimiter with fn release(
   _self,
   _bucket,
-  _status,
-  _headers,
-  _now_unix_ms,
+  status~,
+  headers~,
 ) {
-  ()
+  ignore(status)
+  ignore(headers)
 }
 
 ///|
@@ -73,7 +96,7 @@ pub fn WindowLimiter::new(
 
 ///|
 /// Explicit fixed-window limiter methods.
-pub extend WindowLimiter with RateLimiter::{acquire, observe}
+pub extend WindowLimiter with RateLimiter::{acquire, release}
 
 ///|
 /// Returns the currently recorded state for a bucket.
@@ -86,7 +109,13 @@ pub fn WindowLimiter::state(
 
 ///|
 /// Rechecks the bucket after every sleep because another task may update it.
-pub impl RateLimiter for WindowLimiter with fn acquire(self, bucket) {
+/// There is no account-wide window here, so `global_exempt` is ignored.
+pub impl RateLimiter for WindowLimiter with fn acquire(
+  self,
+  bucket,
+  global_exempt~,
+) {
+  ignore(global_exempt)
   for ;; {
     guard self.states.get(bucket) is Some(state) else { return }
     let now = self.clock.now_unix_ms()
@@ -106,13 +135,17 @@ pub impl RateLimiter for WindowLimiter with fn acquire(self, bucket) {
 
 ///|
 /// Replaces parsed state; a 429 Retry-After takes precedence over that parser.
-pub impl RateLimiter for WindowLimiter with fn observe(
+/// An attempt without a response (status `0`) leaves the window unchanged.
+pub impl RateLimiter for WindowLimiter with fn release(
   self,
   bucket,
-  status,
-  headers,
-  now_unix_ms,
+  status~,
+  headers~,
 ) {
+  if status == 0 {
+    return
+  }
+  let now_unix_ms = self.clock.now_unix_ms()
   if (self.parse)(headers, now_unix_ms) is Some(state) {
     self.states[bucket] = state
   }

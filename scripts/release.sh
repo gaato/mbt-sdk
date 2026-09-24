@@ -54,7 +54,9 @@ case "$cmd" in
         out=$(moon -C "$module" publish --dry-run 2>&1) || true
         if echo "$out" | grep -q 'Dry run completed successfully'; then
           echo "would   $name@$version"
-        elif [ "${#pending[@]}" -gt 0 ] && echo "$out" | grep -qE "dependency \`($(IFS='|'; echo "${pending[*]}"))\`.*not found in the registry"; then
+        # moon says "not found in the registry" for a module that was never
+        # published and "no version satisfies" for a new version of one that was.
+        elif [ "${#pending[@]}" -gt 0 ] && echo "$out" | grep -qE "dependency \`($(IFS='|'; echo "${pending[*]}"))\`.*(not found in the registry|no version satisfies)"; then
           echo "would   $name@$version (after ${pending[*]}; not checkable before they exist)"
         else
           echo "$out"; exit 1

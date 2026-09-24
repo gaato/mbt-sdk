@@ -33,6 +33,17 @@ pub fn SdkError::status(Self) -> Int?
 pub fn SdkError::to_repr(Self) -> @debug.Repr
 
 // Types and methods
+pub(all) struct Attempt {
+  bucket : String
+  request : @http.Request
+  attempt : Int
+  status : Int
+  headers : @http.Headers
+  body : Bytes
+  duration_ms : Int64
+  error : SdkError?
+}
+
 pub(all) enum Auth {
   NoAuth
   Bearer(String)
@@ -57,16 +68,16 @@ pub fn Backoff::to_repr(Self) -> @debug.Repr
 pub struct Client {
   // private fields
 }
-pub fn Client::new(&@http.Transport, &@clock.Clock, base_url~ : String, default_headers? : @http.Headers, auth? : Auth, retry? : RetryPolicy, limiter? : &RateLimiter, middleware? : Array[async (@http.Request, async (@http.Request) -> @http.Response raise @http.HttpError) -> @http.Response raise @http.HttpError], random? : () -> Double) -> Self
-pub async fn Client::send(Self, @http.Request, bucket? : String) -> @http.Response raise SdkError
-pub async fn Client::send_json(Self, @http.Request, bucket? : String) -> Json raise SdkError
-pub async fn Client::send_stream(Self, @http.Request, bucket? : String) -> (@http.ResponseHead, &@http.BodyStream) raise SdkError
+pub fn Client::new(&@http.Transport, &@clock.Clock, base_url~ : String, default_headers? : @http.Headers, auth? : Auth, retry? : &RetryDecider, limiter? : &RateLimiter, middleware? : Array[async (@http.Request, async (@http.Request) -> @http.Response raise @http.HttpError) -> @http.Response raise @http.HttpError], observer? : (Attempt) -> Unit, random? : () -> Double) -> Self
+pub async fn Client::send(Self, @http.Request, bucket? : String, global_exempt? : Bool) -> @http.Response raise SdkError
+pub async fn Client::send_json(Self, @http.Request, bucket? : String, global_exempt? : Bool) -> Json raise SdkError
+pub async fn Client::send_stream(Self, @http.Request, bucket? : String, global_exempt? : Bool) -> (@http.ResponseHead, &@http.BodyStream) raise SdkError
 
 pub struct NoLimiter {
 }
-pub async fn NoLimiter::acquire(Self, String) -> Unit noraise
+pub async fn NoLimiter::acquire(Self, String, global_exempt~ : Bool) -> Unit
 pub fn NoLimiter::new() -> Self
-pub fn NoLimiter::observe(Self, String, Int, @http.Headers, Int64) -> Unit
+pub async fn NoLimiter::release(Self, String, status~ : Int, headers~ : @http.Headers) -> Unit
 pub impl RateLimiter for NoLimiter
 
 pub(all) struct Page[T] {
@@ -74,13 +85,14 @@ pub(all) struct Page[T] {
   next : String?
 }
 
-pub struct Paginator[T] {
+pub struct Paginator[T, E] {
   // private fields
 }
-pub async fn[T] Paginator::collect(Self[T], max~ : Int) -> Array[T] raise SdkError
-pub async fn[T] Paginator::each(Self[T], async (T) -> Unit raise SdkError) -> Unit raise SdkError
-pub fn[T] Paginator::new(async (String?) -> Page[T] raise SdkError) -> Self[T]
-pub async fn[T] Paginator::next_page(Self[T]) -> Array[T]? raise SdkError
+pub async fn[T, E : Error] Paginator::collect(Self[T, E], max~ : Int) -> Array[T] raise E
+pub async fn[T, E : Error] Paginator::each(Self[T, E], async (T) -> Unit raise E) -> Unit raise E
+pub fn[T, E : Error] Paginator::new(async () -> Array[T]? raise E) -> Self[T, E]
+pub async fn[T, E : Error] Paginator::next_page(Self[T, E]) -> Array[T]? raise E
+pub fn[T, E : Error] Paginator::with_cursor(async (String?) -> Page[T] raise E) -> Self[T, E]
 
 pub(all) struct RateLimitState {
   remaining : Int
@@ -102,13 +114,14 @@ pub fn RetryPolicy::next_delay_ms(Self, SdkError, @http.Request, Int, Double) ->
 pub fn RetryPolicy::none() -> Self
 pub fn RetryPolicy::not_equal(Self, Self) -> Bool
 pub fn RetryPolicy::to_repr(Self) -> @debug.Repr
+pub impl RetryDecider for RetryPolicy
 
 pub struct WindowLimiter {
   // private fields
 }
-pub async fn WindowLimiter::acquire(Self, String) -> Unit noraise
+pub async fn WindowLimiter::acquire(Self, String, global_exempt~ : Bool) -> Unit
 pub fn WindowLimiter::new(&@clock.Clock, (@http.Headers, Int64) -> RateLimitState?) -> Self
-pub fn WindowLimiter::observe(Self, String, Int, @http.Headers, Int64) -> Unit
+pub async fn WindowLimiter::release(Self, String, status~ : Int, headers~ : @http.Headers) -> Unit
 pub fn WindowLimiter::state(Self, String) -> RateLimitState?
 pub impl RateLimiter for WindowLimiter
 
@@ -116,6 +129,10 @@ pub impl RateLimiter for WindowLimiter
 
 // Traits
 pub(open) trait RateLimiter {
-  async fn acquire(Self, String) -> Unit noraise
-  fn observe(Self, String, Int, @http.Headers, Int64) -> Unit
+  async fn acquire(Self, String, global_exempt~ : Bool) -> Unit
+  async fn release(Self, String, status~ : Int, headers~ : @http.Headers) -> Unit
+}
+
+pub(open) trait RetryDecider {
+  fn next_delay_ms(Self, SdkError, @http.Request, Int, Double) -> Int?
 }

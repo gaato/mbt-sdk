@@ -292,3 +292,301 @@ async test "send_stream returns success and closes classified error streams" {
     transport.assert_complete()
   })
 }
+
+///|
+/// Records every `acquire` and `release` a client makes, with the released
+/// status, so a test can check that they pair up on every exit.
+priv struct PairingLimiter {
+  acquired : Array[(String, Bool)]
+  released : Array[(String, Int)]
+}
+
+///|
+impl @runtime.RateLimiter for PairingLimiter with fn acquire(
+  self,
+  bucket,
+  global_exempt~,
+) {
+  self.acquired.push((bucket, global_exempt))
+}
+
+///|
+impl @runtime.RateLimiter for PairingLimiter with fn release(
+  self,
+  bucket,
+  status~,
+  headers~,
+) {
+  ignore(headers)
+  self.released.push((bucket, status))
+}
+
+///|
+priv struct AlwaysConnectError {}
+
+///|
+impl @http.Transport for AlwaysConnectError with fn send(_self, _request) {
+  raise @http.HttpError::Connect("offline")
+}
+
+///|
+impl @http.Transport for AlwaysConnectError with fn send_stream(_self, _request) {
+  raise @http.HttpError::Connect("offline")
+}
+
+///|
+async test "Client releases with status 0 and observes an attempt without a response" {
+  bounded(() => {
+    let limiter = PairingLimiter::{ acquired: [], released: [], }
+    let attempts : Array[(Int, Int, Bool)] = []
+    let clock = @mock.FakeClock::new()
+    let client = @runtime.Client::new(
+      AlwaysConnectError::{ },
+      clock,
+      base_url="https://api.test",
+      retry=@runtime.RetryPolicy::none(),
+      limiter~,
+      observer=attempt => {
+        attempts.push(
+          (attempt.attempt, attempt.status, attempt.error is Some(_)),
+        )
+      },
+    )
+    try
+      client.send(@http.Request::get("/down"), bucket="b", global_exempt=true)
+    catch {
+      @runtime.Transport(@http.Connect("offline")) => ()
+      _ => fail("expected the connect failure")
+    } noraise {
+      _ => fail("expected a failure")
+    }
+    assert_eq(limiter.acquired, [("b", true)])
+    assert_eq(limiter.released, [("b", 0)])
+    assert_eq(attempts, [(0, 0, true)])
+    try client.send_stream(@http.Request::get("/down"), bucket="s") catch {
+      @runtime.Transport(@http.Connect("offline")) => ()
+      _ => fail("expected the connect failure")
+    } noraise {
+      _ => fail("expected a failure")
+    }
+    assert_eq(limiter.released, [("b", 0), ("s", 0)])
+  })
+}
+
+///|
+/// A limiter whose `release` awaits, as a limiter backed by another process
+/// does, and so can be cut short by cancellation.
+priv struct SuspendingLimiter {
+  mut released : Int
+}
+
+///|
+impl @runtime.RateLimiter for SuspendingLimiter with fn acquire(
+  _self,
+  _bucket,
+  global_exempt~,
+) {
+  ignore(global_exempt)
+}
+
+///|
+impl @runtime.RateLimiter for SuspendingLimiter with fn release(
+  self,
+  _bucket,
+  status~,
+  headers~,
+) {
+  ignore(status)
+  ignore(headers)
+  self.released += 1
+  @async.sleep(60000)
+}
+
+///|
+priv struct Stalled {}
+
+///|
+impl @http.Transport for Stalled with fn send(_self, _request) {
+  @async.sleep(60000)
+  buffered_response(200)
+}
+
+///|
+impl @http.Transport for Stalled with fn send_stream(_self, _request) {
+  @async.sleep(60000)
+  raise @http.HttpError::Protocol("unreachable")
+}
+
+///|
+async test "Client observes a cancelled attempt even when the release suspends" {
+  bounded(() => {
+    let limiter = SuspendingLimiter::{ released: 0, }
+    let attempts : Array[(Int, Int)] = []
+    let client = @runtime.Client::new(
+      Stalled::{ },
+      @mock.FakeClock::new(),
+      base_url="https://api.test",
+      limiter~,
+      observer=attempt => attempts.push((attempt.attempt, attempt.status)),
+    )
+    let buffered = @async.with_timeout_opt(20, () => {
+      ignore(client.send(@http.Request::get("/slow")))
+    })
+    assert_true(buffered is None)
+    assert_eq(limiter.released, 1)
+    assert_eq(attempts, [(0, 0)])
+    let streamed = @async.with_timeout_opt(20, () => {
+      ignore(client.send_stream(@http.Request::get("/slow")))
+    })
+    assert_true(streamed is None)
+    assert_eq(limiter.released, 2)
+    assert_eq(attempts, [(0, 0), (0, 0)])
+  })
+}
+
+///|
+priv suberror ReleaseRejected derive(Debug)
+
+///|
+/// A limiter whose `release` fails, as a remote limiter does for a lease it
+/// no longer knows.
+priv struct RejectingLimiter {}
+
+///|
+impl @runtime.RateLimiter for RejectingLimiter with fn acquire(
+  _self,
+  _bucket,
+  global_exempt~,
+) {
+  ignore(global_exempt)
+}
+
+///|
+impl @runtime.RateLimiter for RejectingLimiter with fn release(
+  _self,
+  _bucket,
+  status~,
+  headers~,
+) {
+  ignore(status)
+  ignore(headers)
+  raise ReleaseRejected
+}
+
+///|
+async test "Client closes a stream it cannot hand over after a failed release" {
+  bounded(() => {
+    let transport = @mock.FakeTransport::new()
+    for _ in 0..<2 {
+      transport.expect_stream(
+        "GET",
+        "/stream",
+        { status: 200, headers: @http.Headers::new(), },
+        [b"ok"],
+      )
+    }
+    let rejecting = @runtime.Client::new(
+      transport,
+      @mock.FakeClock::new(),
+      base_url="https://api.test",
+      limiter=RejectingLimiter::{ },
+    )
+    try rejecting.send_stream(@http.Request::get("/stream")) catch {
+      @runtime.Config(message) =>
+        assert_true(message.contains("rate limiter release failed"))
+      _ => fail("expected the release failure")
+    } noraise {
+      _ => fail("expected a failure")
+    }
+    assert_eq(transport.streams_closed(), 1)
+    let suspending = @runtime.Client::new(
+      transport,
+      @mock.FakeClock::new(),
+      base_url="https://api.test",
+      limiter=SuspendingLimiter::{ released: 0, },
+    )
+    let handed = @async.with_timeout_opt(20, () => {
+      ignore(suspending.send_stream(@http.Request::get("/stream")))
+    })
+    assert_true(handed is None)
+    assert_eq(transport.streams_closed(), 2)
+    transport.assert_complete()
+  })
+}
+
+///|
+async test "Client releases every attempt and observes them before retrying" {
+  bounded(() => {
+    let transport = @mock.FakeTransport::new()
+    transport.expect(
+      "GET",
+      "/limited",
+      buffered_response(
+        429,
+        headers=@http.Headers::from_array([("retry-after", "2")]),
+      ),
+    )
+    transport.expect("GET", "/limited", buffered_response(200, body=b"ok"))
+    let limiter = PairingLimiter::{ acquired: [], released: [], }
+    let order : Array[String] = []
+    let clock = @mock.FakeClock::new()
+    let client = @runtime.Client::new(
+      transport,
+      clock,
+      base_url="https://api.test",
+      limiter~,
+      observer=attempt => {
+        order.push(
+          "attempt \{attempt.attempt} status \{attempt.status} bucket \{attempt.bucket}",
+        )
+      },
+      random=() => 0.5,
+    )
+    let response = client.send(@http.Request::get("/limited"), bucket="l")
+    assert_eq(response.body, b"ok")
+    assert_eq(limiter.acquired, [("l", false), ("l", false)])
+    assert_eq(limiter.released, [("l", 429), ("l", 200)])
+    assert_eq(order, [
+      "attempt 0 status 429 bucket l", "attempt 1 status 200 bucket l",
+    ])
+    assert_eq(clock.slept(), [2000])
+    transport.assert_complete()
+  })
+}
+
+///|
+priv struct NeverRetry {}
+
+///|
+impl @runtime.RetryDecider for NeverRetry with fn next_delay_ms(
+  _self,
+  _error,
+  _request,
+  _attempt,
+  _random,
+) {
+  None
+}
+
+///|
+async test "Client asks the supplied retry decider" {
+  bounded(() => {
+    let transport = @mock.FakeTransport::new()
+    transport.expect("GET", "/once", buffered_response(500))
+    let clock = @mock.FakeClock::new()
+    let client = @runtime.Client::new(
+      transport,
+      clock,
+      base_url="https://api.test",
+      retry=NeverRetry::{ },
+    )
+    try client.send(@http.Request::get("/once")) catch {
+      @runtime.Status(status=500, ..) => ()
+      _ => fail("expected the 500")
+    } noraise {
+      _ => fail("expected a failure")
+    }
+    assert_eq(clock.slept(), [])
+    transport.assert_complete()
+  })
+}

@@ -95,8 +95,8 @@ pub fn[T] GitHub::graphql_paginator(
   variables? : Json,
   cursor_variable? : String = "after",
   operation_name? : String,
-) -> @runtime.Paginator[T] {
-  @runtime.Paginator::new(cursor => {
+) -> @runtime.Paginator[T, @runtime.SdkError] {
+  @runtime.Paginator::with_cursor(cursor => {
     let variables = match cursor {
       None => variables
       Some(cursor) => Some(with_cursor(variables, cursor_variable, cursor))
