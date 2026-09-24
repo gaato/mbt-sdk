@@ -1,8 +1,9 @@
 name: Spec watch
 
 # Fetches the upstream OpenAI, Anthropic and GitHub specs daily. When changed: re-vendor, apply the
-# overlays, regenerate, run the gates, and open a PR. When generation, the gates
-# and CI all pass, the PR is merged here; otherwise it stays open for a human.
+# overlays, regenerate, bump the module version when src changed, run the gates,
+# and open a PR. When generation, the gates and CI all pass, the PR is merged
+# here and release.yml publishes; otherwise it stays open for a human.
 # Overlay actions that no longer match (zero-match) or no longer change anything
 # (no-op: upstream fixed it) fail the overlay step; their messages go into the
 # PR body so a human can prune the overlay.
@@ -99,6 +100,30 @@ jobs:
           # Each container starts without the registry index, which moon info needs.
           moonbit bash -c 'moon update && moon fmt && moon info' || true
 
+      # Only src ships. A spec change that leaves src alone releases nothing; a
+      # src change with the same public API (.mbti) is a patch. Generated types
+      # are pub(all), so any public API change is breaking: minor while 0.x.
+      - name: Bump the module version
+        if: steps.fetch.outputs.changed == 'true'
+        id: bump
+        run: |
+          if [ -z "$(git status --porcelain -- "$PROVIDER/src")" ]; then
+            echo "Nothing under $PROVIDER/src changed; no release."
+            exit 0
+          fi
+          current="$(sed -nE 's/^version = "(.*)"$/\1/p' "$PROVIDER/moon.mod")"
+          IFS=. read -r major minor patch <<< "$current"
+          if [ -n "$(git status --porcelain -- ":(glob)$PROVIDER/src/**/*.mbti")" ]; then
+            kind="public API changed"
+            if [ "$major" = 0 ]; then next="0.$((minor + 1)).0"; else next="$((major + 1)).0.0"; fi
+          else
+            kind="public API unchanged"
+            next="$major.$minor.$((patch + 1))"
+          fi
+          scripts/release.sh bump "$PROVIDER" "$next"
+          echo "version=$next" >> "$GITHUB_OUTPUT"
+          echo "summary=$current → $next ($kind)" >> "$GITHUB_OUTPUT"
+
       - name: Gates (native and wasm-gc; the PR's CI run adds js)
         if: steps.fetch.outputs.changed == 'true'
         id: gates
@@ -133,7 +158,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git switch -c "$branch"
-          git add -A "$PROVIDER"
+          git add -A -- "$PROVIDER" ':(glob)*/moon.mod'
           git commit -m "Update vendored $PROVIDER spec and regenerate"
           git push origin "$branch"
           {
@@ -141,6 +166,7 @@ jobs:
             echo
             echo "- overlay + generator exit status: \`${{ steps.regen.outputs.generate_status }}\`"
             echo "- gates exit status: \`${{ steps.gates.outputs.gates_status }}\`"
+            echo "- release: ${{ steps.bump.outputs.summary || 'none (nothing under src changed)' }}"
             echo
             echo "Spec watch merges this PR itself when both are \`0\` and CI passes; otherwise it waits for a human."
             echo
@@ -159,6 +185,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           BRANCH: ${{ steps.pr.outputs.branch }}
           PR: ${{ steps.pr.outputs.number }}
+          VERSION: ${{ steps.bump.outputs.version }}
         run: |
           sha="$(gh pr view "$PR" --json headRefOid --jq .headRefOid)"
           find_run() {
@@ -180,6 +207,11 @@ jobs:
           fi
           gh pr merge "$PR" --squash --match-head-commit "$sha"
           gh api -X DELETE "repos/$GITHUB_REPOSITORY/git/refs/heads/$BRANCH"
+          # A merge made with GITHUB_TOKEN starts no CI run on main, so the
+          # workflow_run trigger of release.yml never fires; dispatch it instead.
+          if [ -n "$VERSION" ]; then
+            gh workflow run release.yml --ref main
+          fi
 
       - name: Flag for review
         if: steps.pr.outputs.number != '' && (steps.regen.outputs.generate_status != '0' || steps.gates.outputs.gates_status != '0')

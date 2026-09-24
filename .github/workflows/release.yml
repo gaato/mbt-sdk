@@ -2,7 +2,8 @@ name: Release
 
 # Publishes to mooncakes.io after CI is green on main. Idempotent: modules whose
 # version is already in the registry index are skipped, so only a version bump
-# in moon.mod releases anything (scripts/release.sh).
+# in moon.mod releases anything (scripts/release.sh). spec-watch.yml dispatches
+# this after merging a bump, because its merges start no CI run on main.
 
 on:
   workflow_run:
