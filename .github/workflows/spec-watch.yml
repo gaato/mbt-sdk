@@ -91,9 +91,12 @@ jobs:
           fi
           set +e
           moonbit scripts/generate.sh > "$RUNNER_TEMP/generate.log" 2>&1
-          echo "generate_status=$?" >> "$GITHUB_OUTPUT"
+          status=$?
+          echo "generate_status=$status" >> "$GITHUB_OUTPUT"
+          echo "generate.sh exited $status"; tail -n 20 "$RUNNER_TEMP/generate.log"
           set -e
-          moonbit bash -c 'moon fmt && moon info' || true
+          # Each container starts without the registry index, which moon info needs.
+          moonbit bash -c 'moon update && moon fmt && moon info' || true
 
       - name: Gates (native and wasm-gc; the PR's CI run adds js)
         if: steps.fetch.outputs.changed == 'true'
@@ -101,7 +104,9 @@ jobs:
         run: |
           set +e
           moonbit scripts/gates.sh --no-js > "$RUNNER_TEMP/gates.log" 2>&1
-          echo "gates_status=$?" >> "$GITHUB_OUTPUT"
+          status=$?
+          echo "gates_status=$status" >> "$GITHUB_OUTPUT"
+          echo "gates.sh exited $status"; tail -n 20 "$RUNNER_TEMP/gates.log"
 
       - name: Open pull request
         if: steps.fetch.outputs.changed == 'true'
