@@ -275,7 +275,7 @@ async test "cancelling handshake closes output before caller regains control" {
       started.get()
       task.cancel()
       try task.wait() catch {
-        @async.TaskCancelled => ()
+        @async.WaitedTaskAlreadyCancelled => ()
         error => raise error
       } noraise {
         _ => fail("expected cancellation")

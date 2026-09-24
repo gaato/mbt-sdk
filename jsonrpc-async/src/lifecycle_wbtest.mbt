@@ -29,10 +29,11 @@ async test "cancellation bypasses catch removes pending and ignores late reply" 
       ignore(peer_read.read_until("\n"))
       assert_eq(connection.pending.length(), 1)
       task.cancel()
-      // Waiting on an explicitly cancelled task reports TaskCancelled. The
-      // catch inside the cancelled call itself must still remain untouched.
+      // Waiting on an explicitly cancelled task reports
+      // WaitedTaskAlreadyCancelled. The catch inside the cancelled call itself
+      // must still remain untouched.
       task.wait() catch {
-        @async.TaskCancelled => ()
+        @async.WaitedTaskAlreadyCancelled => ()
         error => raise error
       }
       assert_true(cleaned)
