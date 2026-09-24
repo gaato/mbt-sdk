@@ -64,6 +64,21 @@ jobs:
         if: steps.fetch.outputs.changed == 'true'
         uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
 
+      # The generator needs moonfmt and the gates need uv, so both run in the
+      # MoonBit image with the host's uv mounted in (the image has no Python).
+      - name: Define the MoonBit runner
+        if: steps.fetch.outputs.changed == 'true'
+        run: |
+          cat > "$RUNNER_TEMP/moonbit" <<EOF
+          #!/usr/bin/env bash
+          exec docker run --rm -v "\$PWD:/work" -w /work \\
+            -v "$(command -v uv):/usr/local/bin/uv:ro" \\
+            -v "$RUNNER_TEMP/uv-cache:/uv-cache" -e UV_CACHE_DIR=/uv-cache -e UV_PYTHON_INSTALL_DIR=/uv-cache/python \\
+            "$MOONBIT_IMAGE" "\$@"
+          EOF
+          chmod +x "$RUNNER_TEMP/moonbit"
+          echo "$RUNNER_TEMP" >> "$GITHUB_PATH"
+
       - name: Re-vendor and regenerate
         if: steps.fetch.outputs.changed == 'true'
         id: regen
@@ -75,17 +90,17 @@ jobs:
             sed -i -E "s/^- sha256 \(gzip as downloaded\): .*/- sha256 (gzip as downloaded): ${{ steps.fetch.outputs.gzip_sha }}/" "$PROVIDER/spec/SOURCE.md"
           fi
           set +e
-          scripts/generate.sh > "$RUNNER_TEMP/generate.log" 2>&1
+          moonbit scripts/generate.sh > "$RUNNER_TEMP/generate.log" 2>&1
           echo "generate_status=$?" >> "$GITHUB_OUTPUT"
           set -e
-          docker run --rm -v "$PWD:/work" -w /work "$MOONBIT_IMAGE" bash -c 'moon fmt && moon info' || true
+          moonbit bash -c 'moon fmt && moon info' || true
 
       - name: Gates (native and wasm-gc; the PR's CI run adds js)
         if: steps.fetch.outputs.changed == 'true'
         id: gates
         run: |
           set +e
-          docker run --rm -v "$PWD:/work" -w /work "$MOONBIT_IMAGE" scripts/gates.sh --no-js > "$RUNNER_TEMP/gates.log" 2>&1
+          moonbit scripts/gates.sh --no-js > "$RUNNER_TEMP/gates.log" 2>&1
           echo "gates_status=$?" >> "$GITHUB_OUTPUT"
 
       - name: Open pull request
