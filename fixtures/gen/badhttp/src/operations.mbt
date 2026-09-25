@@ -2,7 +2,7 @@
 
 ///|
 fn[T : ToJson] parameter_value(value : T) -> String {
-  match value.to_json() {
+  match Json(value) {
     String(value) => value
     True => "true"
     False => "false"

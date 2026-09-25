@@ -141,7 +141,7 @@ test "open strings choose known or unknown exactly once and reject other types" 
     let mut known_calls = 0
     let mut unknown_calls = 0
     let result = @json.open_string(
-      raw.to_json(),
+      Json(raw),
       path,
       s => {
         known_calls += 1
@@ -175,7 +175,7 @@ test "open integers preserve unknown values and reject fractions overflow and ot
     let mut known_calls = 0
     let mut unknown_calls = 0
     let result = @json.open_int(
-      raw.to_json(),
+      Json(raw),
       path,
       n => {
         known_calls += 1

@@ -2,7 +2,7 @@
 
 ///|
 fn[T : ToJson] parameter_value(value : T) -> String {
-  match value.to_json() {
+  match Json(value) {
     String(value) => value
     True => "true"
     False => "false"
@@ -59,7 +59,7 @@ fn[T : @json.FromJson] decode_response(
 pub fn create_chat_completion_request(
   body : CreateChatCompletionRequest,
 ) -> @http.Request {
-  @http.Request::post("/chat/completions").json_body(body.to_json())
+  @http.Request::post("/chat/completions").json_body(Json(body))
 }
 
 ///|
@@ -84,7 +84,7 @@ pub fn create_chat_completion_decode(
 ///
 /// Creates an embedding vector representing the input text.
 pub fn create_embedding_request(body : CreateEmbeddingRequest) -> @http.Request {
-  @http.Request::post("/embeddings").json_body(body.to_json())
+  @http.Request::post("/embeddings").json_body(Json(body))
 }
 
 ///|
@@ -159,7 +159,7 @@ pub fn retrieve_model_decode(
 ///
 /// Creates a model response. Provide [text](/docs/guides/text) or [image](/docs/guides/images) inputs to generate [text](/docs/guides/text) or [JSON](/docs/guides/structured-outputs) outputs. Have the model call your own [custom code](/docs/guides/function-calling) or use built-in [tools](/docs/guides/tools) like [web search](/docs/guides/tools-web-search) or [file search](/docs/guides/tools-file-search) to use your own data as input for the model's response.
 pub fn create_response_request(body : CreateResponse) -> @http.Request {
-  @http.Request::post("/responses").json_body(body.to_json())
+  @http.Request::post("/responses").json_body(Json(body))
 }
 
 ///|

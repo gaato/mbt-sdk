@@ -31,7 +31,7 @@ pub impl @json.FromJson for UInt64Number with fn from_json(value, path) {
   if repr is Some(text) &&
     text.length() > 0 &&
     text.iter().all(c => c >= '0' && c <= '9') {
-    return { value: @json.from_json(text.to_json(), path~), }
+    return { value: @json.from_json(Json(text), path~), }
   }
   if raw.is_nan() || raw < 0.0 || raw >= 18446744073709551616.0 {
     raise @json.JsonDecodeError((path, "unsigned JSON integer out of range"))
@@ -61,31 +61,31 @@ fn[T : @json.FromJson] decode_result(
 ///|
 /// Creates a initialize request from generated protocol types.
 pub fn initialize(params : InitializeParams) -> Call[InitializeResponse] {
-  { name: "initialize", params: params.to_json(), decode: decode_result, }
+  { name: "initialize", params: Json(params), decode: decode_result, }
 }
 
 ///|
 /// Creates a thread/start request from generated protocol types.
 pub fn thread_start(params : ThreadStartParams) -> Call[ThreadStartResponse] {
-  { name: "thread/start", params: params.to_json(), decode: decode_result, }
+  { name: "thread/start", params: Json(params), decode: decode_result, }
 }
 
 ///|
 /// Creates a thread/resume request from generated protocol types.
 pub fn thread_resume(params : ThreadResumeParams) -> Call[ThreadResumeResponse] {
-  { name: "thread/resume", params: params.to_json(), decode: decode_result, }
+  { name: "thread/resume", params: Json(params), decode: decode_result, }
 }
 
 ///|
 /// Creates a turn/start request from generated protocol types.
 pub fn turn_start(params : TurnStartParams) -> Call[TurnStartResponse] {
-  { name: "turn/start", params: params.to_json(), decode: decode_result, }
+  { name: "turn/start", params: Json(params), decode: decode_result, }
 }
 
 ///|
 /// Creates a turn/interrupt request from generated protocol types.
 pub fn turn_interrupt(params : TurnInterruptParams) -> Call[Json] {
-  { name: "turn/interrupt", params: params.to_json(), decode: decode_result, }
+  { name: "turn/interrupt", params: Json(params), decode: decode_result, }
 }
 
 ///|

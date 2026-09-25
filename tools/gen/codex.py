@@ -202,7 +202,7 @@ pub impl @json.FromJson for UInt64Number with fn from_json(value, path) {
     raise @json.JsonDecodeError((path, "expected unsigned JSON integer"))
   }
   if repr is Some(text) && text.length() > 0 && text.iter().all(c => c >= '0' && c <= '9') {
-    return { value: @json.from_json(text.to_json(), path~) }
+    return { value: @json.from_json(Json(text), path~) }
   }
   if raw.is_nan() || raw < 0.0 || raw >= 18446744073709551616.0 {
     raise @json.JsonDecodeError((path, "unsigned JSON integer out of range"))
@@ -231,7 +231,7 @@ fn[T : @json.FromJson] decode_result(value : Json) -> T raise @json.JsonDecodeEr
         lines.append(f'''///|
 /// Creates a {method} request from generated protocol types.
 pub fn {snake_case(method)}(params : {builder.type_of(params)}) -> Call[{builder.type_of(result)}] {{
-  {{ name: {json.dumps(method)}, params: params.to_json(), decode: decode_result }}
+  {{ name: {json.dumps(method)}, params: Json(params), decode: decode_result }}
 }}
 ''')
     lines.append('///|\n/// Typed progress events; unselected or newer events retain their JSON.\npub(all) enum Event {')

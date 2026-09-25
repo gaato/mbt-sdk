@@ -66,10 +66,11 @@ def _is_int64(type_ref: TypeRef) -> bool:
 
 
 def _to_json(type_ref: TypeRef, value: str) -> str:
-    """`value.to_json()`, elided on raw `Json` where that method is deprecated."""
+    """`Json(value)`, elided on raw `Json`. Core deprecates the `.to_json()`
+    method on its own types, and the constructor reads the same for all."""
     if type_ref.kind == "Json":
         return value
-    return f"{value}.to_json()"
+    return f"Json({value})"
 
 
 def _encoded_value(type_ref: TypeRef, value: str) -> str:
@@ -220,7 +221,7 @@ def _string_enum(declaration: StringEnum) -> str:
     lines.extend(["///|", f"pub impl ToJson for {declaration.name} with fn to_json(self) {{", "  let raw = match self {"])
     lines.extend(f"    {variant.name} => {_moon_string(variant.value)}" for variant in declaration.variants)
     tail = f"{declaration.fallback}(raw)"
-    lines.extend([f"    {tail} => raw", "  }", "  raw.to_json()", "}"])
+    lines.extend([f"    {tail} => raw", "  }", "  Json(raw)", "}"])
     lines.extend(_doc("Decodes this string enum from JSON.", ""))
     lines.append(f"pub extend {declaration.name} with @json.FromJson::{{from_json}}")
     lines.extend(["///|", f"pub impl @json.FromJson for {declaration.name} with fn from_json(value, path) {{", "  @sdkjson.open_string(", "    value,", "    path,", "    raw => {"])
@@ -286,7 +287,7 @@ def _external_union(declaration: ExternalUnion) -> str:
         if variant.type:
             lines.append(f"    {variant.name}(value) => @sdkjson.ObjBuilder::new().field({tag}, {_encoded_value(variant.type, 'value')}).build()")
         else:
-            lines.append(f"    {variant.name} => {tag}.to_json()")
+            lines.append(f"    {variant.name} => Json({tag})")
     lines.extend(["    UnknownValue(value) => value", "  }", "}"])
     lines.extend(_doc("Decodes known variants strictly and retains unknown tags.", ""))
     lines.append(f"pub extend {declaration.name} with @json.FromJson::{{from_json}}")
@@ -592,7 +593,7 @@ MAP_HELPERS = r'''///|
 fn[T : ToJson] json_map_to_json(value : Map[String, T]) -> Json {
   let result : Map[String, Json] = Map([])
   for key, item in value {
-    result[key] = item.to_json()
+    result[key] = Json(item)
   }
   Json::object(result)
 }
@@ -917,7 +918,7 @@ fn percent_encode_segments(value : String) -> String {
 
 PARAMETER_VALUE_HELPER = r'''///|
 fn[T : ToJson] parameter_value(value : T) -> String {
-  match value.to_json() {
+  match Json(value) {
     String(value) => value
     True => "true"
     False => "false"

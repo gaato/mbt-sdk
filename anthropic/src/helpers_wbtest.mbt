@@ -67,7 +67,7 @@ test "request body is the generated encoding plus extra, and extra is validated"
   assert_eq(params.top_p, Some(0.9))
   let (_, streaming) = message_body(request, true)
   guard streaming is Object(fields) else { fail("body must be an object") }
-  assert_eq(fields.get("stream"), Some(true.to_json()))
+  assert_eq(fields.get("stream"), Some(Json(true)))
   for
     key in [
       "model", "max_tokens", "messages", "system", "temperature", "stop_sequences",
@@ -178,7 +178,7 @@ test "typed request fields encode through the generated vocabulary" {
   let (_, counted) = count_tokens_body(request)
   guard counted is Object(fields) else { fail("body must be an object") }
   assert_eq(fields.get("max_tokens"), None)
-  assert_eq(fields.get("model"), Some("claude".to_json()))
+  assert_eq(fields.get("model"), Some(Json("claude")))
   assert_eq(
     fields.get("tool_choice"),
     Some({ "type": "tool", "name": "get_weather" }),

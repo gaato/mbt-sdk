@@ -170,7 +170,7 @@ fn[T : @json.FromJson] decode_nullable_field(
 fn[T : ToJson] json_map_to_json(value : Map[String, T]) -> Json {
   let result : Map[String, Json] = Map([])
   for key, item in value {
-    result[key] = item.to_json()
+    result[key] = Json(item)
   }
   Json::object(result)
 }
@@ -531,9 +531,9 @@ pub extend AskForApproval with ToJson::{to_json}
 ///|
 pub impl ToJson for AskForApproval with fn to_json(self) {
   match self {
-    Untrusted => "untrusted".to_json()
-    OnRequest => "on-request".to_json()
-    Never => "never".to_json()
+    Untrusted => Json("untrusted")
+    OnRequest => Json("on-request")
+    Never => Json("never")
     Granular(value) =>
       @sdkjson.ObjBuilder::new().field("granular", value).build()
     UnknownValue(value) => value
@@ -597,7 +597,7 @@ pub impl ToJson for ApprovalsReviewer with fn to_json(self) {
     GuardianSubagent => "guardian_subagent"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -651,7 +651,7 @@ pub impl ToJson for Personality with fn to_json(self) {
     Pragmatic => "pragmatic"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -705,7 +705,7 @@ pub impl ToJson for SandboxMode with fn to_json(self) {
     DangerFullAccess => "danger-full-access"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -757,7 +757,7 @@ pub impl ToJson for ThreadStartSource with fn to_json(self) {
     Clear => "clear"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -1030,7 +1030,7 @@ pub impl ToJson for NetworkAccess with fn to_json(self) {
     Enabled => "enabled"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -1205,10 +1205,10 @@ pub extend SandboxPolicy with ToJson::{to_json}
 ///|
 pub impl ToJson for SandboxPolicy with fn to_json(self) {
   match self {
-    DangerFullAccess(value) => value.to_json()
-    ReadOnly(value) => value.to_json()
-    ExternalSandbox(value) => value.to_json()
-    WorkspaceWrite(value) => value.to_json()
+    DangerFullAccess(value) => Json(value)
+    ReadOnly(value) => Json(value)
+    ExternalSandbox(value) => Json(value)
+    WorkspaceWrite(value) => Json(value)
     Unknown(_, value) => value
   }
 }
@@ -1317,7 +1317,7 @@ pub impl ToJson for ThreadHistoryMode with fn to_json(self) {
     Paginated => "paginated"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -1551,9 +1551,9 @@ pub extend SubAgentSource with ToJson::{to_json}
 ///|
 pub impl ToJson for SubAgentSource with fn to_json(self) {
   match self {
-    Review => "review".to_json()
-    Compact => "compact".to_json()
-    MemoryConsolidation => "memory_consolidation".to_json()
+    Review => Json("review")
+    Compact => Json("compact")
+    MemoryConsolidation => Json("memory_consolidation")
     ThreadSpawn(value) =>
       @sdkjson.ObjBuilder::new().field("thread_spawn", value).build()
     Other(value) => @sdkjson.ObjBuilder::new().field("other", value).build()
@@ -1622,11 +1622,11 @@ pub extend SessionSource with ToJson::{to_json}
 ///|
 pub impl ToJson for SessionSource with fn to_json(self) {
   match self {
-    Cli => "cli".to_json()
-    Vscode => "vscode".to_json()
-    Exec => "exec".to_json()
-    AppServer => "appServer".to_json()
-    Unknown => "unknown".to_json()
+    Cli => Json("cli")
+    Vscode => Json("vscode")
+    Exec => Json("exec")
+    AppServer => Json("appServer")
+    Unknown => Json("unknown")
     Custom(value) => @sdkjson.ObjBuilder::new().field("custom", value).build()
     SubAgent(value) =>
       @sdkjson.ObjBuilder::new().field("subAgent", value).build()
@@ -1820,7 +1820,7 @@ pub impl ToJson for ThreadActiveFlag with fn to_json(self) {
     WaitingOnUserInput => "waitingOnUserInput"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -1920,10 +1920,10 @@ pub extend ThreadStatus with ToJson::{to_json}
 ///|
 pub impl ToJson for ThreadStatus with fn to_json(self) {
   match self {
-    NotLoaded(value) => value.to_json()
-    Idle(value) => value.to_json()
-    SystemError(value) => value.to_json()
-    Active(value) => value.to_json()
+    NotLoaded(value) => Json(value)
+    Idle(value) => Json(value)
+    SystemError(value) => Json(value)
+    Active(value) => Json(value)
     Unknown(_, value) => value
   }
 }
@@ -2187,7 +2187,7 @@ pub impl ToJson for NonSteerableTurnKind with fn to_json(self) {
     Compact => "compact"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -2296,19 +2296,19 @@ pub extend CodexErrorInfo with ToJson::{to_json}
 ///|
 pub impl ToJson for CodexErrorInfo with fn to_json(self) {
   match self {
-    ContextWindowExceeded => "contextWindowExceeded".to_json()
-    SessionBudgetExceeded => "sessionBudgetExceeded".to_json()
-    UsageLimitExceeded => "usageLimitExceeded".to_json()
-    RateLimitExceeded => "rateLimitExceeded".to_json()
-    ServerOverloaded => "serverOverloaded".to_json()
-    CyberPolicy => "cyberPolicy".to_json()
-    MisalignmentPolicyViolation => "misalignmentPolicyViolation".to_json()
-    InternalServerError => "internalServerError".to_json()
-    Unauthorized => "unauthorized".to_json()
-    BadRequest => "badRequest".to_json()
-    ThreadRollbackFailed => "threadRollbackFailed".to_json()
-    SandboxError => "sandboxError".to_json()
-    Other => "other".to_json()
+    ContextWindowExceeded => Json("contextWindowExceeded")
+    SessionBudgetExceeded => Json("sessionBudgetExceeded")
+    UsageLimitExceeded => Json("usageLimitExceeded")
+    RateLimitExceeded => Json("rateLimitExceeded")
+    ServerOverloaded => Json("serverOverloaded")
+    CyberPolicy => Json("cyberPolicy")
+    MisalignmentPolicyViolation => Json("misalignmentPolicyViolation")
+    InternalServerError => Json("internalServerError")
+    Unauthorized => Json("unauthorized")
+    BadRequest => Json("badRequest")
+    ThreadRollbackFailed => Json("threadRollbackFailed")
+    SandboxError => Json("sandboxError")
+    Other => Json("other")
     HttpConnectionFailed(value) =>
       @sdkjson.ObjBuilder::new().field("httpConnectionFailed", value).build()
     ResponseStreamConnectionFailed(value) =>
@@ -2752,7 +2752,7 @@ pub impl ToJson for ImageDetail with fn to_json(self) {
     Original => "original"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -3125,13 +3125,13 @@ pub extend UserInput with ToJson::{to_json}
 ///|
 pub impl ToJson for UserInput with fn to_json(self) {
   match self {
-    Text(value) => value.to_json()
-    Image(value) => value.to_json()
-    LocalImage(value) => value.to_json()
-    Audio(value) => value.to_json()
-    LocalAudio(value) => value.to_json()
-    Skill(value) => value.to_json()
-    Mention(value) => value.to_json()
+    Text(value) => Json(value)
+    Image(value) => Json(value)
+    LocalImage(value) => Json(value)
+    Audio(value) => Json(value)
+    LocalAudio(value) => Json(value)
+    Skill(value) => Json(value)
+    Mention(value) => Json(value)
     Unknown(_, value) => value
   }
 }
@@ -3459,7 +3459,7 @@ pub impl ToJson for MessagePhase with fn to_json(self) {
     FinalAnswer => "final_answer"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -3883,10 +3883,10 @@ pub extend FunctionCallOutputContentItem with ToJson::{to_json}
 ///|
 pub impl ToJson for FunctionCallOutputContentItem with fn to_json(self) {
   match self {
-    InputText(value) => value.to_json()
-    InputImage(value) => value.to_json()
-    InputAudio(value) => value.to_json()
-    EncryptedContent(value) => value.to_json()
+    InputText(value) => Json(value)
+    InputImage(value) => Json(value)
+    InputAudio(value) => Json(value)
+    EncryptedContent(value) => Json(value)
     Unknown(_, value) => value
   }
 }
@@ -3934,8 +3934,8 @@ pub extend FunctionCallOutputBody with ToJson::{to_json}
 ///|
 pub impl ToJson for FunctionCallOutputBody with fn to_json(self) {
   match self {
-    Text(value) => value.to_json()
-    FunctionCallOutputContentItemArray(value) => value.to_json()
+    Text(value) => Json(value)
+    FunctionCallOutputContentItemArray(value) => Json(value)
   }
 }
 
@@ -4411,10 +4411,10 @@ pub extend CommandAction with ToJson::{to_json}
 ///|
 pub impl ToJson for CommandAction with fn to_json(self) {
   match self {
-    Read(value) => value.to_json()
-    ListFiles(value) => value.to_json()
-    Search(value) => value.to_json()
-    KnownUnknown(value) => value.to_json()
+    Read(value) => Json(value)
+    ListFiles(value) => Json(value)
+    Search(value) => Json(value)
+    KnownUnknown(value) => Json(value)
     Unknown(_, value) => value
   }
 }
@@ -4468,7 +4468,7 @@ pub impl ToJson for CommandExecutionSource with fn to_json(self) {
     UnifiedExecInteraction => "unifiedExecInteraction"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -4528,7 +4528,7 @@ pub impl ToJson for CommandExecutionStatus with fn to_json(self) {
     Declined => "declined"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -4829,9 +4829,9 @@ pub extend PatchChangeKind with ToJson::{to_json}
 ///|
 pub impl ToJson for PatchChangeKind with fn to_json(self) {
   match self {
-    Add(value) => value.to_json()
-    Delete(value) => value.to_json()
-    Update(value) => value.to_json()
+    Add(value) => Json(value)
+    Delete(value) => Json(value)
+    Update(value) => Json(value)
     Unknown(_, value) => value
   }
 }
@@ -4939,7 +4939,7 @@ pub impl ToJson for PatchApplyStatus with fn to_json(self) {
     Declined => "declined"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -5222,7 +5222,7 @@ pub impl ToJson for McpToolCallStatus with fn to_json(self) {
     Failed => "failed"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -5571,9 +5571,9 @@ pub extend DynamicToolCallOutputContentItem with ToJson::{to_json}
 ///|
 pub impl ToJson for DynamicToolCallOutputContentItem with fn to_json(self) {
   match self {
-    InputText(value) => value.to_json()
-    InputImage(value) => value.to_json()
-    InputAudio(value) => value.to_json()
+    InputText(value) => Json(value)
+    InputImage(value) => Json(value)
+    InputAudio(value) => Json(value)
     Unknown(_, value) => value
   }
 }
@@ -5627,7 +5627,7 @@ pub impl ToJson for DynamicToolCallStatus with fn to_json(self) {
     Failed => "failed"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -5784,7 +5784,7 @@ pub impl ToJson for CollabAgentStatus with fn to_json(self) {
     NotFound => "notFound"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -5895,7 +5895,7 @@ pub impl ToJson for CollabAgentToolCallStatus with fn to_json(self) {
     Interrupted => "interrupted"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -5965,7 +5965,7 @@ pub impl ToJson for CollabAgentTool with fn to_json(self) {
     ListAgents => "listAgents"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -6127,7 +6127,7 @@ pub impl ToJson for SubAgentActivityKind with fn to_json(self) {
     Completed => "completed"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -6460,10 +6460,10 @@ pub extend WebSearchAction with ToJson::{to_json}
 ///|
 pub impl ToJson for WebSearchAction with fn to_json(self) {
   match self {
-    Search(value) => value.to_json()
-    OpenPage(value) => value.to_json()
-    FindInPage(value) => value.to_json()
-    Other(value) => value.to_json()
+    Search(value) => Json(value)
+    OpenPage(value) => Json(value)
+    FindInPage(value) => Json(value)
+    Other(value) => Json(value)
     Unknown(_, value) => value
   }
 }
@@ -6749,7 +6749,7 @@ pub extend ImageGenerationFailure with ToJson::{to_json}
 ///|
 pub impl ToJson for ImageGenerationFailure with fn to_json(self) {
   match self {
-    UsageLimitExceeded(value) => value.to_json()
+    UsageLimitExceeded(value) => Json(value)
     Unknown(_, value) => value
   }
 }
@@ -7073,25 +7073,25 @@ pub extend ThreadItem with ToJson::{to_json}
 ///|
 pub impl ToJson for ThreadItem with fn to_json(self) {
   match self {
-    UserMessage(value) => value.to_json()
-    HookPrompt(value) => value.to_json()
-    AgentMessage(value) => value.to_json()
-    FunctionCallOutput(value) => value.to_json()
-    Plan(value) => value.to_json()
-    Reasoning(value) => value.to_json()
-    CommandExecution(value) => value.to_json()
-    FileChange(value) => value.to_json()
-    McpToolCall(value) => value.to_json()
-    DynamicToolCall(value) => value.to_json()
-    CollabAgentToolCall(value) => value.to_json()
-    SubAgentActivity(value) => value.to_json()
-    WebSearch(value) => value.to_json()
-    ImageView(value) => value.to_json()
-    Sleep(value) => value.to_json()
-    ImageGeneration(value) => value.to_json()
-    EnteredReviewMode(value) => value.to_json()
-    ExitedReviewMode(value) => value.to_json()
-    ContextCompaction(value) => value.to_json()
+    UserMessage(value) => Json(value)
+    HookPrompt(value) => Json(value)
+    AgentMessage(value) => Json(value)
+    FunctionCallOutput(value) => Json(value)
+    Plan(value) => Json(value)
+    Reasoning(value) => Json(value)
+    CommandExecution(value) => Json(value)
+    FileChange(value) => Json(value)
+    McpToolCall(value) => Json(value)
+    DynamicToolCall(value) => Json(value)
+    CollabAgentToolCall(value) => Json(value)
+    SubAgentActivity(value) => Json(value)
+    WebSearch(value) => Json(value)
+    ImageView(value) => Json(value)
+    Sleep(value) => Json(value)
+    ImageGeneration(value) => Json(value)
+    EnteredReviewMode(value) => Json(value)
+    ExitedReviewMode(value) => Json(value)
+    ContextCompaction(value) => Json(value)
     Unknown(_, value) => value
   }
 }
@@ -7158,7 +7158,7 @@ pub impl ToJson for TurnItemsView with fn to_json(self) {
     Full => "full"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -7214,7 +7214,7 @@ pub impl ToJson for TurnStatus with fn to_json(self) {
     InProgress => "inProgress"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -7879,7 +7879,7 @@ pub impl ToJson for ReasoningSummary with fn to_json(self) {
     None => "none"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -8209,7 +8209,7 @@ pub impl ToJson for CommandExecutionApprovalKind with fn to_json(self) {
     WriteStdin => "writeStdin"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -8267,7 +8267,7 @@ pub impl ToJson for NetworkApprovalProtocol with fn to_json(self) {
     Socks5Udp => "socks5Udp"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -8377,7 +8377,7 @@ pub impl ToJson for NetworkPolicyRuleAction with fn to_json(self) {
     Deny => "deny"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -8750,8 +8750,8 @@ pub extend CommandExecutionApprovalDecision with ToJson::{to_json}
 ///|
 pub impl ToJson for CommandExecutionApprovalDecision with fn to_json(self) {
   match self {
-    Accept => "accept".to_json()
-    AcceptForSession => "acceptForSession".to_json()
+    Accept => Json("accept")
+    AcceptForSession => Json("acceptForSession")
     AcceptWithExecpolicyAmendment(value) =>
       @sdkjson.ObjBuilder::new()
       .field("acceptWithExecpolicyAmendment", value)
@@ -8760,8 +8760,8 @@ pub impl ToJson for CommandExecutionApprovalDecision with fn to_json(self) {
       @sdkjson.ObjBuilder::new()
       .field("applyNetworkPolicyAmendment", value)
       .build()
-    Decline => "decline".to_json()
-    Cancel => "cancel".to_json()
+    Decline => Json("decline")
+    Cancel => Json("cancel")
     UnknownValue(value) => value
   }
 }
@@ -8972,7 +8972,7 @@ pub impl ToJson for FileChangeApprovalDecision with fn to_json(self) {
     Cancel => "cancel"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -9076,7 +9076,7 @@ pub impl ToJson for FileSystemAccessMode with fn to_json(self) {
     Deny => "deny"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -9529,12 +9529,12 @@ pub extend FileSystemSpecialPath with ToJson::{to_json}
 ///|
 pub impl ToJson for FileSystemSpecialPath with fn to_json(self) {
   match self {
-    Root(value) => value.to_json()
-    Minimal(value) => value.to_json()
-    ProjectRoots(value) => value.to_json()
-    Tmpdir(value) => value.to_json()
-    SlashTmp(value) => value.to_json()
-    KnownUnknown(value) => value.to_json()
+    Root(value) => Json(value)
+    Minimal(value) => Json(value)
+    ProjectRoots(value) => Json(value)
+    Tmpdir(value) => Json(value)
+    SlashTmp(value) => Json(value)
+    KnownUnknown(value) => Json(value)
     Unknown(_, value) => value
   }
 }
@@ -9634,9 +9634,9 @@ pub extend FileSystemPath with ToJson::{to_json}
 ///|
 pub impl ToJson for FileSystemPath with fn to_json(self) {
   match self {
-    Path(value) => value.to_json()
-    GlobPattern(value) => value.to_json()
-    Special(value) => value.to_json()
+    Path(value) => Json(value)
+    GlobPattern(value) => Json(value)
+    Special(value) => Json(value)
     Unknown(_, value) => value
   }
 }
@@ -10056,7 +10056,7 @@ pub impl ToJson for PermissionGrantScope with fn to_json(self) {
     Session => "session"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|

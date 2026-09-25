@@ -2,7 +2,7 @@
 
 ///|
 fn[T : ToJson] parameter_value(value : T) -> String {
-  match value.to_json() {
+  match Json(value) {
     String(value) => value
     True => "true"
     False => "false"
@@ -63,7 +63,7 @@ fn[T : @json.FromJson] decode_response(
 ///
 /// Update an existing pet.
 pub fn update_pet_request(body : Pet) -> @http.Request {
-  @http.Request::put("/pet").json_body(body.to_json())
+  @http.Request::put("/pet").json_body(Json(body))
 }
 
 ///|
@@ -86,7 +86,7 @@ pub fn update_pet_decode(
 ///
 /// Add a new pet to the store.
 pub fn add_pet_request(body : Pet) -> @http.Request {
-  @http.Request::post("/pet").json_body(body.to_json())
+  @http.Request::post("/pet").json_body(Json(body))
 }
 
 ///|
@@ -303,7 +303,7 @@ pub fn get_inventory_decode(
 ///
 /// Place an order for a pet.
 pub fn place_order_request(body : Order) -> @http.Request {
-  @http.Request::post("/store/order").json_body(body.to_json())
+  @http.Request::post("/store/order").json_body(Json(body))
 }
 
 ///|
@@ -364,7 +364,7 @@ pub fn delete_order_request(order_id : Int64) -> @http.Request {
 ///
 /// Create user.
 pub fn create_user_request(body : User) -> @http.Request {
-  @http.Request::post("/user").json_body(body.to_json())
+  @http.Request::post("/user").json_body(Json(body))
 }
 
 ///|
@@ -391,7 +391,7 @@ pub fn create_user_decode(
 pub fn create_users_with_list_input_request(
   body : Array[User],
 ) -> @http.Request {
-  @http.Request::post("/user/createWithList").json_body(body.to_json())
+  @http.Request::post("/user/createWithList").json_body(Json(body))
 }
 
 ///|
@@ -486,7 +486,7 @@ pub fn get_user_by_name_decode(
 /// Update user resource. The caller handles the response as @http.Response.
 pub fn update_user_request(username : String, body : User) -> @http.Request {
   @http.Request::put("/user/" + percent_encode(parameter_value(username))).json_body(
-    body.to_json(),
+    Json(body),
   )
 }
 

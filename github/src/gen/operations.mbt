@@ -2,7 +2,7 @@
 
 ///|
 fn[T : ToJson] parameter_value(value : T) -> String {
-  match value.to_json() {
+  match Json(value) {
     String(value) => value
     True => "true"
     False => "false"
@@ -346,7 +346,7 @@ pub fn agent_tasks_create_task_in_repo_request(
     "/" +
     percent_encode(parameter_value(repo)) +
     "/tasks",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -576,7 +576,7 @@ pub fn apps_get_webhook_config_for_app_decode(
 pub fn apps_update_webhook_config_for_app_request(
   body : AppsUpdateWebhookConfigForAppRequest,
 ) -> @http.Request {
-  @http.Request::patch("/app/hook/config").json_body(body.to_json())
+  @http.Request::patch("/app/hook/config").json_body(Json(body))
 }
 
 ///|
@@ -810,7 +810,7 @@ pub fn apps_create_installation_access_token_request(
     "/app/installations/" +
     percent_encode(parameter_value(installation_id)) +
     "/access_tokens",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -866,7 +866,7 @@ pub fn apps_delete_authorization_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/applications/" + percent_encode(parameter_value(client_id)) + "/grant",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -878,7 +878,7 @@ pub fn apps_check_token_request(
 ) -> @http.Request {
   @http.Request::post(
     "/applications/" + percent_encode(parameter_value(client_id)) + "/token",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -908,7 +908,7 @@ pub fn apps_reset_token_request(
 ) -> @http.Request {
   @http.Request::patch(
     "/applications/" + percent_encode(parameter_value(client_id)) + "/token",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -938,7 +938,7 @@ pub fn apps_delete_token_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/applications/" + percent_encode(parameter_value(client_id)) + "/token",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -952,7 +952,7 @@ pub fn apps_scope_token_request(
     "/applications/" +
     percent_encode(parameter_value(client_id)) +
     "/token/scoped",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -1120,7 +1120,7 @@ pub fn codes_of_conduct_get_conduct_code_decode(
 pub fn credentials_revoke_request(
   body : CredentialsRevokeRequest,
 ) -> @http.Request {
-  @http.Request::post("/credentials/revoke").json_body(body.to_json())
+  @http.Request::post("/credentials/revoke").json_body(Json(body))
 }
 
 ///|
@@ -1190,7 +1190,7 @@ pub fn actions_set_actions_cache_retention_limit_for_enterprise_request(
     "/enterprises/" +
     percent_encode(parameter_value(enterprise)) +
     "/actions/cache/retention-limit",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -1235,7 +1235,7 @@ pub fn actions_set_actions_cache_storage_limit_for_enterprise_request(
     "/enterprises/" +
     percent_encode(parameter_value(enterprise)) +
     "/actions/cache/storage-limit",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -1280,7 +1280,7 @@ pub fn oidc_create_oidc_custom_property_inclusion_for_enterprise_request(
     "/enterprises/" +
     percent_encode(parameter_value(enterprise)) +
     "/actions/oidc/customization/properties/repo",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -1372,7 +1372,7 @@ pub fn code_security_create_configuration_for_enterprise_request(
     "/enterprises/" +
     percent_encode(parameter_value(enterprise)) +
     "/code-security/configurations",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -1470,7 +1470,7 @@ pub fn code_security_update_enterprise_configuration_request(
     percent_encode(parameter_value(enterprise)) +
     "/code-security/configurations/" +
     percent_encode(parameter_value(configuration_id)),
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -1520,7 +1520,7 @@ pub fn code_security_attach_enterprise_configuration_request(
     "/code-security/configurations/" +
     percent_encode(parameter_value(configuration_id)) +
     "/attach",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -1537,7 +1537,7 @@ pub fn code_security_set_configuration_as_default_for_enterprise_request(
     "/code-security/configurations/" +
     percent_encode(parameter_value(configuration_id)) +
     "/defaults",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -1812,7 +1812,7 @@ pub fn copilot_set_enterprise_coding_agent_policy_request(
     "/enterprises/" +
     percent_encode(parameter_value(enterprise)) +
     "/copilot/policies/coding_agent",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -1826,7 +1826,7 @@ pub fn copilot_add_organizations_to_enterprise_coding_agent_policy_request(
     "/enterprises/" +
     percent_encode(parameter_value(enterprise)) +
     "/copilot/policies/coding_agent/organizations",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -1840,7 +1840,7 @@ pub fn copilot_remove_organizations_from_enterprise_coding_agent_policy_request(
     "/enterprises/" +
     percent_encode(parameter_value(enterprise)) +
     "/copilot/policies/coding_agent/organizations",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -2002,7 +2002,7 @@ pub fn dependabot_update_repository_access_for_enterprise_request(
     "/enterprises/" +
     percent_encode(parameter_value(enterprise)) +
     "/dependabot/repository-access",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -2016,7 +2016,7 @@ pub fn dependabot_set_repository_access_default_level_for_enterprise_request(
     "/enterprises/" +
     percent_encode(parameter_value(enterprise)) +
     "/dependabot/repository-access/default-level",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -2127,7 +2127,7 @@ pub fn gists_list_decode(
 ///
 /// Create a gist
 pub fn gists_create_request(body : GistsCreateRequest) -> @http.Request {
-  @http.Request::post("/gists").json_body(body.to_json())
+  @http.Request::post("/gists").json_body(Json(body))
 }
 
 ///|
@@ -2265,7 +2265,7 @@ pub fn gists_update_request(
   body : GistsUpdateRequest,
 ) -> @http.Request {
   @http.Request::patch("/gists/" + percent_encode(parameter_value(gist_id))).json_body(
-    body.to_json(),
+    Json(body),
   )
 }
 
@@ -2343,7 +2343,7 @@ pub fn gists_create_comment_request(
 ) -> @http.Request {
   @http.Request::post(
     "/gists/" + percent_encode(parameter_value(gist_id)) + "/comments",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -2410,7 +2410,7 @@ pub fn gists_update_comment_request(
     percent_encode(parameter_value(gist_id)) +
     "/comments/" +
     percent_encode(parameter_value(comment_id)),
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -2865,7 +2865,7 @@ pub fn licenses_get_decode(
 ///
 /// Render a Markdown document The caller handles the response as @http.Response.
 pub fn markdown_render_request(body : MarkdownRenderRequest) -> @http.Request {
-  @http.Request::post("/markdown").json_body(body.to_json())
+  @http.Request::post("/markdown").json_body(Json(body))
 }
 
 ///|
@@ -3238,7 +3238,7 @@ pub fn activity_list_notifications_for_authenticated_user_decode(
 pub fn activity_mark_notifications_as_read_request(
   body : ActivityMarkNotificationsAsReadRequest,
 ) -> @http.Request {
-  @http.Request::put("/notifications").json_body(body.to_json())
+  @http.Request::put("/notifications").json_body(Json(body))
 }
 
 ///|
@@ -3346,7 +3346,7 @@ pub fn activity_set_thread_subscription_request(
     "/notifications/threads/" +
     percent_encode(parameter_value(thread_id)) +
     "/subscription",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -3468,7 +3468,7 @@ pub fn actions_set_actions_cache_retention_limit_for_organization_request(
     "/organizations/" +
     percent_encode(parameter_value(org)) +
     "/actions/cache/retention-limit",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -3513,7 +3513,7 @@ pub fn actions_set_actions_cache_storage_limit_for_organization_request(
     "/organizations/" +
     percent_encode(parameter_value(org)) +
     "/actions/cache/storage-limit",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -3601,7 +3601,7 @@ pub fn billing_create_organization_budget_request(
     "/organizations/" +
     percent_encode(parameter_value(org)) +
     "/settings/billing/budgets",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -3650,7 +3650,7 @@ pub fn billing_update_budget_org_request(
     percent_encode(parameter_value(org)) +
     "/settings/billing/budgets/" +
     percent_encode(parameter_value(budget_id)),
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -3830,7 +3830,7 @@ pub fn orgs_update_request(
   body : OrgsUpdateRequest,
 ) -> @http.Request {
   @http.Request::patch("/orgs/" + percent_encode(parameter_value(org))).json_body(
-    body.to_json(),
+    Json(body),
   )
 }
 
@@ -3977,7 +3977,7 @@ pub fn actions_create_hosted_runner_for_org_request(
 ) -> @http.Request {
   @http.Request::post(
     "/orgs/" + percent_encode(parameter_value(org)) + "/actions/hosted-runners",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -4366,7 +4366,7 @@ pub fn actions_update_hosted_runner_for_org_request(
     percent_encode(parameter_value(org)) +
     "/actions/hosted-runners/" +
     percent_encode(parameter_value(hosted_runner_id)),
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -4462,7 +4462,7 @@ pub fn oidc_create_oidc_custom_property_inclusion_for_org_request(
     "/orgs/" +
     percent_encode(parameter_value(org)) +
     "/actions/oidc/customization/properties/repo",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -4540,7 +4540,7 @@ pub fn oidc_update_oidc_custom_sub_template_for_org_request(
     "/orgs/" +
     percent_encode(parameter_value(org)) +
     "/actions/oidc/customization/sub",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -4599,7 +4599,7 @@ pub fn actions_set_github_actions_permissions_organization_request(
 ) -> @http.Request {
   @http.Request::put(
     "/orgs/" + percent_encode(parameter_value(org)) + "/actions/permissions",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -4644,7 +4644,7 @@ pub fn actions_set_artifact_and_log_retention_settings_organization_request(
     "/orgs/" +
     percent_encode(parameter_value(org)) +
     "/actions/permissions/artifact-and-log-retention",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -4689,7 +4689,7 @@ pub fn actions_set_fork_pr_contributor_approval_permissions_organization_request
     "/orgs/" +
     percent_encode(parameter_value(org)) +
     "/actions/permissions/fork-pr-contributor-approval",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -4734,7 +4734,7 @@ pub fn actions_set_private_repo_fork_pr_workflows_settings_organization_request(
     "/orgs/" +
     percent_encode(parameter_value(org)) +
     "/actions/permissions/fork-pr-workflows-private-repos",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -4788,7 +4788,7 @@ pub fn actions_set_selected_repositories_enabled_github_actions_organization_req
     "/orgs/" +
     percent_encode(parameter_value(org)) +
     "/actions/permissions/repositories",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -4863,7 +4863,7 @@ pub fn actions_set_allowed_actions_organization_request(
     "/orgs/" +
     percent_encode(parameter_value(org)) +
     "/actions/permissions/selected-actions",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -4908,7 +4908,7 @@ pub fn actions_set_self_hosted_runners_permissions_organization_request(
     "/orgs/" +
     percent_encode(parameter_value(org)) +
     "/actions/permissions/self-hosted-runners",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -4962,7 +4962,7 @@ pub fn actions_set_selected_repositories_self_hosted_runners_organization_reques
     "/orgs/" +
     percent_encode(parameter_value(org)) +
     "/actions/permissions/self-hosted-runners/repositories",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -5037,7 +5037,7 @@ pub fn actions_set_github_actions_default_workflow_permissions_organization_requ
     "/orgs/" +
     percent_encode(parameter_value(org)) +
     "/actions/permissions/workflow",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -5095,7 +5095,7 @@ pub fn actions_create_org_actions_policy_request(
 ) -> @http.Request {
   @http.Request::post(
     "/orgs/" + percent_encode(parameter_value(org)) + "/actions/policies",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -5162,7 +5162,7 @@ pub fn actions_update_org_actions_policy_request(
     percent_encode(parameter_value(org)) +
     "/actions/policies/" +
     percent_encode(parameter_value(policy_id)),
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -5253,7 +5253,7 @@ pub fn actions_create_self_hosted_runner_group_for_org_request(
 ) -> @http.Request {
   @http.Request::post(
     "/orgs/" + percent_encode(parameter_value(org)) + "/actions/runner-groups",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -5320,7 +5320,7 @@ pub fn actions_update_self_hosted_runner_group_for_org_request(
     percent_encode(parameter_value(org)) +
     "/actions/runner-groups/" +
     percent_encode(parameter_value(runner_group_id)),
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -5456,7 +5456,7 @@ pub fn actions_set_repo_access_to_self_hosted_runner_group_in_org_request(
     "/actions/runner-groups/" +
     percent_encode(parameter_value(runner_group_id)) +
     "/repositories",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -5552,7 +5552,7 @@ pub fn actions_set_self_hosted_runners_in_group_for_org_request(
     "/actions/runner-groups/" +
     percent_encode(parameter_value(runner_group_id)) +
     "/runners",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -5711,7 +5711,7 @@ pub fn actions_generate_runner_jitconfig_for_org_request(
     "/orgs/" +
     percent_encode(parameter_value(org)) +
     "/actions/runners/generate-jitconfig",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -5854,7 +5854,7 @@ pub fn actions_add_custom_labels_to_self_hosted_runner_for_org_request(
     "/actions/runners/" +
     percent_encode(parameter_value(runner_id)) +
     "/labels",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -5871,7 +5871,7 @@ pub fn actions_set_custom_labels_for_self_hosted_runner_for_org_request(
     "/actions/runners/" +
     percent_encode(parameter_value(runner_id)) +
     "/labels",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -6023,7 +6023,7 @@ pub fn actions_create_or_update_org_secret_request(
     percent_encode(parameter_value(org)) +
     "/actions/secrets/" +
     percent_encode(parameter_value(secret_name)),
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -6116,7 +6116,7 @@ pub fn actions_set_selected_repos_for_org_secret_request(
     "/actions/secrets/" +
     percent_encode(parameter_value(secret_name)) +
     "/repositories",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -6204,7 +6204,7 @@ pub fn actions_create_org_variable_request(
 ) -> @http.Request {
   @http.Request::post(
     "/orgs/" + percent_encode(parameter_value(org)) + "/actions/variables",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -6271,7 +6271,7 @@ pub fn actions_update_org_variable_request(
     percent_encode(parameter_value(org)) +
     "/actions/variables/" +
     percent_encode(parameter_value(name)),
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -6346,7 +6346,7 @@ pub fn actions_set_selected_repos_for_org_variable_request(
     "/actions/variables/" +
     percent_encode(parameter_value(name)) +
     "/repositories",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -6500,7 +6500,7 @@ pub fn agents_create_or_update_org_secret_request(
     percent_encode(parameter_value(org)) +
     "/agents/secrets/" +
     percent_encode(parameter_value(secret_name)),
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -6593,7 +6593,7 @@ pub fn agents_set_selected_repos_for_org_secret_request(
     "/agents/secrets/" +
     percent_encode(parameter_value(secret_name)) +
     "/repositories",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -6681,7 +6681,7 @@ pub fn agents_create_org_variable_request(
 ) -> @http.Request {
   @http.Request::post(
     "/orgs/" + percent_encode(parameter_value(org)) + "/agents/variables",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -6748,7 +6748,7 @@ pub fn agents_update_org_variable_request(
     percent_encode(parameter_value(org)) +
     "/agents/variables/" +
     percent_encode(parameter_value(name)),
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -6823,7 +6823,7 @@ pub fn agents_set_selected_repos_for_org_variable_request(
     "/agents/variables/" +
     percent_encode(parameter_value(name)) +
     "/repositories",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -6873,7 +6873,7 @@ pub fn orgs_create_artifact_deployment_record_request(
     "/orgs/" +
     percent_encode(parameter_value(org)) +
     "/artifacts/metadata/deployment-record",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -6907,7 +6907,7 @@ pub fn orgs_set_cluster_deployment_records_request(
     percent_encode(parameter_value(org)) +
     "/artifacts/metadata/deployment-record/cluster/" +
     percent_encode(parameter_value(cluster)),
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -6942,7 +6942,7 @@ pub fn orgs_create_cluster_deployment_records_job_request(
     "/artifacts/metadata/deployment-record/cluster/" +
     percent_encode(parameter_value(cluster)) +
     "/jobs",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -7010,7 +7010,7 @@ pub fn orgs_create_artifact_storage_record_request(
     "/orgs/" +
     percent_encode(parameter_value(org)) +
     "/artifacts/metadata/storage-record",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -7124,7 +7124,7 @@ pub fn orgs_list_attestations_bulk_request(
     Some(value) => url = append_query(url, "after", parameter_value(value))
     None => ()
   }
-  @http.Request::post(url).json_body(body.to_json())
+  @http.Request::post(url).json_body(Json(body))
 }
 
 ///|
@@ -7438,7 +7438,7 @@ pub fn campaigns_create_campaign_request(
 ) -> @http.Request {
   @http.Request::post(
     "/orgs/" + percent_encode(parameter_value(org)) + "/campaigns",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -7505,7 +7505,7 @@ pub fn campaigns_update_campaign_request(
     percent_encode(parameter_value(org)) +
     "/campaigns/" +
     percent_encode(parameter_value(campaign_number)),
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -7579,7 +7579,7 @@ pub fn code_scanning_update_ai_scan_enablement_for_org_request(
 ) -> @http.Request {
   @http.Request::patch(
     "/orgs/" + percent_encode(parameter_value(org)) + "/code-scanning/ai-scan",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -7747,7 +7747,7 @@ pub fn code_security_create_configuration_request(
     "/orgs/" +
     percent_encode(parameter_value(org)) +
     "/code-security/configurations",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -7810,7 +7810,7 @@ pub fn code_security_detach_configuration_request(
     "/orgs/" +
     percent_encode(parameter_value(org)) +
     "/code-security/configurations/detach",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -7859,7 +7859,7 @@ pub fn code_security_update_configuration_request(
     percent_encode(parameter_value(org)) +
     "/code-security/configurations/" +
     percent_encode(parameter_value(configuration_id)),
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -7909,7 +7909,7 @@ pub fn code_security_attach_configuration_request(
     "/code-security/configurations/" +
     percent_encode(parameter_value(configuration_id)) +
     "/attach",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -7926,7 +7926,7 @@ pub fn code_security_set_configuration_as_default_request(
     "/code-security/configurations/" +
     percent_encode(parameter_value(configuration_id)) +
     "/defaults",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -8047,7 +8047,7 @@ pub fn codespaces_set_codespaces_access_request(
 ) -> @http.Request {
   @http.Request::put(
     "/orgs/" + percent_encode(parameter_value(org)) + "/codespaces/access",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -8061,7 +8061,7 @@ pub fn codespaces_set_codespaces_access_users_request(
     "/orgs/" +
     percent_encode(parameter_value(org)) +
     "/codespaces/access/selected_users",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -8075,7 +8075,7 @@ pub fn codespaces_delete_codespaces_access_users_request(
     "/orgs/" +
     percent_encode(parameter_value(org)) +
     "/codespaces/access/selected_users",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -8193,7 +8193,7 @@ pub fn codespaces_create_or_update_org_secret_request(
     percent_encode(parameter_value(org)) +
     "/codespaces/secrets/" +
     percent_encode(parameter_value(secret_name)),
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -8286,7 +8286,7 @@ pub fn codespaces_set_selected_repos_for_org_secret_request(
     "/codespaces/secrets/" +
     percent_encode(parameter_value(secret_name)) +
     "/repositories",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -8379,7 +8379,7 @@ pub fn copilot_spaces_create_for_org_request(
 ) -> @http.Request {
   @http.Request::post(
     "/orgs/" + percent_encode(parameter_value(org)) + "/copilot-spaces",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -8446,7 +8446,7 @@ pub fn copilot_spaces_update_for_org_request(
     percent_encode(parameter_value(org)) +
     "/copilot-spaces/" +
     percent_encode(parameter_value(space_number)),
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -8530,7 +8530,7 @@ pub fn copilot_spaces_add_collaborator_for_org_request(
     "/copilot-spaces/" +
     percent_encode(parameter_value(space_number)) +
     "/collaborators",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -8570,7 +8570,7 @@ pub fn copilot_spaces_update_collaborator_for_org_request(
     percent_encode(parameter_value(actor_type)) +
     "/" +
     percent_encode(parameter_value(actor_identifier)),
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -8660,7 +8660,7 @@ pub fn copilot_spaces_create_resource_for_org_request(
     "/copilot-spaces/" +
     percent_encode(parameter_value(space_number)) +
     "/resources",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -8733,7 +8733,7 @@ pub fn copilot_spaces_update_resource_for_org_request(
     percent_encode(parameter_value(space_number)) +
     "/resources/" +
     percent_encode(parameter_value(space_resource_id)),
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -8852,7 +8852,7 @@ pub fn copilot_add_copilot_seats_for_teams_request(
     "/orgs/" +
     percent_encode(parameter_value(org)) +
     "/copilot/billing/selected_teams",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -8884,7 +8884,7 @@ pub fn copilot_cancel_copilot_seat_assignment_for_teams_request(
     "/orgs/" +
     percent_encode(parameter_value(org)) +
     "/copilot/billing/selected_teams",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -8916,7 +8916,7 @@ pub fn copilot_add_copilot_seats_for_users_request(
     "/orgs/" +
     percent_encode(parameter_value(org)) +
     "/copilot/billing/selected_users",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -8948,7 +8948,7 @@ pub fn copilot_cancel_copilot_seat_assignment_for_users_request(
     "/orgs/" +
     percent_encode(parameter_value(org)) +
     "/copilot/billing/selected_users",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -9011,7 +9011,7 @@ pub fn copilot_set_copilot_coding_agent_permissions_organization_request(
     "/orgs/" +
     percent_encode(parameter_value(org)) +
     "/copilot/coding-agent/permissions",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -9065,7 +9065,7 @@ pub fn copilot_set_copilot_coding_agent_selected_repositories_for_organization_r
     "/orgs/" +
     percent_encode(parameter_value(org)) +
     "/copilot/coding-agent/permissions/repositories",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -9140,7 +9140,7 @@ pub fn copilot_set_copilot_content_exclusion_for_organization_request(
     "/orgs/" +
     percent_encode(parameter_value(org)) +
     "/copilot/content_exclusion",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -9528,7 +9528,7 @@ pub fn dependabot_update_repository_access_for_org_request(
     "/orgs/" +
     percent_encode(parameter_value(org)) +
     "/dependabot/repository-access",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -9542,7 +9542,7 @@ pub fn dependabot_set_repository_access_default_level_request(
     "/orgs/" +
     percent_encode(parameter_value(org)) +
     "/dependabot/repository-access/default-level",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -9660,7 +9660,7 @@ pub fn dependabot_create_or_update_org_secret_request(
     percent_encode(parameter_value(org)) +
     "/dependabot/secrets/" +
     percent_encode(parameter_value(secret_name)),
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -9753,7 +9753,7 @@ pub fn dependabot_set_selected_repos_for_org_secret_request(
     "/dependabot/secrets/" +
     percent_encode(parameter_value(secret_name)) +
     "/repositories",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -9946,7 +9946,7 @@ pub fn orgs_create_webhook_request(
 ) -> @http.Request {
   @http.Request::post(
     "/orgs/" + percent_encode(parameter_value(org)) + "/hooks",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -10010,7 +10010,7 @@ pub fn orgs_update_webhook_request(
     percent_encode(parameter_value(org)) +
     "/hooks/" +
     percent_encode(parameter_value(hook_id)),
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -10094,7 +10094,7 @@ pub fn orgs_update_webhook_config_for_org_request(
     "/hooks/" +
     percent_encode(parameter_value(hook_id)) +
     "/config",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -10804,7 +10804,7 @@ pub fn interactions_set_restrictions_for_org_request(
 ) -> @http.Request {
   @http.Request::put(
     "/orgs/" + percent_encode(parameter_value(org)) + "/interaction-limits",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -10878,7 +10878,7 @@ pub fn interactions_update_pull_request_creation_cap_for_org_request(
     "/orgs/" +
     percent_encode(parameter_value(org)) +
     "/interaction-limits/pulls/creation-cap",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -10957,7 +10957,7 @@ pub fn orgs_create_invitation_request(
 ) -> @http.Request {
   @http.Request::post(
     "/orgs/" + percent_encode(parameter_value(org)) + "/invitations",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -11072,7 +11072,7 @@ pub fn orgs_create_issue_field_request(
 ) -> @http.Request {
   @http.Request::post(
     "/orgs/" + percent_encode(parameter_value(org)) + "/issue-fields",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -11106,7 +11106,7 @@ pub fn orgs_update_issue_field_request(
     percent_encode(parameter_value(org)) +
     "/issue-fields/" +
     percent_encode(parameter_value(issue_field_id)),
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -11178,7 +11178,7 @@ pub fn orgs_create_issue_type_request(
 ) -> @http.Request {
   @http.Request::post(
     "/orgs/" + percent_encode(parameter_value(org)) + "/issue-types",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -11212,7 +11212,7 @@ pub fn orgs_update_issue_type_request(
     percent_encode(parameter_value(org)) +
     "/issue-types/" +
     percent_encode(parameter_value(issue_type_id)),
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -11577,7 +11577,7 @@ pub fn orgs_set_membership_for_user_request(
     percent_encode(parameter_value(org)) +
     "/memberships/" +
     percent_encode(parameter_value(username)),
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -11668,7 +11668,7 @@ pub fn migrations_start_for_org_request(
 ) -> @http.Request {
   @http.Request::post(
     "/orgs/" + percent_encode(parameter_value(org)) + "/migrations",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -12126,7 +12126,7 @@ pub fn orgs_convert_member_to_outside_collaborator_request(
     percent_encode(parameter_value(org)) +
     "/outside_collaborators/" +
     percent_encode(parameter_value(username)),
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -12516,7 +12516,7 @@ pub fn orgs_review_pat_grant_requests_in_bulk_request(
     "/orgs/" +
     percent_encode(parameter_value(org)) +
     "/personal-access-token-requests",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -12532,7 +12532,7 @@ pub fn orgs_review_pat_grant_request_request(
     percent_encode(parameter_value(org)) +
     "/personal-access-token-requests/" +
     percent_encode(parameter_value(pat_request_id)),
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -12675,7 +12675,7 @@ pub fn orgs_update_pat_accesses_request(
 ) -> @http.Request {
   @http.Request::post(
     "/orgs/" + percent_encode(parameter_value(org)) + "/personal-access-tokens",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -12691,7 +12691,7 @@ pub fn orgs_update_pat_access_request(
     percent_encode(parameter_value(org)) +
     "/personal-access-tokens/" +
     percent_encode(parameter_value(pat_id)),
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -12786,7 +12786,7 @@ pub fn private_registries_create_org_private_registry_request(
 ) -> @http.Request {
   @http.Request::post(
     "/orgs/" + percent_encode(parameter_value(org)) + "/private-registries",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -12884,7 +12884,7 @@ pub fn private_registries_update_org_private_registry_request(
     percent_encode(parameter_value(org)) +
     "/private-registries/" +
     percent_encode(parameter_value(secret_name)),
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -12997,7 +12997,7 @@ pub fn projects_create_draft_item_for_org_request(
     "/projectsV2/" +
     percent_encode(parameter_value(project_number)) +
     "/drafts",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -13209,7 +13209,7 @@ pub fn projects_add_item_for_org_request(
     "/projectsV2/" +
     percent_encode(parameter_value(project_number)) +
     "/items",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -13286,7 +13286,7 @@ pub fn projects_update_item_for_org_request(
     percent_encode(parameter_value(project_number)) +
     "/items/" +
     percent_encode(parameter_value(item_id)),
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -13339,7 +13339,7 @@ pub fn projects_create_view_for_org_request(
     "/projectsV2/" +
     percent_encode(parameter_value(project_number)) +
     "/views",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -13454,7 +13454,7 @@ pub fn orgs_custom_properties_for_repos_create_or_update_organization_definition
 ) -> @http.Request {
   @http.Request::patch(
     "/orgs/" + percent_encode(parameter_value(org)) + "/properties/schema",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -13521,7 +13521,7 @@ pub fn orgs_custom_properties_for_repos_create_or_update_organization_definition
     percent_encode(parameter_value(org)) +
     "/properties/schema/" +
     percent_encode(parameter_value(custom_property_name)),
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -13612,7 +13612,7 @@ pub fn orgs_custom_properties_for_repos_create_or_update_organization_values_req
 ) -> @http.Request {
   @http.Request::patch(
     "/orgs/" + percent_encode(parameter_value(org)) + "/properties/values",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -13762,7 +13762,7 @@ pub fn repos_create_in_org_request(
 ) -> @http.Request {
   @http.Request::post(
     "/orgs/" + percent_encode(parameter_value(org)) + "/repos",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -13835,7 +13835,7 @@ pub fn repos_create_org_ruleset_request(
 ) -> @http.Request {
   @http.Request::post(
     "/orgs/" + percent_encode(parameter_value(org)) + "/rulesets",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -14009,7 +14009,7 @@ pub fn repos_update_org_ruleset_request(
     percent_encode(parameter_value(org)) +
     "/rulesets/" +
     percent_encode(parameter_value(ruleset_id)),
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -14335,7 +14335,7 @@ pub fn secret_scanning_bulk_create_org_custom_patterns_request(
     "/orgs/" +
     percent_encode(parameter_value(org)) +
     "/secret-scanning/custom-patterns",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -14367,7 +14367,7 @@ pub fn secret_scanning_bulk_delete_org_custom_patterns_request(
     "/orgs/" +
     percent_encode(parameter_value(org)) +
     "/secret-scanning/custom-patterns",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -14383,7 +14383,7 @@ pub fn secret_scanning_update_org_custom_pattern_request(
     percent_encode(parameter_value(org)) +
     "/secret-scanning/custom-patterns/" +
     percent_encode(parameter_value(pattern_id)),
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -14446,7 +14446,7 @@ pub fn secret_scanning_update_org_pattern_configs_request(
     "/orgs/" +
     percent_encode(parameter_value(org)) +
     "/secret-scanning/pattern-configurations",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -14626,7 +14626,7 @@ pub fn orgs_set_immutable_releases_settings_request(
     "/orgs/" +
     percent_encode(parameter_value(org)) +
     "/settings/immutable-releases",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -14680,7 +14680,7 @@ pub fn orgs_set_immutable_releases_settings_repositories_request(
     "/orgs/" +
     percent_encode(parameter_value(org)) +
     "/settings/immutable-releases/repositories",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -14764,7 +14764,7 @@ pub fn hosted_compute_create_network_configuration_for_org_request(
     "/orgs/" +
     percent_encode(parameter_value(org)) +
     "/settings/network-configurations",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -14831,7 +14831,7 @@ pub fn hosted_compute_update_network_configuration_for_org_request(
     percent_encode(parameter_value(org)) +
     "/settings/network-configurations/" +
     percent_encode(parameter_value(network_configuration_id)),
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -14952,7 +14952,7 @@ pub fn teams_create_request(
 ) -> @http.Request {
   @http.Request::post(
     "/orgs/" + percent_encode(parameter_value(org)) + "/teams",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -15019,7 +15019,7 @@ pub fn teams_update_in_org_request(
     percent_encode(parameter_value(org)) +
     "/teams/" +
     percent_encode(parameter_value(team_slug)),
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -15198,7 +15198,7 @@ pub fn teams_add_or_update_membership_for_user_in_org_request(
     percent_encode(parameter_value(team_slug)) +
     "/memberships/" +
     percent_encode(parameter_value(username)),
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -15338,7 +15338,7 @@ pub fn teams_add_or_update_repo_permissions_in_org_request(
     percent_encode(parameter_value(owner)) +
     "/" +
     percent_encode(parameter_value(repo)),
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -15421,7 +15421,7 @@ pub fn orgs_enable_or_disable_security_product_on_all_org_repos_request(
     percent_encode(parameter_value(security_product)) +
     "/" +
     percent_encode(parameter_value(enablement)),
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -15492,7 +15492,7 @@ pub fn repos_update_request(
     percent_encode(parameter_value(owner)) +
     "/" +
     percent_encode(parameter_value(repo)),
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -15696,7 +15696,7 @@ pub fn actions_set_actions_cache_retention_limit_for_repository_request(
     "/" +
     percent_encode(parameter_value(repo)) +
     "/actions/cache/retention-limit",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -15747,7 +15747,7 @@ pub fn actions_set_actions_cache_storage_limit_for_repository_request(
     "/" +
     percent_encode(parameter_value(repo)) +
     "/actions/cache/storage-limit",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -16067,7 +16067,7 @@ pub fn actions_re_run_job_for_workflow_run_request(
     "/actions/jobs/" +
     percent_encode(parameter_value(job_id)) +
     "/rerun",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -16136,7 +16136,7 @@ pub fn actions_set_custom_oidc_sub_claim_for_repo_request(
     "/" +
     percent_encode(parameter_value(repo)) +
     "/actions/oidc/customization/sub",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -16291,7 +16291,7 @@ pub fn actions_set_github_actions_permissions_repository_request(
     "/" +
     percent_encode(parameter_value(repo)) +
     "/actions/permissions",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -16342,7 +16342,7 @@ pub fn actions_set_workflow_access_to_repository_request(
     "/" +
     percent_encode(parameter_value(repo)) +
     "/actions/permissions/access",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -16393,7 +16393,7 @@ pub fn actions_set_artifact_and_log_retention_settings_repository_request(
     "/" +
     percent_encode(parameter_value(repo)) +
     "/actions/permissions/artifact-and-log-retention",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -16444,7 +16444,7 @@ pub fn actions_set_fork_pr_contributor_approval_permissions_repository_request(
     "/" +
     percent_encode(parameter_value(repo)) +
     "/actions/permissions/fork-pr-contributor-approval",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -16495,7 +16495,7 @@ pub fn actions_set_private_repo_fork_pr_workflows_settings_repository_request(
     "/" +
     percent_encode(parameter_value(repo)) +
     "/actions/permissions/fork-pr-workflows-private-repos",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -16546,7 +16546,7 @@ pub fn actions_set_allowed_actions_repository_request(
     "/" +
     percent_encode(parameter_value(repo)) +
     "/actions/permissions/selected-actions",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -16597,7 +16597,7 @@ pub fn actions_set_github_actions_default_workflow_permissions_repository_reques
     "/" +
     percent_encode(parameter_value(repo)) +
     "/actions/permissions/workflow",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -16663,7 +16663,7 @@ pub fn actions_create_repo_actions_policy_request(
     "/" +
     percent_encode(parameter_value(repo)) +
     "/actions/policies",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -16736,7 +16736,7 @@ pub fn actions_update_repo_actions_policy_request(
     percent_encode(parameter_value(repo)) +
     "/actions/policies/" +
     percent_encode(parameter_value(policy_id)),
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -16907,7 +16907,7 @@ pub fn actions_generate_runner_jitconfig_for_repo_request(
     "/" +
     percent_encode(parameter_value(repo)) +
     "/actions/runners/generate-jitconfig",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -17068,7 +17068,7 @@ pub fn actions_add_custom_labels_to_self_hosted_runner_for_repo_request(
     "/actions/runners/" +
     percent_encode(parameter_value(runner_id)) +
     "/labels",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -17088,7 +17088,7 @@ pub fn actions_set_custom_labels_for_self_hosted_runner_for_repo_request(
     "/actions/runners/" +
     percent_encode(parameter_value(runner_id)) +
     "/labels",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -17808,7 +17808,7 @@ pub fn actions_review_pending_deployments_for_run_request(
     "/actions/runs/" +
     percent_encode(parameter_value(run_id)) +
     "/pending_deployments",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -17846,7 +17846,7 @@ pub fn actions_re_run_workflow_request(
     "/actions/runs/" +
     percent_encode(parameter_value(run_id)) +
     "/rerun",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -17884,7 +17884,7 @@ pub fn actions_re_run_workflow_failed_jobs_request(
     "/actions/runs/" +
     percent_encode(parameter_value(run_id)) +
     "/rerun-failed-jobs",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -18071,7 +18071,7 @@ pub fn actions_create_or_update_repo_secret_request(
     percent_encode(parameter_value(repo)) +
     "/actions/secrets/" +
     percent_encode(parameter_value(secret_name)),
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -18167,7 +18167,7 @@ pub fn actions_create_repo_variable_request(
     "/" +
     percent_encode(parameter_value(repo)) +
     "/actions/variables",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -18240,7 +18240,7 @@ pub fn actions_update_repo_variable_request(
     percent_encode(parameter_value(repo)) +
     "/actions/variables/" +
     percent_encode(parameter_value(name)),
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -18376,7 +18376,7 @@ pub fn actions_create_workflow_dispatch_request(
     "/actions/workflows/" +
     percent_encode(parameter_value(workflow_id)) +
     "/dispatches",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -18831,7 +18831,7 @@ pub fn agents_create_or_update_repo_secret_request(
     percent_encode(parameter_value(repo)) +
     "/agents/secrets/" +
     percent_encode(parameter_value(secret_name)),
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -18927,7 +18927,7 @@ pub fn agents_create_repo_variable_request(
     "/" +
     percent_encode(parameter_value(repo)) +
     "/agents/variables",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -19000,7 +19000,7 @@ pub fn agents_update_repo_variable_request(
     percent_encode(parameter_value(repo)) +
     "/agents/variables/" +
     percent_encode(parameter_value(name)),
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -19096,7 +19096,7 @@ pub fn repos_create_attestation_request(
     "/" +
     percent_encode(parameter_value(repo)) +
     "/attestations",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -19221,7 +19221,7 @@ pub fn repos_create_autolink_request(
     "/" +
     percent_encode(parameter_value(repo)) +
     "/autolinks",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -19500,7 +19500,7 @@ pub fn repos_update_branch_protection_request(
     "/branches/" +
     percent_encode_segments(parameter_value(branch)) +
     "/protection",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -19687,7 +19687,7 @@ pub fn repos_update_pull_request_review_protection_request(
     "/branches/" +
     percent_encode_segments(parameter_value(branch)) +
     "/protection/required_pull_request_reviews",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -19874,7 +19874,7 @@ pub fn repos_update_status_check_protection_request(
     "/branches/" +
     percent_encode_segments(parameter_value(branch)) +
     "/protection/required_status_checks",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -19968,7 +19968,7 @@ pub fn repos_add_status_check_contexts_request(
     "/branches/" +
     percent_encode_segments(parameter_value(branch)) +
     "/protection/required_status_checks/contexts",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -20006,7 +20006,7 @@ pub fn repos_set_status_check_contexts_request(
     "/branches/" +
     percent_encode_segments(parameter_value(branch)) +
     "/protection/required_status_checks/contexts",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -20044,7 +20044,7 @@ pub fn repos_remove_status_check_contexts_request(
     "/branches/" +
     percent_encode_segments(parameter_value(branch)) +
     "/protection/required_status_checks/contexts",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -20175,7 +20175,7 @@ pub fn repos_add_app_access_restrictions_request(
     "/branches/" +
     percent_encode_segments(parameter_value(branch)) +
     "/protection/restrictions/apps",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -20213,7 +20213,7 @@ pub fn repos_set_app_access_restrictions_request(
     "/branches/" +
     percent_encode_segments(parameter_value(branch)) +
     "/protection/restrictions/apps",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -20251,7 +20251,7 @@ pub fn repos_remove_app_access_restrictions_request(
     "/branches/" +
     percent_encode_segments(parameter_value(branch)) +
     "/protection/restrictions/apps",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -20326,7 +20326,7 @@ pub fn repos_add_team_access_restrictions_request(
     "/branches/" +
     percent_encode_segments(parameter_value(branch)) +
     "/protection/restrictions/teams",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -20364,7 +20364,7 @@ pub fn repos_set_team_access_restrictions_request(
     "/branches/" +
     percent_encode_segments(parameter_value(branch)) +
     "/protection/restrictions/teams",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -20402,7 +20402,7 @@ pub fn repos_remove_team_access_restrictions_request(
     "/branches/" +
     percent_encode_segments(parameter_value(branch)) +
     "/protection/restrictions/teams",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -20477,7 +20477,7 @@ pub fn repos_add_user_access_restrictions_request(
     "/branches/" +
     percent_encode_segments(parameter_value(branch)) +
     "/protection/restrictions/users",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -20515,7 +20515,7 @@ pub fn repos_set_user_access_restrictions_request(
     "/branches/" +
     percent_encode_segments(parameter_value(branch)) +
     "/protection/restrictions/users",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -20553,7 +20553,7 @@ pub fn repos_remove_user_access_restrictions_request(
     "/branches/" +
     percent_encode_segments(parameter_value(branch)) +
     "/protection/restrictions/users",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -20591,7 +20591,7 @@ pub fn repos_rename_branch_request(
     "/branches/" +
     percent_encode_segments(parameter_value(branch)) +
     "/rename",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -20626,7 +20626,7 @@ pub fn checks_create_request(
     "/" +
     percent_encode(parameter_value(repo)) +
     "/check-runs",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -20699,7 +20699,7 @@ pub fn checks_update_request(
     percent_encode(parameter_value(repo)) +
     "/check-runs/" +
     percent_encode(parameter_value(check_run_id)),
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -20817,7 +20817,7 @@ pub fn checks_create_suite_request(
     "/" +
     percent_encode(parameter_value(repo)) +
     "/check-suites",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -20852,7 +20852,7 @@ pub fn checks_set_suites_preferences_request(
     "/" +
     percent_encode(parameter_value(repo)) +
     "/check-suites/preferences",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -21149,7 +21149,7 @@ pub fn code_quality_update_setup_request(
     "/" +
     percent_encode(parameter_value(repo)) +
     "/code-quality/setup",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -21218,7 +21218,7 @@ pub fn code_scanning_update_ai_scan_enablement_request(
     "/" +
     percent_encode(parameter_value(repo)) +
     "/code-scanning/ai-scan",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -21389,7 +21389,7 @@ pub fn code_scanning_update_alert_request(
     percent_encode(parameter_value(repo)) +
     "/code-scanning/alerts/" +
     percent_encode(parameter_value(alert_number)),
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -21501,7 +21501,7 @@ pub fn code_scanning_commit_autofix_request(
     "/code-scanning/alerts/" +
     percent_encode(parameter_value(alert_number)) +
     "/autofix/commits",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -21835,7 +21835,7 @@ pub fn code_scanning_create_variant_analysis_request(
     "/" +
     percent_encode(parameter_value(repo)) +
     "/code-scanning/codeql/variant-analyses",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -21982,7 +21982,7 @@ pub fn code_scanning_update_default_setup_request(
     "/" +
     percent_encode(parameter_value(repo)) +
     "/code-scanning/default-setup",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -22017,7 +22017,7 @@ pub fn code_scanning_upload_sarif_request(
     "/" +
     percent_encode(parameter_value(repo)) +
     "/code-scanning/sarifs",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -22203,7 +22203,7 @@ pub fn codespaces_create_with_repo_for_authenticated_user_request(
     "/" +
     percent_encode(parameter_value(repo)) +
     "/codespaces",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -22528,7 +22528,7 @@ pub fn codespaces_create_or_update_repo_secret_request(
     percent_encode(parameter_value(repo)) +
     "/codespaces/secrets/" +
     percent_encode(parameter_value(secret_name)),
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -22655,7 +22655,7 @@ pub fn repos_add_collaborator_request(
     percent_encode(parameter_value(repo)) +
     "/collaborators/" +
     percent_encode(parameter_value(username)),
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -22826,7 +22826,7 @@ pub fn repos_update_commit_comment_request(
     percent_encode(parameter_value(repo)) +
     "/comments/" +
     percent_encode(parameter_value(comment_id)),
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -22933,7 +22933,7 @@ pub fn reactions_create_for_commit_comment_request(
     "/comments/" +
     percent_encode(parameter_value(comment_id)) +
     "/reactions",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -23148,7 +23148,7 @@ pub fn repos_create_commit_comment_request(
     "/commits/" +
     percent_encode_segments(parameter_value(commit_sha)) +
     "/comments",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -23609,7 +23609,7 @@ pub fn repos_create_or_update_file_contents_request(
     percent_encode(parameter_value(repo)) +
     "/contents/" +
     percent_encode_segments(parameter_value(path)),
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -23646,7 +23646,7 @@ pub fn repos_delete_file_request(
     percent_encode(parameter_value(repo)) +
     "/contents/" +
     percent_encode_segments(parameter_value(path)),
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -23917,7 +23917,7 @@ pub fn dependabot_update_alert_request(
     percent_encode(parameter_value(repo)) +
     "/dependabot/alerts/" +
     percent_encode(parameter_value(alert_number)),
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -24067,7 +24067,7 @@ pub fn dependabot_create_or_update_repo_secret_request(
     percent_encode(parameter_value(repo)) +
     "/dependabot/secrets/" +
     percent_encode(parameter_value(secret_name)),
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -24246,7 +24246,7 @@ pub fn dependency_graph_create_repository_snapshot_request(
     "/" +
     percent_encode(parameter_value(repo)) +
     "/dependency-graph/snapshots",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -24345,7 +24345,7 @@ pub fn repos_create_deployment_request(
     "/" +
     percent_encode(parameter_value(repo)) +
     "/deployments",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -24483,7 +24483,7 @@ pub fn repos_create_deployment_status_request(
     "/deployments/" +
     percent_encode(parameter_value(deployment_id)) +
     "/statuses",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -24557,7 +24557,7 @@ pub fn repos_create_dispatch_event_request(
     "/" +
     percent_encode(parameter_value(repo)) +
     "/dispatches",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -24655,7 +24655,7 @@ pub fn repos_create_or_update_environment_request(
     percent_encode(parameter_value(repo)) +
     "/environments/" +
     percent_encode(parameter_value(environment_name)),
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -24757,7 +24757,7 @@ pub fn repos_create_deployment_branch_policy_request(
     "/environments/" +
     percent_encode(parameter_value(environment_name)) +
     "/deployment-branch-policies",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -24836,7 +24836,7 @@ pub fn repos_update_deployment_branch_policy_request(
     percent_encode(parameter_value(environment_name)) +
     "/deployment-branch-policies/" +
     percent_encode(parameter_value(branch_policy_id)),
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -24932,7 +24932,7 @@ pub fn repos_create_deployment_protection_rule_request(
     "/environments/" +
     percent_encode(parameter_value(environment_name)) +
     "/deployment_protection_rules",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -25200,7 +25200,7 @@ pub fn actions_create_or_update_environment_secret_request(
     percent_encode(parameter_value(environment_name)) +
     "/secrets/" +
     percent_encode(parameter_value(secret_name)),
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -25305,7 +25305,7 @@ pub fn actions_create_environment_variable_request(
     "/environments/" +
     percent_encode(parameter_value(environment_name)) +
     "/variables",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -25384,7 +25384,7 @@ pub fn actions_update_environment_variable_request(
     percent_encode(parameter_value(environment_name)) +
     "/variables/" +
     percent_encode(parameter_value(name)),
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -25513,7 +25513,7 @@ pub fn repos_create_fork_request(
     "/" +
     percent_encode(parameter_value(repo)) +
     "/forks",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -25548,7 +25548,7 @@ pub fn git_create_blob_request(
     "/" +
     percent_encode(parameter_value(repo)) +
     "/git/blobs",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -25619,7 +25619,7 @@ pub fn git_create_commit_request(
     "/" +
     percent_encode(parameter_value(repo)) +
     "/git/commits",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -25762,7 +25762,7 @@ pub fn git_create_ref_request(
     "/" +
     percent_encode(parameter_value(repo)) +
     "/git/refs",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -25799,7 +25799,7 @@ pub fn git_update_ref_request(
     percent_encode(parameter_value(repo)) +
     "/git/refs/" +
     percent_encode_segments(parameter_value(ref_)),
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -25852,7 +25852,7 @@ pub fn git_create_tag_request(
     "/" +
     percent_encode(parameter_value(repo)) +
     "/git/tags",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -25923,7 +25923,7 @@ pub fn git_create_tree_request(
     "/" +
     percent_encode(parameter_value(repo)) +
     "/git/trees",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -26075,7 +26075,7 @@ pub fn repos_create_webhook_request(
     "/" +
     percent_encode(parameter_value(repo)) +
     "/hooks",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -26148,7 +26148,7 @@ pub fn repos_update_webhook_request(
     percent_encode(parameter_value(repo)) +
     "/hooks/" +
     percent_encode(parameter_value(hook_id)),
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -26241,7 +26241,7 @@ pub fn repos_update_webhook_config_for_repo_request(
     "/hooks/" +
     percent_encode(parameter_value(hook_id)) +
     "/config",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -26526,7 +26526,7 @@ pub fn migrations_start_import_request(
     "/" +
     percent_encode(parameter_value(repo)) +
     "/import",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -26561,7 +26561,7 @@ pub fn migrations_update_import_request(
     "/" +
     percent_encode(parameter_value(repo)) +
     "/import",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -26652,7 +26652,7 @@ pub fn migrations_map_commit_author_request(
     percent_encode(parameter_value(repo)) +
     "/import/authors/" +
     percent_encode(parameter_value(author_id)),
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -26721,7 +26721,7 @@ pub fn migrations_set_lfs_preference_request(
     "/" +
     percent_encode(parameter_value(repo)) +
     "/import/lfs",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -26824,7 +26824,7 @@ pub fn interactions_set_restrictions_for_repo_request(
     "/" +
     percent_encode(parameter_value(repo)) +
     "/interaction-limits",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -26909,7 +26909,7 @@ pub fn interactions_set_pull_request_bypass_list_for_repo_request(
     "/" +
     percent_encode(parameter_value(repo)) +
     "/interaction-limits/pulls/bypass-list",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -26926,7 +26926,7 @@ pub fn interactions_remove_pull_request_bypass_list_for_repo_request(
     "/" +
     percent_encode(parameter_value(repo)) +
     "/interaction-limits/pulls/bypass-list",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -26977,7 +26977,7 @@ pub fn interactions_update_pull_request_creation_cap_for_repo_request(
     "/" +
     percent_encode(parameter_value(repo)) +
     "/interaction-limits/pulls/creation-cap",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -27057,7 +27057,7 @@ pub fn repos_update_invitation_request(
     percent_encode(parameter_value(repo)) +
     "/invitations/" +
     percent_encode(parameter_value(invitation_id)),
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -27243,7 +27243,7 @@ pub fn issues_create_request(
     "/" +
     percent_encode(parameter_value(repo)) +
     "/issues",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -27374,7 +27374,7 @@ pub fn issues_update_comment_request(
     percent_encode(parameter_value(repo)) +
     "/issues/comments/" +
     percent_encode(parameter_value(comment_id)),
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -27537,7 +27537,7 @@ pub fn reactions_create_for_issue_comment_request(
     "/issues/comments/" +
     percent_encode(parameter_value(comment_id)) +
     "/reactions",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -27710,7 +27710,7 @@ pub fn issues_update_request(
     percent_encode(parameter_value(repo)) +
     "/issues/" +
     percent_encode(parameter_value(issue_number)),
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -27748,7 +27748,7 @@ pub fn issues_add_assignees_request(
     "/issues/" +
     percent_encode(parameter_value(issue_number)) +
     "/assignees",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -27786,7 +27786,7 @@ pub fn issues_remove_assignees_request(
     "/issues/" +
     percent_encode(parameter_value(issue_number)) +
     "/assignees",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -27896,7 +27896,7 @@ pub fn issues_create_comment_request(
     "/issues/" +
     percent_encode(parameter_value(issue_number)) +
     "/comments",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -27980,7 +27980,7 @@ pub fn issues_add_blocked_by_dependency_request(
     "/issues/" +
     percent_encode(parameter_value(issue_number)) +
     "/dependencies/blocked_by",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -28195,7 +28195,7 @@ pub fn issues_add_issue_field_values_request(
     "/issues/" +
     percent_encode(parameter_value(issue_number)) +
     "/issue-field-values",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -28233,7 +28233,7 @@ pub fn issues_set_issue_field_values_request(
     "/issues/" +
     percent_encode(parameter_value(issue_number)) +
     "/issue-field-values",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -28338,7 +28338,7 @@ pub fn issues_add_labels_request(
     "/issues/" +
     percent_encode(parameter_value(issue_number)) +
     "/labels",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -28472,7 +28472,7 @@ pub fn issues_lock_request(
     "/issues/" +
     percent_encode(parameter_value(issue_number)) +
     "/lock",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -28599,7 +28599,7 @@ pub fn reactions_create_for_issue_request(
     "/issues/" +
     percent_encode(parameter_value(issue_number)) +
     "/reactions",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -28704,7 +28704,7 @@ pub fn issues_add_relates_to_request(
     "/issues/" +
     percent_encode(parameter_value(issue_number)) +
     "/relates_to",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -28781,7 +28781,7 @@ pub fn issues_remove_sub_issue_request(
     "/issues/" +
     percent_encode(parameter_value(issue_number)) +
     "/sub_issue",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -28865,7 +28865,7 @@ pub fn issues_add_sub_issue_request(
     "/issues/" +
     percent_encode(parameter_value(issue_number)) +
     "/sub_issues",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -28903,7 +28903,7 @@ pub fn issues_reprioritize_sub_issue_request(
     "/issues/" +
     percent_encode(parameter_value(issue_number)) +
     "/sub_issues/priority",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -29168,7 +29168,7 @@ pub fn repos_create_deploy_key_request(
     "/" +
     percent_encode(parameter_value(repo)) +
     "/keys",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -29300,7 +29300,7 @@ pub fn issues_create_label_request(
     "/" +
     percent_encode(parameter_value(repo)) +
     "/labels",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -29373,7 +29373,7 @@ pub fn issues_update_label_request(
     percent_encode(parameter_value(repo)) +
     "/labels/" +
     percent_encode(parameter_value(name)),
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -29498,7 +29498,7 @@ pub fn repos_merge_upstream_request(
     "/" +
     percent_encode(parameter_value(repo)) +
     "/merge-upstream",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -29533,7 +29533,7 @@ pub fn repos_merge_request(
     "/" +
     percent_encode(parameter_value(repo)) +
     "/merges",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -29626,7 +29626,7 @@ pub fn issues_create_milestone_request(
     "/" +
     percent_encode(parameter_value(repo)) +
     "/milestones",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -29699,7 +29699,7 @@ pub fn issues_update_milestone_request(
     percent_encode(parameter_value(repo)) +
     "/milestones/" +
     percent_encode(parameter_value(milestone_number)),
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -29862,7 +29862,7 @@ pub fn activity_mark_repo_notifications_as_read_request(
     "/" +
     percent_encode(parameter_value(repo)) +
     "/notifications",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -29928,7 +29928,7 @@ pub fn repos_create_pages_site_request(
     "/" +
     percent_encode(parameter_value(repo)) +
     "/pages",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -29963,7 +29963,7 @@ pub fn repos_update_information_about_pages_site_request(
     "/" +
     percent_encode(parameter_value(repo)) +
     "/pages",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -30143,7 +30143,7 @@ pub fn repos_create_pages_deployment_request(
     "/" +
     percent_encode(parameter_value(repo)) +
     "/pages/deployments",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -30367,7 +30367,7 @@ pub fn repos_custom_properties_for_repos_create_or_update_repository_values_requ
     "/" +
     percent_encode(parameter_value(repo)) +
     "/properties/values",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -30452,7 +30452,7 @@ pub fn pulls_create_request(
     "/" +
     percent_encode(parameter_value(repo)) +
     "/pulls",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -30583,7 +30583,7 @@ pub fn pulls_update_review_comment_request(
     percent_encode(parameter_value(repo)) +
     "/pulls/comments/" +
     percent_encode(parameter_value(comment_id)),
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -30690,7 +30690,7 @@ pub fn reactions_create_for_pull_request_review_comment_request(
     "/pulls/comments/" +
     percent_encode(parameter_value(comment_id)) +
     "/reactions",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -30784,7 +30784,7 @@ pub fn pulls_update_request(
     percent_encode(parameter_value(repo)) +
     "/pulls/" +
     percent_encode(parameter_value(pull_number)),
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -30822,7 +30822,7 @@ pub fn codespaces_create_with_pr_for_authenticated_user_request(
     "/pulls/" +
     percent_encode(parameter_value(pull_number)) +
     "/codespaces",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -30921,7 +30921,7 @@ pub fn pulls_create_review_comment_request(
     "/pulls/" +
     percent_encode(parameter_value(pull_number)) +
     "/comments",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -30962,7 +30962,7 @@ pub fn pulls_create_reply_for_review_comment_request(
     "/comments/" +
     percent_encode(parameter_value(comment_id)) +
     "/replies",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -31111,7 +31111,7 @@ pub fn pulls_merge_request(
     "/pulls/" +
     percent_encode(parameter_value(pull_number)) +
     "/merge",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -31149,7 +31149,7 @@ pub fn pulls_merge_async_request(
     "/pulls/" +
     percent_encode(parameter_value(pull_number)) +
     "/merge-async",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -31263,7 +31263,7 @@ pub fn pulls_request_reviewers_request(
     "/pulls/" +
     percent_encode(parameter_value(pull_number)) +
     "/requested_reviewers",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -31301,7 +31301,7 @@ pub fn pulls_remove_requested_reviewers_request(
     "/pulls/" +
     percent_encode(parameter_value(pull_number)) +
     "/requested_reviewers",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -31385,7 +31385,7 @@ pub fn pulls_create_review_request(
     "/pulls/" +
     percent_encode(parameter_value(pull_number)) +
     "/reviews",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -31464,7 +31464,7 @@ pub fn pulls_update_review_request(
     percent_encode(parameter_value(pull_number)) +
     "/reviews/" +
     percent_encode(parameter_value(review_id)),
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -31593,7 +31593,7 @@ pub fn pulls_dismiss_review_request(
     "/reviews/" +
     percent_encode(parameter_value(review_id)) +
     "/dismissals",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -31634,7 +31634,7 @@ pub fn pulls_submit_review_request(
     "/reviews/" +
     percent_encode(parameter_value(review_id)) +
     "/events",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -31672,7 +31672,7 @@ pub fn pulls_update_branch_request(
     "/pulls/" +
     percent_encode(parameter_value(pull_number)) +
     "/update-branch",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -31828,7 +31828,7 @@ pub fn repos_create_release_request(
     "/" +
     percent_encode(parameter_value(repo)) +
     "/releases",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -31901,7 +31901,7 @@ pub fn repos_update_release_asset_request(
     percent_encode(parameter_value(repo)) +
     "/releases/assets/" +
     percent_encode(parameter_value(asset_id)),
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -31954,7 +31954,7 @@ pub fn repos_generate_release_notes_request(
     "/" +
     percent_encode(parameter_value(repo)) +
     "/releases/generate-notes",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -32097,7 +32097,7 @@ pub fn repos_update_release_request(
     percent_encode(parameter_value(repo)) +
     "/releases/" +
     percent_encode(parameter_value(release_id)),
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -32293,7 +32293,7 @@ pub fn reactions_create_for_release_request(
     "/releases/" +
     percent_encode(parameter_value(release_id)) +
     "/reactions",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -32448,7 +32448,7 @@ pub fn repos_create_repo_ruleset_request(
     "/" +
     percent_encode(parameter_value(repo)) +
     "/rulesets",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -32633,7 +32633,7 @@ pub fn repos_update_repo_ruleset_request(
     percent_encode(parameter_value(repo)) +
     "/rulesets/" +
     percent_encode(parameter_value(ruleset_id)),
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -32956,7 +32956,7 @@ pub fn secret_scanning_update_alert_request(
     percent_encode(parameter_value(repo)) +
     "/secret-scanning/alerts/" +
     percent_encode(parameter_value(alert_number)),
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -33101,7 +33101,7 @@ pub fn secret_scanning_bulk_create_repo_custom_patterns_request(
     "/" +
     percent_encode(parameter_value(repo)) +
     "/secret-scanning/custom-patterns",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -33136,7 +33136,7 @@ pub fn secret_scanning_bulk_delete_repo_custom_patterns_request(
     "/" +
     percent_encode(parameter_value(repo)) +
     "/secret-scanning/custom-patterns",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -33155,7 +33155,7 @@ pub fn secret_scanning_update_repo_custom_pattern_request(
     percent_encode(parameter_value(repo)) +
     "/secret-scanning/custom-patterns/" +
     percent_encode(parameter_value(pattern_id)),
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -33190,7 +33190,7 @@ pub fn secret_scanning_create_push_protection_bypass_request(
     "/" +
     percent_encode(parameter_value(repo)) +
     "/secret-scanning/push-protection-bypasses",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -33322,7 +33322,7 @@ pub fn security_advisories_create_repository_advisory_request(
     "/" +
     percent_encode(parameter_value(repo)) +
     "/security-advisories",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -33357,7 +33357,7 @@ pub fn security_advisories_create_private_vulnerability_report_request(
     "/" +
     percent_encode(parameter_value(repo)) +
     "/security-advisories/reports",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -33430,7 +33430,7 @@ pub fn security_advisories_update_repository_advisory_request(
     percent_encode(parameter_value(repo)) +
     "/security-advisories/" +
     percent_encode(parameter_value(ghsa_id)),
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -33570,7 +33570,7 @@ pub fn pull_request_stacks_create_request(
     "/" +
     percent_encode(parameter_value(repo)) +
     "/stacks",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -33644,7 +33644,7 @@ pub fn pull_request_stacks_add_request(
     "/stacks/" +
     percent_encode(parameter_value(stack_number)) +
     "/add",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -34008,7 +34008,7 @@ pub fn repos_create_commit_status_request(
     percent_encode(parameter_value(repo)) +
     "/statuses/" +
     percent_encode_segments(parameter_value(sha)),
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -34120,7 +34120,7 @@ pub fn activity_set_repo_subscription_request(
     "/" +
     percent_encode(parameter_value(repo)) +
     "/subscription",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -34318,7 +34318,7 @@ pub fn repos_replace_all_topics_request(
     "/" +
     percent_encode(parameter_value(repo)) +
     "/topics",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -34497,7 +34497,7 @@ pub fn repos_transfer_request(
     "/" +
     percent_encode(parameter_value(repo)) +
     "/transfer",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -34598,7 +34598,7 @@ pub fn repos_create_using_template_request(
     "/" +
     percent_encode(parameter_value(template_repo)) +
     "/generate",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -35029,7 +35029,7 @@ pub fn teams_update_legacy_request(
   body : TeamsUpdateLegacyRequest,
 ) -> @http.Request {
   @http.Request::patch("/teams/" + percent_encode(parameter_value(team_id))).json_body(
-    body.to_json(),
+    Json(body),
   )
 }
 
@@ -35234,7 +35234,7 @@ pub fn teams_add_or_update_membership_for_user_legacy_request(
     percent_encode(parameter_value(team_id)) +
     "/memberships/" +
     percent_encode(parameter_value(username)),
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -35360,7 +35360,7 @@ pub fn teams_add_or_update_repo_permissions_legacy_request(
     percent_encode(parameter_value(owner)) +
     "/" +
     percent_encode(parameter_value(repo)),
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -35450,7 +35450,7 @@ pub fn users_get_authenticated_decode(
 pub fn users_update_authenticated_request(
   body : UsersUpdateAuthenticatedRequest,
 ) -> @http.Request {
-  @http.Request::patch("/user").json_body(body.to_json())
+  @http.Request::patch("/user").json_body(Json(body))
 }
 
 ///|
@@ -35705,7 +35705,7 @@ pub fn codespaces_create_or_update_secret_for_authenticated_user_request(
 ) -> @http.Request {
   @http.Request::put(
     "/user/codespaces/secrets/" + percent_encode(parameter_value(secret_name)),
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -35779,7 +35779,7 @@ pub fn codespaces_set_repositories_for_secret_for_authenticated_user_request(
     "/user/codespaces/secrets/" +
     percent_encode(parameter_value(secret_name)) +
     "/repositories",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -35850,7 +35850,7 @@ pub fn codespaces_update_for_authenticated_user_request(
 ) -> @http.Request {
   @http.Request::patch(
     "/user/codespaces/" + percent_encode(parameter_value(codespace_name)),
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -35988,7 +35988,7 @@ pub fn codespaces_publish_for_authenticated_user_request(
     "/user/codespaces/" +
     percent_encode(parameter_value(codespace_name)) +
     "/publish",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -36102,7 +36102,7 @@ pub fn packages_list_docker_migration_conflicting_packages_for_authenticated_use
 pub fn users_set_primary_email_visibility_for_authenticated_user_request(
   body : UsersSetPrimaryEmailVisibilityForAuthenticatedUserRequest,
 ) -> @http.Request {
-  @http.Request::patch("/user/email/visibility").json_body(body.to_json())
+  @http.Request::patch("/user/email/visibility").json_body(Json(body))
 }
 
 ///|
@@ -36166,7 +36166,7 @@ pub fn users_list_emails_for_authenticated_user_decode(
 pub fn users_add_email_for_authenticated_user_request(
   body : UsersAddEmailForAuthenticatedUserRequest,
 ) -> @http.Request {
-  @http.Request::post("/user/emails").json_body(body.to_json())
+  @http.Request::post("/user/emails").json_body(Json(body))
 }
 
 ///|
@@ -36193,7 +36193,7 @@ pub fn users_add_email_for_authenticated_user_decode(
 pub fn users_delete_email_for_authenticated_user_request(
   body : UsersDeleteEmailForAuthenticatedUserRequest,
 ) -> @http.Request {
-  @http.Request::delete("/user/emails").json_body(body.to_json())
+  @http.Request::delete("/user/emails").json_body(Json(body))
 }
 
 ///|
@@ -36342,7 +36342,7 @@ pub fn users_list_gpg_keys_for_authenticated_user_decode(
 pub fn users_create_gpg_key_for_authenticated_user_request(
   body : UsersCreateGpgKeyForAuthenticatedUserRequest,
 ) -> @http.Request {
-  @http.Request::post("/user/gpg_keys").json_body(body.to_json())
+  @http.Request::post("/user/gpg_keys").json_body(Json(body))
 }
 
 ///|
@@ -36541,7 +36541,7 @@ pub fn interactions_get_restrictions_for_authenticated_user_decode(
 pub fn interactions_set_restrictions_for_authenticated_user_request(
   body : InteractionLimit,
 ) -> @http.Request {
-  @http.Request::put("/user/interaction-limits").json_body(body.to_json())
+  @http.Request::put("/user/interaction-limits").json_body(Json(body))
 }
 
 ///|
@@ -36679,7 +36679,7 @@ pub fn users_list_public_ssh_keys_for_authenticated_user_decode(
 pub fn users_create_public_ssh_key_for_authenticated_user_request(
   body : UsersCreatePublicSshKeyForAuthenticatedUserRequest,
 ) -> @http.Request {
-  @http.Request::post("/user/keys").json_body(body.to_json())
+  @http.Request::post("/user/keys").json_body(Json(body))
 }
 
 ///|
@@ -36890,7 +36890,7 @@ pub fn orgs_update_membership_for_authenticated_user_request(
 ) -> @http.Request {
   @http.Request::patch(
     "/user/memberships/orgs/" + percent_encode(parameter_value(org)),
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -36954,7 +36954,7 @@ pub fn migrations_list_for_authenticated_user_decode(
 pub fn migrations_start_for_authenticated_user_request(
   body : MigrationsStartForAuthenticatedUserRequest,
 ) -> @http.Request {
-  @http.Request::post("/user/migrations").json_body(body.to_json())
+  @http.Request::post("/user/migrations").json_body(Json(body))
 }
 
 ///|
@@ -37480,7 +37480,7 @@ pub fn repos_list_for_authenticated_user_decode(
 pub fn repos_create_for_authenticated_user_request(
   body : ReposCreateForAuthenticatedUserRequest,
 ) -> @http.Request {
-  @http.Request::post("/user/repos").json_body(body.to_json())
+  @http.Request::post("/user/repos").json_body(Json(body))
 }
 
 ///|
@@ -37605,7 +37605,7 @@ pub fn users_list_social_accounts_for_authenticated_user_decode(
 pub fn users_add_social_account_for_authenticated_user_request(
   body : UsersAddSocialAccountForAuthenticatedUserRequest,
 ) -> @http.Request {
-  @http.Request::post("/user/social_accounts").json_body(body.to_json())
+  @http.Request::post("/user/social_accounts").json_body(Json(body))
 }
 
 ///|
@@ -37632,7 +37632,7 @@ pub fn users_add_social_account_for_authenticated_user_decode(
 pub fn users_delete_social_account_for_authenticated_user_request(
   body : UsersDeleteSocialAccountForAuthenticatedUserRequest,
 ) -> @http.Request {
-  @http.Request::delete("/user/social_accounts").json_body(body.to_json())
+  @http.Request::delete("/user/social_accounts").json_body(Json(body))
 }
 
 ///|
@@ -37678,7 +37678,7 @@ pub fn users_list_ssh_signing_keys_for_authenticated_user_decode(
 pub fn users_create_ssh_signing_key_for_authenticated_user_request(
   body : UsersCreateSshSigningKeyForAuthenticatedUserRequest,
 ) -> @http.Request {
-  @http.Request::post("/user/ssh_signing_keys").json_body(body.to_json())
+  @http.Request::post("/user/ssh_signing_keys").json_body(Json(body))
 }
 
 ///|
@@ -37946,7 +37946,7 @@ pub fn projects_create_draft_item_for_authenticated_user_request(
     "/projectsV2/" +
     percent_encode(parameter_value(project_number)) +
     "/drafts",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -38015,7 +38015,7 @@ pub fn projects_create_view_for_user_request(
     "/projectsV2/" +
     percent_encode(parameter_value(project_number)) +
     "/views",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -38086,7 +38086,7 @@ pub fn users_list_attestations_bulk_request(
     Some(value) => url = append_query(url, "after", parameter_value(value))
     None => ()
   }
-  @http.Request::post(url).json_body(body.to_json())
+  @http.Request::post(url).json_body(Json(body))
 }
 
 ///|
@@ -38258,7 +38258,7 @@ pub fn copilot_spaces_create_for_user_request(
 ) -> @http.Request {
   @http.Request::post(
     "/users/" + percent_encode(parameter_value(username)) + "/copilot-spaces",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -38325,7 +38325,7 @@ pub fn copilot_spaces_update_for_user_request(
     percent_encode(parameter_value(username)) +
     "/copilot-spaces/" +
     percent_encode(parameter_value(space_number)),
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -38409,7 +38409,7 @@ pub fn copilot_spaces_add_collaborator_for_user_request(
     "/copilot-spaces/" +
     percent_encode(parameter_value(space_number)) +
     "/collaborators",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -38449,7 +38449,7 @@ pub fn copilot_spaces_update_collaborator_for_user_request(
     percent_encode(parameter_value(actor_type)) +
     "/" +
     percent_encode(parameter_value(actor_identifier)),
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -38539,7 +38539,7 @@ pub fn copilot_spaces_create_resource_for_user_request(
     "/copilot-spaces/" +
     percent_encode(parameter_value(space_number)) +
     "/resources",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -38612,7 +38612,7 @@ pub fn copilot_spaces_update_resource_for_user_request(
     percent_encode(parameter_value(space_number)) +
     "/resources/" +
     percent_encode(parameter_value(space_resource_id)),
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -39512,7 +39512,7 @@ pub fn projects_add_field_for_user_request(
     "/projectsV2/" +
     percent_encode(parameter_value(project_number)) +
     "/fields",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -39641,7 +39641,7 @@ pub fn projects_add_item_for_user_request(
     "/projectsV2/" +
     percent_encode(parameter_value(project_number)) +
     "/items",
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|
@@ -39718,7 +39718,7 @@ pub fn projects_update_item_for_user_request(
     percent_encode(parameter_value(project_number)) +
     "/items/" +
     percent_encode(parameter_value(item_id)),
-  ).json_body(body.to_json())
+  ).json_body(Json(body))
 }
 
 ///|

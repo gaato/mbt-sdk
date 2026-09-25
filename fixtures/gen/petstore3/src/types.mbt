@@ -164,7 +164,7 @@ pub impl ToJson for OrderStatus with fn to_json(self) {
     Delivered => "delivered"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -456,7 +456,7 @@ pub impl ToJson for PetStatus with fn to_json(self) {
     Sold => "sold"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -632,7 +632,7 @@ pub impl ToJson for FindPetsByStatusStatus with fn to_json(self) {
     Sold => "sold"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|

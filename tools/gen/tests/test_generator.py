@@ -912,7 +912,7 @@ class IRTests(unittest.TestCase):
         self.assertIn("boundary : String", source)
         self.assertIn("@multipart.Part::file(\"file\", file_filename, file_content_type, file)", source)
         self.assertIn("@multipart.Part::text(\"title\", parameter_value(title))", source)
-        self.assertIn("@multipart.Part::json(\"metadata\", value.to_json())", source)
+        self.assertIn("@multipart.Part::json(\"metadata\", Json(value))", source)
         self.assertIn("@multipart.apply(request, parts, boundary)", source)
         self.assertIn('"gaato/sdk-runtime/multipart" @multipart', generated["moon.pkg"])
 
@@ -1000,8 +1000,8 @@ class IRTests(unittest.TestCase):
         sources = emit(IRBuilder(doc, "example/gen").build())
         self.assertIn('@http.Request::post("/raw").json_body(body)\n', sources["operations.mbt"])
         # A named union body still needs the encode call.
-        self.assertIn('@http.Request::post("/mixed").json_body(body.to_json())\n', sources["operations.mbt"])
-        self.assertIn("    Text(value) => value.to_json()\n    Object(value) => value\n", sources["types.mbt"])
+        self.assertIn('@http.Request::post("/mixed").json_body(Json(body))\n', sources["operations.mbt"])
+        self.assertIn("    Text(value) => Json(value)\n    Object(value) => value\n", sources["types.mbt"])
 
 
 class CLITests(unittest.TestCase):

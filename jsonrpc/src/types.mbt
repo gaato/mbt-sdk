@@ -142,8 +142,8 @@ pub extend RpcError with ToJson::{to_json}
 ///|
 pub impl ToJson for RpcError with fn to_json(self) {
   let fields : Map[String, Json] = Map([])
-  fields["code"] = self.code.to_json()
-  fields["message"] = self.message.to_json()
+  fields["code"] = Json(self.code)
+  fields["message"] = Json(self.message)
   if self.data is Some(data) {
     fields["data"] = data
   }

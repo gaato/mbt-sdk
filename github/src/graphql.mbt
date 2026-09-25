@@ -302,7 +302,7 @@ fn with_cursor(
         "graphql variables must be an object to carry the \{name} cursor",
       )
   }
-  fields[name] = cursor.to_json()
+  fields[name] = Json(cursor)
   Json::object(fields)
 }
 

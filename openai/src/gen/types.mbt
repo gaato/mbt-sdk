@@ -155,7 +155,7 @@ fn[T : @json.FromJson] decode_nullable_field(
 fn[T : ToJson] json_map_to_json(value : Map[String, T]) -> Json {
   let result : Map[String, Json] = Map([])
   for key, item in value {
-    result[key] = item.to_json()
+    result[key] = Json(item)
   }
   Json::object(result)
 }
@@ -791,8 +791,8 @@ pub impl ToJson for ChatCompletionRequestAssistantMessageContentPart with fn to_
   self,
 ) {
   match self {
-    Text(value) => value.to_json()
-    Refusal(value) => value.to_json()
+    Text(value) => Json(value)
+    Refusal(value) => Json(value)
     Unknown(_, value) => value
   }
 }
@@ -849,9 +849,8 @@ pub impl ToJson for ChatCompletionRequestAssistantMessageContent with fn to_json
   self,
 ) {
   match self {
-    Text(value) => value.to_json()
-    ChatCompletionRequestAssistantMessageContentPartArray(value) =>
-      value.to_json()
+    Text(value) => Json(value)
+    ChatCompletionRequestAssistantMessageContentPartArray(value) => Json(value)
   }
 }
 
@@ -1122,8 +1121,8 @@ pub impl ToJson for ChatCompletionRequestDeveloperMessageContent with fn to_json
   self,
 ) {
   match self {
-    Text(value) => value.to_json()
-    ChatCompletionRequestMessageContentPartTextArray(value) => value.to_json()
+    Text(value) => Json(value)
+    ChatCompletionRequestMessageContentPartTextArray(value) => Json(value)
   }
 }
 
@@ -1304,7 +1303,7 @@ pub impl ToJson for ChatCompletionRequestSystemMessageContentPart with fn to_jso
   self,
 ) {
   match self {
-    Text(value) => value.to_json()
+    Text(value) => Json(value)
     Unknown(_, value) => value
   }
 }
@@ -1357,8 +1356,8 @@ pub impl ToJson for ChatCompletionRequestSystemMessageContent with fn to_json(
   self,
 ) {
   match self {
-    Text(value) => value.to_json()
-    ChatCompletionRequestSystemMessageContentPartArray(value) => value.to_json()
+    Text(value) => Json(value)
+    ChatCompletionRequestSystemMessageContentPartArray(value) => Json(value)
   }
 }
 
@@ -1488,7 +1487,7 @@ pub impl ToJson for ChatCompletionRequestMessageContentPartImageImageUrlDetail w
     High => "high"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -1682,7 +1681,7 @@ pub impl ToJson for ChatCompletionRequestMessageContentPartAudioInputAudioFormat
     Mp3 => "mp3"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -2003,10 +2002,10 @@ pub impl ToJson for ChatCompletionRequestUserMessageContentPart with fn to_json(
   self,
 ) {
   match self {
-    Text(value) => value.to_json()
-    ImageUrl(value) => value.to_json()
-    InputAudio(value) => value.to_json()
-    File(value) => value.to_json()
+    Text(value) => Json(value)
+    ImageUrl(value) => Json(value)
+    InputAudio(value) => Json(value)
+    File(value) => Json(value)
     Unknown(_, value) => value
   }
 }
@@ -2060,8 +2059,8 @@ pub impl ToJson for ChatCompletionRequestUserMessageContent with fn to_json(
   self,
 ) {
   match self {
-    Text(value) => value.to_json()
-    ChatCompletionRequestUserMessageContentPartArray(value) => value.to_json()
+    Text(value) => Json(value)
+    ChatCompletionRequestUserMessageContentPartArray(value) => Json(value)
   }
 }
 
@@ -2182,7 +2181,7 @@ pub impl ToJson for ChatCompletionRequestToolMessageContentPart with fn to_json(
   self,
 ) {
   match self {
-    Text(value) => value.to_json()
+    Text(value) => Json(value)
     Unknown(_, value) => value
   }
 }
@@ -2233,8 +2232,8 @@ pub impl ToJson for ChatCompletionRequestToolMessageContent with fn to_json(
   self,
 ) {
   match self {
-    Text(value) => value.to_json()
-    ChatCompletionRequestToolMessageContentPartArray(value) => value.to_json()
+    Text(value) => Json(value)
+    ChatCompletionRequestToolMessageContentPartArray(value) => Json(value)
   }
 }
 
@@ -2353,12 +2352,12 @@ pub extend ChatCompletionRequestMessage with ToJson::{to_json}
 ///|
 pub impl ToJson for ChatCompletionRequestMessage with fn to_json(self) {
   match self {
-    Developer(value) => value.to_json()
-    System(value) => value.to_json()
-    User(value) => value.to_json()
-    Assistant(value) => value.to_json()
-    Tool(value) => value.to_json()
-    Function(value) => value.to_json()
+    Developer(value) => Json(value)
+    System(value) => Json(value)
+    User(value) => Json(value)
+    Assistant(value) => Json(value)
+    Tool(value) => Json(value)
+    Function(value) => Json(value)
     Unknown(_, value) => value
   }
 }
@@ -2859,7 +2858,7 @@ pub impl ToJson for ChatCompletionStreamResponseDeltaRole with fn to_json(self) 
     Tool => "tool"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -3228,7 +3227,7 @@ pub impl ToJson for ChatCompletionToolChoiceOptionText with fn to_json(self) {
     Required => "required"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -3278,8 +3277,8 @@ pub extend ChatCompletionToolChoiceOption with ToJson::{to_json}
 ///|
 pub impl ToJson for ChatCompletionToolChoiceOption with fn to_json(self) {
   match self {
-    Text(value) => value.to_json()
-    ChatCompletionNamedToolChoice(value) => value.to_json()
+    Text(value) => Json(value)
+    ChatCompletionNamedToolChoice(value) => Json(value)
   }
 }
 
@@ -3344,7 +3343,7 @@ pub impl ToJson for ClickButton with fn to_json(self) {
     Forward => "forward"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -3621,7 +3620,7 @@ pub impl ToJson for CodeInterpreterToolCallStatus with fn to_json(self) {
     Completed => "completed"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -3672,8 +3671,8 @@ pub extend CodeInterpreterToolOutput with ToJson::{to_json}
 ///|
 pub impl ToJson for CodeInterpreterToolOutput with fn to_json(self) {
   match self {
-    Logs(value) => value.to_json()
-    Files(value) => value.to_json()
+    Logs(value) => Json(value)
+    Files(value) => Json(value)
     Unknown(_, value) => value
   }
 }
@@ -4423,15 +4422,15 @@ pub extend ComputerAction with ToJson::{to_json}
 ///|
 pub impl ToJson for ComputerAction with fn to_json(self) {
   match self {
-    Click(value) => value.to_json()
-    DoubleClick(value) => value.to_json()
-    Drag(value) => value.to_json()
-    Keypress(value) => value.to_json()
-    Move(value) => value.to_json()
-    Screenshot(value) => value.to_json()
-    Scroll(value) => value.to_json()
-    Type(value) => value.to_json()
-    Wait(value) => value.to_json()
+    Click(value) => Json(value)
+    DoubleClick(value) => Json(value)
+    Drag(value) => Json(value)
+    Keypress(value) => Json(value)
+    Move(value) => Json(value)
+    Screenshot(value) => Json(value)
+    Scroll(value) => Json(value)
+    Type(value) => Json(value)
+    Wait(value) => Json(value)
     Unknown(_, value) => value
   }
 }
@@ -4601,7 +4600,7 @@ pub impl ToJson for ComputerToolCallStatus with fn to_json(self) {
     Incomplete => "incomplete"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -4725,7 +4724,7 @@ pub impl ToJson for ServiceTier with fn to_json(self) {
     Flex => "flex"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -4777,7 +4776,7 @@ pub impl ToJson for ResponseModalitiesItem with fn to_json(self) {
     Audio => "audio"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -4833,7 +4832,7 @@ pub impl ToJson for ReasoningEffort with fn to_json(self) {
     High => "high"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -5006,7 +5005,7 @@ pub impl ToJson for WebSearchContextSize with fn to_json(self) {
     High => "high"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -5330,9 +5329,9 @@ pub impl ToJson for CreateChatCompletionRequestResponseFormat with fn to_json(
   self,
 ) {
   match self {
-    Text(value) => value.to_json()
-    JsonSchema(value) => value.to_json()
-    JsonObject(value) => value.to_json()
+    Text(value) => Json(value)
+    JsonSchema(value) => Json(value)
+    JsonObject(value) => Json(value)
     Unknown(_, value) => value
   }
 }
@@ -5394,7 +5393,7 @@ pub impl ToJson for CreateChatCompletionRequestAudioFormat with fn to_json(self)
     Pcm16 => "pcm16"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -5503,8 +5502,8 @@ pub extend StopConfiguration with ToJson::{to_json}
 ///|
 pub impl ToJson for StopConfiguration with fn to_json(self) {
   match self {
-    Text(value) => value.to_json()
-    TextArray(value) => value.to_json()
+    Text(value) => Json(value)
+    TextArray(value) => Json(value)
   }
 }
 
@@ -5552,8 +5551,8 @@ pub extend PredictionContentContent with ToJson::{to_json}
 ///|
 pub impl ToJson for PredictionContentContent with fn to_json(self) {
   match self {
-    Text(value) => value.to_json()
-    ChatCompletionRequestMessageContentPartTextArray(value) => value.to_json()
+    Text(value) => Json(value)
+    ChatCompletionRequestMessageContentPartTextArray(value) => Json(value)
   }
 }
 
@@ -5656,7 +5655,7 @@ pub extend CreateChatCompletionRequestPrediction with ToJson::{to_json}
 ///|
 pub impl ToJson for CreateChatCompletionRequestPrediction with fn to_json(self) {
   match self {
-    Content(value) => value.to_json()
+    Content(value) => Json(value)
     Unknown(_, value) => value
   }
 }
@@ -5715,7 +5714,7 @@ pub impl ToJson for CreateChatCompletionRequestFunctionCallText with fn to_json(
     Auto => "auto"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -5768,8 +5767,8 @@ pub impl ToJson for CreateChatCompletionRequestFunctionCall with fn to_json(
   self,
 ) {
   match self {
-    Text(value) => value.to_json()
-    ChatCompletionFunctionCallOption(value) => value.to_json()
+    Text(value) => Json(value)
+    ChatCompletionFunctionCallOption(value) => Json(value)
   }
 }
 
@@ -6052,7 +6051,7 @@ pub impl ToJson for CreateChatCompletionResponseChoicesItemFinishReason with fn 
     FunctionCall => "function_call"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -6410,7 +6409,7 @@ pub impl ToJson for CreateChatCompletionStreamResponseChoicesItemFinishReason wi
     FunctionCall => "function_call"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -6630,10 +6629,10 @@ pub extend CreateEmbeddingRequestInput with ToJson::{to_json}
 ///|
 pub impl ToJson for CreateEmbeddingRequestInput with fn to_json(self) {
   match self {
-    Text(value) => value.to_json()
-    TextArray(value) => value.to_json()
-    IntArray(value) => value.to_json()
-    IntArrayArray(value) => value.to_json()
+    Text(value) => Json(value)
+    TextArray(value) => Json(value)
+    IntArray(value) => Json(value)
+    IntArrayArray(value) => Json(value)
   }
 }
 
@@ -6697,7 +6696,7 @@ pub impl ToJson for CreateEmbeddingRequestEncodingFormat with fn to_json(self) {
     Base64 => "base64"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -7053,7 +7052,7 @@ pub impl ToJson for ReasoningSummary with fn to_json(self) {
     Detailed => "detailed"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -7107,7 +7106,7 @@ pub impl ToJson for ReasoningGenerateSummary with fn to_json(self) {
     Detailed => "detailed"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -7290,9 +7289,9 @@ pub extend TextResponseFormatConfiguration with ToJson::{to_json}
 ///|
 pub impl ToJson for TextResponseFormatConfiguration with fn to_json(self) {
   match self {
-    Text(value) => value.to_json()
-    JsonSchema(value) => value.to_json()
-    JsonObject(value) => value.to_json()
+    Text(value) => Json(value)
+    JsonSchema(value) => Json(value)
+    JsonObject(value) => Json(value)
     Unknown(_, value) => value
   }
 }
@@ -7387,7 +7386,7 @@ pub impl ToJson for RankingOptionsRanker with fn to_json(self) {
     Default20241115 => "default-2024-11-15"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -7697,7 +7696,7 @@ pub impl ToJson for WebSearchPreviewToolSearchContextSize with fn to_json(self) 
     High => "high"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -7819,7 +7818,7 @@ pub impl ToJson for ComputerUsePreviewToolEnvironment with fn to_json(self) {
     Browser => "browser"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -7936,10 +7935,10 @@ pub extend Tool with ToJson::{to_json}
 ///|
 pub impl ToJson for Tool with fn to_json(self) {
   match self {
-    FileSearch(value) => value.to_json()
-    Function(value) => value.to_json()
-    WebSearchPreview(value) => value.to_json()
-    ComputerUsePreview(value) => value.to_json()
+    FileSearch(value) => Json(value)
+    Function(value) => Json(value)
+    WebSearchPreview(value) => Json(value)
+    ComputerUsePreview(value) => Json(value)
     Unknown(_, value) => value
   }
 }
@@ -7989,7 +7988,7 @@ pub impl ToJson for CreateResponseTruncation with fn to_json(self) {
     Disabled => "disabled"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -8213,9 +8212,9 @@ pub extend Annotation with ToJson::{to_json}
 ///|
 pub impl ToJson for Annotation with fn to_json(self) {
   match self {
-    FileCitation(value) => value.to_json()
-    UrlCitation(value) => value.to_json()
-    FilePath(value) => value.to_json()
+    FileCitation(value) => Json(value)
+    UrlCitation(value) => Json(value)
+    FilePath(value) => Json(value)
     Unknown(_, value) => value
   }
 }
@@ -8366,8 +8365,8 @@ pub extend OutputContent with ToJson::{to_json}
 ///|
 pub impl ToJson for OutputContent with fn to_json(self) {
   match self {
-    OutputText(value) => value.to_json()
-    Refusal(value) => value.to_json()
+    OutputText(value) => Json(value)
+    Refusal(value) => Json(value)
     Unknown(_, value) => value
   }
 }
@@ -8417,7 +8416,7 @@ pub impl ToJson for OutputMessageStatus with fn to_json(self) {
     Incomplete => "incomplete"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -8533,7 +8532,7 @@ pub impl ToJson for EasyInputMessageRole with fn to_json(self) {
     Developer => "developer"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -8639,7 +8638,7 @@ pub impl ToJson for InputImageContentDetail with fn to_json(self) {
     Auto => "auto"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -8819,9 +8818,9 @@ pub extend InputContent with ToJson::{to_json}
 ///|
 pub impl ToJson for InputContent with fn to_json(self) {
   match self {
-    InputText(value) => value.to_json()
-    InputImage(value) => value.to_json()
-    InputFile(value) => value.to_json()
+    InputText(value) => Json(value)
+    InputImage(value) => Json(value)
+    InputFile(value) => Json(value)
     Unknown(_, value) => value
   }
 }
@@ -8865,8 +8864,8 @@ pub extend EasyInputMessageContent with ToJson::{to_json}
 ///|
 pub impl ToJson for EasyInputMessageContent with fn to_json(self) {
   match self {
-    Text(value) => value.to_json()
-    InputMessageContentList(value) => value.to_json()
+    Text(value) => Json(value)
+    InputMessageContentList(value) => Json(value)
   }
 }
 
@@ -8977,7 +8976,7 @@ pub impl ToJson for InputMessageRole with fn to_json(self) {
     Developer => "developer"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -9031,7 +9030,7 @@ pub impl ToJson for InputMessageStatus with fn to_json(self) {
     Incomplete => "incomplete"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -9148,7 +9147,7 @@ pub impl ToJson for FileSearchToolCallStatus with fn to_json(self) {
     Failed => "failed"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -9201,9 +9200,9 @@ pub extend VectorStoreFileAttributesValue with ToJson::{to_json}
 ///|
 pub impl ToJson for VectorStoreFileAttributesValue with fn to_json(self) {
   match self {
-    Text(value) => value.to_json()
-    Number(value) => value.to_json()
-    Bool(value) => value.to_json()
+    Text(value) => Json(value)
+    Number(value) => Json(value)
+    Bool(value) => Json(value)
   }
 }
 
@@ -9468,7 +9467,7 @@ pub impl ToJson for ComputerCallOutputItemParamStatus with fn to_json(self) {
     Incomplete => "incomplete"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -9610,7 +9609,7 @@ pub impl ToJson for WebSearchToolCallStatus with fn to_json(self) {
     Failed => "failed"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -9723,7 +9722,7 @@ pub impl ToJson for FunctionToolCallStatus with fn to_json(self) {
     Incomplete => "incomplete"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -9847,7 +9846,7 @@ pub impl ToJson for FunctionCallOutputItemParamStatus with fn to_json(self) {
     Incomplete => "incomplete"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -10025,7 +10024,7 @@ pub impl ToJson for ReasoningItemStatus with fn to_json(self) {
     Incomplete => "incomplete"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -10245,17 +10244,17 @@ pub extend InputItem with ToJson::{to_json}
 ///|
 pub impl ToJson for InputItem with fn to_json(self) {
   match self {
-    OutputMessage(value) => value.to_json()
-    EasyInputMessage(value) => value.to_json()
-    InputMessage(value) => value.to_json()
-    FileSearchCall(value) => value.to_json()
-    ComputerCall(value) => value.to_json()
-    ComputerCallOutput(value) => value.to_json()
-    WebSearchCall(value) => value.to_json()
-    FunctionCall(value) => value.to_json()
-    FunctionCallOutput(value) => value.to_json()
-    Reasoning(value) => value.to_json()
-    ItemReference(value) => value.to_json()
+    OutputMessage(value) => Json(value)
+    EasyInputMessage(value) => Json(value)
+    InputMessage(value) => Json(value)
+    FileSearchCall(value) => Json(value)
+    ComputerCall(value) => Json(value)
+    ComputerCallOutput(value) => Json(value)
+    WebSearchCall(value) => Json(value)
+    FunctionCall(value) => Json(value)
+    FunctionCallOutput(value) => Json(value)
+    Reasoning(value) => Json(value)
+    ItemReference(value) => Json(value)
     Unknown(_, value) => value
   }
 }
@@ -10318,8 +10317,8 @@ pub extend CreateResponseInput with ToJson::{to_json}
 ///|
 pub impl ToJson for CreateResponseInput with fn to_json(self) {
   match self {
-    Text(value) => value.to_json()
-    InputItemArray(value) => value.to_json()
+    Text(value) => Json(value)
+    InputItemArray(value) => Json(value)
   }
 }
 
@@ -10372,7 +10371,7 @@ pub impl ToJson for Includable with fn to_json(self) {
     ComputerCallOutputOutputImageUrl => "computer_call_output.output.image_url"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -10571,15 +10570,15 @@ pub extend Item with ToJson::{to_json}
 ///|
 pub impl ToJson for Item with fn to_json(self) {
   match self {
-    OutputMessage(value) => value.to_json()
-    InputMessage(value) => value.to_json()
-    FileSearchCall(value) => value.to_json()
-    ComputerCall(value) => value.to_json()
-    ComputerCallOutput(value) => value.to_json()
-    WebSearchCall(value) => value.to_json()
-    FunctionCall(value) => value.to_json()
-    FunctionCallOutput(value) => value.to_json()
-    Reasoning(value) => value.to_json()
+    OutputMessage(value) => Json(value)
+    InputMessage(value) => Json(value)
+    FileSearchCall(value) => Json(value)
+    ComputerCall(value) => Json(value)
+    ComputerCallOutput(value) => Json(value)
+    WebSearchCall(value) => Json(value)
+    FunctionCall(value) => Json(value)
+    FunctionCallOutput(value) => Json(value)
+    Reasoning(value) => Json(value)
     Unknown(_, value) => value
   }
 }
@@ -10747,12 +10746,12 @@ pub extend OutputItem with ToJson::{to_json}
 ///|
 pub impl ToJson for OutputItem with fn to_json(self) {
   match self {
-    Message(value) => value.to_json()
-    FileSearchCall(value) => value.to_json()
-    FunctionCall(value) => value.to_json()
-    WebSearchCall(value) => value.to_json()
-    ComputerCall(value) => value.to_json()
-    Reasoning(value) => value.to_json()
+    Message(value) => Json(value)
+    FileSearchCall(value) => Json(value)
+    FunctionCall(value) => Json(value)
+    WebSearchCall(value) => Json(value)
+    ComputerCall(value) => Json(value)
+    Reasoning(value) => Json(value)
     Unknown(_, value) => value
   }
 }
@@ -10847,7 +10846,7 @@ pub impl ToJson for ResponseTruncation with fn to_json(self) {
     Disabled => "disabled"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -10902,7 +10901,7 @@ pub impl ToJson for ResponseStatus with fn to_json(self) {
     Incomplete => "incomplete"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -10987,7 +10986,7 @@ pub impl ToJson for ResponseErrorCode with fn to_json(self) {
     ImageFileNotFound => "image_file_not_found"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -11105,7 +11104,7 @@ pub impl ToJson for ResponseIncompleteDetailsReason with fn to_json(self) {
     ContentFilter => "content_filter"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -12987,7 +12986,7 @@ pub impl ToJson for ResponsePropertiesTruncation with fn to_json(self) {
     Disabled => "disabled"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -14060,42 +14059,42 @@ pub extend ResponseStreamEvent with ToJson::{to_json}
 ///|
 pub impl ToJson for ResponseStreamEvent with fn to_json(self) {
   match self {
-    ResponseAudioDelta(value) => value.to_json()
-    ResponseAudioDone(value) => value.to_json()
-    ResponseAudioTranscriptDelta(value) => value.to_json()
-    ResponseAudioTranscriptDone(value) => value.to_json()
-    ResponseCodeInterpreterCallCodeDelta(value) => value.to_json()
-    ResponseCodeInterpreterCallCodeDone(value) => value.to_json()
-    ResponseCodeInterpreterCallCompleted(value) => value.to_json()
-    ResponseCodeInterpreterCallInProgress(value) => value.to_json()
-    ResponseCodeInterpreterCallInterpreting(value) => value.to_json()
-    ResponseCompleted(value) => value.to_json()
-    ResponseContentPartAdded(value) => value.to_json()
-    ResponseContentPartDone(value) => value.to_json()
-    ResponseCreated(value) => value.to_json()
-    Error(value) => value.to_json()
-    ResponseFileSearchCallCompleted(value) => value.to_json()
-    ResponseFileSearchCallInProgress(value) => value.to_json()
-    ResponseFileSearchCallSearching(value) => value.to_json()
-    ResponseFunctionCallArgumentsDelta(value) => value.to_json()
-    ResponseFunctionCallArgumentsDone(value) => value.to_json()
-    ResponseInProgress(value) => value.to_json()
-    ResponseFailed(value) => value.to_json()
-    ResponseIncomplete(value) => value.to_json()
-    ResponseOutputItemAdded(value) => value.to_json()
-    ResponseOutputItemDone(value) => value.to_json()
-    ResponseReasoningSummaryPartAdded(value) => value.to_json()
-    ResponseReasoningSummaryPartDone(value) => value.to_json()
-    ResponseReasoningSummaryTextDelta(value) => value.to_json()
-    ResponseReasoningSummaryTextDone(value) => value.to_json()
-    ResponseRefusalDelta(value) => value.to_json()
-    ResponseRefusalDone(value) => value.to_json()
-    ResponseOutputTextAnnotationAdded(value) => value.to_json()
-    ResponseOutputTextDelta(value) => value.to_json()
-    ResponseOutputTextDone(value) => value.to_json()
-    ResponseWebSearchCallCompleted(value) => value.to_json()
-    ResponseWebSearchCallInProgress(value) => value.to_json()
-    ResponseWebSearchCallSearching(value) => value.to_json()
+    ResponseAudioDelta(value) => Json(value)
+    ResponseAudioDone(value) => Json(value)
+    ResponseAudioTranscriptDelta(value) => Json(value)
+    ResponseAudioTranscriptDone(value) => Json(value)
+    ResponseCodeInterpreterCallCodeDelta(value) => Json(value)
+    ResponseCodeInterpreterCallCodeDone(value) => Json(value)
+    ResponseCodeInterpreterCallCompleted(value) => Json(value)
+    ResponseCodeInterpreterCallInProgress(value) => Json(value)
+    ResponseCodeInterpreterCallInterpreting(value) => Json(value)
+    ResponseCompleted(value) => Json(value)
+    ResponseContentPartAdded(value) => Json(value)
+    ResponseContentPartDone(value) => Json(value)
+    ResponseCreated(value) => Json(value)
+    Error(value) => Json(value)
+    ResponseFileSearchCallCompleted(value) => Json(value)
+    ResponseFileSearchCallInProgress(value) => Json(value)
+    ResponseFileSearchCallSearching(value) => Json(value)
+    ResponseFunctionCallArgumentsDelta(value) => Json(value)
+    ResponseFunctionCallArgumentsDone(value) => Json(value)
+    ResponseInProgress(value) => Json(value)
+    ResponseFailed(value) => Json(value)
+    ResponseIncomplete(value) => Json(value)
+    ResponseOutputItemAdded(value) => Json(value)
+    ResponseOutputItemDone(value) => Json(value)
+    ResponseReasoningSummaryPartAdded(value) => Json(value)
+    ResponseReasoningSummaryPartDone(value) => Json(value)
+    ResponseReasoningSummaryTextDelta(value) => Json(value)
+    ResponseReasoningSummaryTextDone(value) => Json(value)
+    ResponseRefusalDelta(value) => Json(value)
+    ResponseRefusalDone(value) => Json(value)
+    ResponseOutputTextAnnotationAdded(value) => Json(value)
+    ResponseOutputTextDelta(value) => Json(value)
+    ResponseOutputTextDone(value) => Json(value)
+    ResponseWebSearchCallCompleted(value) => Json(value)
+    ResponseWebSearchCallInProgress(value) => Json(value)
+    ResponseWebSearchCallSearching(value) => Json(value)
     Unknown(_, value) => value
   }
 }

@@ -183,7 +183,7 @@ fn[T : @json.FromJson] decode_nullable_field(
 fn[T : ToJson] json_map_to_json(value : Map[String, T]) -> Json {
   let result : Map[String, Json] = Map([])
   for key, item in value {
-    result[key] = item.to_json()
+    result[key] = Json(item)
   }
   Json::object(result)
 }
@@ -480,7 +480,7 @@ pub impl ToJson for SecurityAdvisoryEcosystems with fn to_json(self) {
     Swift => "swift"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -1061,7 +1061,7 @@ pub impl ToJson for SecurityAdvisoryCreditTypes with fn to_json(self) {
     Other => "other"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -1125,7 +1125,7 @@ pub impl ToJson for GlobalAdvisoryType with fn to_json(self) {
     Malware => "malware"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -1183,7 +1183,7 @@ pub impl ToJson for GlobalAdvisorySeverity with fn to_json(self) {
     Unknown => "unknown"
     UnknownValue(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -1240,7 +1240,7 @@ pub impl ToJson for GlobalAdvisoryIdentifiersItemType with fn to_json(self) {
     GHSA => "GHSA"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -1929,8 +1929,8 @@ pub extend WebhookConfigInsecureSsl with ToJson::{to_json}
 ///|
 pub impl ToJson for WebhookConfigInsecureSsl with fn to_json(self) {
   match self {
-    Text(value) => value.to_json()
-    Number(value) => value.to_json()
+    Text(value) => Json(value)
+    Number(value) => Json(value)
   }
 }
 
@@ -2157,9 +2157,9 @@ pub extend ValidationErrorErrorsItemValue with ToJson::{to_json}
 ///|
 pub impl ToJson for ValidationErrorErrorsItemValue with fn to_json(self) {
   match self {
-    Text(value) => value.to_json()
-    Int(value) => value.to_json()
-    TextArray(value) => value.to_json()
+    Text(value) => Json(value)
+    Int(value) => Json(value)
+    TextArray(value) => Json(value)
   }
 }
 
@@ -2637,7 +2637,7 @@ pub impl ToJson for AppPermissionsActions with fn to_json(self) {
     Write => "write"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -2688,7 +2688,7 @@ pub impl ToJson for AppPermissionsAdministration with fn to_json(self) {
     Write => "write"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -2742,7 +2742,7 @@ pub impl ToJson for AppPermissionsArtifactMetadata with fn to_json(self) {
     Write => "write"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -2796,7 +2796,7 @@ pub impl ToJson for AppPermissionsAttestations with fn to_json(self) {
     Write => "write"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -2850,7 +2850,7 @@ pub impl ToJson for AppPermissionsChecks with fn to_json(self) {
     Write => "write"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -2901,7 +2901,7 @@ pub impl ToJson for AppPermissionsCodeQuality with fn to_json(self) {
     Write => "write"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -2955,7 +2955,7 @@ pub impl ToJson for AppPermissionsCodespaces with fn to_json(self) {
     Write => "write"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -3009,7 +3009,7 @@ pub impl ToJson for AppPermissionsContents with fn to_json(self) {
     Write => "write"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -3063,7 +3063,7 @@ pub impl ToJson for AppPermissionsDependabotSecrets with fn to_json(self) {
     Write => "write"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -3117,7 +3117,7 @@ pub impl ToJson for AppPermissionsDeployments with fn to_json(self) {
     Write => "write"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -3171,7 +3171,7 @@ pub impl ToJson for AppPermissionsDiscussions with fn to_json(self) {
     Write => "write"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -3225,7 +3225,7 @@ pub impl ToJson for AppPermissionsEnvironments with fn to_json(self) {
     Write => "write"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -3279,7 +3279,7 @@ pub impl ToJson for AppPermissionsIssues with fn to_json(self) {
     Write => "write"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -3330,7 +3330,7 @@ pub impl ToJson for AppPermissionsMergeQueues with fn to_json(self) {
     Write => "write"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -3384,7 +3384,7 @@ pub impl ToJson for AppPermissionsMetadata with fn to_json(self) {
     Write => "write"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -3438,7 +3438,7 @@ pub impl ToJson for AppPermissionsPackages with fn to_json(self) {
     Write => "write"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -3492,7 +3492,7 @@ pub impl ToJson for AppPermissionsPages with fn to_json(self) {
     Write => "write"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -3543,7 +3543,7 @@ pub impl ToJson for AppPermissionsPullRequests with fn to_json(self) {
     Write => "write"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -3599,7 +3599,7 @@ pub impl ToJson for AppPermissionsRepositoryCustomProperties with fn to_json(
     Write => "write"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -3655,7 +3655,7 @@ pub impl ToJson for AppPermissionsRepositoryHooks with fn to_json(self) {
     Write => "write"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -3711,7 +3711,7 @@ pub impl ToJson for AppPermissionsRepositoryProjects with fn to_json(self) {
     Admin => "admin"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -3766,7 +3766,7 @@ pub impl ToJson for AppPermissionsSecretScanningAlerts with fn to_json(self) {
     Write => "write"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -3820,7 +3820,7 @@ pub impl ToJson for AppPermissionsSecrets with fn to_json(self) {
     Write => "write"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -3871,7 +3871,7 @@ pub impl ToJson for AppPermissionsSecurityEvents with fn to_json(self) {
     Write => "write"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -3925,7 +3925,7 @@ pub impl ToJson for AppPermissionsSingleFile with fn to_json(self) {
     Write => "write"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -3979,7 +3979,7 @@ pub impl ToJson for AppPermissionsStatuses with fn to_json(self) {
     Write => "write"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -4033,7 +4033,7 @@ pub impl ToJson for AppPermissionsVulnerabilityAlerts with fn to_json(self) {
     Write => "write"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -4094,7 +4094,7 @@ pub impl ToJson for AppPermissionsCustomPropertiesForOrganizations with fn to_js
     Write => "write"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -4150,7 +4150,7 @@ pub impl ToJson for AppPermissionsMembers with fn to_json(self) {
     Write => "write"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -4203,7 +4203,7 @@ pub impl ToJson for AppPermissionsOrganizationAdministration with fn to_json(
     Write => "write"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -4259,7 +4259,7 @@ pub impl ToJson for AppPermissionsOrganizationCustomRoles with fn to_json(self) 
     Write => "write"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -4317,7 +4317,7 @@ pub impl ToJson for AppPermissionsOrganizationCustomOrgRoles with fn to_json(
     Write => "write"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -4382,7 +4382,7 @@ pub impl ToJson for AppPermissionsOrganizationCustomProperties with fn to_json(
     Admin => "admin"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -4448,7 +4448,7 @@ pub impl ToJson for AppPermissionsOrganizationCopilotSeatManagement with fn to_j
     Write => "write"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -4511,7 +4511,7 @@ pub impl ToJson for AppPermissionsOrganizationCopilotAgentSettings with fn to_js
     Write => "write"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -4574,7 +4574,7 @@ pub impl ToJson for AppPermissionsOrganizationAnnouncementBanners with fn to_jso
     Write => "write"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -4630,7 +4630,7 @@ pub impl ToJson for AppPermissionsOrganizationHooks with fn to_json(self) {
     Write => "write"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -4691,7 +4691,7 @@ pub impl ToJson for AppPermissionsOrganizationPersonalAccessTokens with fn to_js
     Write => "write"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -4756,7 +4756,7 @@ pub impl ToJson for AppPermissionsOrganizationPersonalAccessTokenRequests with f
     Write => "write"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -4814,7 +4814,7 @@ pub impl ToJson for AppPermissionsOrganizationProjects with fn to_json(self) {
     Admin => "admin"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -4869,7 +4869,7 @@ pub impl ToJson for AppPermissionsOrganizationPackages with fn to_json(self) {
     Write => "write"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -4923,7 +4923,7 @@ pub impl ToJson for AppPermissionsOrganizationSecrets with fn to_json(self) {
     Write => "write"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -4984,7 +4984,7 @@ pub impl ToJson for AppPermissionsOrganizationSelfHostedRunners with fn to_json(
     Write => "write"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -5040,7 +5040,7 @@ pub impl ToJson for AppPermissionsOrganizationUserBlocking with fn to_json(self)
     Write => "write"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -5096,7 +5096,7 @@ pub impl ToJson for AppPermissionsEmailAddresses with fn to_json(self) {
     Write => "write"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -5150,7 +5150,7 @@ pub impl ToJson for AppPermissionsFollowers with fn to_json(self) {
     Write => "write"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -5204,7 +5204,7 @@ pub impl ToJson for AppPermissionsGitSshKeys with fn to_json(self) {
     Write => "write"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -5258,7 +5258,7 @@ pub impl ToJson for AppPermissionsGpgKeys with fn to_json(self) {
     Write => "write"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -5309,7 +5309,7 @@ pub impl ToJson for AppPermissionsInteractionLimits with fn to_json(self) {
     Write => "write"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -5363,7 +5363,7 @@ pub impl ToJson for AppPermissionsStarring with fn to_json(self) {
     Write => "write"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -5428,7 +5428,7 @@ pub impl ToJson for AppPermissionsEnterpriseCustomPropertiesForOrganizations wit
     Admin => "admin"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -6003,7 +6003,7 @@ pub impl ToJson for InstallationRepositorySelection with fn to_json(self) {
     Selected => "selected"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -6347,7 +6347,7 @@ pub impl ToJson for RepositoryPullRequestCreationPolicy with fn to_json(self) {
     CollaboratorsOnly => "collaborators_only"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -6401,7 +6401,7 @@ pub impl ToJson for RepositorySquashMergeCommitTitle with fn to_json(self) {
     COMMITORPRTITLE => "COMMIT_OR_PR_TITLE"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -6457,7 +6457,7 @@ pub impl ToJson for RepositorySquashMergeCommitMessage with fn to_json(self) {
     BLANK => "BLANK"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -6512,7 +6512,7 @@ pub impl ToJson for RepositoryMergeCommitTitle with fn to_json(self) {
     MERGEMESSAGE => "MERGE_MESSAGE"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -6568,7 +6568,7 @@ pub impl ToJson for RepositoryMergeCommitMessage with fn to_json(self) {
     BLANK => "BLANK"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -7239,7 +7239,7 @@ pub impl ToJson for InstallationTokenRepositorySelection with fn to_json(self) {
     Selected => "selected"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -7386,7 +7386,7 @@ pub impl ToJson for NullableScopedInstallationRepositorySelection with fn to_jso
     Selected => "selected"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -7891,7 +7891,7 @@ pub impl ToJson for OidcCustomPropertyInclusionInclusionSource with fn to_json(
     Enterprise => "enterprise"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -8051,7 +8051,7 @@ pub impl ToJson for CodeSecurityConfigurationTargetType with fn to_json(self) {
     Enterprise => "enterprise"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -8114,7 +8114,7 @@ pub impl ToJson for CodeSecurityConfigurationAdvancedSecurity with fn to_json(
     SecretProtection => "secret_protection"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -8176,7 +8176,7 @@ pub impl ToJson for CodeSecurityConfigurationDependencyGraph with fn to_json(
     NotSet => "not_set"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -8244,7 +8244,7 @@ pub impl ToJson for CodeSecurityConfigurationDependencyGraphAutosubmitAction wit
     NotSet => "not_set"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -8366,7 +8366,7 @@ pub impl ToJson for CodeSecurityConfigurationDependabotAlerts with fn to_json(
     NotSet => "not_set"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -8434,7 +8434,7 @@ pub impl ToJson for CodeSecurityConfigurationDependabotSecurityUpdates with fn t
     NotSet => "not_set"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -8502,7 +8502,7 @@ pub impl ToJson for CodeSecurityConfigurationDependabotDelegatedAlertDismissal w
     NotSet => "not_set"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -8627,7 +8627,7 @@ pub impl ToJson for CodeSecurityConfigurationCodeScanningDefaultSetup with fn to
     NotSet => "not_set"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -8695,7 +8695,7 @@ pub impl ToJson for CodeSecurityConfigurationCodeScanningDefaultSetupOptionsRunn
     NotSet => "not_set"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -8833,7 +8833,7 @@ pub impl ToJson for CodeSecurityConfigurationCodeScanningDelegatedAlertDismissal
     NotSet => "not_set"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -8894,7 +8894,7 @@ pub impl ToJson for CodeSecurityConfigurationSecretScanning with fn to_json(
     NotSet => "not_set"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -8962,7 +8962,7 @@ pub impl ToJson for CodeSecurityConfigurationSecretScanningPushProtection with f
     NotSet => "not_set"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -9030,7 +9030,7 @@ pub impl ToJson for CodeSecurityConfigurationSecretScanningDelegatedBypass with 
     NotSet => "not_set"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -9096,7 +9096,7 @@ pub impl ToJson for CodeSecurityConfigurationSecretScanningDelegatedBypassOption
     ROLE => "ROLE"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -9161,7 +9161,7 @@ pub impl ToJson for CodeSecurityConfigurationSecretScanningDelegatedBypassOption
     EXEMPT => "EXEMPT"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -9364,7 +9364,7 @@ pub impl ToJson for CodeSecurityConfigurationSecretScanningValidityChecks with f
     NotSet => "not_set"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -9432,7 +9432,7 @@ pub impl ToJson for CodeSecurityConfigurationSecretScanningNonProviderPatterns w
     NotSet => "not_set"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -9500,7 +9500,7 @@ pub impl ToJson for CodeSecurityConfigurationSecretScanningGenericSecrets with f
     NotSet => "not_set"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -9568,7 +9568,7 @@ pub impl ToJson for CodeSecurityConfigurationSecretScanningDelegatedAlertDismiss
     NotSet => "not_set"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -9636,7 +9636,7 @@ pub impl ToJson for CodeSecurityConfigurationSecretScanningExtendedMetadata with
     NotSet => "not_set"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -9704,7 +9704,7 @@ pub impl ToJson for CodeSecurityConfigurationPrivateVulnerabilityReporting with 
     NotSet => "not_set"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -9763,7 +9763,7 @@ pub impl ToJson for CodeSecurityConfigurationEnforcement with fn to_json(self) {
     EnterpriseEnforced => "enterprise_enforced"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -10138,7 +10138,7 @@ pub impl ToJson for CodeScanningDefaultSetupOptionsRunnerType with fn to_json(
     NotSet => "not_set"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -10260,7 +10260,7 @@ pub impl ToJson for CodeSecurityDefaultConfigurationsItemDefaultForNewRepos with
     All => "all"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -10673,7 +10673,7 @@ pub impl ToJson for CodeSecurityConfigurationRepositoriesStatus with fn to_json(
     EnterpriseEnforced => "enterprise_enforced"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -10969,7 +10969,7 @@ pub impl ToJson for DependabotAlertSecurityVulnerabilitySeverity with fn to_json
     Critical => "critical"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -11159,7 +11159,7 @@ pub impl ToJson for DependabotAlertSecurityAdvisorySeverity with fn to_json(
     Critical => "critical"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -11224,7 +11224,7 @@ pub impl ToJson for DependabotAlertSecurityAdvisoryClassification with fn to_jso
     Malware => "malware"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -11404,7 +11404,7 @@ pub impl ToJson for DependabotAlertSecurityAdvisoryIdentifiersItemType with fn t
     GHSA => "GHSA"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -11719,7 +11719,7 @@ pub impl ToJson for DependabotAlertDismissalRequestSimpleStatus with fn to_json(
     Cancelled => "cancelled"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -11909,7 +11909,7 @@ pub impl ToJson for DependabotAlertWithRepositoryState with fn to_json(self) {
     Open => "open"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -11972,7 +11972,7 @@ pub impl ToJson for DependabotAlertWithRepositoryDependencyScope with fn to_json
     Runtime => "runtime"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -12041,7 +12041,7 @@ pub impl ToJson for DependabotAlertWithRepositoryDependencyRelationship with fn 
     Inconclusive => "inconclusive"
     UnknownValue(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -12185,7 +12185,7 @@ pub impl ToJson for DependabotAlertWithRepositoryDismissedReason with fn to_json
     TolerableRisk => "tolerable_risk"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -12680,7 +12680,7 @@ pub impl ToJson for DependabotRepositoryAccessDetailsDefaultLevel with fn to_jso
     Internal => "internal"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -12965,7 +12965,7 @@ pub impl ToJson for NullableMilestoneState with fn to_json(self) {
     Closed => "closed"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -13158,7 +13158,7 @@ pub impl ToJson for IssueTypeColor with fn to_json(self) {
     Purple => "purple"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -13434,7 +13434,7 @@ pub impl ToJson for AuthorAssociation with fn to_json(self) {
     OWNER => "OWNER"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -13938,7 +13938,7 @@ pub impl ToJson for IssueFieldValueDataType with fn to_json(self) {
     Date => "date"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -13990,8 +13990,8 @@ pub extend IssueFieldValueValue with ToJson::{to_json}
 ///|
 pub impl ToJson for IssueFieldValueValue with fn to_json(self) {
   match self {
-    Text(value) => value.to_json()
-    Number(value) => value.to_json()
+    Text(value) => Json(value)
+    Number(value) => Json(value)
   }
 }
 
@@ -14252,7 +14252,7 @@ pub impl ToJson for IssueStateReason with fn to_json(self) {
     Duplicate => "duplicate"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -14384,8 +14384,8 @@ pub extend IssueLabelsItem with ToJson::{to_json}
 ///|
 pub impl ToJson for IssueLabelsItem with fn to_json(self) {
   match self {
-    Text(value) => value.to_json()
-    Object(value) => value.to_json()
+    Text(value) => Json(value)
+    Object(value) => Json(value)
   }
 }
 
@@ -15178,7 +15178,7 @@ pub impl ToJson for ReleaseAssetState with fn to_json(self) {
     Open => "open"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -17505,7 +17505,7 @@ pub impl ToJson for MarketplaceListingPlanPriceModel with fn to_json(self) {
     PERUNIT => "PER_UNIT"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -18337,7 +18337,7 @@ pub impl ToJson for SecurityAndAnalysisAdvancedSecurityStatus with fn to_json(
     Disabled => "disabled"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -18439,7 +18439,7 @@ pub impl ToJson for SecurityAndAnalysisCodeSecurityStatus with fn to_json(self) 
     Disabled => "disabled"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -18550,7 +18550,7 @@ pub impl ToJson for SecurityAndAnalysisDependabotSecurityUpdatesStatus with fn t
     Disabled => "disabled"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -18663,7 +18663,7 @@ pub impl ToJson for SecurityAndAnalysisSecretScanningStatus with fn to_json(
     Disabled => "disabled"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -18774,7 +18774,7 @@ pub impl ToJson for SecurityAndAnalysisSecretScanningPushProtectionStatus with f
     Disabled => "disabled"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -18896,7 +18896,7 @@ pub impl ToJson for SecurityAndAnalysisSecretScanningNonProviderPatternsStatus w
     Disabled => "disabled"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -19018,7 +19018,7 @@ pub impl ToJson for SecurityAndAnalysisSecretScanningAiDetectionStatus with fn t
     Disabled => "disabled"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -19138,7 +19138,7 @@ pub impl ToJson for SecurityAndAnalysisSecretScanningDelegatedAlertDismissalStat
     Disabled => "disabled"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -19260,7 +19260,7 @@ pub impl ToJson for SecurityAndAnalysisSecretScanningDelegatedBypassStatus with 
     Disabled => "disabled"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -19382,7 +19382,7 @@ pub impl ToJson for SecurityAndAnalysisSecretScanningDelegatedBypassOptionsRevie
     ROLE => "ROLE"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -19447,7 +19447,7 @@ pub impl ToJson for SecurityAndAnalysisSecretScanningDelegatedBypassOptionsRevie
     EXEMPT => "EXEMPT"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -19760,7 +19760,7 @@ pub impl ToJson for MinimalRepositoryPullRequestCreationPolicy with fn to_json(
     CollaboratorsOnly => "collaborators_only"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -20905,7 +20905,7 @@ pub impl ToJson for CreateBudgetBudgetBudgetScope with fn to_json(self) {
     User => "user"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -20964,7 +20964,7 @@ pub impl ToJson for CreateBudgetBudgetBudgetType with fn to_json(self) {
     SkuPricing => "SkuPricing"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -21224,7 +21224,7 @@ pub impl ToJson for UpdateBudgetBudgetBudgetScope with fn to_json(self) {
     User => "user"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -21283,7 +21283,7 @@ pub impl ToJson for UpdateBudgetBudgetBudgetType with fn to_json(self) {
     SkuPricing => "SkuPricing"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -22260,7 +22260,7 @@ pub impl ToJson for NullableActionsHostedRunnerPoolImageSource with fn to_json(
     Custom => "custom"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -22506,7 +22506,7 @@ pub impl ToJson for ActionsHostedRunnerStatus with fn to_json(self) {
     Stuck => "Stuck"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -22827,7 +22827,7 @@ pub impl ToJson for ActionsHostedRunnerCuratedImageSource with fn to_json(self) 
     Custom => "custom"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -23137,7 +23137,7 @@ pub impl ToJson for EnabledRepositories with fn to_json(self) {
     Selected => "selected"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -23191,7 +23191,7 @@ pub impl ToJson for AllowedActions with fn to_json(self) {
     Selected => "selected"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -23428,7 +23428,7 @@ pub impl ToJson for ActionsForkPrContributorApprovalApprovalPolicy with fn to_js
     AllExternalContributors => "all_external_contributors"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -23766,7 +23766,7 @@ pub impl ToJson for SelfHostedRunnersSettingsEnabledRepositories with fn to_json
     None => "none"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -23879,7 +23879,7 @@ pub impl ToJson for ActionsDefaultWorkflowPermissions with fn to_json(self) {
     Write => "write"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -24057,7 +24057,7 @@ pub impl ToJson for RepositoryRuleEnforcement with fn to_json(self) {
     Evaluate => "evaluate"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -24124,7 +24124,7 @@ pub impl ToJson for ActionsRuleParamsActorType with fn to_json(self) {
     RepositoryRole => "RepositoryRole"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -24426,7 +24426,7 @@ pub impl ToJson for ActionsRuleRestrictActionEventsParametersAllowedEventsItem w
     WorkflowRun => "workflow_run"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -24624,8 +24624,8 @@ pub extend ActionsRule with ToJson::{to_json}
 ///|
 pub impl ToJson for ActionsRule with fn to_json(self) {
   match self {
-    RestrictActionsActors(value) => value.to_json()
-    RestrictActionEvents(value) => value.to_json()
+    RestrictActionsActors(value) => Json(value)
+    RestrictActionEvents(value) => Json(value)
     Unknown(_, value) => value
   }
 }
@@ -24677,7 +24677,7 @@ pub impl ToJson for ActionsPolicySourceType with fn to_json(self) {
     Enterprise => "Enterprise"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -25100,7 +25100,7 @@ pub impl ToJson for RunnerLabelType with fn to_json(self) {
     Custom => "custom"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -25369,7 +25369,7 @@ pub impl ToJson for AuthenticationTokenRepositorySelection with fn to_json(self)
     Selected => "selected"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -25501,7 +25501,7 @@ pub impl ToJson for OrganizationActionsSecretVisibility with fn to_json(self) {
     Selected => "selected"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -25693,7 +25693,7 @@ pub impl ToJson for OrganizationActionsVariableVisibility with fn to_json(self) 
     Selected => "selected"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -25835,7 +25835,7 @@ pub impl ToJson for ArtifactDeploymentRecordRuntimeRisksItem with fn to_json(
     SensitiveData => "sensitive-data"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -25995,7 +25995,7 @@ pub impl ToJson for CampaignState with fn to_json(self) {
     Closed => "closed"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -26046,7 +26046,7 @@ pub impl ToJson for NullableTeamSimpleType with fn to_json(self) {
     Organization => "organization"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -26290,7 +26290,7 @@ pub impl ToJson for TeamType with fn to_json(self) {
     Organization => "organization"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -26343,7 +26343,7 @@ pub impl ToJson for TeamAccessSource with fn to_json(self) {
     Enterprise => "enterprise"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -26702,7 +26702,7 @@ pub impl ToJson for CodeScanningAiScanOrgSettingsPrScan with fn to_json(self) {
     Disabled => "disabled"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -26809,7 +26809,7 @@ pub impl ToJson for CodeScanningAiScanOrgEnablementUpdatePrScan with fn to_json(
     Disabled => "disabled"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -26917,7 +26917,7 @@ pub impl ToJson for CodeScanningAlertStateQuery with fn to_json(self) {
     Fixed => "fixed"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -26983,7 +26983,7 @@ pub impl ToJson for CodeScanningAlertSeverity with fn to_json(self) {
     Error => "error"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -27044,7 +27044,7 @@ pub impl ToJson for CodeScanningAlertState with fn to_json(self) {
     Fixed => "fixed"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -27103,7 +27103,7 @@ pub impl ToJson for CodeScanningAlertDismissedReason with fn to_json(self) {
     Mitigated => "mitigated"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -27163,7 +27163,7 @@ pub impl ToJson for CodeScanningAlertRuleSummarySeverity with fn to_json(self) {
     Error => "error"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -27232,7 +27232,7 @@ pub impl ToJson for CodeScanningAlertRuleSummarySecuritySeverityLevel with fn to
     Critical => "critical"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -27520,7 +27520,7 @@ pub impl ToJson for CodeScanningAlertClassification with fn to_json(self) {
     Library => "library"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -27884,7 +27884,7 @@ pub impl ToJson for NullableCodespaceMachinePrebuildAvailability with fn to_json
     InProgress => "in_progress"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -28058,7 +28058,7 @@ pub impl ToJson for CodespaceState with fn to_json(self) {
     Rebuilding => "Rebuilding"
     UnknownValue(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -28193,7 +28193,7 @@ pub impl ToJson for CodespaceLocation with fn to_json(self) {
     WestUs2 => "WestUs2"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -28535,7 +28535,7 @@ pub impl ToJson for CodespacesOrgSecretVisibility with fn to_json(self) {
     Selected => "selected"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -28726,7 +28726,7 @@ pub impl ToJson for CopilotSpaceBaseRole with fn to_json(self) {
     NoAccess => "no_access"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -28798,7 +28798,7 @@ pub impl ToJson for CopilotSpaceResourcesAttributesItemResourceType with fn to_j
     UploadedTextFile => "uploaded_text_file"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -29164,7 +29164,7 @@ pub impl ToJson for CopilotSpaceCollaboratorUserRole with fn to_json(self) {
     Admin => "admin"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -29391,7 +29391,7 @@ pub impl ToJson for CopilotSpaceCollaboratorTeamRole with fn to_json(self) {
     Admin => "admin"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -29565,8 +29565,8 @@ pub extend CopilotSpaceCollaborator with ToJson::{to_json}
 ///|
 pub impl ToJson for CopilotSpaceCollaborator with fn to_json(self) {
   match self {
-    User(value) => value.to_json()
-    Team(value) => value.to_json()
+    User(value) => Json(value)
+    Team(value) => Json(value)
     Unknown(_, value) => value
   }
 }
@@ -29627,7 +29627,7 @@ pub impl ToJson for CopilotSpaceResourceResourceType with fn to_json(self) {
     UploadedTextFile => "uploaded_text_file"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -29953,7 +29953,7 @@ pub impl ToJson for CopilotSeatDetailsPlanType with fn to_json(self) {
     Unknown => "unknown"
     UnknownValue(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -30112,7 +30112,7 @@ pub impl ToJson for OrganizationDependabotSecretVisibility with fn to_json(self)
     Selected => "selected"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -30297,7 +30297,7 @@ pub impl ToJson for NullableMinimalRepositoryPullRequestCreationPolicy with fn t
     CollaboratorsOnly => "collaborators_only"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -31001,7 +31001,7 @@ pub impl ToJson for PackagePackageType with fn to_json(self) {
     Container => "container"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -31056,7 +31056,7 @@ pub impl ToJson for PackageVisibility with fn to_json(self) {
     Public => "public"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -31890,7 +31890,7 @@ pub impl ToJson for InteractionGroup with fn to_json(self) {
     CollaboratorsOnly => "collaborators_only"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -32006,7 +32006,7 @@ pub impl ToJson for InteractionExpiry with fn to_json(self) {
     SixMonths => "six_months"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -32117,7 +32117,7 @@ pub impl ToJson for IssueFieldDataType with fn to_json(self) {
     Number => "number"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -32171,7 +32171,7 @@ pub impl ToJson for IssueFieldVisibility with fn to_json(self) {
     All => "all"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -32234,7 +32234,7 @@ pub impl ToJson for IssueFieldOptionsItemColor with fn to_json(self) {
     Purple => "purple"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -32468,7 +32468,7 @@ pub impl ToJson for OrganizationCreateIssueFieldDataType with fn to_json(self) {
     Number => "number"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -32525,7 +32525,7 @@ pub impl ToJson for OrganizationCreateIssueFieldVisibility with fn to_json(self)
     All => "all"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -32600,7 +32600,7 @@ pub impl ToJson for OrganizationCreateIssueFieldOptionsItemColor with fn to_json
     Purple => "purple"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -32805,7 +32805,7 @@ pub impl ToJson for OrganizationUpdateIssueFieldVisibility with fn to_json(self)
     All => "all"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -32880,7 +32880,7 @@ pub impl ToJson for OrganizationUpdateIssueFieldOptionsItemColor with fn to_json
     Purple => "purple"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -33097,7 +33097,7 @@ pub impl ToJson for OrganizationCreateIssueTypeColor with fn to_json(self) {
     Purple => "purple"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -33236,7 +33236,7 @@ pub impl ToJson for OrganizationUpdateIssueTypeColor with fn to_json(self) {
     Purple => "purple"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -33363,7 +33363,7 @@ pub impl ToJson for OrgMembershipState with fn to_json(self) {
     Pending => "pending"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -33416,7 +33416,7 @@ pub impl ToJson for OrgMembershipRole with fn to_json(self) {
     BillingManager => "billing_manager"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -33750,7 +33750,7 @@ pub impl ToJson for OrganizationRoleBaseRole with fn to_json(self) {
     Admin => "admin"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -33809,7 +33809,7 @@ pub impl ToJson for OrganizationRoleSource with fn to_json(self) {
     Predefined => "Predefined"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -33958,7 +33958,7 @@ pub impl ToJson for TeamRoleAssignmentAssignment with fn to_json(self) {
     Mixed => "mixed"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -34079,7 +34079,7 @@ pub impl ToJson for TeamRoleAssignmentType with fn to_json(self) {
     Organization => "organization"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -34270,7 +34270,7 @@ pub impl ToJson for TeamSimpleType with fn to_json(self) {
     Organization => "organization"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -34450,7 +34450,7 @@ pub impl ToJson for UserRoleAssignmentAssignment with fn to_json(self) {
     Mixed => "mixed"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -34680,7 +34680,7 @@ pub impl ToJson for PackageVersionMetadataPackageType with fn to_json(self) {
     Container => "container"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -34998,7 +34998,7 @@ pub impl ToJson for OrganizationProgrammaticAccessGrantRequestRepositorySelectio
     Subset => "subset"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -35257,7 +35257,7 @@ pub impl ToJson for OrganizationProgrammaticAccessGrantRepositorySelection with 
     Subset => "subset"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -35522,7 +35522,7 @@ pub impl ToJson for OrgPrivateRegistryConfigurationRegistryType with fn to_json(
     TerraformRegistry => "terraform_registry"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -35603,7 +35603,7 @@ pub impl ToJson for OrgPrivateRegistryConfigurationAuthType with fn to_json(
     OidcGcp => "oidc_gcp"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -35670,7 +35670,7 @@ pub impl ToJson for OrgPrivateRegistryConfigurationVisibility with fn to_json(
     Selected => "selected"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -35935,7 +35935,7 @@ pub impl ToJson for OrgPrivateRegistryConfigurationWithSelectedRepositoriesRegis
     TerraformRegistry => "terraform_registry"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -36023,7 +36023,7 @@ pub impl ToJson for OrgPrivateRegistryConfigurationWithSelectedRepositoriesAuthT
     OidcGcp => "oidc_gcp"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -36095,7 +36095,7 @@ pub impl ToJson for OrgPrivateRegistryConfigurationWithSelectedRepositoriesVisib
     Selected => "selected"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -36349,7 +36349,7 @@ pub impl ToJson for NullableProjectsV2StatusUpdateStatus with fn to_json(self) {
     COMPLETE => "COMPLETE"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -36503,7 +36503,7 @@ pub impl ToJson for ProjectsV2State with fn to_json(self) {
     Closed => "closed"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -36740,7 +36740,7 @@ pub impl ToJson for AutoMergeMergeMethod with fn to_json(self) {
     Rebase => "rebase"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -37496,7 +37496,7 @@ pub impl ToJson for ProjectsV2ItemContentType with fn to_json(self) {
     DraftIssue => "DraftIssue"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -37968,7 +37968,7 @@ pub impl ToJson for ProjectsV2FieldDataType with fn to_json(self) {
     SubIssuesProgress => "sub_issues_progress"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -38199,7 +38199,7 @@ pub impl ToJson for ProjectsV2FieldSingleSelectOptionColor with fn to_json(self)
     YELLOW => "YELLOW"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -38555,7 +38555,7 @@ pub impl ToJson for ProjectsV2ViewLayout with fn to_json(self) {
     Roadmap => "roadmap"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -38602,8 +38602,8 @@ pub extend ProjectsV2ViewSortByItemItem with ToJson::{to_json}
 ///|
 pub impl ToJson for ProjectsV2ViewSortByItemItem with fn to_json(self) {
   match self {
-    Int(value) => value.to_json()
-    Text(value) => value.to_json()
+    Int(value) => Json(value)
+    Text(value) => Json(value)
   }
 }
 
@@ -38776,7 +38776,7 @@ pub impl ToJson for CustomPropertySourceType with fn to_json(self) {
     Enterprise => "enterprise"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -38836,7 +38836,7 @@ pub impl ToJson for CustomPropertyValueType with fn to_json(self) {
     Url => "url"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -38888,8 +38888,8 @@ pub extend CustomPropertyDefaultValue with ToJson::{to_json}
 ///|
 pub impl ToJson for CustomPropertyDefaultValue with fn to_json(self) {
   match self {
-    Text(value) => value.to_json()
-    TextArray(value) => value.to_json()
+    Text(value) => Json(value)
+    TextArray(value) => Json(value)
   }
 }
 
@@ -38943,7 +38943,7 @@ pub impl ToJson for CustomPropertyValuesEditableBy with fn to_json(self) {
     OrgAndRepoActors => "org_and_repo_actors"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -39099,7 +39099,7 @@ pub impl ToJson for CustomPropertySetPayloadValueType with fn to_json(self) {
     Url => "url"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -39151,8 +39151,8 @@ pub extend CustomPropertySetPayloadDefaultValue with ToJson::{to_json}
 ///|
 pub impl ToJson for CustomPropertySetPayloadDefaultValue with fn to_json(self) {
   match self {
-    Text(value) => value.to_json()
-    TextArray(value) => value.to_json()
+    Text(value) => Json(value)
+    TextArray(value) => Json(value)
   }
 }
 
@@ -39210,7 +39210,7 @@ pub impl ToJson for CustomPropertySetPayloadValuesEditableBy with fn to_json(
     OrgAndRepoActors => "org_and_repo_actors"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -39347,8 +39347,8 @@ pub extend CustomPropertyValueValue with ToJson::{to_json}
 ///|
 pub impl ToJson for CustomPropertyValueValue with fn to_json(self) {
   match self {
-    Text(value) => value.to_json()
-    TextArray(value) => value.to_json()
+    Text(value) => Json(value)
+    TextArray(value) => Json(value)
   }
 }
 
@@ -39588,7 +39588,7 @@ pub impl ToJson for NullableRepositoryPullRequestCreationPolicy with fn to_json(
     CollaboratorsOnly => "collaborators_only"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -39646,7 +39646,7 @@ pub impl ToJson for NullableRepositorySquashMergeCommitTitle with fn to_json(
     COMMITORPRTITLE => "COMMIT_OR_PR_TITLE"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -39711,7 +39711,7 @@ pub impl ToJson for NullableRepositorySquashMergeCommitMessage with fn to_json(
     BLANK => "BLANK"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -39768,7 +39768,7 @@ pub impl ToJson for NullableRepositoryMergeCommitTitle with fn to_json(self) {
     MERGEMESSAGE => "MERGE_MESSAGE"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -39824,7 +39824,7 @@ pub impl ToJson for NullableRepositoryMergeCommitMessage with fn to_json(self) {
     BLANK => "BLANK"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -40560,7 +40560,7 @@ pub impl ToJson for FullRepositoryPullRequestCreationPolicy with fn to_json(
     CollaboratorsOnly => "collaborators_only"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -40682,7 +40682,7 @@ pub impl ToJson for FullRepositorySquashMergeCommitTitle with fn to_json(self) {
     COMMITORPRTITLE => "COMMIT_OR_PR_TITLE"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -40738,7 +40738,7 @@ pub impl ToJson for FullRepositorySquashMergeCommitMessage with fn to_json(self)
     BLANK => "BLANK"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -40795,7 +40795,7 @@ pub impl ToJson for FullRepositoryMergeCommitTitle with fn to_json(self) {
     MERGEMESSAGE => "MERGE_MESSAGE"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -40851,7 +40851,7 @@ pub impl ToJson for FullRepositoryMergeCommitMessage with fn to_json(self) {
     BLANK => "BLANK"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -41507,7 +41507,7 @@ pub impl ToJson for RepositoryRulesetBypassActorActorType with fn to_json(self) 
     User => "User"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -41569,7 +41569,7 @@ pub impl ToJson for RepositoryRulesetBypassActorBypassMode with fn to_json(self)
     Exempt => "exempt"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -42034,7 +42034,7 @@ pub impl ToJson for RepositoryRuleMergeQueueParametersGroupingStrategy with fn t
     HEADGREEN => "HEADGREEN"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -42099,7 +42099,7 @@ pub impl ToJson for RepositoryRuleMergeQueueParametersMergeMethod with fn to_jso
     REBASE => "REBASE"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -42467,7 +42467,7 @@ pub impl ToJson for RepositoryRuleParamsActorType with fn to_json(self) {
     RepositoryRole => "RepositoryRole"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -42761,7 +42761,7 @@ pub impl ToJson for RepositoryRulePullRequestParametersAllowedMergeMethodsItem w
     Rebase => "rebase"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -43237,7 +43237,7 @@ pub impl ToJson for RepositoryRuleCommitMessagePatternParametersOperator with fn
     Regex => "regex"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -43433,7 +43433,7 @@ pub impl ToJson for RepositoryRuleCommitAuthorEmailPatternParametersOperator wit
     Regex => "regex"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -43633,7 +43633,7 @@ pub impl ToJson for RepositoryRuleCommitterEmailPatternParametersOperator with f
     Regex => "regex"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -43829,7 +43829,7 @@ pub impl ToJson for RepositoryRuleBranchNamePatternParametersOperator with fn to
     Regex => "regex"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -44020,7 +44020,7 @@ pub impl ToJson for RepositoryRuleTagNamePatternParametersOperator with fn to_js
     Regex => "regex"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -44387,7 +44387,7 @@ pub impl ToJson for RepositoryRuleParamsCodeScanningToolAlertsThreshold with fn 
     All => "all"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -44460,7 +44460,7 @@ pub impl ToJson for RepositoryRuleParamsCodeScanningToolSecurityAlertsThreshold 
     All => "all"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -44692,7 +44692,7 @@ pub impl ToJson for RepositoryRuleCodeQualityParametersSeverity with fn to_json(
     All => "all"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -45581,31 +45581,31 @@ pub extend RepositoryRule with ToJson::{to_json}
 ///|
 pub impl ToJson for RepositoryRule with fn to_json(self) {
   match self {
-    Creation(value) => value.to_json()
-    Update(value) => value.to_json()
-    Deletion(value) => value.to_json()
-    RequiredLinearHistory(value) => value.to_json()
-    MergeQueue(value) => value.to_json()
-    RequiredDeployments(value) => value.to_json()
-    RequiredSignatures(value) => value.to_json()
-    PullRequest(value) => value.to_json()
-    RequiredStatusChecks(value) => value.to_json()
-    NonFastForward(value) => value.to_json()
-    CommitMessagePattern(value) => value.to_json()
-    CommitAuthorEmailPattern(value) => value.to_json()
-    CommitterEmailPattern(value) => value.to_json()
-    BranchNamePattern(value) => value.to_json()
-    TagNamePattern(value) => value.to_json()
-    Workflows(value) => value.to_json()
-    CodeScanning(value) => value.to_json()
-    CodeQuality(value) => value.to_json()
-    CodeCoverage(value) => value.to_json()
-    CopilotCodeReview(value) => value.to_json()
-    LicenseComplianceScanning(value) => value.to_json()
-    FilePathRestriction(value) => value.to_json()
-    MaxFilePathLength(value) => value.to_json()
-    FileExtensionRestriction(value) => value.to_json()
-    MaxFileSize(value) => value.to_json()
+    Creation(value) => Json(value)
+    Update(value) => Json(value)
+    Deletion(value) => Json(value)
+    RequiredLinearHistory(value) => Json(value)
+    MergeQueue(value) => Json(value)
+    RequiredDeployments(value) => Json(value)
+    RequiredSignatures(value) => Json(value)
+    PullRequest(value) => Json(value)
+    RequiredStatusChecks(value) => Json(value)
+    NonFastForward(value) => Json(value)
+    CommitMessagePattern(value) => Json(value)
+    CommitAuthorEmailPattern(value) => Json(value)
+    CommitterEmailPattern(value) => Json(value)
+    BranchNamePattern(value) => Json(value)
+    TagNamePattern(value) => Json(value)
+    Workflows(value) => Json(value)
+    CodeScanning(value) => Json(value)
+    CodeQuality(value) => Json(value)
+    CodeCoverage(value) => Json(value)
+    CopilotCodeReview(value) => Json(value)
+    LicenseComplianceScanning(value) => Json(value)
+    FilePathRestriction(value) => Json(value)
+    MaxFilePathLength(value) => Json(value)
+    FileExtensionRestriction(value) => Json(value)
+    MaxFileSize(value) => Json(value)
     Unknown(_, value) => value
   }
 }
@@ -45688,7 +45688,7 @@ pub impl ToJson for RepositoryRulesetTarget with fn to_json(self) {
     Repository => "repository"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -45746,7 +45746,7 @@ pub impl ToJson for RepositoryRulesetSourceType with fn to_json(self) {
     Enterprise => "Enterprise"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -45805,7 +45805,7 @@ pub impl ToJson for RepositoryRulesetCurrentUserCanBypass with fn to_json(self) 
     Exempt => "exempt"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -46140,27 +46140,27 @@ pub extend OrgRules with ToJson::{to_json}
 ///|
 pub impl ToJson for OrgRules with fn to_json(self) {
   match self {
-    Creation(value) => value.to_json()
-    Update(value) => value.to_json()
-    Deletion(value) => value.to_json()
-    RequiredLinearHistory(value) => value.to_json()
-    RequiredDeployments(value) => value.to_json()
-    RequiredSignatures(value) => value.to_json()
-    PullRequest(value) => value.to_json()
-    RequiredStatusChecks(value) => value.to_json()
-    NonFastForward(value) => value.to_json()
-    CommitMessagePattern(value) => value.to_json()
-    CommitAuthorEmailPattern(value) => value.to_json()
-    CommitterEmailPattern(value) => value.to_json()
-    BranchNamePattern(value) => value.to_json()
-    TagNamePattern(value) => value.to_json()
-    FilePathRestriction(value) => value.to_json()
-    MaxFilePathLength(value) => value.to_json()
-    FileExtensionRestriction(value) => value.to_json()
-    MaxFileSize(value) => value.to_json()
-    Workflows(value) => value.to_json()
-    CodeScanning(value) => value.to_json()
-    CopilotCodeReview(value) => value.to_json()
+    Creation(value) => Json(value)
+    Update(value) => Json(value)
+    Deletion(value) => Json(value)
+    RequiredLinearHistory(value) => Json(value)
+    RequiredDeployments(value) => Json(value)
+    RequiredSignatures(value) => Json(value)
+    PullRequest(value) => Json(value)
+    RequiredStatusChecks(value) => Json(value)
+    NonFastForward(value) => Json(value)
+    CommitMessagePattern(value) => Json(value)
+    CommitAuthorEmailPattern(value) => Json(value)
+    CommitterEmailPattern(value) => Json(value)
+    BranchNamePattern(value) => Json(value)
+    TagNamePattern(value) => Json(value)
+    FilePathRestriction(value) => Json(value)
+    MaxFilePathLength(value) => Json(value)
+    FileExtensionRestriction(value) => Json(value)
+    MaxFileSize(value) => Json(value)
+    Workflows(value) => Json(value)
+    CodeScanning(value) => Json(value)
+    CopilotCodeReview(value) => Json(value)
     Unknown(_, value) => value
   }
 }
@@ -46236,7 +46236,7 @@ pub impl ToJson for RuleSuitesItemResult with fn to_json(self) {
     Bypass => "bypass"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -46290,7 +46290,7 @@ pub impl ToJson for RuleSuitesItemEvaluationResult with fn to_json(self) {
     Bypass => "bypass"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -46446,7 +46446,7 @@ pub impl ToJson for RuleSuiteResult with fn to_json(self) {
     Bypass => "bypass"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -46500,7 +46500,7 @@ pub impl ToJson for RuleSuiteEvaluationResult with fn to_json(self) {
     Bypass => "bypass"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -46623,7 +46623,7 @@ pub impl ToJson for RuleSuiteRuleEvaluationsItemEnforcement with fn to_json(
     DeletedRuleset => "deleted ruleset"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -46680,7 +46680,7 @@ pub impl ToJson for RuleSuiteRuleEvaluationsItemResult with fn to_json(self) {
     Fail => "fail"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -47126,7 +47126,7 @@ pub impl ToJson for SecretScanningAlertState with fn to_json(self) {
     Resolved => "resolved"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -47184,7 +47184,7 @@ pub impl ToJson for SecretScanningAlertResolution with fn to_json(self) {
     UsedInTests => "used_in_tests"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -47244,7 +47244,7 @@ pub impl ToJson for OrganizationSecretScanningAlertValidity with fn to_json(
     Unknown => "unknown"
     UnknownValue(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -47581,7 +47581,7 @@ pub impl ToJson for SecretScanningCustomPatternState with fn to_json(self) {
     Unpublished => "unpublished"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -47842,7 +47842,7 @@ pub impl ToJson for SecretScanningCustomPatternValidationErrorCode with fn to_js
     CustomPatternVersionMismatch => "custom_pattern_version_mismatch"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -48117,7 +48117,7 @@ pub impl ToJson for SecretScanningPatternOverrideDefaultSetting with fn to_json(
     Enabled => "enabled"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -48182,7 +48182,7 @@ pub impl ToJson for SecretScanningPatternOverrideEnterpriseSetting with fn to_js
     Enabled => "enabled"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -48241,7 +48241,7 @@ pub impl ToJson for SecretScanningPatternOverrideSetting with fn to_json(self) {
     Enabled => "enabled"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -48619,7 +48619,7 @@ pub impl ToJson for RepositoryAdvisoryCreditState with fn to_json(self) {
     Pending => "pending"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -48736,7 +48736,7 @@ pub impl ToJson for RepositoryAdvisorySeverity with fn to_json(self) {
     Low => "low"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -49112,7 +49112,7 @@ pub impl ToJson for RepositoryAdvisoryIdentifiersItemType with fn to_json(self) 
     GHSA => "GHSA"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -49228,7 +49228,7 @@ pub impl ToJson for RepositoryAdvisoryState with fn to_json(self) {
     Triage => "triage"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -49999,7 +49999,7 @@ pub impl ToJson for ImmutableReleasesOrganizationSettingsEnforcedRepositories wi
     Selected => "selected"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -50116,7 +50116,7 @@ pub impl ToJson for NetworkConfigurationComputeService with fn to_json(self) {
     Codespaces => "codespaces"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -50740,7 +50740,7 @@ pub impl ToJson for TeamFullPrivacy with fn to_json(self) {
     Secret => "secret"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -50791,7 +50791,7 @@ pub impl ToJson for TeamFullNotificationSetting with fn to_json(self) {
     NotificationsDisabled => "notifications_disabled"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -50845,7 +50845,7 @@ pub impl ToJson for TeamFullType with fn to_json(self) {
     Organization => "organization"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -51053,7 +51053,7 @@ pub impl ToJson for TeamMemberRole with fn to_json(self) {
     Maintainer => "maintainer"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -51271,7 +51271,7 @@ pub impl ToJson for TeamMembershipRole with fn to_json(self) {
     Maintainer => "maintainer"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -51322,7 +51322,7 @@ pub impl ToJson for TeamMembershipState with fn to_json(self) {
     Pending => "pending"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -52747,7 +52747,7 @@ pub impl ToJson for ConcurrencyGroupGroupMembersItemStatus with fn to_json(self)
     Pending => "pending"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -52965,7 +52965,7 @@ pub impl ToJson for JobStatus with fn to_json(self) {
     Pending => "pending"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -53030,7 +53030,7 @@ pub impl ToJson for JobConclusion with fn to_json(self) {
     ActionRequired => "action_required"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -53088,7 +53088,7 @@ pub impl ToJson for JobStepsItemStatus with fn to_json(self) {
     Completed => "completed"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -53646,7 +53646,7 @@ pub impl ToJson for ActionsWorkflowAccessToRepositoryAccessLevel with fn to_json
     Organization => "organization"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -54298,7 +54298,7 @@ pub impl ToJson for EnvironmentApprovalsState with fn to_json(self) {
     Pending => "pending"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -54421,7 +54421,7 @@ pub impl ToJson for ConcurrencyGroupRunListConcurrencyGroupsItemGroupMembersItem
     Pending => "pending"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -54718,7 +54718,7 @@ pub impl ToJson for DeploymentReviewerType with fn to_json(self) {
     Team => "Team"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -54964,7 +54964,7 @@ pub extend DeploymentPayload with ToJson::{to_json}
 pub impl ToJson for DeploymentPayload with fn to_json(self) {
   match self {
     Object(value) => value
-    Text(value) => value.to_json()
+    Text(value) => Json(value)
   }
 }
 
@@ -55630,7 +55630,7 @@ pub impl ToJson for WorkflowState with fn to_json(self) {
     DisabledManually => "disabled_manually"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -56086,7 +56086,7 @@ pub impl ToJson for ActivityActivityType with fn to_json(self) {
     MergeQueueMerge => "merge_queue_merge"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -58101,7 +58101,7 @@ pub impl ToJson for DiffEntryStatus with fn to_json(self) {
     Unchanged => "unchanged"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -59783,7 +59783,7 @@ pub impl ToJson for CheckRunStatus with fn to_json(self) {
     Pending => "pending"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -59848,7 +59848,7 @@ pub impl ToJson for CheckRunConclusion with fn to_json(self) {
     ActionRequired => "action_required"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -60438,7 +60438,7 @@ pub impl ToJson for CheckSuiteStatus with fn to_json(self) {
     Pending => "pending"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -60507,7 +60507,7 @@ pub impl ToJson for CheckSuiteConclusion with fn to_json(self) {
     Stale => "stale"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -60893,7 +60893,7 @@ pub impl ToJson for CodeQualityFindingRuleSeverity with fn to_json(self) {
     None => "none"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -60951,7 +60951,7 @@ pub impl ToJson for CodeQualityFindingRuleCategory with fn to_json(self) {
     Reliability => "reliability"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -61196,7 +61196,7 @@ pub impl ToJson for CodeQualityFindingState with fn to_json(self) {
     Dismissed => "dismissed"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -61321,7 +61321,7 @@ pub impl ToJson for CodeQualitySetupState with fn to_json(self) {
     NotConfigured => "not-configured"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -61382,7 +61382,7 @@ pub impl ToJson for CodeQualitySetupLanguagesItem with fn to_json(self) {
     Rust => "rust"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -61441,7 +61441,7 @@ pub impl ToJson for CodeQualitySetupRunnerType with fn to_json(self) {
     Labeled => "labeled"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -61495,7 +61495,7 @@ pub impl ToJson for CodeQualitySetupAiFindingsOption with fn to_json(self) {
     OnPush => "on_push"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -61624,7 +61624,7 @@ pub impl ToJson for CodeQualitySetupUpdateState with fn to_json(self) {
     NotConfigured => "not-configured"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -61678,7 +61678,7 @@ pub impl ToJson for CodeQualitySetupUpdateRunnerType with fn to_json(self) {
     Labeled => "labeled"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -61740,7 +61740,7 @@ pub impl ToJson for CodeQualitySetupUpdateLanguagesItem with fn to_json(self) {
     Ruby => "ruby"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -61798,7 +61798,7 @@ pub impl ToJson for CodeQualitySetupUpdateAiFindingsOption with fn to_json(self)
     OnPush => "on_push"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -61980,7 +61980,7 @@ pub impl ToJson for CodeScanningAiScanEnablementPrScan with fn to_json(self) {
     Disabled => "disabled"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -62082,7 +62082,7 @@ pub impl ToJson for CodeScanningAiScanEnablementUpdatePrScan with fn to_json(
     Disabled => "disabled"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -62331,7 +62331,7 @@ pub impl ToJson for CodeScanningAlertRuleSeverity with fn to_json(self) {
     Error => "error"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -62398,7 +62398,7 @@ pub impl ToJson for CodeScanningAlertRuleSecuritySeverityLevel with fn to_json(
     Critical => "critical"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -62696,7 +62696,7 @@ pub impl ToJson for CodeScanningAlertSetState with fn to_json(self) {
     Dismissed => "dismissed"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -62754,7 +62754,7 @@ pub impl ToJson for CodeScanningAutofixStatus with fn to_json(self) {
     Outdated => "outdated"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -62976,7 +62976,7 @@ pub impl ToJson for CodeScanningAlertInstanceState with fn to_json(self) {
     Fixed => "fixed"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -63465,7 +63465,7 @@ pub impl ToJson for CodeScanningVariantAnalysisLanguage with fn to_json(self) {
     Swift => "swift"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -63610,7 +63610,7 @@ pub impl ToJson for CodeScanningVariantAnalysisStatus with fn to_json(self) {
     TimedOut => "timed_out"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -63735,7 +63735,7 @@ pub impl ToJson for CodeScanningVariantAnalysisFailureReason with fn to_json(
     InternalError => "internal_error"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -64227,7 +64227,7 @@ pub impl ToJson for CodeScanningDefaultSetupState with fn to_json(self) {
     NotConfigured => "not-configured"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -64299,7 +64299,7 @@ pub impl ToJson for CodeScanningDefaultSetupLanguagesItem with fn to_json(self) 
     Swift => "swift"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -64364,7 +64364,7 @@ pub impl ToJson for CodeScanningDefaultSetupRunnerType with fn to_json(self) {
     Labeled => "labeled"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -64418,7 +64418,7 @@ pub impl ToJson for CodeScanningDefaultSetupQuerySuite with fn to_json(self) {
     Extended => "extended"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -64472,7 +64472,7 @@ pub impl ToJson for CodeScanningDefaultSetupThreatModel with fn to_json(self) {
     RemoteAndLocal => "remote_and_local"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -64609,7 +64609,7 @@ pub impl ToJson for CodeScanningDefaultSetupUpdateState with fn to_json(self) {
     NotConfigured => "not-configured"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -64665,7 +64665,7 @@ pub impl ToJson for CodeScanningDefaultSetupUpdateRunnerType with fn to_json(
     Labeled => "labeled"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -64723,7 +64723,7 @@ pub impl ToJson for CodeScanningDefaultSetupUpdateQuerySuite with fn to_json(
     Extended => "extended"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -64783,7 +64783,7 @@ pub impl ToJson for CodeScanningDefaultSetupUpdateThreatModel with fn to_json(
     RemoteAndLocal => "remote_and_local"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -64860,7 +64860,7 @@ pub impl ToJson for CodeScanningDefaultSetupUpdateLanguagesItem with fn to_json(
     Swift => "swift"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -65111,7 +65111,7 @@ pub impl ToJson for CodeScanningSarifsStatusProcessingStatus with fn to_json(
     Failed => "failed"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -65251,7 +65251,7 @@ pub impl ToJson for CodeSecurityConfigurationForRepositoryStatus with fn to_json
     EnterpriseEnforced => "enterprise_enforced"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -65497,7 +65497,7 @@ pub impl ToJson for CodespaceMachinePrebuildAvailability with fn to_json(self) {
     InProgress => "in_progress"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -65979,7 +65979,7 @@ pub impl ToJson for RepositoryInvitationPermissions with fn to_json(self) {
     Maintain => "maintain"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -66543,7 +66543,7 @@ pub impl ToJson for ReactionContent with fn to_json(self) {
     Eyes => "eyes"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -67359,7 +67359,7 @@ pub impl ToJson for CommitComparisonStatus with fn to_json(self) {
     Identical => "identical"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -67842,7 +67842,7 @@ pub impl ToJson for ContentDirectoryItemType with fn to_json(self) {
     Symlink => "symlink"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -69508,7 +69508,7 @@ pub impl ToJson for DependabotAlertState with fn to_json(self) {
     Open => "open"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -69561,7 +69561,7 @@ pub impl ToJson for DependabotAlertDependencyScope with fn to_json(self) {
     Runtime => "runtime"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -69619,7 +69619,7 @@ pub impl ToJson for DependabotAlertDependencyRelationship with fn to_json(self) 
     Inconclusive => "inconclusive"
     UnknownValue(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -69750,7 +69750,7 @@ pub impl ToJson for DependabotAlertDismissedReason with fn to_json(self) {
     TolerableRisk => "tolerable_risk"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -70003,7 +70003,7 @@ pub impl ToJson for DependencyGraphDiffItemChangeType with fn to_json(self) {
     Removed => "removed"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -70130,7 +70130,7 @@ pub impl ToJson for DependencyGraphDiffItemScope with fn to_json(self) {
     Development => "development"
     UnknownValue(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -70721,9 +70721,9 @@ pub extend MetadataValue with ToJson::{to_json}
 ///|
 pub impl ToJson for MetadataValue with fn to_json(self) {
   match self {
-    Text(value) => value.to_json()
-    Number(value) => value.to_json()
-    Bool(value) => value.to_json()
+    Text(value) => Json(value)
+    Number(value) => Json(value)
+    Bool(value) => Json(value)
   }
 }
 
@@ -70778,7 +70778,7 @@ pub impl ToJson for DependencyRelationship with fn to_json(self) {
     Indirect => "indirect"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -70832,7 +70832,7 @@ pub impl ToJson for DependencyScope with fn to_json(self) {
     Development => "development"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -71243,7 +71243,7 @@ pub impl ToJson for DeploymentStatusState with fn to_json(self) {
     InProgress => "in_progress"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -71752,9 +71752,9 @@ pub extend EnvironmentProtectionRulesItem with ToJson::{to_json}
 ///|
 pub impl ToJson for EnvironmentProtectionRulesItem with fn to_json(self) {
   match self {
-    WaitTimer(value) => value.to_json()
-    RequiredReviewers(value) => value.to_json()
-    BranchPolicy(value) => value.to_json()
+    WaitTimer(value) => Json(value)
+    RequiredReviewers(value) => Json(value)
+    BranchPolicy(value) => Json(value)
     Unknown(_, value) => value
   }
 }
@@ -71899,7 +71899,7 @@ pub impl ToJson for DeploymentBranchPolicyType with fn to_json(self) {
     Tag => "tag"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -72022,7 +72022,7 @@ pub impl ToJson for DeploymentBranchPolicyNamePatternWithTypeType with fn to_jso
     Tag => "tag"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -73225,7 +73225,7 @@ pub impl ToJson for RepositoryHashAlgorithmHashAlgorithm with fn to_json(self) {
     Sha256 => "sha256"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -73573,7 +73573,7 @@ pub impl ToJson for ImportStatus with fn to_json(self) {
     DetectionNeedsAuth => "detection_needs_auth"
     UnknownValue(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -74037,7 +74037,7 @@ pub impl ToJson for NullableIssueStateReason with fn to_json(self) {
     Duplicate => "duplicate"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -74175,8 +74175,8 @@ pub extend NullableIssueLabelsItem with ToJson::{to_json}
 ///|
 pub impl ToJson for NullableIssueLabelsItem with fn to_json(self) {
   match self {
-    Text(value) => value.to_json()
-    Object(value) => value.to_json()
+    Text(value) => Json(value)
+    Object(value) => Json(value)
   }
 }
 
@@ -74840,7 +74840,7 @@ pub impl ToJson for IssueTypeWebhookColor with fn to_json(self) {
     Purple => "purple"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -75096,7 +75096,7 @@ pub impl ToJson for NullableIssueEventIntentConfidence with fn to_json(self) {
     HIGH => "HIGH"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -75410,7 +75410,7 @@ pub impl ToJson for IssueSuggestionAction with fn to_json(self) {
     CloseIssue => "close_issue"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -75472,7 +75472,7 @@ pub impl ToJson for IssueSuggestionState with fn to_json(self) {
     Invalidated => "invalidated"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -75524,10 +75524,10 @@ pub extend IssueSuggestionTargetValue with ToJson::{to_json}
 ///|
 pub impl ToJson for IssueSuggestionTargetValue with fn to_json(self) {
   match self {
-    Text(value) => value.to_json()
-    Number(value) => value.to_json()
-    Bool(value) => value.to_json()
-    TextArray(value) => value.to_json()
+    Text(value) => Json(value)
+    Number(value) => Json(value)
+    Bool(value) => Json(value)
+    TextArray(value) => Json(value)
   }
 }
 
@@ -75591,7 +75591,7 @@ pub impl ToJson for IssueSuggestionConfidence with fn to_json(self) {
     HIGH => "HIGH"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -75967,7 +75967,7 @@ pub impl ToJson for PullRequestReviewCommentStartSide with fn to_json(self) {
     RIGHT => "RIGHT"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -76021,7 +76021,7 @@ pub impl ToJson for PullRequestReviewCommentSide with fn to_json(self) {
     RIGHT => "RIGHT"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -76075,7 +76075,7 @@ pub impl ToJson for PullRequestReviewCommentSubjectType with fn to_json(self) {
     File => "file"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -76593,7 +76593,7 @@ pub impl ToJson for MergedUpstreamMergeType with fn to_json(self) {
     None => "none"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -76703,7 +76703,7 @@ pub impl ToJson for MilestoneState with fn to_json(self) {
     Closed => "closed"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -76952,7 +76952,7 @@ pub impl ToJson for PagesHttpsCertificateState with fn to_json(self) {
     DnsChanged => "dns_changed"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -77077,7 +77077,7 @@ pub impl ToJson for PageStatus with fn to_json(self) {
     Errored => "errored"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -77131,7 +77131,7 @@ pub impl ToJson for PageProtectedDomainState with fn to_json(self) {
     Unverified => "unverified"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -77186,7 +77186,7 @@ pub impl ToJson for PageBuildType with fn to_json(self) {
     Workflow => "workflow"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -77510,8 +77510,8 @@ pub extend PageDeploymentId with ToJson::{to_json}
 ///|
 pub impl ToJson for PageDeploymentId with fn to_json(self) {
   match self {
-    Int(value) => value.to_json()
-    Text(value) => value.to_json()
+    Int(value) => Json(value)
+    Text(value) => Json(value)
   }
 }
 
@@ -77639,7 +77639,7 @@ pub impl ToJson for PagesDeploymentStatusStatus with fn to_json(self) {
     Succeed => "succeed"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -78228,7 +78228,7 @@ pub impl ToJson for PullRequestState with fn to_json(self) {
     Closed => "closed"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -78927,7 +78927,7 @@ pub impl ToJson for PullRequestMergeAsyncResultStatus with fn to_json(self) {
     Failed => "failed"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -79401,7 +79401,7 @@ pub impl ToJson for ReviewCommentSide with fn to_json(self) {
     RIGHT => "RIGHT"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -79452,7 +79452,7 @@ pub impl ToJson for ReviewCommentStartSide with fn to_json(self) {
     RIGHT => "RIGHT"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -79506,7 +79506,7 @@ pub impl ToJson for ReviewCommentSubjectType with fn to_json(self) {
     File => "file"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -79816,7 +79816,7 @@ pub impl ToJson for RepositoryRuleRulesetInfoRulesetSourceType with fn to_json(
     Organization => "Organization"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -79939,7 +79939,7 @@ pub impl ToJson for RepositoryRuleDetailedCreationRulesetSourceType with fn to_j
     Organization => "Organization"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -80118,7 +80118,7 @@ pub impl ToJson for RepositoryRuleDetailedUpdateRulesetSourceType with fn to_jso
     Organization => "Organization"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -80249,7 +80249,7 @@ pub impl ToJson for RepositoryRuleDetailedDeletionRulesetSourceType with fn to_j
     Organization => "Organization"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -80376,7 +80376,7 @@ pub impl ToJson for RepositoryRuleDetailedRequiredLinearHistoryRulesetSourceType
     Organization => "Organization"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -80512,7 +80512,7 @@ pub impl ToJson for RepositoryRuleDetailedMergeQueueParametersGroupingStrategy w
     HEADGREEN => "HEADGREEN"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -80579,7 +80579,7 @@ pub impl ToJson for RepositoryRuleDetailedMergeQueueParametersMergeMethod with f
     REBASE => "REBASE"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -80743,7 +80743,7 @@ pub impl ToJson for RepositoryRuleDetailedMergeQueueRulesetSourceType with fn to
     Organization => "Organization"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -80940,7 +80940,7 @@ pub impl ToJson for RepositoryRuleDetailedRequiredDeploymentsRulesetSourceType w
     Organization => "Organization"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -81077,7 +81077,7 @@ pub impl ToJson for RepositoryRuleDetailedRequiredSignaturesRulesetSourceType wi
     Organization => "Organization"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -81210,7 +81210,7 @@ pub impl ToJson for RepositoryRuleDetailedPullRequestParametersAllowedMergeMetho
     Rebase => "rebase"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -81396,7 +81396,7 @@ pub impl ToJson for RepositoryRuleDetailedPullRequestRulesetSourceType with fn t
     Organization => "Organization"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -81607,7 +81607,7 @@ pub impl ToJson for RepositoryRuleDetailedRequiredStatusChecksRulesetSourceType 
     Organization => "Organization"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -81747,7 +81747,7 @@ pub impl ToJson for RepositoryRuleDetailedNonFastForwardRulesetSourceType with f
     Organization => "Organization"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -81878,7 +81878,7 @@ pub impl ToJson for RepositoryRuleDetailedCommitMessagePatternParametersOperator
     Regex => "regex"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -82018,7 +82018,7 @@ pub impl ToJson for RepositoryRuleDetailedCommitMessagePatternRulesetSourceType 
     Organization => "Organization"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -82162,7 +82162,7 @@ pub impl ToJson for RepositoryRuleDetailedCommitAuthorEmailPatternParametersOper
     Regex => "regex"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -82302,7 +82302,7 @@ pub impl ToJson for RepositoryRuleDetailedCommitAuthorEmailPatternRulesetSourceT
     Organization => "Organization"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -82446,7 +82446,7 @@ pub impl ToJson for RepositoryRuleDetailedCommitterEmailPatternParametersOperato
     Regex => "regex"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -82586,7 +82586,7 @@ pub impl ToJson for RepositoryRuleDetailedCommitterEmailPatternRulesetSourceType
     Organization => "Organization"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -82730,7 +82730,7 @@ pub impl ToJson for RepositoryRuleDetailedBranchNamePatternParametersOperator wi
     Regex => "regex"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -82870,7 +82870,7 @@ pub impl ToJson for RepositoryRuleDetailedBranchNamePatternRulesetSourceType wit
     Organization => "Organization"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -83009,7 +83009,7 @@ pub impl ToJson for RepositoryRuleDetailedTagNamePatternParametersOperator with 
     Regex => "regex"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -83147,7 +83147,7 @@ pub impl ToJson for RepositoryRuleDetailedTagNamePatternRulesetSourceType with f
     Organization => "Organization"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -83340,7 +83340,7 @@ pub impl ToJson for RepositoryRuleDetailedWorkflowsRulesetSourceType with fn to_
     Organization => "Organization"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -83528,7 +83528,7 @@ pub impl ToJson for RepositoryRuleDetailedCodeScanningRulesetSourceType with fn 
     Organization => "Organization"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -83726,7 +83726,7 @@ pub impl ToJson for RepositoryRuleDetailedCopilotCodeReviewRulesetSourceType wit
     Organization => "Organization"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -83861,7 +83861,7 @@ pub impl ToJson for RepositoryRuleDetailedLicenseComplianceScanningRulesetSource
     Organization => "Organization"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -84058,7 +84058,7 @@ pub impl ToJson for RepositoryRuleDetailedFilePathRestrictionRulesetSourceType w
     Organization => "Organization"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -84254,7 +84254,7 @@ pub impl ToJson for RepositoryRuleDetailedMaxFilePathLengthRulesetSourceType wit
     Organization => "Organization"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -84452,7 +84452,7 @@ pub impl ToJson for RepositoryRuleDetailedFileExtensionRestrictionRulesetSourceT
     Organization => "Organization"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -84647,7 +84647,7 @@ pub impl ToJson for RepositoryRuleDetailedMaxFileSizeRulesetSourceType with fn t
     Organization => "Organization"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -84786,29 +84786,29 @@ pub extend RepositoryRuleDetailed with ToJson::{to_json}
 ///|
 pub impl ToJson for RepositoryRuleDetailed with fn to_json(self) {
   match self {
-    Creation(value) => value.to_json()
-    Update(value) => value.to_json()
-    Deletion(value) => value.to_json()
-    RequiredLinearHistory(value) => value.to_json()
-    MergeQueue(value) => value.to_json()
-    RequiredDeployments(value) => value.to_json()
-    RequiredSignatures(value) => value.to_json()
-    PullRequest(value) => value.to_json()
-    RequiredStatusChecks(value) => value.to_json()
-    NonFastForward(value) => value.to_json()
-    CommitMessagePattern(value) => value.to_json()
-    CommitAuthorEmailPattern(value) => value.to_json()
-    CommitterEmailPattern(value) => value.to_json()
-    BranchNamePattern(value) => value.to_json()
-    TagNamePattern(value) => value.to_json()
-    Workflows(value) => value.to_json()
-    CodeScanning(value) => value.to_json()
-    CopilotCodeReview(value) => value.to_json()
-    LicenseComplianceScanning(value) => value.to_json()
-    FilePathRestriction(value) => value.to_json()
-    MaxFilePathLength(value) => value.to_json()
-    FileExtensionRestriction(value) => value.to_json()
-    MaxFileSize(value) => value.to_json()
+    Creation(value) => Json(value)
+    Update(value) => Json(value)
+    Deletion(value) => Json(value)
+    RequiredLinearHistory(value) => Json(value)
+    MergeQueue(value) => Json(value)
+    RequiredDeployments(value) => Json(value)
+    RequiredSignatures(value) => Json(value)
+    PullRequest(value) => Json(value)
+    RequiredStatusChecks(value) => Json(value)
+    NonFastForward(value) => Json(value)
+    CommitMessagePattern(value) => Json(value)
+    CommitAuthorEmailPattern(value) => Json(value)
+    CommitterEmailPattern(value) => Json(value)
+    BranchNamePattern(value) => Json(value)
+    TagNamePattern(value) => Json(value)
+    Workflows(value) => Json(value)
+    CodeScanning(value) => Json(value)
+    CopilotCodeReview(value) => Json(value)
+    LicenseComplianceScanning(value) => Json(value)
+    FilePathRestriction(value) => Json(value)
+    MaxFilePathLength(value) => Json(value)
+    FileExtensionRestriction(value) => Json(value)
+    MaxFileSize(value) => Json(value)
     Unknown(_, value) => value
   }
 }
@@ -84890,7 +84890,7 @@ pub impl ToJson for SecretScanningAlertValidity with fn to_json(self) {
     Unknown => "unknown"
     UnknownValue(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -85275,7 +85275,7 @@ pub impl ToJson for SecretScanningAlertWithMetadataValidity with fn to_json(
     Unknown => "unknown"
     UnknownValue(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -85634,7 +85634,7 @@ pub impl ToJson for SecretScanningLocationType with fn to_json(self) {
     PullRequestReviewComment => "pull_request_review_comment"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -85757,7 +85757,7 @@ pub impl ToJson for SecretScanningPushProtectionBypassReason with fn to_json(
     WillFixLater => "will_fix_later"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -86309,7 +86309,7 @@ pub impl ToJson for RepositoryAdvisoryCreateSeverity with fn to_json(self) {
     Low => "low"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -86462,9 +86462,9 @@ pub impl ToJson for RepositoryAdvisoryDescriptionValidationErrorErrorsItemValue 
   self,
 ) {
   match self {
-    Text(value) => value.to_json()
-    Int(value) => value.to_json()
-    TextArray(value) => value.to_json()
+    Text(value) => Json(value)
+    Int(value) => Json(value)
+    TextArray(value) => Json(value)
   }
 }
 
@@ -86837,7 +86837,7 @@ pub impl ToJson for PrivateVulnerabilityReportCreateSeverity with fn to_json(
     Low => "low"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -87184,7 +87184,7 @@ pub impl ToJson for RepositoryAdvisoryUpdateSeverity with fn to_json(self) {
     Low => "low"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -87242,7 +87242,7 @@ pub impl ToJson for RepositoryAdvisoryUpdateState with fn to_json(self) {
     Draft => "draft"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -87456,7 +87456,7 @@ pub impl ToJson for PullRequestStackMinimalPullRequestsItemState with fn to_json
     Closed => "closed"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -87955,7 +87955,7 @@ pub impl ToJson for PullRequestStackPullRequestState with fn to_json(self) {
     Closed => "closed"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -90012,7 +90012,7 @@ pub impl ToJson for RepoSearchResultItemPullRequestCreationPolicy with fn to_jso
     CollaboratorsOnly => "collaborators_only"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -91558,7 +91558,7 @@ pub impl ToJson for CodespacesSecretVisibility with fn to_json(self) {
     Selected => "selected"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -91844,7 +91844,7 @@ pub impl ToJson for CodespaceWithFullRepositoryState with fn to_json(self) {
     Rebuilding => "Rebuilding"
     UnknownValue(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -91985,7 +91985,7 @@ pub impl ToJson for CodespaceWithFullRepositoryLocation with fn to_json(self) {
     WestUs2 => "WestUs2"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -93321,7 +93321,7 @@ pub impl ToJson for SecurityAdvisoriesListGlobalAdvisoriesType with fn to_json(
     Unreviewed => "unreviewed"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -93391,7 +93391,7 @@ pub impl ToJson for SecurityAdvisoriesListGlobalAdvisoriesSeverity with fn to_js
     Critical => "critical"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -93452,8 +93452,8 @@ pub impl ToJson for SecurityAdvisoriesListGlobalAdvisoriesCwes with fn to_json(
   self,
 ) {
   match self {
-    Text(value) => value.to_json()
-    TextArray(value) => value.to_json()
+    Text(value) => Json(value)
+    TextArray(value) => Json(value)
   }
 }
 
@@ -93513,8 +93513,8 @@ pub impl ToJson for SecurityAdvisoriesListGlobalAdvisoriesAffects with fn to_jso
   self,
 ) {
   match self {
-    Text(value) => value.to_json()
-    TextArray(value) => value.to_json()
+    Text(value) => Json(value)
+    TextArray(value) => Json(value)
   }
 }
 
@@ -93581,7 +93581,7 @@ pub impl ToJson for SecurityAdvisoriesListGlobalAdvisoriesDirection with fn to_j
     Desc => "desc"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -93648,7 +93648,7 @@ pub impl ToJson for SecurityAdvisoriesListGlobalAdvisoriesSort with fn to_json(
     EpssPercentile => "epss_percentile"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -93706,7 +93706,7 @@ pub impl ToJson for AgentTasksListTasksForRepoSort with fn to_json(self) {
     CreatedAt => "created_at"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -93760,7 +93760,7 @@ pub impl ToJson for AgentTasksListTasksForRepoDirection with fn to_json(self) {
     Desc => "desc"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -93823,7 +93823,7 @@ pub impl ToJson for AgentTasksListTasksForRepoResponseTasksItemCreatorType with 
     Organization => "organization"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -94077,7 +94077,7 @@ pub impl ToJson for AgentTasksListTasksForRepoResponseTasksItemState with fn to_
     Cancelled => "cancelled"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -94148,7 +94148,7 @@ pub impl ToJson for AgentTasksListTasksForRepoResponseTasksItemArtifactsItemType
     Branch => "branch"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -94602,7 +94602,7 @@ pub impl ToJson for AgentTasksCreateTaskInRepoResponseCreatorType with fn to_jso
     Organization => "organization"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -94840,7 +94840,7 @@ pub impl ToJson for AgentTasksCreateTaskInRepoResponseState with fn to_json(
     Cancelled => "cancelled"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -94911,7 +94911,7 @@ pub impl ToJson for AgentTasksCreateTaskInRepoResponseArtifactsItemType with fn 
     Branch => "branch"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -95228,7 +95228,7 @@ pub impl ToJson for AgentTasksGetTaskByRepoAndIdResponseCreatorType with fn to_j
     Organization => "organization"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -95470,7 +95470,7 @@ pub impl ToJson for AgentTasksGetTaskByRepoAndIdResponseState with fn to_json(
     Cancelled => "cancelled"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -95541,7 +95541,7 @@ pub impl ToJson for AgentTasksGetTaskByRepoAndIdResponseArtifactsItemType with f
     Branch => "branch"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -95918,7 +95918,7 @@ pub impl ToJson for AgentTasksGetTaskByRepoAndIdResponseSessionsItemState with f
     Cancelled => "cancelled"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -95989,7 +95989,7 @@ pub impl ToJson for AgentTasksGetTaskByRepoAndIdResponseSessionsItemUsageType wi
     PremiumRequests => "premium_requests"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -96441,7 +96441,7 @@ pub impl ToJson for AgentTasksListTasksSort with fn to_json(self) {
     CreatedAt => "created_at"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -96495,7 +96495,7 @@ pub impl ToJson for AgentTasksListTasksDirection with fn to_json(self) {
     Desc => "desc"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -96558,7 +96558,7 @@ pub impl ToJson for AgentTasksListTasksResponseTasksItemCreatorType with fn to_j
     Organization => "organization"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -96800,7 +96800,7 @@ pub impl ToJson for AgentTasksListTasksResponseTasksItemState with fn to_json(
     Cancelled => "cancelled"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -96871,7 +96871,7 @@ pub impl ToJson for AgentTasksListTasksResponseTasksItemArtifactsItemType with f
     Branch => "branch"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -97241,7 +97241,7 @@ pub impl ToJson for AgentTasksGetTaskByIdResponseCreatorType with fn to_json(
     Organization => "organization"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -97468,7 +97468,7 @@ pub impl ToJson for AgentTasksGetTaskByIdResponseState with fn to_json(self) {
     Cancelled => "cancelled"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -97535,7 +97535,7 @@ pub impl ToJson for AgentTasksGetTaskByIdResponseArtifactsItemType with fn to_js
     Branch => "branch"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -97897,7 +97897,7 @@ pub impl ToJson for AgentTasksGetTaskByIdResponseSessionsItemState with fn to_js
     Cancelled => "cancelled"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -97968,7 +97968,7 @@ pub impl ToJson for AgentTasksGetTaskByIdResponseSessionsItemUsageType with fn t
     PremiumRequests => "premium_requests"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -98471,7 +98471,7 @@ pub impl ToJson for AppsListWebhookDeliveriesStatus with fn to_json(self) {
     Failure => "failure"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -98898,7 +98898,7 @@ pub impl ToJson for CodeSecurityCreateConfigurationForEnterpriseRequestAdvancedS
     SecretProtection => "secret_protection"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -98967,7 +98967,7 @@ pub impl ToJson for CodeSecurityCreateConfigurationForEnterpriseRequestCodeSecur
     NotSet => "not_set"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -99035,7 +99035,7 @@ pub impl ToJson for CodeSecurityCreateConfigurationForEnterpriseRequestDependenc
     NotSet => "not_set"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -99103,7 +99103,7 @@ pub impl ToJson for CodeSecurityCreateConfigurationForEnterpriseRequestDependenc
     NotSet => "not_set"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -99230,7 +99230,7 @@ pub impl ToJson for CodeSecurityCreateConfigurationForEnterpriseRequestDependabo
     NotSet => "not_set"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -99298,7 +99298,7 @@ pub impl ToJson for CodeSecurityCreateConfigurationForEnterpriseRequestDependabo
     NotSet => "not_set"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -99366,7 +99366,7 @@ pub impl ToJson for CodeSecurityCreateConfigurationForEnterpriseRequestCodeScann
     NotSet => "not_set"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -99434,7 +99434,7 @@ pub impl ToJson for CodeSecurityCreateConfigurationForEnterpriseRequestCodeScann
     NotSet => "not_set"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -99502,7 +99502,7 @@ pub impl ToJson for CodeSecurityCreateConfigurationForEnterpriseRequestSecretPro
     NotSet => "not_set"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -99570,7 +99570,7 @@ pub impl ToJson for CodeSecurityCreateConfigurationForEnterpriseRequestSecretSca
     NotSet => "not_set"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -99638,7 +99638,7 @@ pub impl ToJson for CodeSecurityCreateConfigurationForEnterpriseRequestSecretSca
     NotSet => "not_set"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -99706,7 +99706,7 @@ pub impl ToJson for CodeSecurityCreateConfigurationForEnterpriseRequestSecretSca
     NotSet => "not_set"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -99774,7 +99774,7 @@ pub impl ToJson for CodeSecurityCreateConfigurationForEnterpriseRequestSecretSca
     NotSet => "not_set"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -99842,7 +99842,7 @@ pub impl ToJson for CodeSecurityCreateConfigurationForEnterpriseRequestSecretSca
     NotSet => "not_set"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -99910,7 +99910,7 @@ pub impl ToJson for CodeSecurityCreateConfigurationForEnterpriseRequestSecretSca
     NotSet => "not_set"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -99978,7 +99978,7 @@ pub impl ToJson for CodeSecurityCreateConfigurationForEnterpriseRequestSecretSca
     NotSet => "not_set"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -100046,7 +100046,7 @@ pub impl ToJson for CodeSecurityCreateConfigurationForEnterpriseRequestPrivateVu
     NotSet => "not_set"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -100114,7 +100114,7 @@ pub impl ToJson for CodeSecurityCreateConfigurationForEnterpriseRequestEnforceme
     EnterpriseEnforced => "enterprise_enforced"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -100410,7 +100410,7 @@ pub impl ToJson for CodeSecurityUpdateEnterpriseConfigurationRequestAdvancedSecu
     SecretProtection => "secret_protection"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -100479,7 +100479,7 @@ pub impl ToJson for CodeSecurityUpdateEnterpriseConfigurationRequestCodeSecurity
     NotSet => "not_set"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -100547,7 +100547,7 @@ pub impl ToJson for CodeSecurityUpdateEnterpriseConfigurationRequestDependencyGr
     NotSet => "not_set"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -100615,7 +100615,7 @@ pub impl ToJson for CodeSecurityUpdateEnterpriseConfigurationRequestDependencyGr
     NotSet => "not_set"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -100742,7 +100742,7 @@ pub impl ToJson for CodeSecurityUpdateEnterpriseConfigurationRequestDependabotAl
     NotSet => "not_set"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -100810,7 +100810,7 @@ pub impl ToJson for CodeSecurityUpdateEnterpriseConfigurationRequestDependabotSe
     NotSet => "not_set"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -100878,7 +100878,7 @@ pub impl ToJson for CodeSecurityUpdateEnterpriseConfigurationRequestCodeScanning
     NotSet => "not_set"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -100946,7 +100946,7 @@ pub impl ToJson for CodeSecurityUpdateEnterpriseConfigurationRequestCodeScanning
     NotSet => "not_set"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -101014,7 +101014,7 @@ pub impl ToJson for CodeSecurityUpdateEnterpriseConfigurationRequestSecretProtec
     NotSet => "not_set"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -101082,7 +101082,7 @@ pub impl ToJson for CodeSecurityUpdateEnterpriseConfigurationRequestSecretScanni
     NotSet => "not_set"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -101150,7 +101150,7 @@ pub impl ToJson for CodeSecurityUpdateEnterpriseConfigurationRequestSecretScanni
     NotSet => "not_set"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -101218,7 +101218,7 @@ pub impl ToJson for CodeSecurityUpdateEnterpriseConfigurationRequestSecretScanni
     NotSet => "not_set"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -101286,7 +101286,7 @@ pub impl ToJson for CodeSecurityUpdateEnterpriseConfigurationRequestSecretScanni
     NotSet => "not_set"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -101354,7 +101354,7 @@ pub impl ToJson for CodeSecurityUpdateEnterpriseConfigurationRequestSecretScanni
     NotSet => "not_set"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -101422,7 +101422,7 @@ pub impl ToJson for CodeSecurityUpdateEnterpriseConfigurationRequestSecretScanni
     NotSet => "not_set"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -101490,7 +101490,7 @@ pub impl ToJson for CodeSecurityUpdateEnterpriseConfigurationRequestSecretScanni
     NotSet => "not_set"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -101558,7 +101558,7 @@ pub impl ToJson for CodeSecurityUpdateEnterpriseConfigurationRequestPrivateVulne
     NotSet => "not_set"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -101626,7 +101626,7 @@ pub impl ToJson for CodeSecurityUpdateEnterpriseConfigurationRequestEnforcement 
     EnterpriseEnforced => "enterprise_enforced"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -101918,7 +101918,7 @@ pub impl ToJson for CodeSecurityAttachEnterpriseConfigurationRequestScope with f
     AllWithoutConfigurations => "all_without_configurations"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -102044,7 +102044,7 @@ pub impl ToJson for CodeSecuritySetConfigurationAsDefaultForEnterpriseRequestDef
     Public => "public"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -102178,7 +102178,7 @@ pub impl ToJson for CodeSecuritySetConfigurationAsDefaultForEnterpriseResponseDe
     Public => "public"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -102316,7 +102316,7 @@ pub impl ToJson for CopilotSetEnterpriseCodingAgentPolicyRequestPolicyState with
     ConfiguredByOrgAdmins => "configured_by_org_admins"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -102692,8 +102692,8 @@ pub extend DependabotListAlertsForEnterpriseHas with ToJson::{to_json}
 ///|
 pub impl ToJson for DependabotListAlertsForEnterpriseHas with fn to_json(self) {
   match self {
-    Text(value) => value.to_json()
-    TextArray(value) => value.to_json()
+    Text(value) => Json(value)
+    TextArray(value) => Json(value)
   }
 }
 
@@ -102749,7 +102749,7 @@ pub impl ToJson for DependabotListAlertsForEnterpriseScope with fn to_json(self)
     Runtime => "runtime"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -102807,7 +102807,7 @@ pub impl ToJson for DependabotListAlertsForEnterpriseSort with fn to_json(self) 
     EpssPercentage => "epss_percentage"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -102871,7 +102871,7 @@ pub impl ToJson for DependabotListAlertsForEnterpriseDirection with fn to_json(
     Desc => "desc"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -103005,7 +103005,7 @@ pub impl ToJson for DependabotSetRepositoryAccessDefaultLevelForEnterpriseReques
     Internal => "internal"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -103164,7 +103164,7 @@ pub impl ToJson for GistsCreateRequestPublicText with fn to_json(self) {
     False => "false"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -103213,8 +103213,8 @@ pub extend GistsCreateRequestPublic with ToJson::{to_json}
 ///|
 pub impl ToJson for GistsCreateRequestPublic with fn to_json(self) {
   match self {
-    Bool(value) => value.to_json()
-    Text(value) => value.to_json()
+    Bool(value) => Json(value)
+    Text(value) => Json(value)
   }
 }
 
@@ -103609,7 +103609,7 @@ pub impl ToJson for AppsListReposAccessibleToInstallationResponseRepositoriesIte
     CollaboratorsOnly => "collaborators_only"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -103674,7 +103674,7 @@ pub impl ToJson for AppsListReposAccessibleToInstallationResponseRepositoriesIte
     COMMITORPRTITLE => "COMMIT_OR_PR_TITLE"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -103741,7 +103741,7 @@ pub impl ToJson for AppsListReposAccessibleToInstallationResponseRepositoriesIte
     BLANK => "BLANK"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -103807,7 +103807,7 @@ pub impl ToJson for AppsListReposAccessibleToInstallationResponseRepositoriesIte
     MERGEMESSAGE => "MERGE_MESSAGE"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -103874,7 +103874,7 @@ pub impl ToJson for AppsListReposAccessibleToInstallationResponseRepositoriesIte
     BLANK => "BLANK"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -104656,7 +104656,7 @@ pub impl ToJson for IssuesListFilter with fn to_json(self) {
     All => "all"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -104713,7 +104713,7 @@ pub impl ToJson for IssuesListState with fn to_json(self) {
     All => "all"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -104767,7 +104767,7 @@ pub impl ToJson for IssuesListSort with fn to_json(self) {
     Comments => "comments"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -104819,7 +104819,7 @@ pub impl ToJson for IssuesListDirection with fn to_json(self) {
     Desc => "desc"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -104870,7 +104870,7 @@ pub impl ToJson for MarkdownRenderRequestMode with fn to_json(self) {
     Gfm => "gfm"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -104979,7 +104979,7 @@ pub impl ToJson for AppsListAccountsForPlanSort with fn to_json(self) {
     Updated => "updated"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -105033,7 +105033,7 @@ pub impl ToJson for AppsListAccountsForPlanDirection with fn to_json(self) {
     Desc => "desc"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -105087,7 +105087,7 @@ pub impl ToJson for AppsListAccountsForPlanStubbedSort with fn to_json(self) {
     Updated => "updated"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -105143,7 +105143,7 @@ pub impl ToJson for AppsListAccountsForPlanStubbedDirection with fn to_json(
     Desc => "desc"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -105359,7 +105359,7 @@ pub impl ToJson for BillingGetAllBudgetsOrgScope with fn to_json(self) {
     User => "user"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -105495,7 +105495,7 @@ pub impl ToJson for BillingCreateOrganizationBudgetRequestBudgetScope with fn to
     User => "user"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -105564,7 +105564,7 @@ pub impl ToJson for BillingCreateOrganizationBudgetRequestBudgetType with fn to_
     SkuPricing => "SkuPricing"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -105775,8 +105775,8 @@ pub extend BillingUpdateBudgetOrgRequestExpiresAt with ToJson::{to_json}
 ///|
 pub impl ToJson for BillingUpdateBudgetOrgRequestExpiresAt with fn to_json(self) {
   match self {
-    Text(value) => value.to_json()
-    Int(value) => value.to_json()
+    Text(value) => Json(value)
+    Int(value) => Json(value)
   }
 }
 
@@ -105909,7 +105909,7 @@ pub impl ToJson for OrgsUpdateRequestDefaultRepositoryPermission with fn to_json
     None => "none"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -105978,7 +105978,7 @@ pub impl ToJson for OrgsUpdateRequestMembersAllowedRepositoryCreationType with f
     None => "none"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -106452,7 +106452,7 @@ pub impl ToJson for ActionsCreateHostedRunnerForOrgRequestImageSource with fn to
     Custom => "custom"
     CustomValue(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -107048,7 +107048,7 @@ pub impl ToJson for ActionsUpdateHostedRunnerForOrgRequestImageSource with fn to
     Custom => "custom"
     CustomValue(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -107472,7 +107472,7 @@ pub impl ToJson for ActionsSetSelfHostedRunnersPermissionsOrganizationRequestEna
     None => "none"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -107970,7 +107970,7 @@ pub impl ToJson for ActionsCreateSelfHostedRunnerGroupForOrgRequestVisibility wi
     Private => "private"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -108144,7 +108144,7 @@ pub impl ToJson for ActionsUpdateSelfHostedRunnerGroupForOrgRequestVisibility wi
     Private => "private"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -109004,7 +109004,7 @@ pub impl ToJson for ActionsCreateOrUpdateOrgSecretRequestVisibility with fn to_j
     Selected => "selected"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -109311,7 +109311,7 @@ pub impl ToJson for ActionsCreateOrgVariableRequestVisibility with fn to_json(
     Selected => "selected"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -109438,7 +109438,7 @@ pub impl ToJson for ActionsUpdateOrgVariableRequestVisibility with fn to_json(
     Selected => "selected"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -109746,7 +109746,7 @@ pub impl ToJson for AgentsCreateOrUpdateOrgSecretRequestVisibility with fn to_js
     Selected => "selected"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -110046,7 +110046,7 @@ pub impl ToJson for AgentsCreateOrgVariableRequestVisibility with fn to_json(
     Selected => "selected"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -110171,7 +110171,7 @@ pub impl ToJson for AgentsUpdateOrgVariableRequestVisibility with fn to_json(
     Selected => "selected"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -110425,7 +110425,7 @@ pub impl ToJson for OrgsCreateArtifactDeploymentRecordRequestStatus with fn to_j
     Decommissioned => "decommissioned"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -110494,7 +110494,7 @@ pub impl ToJson for OrgsCreateArtifactDeploymentRecordRequestRuntimeRisksItem wi
     SensitiveData => "sensitive-data"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -110741,7 +110741,7 @@ pub impl ToJson for OrgsSetClusterDeploymentRecordsRequestDeploymentsItemStatus 
     Decommissioned => "decommissioned"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -110810,7 +110810,7 @@ pub impl ToJson for OrgsSetClusterDeploymentRecordsRequestDeploymentsItemRuntime
     SensitiveData => "sensitive-data"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -111111,7 +111111,7 @@ pub impl ToJson for OrgsCreateClusterDeploymentRecordsJobRequestDeploymentsItemS
     Decommissioned => "decommissioned"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -111180,7 +111180,7 @@ pub impl ToJson for OrgsCreateClusterDeploymentRecordsJobRequestDeploymentsItemR
     SensitiveData => "sensitive-data"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -111487,7 +111487,7 @@ pub impl ToJson for OrgsGetClusterDeploymentRecordsJobResponseStatus with fn to_
     Failed => "failed"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -111629,7 +111629,7 @@ pub impl ToJson for OrgsCreateArtifactStorageRecordRequestStatus with fn to_json
     Deleted => "deleted"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -112747,7 +112747,7 @@ pub impl ToJson for CampaignsListOrgCampaignsDirection with fn to_json(self) {
     Desc => "desc"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -112805,7 +112805,7 @@ pub impl ToJson for CampaignsListOrgCampaignsSort with fn to_json(self) {
     Published => "published"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -113101,7 +113101,7 @@ pub impl ToJson for CodeScanningListAlertsForOrgDirection with fn to_json(self) 
     Desc => "desc"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -113157,7 +113157,7 @@ pub impl ToJson for CodeScanningListAlertsForOrgSort with fn to_json(self) {
     Updated => "updated"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -113218,7 +113218,7 @@ pub impl ToJson for CodeSecurityGetConfigurationsForOrgTargetType with fn to_jso
     All => "all"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -113287,7 +113287,7 @@ pub impl ToJson for CodeSecurityCreateConfigurationRequestAdvancedSecurity with 
     SecretProtection => "secret_protection"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -113356,7 +113356,7 @@ pub impl ToJson for CodeSecurityCreateConfigurationRequestCodeSecurity with fn t
     NotSet => "not_set"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -113424,7 +113424,7 @@ pub impl ToJson for CodeSecurityCreateConfigurationRequestDependencyGraph with f
     NotSet => "not_set"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -113492,7 +113492,7 @@ pub impl ToJson for CodeSecurityCreateConfigurationRequestDependencyGraphAutosub
     NotSet => "not_set"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -113619,7 +113619,7 @@ pub impl ToJson for CodeSecurityCreateConfigurationRequestDependabotAlerts with 
     NotSet => "not_set"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -113687,7 +113687,7 @@ pub impl ToJson for CodeSecurityCreateConfigurationRequestDependabotSecurityUpda
     NotSet => "not_set"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -113755,7 +113755,7 @@ pub impl ToJson for CodeSecurityCreateConfigurationRequestDependabotDelegatedAle
     NotSet => "not_set"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -113823,7 +113823,7 @@ pub impl ToJson for CodeSecurityCreateConfigurationRequestCodeScanningDefaultSet
     NotSet => "not_set"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -113891,7 +113891,7 @@ pub impl ToJson for CodeSecurityCreateConfigurationRequestCodeScanningDelegatedA
     NotSet => "not_set"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -113959,7 +113959,7 @@ pub impl ToJson for CodeSecurityCreateConfigurationRequestSecretProtection with 
     NotSet => "not_set"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -114027,7 +114027,7 @@ pub impl ToJson for CodeSecurityCreateConfigurationRequestSecretScanning with fn
     NotSet => "not_set"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -114095,7 +114095,7 @@ pub impl ToJson for CodeSecurityCreateConfigurationRequestSecretScanningPushProt
     NotSet => "not_set"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -114163,7 +114163,7 @@ pub impl ToJson for CodeSecurityCreateConfigurationRequestSecretScanningDelegate
     NotSet => "not_set"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -114229,7 +114229,7 @@ pub impl ToJson for CodeSecurityCreateConfigurationRequestSecretScanningDelegate
     ROLE => "ROLE"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -114294,7 +114294,7 @@ pub impl ToJson for CodeSecurityCreateConfigurationRequestSecretScanningDelegate
     EXEMPT => "EXEMPT"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -114491,7 +114491,7 @@ pub impl ToJson for CodeSecurityCreateConfigurationRequestSecretScanningValidity
     NotSet => "not_set"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -114559,7 +114559,7 @@ pub impl ToJson for CodeSecurityCreateConfigurationRequestSecretScanningNonProvi
     NotSet => "not_set"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -114627,7 +114627,7 @@ pub impl ToJson for CodeSecurityCreateConfigurationRequestSecretScanningGenericS
     NotSet => "not_set"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -114695,7 +114695,7 @@ pub impl ToJson for CodeSecurityCreateConfigurationRequestSecretScanningDelegate
     NotSet => "not_set"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -114763,7 +114763,7 @@ pub impl ToJson for CodeSecurityCreateConfigurationRequestSecretScanningExtended
     NotSet => "not_set"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -114831,7 +114831,7 @@ pub impl ToJson for CodeSecurityCreateConfigurationRequestPrivateVulnerabilityRe
     NotSet => "not_set"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -114897,7 +114897,7 @@ pub impl ToJson for CodeSecurityCreateConfigurationRequestEnforcement with fn to
     Unenforced => "unenforced"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -115267,7 +115267,7 @@ pub impl ToJson for CodeSecurityUpdateConfigurationRequestAdvancedSecurity with 
     SecretProtection => "secret_protection"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -115336,7 +115336,7 @@ pub impl ToJson for CodeSecurityUpdateConfigurationRequestCodeSecurity with fn t
     NotSet => "not_set"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -115404,7 +115404,7 @@ pub impl ToJson for CodeSecurityUpdateConfigurationRequestDependencyGraph with f
     NotSet => "not_set"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -115472,7 +115472,7 @@ pub impl ToJson for CodeSecurityUpdateConfigurationRequestDependencyGraphAutosub
     NotSet => "not_set"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -115599,7 +115599,7 @@ pub impl ToJson for CodeSecurityUpdateConfigurationRequestDependabotAlerts with 
     NotSet => "not_set"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -115667,7 +115667,7 @@ pub impl ToJson for CodeSecurityUpdateConfigurationRequestDependabotSecurityUpda
     NotSet => "not_set"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -115735,7 +115735,7 @@ pub impl ToJson for CodeSecurityUpdateConfigurationRequestDependabotDelegatedAle
     NotSet => "not_set"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -115803,7 +115803,7 @@ pub impl ToJson for CodeSecurityUpdateConfigurationRequestCodeScanningDefaultSet
     NotSet => "not_set"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -115871,7 +115871,7 @@ pub impl ToJson for CodeSecurityUpdateConfigurationRequestCodeScanningDelegatedA
     NotSet => "not_set"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -115939,7 +115939,7 @@ pub impl ToJson for CodeSecurityUpdateConfigurationRequestSecretProtection with 
     NotSet => "not_set"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -116007,7 +116007,7 @@ pub impl ToJson for CodeSecurityUpdateConfigurationRequestSecretScanning with fn
     NotSet => "not_set"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -116075,7 +116075,7 @@ pub impl ToJson for CodeSecurityUpdateConfigurationRequestSecretScanningPushProt
     NotSet => "not_set"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -116143,7 +116143,7 @@ pub impl ToJson for CodeSecurityUpdateConfigurationRequestSecretScanningDelegate
     NotSet => "not_set"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -116209,7 +116209,7 @@ pub impl ToJson for CodeSecurityUpdateConfigurationRequestSecretScanningDelegate
     ROLE => "ROLE"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -116274,7 +116274,7 @@ pub impl ToJson for CodeSecurityUpdateConfigurationRequestSecretScanningDelegate
     EXEMPT => "EXEMPT"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -116471,7 +116471,7 @@ pub impl ToJson for CodeSecurityUpdateConfigurationRequestSecretScanningValidity
     NotSet => "not_set"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -116539,7 +116539,7 @@ pub impl ToJson for CodeSecurityUpdateConfigurationRequestSecretScanningNonProvi
     NotSet => "not_set"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -116607,7 +116607,7 @@ pub impl ToJson for CodeSecurityUpdateConfigurationRequestSecretScanningGenericS
     NotSet => "not_set"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -116675,7 +116675,7 @@ pub impl ToJson for CodeSecurityUpdateConfigurationRequestSecretScanningDelegate
     NotSet => "not_set"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -116743,7 +116743,7 @@ pub impl ToJson for CodeSecurityUpdateConfigurationRequestSecretScanningExtended
     NotSet => "not_set"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -116811,7 +116811,7 @@ pub impl ToJson for CodeSecurityUpdateConfigurationRequestPrivateVulnerabilityRe
     NotSet => "not_set"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -116877,7 +116877,7 @@ pub impl ToJson for CodeSecurityUpdateConfigurationRequestEnforcement with fn to
     Unenforced => "unenforced"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -117193,7 +117193,7 @@ pub impl ToJson for CodeSecurityAttachConfigurationRequestScope with fn to_json(
     Selected => "selected"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -117323,7 +117323,7 @@ pub impl ToJson for CodeSecuritySetConfigurationAsDefaultRequestDefaultForNewRep
     Public => "public"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -117455,7 +117455,7 @@ pub impl ToJson for CodeSecuritySetConfigurationAsDefaultResponseDefaultForNewRe
     Public => "public"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -117643,7 +117643,7 @@ pub impl ToJson for CodespacesSetCodespacesAccessRequestVisibility with fn to_js
     AllMembersAndOutsideCollaborators => "all_members_and_outside_collaborators"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -117932,7 +117932,7 @@ pub impl ToJson for CodespacesCreateOrUpdateOrgSecretRequestVisibility with fn t
     Selected => "selected"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -118235,7 +118235,7 @@ pub impl ToJson for CopilotSpacesCreateForOrgRequestBaseRole with fn to_json(
     NoAccess => "no_access"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -118312,7 +118312,7 @@ pub impl ToJson for CopilotSpacesCreateForOrgRequestResourcesAttributesItemResou
     UploadedTextFile => "uploaded_text_file"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -118591,7 +118591,7 @@ pub impl ToJson for CopilotSpacesUpdateForOrgRequestBaseRole with fn to_json(
     NoAccess => "no_access"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -118668,7 +118668,7 @@ pub impl ToJson for CopilotSpacesUpdateForOrgRequestResourcesAttributesItemResou
     UploadedTextFile => "uploaded_text_file"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -119005,7 +119005,7 @@ pub impl ToJson for CopilotSpacesAddCollaboratorForOrgRequestActorType with fn t
     Team => "Team"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -119070,7 +119070,7 @@ pub impl ToJson for CopilotSpacesAddCollaboratorForOrgRequestRole with fn to_jso
     Admin => "admin"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -119198,7 +119198,7 @@ pub impl ToJson for CopilotSpacesUpdateCollaboratorForOrgActorType with fn to_js
     Team => "Team"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -119267,7 +119267,7 @@ pub impl ToJson for CopilotSpacesUpdateCollaboratorForOrgRequestRole with fn to_
     NoAccess => "no_access"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -119387,7 +119387,7 @@ pub impl ToJson for CopilotSpacesRemoveCollaboratorForOrgActorType with fn to_js
     Team => "Team"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -119508,7 +119508,7 @@ pub impl ToJson for CopilotSpacesCreateResourceForOrgRequestResourceType with fn
     GithubPullRequest => "github_pull_request"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -120172,7 +120172,7 @@ pub impl ToJson for CopilotGetCopilotCodingAgentPermissionsOrganizationResponseE
     None => "none"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -120307,7 +120307,7 @@ pub impl ToJson for CopilotSetCopilotCodingAgentPermissionsOrganizationRequestEn
     None => "none"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -120615,7 +120615,7 @@ pub impl ToJson for DependabotListAlertsForOrgHasTextArrayItem with fn to_json(
     Deployment => "deployment"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -120666,8 +120666,8 @@ pub extend DependabotListAlertsForOrgHas with ToJson::{to_json}
 ///|
 pub impl ToJson for DependabotListAlertsForOrgHas with fn to_json(self) {
   match self {
-    Text(value) => value.to_json()
-    TextArray(value) => value.to_json()
+    Text(value) => Json(value)
+    TextArray(value) => Json(value)
   }
 }
 
@@ -120726,7 +120726,7 @@ pub impl ToJson for DependabotListAlertsForOrgScope with fn to_json(self) {
     Runtime => "runtime"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -120782,7 +120782,7 @@ pub impl ToJson for DependabotListAlertsForOrgSort with fn to_json(self) {
     EpssPercentage => "epss_percentage"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -120837,7 +120837,7 @@ pub impl ToJson for DependabotListAlertsForOrgDirection with fn to_json(self) {
     Desc => "desc"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -120967,7 +120967,7 @@ pub impl ToJson for DependabotSetRepositoryAccessDefaultLevelRequestDefaultLevel
     Internal => "internal"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -121145,7 +121145,7 @@ pub impl ToJson for DependabotCreateOrUpdateOrgSecretRequestVisibility with fn t
     Selected => "selected"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -121206,8 +121206,8 @@ pub impl ToJson for DependabotCreateOrUpdateOrgSecretRequestSelectedRepositoryId
   self,
 ) {
   match self {
-    Int(value) => value.to_json()
-    Text(value) => value.to_json()
+    Int(value) => Json(value)
+    Text(value) => Json(value)
   }
 }
 
@@ -121781,7 +121781,7 @@ pub impl ToJson for OrgsListWebhookDeliveriesStatus with fn to_json(self) {
     Failure => "failure"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -121843,7 +121843,7 @@ pub impl ToJson for ApiInsightsGetRouteStatsByActorActorType with fn to_json(
     GithubAppUserToServer => "github_app_user_to_server"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -121904,7 +121904,7 @@ pub impl ToJson for ApiInsightsGetRouteStatsByActorDirection with fn to_json(
     Desc => "desc"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -121970,7 +121970,7 @@ pub impl ToJson for ApiInsightsGetRouteStatsByActorSortItem with fn to_json(
     TotalRequestCount => "total_request_count"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -122030,7 +122030,7 @@ pub impl ToJson for ApiInsightsGetSubjectStatsDirection with fn to_json(self) {
     Desc => "desc"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -122090,7 +122090,7 @@ pub impl ToJson for ApiInsightsGetSubjectStatsSortItem with fn to_json(self) {
     TotalRequestCount => "total_request_count"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -122160,7 +122160,7 @@ pub impl ToJson for ApiInsightsGetSummaryStatsByActorActorType with fn to_json(
     GithubAppUserToServer => "github_app_user_to_server"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -122227,7 +122227,7 @@ pub impl ToJson for ApiInsightsGetTimeStatsByActorActorType with fn to_json(
     GithubAppUserToServer => "github_app_user_to_server"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -122286,7 +122286,7 @@ pub impl ToJson for ApiInsightsGetUserStatsDirection with fn to_json(self) {
     Desc => "desc"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -122346,7 +122346,7 @@ pub impl ToJson for ApiInsightsGetUserStatsSortItem with fn to_json(self) {
     TotalRequestCount => "total_request_count"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -122672,7 +122672,7 @@ pub impl ToJson for OrgsListPendingInvitationsRole with fn to_json(self) {
     HiringManager => "hiring_manager"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -122738,7 +122738,7 @@ pub impl ToJson for OrgsListPendingInvitationsInvitationSource with fn to_json(
     Scim => "scim"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -122799,7 +122799,7 @@ pub impl ToJson for OrgsCreateInvitationRequestRole with fn to_json(self) {
     Reinstate => "reinstate"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -122925,7 +122925,7 @@ pub impl ToJson for IssuesListForOrgFilter with fn to_json(self) {
     All => "all"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -122985,7 +122985,7 @@ pub impl ToJson for IssuesListForOrgState with fn to_json(self) {
     All => "all"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -123039,7 +123039,7 @@ pub impl ToJson for IssuesListForOrgSort with fn to_json(self) {
     Comments => "comments"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -123091,7 +123091,7 @@ pub impl ToJson for IssuesListForOrgDirection with fn to_json(self) {
     Desc => "desc"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -123147,7 +123147,7 @@ pub impl ToJson for OrgsListMembersFilter with fn to_json(self) {
     All => "all"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -123201,7 +123201,7 @@ pub impl ToJson for OrgsListMembersRole with fn to_json(self) {
     Member => "member"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -123316,7 +123316,7 @@ pub impl ToJson for OrgsSetMembershipForUserRequestRole with fn to_json(self) {
     Member => "member"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -123566,7 +123566,7 @@ pub impl ToJson for OrgsListOutsideCollaboratorsFilter with fn to_json(self) {
     All => "all"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -123738,7 +123738,7 @@ pub impl ToJson for PackagesListPackagesForOrganizationPackageType with fn to_js
     Container => "container"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -123807,7 +123807,7 @@ pub impl ToJson for PackagesListPackagesForOrganizationVisibility with fn to_jso
     Internal => "internal"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -123879,7 +123879,7 @@ pub impl ToJson for PackagesGetPackageForOrganizationPackageType with fn to_json
     Container => "container"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -123947,7 +123947,7 @@ pub impl ToJson for PackagesDeletePackageForOrgPackageType with fn to_json(self)
     Container => "container"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -124017,7 +124017,7 @@ pub impl ToJson for PackagesRestorePackageForOrgPackageType with fn to_json(
     Container => "container"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -124094,7 +124094,7 @@ pub impl ToJson for PackagesGetAllPackageVersionsForPackageOwnedByOrgPackageType
     Container => "container"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -124163,7 +124163,7 @@ pub impl ToJson for PackagesGetAllPackageVersionsForPackageOwnedByOrgState with 
     Deleted => "deleted"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -124236,7 +124236,7 @@ pub impl ToJson for PackagesGetPackageVersionForOrganizationPackageType with fn 
     Container => "container"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -124311,7 +124311,7 @@ pub impl ToJson for PackagesDeletePackageVersionForOrgPackageType with fn to_jso
     Container => "container"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -124386,7 +124386,7 @@ pub impl ToJson for PackagesRestorePackageVersionForOrgPackageType with fn to_js
     Container => "container"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -124446,7 +124446,7 @@ pub impl ToJson for OrgsListPatGrantRequestsDirection with fn to_json(self) {
     Desc => "desc"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -124507,7 +124507,7 @@ pub impl ToJson for OrgsReviewPatGrantRequestsInBulkRequestAction with fn to_jso
     Deny => "deny"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -124625,7 +124625,7 @@ pub impl ToJson for OrgsReviewPatGrantRequestRequestAction with fn to_json(self)
     Deny => "deny"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -124735,7 +124735,7 @@ pub impl ToJson for OrgsListPatGrantsDirection with fn to_json(self) {
     Desc => "desc"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -124973,7 +124973,7 @@ pub impl ToJson for PrivateRegistriesCreateOrgPrivateRegistryRequestRegistryType
     TerraformRegistry => "terraform_registry"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -125053,7 +125053,7 @@ pub impl ToJson for PrivateRegistriesCreateOrgPrivateRegistryRequestVisibility w
     Selected => "selected"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -125129,7 +125129,7 @@ pub impl ToJson for PrivateRegistriesCreateOrgPrivateRegistryRequestAuthType wit
     OidcGcp => "oidc_gcp"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -125469,7 +125469,7 @@ pub impl ToJson for PrivateRegistriesUpdateOrgPrivateRegistryRequestRegistryType
     TerraformRegistry => "terraform_registry"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -125549,7 +125549,7 @@ pub impl ToJson for PrivateRegistriesUpdateOrgPrivateRegistryRequestVisibility w
     Selected => "selected"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -125625,7 +125625,7 @@ pub impl ToJson for PrivateRegistriesUpdateOrgPrivateRegistryRequestAuthType wit
     OidcGcp => "oidc_gcp"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -125921,8 +125921,8 @@ pub extend ProjectsListItemsForOrgFields with ToJson::{to_json}
 ///|
 pub impl ToJson for ProjectsListItemsForOrgFields with fn to_json(self) {
   match self {
-    Text(value) => value.to_json()
-    TextArray(value) => value.to_json()
+    Text(value) => Json(value)
+    TextArray(value) => Json(value)
   }
 }
 
@@ -125978,7 +125978,7 @@ pub impl ToJson for ProjectsAddItemForOrgRequestType with fn to_json(self) {
     PullRequest => "PullRequest"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -126093,8 +126093,8 @@ pub extend ProjectsGetOrgItemFields with ToJson::{to_json}
 ///|
 pub impl ToJson for ProjectsGetOrgItemFields with fn to_json(self) {
   match self {
-    Text(value) => value.to_json()
-    TextArray(value) => value.to_json()
+    Text(value) => Json(value)
+    TextArray(value) => Json(value)
   }
 }
 
@@ -126150,8 +126150,8 @@ pub impl ToJson for ProjectsUpdateItemForOrgRequestFieldsItemValue with fn to_js
   self,
 ) {
   match self {
-    Text(value) => value.to_json()
-    Number(value) => value.to_json()
+    Text(value) => Json(value)
+    Number(value) => Json(value)
   }
 }
 
@@ -126317,7 +126317,7 @@ pub impl ToJson for ProjectsCreateViewForOrgRequestLayout with fn to_json(self) 
     Roadmap => "roadmap"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -126376,8 +126376,8 @@ pub impl ToJson for ProjectsCreateViewForOrgRequestSortByItemItem with fn to_jso
   self,
 ) {
   match self {
-    Int(value) => value.to_json()
-    Text(value) => value.to_json()
+    Int(value) => Json(value)
+    Text(value) => Json(value)
   }
 }
 
@@ -126512,8 +126512,8 @@ pub extend ProjectsListViewItemsForOrgFields with ToJson::{to_json}
 ///|
 pub impl ToJson for ProjectsListViewItemsForOrgFields with fn to_json(self) {
   match self {
-    Text(value) => value.to_json()
-    TextArray(value) => value.to_json()
+    Text(value) => Json(value)
+    TextArray(value) => Json(value)
   }
 }
 
@@ -126699,7 +126699,7 @@ pub impl ToJson for ReposListForOrgType with fn to_json(self) {
     Member => "member"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -126758,7 +126758,7 @@ pub impl ToJson for ReposListForOrgSort with fn to_json(self) {
     FullName => "full_name"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -126811,7 +126811,7 @@ pub impl ToJson for ReposListForOrgDirection with fn to_json(self) {
     Desc => "desc"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -126865,7 +126865,7 @@ pub impl ToJson for ReposCreateInOrgRequestVisibility with fn to_json(self) {
     Private => "private"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -126926,7 +126926,7 @@ pub impl ToJson for ReposCreateInOrgRequestSquashMergeCommitTitle with fn to_jso
     COMMITORPRTITLE => "COMMIT_OR_PR_TITLE"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -126993,7 +126993,7 @@ pub impl ToJson for ReposCreateInOrgRequestSquashMergeCommitMessage with fn to_j
     BLANK => "BLANK"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -127052,7 +127052,7 @@ pub impl ToJson for ReposCreateInOrgRequestMergeCommitTitle with fn to_json(
     MERGEMESSAGE => "MERGE_MESSAGE"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -127114,7 +127114,7 @@ pub impl ToJson for ReposCreateInOrgRequestMergeCommitMessage with fn to_json(
     BLANK => "BLANK"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -127355,7 +127355,7 @@ pub impl ToJson for ReposCreateOrgRulesetRequestTarget with fn to_json(self) {
     Repository => "repository"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -127485,7 +127485,7 @@ pub impl ToJson for ReposGetOrgRuleSuitesTimePeriod with fn to_json(self) {
     Month => "month"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -127545,7 +127545,7 @@ pub impl ToJson for ReposGetOrgRuleSuitesRuleSuiteResult with fn to_json(self) {
     All => "all"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -127603,7 +127603,7 @@ pub impl ToJson for ReposGetOrgRuleSuitesEvaluateStatus with fn to_json(self) {
     Evaluate => "evaluate"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -127662,7 +127662,7 @@ pub impl ToJson for ReposUpdateOrgRulesetRequestTarget with fn to_json(self) {
     Repository => "repository"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -127788,7 +127788,7 @@ pub impl ToJson for SecretScanningListAlertsForOrgState with fn to_json(self) {
     Resolved => "resolved"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -127842,7 +127842,7 @@ pub impl ToJson for SecretScanningListAlertsForOrgSort with fn to_json(self) {
     Updated => "updated"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -127898,7 +127898,7 @@ pub impl ToJson for SecretScanningListAlertsForOrgDirection with fn to_json(
     Desc => "desc"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -127956,7 +127956,7 @@ pub impl ToJson for SecretScanningListOrgCustomPatternsState with fn to_json(
     Unpublished => "unpublished"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -128021,7 +128021,7 @@ pub impl ToJson for SecretScanningListOrgCustomPatternsPushProtection with fn to
     Disabled => "disabled"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -128081,7 +128081,7 @@ pub impl ToJson for SecretScanningListOrgCustomPatternsSort with fn to_json(
     Name => "name"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -128145,7 +128145,7 @@ pub impl ToJson for SecretScanningListOrgCustomPatternsDirection with fn to_json
     Desc => "desc"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -128326,7 +128326,7 @@ pub impl ToJson for SecretScanningBulkDeleteOrgCustomPatternsRequestPostDeleteAc
     ResolveAlerts => "resolve_alerts"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -128458,7 +128458,7 @@ pub impl ToJson for SecretScanningUpdateOrgPatternConfigsRequestProviderPatternS
     Enabled => "enabled"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -128591,7 +128591,7 @@ pub impl ToJson for SecretScanningUpdateOrgPatternConfigsRequestCustomPatternSet
     Enabled => "enabled"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -128883,7 +128883,7 @@ pub impl ToJson for SecurityAdvisoriesListOrgRepositoryAdvisoriesDirection with 
     Desc => "desc"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -128950,7 +128950,7 @@ pub impl ToJson for SecurityAdvisoriesListOrgRepositoryAdvisoriesSort with fn to
     Published => "published"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -129020,7 +129020,7 @@ pub impl ToJson for SecurityAdvisoriesListOrgRepositoryAdvisoriesState with fn t
     Closed => "closed"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -129089,7 +129089,7 @@ pub impl ToJson for OrgsSetImmutableReleasesSettingsRequestEnforcedRepositories 
     Selected => "selected"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -129408,7 +129408,7 @@ pub impl ToJson for HostedComputeCreateNetworkConfigurationForOrgRequestComputeS
     Actions => "actions"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -129560,7 +129560,7 @@ pub impl ToJson for HostedComputeUpdateNetworkConfigurationForOrgRequestComputeS
     Actions => "actions"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -129705,7 +129705,7 @@ pub impl ToJson for TeamsListTeamType with fn to_json(self) {
     Organization => "organization"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -129757,7 +129757,7 @@ pub impl ToJson for TeamsCreateRequestPrivacy with fn to_json(self) {
     Closed => "closed"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -129811,7 +129811,7 @@ pub impl ToJson for TeamsCreateRequestNotificationSetting with fn to_json(self) 
     NotificationsDisabled => "notifications_disabled"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -129867,7 +129867,7 @@ pub impl ToJson for TeamsCreateRequestPermission with fn to_json(self) {
     Push => "push"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -130010,7 +130010,7 @@ pub impl ToJson for TeamsUpdateInOrgRequestPrivacy with fn to_json(self) {
     Closed => "closed"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -130071,7 +130071,7 @@ pub impl ToJson for TeamsUpdateInOrgRequestNotificationSetting with fn to_json(
     NotificationsDisabled => "notifications_disabled"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -130129,7 +130129,7 @@ pub impl ToJson for TeamsUpdateInOrgRequestPermission with fn to_json(self) {
     Admin => "admin"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -130268,7 +130268,7 @@ pub impl ToJson for TeamsListMembersInOrgRole with fn to_json(self) {
     All => "all"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -130332,7 +130332,7 @@ pub impl ToJson for TeamsAddOrUpdateMembershipForUserInOrgRequestRole with fn to
     Maintainer => "maintainer"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -130517,7 +130517,7 @@ pub impl ToJson for OrgsEnableOrDisableSecurityProductOnAllOrgReposSecurityProdu
     SecretScanningPushProtection => "secret_scanning_push_protection"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -130587,7 +130587,7 @@ pub impl ToJson for OrgsEnableOrDisableSecurityProductOnAllOrgReposEnablement wi
     DisableAll => "disable_all"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -130652,7 +130652,7 @@ pub impl ToJson for OrgsEnableOrDisableSecurityProductOnAllOrgReposRequestQueryS
     Extended => "extended"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -130765,7 +130765,7 @@ pub impl ToJson for ReposUpdateRequestVisibility with fn to_json(self) {
     Private => "private"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -131284,7 +131284,7 @@ pub impl ToJson for ReposUpdateRequestSecurityAndAnalysisSecretScanningDelegated
     ROLE => "ROLE"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -131349,7 +131349,7 @@ pub impl ToJson for ReposUpdateRequestSecurityAndAnalysisSecretScanningDelegated
     EXEMPT => "EXEMPT"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -131660,7 +131660,7 @@ pub impl ToJson for ReposUpdateRequestPullRequestCreationPolicy with fn to_json(
     CollaboratorsOnly => "collaborators_only"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -131718,7 +131718,7 @@ pub impl ToJson for ReposUpdateRequestSquashMergeCommitTitle with fn to_json(
     COMMITORPRTITLE => "COMMIT_OR_PR_TITLE"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -131783,7 +131783,7 @@ pub impl ToJson for ReposUpdateRequestSquashMergeCommitMessage with fn to_json(
     BLANK => "BLANK"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -131840,7 +131840,7 @@ pub impl ToJson for ReposUpdateRequestMergeCommitTitle with fn to_json(self) {
     MERGEMESSAGE => "MERGE_MESSAGE"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -131896,7 +131896,7 @@ pub impl ToJson for ReposUpdateRequestMergeCommitMessage with fn to_json(self) {
     BLANK => "BLANK"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -132202,7 +132202,7 @@ pub impl ToJson for ActionsGetActionsCacheListSort with fn to_json(self) {
     SizeInBytes => "size_in_bytes"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -132257,7 +132257,7 @@ pub impl ToJson for ActionsGetActionsCacheListDirection with fn to_json(self) {
     Desc => "desc"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -133164,7 +133164,7 @@ pub impl ToJson for ActionsListWorkflowRunsForRepoStatus with fn to_json(self) {
     Pending => "pending"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -133288,7 +133288,7 @@ pub impl ToJson for ActionsListWorkflowRunArtifactsDirection with fn to_json(
     Desc => "desc"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -133465,7 +133465,7 @@ pub impl ToJson for ActionsListJobsForWorkflowRunFilter with fn to_json(self) {
     All => "all"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -133584,7 +133584,7 @@ pub impl ToJson for ActionsReviewPendingDeploymentsForRunRequestState with fn to
     Rejected => "rejected"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -134130,8 +134130,8 @@ pub extend ActionsGetWorkflowWorkflowId with ToJson::{to_json}
 ///|
 pub impl ToJson for ActionsGetWorkflowWorkflowId with fn to_json(self) {
   match self {
-    Int(value) => value.to_json()
-    Text(value) => value.to_json()
+    Int(value) => Json(value)
+    Text(value) => Json(value)
   }
 }
 
@@ -134180,8 +134180,8 @@ pub extend ActionsDisableWorkflowWorkflowId with ToJson::{to_json}
 ///|
 pub impl ToJson for ActionsDisableWorkflowWorkflowId with fn to_json(self) {
   match self {
-    Int(value) => value.to_json()
-    Text(value) => value.to_json()
+    Int(value) => Json(value)
+    Text(value) => Json(value)
   }
 }
 
@@ -134234,8 +134234,8 @@ pub impl ToJson for ActionsCreateWorkflowDispatchWorkflowId with fn to_json(
   self,
 ) {
   match self {
-    Int(value) => value.to_json()
-    Text(value) => value.to_json()
+    Int(value) => Json(value)
+    Text(value) => Json(value)
   }
 }
 
@@ -134346,8 +134346,8 @@ pub extend ActionsEnableWorkflowWorkflowId with ToJson::{to_json}
 ///|
 pub impl ToJson for ActionsEnableWorkflowWorkflowId with fn to_json(self) {
   match self {
-    Int(value) => value.to_json()
-    Text(value) => value.to_json()
+    Int(value) => Json(value)
+    Text(value) => Json(value)
   }
 }
 
@@ -134398,8 +134398,8 @@ pub extend ActionsListWorkflowRunsWorkflowId with ToJson::{to_json}
 ///|
 pub impl ToJson for ActionsListWorkflowRunsWorkflowId with fn to_json(self) {
   match self {
-    Int(value) => value.to_json()
-    Text(value) => value.to_json()
+    Int(value) => Json(value)
+    Text(value) => Json(value)
   }
 }
 
@@ -134479,7 +134479,7 @@ pub impl ToJson for ActionsListWorkflowRunsStatus with fn to_json(self) {
     Pending => "pending"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -134594,8 +134594,8 @@ pub extend ActionsGetWorkflowUsageWorkflowId with ToJson::{to_json}
 ///|
 pub impl ToJson for ActionsGetWorkflowUsageWorkflowId with fn to_json(self) {
   match self {
-    Int(value) => value.to_json()
-    Text(value) => value.to_json()
+    Int(value) => Json(value)
+    Text(value) => Json(value)
   }
 }
 
@@ -134651,7 +134651,7 @@ pub impl ToJson for ReposListActivitiesDirection with fn to_json(self) {
     Desc => "desc"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -134711,7 +134711,7 @@ pub impl ToJson for ReposListActivitiesTimePeriod with fn to_json(self) {
     Year => "year"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -134776,7 +134776,7 @@ pub impl ToJson for ReposListActivitiesActivityType with fn to_json(self) {
     MergeQueueMerge => "merge_queue_merge"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -136599,8 +136599,8 @@ pub extend ReposAddStatusCheckContextsRequest with ToJson::{to_json}
 ///|
 pub impl ToJson for ReposAddStatusCheckContextsRequest with fn to_json(self) {
   match self {
-    Object(value) => value.to_json()
-    TextArray(value) => value.to_json()
+    Object(value) => Json(value)
+    TextArray(value) => Json(value)
   }
 }
 
@@ -136704,8 +136704,8 @@ pub extend ReposSetStatusCheckContextsRequest with ToJson::{to_json}
 ///|
 pub impl ToJson for ReposSetStatusCheckContextsRequest with fn to_json(self) {
   match self {
-    Object(value) => value.to_json()
-    TextArray(value) => value.to_json()
+    Object(value) => Json(value)
+    TextArray(value) => Json(value)
   }
 }
 
@@ -136814,8 +136814,8 @@ pub extend ReposRemoveStatusCheckContextsRequest with ToJson::{to_json}
 ///|
 pub impl ToJson for ReposRemoveStatusCheckContextsRequest with fn to_json(self) {
   match self {
-    Object(value) => value.to_json()
-    TextArray(value) => value.to_json()
+    Object(value) => Json(value)
+    TextArray(value) => Json(value)
   }
 }
 
@@ -137068,8 +137068,8 @@ pub extend ReposAddTeamAccessRestrictionsRequest with ToJson::{to_json}
 ///|
 pub impl ToJson for ReposAddTeamAccessRestrictionsRequest with fn to_json(self) {
   match self {
-    Object(value) => value.to_json()
-    TextArray(value) => value.to_json()
+    Object(value) => Json(value)
+    TextArray(value) => Json(value)
   }
 }
 
@@ -137180,8 +137180,8 @@ pub extend ReposSetTeamAccessRestrictionsRequest with ToJson::{to_json}
 ///|
 pub impl ToJson for ReposSetTeamAccessRestrictionsRequest with fn to_json(self) {
   match self {
-    Object(value) => value.to_json()
-    TextArray(value) => value.to_json()
+    Object(value) => Json(value)
+    TextArray(value) => Json(value)
   }
 }
 
@@ -137294,8 +137294,8 @@ pub impl ToJson for ReposRemoveTeamAccessRestrictionsRequest with fn to_json(
   self,
 ) {
   match self {
-    Object(value) => value.to_json()
-    TextArray(value) => value.to_json()
+    Object(value) => Json(value)
+    TextArray(value) => Json(value)
   }
 }
 
@@ -137556,7 +137556,7 @@ pub impl ToJson for ChecksCreateRequestStatus with fn to_json(self) {
     Pending => "pending"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -137626,7 +137626,7 @@ pub impl ToJson for ChecksCreateRequestConclusion with fn to_json(self) {
     TimedOut => "timed_out"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -137697,7 +137697,7 @@ pub impl ToJson for ChecksCreateRequestOutputAnnotationsItemAnnotationLevel with
     Failure => "failure"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -138134,7 +138134,7 @@ pub impl ToJson for ChecksUpdateRequestStatus with fn to_json(self) {
     Pending => "pending"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -138204,7 +138204,7 @@ pub impl ToJson for ChecksUpdateRequestConclusion with fn to_json(self) {
     TimedOut => "timed_out"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -138275,7 +138275,7 @@ pub impl ToJson for ChecksUpdateRequestOutputAnnotationsItemAnnotationLevel with
     Failure => "failure"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -138864,7 +138864,7 @@ pub impl ToJson for ChecksListForSuiteStatus with fn to_json(self) {
     Completed => "completed"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -138919,7 +138919,7 @@ pub impl ToJson for ChecksListForSuiteFilter with fn to_json(self) {
     All => "all"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -139029,7 +139029,7 @@ pub impl ToJson for CodeQualityListFindingsForRepoDirection with fn to_json(
     Desc => "desc"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -139085,7 +139085,7 @@ pub impl ToJson for CodeQualityListFindingsForRepoState with fn to_json(self) {
     Dismissed => "dismissed"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -139139,7 +139139,7 @@ pub impl ToJson for CodeScanningListAlertsForRepoDirection with fn to_json(self)
     Desc => "desc"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -139195,7 +139195,7 @@ pub impl ToJson for CodeScanningListAlertsForRepoSort with fn to_json(self) {
     Updated => "updated"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -139323,7 +139323,7 @@ pub impl ToJson for CodeScanningListRecentAnalysesDirection with fn to_json(
     Desc => "desc"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -139601,7 +139601,7 @@ pub impl ToJson for CodespacesCreateWithRepoForAuthenticatedUserRequestGeo with 
     UsWest => "UsWest"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -140228,7 +140228,7 @@ pub impl ToJson for ReposListCollaboratorsAffiliation with fn to_json(self) {
     All => "all"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -140291,7 +140291,7 @@ pub impl ToJson for ReposListCollaboratorsPermission with fn to_json(self) {
     Admin => "admin"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -140453,7 +140453,7 @@ pub impl ToJson for ReactionsListForCommitCommentContent with fn to_json(self) {
     Eyes => "eyes"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -140532,7 +140532,7 @@ pub impl ToJson for ReactionsCreateForCommitCommentRequestContent with fn to_jso
     Eyes => "eyes"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -140706,7 +140706,7 @@ pub impl ToJson for ChecksListForRefStatus with fn to_json(self) {
     Completed => "completed"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -140761,7 +140761,7 @@ pub impl ToJson for ChecksListForRefFilter with fn to_json(self) {
     All => "all"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -140920,9 +140920,9 @@ pub extend ReposGetContentResponseObject with ToJson::{to_json}
 ///|
 pub impl ToJson for ReposGetContentResponseObject with fn to_json(self) {
   match self {
-    File(value) => value.to_json()
-    Symlink(value) => value.to_json()
-    Submodule(value) => value.to_json()
+    File(value) => Json(value)
+    Symlink(value) => Json(value)
+    Submodule(value) => Json(value)
     Unknown(_, value) => value
   }
 }
@@ -140969,8 +140969,8 @@ pub extend ReposGetContentResponse with ToJson::{to_json}
 ///|
 pub impl ToJson for ReposGetContentResponse with fn to_json(self) {
   match self {
-    ContentDirectory(value) => value.to_json()
-    Object(value) => value.to_json()
+    ContentDirectory(value) => Json(value)
+    Object(value) => Json(value)
   }
 }
 
@@ -141600,8 +141600,8 @@ pub extend DependabotListAlertsForRepoHas with ToJson::{to_json}
 ///|
 pub impl ToJson for DependabotListAlertsForRepoHas with fn to_json(self) {
   match self {
-    Text(value) => value.to_json()
-    TextArray(value) => value.to_json()
+    Text(value) => Json(value)
+    TextArray(value) => Json(value)
   }
 }
 
@@ -141657,7 +141657,7 @@ pub impl ToJson for DependabotListAlertsForRepoScope with fn to_json(self) {
     Runtime => "runtime"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -141713,7 +141713,7 @@ pub impl ToJson for DependabotListAlertsForRepoSort with fn to_json(self) {
     EpssPercentage => "epss_percentage"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -141768,7 +141768,7 @@ pub impl ToJson for DependabotListAlertsForRepoDirection with fn to_json(self) {
     Desc => "desc"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -141822,7 +141822,7 @@ pub impl ToJson for DependabotUpdateAlertRequestState with fn to_json(self) {
     Open => "open"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -141889,7 +141889,7 @@ pub impl ToJson for DependabotUpdateAlertRequestDismissedReason with fn to_json(
     TolerableRisk => "tolerable_risk"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -142316,7 +142316,7 @@ pub extend ReposCreateDeploymentRequestPayload with ToJson::{to_json}
 pub impl ToJson for ReposCreateDeploymentRequestPayload with fn to_json(self) {
   match self {
     Object(value) => value
-    Text(value) => value.to_json()
+    Text(value) => Json(value)
   }
 }
 
@@ -142480,7 +142480,7 @@ pub impl ToJson for ReposCreateDeploymentStatusRequestState with fn to_json(
     Success => "success"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -143422,7 +143422,7 @@ pub impl ToJson for ReposListForksSort with fn to_json(self) {
     Watchers => "watchers"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -143874,7 +143874,7 @@ pub impl ToJson for GitCreateTagRequestType with fn to_json(self) {
     Blob => "blob"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -144056,7 +144056,7 @@ pub impl ToJson for GitCreateTreeRequestTreeItemMode with fn to_json(self) {
     Value120000 => "120000"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -144115,7 +144115,7 @@ pub impl ToJson for GitCreateTreeRequestTreeItemType with fn to_json(self) {
     Commit => "commit"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -144541,7 +144541,7 @@ pub impl ToJson for ReposListWebhookDeliveriesStatus with fn to_json(self) {
     Failure => "failure"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -144599,7 +144599,7 @@ pub impl ToJson for MigrationsStartImportRequestVcs with fn to_json(self) {
     Tfvc => "tfvc"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -144725,7 +144725,7 @@ pub impl ToJson for MigrationsUpdateImportRequestVcs with fn to_json(self) {
     Mercurial => "mercurial"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -144899,7 +144899,7 @@ pub impl ToJson for MigrationsSetLfsPreferenceRequestUseLfs with fn to_json(
     OptOut => "opt_out"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -145218,7 +145218,7 @@ pub impl ToJson for ReposUpdateInvitationRequestPermissions with fn to_json(
     Admin => "admin"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -145325,7 +145325,7 @@ pub impl ToJson for IssuesListForRepoState with fn to_json(self) {
     All => "all"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -145382,7 +145382,7 @@ pub impl ToJson for IssuesListForRepoSort with fn to_json(self) {
     Comments => "comments"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -145434,7 +145434,7 @@ pub impl ToJson for IssuesListForRepoDirection with fn to_json(self) {
     Desc => "desc"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -145483,8 +145483,8 @@ pub extend IssuesCreateRequestTitle with ToJson::{to_json}
 ///|
 pub impl ToJson for IssuesCreateRequestTitle with fn to_json(self) {
   match self {
-    Text(value) => value.to_json()
-    Int(value) => value.to_json()
+    Text(value) => Json(value)
+    Int(value) => Json(value)
   }
 }
 
@@ -145533,8 +145533,8 @@ pub extend IssuesCreateRequestMilestone with ToJson::{to_json}
 ///|
 pub impl ToJson for IssuesCreateRequestMilestone with fn to_json(self) {
   match self {
-    Text(value) => value.to_json()
-    Int(value) => value.to_json()
+    Text(value) => Json(value)
+    Int(value) => Json(value)
   }
 }
 
@@ -145650,8 +145650,8 @@ pub extend IssuesCreateRequestLabelsItem with ToJson::{to_json}
 ///|
 pub impl ToJson for IssuesCreateRequestLabelsItem with fn to_json(self) {
   match self {
-    Text(value) => value.to_json()
-    Object(value) => value.to_json()
+    Text(value) => Json(value)
+    Object(value) => Json(value)
   }
 }
 
@@ -145713,9 +145713,9 @@ pub impl ToJson for IssuesCreateRequestIssueFieldValuesItemValue with fn to_json
   self,
 ) {
   match self {
-    Text(value) => value.to_json()
-    Number(value) => value.to_json()
-    TextArray(value) => value.to_json()
+    Text(value) => Json(value)
+    Number(value) => Json(value)
+    TextArray(value) => Json(value)
   }
 }
 
@@ -145924,7 +145924,7 @@ pub impl ToJson for IssuesListCommentsForRepoSort with fn to_json(self) {
     Updated => "updated"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -145978,7 +145978,7 @@ pub impl ToJson for IssuesListCommentsForRepoDirection with fn to_json(self) {
     Desc => "desc"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -146090,7 +146090,7 @@ pub impl ToJson for ReactionsListForIssueCommentContent with fn to_json(self) {
     Eyes => "eyes"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -146169,7 +146169,7 @@ pub impl ToJson for ReactionsCreateForIssueCommentRequestContent with fn to_json
     Eyes => "eyes"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -146274,8 +146274,8 @@ pub extend IssuesUpdateRequestTitle with ToJson::{to_json}
 ///|
 pub impl ToJson for IssuesUpdateRequestTitle with fn to_json(self) {
   match self {
-    Text(value) => value.to_json()
-    Int(value) => value.to_json()
+    Text(value) => Json(value)
+    Int(value) => Json(value)
   }
 }
 
@@ -146329,7 +146329,7 @@ pub impl ToJson for IssuesUpdateRequestState with fn to_json(self) {
     Closed => "closed"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -146387,7 +146387,7 @@ pub impl ToJson for IssuesUpdateRequestStateReason with fn to_json(self) {
     Reopened => "reopened"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -146438,8 +146438,8 @@ pub extend IssuesUpdateRequestMilestone with ToJson::{to_json}
 ///|
 pub impl ToJson for IssuesUpdateRequestMilestone with fn to_json(self) {
   match self {
-    Text(value) => value.to_json()
-    Int(value) => value.to_json()
+    Text(value) => Json(value)
+    Int(value) => Json(value)
   }
 }
 
@@ -146502,7 +146502,7 @@ pub impl ToJson for IssuesUpdateRequestLabelsItemObjectConfidence with fn to_jso
     High => "high"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -146636,8 +146636,8 @@ pub extend IssuesUpdateRequestLabelsItem with ToJson::{to_json}
 ///|
 pub impl ToJson for IssuesUpdateRequestLabelsItem with fn to_json(self) {
   match self {
-    Text(value) => value.to_json()
-    Object(value) => value.to_json()
+    Text(value) => Json(value)
+    Object(value) => Json(value)
   }
 }
 
@@ -146707,7 +146707,7 @@ pub impl ToJson for IssuesUpdateRequestAssigneesItemObjectConfidence with fn to_
     High => "high"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -146823,8 +146823,8 @@ pub extend IssuesUpdateRequestAssigneesItem with ToJson::{to_json}
 ///|
 pub impl ToJson for IssuesUpdateRequestAssigneesItem with fn to_json(self) {
   match self {
-    Text(value) => value.to_json()
-    Object(value) => value.to_json()
+    Text(value) => Json(value)
+    Object(value) => Json(value)
   }
 }
 
@@ -146886,9 +146886,9 @@ pub impl ToJson for IssuesUpdateRequestIssueFieldValuesItemValue with fn to_json
   self,
 ) {
   match self {
-    Text(value) => value.to_json()
-    Number(value) => value.to_json()
-    TextArray(value) => value.to_json()
+    Text(value) => Json(value)
+    Number(value) => Json(value)
+    TextArray(value) => Json(value)
   }
 }
 
@@ -146961,7 +146961,7 @@ pub impl ToJson for IssuesUpdateRequestIssueFieldValuesItemConfidence with fn to
     High => "high"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -147092,7 +147092,7 @@ pub impl ToJson for IssuesUpdateRequestTypeObjectConfidence with fn to_json(
     High => "high"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -147211,8 +147211,8 @@ pub extend IssuesUpdateRequestType with ToJson::{to_json}
 ///|
 pub impl ToJson for IssuesUpdateRequestType with fn to_json(self) {
   match self {
-    Text(value) => value.to_json()
-    Object(value) => value.to_json()
+    Text(value) => Json(value)
+    Object(value) => Json(value)
   }
 }
 
@@ -147369,7 +147369,7 @@ pub impl ToJson for IssuesUpdateResponseStateReason with fn to_json(self) {
     Duplicate => "duplicate"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -147678,8 +147678,8 @@ pub extend IssuesUpdateResponseLabelsItem with ToJson::{to_json}
 ///|
 pub impl ToJson for IssuesUpdateResponseLabelsItem with fn to_json(self) {
   match self {
-    Text(value) => value.to_json()
-    Object(value) => value.to_json()
+    Text(value) => Json(value)
+    Object(value) => Json(value)
   }
 }
 
@@ -147821,7 +147821,7 @@ pub impl ToJson for IssuesUpdateResponseSuggestionsTypeItemConfidence with fn to
     High => "high"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -147887,7 +147887,7 @@ pub impl ToJson for IssuesUpdateResponseSuggestionsTypeItemIgnoredReason with fn
     IssueAlreadyClosed => "issue_already_closed"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -148022,9 +148022,9 @@ pub impl ToJson for IssuesUpdateResponseSuggestionsIssueFieldValuesItemValue wit
   self,
 ) {
   match self {
-    Text(value) => value.to_json()
-    Number(value) => value.to_json()
-    TextArray(value) => value.to_json()
+    Text(value) => Json(value)
+    Number(value) => Json(value)
+    TextArray(value) => Json(value)
   }
 }
 
@@ -148097,7 +148097,7 @@ pub impl ToJson for IssuesUpdateResponseSuggestionsIssueFieldValuesItemConfidenc
     High => "high"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -148163,7 +148163,7 @@ pub impl ToJson for IssuesUpdateResponseSuggestionsIssueFieldValuesItemIgnoredRe
     IssueAlreadyClosed => "issue_already_closed"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -148315,7 +148315,7 @@ pub impl ToJson for IssuesUpdateResponseSuggestionsLabelsItemConfidence with fn 
     High => "high"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -148381,7 +148381,7 @@ pub impl ToJson for IssuesUpdateResponseSuggestionsLabelsItemIgnoredReason with 
     IssueAlreadyClosed => "issue_already_closed"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -148524,7 +148524,7 @@ pub impl ToJson for IssuesUpdateResponseSuggestionsAssigneesItemConfidence with 
     High => "high"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -148590,7 +148590,7 @@ pub impl ToJson for IssuesUpdateResponseSuggestionsAssigneesItemIgnoredReason wi
     IssueAlreadyClosed => "issue_already_closed"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -148736,7 +148736,7 @@ pub impl ToJson for IssuesUpdateResponseSuggestionsStateItemConfidence with fn t
     High => "high"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -148802,7 +148802,7 @@ pub impl ToJson for IssuesUpdateResponseSuggestionsStateItemIgnoredReason with f
     IssueAlreadyClosed => "issue_already_closed"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -149285,7 +149285,7 @@ pub impl ToJson for IssuesAddAssigneesRequestAssigneesItemObjectConfidence with 
     High => "high"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -149408,8 +149408,8 @@ pub extend IssuesAddAssigneesRequestAssigneesItem with ToJson::{to_json}
 ///|
 pub impl ToJson for IssuesAddAssigneesRequestAssigneesItem with fn to_json(self) {
   match self {
-    Text(value) => value.to_json()
-    Object(value) => value.to_json()
+    Text(value) => Json(value)
+    Object(value) => Json(value)
   }
 }
 
@@ -149659,9 +149659,9 @@ pub impl ToJson for IssuesAddIssueFieldValuesRequestIssueFieldValuesItemValue wi
   self,
 ) {
   match self {
-    Text(value) => value.to_json()
-    Number(value) => value.to_json()
-    TextArray(value) => value.to_json()
+    Text(value) => Json(value)
+    Number(value) => Json(value)
+    TextArray(value) => Json(value)
   }
 }
 
@@ -149844,8 +149844,8 @@ pub impl ToJson for IssuesSetIssueFieldValuesRequestIssueFieldValuesItemValue wi
   self,
 ) {
   match self {
-    Text(value) => value.to_json()
-    Number(value) => value.to_json()
+    Text(value) => Json(value)
+    Number(value) => Json(value)
   }
 }
 
@@ -150031,7 +150031,7 @@ pub impl ToJson for IssuesAddLabelsRequestObjectLabelsItemObjectConfidence with 
     High => "high"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -150154,8 +150154,8 @@ pub extend IssuesAddLabelsRequestObjectLabelsItem with ToJson::{to_json}
 ///|
 pub impl ToJson for IssuesAddLabelsRequestObjectLabelsItem with fn to_json(self) {
   match self {
-    Text(value) => value.to_json()
-    Object(value) => value.to_json()
+    Text(value) => Json(value)
+    Object(value) => Json(value)
   }
 }
 
@@ -150273,7 +150273,7 @@ pub impl ToJson for IssuesAddLabelsRequestObjectArrayItemConfidence with fn to_j
     High => "high"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -150390,9 +150390,9 @@ pub extend IssuesAddLabelsRequest with ToJson::{to_json}
 ///|
 pub impl ToJson for IssuesAddLabelsRequest with fn to_json(self) {
   match self {
-    Object(value) => value.to_json()
-    TextArray(value) => value.to_json()
-    ObjectArray(value) => value.to_json()
+    Object(value) => Json(value)
+    TextArray(value) => Json(value)
+    ObjectArray(value) => Json(value)
   }
 }
 
@@ -150457,7 +150457,7 @@ pub impl ToJson for IssuesLockRequestLockReason with fn to_json(self) {
     Spam => "spam"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -150568,7 +150568,7 @@ pub impl ToJson for ReactionsListForIssueContent with fn to_json(self) {
     Eyes => "eyes"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -150640,7 +150640,7 @@ pub impl ToJson for ReactionsCreateForIssueRequestContent with fn to_json(self) 
     Eyes => "eyes"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -150962,7 +150962,7 @@ pub impl ToJson for IssuesListSuggestionsState with fn to_json(self) {
     All => "all"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -151027,7 +151027,7 @@ pub impl ToJson for IssuesListSuggestionsAction with fn to_json(self) {
     CloseIssue => "close_issue"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -151365,7 +151365,7 @@ pub impl ToJson for IssuesListMilestonesState with fn to_json(self) {
     All => "all"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -151420,7 +151420,7 @@ pub impl ToJson for IssuesListMilestonesSort with fn to_json(self) {
     Completeness => "completeness"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -151474,7 +151474,7 @@ pub impl ToJson for IssuesListMilestonesDirection with fn to_json(self) {
     Desc => "desc"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -151528,7 +151528,7 @@ pub impl ToJson for IssuesCreateMilestoneRequestState with fn to_json(self) {
     Closed => "closed"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -151644,7 +151644,7 @@ pub impl ToJson for IssuesUpdateMilestoneRequestState with fn to_json(self) {
     Closed => "closed"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -151878,7 +151878,7 @@ pub impl ToJson for ReposCreatePagesSiteRequestBuildType with fn to_json(self) {
     Workflow => "workflow"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -151932,7 +151932,7 @@ pub impl ToJson for ReposCreatePagesSiteRequestSourcePath with fn to_json(self) 
     Docs => "/docs"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -152105,7 +152105,7 @@ pub impl ToJson for ReposUpdateInformationAboutPagesSiteRequestBuildType with fn
     Workflow => "workflow"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -152172,7 +152172,7 @@ pub impl ToJson for ReposUpdateInformationAboutPagesSiteRequestSourceText with f
     MasterDocs => "master /docs"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -152238,7 +152238,7 @@ pub impl ToJson for ReposUpdateInformationAboutPagesSiteRequestSourceObjectPath 
     Docs => "/docs"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -152363,8 +152363,8 @@ pub impl ToJson for ReposUpdateInformationAboutPagesSiteRequestSource with fn to
   self,
 ) {
   match self {
-    Text(value) => value.to_json()
-    Object(value) => value.to_json()
+    Text(value) => Json(value)
+    Object(value) => Json(value)
   }
 }
 
@@ -152567,8 +152567,8 @@ pub impl ToJson for ReposGetPagesDeploymentPagesDeploymentId with fn to_json(
   self,
 ) {
   match self {
-    Int(value) => value.to_json()
-    Text(value) => value.to_json()
+    Int(value) => Json(value)
+    Text(value) => Json(value)
   }
 }
 
@@ -152628,8 +152628,8 @@ pub impl ToJson for ReposCancelPagesDeploymentPagesDeploymentId with fn to_json(
   self,
 ) {
   match self {
-    Int(value) => value.to_json()
-    Text(value) => value.to_json()
+    Int(value) => Json(value)
+    Text(value) => Json(value)
   }
 }
 
@@ -152803,7 +152803,7 @@ pub impl ToJson for PullsListState with fn to_json(self) {
     All => "all"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -152859,7 +152859,7 @@ pub impl ToJson for PullsListSort with fn to_json(self) {
     LongRunning => "long-running"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -152912,7 +152912,7 @@ pub impl ToJson for PullsListDirection with fn to_json(self) {
     Desc => "desc"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -153042,7 +153042,7 @@ pub impl ToJson for PullsListReviewCommentsForRepoSort with fn to_json(self) {
     CreatedAt => "created_at"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -153099,7 +153099,7 @@ pub impl ToJson for PullsListReviewCommentsForRepoDirection with fn to_json(
     Desc => "desc"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -153222,7 +153222,7 @@ pub impl ToJson for ReactionsListForPullRequestReviewCommentContent with fn to_j
     Eyes => "eyes"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -153305,7 +153305,7 @@ pub impl ToJson for ReactionsCreateForPullRequestReviewCommentRequestContent wit
     Eyes => "eyes"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -153424,7 +153424,7 @@ pub impl ToJson for PullsUpdateRequestState with fn to_json(self) {
     Closed => "closed"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -153556,7 +153556,7 @@ pub impl ToJson for CodespacesCreateWithPrForAuthenticatedUserRequestGeo with fn
     UsWest => "UsWest"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -153726,7 +153726,7 @@ pub impl ToJson for PullsListReviewCommentsSort with fn to_json(self) {
     Updated => "updated"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -153780,7 +153780,7 @@ pub impl ToJson for PullsListReviewCommentsDirection with fn to_json(self) {
     Desc => "desc"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -153834,7 +153834,7 @@ pub impl ToJson for PullsCreateReviewCommentRequestSide with fn to_json(self) {
     RIGHT => "RIGHT"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -153892,7 +153892,7 @@ pub impl ToJson for PullsCreateReviewCommentRequestStartSide with fn to_json(
     Side => "side"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -153956,7 +153956,7 @@ pub impl ToJson for PullsCreateReviewCommentRequestSubjectType with fn to_json(
     File => "file"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -154161,7 +154161,7 @@ pub impl ToJson for PullsMergeRequestMergeMethod with fn to_json(self) {
     Rebase => "rebase"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -154277,7 +154277,7 @@ pub impl ToJson for PullsMergeAsyncRequestMergeMethod with fn to_json(self) {
     Rebase => "rebase"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -154334,7 +154334,7 @@ pub impl ToJson for PullsMergeAsyncRequestMergeAction with fn to_json(self) {
     MergeQueue => "merge_queue"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -154565,7 +154565,7 @@ pub impl ToJson for PullsCreateReviewRequestEvent with fn to_json(self) {
     COMMENT => "COMMENT"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -154853,7 +154853,7 @@ pub impl ToJson for PullsSubmitReviewRequestEvent with fn to_json(self) {
     COMMENT => "COMMENT"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -155066,7 +155066,7 @@ pub impl ToJson for ReposCreateReleaseRequestMakeLatest with fn to_json(self) {
     Legacy => "legacy"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -155341,7 +155341,7 @@ pub impl ToJson for ReposUpdateReleaseRequestMakeLatest with fn to_json(self) {
     Legacy => "legacy"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -155493,7 +155493,7 @@ pub impl ToJson for ReactionsListForReleaseContent with fn to_json(self) {
     Eyes => "eyes"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -155561,7 +155561,7 @@ pub impl ToJson for ReactionsCreateForReleaseRequestContent with fn to_json(
     Eyes => "eyes"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -155669,7 +155669,7 @@ pub impl ToJson for ReposCreateRepoRulesetRequestTarget with fn to_json(self) {
     Push => "push"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -155798,7 +155798,7 @@ pub impl ToJson for ReposGetRepoRuleSuitesTimePeriod with fn to_json(self) {
     Month => "month"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -155858,7 +155858,7 @@ pub impl ToJson for ReposGetRepoRuleSuitesRuleSuiteResult with fn to_json(self) 
     All => "all"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -155918,7 +155918,7 @@ pub impl ToJson for ReposGetRepoRuleSuitesEvaluateStatus with fn to_json(self) {
     Evaluate => "evaluate"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -155975,7 +155975,7 @@ pub impl ToJson for ReposUpdateRepoRulesetRequestTarget with fn to_json(self) {
     Push => "push"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -156100,7 +156100,7 @@ pub impl ToJson for SecretScanningListAlertsForRepoState with fn to_json(self) {
     Resolved => "resolved"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -156154,7 +156154,7 @@ pub impl ToJson for SecretScanningListAlertsForRepoSort with fn to_json(self) {
     Updated => "updated"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -156210,7 +156210,7 @@ pub impl ToJson for SecretScanningListAlertsForRepoDirection with fn to_json(
     Desc => "desc"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -156268,7 +156268,7 @@ pub impl ToJson for SecretScanningUpdateAlertRequestValidity with fn to_json(
     Inactive => "inactive"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -156400,7 +156400,7 @@ pub impl ToJson for SecretScanningListRepoCustomPatternsState with fn to_json(
     Unpublished => "unpublished"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -156465,7 +156465,7 @@ pub impl ToJson for SecretScanningListRepoCustomPatternsPushProtection with fn t
     Disabled => "disabled"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -156525,7 +156525,7 @@ pub impl ToJson for SecretScanningListRepoCustomPatternsSort with fn to_json(
     Name => "name"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -156589,7 +156589,7 @@ pub impl ToJson for SecretScanningListRepoCustomPatternsDirection with fn to_jso
     Desc => "desc"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -156770,7 +156770,7 @@ pub impl ToJson for SecretScanningBulkDeleteRepoCustomPatternsRequestPostDeleteA
     ResolveAlerts => "resolve_alerts"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -156965,7 +156965,7 @@ pub impl ToJson for SecurityAdvisoriesListRepositoryAdvisoriesDirection with fn 
     Desc => "desc"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -157030,7 +157030,7 @@ pub impl ToJson for SecurityAdvisoriesListRepositoryAdvisoriesSort with fn to_js
     Published => "published"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -157100,7 +157100,7 @@ pub impl ToJson for SecurityAdvisoriesListRepositoryAdvisoriesState with fn to_j
     Closed => "closed"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -157800,7 +157800,7 @@ pub impl ToJson for ReposCreateCommitStatusRequestState with fn to_json(self) {
     Success => "success"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -158023,7 +158023,7 @@ pub impl ToJson for ReposGetClonesPer with fn to_json(self) {
     Week => "week"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -158074,7 +158074,7 @@ pub impl ToJson for ReposGetViewsPer with fn to_json(self) {
     Week => "week"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -158246,7 +158246,7 @@ pub impl ToJson for SearchCodeOrder with fn to_json(self) {
     Asc => "asc"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -158352,7 +158352,7 @@ pub impl ToJson for SearchCommitsSort with fn to_json(self) {
     CommitterDate => "committer-date"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -158403,7 +158403,7 @@ pub impl ToJson for SearchCommitsOrder with fn to_json(self) {
     Asc => "asc"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -158527,7 +158527,7 @@ pub impl ToJson for SearchIssuesAndPullRequestsSort with fn to_json(self) {
     Updated => "updated"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -158590,7 +158590,7 @@ pub impl ToJson for SearchIssuesAndPullRequestsOrder with fn to_json(self) {
     Asc => "asc"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -158644,7 +158644,7 @@ pub impl ToJson for SearchIssuesAndPullRequestsSearchType with fn to_json(self) 
     Hybrid => "hybrid"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -158709,7 +158709,7 @@ pub impl ToJson for SearchIssuesAndPullRequestsResponseSearchType with fn to_jso
     Hybrid => "hybrid"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -158787,7 +158787,7 @@ pub impl ToJson for SearchIssuesAndPullRequestsResponseLexicalFallbackReasonItem
     ServiceUnavailable => "service_unavailable"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -158928,7 +158928,7 @@ pub impl ToJson for SearchLabelsSort with fn to_json(self) {
     Updated => "updated"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -158979,7 +158979,7 @@ pub impl ToJson for SearchLabelsOrder with fn to_json(self) {
     Asc => "asc"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -159089,7 +159089,7 @@ pub impl ToJson for SearchReposSort with fn to_json(self) {
     Updated => "updated"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -159142,7 +159142,7 @@ pub impl ToJson for SearchReposOrder with fn to_json(self) {
     Asc => "asc"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -159305,7 +159305,7 @@ pub impl ToJson for SearchUsersSort with fn to_json(self) {
     Joined => "joined"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -159357,7 +159357,7 @@ pub impl ToJson for SearchUsersOrder with fn to_json(self) {
     Asc => "asc"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -159463,7 +159463,7 @@ pub impl ToJson for TeamsUpdateLegacyRequestPrivacy with fn to_json(self) {
     Closed => "closed"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -159524,7 +159524,7 @@ pub impl ToJson for TeamsUpdateLegacyRequestNotificationSetting with fn to_json(
     NotificationsDisabled => "notifications_disabled"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -159582,7 +159582,7 @@ pub impl ToJson for TeamsUpdateLegacyRequestPermission with fn to_json(self) {
     Admin => "admin"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -159721,7 +159721,7 @@ pub impl ToJson for TeamsListMembersLegacyRole with fn to_json(self) {
     All => "all"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -159785,7 +159785,7 @@ pub impl ToJson for TeamsAddOrUpdateMembershipForUserLegacyRequestRole with fn t
     Maintainer => "maintainer"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -159907,7 +159907,7 @@ pub impl ToJson for TeamsAddOrUpdateRepoPermissionsLegacyRequestPermission with 
     Admin => "admin"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -160015,8 +160015,8 @@ pub extend UsersGetAuthenticatedResponse with ToJson::{to_json}
 ///|
 pub impl ToJson for UsersGetAuthenticatedResponse with fn to_json(self) {
   match self {
-    Public(value) => value.to_json()
-    Private(value) => value.to_json()
+    Public(value) => Json(value)
+    Private(value) => Json(value)
     Unknown(_, value) => value
   }
 }
@@ -160286,8 +160286,8 @@ pub impl ToJson for CodespacesCreateOrUpdateSecretForAuthenticatedUserRequestSel
   self,
 ) {
   match self {
-    Int(value) => value.to_json()
-    Text(value) => value.to_json()
+    Int(value) => Json(value)
+    Text(value) => Json(value)
   }
 }
 
@@ -160752,7 +160752,7 @@ pub impl ToJson for UsersSetPrimaryEmailVisibilityForAuthenticatedUserRequestVis
     Private => "private"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -160918,9 +160918,9 @@ pub impl ToJson for UsersAddEmailForAuthenticatedUserRequest with fn to_json(
   self,
 ) {
   match self {
-    Object(value) => value.to_json()
-    TextArray(value) => value.to_json()
-    Text(value) => value.to_json()
+    Object(value) => Json(value)
+    TextArray(value) => Json(value)
+    Text(value) => Json(value)
   }
 }
 
@@ -161045,9 +161045,9 @@ pub impl ToJson for UsersDeleteEmailForAuthenticatedUserRequest with fn to_json(
   self,
 ) {
   match self {
-    Object(value) => value.to_json()
-    TextArray(value) => value.to_json()
-    Text(value) => value.to_json()
+    Object(value) => Json(value)
+    TextArray(value) => Json(value)
+    Text(value) => Json(value)
   }
 }
 
@@ -161326,7 +161326,7 @@ pub impl ToJson for AppsListInstallationReposForAuthenticatedUserResponseReposit
     CollaboratorsOnly => "collaborators_only"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -161391,7 +161391,7 @@ pub impl ToJson for AppsListInstallationReposForAuthenticatedUserResponseReposit
     COMMITORPRTITLE => "COMMIT_OR_PR_TITLE"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -161458,7 +161458,7 @@ pub impl ToJson for AppsListInstallationReposForAuthenticatedUserResponseReposit
     BLANK => "BLANK"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -161524,7 +161524,7 @@ pub impl ToJson for AppsListInstallationReposForAuthenticatedUserResponseReposit
     MERGEMESSAGE => "MERGE_MESSAGE"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -161591,7 +161591,7 @@ pub impl ToJson for AppsListInstallationReposForAuthenticatedUserResponseReposit
     BLANK => "BLANK"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -162375,7 +162375,7 @@ pub impl ToJson for IssuesListForAuthenticatedUserFilter with fn to_json(self) {
     All => "all"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -162435,7 +162435,7 @@ pub impl ToJson for IssuesListForAuthenticatedUserState with fn to_json(self) {
     All => "all"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -162492,7 +162492,7 @@ pub impl ToJson for IssuesListForAuthenticatedUserSort with fn to_json(self) {
     Comments => "comments"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -162549,7 +162549,7 @@ pub impl ToJson for IssuesListForAuthenticatedUserDirection with fn to_json(
     Desc => "desc"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -162677,7 +162677,7 @@ pub impl ToJson for OrgsListMembershipsForAuthenticatedUserState with fn to_json
     Pending => "pending"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -162902,7 +162902,7 @@ pub impl ToJson for PackagesListPackagesForAuthenticatedUserPackageType with fn 
     Container => "container"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -162973,7 +162973,7 @@ pub impl ToJson for PackagesListPackagesForAuthenticatedUserVisibility with fn t
     Internal => "internal"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -163047,7 +163047,7 @@ pub impl ToJson for PackagesGetPackageForAuthenticatedUserPackageType with fn to
     Container => "container"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -163124,7 +163124,7 @@ pub impl ToJson for PackagesDeletePackageForAuthenticatedUserPackageType with fn
     Container => "container"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -163201,7 +163201,7 @@ pub impl ToJson for PackagesRestorePackageForAuthenticatedUserPackageType with f
     Container => "container"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -163278,7 +163278,7 @@ pub impl ToJson for PackagesGetAllPackageVersionsForPackageOwnedByAuthenticatedU
     Container => "container"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -163347,7 +163347,7 @@ pub impl ToJson for PackagesGetAllPackageVersionsForPackageOwnedByAuthenticatedU
     Deleted => "deleted"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -163420,7 +163420,7 @@ pub impl ToJson for PackagesGetPackageVersionForAuthenticatedUserPackageType wit
     Container => "container"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -163497,7 +163497,7 @@ pub impl ToJson for PackagesDeletePackageVersionForAuthenticatedUserPackageType 
     Container => "container"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -163574,7 +163574,7 @@ pub impl ToJson for PackagesRestorePackageVersionForAuthenticatedUserPackageType
     Container => "container"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -163638,7 +163638,7 @@ pub impl ToJson for ReposListForAuthenticatedUserVisibility with fn to_json(
     Private => "private"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -163701,7 +163701,7 @@ pub impl ToJson for ReposListForAuthenticatedUserType with fn to_json(self) {
     Member => "member"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -163762,7 +163762,7 @@ pub impl ToJson for ReposListForAuthenticatedUserSort with fn to_json(self) {
     FullName => "full_name"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -163818,7 +163818,7 @@ pub impl ToJson for ReposListForAuthenticatedUserDirection with fn to_json(self)
     Desc => "desc"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -163883,7 +163883,7 @@ pub impl ToJson for ReposCreateForAuthenticatedUserRequestSquashMergeCommitTitle
     COMMITORPRTITLE => "COMMIT_OR_PR_TITLE"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -163950,7 +163950,7 @@ pub impl ToJson for ReposCreateForAuthenticatedUserRequestSquashMergeCommitMessa
     BLANK => "BLANK"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -164016,7 +164016,7 @@ pub impl ToJson for ReposCreateForAuthenticatedUserRequestMergeCommitTitle with 
     MERGEMESSAGE => "MERGE_MESSAGE"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -164083,7 +164083,7 @@ pub impl ToJson for ReposCreateForAuthenticatedUserRequestMergeCommitMessage wit
     BLANK => "BLANK"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -164498,7 +164498,7 @@ pub impl ToJson for ActivityListReposStarredByAuthenticatedUserSort with fn to_j
     Updated => "updated"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -164563,7 +164563,7 @@ pub impl ToJson for ActivityListReposStarredByAuthenticatedUserDirection with fn
     Desc => "desc"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -164615,8 +164615,8 @@ pub extend UsersGetByIdResponse with ToJson::{to_json}
 ///|
 pub impl ToJson for UsersGetByIdResponse with fn to_json(self) {
   match self {
-    Public(value) => value.to_json()
-    Private(value) => value.to_json()
+    Public(value) => Json(value)
+    Private(value) => Json(value)
     Unknown(_, value) => value
   }
 }
@@ -164731,7 +164731,7 @@ pub impl ToJson for ProjectsCreateViewForUserRequestLayout with fn to_json(self)
     Roadmap => "roadmap"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -164790,8 +164790,8 @@ pub impl ToJson for ProjectsCreateViewForUserRequestSortByItemItem with fn to_js
   self,
 ) {
   match self {
-    Int(value) => value.to_json()
-    Text(value) => value.to_json()
+    Int(value) => Json(value)
+    Text(value) => Json(value)
   }
 }
 
@@ -164927,8 +164927,8 @@ pub extend UsersGetByUsernameResponse with ToJson::{to_json}
 ///|
 pub impl ToJson for UsersGetByUsernameResponse with fn to_json(self) {
   match self {
-    Public(value) => value.to_json()
-    Private(value) => value.to_json()
+    Public(value) => Json(value)
+    Private(value) => Json(value)
     Unknown(_, value) => value
   }
 }
@@ -165540,7 +165540,7 @@ pub impl ToJson for CopilotSpacesCreateForUserRequestBaseRole with fn to_json(
     NoAccess => "no_access"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -165615,7 +165615,7 @@ pub impl ToJson for CopilotSpacesCreateForUserRequestResourcesAttributesItemReso
     UploadedTextFile => "uploaded_text_file"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -165892,7 +165892,7 @@ pub impl ToJson for CopilotSpacesUpdateForUserRequestBaseRole with fn to_json(
     NoAccess => "no_access"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -165967,7 +165967,7 @@ pub impl ToJson for CopilotSpacesUpdateForUserRequestResourcesAttributesItemReso
     UploadedTextFile => "uploaded_text_file"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -166304,7 +166304,7 @@ pub impl ToJson for CopilotSpacesAddCollaboratorForUserRequestActorType with fn 
     Team => "Team"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -166369,7 +166369,7 @@ pub impl ToJson for CopilotSpacesAddCollaboratorForUserRequestRole with fn to_js
     Admin => "admin"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -166502,7 +166502,7 @@ pub impl ToJson for CopilotSpacesUpdateCollaboratorForUserActorType with fn to_j
     Team => "Team"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -166571,7 +166571,7 @@ pub impl ToJson for CopilotSpacesUpdateCollaboratorForUserRequestRole with fn to
     NoAccess => "no_access"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -166693,7 +166693,7 @@ pub impl ToJson for CopilotSpacesRemoveCollaboratorForUserActorType with fn to_j
     Team => "Team"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -166816,7 +166816,7 @@ pub impl ToJson for CopilotSpacesCreateResourceForUserRequestResourceType with f
     GithubPullRequest => "github_pull_request"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -166991,7 +166991,7 @@ pub impl ToJson for UsersGetContextForUserSubjectType with fn to_json(self) {
     PullRequest => "pull_request"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -167055,7 +167055,7 @@ pub impl ToJson for PackagesListPackagesForUserPackageType with fn to_json(self)
     Container => "container"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -167117,7 +167117,7 @@ pub impl ToJson for PackagesListPackagesForUserVisibility with fn to_json(self) 
     Internal => "internal"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -167182,7 +167182,7 @@ pub impl ToJson for PackagesGetPackageForUserPackageType with fn to_json(self) {
     Container => "container"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -167250,7 +167250,7 @@ pub impl ToJson for PackagesDeletePackageForUserPackageType with fn to_json(
     Container => "container"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -167320,7 +167320,7 @@ pub impl ToJson for PackagesRestorePackageForUserPackageType with fn to_json(
     Container => "container"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -167397,7 +167397,7 @@ pub impl ToJson for PackagesGetAllPackageVersionsForPackageOwnedByUserPackageTyp
     Container => "container"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -167472,7 +167472,7 @@ pub impl ToJson for PackagesGetPackageVersionForUserPackageType with fn to_json(
     Container => "container"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -167547,7 +167547,7 @@ pub impl ToJson for PackagesDeletePackageVersionForUserPackageType with fn to_js
     Container => "container"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -167624,7 +167624,7 @@ pub impl ToJson for PackagesRestorePackageVersionForUserPackageType with fn to_j
     Container => "container"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -167693,7 +167693,7 @@ pub impl ToJson for ProjectsAddFieldForUserRequestValue0DataType with fn to_json
     Date => "date"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -167919,9 +167919,9 @@ pub extend ProjectsAddFieldForUserRequest with ToJson::{to_json}
 ///|
 pub impl ToJson for ProjectsAddFieldForUserRequest with fn to_json(self) {
   match self {
-    Value0(value) => value.to_json()
-    Value1(value) => value.to_json()
-    Value2(value) => value.to_json()
+    Value0(value) => Json(value)
+    Value1(value) => Json(value)
+    Value2(value) => Json(value)
     Unknown(_, value) => value
   }
 }
@@ -167970,8 +167970,8 @@ pub extend ProjectsListItemsForUserFields with ToJson::{to_json}
 ///|
 pub impl ToJson for ProjectsListItemsForUserFields with fn to_json(self) {
   match self {
-    Text(value) => value.to_json()
-    TextArray(value) => value.to_json()
+    Text(value) => Json(value)
+    TextArray(value) => Json(value)
   }
 }
 
@@ -168027,7 +168027,7 @@ pub impl ToJson for ProjectsAddItemForUserRequestType with fn to_json(self) {
     PullRequest => "PullRequest"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -168142,8 +168142,8 @@ pub extend ProjectsGetUserItemFields with ToJson::{to_json}
 ///|
 pub impl ToJson for ProjectsGetUserItemFields with fn to_json(self) {
   match self {
-    Text(value) => value.to_json()
-    TextArray(value) => value.to_json()
+    Text(value) => Json(value)
+    TextArray(value) => Json(value)
   }
 }
 
@@ -168201,8 +168201,8 @@ pub impl ToJson for ProjectsUpdateItemForUserRequestFieldsItemValue with fn to_j
   self,
 ) {
   match self {
-    Text(value) => value.to_json()
-    Number(value) => value.to_json()
+    Text(value) => Json(value)
+    Number(value) => Json(value)
   }
 }
 
@@ -168364,8 +168364,8 @@ pub extend ProjectsListViewItemsForUserFields with ToJson::{to_json}
 ///|
 pub impl ToJson for ProjectsListViewItemsForUserFields with fn to_json(self) {
   match self {
-    Text(value) => value.to_json()
-    TextArray(value) => value.to_json()
+    Text(value) => Json(value)
+    TextArray(value) => Json(value)
   }
 }
 
@@ -168423,7 +168423,7 @@ pub impl ToJson for ReposListForUserType with fn to_json(self) {
     Member => "member"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -168479,7 +168479,7 @@ pub impl ToJson for ReposListForUserSort with fn to_json(self) {
     FullName => "full_name"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -168532,7 +168532,7 @@ pub impl ToJson for ReposListForUserDirection with fn to_json(self) {
     Desc => "desc"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -168586,7 +168586,7 @@ pub impl ToJson for ActivityListReposStarredByUserSort with fn to_json(self) {
     Updated => "updated"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -168642,7 +168642,7 @@ pub impl ToJson for ActivityListReposStarredByUserDirection with fn to_json(
     Desc => "desc"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|

@@ -403,7 +403,7 @@ test "reasoning_effort passes through the open enum, including values newer than
       false,
     )
     guard body is Object(fields) else { fail("object body") }
-    assert_eq(fields.get("reasoning_effort"), Some(effort.to_json()))
+    assert_eq(fields.get("reasoning_effort"), Some(Json(effort)))
   }
   let (_, body) = chat_parts(
     ChatRequest::new(model="g", messages=[ChatMessage::user("hi")]),

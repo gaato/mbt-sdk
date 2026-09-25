@@ -2,7 +2,7 @@
 
 ///|
 fn[T : ToJson] parameter_value(value : T) -> String {
-  match value.to_json() {
+  match Json(value) {
     String(value) => value
     True => "true"
     False => "false"
@@ -68,9 +68,7 @@ pub fn messages_post_request(
   anthropic_user_profile_id? : String,
   anthropic_workspace_id? : String,
 ) -> @http.Request {
-  let mut request = @http.Request::post("/v1/messages").json_body(
-    body.to_json(),
-  )
+  let mut request = @http.Request::post("/v1/messages").json_body(Json(body))
   match anthropic_version {
     Some(value) =>
       request = request.header("anthropic-version", parameter_value(value))
@@ -245,7 +243,7 @@ pub fn messages_count_tokens_post_request(
   anthropic_workspace_id? : String,
 ) -> @http.Request {
   let mut request = @http.Request::post("/v1/messages/count_tokens").json_body(
-    body.to_json(),
+    Json(body),
   )
   match anthropic_version {
     Some(value) =>

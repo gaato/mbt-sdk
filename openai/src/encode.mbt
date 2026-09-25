@@ -36,10 +36,10 @@ fn chat_message_json(message : ChatMessage) -> Json raise @runtime.SdkError {
   if !(message.role == "assistant" &&
     message.tool_calls is Some(_) &&
     message.content.is_empty()) {
-    fields["content"] = message.content.to_json()
+    fields["content"] = Json(message.content)
   }
   if message.name is Some(name) {
-    fields["name"] = name.to_json()
+    fields["name"] = Json(name)
   }
   match message.role {
     "system" | "user" =>
@@ -55,8 +55,8 @@ fn chat_message_json(message : ChatMessage) -> Json raise @runtime.SdkError {
         )
       }
       if message.tool_calls is Some(calls) {
-        fields["tool_calls"] = calls
-          .map(call => {
+        fields["tool_calls"] = Json(
+          calls.map(call => {
             @gen.ChatCompletionMessageToolCall::new(
               id=call.id,
               function=@gen.ChatCompletionMessageToolCallFunction::new(
@@ -64,8 +64,8 @@ fn chat_message_json(message : ChatMessage) -> Json raise @runtime.SdkError {
                 arguments=call.arguments,
               ),
             ).to_json()
-          })
-          .to_json()
+          }),
+        )
       }
     }
     "tool" => {
@@ -73,7 +73,7 @@ fn chat_message_json(message : ChatMessage) -> Json raise @runtime.SdkError {
         raise @runtime.Config("tool chat message cannot contain tool_calls")
       }
       match message.tool_call_id {
-        Some(tool_call_id) => fields["tool_call_id"] = tool_call_id.to_json()
+        Some(tool_call_id) => fields["tool_call_id"] = Json(tool_call_id)
         None => raise @runtime.Config("tool chat message requires tool_call_id")
       }
     }
@@ -122,22 +122,22 @@ fn chat_parts(
     "messages": Json::array(request.messages.map(chat_message_json)),
   }
   if request.max_tokens is Some(value) {
-    fields["max_tokens"] = value.to_json()
+    fields["max_tokens"] = Json(value)
   }
   if request.temperature is Some(value) {
-    fields["temperature"] = value.to_json()
+    fields["temperature"] = Json(value)
   }
   if request.reasoning_effort is Some(value) {
-    fields["reasoning_effort"] = value.to_json()
+    fields["reasoning_effort"] = Json(value)
   }
   if request.tools is Some(tools) {
-    fields["tools"] = tools.map(chat_tool_json).to_json()
+    fields["tools"] = Json(tools.map(chat_tool_json))
   }
   if request.tool_choice is Some(tool_choice) {
     fields["tool_choice"] = tool_choice
   }
   if stream {
-    fields["stream"] = true.to_json()
+    fields["stream"] = Json(true)
     fields["stream_options"] = { "include_usage": true }
   }
   let raw = Json::object(fields)
@@ -161,7 +161,7 @@ fn chat_parts(
       guard messages.get(index) is Some(Object(fields)) else {
         raise @runtime.Config("generated chat message must be an object")
       }
-      fields["name"] = name.to_json()
+      fields["name"] = Json(name)
     }
   }
   for key, value in request.extra {

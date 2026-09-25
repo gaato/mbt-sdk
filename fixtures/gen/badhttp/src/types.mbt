@@ -55,7 +55,7 @@ pub impl ToJson for GetBadjsonFlavorFlavor with fn to_json(self) {
     Utf16 => "utf16"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -147,7 +147,7 @@ pub impl ToJson for GetSseFlavorFlavor with fn to_json(self) {
     Resume => "resume"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -234,7 +234,7 @@ pub impl ToJson for GetRangeFlavorFlavor with fn to_json(self) {
     IfRangeIgnored => "if-range-ignored"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -313,7 +313,7 @@ pub impl ToJson for GetEtagFlavorFlavor with fn to_json(self) {
     Future => "future"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -406,7 +406,7 @@ pub impl ToJson for GetCookiesFlavorFlavor with fn to_json(self) {
     Huge => "huge"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -509,7 +509,7 @@ pub impl ToJson for GetAuthFlavorFlavor with fn to_json(self) {
     Redirect => "redirect"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -590,7 +590,7 @@ pub impl ToJson for GetCrosshostFlavorFlavor with fn to_json(self) {
     Jar => "jar"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -689,7 +689,7 @@ pub impl ToJson for GetCompressFlavorFlavor with fn to_json(self) {
     Bomb => "bomb"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -757,8 +757,8 @@ pub extend GetRedirectHopsHops with ToJson::{to_json}
 ///|
 pub impl ToJson for GetRedirectHopsHops with fn to_json(self) {
   match self {
-    Int(value) => value.to_json()
-    Text(value) => value.to_json()
+    Int(value) => Json(value)
+    Text(value) => Json(value)
   }
 }
 
@@ -809,7 +809,7 @@ pub impl ToJson for Get402PayNetwork with fn to_json(self) {
     Base => "base"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -870,7 +870,7 @@ pub impl ToJson for Get402ScenarioScenario with fn to_json(self) {
     WrongNetwork => "wrong-network"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -929,7 +929,7 @@ pub impl ToJson for Get402ScenarioNetwork with fn to_json(self) {
     Base => "base"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -996,7 +996,7 @@ pub impl ToJson for Get402BrokenFlavorFlavor with fn to_json(self) {
     V1Body => "v1-body"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -1058,7 +1058,7 @@ pub impl ToJson for Get402BrokenFlavorNetwork with fn to_json(self) {
     Base => "base"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|

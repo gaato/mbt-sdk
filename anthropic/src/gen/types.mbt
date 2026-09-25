@@ -138,7 +138,7 @@ pub impl ToJson for AllowedCaller with fn to_json(self) {
     CodeExecution20260521 => "code_execution_20260521"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -246,7 +246,7 @@ pub impl ToJson for Base64ImageSourceMediaType with fn to_json(self) {
     ImageWebp => "image/webp"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -412,7 +412,7 @@ pub impl ToJson for BashCodeExecutionToolResultErrorCode with fn to_json(self) {
     OutputFileTooLarge => "output_file_too_large"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -469,7 +469,7 @@ pub impl ToJson for CacheControlEphemeralTtl with fn to_json(self) {
     Value1h => "1h"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -569,7 +569,7 @@ pub extend BashTool20250124CacheControl with ToJson::{to_json}
 ///|
 pub impl ToJson for BashTool20250124CacheControl with fn to_json(self) {
   match self {
-    Ephemeral(value) => value.to_json()
+    Ephemeral(value) => Json(value)
     Unknown(_, value) => value
   }
 }
@@ -2966,7 +2966,7 @@ pub extend BrowserToolset20260801CacheControl with ToJson::{to_json}
 ///|
 pub impl ToJson for BrowserToolset20260801CacheControl with fn to_json(self) {
   match self {
-    Ephemeral(value) => value.to_json()
+    Ephemeral(value) => Json(value)
     Unknown(_, value) => value
   }
 }
@@ -3580,11 +3580,11 @@ pub extend CitationsDeltaCitation with ToJson::{to_json}
 ///|
 pub impl ToJson for CitationsDeltaCitation with fn to_json(self) {
   match self {
-    CharLocation(value) => value.to_json()
-    ContentBlockLocation(value) => value.to_json()
-    PageLocation(value) => value.to_json()
-    SearchResultLocation(value) => value.to_json()
-    WebSearchResultLocation(value) => value.to_json()
+    CharLocation(value) => Json(value)
+    ContentBlockLocation(value) => Json(value)
+    PageLocation(value) => Json(value)
+    SearchResultLocation(value) => Json(value)
+    WebSearchResultLocation(value) => Json(value)
     Unknown(_, value) => value
   }
 }
@@ -3696,7 +3696,7 @@ pub impl ToJson for CodeExecutionToolResultErrorCode with fn to_json(self) {
     ExecutionTimeExceeded => "execution_time_exceeded"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -3747,7 +3747,7 @@ pub extend CodeExecutionTool20250522CacheControl with ToJson::{to_json}
 ///|
 pub impl ToJson for CodeExecutionTool20250522CacheControl with fn to_json(self) {
   match self {
-    Ephemeral(value) => value.to_json()
+    Ephemeral(value) => Json(value)
     Unknown(_, value) => value
   }
 }
@@ -3867,7 +3867,7 @@ pub extend CodeExecutionTool20250825CacheControl with ToJson::{to_json}
 ///|
 pub impl ToJson for CodeExecutionTool20250825CacheControl with fn to_json(self) {
   match self {
-    Ephemeral(value) => value.to_json()
+    Ephemeral(value) => Json(value)
     Unknown(_, value) => value
   }
 }
@@ -3987,7 +3987,7 @@ pub extend CodeExecutionTool20260120CacheControl with ToJson::{to_json}
 ///|
 pub impl ToJson for CodeExecutionTool20260120CacheControl with fn to_json(self) {
   match self {
-    Ephemeral(value) => value.to_json()
+    Ephemeral(value) => Json(value)
     Unknown(_, value) => value
   }
 }
@@ -4107,7 +4107,7 @@ pub extend CodeExecutionTool20260521CacheControl with ToJson::{to_json}
 ///|
 pub impl ToJson for CodeExecutionTool20260521CacheControl with fn to_json(self) {
   match self {
-    Ephemeral(value) => value.to_json()
+    Ephemeral(value) => Json(value)
     Unknown(_, value) => value
   }
 }
@@ -5310,7 +5310,7 @@ pub extend ComputerToolset20260801CacheControl with ToJson::{to_json}
 ///|
 pub impl ToJson for ComputerToolset20260801CacheControl with fn to_json(self) {
   match self {
-    Ephemeral(value) => value.to_json()
+    Ephemeral(value) => Json(value)
     Unknown(_, value) => value
   }
 }
@@ -5422,7 +5422,7 @@ pub impl ToJson for ContainerSkillType with fn to_json(self) {
     Custom => "custom"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -5583,7 +5583,7 @@ pub impl ToJson for SkillParamsType with fn to_json(self) {
     CustomSkill => "custom"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -5955,11 +5955,11 @@ pub extend ContentBlockDeltaEventDelta with ToJson::{to_json}
 ///|
 pub impl ToJson for ContentBlockDeltaEventDelta with fn to_json(self) {
   match self {
-    CitationsDelta(value) => value.to_json()
-    InputJsonDelta(value) => value.to_json()
-    SignatureDelta(value) => value.to_json()
-    TextDelta(value) => value.to_json()
-    ThinkingDelta(value) => value.to_json()
+    CitationsDelta(value) => Json(value)
+    InputJsonDelta(value) => Json(value)
+    SignatureDelta(value) => Json(value)
+    TextDelta(value) => Json(value)
+    ThinkingDelta(value) => Json(value)
     Unknown(_, value) => value
   }
 }
@@ -6066,7 +6066,7 @@ pub extend RequestImageBlockCacheControl with ToJson::{to_json}
 ///|
 pub impl ToJson for RequestImageBlockCacheControl with fn to_json(self) {
   match self {
-    Ephemeral(value) => value.to_json()
+    Ephemeral(value) => Json(value)
     Unknown(_, value) => value
   }
 }
@@ -6212,9 +6212,9 @@ pub extend RequestImageBlockSource with ToJson::{to_json}
 ///|
 pub impl ToJson for RequestImageBlockSource with fn to_json(self) {
   match self {
-    Base64(value) => value.to_json()
-    File(value) => value.to_json()
-    Url(value) => value.to_json()
+    Base64(value) => Json(value)
+    File(value) => Json(value)
+    Url(value) => Json(value)
     Unknown(_, value) => value
   }
 }
@@ -6270,7 +6270,7 @@ pub impl ToJson for RequestImageTransformationsOversizedImage with fn to_json(
     Error => "error"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -6433,7 +6433,7 @@ pub extend RequestTextBlockCacheControl with ToJson::{to_json}
 ///|
 pub impl ToJson for RequestTextBlockCacheControl with fn to_json(self) {
   match self {
-    Ephemeral(value) => value.to_json()
+    Ephemeral(value) => Json(value)
     Unknown(_, value) => value
   }
 }
@@ -6872,11 +6872,11 @@ pub extend RequestTextBlockCitationsItem with ToJson::{to_json}
 ///|
 pub impl ToJson for RequestTextBlockCitationsItem with fn to_json(self) {
   match self {
-    CharLocation(value) => value.to_json()
-    ContentBlockLocation(value) => value.to_json()
-    PageLocation(value) => value.to_json()
-    SearchResultLocation(value) => value.to_json()
-    WebSearchResultLocation(value) => value.to_json()
+    CharLocation(value) => Json(value)
+    ContentBlockLocation(value) => Json(value)
+    PageLocation(value) => Json(value)
+    SearchResultLocation(value) => Json(value)
+    WebSearchResultLocation(value) => Json(value)
     Unknown(_, value) => value
   }
 }
@@ -6995,8 +6995,8 @@ pub impl ToJson for ContentBlockSourceContentValueArrayItem with fn to_json(
   self,
 ) {
   match self {
-    Image(value) => value.to_json()
-    Text(value) => value.to_json()
+    Image(value) => Json(value)
+    Text(value) => Json(value)
     Unknown(_, value) => value
   }
 }
@@ -7044,8 +7044,8 @@ pub extend ContentBlockSourceContent with ToJson::{to_json}
 ///|
 pub impl ToJson for ContentBlockSourceContent with fn to_json(self) {
   match self {
-    Text(value) => value.to_json()
-    ValueArray(value) => value.to_json()
+    Text(value) => Json(value)
+    ValueArray(value) => Json(value)
   }
 }
 
@@ -7331,8 +7331,8 @@ pub impl ToJson for ResponseBashCodeExecutionToolResultBlockContent with fn to_j
   self,
 ) {
   match self {
-    BashCodeExecutionToolResultError(value) => value.to_json()
-    BashCodeExecutionResult(value) => value.to_json()
+    BashCodeExecutionToolResultError(value) => Json(value)
+    BashCodeExecutionResult(value) => Json(value)
     Unknown(_, value) => value
   }
 }
@@ -7694,9 +7694,9 @@ pub impl ToJson for ResponseCodeExecutionToolResultBlockContent with fn to_json(
   self,
 ) {
   match self {
-    CodeExecutionToolResultError(value) => value.to_json()
-    CodeExecutionResult(value) => value.to_json()
-    EncryptedCodeExecutionResult(value) => value.to_json()
+    CodeExecutionToolResultError(value) => Json(value)
+    CodeExecutionResult(value) => Json(value)
+    EncryptedCodeExecutionResult(value) => Json(value)
     Unknown(_, value) => value
   }
 }
@@ -8062,9 +8062,9 @@ pub extend ResponseServerToolUseBlockCaller with ToJson::{to_json}
 ///|
 pub impl ToJson for ResponseServerToolUseBlockCaller with fn to_json(self) {
   match self {
-    CodeExecution20250825(value) => value.to_json()
-    CodeExecution20260120(value) => value.to_json()
-    Direct(value) => value.to_json()
+    CodeExecution20250825(value) => Json(value)
+    CodeExecution20260120(value) => Json(value)
+    Direct(value) => Json(value)
     Unknown(_, value) => value
   }
 }
@@ -8128,7 +8128,7 @@ pub impl ToJson for ResponseServerToolUseBlockName with fn to_json(self) {
     ToolSearchToolBm25 => "tool_search_tool_bm25"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -8252,11 +8252,11 @@ pub extend ResponseTextBlockCitationsItem with ToJson::{to_json}
 ///|
 pub impl ToJson for ResponseTextBlockCitationsItem with fn to_json(self) {
   match self {
-    CharLocation(value) => value.to_json()
-    ContentBlockLocation(value) => value.to_json()
-    PageLocation(value) => value.to_json()
-    SearchResultLocation(value) => value.to_json()
-    WebSearchResultLocation(value) => value.to_json()
+    CharLocation(value) => Json(value)
+    ContentBlockLocation(value) => Json(value)
+    PageLocation(value) => Json(value)
+    SearchResultLocation(value) => Json(value)
+    WebSearchResultLocation(value) => Json(value)
     Unknown(_, value) => value
   }
 }
@@ -8381,7 +8381,7 @@ pub impl ToJson for TextEditorCodeExecutionToolResultErrorCode with fn to_json(
     FileNotFound => "file_not_found"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -8521,7 +8521,7 @@ pub impl ToJson for ResponseTextEditorCodeExecutionViewResultBlockFileType with 
     Pdf => "pdf"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -8824,10 +8824,10 @@ pub impl ToJson for ResponseTextEditorCodeExecutionToolResultBlockContent with f
   self,
 ) {
   match self {
-    TextEditorCodeExecutionToolResultError(value) => value.to_json()
-    TextEditorCodeExecutionViewResult(value) => value.to_json()
-    TextEditorCodeExecutionCreateResult(value) => value.to_json()
-    TextEditorCodeExecutionStrReplaceResult(value) => value.to_json()
+    TextEditorCodeExecutionToolResultError(value) => Json(value)
+    TextEditorCodeExecutionViewResult(value) => Json(value)
+    TextEditorCodeExecutionCreateResult(value) => Json(value)
+    TextEditorCodeExecutionStrReplaceResult(value) => Json(value)
     Unknown(_, value) => value
   }
 }
@@ -9012,7 +9012,7 @@ pub impl ToJson for ToolSearchToolResultErrorCode with fn to_json(self) {
     ExecutionTimeExceeded => "execution_time_exceeded"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -9234,8 +9234,8 @@ pub impl ToJson for ResponseToolSearchToolResultBlockContent with fn to_json(
   self,
 ) {
   match self {
-    ToolSearchToolResultError(value) => value.to_json()
-    ToolSearchToolSearchResult(value) => value.to_json()
+    ToolSearchToolResultError(value) => Json(value)
+    ToolSearchToolSearchResult(value) => Json(value)
     Unknown(_, value) => value
   }
 }
@@ -9345,9 +9345,9 @@ pub extend ResponseToolUseBlockCaller with ToJson::{to_json}
 ///|
 pub impl ToJson for ResponseToolUseBlockCaller with fn to_json(self) {
   match self {
-    CodeExecution20250825(value) => value.to_json()
-    CodeExecution20260120(value) => value.to_json()
-    Direct(value) => value.to_json()
+    CodeExecution20250825(value) => Json(value)
+    CodeExecution20260120(value) => Json(value)
+    Direct(value) => Json(value)
     Unknown(_, value) => value
   }
 }
@@ -9472,9 +9472,9 @@ pub extend ResponseWebFetchToolResultBlockCaller with ToJson::{to_json}
 ///|
 pub impl ToJson for ResponseWebFetchToolResultBlockCaller with fn to_json(self) {
   match self {
-    CodeExecution20250825(value) => value.to_json()
-    CodeExecution20260120(value) => value.to_json()
-    Direct(value) => value.to_json()
+    CodeExecution20250825(value) => Json(value)
+    CodeExecution20260120(value) => Json(value)
+    Direct(value) => Json(value)
     Unknown(_, value) => value
   }
 }
@@ -9546,7 +9546,7 @@ pub impl ToJson for WebFetchToolResultErrorCode with fn to_json(self) {
     ContentTooLarge => "content_too_large"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -9751,8 +9751,8 @@ pub extend ResponseDocumentBlockSource with ToJson::{to_json}
 ///|
 pub impl ToJson for ResponseDocumentBlockSource with fn to_json(self) {
   match self {
-    Base64(value) => value.to_json()
-    Text(value) => value.to_json()
+    Base64(value) => Json(value)
+    Text(value) => Json(value)
     Unknown(_, value) => value
   }
 }
@@ -9920,8 +9920,8 @@ pub extend ResponseWebFetchToolResultBlockContent with ToJson::{to_json}
 ///|
 pub impl ToJson for ResponseWebFetchToolResultBlockContent with fn to_json(self) {
   match self {
-    WebFetchToolResultError(value) => value.to_json()
-    WebFetchResult(value) => value.to_json()
+    WebFetchToolResultError(value) => Json(value)
+    WebFetchResult(value) => Json(value)
     Unknown(_, value) => value
   }
 }
@@ -10034,9 +10034,9 @@ pub extend ResponseWebSearchToolResultBlockCaller with ToJson::{to_json}
 ///|
 pub impl ToJson for ResponseWebSearchToolResultBlockCaller with fn to_json(self) {
   match self {
-    CodeExecution20250825(value) => value.to_json()
-    CodeExecution20260120(value) => value.to_json()
-    Direct(value) => value.to_json()
+    CodeExecution20250825(value) => Json(value)
+    CodeExecution20260120(value) => Json(value)
+    Direct(value) => Json(value)
     Unknown(_, value) => value
   }
 }
@@ -10100,7 +10100,7 @@ pub impl ToJson for WebSearchToolResultErrorCode with fn to_json(self) {
     RequestTooLarge => "request_too_large"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -10267,8 +10267,8 @@ pub impl ToJson for ResponseWebSearchToolResultBlockContent with fn to_json(
   self,
 ) {
   match self {
-    ResponseWebSearchToolResultError(value) => value.to_json()
-    ResponseWebSearchResultBlockArray(value) => value.to_json()
+    ResponseWebSearchToolResultError(value) => Json(value)
+    ResponseWebSearchResultBlockArray(value) => Json(value)
   }
 }
 
@@ -10402,18 +10402,18 @@ pub extend ContentBlockStartEventContentBlock with ToJson::{to_json}
 ///|
 pub impl ToJson for ContentBlockStartEventContentBlock with fn to_json(self) {
   match self {
-    BashCodeExecutionToolResult(value) => value.to_json()
-    CodeExecutionToolResult(value) => value.to_json()
-    ContainerUpload(value) => value.to_json()
-    RedactedThinking(value) => value.to_json()
-    ServerToolUse(value) => value.to_json()
-    Text(value) => value.to_json()
-    TextEditorCodeExecutionToolResult(value) => value.to_json()
-    Thinking(value) => value.to_json()
-    ToolSearchToolResult(value) => value.to_json()
-    ToolUse(value) => value.to_json()
-    WebFetchToolResult(value) => value.to_json()
-    WebSearchToolResult(value) => value.to_json()
+    BashCodeExecutionToolResult(value) => Json(value)
+    CodeExecutionToolResult(value) => Json(value)
+    ContainerUpload(value) => Json(value)
+    RedactedThinking(value) => Json(value)
+    ServerToolUse(value) => Json(value)
+    Text(value) => Json(value)
+    TextEditorCodeExecutionToolResult(value) => Json(value)
+    Thinking(value) => Json(value)
+    ToolSearchToolResult(value) => Json(value)
+    ToolUse(value) => Json(value)
+    WebFetchToolResult(value) => Json(value)
+    WebSearchToolResult(value) => Json(value)
     Unknown(_, value) => value
   }
 }
@@ -10663,7 +10663,7 @@ pub extend CountMessageTokensParamsCacheControl with ToJson::{to_json}
 ///|
 pub impl ToJson for CountMessageTokensParamsCacheControl with fn to_json(self) {
   match self {
-    Ephemeral(value) => value.to_json()
+    Ephemeral(value) => Json(value)
     Unknown(_, value) => value
   }
 }
@@ -10717,7 +10717,7 @@ pub impl ToJson for RequestBashCodeExecutionToolResultBlockCacheControl with fn 
   self,
 ) {
   match self {
-    Ephemeral(value) => value.to_json()
+    Ephemeral(value) => Json(value)
     Unknown(_, value) => value
   }
 }
@@ -10945,8 +10945,8 @@ pub impl ToJson for RequestBashCodeExecutionToolResultBlockContent with fn to_js
   self,
 ) {
   match self {
-    BashCodeExecutionToolResultError(value) => value.to_json()
-    BashCodeExecutionResult(value) => value.to_json()
+    BashCodeExecutionToolResultError(value) => Json(value)
+    BashCodeExecutionResult(value) => Json(value)
     Unknown(_, value) => value
   }
 }
@@ -11078,7 +11078,7 @@ pub impl ToJson for RequestCodeExecutionToolResultBlockCacheControl with fn to_j
   self,
 ) {
   match self {
-    Ephemeral(value) => value.to_json()
+    Ephemeral(value) => Json(value)
     Unknown(_, value) => value
   }
 }
@@ -11373,9 +11373,9 @@ pub impl ToJson for RequestCodeExecutionToolResultBlockContent with fn to_json(
   self,
 ) {
   match self {
-    CodeExecutionToolResultError(value) => value.to_json()
-    CodeExecutionResult(value) => value.to_json()
-    EncryptedCodeExecutionResult(value) => value.to_json()
+    CodeExecutionToolResultError(value) => Json(value)
+    CodeExecutionResult(value) => Json(value)
+    EncryptedCodeExecutionResult(value) => Json(value)
     Unknown(_, value) => value
   }
 }
@@ -11498,7 +11498,7 @@ pub impl ToJson for RequestContainerUploadBlockCacheControl with fn to_json(
   self,
 ) {
   match self {
-    Ephemeral(value) => value.to_json()
+    Ephemeral(value) => Json(value)
     Unknown(_, value) => value
   }
 }
@@ -11607,7 +11607,7 @@ pub extend RequestDocumentBlockCacheControl with ToJson::{to_json}
 ///|
 pub impl ToJson for RequestDocumentBlockCacheControl with fn to_json(self) {
   match self {
-    Ephemeral(value) => value.to_json()
+    Ephemeral(value) => Json(value)
     Unknown(_, value) => value
   }
 }
@@ -11799,11 +11799,11 @@ pub extend RequestDocumentBlockSource with ToJson::{to_json}
 ///|
 pub impl ToJson for RequestDocumentBlockSource with fn to_json(self) {
   match self {
-    Base64(value) => value.to_json()
-    Content(value) => value.to_json()
-    File(value) => value.to_json()
-    Text(value) => value.to_json()
-    Url(value) => value.to_json()
+    Base64(value) => Json(value)
+    Content(value) => Json(value)
+    File(value) => Json(value)
+    Text(value) => Json(value)
+    Url(value) => Json(value)
     Unknown(_, value) => value
   }
 }
@@ -11980,7 +11980,7 @@ pub extend RequestSearchResultBlockCacheControl with ToJson::{to_json}
 ///|
 pub impl ToJson for RequestSearchResultBlockCacheControl with fn to_json(self) {
   match self {
-    Ephemeral(value) => value.to_json()
+    Ephemeral(value) => Json(value)
     Unknown(_, value) => value
   }
 }
@@ -12102,7 +12102,7 @@ pub extend RequestServerToolUseBlockCacheControl with ToJson::{to_json}
 ///|
 pub impl ToJson for RequestServerToolUseBlockCacheControl with fn to_json(self) {
   match self {
-    Ephemeral(value) => value.to_json()
+    Ephemeral(value) => Json(value)
     Unknown(_, value) => value
   }
 }
@@ -12151,9 +12151,9 @@ pub extend RequestServerToolUseBlockCaller with ToJson::{to_json}
 ///|
 pub impl ToJson for RequestServerToolUseBlockCaller with fn to_json(self) {
   match self {
-    CodeExecution20250825(value) => value.to_json()
-    CodeExecution20260120(value) => value.to_json()
-    Direct(value) => value.to_json()
+    CodeExecution20250825(value) => Json(value)
+    CodeExecution20260120(value) => Json(value)
+    Direct(value) => Json(value)
     Unknown(_, value) => value
   }
 }
@@ -12217,7 +12217,7 @@ pub impl ToJson for RequestServerToolUseBlockName with fn to_json(self) {
     ToolSearchToolBm25 => "tool_search_tool_bm25"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -12357,7 +12357,7 @@ pub impl ToJson for RequestTextEditorCodeExecutionToolResultBlockCacheControl wi
   self,
 ) {
   match self {
-    Ephemeral(value) => value.to_json()
+    Ephemeral(value) => Json(value)
     Unknown(_, value) => value
   }
 }
@@ -12491,7 +12491,7 @@ pub impl ToJson for RequestTextEditorCodeExecutionViewResultBlockFileType with f
     Pdf => "pdf"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -12802,10 +12802,10 @@ pub impl ToJson for RequestTextEditorCodeExecutionToolResultBlockContent with fn
   self,
 ) {
   match self {
-    TextEditorCodeExecutionToolResultError(value) => value.to_json()
-    TextEditorCodeExecutionViewResult(value) => value.to_json()
-    TextEditorCodeExecutionCreateResult(value) => value.to_json()
-    TextEditorCodeExecutionStrReplaceResult(value) => value.to_json()
+    TextEditorCodeExecutionToolResultError(value) => Json(value)
+    TextEditorCodeExecutionViewResult(value) => Json(value)
+    TextEditorCodeExecutionCreateResult(value) => Json(value)
+    TextEditorCodeExecutionStrReplaceResult(value) => Json(value)
     Unknown(_, value) => value
   }
 }
@@ -12992,7 +12992,7 @@ pub extend RequestToolResultBlockCacheControl with ToJson::{to_json}
 ///|
 pub impl ToJson for RequestToolResultBlockCacheControl with fn to_json(self) {
   match self {
-    Ephemeral(value) => value.to_json()
+    Ephemeral(value) => Json(value)
     Unknown(_, value) => value
   }
 }
@@ -13037,7 +13037,7 @@ pub extend RequestBrowserStateBlockCacheControl with ToJson::{to_json}
 ///|
 pub impl ToJson for RequestBrowserStateBlockCacheControl with fn to_json(self) {
   match self {
-    Ephemeral(value) => value.to_json()
+    Ephemeral(value) => Json(value)
     Unknown(_, value) => value
   }
 }
@@ -13087,10 +13087,10 @@ pub impl ToJson for RequestBrowserStateBlockStateChangesItem with fn to_json(
   self,
 ) {
   match self {
-    DownloadCompleted(value) => value.to_json()
-    DownloadFailed(value) => value.to_json()
-    DownloadStarted(value) => value.to_json()
-    TabOpened(value) => value.to_json()
+    DownloadCompleted(value) => Json(value)
+    DownloadFailed(value) => Json(value)
+    DownloadStarted(value) => Json(value)
+    TabOpened(value) => Json(value)
     Unknown(_, value) => value
   }
 }
@@ -13209,7 +13209,7 @@ pub extend RequestToolReferenceBlockCacheControl with ToJson::{to_json}
 ///|
 pub impl ToJson for RequestToolReferenceBlockCacheControl with fn to_json(self) {
   match self {
-    Ephemeral(value) => value.to_json()
+    Ephemeral(value) => Json(value)
     Unknown(_, value) => value
   }
 }
@@ -13330,12 +13330,12 @@ pub impl ToJson for RequestToolResultBlockContentValueArrayItem with fn to_json(
   self,
 ) {
   match self {
-    BrowserState(value) => value.to_json()
-    Document(value) => value.to_json()
-    Image(value) => value.to_json()
-    SearchResult(value) => value.to_json()
-    Text(value) => value.to_json()
-    ToolReference(value) => value.to_json()
+    BrowserState(value) => Json(value)
+    Document(value) => Json(value)
+    Image(value) => Json(value)
+    SearchResult(value) => Json(value)
+    Text(value) => Json(value)
+    ToolReference(value) => Json(value)
     Unknown(_, value) => value
   }
 }
@@ -13387,8 +13387,8 @@ pub extend RequestToolResultBlockContent with ToJson::{to_json}
 ///|
 pub impl ToJson for RequestToolResultBlockContent with fn to_json(self) {
   match self {
-    Text(value) => value.to_json()
-    ValueArray(value) => value.to_json()
+    Text(value) => Json(value)
+    ValueArray(value) => Json(value)
   }
 }
 
@@ -13526,7 +13526,7 @@ pub impl ToJson for RequestToolSearchToolResultBlockCacheControl with fn to_json
   self,
 ) {
   match self {
-    Ephemeral(value) => value.to_json()
+    Ephemeral(value) => Json(value)
     Unknown(_, value) => value
   }
 }
@@ -13694,8 +13694,8 @@ pub impl ToJson for RequestToolSearchToolResultBlockContent with fn to_json(
   self,
 ) {
   match self {
-    ToolSearchToolResultError(value) => value.to_json()
-    ToolSearchToolSearchResult(value) => value.to_json()
+    ToolSearchToolResultError(value) => Json(value)
+    ToolSearchToolSearchResult(value) => Json(value)
     Unknown(_, value) => value
   }
 }
@@ -13814,7 +13814,7 @@ pub extend RequestToolUseBlockCacheControl with ToJson::{to_json}
 ///|
 pub impl ToJson for RequestToolUseBlockCacheControl with fn to_json(self) {
   match self {
-    Ephemeral(value) => value.to_json()
+    Ephemeral(value) => Json(value)
     Unknown(_, value) => value
   }
 }
@@ -13861,9 +13861,9 @@ pub extend RequestToolUseBlockCaller with ToJson::{to_json}
 ///|
 pub impl ToJson for RequestToolUseBlockCaller with fn to_json(self) {
   match self {
-    CodeExecution20250825(value) => value.to_json()
-    CodeExecution20260120(value) => value.to_json()
-    Direct(value) => value.to_json()
+    CodeExecution20250825(value) => Json(value)
+    CodeExecution20260120(value) => Json(value)
+    Direct(value) => Json(value)
     Unknown(_, value) => value
   }
 }
@@ -13998,7 +13998,7 @@ pub impl ToJson for RequestWebFetchToolResultBlockCacheControl with fn to_json(
   self,
 ) {
   match self {
-    Ephemeral(value) => value.to_json()
+    Ephemeral(value) => Json(value)
     Unknown(_, value) => value
   }
 }
@@ -14047,9 +14047,9 @@ pub extend RequestWebFetchToolResultBlockCaller with ToJson::{to_json}
 ///|
 pub impl ToJson for RequestWebFetchToolResultBlockCaller with fn to_json(self) {
   match self {
-    CodeExecution20250825(value) => value.to_json()
-    CodeExecution20260120(value) => value.to_json()
-    Direct(value) => value.to_json()
+    CodeExecution20250825(value) => Json(value)
+    CodeExecution20260120(value) => Json(value)
+    Direct(value) => Json(value)
     Unknown(_, value) => value
   }
 }
@@ -14220,8 +14220,8 @@ pub extend RequestWebFetchToolResultBlockContent with ToJson::{to_json}
 ///|
 pub impl ToJson for RequestWebFetchToolResultBlockContent with fn to_json(self) {
   match self {
-    WebFetchToolResultError(value) => value.to_json()
-    WebFetchResult(value) => value.to_json()
+    WebFetchToolResultError(value) => Json(value)
+    WebFetchResult(value) => Json(value)
     Unknown(_, value) => value
   }
 }
@@ -14349,7 +14349,7 @@ pub impl ToJson for RequestWebSearchToolResultBlockCacheControl with fn to_json(
   self,
 ) {
   match self {
-    Ephemeral(value) => value.to_json()
+    Ephemeral(value) => Json(value)
     Unknown(_, value) => value
   }
 }
@@ -14398,9 +14398,9 @@ pub extend RequestWebSearchToolResultBlockCaller with ToJson::{to_json}
 ///|
 pub impl ToJson for RequestWebSearchToolResultBlockCaller with fn to_json(self) {
   match self {
-    CodeExecution20250825(value) => value.to_json()
-    CodeExecution20260120(value) => value.to_json()
-    Direct(value) => value.to_json()
+    CodeExecution20250825(value) => Json(value)
+    CodeExecution20260120(value) => Json(value)
+    Direct(value) => Json(value)
     Unknown(_, value) => value
   }
 }
@@ -14568,8 +14568,8 @@ pub extend RequestWebSearchToolResultBlockContent with ToJson::{to_json}
 ///|
 pub impl ToJson for RequestWebSearchToolResultBlockContent with fn to_json(self) {
   match self {
-    RequestWebSearchResultBlockArray(value) => value.to_json()
-    RequestWebSearchToolResultError(value) => value.to_json()
+    RequestWebSearchResultBlockArray(value) => Json(value)
+    RequestWebSearchToolResultError(value) => Json(value)
   }
 }
 
@@ -14717,22 +14717,22 @@ pub extend InputContentBlock with ToJson::{to_json}
 ///|
 pub impl ToJson for InputContentBlock with fn to_json(self) {
   match self {
-    BashCodeExecutionToolResult(value) => value.to_json()
-    CodeExecutionToolResult(value) => value.to_json()
-    ContainerUpload(value) => value.to_json()
-    Document(value) => value.to_json()
-    Image(value) => value.to_json()
-    RedactedThinking(value) => value.to_json()
-    SearchResult(value) => value.to_json()
-    ServerToolUse(value) => value.to_json()
-    Text(value) => value.to_json()
-    TextEditorCodeExecutionToolResult(value) => value.to_json()
-    Thinking(value) => value.to_json()
-    ToolResult(value) => value.to_json()
-    ToolSearchToolResult(value) => value.to_json()
-    ToolUse(value) => value.to_json()
-    WebFetchToolResult(value) => value.to_json()
-    WebSearchToolResult(value) => value.to_json()
+    BashCodeExecutionToolResult(value) => Json(value)
+    CodeExecutionToolResult(value) => Json(value)
+    ContainerUpload(value) => Json(value)
+    Document(value) => Json(value)
+    Image(value) => Json(value)
+    RedactedThinking(value) => Json(value)
+    SearchResult(value) => Json(value)
+    ServerToolUse(value) => Json(value)
+    Text(value) => Json(value)
+    TextEditorCodeExecutionToolResult(value) => Json(value)
+    Thinking(value) => Json(value)
+    ToolResult(value) => Json(value)
+    ToolSearchToolResult(value) => Json(value)
+    ToolUse(value) => Json(value)
+    WebFetchToolResult(value) => Json(value)
+    WebSearchToolResult(value) => Json(value)
     Unknown(_, value) => value
   }
 }
@@ -14794,8 +14794,8 @@ pub extend InputMessageContent with ToJson::{to_json}
 ///|
 pub impl ToJson for InputMessageContent with fn to_json(self) {
   match self {
-    Text(value) => value.to_json()
-    InputContentBlockArray(value) => value.to_json()
+    Text(value) => Json(value)
+    InputContentBlockArray(value) => Json(value)
   }
 }
 
@@ -14848,7 +14848,7 @@ pub impl ToJson for InputMessageRole with fn to_json(self) {
     System => "system"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -14957,7 +14957,7 @@ pub impl ToJson for EffortLevel with fn to_json(self) {
     Max => "max"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -15104,8 +15104,8 @@ pub extend CountMessageTokensParamsSystem with ToJson::{to_json}
 ///|
 pub impl ToJson for CountMessageTokensParamsSystem with fn to_json(self) {
   match self {
-    Text(value) => value.to_json()
-    RequestTextBlockArray(value) => value.to_json()
+    Text(value) => Json(value)
+    RequestTextBlockArray(value) => Json(value)
   }
 }
 
@@ -15161,7 +15161,7 @@ pub impl ToJson for ThinkingDisplayMode with fn to_json(self) {
     Omitted => "omitted"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -15362,9 +15362,9 @@ pub extend ThinkingConfigParam with ToJson::{to_json}
 ///|
 pub impl ToJson for ThinkingConfigParam with fn to_json(self) {
   match self {
-    Adaptive(value) => value.to_json()
-    Disabled(value) => value.to_json()
-    Enabled(value) => value.to_json()
+    Adaptive(value) => Json(value)
+    Disabled(value) => Json(value)
+    Enabled(value) => Json(value)
     Unknown(_, value) => value
   }
 }
@@ -15615,10 +15615,10 @@ pub extend ToolChoice with ToJson::{to_json}
 ///|
 pub impl ToJson for ToolChoice with fn to_json(self) {
   match self {
-    Any(value) => value.to_json()
-    Auto(value) => value.to_json()
-    None(value) => value.to_json()
-    Tool(value) => value.to_json()
+    Any(value) => Json(value)
+    Auto(value) => Json(value)
+    None(value) => Json(value)
+    Tool(value) => Json(value)
     Unknown(_, value) => value
   }
 }
@@ -15663,7 +15663,7 @@ pub extend ToolCacheControl with ToJson::{to_json}
 ///|
 pub impl ToJson for ToolCacheControl with fn to_json(self) {
   match self {
-    Ephemeral(value) => value.to_json()
+    Ephemeral(value) => Json(value)
     Unknown(_, value) => value
   }
 }
@@ -15801,7 +15801,7 @@ pub extend MemoryTool20250818CacheControl with ToJson::{to_json}
 ///|
 pub impl ToJson for MemoryTool20250818CacheControl with fn to_json(self) {
   match self {
-    Ephemeral(value) => value.to_json()
+    Ephemeral(value) => Json(value)
     Unknown(_, value) => value
   }
 }
@@ -15921,7 +15921,7 @@ pub extend TextEditor20250124CacheControl with ToJson::{to_json}
 ///|
 pub impl ToJson for TextEditor20250124CacheControl with fn to_json(self) {
   match self {
-    Ephemeral(value) => value.to_json()
+    Ephemeral(value) => Json(value)
     Unknown(_, value) => value
   }
 }
@@ -16041,7 +16041,7 @@ pub extend TextEditor20250429CacheControl with ToJson::{to_json}
 ///|
 pub impl ToJson for TextEditor20250429CacheControl with fn to_json(self) {
   match self {
-    Ephemeral(value) => value.to_json()
+    Ephemeral(value) => Json(value)
     Unknown(_, value) => value
   }
 }
@@ -16161,7 +16161,7 @@ pub extend TextEditor20250728CacheControl with ToJson::{to_json}
 ///|
 pub impl ToJson for TextEditor20250728CacheControl with fn to_json(self) {
   match self {
-    Ephemeral(value) => value.to_json()
+    Ephemeral(value) => Json(value)
     Unknown(_, value) => value
   }
 }
@@ -16286,7 +16286,7 @@ pub extend WebSearchTool20250305CacheControl with ToJson::{to_json}
 ///|
 pub impl ToJson for WebSearchTool20250305CacheControl with fn to_json(self) {
   match self {
-    Ephemeral(value) => value.to_json()
+    Ephemeral(value) => Json(value)
     Unknown(_, value) => value
   }
 }
@@ -16486,7 +16486,7 @@ pub extend WebFetchTool20250910CacheControl with ToJson::{to_json}
 ///|
 pub impl ToJson for WebFetchTool20250910CacheControl with fn to_json(self) {
   match self {
-    Ephemeral(value) => value.to_json()
+    Ephemeral(value) => Json(value)
     Unknown(_, value) => value
   }
 }
@@ -16770,10 +16770,10 @@ pub extend WebFetchUrlSourcesClientToolResults with ToJson::{to_json}
 ///|
 pub impl ToJson for WebFetchUrlSourcesClientToolResults with fn to_json(self) {
   match self {
-    All(value) => value.to_json()
-    Except(value) => value.to_json()
-    None(value) => value.to_json()
-    Only(value) => value.to_json()
+    All(value) => Json(value)
+    Except(value) => Json(value)
+    None(value) => Json(value)
+    Only(value) => Json(value)
     Unknown(_, value) => value
   }
 }
@@ -16824,10 +16824,10 @@ pub extend WebFetchUrlSourcesServerToolResults with ToJson::{to_json}
 ///|
 pub impl ToJson for WebFetchUrlSourcesServerToolResults with fn to_json(self) {
   match self {
-    All(value) => value.to_json()
-    Except(value) => value.to_json()
-    None(value) => value.to_json()
-    Only(value) => value.to_json()
+    All(value) => Json(value)
+    Except(value) => Json(value)
+    None(value) => Json(value)
+    Only(value) => Json(value)
     Unknown(_, value) => value
   }
 }
@@ -16876,8 +16876,8 @@ pub extend WebFetchUrlSourcesUserInput with ToJson::{to_json}
 ///|
 pub impl ToJson for WebFetchUrlSourcesUserInput with fn to_json(self) {
   match self {
-    All(value) => value.to_json()
-    None(value) => value.to_json()
+    All(value) => Json(value)
+    None(value) => Json(value)
     Unknown(_, value) => value
   }
 }
@@ -17078,7 +17078,7 @@ pub extend WebSearchTool20260209CacheControl with ToJson::{to_json}
 ///|
 pub impl ToJson for WebSearchTool20260209CacheControl with fn to_json(self) {
   match self {
-    Ephemeral(value) => value.to_json()
+    Ephemeral(value) => Json(value)
     Unknown(_, value) => value
   }
 }
@@ -17213,7 +17213,7 @@ pub extend WebFetchTool20260209CacheControl with ToJson::{to_json}
 ///|
 pub impl ToJson for WebFetchTool20260209CacheControl with fn to_json(self) {
   match self {
-    Ephemeral(value) => value.to_json()
+    Ephemeral(value) => Json(value)
     Unknown(_, value) => value
   }
 }
@@ -17358,7 +17358,7 @@ pub extend WebFetchTool20260309CacheControl with ToJson::{to_json}
 ///|
 pub impl ToJson for WebFetchTool20260309CacheControl with fn to_json(self) {
   match self {
-    Ephemeral(value) => value.to_json()
+    Ephemeral(value) => Json(value)
     Unknown(_, value) => value
   }
 }
@@ -17508,7 +17508,7 @@ pub extend WebSearchTool20260318CacheControl with ToJson::{to_json}
 ///|
 pub impl ToJson for WebSearchTool20260318CacheControl with fn to_json(self) {
   match self {
-    Ephemeral(value) => value.to_json()
+    Ephemeral(value) => Json(value)
     Unknown(_, value) => value
   }
 }
@@ -17558,7 +17558,7 @@ pub impl ToJson for WebSearchTool20260318ResponseInclusion with fn to_json(self)
     Excluded => "excluded"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -17704,7 +17704,7 @@ pub extend WebFetchTool20260318CacheControl with ToJson::{to_json}
 ///|
 pub impl ToJson for WebFetchTool20260318CacheControl with fn to_json(self) {
   match self {
-    Ephemeral(value) => value.to_json()
+    Ephemeral(value) => Json(value)
     Unknown(_, value) => value
   }
 }
@@ -17754,7 +17754,7 @@ pub impl ToJson for WebFetchTool20260318ResponseInclusion with fn to_json(self) 
     Excluded => "excluded"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -17915,7 +17915,7 @@ pub extend ToolSearchToolBM2520251119CacheControl with ToJson::{to_json}
 ///|
 pub impl ToJson for ToolSearchToolBM2520251119CacheControl with fn to_json(self) {
   match self {
-    Ephemeral(value) => value.to_json()
+    Ephemeral(value) => Json(value)
     Unknown(_, value) => value
   }
 }
@@ -17967,7 +17967,7 @@ pub impl ToJson for ToolSearchToolBM2520251119Type with fn to_json(self) {
     ToolSearchToolBm25 => "tool_search_tool_bm25"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -18091,7 +18091,7 @@ pub impl ToJson for ToolSearchToolRegex20251119CacheControl with fn to_json(
   self,
 ) {
   match self {
-    Ephemeral(value) => value.to_json()
+    Ephemeral(value) => Json(value)
     Unknown(_, value) => value
   }
 }
@@ -18143,7 +18143,7 @@ pub impl ToJson for ToolSearchToolRegex20251119Type with fn to_json(self) {
     ToolSearchToolRegex => "tool_search_tool_regex"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -18285,27 +18285,27 @@ pub extend CountMessageTokensParamsToolsItem with ToJson::{to_json}
 ///|
 pub impl ToJson for CountMessageTokensParamsToolsItem with fn to_json(self) {
   match self {
-    Tool(value) => value.to_json()
-    BashTool20250124(value) => value.to_json()
-    CodeExecutionTool20250522(value) => value.to_json()
-    CodeExecutionTool20250825(value) => value.to_json()
-    CodeExecutionTool20260120(value) => value.to_json()
-    CodeExecutionTool20260521(value) => value.to_json()
-    BrowserToolset20260801(value) => value.to_json()
-    MemoryTool20250818(value) => value.to_json()
-    ComputerToolset20260801(value) => value.to_json()
-    TextEditor20250124(value) => value.to_json()
-    TextEditor20250429(value) => value.to_json()
-    TextEditor20250728(value) => value.to_json()
-    WebSearchTool20250305(value) => value.to_json()
-    WebFetchTool20250910(value) => value.to_json()
-    WebSearchTool20260209(value) => value.to_json()
-    WebFetchTool20260209(value) => value.to_json()
-    WebFetchTool20260309(value) => value.to_json()
-    WebSearchTool20260318(value) => value.to_json()
-    WebFetchTool20260318(value) => value.to_json()
-    ToolSearchToolBM2520251119(value) => value.to_json()
-    ToolSearchToolRegex20251119(value) => value.to_json()
+    Tool(value) => Json(value)
+    BashTool20250124(value) => Json(value)
+    CodeExecutionTool20250522(value) => Json(value)
+    CodeExecutionTool20250825(value) => Json(value)
+    CodeExecutionTool20260120(value) => Json(value)
+    CodeExecutionTool20260521(value) => Json(value)
+    BrowserToolset20260801(value) => Json(value)
+    MemoryTool20250818(value) => Json(value)
+    ComputerToolset20260801(value) => Json(value)
+    TextEditor20250124(value) => Json(value)
+    TextEditor20250429(value) => Json(value)
+    TextEditor20250728(value) => Json(value)
+    WebSearchTool20250305(value) => Json(value)
+    WebFetchTool20250910(value) => Json(value)
+    WebSearchTool20260209(value) => Json(value)
+    WebFetchTool20260209(value) => Json(value)
+    WebFetchTool20260309(value) => Json(value)
+    WebSearchTool20260318(value) => Json(value)
+    WebFetchTool20260318(value) => Json(value)
+    ToolSearchToolBM2520251119(value) => Json(value)
+    ToolSearchToolRegex20251119(value) => Json(value)
     Unknown(_, value) => value
   }
 }
@@ -18522,7 +18522,7 @@ pub extend CreateMessageParamsCacheControl with ToJson::{to_json}
 ///|
 pub impl ToJson for CreateMessageParamsCacheControl with fn to_json(self) {
   match self {
-    Ephemeral(value) => value.to_json()
+    Ephemeral(value) => Json(value)
     Unknown(_, value) => value
   }
 }
@@ -18567,8 +18567,8 @@ pub extend CreateMessageParamsContainer with ToJson::{to_json}
 ///|
 pub impl ToJson for CreateMessageParamsContainer with fn to_json(self) {
   match self {
-    ContainerParams(value) => value.to_json()
-    Text(value) => value.to_json()
+    ContainerParams(value) => Json(value)
+    Text(value) => Json(value)
   }
 }
 
@@ -18663,7 +18663,7 @@ pub impl ToJson for CreateMessageParamsServiceTier with fn to_json(self) {
     StandardOnly => "standard_only"
     Custom(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -18712,8 +18712,8 @@ pub extend CreateMessageParamsSystem with ToJson::{to_json}
 ///|
 pub impl ToJson for CreateMessageParamsSystem with fn to_json(self) {
   match self {
-    Text(value) => value.to_json()
-    RequestTextBlockArray(value) => value.to_json()
+    Text(value) => Json(value)
+    RequestTextBlockArray(value) => Json(value)
   }
 }
 
@@ -18782,27 +18782,27 @@ pub extend CreateMessageParamsToolsItem with ToJson::{to_json}
 ///|
 pub impl ToJson for CreateMessageParamsToolsItem with fn to_json(self) {
   match self {
-    Tool(value) => value.to_json()
-    BashTool20250124(value) => value.to_json()
-    CodeExecutionTool20250522(value) => value.to_json()
-    CodeExecutionTool20250825(value) => value.to_json()
-    CodeExecutionTool20260120(value) => value.to_json()
-    CodeExecutionTool20260521(value) => value.to_json()
-    BrowserToolset20260801(value) => value.to_json()
-    MemoryTool20250818(value) => value.to_json()
-    ComputerToolset20260801(value) => value.to_json()
-    TextEditor20250124(value) => value.to_json()
-    TextEditor20250429(value) => value.to_json()
-    TextEditor20250728(value) => value.to_json()
-    WebSearchTool20250305(value) => value.to_json()
-    WebFetchTool20250910(value) => value.to_json()
-    WebSearchTool20260209(value) => value.to_json()
-    WebFetchTool20260209(value) => value.to_json()
-    WebFetchTool20260309(value) => value.to_json()
-    WebSearchTool20260318(value) => value.to_json()
-    WebFetchTool20260318(value) => value.to_json()
-    ToolSearchToolBM2520251119(value) => value.to_json()
-    ToolSearchToolRegex20251119(value) => value.to_json()
+    Tool(value) => Json(value)
+    BashTool20250124(value) => Json(value)
+    CodeExecutionTool20250522(value) => Json(value)
+    CodeExecutionTool20250825(value) => Json(value)
+    CodeExecutionTool20260120(value) => Json(value)
+    CodeExecutionTool20260521(value) => Json(value)
+    BrowserToolset20260801(value) => Json(value)
+    MemoryTool20250818(value) => Json(value)
+    ComputerToolset20260801(value) => Json(value)
+    TextEditor20250124(value) => Json(value)
+    TextEditor20250429(value) => Json(value)
+    TextEditor20250728(value) => Json(value)
+    WebSearchTool20250305(value) => Json(value)
+    WebFetchTool20250910(value) => Json(value)
+    WebSearchTool20260209(value) => Json(value)
+    WebFetchTool20260209(value) => Json(value)
+    WebFetchTool20260309(value) => Json(value)
+    WebSearchTool20260318(value) => Json(value)
+    WebFetchTool20260318(value) => Json(value)
+    ToolSearchToolBM2520251119(value) => Json(value)
+    ToolSearchToolRegex20251119(value) => Json(value)
     Unknown(_, value) => value
   }
 }
@@ -19398,15 +19398,15 @@ pub extend ErrorResponseError with ToJson::{to_json}
 ///|
 pub impl ToJson for ErrorResponseError with fn to_json(self) {
   match self {
-    ApiError(value) => value.to_json()
-    AuthenticationError(value) => value.to_json()
-    BillingError(value) => value.to_json()
-    InvalidRequestError(value) => value.to_json()
-    NotFoundError(value) => value.to_json()
-    OverloadedError(value) => value.to_json()
-    PermissionError(value) => value.to_json()
-    RateLimitError(value) => value.to_json()
-    TimeoutError(value) => value.to_json()
+    ApiError(value) => Json(value)
+    AuthenticationError(value) => Json(value)
+    BillingError(value) => Json(value)
+    InvalidRequestError(value) => Json(value)
+    NotFoundError(value) => Json(value)
+    OverloadedError(value) => Json(value)
+    PermissionError(value) => Json(value)
+    RateLimitError(value) => Json(value)
+    TimeoutError(value) => Json(value)
     Unknown(_, value) => value
   }
 }
@@ -19852,18 +19852,18 @@ pub extend ContentBlock with ToJson::{to_json}
 ///|
 pub impl ToJson for ContentBlock with fn to_json(self) {
   match self {
-    BashCodeExecutionToolResult(value) => value.to_json()
-    CodeExecutionToolResult(value) => value.to_json()
-    ContainerUpload(value) => value.to_json()
-    RedactedThinking(value) => value.to_json()
-    ServerToolUse(value) => value.to_json()
-    Text(value) => value.to_json()
-    TextEditorCodeExecutionToolResult(value) => value.to_json()
-    Thinking(value) => value.to_json()
-    ToolSearchToolResult(value) => value.to_json()
-    ToolUse(value) => value.to_json()
-    WebFetchToolResult(value) => value.to_json()
-    WebSearchToolResult(value) => value.to_json()
+    BashCodeExecutionToolResult(value) => Json(value)
+    CodeExecutionToolResult(value) => Json(value)
+    ContainerUpload(value) => Json(value)
+    RedactedThinking(value) => Json(value)
+    ServerToolUse(value) => Json(value)
+    Text(value) => Json(value)
+    TextEditorCodeExecutionToolResult(value) => Json(value)
+    Thinking(value) => Json(value)
+    ToolSearchToolResult(value) => Json(value)
+    ToolUse(value) => Json(value)
+    WebFetchToolResult(value) => Json(value)
+    WebSearchToolResult(value) => Json(value)
     Unknown(_, value) => value
   }
 }
@@ -19936,7 +19936,7 @@ pub impl ToJson for StopReason with fn to_json(self) {
     ModelContextWindowExceeded => "model_context_window_exceeded"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -19998,7 +19998,7 @@ pub impl ToJson for RefusalCategory with fn to_json(self) {
     GeneralHarms => "general_harms"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -20203,7 +20203,7 @@ pub impl ToJson for UsageServiceTier with fn to_json(self) {
     Batch => "batch"
     Unknown(raw) => raw
   }
-  raw.to_json()
+  Json(raw)
 }
 
 ///|
@@ -20741,12 +20741,12 @@ pub extend MessageStreamEvent with ToJson::{to_json}
 ///|
 pub impl ToJson for MessageStreamEvent with fn to_json(self) {
   match self {
-    ContentBlockDelta(value) => value.to_json()
-    ContentBlockStart(value) => value.to_json()
-    ContentBlockStop(value) => value.to_json()
-    MessageDelta(value) => value.to_json()
-    MessageStart(value) => value.to_json()
-    MessageStop(value) => value.to_json()
+    ContentBlockDelta(value) => Json(value)
+    ContentBlockStart(value) => Json(value)
+    ContentBlockStop(value) => Json(value)
+    MessageDelta(value) => Json(value)
+    MessageStart(value) => Json(value)
+    MessageStop(value) => Json(value)
     Unknown(_, value) => value
   }
 }

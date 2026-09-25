@@ -48,7 +48,7 @@ async test "concurrent calls in both directions retain their ids" {
       for i in 0..<30 {
         tasks.push(
           group.spawn(() => {
-            assert_eq(left.call("right", params=i.to_json()), {
+            assert_eq(left.call("right", params=Json(i)), {
               "name": "right",
               "params": i,
             })
@@ -56,7 +56,7 @@ async test "concurrent calls in both directions retain their ids" {
         )
         tasks.push(
           group.spawn(() => {
-            assert_eq(right.call("left", params=i.to_json()), {
+            assert_eq(right.call("left", params=Json(i)), {
               "name": "left",
               "params": i,
             })
@@ -82,19 +82,19 @@ async test "notifications run in FIFO order while requests remain responsive" {
         _,
         params,
       ) => {
-        if params == Some((0).to_json()) {
+        if params == Some(Json(0)) {
           release.get()
         }
         @async.sleep(1)
         received.put(params.unwrap())
       })
       for i in 0..<100 {
-        left.notify("update", params=i.to_json())
+        left.notify("update", params=Json(i))
       }
       assert_eq(left.call("ready"), true)
       release.put(())
       for i in 0..<100 {
-        assert_eq(received.get(), i.to_json())
+        assert_eq(received.get(), Json(i))
       }
     })
   })
@@ -120,7 +120,7 @@ async test "remote errors default method handler and call deadlines" {
       try right.call("missing") catch {
         @jsonrpc_async.RpcFailure::Remote(error) => {
           assert_eq(error.code, -32601)
-          assert_eq(error.data, Some("missing".to_json()))
+          assert_eq(error.data, Some(Json("missing")))
         }
         error => raise error
       } noraise {
