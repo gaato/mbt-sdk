@@ -150723,6 +150723,52 @@ pub impl @json.FromJson for ReactionsCreateForIssueRequest with fn from_json(
 
 ///|
 ///
+/// Generated representation of IssuesAddRelatesToRequest.
+pub(all) struct IssuesAddRelatesToRequest {
+  issue_id : Int
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend IssuesAddRelatesToRequest with Eq::{equal, not_equal}
+
+///|
+pub extend IssuesAddRelatesToRequest with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a IssuesAddRelatesToRequest with omitted optional fields absent.
+pub fn IssuesAddRelatesToRequest::new(
+  issue_id~ : Int,
+) -> IssuesAddRelatesToRequest {
+  { issue_id, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend IssuesAddRelatesToRequest with ToJson::{to_json}
+
+///|
+pub impl ToJson for IssuesAddRelatesToRequest with fn to_json(self) {
+  @sdkjson.ObjBuilder::new().field("issue_id", self.issue_id).build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend IssuesAddRelatesToRequest with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for IssuesAddRelatesToRequest with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  { issue_id: required_field(obj, "issue_id", path), }
+}
+
+///|
+///
 /// Generated representation of IssuesRemoveSubIssueRequest.
 pub(all) struct IssuesRemoveSubIssueRequest {
   sub_issue_id : Int
@@ -154204,7 +154250,7 @@ pub impl @json.FromJson for PullsMergeRequest with fn from_json(value, path) {
 
 ///|
 ///
-/// The merge method to use.
+/// The merge method to use for a direct merge. Only supported for direct merges.
 pub(all) enum PullsMergeAsyncRequestMergeMethod {
   Merge
   Squash
@@ -154261,7 +154307,7 @@ pub impl @json.FromJson for PullsMergeAsyncRequestMergeMethod with fn from_json(
 
 ///|
 ///
-/// The action that will be taken to merge the pull request. `direct_merge` merges the pull request directly without using a merge queue; `merge_queue` adds the pull request to a merge queue; `default` selects the most appropriate option.
+/// The action that will be taken to merge the pull request. `direct_merge` merges the pull request directly without using a merge queue; `merge_queue` adds the pull request to a merge queue; `default` uses a merge queue if one is configured for the target branch, or merges directly otherwise. If omitted, defaults to `default`.
 pub(all) enum PullsMergeAsyncRequestMergeAction {
   Default
   DirectMerge

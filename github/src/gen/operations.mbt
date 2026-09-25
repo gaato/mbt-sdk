@@ -28643,6 +28643,129 @@ pub fn reactions_delete_for_issue_request(
 
 ///|
 ///
+/// List issues related to an issue
+pub fn issues_list_relates_to_request(
+  owner : String,
+  repo : String,
+  issue_number : Int,
+  per_page? : Int,
+  page? : Int,
+) -> @http.Request {
+  let mut url = "/repos/" +
+    percent_encode(parameter_value(owner)) +
+    "/" +
+    percent_encode(parameter_value(repo)) +
+    "/issues/" +
+    percent_encode(parameter_value(issue_number)) +
+    "/relates_to"
+  match per_page {
+    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    None => ()
+  }
+  match page {
+    Some(value) => url = append_query(url, "page", parameter_value(value))
+    None => ()
+  }
+  @http.Request::get(url)
+}
+
+///|
+///
+/// Decodes a parsed successful issues/list-relates-to response.
+pub fn issues_list_relates_to_decode_json(
+  value : Json,
+) -> Array[Issue] raise @json.JsonDecodeError {
+  @json.from_json(value)
+}
+
+///|
+///
+/// Decodes a successful issues/list-relates-to response.
+pub fn issues_list_relates_to_decode(
+  response : @http.Response,
+) -> Array[Issue] raise @runtime.SdkError {
+  decode_response(response)
+}
+
+///|
+///
+/// Add a related issue
+pub fn issues_add_relates_to_request(
+  owner : String,
+  repo : String,
+  issue_number : Int,
+  body : IssuesAddRelatesToRequest,
+) -> @http.Request {
+  @http.Request::post(
+    "/repos/" +
+    percent_encode(parameter_value(owner)) +
+    "/" +
+    percent_encode(parameter_value(repo)) +
+    "/issues/" +
+    percent_encode(parameter_value(issue_number)) +
+    "/relates_to",
+  ).json_body(body.to_json())
+}
+
+///|
+///
+/// Decodes a parsed successful issues/add-relates-to response.
+pub fn issues_add_relates_to_decode_json(
+  value : Json,
+) -> Issue raise @json.JsonDecodeError {
+  @json.from_json(value)
+}
+
+///|
+///
+/// Decodes a successful issues/add-relates-to response.
+pub fn issues_add_relates_to_decode(
+  response : @http.Response,
+) -> Issue raise @runtime.SdkError {
+  decode_response(response)
+}
+
+///|
+///
+/// Remove a related issue
+pub fn issues_remove_relates_to_request(
+  owner : String,
+  repo : String,
+  issue_number : Int,
+  issue_id : Int,
+) -> @http.Request {
+  @http.Request::delete(
+    "/repos/" +
+    percent_encode(parameter_value(owner)) +
+    "/" +
+    percent_encode(parameter_value(repo)) +
+    "/issues/" +
+    percent_encode(parameter_value(issue_number)) +
+    "/relates_to/" +
+    percent_encode(parameter_value(issue_id)),
+  )
+}
+
+///|
+///
+/// Decodes a parsed successful issues/remove-relates-to response.
+pub fn issues_remove_relates_to_decode_json(
+  value : Json,
+) -> Issue raise @json.JsonDecodeError {
+  @json.from_json(value)
+}
+
+///|
+///
+/// Decodes a successful issues/remove-relates-to response.
+pub fn issues_remove_relates_to_decode(
+  response : @http.Response,
+) -> Issue raise @runtime.SdkError {
+  decode_response(response)
+}
+
+///|
+///
 /// Remove sub-issue
 pub fn issues_remove_sub_issue_request(
   owner : String,

@@ -2898,6 +2898,12 @@ pub fn issues_add_labels_decode_json(Json) -> Array[Label] raise @moonbitlang/co
 
 pub fn issues_add_labels_request(String, String, Int, IssuesAddLabelsRequest) -> @http.Request
 
+pub fn issues_add_relates_to_decode(@http.Response) -> Issue raise @sdk-runtime.SdkError
+
+pub fn issues_add_relates_to_decode_json(Json) -> Issue raise @moonbitlang/core/json.JsonDecodeError
+
+pub fn issues_add_relates_to_request(String, String, Int, IssuesAddRelatesToRequest) -> @http.Request
+
 pub fn issues_add_sub_issue_decode(@http.Response) -> Issue raise @sdk-runtime.SdkError
 
 pub fn issues_add_sub_issue_decode_json(Json) -> Issue raise @moonbitlang/core/json.JsonDecodeError
@@ -3088,6 +3094,12 @@ pub fn issues_list_milestones_decode_json(Json) -> Array[Milestone] raise @moonb
 
 pub fn issues_list_milestones_request(String, String, state? : IssuesListMilestonesState, sort? : IssuesListMilestonesSort, direction? : IssuesListMilestonesDirection, per_page? : Int, page? : Int) -> @http.Request
 
+pub fn issues_list_relates_to_decode(@http.Response) -> Array[Issue] raise @sdk-runtime.SdkError
+
+pub fn issues_list_relates_to_decode_json(Json) -> Array[Issue] raise @moonbitlang/core/json.JsonDecodeError
+
+pub fn issues_list_relates_to_request(String, String, Int, per_page? : Int, page? : Int) -> @http.Request
+
 pub fn issues_list_request(filter? : IssuesListFilter, state? : IssuesListState, labels? : String, sort? : IssuesListSort, direction? : IssuesListDirection, since? : String, collab? : Bool, orgs? : Bool, owned? : Bool, pulls? : Bool, per_page? : Int, page? : Int) -> @http.Request
 
 pub fn issues_list_sub_issues_decode(@http.Response) -> Array[Issue] raise @sdk-runtime.SdkError
@@ -3129,6 +3141,12 @@ pub fn issues_remove_label_decode(@http.Response) -> Array[Label] raise @sdk-run
 pub fn issues_remove_label_decode_json(Json) -> Array[Label] raise @moonbitlang/core/json.JsonDecodeError
 
 pub fn issues_remove_label_request(String, String, Int, String) -> @http.Request
+
+pub fn issues_remove_relates_to_decode(@http.Response) -> Issue raise @sdk-runtime.SdkError
+
+pub fn issues_remove_relates_to_decode_json(Json) -> Issue raise @moonbitlang/core/json.JsonDecodeError
+
+pub fn issues_remove_relates_to_request(String, String, Int, Int) -> @http.Request
 
 pub fn issues_remove_sub_issue_decode(@http.Response) -> Issue raise @sdk-runtime.SdkError
 
@@ -23745,6 +23763,18 @@ pub fn IssuesAddLabelsRequestObjectLabelsItemObjectConfidence::to_json(Self) -> 
 pub fn IssuesAddLabelsRequestObjectLabelsItemObjectConfidence::to_repr(Self) -> @debug.Repr
 pub impl ToJson for IssuesAddLabelsRequestObjectLabelsItemObjectConfidence
 pub impl @moonbitlang/core/json.FromJson for IssuesAddLabelsRequestObjectLabelsItemObjectConfidence
+
+pub(all) struct IssuesAddRelatesToRequest {
+  issue_id : Int
+} derive(Eq, @debug.Debug)
+pub fn IssuesAddRelatesToRequest::equal(Self, Self) -> Bool
+pub fn IssuesAddRelatesToRequest::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn IssuesAddRelatesToRequest::new(issue_id~ : Int) -> Self
+pub fn IssuesAddRelatesToRequest::not_equal(Self, Self) -> Bool
+pub fn IssuesAddRelatesToRequest::to_json(Self) -> Json
+pub fn IssuesAddRelatesToRequest::to_repr(Self) -> @debug.Repr
+pub impl ToJson for IssuesAddRelatesToRequest
+pub impl @moonbitlang/core/json.FromJson for IssuesAddRelatesToRequest
 
 pub(all) struct IssuesAddSubIssueRequest {
   sub_issue_id : Int
