@@ -10,7 +10,9 @@ name: Canary
 
 on:
   schedule:
-    - cron: "17 3 * * *"
+    # 06:17 JST: after the nightly and latest images are rebuilt (12:10 and
+    # 11:17 UTC in gaato/moonbit-docker), with results ready by morning in Japan.
+    - cron: "17 21 * * *"
   workflow_dispatch:
 
 permissions:

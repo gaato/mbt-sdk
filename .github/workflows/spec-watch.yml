@@ -10,7 +10,9 @@ name: Spec watch
 
 on:
   schedule:
-    - cron: "43 4 * * *"
+    # 07:43 JST (15:43 US Pacific): results are ready by morning in Japan; later
+    # upstream spec changes are picked up the next day.
+    - cron: "43 22 * * *"
   workflow_dispatch:
 
 permissions:
