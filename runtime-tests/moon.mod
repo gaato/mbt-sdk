@@ -18,7 +18,7 @@ import {
   "gaato/sdk-runtime@0.2.1",
   "gaato/openai@0.2.0",
   "gaato/anthropic@0.2.1",
-  "gaato/github@0.3.0",
+  "gaato/github@0.4.0",
   "gaato/fixture-badhttp@0.0.0",
   "moonbitlang/async@0.22.4",
 }
