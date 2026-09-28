@@ -13418,6 +13418,145 @@ pub fn projects_list_view_items_for_org_decode(
 
 ///|
 ///
+/// Get registered app installations for external custom properties
+pub fn orgs_external_properties_for_repos_get_organization_app_installations_request(
+  org : String,
+) -> @http.Request {
+  @http.Request::get(
+    "/orgs/" +
+    percent_encode(parameter_value(org)) +
+    "/properties/installations",
+  )
+}
+
+///|
+///
+/// Decodes a parsed successful orgs/external-properties-for-repos-get-organization-app-installations response.
+pub fn orgs_external_properties_for_repos_get_organization_app_installations_decode_json(
+  value : Json,
+) -> Array[OrganizationExternalPropertyInstallation] raise @json.JsonDecodeError {
+  @json.from_json(value)
+}
+
+///|
+///
+/// Decodes a successful orgs/external-properties-for-repos-get-organization-app-installations response.
+pub fn orgs_external_properties_for_repos_get_organization_app_installations_decode(
+  response : @http.Response,
+) -> Array[OrganizationExternalPropertyInstallation] raise @runtime.SdkError {
+  decode_response(response)
+}
+
+///|
+///
+/// Register an app installation for external custom properties
+pub fn orgs_external_properties_for_repos_register_organization_app_installation_request(
+  org : String,
+  body : OrgsExternalPropertiesForReposRegisterOrganizationAppInstallationRequest,
+) -> @http.Request {
+  @http.Request::post(
+    "/orgs/" +
+    percent_encode(parameter_value(org)) +
+    "/properties/installations",
+  ).json_body(Json(body))
+}
+
+///|
+///
+/// Decodes a parsed successful orgs/external-properties-for-repos-register-organization-app-installation response.
+pub fn orgs_external_properties_for_repos_register_organization_app_installation_decode_json(
+  value : Json,
+) -> OrganizationExternalPropertyInstallation raise @json.JsonDecodeError {
+  @json.from_json(value)
+}
+
+///|
+///
+/// Decodes a successful orgs/external-properties-for-repos-register-organization-app-installation response.
+pub fn orgs_external_properties_for_repos_register_organization_app_installation_decode(
+  response : @http.Response,
+) -> OrganizationExternalPropertyInstallation raise @runtime.SdkError {
+  decode_response(response)
+}
+
+///|
+///
+/// Get all external custom properties for a GitHub App installation in an organization
+pub fn orgs_external_properties_for_repos_get_organization_definitions_request(
+  org : String,
+) -> @http.Request {
+  @http.Request::get(
+    "/orgs/" +
+    percent_encode(parameter_value(org)) +
+    "/properties/installations/schema",
+  )
+}
+
+///|
+///
+/// Decodes a parsed successful orgs/external-properties-for-repos-get-organization-definitions response.
+pub fn orgs_external_properties_for_repos_get_organization_definitions_decode_json(
+  value : Json,
+) -> Array[ExternalProperty] raise @json.JsonDecodeError {
+  @json.from_json(value)
+}
+
+///|
+///
+/// Decodes a successful orgs/external-properties-for-repos-get-organization-definitions response.
+pub fn orgs_external_properties_for_repos_get_organization_definitions_decode(
+  response : @http.Response,
+) -> Array[ExternalProperty] raise @runtime.SdkError {
+  decode_response(response)
+}
+
+///|
+///
+/// Create or update external custom property values for organization repositories The caller handles the response as @http.Response.
+pub fn orgs_external_properties_for_repos_create_or_update_organization_values_request(
+  org : String,
+  body : OrgsExternalPropertiesForReposCreateOrUpdateOrganizationValuesRequest,
+) -> @http.Request {
+  @http.Request::patch(
+    "/orgs/" +
+    percent_encode(parameter_value(org)) +
+    "/properties/installations/values",
+  ).json_body(Json(body))
+}
+
+///|
+///
+/// Create or update external custom property values for a property across organization repositories The caller handles the response as @http.Response.
+pub fn orgs_external_properties_for_repos_create_or_update_values_for_organization_property_request(
+  org : String,
+  property_name : String,
+  body : OrgsExternalPropertiesForReposCreateOrUpdateValuesForOrganizationPropertyRequest,
+) -> @http.Request {
+  @http.Request::patch(
+    "/orgs/" +
+    percent_encode(parameter_value(org)) +
+    "/properties/installations/values/" +
+    percent_encode(parameter_value(property_name)),
+  ).json_body(Json(body))
+}
+
+///|
+///
+/// Remove all external custom property values for a property across all organization repositories The caller handles the response as @http.Response.
+pub fn orgs_external_properties_for_repos_delete_organization_values_request(
+  org : String,
+  property_name : String,
+) -> @http.Request {
+  @http.Request::delete(
+    "/orgs/" +
+    percent_encode(parameter_value(org)) +
+    "/properties/installations/values/" +
+    percent_encode(parameter_value(property_name)),
+  )
+}
+
+///|
+///
 /// Get all custom properties for an organization
 pub fn orgs_custom_properties_for_repos_get_organization_definitions_request(
   org : String,
@@ -16086,6 +16225,28 @@ pub fn actions_re_run_job_for_workflow_run_decode(
   response : @http.Response,
 ) -> EmptyObject raise @runtime.SdkError {
   decode_response(response)
+}
+
+///|
+///
+/// Download step logs for a workflow run job The caller handles the response as @http.Response.
+pub fn actions_download_step_logs_for_workflow_run_job_request(
+  owner : String,
+  repo : String,
+  job_id : Int64,
+  step_number : Int,
+) -> @http.Request {
+  @http.Request::get(
+    "/repos/" +
+    percent_encode(parameter_value(owner)) +
+    "/" +
+    percent_encode(parameter_value(repo)) +
+    "/actions/jobs/" +
+    percent_encode(parameter_value(job_id)) +
+    "/steps/" +
+    percent_encode(parameter_value(step_number)) +
+    "/logs",
+  )
 }
 
 ///|

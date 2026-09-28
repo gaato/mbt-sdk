@@ -178,6 +178,8 @@ pub fn actions_download_artifact_request(String, String, Int, String) -> @http.R
 
 pub fn actions_download_job_logs_for_workflow_run_request(String, String, Int64) -> @http.Request
 
+pub fn actions_download_step_logs_for_workflow_run_job_request(String, String, Int64, Int) -> @http.Request
+
 pub fn actions_download_workflow_run_attempt_logs_request(String, String, Int, Int) -> @http.Request
 
 pub fn actions_download_workflow_run_logs_request(String, String, Int) -> @http.Request
@@ -3505,6 +3507,30 @@ pub fn orgs_disable_selected_repository_immutable_releases_organization_request(
 pub fn orgs_enable_or_disable_security_product_on_all_org_repos_request(String, OrgsEnableOrDisableSecurityProductOnAllOrgReposSecurityProduct, OrgsEnableOrDisableSecurityProductOnAllOrgReposEnablement, OrgsEnableOrDisableSecurityProductOnAllOrgReposRequest) -> @http.Request
 
 pub fn orgs_enable_selected_repository_immutable_releases_organization_request(String, Int) -> @http.Request
+
+pub fn orgs_external_properties_for_repos_create_or_update_organization_values_request(String, OrgsExternalPropertiesForReposCreateOrUpdateOrganizationValuesRequest) -> @http.Request
+
+pub fn orgs_external_properties_for_repos_create_or_update_values_for_organization_property_request(String, String, OrgsExternalPropertiesForReposCreateOrUpdateValuesForOrganizationPropertyRequest) -> @http.Request
+
+pub fn orgs_external_properties_for_repos_delete_organization_values_request(String, String) -> @http.Request
+
+pub fn orgs_external_properties_for_repos_get_organization_app_installations_decode(@http.Response) -> Array[OrganizationExternalPropertyInstallation] raise @sdk-runtime.SdkError
+
+pub fn orgs_external_properties_for_repos_get_organization_app_installations_decode_json(Json) -> Array[OrganizationExternalPropertyInstallation] raise @moonbitlang/core/json.JsonDecodeError
+
+pub fn orgs_external_properties_for_repos_get_organization_app_installations_request(String) -> @http.Request
+
+pub fn orgs_external_properties_for_repos_get_organization_definitions_decode(@http.Response) -> Array[ExternalProperty] raise @sdk-runtime.SdkError
+
+pub fn orgs_external_properties_for_repos_get_organization_definitions_decode_json(Json) -> Array[ExternalProperty] raise @moonbitlang/core/json.JsonDecodeError
+
+pub fn orgs_external_properties_for_repos_get_organization_definitions_request(String) -> @http.Request
+
+pub fn orgs_external_properties_for_repos_register_organization_app_installation_decode(@http.Response) -> OrganizationExternalPropertyInstallation raise @sdk-runtime.SdkError
+
+pub fn orgs_external_properties_for_repos_register_organization_app_installation_decode_json(Json) -> OrganizationExternalPropertyInstallation raise @moonbitlang/core/json.JsonDecodeError
+
+pub fn orgs_external_properties_for_repos_register_organization_app_installation_request(String, OrgsExternalPropertiesForReposRegisterOrganizationAppInstallationRequest) -> @http.Request
 
 pub fn orgs_get_cluster_deployment_records_job_decode(@http.Response) -> OrgsGetClusterDeploymentRecordsJobResponse raise @sdk-runtime.SdkError
 
@@ -9853,6 +9879,7 @@ pub(all) struct AppPermissions {
   organization_custom_properties : AppPermissionsOrganizationCustomProperties?
   organization_copilot_seat_management : AppPermissionsOrganizationCopilotSeatManagement?
   organization_copilot_agent_settings : AppPermissionsOrganizationCopilotAgentSettings?
+  organization_external_properties_for_repos : AppPermissionsOrganizationExternalPropertiesForRepos?
   organization_announcement_banners : AppPermissionsOrganizationAnnouncementBanners?
   organization_hooks : AppPermissionsOrganizationHooks?
   organization_personal_access_tokens : AppPermissionsOrganizationPersonalAccessTokens?
@@ -9872,7 +9899,7 @@ pub(all) struct AppPermissions {
 } derive(Eq, @debug.Debug)
 pub fn AppPermissions::equal(Self, Self) -> Bool
 pub fn AppPermissions::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
-pub fn AppPermissions::new(actions? : AppPermissionsActions, administration? : AppPermissionsAdministration, artifact_metadata? : AppPermissionsArtifactMetadata, attestations? : AppPermissionsAttestations, checks? : AppPermissionsChecks, code_quality? : AppPermissionsCodeQuality, codespaces? : AppPermissionsCodespaces, contents? : AppPermissionsContents, dependabot_secrets? : AppPermissionsDependabotSecrets, deployments? : AppPermissionsDeployments, discussions? : AppPermissionsDiscussions, environments? : AppPermissionsEnvironments, issues? : AppPermissionsIssues, merge_queues? : AppPermissionsMergeQueues, metadata? : AppPermissionsMetadata, packages? : AppPermissionsPackages, pages? : AppPermissionsPages, pull_requests? : AppPermissionsPullRequests, repository_custom_properties? : AppPermissionsRepositoryCustomProperties, repository_hooks? : AppPermissionsRepositoryHooks, repository_projects? : AppPermissionsRepositoryProjects, secret_scanning_alerts? : AppPermissionsSecretScanningAlerts, secrets? : AppPermissionsSecrets, security_events? : AppPermissionsSecurityEvents, single_file? : AppPermissionsSingleFile, statuses? : AppPermissionsStatuses, vulnerability_alerts? : AppPermissionsVulnerabilityAlerts, custom_properties_for_organizations? : AppPermissionsCustomPropertiesForOrganizations, members? : AppPermissionsMembers, organization_administration? : AppPermissionsOrganizationAdministration, organization_custom_roles? : AppPermissionsOrganizationCustomRoles, organization_custom_org_roles? : AppPermissionsOrganizationCustomOrgRoles, organization_custom_properties? : AppPermissionsOrganizationCustomProperties, organization_copilot_seat_management? : AppPermissionsOrganizationCopilotSeatManagement, organization_copilot_agent_settings? : AppPermissionsOrganizationCopilotAgentSettings, organization_announcement_banners? : AppPermissionsOrganizationAnnouncementBanners, organization_hooks? : AppPermissionsOrganizationHooks, organization_personal_access_tokens? : AppPermissionsOrganizationPersonalAccessTokens, organization_personal_access_token_requests? : AppPermissionsOrganizationPersonalAccessTokenRequests, organization_projects? : AppPermissionsOrganizationProjects, organization_packages? : AppPermissionsOrganizationPackages, organization_secrets? : AppPermissionsOrganizationSecrets, organization_self_hosted_runners? : AppPermissionsOrganizationSelfHostedRunners, organization_user_blocking? : AppPermissionsOrganizationUserBlocking, email_addresses? : AppPermissionsEmailAddresses, followers? : AppPermissionsFollowers, git_ssh_keys? : AppPermissionsGitSshKeys, gpg_keys? : AppPermissionsGpgKeys, interaction_limits? : AppPermissionsInteractionLimits, starring? : AppPermissionsStarring, enterprise_custom_properties_for_organizations? : AppPermissionsEnterpriseCustomPropertiesForOrganizations) -> Self
+pub fn AppPermissions::new(actions? : AppPermissionsActions, administration? : AppPermissionsAdministration, artifact_metadata? : AppPermissionsArtifactMetadata, attestations? : AppPermissionsAttestations, checks? : AppPermissionsChecks, code_quality? : AppPermissionsCodeQuality, codespaces? : AppPermissionsCodespaces, contents? : AppPermissionsContents, dependabot_secrets? : AppPermissionsDependabotSecrets, deployments? : AppPermissionsDeployments, discussions? : AppPermissionsDiscussions, environments? : AppPermissionsEnvironments, issues? : AppPermissionsIssues, merge_queues? : AppPermissionsMergeQueues, metadata? : AppPermissionsMetadata, packages? : AppPermissionsPackages, pages? : AppPermissionsPages, pull_requests? : AppPermissionsPullRequests, repository_custom_properties? : AppPermissionsRepositoryCustomProperties, repository_hooks? : AppPermissionsRepositoryHooks, repository_projects? : AppPermissionsRepositoryProjects, secret_scanning_alerts? : AppPermissionsSecretScanningAlerts, secrets? : AppPermissionsSecrets, security_events? : AppPermissionsSecurityEvents, single_file? : AppPermissionsSingleFile, statuses? : AppPermissionsStatuses, vulnerability_alerts? : AppPermissionsVulnerabilityAlerts, custom_properties_for_organizations? : AppPermissionsCustomPropertiesForOrganizations, members? : AppPermissionsMembers, organization_administration? : AppPermissionsOrganizationAdministration, organization_custom_roles? : AppPermissionsOrganizationCustomRoles, organization_custom_org_roles? : AppPermissionsOrganizationCustomOrgRoles, organization_custom_properties? : AppPermissionsOrganizationCustomProperties, organization_copilot_seat_management? : AppPermissionsOrganizationCopilotSeatManagement, organization_copilot_agent_settings? : AppPermissionsOrganizationCopilotAgentSettings, organization_external_properties_for_repos? : AppPermissionsOrganizationExternalPropertiesForRepos, organization_announcement_banners? : AppPermissionsOrganizationAnnouncementBanners, organization_hooks? : AppPermissionsOrganizationHooks, organization_personal_access_tokens? : AppPermissionsOrganizationPersonalAccessTokens, organization_personal_access_token_requests? : AppPermissionsOrganizationPersonalAccessTokenRequests, organization_projects? : AppPermissionsOrganizationProjects, organization_packages? : AppPermissionsOrganizationPackages, organization_secrets? : AppPermissionsOrganizationSecrets, organization_self_hosted_runners? : AppPermissionsOrganizationSelfHostedRunners, organization_user_blocking? : AppPermissionsOrganizationUserBlocking, email_addresses? : AppPermissionsEmailAddresses, followers? : AppPermissionsFollowers, git_ssh_keys? : AppPermissionsGitSshKeys, gpg_keys? : AppPermissionsGpgKeys, interaction_limits? : AppPermissionsInteractionLimits, starring? : AppPermissionsStarring, enterprise_custom_properties_for_organizations? : AppPermissionsEnterpriseCustomPropertiesForOrganizations) -> Self
 pub fn AppPermissions::not_equal(Self, Self) -> Bool
 pub fn AppPermissions::to_json(Self) -> Json
 pub fn AppPermissions::to_repr(Self) -> @debug.Repr
@@ -10270,6 +10297,20 @@ pub fn AppPermissionsOrganizationCustomRoles::to_json(Self) -> Json
 pub fn AppPermissionsOrganizationCustomRoles::to_repr(Self) -> @debug.Repr
 pub impl ToJson for AppPermissionsOrganizationCustomRoles
 pub impl @moonbitlang/core/json.FromJson for AppPermissionsOrganizationCustomRoles
+
+pub(all) enum AppPermissionsOrganizationExternalPropertiesForRepos {
+  Read
+  Write
+  Admin
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+pub fn AppPermissionsOrganizationExternalPropertiesForRepos::equal(Self, Self) -> Bool
+pub fn AppPermissionsOrganizationExternalPropertiesForRepos::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn AppPermissionsOrganizationExternalPropertiesForRepos::not_equal(Self, Self) -> Bool
+pub fn AppPermissionsOrganizationExternalPropertiesForRepos::to_json(Self) -> Json
+pub fn AppPermissionsOrganizationExternalPropertiesForRepos::to_repr(Self) -> @debug.Repr
+pub impl ToJson for AppPermissionsOrganizationExternalPropertiesForRepos
+pub impl @moonbitlang/core/json.FromJson for AppPermissionsOrganizationExternalPropertiesForRepos
 
 pub(all) enum AppPermissionsOrganizationHooks {
   Read
@@ -21032,6 +21073,18 @@ pub fn EventRepo::to_repr(Self) -> @debug.Repr
 pub impl ToJson for EventRepo
 pub impl @moonbitlang/core/json.FromJson for EventRepo
 
+pub(all) struct ExternalProperty {
+  property_name : String
+} derive(Eq, @debug.Debug)
+pub fn ExternalProperty::equal(Self, Self) -> Bool
+pub fn ExternalProperty::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ExternalProperty::new(property_name~ : String) -> Self
+pub fn ExternalProperty::not_equal(Self, Self) -> Bool
+pub fn ExternalProperty::to_json(Self) -> Json
+pub fn ExternalProperty::to_repr(Self) -> @debug.Repr
+pub impl ToJson for ExternalProperty
+pub impl @moonbitlang/core/json.FromJson for ExternalProperty
+
 pub(all) struct Feed {
   timeline_url : String
   user_url : String
@@ -27629,6 +27682,31 @@ pub fn OrganizationDependabotSecretVisibility::to_repr(Self) -> @debug.Repr
 pub impl ToJson for OrganizationDependabotSecretVisibility
 pub impl @moonbitlang/core/json.FromJson for OrganizationDependabotSecretVisibility
 
+pub(all) struct OrganizationExternalPropertyInstallation {
+  display_name : String
+  installation : OrganizationExternalPropertyInstallationInstallation
+} derive(Eq, @debug.Debug)
+pub fn OrganizationExternalPropertyInstallation::equal(Self, Self) -> Bool
+pub fn OrganizationExternalPropertyInstallation::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn OrganizationExternalPropertyInstallation::new(display_name~ : String, installation~ : OrganizationExternalPropertyInstallationInstallation) -> Self
+pub fn OrganizationExternalPropertyInstallation::not_equal(Self, Self) -> Bool
+pub fn OrganizationExternalPropertyInstallation::to_json(Self) -> Json
+pub fn OrganizationExternalPropertyInstallation::to_repr(Self) -> @debug.Repr
+pub impl ToJson for OrganizationExternalPropertyInstallation
+pub impl @moonbitlang/core/json.FromJson for OrganizationExternalPropertyInstallation
+
+pub(all) struct OrganizationExternalPropertyInstallationInstallation {
+  id : Int
+} derive(Eq, @debug.Debug)
+pub fn OrganizationExternalPropertyInstallationInstallation::equal(Self, Self) -> Bool
+pub fn OrganizationExternalPropertyInstallationInstallation::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn OrganizationExternalPropertyInstallationInstallation::new(id~ : Int) -> Self
+pub fn OrganizationExternalPropertyInstallationInstallation::not_equal(Self, Self) -> Bool
+pub fn OrganizationExternalPropertyInstallationInstallation::to_json(Self) -> Json
+pub fn OrganizationExternalPropertyInstallationInstallation::to_repr(Self) -> @debug.Repr
+pub impl ToJson for OrganizationExternalPropertyInstallationInstallation
+pub impl @moonbitlang/core/json.FromJson for OrganizationExternalPropertyInstallationInstallation
+
 pub(all) struct OrganizationFull {
   login : String
   id : Int
@@ -28446,6 +28524,44 @@ pub fn OrgsEnableOrDisableSecurityProductOnAllOrgReposSecurityProduct::to_json(S
 pub fn OrgsEnableOrDisableSecurityProductOnAllOrgReposSecurityProduct::to_repr(Self) -> @debug.Repr
 pub impl ToJson for OrgsEnableOrDisableSecurityProductOnAllOrgReposSecurityProduct
 pub impl @moonbitlang/core/json.FromJson for OrgsEnableOrDisableSecurityProductOnAllOrgReposSecurityProduct
+
+pub(all) struct OrgsExternalPropertiesForReposCreateOrUpdateOrganizationValuesRequest {
+  repository_names : Array[String]
+  properties : Array[CustomPropertyValue]
+} derive(Eq, @debug.Debug)
+pub fn OrgsExternalPropertiesForReposCreateOrUpdateOrganizationValuesRequest::equal(Self, Self) -> Bool
+pub fn OrgsExternalPropertiesForReposCreateOrUpdateOrganizationValuesRequest::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn OrgsExternalPropertiesForReposCreateOrUpdateOrganizationValuesRequest::new(repository_names~ : Array[String], properties~ : Array[CustomPropertyValue]) -> Self
+pub fn OrgsExternalPropertiesForReposCreateOrUpdateOrganizationValuesRequest::not_equal(Self, Self) -> Bool
+pub fn OrgsExternalPropertiesForReposCreateOrUpdateOrganizationValuesRequest::to_json(Self) -> Json
+pub fn OrgsExternalPropertiesForReposCreateOrUpdateOrganizationValuesRequest::to_repr(Self) -> @debug.Repr
+pub impl ToJson for OrgsExternalPropertiesForReposCreateOrUpdateOrganizationValuesRequest
+pub impl @moonbitlang/core/json.FromJson for OrgsExternalPropertiesForReposCreateOrUpdateOrganizationValuesRequest
+
+pub(all) struct OrgsExternalPropertiesForReposCreateOrUpdateValuesForOrganizationPropertyRequest {
+  repository_values : Array[RepositoryExternalPropertyPayload]
+} derive(Eq, @debug.Debug)
+pub fn OrgsExternalPropertiesForReposCreateOrUpdateValuesForOrganizationPropertyRequest::equal(Self, Self) -> Bool
+pub fn OrgsExternalPropertiesForReposCreateOrUpdateValuesForOrganizationPropertyRequest::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn OrgsExternalPropertiesForReposCreateOrUpdateValuesForOrganizationPropertyRequest::new(repository_values~ : Array[RepositoryExternalPropertyPayload]) -> Self
+pub fn OrgsExternalPropertiesForReposCreateOrUpdateValuesForOrganizationPropertyRequest::not_equal(Self, Self) -> Bool
+pub fn OrgsExternalPropertiesForReposCreateOrUpdateValuesForOrganizationPropertyRequest::to_json(Self) -> Json
+pub fn OrgsExternalPropertiesForReposCreateOrUpdateValuesForOrganizationPropertyRequest::to_repr(Self) -> @debug.Repr
+pub impl ToJson for OrgsExternalPropertiesForReposCreateOrUpdateValuesForOrganizationPropertyRequest
+pub impl @moonbitlang/core/json.FromJson for OrgsExternalPropertiesForReposCreateOrUpdateValuesForOrganizationPropertyRequest
+
+pub(all) struct OrgsExternalPropertiesForReposRegisterOrganizationAppInstallationRequest {
+  installation_id : Int?
+  display_name : String
+} derive(Eq, @debug.Debug)
+pub fn OrgsExternalPropertiesForReposRegisterOrganizationAppInstallationRequest::equal(Self, Self) -> Bool
+pub fn OrgsExternalPropertiesForReposRegisterOrganizationAppInstallationRequest::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn OrgsExternalPropertiesForReposRegisterOrganizationAppInstallationRequest::new(display_name~ : String, installation_id? : Int) -> Self
+pub fn OrgsExternalPropertiesForReposRegisterOrganizationAppInstallationRequest::not_equal(Self, Self) -> Bool
+pub fn OrgsExternalPropertiesForReposRegisterOrganizationAppInstallationRequest::to_json(Self) -> Json
+pub fn OrgsExternalPropertiesForReposRegisterOrganizationAppInstallationRequest::to_repr(Self) -> @debug.Repr
+pub impl ToJson for OrgsExternalPropertiesForReposRegisterOrganizationAppInstallationRequest
+pub impl @moonbitlang/core/json.FromJson for OrgsExternalPropertiesForReposRegisterOrganizationAppInstallationRequest
 
 pub(all) struct OrgsGetClusterDeploymentRecordsJobResponse {
   job_id : Int
@@ -36538,6 +36654,19 @@ pub fn RepositoryCollaboratorPermission::to_json(Self) -> Json
 pub fn RepositoryCollaboratorPermission::to_repr(Self) -> @debug.Repr
 pub impl ToJson for RepositoryCollaboratorPermission
 pub impl @moonbitlang/core/json.FromJson for RepositoryCollaboratorPermission
+
+pub(all) struct RepositoryExternalPropertyPayload {
+  repository_name : String
+  value : String?
+} derive(Eq, @debug.Debug)
+pub fn RepositoryExternalPropertyPayload::equal(Self, Self) -> Bool
+pub fn RepositoryExternalPropertyPayload::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn RepositoryExternalPropertyPayload::new(repository_name~ : String, value? : String) -> Self
+pub fn RepositoryExternalPropertyPayload::not_equal(Self, Self) -> Bool
+pub fn RepositoryExternalPropertyPayload::to_json(Self) -> Json
+pub fn RepositoryExternalPropertyPayload::to_repr(Self) -> @debug.Repr
+pub impl ToJson for RepositoryExternalPropertyPayload
+pub impl @moonbitlang/core/json.FromJson for RepositoryExternalPropertyPayload
 
 pub(all) struct RepositoryHashAlgorithm {
   hash_algorithm : RepositoryHashAlgorithmHashAlgorithm
