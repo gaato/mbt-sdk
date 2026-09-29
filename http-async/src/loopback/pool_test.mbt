@@ -56,6 +56,49 @@ async test "sequential requests reuse one parked connection" {
 }
 
 ///|
+async test "pool reuses only connections with the same User-Agent" {
+  with_keepalive_server(
+    (request, conn) => {
+      let expected = match request.path {
+        "/first" | "/third" => "agent-a"
+        "/second" => "agent-b"
+        "/default" => "moonbit-http-client/1.1"
+        _ => fail("unexpected path")
+      }
+      assert_eq(request.headers.get("user-agent"), Some(expected))
+      pong(conn)
+    },
+    (url, connections) => {
+      let transport = @adapter.AsyncTransport::new()
+      ignore(
+        transport.send(
+          @http.Request::get(url + "/first").header("User-Agent", "agent-a"),
+        ),
+      )
+      assert_eq(connections(), 1)
+      ignore(
+        transport.send(
+          @http.Request::get(url + "/second").header("user-agent", "agent-b"),
+        ),
+      )
+      assert_eq(connections(), 2)
+      assert_eq(transport.idle_connections(), 2)
+      ignore(
+        transport.send(
+          @http.Request::get(url + "/third").header("USER-AGENT", "agent-a"),
+        ),
+      )
+      assert_eq(connections(), 2)
+      assert_eq(transport.idle_connections(), 2)
+      ignore(transport.send(@http.Request::get(url + "/default")))
+      assert_eq(connections(), 3)
+      assert_eq(transport.idle_connections(), 3)
+      transport.close()
+    },
+  )
+}
+
+///|
 async test "Connection: close and disabled reuse dial per request" {
   with_keepalive_server(
     (_, conn) => {

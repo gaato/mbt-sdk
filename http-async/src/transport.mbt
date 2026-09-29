@@ -68,6 +68,7 @@ pub impl @http.Transport for AsyncTransport with fn send_stream(self, request) {
     let stream : &@http.BodyStream = ClientStream::{
       transport: self,
       origin: exchange.origin,
+      user_agent: exchange.user_agent,
       client: exchange.client,
       keep_alive: exchange.keep_alive,
       timeout_ms: self.timeout_ms,
@@ -102,6 +103,7 @@ async fn[X] bounded(
 priv struct ClientStream {
   transport : AsyncTransport
   origin : String
+  user_agent : String?
   client : @ahttp.Client
   keep_alive : Bool
   timeout_ms : Int
@@ -116,7 +118,7 @@ impl @http.BodyStream for ClientStream with fn close(self) {
   if !self.closed {
     self.closed = true
     if self.finished && self.keep_alive {
-      self.transport.checkin(self.origin, self.client)
+      self.transport.checkin(self.origin, self.user_agent, self.client)
     } else {
       self.client.close()
     }
@@ -147,6 +149,7 @@ priv struct Opened {
   head : @http.ResponseHead
   client : @ahttp.Client
   origin : String
+  user_agent : String?
   keep_alive : Bool
 }
 
@@ -154,7 +157,7 @@ priv struct Opened {
 /// Parks or closes the connection of a fully consumed exchange.
 fn AsyncTransport::release(self : AsyncTransport, opened : Opened) -> Unit {
   if opened.keep_alive {
-    self.checkin(opened.origin, opened.client)
+    self.checkin(opened.origin, opened.user_agent, opened.client)
   } else {
     opened.client.close()
   }
@@ -168,8 +171,18 @@ async fn AsyncTransport::open_request(
   let meth = request_method(request.http_method)
   let (origin, path) = split_url(request.url)
   let headers : @ahttp.Headers = Map([])
+  let mut user_agent : String? = None
   for (name, value) in request.headers.iter() {
     if name == "content-length" {
+      continue
+    }
+    if name == "user-agent" {
+      user_agent = Some(
+        match user_agent {
+          None => value
+          Some(previous) => previous + ", " + value
+        },
+      )
       continue
     }
     let key = @ahttp.CaseInsensitiveString(name)
@@ -180,7 +193,7 @@ async fn AsyncTransport::open_request(
   }
   let mut fresh = false
   for ;; {
-    let (client, reused) = self.checkout(origin, fresh~)
+    let (client, reused) = self.checkout(origin, user_agent, fresh~)
     let response = exchange(client, meth, path, headers, request.body) catch {
       error => {
         if reused && replayable(request) {
@@ -196,6 +209,7 @@ async fn AsyncTransport::open_request(
       head: response_head(response),
       client,
       origin,
+      user_agent,
       keep_alive: !connection_close(response),
     }
   }

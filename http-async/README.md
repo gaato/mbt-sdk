@@ -10,4 +10,6 @@ connection/protocol error classification; JS uses fetch.
 
 `AsyncTransport` keeps a small keep-alive pool per origin (`max_idle_per_origin`, `idle_max_ms`), never queues concurrent requests, and replays a request once on a fresh connection when a reused one fails before the response head, but only for idempotent methods or requests carrying an `Idempotency-Key`. Call `close()` to drop parked connections.
 
+In 0.1.2, a request's `User-Agent` is set when its connection is opened. Connections are reused only for requests with the same `User-Agent`; requests without one retain moonbitlang/async's default.
+
 Unofficial and experimental. Source, issues and design notes: https://github.com/gaato/mbt-sdk

@@ -30,6 +30,65 @@ async fn reply(
 }
 
 ///|
+// Inspect raw header lines because the HTTP server parser collapses duplicates.
+async fn with_raw_request(
+  expected_user_agent : String,
+  run : async (String) -> Unit,
+) -> Unit {
+  @async.with_timeout(5000, () => {
+    let server = @socket.TcpServer(@socket.Addr::parse("127.0.0.1:0"))
+    defer server.close()
+    @async.with_task_group(group => {
+      group.spawn_bg(no_wait=true, () => {
+        let (conn, _) = server.accept()
+        defer conn.close()
+        guard conn.read_until("\r\n\r\n") is Some(head) else {
+          fail("missing request headers")
+        }
+        let mut count = 0
+        for line in head.split("\r\n") {
+          if line.to_lower().has_prefix("user-agent:") {
+            count += 1
+            assert_eq(line, "User-Agent: " + expected_user_agent)
+          }
+        }
+        assert_eq(count, 1)
+        conn.write(b"HTTP/1.1 200 OK\r\nContent-Length: 2\r\n\r\nok")
+      })
+      run("http://127.0.0.1:\{server.addr.port()}")
+    })
+  })
+}
+
+///|
+async test "custom User-Agent occurs exactly once on the wire" {
+  with_raw_request("kbbi.mbt/0.1.0", url => {
+    let response = @adapter.AsyncTransport::new().send(
+      @http.Request::get(url).header("uSeR-aGeNt", "kbbi.mbt/0.1.0"),
+    )
+    assert_eq(response.status, 200)
+  })
+}
+
+///|
+async test "repeated User-Agent values keep the existing comma join" {
+  with_raw_request("agent-a, agent-b", url => {
+    let request = @http.Request::get(url)
+      .header("User-Agent", "agent-a")
+      .header("user-agent", "agent-b")
+    assert_eq(@adapter.AsyncTransport::new().send(request).status, 200)
+  })
+}
+
+///|
+async test "default User-Agent occurs exactly once on the wire" {
+  with_raw_request("moonbit-http-client/1.1", url => {
+    let response = @adapter.AsyncTransport::new().send(@http.Request::get(url))
+    assert_eq(response.status, 200)
+  })
+}
+
+///|
 async test "GET body and lowercase response header names" {
   with_server(
     conn => {

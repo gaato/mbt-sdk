@@ -2,6 +2,7 @@
 /// A keep-alive connection parked between requests to one origin.
 priv struct IdleConn {
   client : @ahttp.Client
+  user_agent : String?
   parked_at_ms : Int64
 }
 
@@ -12,6 +13,7 @@ priv struct IdleConn {
 async fn AsyncTransport::checkout(
   self : AsyncTransport,
   origin : String,
+  user_agent : String?,
   fresh~ : Bool,
 ) -> (@ahttp.Client, Bool) raise @http.HttpError {
   if self.closed {
@@ -19,14 +21,22 @@ async fn AsyncTransport::checkout(
   }
   if !fresh && self.idle.get(origin) is Some(parked) {
     let now = @async.now()
-    while parked.pop() is Some(conn) {
-      if now - conn.parked_at_ms < self.idle_max_ms.to_int64() {
+    for i = parked.length() - 1; i >= 0; i = i - 1 {
+      let conn = parked[i]
+      if now - conn.parked_at_ms >= self.idle_max_ms.to_int64() {
+        ignore(parked.remove(i))
+        conn.client.close()
+      } else if conn.user_agent == user_agent {
+        ignore(parked.remove(i))
         return (conn.client, true)
       }
-      conn.client.close()
     }
   }
-  let client = @ahttp.Client(origin) catch {
+  let dial_headers : @ahttp.Headers = Map([])
+  if user_agent is Some(value) {
+    dial_headers["User-Agent"] = value
+  }
+  let client = @ahttp.Client(origin, headers=dial_headers) catch {
     @ahttp.URIParseError::InvalidFormat =>
       raise @http.HttpError::Protocol("invalid URL")
     @ahttp.URIParseError::UnsupportedProtocol(protocol) =>
@@ -42,6 +52,7 @@ async fn AsyncTransport::checkout(
 fn AsyncTransport::checkin(
   self : AsyncTransport,
   origin : String,
+  user_agent : String?,
   client : @ahttp.Client,
 ) -> Unit {
   if self.closed || self.max_idle_per_origin <= 0 || self.idle_max_ms <= 0 {
@@ -53,7 +64,7 @@ fn AsyncTransport::checkin(
     client.close()
     return
   }
-  parked.push({ client, parked_at_ms: @async.now(), })
+  parked.push({ client, user_agent, parked_at_ms: @async.now(), })
 }
 
 ///|
