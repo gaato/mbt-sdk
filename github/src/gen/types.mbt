@@ -4542,6 +4542,74 @@ pub impl @json.FromJson for AppPermissionsOrganizationCopilotAgentSettings with 
 
 ///|
 ///
+/// The level of permission to grant the access token for managing external custom properties for repositories in an organization.
+pub(all) enum AppPermissionsOrganizationExternalPropertiesForRepos {
+  Read
+  Write
+  Admin
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AppPermissionsOrganizationExternalPropertiesForRepos with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AppPermissionsOrganizationExternalPropertiesForRepos with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AppPermissionsOrganizationExternalPropertiesForRepos with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AppPermissionsOrganizationExternalPropertiesForRepos with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Read => "read"
+    Write => "write"
+    Admin => "admin"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AppPermissionsOrganizationExternalPropertiesForRepos with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AppPermissionsOrganizationExternalPropertiesForRepos with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "read" => Some(Read)
+        "write" => Some(Write)
+        "admin" => Some(Admin)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
 /// The level of permission to grant the access token to view and manage announcement banners for an organization.
 pub(all) enum AppPermissionsOrganizationAnnouncementBanners {
   Read
@@ -5497,6 +5565,7 @@ pub(all) struct AppPermissions {
   organization_custom_properties : AppPermissionsOrganizationCustomProperties?
   organization_copilot_seat_management : AppPermissionsOrganizationCopilotSeatManagement?
   organization_copilot_agent_settings : AppPermissionsOrganizationCopilotAgentSettings?
+  organization_external_properties_for_repos : AppPermissionsOrganizationExternalPropertiesForRepos?
   organization_announcement_banners : AppPermissionsOrganizationAnnouncementBanners?
   organization_hooks : AppPermissionsOrganizationHooks?
   organization_personal_access_tokens : AppPermissionsOrganizationPersonalAccessTokens?
@@ -5560,6 +5629,7 @@ pub fn AppPermissions::new(
   organization_custom_properties? : AppPermissionsOrganizationCustomProperties,
   organization_copilot_seat_management? : AppPermissionsOrganizationCopilotSeatManagement,
   organization_copilot_agent_settings? : AppPermissionsOrganizationCopilotAgentSettings,
+  organization_external_properties_for_repos? : AppPermissionsOrganizationExternalPropertiesForRepos,
   organization_announcement_banners? : AppPermissionsOrganizationAnnouncementBanners,
   organization_hooks? : AppPermissionsOrganizationHooks,
   organization_personal_access_tokens? : AppPermissionsOrganizationPersonalAccessTokens,
@@ -5613,6 +5683,7 @@ pub fn AppPermissions::new(
     organization_custom_properties,
     organization_copilot_seat_management,
     organization_copilot_agent_settings,
+    organization_external_properties_for_repos,
     organization_announcement_banners,
     organization_hooks,
     organization_personal_access_tokens,
@@ -5684,6 +5755,10 @@ pub impl ToJson for AppPermissions with fn to_json(self) {
   .opt(
     "organization_copilot_agent_settings",
     self.organization_copilot_agent_settings,
+  )
+  .opt(
+    "organization_external_properties_for_repos",
+    self.organization_external_properties_for_repos,
   )
   .opt(
     "organization_announcement_banners",
@@ -5783,6 +5858,9 @@ pub impl @json.FromJson for AppPermissions with fn from_json(value, path) {
     ),
     organization_copilot_agent_settings: @sdkjson.opt_field(
       obj, "organization_copilot_agent_settings", path,
+    ),
+    organization_external_properties_for_repos: @sdkjson.opt_field(
+      obj, "organization_external_properties_for_repos", path,
     ),
     organization_announcement_banners: @sdkjson.opt_field(
       obj, "organization_announcement_banners", path,
@@ -38751,6 +38829,317 @@ pub impl @json.FromJson for ProjectsV2View with fn from_json(value, path) {
 
 ///|
 ///
+/// The GitHub App installation that was registered.
+pub(all) struct OrganizationExternalPropertyInstallationInstallation {
+  id : Int
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend OrganizationExternalPropertyInstallationInstallation with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend OrganizationExternalPropertyInstallationInstallation with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a OrganizationExternalPropertyInstallationInstallation with omitted optional fields absent.
+pub fn OrganizationExternalPropertyInstallationInstallation::new(
+  id~ : Int,
+) -> OrganizationExternalPropertyInstallationInstallation {
+  { id, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend OrganizationExternalPropertyInstallationInstallation with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for OrganizationExternalPropertyInstallationInstallation with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new().field("id", self.id).build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend OrganizationExternalPropertyInstallationInstallation with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for OrganizationExternalPropertyInstallationInstallation with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  { id: required_field(obj, "id", path), }
+}
+
+///|
+///
+/// A GitHub App installation that has been registered to read and write an organization's external custom properties, together with the display name assigned to it.
+pub(all) struct OrganizationExternalPropertyInstallation {
+  display_name : String
+  installation : OrganizationExternalPropertyInstallationInstallation
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend OrganizationExternalPropertyInstallation with Eq::{equal, not_equal}
+
+///|
+pub extend OrganizationExternalPropertyInstallation with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a OrganizationExternalPropertyInstallation with omitted optional fields absent.
+pub fn OrganizationExternalPropertyInstallation::new(
+  display_name~ : String,
+  installation~ : OrganizationExternalPropertyInstallationInstallation,
+) -> OrganizationExternalPropertyInstallation {
+  { display_name, installation, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend OrganizationExternalPropertyInstallation with ToJson::{to_json}
+
+///|
+pub impl ToJson for OrganizationExternalPropertyInstallation with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .field("display_name", self.display_name)
+  .field("installation", self.installation)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend OrganizationExternalPropertyInstallation with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for OrganizationExternalPropertyInstallation with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    display_name: required_field(obj, "display_name", path),
+    installation: required_field(obj, "installation", path),
+  }
+}
+
+///|
+///
+/// External custom property defined for a GitHub App installation
+pub(all) struct ExternalProperty {
+  property_name : String
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ExternalProperty with Eq::{equal, not_equal}
+
+///|
+pub extend ExternalProperty with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a ExternalProperty with omitted optional fields absent.
+pub fn ExternalProperty::new(property_name~ : String) -> ExternalProperty {
+  { property_name, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend ExternalProperty with ToJson::{to_json}
+
+///|
+pub impl ToJson for ExternalProperty with fn to_json(self) {
+  @sdkjson.ObjBuilder::new().field("property_name", self.property_name).build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend ExternalProperty with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for ExternalProperty with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  { property_name: required_field(obj, "property_name", path), }
+}
+
+///|
+///
+/// The value assigned to the property
+pub(all) enum CustomPropertyValueValue {
+  Text(String)
+  TextArray(Array[String])
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend CustomPropertyValueValue with Eq::{equal, not_equal}
+
+///|
+pub extend CustomPropertyValueValue with @debug.Debug::{to_repr}
+
+///|
+///
+/// Encodes this union as JSON.
+pub extend CustomPropertyValueValue with ToJson::{to_json}
+
+///|
+pub impl ToJson for CustomPropertyValueValue with fn to_json(self) {
+  match self {
+    Text(value) => Json(value)
+    TextArray(value) => Json(value)
+  }
+}
+
+///|
+///
+/// Decodes this union from JSON.
+pub extend CustomPropertyValueValue with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for CustomPropertyValueValue with fn from_json(
+  value,
+  path,
+) {
+  if value is String(_) {
+    let decoded : String = @json.from_json(value, path~)
+    return Text(decoded)
+  }
+  if json_array_matches(value, item => item is String(_)) {
+    let decoded : Array[String] = @json.from_json(value, path~)
+    return TextArray(decoded)
+  }
+  raise @json.JsonDecodeError(
+    (path, "JSON shape does not match any CustomPropertyValueValue variant"),
+  )
+}
+
+///|
+///
+/// Custom property name and associated value
+pub(all) struct CustomPropertyValue {
+  property_name : String
+  value : CustomPropertyValueValue?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend CustomPropertyValue with Eq::{equal, not_equal}
+
+///|
+pub extend CustomPropertyValue with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a CustomPropertyValue with omitted optional fields absent.
+pub fn CustomPropertyValue::new(
+  property_name~ : String,
+  value? : CustomPropertyValueValue,
+) -> CustomPropertyValue {
+  { property_name, value, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend CustomPropertyValue with ToJson::{to_json}
+
+///|
+pub impl ToJson for CustomPropertyValue with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("property_name", self.property_name)
+  .presence("value", nullable_presence(self.value.map(value => value)))
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend CustomPropertyValue with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for CustomPropertyValue with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    property_name: required_field(obj, "property_name", path),
+    value: decode_nullable_field(obj, "value", path),
+  }
+}
+
+///|
+///
+/// Repository name and associated external custom property value
+pub(all) struct RepositoryExternalPropertyPayload {
+  repository_name : String
+  value : String?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RepositoryExternalPropertyPayload with Eq::{equal, not_equal}
+
+///|
+pub extend RepositoryExternalPropertyPayload with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a RepositoryExternalPropertyPayload with omitted optional fields absent.
+pub fn RepositoryExternalPropertyPayload::new(
+  repository_name~ : String,
+  value? : String,
+) -> RepositoryExternalPropertyPayload {
+  { repository_name, value, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend RepositoryExternalPropertyPayload with ToJson::{to_json}
+
+///|
+pub impl ToJson for RepositoryExternalPropertyPayload with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("repository_name", self.repository_name)
+  .presence("value", nullable_presence(self.value.map(value => value)))
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend RepositoryExternalPropertyPayload with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for RepositoryExternalPropertyPayload with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    repository_name: required_field(obj, "repository_name", path),
+    value: decode_nullable_field(obj, "value", path),
+  }
+}
+
+///|
+///
 /// The source type of the property
 pub(all) enum CustomPropertySourceType {
   Organization
@@ -39322,107 +39711,6 @@ pub impl @json.FromJson for CustomPropertySetPayload with fn from_json(
     require_explicit_values: @sdkjson.opt_field(
       obj, "require_explicit_values", path,
     ),
-  }
-}
-
-///|
-///
-/// The value assigned to the property
-pub(all) enum CustomPropertyValueValue {
-  Text(String)
-  TextArray(Array[String])
-} derive(Eq, @debug.Debug)
-
-///|
-pub extend CustomPropertyValueValue with Eq::{equal, not_equal}
-
-///|
-pub extend CustomPropertyValueValue with @debug.Debug::{to_repr}
-
-///|
-///
-/// Encodes this union as JSON.
-pub extend CustomPropertyValueValue with ToJson::{to_json}
-
-///|
-pub impl ToJson for CustomPropertyValueValue with fn to_json(self) {
-  match self {
-    Text(value) => Json(value)
-    TextArray(value) => Json(value)
-  }
-}
-
-///|
-///
-/// Decodes this union from JSON.
-pub extend CustomPropertyValueValue with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for CustomPropertyValueValue with fn from_json(
-  value,
-  path,
-) {
-  if value is String(_) {
-    let decoded : String = @json.from_json(value, path~)
-    return Text(decoded)
-  }
-  if json_array_matches(value, item => item is String(_)) {
-    let decoded : Array[String] = @json.from_json(value, path~)
-    return TextArray(decoded)
-  }
-  raise @json.JsonDecodeError(
-    (path, "JSON shape does not match any CustomPropertyValueValue variant"),
-  )
-}
-
-///|
-///
-/// Custom property name and associated value
-pub(all) struct CustomPropertyValue {
-  property_name : String
-  value : CustomPropertyValueValue?
-} derive(Eq, @debug.Debug)
-
-///|
-pub extend CustomPropertyValue with Eq::{equal, not_equal}
-
-///|
-pub extend CustomPropertyValue with @debug.Debug::{to_repr}
-
-///|
-///
-/// Creates a CustomPropertyValue with omitted optional fields absent.
-pub fn CustomPropertyValue::new(
-  property_name~ : String,
-  value? : CustomPropertyValueValue,
-) -> CustomPropertyValue {
-  { property_name, value, }
-}
-
-///|
-///
-/// Encodes this value as JSON.
-pub extend CustomPropertyValue with ToJson::{to_json}
-
-///|
-pub impl ToJson for CustomPropertyValue with fn to_json(self) {
-  @sdkjson.ObjBuilder::new()
-  .field("property_name", self.property_name)
-  .presence("value", nullable_presence(self.value.map(value => value)))
-  .build()
-}
-
-///|
-///
-/// Decodes this value from JSON.
-pub extend CustomPropertyValue with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for CustomPropertyValue with fn from_json(value, path) {
-  let obj = @sdkjson.expect_object(value, path)
-  {
-    property_name: required_field(obj, "property_name", path),
-    value: decode_nullable_field(obj, "value", path),
   }
 }
 
@@ -126540,6 +126828,195 @@ pub impl @json.FromJson for ProjectsListViewItemsForOrgFields with fn from_json(
       path, "JSON shape does not match any ProjectsListViewItemsForOrgFields variant",
     ),
   )
+}
+
+///|
+///
+/// Generated representation of OrgsExternalPropertiesForReposRegisterOrganizationAppInstallationRequest.
+pub(all) struct OrgsExternalPropertiesForReposRegisterOrganizationAppInstallationRequest {
+  installation_id : Int?
+  display_name : String
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend OrgsExternalPropertiesForReposRegisterOrganizationAppInstallationRequest with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend OrgsExternalPropertiesForReposRegisterOrganizationAppInstallationRequest with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a OrgsExternalPropertiesForReposRegisterOrganizationAppInstallationRequest with omitted optional fields absent.
+pub fn OrgsExternalPropertiesForReposRegisterOrganizationAppInstallationRequest::new(
+  display_name~ : String,
+  installation_id? : Int,
+) -> OrgsExternalPropertiesForReposRegisterOrganizationAppInstallationRequest {
+  { installation_id, display_name, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend OrgsExternalPropertiesForReposRegisterOrganizationAppInstallationRequest with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for OrgsExternalPropertiesForReposRegisterOrganizationAppInstallationRequest with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("installation_id", self.installation_id)
+  .field("display_name", self.display_name)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend OrgsExternalPropertiesForReposRegisterOrganizationAppInstallationRequest with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for OrgsExternalPropertiesForReposRegisterOrganizationAppInstallationRequest with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    installation_id: @sdkjson.opt_field(obj, "installation_id", path),
+    display_name: required_field(obj, "display_name", path),
+  }
+}
+
+///|
+///
+/// Generated representation of OrgsExternalPropertiesForReposCreateOrUpdateOrganizationValuesRequest.
+pub(all) struct OrgsExternalPropertiesForReposCreateOrUpdateOrganizationValuesRequest {
+  repository_names : Array[String]
+  properties : Array[CustomPropertyValue]
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend OrgsExternalPropertiesForReposCreateOrUpdateOrganizationValuesRequest with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend OrgsExternalPropertiesForReposCreateOrUpdateOrganizationValuesRequest with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a OrgsExternalPropertiesForReposCreateOrUpdateOrganizationValuesRequest with omitted optional fields absent.
+pub fn OrgsExternalPropertiesForReposCreateOrUpdateOrganizationValuesRequest::new(
+  repository_names~ : Array[String],
+  properties~ : Array[CustomPropertyValue],
+) -> OrgsExternalPropertiesForReposCreateOrUpdateOrganizationValuesRequest {
+  { repository_names, properties, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend OrgsExternalPropertiesForReposCreateOrUpdateOrganizationValuesRequest with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for OrgsExternalPropertiesForReposCreateOrUpdateOrganizationValuesRequest with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .field("repository_names", self.repository_names)
+  .field("properties", self.properties)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend OrgsExternalPropertiesForReposCreateOrUpdateOrganizationValuesRequest with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for OrgsExternalPropertiesForReposCreateOrUpdateOrganizationValuesRequest with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    repository_names: required_field(obj, "repository_names", path),
+    properties: required_field(obj, "properties", path),
+  }
+}
+
+///|
+///
+/// Generated representation of OrgsExternalPropertiesForReposCreateOrUpdateValuesForOrganizationPropertyRequest.
+pub(all) struct OrgsExternalPropertiesForReposCreateOrUpdateValuesForOrganizationPropertyRequest {
+  repository_values : Array[RepositoryExternalPropertyPayload]
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend OrgsExternalPropertiesForReposCreateOrUpdateValuesForOrganizationPropertyRequest with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend OrgsExternalPropertiesForReposCreateOrUpdateValuesForOrganizationPropertyRequest with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a OrgsExternalPropertiesForReposCreateOrUpdateValuesForOrganizationPropertyRequest with omitted optional fields absent.
+pub fn OrgsExternalPropertiesForReposCreateOrUpdateValuesForOrganizationPropertyRequest::new(
+  repository_values~ : Array[RepositoryExternalPropertyPayload],
+) -> OrgsExternalPropertiesForReposCreateOrUpdateValuesForOrganizationPropertyRequest {
+  { repository_values, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend OrgsExternalPropertiesForReposCreateOrUpdateValuesForOrganizationPropertyRequest with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for OrgsExternalPropertiesForReposCreateOrUpdateValuesForOrganizationPropertyRequest with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .field("repository_values", self.repository_values)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend OrgsExternalPropertiesForReposCreateOrUpdateValuesForOrganizationPropertyRequest with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for OrgsExternalPropertiesForReposCreateOrUpdateValuesForOrganizationPropertyRequest with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  { repository_values: required_field(obj, "repository_values", path), }
 }
 
 ///|
