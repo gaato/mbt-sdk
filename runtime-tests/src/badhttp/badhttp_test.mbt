@@ -196,8 +196,13 @@ async test "generated badhttp fixture builds, decodes and classifies requests" {
 async test "status 503 then 200: the client retries and succeeds" {
   bounded(() => {
     // badhttp picks at random from a comma-separated list; with retries the
-    // request eventually lands on 200. Two 503s in a row cost two backoffs.
-    let policy = { ..@runtime.RetryPolicy::default(), max_retries: 6, }
+    // request eventually lands on 200. Short backoffs and many retries keep an
+    // unlucky run of 503s (1 in 2^13 with 12 retries) inside the time bound.
+    let policy = {
+      ..@runtime.RetryPolicy::default(),
+      max_retries: 12,
+      backoff: { ..@runtime.Backoff::default(), base_ms: 50, max_ms: 200, },
+    }
     let response = client(retry=policy).send(
       @http.Request::get("/status/503,200"),
     )
