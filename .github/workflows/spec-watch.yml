@@ -42,7 +42,7 @@ jobs:
       PROVIDER: ${{ matrix.provider }}
       SPEC_FILE: ${{ matrix.spec_file }}
       SPEC_URL: ${{ matrix.spec_url }}
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     timeout-minutes: 60
     steps:
       - name: Check out repository
