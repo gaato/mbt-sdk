@@ -3108,6 +3108,369 @@ pub impl @json.FromJson for CacheCreation with fn from_json(value, path) {
 
 ///|
 ///
+/// Generated representation of CacheMissMessagesChanged.
+pub(all) struct CacheMissMessagesChanged {
+  cache_missed_input_tokens : Int
+  type_ : String
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend CacheMissMessagesChanged with Eq::{equal, not_equal}
+
+///|
+pub extend CacheMissMessagesChanged with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a CacheMissMessagesChanged with omitted optional fields absent.
+pub fn CacheMissMessagesChanged::new(
+  cache_missed_input_tokens~ : Int,
+  type_~ : String,
+) -> CacheMissMessagesChanged {
+  { cache_missed_input_tokens, type_, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend CacheMissMessagesChanged with ToJson::{to_json}
+
+///|
+pub impl ToJson for CacheMissMessagesChanged with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("cache_missed_input_tokens", self.cache_missed_input_tokens)
+  .field("type", self.type_)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend CacheMissMessagesChanged with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for CacheMissMessagesChanged with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    cache_missed_input_tokens: required_field(
+      obj, "cache_missed_input_tokens", path,
+    ),
+    type_: required_field(obj, "type", path),
+  }
+}
+
+///|
+///
+/// Generated representation of CacheMissModelChanged.
+pub(all) struct CacheMissModelChanged {
+  cache_missed_input_tokens : Int
+  type_ : String
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend CacheMissModelChanged with Eq::{equal, not_equal}
+
+///|
+pub extend CacheMissModelChanged with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a CacheMissModelChanged with omitted optional fields absent.
+pub fn CacheMissModelChanged::new(
+  cache_missed_input_tokens~ : Int,
+  type_~ : String,
+) -> CacheMissModelChanged {
+  { cache_missed_input_tokens, type_, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend CacheMissModelChanged with ToJson::{to_json}
+
+///|
+pub impl ToJson for CacheMissModelChanged with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("cache_missed_input_tokens", self.cache_missed_input_tokens)
+  .field("type", self.type_)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend CacheMissModelChanged with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for CacheMissModelChanged with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    cache_missed_input_tokens: required_field(
+      obj, "cache_missed_input_tokens", path,
+    ),
+    type_: required_field(obj, "type", path),
+  }
+}
+
+///|
+///
+/// Generated representation of CacheMissPreviousMessageNotFound.
+pub(all) struct CacheMissPreviousMessageNotFound {
+  type_ : String
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend CacheMissPreviousMessageNotFound with Eq::{equal, not_equal}
+
+///|
+pub extend CacheMissPreviousMessageNotFound with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a CacheMissPreviousMessageNotFound with omitted optional fields absent.
+pub fn CacheMissPreviousMessageNotFound::new(
+  type_~ : String,
+) -> CacheMissPreviousMessageNotFound {
+  { type_, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend CacheMissPreviousMessageNotFound with ToJson::{to_json}
+
+///|
+pub impl ToJson for CacheMissPreviousMessageNotFound with fn to_json(self) {
+  @sdkjson.ObjBuilder::new().field("type", self.type_).build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend CacheMissPreviousMessageNotFound with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for CacheMissPreviousMessageNotFound with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  { type_: required_field(obj, "type", path), }
+}
+
+///|
+///
+/// Generated representation of CacheMissSystemChanged.
+pub(all) struct CacheMissSystemChanged {
+  cache_missed_input_tokens : Int
+  type_ : String
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend CacheMissSystemChanged with Eq::{equal, not_equal}
+
+///|
+pub extend CacheMissSystemChanged with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a CacheMissSystemChanged with omitted optional fields absent.
+pub fn CacheMissSystemChanged::new(
+  cache_missed_input_tokens~ : Int,
+  type_~ : String,
+) -> CacheMissSystemChanged {
+  { cache_missed_input_tokens, type_, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend CacheMissSystemChanged with ToJson::{to_json}
+
+///|
+pub impl ToJson for CacheMissSystemChanged with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("cache_missed_input_tokens", self.cache_missed_input_tokens)
+  .field("type", self.type_)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend CacheMissSystemChanged with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for CacheMissSystemChanged with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    cache_missed_input_tokens: required_field(
+      obj, "cache_missed_input_tokens", path,
+    ),
+    type_: required_field(obj, "type", path),
+  }
+}
+
+///|
+///
+/// Generated representation of CacheMissToolsChanged.
+pub(all) struct CacheMissToolsChanged {
+  cache_missed_input_tokens : Int
+  type_ : String
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend CacheMissToolsChanged with Eq::{equal, not_equal}
+
+///|
+pub extend CacheMissToolsChanged with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a CacheMissToolsChanged with omitted optional fields absent.
+pub fn CacheMissToolsChanged::new(
+  cache_missed_input_tokens~ : Int,
+  type_~ : String,
+) -> CacheMissToolsChanged {
+  { cache_missed_input_tokens, type_, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend CacheMissToolsChanged with ToJson::{to_json}
+
+///|
+pub impl ToJson for CacheMissToolsChanged with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("cache_missed_input_tokens", self.cache_missed_input_tokens)
+  .field("type", self.type_)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend CacheMissToolsChanged with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for CacheMissToolsChanged with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    cache_missed_input_tokens: required_field(
+      obj, "cache_missed_input_tokens", path,
+    ),
+    type_: required_field(obj, "type", path),
+  }
+}
+
+///|
+///
+/// Generated representation of CacheMissUnavailable.
+pub(all) struct CacheMissUnavailable {
+  type_ : String
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend CacheMissUnavailable with Eq::{equal, not_equal}
+
+///|
+pub extend CacheMissUnavailable with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a CacheMissUnavailable with omitted optional fields absent.
+pub fn CacheMissUnavailable::new(type_~ : String) -> CacheMissUnavailable {
+  { type_, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend CacheMissUnavailable with ToJson::{to_json}
+
+///|
+pub impl ToJson for CacheMissUnavailable with fn to_json(self) {
+  @sdkjson.ObjBuilder::new().field("type", self.type_).build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend CacheMissUnavailable with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for CacheMissUnavailable with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  { type_: required_field(obj, "type", path), }
+}
+
+///|
+///
+/// Generated tagged union CacheMissReason.
+pub(all) enum CacheMissReason {
+  MessagesChanged(CacheMissMessagesChanged)
+  ModelChanged(CacheMissModelChanged)
+  PreviousMessageNotFound(CacheMissPreviousMessageNotFound)
+  SystemChanged(CacheMissSystemChanged)
+  ToolsChanged(CacheMissToolsChanged)
+  Unavailable(CacheMissUnavailable)
+  Unknown(String, Json)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend CacheMissReason with Eq::{equal, not_equal}
+
+///|
+pub extend CacheMissReason with @debug.Debug::{to_repr}
+
+///|
+///
+/// Encodes this tagged union as JSON.
+pub extend CacheMissReason with ToJson::{to_json}
+
+///|
+pub impl ToJson for CacheMissReason with fn to_json(self) {
+  match self {
+    MessagesChanged(value) => Json(value)
+    ModelChanged(value) => Json(value)
+    PreviousMessageNotFound(value) => Json(value)
+    SystemChanged(value) => Json(value)
+    ToolsChanged(value) => Json(value)
+    Unavailable(value) => Json(value)
+    Unknown(_, value) => value
+  }
+}
+
+///|
+///
+/// Decodes this tagged union from JSON.
+pub extend CacheMissReason with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for CacheMissReason with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  let tag : String = required_field(obj, "type", path)
+  match tag {
+    "messages_changed" => MessagesChanged(@json.from_json(value, path~))
+    "model_changed" => ModelChanged(@json.from_json(value, path~))
+    "previous_message_not_found" =>
+      PreviousMessageNotFound(@json.from_json(value, path~))
+    "system_changed" => SystemChanged(@json.from_json(value, path~))
+    "tools_changed" => ToolsChanged(@json.from_json(value, path~))
+    "unavailable" => Unavailable(@json.from_json(value, path~))
+    other => Unknown(other, value)
+  }
+}
+
+///|
+///
 /// Indicates whether a capability is supported.
 pub(all) struct CapabilitySupport {
   supported : Bool
@@ -15241,6 +15604,52 @@ pub impl @json.FromJson for ThinkingConfigAdaptive with fn from_json(
 
 ///|
 ///
+/// Generated representation of ThinkingConfigBetweenTools.
+pub(all) struct ThinkingConfigBetweenTools {
+  type_ : String
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ThinkingConfigBetweenTools with Eq::{equal, not_equal}
+
+///|
+pub extend ThinkingConfigBetweenTools with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a ThinkingConfigBetweenTools with omitted optional fields absent.
+pub fn ThinkingConfigBetweenTools::new(
+  type_~ : String,
+) -> ThinkingConfigBetweenTools {
+  { type_, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend ThinkingConfigBetweenTools with ToJson::{to_json}
+
+///|
+pub impl ToJson for ThinkingConfigBetweenTools with fn to_json(self) {
+  @sdkjson.ObjBuilder::new().field("type", self.type_).build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend ThinkingConfigBetweenTools with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for ThinkingConfigBetweenTools with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  { type_: required_field(obj, "type", path), }
+}
+
+///|
+///
 /// Generated representation of ThinkingConfigDisabled.
 pub(all) struct ThinkingConfigDisabled {
   type_ : String
@@ -15343,6 +15752,7 @@ pub impl @json.FromJson for ThinkingConfigEnabled with fn from_json(value, path)
 /// Configuration for enabling Claude's extended thinking. When enabled, responses include `thinking` content blocks showing Claude's thinking process before the final answer. Requires a minimum budget of 1,024 tokens and counts towards your `max_tokens` limit. See [extended thinking](https://platform.claude.com/docs/en/build-with-claude/extended-thinking) for details.
 pub(all) enum ThinkingConfigParam {
   Adaptive(ThinkingConfigAdaptive)
+  BetweenTools(ThinkingConfigBetweenTools)
   Disabled(ThinkingConfigDisabled)
   Enabled(ThinkingConfigEnabled)
   Unknown(String, Json)
@@ -15363,6 +15773,7 @@ pub extend ThinkingConfigParam with ToJson::{to_json}
 pub impl ToJson for ThinkingConfigParam with fn to_json(self) {
   match self {
     Adaptive(value) => Json(value)
+    BetweenTools(value) => Json(value)
     Disabled(value) => Json(value)
     Enabled(value) => Json(value)
     Unknown(_, value) => value
@@ -15380,6 +15791,7 @@ pub impl @json.FromJson for ThinkingConfigParam with fn from_json(value, path) {
   let tag : String = required_field(obj, "type", path)
   match tag {
     "adaptive" => Adaptive(@json.from_json(value, path~))
+    "between_tools" => BetweenTools(@json.from_json(value, path~))
     "disabled" => Disabled(@json.from_json(value, path~))
     "enabled" => Enabled(@json.from_json(value, path~))
     other => Unknown(other, value)
@@ -18597,6 +19009,53 @@ pub impl @json.FromJson for CreateMessageParamsContainer with fn from_json(
 
 ///|
 ///
+/// Request-level diagnostics. Currently carries the previous response id for prompt-cache divergence reporting.
+pub(all) struct DiagnosticsParam {
+  previous_message_id : @sdkjson.Presence[String]
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend DiagnosticsParam with Eq::{equal, not_equal}
+
+///|
+pub extend DiagnosticsParam with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a DiagnosticsParam with omitted optional fields absent.
+pub fn DiagnosticsParam::new(previous_message_id? : String) -> DiagnosticsParam {
+  { previous_message_id: @sdkjson.Presence::from_option(previous_message_id), }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend DiagnosticsParam with ToJson::{to_json}
+
+///|
+pub impl ToJson for DiagnosticsParam with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .presence("previous_message_id", self.previous_message_id)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend DiagnosticsParam with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for DiagnosticsParam with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    previous_message_id: @sdkjson.presence_field(
+      obj, "previous_message_id", path,
+    ),
+  }
+}
+
+///|
+///
 /// Generated representation of Metadata.
 pub(all) struct Metadata {
   user_id : @sdkjson.Presence[String]
@@ -18872,6 +19331,7 @@ pub(all) struct CreateMessageParams {
   messages : Array[InputMessage]
   cache_control : @sdkjson.Presence[CreateMessageParamsCacheControl]
   container : @sdkjson.Presence[CreateMessageParamsContainer]
+  diagnostics : @sdkjson.Presence[DiagnosticsParam]
   inference_geo : @sdkjson.Presence[String]
   max_tokens : Int
   metadata : Metadata?
@@ -18903,6 +19363,7 @@ pub fn CreateMessageParams::new(
   max_tokens~ : Int,
   cache_control? : CreateMessageParamsCacheControl,
   container? : CreateMessageParamsContainer,
+  diagnostics? : DiagnosticsParam,
   inference_geo? : String,
   metadata? : Metadata,
   output_config? : OutputConfig,
@@ -18922,6 +19383,7 @@ pub fn CreateMessageParams::new(
     messages,
     cache_control: @sdkjson.Presence::from_option(cache_control),
     container: @sdkjson.Presence::from_option(container),
+    diagnostics: @sdkjson.Presence::from_option(diagnostics),
     inference_geo: @sdkjson.Presence::from_option(inference_geo),
     max_tokens,
     metadata,
@@ -18951,6 +19413,7 @@ pub impl ToJson for CreateMessageParams with fn to_json(self) {
   .field("messages", self.messages)
   .presence("cache_control", self.cache_control)
   .presence("container", self.container)
+  .presence("diagnostics", self.diagnostics)
   .presence("inference_geo", self.inference_geo)
   .field("max_tokens", self.max_tokens)
   .opt("metadata", self.metadata)
@@ -18981,6 +19444,7 @@ pub impl @json.FromJson for CreateMessageParams with fn from_json(value, path) {
     messages: required_field(obj, "messages", path),
     cache_control: @sdkjson.presence_field(obj, "cache_control", path),
     container: @sdkjson.presence_field(obj, "container", path),
+    diagnostics: @sdkjson.presence_field(obj, "diagnostics", path),
     inference_geo: @sdkjson.presence_field(obj, "inference_geo", path),
     max_tokens: required_field(obj, "max_tokens", path),
     metadata: @sdkjson.opt_field(obj, "metadata", path),
@@ -18996,6 +19460,52 @@ pub impl @json.FromJson for CreateMessageParams with fn from_json(value, path) {
     top_k: @sdkjson.opt_field(obj, "top_k", path),
     top_p: @sdkjson.opt_field(obj, "top_p", path),
   }
+}
+
+///|
+///
+/// Request-level diagnostics: why the prompt cache could not fully reuse the prefix of the request named by `diagnostics.previous_message_id`.
+pub(all) struct Diagnostics {
+  cache_miss_reason : CacheMissReason?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend Diagnostics with Eq::{equal, not_equal}
+
+///|
+pub extend Diagnostics with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a Diagnostics with omitted optional fields absent.
+pub fn Diagnostics::new(cache_miss_reason? : CacheMissReason) -> Diagnostics {
+  { cache_miss_reason, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend Diagnostics with ToJson::{to_json}
+
+///|
+pub impl ToJson for Diagnostics with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .presence(
+    "cache_miss_reason",
+    nullable_presence(self.cache_miss_reason.map(value => value)),
+  )
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend Diagnostics with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for Diagnostics with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  { cache_miss_reason: decode_nullable_field(obj, "cache_miss_reason", path), }
 }
 
 ///|
@@ -20338,6 +20848,7 @@ pub(all) struct Message {
   stop_sequence : @sdkjson.Presence[String]
   stop_details : @sdkjson.Presence[RefusalStopDetails]
   usage : Usage
+  diagnostics : @sdkjson.Presence[Diagnostics]
   container : @sdkjson.Presence[Container]
 } derive(Eq, @debug.Debug)
 
@@ -20358,6 +20869,7 @@ pub fn Message::new(
   stop_reason? : StopReason,
   stop_sequence? : String,
   stop_details? : RefusalStopDetails,
+  diagnostics? : Diagnostics,
   container? : Container,
 ) -> Message {
   {
@@ -20368,6 +20880,7 @@ pub fn Message::new(
     stop_sequence: @sdkjson.Presence::from_option(stop_sequence),
     stop_details: @sdkjson.Presence::from_option(stop_details),
     usage,
+    diagnostics: @sdkjson.Presence::from_option(diagnostics),
     container: @sdkjson.Presence::from_option(container),
   }
 }
@@ -20392,6 +20905,7 @@ pub impl ToJson for Message with fn to_json(self) {
   .presence("stop_sequence", self.stop_sequence)
   .presence("stop_details", self.stop_details)
   .field("usage", self.usage)
+  .presence("diagnostics", self.diagnostics)
   .presence("container", self.container)
   .build()
 }
@@ -20412,6 +20926,7 @@ pub impl @json.FromJson for Message with fn from_json(value, path) {
     stop_sequence: @sdkjson.presence_field(obj, "stop_sequence", path),
     stop_details: @sdkjson.presence_field(obj, "stop_details", path),
     usage: required_field(obj, "usage", path),
+    diagnostics: @sdkjson.presence_field(obj, "diagnostics", path),
     container: @sdkjson.presence_field(obj, "container", path),
   }
 }

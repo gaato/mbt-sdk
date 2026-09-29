@@ -7,7 +7,7 @@ actions:
     description: Older compatible tool-use fixtures omit caller; explicitly use the upstream direct-caller default for these two blocks.
     update:
       x-moonbit-default-on-missing: true
-  - target: "$['components']['schemas']['Message']['required'][?@ == 'stop_sequence' || @ == 'stop_details' || @ == 'container']"
+  - target: "$['components']['schemas']['Message']['required'][?@ == 'stop_sequence' || @ == 'stop_details' || @ == 'container' || @ == 'diagnostics']"
     description: Preserve the compatible-provider response fixtures in helpers_wbtest; these nullable metadata fields are absent there.
     remove: true
   - target: "$['components']['schemas']['MessageDelta']['required'][?@ == 'container' || @ == 'stop_details' || @ == 'stop_sequence']"

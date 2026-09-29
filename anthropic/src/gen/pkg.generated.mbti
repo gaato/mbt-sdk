@@ -759,6 +759,99 @@ pub fn CacheCreation::to_repr(Self) -> @debug.Repr
 pub impl ToJson for CacheCreation
 pub impl @moonbitlang/core/json.FromJson for CacheCreation
 
+pub(all) struct CacheMissMessagesChanged {
+  cache_missed_input_tokens : Int
+  type_ : String
+} derive(Eq, @debug.Debug)
+pub fn CacheMissMessagesChanged::equal(Self, Self) -> Bool
+pub fn CacheMissMessagesChanged::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn CacheMissMessagesChanged::new(cache_missed_input_tokens~ : Int, type_~ : String) -> Self
+pub fn CacheMissMessagesChanged::not_equal(Self, Self) -> Bool
+pub fn CacheMissMessagesChanged::to_json(Self) -> Json
+pub fn CacheMissMessagesChanged::to_repr(Self) -> @debug.Repr
+pub impl ToJson for CacheMissMessagesChanged
+pub impl @moonbitlang/core/json.FromJson for CacheMissMessagesChanged
+
+pub(all) struct CacheMissModelChanged {
+  cache_missed_input_tokens : Int
+  type_ : String
+} derive(Eq, @debug.Debug)
+pub fn CacheMissModelChanged::equal(Self, Self) -> Bool
+pub fn CacheMissModelChanged::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn CacheMissModelChanged::new(cache_missed_input_tokens~ : Int, type_~ : String) -> Self
+pub fn CacheMissModelChanged::not_equal(Self, Self) -> Bool
+pub fn CacheMissModelChanged::to_json(Self) -> Json
+pub fn CacheMissModelChanged::to_repr(Self) -> @debug.Repr
+pub impl ToJson for CacheMissModelChanged
+pub impl @moonbitlang/core/json.FromJson for CacheMissModelChanged
+
+pub(all) struct CacheMissPreviousMessageNotFound {
+  type_ : String
+} derive(Eq, @debug.Debug)
+pub fn CacheMissPreviousMessageNotFound::equal(Self, Self) -> Bool
+pub fn CacheMissPreviousMessageNotFound::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn CacheMissPreviousMessageNotFound::new(type_~ : String) -> Self
+pub fn CacheMissPreviousMessageNotFound::not_equal(Self, Self) -> Bool
+pub fn CacheMissPreviousMessageNotFound::to_json(Self) -> Json
+pub fn CacheMissPreviousMessageNotFound::to_repr(Self) -> @debug.Repr
+pub impl ToJson for CacheMissPreviousMessageNotFound
+pub impl @moonbitlang/core/json.FromJson for CacheMissPreviousMessageNotFound
+
+pub(all) enum CacheMissReason {
+  MessagesChanged(CacheMissMessagesChanged)
+  ModelChanged(CacheMissModelChanged)
+  PreviousMessageNotFound(CacheMissPreviousMessageNotFound)
+  SystemChanged(CacheMissSystemChanged)
+  ToolsChanged(CacheMissToolsChanged)
+  Unavailable(CacheMissUnavailable)
+  Unknown(String, Json)
+} derive(Eq, @debug.Debug)
+pub fn CacheMissReason::equal(Self, Self) -> Bool
+pub fn CacheMissReason::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn CacheMissReason::not_equal(Self, Self) -> Bool
+pub fn CacheMissReason::to_json(Self) -> Json
+pub fn CacheMissReason::to_repr(Self) -> @debug.Repr
+pub impl ToJson for CacheMissReason
+pub impl @moonbitlang/core/json.FromJson for CacheMissReason
+
+pub(all) struct CacheMissSystemChanged {
+  cache_missed_input_tokens : Int
+  type_ : String
+} derive(Eq, @debug.Debug)
+pub fn CacheMissSystemChanged::equal(Self, Self) -> Bool
+pub fn CacheMissSystemChanged::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn CacheMissSystemChanged::new(cache_missed_input_tokens~ : Int, type_~ : String) -> Self
+pub fn CacheMissSystemChanged::not_equal(Self, Self) -> Bool
+pub fn CacheMissSystemChanged::to_json(Self) -> Json
+pub fn CacheMissSystemChanged::to_repr(Self) -> @debug.Repr
+pub impl ToJson for CacheMissSystemChanged
+pub impl @moonbitlang/core/json.FromJson for CacheMissSystemChanged
+
+pub(all) struct CacheMissToolsChanged {
+  cache_missed_input_tokens : Int
+  type_ : String
+} derive(Eq, @debug.Debug)
+pub fn CacheMissToolsChanged::equal(Self, Self) -> Bool
+pub fn CacheMissToolsChanged::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn CacheMissToolsChanged::new(cache_missed_input_tokens~ : Int, type_~ : String) -> Self
+pub fn CacheMissToolsChanged::not_equal(Self, Self) -> Bool
+pub fn CacheMissToolsChanged::to_json(Self) -> Json
+pub fn CacheMissToolsChanged::to_repr(Self) -> @debug.Repr
+pub impl ToJson for CacheMissToolsChanged
+pub impl @moonbitlang/core/json.FromJson for CacheMissToolsChanged
+
+pub(all) struct CacheMissUnavailable {
+  type_ : String
+} derive(Eq, @debug.Debug)
+pub fn CacheMissUnavailable::equal(Self, Self) -> Bool
+pub fn CacheMissUnavailable::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn CacheMissUnavailable::new(type_~ : String) -> Self
+pub fn CacheMissUnavailable::not_equal(Self, Self) -> Bool
+pub fn CacheMissUnavailable::to_json(Self) -> Json
+pub fn CacheMissUnavailable::to_repr(Self) -> @debug.Repr
+pub impl ToJson for CacheMissUnavailable
+pub impl @moonbitlang/core/json.FromJson for CacheMissUnavailable
+
 pub(all) struct CapabilitySupport {
   supported : Bool
 } derive(Eq, @debug.Debug)
@@ -1504,6 +1597,7 @@ pub(all) struct CreateMessageParams {
   messages : Array[InputMessage]
   cache_control : @gaato/sdk-runtime/json.Presence[CreateMessageParamsCacheControl]
   container : @gaato/sdk-runtime/json.Presence[CreateMessageParamsContainer]
+  diagnostics : @gaato/sdk-runtime/json.Presence[DiagnosticsParam]
   inference_geo : @gaato/sdk-runtime/json.Presence[String]
   max_tokens : Int
   metadata : Metadata?
@@ -1521,7 +1615,7 @@ pub(all) struct CreateMessageParams {
 } derive(Eq, @debug.Debug)
 pub fn CreateMessageParams::equal(Self, Self) -> Bool
 pub fn CreateMessageParams::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
-pub fn CreateMessageParams::new(model~ : String, messages~ : Array[InputMessage], max_tokens~ : Int, cache_control? : CreateMessageParamsCacheControl, container? : CreateMessageParamsContainer, inference_geo? : String, metadata? : Metadata, output_config? : OutputConfig, service_tier? : CreateMessageParamsServiceTier, stop_sequences? : Array[String], stream? : Bool, system? : CreateMessageParamsSystem, temperature? : Double, thinking? : ThinkingConfigParam, tool_choice? : ToolChoice, tools? : Array[CreateMessageParamsToolsItem], top_k? : Int, top_p? : Double) -> Self
+pub fn CreateMessageParams::new(model~ : String, messages~ : Array[InputMessage], max_tokens~ : Int, cache_control? : CreateMessageParamsCacheControl, container? : CreateMessageParamsContainer, diagnostics? : DiagnosticsParam, inference_geo? : String, metadata? : Metadata, output_config? : OutputConfig, service_tier? : CreateMessageParamsServiceTier, stop_sequences? : Array[String], stream? : Bool, system? : CreateMessageParamsSystem, temperature? : Double, thinking? : ThinkingConfigParam, tool_choice? : ToolChoice, tools? : Array[CreateMessageParamsToolsItem], top_k? : Int, top_p? : Double) -> Self
 pub fn CreateMessageParams::not_equal(Self, Self) -> Bool
 pub fn CreateMessageParams::to_json(Self) -> Json
 pub fn CreateMessageParams::to_repr(Self) -> @debug.Repr
@@ -1608,6 +1702,30 @@ pub fn CreateMessageParamsToolsItem::to_json(Self) -> Json
 pub fn CreateMessageParamsToolsItem::to_repr(Self) -> @debug.Repr
 pub impl ToJson for CreateMessageParamsToolsItem
 pub impl @moonbitlang/core/json.FromJson for CreateMessageParamsToolsItem
+
+pub(all) struct Diagnostics {
+  cache_miss_reason : CacheMissReason?
+} derive(Eq, @debug.Debug)
+pub fn Diagnostics::equal(Self, Self) -> Bool
+pub fn Diagnostics::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn Diagnostics::new(cache_miss_reason? : CacheMissReason) -> Self
+pub fn Diagnostics::not_equal(Self, Self) -> Bool
+pub fn Diagnostics::to_json(Self) -> Json
+pub fn Diagnostics::to_repr(Self) -> @debug.Repr
+pub impl ToJson for Diagnostics
+pub impl @moonbitlang/core/json.FromJson for Diagnostics
+
+pub(all) struct DiagnosticsParam {
+  previous_message_id : @gaato/sdk-runtime/json.Presence[String]
+} derive(Eq, @debug.Debug)
+pub fn DiagnosticsParam::equal(Self, Self) -> Bool
+pub fn DiagnosticsParam::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn DiagnosticsParam::new(previous_message_id? : String) -> Self
+pub fn DiagnosticsParam::not_equal(Self, Self) -> Bool
+pub fn DiagnosticsParam::to_json(Self) -> Json
+pub fn DiagnosticsParam::to_repr(Self) -> @debug.Repr
+pub impl ToJson for DiagnosticsParam
+pub impl @moonbitlang/core/json.FromJson for DiagnosticsParam
 
 pub(all) struct DirectCaller {
   type_ : String
@@ -1882,11 +2000,12 @@ pub(all) struct Message {
   stop_sequence : @gaato/sdk-runtime/json.Presence[String]
   stop_details : @gaato/sdk-runtime/json.Presence[RefusalStopDetails]
   usage : Usage
+  diagnostics : @gaato/sdk-runtime/json.Presence[Diagnostics]
   container : @gaato/sdk-runtime/json.Presence[Container]
 } derive(Eq, @debug.Debug)
 pub fn Message::equal(Self, Self) -> Bool
 pub fn Message::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
-pub fn Message::new(id~ : String, content~ : Array[ContentBlock], model~ : String, usage~ : Usage, stop_reason? : StopReason, stop_sequence? : String, stop_details? : RefusalStopDetails, container? : Container) -> Self
+pub fn Message::new(id~ : String, content~ : Array[ContentBlock], model~ : String, usage~ : Usage, stop_reason? : StopReason, stop_sequence? : String, stop_details? : RefusalStopDetails, diagnostics? : Diagnostics, container? : Container) -> Self
 pub fn Message::not_equal(Self, Self) -> Bool
 pub fn Message::to_json(Self) -> Json
 pub fn Message::to_repr(Self) -> @debug.Repr
@@ -4217,6 +4336,18 @@ pub fn ThinkingConfigAdaptive::to_repr(Self) -> @debug.Repr
 pub impl ToJson for ThinkingConfigAdaptive
 pub impl @moonbitlang/core/json.FromJson for ThinkingConfigAdaptive
 
+pub(all) struct ThinkingConfigBetweenTools {
+  type_ : String
+} derive(Eq, @debug.Debug)
+pub fn ThinkingConfigBetweenTools::equal(Self, Self) -> Bool
+pub fn ThinkingConfigBetweenTools::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ThinkingConfigBetweenTools::new(type_~ : String) -> Self
+pub fn ThinkingConfigBetweenTools::not_equal(Self, Self) -> Bool
+pub fn ThinkingConfigBetweenTools::to_json(Self) -> Json
+pub fn ThinkingConfigBetweenTools::to_repr(Self) -> @debug.Repr
+pub impl ToJson for ThinkingConfigBetweenTools
+pub impl @moonbitlang/core/json.FromJson for ThinkingConfigBetweenTools
+
 pub(all) struct ThinkingConfigDisabled {
   type_ : String
 } derive(Eq, @debug.Debug)
@@ -4245,6 +4376,7 @@ pub impl @moonbitlang/core/json.FromJson for ThinkingConfigEnabled
 
 pub(all) enum ThinkingConfigParam {
   Adaptive(ThinkingConfigAdaptive)
+  BetweenTools(ThinkingConfigBetweenTools)
   Disabled(ThinkingConfigDisabled)
   Enabled(ThinkingConfigEnabled)
   Unknown(String, Json)
