@@ -62033,10 +62033,8 @@ paths:
   "/user/installations/{installation_id}/repositories/{repository_id}":
     put:
       summary: Add a repository to an app installation
-      description: |-
-        Add a single repository to an installation. The authenticated user must have admin access to the repository.
-
-        This endpoint only works for PATs (classic) with the `repo` scope.
+      description: Add a single repository to an installation. The authenticated user
+        must have admin access to the repository.
       tags:
       - apps
       operationId: apps/add-repo-to-installation-for-authenticated-user
@@ -62057,7 +62055,7 @@ paths:
           "$ref": "#/components/responses/not_found"
       x-github:
         githubCloudOnly: false
-        enabledForGitHubApps: false
+        enabledForGitHubApps: true
         category: apps
         subcategory: installations
     delete:
@@ -62065,7 +62063,7 @@ paths:
       description: |-
         Remove a single repository from an installation. The authenticated user must have admin access to the repository. The installation must have the `repository_selection` of `selected`.
 
-        This endpoint only works for PATs (classic) with the `repo` scope.
+        To use a PAT (classic) with this endpoint, the `repo` scope is required
       tags:
       - apps
       operationId: apps/remove-repo-from-installation-for-authenticated-user
@@ -62090,7 +62088,7 @@ paths:
             that the application has access to in the organization.
       x-github:
         githubCloudOnly: false
-        enabledForGitHubApps: false
+        enabledForGitHubApps: true
         category: apps
         subcategory: installations
   "/user/interaction-limits":
@@ -63710,7 +63708,7 @@ paths:
           "$ref": "#/components/responses/bad_request"
       x-github:
         githubCloudOnly: false
-        enabledForGitHubApps: false
+        enabledForGitHubApps: true
         category: repos
         subcategory: repos
   "/user/repository_invitations":
