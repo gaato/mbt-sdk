@@ -20848,7 +20848,7 @@ pub(all) struct Message {
   stop_sequence : @sdkjson.Presence[String]
   stop_details : @sdkjson.Presence[RefusalStopDetails]
   usage : Usage
-  diagnostics : Diagnostics?
+  diagnostics : @sdkjson.Presence[Diagnostics]
   container : @sdkjson.Presence[Container]
 } derive(Eq, @debug.Debug)
 
@@ -20880,7 +20880,7 @@ pub fn Message::new(
     stop_sequence: @sdkjson.Presence::from_option(stop_sequence),
     stop_details: @sdkjson.Presence::from_option(stop_details),
     usage,
-    diagnostics,
+    diagnostics: @sdkjson.Presence::from_option(diagnostics),
     container: @sdkjson.Presence::from_option(container),
   }
 }
@@ -20905,10 +20905,7 @@ pub impl ToJson for Message with fn to_json(self) {
   .presence("stop_sequence", self.stop_sequence)
   .presence("stop_details", self.stop_details)
   .field("usage", self.usage)
-  .presence(
-    "diagnostics",
-    nullable_presence(self.diagnostics.map(value => value)),
-  )
+  .presence("diagnostics", self.diagnostics)
   .presence("container", self.container)
   .build()
 }
@@ -20929,7 +20926,7 @@ pub impl @json.FromJson for Message with fn from_json(value, path) {
     stop_sequence: @sdkjson.presence_field(obj, "stop_sequence", path),
     stop_details: @sdkjson.presence_field(obj, "stop_details", path),
     usage: required_field(obj, "usage", path),
-    diagnostics: decode_nullable_field(obj, "diagnostics", path),
+    diagnostics: @sdkjson.presence_field(obj, "diagnostics", path),
     container: @sdkjson.presence_field(obj, "container", path),
   }
 }

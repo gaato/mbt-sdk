@@ -2000,7 +2000,7 @@ pub(all) struct Message {
   stop_sequence : @gaato/sdk-runtime/json.Presence[String]
   stop_details : @gaato/sdk-runtime/json.Presence[RefusalStopDetails]
   usage : Usage
-  diagnostics : Diagnostics?
+  diagnostics : @gaato/sdk-runtime/json.Presence[Diagnostics]
   container : @gaato/sdk-runtime/json.Presence[Container]
 } derive(Eq, @debug.Debug)
 pub fn Message::equal(Self, Self) -> Bool
