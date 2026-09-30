@@ -32869,10 +32869,11 @@ pub(all) struct PullsMergeAsyncRequest {
   sha : String?
   merge_method : PullsMergeAsyncRequestMergeMethod?
   merge_action : PullsMergeAsyncRequestMergeAction?
+  bypass_rules : Bool?
 } derive(Eq, @debug.Debug)
 pub fn PullsMergeAsyncRequest::equal(Self, Self) -> Bool
 pub fn PullsMergeAsyncRequest::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
-pub fn PullsMergeAsyncRequest::new(commit_title? : String, commit_message? : String, sha? : String, merge_method? : PullsMergeAsyncRequestMergeMethod, merge_action? : PullsMergeAsyncRequestMergeAction) -> Self
+pub fn PullsMergeAsyncRequest::new(commit_title? : String, commit_message? : String, sha? : String, merge_method? : PullsMergeAsyncRequestMergeMethod, merge_action? : PullsMergeAsyncRequestMergeAction, bypass_rules? : Bool) -> Self
 pub fn PullsMergeAsyncRequest::not_equal(Self, Self) -> Bool
 pub fn PullsMergeAsyncRequest::to_json(Self) -> Json
 pub fn PullsMergeAsyncRequest::to_repr(Self) -> @debug.Repr

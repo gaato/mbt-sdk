@@ -25949,7 +25949,11 @@ paths:
       description: |-
         Registers a GitHub App installation so it can read and write external custom properties for an organization, and assigns it a display name.
 
-        An app installation can only be registered once, and its display name can't be changed afterward. Calling with an app installation that has already been registered returns a `422` response with an `already_exists` error code.
+        The display name must be 1 to 15 characters and contain only letters and numbers. Capitalization is preserved as entered.
+
+        An app installation can only be registered once, and its display name can't be changed afterward. Calling with an app installation that has already been registered returns a `422` response with an `already_exists` error code for `installation_id`. If the display name is already in use by another app installation in the organization, the response is `422` with an `already_exists` error code for `display_name`. An invalid display name also returns `422`.
+
+        The app installation being registered must have write or admin permission for organization external custom properties for repositories. If it doesn't, the response is `422`. This is the permission of the installation being registered, which isn't necessarily the caller.
 
         Uninstalling the GitHub App unregisters it, and removes the external custom properties it created.
 
@@ -25979,8 +25983,10 @@ paths:
                 display_name:
                   type: string
                   description: The display name for this app installation's external
-                    custom properties in the organization. This can't be changed after
-                    the app installation is registered.
+                    custom properties in the organization. Must be 1 to 15 characters
+                    and contain only letters and numbers. Capitalization is preserved
+                    as entered. This can't be changed after the app installation is
+                    registered.
                   minLength: 1
                   maxLength: 15
                   pattern: "^[a-zA-Z0-9]+$"
@@ -53117,6 +53123,11 @@ paths:
                   - default
                   - direct_merge
                   - merge_queue
+                bypass_rules:
+                  type: boolean
+                  default: false
+                  description: Whether to bypass repository rules that the authenticated
+                    actor is permitted to bypass.
             examples:
               direct-merge:
                 summary: Direct merge example
@@ -53273,6 +53284,7 @@ paths:
                       merge_method: merge
                       merge_action: default
                       expected_head_sha: 6dcb09b5b57875f334f61aebed695e2e4193db5e
+                      bypass_rules: false
                 response-if-the-pull-request-is-enqueued:
                   summary: Enqueued in the merge queue
                   value:
@@ -114850,6 +114862,12 @@ components:
                 type: string
                 description: SHA that the pull request head must match for the enqueued
                   merge to proceed.
+              bypass_rules:
+                type: boolean
+                default: false
+                description: Whether the asynchronous merge request will attempt to
+                  bypass repository rules that the authenticated actor is permitted
+                  to bypass.
             required:
             - message
             - uuid

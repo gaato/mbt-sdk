@@ -154848,6 +154848,7 @@ pub(all) struct PullsMergeAsyncRequest {
   sha : String?
   merge_method : PullsMergeAsyncRequestMergeMethod?
   merge_action : PullsMergeAsyncRequestMergeAction?
+  bypass_rules : Bool?
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -154865,8 +154866,16 @@ pub fn PullsMergeAsyncRequest::new(
   sha? : String,
   merge_method? : PullsMergeAsyncRequestMergeMethod,
   merge_action? : PullsMergeAsyncRequestMergeAction,
+  bypass_rules? : Bool,
 ) -> PullsMergeAsyncRequest {
-  { commit_title, commit_message, sha, merge_method, merge_action, }
+  {
+    commit_title,
+    commit_message,
+    sha,
+    merge_method,
+    merge_action,
+    bypass_rules,
+  }
 }
 
 ///|
@@ -154882,6 +154891,7 @@ pub impl ToJson for PullsMergeAsyncRequest with fn to_json(self) {
   .opt("sha", self.sha)
   .opt("merge_method", self.merge_method)
   .opt("merge_action", self.merge_action)
+  .opt("bypass_rules", self.bypass_rules)
   .build()
 }
 
@@ -154902,6 +154912,7 @@ pub impl @json.FromJson for PullsMergeAsyncRequest with fn from_json(
     sha: @sdkjson.opt_field(obj, "sha", path),
     merge_method: @sdkjson.opt_field(obj, "merge_method", path),
     merge_action: @sdkjson.opt_field(obj, "merge_action", path),
+    bypass_rules: @sdkjson.opt_field(obj, "bypass_rules", path),
   }
 }
 
