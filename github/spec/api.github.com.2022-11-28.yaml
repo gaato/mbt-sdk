@@ -15640,9 +15640,6 @@ paths:
     get:
       summary: Get the AI Scan setting for an organization
       description: |-
-        > [!NOTE]
-        > This endpoint is in public preview and is subject to change.
-
         Gets the AI Scan setting stored on an organization.
 
         The response reports the value stored on the organization. Organization respects enterprise policy.
@@ -15680,9 +15677,6 @@ paths:
     patch:
       summary: Update the AI Scan setting for an organization
       description: |-
-        > [!NOTE]
-        > This endpoint is in public preview and is subject to change.
-
         Updates the AI Scan setting stored on an organization.
 
         The organization respects the enterprise policy, so enabling is rejected when the enterprise disallows AI Scan.
@@ -37775,9 +37769,6 @@ paths:
     get:
       summary: Get AI Scan enablement for a repository
       description: |-
-        > [!NOTE]
-        > This endpoint is in public preview and is subject to change.
-
         Gets whether AI Scan is enabled for a repository.
 
         OAuth app tokens and personal access tokens (classic) need the `security_events` scope to use this endpoint with private or public repositories, or the `public_repo` scope to use this endpoint with only public repositories.
@@ -37812,9 +37803,6 @@ paths:
     patch:
       summary: Update AI Scan enablement for a repository
       description: |-
-        > [!NOTE]
-        > This endpoint is in public preview and is subject to change.
-
         Updates whether AI Scan is enabled for a repository.
 
         OAuth app tokens and personal access tokens (classic) need the `repo` scope to use this endpoint with private or public repositories, or the `public_repo` scope to use this endpoint with only public repositories.
