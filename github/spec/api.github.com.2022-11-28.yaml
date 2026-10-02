@@ -10046,7 +10046,9 @@ paths:
     get:
       summary: Get artifact and log retention settings for an organization
       description: |-
-        Gets artifact and log retention settings for an organization.
+        Gets retention settings for checks, workflow runs, commit statuses, artifacts, and logs for an organization.
+
+        Checks include check suites, check runs, and check annotations. These settings also apply to checks and commit statuses created by third-party integrations, and are not limited to data created by GitHub Actions.
 
         OAuth app tokens and personal access tokens (classic) need the `admin:org` scope or the "Actions policies" fine-grained permission to use this endpoint.
       operationId: actions/get-artifact-and-log-retention-settings-organization
@@ -10081,7 +10083,9 @@ paths:
     put:
       summary: Set artifact and log retention settings for an organization
       description: |-
-        Sets artifact and log retention settings for an organization.
+        Sets retention settings for checks, workflow runs, commit statuses, artifacts, and logs for an organization.
+
+        Checks include check suites, check runs, and check annotations. These settings also apply to checks and commit statuses created by third-party integrations, and are not limited to data created by GitHub Actions.
 
         OAuth app tokens and personal access tokens (classic) need the `admin:org` scope or the "Actions policies" fine-grained permission to use this endpoint.
       operationId: actions/set-artifact-and-log-retention-settings-organization
@@ -30821,7 +30825,9 @@ paths:
     get:
       summary: Get artifact and log retention settings for a repository
       description: |-
-        Gets artifact and log retention settings for a repository.
+        Gets retention settings for checks, workflow runs, commit statuses, artifacts, and logs for a repository.
+
+        Checks include check suites, check runs, and check annotations. These settings also apply to checks and commit statuses created by third-party integrations, and are not limited to data created by GitHub Actions.
 
         OAuth app tokens and personal access tokens (classic) need the `repo` scope to use this endpoint.
       operationId: actions/get-artifact-and-log-retention-settings-repository
@@ -30854,7 +30860,9 @@ paths:
     put:
       summary: Set artifact and log retention settings for a repository
       description: |-
-        Sets artifact and log retention settings for a repository.
+        Sets retention settings for checks, workflow runs, commit statuses, artifacts, and logs for a repository.
+
+        Checks include check suites, check runs, and check annotations. These settings also apply to checks and commit statuses created by third-party integrations, and are not limited to data created by GitHub Actions.
 
         OAuth app tokens and personal access tokens (classic) need the `repo` scope to use this endpoint.
       operationId: actions/set-artifact-and-log-retention-settings-repository
@@ -52062,6 +52070,8 @@ paths:
               examples:
                 default:
                   "$ref": "#/components/examples/pull-request-review-comment-2"
+        '304':
+          "$ref": "#/components/responses/not_modified"
         '404':
           "$ref": "#/components/responses/not_found"
       x-github:
@@ -94723,7 +94733,8 @@ components:
       properties:
         days:
           type: integer
-          description: The number of days artifacts and logs are retained
+          description: The number of days checks, workflow runs, commit statuses,
+            artifacts, and logs are retained
         maximum_allowed_days:
           type: integer
           description: The maximum number of days that can be configured
@@ -94735,7 +94746,8 @@ components:
       properties:
         days:
           type: integer
-          description: The number of days to retain artifacts and logs
+          description: The number of days to retain checks, workflow runs, commit
+            statuses, artifacts, and logs
       required:
       - days
     actions-fork-pr-contributor-approval:
