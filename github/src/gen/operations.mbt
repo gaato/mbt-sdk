@@ -31485,6 +31485,44 @@ pub fn pulls_remove_requested_reviewers_decode(
 
 ///|
 ///
+/// Rerequest reviewers for a pull request
+pub fn pulls_rerequest_reviewers_request(
+  owner : String,
+  repo : String,
+  pull_number : Int,
+  body : PullsRerequestReviewersRequest,
+) -> @http.Request {
+  @http.Request::post(
+    "/repos/" +
+    percent_encode(parameter_value(owner)) +
+    "/" +
+    percent_encode(parameter_value(repo)) +
+    "/pulls/" +
+    percent_encode(parameter_value(pull_number)) +
+    "/requested_reviewers/rerequest",
+  ).json_body(Json(body))
+}
+
+///|
+///
+/// Decodes a parsed successful pulls/rerequest-reviewers response.
+pub fn pulls_rerequest_reviewers_decode_json(
+  value : Json,
+) -> PullRequestSimple raise @json.JsonDecodeError {
+  @json.from_json(value)
+}
+
+///|
+///
+/// Decodes a successful pulls/rerequest-reviewers response.
+pub fn pulls_rerequest_reviewers_decode(
+  response : @http.Response,
+) -> PullRequestSimple raise @runtime.SdkError {
+  decode_response(response)
+}
+
+///|
+///
 /// List reviews for a pull request
 pub fn pulls_list_reviews_request(
   owner : String,

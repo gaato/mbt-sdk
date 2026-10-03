@@ -4320,6 +4320,12 @@ pub fn pulls_request_reviewers_decode_json(Json) -> PullRequestSimple raise @moo
 
 pub fn pulls_request_reviewers_request(String, String, Int, PullsRequestReviewersRequest) -> @http.Request
 
+pub fn pulls_rerequest_reviewers_decode(@http.Response) -> PullRequestSimple raise @sdk-runtime.SdkError
+
+pub fn pulls_rerequest_reviewers_decode_json(Json) -> PullRequestSimple raise @moonbitlang/core/json.JsonDecodeError
+
+pub fn pulls_rerequest_reviewers_request(String, String, Int, PullsRerequestReviewersRequest) -> @http.Request
+
 pub fn pulls_submit_review_decode(@http.Response) -> PullRequestReview raise @sdk-runtime.SdkError
 
 pub fn pulls_submit_review_decode_json(Json) -> PullRequestReview raise @moonbitlang/core/json.JsonDecodeError
@@ -32962,6 +32968,19 @@ pub fn PullsRequestReviewersRequest::to_json(Self) -> Json
 pub fn PullsRequestReviewersRequest::to_repr(Self) -> @debug.Repr
 pub impl ToJson for PullsRequestReviewersRequest
 pub impl @moonbitlang/core/json.FromJson for PullsRequestReviewersRequest
+
+pub(all) struct PullsRerequestReviewersRequest {
+  reviewers : Array[String]?
+  team_reviewers : Array[String]?
+} derive(Eq, @debug.Debug)
+pub fn PullsRerequestReviewersRequest::equal(Self, Self) -> Bool
+pub fn PullsRerequestReviewersRequest::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn PullsRerequestReviewersRequest::new(reviewers? : Array[String], team_reviewers? : Array[String]) -> Self
+pub fn PullsRerequestReviewersRequest::not_equal(Self, Self) -> Bool
+pub fn PullsRerequestReviewersRequest::to_json(Self) -> Json
+pub fn PullsRerequestReviewersRequest::to_repr(Self) -> @debug.Repr
+pub impl ToJson for PullsRerequestReviewersRequest
+pub impl @moonbitlang/core/json.FromJson for PullsRerequestReviewersRequest
 
 pub(all) struct PullsSubmitReviewRequest {
   body : String?
