@@ -155026,6 +155026,60 @@ pub impl @json.FromJson for PullsRemoveRequestedReviewersRequest with fn from_js
 
 ///|
 ///
+/// Generated representation of PullsRerequestReviewersRequest.
+pub(all) struct PullsRerequestReviewersRequest {
+  reviewers : Array[String]?
+  team_reviewers : Array[String]?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend PullsRerequestReviewersRequest with Eq::{equal, not_equal}
+
+///|
+pub extend PullsRerequestReviewersRequest with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a PullsRerequestReviewersRequest with omitted optional fields absent.
+pub fn PullsRerequestReviewersRequest::new(
+  reviewers? : Array[String],
+  team_reviewers? : Array[String],
+) -> PullsRerequestReviewersRequest {
+  { reviewers, team_reviewers, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend PullsRerequestReviewersRequest with ToJson::{to_json}
+
+///|
+pub impl ToJson for PullsRerequestReviewersRequest with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .opt("reviewers", self.reviewers)
+  .opt("team_reviewers", self.team_reviewers)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend PullsRerequestReviewersRequest with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for PullsRerequestReviewersRequest with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    reviewers: @sdkjson.opt_field(obj, "reviewers", path),
+    team_reviewers: @sdkjson.opt_field(obj, "team_reviewers", path),
+  }
+}
+
+///|
+///
 /// The review action you want to perform. The review actions include: `APPROVE`, `REQUEST_CHANGES`, or `COMMENT`. By leaving this blank, you set the review action state to `PENDING`, which means you will need to [submit the pull request review](https://docs.github.com/rest/pulls/reviews#submit-a-review-for-a-pull-request) when you are ready.
 pub(all) enum PullsCreateReviewRequestEvent {
   APPROVE
