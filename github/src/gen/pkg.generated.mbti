@@ -37174,6 +37174,8 @@ pub(all) enum RepositoryRuleDetailed {
   TagNamePattern(RepositoryRuleDetailedTagNamePattern)
   Workflows(RepositoryRuleDetailedWorkflows)
   CodeScanning(RepositoryRuleDetailedCodeScanning)
+  CodeQuality(RepositoryRuleDetailedCodeQuality)
+  CodeCoverage(RepositoryRuleDetailedCodeCoverage)
   CopilotCodeReview(RepositoryRuleDetailedCopilotCodeReview)
   LicenseComplianceScanning(RepositoryRuleDetailedLicenseComplianceScanning)
   FilePathRestriction(RepositoryRuleDetailedFilePathRestriction)
@@ -37248,6 +37250,104 @@ pub fn RepositoryRuleDetailedBranchNamePatternRulesetSourceType::to_json(Self) -
 pub fn RepositoryRuleDetailedBranchNamePatternRulesetSourceType::to_repr(Self) -> @debug.Repr
 pub impl ToJson for RepositoryRuleDetailedBranchNamePatternRulesetSourceType
 pub impl @moonbitlang/core/json.FromJson for RepositoryRuleDetailedBranchNamePatternRulesetSourceType
+
+pub(all) struct RepositoryRuleDetailedCodeCoverage {
+  type_ : String
+  parameters : RepositoryRuleDetailedCodeCoverageParameters?
+  ruleset_source_type : RepositoryRuleDetailedCodeCoverageRulesetSourceType?
+  ruleset_source : String?
+  ruleset_id : Int?
+} derive(Eq, @debug.Debug)
+pub fn RepositoryRuleDetailedCodeCoverage::equal(Self, Self) -> Bool
+pub fn RepositoryRuleDetailedCodeCoverage::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn RepositoryRuleDetailedCodeCoverage::new(type_~ : String, parameters? : RepositoryRuleDetailedCodeCoverageParameters, ruleset_source_type? : RepositoryRuleDetailedCodeCoverageRulesetSourceType, ruleset_source? : String, ruleset_id? : Int) -> Self
+pub fn RepositoryRuleDetailedCodeCoverage::not_equal(Self, Self) -> Bool
+pub fn RepositoryRuleDetailedCodeCoverage::to_json(Self) -> Json
+pub fn RepositoryRuleDetailedCodeCoverage::to_repr(Self) -> @debug.Repr
+pub impl ToJson for RepositoryRuleDetailedCodeCoverage
+pub impl @moonbitlang/core/json.FromJson for RepositoryRuleDetailedCodeCoverage
+
+pub(all) struct RepositoryRuleDetailedCodeCoverageParameters {
+  max_coverage_drop : Double?
+  minimum_coverage : Double?
+} derive(Eq, @debug.Debug)
+pub fn RepositoryRuleDetailedCodeCoverageParameters::equal(Self, Self) -> Bool
+pub fn RepositoryRuleDetailedCodeCoverageParameters::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn RepositoryRuleDetailedCodeCoverageParameters::new(max_coverage_drop? : Double, minimum_coverage? : Double) -> Self
+pub fn RepositoryRuleDetailedCodeCoverageParameters::not_equal(Self, Self) -> Bool
+pub fn RepositoryRuleDetailedCodeCoverageParameters::to_json(Self) -> Json
+pub fn RepositoryRuleDetailedCodeCoverageParameters::to_repr(Self) -> @debug.Repr
+pub impl ToJson for RepositoryRuleDetailedCodeCoverageParameters
+pub impl @moonbitlang/core/json.FromJson for RepositoryRuleDetailedCodeCoverageParameters
+
+pub(all) enum RepositoryRuleDetailedCodeCoverageRulesetSourceType {
+  Repository
+  Organization
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+pub fn RepositoryRuleDetailedCodeCoverageRulesetSourceType::equal(Self, Self) -> Bool
+pub fn RepositoryRuleDetailedCodeCoverageRulesetSourceType::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn RepositoryRuleDetailedCodeCoverageRulesetSourceType::not_equal(Self, Self) -> Bool
+pub fn RepositoryRuleDetailedCodeCoverageRulesetSourceType::to_json(Self) -> Json
+pub fn RepositoryRuleDetailedCodeCoverageRulesetSourceType::to_repr(Self) -> @debug.Repr
+pub impl ToJson for RepositoryRuleDetailedCodeCoverageRulesetSourceType
+pub impl @moonbitlang/core/json.FromJson for RepositoryRuleDetailedCodeCoverageRulesetSourceType
+
+pub(all) struct RepositoryRuleDetailedCodeQuality {
+  type_ : String
+  parameters : RepositoryRuleDetailedCodeQualityParameters?
+  ruleset_source_type : RepositoryRuleDetailedCodeQualityRulesetSourceType?
+  ruleset_source : String?
+  ruleset_id : Int?
+} derive(Eq, @debug.Debug)
+pub fn RepositoryRuleDetailedCodeQuality::equal(Self, Self) -> Bool
+pub fn RepositoryRuleDetailedCodeQuality::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn RepositoryRuleDetailedCodeQuality::new(type_~ : String, parameters? : RepositoryRuleDetailedCodeQualityParameters, ruleset_source_type? : RepositoryRuleDetailedCodeQualityRulesetSourceType, ruleset_source? : String, ruleset_id? : Int) -> Self
+pub fn RepositoryRuleDetailedCodeQuality::not_equal(Self, Self) -> Bool
+pub fn RepositoryRuleDetailedCodeQuality::to_json(Self) -> Json
+pub fn RepositoryRuleDetailedCodeQuality::to_repr(Self) -> @debug.Repr
+pub impl ToJson for RepositoryRuleDetailedCodeQuality
+pub impl @moonbitlang/core/json.FromJson for RepositoryRuleDetailedCodeQuality
+
+pub(all) struct RepositoryRuleDetailedCodeQualityParameters {
+  severity : RepositoryRuleDetailedCodeQualityParametersSeverity
+} derive(Eq, @debug.Debug)
+pub fn RepositoryRuleDetailedCodeQualityParameters::equal(Self, Self) -> Bool
+pub fn RepositoryRuleDetailedCodeQualityParameters::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn RepositoryRuleDetailedCodeQualityParameters::new(severity~ : RepositoryRuleDetailedCodeQualityParametersSeverity) -> Self
+pub fn RepositoryRuleDetailedCodeQualityParameters::not_equal(Self, Self) -> Bool
+pub fn RepositoryRuleDetailedCodeQualityParameters::to_json(Self) -> Json
+pub fn RepositoryRuleDetailedCodeQualityParameters::to_repr(Self) -> @debug.Repr
+pub impl ToJson for RepositoryRuleDetailedCodeQualityParameters
+pub impl @moonbitlang/core/json.FromJson for RepositoryRuleDetailedCodeQualityParameters
+
+pub(all) enum RepositoryRuleDetailedCodeQualityParametersSeverity {
+  Errors
+  Warnings
+  Notes
+  All
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+pub fn RepositoryRuleDetailedCodeQualityParametersSeverity::equal(Self, Self) -> Bool
+pub fn RepositoryRuleDetailedCodeQualityParametersSeverity::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn RepositoryRuleDetailedCodeQualityParametersSeverity::not_equal(Self, Self) -> Bool
+pub fn RepositoryRuleDetailedCodeQualityParametersSeverity::to_json(Self) -> Json
+pub fn RepositoryRuleDetailedCodeQualityParametersSeverity::to_repr(Self) -> @debug.Repr
+pub impl ToJson for RepositoryRuleDetailedCodeQualityParametersSeverity
+pub impl @moonbitlang/core/json.FromJson for RepositoryRuleDetailedCodeQualityParametersSeverity
+
+pub(all) enum RepositoryRuleDetailedCodeQualityRulesetSourceType {
+  Repository
+  Organization
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+pub fn RepositoryRuleDetailedCodeQualityRulesetSourceType::equal(Self, Self) -> Bool
+pub fn RepositoryRuleDetailedCodeQualityRulesetSourceType::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn RepositoryRuleDetailedCodeQualityRulesetSourceType::not_equal(Self, Self) -> Bool
+pub fn RepositoryRuleDetailedCodeQualityRulesetSourceType::to_json(Self) -> Json
+pub fn RepositoryRuleDetailedCodeQualityRulesetSourceType::to_repr(Self) -> @debug.Repr
+pub impl ToJson for RepositoryRuleDetailedCodeQualityRulesetSourceType
+pub impl @moonbitlang/core/json.FromJson for RepositoryRuleDetailedCodeQualityRulesetSourceType
 
 pub(all) struct RepositoryRuleDetailedCodeScanning {
   type_ : String

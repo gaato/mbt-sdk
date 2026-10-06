@@ -45167,7 +45167,7 @@ pub impl @json.FromJson for RepositoryRuleCodeCoverageParameters with fn from_js
 
 ///|
 ///
-/// Enforce minimum line coverage thresholds on pull requests. When configured, uploaded coverage data must meet the specified criteria before changes can be merged.
+/// Enforce minimum line coverage thresholds on pull requests. This rule evaluates uploaded coverage data but does not wait for coverage uploads. To ensure coverage is evaluated before merging, make each status check associated with a coverage upload a required status check.
 pub(all) struct RepositoryRuleCodeCoverage {
   type_ : String
   parameters : RepositoryRuleCodeCoverageParameters?
@@ -83913,6 +83913,457 @@ pub impl @json.FromJson for RepositoryRuleDetailedCodeScanning with fn from_json
 
 ///|
 ///
+/// The lowest severity level at which code quality reviews need to be resolved before commits can be merged.
+pub(all) enum RepositoryRuleDetailedCodeQualityParametersSeverity {
+  Errors
+  Warnings
+  Notes
+  All
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RepositoryRuleDetailedCodeQualityParametersSeverity with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend RepositoryRuleDetailedCodeQualityParametersSeverity with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend RepositoryRuleDetailedCodeQualityParametersSeverity with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for RepositoryRuleDetailedCodeQualityParametersSeverity with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Errors => "errors"
+    Warnings => "warnings"
+    Notes => "notes"
+    All => "all"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend RepositoryRuleDetailedCodeQualityParametersSeverity with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for RepositoryRuleDetailedCodeQualityParametersSeverity with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "errors" => Some(Errors)
+        "warnings" => Some(Warnings)
+        "notes" => Some(Notes)
+        "all" => Some(All)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of RepositoryRuleDetailedCodeQualityParameters.
+pub(all) struct RepositoryRuleDetailedCodeQualityParameters {
+  severity : RepositoryRuleDetailedCodeQualityParametersSeverity
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RepositoryRuleDetailedCodeQualityParameters with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend RepositoryRuleDetailedCodeQualityParameters with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a RepositoryRuleDetailedCodeQualityParameters with omitted optional fields absent.
+pub fn RepositoryRuleDetailedCodeQualityParameters::new(
+  severity~ : RepositoryRuleDetailedCodeQualityParametersSeverity,
+) -> RepositoryRuleDetailedCodeQualityParameters {
+  { severity, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend RepositoryRuleDetailedCodeQualityParameters with ToJson::{to_json}
+
+///|
+pub impl ToJson for RepositoryRuleDetailedCodeQualityParameters with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new().field("severity", self.severity).build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend RepositoryRuleDetailedCodeQualityParameters with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for RepositoryRuleDetailedCodeQualityParameters with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  { severity: required_field(obj, "severity", path), }
+}
+
+///|
+///
+/// The type of source for the ruleset that includes this rule.
+pub(all) enum RepositoryRuleDetailedCodeQualityRulesetSourceType {
+  Repository
+  Organization
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RepositoryRuleDetailedCodeQualityRulesetSourceType with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend RepositoryRuleDetailedCodeQualityRulesetSourceType with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend RepositoryRuleDetailedCodeQualityRulesetSourceType with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for RepositoryRuleDetailedCodeQualityRulesetSourceType with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Repository => "Repository"
+    Organization => "Organization"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend RepositoryRuleDetailedCodeQualityRulesetSourceType with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for RepositoryRuleDetailedCodeQualityRulesetSourceType with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "Repository" => Some(Repository)
+        "Organization" => Some(Organization)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of RepositoryRuleDetailedCodeQuality.
+pub(all) struct RepositoryRuleDetailedCodeQuality {
+  type_ : String
+  parameters : RepositoryRuleDetailedCodeQualityParameters?
+  ruleset_source_type : RepositoryRuleDetailedCodeQualityRulesetSourceType?
+  ruleset_source : String?
+  ruleset_id : Int?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RepositoryRuleDetailedCodeQuality with Eq::{equal, not_equal}
+
+///|
+pub extend RepositoryRuleDetailedCodeQuality with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a RepositoryRuleDetailedCodeQuality with omitted optional fields absent.
+pub fn RepositoryRuleDetailedCodeQuality::new(
+  type_~ : String,
+  parameters? : RepositoryRuleDetailedCodeQualityParameters,
+  ruleset_source_type? : RepositoryRuleDetailedCodeQualityRulesetSourceType,
+  ruleset_source? : String,
+  ruleset_id? : Int,
+) -> RepositoryRuleDetailedCodeQuality {
+  { type_, parameters, ruleset_source_type, ruleset_source, ruleset_id, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend RepositoryRuleDetailedCodeQuality with ToJson::{to_json}
+
+///|
+pub impl ToJson for RepositoryRuleDetailedCodeQuality with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("type", self.type_)
+  .opt("parameters", self.parameters)
+  .opt("ruleset_source_type", self.ruleset_source_type)
+  .opt("ruleset_source", self.ruleset_source)
+  .opt("ruleset_id", self.ruleset_id)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend RepositoryRuleDetailedCodeQuality with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for RepositoryRuleDetailedCodeQuality with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    type_: required_field(obj, "type", path),
+    parameters: @sdkjson.opt_field(obj, "parameters", path),
+    ruleset_source_type: @sdkjson.opt_field(obj, "ruleset_source_type", path),
+    ruleset_source: @sdkjson.opt_field(obj, "ruleset_source", path),
+    ruleset_id: @sdkjson.opt_field(obj, "ruleset_id", path),
+  }
+}
+
+///|
+///
+/// Generated representation of RepositoryRuleDetailedCodeCoverageParameters.
+pub(all) struct RepositoryRuleDetailedCodeCoverageParameters {
+  max_coverage_drop : Double?
+  minimum_coverage : Double?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RepositoryRuleDetailedCodeCoverageParameters with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend RepositoryRuleDetailedCodeCoverageParameters with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a RepositoryRuleDetailedCodeCoverageParameters with omitted optional fields absent.
+pub fn RepositoryRuleDetailedCodeCoverageParameters::new(
+  max_coverage_drop? : Double,
+  minimum_coverage? : Double,
+) -> RepositoryRuleDetailedCodeCoverageParameters {
+  { max_coverage_drop, minimum_coverage, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend RepositoryRuleDetailedCodeCoverageParameters with ToJson::{to_json}
+
+///|
+pub impl ToJson for RepositoryRuleDetailedCodeCoverageParameters with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("max_coverage_drop", self.max_coverage_drop)
+  .opt("minimum_coverage", self.minimum_coverage)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend RepositoryRuleDetailedCodeCoverageParameters with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for RepositoryRuleDetailedCodeCoverageParameters with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    max_coverage_drop: @sdkjson.opt_field(obj, "max_coverage_drop", path),
+    minimum_coverage: @sdkjson.opt_field(obj, "minimum_coverage", path),
+  }
+}
+
+///|
+///
+/// The type of source for the ruleset that includes this rule.
+pub(all) enum RepositoryRuleDetailedCodeCoverageRulesetSourceType {
+  Repository
+  Organization
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RepositoryRuleDetailedCodeCoverageRulesetSourceType with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend RepositoryRuleDetailedCodeCoverageRulesetSourceType with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend RepositoryRuleDetailedCodeCoverageRulesetSourceType with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for RepositoryRuleDetailedCodeCoverageRulesetSourceType with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Repository => "Repository"
+    Organization => "Organization"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend RepositoryRuleDetailedCodeCoverageRulesetSourceType with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for RepositoryRuleDetailedCodeCoverageRulesetSourceType with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "Repository" => Some(Repository)
+        "Organization" => Some(Organization)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of RepositoryRuleDetailedCodeCoverage.
+pub(all) struct RepositoryRuleDetailedCodeCoverage {
+  type_ : String
+  parameters : RepositoryRuleDetailedCodeCoverageParameters?
+  ruleset_source_type : RepositoryRuleDetailedCodeCoverageRulesetSourceType?
+  ruleset_source : String?
+  ruleset_id : Int?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RepositoryRuleDetailedCodeCoverage with Eq::{equal, not_equal}
+
+///|
+pub extend RepositoryRuleDetailedCodeCoverage with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a RepositoryRuleDetailedCodeCoverage with omitted optional fields absent.
+pub fn RepositoryRuleDetailedCodeCoverage::new(
+  type_~ : String,
+  parameters? : RepositoryRuleDetailedCodeCoverageParameters,
+  ruleset_source_type? : RepositoryRuleDetailedCodeCoverageRulesetSourceType,
+  ruleset_source? : String,
+  ruleset_id? : Int,
+) -> RepositoryRuleDetailedCodeCoverage {
+  { type_, parameters, ruleset_source_type, ruleset_source, ruleset_id, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend RepositoryRuleDetailedCodeCoverage with ToJson::{to_json}
+
+///|
+pub impl ToJson for RepositoryRuleDetailedCodeCoverage with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("type", self.type_)
+  .opt("parameters", self.parameters)
+  .opt("ruleset_source_type", self.ruleset_source_type)
+  .opt("ruleset_source", self.ruleset_source)
+  .opt("ruleset_id", self.ruleset_id)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend RepositoryRuleDetailedCodeCoverage with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for RepositoryRuleDetailedCodeCoverage with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    type_: required_field(obj, "type", path),
+    parameters: @sdkjson.opt_field(obj, "parameters", path),
+    ruleset_source_type: @sdkjson.opt_field(obj, "ruleset_source_type", path),
+    ruleset_source: @sdkjson.opt_field(obj, "ruleset_source", path),
+    ruleset_id: @sdkjson.opt_field(obj, "ruleset_id", path),
+  }
+}
+
+///|
+///
 /// Generated representation of RepositoryRuleDetailedCopilotCodeReviewParameters.
 pub(all) struct RepositoryRuleDetailedCopilotCodeReviewParameters {
   review_draft_pull_requests : Bool?
@@ -85051,6 +85502,8 @@ pub(all) enum RepositoryRuleDetailed {
   TagNamePattern(RepositoryRuleDetailedTagNamePattern)
   Workflows(RepositoryRuleDetailedWorkflows)
   CodeScanning(RepositoryRuleDetailedCodeScanning)
+  CodeQuality(RepositoryRuleDetailedCodeQuality)
+  CodeCoverage(RepositoryRuleDetailedCodeCoverage)
   CopilotCodeReview(RepositoryRuleDetailedCopilotCodeReview)
   LicenseComplianceScanning(RepositoryRuleDetailedLicenseComplianceScanning)
   FilePathRestriction(RepositoryRuleDetailedFilePathRestriction)
@@ -85091,6 +85544,8 @@ pub impl ToJson for RepositoryRuleDetailed with fn to_json(self) {
     TagNamePattern(value) => Json(value)
     Workflows(value) => Json(value)
     CodeScanning(value) => Json(value)
+    CodeQuality(value) => Json(value)
+    CodeCoverage(value) => Json(value)
     CopilotCodeReview(value) => Json(value)
     LicenseComplianceScanning(value) => Json(value)
     FilePathRestriction(value) => Json(value)
@@ -85136,6 +85591,8 @@ pub impl @json.FromJson for RepositoryRuleDetailed with fn from_json(
     "tag_name_pattern" => TagNamePattern(@json.from_json(value, path~))
     "workflows" => Workflows(@json.from_json(value, path~))
     "code_scanning" => CodeScanning(@json.from_json(value, path~))
+    "code_quality" => CodeQuality(@json.from_json(value, path~))
+    "code_coverage" => CodeCoverage(@json.from_json(value, path~))
     "copilot_code_review" => CopilotCodeReview(@json.from_json(value, path~))
     "license_compliance_scanning" =>
       LicenseComplianceScanning(@json.from_json(value, path~))
