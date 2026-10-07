@@ -30,7 +30,7 @@ pub fn models_list_decode(@http.Response) -> ListResponseModelInfo raise @sdk-ru
 
 pub fn models_list_decode_json(Json) -> ListResponseModelInfo raise @moonbitlang/core/json.JsonDecodeError
 
-pub fn models_list_request(before_id? : String, after_id? : String, limit? : Int, anthropic_version? : String, anthropic_beta? : Array[String], x_api_key? : String, anthropic_workspace_id? : String) -> @http.Request
+pub fn models_list_request(before_id? : String, after_id? : String, limit? : Int, lifecycle? : Array[ModelsListLifecycleItem], anthropic_version? : String, anthropic_beta? : Array[String], x_api_key? : String, anthropic_workspace_id? : String) -> @http.Request
 
 // Errors
 
@@ -2120,12 +2120,13 @@ pub(all) struct ModelCapabilities {
   effort : EffortCapability
   image_input : CapabilitySupport
   pdf_input : CapabilitySupport
+  server_tools : ServerToolsCapability
   structured_outputs : CapabilitySupport
   thinking : ThinkingCapability
 } derive(Eq, @debug.Debug)
 pub fn ModelCapabilities::equal(Self, Self) -> Bool
 pub fn ModelCapabilities::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
-pub fn ModelCapabilities::new(batch~ : CapabilitySupport, citations~ : CapabilitySupport, code_execution~ : CapabilitySupport, context_management~ : ContextManagementCapability, effort~ : EffortCapability, image_input~ : CapabilitySupport, pdf_input~ : CapabilitySupport, structured_outputs~ : CapabilitySupport, thinking~ : ThinkingCapability) -> Self
+pub fn ModelCapabilities::new(batch~ : CapabilitySupport, citations~ : CapabilitySupport, code_execution~ : CapabilitySupport, context_management~ : ContextManagementCapability, effort~ : EffortCapability, image_input~ : CapabilitySupport, pdf_input~ : CapabilitySupport, server_tools~ : ServerToolsCapability, structured_outputs~ : CapabilitySupport, thinking~ : ThinkingCapability) -> Self
 pub fn ModelCapabilities::not_equal(Self, Self) -> Bool
 pub fn ModelCapabilities::to_json(Self) -> Json
 pub fn ModelCapabilities::to_repr(Self) -> @debug.Repr
@@ -2135,19 +2136,67 @@ pub impl @moonbitlang/core/json.FromJson for ModelCapabilities
 pub(all) struct ModelInfo {
   capabilities : ModelCapabilities?
   created_at : String
+  deprecated_at : String?
   display_name : String
   id : String
+  lifecycle : ModelInfoLifecycle
+  line : ModelLine?
   max_input_tokens : Int?
   max_tokens : Int?
+  retires_at : String?
 } derive(Eq, @debug.Debug)
 pub fn ModelInfo::equal(Self, Self) -> Bool
 pub fn ModelInfo::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
-pub fn ModelInfo::new(created_at~ : String, display_name~ : String, id~ : String, capabilities? : ModelCapabilities, max_input_tokens? : Int, max_tokens? : Int) -> Self
+pub fn ModelInfo::new(created_at~ : String, display_name~ : String, id~ : String, lifecycle~ : ModelInfoLifecycle, capabilities? : ModelCapabilities, deprecated_at? : String, line? : ModelLine, max_input_tokens? : Int, max_tokens? : Int, retires_at? : String) -> Self
 pub fn ModelInfo::not_equal(Self, Self) -> Bool
 pub fn ModelInfo::to_json(Self) -> Json
 pub fn ModelInfo::to_repr(Self) -> @debug.Repr
 pub impl ToJson for ModelInfo
 pub impl @moonbitlang/core/json.FromJson for ModelInfo
+
+pub(all) enum ModelInfoLifecycle {
+  Active
+  Deprecated
+  Retired
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+pub fn ModelInfoLifecycle::equal(Self, Self) -> Bool
+pub fn ModelInfoLifecycle::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ModelInfoLifecycle::not_equal(Self, Self) -> Bool
+pub fn ModelInfoLifecycle::to_json(Self) -> Json
+pub fn ModelInfoLifecycle::to_repr(Self) -> @debug.Repr
+pub impl ToJson for ModelInfoLifecycle
+pub impl @moonbitlang/core/json.FromJson for ModelInfoLifecycle
+
+pub(all) enum ModelLine {
+  Haiku
+  Sonnet
+  Opus
+  Fable
+  Mythos
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+pub fn ModelLine::equal(Self, Self) -> Bool
+pub fn ModelLine::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ModelLine::not_equal(Self, Self) -> Bool
+pub fn ModelLine::to_json(Self) -> Json
+pub fn ModelLine::to_repr(Self) -> @debug.Repr
+pub impl ToJson for ModelLine
+pub impl @moonbitlang/core/json.FromJson for ModelLine
+
+pub(all) enum ModelsListLifecycleItem {
+  Active
+  Deprecated
+  Retired
+  Custom(String)
+} derive(Eq, @debug.Debug)
+pub fn ModelsListLifecycleItem::equal(Self, Self) -> Bool
+pub fn ModelsListLifecycleItem::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ModelsListLifecycleItem::not_equal(Self, Self) -> Bool
+pub fn ModelsListLifecycleItem::to_json(Self) -> Json
+pub fn ModelsListLifecycleItem::to_repr(Self) -> @debug.Repr
+pub impl ToJson for ModelsListLifecycleItem
+pub impl @moonbitlang/core/json.FromJson for ModelsListLifecycleItem
 
 pub(all) struct NotFoundError {
   message : String
@@ -4135,6 +4184,20 @@ pub fn ServerToolUsage::to_repr(Self) -> @debug.Repr
 pub impl ToJson for ServerToolUsage
 pub impl @moonbitlang/core/json.FromJson for ServerToolUsage
 
+pub(all) struct ServerToolsCapability {
+  code_execution : CapabilitySupport
+  supported : Bool
+  web_search : CapabilitySupport
+} derive(Eq, @debug.Debug)
+pub fn ServerToolsCapability::equal(Self, Self) -> Bool
+pub fn ServerToolsCapability::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ServerToolsCapability::new(code_execution~ : CapabilitySupport, supported~ : Bool, web_search~ : CapabilitySupport) -> Self
+pub fn ServerToolsCapability::not_equal(Self, Self) -> Bool
+pub fn ServerToolsCapability::to_json(Self) -> Json
+pub fn ServerToolsCapability::to_repr(Self) -> @debug.Repr
+pub impl ToJson for ServerToolsCapability
+pub impl @moonbitlang/core/json.FromJson for ServerToolsCapability
+
 pub(all) struct SignatureContentBlockDelta {
   signature : String
   type_ : String
@@ -4417,11 +4480,12 @@ pub impl @moonbitlang/core/json.FromJson for ThinkingDisplayMode
 
 pub(all) struct ThinkingTypes {
   adaptive : CapabilitySupport
+  disabled : CapabilitySupport
   enabled : CapabilitySupport
 } derive(Eq, @debug.Debug)
 pub fn ThinkingTypes::equal(Self, Self) -> Bool
 pub fn ThinkingTypes::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
-pub fn ThinkingTypes::new(adaptive~ : CapabilitySupport, enabled~ : CapabilitySupport) -> Self
+pub fn ThinkingTypes::new(adaptive~ : CapabilitySupport, disabled~ : CapabilitySupport, enabled~ : CapabilitySupport) -> Self
 pub fn ThinkingTypes::not_equal(Self, Self) -> Bool
 pub fn ThinkingTypes::to_json(Self) -> Json
 pub fn ThinkingTypes::to_repr(Self) -> @debug.Repr

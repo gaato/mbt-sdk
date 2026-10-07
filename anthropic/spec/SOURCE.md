@@ -1,9 +1,9 @@
 # anthropic.json
 
 - Source: https://raw.githubusercontent.com/anthropics/anthropic-sdk-python/main/scripts/mock-spec.json.gz (gunzipped, byte for byte)
-- Fetched: 2026-10-01
-- sha256: d721a6487a161bd44bbdacb09c1406a0891c9162e68887aacae463577e87a53a
-- sha256 (gzip as downloaded): c7b58a83ddf114257c794e7e25ce0c0c09a2749ab9d8a59d54fdc894c61fc9ba
+- Fetched: 2026-10-07
+- sha256: 752f03c44b9ea12e3dad2fc0fc76dce22e400aafe5b3494927192fe37317c4c3
+- sha256 (gzip as downloaded): adc2483d4c8cd909f8b32607f855c072ee44a9acb74124d45db7110e1f70b6e1
 - OpenAPI version: 3.1.0 (info has no version field; the file follows the SDK releases)
 
 Anthropic does not publish its OpenAPI document on its own; the Stainless-generated official SDKs vendor the spec they were built from as `scripts/mock-spec.json.gz` (used by their `scripts/mock` test server), and every SDK repository carries the same file. The path is stable on `main` and the file is refreshed with each SDK release, so `spec-watch.yml` compares its gunzipped sha256 against the line above. The older hash-named copies under `storage.googleapis.com/stainless-sdk-openapi-specs/` are no longer referenced from the SDK repositories and are not used.
