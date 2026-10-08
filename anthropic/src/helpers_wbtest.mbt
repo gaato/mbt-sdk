@@ -199,11 +199,16 @@ test "generated model metadata distinguishes required null from missing" {
     "created_at": "2026-09-23T00:00:00Z",
     "display_name": "Test model",
     "capabilities": Json::null(),
+    "deprecated_at": Json::null(),
+    "lifecycle": "active",
+    "line": Json::null(),
     "max_input_tokens": Json::null(),
     "max_tokens": Json::null(),
+    "retires_at": Json::null(),
   }
   let model : @gen.ModelInfo = @json.from_json(complete)
   assert_eq(model.max_tokens, None)
+  assert_eq(model.lifecycle, Active)
   guard complete is Object(fields) else { fail("expected object") }
   fields.remove("max_tokens")
   try (@json.from_json(complete) : @gen.ModelInfo) catch {

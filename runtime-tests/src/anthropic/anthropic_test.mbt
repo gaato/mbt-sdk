@@ -249,14 +249,14 @@ async test "from_client uses Bearer configuration, version, and per-operation bu
       "GET",
       "/v1/models?limit=2",
       json_response(
-        "{\"data\":[{\"type\":\"model\",\"id\":\"claude-opus-5\",\"display_name\":\"Claude Opus 5\",\"created_at\":\"2026-04-01T00:00:00Z\",\"capabilities\":null,\"max_input_tokens\":null,\"max_tokens\":null},{\"type\":\"model\",\"id\":\"claude-haiku-4-5\",\"display_name\":\"Claude Haiku 4.5\",\"created_at\":\"2025-10-01T00:00:00Z\",\"capabilities\":null,\"max_input_tokens\":null,\"max_tokens\":64000}],\"has_more\":true,\"first_id\":\"claude-opus-5\",\"last_id\":\"claude-haiku-4-5\"}",
+        "{\"data\":[{\"type\":\"model\",\"id\":\"claude-opus-5\",\"display_name\":\"Claude Opus 5\",\"created_at\":\"2026-04-01T00:00:00Z\",\"capabilities\":null,\"deprecated_at\":null,\"lifecycle\":\"active\",\"line\":null,\"retires_at\":null,\"max_input_tokens\":null,\"max_tokens\":null},{\"type\":\"model\",\"id\":\"claude-haiku-4-5\",\"display_name\":\"Claude Haiku 4.5\",\"created_at\":\"2025-10-01T00:00:00Z\",\"capabilities\":null,\"deprecated_at\":null,\"lifecycle\":\"active\",\"line\":null,\"retires_at\":null,\"max_input_tokens\":null,\"max_tokens\":64000}],\"has_more\":true,\"first_id\":\"claude-opus-5\",\"last_id\":\"claude-haiku-4-5\"}",
       ),
     )
     transport.expect(
       "GET",
       "/v1/models/claude-haiku-4-5",
       json_response(
-        "{\"type\":\"model\",\"id\":\"claude-haiku-4-5\",\"display_name\":\"Claude Haiku 4.5\",\"created_at\":\"2025-10-01T00:00:00Z\",\"capabilities\":null,\"max_input_tokens\":null,\"max_tokens\":null}",
+        "{\"type\":\"model\",\"id\":\"claude-haiku-4-5\",\"display_name\":\"Claude Haiku 4.5\",\"created_at\":\"2025-10-01T00:00:00Z\",\"capabilities\":null,\"deprecated_at\":null,\"lifecycle\":\"active\",\"line\":null,\"retires_at\":null,\"max_input_tokens\":null,\"max_tokens\":null}",
       ),
     )
     let limiter = RecordingLimiter::{ acquired: [], observed: [], }
