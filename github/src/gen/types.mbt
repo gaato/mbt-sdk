@@ -52434,7 +52434,7 @@ pub impl @json.FromJson for RateLimitOverviewResources with fn from_json(
 
 ///|
 ///
-/// Rate Limit Overview
+/// Rate limit status for the applicable requester and resource category. Requests authenticated as a user share the user's rate limit across credentials. Requests without authentication use the requesting IP address. API requests routed through either an API hostname or a web hostname can count against the same applicable limit.
 pub(all) struct RateLimitOverview {
   resources : RateLimitOverviewResources
   rate : RateLimit
