@@ -126,17 +126,21 @@ pub async fn Anthropic::count_tokens(
 
 ///|
 /// Lists one page of models. Follow `has_more` with `after_id=last_id`.
+/// Without `lifecycle` the API lists active and deprecated models; retired
+/// models appear only when `Retired` is requested.
 pub async fn Anthropic::list_models(
   self : Anthropic,
   limit? : Int,
   after_id? : String,
   before_id? : String,
+  lifecycle? : Array[ModelsListLifecycleItem],
 ) -> ListResponseModelInfo raise @runtime.SdkError {
   let response = self.client.send(
     @gen.models_list_request(
       limit?,
       after_id?,
       before_id?,
+      lifecycle?,
       anthropic_version=self.version,
     ),
     bucket="models",

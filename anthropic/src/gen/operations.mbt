@@ -115,6 +115,7 @@ pub fn models_list_request(
   before_id? : String,
   after_id? : String,
   limit? : Int,
+  lifecycle? : Array[ModelsListLifecycleItem],
   anthropic_version? : String,
   anthropic_beta? : Array[String],
   x_api_key? : String,
@@ -131,6 +132,13 @@ pub fn models_list_request(
   }
   match limit {
     Some(value) => url = append_query(url, "limit", parameter_value(value))
+    None => ()
+  }
+  match lifecycle {
+    Some(values) =>
+      for value in values {
+        url = append_query(url, "lifecycle[]", parameter_value(value))
+      }
     None => ()
   }
   let mut request = @http.Request::get(url)

@@ -20002,9 +20002,65 @@ pub impl @json.FromJson for ErrorResponse with fn from_json(value, path) {
 
 ///|
 ///
-/// Supported thinking type configurations.
+/// Web search and code execution tool support, with one entry per tool.
+pub(all) struct ServerToolsCapability {
+  code_execution : CapabilitySupport
+  supported : Bool
+  web_search : CapabilitySupport
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ServerToolsCapability with Eq::{equal, not_equal}
+
+///|
+pub extend ServerToolsCapability with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a ServerToolsCapability with omitted optional fields absent.
+pub fn ServerToolsCapability::new(
+  code_execution~ : CapabilitySupport,
+  supported~ : Bool,
+  web_search~ : CapabilitySupport,
+) -> ServerToolsCapability {
+  { code_execution, supported, web_search, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend ServerToolsCapability with ToJson::{to_json}
+
+///|
+pub impl ToJson for ServerToolsCapability with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("code_execution", self.code_execution)
+  .field("supported", self.supported)
+  .field("web_search", self.web_search)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend ServerToolsCapability with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for ServerToolsCapability with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    code_execution: required_field(obj, "code_execution", path),
+    supported: required_field(obj, "supported", path),
+    web_search: required_field(obj, "web_search", path),
+  }
+}
+
+///|
+///
+/// Which `thinking.type` values the model accepts on requests. Read each key on its own: for example, `enabled` can be false while `disabled` is true.
 pub(all) struct ThinkingTypes {
   adaptive : CapabilitySupport
+  disabled : CapabilitySupport
   enabled : CapabilitySupport
 } derive(Eq, @debug.Debug)
 
@@ -20019,9 +20075,10 @@ pub extend ThinkingTypes with @debug.Debug::{to_repr}
 /// Creates a ThinkingTypes with omitted optional fields absent.
 pub fn ThinkingTypes::new(
   adaptive~ : CapabilitySupport,
+  disabled~ : CapabilitySupport,
   enabled~ : CapabilitySupport,
 ) -> ThinkingTypes {
-  { adaptive, enabled, }
+  { adaptive, disabled, enabled, }
 }
 
 ///|
@@ -20033,6 +20090,7 @@ pub extend ThinkingTypes with ToJson::{to_json}
 pub impl ToJson for ThinkingTypes with fn to_json(self) {
   @sdkjson.ObjBuilder::new()
   .field("adaptive", self.adaptive)
+  .field("disabled", self.disabled)
   .field("enabled", self.enabled)
   .build()
 }
@@ -20047,6 +20105,7 @@ pub impl @json.FromJson for ThinkingTypes with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
   {
     adaptive: required_field(obj, "adaptive", path),
+    disabled: required_field(obj, "disabled", path),
     enabled: required_field(obj, "enabled", path),
   }
 }
@@ -20113,6 +20172,7 @@ pub(all) struct ModelCapabilities {
   effort : EffortCapability
   image_input : CapabilitySupport
   pdf_input : CapabilitySupport
+  server_tools : ServerToolsCapability
   structured_outputs : CapabilitySupport
   thinking : ThinkingCapability
 } derive(Eq, @debug.Debug)
@@ -20134,6 +20194,7 @@ pub fn ModelCapabilities::new(
   effort~ : EffortCapability,
   image_input~ : CapabilitySupport,
   pdf_input~ : CapabilitySupport,
+  server_tools~ : ServerToolsCapability,
   structured_outputs~ : CapabilitySupport,
   thinking~ : ThinkingCapability,
 ) -> ModelCapabilities {
@@ -20145,6 +20206,7 @@ pub fn ModelCapabilities::new(
     effort,
     image_input,
     pdf_input,
+    server_tools,
     structured_outputs,
     thinking,
   }
@@ -20165,6 +20227,7 @@ pub impl ToJson for ModelCapabilities with fn to_json(self) {
   .field("effort", self.effort)
   .field("image_input", self.image_input)
   .field("pdf_input", self.pdf_input)
+  .field("server_tools", self.server_tools)
   .field("structured_outputs", self.structured_outputs)
   .field("thinking", self.thinking)
   .build()
@@ -20186,9 +20249,124 @@ pub impl @json.FromJson for ModelCapabilities with fn from_json(value, path) {
     effort: required_field(obj, "effort", path),
     image_input: required_field(obj, "image_input", path),
     pdf_input: required_field(obj, "pdf_input", path),
+    server_tools: required_field(obj, "server_tools", path),
     structured_outputs: required_field(obj, "structured_outputs", path),
     thinking: required_field(obj, "thinking", path),
   }
+}
+
+///|
+///
+/// The model's current lifecycle stage. - `active`: The model is available for use, open to new adopters, and not scheduled for retirement. - `deprecated`: The model remains callable for organizations with existing access, but is headed for retirement and closed to new adopters. - `retired`: The model is no longer available for use; inference requests naming it fail. It remains in the catalogue as the historical record of its retirement.
+pub(all) enum ModelInfoLifecycle {
+  Active
+  Deprecated
+  Retired
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ModelInfoLifecycle with Eq::{equal, not_equal}
+
+///|
+pub extend ModelInfoLifecycle with @debug.Debug::{to_repr}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend ModelInfoLifecycle with ToJson::{to_json}
+
+///|
+pub impl ToJson for ModelInfoLifecycle with fn to_json(self) {
+  let raw = match self {
+    Active => "active"
+    Deprecated => "deprecated"
+    Retired => "retired"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend ModelInfoLifecycle with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for ModelInfoLifecycle with fn from_json(value, path) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "active" => Some(Active)
+        "deprecated" => Some(Deprecated)
+        "retired" => Some(Retired)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// A Claude model line, such as `opus` or `sonnet`. More lines may be added as new values.
+pub(all) enum ModelLine {
+  Haiku
+  Sonnet
+  Opus
+  Fable
+  Mythos
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ModelLine with Eq::{equal, not_equal}
+
+///|
+pub extend ModelLine with @debug.Debug::{to_repr}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend ModelLine with ToJson::{to_json}
+
+///|
+pub impl ToJson for ModelLine with fn to_json(self) {
+  let raw = match self {
+    Haiku => "haiku"
+    Sonnet => "sonnet"
+    Opus => "opus"
+    Fable => "fable"
+    Mythos => "mythos"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend ModelLine with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for ModelLine with fn from_json(value, path) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "haiku" => Some(Haiku)
+        "sonnet" => Some(Sonnet)
+        "opus" => Some(Opus)
+        "fable" => Some(Fable)
+        "mythos" => Some(Mythos)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
 }
 
 ///|
@@ -20197,10 +20375,14 @@ pub impl @json.FromJson for ModelCapabilities with fn from_json(value, path) {
 pub(all) struct ModelInfo {
   capabilities : ModelCapabilities?
   created_at : String
+  deprecated_at : String?
   display_name : String
   id : String
+  lifecycle : ModelInfoLifecycle
+  line : ModelLine?
   max_input_tokens : Int?
   max_tokens : Int?
+  retires_at : String?
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -20216,11 +20398,26 @@ pub fn ModelInfo::new(
   created_at~ : String,
   display_name~ : String,
   id~ : String,
+  lifecycle~ : ModelInfoLifecycle,
   capabilities? : ModelCapabilities,
+  deprecated_at? : String,
+  line? : ModelLine,
   max_input_tokens? : Int,
   max_tokens? : Int,
+  retires_at? : String,
 ) -> ModelInfo {
-  { capabilities, created_at, display_name, id, max_input_tokens, max_tokens, }
+  {
+    capabilities,
+    created_at,
+    deprecated_at,
+    display_name,
+    id,
+    lifecycle,
+    line,
+    max_input_tokens,
+    max_tokens,
+    retires_at,
+  }
 }
 
 ///|
@@ -20236,8 +20433,14 @@ pub impl ToJson for ModelInfo with fn to_json(self) {
     nullable_presence(self.capabilities.map(value => value)),
   )
   .field("created_at", self.created_at)
+  .presence(
+    "deprecated_at",
+    nullable_presence(self.deprecated_at.map(value => value)),
+  )
   .field("display_name", self.display_name)
   .field("id", self.id)
+  .field("lifecycle", self.lifecycle)
+  .presence("line", nullable_presence(self.line.map(value => value)))
   .presence(
     "max_input_tokens",
     nullable_presence(self.max_input_tokens.map(value => value)),
@@ -20245,6 +20448,10 @@ pub impl ToJson for ModelInfo with fn to_json(self) {
   .presence(
     "max_tokens",
     nullable_presence(self.max_tokens.map(value => value)),
+  )
+  .presence(
+    "retires_at",
+    nullable_presence(self.retires_at.map(value => value)),
   )
   .field("type", "model")
   .build()
@@ -20261,10 +20468,14 @@ pub impl @json.FromJson for ModelInfo with fn from_json(value, path) {
   {
     capabilities: decode_nullable_field(obj, "capabilities", path),
     created_at: required_field(obj, "created_at", path),
+    deprecated_at: decode_nullable_field(obj, "deprecated_at", path),
     display_name: required_field(obj, "display_name", path),
     id: required_field(obj, "id", path),
+    lifecycle: required_field(obj, "lifecycle", path),
+    line: decode_nullable_field(obj, "line", path),
     max_input_tokens: decode_nullable_field(obj, "max_input_tokens", path),
     max_tokens: decode_nullable_field(obj, "max_tokens", path),
+    retires_at: decode_nullable_field(obj, "retires_at", path),
   }
 }
 
@@ -21284,4 +21495,61 @@ pub impl @json.FromJson for MessageStreamEvent with fn from_json(value, path) {
     "message_stop" => MessageStop(@json.from_json(value, path~))
     other => Unknown(other, value)
   }
+}
+
+///|
+///
+/// Generated string enum ModelsListLifecycleItem.
+pub(all) enum ModelsListLifecycleItem {
+  Active
+  Deprecated
+  Retired
+  Custom(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ModelsListLifecycleItem with Eq::{equal, not_equal}
+
+///|
+pub extend ModelsListLifecycleItem with @debug.Debug::{to_repr}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend ModelsListLifecycleItem with ToJson::{to_json}
+
+///|
+pub impl ToJson for ModelsListLifecycleItem with fn to_json(self) {
+  let raw = match self {
+    Active => "active"
+    Deprecated => "deprecated"
+    Retired => "retired"
+    Custom(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend ModelsListLifecycleItem with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for ModelsListLifecycleItem with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "active" => Some(Active)
+        "deprecated" => Some(Deprecated)
+        "retired" => Some(Retired)
+        _ => None
+      }
+    },
+    raw => Custom(raw),
+  )
 }

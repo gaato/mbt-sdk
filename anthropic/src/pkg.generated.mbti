@@ -31,7 +31,7 @@ pub async fn Anthropic::count_tokens(Self, MessageRequest) -> Int raise @sdk-run
 pub async fn Anthropic::create_message(Self, MessageRequest) -> MessageResponse raise @sdk-runtime.SdkError
 pub async fn Anthropic::create_message_params(Self, @gen.CreateMessageParams) -> @gen.Message raise @sdk-runtime.SdkError
 pub fn Anthropic::from_client(@sdk-runtime.Client, version? : String) -> Self
-pub async fn Anthropic::list_models(Self, limit? : Int, after_id? : String, before_id? : String) -> @gen.ListResponseModelInfo raise @sdk-runtime.SdkError
+pub async fn Anthropic::list_models(Self, limit? : Int, after_id? : String, before_id? : String, lifecycle? : Array[@gen.ModelsListLifecycleItem]) -> @gen.ListResponseModelInfo raise @sdk-runtime.SdkError
 pub fn Anthropic::new(api_key~ : String, &@http.Transport, &@clock.Clock, base_url? : String, version? : String, auth_header? : AuthHeader, retry? : @sdk-runtime.RetryPolicy) -> Self
 pub async fn Anthropic::retrieve_model(Self, String) -> @gen.ModelInfo raise @sdk-runtime.SdkError
 pub async fn[E : Error] Anthropic::stream_message(Self, MessageRequest, async (MessageEvent) -> Unit raise E) -> Unit
@@ -185,6 +185,8 @@ pub using @gen {type MessageStreamEvent}
 pub using @gen {type Metadata}
 
 pub using @gen {type ModelInfo}
+
+pub using @gen {type ModelsListLifecycleItem}
 
 pub using @gen {type OutputConfig}
 
