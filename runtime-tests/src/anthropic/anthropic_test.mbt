@@ -247,7 +247,7 @@ async test "from_client uses Bearer configuration, version, and per-operation bu
     )
     transport.expect(
       "GET",
-      "/v1/models?limit=2",
+      "/v1/models?limit=2&lifecycle%5B%5D=active&lifecycle%5B%5D=retired",
       json_response(
         "{\"data\":[{\"type\":\"model\",\"id\":\"claude-opus-5\",\"display_name\":\"Claude Opus 5\",\"created_at\":\"2026-04-01T00:00:00Z\",\"capabilities\":null,\"deprecated_at\":null,\"lifecycle\":\"active\",\"line\":null,\"retires_at\":null,\"max_input_tokens\":null,\"max_tokens\":null},{\"type\":\"model\",\"id\":\"claude-haiku-4-5\",\"display_name\":\"Claude Haiku 4.5\",\"created_at\":\"2025-10-01T00:00:00Z\",\"capabilities\":null,\"deprecated_at\":null,\"lifecycle\":\"active\",\"line\":null,\"retires_at\":null,\"max_input_tokens\":null,\"max_tokens\":64000}],\"has_more\":true,\"first_id\":\"claude-opus-5\",\"last_id\":\"claude-haiku-4-5\"}",
       ),
@@ -276,7 +276,7 @@ async test "from_client uses Bearer configuration, version, and per-operation bu
         @anthropic_sdk.MessageRequest::new(model="model", max_tokens=1, messages=[]),
       ),
     )
-    let models = client.list_models(limit=2)
+    let models = client.list_models(limit=2, lifecycle=[Active, Retired])
     assert_eq(models.data.map(model => model.id), [
       "claude-opus-5", "claude-haiku-4-5",
     ])
@@ -290,7 +290,10 @@ async test "from_client uses Bearer configuration, version, and per-operation bu
     assert_eq(sent[0].headers.get("authorization"), Some("Bearer router-key"))
     assert_eq(sent[0].headers.get("x-api-key"), None)
     assert_eq(sent[0].headers.get("anthropic-version"), Some("2023-06-01"))
-    assert_eq(sent[1].url, "https://openrouter.ai/api/v1/models?limit=2")
+    assert_eq(
+      sent[1].url,
+      "https://openrouter.ai/api/v1/models?limit=2&lifecycle%5B%5D=active&lifecycle%5B%5D=retired",
+    )
     assert_eq(sent[1].headers.get("anthropic-version"), Some("2023-06-01"))
     assert_eq(
       sent[2].url,

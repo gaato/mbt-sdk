@@ -7,6 +7,7 @@ pub using @gen {
   type Usage,
   type ModelInfo,
   type ListResponseModelInfo,
+  type ModelsListLifecycleItem,
   type InputContentBlock,
   type ToolChoice,
   type ThinkingConfigParam,
