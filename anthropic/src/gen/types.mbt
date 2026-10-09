@@ -217,6 +217,50 @@ pub impl @json.FromJson for AuthenticationError with fn from_json(value, path) {
 
 ///|
 ///
+/// The tools available after a message exceed a limit on their number or their size.
+pub(all) struct AvailableToolsLimitExceededErrorDetails {} derive (
+  Eq,
+  @debug.Debug,
+)
+
+///|
+pub extend AvailableToolsLimitExceededErrorDetails with Eq::{equal, not_equal}
+
+///|
+pub extend AvailableToolsLimitExceededErrorDetails with @debug.Debug::{to_repr}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AvailableToolsLimitExceededErrorDetails with ToJson::{to_json}
+
+///|
+pub impl ToJson for AvailableToolsLimitExceededErrorDetails with fn to_json(
+  _self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .field("error_code", "available_tools_limit_exceeded")
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AvailableToolsLimitExceededErrorDetails with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AvailableToolsLimitExceededErrorDetails with fn from_json(
+  value,
+  path,
+) {
+  let _ = @sdkjson.expect_object(value, path)
+  AvailableToolsLimitExceededErrorDetails::{ }
+}
+
+///|
+///
 /// Generated string enum Base64ImageSourceMediaType.
 pub(all) enum Base64ImageSourceMediaType {
   ImageJpeg
@@ -4030,6 +4074,161 @@ pub impl @json.FromJson for CitationsDelta with fn from_json(value, path) {
 
 ///|
 ///
+/// The API key belongs to the Claude Code workspace, and the user who created it is no longer a member of the organization or of that workspace.
+pub(all) struct ClaudeCodeKeyCreatorNotMemberErrorDetails {} derive (
+  Eq,
+  @debug.Debug,
+)
+
+///|
+pub extend ClaudeCodeKeyCreatorNotMemberErrorDetails with Eq::{equal, not_equal}
+
+///|
+pub extend ClaudeCodeKeyCreatorNotMemberErrorDetails with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend ClaudeCodeKeyCreatorNotMemberErrorDetails with ToJson::{to_json}
+
+///|
+pub impl ToJson for ClaudeCodeKeyCreatorNotMemberErrorDetails with fn to_json(
+  _self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .field("error_code", "claude_code_key_creator_not_member")
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend ClaudeCodeKeyCreatorNotMemberErrorDetails with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for ClaudeCodeKeyCreatorNotMemberErrorDetails with fn from_json(
+  value,
+  path,
+) {
+  let _ = @sdkjson.expect_object(value, path)
+  ClaudeCodeKeyCreatorNotMemberErrorDetails::{ }
+}
+
+///|
+///
+/// The request comes from a Claude Code version older than the minimum that the requested model or the organization requires. Update Claude Code, then retry.
+pub(all) struct ClaudeCodeVersionTooOldErrorDetails {} derive(Eq, @debug.Debug)
+
+///|
+pub extend ClaudeCodeVersionTooOldErrorDetails with Eq::{equal, not_equal}
+
+///|
+pub extend ClaudeCodeVersionTooOldErrorDetails with @debug.Debug::{to_repr}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend ClaudeCodeVersionTooOldErrorDetails with ToJson::{to_json}
+
+///|
+pub impl ToJson for ClaudeCodeVersionTooOldErrorDetails with fn to_json(_self) {
+  @sdkjson.ObjBuilder::new()
+  .field("error_code", "claude_code_version_too_old")
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend ClaudeCodeVersionTooOldErrorDetails with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for ClaudeCodeVersionTooOldErrorDetails with fn from_json(
+  value,
+  path,
+) {
+  let _ = @sdkjson.expect_object(value, path)
+  ClaudeCodeVersionTooOldErrorDetails::{ }
+}
+
+///|
+///
+/// The workspace's customer-managed encryption key is disabled or revoked. Re-enable the key, then retry.
+pub(all) struct CmekKeyDisabledErrorDetails {} derive(Eq, @debug.Debug)
+
+///|
+pub extend CmekKeyDisabledErrorDetails with Eq::{equal, not_equal}
+
+///|
+pub extend CmekKeyDisabledErrorDetails with @debug.Debug::{to_repr}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend CmekKeyDisabledErrorDetails with ToJson::{to_json}
+
+///|
+pub impl ToJson for CmekKeyDisabledErrorDetails with fn to_json(_self) {
+  @sdkjson.ObjBuilder::new().field("error_code", "cmek_key_disabled").build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend CmekKeyDisabledErrorDetails with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for CmekKeyDisabledErrorDetails with fn from_json(
+  value,
+  path,
+) {
+  let _ = @sdkjson.expect_object(value, path)
+  CmekKeyDisabledErrorDetails::{ }
+}
+
+///|
+///
+/// The key management service's network access controls blocked the request to the workspace's customer-managed encryption key. The key itself may be healthy.
+pub(all) struct CmekKeyNetworkBlockedErrorDetails {} derive(Eq, @debug.Debug)
+
+///|
+pub extend CmekKeyNetworkBlockedErrorDetails with Eq::{equal, not_equal}
+
+///|
+pub extend CmekKeyNetworkBlockedErrorDetails with @debug.Debug::{to_repr}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend CmekKeyNetworkBlockedErrorDetails with ToJson::{to_json}
+
+///|
+pub impl ToJson for CmekKeyNetworkBlockedErrorDetails with fn to_json(_self) {
+  @sdkjson.ObjBuilder::new()
+  .field("error_code", "cmek_key_network_blocked")
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend CmekKeyNetworkBlockedErrorDetails with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for CmekKeyNetworkBlockedErrorDetails with fn from_json(
+  value,
+  path,
+) {
+  let _ = @sdkjson.expect_object(value, path)
+  CmekKeyNetworkBlockedErrorDetails::{ }
+}
+
+///|
+///
 /// Generated string enum CodeExecutionToolResultErrorCode.
 pub(all) enum CodeExecutionToolResultErrorCode {
   InvalidToolInput
@@ -4566,6 +4765,376 @@ pub impl @json.FromJson for CodeExecutionTool20260521 with fn from_json(
     strict: @sdkjson.opt_field(obj, "strict", path),
     type_: required_field(obj, "type", path),
   }
+}
+
+///|
+///
+/// `messages` holds more than one `compaction` block with content. Send only the block the conversation returned last.
+pub(all) struct CompactionBlockAmbiguousErrorDetails {} derive(Eq, @debug.Debug)
+
+///|
+pub extend CompactionBlockAmbiguousErrorDetails with Eq::{equal, not_equal}
+
+///|
+pub extend CompactionBlockAmbiguousErrorDetails with @debug.Debug::{to_repr}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend CompactionBlockAmbiguousErrorDetails with ToJson::{to_json}
+
+///|
+pub impl ToJson for CompactionBlockAmbiguousErrorDetails with fn to_json(_self) {
+  @sdkjson.ObjBuilder::new()
+  .field("error_code", "compaction_block_ambiguous")
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend CompactionBlockAmbiguousErrorDetails with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for CompactionBlockAmbiguousErrorDetails with fn from_json(
+  value,
+  path,
+) {
+  let _ = @sdkjson.expect_object(value, path)
+  CompactionBlockAmbiguousErrorDetails::{ }
+}
+
+///|
+///
+/// The `compaction` block is not the first block of the conversation, or is in a `system` message.
+pub(all) struct CompactionBlockMisplacedErrorDetails {} derive(Eq, @debug.Debug)
+
+///|
+pub extend CompactionBlockMisplacedErrorDetails with Eq::{equal, not_equal}
+
+///|
+pub extend CompactionBlockMisplacedErrorDetails with @debug.Debug::{to_repr}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend CompactionBlockMisplacedErrorDetails with ToJson::{to_json}
+
+///|
+pub impl ToJson for CompactionBlockMisplacedErrorDetails with fn to_json(_self) {
+  @sdkjson.ObjBuilder::new()
+  .field("error_code", "compaction_block_misplaced")
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend CompactionBlockMisplacedErrorDetails with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for CompactionBlockMisplacedErrorDetails with fn from_json(
+  value,
+  path,
+) {
+  let _ = @sdkjson.expect_object(value, path)
+  CompactionBlockMisplacedErrorDetails::{ }
+}
+
+///|
+///
+/// The `compaction` block's `content` differs from the text its `signature` recorded.
+pub(all) struct CompactionContentMismatchErrorDetails {} derive(Eq, @debug.Debug)
+
+///|
+pub extend CompactionContentMismatchErrorDetails with Eq::{equal, not_equal}
+
+///|
+pub extend CompactionContentMismatchErrorDetails with @debug.Debug::{to_repr}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend CompactionContentMismatchErrorDetails with ToJson::{to_json}
+
+///|
+pub impl ToJson for CompactionContentMismatchErrorDetails with fn to_json(_self) {
+  @sdkjson.ObjBuilder::new()
+  .field("error_code", "compaction_content_mismatch")
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend CompactionContentMismatchErrorDetails with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for CompactionContentMismatchErrorDetails with fn from_json(
+  value,
+  path,
+) {
+  let _ = @sdkjson.expect_object(value, path)
+  CompactionContentMismatchErrorDetails::{ }
+}
+
+///|
+///
+/// The compaction request ends on an `assistant` turn that is not finished.
+pub(all) struct CompactionIncompleteTurnErrorDetails {} derive(Eq, @debug.Debug)
+
+///|
+pub extend CompactionIncompleteTurnErrorDetails with Eq::{equal, not_equal}
+
+///|
+pub extend CompactionIncompleteTurnErrorDetails with @debug.Debug::{to_repr}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend CompactionIncompleteTurnErrorDetails with ToJson::{to_json}
+
+///|
+pub impl ToJson for CompactionIncompleteTurnErrorDetails with fn to_json(_self) {
+  @sdkjson.ObjBuilder::new()
+  .field("error_code", "compaction_incomplete_turn")
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend CompactionIncompleteTurnErrorDetails with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for CompactionIncompleteTurnErrorDetails with fn from_json(
+  value,
+  path,
+) {
+  let _ = @sdkjson.expect_object(value, path)
+  CompactionIncompleteTurnErrorDetails::{ }
+}
+
+///|
+///
+/// `messages` holds no `user` or `assistant` content to summarize or adopt.
+pub(all) struct CompactionNothingToSummarizeErrorDetails {} derive (
+  Eq,
+  @debug.Debug,
+)
+
+///|
+pub extend CompactionNothingToSummarizeErrorDetails with Eq::{equal, not_equal}
+
+///|
+pub extend CompactionNothingToSummarizeErrorDetails with @debug.Debug::{to_repr}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend CompactionNothingToSummarizeErrorDetails with ToJson::{to_json}
+
+///|
+pub impl ToJson for CompactionNothingToSummarizeErrorDetails with fn to_json(
+  _self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .field("error_code", "compaction_nothing_to_summarize")
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend CompactionNothingToSummarizeErrorDetails with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for CompactionNothingToSummarizeErrorDetails with fn from_json(
+  value,
+  path,
+) {
+  let _ = @sdkjson.expect_object(value, path)
+  CompactionNothingToSummarizeErrorDetails::{ }
+}
+
+///|
+///
+/// The `compaction` block's `signature` does not verify.
+pub(all) struct CompactionSignatureInvalidErrorDetails {} derive (
+  Eq,
+  @debug.Debug,
+)
+
+///|
+pub extend CompactionSignatureInvalidErrorDetails with Eq::{equal, not_equal}
+
+///|
+pub extend CompactionSignatureInvalidErrorDetails with @debug.Debug::{to_repr}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend CompactionSignatureInvalidErrorDetails with ToJson::{to_json}
+
+///|
+pub impl ToJson for CompactionSignatureInvalidErrorDetails with fn to_json(
+  _self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .field("error_code", "compaction_signature_invalid")
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend CompactionSignatureInvalidErrorDetails with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for CompactionSignatureInvalidErrorDetails with fn from_json(
+  value,
+  path,
+) {
+  let _ = @sdkjson.expect_object(value, path)
+  CompactionSignatureInvalidErrorDetails::{ }
+}
+
+///|
+///
+/// The conversation references more distinct tools than a `compaction` block can record.
+pub(all) struct CompactionTooManyToolReferencesErrorDetails {} derive (
+  Eq,
+  @debug.Debug,
+)
+
+///|
+pub extend CompactionTooManyToolReferencesErrorDetails with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend CompactionTooManyToolReferencesErrorDetails with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend CompactionTooManyToolReferencesErrorDetails with ToJson::{to_json}
+
+///|
+pub impl ToJson for CompactionTooManyToolReferencesErrorDetails with fn to_json(
+  _self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .field("error_code", "compaction_too_many_tool_references")
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend CompactionTooManyToolReferencesErrorDetails with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for CompactionTooManyToolReferencesErrorDetails with fn from_json(
+  value,
+  path,
+) {
+  let _ = @sdkjson.expect_object(value, path)
+  CompactionTooManyToolReferencesErrorDetails::{ }
+}
+
+///|
+///
+/// The `compaction` block's `tool_changes` differs from what was returned with the block.
+pub(all) struct CompactionToolChangesMismatchErrorDetails {} derive (
+  Eq,
+  @debug.Debug,
+)
+
+///|
+pub extend CompactionToolChangesMismatchErrorDetails with Eq::{equal, not_equal}
+
+///|
+pub extend CompactionToolChangesMismatchErrorDetails with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend CompactionToolChangesMismatchErrorDetails with ToJson::{to_json}
+
+///|
+pub impl ToJson for CompactionToolChangesMismatchErrorDetails with fn to_json(
+  _self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .field("error_code", "compaction_tool_changes_mismatch")
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend CompactionToolChangesMismatchErrorDetails with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for CompactionToolChangesMismatchErrorDetails with fn from_json(
+  value,
+  path,
+) {
+  let _ = @sdkjson.expect_object(value, path)
+  CompactionToolChangesMismatchErrorDetails::{ }
+}
+
+///|
+///
+/// The compaction could not be completed for a transient server reason. Retry the request.
+pub(all) struct CompactionUnavailableErrorDetails {} derive(Eq, @debug.Debug)
+
+///|
+pub extend CompactionUnavailableErrorDetails with Eq::{equal, not_equal}
+
+///|
+pub extend CompactionUnavailableErrorDetails with @debug.Debug::{to_repr}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend CompactionUnavailableErrorDetails with ToJson::{to_json}
+
+///|
+pub impl ToJson for CompactionUnavailableErrorDetails with fn to_json(_self) {
+  @sdkjson.ObjBuilder::new()
+  .field("error_code", "compaction_unavailable")
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend CompactionUnavailableErrorDetails with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for CompactionUnavailableErrorDetails with fn from_json(
+  value,
+  path,
+) {
+  let _ = @sdkjson.expect_object(value, path)
+  CompactionUnavailableErrorDetails::{ }
 }
 
 ///|
@@ -19577,6 +20146,45 @@ pub impl @json.FromJson for EffortCapability with fn from_json(value, path) {
 
 ///|
 ///
+/// The organization has crossed the monthly API usage threshold of its API tier.
+pub(all) struct EnforcedSpendLimitReachedErrorDetails {} derive(Eq, @debug.Debug)
+
+///|
+pub extend EnforcedSpendLimitReachedErrorDetails with Eq::{equal, not_equal}
+
+///|
+pub extend EnforcedSpendLimitReachedErrorDetails with @debug.Debug::{to_repr}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend EnforcedSpendLimitReachedErrorDetails with ToJson::{to_json}
+
+///|
+pub impl ToJson for EnforcedSpendLimitReachedErrorDetails with fn to_json(_self) {
+  @sdkjson.ObjBuilder::new()
+  .field("error_code", "enforced_spend_limit_reached")
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend EnforcedSpendLimitReachedErrorDetails with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for EnforcedSpendLimitReachedErrorDetails with fn from_json(
+  value,
+  path,
+) {
+  let _ = @sdkjson.expect_object(value, path)
+  EnforcedSpendLimitReachedErrorDetails::{ }
+}
+
+///|
+///
 /// Generated representation of InvalidRequestError.
 pub(all) struct InvalidRequestError {
   message : String
@@ -21495,6 +22103,315 @@ pub impl @json.FromJson for MessageStreamEvent with fn from_json(value, path) {
     "message_stop" => MessageStop(@json.from_json(value, path~))
     other => Unknown(other, value)
   }
+}
+
+///|
+///
+/// Anthropic has disabled the organization for trust and safety reasons. An organization disabled for any other reason, such as billing, does not get this code. `appeal_url`, when present, is where the organization can appeal.
+pub(all) struct OrganizationOnHoldErrorDetails {
+  appeal_url : @sdkjson.Presence[String]
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend OrganizationOnHoldErrorDetails with Eq::{equal, not_equal}
+
+///|
+pub extend OrganizationOnHoldErrorDetails with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a OrganizationOnHoldErrorDetails with omitted optional fields absent.
+pub fn OrganizationOnHoldErrorDetails::new(
+  appeal_url? : String,
+) -> OrganizationOnHoldErrorDetails {
+  { appeal_url: @sdkjson.Presence::from_option(appeal_url), }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend OrganizationOnHoldErrorDetails with ToJson::{to_json}
+
+///|
+pub impl ToJson for OrganizationOnHoldErrorDetails with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .presence("appeal_url", self.appeal_url)
+  .field("error_code", "organization_on_hold")
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend OrganizationOnHoldErrorDetails with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for OrganizationOnHoldErrorDetails with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  { appeal_url: @sdkjson.presence_field(obj, "appeal_url", path), }
+}
+
+///|
+///
+/// The request body is not valid for its `Content-Encoding`.
+pub(all) struct RequestBodyEncodingInvalidErrorDetails {} derive (
+  Eq,
+  @debug.Debug,
+)
+
+///|
+pub extend RequestBodyEncodingInvalidErrorDetails with Eq::{equal, not_equal}
+
+///|
+pub extend RequestBodyEncodingInvalidErrorDetails with @debug.Debug::{to_repr}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend RequestBodyEncodingInvalidErrorDetails with ToJson::{to_json}
+
+///|
+pub impl ToJson for RequestBodyEncodingInvalidErrorDetails with fn to_json(
+  _self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .field("error_code", "request_body_encoding_invalid")
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend RequestBodyEncodingInvalidErrorDetails with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for RequestBodyEncodingInvalidErrorDetails with fn from_json(
+  value,
+  path,
+) {
+  let _ = @sdkjson.expect_object(value, path)
+  RequestBodyEncodingInvalidErrorDetails::{ }
+}
+
+///|
+///
+/// The request's `Content-Encoding` is not supported.
+pub(all) struct RequestBodyEncodingUnsupportedErrorDetails {} derive (
+  Eq,
+  @debug.Debug,
+)
+
+///|
+pub extend RequestBodyEncodingUnsupportedErrorDetails with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend RequestBodyEncodingUnsupportedErrorDetails with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend RequestBodyEncodingUnsupportedErrorDetails with ToJson::{to_json}
+
+///|
+pub impl ToJson for RequestBodyEncodingUnsupportedErrorDetails with fn to_json(
+  _self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .field("error_code", "request_body_encoding_unsupported")
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend RequestBodyEncodingUnsupportedErrorDetails with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for RequestBodyEncodingUnsupportedErrorDetails with fn from_json(
+  value,
+  path,
+) {
+  let _ = @sdkjson.expect_object(value, path)
+  RequestBodyEncodingUnsupportedErrorDetails::{ }
+}
+
+///|
+///
+/// The compressed request body exceeds the request size limit once decoded.
+pub(all) struct RequestBodyTooLargeAfterDecodingErrorDetails {} derive (
+  Eq,
+  @debug.Debug,
+)
+
+///|
+pub extend RequestBodyTooLargeAfterDecodingErrorDetails with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend RequestBodyTooLargeAfterDecodingErrorDetails with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend RequestBodyTooLargeAfterDecodingErrorDetails with ToJson::{to_json}
+
+///|
+pub impl ToJson for RequestBodyTooLargeAfterDecodingErrorDetails with fn to_json(
+  _self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .field("error_code", "request_body_too_large_after_decoding")
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend RequestBodyTooLargeAfterDecodingErrorDetails with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for RequestBodyTooLargeAfterDecodingErrorDetails with fn from_json(
+  value,
+  path,
+) {
+  let _ = @sdkjson.expect_object(value, path)
+  RequestBodyTooLargeAfterDecodingErrorDetails::{ }
+}
+
+///|
+///
+/// A custom skill the request names is stored under an encryption key state the workspace cannot currently decrypt.
+pub(all) struct SkillReadBlockedUndecryptableErrorDetails {} derive (
+  Eq,
+  @debug.Debug,
+)
+
+///|
+pub extend SkillReadBlockedUndecryptableErrorDetails with Eq::{equal, not_equal}
+
+///|
+pub extend SkillReadBlockedUndecryptableErrorDetails with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend SkillReadBlockedUndecryptableErrorDetails with ToJson::{to_json}
+
+///|
+pub impl ToJson for SkillReadBlockedUndecryptableErrorDetails with fn to_json(
+  _self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .field("error_code", "skill_read_blocked_undecryptable")
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend SkillReadBlockedUndecryptableErrorDetails with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for SkillReadBlockedUndecryptableErrorDetails with fn from_json(
+  value,
+  path,
+) {
+  let _ = @sdkjson.expect_object(value, path)
+  SkillReadBlockedUndecryptableErrorDetails::{ }
+}
+
+///|
+///
+/// A tool made available in `messages` takes a name that an available tool of another kind, or of another MCP server, already holds.
+pub(all) struct ToolNameConflictErrorDetails {} derive(Eq, @debug.Debug)
+
+///|
+pub extend ToolNameConflictErrorDetails with Eq::{equal, not_equal}
+
+///|
+pub extend ToolNameConflictErrorDetails with @debug.Debug::{to_repr}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend ToolNameConflictErrorDetails with ToJson::{to_json}
+
+///|
+pub impl ToJson for ToolNameConflictErrorDetails with fn to_json(_self) {
+  @sdkjson.ObjBuilder::new().field("error_code", "tool_name_conflict").build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend ToolNameConflictErrorDetails with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for ToolNameConflictErrorDetails with fn from_json(
+  value,
+  path,
+) {
+  let _ = @sdkjson.expect_object(value, path)
+  ToolNameConflictErrorDetails::{ }
+}
+
+///|
+///
+/// A tool change or MCP tool listing references a tool or MCP server that is not defined at that position in the conversation.
+pub(all) struct ToolReferenceUnresolvedErrorDetails {} derive(Eq, @debug.Debug)
+
+///|
+pub extend ToolReferenceUnresolvedErrorDetails with Eq::{equal, not_equal}
+
+///|
+pub extend ToolReferenceUnresolvedErrorDetails with @debug.Debug::{to_repr}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend ToolReferenceUnresolvedErrorDetails with ToJson::{to_json}
+
+///|
+pub impl ToJson for ToolReferenceUnresolvedErrorDetails with fn to_json(_self) {
+  @sdkjson.ObjBuilder::new()
+  .field("error_code", "tool_reference_unresolved")
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend ToolReferenceUnresolvedErrorDetails with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for ToolReferenceUnresolvedErrorDetails with fn from_json(
+  value,
+  path,
+) {
+  let _ = @sdkjson.expect_object(value, path)
+  ToolReferenceUnresolvedErrorDetails::{ }
 }
 
 ///|
