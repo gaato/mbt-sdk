@@ -76,6 +76,16 @@ pub fn AuthenticationError::to_repr(Self) -> @debug.Repr
 pub impl ToJson for AuthenticationError
 pub impl @moonbitlang/core/json.FromJson for AuthenticationError
 
+pub(all) struct AvailableToolsLimitExceededErrorDetails {
+} derive(Eq, @debug.Debug)
+pub fn AvailableToolsLimitExceededErrorDetails::equal(Self, Self) -> Bool
+pub fn AvailableToolsLimitExceededErrorDetails::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn AvailableToolsLimitExceededErrorDetails::not_equal(Self, Self) -> Bool
+pub fn AvailableToolsLimitExceededErrorDetails::to_json(Self) -> Json
+pub fn AvailableToolsLimitExceededErrorDetails::to_repr(Self) -> @debug.Repr
+pub impl ToJson for AvailableToolsLimitExceededErrorDetails
+pub impl @moonbitlang/core/json.FromJson for AvailableToolsLimitExceededErrorDetails
+
 pub(all) struct Base64ImageSource {
   data : String
   media_type : Base64ImageSourceMediaType
@@ -893,6 +903,46 @@ pub fn CitationsDeltaCitation::to_repr(Self) -> @debug.Repr
 pub impl ToJson for CitationsDeltaCitation
 pub impl @moonbitlang/core/json.FromJson for CitationsDeltaCitation
 
+pub(all) struct ClaudeCodeKeyCreatorNotMemberErrorDetails {
+} derive(Eq, @debug.Debug)
+pub fn ClaudeCodeKeyCreatorNotMemberErrorDetails::equal(Self, Self) -> Bool
+pub fn ClaudeCodeKeyCreatorNotMemberErrorDetails::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ClaudeCodeKeyCreatorNotMemberErrorDetails::not_equal(Self, Self) -> Bool
+pub fn ClaudeCodeKeyCreatorNotMemberErrorDetails::to_json(Self) -> Json
+pub fn ClaudeCodeKeyCreatorNotMemberErrorDetails::to_repr(Self) -> @debug.Repr
+pub impl ToJson for ClaudeCodeKeyCreatorNotMemberErrorDetails
+pub impl @moonbitlang/core/json.FromJson for ClaudeCodeKeyCreatorNotMemberErrorDetails
+
+pub(all) struct ClaudeCodeVersionTooOldErrorDetails {
+} derive(Eq, @debug.Debug)
+pub fn ClaudeCodeVersionTooOldErrorDetails::equal(Self, Self) -> Bool
+pub fn ClaudeCodeVersionTooOldErrorDetails::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ClaudeCodeVersionTooOldErrorDetails::not_equal(Self, Self) -> Bool
+pub fn ClaudeCodeVersionTooOldErrorDetails::to_json(Self) -> Json
+pub fn ClaudeCodeVersionTooOldErrorDetails::to_repr(Self) -> @debug.Repr
+pub impl ToJson for ClaudeCodeVersionTooOldErrorDetails
+pub impl @moonbitlang/core/json.FromJson for ClaudeCodeVersionTooOldErrorDetails
+
+pub(all) struct CmekKeyDisabledErrorDetails {
+} derive(Eq, @debug.Debug)
+pub fn CmekKeyDisabledErrorDetails::equal(Self, Self) -> Bool
+pub fn CmekKeyDisabledErrorDetails::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn CmekKeyDisabledErrorDetails::not_equal(Self, Self) -> Bool
+pub fn CmekKeyDisabledErrorDetails::to_json(Self) -> Json
+pub fn CmekKeyDisabledErrorDetails::to_repr(Self) -> @debug.Repr
+pub impl ToJson for CmekKeyDisabledErrorDetails
+pub impl @moonbitlang/core/json.FromJson for CmekKeyDisabledErrorDetails
+
+pub(all) struct CmekKeyNetworkBlockedErrorDetails {
+} derive(Eq, @debug.Debug)
+pub fn CmekKeyNetworkBlockedErrorDetails::equal(Self, Self) -> Bool
+pub fn CmekKeyNetworkBlockedErrorDetails::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn CmekKeyNetworkBlockedErrorDetails::not_equal(Self, Self) -> Bool
+pub fn CmekKeyNetworkBlockedErrorDetails::to_json(Self) -> Json
+pub fn CmekKeyNetworkBlockedErrorDetails::to_repr(Self) -> @debug.Repr
+pub impl ToJson for CmekKeyNetworkBlockedErrorDetails
+pub impl @moonbitlang/core/json.FromJson for CmekKeyNetworkBlockedErrorDetails
+
 pub(all) struct CodeExecutionTool20250522 {
   allowed_callers : Array[AllowedCaller]?
   cache_control : @gaato/sdk-runtime/json.Presence[CodeExecutionTool20250522CacheControl]
@@ -1019,6 +1069,96 @@ pub fn CodeExecutionToolResultErrorCode::to_json(Self) -> Json
 pub fn CodeExecutionToolResultErrorCode::to_repr(Self) -> @debug.Repr
 pub impl ToJson for CodeExecutionToolResultErrorCode
 pub impl @moonbitlang/core/json.FromJson for CodeExecutionToolResultErrorCode
+
+pub(all) struct CompactionBlockAmbiguousErrorDetails {
+} derive(Eq, @debug.Debug)
+pub fn CompactionBlockAmbiguousErrorDetails::equal(Self, Self) -> Bool
+pub fn CompactionBlockAmbiguousErrorDetails::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn CompactionBlockAmbiguousErrorDetails::not_equal(Self, Self) -> Bool
+pub fn CompactionBlockAmbiguousErrorDetails::to_json(Self) -> Json
+pub fn CompactionBlockAmbiguousErrorDetails::to_repr(Self) -> @debug.Repr
+pub impl ToJson for CompactionBlockAmbiguousErrorDetails
+pub impl @moonbitlang/core/json.FromJson for CompactionBlockAmbiguousErrorDetails
+
+pub(all) struct CompactionBlockMisplacedErrorDetails {
+} derive(Eq, @debug.Debug)
+pub fn CompactionBlockMisplacedErrorDetails::equal(Self, Self) -> Bool
+pub fn CompactionBlockMisplacedErrorDetails::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn CompactionBlockMisplacedErrorDetails::not_equal(Self, Self) -> Bool
+pub fn CompactionBlockMisplacedErrorDetails::to_json(Self) -> Json
+pub fn CompactionBlockMisplacedErrorDetails::to_repr(Self) -> @debug.Repr
+pub impl ToJson for CompactionBlockMisplacedErrorDetails
+pub impl @moonbitlang/core/json.FromJson for CompactionBlockMisplacedErrorDetails
+
+pub(all) struct CompactionContentMismatchErrorDetails {
+} derive(Eq, @debug.Debug)
+pub fn CompactionContentMismatchErrorDetails::equal(Self, Self) -> Bool
+pub fn CompactionContentMismatchErrorDetails::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn CompactionContentMismatchErrorDetails::not_equal(Self, Self) -> Bool
+pub fn CompactionContentMismatchErrorDetails::to_json(Self) -> Json
+pub fn CompactionContentMismatchErrorDetails::to_repr(Self) -> @debug.Repr
+pub impl ToJson for CompactionContentMismatchErrorDetails
+pub impl @moonbitlang/core/json.FromJson for CompactionContentMismatchErrorDetails
+
+pub(all) struct CompactionIncompleteTurnErrorDetails {
+} derive(Eq, @debug.Debug)
+pub fn CompactionIncompleteTurnErrorDetails::equal(Self, Self) -> Bool
+pub fn CompactionIncompleteTurnErrorDetails::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn CompactionIncompleteTurnErrorDetails::not_equal(Self, Self) -> Bool
+pub fn CompactionIncompleteTurnErrorDetails::to_json(Self) -> Json
+pub fn CompactionIncompleteTurnErrorDetails::to_repr(Self) -> @debug.Repr
+pub impl ToJson for CompactionIncompleteTurnErrorDetails
+pub impl @moonbitlang/core/json.FromJson for CompactionIncompleteTurnErrorDetails
+
+pub(all) struct CompactionNothingToSummarizeErrorDetails {
+} derive(Eq, @debug.Debug)
+pub fn CompactionNothingToSummarizeErrorDetails::equal(Self, Self) -> Bool
+pub fn CompactionNothingToSummarizeErrorDetails::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn CompactionNothingToSummarizeErrorDetails::not_equal(Self, Self) -> Bool
+pub fn CompactionNothingToSummarizeErrorDetails::to_json(Self) -> Json
+pub fn CompactionNothingToSummarizeErrorDetails::to_repr(Self) -> @debug.Repr
+pub impl ToJson for CompactionNothingToSummarizeErrorDetails
+pub impl @moonbitlang/core/json.FromJson for CompactionNothingToSummarizeErrorDetails
+
+pub(all) struct CompactionSignatureInvalidErrorDetails {
+} derive(Eq, @debug.Debug)
+pub fn CompactionSignatureInvalidErrorDetails::equal(Self, Self) -> Bool
+pub fn CompactionSignatureInvalidErrorDetails::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn CompactionSignatureInvalidErrorDetails::not_equal(Self, Self) -> Bool
+pub fn CompactionSignatureInvalidErrorDetails::to_json(Self) -> Json
+pub fn CompactionSignatureInvalidErrorDetails::to_repr(Self) -> @debug.Repr
+pub impl ToJson for CompactionSignatureInvalidErrorDetails
+pub impl @moonbitlang/core/json.FromJson for CompactionSignatureInvalidErrorDetails
+
+pub(all) struct CompactionTooManyToolReferencesErrorDetails {
+} derive(Eq, @debug.Debug)
+pub fn CompactionTooManyToolReferencesErrorDetails::equal(Self, Self) -> Bool
+pub fn CompactionTooManyToolReferencesErrorDetails::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn CompactionTooManyToolReferencesErrorDetails::not_equal(Self, Self) -> Bool
+pub fn CompactionTooManyToolReferencesErrorDetails::to_json(Self) -> Json
+pub fn CompactionTooManyToolReferencesErrorDetails::to_repr(Self) -> @debug.Repr
+pub impl ToJson for CompactionTooManyToolReferencesErrorDetails
+pub impl @moonbitlang/core/json.FromJson for CompactionTooManyToolReferencesErrorDetails
+
+pub(all) struct CompactionToolChangesMismatchErrorDetails {
+} derive(Eq, @debug.Debug)
+pub fn CompactionToolChangesMismatchErrorDetails::equal(Self, Self) -> Bool
+pub fn CompactionToolChangesMismatchErrorDetails::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn CompactionToolChangesMismatchErrorDetails::not_equal(Self, Self) -> Bool
+pub fn CompactionToolChangesMismatchErrorDetails::to_json(Self) -> Json
+pub fn CompactionToolChangesMismatchErrorDetails::to_repr(Self) -> @debug.Repr
+pub impl ToJson for CompactionToolChangesMismatchErrorDetails
+pub impl @moonbitlang/core/json.FromJson for CompactionToolChangesMismatchErrorDetails
+
+pub(all) struct CompactionUnavailableErrorDetails {
+} derive(Eq, @debug.Debug)
+pub fn CompactionUnavailableErrorDetails::equal(Self, Self) -> Bool
+pub fn CompactionUnavailableErrorDetails::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn CompactionUnavailableErrorDetails::not_equal(Self, Self) -> Bool
+pub fn CompactionUnavailableErrorDetails::to_json(Self) -> Json
+pub fn CompactionUnavailableErrorDetails::to_repr(Self) -> @debug.Repr
+pub impl ToJson for CompactionUnavailableErrorDetails
+pub impl @moonbitlang/core/json.FromJson for CompactionUnavailableErrorDetails
 
 pub(all) struct ComputerCursorPositionConfig {
   defer_loading : @gaato/sdk-runtime/json.Presence[Bool]
@@ -1772,6 +1912,16 @@ pub fn EffortLevel::to_repr(Self) -> @debug.Repr
 pub impl ToJson for EffortLevel
 pub impl @moonbitlang/core/json.FromJson for EffortLevel
 
+pub(all) struct EnforcedSpendLimitReachedErrorDetails {
+} derive(Eq, @debug.Debug)
+pub fn EnforcedSpendLimitReachedErrorDetails::equal(Self, Self) -> Bool
+pub fn EnforcedSpendLimitReachedErrorDetails::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn EnforcedSpendLimitReachedErrorDetails::not_equal(Self, Self) -> Bool
+pub fn EnforcedSpendLimitReachedErrorDetails::to_json(Self) -> Json
+pub fn EnforcedSpendLimitReachedErrorDetails::to_repr(Self) -> @debug.Repr
+pub impl ToJson for EnforcedSpendLimitReachedErrorDetails
+pub impl @moonbitlang/core/json.FromJson for EnforcedSpendLimitReachedErrorDetails
+
 pub(all) struct ErrorResponse {
   error : ErrorResponseError
   request_id : String?
@@ -2211,6 +2361,18 @@ pub fn NotFoundError::to_repr(Self) -> @debug.Repr
 pub impl ToJson for NotFoundError
 pub impl @moonbitlang/core/json.FromJson for NotFoundError
 
+pub(all) struct OrganizationOnHoldErrorDetails {
+  appeal_url : @gaato/sdk-runtime/json.Presence[String]
+} derive(Eq, @debug.Debug)
+pub fn OrganizationOnHoldErrorDetails::equal(Self, Self) -> Bool
+pub fn OrganizationOnHoldErrorDetails::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn OrganizationOnHoldErrorDetails::new(appeal_url? : String) -> Self
+pub fn OrganizationOnHoldErrorDetails::not_equal(Self, Self) -> Bool
+pub fn OrganizationOnHoldErrorDetails::to_json(Self) -> Json
+pub fn OrganizationOnHoldErrorDetails::to_repr(Self) -> @debug.Repr
+pub impl ToJson for OrganizationOnHoldErrorDetails
+pub impl @moonbitlang/core/json.FromJson for OrganizationOnHoldErrorDetails
+
 pub(all) struct OutputConfig {
   effort : @gaato/sdk-runtime/json.Presence[EffortLevel]
   format : @gaato/sdk-runtime/json.Presence[JsonOutputFormat]
@@ -2397,6 +2559,36 @@ pub fn RequestBashCodeExecutionToolResultError::to_json(Self) -> Json
 pub fn RequestBashCodeExecutionToolResultError::to_repr(Self) -> @debug.Repr
 pub impl ToJson for RequestBashCodeExecutionToolResultError
 pub impl @moonbitlang/core/json.FromJson for RequestBashCodeExecutionToolResultError
+
+pub(all) struct RequestBodyEncodingInvalidErrorDetails {
+} derive(Eq, @debug.Debug)
+pub fn RequestBodyEncodingInvalidErrorDetails::equal(Self, Self) -> Bool
+pub fn RequestBodyEncodingInvalidErrorDetails::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn RequestBodyEncodingInvalidErrorDetails::not_equal(Self, Self) -> Bool
+pub fn RequestBodyEncodingInvalidErrorDetails::to_json(Self) -> Json
+pub fn RequestBodyEncodingInvalidErrorDetails::to_repr(Self) -> @debug.Repr
+pub impl ToJson for RequestBodyEncodingInvalidErrorDetails
+pub impl @moonbitlang/core/json.FromJson for RequestBodyEncodingInvalidErrorDetails
+
+pub(all) struct RequestBodyEncodingUnsupportedErrorDetails {
+} derive(Eq, @debug.Debug)
+pub fn RequestBodyEncodingUnsupportedErrorDetails::equal(Self, Self) -> Bool
+pub fn RequestBodyEncodingUnsupportedErrorDetails::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn RequestBodyEncodingUnsupportedErrorDetails::not_equal(Self, Self) -> Bool
+pub fn RequestBodyEncodingUnsupportedErrorDetails::to_json(Self) -> Json
+pub fn RequestBodyEncodingUnsupportedErrorDetails::to_repr(Self) -> @debug.Repr
+pub impl ToJson for RequestBodyEncodingUnsupportedErrorDetails
+pub impl @moonbitlang/core/json.FromJson for RequestBodyEncodingUnsupportedErrorDetails
+
+pub(all) struct RequestBodyTooLargeAfterDecodingErrorDetails {
+} derive(Eq, @debug.Debug)
+pub fn RequestBodyTooLargeAfterDecodingErrorDetails::equal(Self, Self) -> Bool
+pub fn RequestBodyTooLargeAfterDecodingErrorDetails::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn RequestBodyTooLargeAfterDecodingErrorDetails::not_equal(Self, Self) -> Bool
+pub fn RequestBodyTooLargeAfterDecodingErrorDetails::to_json(Self) -> Json
+pub fn RequestBodyTooLargeAfterDecodingErrorDetails::to_repr(Self) -> @debug.Repr
+pub impl ToJson for RequestBodyTooLargeAfterDecodingErrorDetails
+pub impl @moonbitlang/core/json.FromJson for RequestBodyTooLargeAfterDecodingErrorDetails
 
 pub(all) struct RequestBrowserStateBlock {
   cache_control : @gaato/sdk-runtime/json.Presence[RequestBrowserStateBlockCacheControl]
@@ -4238,6 +4430,16 @@ pub fn SkillParamsType::to_repr(Self) -> @debug.Repr
 pub impl ToJson for SkillParamsType
 pub impl @moonbitlang/core/json.FromJson for SkillParamsType
 
+pub(all) struct SkillReadBlockedUndecryptableErrorDetails {
+} derive(Eq, @debug.Debug)
+pub fn SkillReadBlockedUndecryptableErrorDetails::equal(Self, Self) -> Bool
+pub fn SkillReadBlockedUndecryptableErrorDetails::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn SkillReadBlockedUndecryptableErrorDetails::not_equal(Self, Self) -> Bool
+pub fn SkillReadBlockedUndecryptableErrorDetails::to_json(Self) -> Json
+pub fn SkillReadBlockedUndecryptableErrorDetails::to_repr(Self) -> @debug.Repr
+pub impl ToJson for SkillReadBlockedUndecryptableErrorDetails
+pub impl @moonbitlang/core/json.FromJson for SkillReadBlockedUndecryptableErrorDetails
+
 pub(all) enum StopReason {
   EndTurn
   MaxTokens
@@ -4591,6 +4793,26 @@ pub fn ToolChoiceTool::to_json(Self) -> Json
 pub fn ToolChoiceTool::to_repr(Self) -> @debug.Repr
 pub impl ToJson for ToolChoiceTool
 pub impl @moonbitlang/core/json.FromJson for ToolChoiceTool
+
+pub(all) struct ToolNameConflictErrorDetails {
+} derive(Eq, @debug.Debug)
+pub fn ToolNameConflictErrorDetails::equal(Self, Self) -> Bool
+pub fn ToolNameConflictErrorDetails::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ToolNameConflictErrorDetails::not_equal(Self, Self) -> Bool
+pub fn ToolNameConflictErrorDetails::to_json(Self) -> Json
+pub fn ToolNameConflictErrorDetails::to_repr(Self) -> @debug.Repr
+pub impl ToJson for ToolNameConflictErrorDetails
+pub impl @moonbitlang/core/json.FromJson for ToolNameConflictErrorDetails
+
+pub(all) struct ToolReferenceUnresolvedErrorDetails {
+} derive(Eq, @debug.Debug)
+pub fn ToolReferenceUnresolvedErrorDetails::equal(Self, Self) -> Bool
+pub fn ToolReferenceUnresolvedErrorDetails::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ToolReferenceUnresolvedErrorDetails::not_equal(Self, Self) -> Bool
+pub fn ToolReferenceUnresolvedErrorDetails::to_json(Self) -> Json
+pub fn ToolReferenceUnresolvedErrorDetails::to_repr(Self) -> @debug.Repr
+pub impl ToJson for ToolReferenceUnresolvedErrorDetails
+pub impl @moonbitlang/core/json.FromJson for ToolReferenceUnresolvedErrorDetails
 
 pub(all) struct ToolSearchToolBM2520251119 {
   allowed_callers : Array[AllowedCaller]?
