@@ -160,7 +160,7 @@ test "next_delay honors Retry-After sources and upper bound" {
           ),
           Some(400),
         ),
-      ] : Array[(@runtime.SdkError, Int?)]) {
+      ] : Array[(@runtime.SdkError, Int32?)]) {
     assert_eq(policy.next_delay_ms(error, request, 0, 0.0), expected)
   }
 }

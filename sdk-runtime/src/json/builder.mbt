@@ -5,7 +5,7 @@
 /// test {
 ///   let builder = @json.ObjBuilder::new()
 ///     .field("name", "sample")
-///     .opt("count", (None : Int?))
+///     .opt("count", (None : Int32?))
 ///     .presence("note", (@json.Null : @json.Presence[String]))
 ///   assert_eq(builder.build(), { "name": "sample", "note": null })
 /// }

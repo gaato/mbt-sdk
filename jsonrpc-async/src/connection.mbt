@@ -9,7 +9,7 @@
 pub(all) suberror RpcFailure {
   Remote(@jsonrpc.RpcError)
   Transport(String)
-  Timeout(Int)
+  Timeout(Int32)
   Closed
 } derive(Debug)
 
@@ -40,7 +40,7 @@ pub struct Connection {
   priv mut next_id : Int64
   priv mut closed : Bool
   priv mut writer_closed : Bool
-  priv mut errors : Int
+  priv mut errors : Int32
 }
 
 ///|
@@ -50,13 +50,13 @@ pub fn[X] Connection::start(
   group : @async.TaskGroup[X],
   reader : &@io.Reader,
   writer : &@io.Writer,
-  close_writer? : () -> Unit = () => (),
-  envelope? : @jsonrpc.Envelope = Strict,
-  max_line? : Int,
-  on_request? : RequestHandler = (name, _) => {
+  close_writer~ : () -> Unit = () => (),
+  envelope~ : @jsonrpc.Envelope = Strict,
+  max_line? : Int32,
+  on_request~ : RequestHandler = (name, _) => {
     Err(@jsonrpc.RpcError::method_not_found(name))
   },
-  on_notification? : NotificationHandler = (_, _) => (),
+  on_notification~ : NotificationHandler = (_, _) => (),
 ) -> Connection {
   let self : Connection = {
     writer,
@@ -145,7 +145,7 @@ pub fn Connection::is_closed(self : Connection) -> Bool {
 
 ///|
 /// Returns the number of malformed received records.
-pub fn Connection::decode_errors(self : Connection) -> Int {
+pub fn Connection::decode_errors(self : Connection) -> Int32 {
   self.errors
 }
 
@@ -153,7 +153,7 @@ pub fn Connection::decode_errors(self : Connection) -> Int {
 async fn Connection::send(
   self : Connection,
   message : @jsonrpc.Message,
-  reply? : Bool = false,
+  reply~ : Bool = false,
 ) -> Unit raise RpcFailure {
   if self.writer_closed || (self.closed && !reply) {
     raise Closed
@@ -183,7 +183,7 @@ pub async fn Connection::call(
   self : Connection,
   name : String,
   params? : Json,
-  timeout_ms? : Int,
+  timeout_ms? : Int32,
 ) -> Json raise RpcFailure {
   if self.closed {
     raise Closed

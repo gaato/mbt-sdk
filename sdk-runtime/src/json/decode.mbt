@@ -73,8 +73,8 @@ pub fn[T] open_string(
 pub fn[T] open_int(
   json : Json,
   path : @json.JsonPath,
-  known : (Int) -> T?,
-  unknown : (Int) -> T,
+  known : (Int32) -> T?,
+  unknown : (Int32) -> T,
 ) -> T raise @json.JsonDecodeError {
   guard json is Number(raw, ..) && raw >= -2147483648.0 && raw <= 2147483647.0 else {
     raise @json.JsonDecodeError((path, "expected integer in Int range"))

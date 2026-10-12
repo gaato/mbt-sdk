@@ -2,7 +2,7 @@
 /// An incremental byte-oriented NDJSON line splitter. Create one per stream.
 pub struct LineFramer {
   priv line : Array[Byte]
-  priv max_line : Int?
+  priv max_line : Int32?
   priv mut finished : Bool
 }
 
@@ -15,7 +15,7 @@ pub struct LineFramer {
 ///   assert_eq(framer.feed(b"one\ntwo\n"), [b"one", b"two"])
 /// }
 /// ```
-pub fn LineFramer::new(max_line? : Int) -> LineFramer {
+pub fn LineFramer::new(max_line? : Int32) -> LineFramer {
   { line: [], max_line, finished: false, }
 }
 

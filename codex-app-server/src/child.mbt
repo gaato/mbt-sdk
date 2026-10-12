@@ -12,12 +12,12 @@ pub struct Session {
 pub async fn[X] spawn(
   group : @async.TaskGroup[X],
   initialize : @protocol.InitializeParams,
-  program? : String = "codex",
+  program~ : String = "codex",
   cwd? : String,
   extra_env? : Map[String, String],
-  handlers? : Handlers = Handlers::new(),
-  on_event? : EventHandler = _ => (),
-  timeout_ms? : Int = 10000,
+  handlers~ : Handlers = Handlers::new(),
+  on_event~ : EventHandler = _ => (),
+  timeout_ms~ : Int32 = 10000,
 ) -> Session {
   let child = @rpc.spawn_child(
     group,
@@ -37,6 +37,9 @@ pub async fn[X] spawn(
 
 ///|
 /// Sends EOF and waits for exit, terminating the child after the timeout.
-pub async fn Session::shutdown(self : Session, timeout_ms? : Int = 5000) -> Int {
+pub async fn Session::shutdown(
+  self : Session,
+  timeout_ms~ : Int32 = 5000,
+) -> Int32 {
   self.child.shutdown(timeout_ms~)
 }

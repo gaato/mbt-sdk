@@ -25,8 +25,8 @@ pub struct Client {
 pub(all) struct Attempt {
   bucket : String
   request : @http.Request
-  attempt : Int
-  status : Int
+  attempt : Int32
+  status : Int32
   headers : @http.Headers
   body : Bytes
   duration_ms : Int64
@@ -88,7 +88,7 @@ pub async fn Client::send(
   self : Client,
   request : @http.Request,
   bucket? : String,
-  global_exempt? : Bool = false,
+  global_exempt~ : Bool = false,
   body? : () -> Bytes,
 ) -> @http.Response raise SdkError {
   let request = self.prepare(request)
@@ -118,7 +118,7 @@ pub async fn Client::send_json(
   self : Client,
   request : @http.Request,
   bucket? : String,
-  global_exempt? : Bool = false,
+  global_exempt~ : Bool = false,
   body? : () -> Bytes,
 ) -> Json raise SdkError {
   let response = self.send(request, bucket?, global_exempt~, body?)
@@ -138,7 +138,7 @@ pub async fn Client::send_stream(
   self : Client,
   request : @http.Request,
   bucket? : String,
-  global_exempt? : Bool = false,
+  global_exempt~ : Bool = false,
   body? : () -> Bytes,
 ) -> (@http.ResponseHead, &@http.BodyStream) raise SdkError {
   let request = self.prepare(request)
@@ -170,7 +170,7 @@ async fn Client::send_once(
   body : (() -> Bytes)?,
   bucket : String,
   global_exempt : Bool,
-  attempt : Int,
+  attempt : Int32,
 ) -> @http.Response raise SdkError {
   let response = self.admit_and_exchange(
     bucket,
@@ -193,7 +193,7 @@ async fn Client::send_stream_once(
   body : (() -> Bytes)?,
   bucket : String,
   global_exempt : Bool,
-  attempt : Int,
+  attempt : Int32,
 ) -> (@http.ResponseHead, &@http.BodyStream) raise SdkError {
   let (head, stream) = self.admit_and_exchange(
     bucket,
@@ -248,10 +248,10 @@ async fn[T] Client::admit_and_exchange(
   self : Client,
   bucket : String,
   global_exempt : Bool,
-  attempt : Int,
+  attempt : Int32,
   build : () -> @http.Request,
   exchange : async (@http.Request) -> T raise SdkError,
-  head : (T) -> (Int, @http.Headers, Bytes),
+  head : (T) -> (Int32, @http.Headers, Bytes),
   discard : (T) -> Unit,
 ) -> T raise SdkError {
   self.limiter.acquire(bucket, global_exempt~) catch {
@@ -303,7 +303,7 @@ async fn[T] Client::exchange_guarded(
   self : Client,
   bucket : String,
   request : @http.Request,
-  attempt : Int,
+  attempt : Int32,
   started_at : Int64,
   exchange : async (@http.Request) -> T raise SdkError,
 ) -> Result[T, SdkError] noraise {
@@ -327,7 +327,7 @@ async fn Client::settle_without_response(
   self : Client,
   bucket : String,
   request : @http.Request,
-  attempt : Int,
+  attempt : Int32,
   started_at : Int64,
   error : SdkError?,
 ) -> Unit noraise {

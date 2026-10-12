@@ -5,9 +5,9 @@ fn body(text : String) -> Bytes {
 
 ///|
 fn status_error(
-  status : Int,
-  headers? : @http.Headers = @http.Headers::new(),
-  body? : Bytes = b"",
+  status : Int32,
+  headers~ : @http.Headers = @http.Headers::new(),
+  body~ : Bytes = b"",
 ) -> @runtime.SdkError {
   if status == 429 {
     @runtime.RateLimited(retry_after_ms=None, headers~, body~)

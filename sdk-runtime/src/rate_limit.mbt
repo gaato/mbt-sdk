@@ -1,7 +1,7 @@
 ///|
 /// Remaining requests and the Unix millisecond instant when a window resets.
 pub(all) struct RateLimitState {
-  remaining : Int
+  remaining : Int32
   reset_at_unix_ms : Int64
 } derive(Eq, Debug)
 
@@ -38,7 +38,7 @@ pub(open) trait RateLimiter {
   /// Status `0` means no response arrived. An error raised on the success
   /// path reaches the caller; one raised while the attempt is already failing
   /// is dropped.
-  async fn release(Self, String, status~ : Int, headers~ : @http.Headers) -> Unit
+  async fn release(Self, String, status~ : Int32, headers~ : @http.Headers) -> Unit
 }
 
 ///|
@@ -195,7 +195,7 @@ pub fn rate_limit_headers(
 }
 
 ///|
-fn parse_nonnegative_int(value : String) -> Int? {
+fn parse_nonnegative_int(value : String) -> Int32? {
   let value = value.trim()
   if value.is_empty() {
     return None
@@ -255,7 +255,7 @@ fn decimal_seconds_ms(value : String) -> Int64? {
 }
 
 ///|
-fn saturating_add_ms(now : Int64, milliseconds : Int) -> Int64 {
+fn saturating_add_ms(now : Int64, milliseconds : Int32) -> Int64 {
   saturating_add_i64(now, milliseconds.to_int64())
 }
 

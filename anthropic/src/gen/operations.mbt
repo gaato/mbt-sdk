@@ -114,7 +114,7 @@ pub fn messages_post_decode(
 pub fn models_list_request(
   before_id? : String,
   after_id? : String,
-  limit? : Int,
+  limit? : Int32,
   lifecycle? : Array[ModelsListLifecycleItem],
   anthropic_version? : String,
   anthropic_beta? : Array[String],

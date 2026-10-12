@@ -14,8 +14,8 @@ pub async fn[X] spawn_child(
   cwd? : String,
   extra_env? : Map[String, String],
   stderr? : &@process.ProcessOutput,
-  envelope? : @jsonrpc.Envelope = Strict,
-  max_line? : Int,
+  envelope~ : @jsonrpc.Envelope = Strict,
+  max_line? : Int32,
   on_request? : RequestHandler,
   on_notification? : NotificationHandler,
 ) -> Child {
@@ -53,7 +53,7 @@ pub async fn[X] spawn_child(
 ///|
 /// Sends EOF and waits for exit. After the deadline, cancels the child and waits
 /// for it to terminate before returning its exit code.
-pub async fn Child::shutdown(self : Child, timeout_ms? : Int = 5000) -> Int {
+pub async fn Child::shutdown(self : Child, timeout_ms~ : Int32 = 5000) -> Int32 {
   self.connection.close()
   if timeout_ms <= 0 {
     self.process.cancel()

@@ -22,7 +22,7 @@ pub fn OpenAI::new(
   api_key~ : String,
   transport : &@http.Transport,
   clock : &@clock.Clock,
-  base_url? : String = "https://api.openai.com/v1",
+  base_url~ : String = "https://api.openai.com/v1",
   organization? : String,
   project? : String,
   retry? : @runtime.RetryPolicy,

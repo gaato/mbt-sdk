@@ -30,7 +30,7 @@ fn generated_tool(tool : ToolDef) -> @gen.Tool {
 /// `stream` selects server-sent events; the facade sets it for `stream_message`.
 pub fn MessageRequest::to_params(
   self : MessageRequest,
-  stream? : Bool = false,
+  stream~ : Bool = false,
 ) -> CreateMessageParams {
   @gen.CreateMessageParams::new(
     model=self.model,

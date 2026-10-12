@@ -2214,7 +2214,7 @@ pub impl @json.FromJson for BrowserScrollToConfig with fn from_json(value, path)
 pub(all) struct BrowserStateChangeDownloadCompleted {
   download_id : String
   path : @sdkjson.Presence[String]
-  size_bytes : @sdkjson.Presence[Int]
+  size_bytes : @sdkjson.Presence[Int32]
   type_ : String
   url : String
 } derive(Eq, @debug.Debug)
@@ -2233,7 +2233,7 @@ pub fn BrowserStateChangeDownloadCompleted::new(
   type_~ : String,
   url~ : String,
   path? : String,
-  size_bytes? : Int,
+  size_bytes? : Int32,
 ) -> BrowserStateChangeDownloadCompleted {
   {
     download_id,
@@ -3099,8 +3099,8 @@ pub impl @json.FromJson for BrowserToolset20260801 with fn from_json(
 ///
 /// Generated representation of CacheCreation.
 pub(all) struct CacheCreation {
-  ephemeral_1h_input_tokens : Int
-  ephemeral_5m_input_tokens : Int
+  ephemeral_1h_input_tokens : Int32
+  ephemeral_5m_input_tokens : Int32
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -3113,8 +3113,8 @@ pub extend CacheCreation with @debug.Debug::{to_repr}
 ///
 /// Creates a CacheCreation with omitted optional fields absent.
 pub fn CacheCreation::new(
-  ephemeral_1h_input_tokens~ : Int,
-  ephemeral_5m_input_tokens~ : Int,
+  ephemeral_1h_input_tokens~ : Int32,
+  ephemeral_5m_input_tokens~ : Int32,
 ) -> CacheCreation {
   { ephemeral_1h_input_tokens, ephemeral_5m_input_tokens, }
 }
@@ -3154,7 +3154,7 @@ pub impl @json.FromJson for CacheCreation with fn from_json(value, path) {
 ///
 /// Generated representation of CacheMissMessagesChanged.
 pub(all) struct CacheMissMessagesChanged {
-  cache_missed_input_tokens : Int
+  cache_missed_input_tokens : Int32
   type_ : String
 } derive(Eq, @debug.Debug)
 
@@ -3168,7 +3168,7 @@ pub extend CacheMissMessagesChanged with @debug.Debug::{to_repr}
 ///
 /// Creates a CacheMissMessagesChanged with omitted optional fields absent.
 pub fn CacheMissMessagesChanged::new(
-  cache_missed_input_tokens~ : Int,
+  cache_missed_input_tokens~ : Int32,
   type_~ : String,
 ) -> CacheMissMessagesChanged {
   { cache_missed_input_tokens, type_, }
@@ -3210,7 +3210,7 @@ pub impl @json.FromJson for CacheMissMessagesChanged with fn from_json(
 ///
 /// Generated representation of CacheMissModelChanged.
 pub(all) struct CacheMissModelChanged {
-  cache_missed_input_tokens : Int
+  cache_missed_input_tokens : Int32
   type_ : String
 } derive(Eq, @debug.Debug)
 
@@ -3224,7 +3224,7 @@ pub extend CacheMissModelChanged with @debug.Debug::{to_repr}
 ///
 /// Creates a CacheMissModelChanged with omitted optional fields absent.
 pub fn CacheMissModelChanged::new(
-  cache_missed_input_tokens~ : Int,
+  cache_missed_input_tokens~ : Int32,
   type_~ : String,
 ) -> CacheMissModelChanged {
   { cache_missed_input_tokens, type_, }
@@ -3309,7 +3309,7 @@ pub impl @json.FromJson for CacheMissPreviousMessageNotFound with fn from_json(
 ///
 /// Generated representation of CacheMissSystemChanged.
 pub(all) struct CacheMissSystemChanged {
-  cache_missed_input_tokens : Int
+  cache_missed_input_tokens : Int32
   type_ : String
 } derive(Eq, @debug.Debug)
 
@@ -3323,7 +3323,7 @@ pub extend CacheMissSystemChanged with @debug.Debug::{to_repr}
 ///
 /// Creates a CacheMissSystemChanged with omitted optional fields absent.
 pub fn CacheMissSystemChanged::new(
-  cache_missed_input_tokens~ : Int,
+  cache_missed_input_tokens~ : Int32,
   type_~ : String,
 ) -> CacheMissSystemChanged {
   { cache_missed_input_tokens, type_, }
@@ -3365,7 +3365,7 @@ pub impl @json.FromJson for CacheMissSystemChanged with fn from_json(
 ///
 /// Generated representation of CacheMissToolsChanged.
 pub(all) struct CacheMissToolsChanged {
-  cache_missed_input_tokens : Int
+  cache_missed_input_tokens : Int32
   type_ : String
 } derive(Eq, @debug.Debug)
 
@@ -3379,7 +3379,7 @@ pub extend CacheMissToolsChanged with @debug.Debug::{to_repr}
 ///
 /// Creates a CacheMissToolsChanged with omitted optional fields absent.
 pub fn CacheMissToolsChanged::new(
-  cache_missed_input_tokens~ : Int,
+  cache_missed_input_tokens~ : Int32,
   type_~ : String,
 ) -> CacheMissToolsChanged {
   { cache_missed_input_tokens, type_, }
@@ -3559,11 +3559,11 @@ pub impl @json.FromJson for CapabilitySupport with fn from_json(value, path) {
 /// Generated representation of ResponseCharLocationCitation.
 pub(all) struct ResponseCharLocationCitation {
   cited_text : String
-  document_index : Int
+  document_index : Int32
   document_title : String?
-  end_char_index : Int
+  end_char_index : Int32
   file_id : String?
-  start_char_index : Int
+  start_char_index : Int32
   type_ : String
 } derive(Eq, @debug.Debug)
 
@@ -3578,9 +3578,9 @@ pub extend ResponseCharLocationCitation with @debug.Debug::{to_repr}
 /// Creates a ResponseCharLocationCitation with omitted optional fields absent.
 pub fn ResponseCharLocationCitation::new(
   cited_text~ : String,
-  document_index~ : Int,
-  end_char_index~ : Int,
-  start_char_index~ : Int,
+  document_index~ : Int32,
+  end_char_index~ : Int32,
+  start_char_index~ : Int32,
   type_~ : String,
   document_title? : String,
   file_id? : String,
@@ -3644,11 +3644,11 @@ pub impl @json.FromJson for ResponseCharLocationCitation with fn from_json(
 /// Generated representation of ResponseContentBlockLocationCitation.
 pub(all) struct ResponseContentBlockLocationCitation {
   cited_text : String
-  document_index : Int
+  document_index : Int32
   document_title : String?
-  end_block_index : Int
+  end_block_index : Int32
   file_id : String?
-  start_block_index : Int
+  start_block_index : Int32
   type_ : String
 } derive(Eq, @debug.Debug)
 
@@ -3663,9 +3663,9 @@ pub extend ResponseContentBlockLocationCitation with @debug.Debug::{to_repr}
 /// Creates a ResponseContentBlockLocationCitation with omitted optional fields absent.
 pub fn ResponseContentBlockLocationCitation::new(
   cited_text~ : String,
-  document_index~ : Int,
-  end_block_index~ : Int,
-  start_block_index~ : Int,
+  document_index~ : Int32,
+  end_block_index~ : Int32,
+  start_block_index~ : Int32,
   type_~ : String,
   document_title? : String,
   file_id? : String,
@@ -3729,11 +3729,11 @@ pub impl @json.FromJson for ResponseContentBlockLocationCitation with fn from_js
 /// Generated representation of ResponsePageLocationCitation.
 pub(all) struct ResponsePageLocationCitation {
   cited_text : String
-  document_index : Int
+  document_index : Int32
   document_title : String?
-  end_page_number : Int
+  end_page_number : Int32
   file_id : String?
-  start_page_number : Int
+  start_page_number : Int32
   type_ : String
 } derive(Eq, @debug.Debug)
 
@@ -3748,9 +3748,9 @@ pub extend ResponsePageLocationCitation with @debug.Debug::{to_repr}
 /// Creates a ResponsePageLocationCitation with omitted optional fields absent.
 pub fn ResponsePageLocationCitation::new(
   cited_text~ : String,
-  document_index~ : Int,
-  end_page_number~ : Int,
-  start_page_number~ : Int,
+  document_index~ : Int32,
+  end_page_number~ : Int32,
+  start_page_number~ : Int32,
   type_~ : String,
   document_title? : String,
   file_id? : String,
@@ -3814,10 +3814,10 @@ pub impl @json.FromJson for ResponsePageLocationCitation with fn from_json(
 /// Generated representation of ResponseSearchResultLocationCitation.
 pub(all) struct ResponseSearchResultLocationCitation {
   cited_text : String
-  end_block_index : Int
-  search_result_index : Int
+  end_block_index : Int32
+  search_result_index : Int32
   source : String
-  start_block_index : Int
+  start_block_index : Int32
   title : String?
   type_ : String
 } derive(Eq, @debug.Debug)
@@ -3833,10 +3833,10 @@ pub extend ResponseSearchResultLocationCitation with @debug.Debug::{to_repr}
 /// Creates a ResponseSearchResultLocationCitation with omitted optional fields absent.
 pub fn ResponseSearchResultLocationCitation::new(
   cited_text~ : String,
-  end_block_index~ : Int,
-  search_result_index~ : Int,
+  end_block_index~ : Int32,
+  search_result_index~ : Int32,
   source~ : String,
-  start_block_index~ : Int,
+  start_block_index~ : Int32,
   type_~ : String,
   title? : String,
 ) -> ResponseSearchResultLocationCitation {
@@ -6923,7 +6923,7 @@ pub impl @json.FromJson for ContentBlockDeltaEventDelta with fn from_json(
 /// Generated representation of ContentBlockDeltaEvent.
 pub(all) struct ContentBlockDeltaEvent {
   delta : ContentBlockDeltaEventDelta
-  index : Int
+  index : Int32
   type_ : String
 } derive(Eq, @debug.Debug)
 
@@ -6938,7 +6938,7 @@ pub extend ContentBlockDeltaEvent with @debug.Debug::{to_repr}
 /// Creates a ContentBlockDeltaEvent with omitted optional fields absent.
 pub fn ContentBlockDeltaEvent::new(
   delta~ : ContentBlockDeltaEventDelta,
-  index~ : Int,
+  index~ : Int32,
   type_~ : String,
 ) -> ContentBlockDeltaEvent {
   { delta, index, type_, }
@@ -7393,10 +7393,10 @@ pub impl @json.FromJson for RequestTextBlockCacheControl with fn from_json(
 /// Generated representation of RequestCharLocationCitation.
 pub(all) struct RequestCharLocationCitation {
   cited_text : String
-  document_index : Int
+  document_index : Int32
   document_title : String?
-  end_char_index : Int
-  start_char_index : Int
+  end_char_index : Int32
+  start_char_index : Int32
   type_ : String
 } derive(Eq, @debug.Debug)
 
@@ -7411,9 +7411,9 @@ pub extend RequestCharLocationCitation with @debug.Debug::{to_repr}
 /// Creates a RequestCharLocationCitation with omitted optional fields absent.
 pub fn RequestCharLocationCitation::new(
   cited_text~ : String,
-  document_index~ : Int,
-  end_char_index~ : Int,
-  start_char_index~ : Int,
+  document_index~ : Int32,
+  end_char_index~ : Int32,
+  start_char_index~ : Int32,
   type_~ : String,
   document_title? : String,
 ) -> RequestCharLocationCitation {
@@ -7473,10 +7473,10 @@ pub impl @json.FromJson for RequestCharLocationCitation with fn from_json(
 /// Generated representation of RequestContentBlockLocationCitation.
 pub(all) struct RequestContentBlockLocationCitation {
   cited_text : String
-  document_index : Int
+  document_index : Int32
   document_title : String?
-  end_block_index : Int
-  start_block_index : Int
+  end_block_index : Int32
+  start_block_index : Int32
   type_ : String
 } derive(Eq, @debug.Debug)
 
@@ -7491,9 +7491,9 @@ pub extend RequestContentBlockLocationCitation with @debug.Debug::{to_repr}
 /// Creates a RequestContentBlockLocationCitation with omitted optional fields absent.
 pub fn RequestContentBlockLocationCitation::new(
   cited_text~ : String,
-  document_index~ : Int,
-  end_block_index~ : Int,
-  start_block_index~ : Int,
+  document_index~ : Int32,
+  end_block_index~ : Int32,
+  start_block_index~ : Int32,
   type_~ : String,
   document_title? : String,
 ) -> RequestContentBlockLocationCitation {
@@ -7553,10 +7553,10 @@ pub impl @json.FromJson for RequestContentBlockLocationCitation with fn from_jso
 /// Generated representation of RequestPageLocationCitation.
 pub(all) struct RequestPageLocationCitation {
   cited_text : String
-  document_index : Int
+  document_index : Int32
   document_title : String?
-  end_page_number : Int
-  start_page_number : Int
+  end_page_number : Int32
+  start_page_number : Int32
   type_ : String
 } derive(Eq, @debug.Debug)
 
@@ -7571,9 +7571,9 @@ pub extend RequestPageLocationCitation with @debug.Debug::{to_repr}
 /// Creates a RequestPageLocationCitation with omitted optional fields absent.
 pub fn RequestPageLocationCitation::new(
   cited_text~ : String,
-  document_index~ : Int,
-  end_page_number~ : Int,
-  start_page_number~ : Int,
+  document_index~ : Int32,
+  end_page_number~ : Int32,
+  start_page_number~ : Int32,
   type_~ : String,
   document_title? : String,
 ) -> RequestPageLocationCitation {
@@ -7633,10 +7633,10 @@ pub impl @json.FromJson for RequestPageLocationCitation with fn from_json(
 /// Generated representation of RequestSearchResultLocationCitation.
 pub(all) struct RequestSearchResultLocationCitation {
   cited_text : String
-  end_block_index : Int
-  search_result_index : Int
+  end_block_index : Int32
+  search_result_index : Int32
   source : String
-  start_block_index : Int
+  start_block_index : Int32
   title : String?
   type_ : String
 } derive(Eq, @debug.Debug)
@@ -7652,10 +7652,10 @@ pub extend RequestSearchResultLocationCitation with @debug.Debug::{to_repr}
 /// Creates a RequestSearchResultLocationCitation with omitted optional fields absent.
 pub fn RequestSearchResultLocationCitation::new(
   cited_text~ : String,
-  end_block_index~ : Int,
-  search_result_index~ : Int,
+  end_block_index~ : Int32,
+  search_result_index~ : Int32,
   source~ : String,
-  start_block_index~ : Int,
+  start_block_index~ : Int32,
   type_~ : String,
   title? : String,
 ) -> RequestSearchResultLocationCitation {
@@ -8170,7 +8170,7 @@ pub impl @json.FromJson for ResponseBashCodeExecutionOutputBlock with fn from_js
 /// Generated representation of ResponseBashCodeExecutionResultBlock.
 pub(all) struct ResponseBashCodeExecutionResultBlock {
   content : Array[ResponseBashCodeExecutionOutputBlock]
-  return_code : Int
+  return_code : Int32
   stderr : String
   stdout : String
   type_ : String
@@ -8187,7 +8187,7 @@ pub extend ResponseBashCodeExecutionResultBlock with @debug.Debug::{to_repr}
 /// Creates a ResponseBashCodeExecutionResultBlock with omitted optional fields absent.
 pub fn ResponseBashCodeExecutionResultBlock::new(
   content~ : Array[ResponseBashCodeExecutionOutputBlock],
-  return_code~ : Int,
+  return_code~ : Int32,
   stderr~ : String,
   stdout~ : String,
   type_~ : String,
@@ -8462,7 +8462,7 @@ pub impl @json.FromJson for ResponseCodeExecutionOutputBlock with fn from_json(
 /// Generated representation of ResponseCodeExecutionResultBlock.
 pub(all) struct ResponseCodeExecutionResultBlock {
   content : Array[ResponseCodeExecutionOutputBlock]
-  return_code : Int
+  return_code : Int32
   stderr : String
   stdout : String
   type_ : String
@@ -8479,7 +8479,7 @@ pub extend ResponseCodeExecutionResultBlock with @debug.Debug::{to_repr}
 /// Creates a ResponseCodeExecutionResultBlock with omitted optional fields absent.
 pub fn ResponseCodeExecutionResultBlock::new(
   content~ : Array[ResponseCodeExecutionOutputBlock],
-  return_code~ : Int,
+  return_code~ : Int32,
   stderr~ : String,
   stdout~ : String,
   type_~ : String,
@@ -8529,7 +8529,7 @@ pub impl @json.FromJson for ResponseCodeExecutionResultBlock with fn from_json(
 pub(all) struct ResponseEncryptedCodeExecutionResultBlock {
   content : Array[ResponseCodeExecutionOutputBlock]
   encrypted_stdout : String
-  return_code : Int
+  return_code : Int32
   stderr : String
   type_ : String
 } derive(Eq, @debug.Debug)
@@ -8548,7 +8548,7 @@ pub extend ResponseEncryptedCodeExecutionResultBlock with @debug.Debug::{
 pub fn ResponseEncryptedCodeExecutionResultBlock::new(
   content~ : Array[ResponseCodeExecutionOutputBlock],
   encrypted_stdout~ : String,
-  return_code~ : Int,
+  return_code~ : Int32,
   stderr~ : String,
   type_~ : String,
 ) -> ResponseEncryptedCodeExecutionResultBlock {
@@ -9489,9 +9489,9 @@ pub impl @json.FromJson for ResponseTextEditorCodeExecutionViewResultBlockFileTy
 pub(all) struct ResponseTextEditorCodeExecutionViewResultBlock {
   content : String
   file_type : ResponseTextEditorCodeExecutionViewResultBlockFileType
-  num_lines : Int?
-  start_line : Int?
-  total_lines : Int?
+  num_lines : Int32?
+  start_line : Int32?
+  total_lines : Int32?
   type_ : String
 } derive(Eq, @debug.Debug)
 
@@ -9513,9 +9513,9 @@ pub fn ResponseTextEditorCodeExecutionViewResultBlock::new(
   content~ : String,
   file_type~ : ResponseTextEditorCodeExecutionViewResultBlockFileType,
   type_~ : String,
-  num_lines? : Int,
-  start_line? : Int,
-  total_lines? : Int,
+  num_lines? : Int32,
+  start_line? : Int32,
+  total_lines? : Int32,
 ) -> ResponseTextEditorCodeExecutionViewResultBlock {
   { content, file_type, num_lines, start_line, total_lines, type_, }
 }
@@ -9638,10 +9638,10 @@ pub impl @json.FromJson for ResponseTextEditorCodeExecutionCreateResultBlock wit
 /// Generated representation of ResponseTextEditorCodeExecutionStrReplaceResultBlock.
 pub(all) struct ResponseTextEditorCodeExecutionStrReplaceResultBlock {
   lines : Array[String]?
-  new_lines : Int?
-  new_start : Int?
-  old_lines : Int?
-  old_start : Int?
+  new_lines : Int32?
+  new_start : Int32?
+  old_lines : Int32?
+  old_start : Int32?
   type_ : String
 } derive(Eq, @debug.Debug)
 
@@ -9662,10 +9662,10 @@ pub extend ResponseTextEditorCodeExecutionStrReplaceResultBlock with @debug.Debu
 pub fn ResponseTextEditorCodeExecutionStrReplaceResultBlock::new(
   type_~ : String,
   lines? : Array[String],
-  new_lines? : Int,
-  new_start? : Int,
-  old_lines? : Int,
-  old_start? : Int,
+  new_lines? : Int32,
+  new_start? : Int32,
+  old_lines? : Int32,
+  old_start? : Int32,
 ) -> ResponseTextEditorCodeExecutionStrReplaceResultBlock {
   { lines, new_lines, new_start, old_lines, old_start, type_, }
 }
@@ -11389,7 +11389,7 @@ pub impl @json.FromJson for ContentBlockStartEventContentBlock with fn from_json
 /// Generated representation of ContentBlockStartEvent.
 pub(all) struct ContentBlockStartEvent {
   content_block : ContentBlockStartEventContentBlock
-  index : Int
+  index : Int32
   type_ : String
 } derive(Eq, @debug.Debug)
 
@@ -11404,7 +11404,7 @@ pub extend ContentBlockStartEvent with @debug.Debug::{to_repr}
 /// Creates a ContentBlockStartEvent with omitted optional fields absent.
 pub fn ContentBlockStartEvent::new(
   content_block~ : ContentBlockStartEventContentBlock,
-  index~ : Int,
+  index~ : Int32,
   type_~ : String,
 ) -> ContentBlockStartEvent {
   { content_block, index, type_, }
@@ -11446,7 +11446,7 @@ pub impl @json.FromJson for ContentBlockStartEvent with fn from_json(
 ///
 /// Generated representation of ContentBlockStopEvent.
 pub(all) struct ContentBlockStopEvent {
-  index : Int
+  index : Int32
   type_ : String
 } derive(Eq, @debug.Debug)
 
@@ -11460,7 +11460,7 @@ pub extend ContentBlockStopEvent with @debug.Debug::{to_repr}
 ///
 /// Creates a ContentBlockStopEvent with omitted optional fields absent.
 pub fn ContentBlockStopEvent::new(
-  index~ : Int,
+  index~ : Int32,
   type_~ : String,
 ) -> ContentBlockStopEvent {
   { index, type_, }
@@ -11786,7 +11786,7 @@ pub impl @json.FromJson for RequestBashCodeExecutionOutputBlock with fn from_jso
 /// Generated representation of RequestBashCodeExecutionResultBlock.
 pub(all) struct RequestBashCodeExecutionResultBlock {
   content : Array[RequestBashCodeExecutionOutputBlock]
-  return_code : Int
+  return_code : Int32
   stderr : String
   stdout : String
   type_ : String
@@ -11803,7 +11803,7 @@ pub extend RequestBashCodeExecutionResultBlock with @debug.Debug::{to_repr}
 /// Creates a RequestBashCodeExecutionResultBlock with omitted optional fields absent.
 pub fn RequestBashCodeExecutionResultBlock::new(
   content~ : Array[RequestBashCodeExecutionOutputBlock],
-  return_code~ : Int,
+  return_code~ : Int32,
   stderr~ : String,
   stdout~ : String,
   type_~ : String,
@@ -12143,7 +12143,7 @@ pub impl @json.FromJson for RequestCodeExecutionOutputBlock with fn from_json(
 /// Generated representation of RequestCodeExecutionResultBlock.
 pub(all) struct RequestCodeExecutionResultBlock {
   content : Array[RequestCodeExecutionOutputBlock]
-  return_code : Int
+  return_code : Int32
   stderr : String
   stdout : String
   type_ : String
@@ -12160,7 +12160,7 @@ pub extend RequestCodeExecutionResultBlock with @debug.Debug::{to_repr}
 /// Creates a RequestCodeExecutionResultBlock with omitted optional fields absent.
 pub fn RequestCodeExecutionResultBlock::new(
   content~ : Array[RequestCodeExecutionOutputBlock],
-  return_code~ : Int,
+  return_code~ : Int32,
   stderr~ : String,
   stdout~ : String,
   type_~ : String,
@@ -12210,7 +12210,7 @@ pub impl @json.FromJson for RequestCodeExecutionResultBlock with fn from_json(
 pub(all) struct RequestEncryptedCodeExecutionResultBlock {
   content : Array[RequestCodeExecutionOutputBlock]
   encrypted_stdout : String
-  return_code : Int
+  return_code : Int32
   stderr : String
   type_ : String
 } derive(Eq, @debug.Debug)
@@ -12227,7 +12227,7 @@ pub extend RequestEncryptedCodeExecutionResultBlock with @debug.Debug::{to_repr}
 pub fn RequestEncryptedCodeExecutionResultBlock::new(
   content~ : Array[RequestCodeExecutionOutputBlock],
   encrypted_stdout~ : String,
-  return_code~ : Int,
+  return_code~ : Int32,
   stderr~ : String,
   type_~ : String,
 ) -> RequestEncryptedCodeExecutionResultBlock {
@@ -13459,9 +13459,9 @@ pub impl @json.FromJson for RequestTextEditorCodeExecutionViewResultBlockFileTyp
 pub(all) struct RequestTextEditorCodeExecutionViewResultBlock {
   content : String
   file_type : RequestTextEditorCodeExecutionViewResultBlockFileType
-  num_lines : @sdkjson.Presence[Int]
-  start_line : @sdkjson.Presence[Int]
-  total_lines : @sdkjson.Presence[Int]
+  num_lines : @sdkjson.Presence[Int32]
+  start_line : @sdkjson.Presence[Int32]
+  total_lines : @sdkjson.Presence[Int32]
   type_ : String
 } derive(Eq, @debug.Debug)
 
@@ -13483,9 +13483,9 @@ pub fn RequestTextEditorCodeExecutionViewResultBlock::new(
   content~ : String,
   file_type~ : RequestTextEditorCodeExecutionViewResultBlockFileType,
   type_~ : String,
-  num_lines? : Int,
-  start_line? : Int,
-  total_lines? : Int,
+  num_lines? : Int32,
+  start_line? : Int32,
+  total_lines? : Int32,
 ) -> RequestTextEditorCodeExecutionViewResultBlock {
   {
     content,
@@ -13609,10 +13609,10 @@ pub impl @json.FromJson for RequestTextEditorCodeExecutionCreateResultBlock with
 /// Generated representation of RequestTextEditorCodeExecutionStrReplaceResultBlock.
 pub(all) struct RequestTextEditorCodeExecutionStrReplaceResultBlock {
   lines : @sdkjson.Presence[Array[String]]
-  new_lines : @sdkjson.Presence[Int]
-  new_start : @sdkjson.Presence[Int]
-  old_lines : @sdkjson.Presence[Int]
-  old_start : @sdkjson.Presence[Int]
+  new_lines : @sdkjson.Presence[Int32]
+  new_start : @sdkjson.Presence[Int32]
+  old_lines : @sdkjson.Presence[Int32]
+  old_start : @sdkjson.Presence[Int32]
   type_ : String
 } derive(Eq, @debug.Debug)
 
@@ -13633,10 +13633,10 @@ pub extend RequestTextEditorCodeExecutionStrReplaceResultBlock with @debug.Debug
 pub fn RequestTextEditorCodeExecutionStrReplaceResultBlock::new(
   type_~ : String,
   lines? : Array[String],
-  new_lines? : Int,
-  new_start? : Int,
-  old_lines? : Int,
-  old_start? : Int,
+  new_lines? : Int32,
+  new_start? : Int32,
+  old_lines? : Int32,
+  old_start? : Int32,
 ) -> RequestTextEditorCodeExecutionStrReplaceResultBlock {
   {
     lines: @sdkjson.Presence::from_option(lines),
@@ -16265,7 +16265,7 @@ pub impl @json.FromJson for ThinkingConfigDisabled with fn from_json(
 ///
 /// Generated representation of ThinkingConfigEnabled.
 pub(all) struct ThinkingConfigEnabled {
-  budget_tokens : Int
+  budget_tokens : Int32
   display : @sdkjson.Presence[ThinkingDisplayMode]
   type_ : String
 } derive(Eq, @debug.Debug)
@@ -16280,7 +16280,7 @@ pub extend ThinkingConfigEnabled with @debug.Debug::{to_repr}
 ///
 /// Creates a ThinkingConfigEnabled with omitted optional fields absent.
 pub fn ThinkingConfigEnabled::new(
-  budget_tokens~ : Int,
+  budget_tokens~ : Int32,
   type_~ : String,
   display? : ThinkingDisplayMode,
 ) -> ThinkingConfigEnabled {
@@ -17173,7 +17173,7 @@ pub(all) struct TextEditor20250728 {
   cache_control : @sdkjson.Presence[TextEditor20250728CacheControl]
   defer_loading : Bool?
   input_examples : Array[Map[String, Json]]?
-  max_characters : @sdkjson.Presence[Int]
+  max_characters : @sdkjson.Presence[Int32]
   strict : Bool?
   type_ : String
 } derive(Eq, @debug.Debug)
@@ -17193,7 +17193,7 @@ pub fn TextEditor20250728::new(
   cache_control? : TextEditor20250728CacheControl,
   defer_loading? : Bool,
   input_examples? : Array[Map[String, Json]],
-  max_characters? : Int,
+  max_characters? : Int32,
   strict? : Bool,
 ) -> TextEditor20250728 {
   {
@@ -17364,7 +17364,7 @@ pub(all) struct WebSearchTool20250305 {
   blocked_domains : @sdkjson.Presence[Array[String]]
   cache_control : @sdkjson.Presence[WebSearchTool20250305CacheControl]
   defer_loading : Bool?
-  max_uses : @sdkjson.Presence[Int]
+  max_uses : @sdkjson.Presence[Int32]
   strict : Bool?
   type_ : String
   user_location : @sdkjson.Presence[UserLocation]
@@ -17386,7 +17386,7 @@ pub fn WebSearchTool20250305::new(
   blocked_domains? : Array[String],
   cache_control? : WebSearchTool20250305CacheControl,
   defer_loading? : Bool,
-  max_uses? : Int,
+  max_uses? : Int32,
   strict? : Bool,
   user_location? : UserLocation,
 ) -> WebSearchTool20250305 {
@@ -17947,8 +17947,8 @@ pub(all) struct WebFetchTool20250910 {
   cache_control : @sdkjson.Presence[WebFetchTool20250910CacheControl]
   citations : @sdkjson.Presence[RequestCitationsConfig]
   defer_loading : Bool?
-  max_content_tokens : @sdkjson.Presence[Int]
-  max_uses : @sdkjson.Presence[Int]
+  max_content_tokens : @sdkjson.Presence[Int32]
+  max_uses : @sdkjson.Presence[Int32]
   strict : Bool?
   type_ : String
   url_sources : @sdkjson.Presence[WebFetchUrlSources]
@@ -17971,8 +17971,8 @@ pub fn WebFetchTool20250910::new(
   cache_control? : WebFetchTool20250910CacheControl,
   citations? : RequestCitationsConfig,
   defer_loading? : Bool,
-  max_content_tokens? : Int,
-  max_uses? : Int,
+  max_content_tokens? : Int32,
+  max_uses? : Int32,
   strict? : Bool,
   url_sources? : WebFetchUrlSources,
 ) -> WebFetchTool20250910 {
@@ -18091,7 +18091,7 @@ pub(all) struct WebSearchTool20260209 {
   blocked_domains : @sdkjson.Presence[Array[String]]
   cache_control : @sdkjson.Presence[WebSearchTool20260209CacheControl]
   defer_loading : Bool?
-  max_uses : @sdkjson.Presence[Int]
+  max_uses : @sdkjson.Presence[Int32]
   strict : Bool?
   type_ : String
   user_location : @sdkjson.Presence[UserLocation]
@@ -18113,7 +18113,7 @@ pub fn WebSearchTool20260209::new(
   blocked_domains? : Array[String],
   cache_control? : WebSearchTool20260209CacheControl,
   defer_loading? : Bool,
-  max_uses? : Int,
+  max_uses? : Int32,
   strict? : Bool,
   user_location? : UserLocation,
 ) -> WebSearchTool20260209 {
@@ -18227,8 +18227,8 @@ pub(all) struct WebFetchTool20260209 {
   cache_control : @sdkjson.Presence[WebFetchTool20260209CacheControl]
   citations : @sdkjson.Presence[RequestCitationsConfig]
   defer_loading : Bool?
-  max_content_tokens : @sdkjson.Presence[Int]
-  max_uses : @sdkjson.Presence[Int]
+  max_content_tokens : @sdkjson.Presence[Int32]
+  max_uses : @sdkjson.Presence[Int32]
   strict : Bool?
   type_ : String
   url_sources : @sdkjson.Presence[WebFetchUrlSources]
@@ -18251,8 +18251,8 @@ pub fn WebFetchTool20260209::new(
   cache_control? : WebFetchTool20260209CacheControl,
   citations? : RequestCitationsConfig,
   defer_loading? : Bool,
-  max_content_tokens? : Int,
-  max_uses? : Int,
+  max_content_tokens? : Int32,
+  max_uses? : Int32,
   strict? : Bool,
   url_sources? : WebFetchUrlSources,
 ) -> WebFetchTool20260209 {
@@ -18372,8 +18372,8 @@ pub(all) struct WebFetchTool20260309 {
   cache_control : @sdkjson.Presence[WebFetchTool20260309CacheControl]
   citations : @sdkjson.Presence[RequestCitationsConfig]
   defer_loading : Bool?
-  max_content_tokens : @sdkjson.Presence[Int]
-  max_uses : @sdkjson.Presence[Int]
+  max_content_tokens : @sdkjson.Presence[Int32]
+  max_uses : @sdkjson.Presence[Int32]
   strict : Bool?
   type_ : String
   url_sources : @sdkjson.Presence[WebFetchUrlSources]
@@ -18397,8 +18397,8 @@ pub fn WebFetchTool20260309::new(
   cache_control? : WebFetchTool20260309CacheControl,
   citations? : RequestCitationsConfig,
   defer_loading? : Bool,
-  max_content_tokens? : Int,
-  max_uses? : Int,
+  max_content_tokens? : Int32,
+  max_uses? : Int32,
   strict? : Bool,
   url_sources? : WebFetchUrlSources,
   use_cache? : Bool,
@@ -18577,7 +18577,7 @@ pub(all) struct WebSearchTool20260318 {
   blocked_domains : @sdkjson.Presence[Array[String]]
   cache_control : @sdkjson.Presence[WebSearchTool20260318CacheControl]
   defer_loading : Bool?
-  max_uses : @sdkjson.Presence[Int]
+  max_uses : @sdkjson.Presence[Int32]
   response_inclusion : WebSearchTool20260318ResponseInclusion?
   strict : Bool?
   type_ : String
@@ -18600,7 +18600,7 @@ pub fn WebSearchTool20260318::new(
   blocked_domains? : Array[String],
   cache_control? : WebSearchTool20260318CacheControl,
   defer_loading? : Bool,
-  max_uses? : Int,
+  max_uses? : Int32,
   response_inclusion? : WebSearchTool20260318ResponseInclusion,
   strict? : Bool,
   user_location? : UserLocation,
@@ -18774,8 +18774,8 @@ pub(all) struct WebFetchTool20260318 {
   cache_control : @sdkjson.Presence[WebFetchTool20260318CacheControl]
   citations : @sdkjson.Presence[RequestCitationsConfig]
   defer_loading : Bool?
-  max_content_tokens : @sdkjson.Presence[Int]
-  max_uses : @sdkjson.Presence[Int]
+  max_content_tokens : @sdkjson.Presence[Int32]
+  max_uses : @sdkjson.Presence[Int32]
   response_inclusion : WebFetchTool20260318ResponseInclusion?
   strict : Bool?
   type_ : String
@@ -18800,8 +18800,8 @@ pub fn WebFetchTool20260318::new(
   cache_control? : WebFetchTool20260318CacheControl,
   citations? : RequestCitationsConfig,
   defer_loading? : Bool,
-  max_content_tokens? : Int,
-  max_uses? : Int,
+  max_content_tokens? : Int32,
+  max_uses? : Int32,
   response_inclusion? : WebFetchTool20260318ResponseInclusion,
   strict? : Bool,
   url_sources? : WebFetchUrlSources,
@@ -19439,7 +19439,7 @@ pub impl @json.FromJson for CountMessageTokensParams with fn from_json(
 ///
 /// Generated representation of CountMessageTokensResponse.
 pub(all) struct CountMessageTokensResponse {
-  input_tokens : Int
+  input_tokens : Int32
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -19452,7 +19452,7 @@ pub extend CountMessageTokensResponse with @debug.Debug::{to_repr}
 ///
 /// Creates a CountMessageTokensResponse with omitted optional fields absent.
 pub fn CountMessageTokensResponse::new(
-  input_tokens~ : Int,
+  input_tokens~ : Int32,
 ) -> CountMessageTokensResponse {
   { input_tokens, }
 }
@@ -19902,7 +19902,7 @@ pub(all) struct CreateMessageParams {
   container : @sdkjson.Presence[CreateMessageParamsContainer]
   diagnostics : @sdkjson.Presence[DiagnosticsParam]
   inference_geo : @sdkjson.Presence[String]
-  max_tokens : Int
+  max_tokens : Int32
   metadata : Metadata?
   output_config : OutputConfig?
   service_tier : CreateMessageParamsServiceTier?
@@ -19913,7 +19913,7 @@ pub(all) struct CreateMessageParams {
   thinking : ThinkingConfigParam?
   tool_choice : ToolChoice?
   tools : Array[CreateMessageParamsToolsItem]?
-  top_k : Int?
+  top_k : Int32?
   top_p : Double?
 } derive(Eq, @debug.Debug)
 
@@ -19929,7 +19929,7 @@ pub extend CreateMessageParams with @debug.Debug::{to_repr}
 pub fn CreateMessageParams::new(
   model~ : String,
   messages~ : Array[InputMessage],
-  max_tokens~ : Int,
+  max_tokens~ : Int32,
   cache_control? : CreateMessageParamsCacheControl,
   container? : CreateMessageParamsContainer,
   diagnostics? : DiagnosticsParam,
@@ -19944,7 +19944,7 @@ pub fn CreateMessageParams::new(
   thinking? : ThinkingConfigParam,
   tool_choice? : ToolChoice,
   tools? : Array[CreateMessageParamsToolsItem],
-  top_k? : Int,
+  top_k? : Int32,
   top_p? : Double,
 ) -> CreateMessageParams {
   {
@@ -20988,8 +20988,8 @@ pub(all) struct ModelInfo {
   id : String
   lifecycle : ModelInfoLifecycle
   line : ModelLine?
-  max_input_tokens : Int?
-  max_tokens : Int?
+  max_input_tokens : Int32?
+  max_tokens : Int32?
   retires_at : String?
 } derive(Eq, @debug.Debug)
 
@@ -21010,8 +21010,8 @@ pub fn ModelInfo::new(
   capabilities? : ModelCapabilities,
   deprecated_at? : String,
   line? : ModelLine,
-  max_input_tokens? : Int,
-  max_tokens? : Int,
+  max_input_tokens? : Int32,
+  max_tokens? : Int32,
   retires_at? : String,
 ) -> ModelInfo {
   {
@@ -21413,7 +21413,7 @@ pub impl @json.FromJson for RefusalStopDetails with fn from_json(value, path) {
 ///
 /// Generated representation of OutputTokensDetails.
 pub(all) struct OutputTokensDetails {
-  thinking_tokens : Int
+  thinking_tokens : Int32
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -21425,7 +21425,9 @@ pub extend OutputTokensDetails with @debug.Debug::{to_repr}
 ///|
 ///
 /// Creates a OutputTokensDetails with omitted optional fields absent.
-pub fn OutputTokensDetails::new(thinking_tokens~ : Int) -> OutputTokensDetails {
+pub fn OutputTokensDetails::new(
+  thinking_tokens~ : Int32,
+) -> OutputTokensDetails {
   { thinking_tokens, }
 }
 
@@ -21456,8 +21458,8 @@ pub impl @json.FromJson for OutputTokensDetails with fn from_json(value, path) {
 ///
 /// Generated representation of ServerToolUsage.
 pub(all) struct ServerToolUsage {
-  web_fetch_requests : Int
-  web_search_requests : Int
+  web_fetch_requests : Int32
+  web_search_requests : Int32
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -21470,8 +21472,8 @@ pub extend ServerToolUsage with @debug.Debug::{to_repr}
 ///
 /// Creates a ServerToolUsage with omitted optional fields absent.
 pub fn ServerToolUsage::new(
-  web_fetch_requests~ : Int,
-  web_search_requests~ : Int,
+  web_fetch_requests~ : Int32,
+  web_search_requests~ : Int32,
 ) -> ServerToolUsage {
   { web_fetch_requests, web_search_requests, }
 }
@@ -21562,11 +21564,11 @@ pub impl @json.FromJson for UsageServiceTier with fn from_json(value, path) {
 /// Generated representation of Usage.
 pub(all) struct Usage {
   cache_creation : @sdkjson.Presence[CacheCreation]
-  cache_creation_input_tokens : @sdkjson.Presence[Int]
-  cache_read_input_tokens : @sdkjson.Presence[Int]
+  cache_creation_input_tokens : @sdkjson.Presence[Int32]
+  cache_read_input_tokens : @sdkjson.Presence[Int32]
   inference_geo : @sdkjson.Presence[String]
-  input_tokens : Int
-  output_tokens : Int
+  input_tokens : Int32
+  output_tokens : Int32
   output_tokens_details : @sdkjson.Presence[OutputTokensDetails]
   server_tool_use : @sdkjson.Presence[ServerToolUsage]
   service_tier : @sdkjson.Presence[UsageServiceTier]
@@ -21582,11 +21584,11 @@ pub extend Usage with @debug.Debug::{to_repr}
 ///
 /// Creates a Usage with omitted optional fields absent.
 pub fn Usage::new(
-  input_tokens~ : Int,
-  output_tokens~ : Int,
+  input_tokens~ : Int32,
+  output_tokens~ : Int32,
   cache_creation? : CacheCreation,
-  cache_creation_input_tokens? : Int,
-  cache_read_input_tokens? : Int,
+  cache_creation_input_tokens? : Int32,
+  cache_read_input_tokens? : Int32,
   inference_geo? : String,
   output_tokens_details? : OutputTokensDetails,
   server_tool_use? : ServerToolUsage,
@@ -21821,10 +21823,10 @@ pub impl @json.FromJson for MessageDelta with fn from_json(value, path) {
 ///
 /// Generated representation of MessageDeltaUsage.
 pub(all) struct MessageDeltaUsage {
-  cache_creation_input_tokens : @sdkjson.Presence[Int]
-  cache_read_input_tokens : @sdkjson.Presence[Int]
-  input_tokens : @sdkjson.Presence[Int]
-  output_tokens : Int
+  cache_creation_input_tokens : @sdkjson.Presence[Int32]
+  cache_read_input_tokens : @sdkjson.Presence[Int32]
+  input_tokens : @sdkjson.Presence[Int32]
+  output_tokens : Int32
   output_tokens_details : @sdkjson.Presence[OutputTokensDetails]
   server_tool_use : @sdkjson.Presence[ServerToolUsage]
 } derive(Eq, @debug.Debug)
@@ -21839,10 +21841,10 @@ pub extend MessageDeltaUsage with @debug.Debug::{to_repr}
 ///
 /// Creates a MessageDeltaUsage with omitted optional fields absent.
 pub fn MessageDeltaUsage::new(
-  output_tokens~ : Int,
-  cache_creation_input_tokens? : Int,
-  cache_read_input_tokens? : Int,
-  input_tokens? : Int,
+  output_tokens~ : Int32,
+  cache_creation_input_tokens? : Int32,
+  cache_read_input_tokens? : Int32,
+  input_tokens? : Int32,
   output_tokens_details? : OutputTokensDetails,
   server_tool_use? : ServerToolUsage,
 ) -> MessageDeltaUsage {

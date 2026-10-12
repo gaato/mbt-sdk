@@ -303,7 +303,7 @@ class IRTests(unittest.TestCase):
         first = emit(IRBuilder(document(operation(request=schema)), "example/gen").build())
         second = emit(IRBuilder(document(operation(request=schema)), "example/gen").build())
         self.assertEqual(first, second)
-        self.assertLess(first["types.mbt"].index("z : Int"), first["types.mbt"].index("a : String"))
+        self.assertLess(first["types.mbt"].index("z : Int32"), first["types.mbt"].index("a : String"))
 
     def test_struct_constructors_require_values_and_default_optional_fields(self):
         schema = {
@@ -677,7 +677,7 @@ class IRTests(unittest.TestCase):
         schemas = {"Value": {"type": "string"}}
         ir = IRBuilder(document(operation(response=schema), schemas), "example/gen").build()
         fields = declaration(ir, "TestOperationResponse").fields
-        self.assertEqual([field.type.moon_type() for field in fields], ["String", "String", "Int"])
+        self.assertEqual([field.type.moon_type() for field in fields], ["String", "String", "Int32"])
         self.assertEqual(
             [field.presence for field in fields],
             [Presence.NULLABLE_REQUIRED, Presence.NULLABLE_REQUIRED, Presence.PRESENCE],
@@ -698,7 +698,7 @@ class IRTests(unittest.TestCase):
         self.assertEqual(ir.operations[0].response_type.moon_type(), "String")
         same = {"allOf": [{"type": "integer", "minimum": 0}, {"type": "integer", "maximum": 10}]}
         ir = IRBuilder(document(operation(response=same)), "example/gen").build()
-        self.assertEqual(ir.operations[0].response_type.moon_type(), "Int")
+        self.assertEqual(ir.operations[0].response_type.moon_type(), "Int32")
         different = {"allOf": [{"type": "integer"}, {"type": "string"}]}
         with self.assertRaises(GenerationError) as caught:
             IRBuilder(document(operation(response=different)), "example/gen").build()
@@ -713,13 +713,13 @@ class IRTests(unittest.TestCase):
         }
         builder = IRBuilder(document(operation(response=schema)), "example/gen")
         ir = builder.build()
-        self.assertEqual(declaration(ir, "TestOperationResponse").fields[0].type.moon_type(), "Int")
+        self.assertEqual(declaration(ir, "TestOperationResponse").fields[0].type.moon_type(), "Int32")
         self.assertTrue(any("later definition" in note.message for note in builder.notes))
 
     def test_integer_enum_stays_int(self):
         schema = {"type": "integer", "enum": [1, 2, 3]}
         ir = IRBuilder(document(operation(request=schema)), "example/gen").build()
-        self.assertEqual(ir.operations[0].request_type.moon_type(), "Int")
+        self.assertEqual(ir.operations[0].request_type.moon_type(), "Int32")
 
     def test_recursive_refs_allow_array_or_nullable_but_not_direct_required(self):
         safe_schemas = {
@@ -773,7 +773,7 @@ class IRTests(unittest.TestCase):
         source = emit(ir)["operations.mbt"]
         self.assertIn("q : String", source)
         self.assertIn("tag : Array[String]", source)
-        self.assertIn("limit? : Int", source)
+        self.assertIn("limit? : Int32", source)
         self.assertIn("mode? : TestOperationMode", source)
         self.assertIn('append_query(url, "tag", parameter_value(value))', source)
         self.assertIn('url + separator + percent_encode(name) + "=" + percent_encode(value)', source)
@@ -810,7 +810,7 @@ class IRTests(unittest.TestCase):
             {"name": "X-Probe", "in": "header", "schema": {"type": "boolean"}},
         ]
         source = emit(IRBuilder(document(operation(parameters=parameters)), "example/gen").build())["operations.mbt"]
-        self.assertIn("x_count : Int", source)
+        self.assertIn("x_count : Int32", source)
         self.assertIn("x_probe? : Bool", source)
         self.assertIn('request.header("X-Count", parameter_value(x_count))', source)
         self.assertIn('request.header("X-Probe", parameter_value(value))', source)
@@ -828,7 +828,7 @@ class IRTests(unittest.TestCase):
         self.assertNotIn("$ref", parameter)
         self.assertEqual(parameter["name"], "limit")
         ir = IRBuilder(normalized, "example/gen").build()
-        self.assertEqual(ir.operations[0].parameters[0].type.moon_type(), "Int")
+        self.assertEqual(ir.operations[0].parameters[0].type.moon_type(), "Int32")
 
     def test_request_only_operation_omits_decode(self):
         responses = {"default": {"content": {"application/json": {"schema": {"type": "object"}}}}}
@@ -842,11 +842,11 @@ class IRTests(unittest.TestCase):
         schema = {"type": "object", "additionalProperties": {"type": "integer"}}
         ir = IRBuilder(document(operation(request=schema, response=schema)), "example/gen").build()
         operation_ir = ir.operations[0]
-        self.assertEqual(operation_ir.request_type.moon_type(), "Map[String, Int]")
-        self.assertEqual(operation_ir.response_type.moon_type(), "Map[String, Int]")
+        self.assertEqual(operation_ir.request_type.moon_type(), "Map[String, Int32]")
+        self.assertEqual(operation_ir.response_type.moon_type(), "Map[String, Int32]")
         source = emit(ir)["operations.mbt"]
-        self.assertIn("body : Map[String, Int]", source)
-        self.assertIn("-> Map[String, Int] raise @runtime.SdkError", source)
+        self.assertIn("body : Map[String, Int32]", source)
+        self.assertIn("-> Map[String, Int32] raise @runtime.SdkError", source)
 
     def test_properties_and_typed_map_are_a_diagnostic(self):
         schema = {

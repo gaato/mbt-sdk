@@ -46,9 +46,9 @@ pub extend Model with @debug.Debug::{to_repr}
 ///|
 /// Token usage reported by a response.
 pub(all) struct Usage {
-  input_tokens : Int
-  output_tokens : Int
-  total_tokens : Int
+  input_tokens : Int32
+  output_tokens : Int32
+  total_tokens : Int32
 } derive(Eq, Debug)
 
 ///|
@@ -247,7 +247,7 @@ pub fn ChatMessage::assistant_tool_calls(
 pub(all) struct ChatRequest {
   model : String
   messages : Array[ChatMessage]
-  max_tokens : Int?
+  max_tokens : Int32?
   temperature : Double?
   /// Wire value of `reasoning_effort` (`low`, `high`, `xhigh`, ...). Passed
   /// through as an open enum, so values newer than the vendored spec work.
@@ -279,7 +279,7 @@ pub extend ChatRequest with @debug.Debug::{to_repr}
 pub fn ChatRequest::new(
   model~ : String,
   messages~ : Array[ChatMessage],
-  max_tokens? : Int,
+  max_tokens? : Int32,
   temperature? : Double,
   reasoning_effort? : String,
   tools? : Array[ToolDef],
@@ -347,7 +347,7 @@ pub(all) enum ChatEvent {
   Delta(String)
   ReasoningDelta(String)
   ToolCallDelta(
-    index~ : Int,
+    index~ : Int32,
     id~ : String?,
     name~ : String?,
     arguments~ : String
@@ -389,7 +389,7 @@ pub fn ToolCallAccumulator::new() -> ToolCallAccumulator {
 /// Adds one tool-call delta. The first supplied id and name for an index win.
 pub fn ToolCallAccumulator::feed(
   self : ToolCallAccumulator,
-  index~ : Int,
+  index~ : Int32,
   id? : String,
   name? : String,
   arguments~ : String,
@@ -429,7 +429,7 @@ pub fn ToolCallAccumulator::finish(
 
 ///|
 priv struct PendingToolCall {
-  index : Int
+  index : Int32
   mut id : String?
   mut name : String?
   arguments : StringBuilder
@@ -440,7 +440,7 @@ priv struct PendingToolCall {
 pub(all) struct EmbeddingRequest {
   model : String
   input : Array[String]
-  dimensions : Int?
+  dimensions : Int32?
   user : String?
 } derive(Eq, Debug)
 
@@ -466,7 +466,7 @@ pub extend EmbeddingRequest with @debug.Debug::{to_repr}
 pub fn EmbeddingRequest::new(
   model~ : String,
   input~ : Array[String],
-  dimensions? : Int,
+  dimensions? : Int32,
   user? : String,
 ) -> EmbeddingRequest {
   { model, input: input.copy(), dimensions, user, }
@@ -475,7 +475,7 @@ pub fn EmbeddingRequest::new(
 ///|
 /// One embedding vector and its position in the result list.
 pub(all) struct Embedding {
-  index : Int
+  index : Int32
   embedding : Array[Double]
 } derive(Eq, Debug)
 
@@ -492,8 +492,8 @@ pub extend Embedding with @debug.Debug::{to_repr}
 pub(all) struct EmbeddingResponse {
   data : Array[Embedding]
   model : String
-  prompt_tokens : Int
-  total_tokens : Int
+  prompt_tokens : Int32
+  total_tokens : Int32
 } derive(Eq, Debug)
 
 ///|
@@ -530,7 +530,7 @@ pub(all) struct ResponseRequest {
   model : String
   input : String
   instructions : String?
-  max_output_tokens : Int?
+  max_output_tokens : Int32?
   temperature : Double?
   previous_response_id : String?
   tools : Array[ToolDef]?
@@ -560,7 +560,7 @@ pub fn ResponseRequest::new(
   model~ : String,
   input~ : String,
   instructions? : String,
-  max_output_tokens? : Int,
+  max_output_tokens? : Int32,
   temperature? : Double,
   previous_response_id? : String,
   tools? : Array[ToolDef],

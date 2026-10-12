@@ -7,8 +7,8 @@
 /// `Link` page be followed, a limiter wait, or a retry sleep. Those are here.
 fn json_response(
   body : String,
-  status? : Int = 200,
-  headers? : @http.Headers = @http.Headers::new(),
+  status~ : Int32 = 200,
+  headers~ : @http.Headers = @http.Headers::new(),
 ) -> @http.Response {
   { status, headers, body: @utf8.encode(body), }
 }
@@ -32,7 +32,7 @@ fn link_header(pairs : Array[(String, String)]) -> String {
 ///|
 /// One `issues/list-for-repo` element, carrying every field the generated
 /// `Issue` decoder requires.
-fn issue_fixture(number : Int, title : String) -> String {
+fn issue_fixture(number : Int32, title : String) -> String {
   let base = "https://api.github.com/repos/gaato/mbt-sdk/issues/" +
     number.to_string()
   "{\"id\":" +
@@ -60,7 +60,7 @@ fn issue_fixture(number : Int, title : String) -> String {
 }
 
 ///|
-fn issue_page(numbers : Array[Int]) -> String {
+fn issue_page(numbers : Array[Int32]) -> String {
   "[" +
   numbers
   .map(number => issue_fixture(number, "issue " + number.to_string()))
@@ -91,8 +91,8 @@ fn sent_text(request : @http.Request) -> String {
 ///|
 /// The headers a rate-limited GitHub response carries.
 fn rate_limit_headers(
-  remaining : Int,
-  reset_unix_seconds : Int,
+  remaining : Int32,
+  reset_unix_seconds : Int32,
 ) -> @http.Headers {
   @http.Headers::from_array([
     ("x-ratelimit-limit", "5000"),
@@ -259,7 +259,7 @@ async test "a request header overrides the client default on the wire" {
 ///|
 /// The absolute next/last targets GitHub writes, which are not rebuilt from the
 /// first request: the repository is addressed by id rather than by name.
-fn page_url(page : Int) -> String {
+fn page_url(page : Int32) -> String {
   "https://api.github.com/repositories/1300192/issues?per_page=2&page=" +
   page.to_string()
 }
@@ -316,7 +316,7 @@ async test "Link pagination follows the absolute next URL to the last page" {
       @mock.FakeClock::new(),
       token="ghp_test",
     )
-    let numbers : Array[Int] = []
+    let numbers : Array[Int32] = []
     gh
     .paginator(
       @gen.issues_list_for_repo_request("gaato", "mbt-sdk", per_page=2),
@@ -986,7 +986,7 @@ async test "an enterprise server reaches graphql outside the rest mount" {
 async test "a graphql paginator threads endCursor through the variables" {
   bounded(() => {
     let transport = @mock.FakeTransport::new()
-    let page = (number : Int, cursor : String?) => {
+    let page = (number : Int32, cursor : String?) => {
       let nodes = "[{\"number\":" + number.to_string() + "}]"
       let next = match cursor {
         Some(cursor) =>

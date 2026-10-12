@@ -13,7 +13,7 @@
 /// }
 /// ```
 pub(all) struct Response {
-  status : Int
+  status : Int32
   headers : Headers
   body : Bytes
 } derive(Eq, Debug)
@@ -47,7 +47,7 @@ pub fn Response::is_success(self : Response) -> Bool {
 ///|
 /// Status and headers available before consuming a streamed body.
 pub(all) struct ResponseHead {
-  status : Int
+  status : Int32
   headers : Headers
 } derive(Eq, Debug)
 

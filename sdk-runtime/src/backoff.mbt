@@ -1,8 +1,8 @@
 ///|
 /// Parameters for pure exponential backoff with symmetric jitter.
 pub(all) struct Backoff {
-  base_ms : Int
-  max_ms : Int
+  base_ms : Int32
+  max_ms : Int32
   factor : Double
   jitter : Double
 } derive(Eq, Debug)
@@ -30,7 +30,11 @@ pub fn Backoff::default() -> Backoff {
 ///   assert_eq(@runtime.Backoff::default().delay_ms(2, 0.5), 2000)
 /// }
 /// ```
-pub fn Backoff::delay_ms(self : Backoff, attempt : Int, random : Double) -> Int {
+pub fn Backoff::delay_ms(
+  self : Backoff,
+  attempt : Int32,
+  random : Double,
+) -> Int32 {
   let cap = self.max_ms.max(0).to_double()
   let base = self.base_ms.max(0).to_double()
   if base == 0.0 || cap == 0.0 {

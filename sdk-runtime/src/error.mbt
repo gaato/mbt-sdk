@@ -2,8 +2,8 @@
 /// Failures distinguished by transport, HTTP status, decoding, or configuration.
 pub(all) suberror SdkError {
   Transport(@http.HttpError)
-  Status(status~ : Int, headers~ : @http.Headers, body~ : Bytes)
-  RateLimited(retry_after_ms~ : Int?, headers~ : @http.Headers, body~ : Bytes)
+  Status(status~ : Int32, headers~ : @http.Headers, body~ : Bytes)
+  RateLimited(retry_after_ms~ : Int32?, headers~ : @http.Headers, body~ : Bytes)
   Decode(message~ : String, body~ : Bytes)
   Config(String)
 } derive(Debug)
@@ -51,7 +51,7 @@ pub fn classify(
 
 ///|
 /// Returns an HTTP status only for failures with an HTTP status.
-pub fn SdkError::status(self : SdkError) -> Int? {
+pub fn SdkError::status(self : SdkError) -> Int32? {
   match self {
     Status(status~, ..) => Some(status)
     RateLimited(..) => Some(429)

@@ -907,7 +907,7 @@ fn github_failure(
 async fn[X] one_github_call(
   operation : String,
   call : async () -> X,
-  hint? : String = "",
+  hint~ : String = "",
 ) -> X {
   call() catch {
     @runtime.Transport(inner) =>

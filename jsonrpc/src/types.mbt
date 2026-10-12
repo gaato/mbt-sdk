@@ -76,7 +76,7 @@ pub impl @json.FromJson for RequestId with fn from_json(value, path) {
 /// }
 /// ```
 pub(all) struct RpcError {
-  code : Int
+  code : Int32
   message : String
   data : Json?
 } derive(Eq, Debug)
@@ -91,20 +91,24 @@ pub extend RpcError with @debug.Debug::{to_repr}
 
 ///|
 /// Creates an RPC error with an optional data value.
-pub fn RpcError::new(code~ : Int, message~ : String, data? : Json) -> RpcError {
+pub fn RpcError::new(
+  code~ : Int32,
+  message~ : String,
+  data? : Json,
+) -> RpcError {
   { code, message, data, }
 }
 
 ///|
 /// Creates the reserved parse error.
-pub fn RpcError::parse_error(message? : String = "Parse error") -> RpcError {
+pub fn RpcError::parse_error(message~ : String = "Parse error") -> RpcError {
   RpcError::new(code=-32700, message~)
 }
 
 ///|
 /// Creates the reserved invalid request error.
 pub fn RpcError::invalid_request(
-  message? : String = "Invalid Request",
+  message~ : String = "Invalid Request",
 ) -> RpcError {
   RpcError::new(code=-32600, message~)
 }
@@ -122,7 +126,7 @@ pub fn RpcError::method_not_found(method_name : String) -> RpcError {
 ///|
 /// Creates the reserved invalid params error.
 pub fn RpcError::invalid_params(
-  message? : String = "Invalid params",
+  message~ : String = "Invalid params",
 ) -> RpcError {
   RpcError::new(code=-32602, message~)
 }
@@ -130,7 +134,7 @@ pub fn RpcError::invalid_params(
 ///|
 /// Creates the reserved internal error.
 pub fn RpcError::internal_error(
-  message? : String = "Internal error",
+  message~ : String = "Internal error",
 ) -> RpcError {
   RpcError::new(code=-32603, message~)
 }
@@ -226,7 +230,7 @@ pub extend Envelope with @debug.Debug::{to_repr}
 pub(all) suberror DecodeError {
   InvalidJson(String)
   InvalidMessage(String)
-  LineTooLong(Int)
+  LineTooLong(Int32)
 } derive(Eq, Debug)
 
 ///|

@@ -1,9 +1,9 @@
 ///|
 fn event(
   data : String,
-  kind? : String = "message",
+  kind~ : String = "message",
   id? : String,
-  retry? : Int,
+  retry? : Int32,
 ) -> @sse.SseEvent {
   { event: kind, data, id, retry, }
 }

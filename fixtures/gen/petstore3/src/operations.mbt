@@ -286,7 +286,7 @@ pub fn get_inventory_request() -> @http.Request {
 /// Decodes a parsed successful getInventory response.
 pub fn get_inventory_decode_json(
   value : Json,
-) -> Map[String, Int] raise @json.JsonDecodeError {
+) -> Map[String, Int32] raise @json.JsonDecodeError {
   @json.from_json(value)
 }
 
@@ -295,7 +295,7 @@ pub fn get_inventory_decode_json(
 /// Decodes a successful getInventory response.
 pub fn get_inventory_decode(
   response : @http.Response,
-) -> Map[String, Int] raise @runtime.SdkError {
+) -> Map[String, Int32] raise @runtime.SdkError {
   decode_response(response)
 }
 

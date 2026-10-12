@@ -481,7 +481,7 @@ pub impl @json.FromJson for ChatCompletionMessageToolCallChunkFunction with fn f
 ///
 /// Generated representation of ChatCompletionMessageToolCallChunk.
 pub(all) struct ChatCompletionMessageToolCallChunk {
-  index : Int
+  index : Int32
   id : String?
   function : ChatCompletionMessageToolCallChunkFunction?
 } derive(Eq, @debug.Debug)
@@ -496,7 +496,7 @@ pub extend ChatCompletionMessageToolCallChunk with @debug.Debug::{to_repr}
 ///
 /// Creates a ChatCompletionMessageToolCallChunk with omitted optional fields absent.
 pub fn ChatCompletionMessageToolCallChunk::new(
-  index~ : Int,
+  index~ : Int32,
   id? : String,
   function? : ChatCompletionMessageToolCallChunkFunction,
 ) -> ChatCompletionMessageToolCallChunk {
@@ -2389,8 +2389,8 @@ pub impl @json.FromJson for ChatCompletionRequestMessage with fn from_json(
 ///
 /// A URL citation when using web search.
 pub(all) struct ChatCompletionResponseMessageAnnotationsItemUrlCitation {
-  end_index : Int
-  start_index : Int
+  end_index : Int32
+  start_index : Int32
   url : String
   title : String
 } derive(Eq, @debug.Debug)
@@ -2410,8 +2410,8 @@ pub extend ChatCompletionResponseMessageAnnotationsItemUrlCitation with @debug.D
 ///
 /// Creates a ChatCompletionResponseMessageAnnotationsItemUrlCitation with omitted optional fields absent.
 pub fn ChatCompletionResponseMessageAnnotationsItemUrlCitation::new(
-  end_index~ : Int,
-  start_index~ : Int,
+  end_index~ : Int32,
+  start_index~ : Int32,
   url~ : String,
   title~ : String,
 ) -> ChatCompletionResponseMessageAnnotationsItemUrlCitation {
@@ -2581,7 +2581,7 @@ pub impl @json.FromJson for ChatCompletionResponseMessageFunctionCall with fn fr
 /// If the audio output modality is requested, this object contains data about the audio response from the model. [Learn more](/docs/guides/audio).
 pub(all) struct ChatCompletionResponseMessageAudio {
   id : String
-  expires_at : Int
+  expires_at : Int32
   data : String
   transcript : String
 } derive(Eq, @debug.Debug)
@@ -2597,7 +2597,7 @@ pub extend ChatCompletionResponseMessageAudio with @debug.Debug::{to_repr}
 /// Creates a ChatCompletionResponseMessageAudio with omitted optional fields absent.
 pub fn ChatCompletionResponseMessageAudio::new(
   id~ : String,
-  expires_at~ : Int,
+  expires_at~ : Int32,
   data~ : String,
   transcript~ : String,
 ) -> ChatCompletionResponseMessageAudio {
@@ -2968,7 +2968,7 @@ pub impl @json.FromJson for ChatCompletionStreamResponseDelta with fn from_json(
 pub(all) struct ChatCompletionTokenLogprobTopLogprobsItem {
   token : String
   logprob : Double
-  bytes : Array[Int]?
+  bytes : Array[Int32]?
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -2985,7 +2985,7 @@ pub extend ChatCompletionTokenLogprobTopLogprobsItem with @debug.Debug::{
 pub fn ChatCompletionTokenLogprobTopLogprobsItem::new(
   token~ : String,
   logprob~ : Double,
-  bytes? : Array[Int],
+  bytes? : Array[Int32],
 ) -> ChatCompletionTokenLogprobTopLogprobsItem {
   { token, logprob, bytes, }
 }
@@ -3032,7 +3032,7 @@ pub impl @json.FromJson for ChatCompletionTokenLogprobTopLogprobsItem with fn fr
 pub(all) struct ChatCompletionTokenLogprob {
   token : String
   logprob : Double
-  bytes : Array[Int]?
+  bytes : Array[Int32]?
   top_logprobs : Array[ChatCompletionTokenLogprobTopLogprobsItem]
 } derive(Eq, @debug.Debug)
 
@@ -3049,7 +3049,7 @@ pub fn ChatCompletionTokenLogprob::new(
   token~ : String,
   logprob~ : Double,
   top_logprobs~ : Array[ChatCompletionTokenLogprobTopLogprobsItem],
-  bytes? : Array[Int],
+  bytes? : Array[Int32],
 ) -> ChatCompletionTokenLogprob {
   { token, logprob, bytes, top_logprobs, }
 }
@@ -3376,8 +3376,8 @@ pub impl @json.FromJson for ClickButton with fn from_json(value, path) {
 pub(all) struct Click {
   type_ : String
   button : ClickButton
-  x : Int
-  y : Int
+  x : Int32
+  y : Int32
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -3392,8 +3392,8 @@ pub extend Click with @debug.Debug::{to_repr}
 pub fn Click::new(
   type_~ : String,
   button~ : ClickButton,
-  x~ : Int,
-  y~ : Int,
+  x~ : Int32,
+  y~ : Int32,
 ) -> Click {
   { type_, button, x, y, }
 }
@@ -3763,10 +3763,10 @@ pub impl @json.FromJson for CodeInterpreterToolCall with fn from_json(
 ///
 /// Breakdown of tokens used in a completion.
 pub(all) struct CompletionUsageCompletionTokensDetails {
-  accepted_prediction_tokens : Int?
-  audio_tokens : Int?
-  reasoning_tokens : Int?
-  rejected_prediction_tokens : Int?
+  accepted_prediction_tokens : Int32?
+  audio_tokens : Int32?
+  reasoning_tokens : Int32?
+  rejected_prediction_tokens : Int32?
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -3779,10 +3779,10 @@ pub extend CompletionUsageCompletionTokensDetails with @debug.Debug::{to_repr}
 ///
 /// Creates a CompletionUsageCompletionTokensDetails with omitted optional fields absent.
 pub fn CompletionUsageCompletionTokensDetails::new(
-  accepted_prediction_tokens? : Int,
-  audio_tokens? : Int,
-  reasoning_tokens? : Int,
-  rejected_prediction_tokens? : Int,
+  accepted_prediction_tokens? : Int32,
+  audio_tokens? : Int32,
+  reasoning_tokens? : Int32,
+  rejected_prediction_tokens? : Int32,
 ) -> CompletionUsageCompletionTokensDetails {
   {
     accepted_prediction_tokens,
@@ -3836,8 +3836,8 @@ pub impl @json.FromJson for CompletionUsageCompletionTokensDetails with fn from_
 ///
 /// Breakdown of tokens used in the prompt.
 pub(all) struct CompletionUsagePromptTokensDetails {
-  audio_tokens : Int?
-  cached_tokens : Int?
+  audio_tokens : Int32?
+  cached_tokens : Int32?
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -3850,8 +3850,8 @@ pub extend CompletionUsagePromptTokensDetails with @debug.Debug::{to_repr}
 ///
 /// Creates a CompletionUsagePromptTokensDetails with omitted optional fields absent.
 pub fn CompletionUsagePromptTokensDetails::new(
-  audio_tokens? : Int,
-  cached_tokens? : Int,
+  audio_tokens? : Int32,
+  cached_tokens? : Int32,
 ) -> CompletionUsagePromptTokensDetails {
   { audio_tokens, cached_tokens, }
 }
@@ -3890,9 +3890,9 @@ pub impl @json.FromJson for CompletionUsagePromptTokensDetails with fn from_json
 ///
 /// Usage statistics for the completion request.
 pub(all) struct CompletionUsage {
-  completion_tokens : Int
-  prompt_tokens : Int
-  total_tokens : Int
+  completion_tokens : Int32
+  prompt_tokens : Int32
+  total_tokens : Int32
   completion_tokens_details : CompletionUsageCompletionTokensDetails?
   prompt_tokens_details : CompletionUsagePromptTokensDetails?
 } derive(Eq, @debug.Debug)
@@ -3907,9 +3907,9 @@ pub extend CompletionUsage with @debug.Debug::{to_repr}
 ///
 /// Creates a CompletionUsage with omitted optional fields absent.
 pub fn CompletionUsage::new(
-  completion_tokens~ : Int,
-  prompt_tokens~ : Int,
-  total_tokens~ : Int,
+  completion_tokens~ : Int32,
+  prompt_tokens~ : Int32,
+  total_tokens~ : Int32,
   completion_tokens_details? : CompletionUsageCompletionTokensDetails,
   prompt_tokens_details? : CompletionUsagePromptTokensDetails,
 ) -> CompletionUsage {
@@ -3964,8 +3964,8 @@ pub impl @json.FromJson for CompletionUsage with fn from_json(value, path) {
 /// A double click action.
 pub(all) struct DoubleClick {
   type_ : String
-  x : Int
-  y : Int
+  x : Int32
+  y : Int32
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -3977,7 +3977,7 @@ pub extend DoubleClick with @debug.Debug::{to_repr}
 ///|
 ///
 /// Creates a DoubleClick with omitted optional fields absent.
-pub fn DoubleClick::new(type_~ : String, x~ : Int, y~ : Int) -> DoubleClick {
+pub fn DoubleClick::new(type_~ : String, x~ : Int32, y~ : Int32) -> DoubleClick {
   { type_, x, y, }
 }
 
@@ -4014,8 +4014,8 @@ pub impl @json.FromJson for DoubleClick with fn from_json(value, path) {
 ///
 /// An x/y coordinate pair, e.g. `{ x: 100, y: 200 }`.
 pub(all) struct Coordinate {
-  x : Int
-  y : Int
+  x : Int32
+  y : Int32
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -4027,7 +4027,7 @@ pub extend Coordinate with @debug.Debug::{to_repr}
 ///|
 ///
 /// Creates a Coordinate with omitted optional fields absent.
-pub fn Coordinate::new(x~ : Int, y~ : Int) -> Coordinate {
+pub fn Coordinate::new(x~ : Int32, y~ : Int32) -> Coordinate {
   { x, y, }
 }
 
@@ -4153,8 +4153,8 @@ pub impl @json.FromJson for KeyPress with fn from_json(value, path) {
 /// A mouse move action.
 pub(all) struct Move {
   type_ : String
-  x : Int
-  y : Int
+  x : Int32
+  y : Int32
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -4166,7 +4166,7 @@ pub extend Move with @debug.Debug::{to_repr}
 ///|
 ///
 /// Creates a Move with omitted optional fields absent.
-pub fn Move::new(type_~ : String, x~ : Int, y~ : Int) -> Move {
+pub fn Move::new(type_~ : String, x~ : Int32, y~ : Int32) -> Move {
   { type_, x, y, }
 }
 
@@ -4245,10 +4245,10 @@ pub impl @json.FromJson for Screenshot with fn from_json(value, path) {
 /// A scroll action.
 pub(all) struct Scroll {
   type_ : String
-  x : Int
-  y : Int
-  scroll_x : Int
-  scroll_y : Int
+  x : Int32
+  y : Int32
+  scroll_x : Int32
+  scroll_y : Int32
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -4262,10 +4262,10 @@ pub extend Scroll with @debug.Debug::{to_repr}
 /// Creates a Scroll with omitted optional fields absent.
 pub fn Scroll::new(
   type_~ : String,
-  x~ : Int,
-  y~ : Int,
-  scroll_x~ : Int,
-  scroll_y~ : Int,
+  x~ : Int32,
+  y~ : Int32,
+  scroll_x~ : Int32,
+  scroll_y~ : Int32,
 ) -> Scroll {
   { type_, x, y, scroll_x, scroll_y, }
 }
@@ -5818,22 +5818,22 @@ pub(all) struct CreateChatCompletionRequest {
   model : String
   modalities : @sdkjson.Presence[Array[ResponseModalitiesItem]]
   reasoning_effort : @sdkjson.Presence[ReasoningEffort]
-  max_completion_tokens : @sdkjson.Presence[Int]
+  max_completion_tokens : @sdkjson.Presence[Int32]
   frequency_penalty : @sdkjson.Presence[Double]
   presence_penalty : @sdkjson.Presence[Double]
   web_search_options : CreateChatCompletionRequestWebSearchOptions?
-  top_logprobs : @sdkjson.Presence[Int]
+  top_logprobs : @sdkjson.Presence[Int32]
   response_format : CreateChatCompletionRequestResponseFormat?
   audio : @sdkjson.Presence[CreateChatCompletionRequestAudio]
   store : @sdkjson.Presence[Bool]
   stream : @sdkjson.Presence[Bool]
   stop : @sdkjson.Presence[StopConfiguration]
-  logit_bias : @sdkjson.Presence[Map[String, Int]]
+  logit_bias : @sdkjson.Presence[Map[String, Int32]]
   logprobs : @sdkjson.Presence[Bool]
-  max_tokens : @sdkjson.Presence[Int]
-  n : @sdkjson.Presence[Int]
+  max_tokens : @sdkjson.Presence[Int32]
+  n : @sdkjson.Presence[Int32]
   prediction : @sdkjson.Presence[CreateChatCompletionRequestPrediction]
-  seed : @sdkjson.Presence[Int]
+  seed : @sdkjson.Presence[Int32]
   stream_options : @sdkjson.Presence[ChatCompletionStreamOptions]
   tools : Array[ChatCompletionTool]?
   tool_choice : ChatCompletionToolChoiceOption?
@@ -5861,22 +5861,22 @@ pub fn CreateChatCompletionRequest::new(
   service_tier? : ServiceTier,
   modalities? : Array[ResponseModalitiesItem],
   reasoning_effort? : ReasoningEffort,
-  max_completion_tokens? : Int,
+  max_completion_tokens? : Int32,
   frequency_penalty? : Double,
   presence_penalty? : Double,
   web_search_options? : CreateChatCompletionRequestWebSearchOptions,
-  top_logprobs? : Int,
+  top_logprobs? : Int32,
   response_format? : CreateChatCompletionRequestResponseFormat,
   audio? : CreateChatCompletionRequestAudio,
   store? : Bool,
   stream? : Bool,
   stop? : StopConfiguration,
-  logit_bias? : Map[String, Int],
+  logit_bias? : Map[String, Int32],
   logprobs? : Bool,
-  max_tokens? : Int,
-  n? : Int,
+  max_tokens? : Int32,
+  n? : Int32,
   prediction? : CreateChatCompletionRequestPrediction,
-  seed? : Int,
+  seed? : Int32,
   stream_options? : ChatCompletionStreamOptions,
   tools? : Array[ChatCompletionTool],
   tool_choice? : ChatCompletionToolChoiceOption,
@@ -6153,7 +6153,7 @@ pub impl @json.FromJson for CreateChatCompletionResponseChoicesItemLogprobs with
 /// Generated representation of CreateChatCompletionResponseChoicesItem.
 pub(all) struct CreateChatCompletionResponseChoicesItem {
   finish_reason : CreateChatCompletionResponseChoicesItemFinishReason
-  index : Int
+  index : Int32
   message : ChatCompletionResponseMessage
   logprobs : @sdkjson.Presence[CreateChatCompletionResponseChoicesItemLogprobs]
 } derive(Eq, @debug.Debug)
@@ -6169,7 +6169,7 @@ pub extend CreateChatCompletionResponseChoicesItem with @debug.Debug::{to_repr}
 /// Creates a CreateChatCompletionResponseChoicesItem with omitted optional fields absent.
 pub fn CreateChatCompletionResponseChoicesItem::new(
   finish_reason~ : CreateChatCompletionResponseChoicesItemFinishReason,
-  index~ : Int,
+  index~ : Int32,
   message~ : ChatCompletionResponseMessage,
   logprobs? : CreateChatCompletionResponseChoicesItemLogprobs,
 ) -> CreateChatCompletionResponseChoicesItem {
@@ -6225,7 +6225,7 @@ pub impl @json.FromJson for CreateChatCompletionResponseChoicesItem with fn from
 pub(all) struct CreateChatCompletionResponse {
   id : String
   choices : Array[CreateChatCompletionResponseChoicesItem]
-  created : Int
+  created : Int32
   model : String
   service_tier : @sdkjson.Presence[ServiceTier]
   system_fingerprint : String?
@@ -6244,7 +6244,7 @@ pub extend CreateChatCompletionResponse with @debug.Debug::{to_repr}
 pub fn CreateChatCompletionResponse::new(
   id~ : String,
   choices~ : Array[CreateChatCompletionResponseChoicesItem],
-  created~ : Int,
+  created~ : Int32,
   model~ : String,
   service_tier? : ServiceTier,
   system_fingerprint? : String,
@@ -6450,7 +6450,7 @@ pub(all) struct CreateChatCompletionStreamResponseChoicesItem {
     CreateChatCompletionStreamResponseChoicesItemLogprobs,
   ]
   finish_reason : CreateChatCompletionStreamResponseChoicesItemFinishReason?
-  index : Int
+  index : Int32
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -6469,7 +6469,7 @@ pub extend CreateChatCompletionStreamResponseChoicesItem with @debug.Debug::{
 /// Creates a CreateChatCompletionStreamResponseChoicesItem with omitted optional fields absent.
 pub fn CreateChatCompletionStreamResponseChoicesItem::new(
   delta~ : ChatCompletionStreamResponseDelta,
-  index~ : Int,
+  index~ : Int32,
   logprobs? : CreateChatCompletionStreamResponseChoicesItemLogprobs,
   finish_reason? : CreateChatCompletionStreamResponseChoicesItemFinishReason,
 ) -> CreateChatCompletionStreamResponseChoicesItem {
@@ -6528,7 +6528,7 @@ pub impl @json.FromJson for CreateChatCompletionStreamResponseChoicesItem with f
 pub(all) struct CreateChatCompletionStreamResponse {
   id : String
   choices : Array[CreateChatCompletionStreamResponseChoicesItem]
-  created : Int
+  created : Int32
   model : String
   service_tier : @sdkjson.Presence[ServiceTier]
   system_fingerprint : String?
@@ -6547,7 +6547,7 @@ pub extend CreateChatCompletionStreamResponse with @debug.Debug::{to_repr}
 pub fn CreateChatCompletionStreamResponse::new(
   id~ : String,
   choices~ : Array[CreateChatCompletionStreamResponseChoicesItem],
-  created~ : Int,
+  created~ : Int32,
   model~ : String,
   service_tier? : ServiceTier,
   system_fingerprint? : String,
@@ -6611,8 +6611,8 @@ pub impl @json.FromJson for CreateChatCompletionStreamResponse with fn from_json
 pub(all) enum CreateEmbeddingRequestInput {
   Text(String)
   TextArray(Array[String])
-  IntArray(Array[Int])
-  IntArrayArray(Array[Array[Int]])
+  IntArray(Array[Int32])
+  IntArrayArray(Array[Array[Int32]])
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -6655,13 +6655,13 @@ pub impl @json.FromJson for CreateEmbeddingRequestInput with fn from_json(
     return TextArray(decoded)
   }
   if json_array_matches(value, item => item is Number(_, ..)) {
-    let decoded : Array[Int] = @json.from_json(value, path~)
+    let decoded : Array[Int32] = @json.from_json(value, path~)
     return IntArray(decoded)
   }
   if json_array_matches(value, item => {
       json_array_matches(item, item => item is Number(_, ..))
     }) {
-    let decoded : Array[Array[Int]] = @json.from_json(value, path~)
+    let decoded : Array[Array[Int32]] = @json.from_json(value, path~)
     return IntArrayArray(decoded)
   }
   raise @json.JsonDecodeError(
@@ -6730,7 +6730,7 @@ pub(all) struct CreateEmbeddingRequest {
   input : CreateEmbeddingRequestInput
   model : String
   encoding_format : CreateEmbeddingRequestEncodingFormat?
-  dimensions : Int?
+  dimensions : Int32?
   user : String?
 } derive(Eq, @debug.Debug)
 
@@ -6747,7 +6747,7 @@ pub fn CreateEmbeddingRequest::new(
   input~ : CreateEmbeddingRequestInput,
   model~ : String,
   encoding_format? : CreateEmbeddingRequestEncodingFormat,
-  dimensions? : Int,
+  dimensions? : Int32,
   user? : String,
 ) -> CreateEmbeddingRequest {
   { input, model, encoding_format, dimensions, user, }
@@ -6793,7 +6793,7 @@ pub impl @json.FromJson for CreateEmbeddingRequest with fn from_json(
 ///
 /// Represents an embedding vector returned by embedding endpoint.
 pub(all) struct Embedding {
-  index : Int
+  index : Int32
   embedding : Array[Double]
 } derive(Eq, @debug.Debug)
 
@@ -6806,7 +6806,7 @@ pub extend Embedding with @debug.Debug::{to_repr}
 ///|
 ///
 /// Creates a Embedding with omitted optional fields absent.
-pub fn Embedding::new(index~ : Int, embedding~ : Array[Double]) -> Embedding {
+pub fn Embedding::new(index~ : Int32, embedding~ : Array[Double]) -> Embedding {
   { index, embedding, }
 }
 
@@ -6842,8 +6842,8 @@ pub impl @json.FromJson for Embedding with fn from_json(value, path) {
 ///
 /// The usage information for the request.
 pub(all) struct CreateEmbeddingResponseUsage {
-  prompt_tokens : Int
-  total_tokens : Int
+  prompt_tokens : Int32
+  total_tokens : Int32
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -6856,8 +6856,8 @@ pub extend CreateEmbeddingResponseUsage with @debug.Debug::{to_repr}
 ///
 /// Creates a CreateEmbeddingResponseUsage with omitted optional fields absent.
 pub fn CreateEmbeddingResponseUsage::new(
-  prompt_tokens~ : Int,
-  total_tokens~ : Int,
+  prompt_tokens~ : Int32,
+  total_tokens~ : Int32,
 ) -> CreateEmbeddingResponseUsage {
   { prompt_tokens, total_tokens, }
 }
@@ -7467,7 +7467,7 @@ pub impl @json.FromJson for RankingOptions with fn from_json(value, path) {
 pub(all) struct FileSearchTool {
   type_ : String
   vector_store_ids : Array[String]
-  max_num_results : Int?
+  max_num_results : Int32?
   ranking_options : RankingOptions?
   filters : @sdkjson.Presence[Json]
 } derive(Eq, @debug.Debug)
@@ -7484,7 +7484,7 @@ pub extend FileSearchTool with @debug.Debug::{to_repr}
 pub fn FileSearchTool::new(
   type_~ : String,
   vector_store_ids~ : Array[String],
-  max_num_results? : Int,
+  max_num_results? : Int32,
   ranking_options? : RankingOptions,
   filters? : Json,
 ) -> FileSearchTool {
@@ -7854,8 +7854,8 @@ pub impl @json.FromJson for ComputerUsePreviewToolEnvironment with fn from_json(
 pub(all) struct ComputerUsePreviewTool {
   type_ : String
   environment : ComputerUsePreviewToolEnvironment
-  display_width : Int
-  display_height : Int
+  display_width : Int32
+  display_height : Int32
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -7870,8 +7870,8 @@ pub extend ComputerUsePreviewTool with @debug.Debug::{to_repr}
 pub fn ComputerUsePreviewTool::new(
   type_~ : String,
   environment~ : ComputerUsePreviewToolEnvironment,
-  display_width~ : Int,
-  display_height~ : Int,
+  display_width~ : Int32,
+  display_height~ : Int32,
 ) -> ComputerUsePreviewTool {
   { type_, environment, display_width, display_height, }
 }
@@ -8021,7 +8021,7 @@ pub impl @json.FromJson for CreateResponseTruncation with fn from_json(
 pub(all) struct FileCitationBody {
   type_ : String
   file_id : String
-  index : Int
+  index : Int32
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -8036,7 +8036,7 @@ pub extend FileCitationBody with @debug.Debug::{to_repr}
 pub fn FileCitationBody::new(
   type_~ : String,
   file_id~ : String,
-  index~ : Int,
+  index~ : Int32,
 ) -> FileCitationBody {
   { type_, file_id, index, }
 }
@@ -8076,8 +8076,8 @@ pub impl @json.FromJson for FileCitationBody with fn from_json(value, path) {
 pub(all) struct UrlCitationBody {
   type_ : String
   url : String
-  start_index : Int
-  end_index : Int
+  start_index : Int32
+  end_index : Int32
   title : String
 } derive(Eq, @debug.Debug)
 
@@ -8093,8 +8093,8 @@ pub extend UrlCitationBody with @debug.Debug::{to_repr}
 pub fn UrlCitationBody::new(
   type_~ : String,
   url~ : String,
-  start_index~ : Int,
-  end_index~ : Int,
+  start_index~ : Int32,
+  end_index~ : Int32,
   title~ : String,
 ) -> UrlCitationBody {
   { type_, url, start_index, end_index, title, }
@@ -8139,7 +8139,7 @@ pub impl @json.FromJson for UrlCitationBody with fn from_json(value, path) {
 pub(all) struct FilePath {
   type_ : String
   file_id : String
-  index : Int
+  index : Int32
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -8154,7 +8154,7 @@ pub extend FilePath with @debug.Debug::{to_repr}
 pub fn FilePath::new(
   type_~ : String,
   file_id~ : String,
-  index~ : Int,
+  index~ : Int32,
 ) -> FilePath {
   { type_, file_id, index, }
 }
@@ -10409,7 +10409,7 @@ pub(all) struct CreateResponse {
   previous_response_id : @sdkjson.Presence[String]
   model : String
   reasoning : @sdkjson.Presence[Reasoning]
-  max_output_tokens : @sdkjson.Presence[Int]
+  max_output_tokens : @sdkjson.Presence[Int32]
   instructions : @sdkjson.Presence[String]
   text : CreateResponseText?
   tools : Array[Tool]?
@@ -10441,7 +10441,7 @@ pub fn CreateResponse::new(
   service_tier? : ServiceTier,
   previous_response_id? : String,
   reasoning? : Reasoning,
-  max_output_tokens? : Int,
+  max_output_tokens? : Int32,
   instructions? : String,
   text? : CreateResponseText,
   tools? : Array[Tool],
@@ -11181,7 +11181,7 @@ pub impl @json.FromJson for ResponseIncompleteDetails with fn from_json(
 ///
 /// A detailed breakdown of the input tokens.
 pub(all) struct ResponseUsageInputTokensDetails {
-  cached_tokens : Int
+  cached_tokens : Int32
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -11194,7 +11194,7 @@ pub extend ResponseUsageInputTokensDetails with @debug.Debug::{to_repr}
 ///
 /// Creates a ResponseUsageInputTokensDetails with omitted optional fields absent.
 pub fn ResponseUsageInputTokensDetails::new(
-  cached_tokens~ : Int,
+  cached_tokens~ : Int32,
 ) -> ResponseUsageInputTokensDetails {
   { cached_tokens, }
 }
@@ -11227,7 +11227,7 @@ pub impl @json.FromJson for ResponseUsageInputTokensDetails with fn from_json(
 ///
 /// A detailed breakdown of the output tokens.
 pub(all) struct ResponseUsageOutputTokensDetails {
-  reasoning_tokens : Int
+  reasoning_tokens : Int32
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -11240,7 +11240,7 @@ pub extend ResponseUsageOutputTokensDetails with @debug.Debug::{to_repr}
 ///
 /// Creates a ResponseUsageOutputTokensDetails with omitted optional fields absent.
 pub fn ResponseUsageOutputTokensDetails::new(
-  reasoning_tokens~ : Int,
+  reasoning_tokens~ : Int32,
 ) -> ResponseUsageOutputTokensDetails {
   { reasoning_tokens, }
 }
@@ -11275,11 +11275,11 @@ pub impl @json.FromJson for ResponseUsageOutputTokensDetails with fn from_json(
 ///
 /// Represents token usage details including input tokens, output tokens, a breakdown of output tokens, and the total tokens used.
 pub(all) struct ResponseUsage {
-  input_tokens : Int
+  input_tokens : Int32
   input_tokens_details : ResponseUsageInputTokensDetails
-  output_tokens : Int
+  output_tokens : Int32
   output_tokens_details : ResponseUsageOutputTokensDetails
-  total_tokens : Int
+  total_tokens : Int32
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -11292,11 +11292,11 @@ pub extend ResponseUsage with @debug.Debug::{to_repr}
 ///
 /// Creates a ResponseUsage with omitted optional fields absent.
 pub fn ResponseUsage::new(
-  input_tokens~ : Int,
+  input_tokens~ : Int32,
   input_tokens_details~ : ResponseUsageInputTokensDetails,
-  output_tokens~ : Int,
+  output_tokens~ : Int32,
   output_tokens_details~ : ResponseUsageOutputTokensDetails,
-  total_tokens~ : Int,
+  total_tokens~ : Int32,
 ) -> ResponseUsage {
   {
     input_tokens,
@@ -11352,7 +11352,7 @@ pub(all) struct Response {
   previous_response_id : @sdkjson.Presence[String]
   model : String
   reasoning : @sdkjson.Presence[Reasoning]
-  max_output_tokens : @sdkjson.Presence[Int]
+  max_output_tokens : @sdkjson.Presence[Int32]
   instructions : String?
   text : ResponseText?
   tools : Array[Tool]
@@ -11393,7 +11393,7 @@ pub fn Response::new(
   service_tier? : ServiceTier,
   previous_response_id? : String,
   reasoning? : Reasoning,
-  max_output_tokens? : Int,
+  max_output_tokens? : Int32,
   instructions? : String,
   text? : ResponseText,
   truncation? : ResponseTruncation,
@@ -11717,7 +11717,7 @@ pub impl @json.FromJson for ResponseAudioTranscriptDoneEvent with fn from_json(
 /// Emitted when a partial code snippet is added by the code interpreter.
 pub(all) struct ResponseCodeInterpreterCallCodeDeltaEvent {
   type_ : String
-  output_index : Int
+  output_index : Int32
   delta : String
 } derive(Eq, @debug.Debug)
 
@@ -11734,7 +11734,7 @@ pub extend ResponseCodeInterpreterCallCodeDeltaEvent with @debug.Debug::{
 /// Creates a ResponseCodeInterpreterCallCodeDeltaEvent with omitted optional fields absent.
 pub fn ResponseCodeInterpreterCallCodeDeltaEvent::new(
   type_~ : String,
-  output_index~ : Int,
+  output_index~ : Int32,
   delta~ : String,
 ) -> ResponseCodeInterpreterCallCodeDeltaEvent {
   { type_, output_index, delta, }
@@ -11781,7 +11781,7 @@ pub impl @json.FromJson for ResponseCodeInterpreterCallCodeDeltaEvent with fn fr
 /// Emitted when code snippet output is finalized by the code interpreter.
 pub(all) struct ResponseCodeInterpreterCallCodeDoneEvent {
   type_ : String
-  output_index : Int
+  output_index : Int32
   code : String
 } derive(Eq, @debug.Debug)
 
@@ -11796,7 +11796,7 @@ pub extend ResponseCodeInterpreterCallCodeDoneEvent with @debug.Debug::{to_repr}
 /// Creates a ResponseCodeInterpreterCallCodeDoneEvent with omitted optional fields absent.
 pub fn ResponseCodeInterpreterCallCodeDoneEvent::new(
   type_~ : String,
-  output_index~ : Int,
+  output_index~ : Int32,
   code~ : String,
 ) -> ResponseCodeInterpreterCallCodeDoneEvent {
   { type_, output_index, code, }
@@ -11843,7 +11843,7 @@ pub impl @json.FromJson for ResponseCodeInterpreterCallCodeDoneEvent with fn fro
 /// Emitted when the code interpreter call is completed.
 pub(all) struct ResponseCodeInterpreterCallCompletedEvent {
   type_ : String
-  output_index : Int
+  output_index : Int32
   code_interpreter_call : CodeInterpreterToolCall
 } derive(Eq, @debug.Debug)
 
@@ -11860,7 +11860,7 @@ pub extend ResponseCodeInterpreterCallCompletedEvent with @debug.Debug::{
 /// Creates a ResponseCodeInterpreterCallCompletedEvent with omitted optional fields absent.
 pub fn ResponseCodeInterpreterCallCompletedEvent::new(
   type_~ : String,
-  output_index~ : Int,
+  output_index~ : Int32,
   code_interpreter_call~ : CodeInterpreterToolCall,
 ) -> ResponseCodeInterpreterCallCompletedEvent {
   { type_, output_index, code_interpreter_call, }
@@ -11907,7 +11907,7 @@ pub impl @json.FromJson for ResponseCodeInterpreterCallCompletedEvent with fn fr
 /// Emitted when a code interpreter call is in progress.
 pub(all) struct ResponseCodeInterpreterCallInProgressEvent {
   type_ : String
-  output_index : Int
+  output_index : Int32
   code_interpreter_call : CodeInterpreterToolCall
 } derive(Eq, @debug.Debug)
 
@@ -11927,7 +11927,7 @@ pub extend ResponseCodeInterpreterCallInProgressEvent with @debug.Debug::{
 /// Creates a ResponseCodeInterpreterCallInProgressEvent with omitted optional fields absent.
 pub fn ResponseCodeInterpreterCallInProgressEvent::new(
   type_~ : String,
-  output_index~ : Int,
+  output_index~ : Int32,
   code_interpreter_call~ : CodeInterpreterToolCall,
 ) -> ResponseCodeInterpreterCallInProgressEvent {
   { type_, output_index, code_interpreter_call, }
@@ -11974,7 +11974,7 @@ pub impl @json.FromJson for ResponseCodeInterpreterCallInProgressEvent with fn f
 /// Emitted when the code interpreter is actively interpreting the code snippet.
 pub(all) struct ResponseCodeInterpreterCallInterpretingEvent {
   type_ : String
-  output_index : Int
+  output_index : Int32
   code_interpreter_call : CodeInterpreterToolCall
 } derive(Eq, @debug.Debug)
 
@@ -11994,7 +11994,7 @@ pub extend ResponseCodeInterpreterCallInterpretingEvent with @debug.Debug::{
 /// Creates a ResponseCodeInterpreterCallInterpretingEvent with omitted optional fields absent.
 pub fn ResponseCodeInterpreterCallInterpretingEvent::new(
   type_~ : String,
-  output_index~ : Int,
+  output_index~ : Int32,
   code_interpreter_call~ : CodeInterpreterToolCall,
 ) -> ResponseCodeInterpreterCallInterpretingEvent {
   { type_, output_index, code_interpreter_call, }
@@ -12096,8 +12096,8 @@ pub impl @json.FromJson for ResponseCompletedEvent with fn from_json(
 pub(all) struct ResponseContentPartAddedEvent {
   type_ : String
   item_id : String
-  output_index : Int
-  content_index : Int
+  output_index : Int32
+  content_index : Int32
   part : OutputContent
 } derive(Eq, @debug.Debug)
 
@@ -12113,8 +12113,8 @@ pub extend ResponseContentPartAddedEvent with @debug.Debug::{to_repr}
 pub fn ResponseContentPartAddedEvent::new(
   type_~ : String,
   item_id~ : String,
-  output_index~ : Int,
-  content_index~ : Int,
+  output_index~ : Int32,
+  content_index~ : Int32,
   part~ : OutputContent,
 ) -> ResponseContentPartAddedEvent {
   { type_, item_id, output_index, content_index, part, }
@@ -12162,8 +12162,8 @@ pub impl @json.FromJson for ResponseContentPartAddedEvent with fn from_json(
 pub(all) struct ResponseContentPartDoneEvent {
   type_ : String
   item_id : String
-  output_index : Int
-  content_index : Int
+  output_index : Int32
+  content_index : Int32
   part : OutputContent
 } derive(Eq, @debug.Debug)
 
@@ -12179,8 +12179,8 @@ pub extend ResponseContentPartDoneEvent with @debug.Debug::{to_repr}
 pub fn ResponseContentPartDoneEvent::new(
   type_~ : String,
   item_id~ : String,
-  output_index~ : Int,
-  content_index~ : Int,
+  output_index~ : Int32,
+  content_index~ : Int32,
   part~ : OutputContent,
 ) -> ResponseContentPartDoneEvent {
   { type_, item_id, output_index, content_index, part, }
@@ -12388,7 +12388,7 @@ pub impl @json.FromJson for ResponseFailedEvent with fn from_json(value, path) {
 /// Emitted when a file search call is completed (results found).
 pub(all) struct ResponseFileSearchCallCompletedEvent {
   type_ : String
-  output_index : Int
+  output_index : Int32
   item_id : String
 } derive(Eq, @debug.Debug)
 
@@ -12403,7 +12403,7 @@ pub extend ResponseFileSearchCallCompletedEvent with @debug.Debug::{to_repr}
 /// Creates a ResponseFileSearchCallCompletedEvent with omitted optional fields absent.
 pub fn ResponseFileSearchCallCompletedEvent::new(
   type_~ : String,
-  output_index~ : Int,
+  output_index~ : Int32,
   item_id~ : String,
 ) -> ResponseFileSearchCallCompletedEvent {
   { type_, output_index, item_id, }
@@ -12446,7 +12446,7 @@ pub impl @json.FromJson for ResponseFileSearchCallCompletedEvent with fn from_js
 /// Emitted when a file search call is initiated.
 pub(all) struct ResponseFileSearchCallInProgressEvent {
   type_ : String
-  output_index : Int
+  output_index : Int32
   item_id : String
 } derive(Eq, @debug.Debug)
 
@@ -12461,7 +12461,7 @@ pub extend ResponseFileSearchCallInProgressEvent with @debug.Debug::{to_repr}
 /// Creates a ResponseFileSearchCallInProgressEvent with omitted optional fields absent.
 pub fn ResponseFileSearchCallInProgressEvent::new(
   type_~ : String,
-  output_index~ : Int,
+  output_index~ : Int32,
   item_id~ : String,
 ) -> ResponseFileSearchCallInProgressEvent {
   { type_, output_index, item_id, }
@@ -12506,7 +12506,7 @@ pub impl @json.FromJson for ResponseFileSearchCallInProgressEvent with fn from_j
 /// Emitted when a file search is currently searching.
 pub(all) struct ResponseFileSearchCallSearchingEvent {
   type_ : String
-  output_index : Int
+  output_index : Int32
   item_id : String
 } derive(Eq, @debug.Debug)
 
@@ -12521,7 +12521,7 @@ pub extend ResponseFileSearchCallSearchingEvent with @debug.Debug::{to_repr}
 /// Creates a ResponseFileSearchCallSearchingEvent with omitted optional fields absent.
 pub fn ResponseFileSearchCallSearchingEvent::new(
   type_~ : String,
-  output_index~ : Int,
+  output_index~ : Int32,
   item_id~ : String,
 ) -> ResponseFileSearchCallSearchingEvent {
   { type_, output_index, item_id, }
@@ -12565,7 +12565,7 @@ pub impl @json.FromJson for ResponseFileSearchCallSearchingEvent with fn from_js
 pub(all) struct ResponseFunctionCallArgumentsDeltaEvent {
   type_ : String
   item_id : String
-  output_index : Int
+  output_index : Int32
   delta : String
 } derive(Eq, @debug.Debug)
 
@@ -12581,7 +12581,7 @@ pub extend ResponseFunctionCallArgumentsDeltaEvent with @debug.Debug::{to_repr}
 pub fn ResponseFunctionCallArgumentsDeltaEvent::new(
   type_~ : String,
   item_id~ : String,
-  output_index~ : Int,
+  output_index~ : Int32,
   delta~ : String,
 ) -> ResponseFunctionCallArgumentsDeltaEvent {
   { type_, item_id, output_index, delta, }
@@ -12631,7 +12631,7 @@ pub impl @json.FromJson for ResponseFunctionCallArgumentsDeltaEvent with fn from
 pub(all) struct ResponseFunctionCallArgumentsDoneEvent {
   type_ : String
   item_id : String
-  output_index : Int
+  output_index : Int32
   arguments : String
 } derive(Eq, @debug.Debug)
 
@@ -12647,7 +12647,7 @@ pub extend ResponseFunctionCallArgumentsDoneEvent with @debug.Debug::{to_repr}
 pub fn ResponseFunctionCallArgumentsDoneEvent::new(
   type_~ : String,
   item_id~ : String,
-  output_index~ : Int,
+  output_index~ : Int32,
   arguments~ : String,
 ) -> ResponseFunctionCallArgumentsDoneEvent {
   { type_, item_id, output_index, arguments, }
@@ -12802,7 +12802,7 @@ pub impl @json.FromJson for ResponseIncompleteEvent with fn from_json(
 /// Emitted when a new output item is added.
 pub(all) struct ResponseOutputItemAddedEvent {
   type_ : String
-  output_index : Int
+  output_index : Int32
   item : OutputItem
 } derive(Eq, @debug.Debug)
 
@@ -12817,7 +12817,7 @@ pub extend ResponseOutputItemAddedEvent with @debug.Debug::{to_repr}
 /// Creates a ResponseOutputItemAddedEvent with omitted optional fields absent.
 pub fn ResponseOutputItemAddedEvent::new(
   type_~ : String,
-  output_index~ : Int,
+  output_index~ : Int32,
   item~ : OutputItem,
 ) -> ResponseOutputItemAddedEvent {
   { type_, output_index, item, }
@@ -12860,7 +12860,7 @@ pub impl @json.FromJson for ResponseOutputItemAddedEvent with fn from_json(
 /// Emitted when an output item is marked done.
 pub(all) struct ResponseOutputItemDoneEvent {
   type_ : String
-  output_index : Int
+  output_index : Int32
   item : OutputItem
 } derive(Eq, @debug.Debug)
 
@@ -12875,7 +12875,7 @@ pub extend ResponseOutputItemDoneEvent with @debug.Debug::{to_repr}
 /// Creates a ResponseOutputItemDoneEvent with omitted optional fields absent.
 pub fn ResponseOutputItemDoneEvent::new(
   type_~ : String,
-  output_index~ : Int,
+  output_index~ : Int32,
   item~ : OutputItem,
 ) -> ResponseOutputItemDoneEvent {
   { type_, output_index, item, }
@@ -13020,7 +13020,7 @@ pub(all) struct ResponseProperties {
   previous_response_id : @sdkjson.Presence[String]
   model : String?
   reasoning : @sdkjson.Presence[Reasoning]
-  max_output_tokens : @sdkjson.Presence[Int]
+  max_output_tokens : @sdkjson.Presence[Int32]
   instructions : @sdkjson.Presence[String]
   text : ResponsePropertiesText?
   tools : Array[Tool]?
@@ -13041,7 +13041,7 @@ pub fn ResponseProperties::new(
   previous_response_id? : String,
   model? : String,
   reasoning? : Reasoning,
-  max_output_tokens? : Int,
+  max_output_tokens? : Int32,
   instructions? : String,
   text? : ResponsePropertiesText,
   tools? : Array[Tool],
@@ -13168,8 +13168,8 @@ pub impl @json.FromJson for ResponseReasoningSummaryPartAddedEventPart with fn f
 pub(all) struct ResponseReasoningSummaryPartAddedEvent {
   type_ : String
   item_id : String
-  output_index : Int
-  summary_index : Int
+  output_index : Int32
+  summary_index : Int32
   part : ResponseReasoningSummaryPartAddedEventPart
 } derive(Eq, @debug.Debug)
 
@@ -13185,8 +13185,8 @@ pub extend ResponseReasoningSummaryPartAddedEvent with @debug.Debug::{to_repr}
 pub fn ResponseReasoningSummaryPartAddedEvent::new(
   type_~ : String,
   item_id~ : String,
-  output_index~ : Int,
-  summary_index~ : Int,
+  output_index~ : Int32,
+  summary_index~ : Int32,
   part~ : ResponseReasoningSummaryPartAddedEventPart,
 ) -> ResponseReasoningSummaryPartAddedEvent {
   { type_, item_id, output_index, summary_index, part, }
@@ -13291,8 +13291,8 @@ pub impl @json.FromJson for ResponseReasoningSummaryPartDoneEventPart with fn fr
 pub(all) struct ResponseReasoningSummaryPartDoneEvent {
   type_ : String
   item_id : String
-  output_index : Int
-  summary_index : Int
+  output_index : Int32
+  summary_index : Int32
   part : ResponseReasoningSummaryPartDoneEventPart
 } derive(Eq, @debug.Debug)
 
@@ -13308,8 +13308,8 @@ pub extend ResponseReasoningSummaryPartDoneEvent with @debug.Debug::{to_repr}
 pub fn ResponseReasoningSummaryPartDoneEvent::new(
   type_~ : String,
   item_id~ : String,
-  output_index~ : Int,
-  summary_index~ : Int,
+  output_index~ : Int32,
+  summary_index~ : Int32,
   part~ : ResponseReasoningSummaryPartDoneEventPart,
 ) -> ResponseReasoningSummaryPartDoneEvent {
   { type_, item_id, output_index, summary_index, part, }
@@ -13359,8 +13359,8 @@ pub impl @json.FromJson for ResponseReasoningSummaryPartDoneEvent with fn from_j
 pub(all) struct ResponseReasoningSummaryTextDeltaEvent {
   type_ : String
   item_id : String
-  output_index : Int
-  summary_index : Int
+  output_index : Int32
+  summary_index : Int32
   delta : String
 } derive(Eq, @debug.Debug)
 
@@ -13376,8 +13376,8 @@ pub extend ResponseReasoningSummaryTextDeltaEvent with @debug.Debug::{to_repr}
 pub fn ResponseReasoningSummaryTextDeltaEvent::new(
   type_~ : String,
   item_id~ : String,
-  output_index~ : Int,
-  summary_index~ : Int,
+  output_index~ : Int32,
+  summary_index~ : Int32,
   delta~ : String,
 ) -> ResponseReasoningSummaryTextDeltaEvent {
   { type_, item_id, output_index, summary_index, delta, }
@@ -13427,8 +13427,8 @@ pub impl @json.FromJson for ResponseReasoningSummaryTextDeltaEvent with fn from_
 pub(all) struct ResponseReasoningSummaryTextDoneEvent {
   type_ : String
   item_id : String
-  output_index : Int
-  summary_index : Int
+  output_index : Int32
+  summary_index : Int32
   text : String
 } derive(Eq, @debug.Debug)
 
@@ -13444,8 +13444,8 @@ pub extend ResponseReasoningSummaryTextDoneEvent with @debug.Debug::{to_repr}
 pub fn ResponseReasoningSummaryTextDoneEvent::new(
   type_~ : String,
   item_id~ : String,
-  output_index~ : Int,
-  summary_index~ : Int,
+  output_index~ : Int32,
+  summary_index~ : Int32,
   text~ : String,
 ) -> ResponseReasoningSummaryTextDoneEvent {
   { type_, item_id, output_index, summary_index, text, }
@@ -13495,8 +13495,8 @@ pub impl @json.FromJson for ResponseReasoningSummaryTextDoneEvent with fn from_j
 pub(all) struct ResponseRefusalDeltaEvent {
   type_ : String
   item_id : String
-  output_index : Int
-  content_index : Int
+  output_index : Int32
+  content_index : Int32
   delta : String
 } derive(Eq, @debug.Debug)
 
@@ -13512,8 +13512,8 @@ pub extend ResponseRefusalDeltaEvent with @debug.Debug::{to_repr}
 pub fn ResponseRefusalDeltaEvent::new(
   type_~ : String,
   item_id~ : String,
-  output_index~ : Int,
-  content_index~ : Int,
+  output_index~ : Int32,
+  content_index~ : Int32,
   delta~ : String,
 ) -> ResponseRefusalDeltaEvent {
   { type_, item_id, output_index, content_index, delta, }
@@ -13561,8 +13561,8 @@ pub impl @json.FromJson for ResponseRefusalDeltaEvent with fn from_json(
 pub(all) struct ResponseRefusalDoneEvent {
   type_ : String
   item_id : String
-  output_index : Int
-  content_index : Int
+  output_index : Int32
+  content_index : Int32
   refusal : String
 } derive(Eq, @debug.Debug)
 
@@ -13578,8 +13578,8 @@ pub extend ResponseRefusalDoneEvent with @debug.Debug::{to_repr}
 pub fn ResponseRefusalDoneEvent::new(
   type_~ : String,
   item_id~ : String,
-  output_index~ : Int,
-  content_index~ : Int,
+  output_index~ : Int32,
+  content_index~ : Int32,
   refusal~ : String,
 ) -> ResponseRefusalDoneEvent {
   { type_, item_id, output_index, content_index, refusal, }
@@ -13627,9 +13627,9 @@ pub impl @json.FromJson for ResponseRefusalDoneEvent with fn from_json(
 pub(all) struct ResponseTextAnnotationDeltaEvent {
   type_ : String
   item_id : String
-  output_index : Int
-  content_index : Int
-  annotation_index : Int
+  output_index : Int32
+  content_index : Int32
+  annotation_index : Int32
   annotation : Annotation
 } derive(Eq, @debug.Debug)
 
@@ -13645,9 +13645,9 @@ pub extend ResponseTextAnnotationDeltaEvent with @debug.Debug::{to_repr}
 pub fn ResponseTextAnnotationDeltaEvent::new(
   type_~ : String,
   item_id~ : String,
-  output_index~ : Int,
-  content_index~ : Int,
-  annotation_index~ : Int,
+  output_index~ : Int32,
+  content_index~ : Int32,
+  annotation_index~ : Int32,
   annotation~ : Annotation,
 ) -> ResponseTextAnnotationDeltaEvent {
   { type_, item_id, output_index, content_index, annotation_index, annotation, }
@@ -13697,8 +13697,8 @@ pub impl @json.FromJson for ResponseTextAnnotationDeltaEvent with fn from_json(
 pub(all) struct ResponseTextDeltaEvent {
   type_ : String
   item_id : String
-  output_index : Int
-  content_index : Int
+  output_index : Int32
+  content_index : Int32
   delta : String
 } derive(Eq, @debug.Debug)
 
@@ -13714,8 +13714,8 @@ pub extend ResponseTextDeltaEvent with @debug.Debug::{to_repr}
 pub fn ResponseTextDeltaEvent::new(
   type_~ : String,
   item_id~ : String,
-  output_index~ : Int,
-  content_index~ : Int,
+  output_index~ : Int32,
+  content_index~ : Int32,
   delta~ : String,
 ) -> ResponseTextDeltaEvent {
   { type_, item_id, output_index, content_index, delta, }
@@ -13763,8 +13763,8 @@ pub impl @json.FromJson for ResponseTextDeltaEvent with fn from_json(
 pub(all) struct ResponseTextDoneEvent {
   type_ : String
   item_id : String
-  output_index : Int
-  content_index : Int
+  output_index : Int32
+  content_index : Int32
   text : String
 } derive(Eq, @debug.Debug)
 
@@ -13780,8 +13780,8 @@ pub extend ResponseTextDoneEvent with @debug.Debug::{to_repr}
 pub fn ResponseTextDoneEvent::new(
   type_~ : String,
   item_id~ : String,
-  output_index~ : Int,
-  content_index~ : Int,
+  output_index~ : Int32,
+  content_index~ : Int32,
   text~ : String,
 ) -> ResponseTextDoneEvent {
   { type_, item_id, output_index, content_index, text, }
@@ -13825,7 +13825,7 @@ pub impl @json.FromJson for ResponseTextDoneEvent with fn from_json(value, path)
 /// Emitted when a web search call is completed.
 pub(all) struct ResponseWebSearchCallCompletedEvent {
   type_ : String
-  output_index : Int
+  output_index : Int32
   item_id : String
 } derive(Eq, @debug.Debug)
 
@@ -13840,7 +13840,7 @@ pub extend ResponseWebSearchCallCompletedEvent with @debug.Debug::{to_repr}
 /// Creates a ResponseWebSearchCallCompletedEvent with omitted optional fields absent.
 pub fn ResponseWebSearchCallCompletedEvent::new(
   type_~ : String,
-  output_index~ : Int,
+  output_index~ : Int32,
   item_id~ : String,
 ) -> ResponseWebSearchCallCompletedEvent {
   { type_, output_index, item_id, }
@@ -13883,7 +13883,7 @@ pub impl @json.FromJson for ResponseWebSearchCallCompletedEvent with fn from_jso
 /// Emitted when a web search call is initiated.
 pub(all) struct ResponseWebSearchCallInProgressEvent {
   type_ : String
-  output_index : Int
+  output_index : Int32
   item_id : String
 } derive(Eq, @debug.Debug)
 
@@ -13898,7 +13898,7 @@ pub extend ResponseWebSearchCallInProgressEvent with @debug.Debug::{to_repr}
 /// Creates a ResponseWebSearchCallInProgressEvent with omitted optional fields absent.
 pub fn ResponseWebSearchCallInProgressEvent::new(
   type_~ : String,
-  output_index~ : Int,
+  output_index~ : Int32,
   item_id~ : String,
 ) -> ResponseWebSearchCallInProgressEvent {
   { type_, output_index, item_id, }
@@ -13941,7 +13941,7 @@ pub impl @json.FromJson for ResponseWebSearchCallInProgressEvent with fn from_js
 /// Emitted when a web search call is executing.
 pub(all) struct ResponseWebSearchCallSearchingEvent {
   type_ : String
-  output_index : Int
+  output_index : Int32
   item_id : String
 } derive(Eq, @debug.Debug)
 
@@ -13956,7 +13956,7 @@ pub extend ResponseWebSearchCallSearchingEvent with @debug.Debug::{to_repr}
 /// Creates a ResponseWebSearchCallSearchingEvent with omitted optional fields absent.
 pub fn ResponseWebSearchCallSearchingEvent::new(
   type_~ : String,
-  output_index~ : Int,
+  output_index~ : Int32,
   item_id~ : String,
 ) -> ResponseWebSearchCallSearchingEvent {
   { type_, output_index, item_id, }

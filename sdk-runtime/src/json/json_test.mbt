@@ -6,7 +6,7 @@ test "presence option conversion and map preserve all three states" {
         (@json.Absent, None, true),
         (@json.Null, None, false),
         (@json.Value(7), Some(7), false),
-      ] : Array[(@json.Presence[Int], Int?, Bool)]) {
+      ] : Array[(@json.Presence[Int32], Int32?, Bool)]) {
     assert_eq(value.to_option(), option)
     assert_eq(value.is_absent(), absent)
     let mut calls = 0
@@ -18,7 +18,7 @@ test "presence option conversion and map preserve all three states" {
     assert_eq(mapped.is_absent(), absent)
     assert_eq(calls, if option is Some(_) { 1 } else { 0 })
   }
-  assert_eq(@json.Presence::from_option((None : Int?)), @json.Absent)
+  assert_eq(@json.Presence::from_option((None : Int32?)), @json.Absent)
   assert_eq(@json.Presence::from_option(Some(7)), @json.Value(7))
 }
 
@@ -30,10 +30,10 @@ test "builder ordering replacement omission and snapshots" {
     .field("first", 1)
     .field("second", "two")
     .field("first", 3)
-    .opt("skip", (None : Int?))
+    .opt("skip", (None : Int32?))
     .opt("optional", Some(false))
-    .presence("absent", (@json.Absent : @json.Presence[Int]))
-    .presence("null", (@json.Null : @json.Presence[Int]))
+    .presence("absent", (@json.Absent : @json.Presence[Int32]))
+    .presence("null", (@json.Null : @json.Presence[Int32]))
     .presence("value", @json.Value(4))
   let snapshot = same.build()
   assert_eq(
@@ -43,7 +43,7 @@ test "builder ordering replacement omission and snapshots" {
   // Omission does not delete or overwrite a field that already exists.
   ignore(
     builder
-    .opt("first", (None : Int?))
+    .opt("first", (None : Int32?))
     .presence("second", (@json.Absent : @json.Presence[String])),
   )
   assert_eq(builder.build(), snapshot)
@@ -234,7 +234,7 @@ enum Kind {
 ///|
 struct Example {
   name : String
-  count : Int?
+  count : Int32?
   note : @json.Presence[String]
   kind : Kind
 } derive(Eq, Debug)

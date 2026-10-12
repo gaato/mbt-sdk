@@ -55,9 +55,9 @@ pub fn GitHub::new(
   transport : &@http.Transport,
   clock : &@clock.Clock,
   token? : String,
-  base_url? : String = "https://api.github.com",
-  api_version? : String = "2022-11-28",
-  user_agent? : String = "gaato-mbt-sdk/0.1.0",
+  base_url~ : String = "https://api.github.com",
+  api_version~ : String = "2022-11-28",
+  user_agent~ : String = "gaato-mbt-sdk/0.1.0",
   retry? : @runtime.RetryPolicy,
   limiter? : &@runtime.RateLimiter,
   graphql_url? : String,
@@ -101,7 +101,7 @@ pub fn GitHub::new(
 /// `graphql_url` for anything else.
 pub fn GitHub::from_client(
   client : @runtime.Client,
-  graphql_url? : String = "https://api.github.com/graphql",
+  graphql_url~ : String = "https://api.github.com/graphql",
 ) -> GitHub {
   { client, graphql_url, }
 }

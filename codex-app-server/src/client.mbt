@@ -26,9 +26,9 @@ pub async fn[X] connect(
   writer : &@io.Writer,
   initialize : @protocol.InitializeParams,
   close_writer~ : () -> Unit,
-  handlers? : Handlers = Handlers::new(),
-  on_event? : EventHandler = _ => (),
-  timeout_ms? : Int = 10000,
+  handlers~ : Handlers = Handlers::new(),
+  on_event~ : EventHandler = _ => (),
+  timeout_ms~ : Int32 = 10000,
 ) -> Client {
   let connection = @rpc.Connection::start(
     group,
@@ -48,7 +48,7 @@ pub async fn[X] connect(
 async fn initialize_connection(
   connection : @rpc.Connection,
   params : @protocol.InitializeParams,
-  timeout_ms~ : Int,
+  timeout_ms~ : Int32,
 ) -> Client {
   let mut ready = false
   defer (if !ready { connection.close() })
@@ -84,7 +84,7 @@ fn[T] decode_result(
 pub async fn[T] Client::call(
   self : Client,
   request : @protocol.Call[T],
-  timeout_ms? : Int,
+  timeout_ms? : Int32,
 ) -> T {
   if request.name == "initialize" {
     raise AlreadyInitialized

@@ -105,7 +105,7 @@ pub fn ToolUseAccumulator::finish(
 
 ///|
 priv struct PendingToolUse {
-  index : Int
+  index : Int32
   id : String
   name : String
   arguments : StringBuilder

@@ -31,9 +31,9 @@ pub fn Anthropic::new(
   api_key~ : String,
   transport : &@http.Transport,
   clock : &@clock.Clock,
-  base_url? : String = "https://api.anthropic.com",
-  version? : String = "2023-06-01",
-  auth_header? : AuthHeader = XApiKey,
+  base_url~ : String = "https://api.anthropic.com",
+  version~ : String = "2023-06-01",
+  auth_header~ : AuthHeader = XApiKey,
   retry? : @runtime.RetryPolicy,
 ) -> Anthropic {
   let auth = match auth_header {
@@ -51,7 +51,7 @@ pub fn Anthropic::new(
 /// Wraps a preconfigured runtime client for compatible APIs and tests.
 pub fn Anthropic::from_client(
   client : @runtime.Client,
-  version? : String = "2023-06-01",
+  version~ : String = "2023-06-01",
 ) -> Anthropic {
   { client, version, }
 }

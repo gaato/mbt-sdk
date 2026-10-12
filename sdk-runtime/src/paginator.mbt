@@ -105,7 +105,7 @@ pub async fn[T, E : Error] Paginator::each(
 /// maximum performs no requests and returns an empty array.
 pub async fn[T, E : Error] Paginator::collect(
   self : Paginator[T, E],
-  max~ : Int,
+  max~ : Int32,
 ) -> Array[T] raise E {
   let result = []
   if max <= 0 {

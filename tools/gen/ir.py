@@ -1526,7 +1526,7 @@ class IRBuilder:
         if kind == "string":
             return TypeRef(str(override) if override else "String")
         if kind == "integer":
-            return TypeRef("Int64" if schema.get("format") == "int64" or override == "Int64" else "Int")
+            return TypeRef("Int64" if schema.get("format") == "int64" or override == "Int64" else "Int32")
         if kind == "number":
             return TypeRef("Double")
         if kind == "boolean":

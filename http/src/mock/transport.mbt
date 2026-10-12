@@ -3,7 +3,7 @@
 pub(all) suberror MockError {
   Unexpected(String)
   Mismatch(String)
-  Unconsumed(Int)
+  Unconsumed(Int32)
   Violated(String)
 } derive(Debug)
 
@@ -29,9 +29,9 @@ priv struct Expectation {
 pub struct FakeTransport {
   priv expectations : Array[Expectation]
   priv requests : Array[@http.Request]
-  priv mut cursor : Int
+  priv mut cursor : Int32
   priv mut violation : String?
-  priv mut closed : Int
+  priv mut closed : Int32
 }
 
 ///|
@@ -104,7 +104,7 @@ pub fn FakeTransport::assert_complete(
 
 ///|
 /// Counts distinct returned streams explicitly closed, including early closes.
-pub fn FakeTransport::streams_closed(self : FakeTransport) -> Int {
+pub fn FakeTransport::streams_closed(self : FakeTransport) -> Int32 {
   self.closed
 }
 
@@ -190,7 +190,7 @@ pub impl @http.Transport for FakeTransport with fn send_stream(self, request) {
 priv struct ScriptStream {
   owner : FakeTransport
   chunks : Array[Bytes]
-  mut cursor : Int
+  mut cursor : Int32
   mut closed : Bool
 }
 

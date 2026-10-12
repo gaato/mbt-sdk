@@ -1,9 +1,9 @@
 ///|
 /// Retry limits, backoff, Retry-After cap, and non-idempotent policy.
 pub(all) struct RetryPolicy {
-  max_retries : Int
+  max_retries : Int32
   backoff : Backoff
-  max_retry_after_ms : Int
+  max_retry_after_ms : Int32
   retry_non_idempotent : Bool
 } derive(Eq, Debug)
 
@@ -57,7 +57,7 @@ pub(open) trait RetryDecider {
   /// The wait in milliseconds before the next attempt, or `None` to stop.
   /// `attempt` counts the attempts already made, starting at `0` for the
   /// first failure; `random` is in `[0, 1)` for jitter.
-  fn next_delay_ms(Self, SdkError, @http.Request, Int, Double) -> Int?
+  fn next_delay_ms(Self, SdkError, @http.Request, Int32, Double) -> Int32?
 }
 
 ///|

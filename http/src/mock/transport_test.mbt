@@ -1,5 +1,5 @@
 ///|
-fn response(status? : Int = 200) -> @http.Response {
+fn response(status~ : Int32 = 200) -> @http.Response {
   {
     status,
     headers: @http.Headers::from_array([("X-Test", "original")]),

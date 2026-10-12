@@ -1460,7 +1460,7 @@ pub(all) struct SubAgentSourceThreadSpawn {
   agent_nickname : @sdkjson.Presence[String]
   agent_path : @sdkjson.Presence[String]
   agent_role : @sdkjson.Presence[String]
-  depth : Int
+  depth : Int32
   parent_thread_id : String
 } derive(Eq, @debug.Debug)
 
@@ -1474,7 +1474,7 @@ pub extend SubAgentSourceThreadSpawn with @debug.Debug::{to_repr}
 ///
 /// Creates a SubAgentSourceThreadSpawn with omitted optional fields absent.
 pub fn SubAgentSourceThreadSpawn::new(
-  depth~ : Int,
+  depth~ : Int32,
   parent_thread_id~ : String,
   agent_nickname? : String,
   agent_path? : String,
@@ -1950,7 +1950,7 @@ pub impl @json.FromJson for ThreadStatus with fn from_json(value, path) {
 ///
 /// Generated representation of CodexErrorInfoHttpConnectionFailed.
 pub(all) struct CodexErrorInfoHttpConnectionFailed {
-  http_status_code : @sdkjson.Presence[Int]
+  http_status_code : @sdkjson.Presence[Int32]
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -1963,7 +1963,7 @@ pub extend CodexErrorInfoHttpConnectionFailed with @debug.Debug::{to_repr}
 ///
 /// Creates a CodexErrorInfoHttpConnectionFailed with omitted optional fields absent.
 pub fn CodexErrorInfoHttpConnectionFailed::new(
-  http_status_code? : Int,
+  http_status_code? : Int32,
 ) -> CodexErrorInfoHttpConnectionFailed {
   { http_status_code: @sdkjson.Presence::from_option(http_status_code), }
 }
@@ -1998,7 +1998,7 @@ pub impl @json.FromJson for CodexErrorInfoHttpConnectionFailed with fn from_json
 ///
 /// Generated representation of CodexErrorInfoResponseStreamConnectionFailed.
 pub(all) struct CodexErrorInfoResponseStreamConnectionFailed {
-  http_status_code : @sdkjson.Presence[Int]
+  http_status_code : @sdkjson.Presence[Int32]
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -2016,7 +2016,7 @@ pub extend CodexErrorInfoResponseStreamConnectionFailed with @debug.Debug::{
 ///
 /// Creates a CodexErrorInfoResponseStreamConnectionFailed with omitted optional fields absent.
 pub fn CodexErrorInfoResponseStreamConnectionFailed::new(
-  http_status_code? : Int,
+  http_status_code? : Int32,
 ) -> CodexErrorInfoResponseStreamConnectionFailed {
   { http_status_code: @sdkjson.Presence::from_option(http_status_code), }
 }
@@ -2055,7 +2055,7 @@ pub impl @json.FromJson for CodexErrorInfoResponseStreamConnectionFailed with fn
 ///
 /// Generated representation of CodexErrorInfoResponseStreamDisconnected.
 pub(all) struct CodexErrorInfoResponseStreamDisconnected {
-  http_status_code : @sdkjson.Presence[Int]
+  http_status_code : @sdkjson.Presence[Int32]
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -2068,7 +2068,7 @@ pub extend CodexErrorInfoResponseStreamDisconnected with @debug.Debug::{to_repr}
 ///
 /// Creates a CodexErrorInfoResponseStreamDisconnected with omitted optional fields absent.
 pub fn CodexErrorInfoResponseStreamDisconnected::new(
-  http_status_code? : Int,
+  http_status_code? : Int32,
 ) -> CodexErrorInfoResponseStreamDisconnected {
   { http_status_code: @sdkjson.Presence::from_option(http_status_code), }
 }
@@ -2107,7 +2107,7 @@ pub impl @json.FromJson for CodexErrorInfoResponseStreamDisconnected with fn fro
 ///
 /// Generated representation of CodexErrorInfoResponseTooManyFailedAttempts.
 pub(all) struct CodexErrorInfoResponseTooManyFailedAttempts {
-  http_status_code : @sdkjson.Presence[Int]
+  http_status_code : @sdkjson.Presence[Int32]
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -2125,7 +2125,7 @@ pub extend CodexErrorInfoResponseTooManyFailedAttempts with @debug.Debug::{
 ///
 /// Creates a CodexErrorInfoResponseTooManyFailedAttempts with omitted optional fields absent.
 pub fn CodexErrorInfoResponseTooManyFailedAttempts::new(
-  http_status_code? : Int,
+  http_status_code? : Int32,
 ) -> CodexErrorInfoResponseTooManyFailedAttempts {
   { http_status_code: @sdkjson.Presence::from_option(http_status_code), }
 }
@@ -3326,8 +3326,8 @@ pub impl @json.FromJson for ThreadItemHookPrompt with fn from_json(value, path) 
 ///
 /// Generated representation of MemoryCitationEntry.
 pub(all) struct MemoryCitationEntry {
-  line_end : UInt
-  line_start : UInt
+  line_end : UInt32
+  line_start : UInt32
   note : String
   path : String
 } derive(Eq, @debug.Debug)
@@ -3342,8 +3342,8 @@ pub extend MemoryCitationEntry with @debug.Debug::{to_repr}
 ///
 /// Creates a MemoryCitationEntry with omitted optional fields absent.
 pub fn MemoryCitationEntry::new(
-  line_end~ : UInt,
-  line_start~ : UInt,
+  line_end~ : UInt32,
+  line_start~ : UInt32,
   note~ : String,
   path~ : String,
 ) -> MemoryCitationEntry {
@@ -4566,7 +4566,7 @@ pub(all) struct ThreadItemCommandExecution {
   command_actions : Array[CommandAction]
   cwd : String
   duration_ms : @sdkjson.Presence[Int64]
-  exit_code : @sdkjson.Presence[Int]
+  exit_code : @sdkjson.Presence[Int32]
   id : String
   plugin_id : @sdkjson.Presence[String]
   process_id : @sdkjson.Presence[String]
@@ -4594,7 +4594,7 @@ pub fn ThreadItemCommandExecution::new(
   type_~ : String,
   aggregated_output? : String,
   duration_ms? : Int64,
-  exit_code? : Int,
+  exit_code? : Int32,
   plugin_id? : String,
   process_id? : String,
   script_path? : String,

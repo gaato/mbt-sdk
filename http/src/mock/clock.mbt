@@ -2,7 +2,7 @@
 /// A deterministic clock whose sleeps advance time without waiting.
 pub struct FakeClock {
   priv mut now : Int64
-  priv delays : Array[Int]
+  priv delays : Array[Int32]
 }
 
 ///|
@@ -15,19 +15,19 @@ pub struct FakeClock {
 ///   assert_eq(clock.slept(), [])
 /// }
 /// ```
-pub fn FakeClock::new(start_unix_ms? : Int64 = 0L) -> FakeClock {
+pub fn FakeClock::new(start_unix_ms~ : Int64 = 0L) -> FakeClock {
   { now: start_unix_ms, delays: [], }
 }
 
 ///|
 /// Returns an independent copy of all requested sleep durations.
-pub fn FakeClock::slept(self : FakeClock) -> Array[Int] {
+pub fn FakeClock::slept(self : FakeClock) -> Array[Int32] {
   self.delays.copy()
 }
 
 ///|
 /// Moves the fake wall clock by `milliseconds` without recording a sleep.
-pub fn FakeClock::advance(self : FakeClock, milliseconds : Int) -> Unit {
+pub fn FakeClock::advance(self : FakeClock, milliseconds : Int32) -> Unit {
   self.now += milliseconds.to_int64()
 }
 

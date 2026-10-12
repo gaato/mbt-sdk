@@ -252,7 +252,7 @@ pub fn Message::from_response(response : MessageResponse) -> Message {
 /// and use `Anthropic::create_message_params`.
 pub(all) struct MessageRequest {
   model : String
-  max_tokens : Int
+  max_tokens : Int32
   messages : Array[Message]
   system : String?
   temperature : Double?
@@ -288,7 +288,7 @@ pub extend MessageRequest with @debug.Debug::{to_repr}
 /// ```
 pub fn MessageRequest::new(
   model~ : String,
-  max_tokens~ : Int,
+  max_tokens~ : Int32,
   messages~ : Array[Message],
   system? : String,
   temperature? : Double,
@@ -396,12 +396,12 @@ pub fn MessageResponse::tool_uses(
 /// generated vocabulary retain their raw JSON.
 pub(all) enum MessageEvent {
   MessageStart(MessageResponse)
-  ContentBlockStart(index~ : Int, block~ : ContentBlock)
-  TextDelta(index~ : Int, text~ : String)
-  ThinkingDelta(index~ : Int, thinking~ : String)
-  SignatureDelta(index~ : Int, signature~ : String)
-  InputJsonDelta(index~ : Int, partial_json~ : String)
-  ContentBlockStop(index~ : Int)
+  ContentBlockStart(index~ : Int32, block~ : ContentBlock)
+  TextDelta(index~ : Int32, text~ : String)
+  ThinkingDelta(index~ : Int32, thinking~ : String)
+  SignatureDelta(index~ : Int32, signature~ : String)
+  InputJsonDelta(index~ : Int32, partial_json~ : String)
+  ContentBlockStop(index~ : Int32)
   MessageDelta(delta~ : MessageDelta, usage~ : MessageDeltaUsage)
   MessageStop
   Ping

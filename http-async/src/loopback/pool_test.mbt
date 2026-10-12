@@ -2,7 +2,7 @@
 /// A keep-alive server that counts accepted client sockets.
 async fn with_keepalive_server(
   handler : async (@ahttp.Request, @ahttp.ServerConnection) -> Unit,
-  run : async (String, () -> Int) -> Unit,
+  run : async (String, () -> Int32) -> Unit,
 ) -> Unit {
   @async.with_timeout(5000, () => {
     let server = @ahttp.Server(@socket.Addr::parse("127.0.0.1:0"))

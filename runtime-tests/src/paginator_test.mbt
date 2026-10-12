@@ -22,7 +22,7 @@ async test "Paginator starts with None follows the cursor and stays finished" {
 async test "Paginator ends at an empty page even when a cursor follows" {
   bounded(() => {
     let cursors : Array[String?] = []
-    let paginator : @runtime.Paginator[Int, @runtime.SdkError] = @runtime.Paginator::with_cursor(cursor => {
+    let paginator : @runtime.Paginator[Int32, @runtime.SdkError] = @runtime.Paginator::with_cursor(cursor => {
         cursors.push(cursor)
         match cursor {
           None => @runtime.Page::{ items: [], next: Some("second"), }
@@ -66,7 +66,7 @@ async test "Paginator each visits every item and collect keeps the unused rest" 
     assert_eq(fetched, [None])
     assert_eq(collect_paginator.next_page(), Some([4]))
     assert_eq(collect_paginator.next_page(), None)
-    let zero : @runtime.Paginator[Int, @runtime.SdkError] = @runtime.Paginator::with_cursor(_ => @runtime.Page::{
+    let zero : @runtime.Paginator[Int32, @runtime.SdkError] = @runtime.Paginator::with_cursor(_ => @runtime.Page::{
         items: [1],
         next: None,
       },
@@ -101,7 +101,7 @@ async test "Paginator failed fetch retries the same cursor" {
 async test "Paginator::new lets the fetch own any cursor and stops at None" {
   bounded(() => {
     let calls = Ref(0)
-    let paginator : @runtime.Paginator[Int, @runtime.SdkError] = @runtime.Paginator::new(() => {
+    let paginator : @runtime.Paginator[Int32, @runtime.SdkError] = @runtime.Paginator::new(() => {
         calls.val += 1
         match calls.val {
           1 => Some([1, 2])

@@ -91,7 +91,7 @@ pub fn AsyncTransport::close(self : AsyncTransport) -> Unit {
 
 ///|
 /// The number of parked keep-alive connections across all origins.
-pub fn AsyncTransport::idle_connections(self : AsyncTransport) -> Int {
+pub fn AsyncTransport::idle_connections(self : AsyncTransport) -> Int32 {
   let mut total = 0
   for _, parked in self.idle {
     total += parked.length()

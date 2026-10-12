@@ -128,7 +128,7 @@ pub fn security_advisories_list_global_advisories_request(
   before? : String,
   after? : String,
   direction? : SecurityAdvisoriesListGlobalAdvisoriesDirection,
-  per_page? : Int,
+  per_page? : Int32,
   sort? : SecurityAdvisoriesListGlobalAdvisoriesSort,
 ) -> @http.Request {
   let mut url = "/advisories"
@@ -261,14 +261,14 @@ pub fn security_advisories_get_global_advisory_decode(
 pub fn agent_tasks_list_tasks_for_repo_request(
   owner : String,
   repo : String,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
   sort? : AgentTasksListTasksForRepoSort,
   direction? : AgentTasksListTasksForRepoDirection,
   state? : String,
   is_archived? : Bool,
   since? : String,
-  creator_id? : Array[Int],
+  creator_id? : Array[Int32],
 ) -> @http.Request {
   let mut url = "/agents/repos/" +
     percent_encode(parameter_value(owner)) +
@@ -407,8 +407,8 @@ pub fn agent_tasks_get_task_by_repo_and_id_decode(
 ///
 /// List tasks
 pub fn agent_tasks_list_tasks_request(
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
   sort? : AgentTasksListTasksSort,
   direction? : AgentTasksListTasksDirection,
   state? : String,
@@ -601,7 +601,7 @@ pub fn apps_update_webhook_config_for_app_decode(
 ///
 /// List deliveries for an app webhook
 pub fn apps_list_webhook_deliveries_request(
-  per_page? : Int,
+  per_page? : Int32,
   cursor? : String,
   status? : AppsListWebhookDeliveriesStatus,
 ) -> @http.Request {
@@ -642,7 +642,7 @@ pub fn apps_list_webhook_deliveries_decode(
 ///|
 ///
 /// Get a delivery for an app webhook
-pub fn apps_get_webhook_delivery_request(delivery_id : Int) -> @http.Request {
+pub fn apps_get_webhook_delivery_request(delivery_id : Int32) -> @http.Request {
   @http.Request::get(
     "/app/hook/deliveries/" + percent_encode(parameter_value(delivery_id)),
   )
@@ -670,7 +670,7 @@ pub fn apps_get_webhook_delivery_decode(
 ///
 /// Redeliver a delivery for an app webhook The caller handles the response as @http.Response.
 pub fn apps_redeliver_webhook_delivery_request(
-  delivery_id : Int,
+  delivery_id : Int32,
 ) -> @http.Request {
   @http.Request::post(
     "/app/hook/deliveries/" +
@@ -683,8 +683,8 @@ pub fn apps_redeliver_webhook_delivery_request(
 ///
 /// List installation requests for the authenticated app
 pub fn apps_list_installation_requests_for_authenticated_app_request(
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/app/installation-requests"
   match per_page {
@@ -720,8 +720,8 @@ pub fn apps_list_installation_requests_for_authenticated_app_decode(
 ///
 /// List installations for the authenticated app
 pub fn apps_list_installations_request(
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
   since? : String,
   outdated? : String,
 ) -> @http.Request {
@@ -766,7 +766,7 @@ pub fn apps_list_installations_decode(
 ///|
 ///
 /// Get an installation for the authenticated app
-pub fn apps_get_installation_request(installation_id : Int) -> @http.Request {
+pub fn apps_get_installation_request(installation_id : Int32) -> @http.Request {
   @http.Request::get(
     "/app/installations/" + percent_encode(parameter_value(installation_id)),
   )
@@ -793,7 +793,9 @@ pub fn apps_get_installation_decode(
 ///|
 ///
 /// Delete an installation for the authenticated app The caller handles the response as @http.Response.
-pub fn apps_delete_installation_request(installation_id : Int) -> @http.Request {
+pub fn apps_delete_installation_request(
+  installation_id : Int32,
+) -> @http.Request {
   @http.Request::delete(
     "/app/installations/" + percent_encode(parameter_value(installation_id)),
   )
@@ -803,7 +805,7 @@ pub fn apps_delete_installation_request(installation_id : Int) -> @http.Request 
 ///
 /// Create an installation access token for an app
 pub fn apps_create_installation_access_token_request(
-  installation_id : Int,
+  installation_id : Int32,
   body : AppsCreateInstallationAccessTokenRequest,
 ) -> @http.Request {
   @http.Request::post(
@@ -835,7 +837,7 @@ pub fn apps_create_installation_access_token_decode(
 ///
 /// Suspend an app installation The caller handles the response as @http.Response.
 pub fn apps_suspend_installation_request(
-  installation_id : Int,
+  installation_id : Int32,
 ) -> @http.Request {
   @http.Request::put(
     "/app/installations/" +
@@ -848,7 +850,7 @@ pub fn apps_suspend_installation_request(
 ///
 /// Unsuspend an app installation The caller handles the response as @http.Response.
 pub fn apps_unsuspend_installation_request(
-  installation_id : Int,
+  installation_id : Int32,
 ) -> @http.Request {
   @http.Request::delete(
     "/app/installations/" +
@@ -1002,7 +1004,7 @@ pub fn apps_get_by_slug_decode(
 ///
 /// Closed - Get an assignment The caller handles the response as @http.Response.
 pub fn classroom_get_an_assignment_request(
-  assignment_id : Int,
+  assignment_id : Int32,
 ) -> @http.Request {
   @http.Request::get(
     "/assignments/" + percent_encode(parameter_value(assignment_id)),
@@ -1013,7 +1015,7 @@ pub fn classroom_get_an_assignment_request(
 ///
 /// Closed - List accepted assignments for an assignment The caller handles the response as @http.Response.
 pub fn classroom_list_accepted_assignments_for_an_assignment_request(
-  assignment_id : Int,
+  assignment_id : Int32,
 ) -> @http.Request {
   @http.Request::get(
     "/assignments/" +
@@ -1026,7 +1028,7 @@ pub fn classroom_list_accepted_assignments_for_an_assignment_request(
 ///
 /// Closed - Get assignment grades The caller handles the response as @http.Response.
 pub fn classroom_get_assignment_grades_request(
-  assignment_id : Int,
+  assignment_id : Int32,
 ) -> @http.Request {
   @http.Request::get(
     "/assignments/" + percent_encode(parameter_value(assignment_id)) + "/grades",
@@ -1043,7 +1045,7 @@ pub fn classroom_list_classrooms_request() -> @http.Request {
 ///|
 ///
 /// Closed - Get a classroom The caller handles the response as @http.Response.
-pub fn classroom_get_a_classroom_request(classroom_id : Int) -> @http.Request {
+pub fn classroom_get_a_classroom_request(classroom_id : Int32) -> @http.Request {
   @http.Request::get(
     "/classrooms/" + percent_encode(parameter_value(classroom_id)),
   )
@@ -1053,7 +1055,7 @@ pub fn classroom_get_a_classroom_request(classroom_id : Int) -> @http.Request {
 ///
 /// Closed - List assignments for a classroom The caller handles the response as @http.Response.
 pub fn classroom_list_assignments_for_a_classroom_request(
-  classroom_id : Int,
+  classroom_id : Int32,
 ) -> @http.Request {
   @http.Request::get(
     "/classrooms/" +
@@ -1321,7 +1323,7 @@ pub fn oidc_delete_oidc_custom_property_inclusion_for_enterprise_request(
 /// Get code security configurations for an enterprise
 pub fn code_security_get_configurations_for_enterprise_request(
   enterprise : String,
-  per_page? : Int,
+  per_page? : Int32,
   before? : String,
   after? : String,
 ) -> @http.Request {
@@ -1429,7 +1431,7 @@ pub fn code_security_get_default_configurations_for_enterprise_decode(
 /// Retrieve a code security configuration of an enterprise
 pub fn code_security_get_single_configuration_for_enterprise_request(
   enterprise : String,
-  configuration_id : Int,
+  configuration_id : Int32,
 ) -> @http.Request {
   @http.Request::get(
     "/enterprises/" +
@@ -1462,7 +1464,7 @@ pub fn code_security_get_single_configuration_for_enterprise_decode(
 /// Update a custom code security configuration for an enterprise
 pub fn code_security_update_enterprise_configuration_request(
   enterprise : String,
-  configuration_id : Int,
+  configuration_id : Int32,
   body : CodeSecurityUpdateEnterpriseConfigurationRequest,
 ) -> @http.Request {
   @http.Request::patch(
@@ -1496,7 +1498,7 @@ pub fn code_security_update_enterprise_configuration_decode(
 /// Delete a code security configuration for an enterprise The caller handles the response as @http.Response.
 pub fn code_security_delete_configuration_for_enterprise_request(
   enterprise : String,
-  configuration_id : Int,
+  configuration_id : Int32,
 ) -> @http.Request {
   @http.Request::delete(
     "/enterprises/" +
@@ -1511,7 +1513,7 @@ pub fn code_security_delete_configuration_for_enterprise_request(
 /// Attach an enterprise configuration to repositories The caller handles the response as @http.Response.
 pub fn code_security_attach_enterprise_configuration_request(
   enterprise : String,
-  configuration_id : Int,
+  configuration_id : Int32,
   body : CodeSecurityAttachEnterpriseConfigurationRequest,
 ) -> @http.Request {
   @http.Request::post(
@@ -1528,7 +1530,7 @@ pub fn code_security_attach_enterprise_configuration_request(
 /// Set a code security configuration as a default for an enterprise
 pub fn code_security_set_configuration_as_default_for_enterprise_request(
   enterprise : String,
-  configuration_id : Int,
+  configuration_id : Int32,
   body : CodeSecuritySetConfigurationAsDefaultForEnterpriseRequest,
 ) -> @http.Request {
   @http.Request::put(
@@ -1563,8 +1565,8 @@ pub fn code_security_set_configuration_as_default_for_enterprise_decode(
 /// Get repositories associated with an enterprise code security configuration
 pub fn code_security_get_repositories_for_enterprise_configuration_request(
   enterprise : String,
-  configuration_id : Int,
-  per_page? : Int,
+  configuration_id : Int32,
+  per_page? : Int32,
   before? : String,
   after? : String,
   status? : String,
@@ -1862,7 +1864,7 @@ pub fn dependabot_list_alerts_for_enterprise_request(
   direction? : DependabotListAlertsForEnterpriseDirection,
   before? : String,
   after? : String,
-  per_page? : Int,
+  per_page? : Int32,
 ) -> @http.Request {
   let mut url = "/enterprises/" +
     percent_encode(parameter_value(enterprise)) +
@@ -1956,8 +1958,8 @@ pub fn dependabot_list_alerts_for_enterprise_decode(
 /// Lists the repositories Dependabot can access in an enterprise
 pub fn dependabot_repository_access_for_enterprise_request(
   enterprise : String,
-  page? : Int,
-  per_page? : Int,
+  page? : Int32,
+  per_page? : Int32,
 ) -> @http.Request {
   let mut url = "/enterprises/" +
     percent_encode(parameter_value(enterprise)) +
@@ -2023,8 +2025,8 @@ pub fn dependabot_set_repository_access_default_level_for_enterprise_request(
 ///
 /// List public events
 pub fn activity_list_public_events_request(
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/events"
   match per_page {
@@ -2086,8 +2088,8 @@ pub fn activity_get_feeds_decode(
 /// List gists for the authenticated user
 pub fn gists_list_request(
   since? : String,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/gists"
   match since {
@@ -2153,8 +2155,8 @@ pub fn gists_create_decode(
 /// List public gists
 pub fn gists_list_public_request(
   since? : String,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/gists/public"
   match since {
@@ -2195,8 +2197,8 @@ pub fn gists_list_public_decode(
 /// List starred gists
 pub fn gists_list_starred_request(
   since? : String,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/gists/starred"
   match since {
@@ -2299,8 +2301,8 @@ pub fn gists_delete_request(gist_id : String) -> @http.Request {
 /// List gist comments
 pub fn gists_list_comments_request(
   gist_id : String,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/gists/" +
     percent_encode(parameter_value(gist_id)) +
@@ -2451,8 +2453,8 @@ pub fn gists_delete_comment_request(
 /// List gist commits
 pub fn gists_list_commits_request(
   gist_id : String,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/gists/" +
     percent_encode(parameter_value(gist_id)) +
@@ -2491,8 +2493,8 @@ pub fn gists_list_commits_decode(
 /// List gist forks
 pub fn gists_list_forks_request(
   gist_id : String,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/gists/" + percent_encode(parameter_value(gist_id)) + "/forks"
   match per_page {
@@ -2667,8 +2669,8 @@ pub fn gitignore_get_template_decode(
 ///
 /// List repositories accessible to the app installation
 pub fn apps_list_repos_accessible_to_installation_request(
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/installation/repositories"
   match per_page {
@@ -2721,8 +2723,8 @@ pub fn issues_list_request(
   orgs? : Bool,
   owned? : Bool,
   pulls? : Bool,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/issues"
   match filter {
@@ -2799,8 +2801,8 @@ pub fn issues_list_decode(
 /// Get all commonly used licenses
 pub fn licenses_get_all_commonly_used_request(
   featured? : Bool,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/licenses"
   match featured {
@@ -2879,7 +2881,7 @@ pub fn markdown_render_raw_request() -> @http.Request {
 ///
 /// Get a subscription plan for an account
 pub fn apps_get_subscription_plan_for_account_request(
-  account_id : Int,
+  account_id : Int32,
 ) -> @http.Request {
   @http.Request::get(
     "/marketplace_listing/accounts/" +
@@ -2908,7 +2910,10 @@ pub fn apps_get_subscription_plan_for_account_decode(
 ///|
 ///
 /// List plans
-pub fn apps_list_plans_request(per_page? : Int, page? : Int) -> @http.Request {
+pub fn apps_list_plans_request(
+  per_page? : Int32,
+  page? : Int32,
+) -> @http.Request {
   let mut url = "/marketplace_listing/plans"
   match per_page {
     Some(value) => url = append_query(url, "per_page", parameter_value(value))
@@ -2943,11 +2948,11 @@ pub fn apps_list_plans_decode(
 ///
 /// List accounts for a plan
 pub fn apps_list_accounts_for_plan_request(
-  plan_id : Int,
+  plan_id : Int32,
   sort? : AppsListAccountsForPlanSort,
   direction? : AppsListAccountsForPlanDirection,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/marketplace_listing/plans/" +
     percent_encode(parameter_value(plan_id)) +
@@ -2993,7 +2998,7 @@ pub fn apps_list_accounts_for_plan_decode(
 ///
 /// Get a subscription plan for an account (stubbed)
 pub fn apps_get_subscription_plan_for_account_stubbed_request(
-  account_id : Int,
+  account_id : Int32,
 ) -> @http.Request {
   @http.Request::get(
     "/marketplace_listing/stubbed/accounts/" +
@@ -3023,8 +3028,8 @@ pub fn apps_get_subscription_plan_for_account_stubbed_decode(
 ///
 /// List plans (stubbed)
 pub fn apps_list_plans_stubbed_request(
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/marketplace_listing/stubbed/plans"
   match per_page {
@@ -3060,11 +3065,11 @@ pub fn apps_list_plans_stubbed_decode(
 ///
 /// List accounts for a plan (stubbed)
 pub fn apps_list_accounts_for_plan_stubbed_request(
-  plan_id : Int,
+  plan_id : Int32,
   sort? : AppsListAccountsForPlanStubbedSort,
   direction? : AppsListAccountsForPlanStubbedDirection,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/marketplace_listing/stubbed/plans/" +
     percent_encode(parameter_value(plan_id)) +
@@ -3137,8 +3142,8 @@ pub fn meta_get_decode(
 pub fn activity_list_public_events_for_repo_network_request(
   owner : String,
   repo : String,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/networks/" +
     percent_encode(parameter_value(owner)) +
@@ -3182,8 +3187,8 @@ pub fn activity_list_notifications_for_authenticated_user_request(
   participating? : Bool,
   since? : String,
   before? : String,
-  page? : Int,
-  per_page? : Int,
+  page? : Int32,
+  per_page? : Int32,
 ) -> @http.Request {
   let mut url = "/notifications"
   match all {
@@ -3262,7 +3267,7 @@ pub fn activity_mark_notifications_as_read_decode(
 ///|
 ///
 /// Get a thread
-pub fn activity_get_thread_request(thread_id : Int) -> @http.Request {
+pub fn activity_get_thread_request(thread_id : Int32) -> @http.Request {
   @http.Request::get(
     "/notifications/threads/" + percent_encode(parameter_value(thread_id)),
   )
@@ -3289,7 +3294,7 @@ pub fn activity_get_thread_decode(
 ///|
 ///
 /// Mark a thread as read The caller handles the response as @http.Response.
-pub fn activity_mark_thread_as_read_request(thread_id : Int) -> @http.Request {
+pub fn activity_mark_thread_as_read_request(thread_id : Int32) -> @http.Request {
   @http.Request::patch(
     "/notifications/threads/" + percent_encode(parameter_value(thread_id)),
   )
@@ -3298,7 +3303,7 @@ pub fn activity_mark_thread_as_read_request(thread_id : Int) -> @http.Request {
 ///|
 ///
 /// Mark a thread as done The caller handles the response as @http.Response.
-pub fn activity_mark_thread_as_done_request(thread_id : Int) -> @http.Request {
+pub fn activity_mark_thread_as_done_request(thread_id : Int32) -> @http.Request {
   @http.Request::delete(
     "/notifications/threads/" + percent_encode(parameter_value(thread_id)),
   )
@@ -3308,7 +3313,7 @@ pub fn activity_mark_thread_as_done_request(thread_id : Int) -> @http.Request {
 ///
 /// Get a thread subscription for the authenticated user
 pub fn activity_get_thread_subscription_for_authenticated_user_request(
-  thread_id : Int,
+  thread_id : Int32,
 ) -> @http.Request {
   @http.Request::get(
     "/notifications/threads/" +
@@ -3339,7 +3344,7 @@ pub fn activity_get_thread_subscription_for_authenticated_user_decode(
 ///
 /// Set a thread subscription
 pub fn activity_set_thread_subscription_request(
-  thread_id : Int,
+  thread_id : Int32,
   body : ActivitySetThreadSubscriptionRequest,
 ) -> @http.Request {
   @http.Request::put(
@@ -3371,7 +3376,7 @@ pub fn activity_set_thread_subscription_decode(
 ///
 /// Delete a thread subscription The caller handles the response as @http.Response.
 pub fn activity_delete_thread_subscription_request(
-  thread_id : Int,
+  thread_id : Int32,
 ) -> @http.Request {
   @http.Request::delete(
     "/notifications/threads/" +
@@ -3395,7 +3400,7 @@ pub fn meta_get_octocat_request(s? : String) -> @http.Request {
 ///|
 ///
 /// List organizations
-pub fn orgs_list_request(since? : Int, per_page? : Int) -> @http.Request {
+pub fn orgs_list_request(since? : Int32, per_page? : Int32) -> @http.Request {
   let mut url = "/organizations"
   match since {
     Some(value) => url = append_query(url, "since", parameter_value(value))
@@ -3521,9 +3526,9 @@ pub fn actions_set_actions_cache_storage_limit_for_organization_request(
 /// Get billing AI credit usage report for an organization The caller handles the response as @http.Response.
 pub fn billing_get_github_billing_ai_credit_usage_report_org_request(
   org : String,
-  year? : Int,
-  month? : Int,
-  day? : Int,
+  year? : Int32,
+  month? : Int32,
+  day? : Int32,
   user? : String,
   model? : String,
   product? : String,
@@ -3563,8 +3568,8 @@ pub fn billing_get_github_billing_ai_credit_usage_report_org_request(
 /// Get all budgets for an organization The caller handles the response as @http.Response.
 pub fn billing_get_all_budgets_org_request(
   org : String,
-  page? : Int,
-  per_page? : Int,
+  page? : Int32,
+  per_page? : Int32,
   scope? : BillingGetAllBudgetsOrgScope,
   user? : String,
 ) -> @http.Request {
@@ -3691,9 +3696,9 @@ pub fn billing_delete_budget_org_request(
 /// Get billing premium request usage report for an organization The caller handles the response as @http.Response.
 pub fn billing_get_github_billing_premium_request_usage_report_org_request(
   org : String,
-  year? : Int,
-  month? : Int,
-  day? : Int,
+  year? : Int32,
+  month? : Int32,
+  day? : Int32,
   user? : String,
   model? : String,
   product? : String,
@@ -3733,9 +3738,9 @@ pub fn billing_get_github_billing_premium_request_usage_report_org_request(
 /// Get billing usage report for an organization The caller handles the response as @http.Response.
 pub fn billing_get_github_billing_usage_report_org_request(
   org : String,
-  year? : Int,
-  month? : Int,
-  day? : Int,
+  year? : Int32,
+  month? : Int32,
+  day? : Int32,
 ) -> @http.Request {
   let mut url = "/organizations/" +
     percent_encode(parameter_value(org)) +
@@ -3760,9 +3765,9 @@ pub fn billing_get_github_billing_usage_report_org_request(
 /// Get billing usage summary for an organization The caller handles the response as @http.Response.
 pub fn billing_get_github_billing_usage_summary_report_org_request(
   org : String,
-  year? : Int,
-  month? : Int,
-  day? : Int,
+  year? : Int32,
+  month? : Int32,
+  day? : Int32,
   repository? : String,
   product? : String,
   sku? : String,
@@ -3893,8 +3898,8 @@ pub fn actions_get_actions_cache_usage_for_org_decode(
 /// List repositories with GitHub Actions cache usage for an organization
 pub fn actions_get_actions_cache_usage_by_repo_for_org_request(
   org : String,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/orgs/" +
     percent_encode(parameter_value(org)) +
@@ -3933,8 +3938,8 @@ pub fn actions_get_actions_cache_usage_by_repo_for_org_decode(
 /// List GitHub-hosted runners for an organization
 pub fn actions_list_hosted_runners_for_org_request(
   org : String,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/orgs/" +
     percent_encode(parameter_value(org)) +
@@ -4034,7 +4039,7 @@ pub fn actions_list_custom_images_for_org_decode(
 /// Get a custom image definition for GitHub Actions Hosted Runners
 pub fn actions_get_custom_image_for_org_request(
   org : String,
-  image_definition_id : Int,
+  image_definition_id : Int32,
 ) -> @http.Request {
   @http.Request::get(
     "/orgs/" +
@@ -4067,7 +4072,7 @@ pub fn actions_get_custom_image_for_org_decode(
 /// Delete a custom image from the organization The caller handles the response as @http.Response.
 pub fn actions_delete_custom_image_from_org_request(
   org : String,
-  image_definition_id : Int,
+  image_definition_id : Int32,
 ) -> @http.Request {
   @http.Request::delete(
     "/orgs/" +
@@ -4081,7 +4086,7 @@ pub fn actions_delete_custom_image_from_org_request(
 ///
 /// List image versions of a custom image for an organization
 pub fn actions_list_custom_image_versions_for_org_request(
-  image_definition_id : Int,
+  image_definition_id : Int32,
   org : String,
 ) -> @http.Request {
   @http.Request::get(
@@ -4116,7 +4121,7 @@ pub fn actions_list_custom_image_versions_for_org_decode(
 /// Get an image version of a custom image for GitHub Actions Hosted Runners
 pub fn actions_get_custom_image_version_for_org_request(
   org : String,
-  image_definition_id : Int,
+  image_definition_id : Int32,
   version : String,
 ) -> @http.Request {
   @http.Request::get(
@@ -4152,7 +4157,7 @@ pub fn actions_get_custom_image_version_for_org_decode(
 /// Delete an image version of custom image from the organization The caller handles the response as @http.Response.
 pub fn actions_delete_custom_image_version_from_org_request(
   org : String,
-  image_definition_id : Int,
+  image_definition_id : Int32,
   version : String,
 ) -> @http.Request {
   @http.Request::delete(
@@ -4325,7 +4330,7 @@ pub fn actions_get_hosted_runners_platforms_for_org_decode(
 /// Get a GitHub-hosted runner for an organization
 pub fn actions_get_hosted_runner_for_org_request(
   org : String,
-  hosted_runner_id : Int,
+  hosted_runner_id : Int32,
 ) -> @http.Request {
   @http.Request::get(
     "/orgs/" +
@@ -4358,7 +4363,7 @@ pub fn actions_get_hosted_runner_for_org_decode(
 /// Update a GitHub-hosted runner for an organization
 pub fn actions_update_hosted_runner_for_org_request(
   org : String,
-  hosted_runner_id : Int,
+  hosted_runner_id : Int32,
   body : ActionsUpdateHostedRunnerForOrgRequest,
 ) -> @http.Request {
   @http.Request::patch(
@@ -4392,7 +4397,7 @@ pub fn actions_update_hosted_runner_for_org_decode(
 /// Delete a GitHub-hosted runner for an organization
 pub fn actions_delete_hosted_runner_for_org_request(
   org : String,
-  hosted_runner_id : Int,
+  hosted_runner_id : Int32,
 ) -> @http.Request {
   @http.Request::delete(
     "/orgs/" +
@@ -4742,8 +4747,8 @@ pub fn actions_set_private_repo_fork_pr_workflows_settings_organization_request(
 /// List selected repositories enabled for GitHub Actions in an organization
 pub fn actions_list_selected_repositories_enabled_github_actions_organization_request(
   org : String,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/orgs/" +
     percent_encode(parameter_value(org)) +
@@ -4796,7 +4801,7 @@ pub fn actions_set_selected_repositories_enabled_github_actions_organization_req
 /// Enable a selected repository for GitHub Actions in an organization The caller handles the response as @http.Response.
 pub fn actions_enable_selected_repository_github_actions_organization_request(
   org : String,
-  repository_id : Int,
+  repository_id : Int32,
 ) -> @http.Request {
   @http.Request::put(
     "/orgs/" +
@@ -4811,7 +4816,7 @@ pub fn actions_enable_selected_repository_github_actions_organization_request(
 /// Disable a selected repository for GitHub Actions in an organization The caller handles the response as @http.Response.
 pub fn actions_disable_selected_repository_github_actions_organization_request(
   org : String,
-  repository_id : Int,
+  repository_id : Int32,
 ) -> @http.Request {
   @http.Request::delete(
     "/orgs/" +
@@ -4916,8 +4921,8 @@ pub fn actions_set_self_hosted_runners_permissions_organization_request(
 /// List repositories allowed to use self-hosted runners in an organization
 pub fn actions_list_selected_repositories_self_hosted_runners_organization_request(
   org : String,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/orgs/" +
     percent_encode(parameter_value(org)) +
@@ -4970,7 +4975,7 @@ pub fn actions_set_selected_repositories_self_hosted_runners_organization_reques
 /// Add a repository to the list of repositories allowed to use self-hosted runners in an organization The caller handles the response as @http.Response.
 pub fn actions_enable_selected_repository_self_hosted_runners_organization_request(
   org : String,
-  repository_id : Int,
+  repository_id : Int32,
 ) -> @http.Request {
   @http.Request::put(
     "/orgs/" +
@@ -4985,7 +4990,7 @@ pub fn actions_enable_selected_repository_self_hosted_runners_organization_reque
 /// Remove a repository from the list of repositories allowed to use self-hosted runners in an organization The caller handles the response as @http.Response.
 pub fn actions_disable_selected_repository_self_hosted_runners_organization_request(
   org : String,
-  repository_id : Int,
+  repository_id : Int32,
 ) -> @http.Request {
   @http.Request::delete(
     "/orgs/" +
@@ -5045,8 +5050,8 @@ pub fn actions_set_github_actions_default_workflow_permissions_organization_requ
 /// List organization Actions policies
 pub fn actions_get_org_actions_policies_request(
   org : String,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
   has_parents? : Bool,
 ) -> @http.Request {
   let mut url = "/orgs/" +
@@ -5121,7 +5126,7 @@ pub fn actions_create_org_actions_policy_decode(
 /// Get an organization Actions policy
 pub fn actions_get_org_actions_policy_request(
   org : String,
-  policy_id : Int,
+  policy_id : Int32,
 ) -> @http.Request {
   @http.Request::get(
     "/orgs/" +
@@ -5154,7 +5159,7 @@ pub fn actions_get_org_actions_policy_decode(
 /// Update an organization Actions policy
 pub fn actions_update_org_actions_policy_request(
   org : String,
-  policy_id : Int,
+  policy_id : Int32,
   body : ActionsUpdateOrgActionsPolicyRequest,
 ) -> @http.Request {
   @http.Request::put(
@@ -5188,7 +5193,7 @@ pub fn actions_update_org_actions_policy_decode(
 /// Delete an organization Actions policy The caller handles the response as @http.Response.
 pub fn actions_delete_org_actions_policy_request(
   org : String,
-  policy_id : Int,
+  policy_id : Int32,
 ) -> @http.Request {
   @http.Request::delete(
     "/orgs/" +
@@ -5203,8 +5208,8 @@ pub fn actions_delete_org_actions_policy_request(
 /// List self-hosted runner groups for an organization
 pub fn actions_list_self_hosted_runner_groups_for_org_request(
   org : String,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
   visible_to_repository? : String,
 ) -> @http.Request {
   let mut url = "/orgs/" +
@@ -5279,7 +5284,7 @@ pub fn actions_create_self_hosted_runner_group_for_org_decode(
 /// Get a self-hosted runner group for an organization
 pub fn actions_get_self_hosted_runner_group_for_org_request(
   org : String,
-  runner_group_id : Int,
+  runner_group_id : Int32,
 ) -> @http.Request {
   @http.Request::get(
     "/orgs/" +
@@ -5312,7 +5317,7 @@ pub fn actions_get_self_hosted_runner_group_for_org_decode(
 /// Update a self-hosted runner group for an organization
 pub fn actions_update_self_hosted_runner_group_for_org_request(
   org : String,
-  runner_group_id : Int,
+  runner_group_id : Int32,
   body : ActionsUpdateSelfHostedRunnerGroupForOrgRequest,
 ) -> @http.Request {
   @http.Request::patch(
@@ -5346,7 +5351,7 @@ pub fn actions_update_self_hosted_runner_group_for_org_decode(
 /// Delete a self-hosted runner group from an organization The caller handles the response as @http.Response.
 pub fn actions_delete_self_hosted_runner_group_from_org_request(
   org : String,
-  runner_group_id : Int,
+  runner_group_id : Int32,
 ) -> @http.Request {
   @http.Request::delete(
     "/orgs/" +
@@ -5361,9 +5366,9 @@ pub fn actions_delete_self_hosted_runner_group_from_org_request(
 /// List GitHub-hosted runners in a group for an organization
 pub fn actions_list_github_hosted_runners_in_group_for_org_request(
   org : String,
-  runner_group_id : Int,
-  per_page? : Int,
-  page? : Int,
+  runner_group_id : Int32,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/orgs/" +
     percent_encode(parameter_value(org)) +
@@ -5404,9 +5409,9 @@ pub fn actions_list_github_hosted_runners_in_group_for_org_decode(
 /// List repository access to a self-hosted runner group in an organization
 pub fn actions_list_repo_access_to_self_hosted_runner_group_in_org_request(
   org : String,
-  runner_group_id : Int,
-  page? : Int,
-  per_page? : Int,
+  runner_group_id : Int32,
+  page? : Int32,
+  per_page? : Int32,
 ) -> @http.Request {
   let mut url = "/orgs/" +
     percent_encode(parameter_value(org)) +
@@ -5447,7 +5452,7 @@ pub fn actions_list_repo_access_to_self_hosted_runner_group_in_org_decode(
 /// Set repository access for a self-hosted runner group in an organization The caller handles the response as @http.Response.
 pub fn actions_set_repo_access_to_self_hosted_runner_group_in_org_request(
   org : String,
-  runner_group_id : Int,
+  runner_group_id : Int32,
   body : ActionsSetRepoAccessToSelfHostedRunnerGroupInOrgRequest,
 ) -> @http.Request {
   @http.Request::put(
@@ -5464,8 +5469,8 @@ pub fn actions_set_repo_access_to_self_hosted_runner_group_in_org_request(
 /// Add repository access to a self-hosted runner group in an organization The caller handles the response as @http.Response.
 pub fn actions_add_repo_access_to_self_hosted_runner_group_in_org_request(
   org : String,
-  runner_group_id : Int,
-  repository_id : Int,
+  runner_group_id : Int32,
+  repository_id : Int32,
 ) -> @http.Request {
   @http.Request::put(
     "/orgs/" +
@@ -5482,8 +5487,8 @@ pub fn actions_add_repo_access_to_self_hosted_runner_group_in_org_request(
 /// Remove repository access to a self-hosted runner group in an organization The caller handles the response as @http.Response.
 pub fn actions_remove_repo_access_to_self_hosted_runner_group_in_org_request(
   org : String,
-  runner_group_id : Int,
-  repository_id : Int,
+  runner_group_id : Int32,
+  repository_id : Int32,
 ) -> @http.Request {
   @http.Request::delete(
     "/orgs/" +
@@ -5500,9 +5505,9 @@ pub fn actions_remove_repo_access_to_self_hosted_runner_group_in_org_request(
 /// List self-hosted runners in a group for an organization
 pub fn actions_list_self_hosted_runners_in_group_for_org_request(
   org : String,
-  runner_group_id : Int,
-  per_page? : Int,
-  page? : Int,
+  runner_group_id : Int32,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/orgs/" +
     percent_encode(parameter_value(org)) +
@@ -5543,7 +5548,7 @@ pub fn actions_list_self_hosted_runners_in_group_for_org_decode(
 /// Set self-hosted runners in a group for an organization The caller handles the response as @http.Response.
 pub fn actions_set_self_hosted_runners_in_group_for_org_request(
   org : String,
-  runner_group_id : Int,
+  runner_group_id : Int32,
   body : ActionsSetSelfHostedRunnersInGroupForOrgRequest,
 ) -> @http.Request {
   @http.Request::put(
@@ -5560,8 +5565,8 @@ pub fn actions_set_self_hosted_runners_in_group_for_org_request(
 /// Add a self-hosted runner to a group for an organization The caller handles the response as @http.Response.
 pub fn actions_add_self_hosted_runner_to_group_for_org_request(
   org : String,
-  runner_group_id : Int,
-  runner_id : Int,
+  runner_group_id : Int32,
+  runner_id : Int32,
 ) -> @http.Request {
   @http.Request::put(
     "/orgs/" +
@@ -5578,8 +5583,8 @@ pub fn actions_add_self_hosted_runner_to_group_for_org_request(
 /// Remove a self-hosted runner from a group for an organization The caller handles the response as @http.Response.
 pub fn actions_remove_self_hosted_runner_from_group_for_org_request(
   org : String,
-  runner_group_id : Int,
-  runner_id : Int,
+  runner_group_id : Int32,
+  runner_id : Int32,
 ) -> @http.Request {
   @http.Request::delete(
     "/orgs/" +
@@ -5597,8 +5602,8 @@ pub fn actions_remove_self_hosted_runner_from_group_for_org_request(
 pub fn actions_list_self_hosted_runners_for_org_request(
   org : String,
   name? : String,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/orgs/" +
     percent_encode(parameter_value(org)) +
@@ -5781,7 +5786,7 @@ pub fn actions_create_remove_token_for_org_decode(
 /// Get a self-hosted runner for an organization
 pub fn actions_get_self_hosted_runner_for_org_request(
   org : String,
-  runner_id : Int,
+  runner_id : Int32,
 ) -> @http.Request {
   @http.Request::get(
     "/orgs/" +
@@ -5814,7 +5819,7 @@ pub fn actions_get_self_hosted_runner_for_org_decode(
 /// Delete a self-hosted runner from an organization The caller handles the response as @http.Response.
 pub fn actions_delete_self_hosted_runner_from_org_request(
   org : String,
-  runner_id : Int,
+  runner_id : Int32,
 ) -> @http.Request {
   @http.Request::delete(
     "/orgs/" +
@@ -5829,7 +5834,7 @@ pub fn actions_delete_self_hosted_runner_from_org_request(
 /// List labels for a self-hosted runner for an organization The caller handles the response as @http.Response.
 pub fn actions_list_labels_for_self_hosted_runner_for_org_request(
   org : String,
-  runner_id : Int,
+  runner_id : Int32,
 ) -> @http.Request {
   @http.Request::get(
     "/orgs/" +
@@ -5845,7 +5850,7 @@ pub fn actions_list_labels_for_self_hosted_runner_for_org_request(
 /// Add custom labels to a self-hosted runner for an organization The caller handles the response as @http.Response.
 pub fn actions_add_custom_labels_to_self_hosted_runner_for_org_request(
   org : String,
-  runner_id : Int,
+  runner_id : Int32,
   body : ActionsAddCustomLabelsToSelfHostedRunnerForOrgRequest,
 ) -> @http.Request {
   @http.Request::post(
@@ -5862,7 +5867,7 @@ pub fn actions_add_custom_labels_to_self_hosted_runner_for_org_request(
 /// Set custom labels for a self-hosted runner for an organization The caller handles the response as @http.Response.
 pub fn actions_set_custom_labels_for_self_hosted_runner_for_org_request(
   org : String,
-  runner_id : Int,
+  runner_id : Int32,
   body : ActionsSetCustomLabelsForSelfHostedRunnerForOrgRequest,
 ) -> @http.Request {
   @http.Request::put(
@@ -5879,7 +5884,7 @@ pub fn actions_set_custom_labels_for_self_hosted_runner_for_org_request(
 /// Remove all custom labels from a self-hosted runner for an organization The caller handles the response as @http.Response.
 pub fn actions_remove_all_custom_labels_from_self_hosted_runner_for_org_request(
   org : String,
-  runner_id : Int,
+  runner_id : Int32,
 ) -> @http.Request {
   @http.Request::delete(
     "/orgs/" +
@@ -5895,7 +5900,7 @@ pub fn actions_remove_all_custom_labels_from_self_hosted_runner_for_org_request(
 /// Remove a custom label from a self-hosted runner for an organization The caller handles the response as @http.Response.
 pub fn actions_remove_custom_label_from_self_hosted_runner_for_org_request(
   org : String,
-  runner_id : Int,
+  runner_id : Int32,
   name : String,
 ) -> @http.Request {
   @http.Request::delete(
@@ -5913,8 +5918,8 @@ pub fn actions_remove_custom_label_from_self_hosted_runner_for_org_request(
 /// List organization secrets
 pub fn actions_list_org_secrets_request(
   org : String,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/orgs/" +
     percent_encode(parameter_value(org)) +
@@ -6065,8 +6070,8 @@ pub fn actions_delete_org_secret_request(
 pub fn actions_list_selected_repos_for_org_secret_request(
   org : String,
   secret_name : String,
-  page? : Int,
-  per_page? : Int,
+  page? : Int32,
+  per_page? : Int32,
 ) -> @http.Request {
   let mut url = "/orgs/" +
     percent_encode(parameter_value(org)) +
@@ -6125,7 +6130,7 @@ pub fn actions_set_selected_repos_for_org_secret_request(
 pub fn actions_add_selected_repo_to_org_secret_request(
   org : String,
   secret_name : String,
-  repository_id : Int,
+  repository_id : Int32,
 ) -> @http.Request {
   @http.Request::put(
     "/orgs/" +
@@ -6143,7 +6148,7 @@ pub fn actions_add_selected_repo_to_org_secret_request(
 pub fn actions_remove_selected_repo_from_org_secret_request(
   org : String,
   secret_name : String,
-  repository_id : Int,
+  repository_id : Int32,
 ) -> @http.Request {
   @http.Request::delete(
     "/orgs/" +
@@ -6160,8 +6165,8 @@ pub fn actions_remove_selected_repo_from_org_secret_request(
 /// List organization variables
 pub fn actions_list_org_variables_request(
   org : String,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/orgs/" +
     percent_encode(parameter_value(org)) +
@@ -6295,8 +6300,8 @@ pub fn actions_delete_org_variable_request(
 pub fn actions_list_selected_repos_for_org_variable_request(
   org : String,
   name : String,
-  page? : Int,
-  per_page? : Int,
+  page? : Int32,
+  per_page? : Int32,
 ) -> @http.Request {
   let mut url = "/orgs/" +
     percent_encode(parameter_value(org)) +
@@ -6355,7 +6360,7 @@ pub fn actions_set_selected_repos_for_org_variable_request(
 pub fn actions_add_selected_repo_to_org_variable_request(
   org : String,
   name : String,
-  repository_id : Int,
+  repository_id : Int32,
 ) -> @http.Request {
   @http.Request::put(
     "/orgs/" +
@@ -6373,7 +6378,7 @@ pub fn actions_add_selected_repo_to_org_variable_request(
 pub fn actions_remove_selected_repo_from_org_variable_request(
   org : String,
   name : String,
-  repository_id : Int,
+  repository_id : Int32,
 ) -> @http.Request {
   @http.Request::delete(
     "/orgs/" +
@@ -6390,8 +6395,8 @@ pub fn actions_remove_selected_repo_from_org_variable_request(
 /// List organization secrets
 pub fn agents_list_org_secrets_request(
   org : String,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/orgs/" +
     percent_encode(parameter_value(org)) +
@@ -6542,8 +6547,8 @@ pub fn agents_delete_org_secret_request(
 pub fn agents_list_selected_repos_for_org_secret_request(
   org : String,
   secret_name : String,
-  page? : Int,
-  per_page? : Int,
+  page? : Int32,
+  per_page? : Int32,
 ) -> @http.Request {
   let mut url = "/orgs/" +
     percent_encode(parameter_value(org)) +
@@ -6602,7 +6607,7 @@ pub fn agents_set_selected_repos_for_org_secret_request(
 pub fn agents_add_selected_repo_to_org_secret_request(
   org : String,
   secret_name : String,
-  repository_id : Int,
+  repository_id : Int32,
 ) -> @http.Request {
   @http.Request::put(
     "/orgs/" +
@@ -6620,7 +6625,7 @@ pub fn agents_add_selected_repo_to_org_secret_request(
 pub fn agents_remove_selected_repo_from_org_secret_request(
   org : String,
   secret_name : String,
-  repository_id : Int,
+  repository_id : Int32,
 ) -> @http.Request {
   @http.Request::delete(
     "/orgs/" +
@@ -6637,8 +6642,8 @@ pub fn agents_remove_selected_repo_from_org_secret_request(
 /// List organization variables
 pub fn agents_list_org_variables_request(
   org : String,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/orgs/" +
     percent_encode(parameter_value(org)) +
@@ -6772,8 +6777,8 @@ pub fn agents_delete_org_variable_request(
 pub fn agents_list_selected_repos_for_org_variable_request(
   org : String,
   name : String,
-  page? : Int,
-  per_page? : Int,
+  page? : Int32,
+  per_page? : Int32,
 ) -> @http.Request {
   let mut url = "/orgs/" +
     percent_encode(parameter_value(org)) +
@@ -6832,7 +6837,7 @@ pub fn agents_set_selected_repos_for_org_variable_request(
 pub fn agents_add_selected_repo_to_org_variable_request(
   org : String,
   name : String,
-  repository_id : Int,
+  repository_id : Int32,
 ) -> @http.Request {
   @http.Request::put(
     "/orgs/" +
@@ -6850,7 +6855,7 @@ pub fn agents_add_selected_repo_to_org_variable_request(
 pub fn agents_remove_selected_repo_from_org_variable_request(
   org : String,
   name : String,
-  repository_id : Int,
+  repository_id : Int32,
 ) -> @http.Request {
   @http.Request::delete(
     "/orgs/" +
@@ -6969,7 +6974,7 @@ pub fn orgs_create_cluster_deployment_records_job_decode(
 pub fn orgs_get_cluster_deployment_records_job_request(
   org : String,
   cluster : String,
-  job_id : Int,
+  job_id : Int32,
 ) -> @http.Request {
   @http.Request::get(
     "/orgs/" +
@@ -7105,7 +7110,7 @@ pub fn orgs_list_artifact_storage_records_decode(
 pub fn orgs_list_attestations_bulk_request(
   org : String,
   body : OrgsListAttestationsBulkRequest,
-  per_page? : Int,
+  per_page? : Int32,
   before? : String,
   after? : String,
 ) -> @http.Request {
@@ -7179,7 +7184,7 @@ pub fn orgs_delete_attestations_by_subject_digest_request(
 /// List attestation repositories
 pub fn orgs_list_attestation_repositories_request(
   org : String,
-  per_page? : Int,
+  per_page? : Int32,
   before? : String,
   after? : String,
   predicate_type? : String,
@@ -7230,7 +7235,7 @@ pub fn orgs_list_attestation_repositories_decode(
 /// Delete attestations by ID The caller handles the response as @http.Response.
 pub fn orgs_delete_attestations_by_id_request(
   org : String,
-  attestation_id : Int,
+  attestation_id : Int32,
 ) -> @http.Request {
   @http.Request::delete(
     "/orgs/" +
@@ -7246,7 +7251,7 @@ pub fn orgs_delete_attestations_by_id_request(
 pub fn orgs_list_attestations_request(
   org : String,
   subject_digest : String,
-  per_page? : Int,
+  per_page? : Int32,
   before? : String,
   after? : String,
   predicate_type? : String,
@@ -7298,8 +7303,8 @@ pub fn orgs_list_attestations_decode(
 /// List users blocked by an organization
 pub fn orgs_list_blocked_users_request(
   org : String,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/orgs/" + percent_encode(parameter_value(org)) + "/blocks"
   match per_page {
@@ -7381,8 +7386,8 @@ pub fn orgs_unblock_user_request(
 /// List campaigns for an organization
 pub fn campaigns_list_org_campaigns_request(
   org : String,
-  page? : Int,
-  per_page? : Int,
+  page? : Int32,
+  per_page? : Int32,
   direction? : CampaignsListOrgCampaignsDirection,
   state? : CampaignState,
   sort? : CampaignsListOrgCampaignsSort,
@@ -7464,7 +7469,7 @@ pub fn campaigns_create_campaign_decode(
 /// Get a campaign for an organization
 pub fn campaigns_get_campaign_summary_request(
   org : String,
-  campaign_number : Int,
+  campaign_number : Int32,
 ) -> @http.Request {
   @http.Request::get(
     "/orgs/" +
@@ -7497,7 +7502,7 @@ pub fn campaigns_get_campaign_summary_decode(
 /// Update a campaign
 pub fn campaigns_update_campaign_request(
   org : String,
-  campaign_number : Int,
+  campaign_number : Int32,
   body : CampaignsUpdateCampaignRequest,
 ) -> @http.Request {
   @http.Request::patch(
@@ -7531,7 +7536,7 @@ pub fn campaigns_update_campaign_decode(
 /// Delete a campaign for an organization The caller handles the response as @http.Response.
 pub fn campaigns_delete_campaign_request(
   org : String,
-  campaign_number : Int,
+  campaign_number : Int32,
 ) -> @http.Request {
   @http.Request::delete(
     "/orgs/" +
@@ -7609,8 +7614,8 @@ pub fn code_scanning_list_alerts_for_org_request(
   tool_guid? : String,
   before? : String,
   after? : String,
-  page? : Int,
-  per_page? : Int,
+  page? : Int32,
+  per_page? : Int32,
   direction? : CodeScanningListAlertsForOrgDirection,
   state? : CodeScanningAlertStateQuery,
   sort? : CodeScanningListAlertsForOrgSort,
@@ -7691,7 +7696,7 @@ pub fn code_scanning_list_alerts_for_org_decode(
 pub fn code_security_get_configurations_for_org_request(
   org : String,
   target_type? : CodeSecurityGetConfigurationsForOrgTargetType,
-  per_page? : Int,
+  per_page? : Int32,
   before? : String,
   after? : String,
 ) -> @http.Request {
@@ -7818,7 +7823,7 @@ pub fn code_security_detach_configuration_request(
 /// Get a code security configuration
 pub fn code_security_get_configuration_request(
   org : String,
-  configuration_id : Int,
+  configuration_id : Int32,
 ) -> @http.Request {
   @http.Request::get(
     "/orgs/" +
@@ -7851,7 +7856,7 @@ pub fn code_security_get_configuration_decode(
 /// Update a code security configuration
 pub fn code_security_update_configuration_request(
   org : String,
-  configuration_id : Int,
+  configuration_id : Int32,
   body : CodeSecurityUpdateConfigurationRequest,
 ) -> @http.Request {
   @http.Request::patch(
@@ -7885,7 +7890,7 @@ pub fn code_security_update_configuration_decode(
 /// Delete a code security configuration The caller handles the response as @http.Response.
 pub fn code_security_delete_configuration_request(
   org : String,
-  configuration_id : Int,
+  configuration_id : Int32,
 ) -> @http.Request {
   @http.Request::delete(
     "/orgs/" +
@@ -7900,7 +7905,7 @@ pub fn code_security_delete_configuration_request(
 /// Attach a configuration to repositories The caller handles the response as @http.Response.
 pub fn code_security_attach_configuration_request(
   org : String,
-  configuration_id : Int,
+  configuration_id : Int32,
   body : CodeSecurityAttachConfigurationRequest,
 ) -> @http.Request {
   @http.Request::post(
@@ -7917,7 +7922,7 @@ pub fn code_security_attach_configuration_request(
 /// Set a code security configuration as a default for an organization
 pub fn code_security_set_configuration_as_default_request(
   org : String,
-  configuration_id : Int,
+  configuration_id : Int32,
   body : CodeSecuritySetConfigurationAsDefaultRequest,
 ) -> @http.Request {
   @http.Request::put(
@@ -7952,8 +7957,8 @@ pub fn code_security_set_configuration_as_default_decode(
 /// Get repositories associated with a code security configuration
 pub fn code_security_get_repositories_for_configuration_request(
   org : String,
-  configuration_id : Int,
-  per_page? : Int,
+  configuration_id : Int32,
+  per_page? : Int32,
   before? : String,
   after? : String,
   status? : String,
@@ -8005,8 +8010,8 @@ pub fn code_security_get_repositories_for_configuration_decode(
 /// List codespaces for the organization
 pub fn codespaces_list_in_organization_request(
   org : String,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/orgs/" + percent_encode(parameter_value(org)) + "/codespaces"
   match per_page {
@@ -8083,8 +8088,8 @@ pub fn codespaces_delete_codespaces_access_users_request(
 /// List organization secrets
 pub fn codespaces_list_org_secrets_request(
   org : String,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/orgs/" +
     percent_encode(parameter_value(org)) +
@@ -8235,8 +8240,8 @@ pub fn codespaces_delete_org_secret_request(
 pub fn codespaces_list_selected_repos_for_org_secret_request(
   org : String,
   secret_name : String,
-  page? : Int,
-  per_page? : Int,
+  page? : Int32,
+  per_page? : Int32,
 ) -> @http.Request {
   let mut url = "/orgs/" +
     percent_encode(parameter_value(org)) +
@@ -8295,7 +8300,7 @@ pub fn codespaces_set_selected_repos_for_org_secret_request(
 pub fn codespaces_add_selected_repo_to_org_secret_request(
   org : String,
   secret_name : String,
-  repository_id : Int,
+  repository_id : Int32,
 ) -> @http.Request {
   @http.Request::put(
     "/orgs/" +
@@ -8313,7 +8318,7 @@ pub fn codespaces_add_selected_repo_to_org_secret_request(
 pub fn codespaces_remove_selected_repo_from_org_secret_request(
   org : String,
   secret_name : String,
-  repository_id : Int,
+  repository_id : Int32,
 ) -> @http.Request {
   @http.Request::delete(
     "/orgs/" +
@@ -8330,7 +8335,7 @@ pub fn codespaces_remove_selected_repo_from_org_secret_request(
 /// List organization Copilot Spaces
 pub fn copilot_spaces_list_for_org_request(
   org : String,
-  per_page? : Int,
+  per_page? : Int32,
   before? : String,
   after? : String,
 ) -> @http.Request {
@@ -8405,7 +8410,7 @@ pub fn copilot_spaces_create_for_org_decode(
 /// Get an organization Copilot Space
 pub fn copilot_spaces_get_for_org_request(
   org : String,
-  space_number : Int,
+  space_number : Int32,
 ) -> @http.Request {
   @http.Request::get(
     "/orgs/" +
@@ -8438,7 +8443,7 @@ pub fn copilot_spaces_get_for_org_decode(
 /// Set an organization Copilot Space
 pub fn copilot_spaces_update_for_org_request(
   org : String,
-  space_number : Int,
+  space_number : Int32,
   body : CopilotSpacesUpdateForOrgRequest,
 ) -> @http.Request {
   @http.Request::put(
@@ -8472,7 +8477,7 @@ pub fn copilot_spaces_update_for_org_decode(
 /// Delete an organization Copilot Space The caller handles the response as @http.Response.
 pub fn copilot_spaces_delete_for_org_request(
   org : String,
-  space_number : Int,
+  space_number : Int32,
 ) -> @http.Request {
   @http.Request::delete(
     "/orgs/" +
@@ -8487,7 +8492,7 @@ pub fn copilot_spaces_delete_for_org_request(
 /// List collaborators for an organization Copilot Space
 pub fn copilot_spaces_list_collaborators_for_org_request(
   org : String,
-  space_number : Int,
+  space_number : Int32,
 ) -> @http.Request {
   @http.Request::get(
     "/orgs/" +
@@ -8521,7 +8526,7 @@ pub fn copilot_spaces_list_collaborators_for_org_decode(
 /// Add a collaborator to an organization Copilot Space
 pub fn copilot_spaces_add_collaborator_for_org_request(
   org : String,
-  space_number : Int,
+  space_number : Int32,
   body : CopilotSpacesAddCollaboratorForOrgRequest,
 ) -> @http.Request {
   @http.Request::post(
@@ -8556,7 +8561,7 @@ pub fn copilot_spaces_add_collaborator_for_org_decode(
 /// Set a collaborator role for an organization Copilot Space
 pub fn copilot_spaces_update_collaborator_for_org_request(
   org : String,
-  space_number : Int,
+  space_number : Int32,
   actor_type : CopilotSpacesUpdateCollaboratorForOrgActorType,
   actor_identifier : String,
   body : CopilotSpacesUpdateCollaboratorForOrgRequest,
@@ -8596,7 +8601,7 @@ pub fn copilot_spaces_update_collaborator_for_org_decode(
 /// Remove a collaborator from an organization Copilot Space The caller handles the response as @http.Response.
 pub fn copilot_spaces_remove_collaborator_for_org_request(
   org : String,
-  space_number : Int,
+  space_number : Int32,
   actor_type : CopilotSpacesRemoveCollaboratorForOrgActorType,
   actor_identifier : String,
 ) -> @http.Request {
@@ -8617,7 +8622,7 @@ pub fn copilot_spaces_remove_collaborator_for_org_request(
 /// List resources for an organization Copilot Space
 pub fn copilot_spaces_list_resources_for_org_request(
   org : String,
-  space_number : Int,
+  space_number : Int32,
 ) -> @http.Request {
   @http.Request::get(
     "/orgs/" +
@@ -8651,7 +8656,7 @@ pub fn copilot_spaces_list_resources_for_org_decode(
 /// Create a resource for an organization Copilot Space
 pub fn copilot_spaces_create_resource_for_org_request(
   org : String,
-  space_number : Int,
+  space_number : Int32,
   body : CopilotSpacesCreateResourceForOrgRequest,
 ) -> @http.Request {
   @http.Request::post(
@@ -8686,8 +8691,8 @@ pub fn copilot_spaces_create_resource_for_org_decode(
 /// Get a resource for an organization Copilot Space
 pub fn copilot_spaces_get_resource_for_org_request(
   org : String,
-  space_number : Int,
-  space_resource_id : Int,
+  space_number : Int32,
+  space_resource_id : Int32,
 ) -> @http.Request {
   @http.Request::get(
     "/orgs/" +
@@ -8722,8 +8727,8 @@ pub fn copilot_spaces_get_resource_for_org_decode(
 /// Set a resource for an organization Copilot Space
 pub fn copilot_spaces_update_resource_for_org_request(
   org : String,
-  space_number : Int,
-  space_resource_id : Int,
+  space_number : Int32,
+  space_resource_id : Int32,
   body : CopilotSpacesUpdateResourceForOrgRequest,
 ) -> @http.Request {
   @http.Request::put(
@@ -8759,8 +8764,8 @@ pub fn copilot_spaces_update_resource_for_org_decode(
 /// Delete a resource from an organization Copilot Space The caller handles the response as @http.Response.
 pub fn copilot_spaces_delete_resource_for_org_request(
   org : String,
-  space_number : Int,
-  space_resource_id : Int,
+  space_number : Int32,
+  space_resource_id : Int32,
 ) -> @http.Request {
   @http.Request::delete(
     "/orgs/" +
@@ -8806,8 +8811,8 @@ pub fn copilot_get_copilot_organization_details_decode(
 /// List all Copilot seat assignments for an organization
 pub fn copilot_list_copilot_seats_request(
   org : String,
-  page? : Int,
-  per_page? : Int,
+  page? : Int32,
+  per_page? : Int32,
 ) -> @http.Request {
   let mut url = "/orgs/" +
     percent_encode(parameter_value(org)) +
@@ -9019,8 +9024,8 @@ pub fn copilot_set_copilot_coding_agent_permissions_organization_request(
 /// List repositories enabled for Copilot cloud agent in an organization
 pub fn copilot_list_copilot_coding_agent_selected_repositories_for_organization_request(
   org : String,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/orgs/" +
     percent_encode(parameter_value(org)) +
@@ -9073,7 +9078,7 @@ pub fn copilot_set_copilot_coding_agent_selected_repositories_for_organization_r
 /// Enable a repository for Copilot cloud agent in an organization The caller handles the response as @http.Response.
 pub fn copilot_enable_copilot_coding_agent_for_repository_in_organization_request(
   org : String,
-  repository_id : Int,
+  repository_id : Int32,
 ) -> @http.Request {
   @http.Request::put(
     "/orgs/" +
@@ -9088,7 +9093,7 @@ pub fn copilot_enable_copilot_coding_agent_for_repository_in_organization_reques
 /// Disable a repository for Copilot cloud agent in an organization The caller handles the response as @http.Response.
 pub fn copilot_disable_copilot_coding_agent_for_repository_in_organization_request(
   org : String,
-  repository_id : Int,
+  repository_id : Int32,
 ) -> @http.Request {
   @http.Request::delete(
     "/orgs/" +
@@ -9373,7 +9378,7 @@ pub fn dependabot_list_alerts_for_org_request(
   direction? : DependabotListAlertsForOrgDirection,
   before? : String,
   after? : String,
-  per_page? : Int,
+  per_page? : Int32,
 ) -> @http.Request {
   let mut url = "/orgs/" +
     percent_encode(parameter_value(org)) +
@@ -9482,8 +9487,8 @@ pub fn dependabot_list_alerts_for_org_decode(
 /// Lists the repositories Dependabot can access in an organization
 pub fn dependabot_repository_access_for_org_request(
   org : String,
-  page? : Int,
-  per_page? : Int,
+  page? : Int32,
+  per_page? : Int32,
 ) -> @http.Request {
   let mut url = "/orgs/" +
     percent_encode(parameter_value(org)) +
@@ -9550,8 +9555,8 @@ pub fn dependabot_set_repository_access_default_level_request(
 /// List organization secrets
 pub fn dependabot_list_org_secrets_request(
   org : String,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/orgs/" +
     percent_encode(parameter_value(org)) +
@@ -9702,8 +9707,8 @@ pub fn dependabot_delete_org_secret_request(
 pub fn dependabot_list_selected_repos_for_org_secret_request(
   org : String,
   secret_name : String,
-  page? : Int,
-  per_page? : Int,
+  page? : Int32,
+  per_page? : Int32,
 ) -> @http.Request {
   let mut url = "/orgs/" +
     percent_encode(parameter_value(org)) +
@@ -9762,7 +9767,7 @@ pub fn dependabot_set_selected_repos_for_org_secret_request(
 pub fn dependabot_add_selected_repo_to_org_secret_request(
   org : String,
   secret_name : String,
-  repository_id : Int,
+  repository_id : Int32,
 ) -> @http.Request {
   @http.Request::put(
     "/orgs/" +
@@ -9780,7 +9785,7 @@ pub fn dependabot_add_selected_repo_to_org_secret_request(
 pub fn dependabot_remove_selected_repo_from_org_secret_request(
   org : String,
   secret_name : String,
-  repository_id : Int,
+  repository_id : Int32,
 ) -> @http.Request {
   @http.Request::delete(
     "/orgs/" +
@@ -9826,8 +9831,8 @@ pub fn packages_list_docker_migration_conflicting_packages_for_organization_deco
 /// List public organization events
 pub fn activity_list_public_org_events_request(
   org : String,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/orgs/" + percent_encode(parameter_value(org)) + "/events"
   match per_page {
@@ -9864,8 +9869,8 @@ pub fn activity_list_public_org_events_decode(
 /// List failed organization invitations
 pub fn orgs_list_failed_invitations_request(
   org : String,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/orgs/" +
     percent_encode(parameter_value(org)) +
@@ -9904,8 +9909,8 @@ pub fn orgs_list_failed_invitations_decode(
 /// List organization webhooks
 pub fn orgs_list_webhooks_request(
   org : String,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/orgs/" + percent_encode(parameter_value(org)) + "/hooks"
   match per_page {
@@ -9970,7 +9975,7 @@ pub fn orgs_create_webhook_decode(
 ///|
 ///
 /// Get an organization webhook
-pub fn orgs_get_webhook_request(org : String, hook_id : Int) -> @http.Request {
+pub fn orgs_get_webhook_request(org : String, hook_id : Int32) -> @http.Request {
   @http.Request::get(
     "/orgs/" +
     percent_encode(parameter_value(org)) +
@@ -10002,7 +10007,7 @@ pub fn orgs_get_webhook_decode(
 /// Update an organization webhook
 pub fn orgs_update_webhook_request(
   org : String,
-  hook_id : Int,
+  hook_id : Int32,
   body : OrgsUpdateWebhookRequest,
 ) -> @http.Request {
   @http.Request::patch(
@@ -10036,7 +10041,7 @@ pub fn orgs_update_webhook_decode(
 /// Delete an organization webhook The caller handles the response as @http.Response.
 pub fn orgs_delete_webhook_request(
   org : String,
-  hook_id : Int,
+  hook_id : Int32,
 ) -> @http.Request {
   @http.Request::delete(
     "/orgs/" +
@@ -10051,7 +10056,7 @@ pub fn orgs_delete_webhook_request(
 /// Get a webhook configuration for an organization
 pub fn orgs_get_webhook_config_for_org_request(
   org : String,
-  hook_id : Int,
+  hook_id : Int32,
 ) -> @http.Request {
   @http.Request::get(
     "/orgs/" +
@@ -10085,7 +10090,7 @@ pub fn orgs_get_webhook_config_for_org_decode(
 /// Update a webhook configuration for an organization
 pub fn orgs_update_webhook_config_for_org_request(
   org : String,
-  hook_id : Int,
+  hook_id : Int32,
   body : OrgsUpdateWebhookConfigForOrgRequest,
 ) -> @http.Request {
   @http.Request::patch(
@@ -10120,8 +10125,8 @@ pub fn orgs_update_webhook_config_for_org_decode(
 /// List deliveries for an organization webhook
 pub fn orgs_list_webhook_deliveries_request(
   org : String,
-  hook_id : Int,
-  per_page? : Int,
+  hook_id : Int32,
+  per_page? : Int32,
   cursor? : String,
   status? : OrgsListWebhookDeliveriesStatus,
 ) -> @http.Request {
@@ -10168,8 +10173,8 @@ pub fn orgs_list_webhook_deliveries_decode(
 /// Get a webhook delivery for an organization webhook
 pub fn orgs_get_webhook_delivery_request(
   org : String,
-  hook_id : Int,
-  delivery_id : Int,
+  hook_id : Int32,
+  delivery_id : Int32,
 ) -> @http.Request {
   @http.Request::get(
     "/orgs/" +
@@ -10204,8 +10209,8 @@ pub fn orgs_get_webhook_delivery_decode(
 /// Redeliver a delivery for an organization webhook The caller handles the response as @http.Response.
 pub fn orgs_redeliver_webhook_delivery_request(
   org : String,
-  hook_id : Int,
-  delivery_id : Int,
+  hook_id : Int32,
+  delivery_id : Int32,
 ) -> @http.Request {
   @http.Request::post(
     "/orgs/" +
@@ -10221,7 +10226,10 @@ pub fn orgs_redeliver_webhook_delivery_request(
 ///|
 ///
 /// Ping an organization webhook The caller handles the response as @http.Response.
-pub fn orgs_ping_webhook_request(org : String, hook_id : Int) -> @http.Request {
+pub fn orgs_ping_webhook_request(
+  org : String,
+  hook_id : Int32,
+) -> @http.Request {
   @http.Request::post(
     "/orgs/" +
     percent_encode(parameter_value(org)) +
@@ -10237,11 +10245,11 @@ pub fn orgs_ping_webhook_request(org : String, hook_id : Int) -> @http.Request {
 pub fn api_insights_get_route_stats_by_actor_request(
   org : String,
   actor_type : ApiInsightsGetRouteStatsByActorActorType,
-  actor_id : Int,
+  actor_id : Int32,
   min_timestamp : String,
   max_timestamp? : String,
-  page? : Int,
-  per_page? : Int,
+  page? : Int32,
+  per_page? : Int32,
   direction? : ApiInsightsGetRouteStatsByActorDirection,
   sort? : Array[ApiInsightsGetRouteStatsByActorSortItem],
   api_route_substring? : String,
@@ -10310,8 +10318,8 @@ pub fn api_insights_get_subject_stats_request(
   org : String,
   min_timestamp : String,
   max_timestamp? : String,
-  page? : Int,
-  per_page? : Int,
+  page? : Int32,
+  per_page? : Int32,
   direction? : ApiInsightsGetSubjectStatsDirection,
   sort? : Array[ApiInsightsGetSubjectStatsSortItem],
   subject_name_substring? : String,
@@ -10455,7 +10463,7 @@ pub fn api_insights_get_summary_stats_by_actor_request(
   org : String,
   min_timestamp : String,
   actor_type : ApiInsightsGetSummaryStatsByActorActorType,
-  actor_id : Int,
+  actor_id : Int32,
   max_timestamp? : String,
 ) -> @http.Request {
   let mut url = "/orgs/" +
@@ -10587,7 +10595,7 @@ pub fn api_insights_get_time_stats_by_user_decode(
 pub fn api_insights_get_time_stats_by_actor_request(
   org : String,
   actor_type : ApiInsightsGetTimeStatsByActorActorType,
-  actor_id : Int,
+  actor_id : Int32,
   min_timestamp : String,
   timestamp_increment : String,
   max_timestamp? : String,
@@ -10638,8 +10646,8 @@ pub fn api_insights_get_user_stats_request(
   user_id : String,
   min_timestamp : String,
   max_timestamp? : String,
-  page? : Int,
-  per_page? : Int,
+  page? : Int32,
+  per_page? : Int32,
   direction? : ApiInsightsGetUserStatsDirection,
   sort? : Array[ApiInsightsGetUserStatsSortItem],
   actor_name_substring? : String,
@@ -10731,8 +10739,8 @@ pub fn apps_get_org_installation_decode(
 /// List app installations for an organization
 pub fn orgs_list_app_installations_request(
   org : String,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/orgs/" +
     percent_encode(parameter_value(org)) +
@@ -10904,8 +10912,8 @@ pub fn interactions_update_pull_request_creation_cap_for_org_decode(
 /// List pending organization invitations
 pub fn orgs_list_pending_invitations_request(
   org : String,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
   role? : OrgsListPendingInvitationsRole,
   invitation_source? : OrgsListPendingInvitationsInvitationSource,
 ) -> @http.Request {
@@ -10983,7 +10991,7 @@ pub fn orgs_create_invitation_decode(
 /// Cancel an organization invitation The caller handles the response as @http.Response.
 pub fn orgs_cancel_invitation_request(
   org : String,
-  invitation_id : Int,
+  invitation_id : Int32,
 ) -> @http.Request {
   @http.Request::delete(
     "/orgs/" +
@@ -10998,9 +11006,9 @@ pub fn orgs_cancel_invitation_request(
 /// List organization invitation teams
 pub fn orgs_list_invitation_teams_request(
   org : String,
-  invitation_id : Int,
-  per_page? : Int,
-  page? : Int,
+  invitation_id : Int32,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/orgs/" +
     percent_encode(parameter_value(org)) +
@@ -11098,7 +11106,7 @@ pub fn orgs_create_issue_field_decode(
 /// Update issue field for an organization
 pub fn orgs_update_issue_field_request(
   org : String,
-  issue_field_id : Int,
+  issue_field_id : Int32,
   body : OrganizationUpdateIssueField,
 ) -> @http.Request {
   @http.Request::patch(
@@ -11132,7 +11140,7 @@ pub fn orgs_update_issue_field_decode(
 /// Delete issue field for an organization The caller handles the response as @http.Response.
 pub fn orgs_delete_issue_field_request(
   org : String,
-  issue_field_id : Int,
+  issue_field_id : Int32,
 ) -> @http.Request {
   @http.Request::delete(
     "/orgs/" +
@@ -11204,7 +11212,7 @@ pub fn orgs_create_issue_type_decode(
 /// Update issue type for an organization
 pub fn orgs_update_issue_type_request(
   org : String,
-  issue_type_id : Int,
+  issue_type_id : Int32,
   body : OrganizationUpdateIssueType,
 ) -> @http.Request {
   @http.Request::put(
@@ -11238,7 +11246,7 @@ pub fn orgs_update_issue_type_decode(
 /// Delete issue type for an organization The caller handles the response as @http.Response.
 pub fn orgs_delete_issue_type_request(
   org : String,
-  issue_type_id : Int,
+  issue_type_id : Int32,
 ) -> @http.Request {
   @http.Request::delete(
     "/orgs/" +
@@ -11260,8 +11268,8 @@ pub fn issues_list_for_org_request(
   sort? : IssuesListForOrgSort,
   direction? : IssuesListForOrgDirection,
   since? : String,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/orgs/" + percent_encode(parameter_value(org)) + "/issues"
   match filter {
@@ -11328,8 +11336,8 @@ pub fn orgs_list_members_request(
   org : String,
   filter? : OrgsListMembersFilter,
   role? : OrgsListMembersRole,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/orgs/" + percent_encode(parameter_value(org)) + "/members"
   match filter {
@@ -11405,8 +11413,8 @@ pub fn orgs_remove_member_request(
 pub fn codespaces_get_codespaces_for_user_in_org_request(
   org : String,
   username : String,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/orgs/" +
     percent_encode(parameter_value(org)) +
@@ -11618,8 +11626,8 @@ pub fn orgs_remove_membership_for_user_request(
 /// List organization migrations
 pub fn migrations_list_for_org_request(
   org : String,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
   exclude? : Array[String],
 ) -> @http.Request {
   let mut url = "/orgs/" + percent_encode(parameter_value(org)) + "/migrations"
@@ -11694,7 +11702,7 @@ pub fn migrations_start_for_org_decode(
 /// Get an organization migration status
 pub fn migrations_get_status_for_org_request(
   org : String,
-  migration_id : Int,
+  migration_id : Int32,
   exclude? : Array[String],
 ) -> @http.Request {
   let mut url = "/orgs/" +
@@ -11734,7 +11742,7 @@ pub fn migrations_get_status_for_org_decode(
 /// Download an organization migration archive The caller handles the response as @http.Response.
 pub fn migrations_download_archive_for_org_request(
   org : String,
-  migration_id : Int,
+  migration_id : Int32,
 ) -> @http.Request {
   @http.Request::get(
     "/orgs/" +
@@ -11750,7 +11758,7 @@ pub fn migrations_download_archive_for_org_request(
 /// Delete an organization migration archive The caller handles the response as @http.Response.
 pub fn migrations_delete_archive_for_org_request(
   org : String,
-  migration_id : Int,
+  migration_id : Int32,
 ) -> @http.Request {
   @http.Request::delete(
     "/orgs/" +
@@ -11766,7 +11774,7 @@ pub fn migrations_delete_archive_for_org_request(
 /// Unlock an organization repository The caller handles the response as @http.Response.
 pub fn migrations_unlock_repo_for_org_request(
   org : String,
-  migration_id : Int,
+  migration_id : Int32,
   repo_name : String,
 ) -> @http.Request {
   @http.Request::delete(
@@ -11785,9 +11793,9 @@ pub fn migrations_unlock_repo_for_org_request(
 /// List repositories in an organization migration
 pub fn migrations_list_repos_for_org_request(
   org : String,
-  migration_id : Int,
-  per_page? : Int,
-  page? : Int,
+  migration_id : Int32,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/orgs/" +
     percent_encode(parameter_value(org)) +
@@ -11871,7 +11879,7 @@ pub fn orgs_revoke_all_org_roles_team_request(
 pub fn orgs_assign_team_to_org_role_request(
   org : String,
   team_slug : String,
-  role_id : Int,
+  role_id : Int32,
 ) -> @http.Request {
   @http.Request::put(
     "/orgs/" +
@@ -11889,7 +11897,7 @@ pub fn orgs_assign_team_to_org_role_request(
 pub fn orgs_revoke_org_role_team_request(
   org : String,
   team_slug : String,
-  role_id : Int,
+  role_id : Int32,
 ) -> @http.Request {
   @http.Request::delete(
     "/orgs/" +
@@ -11922,7 +11930,7 @@ pub fn orgs_revoke_all_org_roles_user_request(
 pub fn orgs_assign_user_to_org_role_request(
   org : String,
   username : String,
-  role_id : Int,
+  role_id : Int32,
 ) -> @http.Request {
   @http.Request::put(
     "/orgs/" +
@@ -11940,7 +11948,7 @@ pub fn orgs_assign_user_to_org_role_request(
 pub fn orgs_revoke_org_role_user_request(
   org : String,
   username : String,
-  role_id : Int,
+  role_id : Int32,
 ) -> @http.Request {
   @http.Request::delete(
     "/orgs/" +
@@ -11955,7 +11963,10 @@ pub fn orgs_revoke_org_role_user_request(
 ///|
 ///
 /// Get an organization role
-pub fn orgs_get_org_role_request(org : String, role_id : Int) -> @http.Request {
+pub fn orgs_get_org_role_request(
+  org : String,
+  role_id : Int32,
+) -> @http.Request {
   @http.Request::get(
     "/orgs/" +
     percent_encode(parameter_value(org)) +
@@ -11987,9 +11998,9 @@ pub fn orgs_get_org_role_decode(
 /// List teams that are assigned to an organization role
 pub fn orgs_list_org_role_teams_request(
   org : String,
-  role_id : Int,
-  per_page? : Int,
-  page? : Int,
+  role_id : Int32,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/orgs/" +
     percent_encode(parameter_value(org)) +
@@ -12030,9 +12041,9 @@ pub fn orgs_list_org_role_teams_decode(
 /// List users that are assigned to an organization role
 pub fn orgs_list_org_role_users_request(
   org : String,
-  role_id : Int,
-  per_page? : Int,
-  page? : Int,
+  role_id : Int32,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/orgs/" +
     percent_encode(parameter_value(org)) +
@@ -12074,8 +12085,8 @@ pub fn orgs_list_org_role_users_decode(
 pub fn orgs_list_outside_collaborators_request(
   org : String,
   filter? : OrgsListOutsideCollaboratorsFilter,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/orgs/" +
     percent_encode(parameter_value(org)) +
@@ -12169,8 +12180,8 @@ pub fn packages_list_packages_for_organization_request(
   package_type : PackagesListPackagesForOrganizationPackageType,
   org : String,
   visibility? : PackagesListPackagesForOrganizationVisibility,
-  page? : Int,
-  per_page? : Int,
+  page? : Int32,
+  per_page? : Int32,
 ) -> @http.Request {
   let mut url = "/orgs/" + percent_encode(parameter_value(org)) + "/packages"
   url = append_query(url, "package_type", parameter_value(package_type))
@@ -12291,8 +12302,8 @@ pub fn packages_get_all_package_versions_for_package_owned_by_org_request(
   package_type : PackagesGetAllPackageVersionsForPackageOwnedByOrgPackageType,
   package_name : String,
   org : String,
-  page? : Int,
-  per_page? : Int,
+  page? : Int32,
+  per_page? : Int32,
   state? : PackagesGetAllPackageVersionsForPackageOwnedByOrgState,
 ) -> @http.Request {
   let mut url = "/orgs/" +
@@ -12342,7 +12353,7 @@ pub fn packages_get_package_version_for_organization_request(
   package_type : PackagesGetPackageVersionForOrganizationPackageType,
   package_name : String,
   org : String,
-  package_version_id : Int,
+  package_version_id : Int32,
 ) -> @http.Request {
   @http.Request::get(
     "/orgs/" +
@@ -12381,7 +12392,7 @@ pub fn packages_delete_package_version_for_org_request(
   package_type : PackagesDeletePackageVersionForOrgPackageType,
   package_name : String,
   org : String,
-  package_version_id : Int,
+  package_version_id : Int32,
 ) -> @http.Request {
   @http.Request::delete(
     "/orgs/" +
@@ -12402,7 +12413,7 @@ pub fn packages_restore_package_version_for_org_request(
   package_type : PackagesRestorePackageVersionForOrgPackageType,
   package_name : String,
   org : String,
-  package_version_id : Int,
+  package_version_id : Int32,
 ) -> @http.Request {
   @http.Request::post(
     "/orgs/" +
@@ -12422,8 +12433,8 @@ pub fn packages_restore_package_version_for_org_request(
 /// List requests to access organization resources with fine-grained personal access tokens
 pub fn orgs_list_pat_grant_requests_request(
   org : String,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
   sort? : String,
   direction? : OrgsListPatGrantRequestsDirection,
   owner? : Array[String],
@@ -12524,7 +12535,7 @@ pub fn orgs_review_pat_grant_requests_in_bulk_request(
 /// Review a request to access organization resources with a fine-grained personal access token The caller handles the response as @http.Response.
 pub fn orgs_review_pat_grant_request_request(
   org : String,
-  pat_request_id : Int,
+  pat_request_id : Int32,
   body : OrgsReviewPatGrantRequestRequest,
 ) -> @http.Request {
   @http.Request::post(
@@ -12540,9 +12551,9 @@ pub fn orgs_review_pat_grant_request_request(
 /// List repositories requested to be accessed by a fine-grained personal access token
 pub fn orgs_list_pat_grant_request_repositories_request(
   org : String,
-  pat_request_id : Int,
-  per_page? : Int,
-  page? : Int,
+  pat_request_id : Int32,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/orgs/" +
     percent_encode(parameter_value(org)) +
@@ -12583,8 +12594,8 @@ pub fn orgs_list_pat_grant_request_repositories_decode(
 /// List fine-grained personal access tokens with access to organization resources
 pub fn orgs_list_pat_grants_request(
   org : String,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
   sort? : String,
   direction? : OrgsListPatGrantsDirection,
   owner? : Array[String],
@@ -12683,7 +12694,7 @@ pub fn orgs_update_pat_accesses_request(
 /// Update the access a fine-grained personal access token has to organization resources The caller handles the response as @http.Response.
 pub fn orgs_update_pat_access_request(
   org : String,
-  pat_id : Int,
+  pat_id : Int32,
   body : OrgsUpdatePatAccessRequest,
 ) -> @http.Request {
   @http.Request::post(
@@ -12699,9 +12710,9 @@ pub fn orgs_update_pat_access_request(
 /// List repositories a fine-grained personal access token has access to
 pub fn orgs_list_pat_grant_repositories_request(
   org : String,
-  pat_id : Int,
-  per_page? : Int,
-  page? : Int,
+  pat_id : Int32,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/orgs/" +
     percent_encode(parameter_value(org)) +
@@ -12742,8 +12753,8 @@ pub fn orgs_list_pat_grant_repositories_decode(
 /// List private registries for an organization
 pub fn private_registries_list_org_private_registries_request(
   org : String,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/orgs/" +
     percent_encode(parameter_value(org)) +
@@ -12910,7 +12921,7 @@ pub fn projects_list_for_org_request(
   q? : String,
   before? : String,
   after? : String,
-  per_page? : Int,
+  per_page? : Int32,
 ) -> @http.Request {
   let mut url = "/orgs/" + percent_encode(parameter_value(org)) + "/projectsV2"
   match q {
@@ -12954,7 +12965,7 @@ pub fn projects_list_for_org_decode(
 ///
 /// Get project for organization
 pub fn projects_get_for_org_request(
-  project_number : Int,
+  project_number : Int32,
   org : String,
 ) -> @http.Request {
   @http.Request::get(
@@ -12988,7 +12999,7 @@ pub fn projects_get_for_org_decode(
 /// Create draft item for organization owned project
 pub fn projects_create_draft_item_for_org_request(
   org : String,
-  project_number : Int,
+  project_number : Int32,
   body : ProjectsCreateDraftItemForOrgRequest,
 ) -> @http.Request {
   @http.Request::post(
@@ -13022,9 +13033,9 @@ pub fn projects_create_draft_item_for_org_decode(
 ///
 /// List project fields for organization
 pub fn projects_list_fields_for_org_request(
-  project_number : Int,
+  project_number : Int32,
   org : String,
-  per_page? : Int,
+  per_page? : Int32,
   before? : String,
   after? : String,
 ) -> @http.Request {
@@ -13070,7 +13081,7 @@ pub fn projects_list_fields_for_org_decode(
 ///
 /// Add a field to an organization-owned project.
 pub fn projects_add_field_for_org_request(
-  project_number : Int,
+  project_number : Int32,
   org : String,
   body : Json,
 ) -> @http.Request {
@@ -13105,8 +13116,8 @@ pub fn projects_add_field_for_org_decode(
 ///
 /// Get project field for organization
 pub fn projects_get_field_for_org_request(
-  project_number : Int,
-  field_id : Int,
+  project_number : Int32,
+  field_id : Int32,
   org : String,
 ) -> @http.Request {
   @http.Request::get(
@@ -13141,13 +13152,13 @@ pub fn projects_get_field_for_org_decode(
 ///
 /// List items for an organization owned project
 pub fn projects_list_items_for_org_request(
-  project_number : Int,
+  project_number : Int32,
   org : String,
   q? : String,
   fields? : ProjectsListItemsForOrgFields,
   before? : String,
   after? : String,
-  per_page? : Int,
+  per_page? : Int32,
 ) -> @http.Request {
   let mut url = "/orgs/" +
     percent_encode(parameter_value(org)) +
@@ -13200,7 +13211,7 @@ pub fn projects_list_items_for_org_decode(
 /// Add item to organization owned project
 pub fn projects_add_item_for_org_request(
   org : String,
-  project_number : Int,
+  project_number : Int32,
   body : ProjectsAddItemForOrgRequest,
 ) -> @http.Request {
   @http.Request::post(
@@ -13234,9 +13245,9 @@ pub fn projects_add_item_for_org_decode(
 ///
 /// Get an item for an organization owned project
 pub fn projects_get_org_item_request(
-  project_number : Int,
+  project_number : Int32,
   org : String,
-  item_id : Int,
+  item_id : Int32,
   fields? : ProjectsGetOrgItemFields,
 ) -> @http.Request {
   let mut url = "/orgs/" +
@@ -13274,9 +13285,9 @@ pub fn projects_get_org_item_decode(
 ///
 /// Update project item for organization
 pub fn projects_update_item_for_org_request(
-  project_number : Int,
+  project_number : Int32,
   org : String,
-  item_id : Int,
+  item_id : Int32,
   body : ProjectsUpdateItemForOrgRequest,
 ) -> @http.Request {
   @http.Request::patch(
@@ -13311,9 +13322,9 @@ pub fn projects_update_item_for_org_decode(
 ///
 /// Delete project item for organization The caller handles the response as @http.Response.
 pub fn projects_delete_item_for_org_request(
-  project_number : Int,
+  project_number : Int32,
   org : String,
-  item_id : Int,
+  item_id : Int32,
 ) -> @http.Request {
   @http.Request::delete(
     "/orgs/" +
@@ -13330,7 +13341,7 @@ pub fn projects_delete_item_for_org_request(
 /// Create a view for an organization-owned project
 pub fn projects_create_view_for_org_request(
   org : String,
-  project_number : Int,
+  project_number : Int32,
   body : ProjectsCreateViewForOrgRequest,
 ) -> @http.Request {
   @http.Request::post(
@@ -13364,13 +13375,13 @@ pub fn projects_create_view_for_org_decode(
 ///
 /// List items for an organization project view
 pub fn projects_list_view_items_for_org_request(
-  project_number : Int,
+  project_number : Int32,
   org : String,
-  view_number : Int,
+  view_number : Int32,
   fields? : ProjectsListViewItemsForOrgFields,
   before? : String,
   after? : String,
-  per_page? : Int,
+  per_page? : Int32,
 ) -> @http.Request {
   let mut url = "/orgs/" +
     percent_encode(parameter_value(org)) +
@@ -13701,8 +13712,8 @@ pub fn orgs_custom_properties_for_repos_delete_organization_definition_request(
 /// List custom property values for organization repositories
 pub fn orgs_custom_properties_for_repos_get_organization_values_request(
   org : String,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
   repository_query? : String,
 ) -> @http.Request {
   let mut url = "/orgs/" +
@@ -13759,8 +13770,8 @@ pub fn orgs_custom_properties_for_repos_create_or_update_organization_values_req
 /// List public organization members
 pub fn orgs_list_public_members_request(
   org : String,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/orgs/" +
     percent_encode(parameter_value(org)) +
@@ -13847,8 +13858,8 @@ pub fn repos_list_for_org_request(
   type_? : ReposListForOrgType,
   sort? : ReposListForOrgSort,
   direction? : ReposListForOrgDirection,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/orgs/" + percent_encode(parameter_value(org)) + "/repos"
   match type_ {
@@ -13927,8 +13938,8 @@ pub fn repos_create_in_org_decode(
 /// Get all organization repository rulesets
 pub fn repos_get_org_rulesets_request(
   org : String,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
   targets? : String,
 ) -> @http.Request {
   let mut url = "/orgs/" + percent_encode(parameter_value(org)) + "/rulesets"
@@ -14006,8 +14017,8 @@ pub fn repos_get_org_rule_suites_request(
   actor_name? : String,
   rule_suite_result? : ReposGetOrgRuleSuitesRuleSuiteResult,
   evaluate_status? : ReposGetOrgRuleSuitesEvaluateStatus,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/orgs/" +
     percent_encode(parameter_value(org)) +
@@ -14074,7 +14085,7 @@ pub fn repos_get_org_rule_suites_decode(
 /// Get an organization rule suite
 pub fn repos_get_org_rule_suite_request(
   org : String,
-  rule_suite_id : Int,
+  rule_suite_id : Int32,
 ) -> @http.Request {
   @http.Request::get(
     "/orgs/" +
@@ -14107,7 +14118,7 @@ pub fn repos_get_org_rule_suite_decode(
 /// Get an organization repository ruleset
 pub fn repos_get_org_ruleset_request(
   org : String,
-  ruleset_id : Int,
+  ruleset_id : Int32,
 ) -> @http.Request {
   @http.Request::get(
     "/orgs/" +
@@ -14140,7 +14151,7 @@ pub fn repos_get_org_ruleset_decode(
 /// Update an organization repository ruleset
 pub fn repos_update_org_ruleset_request(
   org : String,
-  ruleset_id : Int,
+  ruleset_id : Int32,
   body : ReposUpdateOrgRulesetRequest,
 ) -> @http.Request {
   @http.Request::put(
@@ -14174,7 +14185,7 @@ pub fn repos_update_org_ruleset_decode(
 /// Delete an organization repository ruleset The caller handles the response as @http.Response.
 pub fn repos_delete_org_ruleset_request(
   org : String,
-  ruleset_id : Int,
+  ruleset_id : Int32,
 ) -> @http.Request {
   @http.Request::delete(
     "/orgs/" +
@@ -14189,9 +14200,9 @@ pub fn repos_delete_org_ruleset_request(
 /// Get organization ruleset history
 pub fn orgs_get_org_ruleset_history_request(
   org : String,
-  ruleset_id : Int,
-  per_page? : Int,
-  page? : Int,
+  ruleset_id : Int32,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/orgs/" +
     percent_encode(parameter_value(org)) +
@@ -14232,8 +14243,8 @@ pub fn orgs_get_org_ruleset_history_decode(
 /// Get organization ruleset version
 pub fn orgs_get_org_ruleset_version_request(
   org : String,
-  ruleset_id : Int,
-  version_id : Int,
+  ruleset_id : Int32,
+  version_id : Int32,
 ) -> @http.Request {
   @http.Request::get(
     "/orgs/" +
@@ -14277,8 +14288,8 @@ pub fn secret_scanning_list_alerts_for_org_request(
   assignee? : String,
   sort? : SecretScanningListAlertsForOrgSort,
   direction? : SecretScanningListAlertsForOrgDirection,
-  page? : Int,
-  per_page? : Int,
+  page? : Int32,
+  per_page? : Int32,
   before? : String,
   after? : String,
   validity? : String,
@@ -14514,7 +14525,7 @@ pub fn secret_scanning_bulk_delete_org_custom_patterns_request(
 /// Update an organization custom pattern
 pub fn secret_scanning_update_org_custom_pattern_request(
   org : String,
-  pattern_id : Int,
+  pattern_id : Int32,
   body : SecretScanningCustomPatternToUpdate,
 ) -> @http.Request {
   @http.Request::patch(
@@ -14615,7 +14626,7 @@ pub fn security_advisories_list_org_repository_advisories_request(
   sort? : SecurityAdvisoriesListOrgRepositoryAdvisoriesSort,
   before? : String,
   after? : String,
-  per_page? : Int,
+  per_page? : Int32,
   state? : SecurityAdvisoriesListOrgRepositoryAdvisoriesState,
 ) -> @http.Request {
   let mut url = "/orgs/" +
@@ -14773,8 +14784,8 @@ pub fn orgs_set_immutable_releases_settings_request(
 /// List selected repositories for immutable releases enforcement
 pub fn orgs_get_immutable_releases_settings_repositories_request(
   org : String,
-  page? : Int,
-  per_page? : Int,
+  page? : Int32,
+  per_page? : Int32,
 ) -> @http.Request {
   let mut url = "/orgs/" +
     percent_encode(parameter_value(org)) +
@@ -14827,7 +14838,7 @@ pub fn orgs_set_immutable_releases_settings_repositories_request(
 /// Enable a selected repository for immutable releases in an organization The caller handles the response as @http.Response.
 pub fn orgs_enable_selected_repository_immutable_releases_organization_request(
   org : String,
-  repository_id : Int,
+  repository_id : Int32,
 ) -> @http.Request {
   @http.Request::put(
     "/orgs/" +
@@ -14842,7 +14853,7 @@ pub fn orgs_enable_selected_repository_immutable_releases_organization_request(
 /// Disable a selected repository for immutable releases in an organization The caller handles the response as @http.Response.
 pub fn orgs_disable_selected_repository_immutable_releases_organization_request(
   org : String,
-  repository_id : Int,
+  repository_id : Int32,
 ) -> @http.Request {
   @http.Request::delete(
     "/orgs/" +
@@ -14857,8 +14868,8 @@ pub fn orgs_disable_selected_repository_immutable_releases_organization_request(
 /// List hosted compute network configurations for an organization
 pub fn hosted_compute_list_network_configurations_for_org_request(
   org : String,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/orgs/" +
     percent_encode(parameter_value(org)) +
@@ -15044,8 +15055,8 @@ pub fn hosted_compute_get_network_settings_for_org_decode(
 /// List teams
 pub fn teams_list_request(
   org : String,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
   team_type? : TeamsListTeamType,
 ) -> @http.Request {
   let mut url = "/orgs/" + percent_encode(parameter_value(org)) + "/teams"
@@ -15200,8 +15211,8 @@ pub fn teams_delete_in_org_request(
 pub fn teams_list_pending_invitations_in_org_request(
   org : String,
   team_slug : String,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/orgs/" +
     percent_encode(parameter_value(org)) +
@@ -15244,8 +15255,8 @@ pub fn teams_list_members_in_org_request(
   org : String,
   team_slug : String,
   role? : TeamsListMembersInOrgRole,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/orgs/" +
     percent_encode(parameter_value(org)) +
@@ -15382,8 +15393,8 @@ pub fn teams_remove_membership_for_user_in_org_request(
 pub fn teams_list_repos_in_org_request(
   org : String,
   team_slug : String,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/orgs/" +
     percent_encode(parameter_value(org)) +
@@ -15507,8 +15518,8 @@ pub fn teams_remove_repo_in_org_request(
 pub fn teams_list_child_in_org_request(
   org : String,
   team_slug : String,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/orgs/" +
     percent_encode(parameter_value(org)) +
@@ -15670,8 +15681,8 @@ pub fn repos_delete_request(owner : String, repo : String) -> @http.Request {
 pub fn actions_list_artifacts_for_repo_request(
   owner : String,
   repo : String,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
   name? : String,
 ) -> @http.Request {
   let mut url = "/repos/" +
@@ -15718,7 +15729,7 @@ pub fn actions_list_artifacts_for_repo_decode(
 pub fn actions_get_artifact_request(
   owner : String,
   repo : String,
-  artifact_id : Int,
+  artifact_id : Int32,
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
@@ -15754,7 +15765,7 @@ pub fn actions_get_artifact_decode(
 pub fn actions_delete_artifact_request(
   owner : String,
   repo : String,
-  artifact_id : Int,
+  artifact_id : Int32,
 ) -> @http.Request {
   @http.Request::delete(
     "/repos/" +
@@ -15772,7 +15783,7 @@ pub fn actions_delete_artifact_request(
 pub fn actions_download_artifact_request(
   owner : String,
   repo : String,
-  artifact_id : Int,
+  artifact_id : Int32,
   archive_format : String,
 ) -> @http.Request {
   @http.Request::get(
@@ -15929,8 +15940,8 @@ pub fn actions_get_actions_cache_usage_decode(
 pub fn actions_get_actions_cache_list_request(
   owner : String,
   repo : String,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
   ref_? : String,
   key? : String,
   sort? : ActionsGetActionsCacheListSort,
@@ -16032,7 +16043,7 @@ pub fn actions_delete_actions_cache_by_key_decode(
 pub fn actions_delete_actions_cache_by_id_request(
   owner : String,
   repo : String,
-  cache_id : Int,
+  cache_id : Int32,
 ) -> @http.Request {
   @http.Request::delete(
     "/repos/" +
@@ -16050,7 +16061,7 @@ pub fn actions_delete_actions_cache_by_id_request(
 pub fn actions_list_concurrency_groups_for_repository_request(
   owner : String,
   repo : String,
-  per_page? : Int,
+  per_page? : Int32,
   after? : String,
 ) -> @http.Request {
   let mut url = "/repos/" +
@@ -16094,8 +16105,8 @@ pub fn actions_get_concurrency_group_for_repository_request(
   owner : String,
   repo : String,
   concurrency_group_name : String,
-  ahead_of_run? : Int,
-  ahead_of_job? : Int,
+  ahead_of_run? : Int32,
+  ahead_of_job? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
     percent_encode(parameter_value(owner)) +
@@ -16234,7 +16245,7 @@ pub fn actions_download_step_logs_for_workflow_run_job_request(
   owner : String,
   repo : String,
   job_id : Int64,
-  step_number : Int,
+  step_number : Int32,
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
@@ -16324,8 +16335,8 @@ pub fn actions_set_custom_oidc_sub_claim_for_repo_decode(
 pub fn actions_list_repo_organization_secrets_request(
   owner : String,
   repo : String,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
     percent_encode(parameter_value(owner)) +
@@ -16367,8 +16378,8 @@ pub fn actions_list_repo_organization_secrets_decode(
 pub fn actions_list_repo_organization_variables_request(
   owner : String,
   repo : String,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
     percent_encode(parameter_value(owner)) +
@@ -16767,8 +16778,8 @@ pub fn actions_set_github_actions_default_workflow_permissions_repository_reques
 pub fn actions_get_repo_actions_policies_request(
   owner : String,
   repo : String,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
   has_parents? : Bool,
 ) -> @http.Request {
   let mut url = "/repos/" +
@@ -16851,7 +16862,7 @@ pub fn actions_create_repo_actions_policy_decode(
 pub fn actions_get_repo_actions_policy_request(
   owner : String,
   repo : String,
-  policy_id : Int,
+  policy_id : Int32,
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
@@ -16887,7 +16898,7 @@ pub fn actions_get_repo_actions_policy_decode(
 pub fn actions_update_repo_actions_policy_request(
   owner : String,
   repo : String,
-  policy_id : Int,
+  policy_id : Int32,
   body : ActionsUpdateRepoActionsPolicyRequest,
 ) -> @http.Request {
   @http.Request::put(
@@ -16924,7 +16935,7 @@ pub fn actions_update_repo_actions_policy_decode(
 pub fn actions_delete_repo_actions_policy_request(
   owner : String,
   repo : String,
-  policy_id : Int,
+  policy_id : Int32,
 ) -> @http.Request {
   @http.Request::delete(
     "/repos/" +
@@ -16943,8 +16954,8 @@ pub fn actions_list_self_hosted_runners_for_repo_request(
   owner : String,
   repo : String,
   name? : String,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
     percent_encode(parameter_value(owner)) +
@@ -17145,7 +17156,7 @@ pub fn actions_create_remove_token_for_repo_decode(
 pub fn actions_get_self_hosted_runner_for_repo_request(
   owner : String,
   repo : String,
-  runner_id : Int,
+  runner_id : Int32,
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
@@ -17181,7 +17192,7 @@ pub fn actions_get_self_hosted_runner_for_repo_decode(
 pub fn actions_delete_self_hosted_runner_from_repo_request(
   owner : String,
   repo : String,
-  runner_id : Int,
+  runner_id : Int32,
 ) -> @http.Request {
   @http.Request::delete(
     "/repos/" +
@@ -17199,7 +17210,7 @@ pub fn actions_delete_self_hosted_runner_from_repo_request(
 pub fn actions_list_labels_for_self_hosted_runner_for_repo_request(
   owner : String,
   repo : String,
-  runner_id : Int,
+  runner_id : Int32,
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
@@ -17218,7 +17229,7 @@ pub fn actions_list_labels_for_self_hosted_runner_for_repo_request(
 pub fn actions_add_custom_labels_to_self_hosted_runner_for_repo_request(
   owner : String,
   repo : String,
-  runner_id : Int,
+  runner_id : Int32,
   body : ActionsAddCustomLabelsToSelfHostedRunnerForRepoRequest,
 ) -> @http.Request {
   @http.Request::post(
@@ -17238,7 +17249,7 @@ pub fn actions_add_custom_labels_to_self_hosted_runner_for_repo_request(
 pub fn actions_set_custom_labels_for_self_hosted_runner_for_repo_request(
   owner : String,
   repo : String,
-  runner_id : Int,
+  runner_id : Int32,
   body : ActionsSetCustomLabelsForSelfHostedRunnerForRepoRequest,
 ) -> @http.Request {
   @http.Request::put(
@@ -17258,7 +17269,7 @@ pub fn actions_set_custom_labels_for_self_hosted_runner_for_repo_request(
 pub fn actions_remove_all_custom_labels_from_self_hosted_runner_for_repo_request(
   owner : String,
   repo : String,
-  runner_id : Int,
+  runner_id : Int32,
 ) -> @http.Request {
   @http.Request::delete(
     "/repos/" +
@@ -17277,7 +17288,7 @@ pub fn actions_remove_all_custom_labels_from_self_hosted_runner_for_repo_request
 pub fn actions_remove_custom_label_from_self_hosted_runner_for_repo_request(
   owner : String,
   repo : String,
-  runner_id : Int,
+  runner_id : Int32,
   name : String,
 ) -> @http.Request {
   @http.Request::delete(
@@ -17302,8 +17313,8 @@ pub fn actions_list_workflow_runs_for_repo_request(
   branch? : String,
   event? : String,
   status? : ActionsListWorkflowRunsForRepoStatus,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
   created? : String,
   exclude_pull_requests? : Bool,
   check_suite_id? : Int64,
@@ -17383,7 +17394,7 @@ pub fn actions_list_workflow_runs_for_repo_decode(
 pub fn actions_get_workflow_run_request(
   owner : String,
   repo : String,
-  run_id : Int,
+  run_id : Int32,
   exclude_pull_requests? : Bool,
 ) -> @http.Request {
   let mut url = "/repos/" +
@@ -17424,7 +17435,7 @@ pub fn actions_get_workflow_run_decode(
 pub fn actions_delete_workflow_run_request(
   owner : String,
   repo : String,
-  run_id : Int,
+  run_id : Int32,
 ) -> @http.Request {
   @http.Request::delete(
     "/repos/" +
@@ -17442,7 +17453,7 @@ pub fn actions_delete_workflow_run_request(
 pub fn actions_get_reviews_for_run_request(
   owner : String,
   repo : String,
-  run_id : Int,
+  run_id : Int32,
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
@@ -17479,7 +17490,7 @@ pub fn actions_get_reviews_for_run_decode(
 pub fn actions_approve_workflow_run_request(
   owner : String,
   repo : String,
-  run_id : Int,
+  run_id : Int32,
 ) -> @http.Request {
   @http.Request::post(
     "/repos/" +
@@ -17516,9 +17527,9 @@ pub fn actions_approve_workflow_run_decode(
 pub fn actions_list_workflow_run_artifacts_request(
   owner : String,
   repo : String,
-  run_id : Int,
-  per_page? : Int,
-  page? : Int,
+  run_id : Int32,
+  per_page? : Int32,
+  page? : Int32,
   name? : String,
   direction? : ActionsListWorkflowRunArtifactsDirection,
 ) -> @http.Request {
@@ -17572,8 +17583,8 @@ pub fn actions_list_workflow_run_artifacts_decode(
 pub fn actions_get_workflow_run_attempt_request(
   owner : String,
   repo : String,
-  run_id : Int,
-  attempt_number : Int,
+  run_id : Int32,
+  attempt_number : Int32,
   exclude_pull_requests? : Bool,
 ) -> @http.Request {
   let mut url = "/repos/" +
@@ -17616,10 +17627,10 @@ pub fn actions_get_workflow_run_attempt_decode(
 pub fn actions_list_jobs_for_workflow_run_attempt_request(
   owner : String,
   repo : String,
-  run_id : Int,
-  attempt_number : Int,
-  per_page? : Int,
-  page? : Int,
+  run_id : Int32,
+  attempt_number : Int32,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
     percent_encode(parameter_value(owner)) +
@@ -17665,8 +17676,8 @@ pub fn actions_list_jobs_for_workflow_run_attempt_decode(
 pub fn actions_download_workflow_run_attempt_logs_request(
   owner : String,
   repo : String,
-  run_id : Int,
-  attempt_number : Int,
+  run_id : Int32,
+  attempt_number : Int32,
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
@@ -17687,7 +17698,7 @@ pub fn actions_download_workflow_run_attempt_logs_request(
 pub fn actions_cancel_workflow_run_request(
   owner : String,
   repo : String,
-  run_id : Int,
+  run_id : Int32,
 ) -> @http.Request {
   @http.Request::post(
     "/repos/" +
@@ -17724,8 +17735,8 @@ pub fn actions_cancel_workflow_run_decode(
 pub fn actions_list_concurrency_groups_for_workflow_run_request(
   owner : String,
   repo : String,
-  run_id : Int,
-  per_page? : Int,
+  run_id : Int32,
+  per_page? : Int32,
   before? : String,
   after? : String,
 ) -> @http.Request {
@@ -17775,7 +17786,7 @@ pub fn actions_list_concurrency_groups_for_workflow_run_decode(
 pub fn actions_review_custom_gates_for_run_request(
   owner : String,
   repo : String,
-  run_id : Int,
+  run_id : Int32,
   body : Json,
 ) -> @http.Request {
   @http.Request::post(
@@ -17795,7 +17806,7 @@ pub fn actions_review_custom_gates_for_run_request(
 pub fn actions_force_cancel_workflow_run_request(
   owner : String,
   repo : String,
-  run_id : Int,
+  run_id : Int32,
 ) -> @http.Request {
   @http.Request::post(
     "/repos/" +
@@ -17832,10 +17843,10 @@ pub fn actions_force_cancel_workflow_run_decode(
 pub fn actions_list_jobs_for_workflow_run_request(
   owner : String,
   repo : String,
-  run_id : Int,
+  run_id : Int32,
   filter? : ActionsListJobsForWorkflowRunFilter,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
     percent_encode(parameter_value(owner)) +
@@ -17883,7 +17894,7 @@ pub fn actions_list_jobs_for_workflow_run_decode(
 pub fn actions_download_workflow_run_logs_request(
   owner : String,
   repo : String,
-  run_id : Int,
+  run_id : Int32,
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
@@ -17902,7 +17913,7 @@ pub fn actions_download_workflow_run_logs_request(
 pub fn actions_delete_workflow_run_logs_request(
   owner : String,
   repo : String,
-  run_id : Int,
+  run_id : Int32,
 ) -> @http.Request {
   @http.Request::delete(
     "/repos/" +
@@ -17921,7 +17932,7 @@ pub fn actions_delete_workflow_run_logs_request(
 pub fn actions_get_pending_deployments_for_run_request(
   owner : String,
   repo : String,
-  run_id : Int,
+  run_id : Int32,
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
@@ -17958,7 +17969,7 @@ pub fn actions_get_pending_deployments_for_run_decode(
 pub fn actions_review_pending_deployments_for_run_request(
   owner : String,
   repo : String,
-  run_id : Int,
+  run_id : Int32,
   body : ActionsReviewPendingDeploymentsForRunRequest,
 ) -> @http.Request {
   @http.Request::post(
@@ -17996,7 +18007,7 @@ pub fn actions_review_pending_deployments_for_run_decode(
 pub fn actions_re_run_workflow_request(
   owner : String,
   repo : String,
-  run_id : Int,
+  run_id : Int32,
   body : ActionsReRunWorkflowRequest,
 ) -> @http.Request {
   @http.Request::post(
@@ -18034,7 +18045,7 @@ pub fn actions_re_run_workflow_decode(
 pub fn actions_re_run_workflow_failed_jobs_request(
   owner : String,
   repo : String,
-  run_id : Int,
+  run_id : Int32,
   body : ActionsReRunWorkflowFailedJobsRequest,
 ) -> @http.Request {
   @http.Request::post(
@@ -18072,7 +18083,7 @@ pub fn actions_re_run_workflow_failed_jobs_decode(
 pub fn actions_get_workflow_run_usage_request(
   owner : String,
   repo : String,
-  run_id : Int,
+  run_id : Int32,
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
@@ -18109,8 +18120,8 @@ pub fn actions_get_workflow_run_usage_decode(
 pub fn actions_list_repo_secrets_request(
   owner : String,
   repo : String,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
     percent_encode(parameter_value(owner)) +
@@ -18277,8 +18288,8 @@ pub fn actions_delete_repo_secret_request(
 pub fn actions_list_repo_variables_request(
   owner : String,
   repo : String,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
     percent_encode(parameter_value(owner)) +
@@ -18428,8 +18439,8 @@ pub fn actions_delete_repo_variable_request(
 pub fn actions_list_repo_workflows_request(
   owner : String,
   repo : String,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
     percent_encode(parameter_value(owner)) +
@@ -18588,8 +18599,8 @@ pub fn actions_list_workflow_runs_request(
   branch? : String,
   event? : String,
   status? : ActionsListWorkflowRunsStatus,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
   created? : String,
   exclude_pull_requests? : Bool,
   check_suite_id? : Int64,
@@ -18709,7 +18720,7 @@ pub fn repos_list_activities_request(
   owner : String,
   repo : String,
   direction? : ReposListActivitiesDirection,
-  per_page? : Int,
+  per_page? : Int32,
   before? : String,
   after? : String,
   ref_? : String,
@@ -18783,8 +18794,8 @@ pub fn repos_list_activities_decode(
 pub fn agents_list_repo_organization_secrets_request(
   owner : String,
   repo : String,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
     percent_encode(parameter_value(owner)) +
@@ -18826,8 +18837,8 @@ pub fn agents_list_repo_organization_secrets_decode(
 pub fn agents_list_repo_organization_variables_request(
   owner : String,
   repo : String,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
     percent_encode(parameter_value(owner)) +
@@ -18869,8 +18880,8 @@ pub fn agents_list_repo_organization_variables_decode(
 pub fn agents_list_repo_secrets_request(
   owner : String,
   repo : String,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
     percent_encode(parameter_value(owner)) +
@@ -19037,8 +19048,8 @@ pub fn agents_delete_repo_secret_request(
 pub fn agents_list_repo_variables_request(
   owner : String,
   repo : String,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
     percent_encode(parameter_value(owner)) +
@@ -19188,8 +19199,8 @@ pub fn agents_delete_repo_variable_request(
 pub fn issues_list_assignees_request(
   owner : String,
   repo : String,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
     percent_encode(parameter_value(owner)) +
@@ -19285,7 +19296,7 @@ pub fn repos_list_attestations_request(
   owner : String,
   repo : String,
   subject_digest : String,
-  per_page? : Int,
+  per_page? : Int32,
   before? : String,
   after? : String,
   predicate_type? : String,
@@ -19409,7 +19420,7 @@ pub fn repos_create_autolink_decode(
 pub fn repos_get_autolink_request(
   owner : String,
   repo : String,
-  autolink_id : Int,
+  autolink_id : Int32,
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
@@ -19445,7 +19456,7 @@ pub fn repos_get_autolink_decode(
 pub fn repos_delete_autolink_request(
   owner : String,
   repo : String,
-  autolink_id : Int,
+  autolink_id : Int32,
 ) -> @http.Request {
   @http.Request::delete(
     "/repos/" +
@@ -19530,8 +19541,8 @@ pub fn repos_list_branches_request(
   owner : String,
   repo : String,
   protected_? : Bool,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
     percent_encode(parameter_value(owner)) +
@@ -20888,8 +20899,8 @@ pub fn checks_list_annotations_request(
   owner : String,
   repo : String,
   check_run_id : Int64,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
     percent_encode(parameter_value(owner)) +
@@ -21040,7 +21051,7 @@ pub fn checks_set_suites_preferences_decode(
 pub fn checks_get_suite_request(
   owner : String,
   repo : String,
-  check_suite_id : Int,
+  check_suite_id : Int32,
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
@@ -21076,12 +21087,12 @@ pub fn checks_get_suite_decode(
 pub fn checks_list_for_suite_request(
   owner : String,
   repo : String,
-  check_suite_id : Int,
+  check_suite_id : Int32,
   check_name? : String,
   status? : ChecksListForSuiteStatus,
   filter? : ChecksListForSuiteFilter,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
     percent_encode(parameter_value(owner)) +
@@ -21137,7 +21148,7 @@ pub fn checks_list_for_suite_decode(
 pub fn checks_rerequest_suite_request(
   owner : String,
   repo : String,
-  check_suite_id : Int,
+  check_suite_id : Int32,
 ) -> @http.Request {
   @http.Request::post(
     "/repos/" +
@@ -21174,7 +21185,7 @@ pub fn checks_rerequest_suite_decode(
 pub fn code_quality_list_findings_for_repo_request(
   owner : String,
   repo : String,
-  per_page? : Int,
+  per_page? : Int32,
   direction? : CodeQualityListFindingsForRepoDirection,
   before? : String,
   after? : String,
@@ -21232,7 +21243,7 @@ pub fn code_quality_list_findings_for_repo_decode(
 pub fn code_quality_get_finding_request(
   owner : String,
   repo : String,
-  finding_number : Int,
+  finding_number : Int32,
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
@@ -21408,10 +21419,10 @@ pub fn code_scanning_list_alerts_for_repo_request(
   repo : String,
   tool_name? : String,
   tool_guid? : String,
-  page? : Int,
-  per_page? : Int,
+  page? : Int32,
+  per_page? : Int32,
   ref_? : String,
-  pr? : Int,
+  pr? : Int32,
   direction? : CodeScanningListAlertsForRepoDirection,
   before? : String,
   after? : String,
@@ -21504,7 +21515,7 @@ pub fn code_scanning_list_alerts_for_repo_decode(
 pub fn code_scanning_get_alert_request(
   owner : String,
   repo : String,
-  alert_number : Int,
+  alert_number : Int32,
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
@@ -21540,7 +21551,7 @@ pub fn code_scanning_get_alert_decode(
 pub fn code_scanning_update_alert_request(
   owner : String,
   repo : String,
-  alert_number : Int,
+  alert_number : Int32,
   body : CodeScanningUpdateAlertRequest,
 ) -> @http.Request {
   @http.Request::patch(
@@ -21577,7 +21588,7 @@ pub fn code_scanning_update_alert_decode(
 pub fn code_scanning_get_autofix_request(
   owner : String,
   repo : String,
-  alert_number : Int,
+  alert_number : Int32,
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
@@ -21614,7 +21625,7 @@ pub fn code_scanning_get_autofix_decode(
 pub fn code_scanning_create_autofix_request(
   owner : String,
   repo : String,
-  alert_number : Int,
+  alert_number : Int32,
 ) -> @http.Request {
   @http.Request::post(
     "/repos/" +
@@ -21651,7 +21662,7 @@ pub fn code_scanning_create_autofix_decode(
 pub fn code_scanning_commit_autofix_request(
   owner : String,
   repo : String,
-  alert_number : Int,
+  alert_number : Int32,
   body : CodeScanningAutofixCommits,
 ) -> @http.Request {
   @http.Request::post(
@@ -21689,11 +21700,11 @@ pub fn code_scanning_commit_autofix_decode(
 pub fn code_scanning_list_alert_instances_request(
   owner : String,
   repo : String,
-  alert_number : Int,
-  page? : Int,
-  per_page? : Int,
+  alert_number : Int32,
+  page? : Int32,
+  per_page? : Int32,
   ref_? : String,
-  pr? : Int,
+  pr? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
     percent_encode(parameter_value(owner)) +
@@ -21747,9 +21758,9 @@ pub fn code_scanning_list_recent_analyses_request(
   repo : String,
   tool_name? : String,
   tool_guid? : String,
-  page? : Int,
-  per_page? : Int,
-  pr? : Int,
+  page? : Int32,
+  per_page? : Int32,
+  pr? : Int32,
   ref_? : String,
   sarif_id? : String,
   direction? : CodeScanningListRecentAnalysesDirection,
@@ -21823,7 +21834,7 @@ pub fn code_scanning_list_recent_analyses_decode(
 pub fn code_scanning_get_analysis_request(
   owner : String,
   repo : String,
-  analysis_id : Int,
+  analysis_id : Int32,
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
@@ -21859,7 +21870,7 @@ pub fn code_scanning_get_analysis_decode(
 pub fn code_scanning_delete_analysis_request(
   owner : String,
   repo : String,
-  analysis_id : Int,
+  analysis_id : Int32,
   confirm_delete? : String,
 ) -> @http.Request {
   let mut url = "/repos/" +
@@ -22023,7 +22034,7 @@ pub fn code_scanning_create_variant_analysis_decode(
 pub fn code_scanning_get_variant_analysis_request(
   owner : String,
   repo : String,
-  codeql_variant_analysis_id : Int,
+  codeql_variant_analysis_id : Int32,
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
@@ -22059,7 +22070,7 @@ pub fn code_scanning_get_variant_analysis_decode(
 pub fn code_scanning_get_variant_analysis_repo_task_request(
   owner : String,
   repo : String,
-  codeql_variant_analysis_id : Int,
+  codeql_variant_analysis_id : Int32,
   repo_owner : String,
   repo_name : String,
 ) -> @http.Request {
@@ -22313,8 +22324,8 @@ pub fn repos_codeowners_errors_decode(
 pub fn codespaces_list_in_repository_for_authenticated_user_request(
   owner : String,
   repo : String,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
     percent_encode(parameter_value(owner)) +
@@ -22391,8 +22402,8 @@ pub fn codespaces_create_with_repo_for_authenticated_user_decode(
 pub fn codespaces_list_devcontainers_in_repository_for_authenticated_user_request(
   owner : String,
   repo : String,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
     percent_encode(parameter_value(owner)) +
@@ -22566,8 +22577,8 @@ pub fn codespaces_check_permissions_for_devcontainer_decode(
 pub fn codespaces_list_repo_secrets_request(
   owner : String,
   repo : String,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
     percent_encode(parameter_value(owner)) +
@@ -22736,8 +22747,8 @@ pub fn repos_list_collaborators_request(
   repo : String,
   affiliation? : ReposListCollaboratorsAffiliation,
   permission? : ReposListCollaboratorsPermission,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
     percent_encode(parameter_value(owner)) +
@@ -22898,8 +22909,8 @@ pub fn repos_get_collaborator_permission_level_decode(
 pub fn repos_list_commit_comments_for_repo_request(
   owner : String,
   repo : String,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
     percent_encode(parameter_value(owner)) +
@@ -23034,8 +23045,8 @@ pub fn reactions_list_for_commit_comment_request(
   repo : String,
   comment_id : Int64,
   content? : ReactionsListForCommitCommentContent,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
     percent_encode(parameter_value(owner)) +
@@ -23122,7 +23133,7 @@ pub fn reactions_delete_for_commit_comment_request(
   owner : String,
   repo : String,
   comment_id : Int64,
-  reaction_id : Int,
+  reaction_id : Int32,
 ) -> @http.Request {
   @http.Request::delete(
     "/repos/" +
@@ -23148,8 +23159,8 @@ pub fn repos_list_commits_request(
   committer? : String,
   since? : String,
   until? : String,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
     percent_encode(parameter_value(owner)) +
@@ -23253,8 +23264,8 @@ pub fn repos_list_comments_for_commit_request(
   owner : String,
   repo : String,
   commit_sha : String,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
     percent_encode(parameter_value(owner)) +
@@ -23337,8 +23348,8 @@ pub fn repos_list_pull_requests_associated_with_commit_request(
   owner : String,
   repo : String,
   commit_sha : String,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
     percent_encode(parameter_value(owner)) +
@@ -23383,8 +23394,8 @@ pub fn repos_get_commit_request(
   owner : String,
   repo : String,
   ref_ : String,
-  page? : Int,
-  per_page? : Int,
+  page? : Int32,
+  per_page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
     percent_encode(parameter_value(owner)) +
@@ -23431,9 +23442,9 @@ pub fn checks_list_for_ref_request(
   check_name? : String,
   status? : ChecksListForRefStatus,
   filter? : ChecksListForRefFilter,
-  per_page? : Int,
-  page? : Int,
-  app_id? : Int,
+  per_page? : Int32,
+  page? : Int32,
+  app_id? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
     percent_encode(parameter_value(owner)) +
@@ -23494,10 +23505,10 @@ pub fn checks_list_suites_for_ref_request(
   owner : String,
   repo : String,
   ref_ : String,
-  app_id? : Int,
+  app_id? : Int32,
   check_name? : String,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
     percent_encode(parameter_value(owner)) +
@@ -23550,8 +23561,8 @@ pub fn repos_get_combined_status_for_ref_request(
   owner : String,
   repo : String,
   ref_ : String,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
     percent_encode(parameter_value(owner)) +
@@ -23596,8 +23607,8 @@ pub fn repos_list_commit_statuses_for_ref_request(
   owner : String,
   repo : String,
   ref_ : String,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
     percent_encode(parameter_value(owner)) +
@@ -23676,8 +23687,8 @@ pub fn repos_compare_commits_request(
   owner : String,
   repo : String,
   basehead : String,
-  page? : Int,
-  per_page? : Int,
+  page? : Int32,
+  per_page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
     percent_encode(parameter_value(owner)) +
@@ -23835,8 +23846,8 @@ pub fn repos_list_contributors_request(
   owner : String,
   repo : String,
   anon? : String,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
     percent_encode(parameter_value(owner)) +
@@ -23931,7 +23942,7 @@ pub fn dependabot_list_alerts_for_repo_request(
   direction? : DependabotListAlertsForRepoDirection,
   before? : String,
   after? : String,
-  per_page? : Int,
+  per_page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
     percent_encode(parameter_value(owner)) +
@@ -24032,7 +24043,7 @@ pub fn dependabot_list_alerts_for_repo_decode(
 pub fn dependabot_get_alert_request(
   owner : String,
   repo : String,
-  alert_number : Int,
+  alert_number : Int32,
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
@@ -24068,7 +24079,7 @@ pub fn dependabot_get_alert_decode(
 pub fn dependabot_update_alert_request(
   owner : String,
   repo : String,
-  alert_number : Int,
+  alert_number : Int32,
   body : DependabotUpdateAlertRequest,
 ) -> @http.Request {
   @http.Request::patch(
@@ -24105,8 +24116,8 @@ pub fn dependabot_update_alert_decode(
 pub fn dependabot_list_repo_secrets_request(
   owner : String,
   repo : String,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
     percent_encode(parameter_value(owner)) +
@@ -24438,8 +24449,8 @@ pub fn repos_list_deployments_request(
   ref_? : String,
   task? : String,
   environment? : String,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
     percent_encode(parameter_value(owner)) +
@@ -24533,7 +24544,7 @@ pub fn repos_create_deployment_decode(
 pub fn repos_get_deployment_request(
   owner : String,
   repo : String,
-  deployment_id : Int,
+  deployment_id : Int32,
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
@@ -24569,7 +24580,7 @@ pub fn repos_get_deployment_decode(
 pub fn repos_delete_deployment_request(
   owner : String,
   repo : String,
-  deployment_id : Int,
+  deployment_id : Int32,
 ) -> @http.Request {
   @http.Request::delete(
     "/repos/" +
@@ -24587,9 +24598,9 @@ pub fn repos_delete_deployment_request(
 pub fn repos_list_deployment_statuses_request(
   owner : String,
   repo : String,
-  deployment_id : Int,
-  per_page? : Int,
-  page? : Int,
+  deployment_id : Int32,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
     percent_encode(parameter_value(owner)) +
@@ -24633,7 +24644,7 @@ pub fn repos_list_deployment_statuses_decode(
 pub fn repos_create_deployment_status_request(
   owner : String,
   repo : String,
-  deployment_id : Int,
+  deployment_id : Int32,
   body : ReposCreateDeploymentStatusRequest,
 ) -> @http.Request {
   @http.Request::post(
@@ -24671,8 +24682,8 @@ pub fn repos_create_deployment_status_decode(
 pub fn repos_get_deployment_status_request(
   owner : String,
   repo : String,
-  deployment_id : Int,
-  status_id : Int,
+  deployment_id : Int32,
+  status_id : Int32,
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
@@ -24727,8 +24738,8 @@ pub fn repos_create_dispatch_event_request(
 pub fn repos_get_all_environments_request(
   owner : String,
   repo : String,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
     percent_encode(parameter_value(owner)) +
@@ -24862,8 +24873,8 @@ pub fn repos_list_deployment_branch_policies_request(
   owner : String,
   repo : String,
   environment_name : String,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
     percent_encode(parameter_value(owner)) +
@@ -24946,7 +24957,7 @@ pub fn repos_get_deployment_branch_policy_request(
   owner : String,
   repo : String,
   environment_name : String,
-  branch_policy_id : Int,
+  branch_policy_id : Int32,
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
@@ -24985,7 +24996,7 @@ pub fn repos_update_deployment_branch_policy_request(
   owner : String,
   repo : String,
   environment_name : String,
-  branch_policy_id : Int,
+  branch_policy_id : Int32,
   body : DeploymentBranchPolicyNamePattern,
 ) -> @http.Request {
   @http.Request::put(
@@ -25025,7 +25036,7 @@ pub fn repos_delete_deployment_branch_policy_request(
   owner : String,
   repo : String,
   environment_name : String,
-  branch_policy_id : Int,
+  branch_policy_id : Int32,
 ) -> @http.Request {
   @http.Request::delete(
     "/repos/" +
@@ -25121,8 +25132,8 @@ pub fn repos_list_custom_deployment_rule_integrations_request(
   environment_name : String,
   repo : String,
   owner : String,
-  page? : Int,
-  per_page? : Int,
+  page? : Int32,
+  per_page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
     percent_encode(parameter_value(owner)) +
@@ -25167,7 +25178,7 @@ pub fn repos_get_custom_deployment_protection_rule_request(
   owner : String,
   repo : String,
   environment_name : String,
-  protection_rule_id : Int,
+  protection_rule_id : Int32,
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
@@ -25206,7 +25217,7 @@ pub fn repos_disable_deployment_protection_rule_request(
   environment_name : String,
   repo : String,
   owner : String,
-  protection_rule_id : Int,
+  protection_rule_id : Int32,
 ) -> @http.Request {
   @http.Request::delete(
     "/repos/" +
@@ -25227,8 +25238,8 @@ pub fn actions_list_environment_secrets_request(
   owner : String,
   repo : String,
   environment_name : String,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
     percent_encode(parameter_value(owner)) +
@@ -25410,8 +25421,8 @@ pub fn actions_list_environment_variables_request(
   owner : String,
   repo : String,
   environment_name : String,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
     percent_encode(parameter_value(owner)) +
@@ -25575,8 +25586,8 @@ pub fn actions_delete_environment_variable_request(
 pub fn activity_list_repo_events_request(
   owner : String,
   repo : String,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
     percent_encode(parameter_value(owner)) +
@@ -25619,8 +25630,8 @@ pub fn repos_list_forks_request(
   owner : String,
   repo : String,
   sort? : ReposListForksSort,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
     percent_encode(parameter_value(owner)) +
@@ -26185,8 +26196,8 @@ pub fn repos_get_hash_algorithm_decode(
 pub fn repos_list_webhooks_request(
   owner : String,
   repo : String,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
     percent_encode(parameter_value(owner)) +
@@ -26263,7 +26274,7 @@ pub fn repos_create_webhook_decode(
 pub fn repos_get_webhook_request(
   owner : String,
   repo : String,
-  hook_id : Int,
+  hook_id : Int32,
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
@@ -26299,7 +26310,7 @@ pub fn repos_get_webhook_decode(
 pub fn repos_update_webhook_request(
   owner : String,
   repo : String,
-  hook_id : Int,
+  hook_id : Int32,
   body : ReposUpdateWebhookRequest,
 ) -> @http.Request {
   @http.Request::patch(
@@ -26336,7 +26347,7 @@ pub fn repos_update_webhook_decode(
 pub fn repos_delete_webhook_request(
   owner : String,
   repo : String,
-  hook_id : Int,
+  hook_id : Int32,
 ) -> @http.Request {
   @http.Request::delete(
     "/repos/" +
@@ -26354,7 +26365,7 @@ pub fn repos_delete_webhook_request(
 pub fn repos_get_webhook_config_for_repo_request(
   owner : String,
   repo : String,
-  hook_id : Int,
+  hook_id : Int32,
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
@@ -26391,7 +26402,7 @@ pub fn repos_get_webhook_config_for_repo_decode(
 pub fn repos_update_webhook_config_for_repo_request(
   owner : String,
   repo : String,
-  hook_id : Int,
+  hook_id : Int32,
   body : ReposUpdateWebhookConfigForRepoRequest,
 ) -> @http.Request {
   @http.Request::patch(
@@ -26429,8 +26440,8 @@ pub fn repos_update_webhook_config_for_repo_decode(
 pub fn repos_list_webhook_deliveries_request(
   owner : String,
   repo : String,
-  hook_id : Int,
-  per_page? : Int,
+  hook_id : Int32,
+  per_page? : Int32,
   cursor? : String,
   status? : ReposListWebhookDeliveriesStatus,
 ) -> @http.Request {
@@ -26480,8 +26491,8 @@ pub fn repos_list_webhook_deliveries_decode(
 pub fn repos_get_webhook_delivery_request(
   owner : String,
   repo : String,
-  hook_id : Int,
-  delivery_id : Int,
+  hook_id : Int32,
+  delivery_id : Int32,
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
@@ -26519,8 +26530,8 @@ pub fn repos_get_webhook_delivery_decode(
 pub fn repos_redeliver_webhook_delivery_request(
   owner : String,
   repo : String,
-  hook_id : Int,
-  delivery_id : Int,
+  hook_id : Int32,
+  delivery_id : Int32,
 ) -> @http.Request {
   @http.Request::post(
     "/repos/" +
@@ -26541,7 +26552,7 @@ pub fn repos_redeliver_webhook_delivery_request(
 pub fn repos_ping_webhook_request(
   owner : String,
   repo : String,
-  hook_id : Int,
+  hook_id : Int32,
 ) -> @http.Request {
   @http.Request::post(
     "/repos/" +
@@ -26560,7 +26571,7 @@ pub fn repos_ping_webhook_request(
 pub fn repos_test_push_webhook_request(
   owner : String,
   repo : String,
-  hook_id : Int,
+  hook_id : Int32,
 ) -> @http.Request {
   @http.Request::post(
     "/repos/" +
@@ -26765,7 +26776,7 @@ pub fn migrations_cancel_import_request(
 pub fn migrations_get_commit_authors_request(
   owner : String,
   repo : String,
-  since? : Int,
+  since? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
     percent_encode(parameter_value(owner)) +
@@ -26803,7 +26814,7 @@ pub fn migrations_get_commit_authors_decode(
 pub fn migrations_map_commit_author_request(
   owner : String,
   repo : String,
-  author_id : Int,
+  author_id : Int32,
   body : MigrationsMapCommitAuthorRequest,
 ) -> @http.Request {
   @http.Request::patch(
@@ -27165,8 +27176,8 @@ pub fn interactions_update_pull_request_creation_cap_for_repo_decode(
 pub fn repos_list_invitations_request(
   owner : String,
   repo : String,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
     percent_encode(parameter_value(owner)) +
@@ -27208,7 +27219,7 @@ pub fn repos_list_invitations_decode(
 pub fn repos_update_invitation_request(
   owner : String,
   repo : String,
-  invitation_id : Int,
+  invitation_id : Int32,
   body : ReposUpdateInvitationRequest,
 ) -> @http.Request {
   @http.Request::patch(
@@ -27245,7 +27256,7 @@ pub fn repos_update_invitation_decode(
 pub fn repos_delete_invitation_request(
   owner : String,
   repo : String,
-  invitation_id : Int,
+  invitation_id : Int32,
 ) -> @http.Request {
   @http.Request::delete(
     "/repos/" +
@@ -27308,8 +27319,8 @@ pub fn issues_list_for_repo_request(
   sort? : IssuesListForRepoSort,
   direction? : IssuesListForRepoDirection,
   since? : String,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
     percent_encode(parameter_value(owner)) +
@@ -27434,8 +27445,8 @@ pub fn issues_list_comments_for_repo_request(
   sort? : IssuesListCommentsForRepoSort,
   direction? : IssuesListCommentsForRepoDirection,
   since? : String,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
     percent_encode(parameter_value(owner)) +
@@ -27638,8 +27649,8 @@ pub fn reactions_list_for_issue_comment_request(
   repo : String,
   comment_id : Int64,
   content? : ReactionsListForIssueCommentContent,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
     percent_encode(parameter_value(owner)) +
@@ -27726,7 +27737,7 @@ pub fn reactions_delete_for_issue_comment_request(
   owner : String,
   repo : String,
   comment_id : Int64,
-  reaction_id : Int,
+  reaction_id : Int32,
 ) -> @http.Request {
   @http.Request::delete(
     "/repos/" +
@@ -27746,8 +27757,8 @@ pub fn reactions_delete_for_issue_comment_request(
 pub fn issues_list_events_for_repo_request(
   owner : String,
   repo : String,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
     percent_encode(parameter_value(owner)) +
@@ -27789,7 +27800,7 @@ pub fn issues_list_events_for_repo_decode(
 pub fn issues_get_event_request(
   owner : String,
   repo : String,
-  event_id : Int,
+  event_id : Int32,
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
@@ -27825,7 +27836,7 @@ pub fn issues_get_event_decode(
 pub fn issues_get_request(
   owner : String,
   repo : String,
-  issue_number : Int,
+  issue_number : Int32,
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
@@ -27861,7 +27872,7 @@ pub fn issues_get_decode(
 pub fn issues_update_request(
   owner : String,
   repo : String,
-  issue_number : Int,
+  issue_number : Int32,
   body : IssuesUpdateRequest,
 ) -> @http.Request {
   @http.Request::patch(
@@ -27898,7 +27909,7 @@ pub fn issues_update_decode(
 pub fn issues_add_assignees_request(
   owner : String,
   repo : String,
-  issue_number : Int,
+  issue_number : Int32,
   body : IssuesAddAssigneesRequest,
 ) -> @http.Request {
   @http.Request::post(
@@ -27936,7 +27947,7 @@ pub fn issues_add_assignees_decode(
 pub fn issues_remove_assignees_request(
   owner : String,
   repo : String,
-  issue_number : Int,
+  issue_number : Int32,
   body : IssuesRemoveAssigneesRequest,
 ) -> @http.Request {
   @http.Request::delete(
@@ -27974,7 +27985,7 @@ pub fn issues_remove_assignees_decode(
 pub fn issues_check_user_can_be_assigned_to_issue_request(
   owner : String,
   repo : String,
-  issue_number : Int,
+  issue_number : Int32,
   assignee : String,
 ) -> @http.Request {
   @http.Request::get(
@@ -27995,10 +28006,10 @@ pub fn issues_check_user_can_be_assigned_to_issue_request(
 pub fn issues_list_comments_request(
   owner : String,
   repo : String,
-  issue_number : Int,
+  issue_number : Int32,
   since? : String,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
     percent_encode(parameter_value(owner)) +
@@ -28046,7 +28057,7 @@ pub fn issues_list_comments_decode(
 pub fn issues_create_comment_request(
   owner : String,
   repo : String,
-  issue_number : Int,
+  issue_number : Int32,
   body : IssuesCreateCommentRequest,
 ) -> @http.Request {
   @http.Request::post(
@@ -28084,9 +28095,9 @@ pub fn issues_create_comment_decode(
 pub fn issues_list_dependencies_blocked_by_request(
   owner : String,
   repo : String,
-  issue_number : Int,
-  per_page? : Int,
-  page? : Int,
+  issue_number : Int32,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
     percent_encode(parameter_value(owner)) +
@@ -28130,7 +28141,7 @@ pub fn issues_list_dependencies_blocked_by_decode(
 pub fn issues_add_blocked_by_dependency_request(
   owner : String,
   repo : String,
-  issue_number : Int,
+  issue_number : Int32,
   body : IssuesAddBlockedByDependencyRequest,
 ) -> @http.Request {
   @http.Request::post(
@@ -28168,8 +28179,8 @@ pub fn issues_add_blocked_by_dependency_decode(
 pub fn issues_remove_dependency_blocked_by_request(
   owner : String,
   repo : String,
-  issue_number : Int,
-  issue_id : Int,
+  issue_number : Int32,
+  issue_id : Int32,
 ) -> @http.Request {
   @http.Request::delete(
     "/repos/" +
@@ -28207,9 +28218,9 @@ pub fn issues_remove_dependency_blocked_by_decode(
 pub fn issues_list_dependencies_blocking_request(
   owner : String,
   repo : String,
-  issue_number : Int,
-  per_page? : Int,
-  page? : Int,
+  issue_number : Int32,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
     percent_encode(parameter_value(owner)) +
@@ -28253,9 +28264,9 @@ pub fn issues_list_dependencies_blocking_decode(
 pub fn issues_list_events_request(
   owner : String,
   repo : String,
-  issue_number : Int,
-  per_page? : Int,
-  page? : Int,
+  issue_number : Int32,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
     percent_encode(parameter_value(owner)) +
@@ -28299,9 +28310,9 @@ pub fn issues_list_events_decode(
 pub fn issues_list_issue_field_values_for_issue_request(
   owner : String,
   repo : String,
-  issue_number : Int,
-  per_page? : Int,
-  page? : Int,
+  issue_number : Int32,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
     percent_encode(parameter_value(owner)) +
@@ -28345,7 +28356,7 @@ pub fn issues_list_issue_field_values_for_issue_decode(
 pub fn issues_add_issue_field_values_request(
   owner : String,
   repo : String,
-  issue_number : Int,
+  issue_number : Int32,
   body : IssuesAddIssueFieldValuesRequest,
 ) -> @http.Request {
   @http.Request::post(
@@ -28383,7 +28394,7 @@ pub fn issues_add_issue_field_values_decode(
 pub fn issues_set_issue_field_values_request(
   owner : String,
   repo : String,
-  issue_number : Int,
+  issue_number : Int32,
   body : IssuesSetIssueFieldValuesRequest,
 ) -> @http.Request {
   @http.Request::put(
@@ -28421,8 +28432,8 @@ pub fn issues_set_issue_field_values_decode(
 pub fn issues_delete_issue_field_value_request(
   owner : String,
   repo : String,
-  issue_number : Int,
-  issue_field_id : Int,
+  issue_number : Int32,
+  issue_field_id : Int32,
 ) -> @http.Request {
   @http.Request::delete(
     "/repos/" +
@@ -28442,9 +28453,9 @@ pub fn issues_delete_issue_field_value_request(
 pub fn issues_list_labels_on_issue_request(
   owner : String,
   repo : String,
-  issue_number : Int,
-  per_page? : Int,
-  page? : Int,
+  issue_number : Int32,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
     percent_encode(parameter_value(owner)) +
@@ -28488,7 +28499,7 @@ pub fn issues_list_labels_on_issue_decode(
 pub fn issues_add_labels_request(
   owner : String,
   repo : String,
-  issue_number : Int,
+  issue_number : Int32,
   body : IssuesAddLabelsRequest,
 ) -> @http.Request {
   @http.Request::post(
@@ -28526,7 +28537,7 @@ pub fn issues_add_labels_decode(
 pub fn issues_set_labels_request(
   owner : String,
   repo : String,
-  issue_number : Int,
+  issue_number : Int32,
   body : Json,
 ) -> @http.Request {
   @http.Request::put(
@@ -28564,7 +28575,7 @@ pub fn issues_set_labels_decode(
 pub fn issues_remove_all_labels_request(
   owner : String,
   repo : String,
-  issue_number : Int,
+  issue_number : Int32,
 ) -> @http.Request {
   @http.Request::delete(
     "/repos/" +
@@ -28583,7 +28594,7 @@ pub fn issues_remove_all_labels_request(
 pub fn issues_remove_label_request(
   owner : String,
   repo : String,
-  issue_number : Int,
+  issue_number : Int32,
   name : String,
 ) -> @http.Request {
   @http.Request::delete(
@@ -28622,7 +28633,7 @@ pub fn issues_remove_label_decode(
 pub fn issues_lock_request(
   owner : String,
   repo : String,
-  issue_number : Int,
+  issue_number : Int32,
   body : IssuesLockRequest,
 ) -> @http.Request {
   @http.Request::put(
@@ -28642,7 +28653,7 @@ pub fn issues_lock_request(
 pub fn issues_unlock_request(
   owner : String,
   repo : String,
-  issue_number : Int,
+  issue_number : Int32,
 ) -> @http.Request {
   @http.Request::delete(
     "/repos/" +
@@ -28661,7 +28672,7 @@ pub fn issues_unlock_request(
 pub fn issues_get_parent_request(
   owner : String,
   repo : String,
-  issue_number : Int,
+  issue_number : Int32,
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
@@ -28698,10 +28709,10 @@ pub fn issues_get_parent_decode(
 pub fn reactions_list_for_issue_request(
   owner : String,
   repo : String,
-  issue_number : Int,
+  issue_number : Int32,
   content? : ReactionsListForIssueContent,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
     percent_encode(parameter_value(owner)) +
@@ -28749,7 +28760,7 @@ pub fn reactions_list_for_issue_decode(
 pub fn reactions_create_for_issue_request(
   owner : String,
   repo : String,
-  issue_number : Int,
+  issue_number : Int32,
   body : ReactionsCreateForIssueRequest,
 ) -> @http.Request {
   @http.Request::post(
@@ -28787,8 +28798,8 @@ pub fn reactions_create_for_issue_decode(
 pub fn reactions_delete_for_issue_request(
   owner : String,
   repo : String,
-  issue_number : Int,
-  reaction_id : Int,
+  issue_number : Int32,
+  reaction_id : Int32,
 ) -> @http.Request {
   @http.Request::delete(
     "/repos/" +
@@ -28808,9 +28819,9 @@ pub fn reactions_delete_for_issue_request(
 pub fn issues_list_relates_to_request(
   owner : String,
   repo : String,
-  issue_number : Int,
-  per_page? : Int,
-  page? : Int,
+  issue_number : Int32,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
     percent_encode(parameter_value(owner)) +
@@ -28854,7 +28865,7 @@ pub fn issues_list_relates_to_decode(
 pub fn issues_add_relates_to_request(
   owner : String,
   repo : String,
-  issue_number : Int,
+  issue_number : Int32,
   body : IssuesAddRelatesToRequest,
 ) -> @http.Request {
   @http.Request::post(
@@ -28892,8 +28903,8 @@ pub fn issues_add_relates_to_decode(
 pub fn issues_remove_relates_to_request(
   owner : String,
   repo : String,
-  issue_number : Int,
-  issue_id : Int,
+  issue_number : Int32,
+  issue_id : Int32,
 ) -> @http.Request {
   @http.Request::delete(
     "/repos/" +
@@ -28931,7 +28942,7 @@ pub fn issues_remove_relates_to_decode(
 pub fn issues_remove_sub_issue_request(
   owner : String,
   repo : String,
-  issue_number : Int,
+  issue_number : Int32,
   body : IssuesRemoveSubIssueRequest,
 ) -> @http.Request {
   @http.Request::delete(
@@ -28969,9 +28980,9 @@ pub fn issues_remove_sub_issue_decode(
 pub fn issues_list_sub_issues_request(
   owner : String,
   repo : String,
-  issue_number : Int,
-  per_page? : Int,
-  page? : Int,
+  issue_number : Int32,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
     percent_encode(parameter_value(owner)) +
@@ -29015,7 +29026,7 @@ pub fn issues_list_sub_issues_decode(
 pub fn issues_add_sub_issue_request(
   owner : String,
   repo : String,
-  issue_number : Int,
+  issue_number : Int32,
   body : IssuesAddSubIssueRequest,
 ) -> @http.Request {
   @http.Request::post(
@@ -29053,7 +29064,7 @@ pub fn issues_add_sub_issue_decode(
 pub fn issues_reprioritize_sub_issue_request(
   owner : String,
   repo : String,
-  issue_number : Int,
+  issue_number : Int32,
   body : IssuesReprioritizeSubIssueRequest,
 ) -> @http.Request {
   @http.Request::patch(
@@ -29091,11 +29102,11 @@ pub fn issues_reprioritize_sub_issue_decode(
 pub fn issues_list_suggestions_request(
   owner : String,
   repo : String,
-  issue_number : Int,
+  issue_number : Int32,
   state? : IssuesListSuggestionsState,
   action? : IssuesListSuggestionsAction,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
     percent_encode(parameter_value(owner)) +
@@ -29147,8 +29158,8 @@ pub fn issues_list_suggestions_decode(
 pub fn issues_approve_suggestion_request(
   owner : String,
   repo : String,
-  issue_number : Int,
-  suggestion_id : Int,
+  issue_number : Int32,
+  suggestion_id : Int32,
 ) -> @http.Request {
   @http.Request::post(
     "/repos/" +
@@ -29187,8 +29198,8 @@ pub fn issues_approve_suggestion_decode(
 pub fn issues_dismiss_suggestion_request(
   owner : String,
   repo : String,
-  issue_number : Int,
-  suggestion_id : Int,
+  issue_number : Int32,
+  suggestion_id : Int32,
 ) -> @http.Request {
   @http.Request::post(
     "/repos/" +
@@ -29227,9 +29238,9 @@ pub fn issues_dismiss_suggestion_decode(
 pub fn issues_list_events_for_timeline_request(
   owner : String,
   repo : String,
-  issue_number : Int,
-  per_page? : Int,
-  page? : Int,
+  issue_number : Int32,
+  per_page? : Int32,
+  page? : Int32,
   exclude? : String,
 ) -> @http.Request {
   let mut url = "/repos/" +
@@ -29278,8 +29289,8 @@ pub fn issues_list_events_for_timeline_decode(
 pub fn repos_list_deploy_keys_request(
   owner : String,
   repo : String,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
     percent_encode(parameter_value(owner)) +
@@ -29356,7 +29367,7 @@ pub fn repos_create_deploy_key_decode(
 pub fn repos_get_deploy_key_request(
   owner : String,
   repo : String,
-  key_id : Int,
+  key_id : Int32,
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
@@ -29392,7 +29403,7 @@ pub fn repos_get_deploy_key_decode(
 pub fn repos_delete_deploy_key_request(
   owner : String,
   repo : String,
-  key_id : Int,
+  key_id : Int32,
 ) -> @http.Request {
   @http.Request::delete(
     "/repos/" +
@@ -29410,8 +29421,8 @@ pub fn repos_delete_deploy_key_request(
 pub fn issues_list_labels_for_repo_request(
   owner : String,
   repo : String,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
     percent_encode(parameter_value(owner)) +
@@ -29594,7 +29605,7 @@ pub fn repos_list_languages_request(
 /// Decodes a parsed successful repos/list-languages response.
 pub fn repos_list_languages_decode_json(
   value : Json,
-) -> Map[String, Int] raise @json.JsonDecodeError {
+) -> Map[String, Int32] raise @json.JsonDecodeError {
   @json.from_json(value)
 }
 
@@ -29603,7 +29614,7 @@ pub fn repos_list_languages_decode_json(
 /// Decodes a successful repos/list-languages response.
 pub fn repos_list_languages_decode(
   response : @http.Response,
-) -> Map[String, Int] raise @runtime.SdkError {
+) -> Map[String, Int32] raise @runtime.SdkError {
   decode_response(response)
 }
 
@@ -29724,8 +29735,8 @@ pub fn issues_list_milestones_request(
   state? : IssuesListMilestonesState,
   sort? : IssuesListMilestonesSort,
   direction? : IssuesListMilestonesDirection,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
     percent_encode(parameter_value(owner)) +
@@ -29814,7 +29825,7 @@ pub fn issues_create_milestone_decode(
 pub fn issues_get_milestone_request(
   owner : String,
   repo : String,
-  milestone_number : Int,
+  milestone_number : Int32,
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
@@ -29850,7 +29861,7 @@ pub fn issues_get_milestone_decode(
 pub fn issues_update_milestone_request(
   owner : String,
   repo : String,
-  milestone_number : Int,
+  milestone_number : Int32,
   body : IssuesUpdateMilestoneRequest,
 ) -> @http.Request {
   @http.Request::patch(
@@ -29887,7 +29898,7 @@ pub fn issues_update_milestone_decode(
 pub fn issues_delete_milestone_request(
   owner : String,
   repo : String,
-  milestone_number : Int,
+  milestone_number : Int32,
 ) -> @http.Request {
   @http.Request::delete(
     "/repos/" +
@@ -29905,9 +29916,9 @@ pub fn issues_delete_milestone_request(
 pub fn issues_list_labels_for_milestone_request(
   owner : String,
   repo : String,
-  milestone_number : Int,
-  per_page? : Int,
-  page? : Int,
+  milestone_number : Int32,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
     percent_encode(parameter_value(owner)) +
@@ -29955,8 +29966,8 @@ pub fn activity_list_repo_notifications_for_authenticated_user_request(
   participating? : Bool,
   since? : String,
   before? : String,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
     percent_encode(parameter_value(owner)) +
@@ -30149,8 +30160,8 @@ pub fn repos_delete_pages_site_request(
 pub fn repos_list_pages_builds_request(
   owner : String,
   repo : String,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
     percent_encode(parameter_value(owner)) +
@@ -30260,7 +30271,7 @@ pub fn repos_get_latest_pages_build_decode(
 pub fn repos_get_pages_build_request(
   owner : String,
   repo : String,
-  build_id : Int,
+  build_id : Int32,
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
@@ -30542,8 +30553,8 @@ pub fn pulls_list_request(
   base? : String,
   sort? : PullsListSort,
   direction? : PullsListDirection,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
     percent_encode(parameter_value(owner)) +
@@ -30643,8 +30654,8 @@ pub fn pulls_list_review_comments_for_repo_request(
   sort? : PullsListReviewCommentsForRepoSort,
   direction? : PullsListReviewCommentsForRepoDirection,
   since? : String,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
     percent_encode(parameter_value(owner)) +
@@ -30791,8 +30802,8 @@ pub fn reactions_list_for_pull_request_review_comment_request(
   repo : String,
   comment_id : Int64,
   content? : ReactionsListForPullRequestReviewCommentContent,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
     percent_encode(parameter_value(owner)) +
@@ -30879,7 +30890,7 @@ pub fn reactions_delete_for_pull_request_comment_request(
   owner : String,
   repo : String,
   comment_id : Int64,
-  reaction_id : Int,
+  reaction_id : Int32,
 ) -> @http.Request {
   @http.Request::delete(
     "/repos/" +
@@ -30899,7 +30910,7 @@ pub fn reactions_delete_for_pull_request_comment_request(
 pub fn pulls_get_request(
   owner : String,
   repo : String,
-  pull_number : Int,
+  pull_number : Int32,
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
@@ -30935,7 +30946,7 @@ pub fn pulls_get_decode(
 pub fn pulls_update_request(
   owner : String,
   repo : String,
-  pull_number : Int,
+  pull_number : Int32,
   body : PullsUpdateRequest,
 ) -> @http.Request {
   @http.Request::patch(
@@ -30972,7 +30983,7 @@ pub fn pulls_update_decode(
 pub fn codespaces_create_with_pr_for_authenticated_user_request(
   owner : String,
   repo : String,
-  pull_number : Int,
+  pull_number : Int32,
   body : CodespacesCreateWithPrForAuthenticatedUserRequest,
 ) -> @http.Request {
   @http.Request::post(
@@ -31010,12 +31021,12 @@ pub fn codespaces_create_with_pr_for_authenticated_user_decode(
 pub fn pulls_list_review_comments_request(
   owner : String,
   repo : String,
-  pull_number : Int,
+  pull_number : Int32,
   sort? : PullsListReviewCommentsSort,
   direction? : PullsListReviewCommentsDirection,
   since? : String,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
     percent_encode(parameter_value(owner)) +
@@ -31071,7 +31082,7 @@ pub fn pulls_list_review_comments_decode(
 pub fn pulls_create_review_comment_request(
   owner : String,
   repo : String,
-  pull_number : Int,
+  pull_number : Int32,
   body : PullsCreateReviewCommentRequest,
 ) -> @http.Request {
   @http.Request::post(
@@ -31109,7 +31120,7 @@ pub fn pulls_create_review_comment_decode(
 pub fn pulls_create_reply_for_review_comment_request(
   owner : String,
   repo : String,
-  pull_number : Int,
+  pull_number : Int32,
   comment_id : Int64,
   body : PullsCreateReplyForReviewCommentRequest,
 ) -> @http.Request {
@@ -31150,9 +31161,9 @@ pub fn pulls_create_reply_for_review_comment_decode(
 pub fn pulls_list_commits_request(
   owner : String,
   repo : String,
-  pull_number : Int,
-  per_page? : Int,
-  page? : Int,
+  pull_number : Int32,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
     percent_encode(parameter_value(owner)) +
@@ -31196,9 +31207,9 @@ pub fn pulls_list_commits_decode(
 pub fn pulls_list_files_request(
   owner : String,
   repo : String,
-  pull_number : Int,
-  per_page? : Int,
-  page? : Int,
+  pull_number : Int32,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
     percent_encode(parameter_value(owner)) +
@@ -31242,7 +31253,7 @@ pub fn pulls_list_files_decode(
 pub fn pulls_check_if_merged_request(
   owner : String,
   repo : String,
-  pull_number : Int,
+  pull_number : Int32,
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
@@ -31261,7 +31272,7 @@ pub fn pulls_check_if_merged_request(
 pub fn pulls_merge_request(
   owner : String,
   repo : String,
-  pull_number : Int,
+  pull_number : Int32,
   body : PullsMergeRequest,
 ) -> @http.Request {
   @http.Request::put(
@@ -31299,7 +31310,7 @@ pub fn pulls_merge_decode(
 pub fn pulls_merge_async_request(
   owner : String,
   repo : String,
-  pull_number : Int,
+  pull_number : Int32,
   body : PullsMergeAsyncRequest,
 ) -> @http.Request {
   @http.Request::put(
@@ -31337,7 +31348,7 @@ pub fn pulls_merge_async_decode(
 pub fn pulls_get_merge_async_result_request(
   owner : String,
   repo : String,
-  pull_number : Int,
+  pull_number : Int32,
   uuid : String,
 ) -> @http.Request {
   @http.Request::get(
@@ -31376,7 +31387,7 @@ pub fn pulls_get_merge_async_result_decode(
 pub fn pulls_list_requested_reviewers_request(
   owner : String,
   repo : String,
-  pull_number : Int,
+  pull_number : Int32,
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
@@ -31413,7 +31424,7 @@ pub fn pulls_list_requested_reviewers_decode(
 pub fn pulls_request_reviewers_request(
   owner : String,
   repo : String,
-  pull_number : Int,
+  pull_number : Int32,
   body : PullsRequestReviewersRequest,
 ) -> @http.Request {
   @http.Request::post(
@@ -31451,7 +31462,7 @@ pub fn pulls_request_reviewers_decode(
 pub fn pulls_remove_requested_reviewers_request(
   owner : String,
   repo : String,
-  pull_number : Int,
+  pull_number : Int32,
   body : PullsRemoveRequestedReviewersRequest,
 ) -> @http.Request {
   @http.Request::delete(
@@ -31489,7 +31500,7 @@ pub fn pulls_remove_requested_reviewers_decode(
 pub fn pulls_rerequest_reviewers_request(
   owner : String,
   repo : String,
-  pull_number : Int,
+  pull_number : Int32,
   body : PullsRerequestReviewersRequest,
 ) -> @http.Request {
   @http.Request::post(
@@ -31527,9 +31538,9 @@ pub fn pulls_rerequest_reviewers_decode(
 pub fn pulls_list_reviews_request(
   owner : String,
   repo : String,
-  pull_number : Int,
-  per_page? : Int,
-  page? : Int,
+  pull_number : Int32,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
     percent_encode(parameter_value(owner)) +
@@ -31573,7 +31584,7 @@ pub fn pulls_list_reviews_decode(
 pub fn pulls_create_review_request(
   owner : String,
   repo : String,
-  pull_number : Int,
+  pull_number : Int32,
   body : PullsCreateReviewRequest,
 ) -> @http.Request {
   @http.Request::post(
@@ -31611,8 +31622,8 @@ pub fn pulls_create_review_decode(
 pub fn pulls_get_review_request(
   owner : String,
   repo : String,
-  pull_number : Int,
-  review_id : Int,
+  pull_number : Int32,
+  review_id : Int32,
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
@@ -31650,8 +31661,8 @@ pub fn pulls_get_review_decode(
 pub fn pulls_update_review_request(
   owner : String,
   repo : String,
-  pull_number : Int,
-  review_id : Int,
+  pull_number : Int32,
+  review_id : Int32,
   body : PullsUpdateReviewRequest,
 ) -> @http.Request {
   @http.Request::put(
@@ -31690,8 +31701,8 @@ pub fn pulls_update_review_decode(
 pub fn pulls_delete_pending_review_request(
   owner : String,
   repo : String,
-  pull_number : Int,
-  review_id : Int,
+  pull_number : Int32,
+  review_id : Int32,
 ) -> @http.Request {
   @http.Request::delete(
     "/repos/" +
@@ -31729,10 +31740,10 @@ pub fn pulls_delete_pending_review_decode(
 pub fn pulls_list_comments_for_review_request(
   owner : String,
   repo : String,
-  pull_number : Int,
-  review_id : Int,
-  per_page? : Int,
-  page? : Int,
+  pull_number : Int32,
+  review_id : Int32,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
     percent_encode(parameter_value(owner)) +
@@ -31778,8 +31789,8 @@ pub fn pulls_list_comments_for_review_decode(
 pub fn pulls_dismiss_review_request(
   owner : String,
   repo : String,
-  pull_number : Int,
-  review_id : Int,
+  pull_number : Int32,
+  review_id : Int32,
   body : PullsDismissReviewRequest,
 ) -> @http.Request {
   @http.Request::put(
@@ -31819,8 +31830,8 @@ pub fn pulls_dismiss_review_decode(
 pub fn pulls_submit_review_request(
   owner : String,
   repo : String,
-  pull_number : Int,
-  review_id : Int,
+  pull_number : Int32,
+  review_id : Int32,
   body : PullsSubmitReviewRequest,
 ) -> @http.Request {
   @http.Request::post(
@@ -31860,7 +31871,7 @@ pub fn pulls_submit_review_decode(
 pub fn pulls_update_branch_request(
   owner : String,
   repo : String,
-  pull_number : Int,
+  pull_number : Int32,
   body : PullsUpdateBranchRequest,
 ) -> @http.Request {
   @http.Request::put(
@@ -31976,8 +31987,8 @@ pub fn repos_get_readme_in_directory_decode(
 pub fn repos_list_releases_request(
   owner : String,
   repo : String,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
     percent_encode(parameter_value(owner)) +
@@ -32054,7 +32065,7 @@ pub fn repos_create_release_decode(
 pub fn repos_get_release_asset_request(
   owner : String,
   repo : String,
-  asset_id : Int,
+  asset_id : Int32,
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
@@ -32090,7 +32101,7 @@ pub fn repos_get_release_asset_decode(
 pub fn repos_update_release_asset_request(
   owner : String,
   repo : String,
-  asset_id : Int,
+  asset_id : Int32,
   body : ReposUpdateReleaseAssetRequest,
 ) -> @http.Request {
   @http.Request::patch(
@@ -32127,7 +32138,7 @@ pub fn repos_update_release_asset_decode(
 pub fn repos_delete_release_asset_request(
   owner : String,
   repo : String,
-  asset_id : Int,
+  asset_id : Int32,
 ) -> @http.Request {
   @http.Request::delete(
     "/repos/" +
@@ -32250,7 +32261,7 @@ pub fn repos_get_release_by_tag_decode(
 pub fn repos_get_release_request(
   owner : String,
   repo : String,
-  release_id : Int,
+  release_id : Int32,
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
@@ -32286,7 +32297,7 @@ pub fn repos_get_release_decode(
 pub fn repos_update_release_request(
   owner : String,
   repo : String,
-  release_id : Int,
+  release_id : Int32,
   body : ReposUpdateReleaseRequest,
 ) -> @http.Request {
   @http.Request::patch(
@@ -32323,7 +32334,7 @@ pub fn repos_update_release_decode(
 pub fn repos_delete_release_request(
   owner : String,
   repo : String,
-  release_id : Int,
+  release_id : Int32,
 ) -> @http.Request {
   @http.Request::delete(
     "/repos/" +
@@ -32341,9 +32352,9 @@ pub fn repos_delete_release_request(
 pub fn repos_list_release_assets_request(
   owner : String,
   repo : String,
-  release_id : Int,
-  per_page? : Int,
-  page? : Int,
+  release_id : Int32,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
     percent_encode(parameter_value(owner)) +
@@ -32387,7 +32398,7 @@ pub fn repos_list_release_assets_decode(
 pub fn repos_upload_release_asset_request(
   owner : String,
   repo : String,
-  release_id : Int,
+  release_id : Int32,
   name : String,
   label? : String,
 ) -> @http.Request {
@@ -32430,10 +32441,10 @@ pub fn repos_upload_release_asset_decode(
 pub fn reactions_list_for_release_request(
   owner : String,
   repo : String,
-  release_id : Int,
+  release_id : Int32,
   content? : ReactionsListForReleaseContent,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
     percent_encode(parameter_value(owner)) +
@@ -32481,7 +32492,7 @@ pub fn reactions_list_for_release_decode(
 pub fn reactions_create_for_release_request(
   owner : String,
   repo : String,
-  release_id : Int,
+  release_id : Int32,
   body : ReactionsCreateForReleaseRequest,
 ) -> @http.Request {
   @http.Request::post(
@@ -32519,8 +32530,8 @@ pub fn reactions_create_for_release_decode(
 pub fn reactions_delete_for_release_request(
   owner : String,
   repo : String,
-  release_id : Int,
-  reaction_id : Int,
+  release_id : Int32,
+  reaction_id : Int32,
 ) -> @http.Request {
   @http.Request::delete(
     "/repos/" +
@@ -32541,8 +32552,8 @@ pub fn repos_get_branch_rules_request(
   owner : String,
   repo : String,
   branch : String,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
     percent_encode(parameter_value(owner)) +
@@ -32585,8 +32596,8 @@ pub fn repos_get_branch_rules_decode(
 pub fn repos_get_repo_rulesets_request(
   owner : String,
   repo : String,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
   includes_parents? : Bool,
   targets? : String,
 ) -> @http.Request {
@@ -32679,8 +32690,8 @@ pub fn repos_get_repo_rule_suites_request(
   actor_name? : String,
   rule_suite_result? : ReposGetRepoRuleSuitesRuleSuiteResult,
   evaluate_status? : ReposGetRepoRuleSuitesEvaluateStatus,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
     percent_encode(parameter_value(owner)) +
@@ -32745,7 +32756,7 @@ pub fn repos_get_repo_rule_suites_decode(
 pub fn repos_get_repo_rule_suite_request(
   owner : String,
   repo : String,
-  rule_suite_id : Int,
+  rule_suite_id : Int32,
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
@@ -32781,7 +32792,7 @@ pub fn repos_get_repo_rule_suite_decode(
 pub fn repos_get_repo_ruleset_request(
   owner : String,
   repo : String,
-  ruleset_id : Int,
+  ruleset_id : Int32,
   includes_parents? : Bool,
 ) -> @http.Request {
   let mut url = "/repos/" +
@@ -32822,7 +32833,7 @@ pub fn repos_get_repo_ruleset_decode(
 pub fn repos_update_repo_ruleset_request(
   owner : String,
   repo : String,
-  ruleset_id : Int,
+  ruleset_id : Int32,
   body : ReposUpdateRepoRulesetRequest,
 ) -> @http.Request {
   @http.Request::put(
@@ -32859,7 +32870,7 @@ pub fn repos_update_repo_ruleset_decode(
 pub fn repos_delete_repo_ruleset_request(
   owner : String,
   repo : String,
-  ruleset_id : Int,
+  ruleset_id : Int32,
 ) -> @http.Request {
   @http.Request::delete(
     "/repos/" +
@@ -32877,9 +32888,9 @@ pub fn repos_delete_repo_ruleset_request(
 pub fn repos_get_repo_ruleset_history_request(
   owner : String,
   repo : String,
-  ruleset_id : Int,
-  per_page? : Int,
-  page? : Int,
+  ruleset_id : Int32,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
     percent_encode(parameter_value(owner)) +
@@ -32923,8 +32934,8 @@ pub fn repos_get_repo_ruleset_history_decode(
 pub fn repos_get_repo_ruleset_version_request(
   owner : String,
   repo : String,
-  ruleset_id : Int,
-  version_id : Int,
+  ruleset_id : Int32,
+  version_id : Int32,
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
@@ -32971,8 +32982,8 @@ pub fn secret_scanning_list_alerts_for_repo_request(
   assignee? : String,
   sort? : SecretScanningListAlertsForRepoSort,
   direction? : SecretScanningListAlertsForRepoDirection,
-  page? : Int,
-  per_page? : Int,
+  page? : Int32,
+  per_page? : Int32,
   before? : String,
   after? : String,
   validity? : String,
@@ -33104,7 +33115,7 @@ pub fn secret_scanning_list_alerts_for_repo_decode(
 pub fn secret_scanning_get_alert_request(
   owner : String,
   repo : String,
-  alert_number : Int,
+  alert_number : Int32,
   hide_secret? : Bool,
 ) -> @http.Request {
   let mut url = "/repos/" +
@@ -33145,7 +33156,7 @@ pub fn secret_scanning_get_alert_decode(
 pub fn secret_scanning_update_alert_request(
   owner : String,
   repo : String,
-  alert_number : Int,
+  alert_number : Int32,
   body : SecretScanningUpdateAlertRequest,
 ) -> @http.Request {
   @http.Request::patch(
@@ -33182,9 +33193,9 @@ pub fn secret_scanning_update_alert_decode(
 pub fn secret_scanning_list_locations_for_alert_request(
   owner : String,
   repo : String,
-  alert_number : Int,
-  page? : Int,
-  per_page? : Int,
+  alert_number : Int32,
+  page? : Int32,
+  per_page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
     percent_encode(parameter_value(owner)) +
@@ -33344,7 +33355,7 @@ pub fn secret_scanning_bulk_delete_repo_custom_patterns_request(
 pub fn secret_scanning_update_repo_custom_pattern_request(
   owner : String,
   repo : String,
-  pattern_id : Int,
+  pattern_id : Int32,
   body : SecretScanningCustomPatternToUpdate,
 ) -> @http.Request {
   @http.Request::patch(
@@ -33454,7 +33465,7 @@ pub fn security_advisories_list_repository_advisories_request(
   sort? : SecurityAdvisoriesListRepositoryAdvisoriesSort,
   before? : String,
   after? : String,
-  per_page? : Int,
+  per_page? : Int32,
   state? : SecurityAdvisoriesListRepositoryAdvisoriesState,
 ) -> @http.Request {
   let mut url = "/repos/" +
@@ -33712,9 +33723,9 @@ pub fn security_advisories_create_fork_decode(
 pub fn pull_request_stacks_list_request(
   owner : String,
   repo : String,
-  pull_request? : Int,
-  per_page? : Int,
-  page? : Int,
+  pull_request? : Int32,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
     percent_encode(parameter_value(owner)) +
@@ -33796,7 +33807,7 @@ pub fn pull_request_stacks_create_decode(
 pub fn pull_request_stacks_get_request(
   owner : String,
   repo : String,
-  stack_number : Int,
+  stack_number : Int32,
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
@@ -33832,7 +33843,7 @@ pub fn pull_request_stacks_get_decode(
 pub fn pull_request_stacks_add_request(
   owner : String,
   repo : String,
-  stack_number : Int,
+  stack_number : Int32,
   body : PullRequestStacksAddRequest,
 ) -> @http.Request {
   @http.Request::post(
@@ -33870,7 +33881,7 @@ pub fn pull_request_stacks_add_decode(
 pub fn pull_request_stacks_unstack_request(
   owner : String,
   repo : String,
-  stack_number : Int,
+  stack_number : Int32,
 ) -> @http.Request {
   @http.Request::post(
     "/repos/" +
@@ -33907,8 +33918,8 @@ pub fn pull_request_stacks_unstack_decode(
 pub fn activity_list_stargazers_for_repo_request(
   owner : String,
   repo : String,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
     percent_encode(parameter_value(owner)) +
@@ -33984,8 +33995,8 @@ pub fn activity_get_stargazer_count_for_repo_decode(
 pub fn activity_get_stargazer_history_for_repo_request(
   owner : String,
   repo : String,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
     percent_encode(parameter_value(owner)) +
@@ -34042,7 +34053,7 @@ pub fn repos_get_code_frequency_stats_request(
 /// Decodes a parsed successful repos/get-code-frequency-stats response.
 pub fn repos_get_code_frequency_stats_decode_json(
   value : Json,
-) -> Array[Array[Int]] raise @json.JsonDecodeError {
+) -> Array[Array[Int32]] raise @json.JsonDecodeError {
   @json.from_json(value)
 }
 
@@ -34051,7 +34062,7 @@ pub fn repos_get_code_frequency_stats_decode_json(
 /// Decodes a successful repos/get-code-frequency-stats response.
 pub fn repos_get_code_frequency_stats_decode(
   response : @http.Response,
-) -> Array[Array[Int]] raise @runtime.SdkError {
+) -> Array[Array[Int32]] raise @runtime.SdkError {
   decode_response(response)
 }
 
@@ -34178,7 +34189,7 @@ pub fn repos_get_punch_card_stats_request(
 /// Decodes a parsed successful repos/get-punch-card-stats response.
 pub fn repos_get_punch_card_stats_decode_json(
   value : Json,
-) -> Array[Array[Int]] raise @json.JsonDecodeError {
+) -> Array[Array[Int32]] raise @json.JsonDecodeError {
   @json.from_json(value)
 }
 
@@ -34187,7 +34198,7 @@ pub fn repos_get_punch_card_stats_decode_json(
 /// Decodes a successful repos/get-punch-card-stats response.
 pub fn repos_get_punch_card_stats_decode(
   response : @http.Response,
-) -> Array[Array[Int]] raise @runtime.SdkError {
+) -> Array[Array[Int32]] raise @runtime.SdkError {
   decode_response(response)
 }
 
@@ -34234,8 +34245,8 @@ pub fn repos_create_commit_status_decode(
 pub fn activity_list_watchers_for_repo_request(
   owner : String,
   repo : String,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
     percent_encode(parameter_value(owner)) +
@@ -34362,8 +34373,8 @@ pub fn activity_delete_repo_subscription_request(
 pub fn repos_list_tags_request(
   owner : String,
   repo : String,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
     percent_encode(parameter_value(owner)) +
@@ -34423,8 +34434,8 @@ pub fn repos_download_tarball_archive_request(
 pub fn repos_list_teams_request(
   owner : String,
   repo : String,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
     percent_encode(parameter_value(owner)) +
@@ -34466,8 +34477,8 @@ pub fn repos_list_teams_decode(
 pub fn repos_get_all_topics_request(
   owner : String,
   repo : String,
-  page? : Int,
-  per_page? : Int,
+  page? : Int32,
+  per_page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
     percent_encode(parameter_value(owner)) +
@@ -34821,7 +34832,7 @@ pub fn repos_create_using_template_decode(
 ///|
 ///
 /// List public repositories
-pub fn repos_list_public_request(since? : Int) -> @http.Request {
+pub fn repos_list_public_request(since? : Int32) -> @http.Request {
   let mut url = "/repositories"
   match since {
     Some(value) => url = append_query(url, "since", parameter_value(value))
@@ -34855,8 +34866,8 @@ pub fn search_code_request(
   q : String,
   sort? : String,
   order? : SearchCodeOrder,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/search/code"
   url = append_query(url, "q", parameter_value(q))
@@ -34904,8 +34915,8 @@ pub fn search_commits_request(
   q : String,
   sort? : SearchCommitsSort,
   order? : SearchCommitsOrder,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/search/commits"
   url = append_query(url, "q", parameter_value(q))
@@ -34953,8 +34964,8 @@ pub fn search_issues_and_pull_requests_request(
   q : String,
   sort? : SearchIssuesAndPullRequestsSort,
   order? : SearchIssuesAndPullRequestsOrder,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
   advanced_search? : String,
   search_type? : SearchIssuesAndPullRequestsSearchType,
 ) -> @http.Request {
@@ -35011,12 +35022,12 @@ pub fn search_issues_and_pull_requests_decode(
 ///
 /// Search labels
 pub fn search_labels_request(
-  repository_id : Int,
+  repository_id : Int32,
   q : String,
   sort? : SearchLabelsSort,
   order? : SearchLabelsOrder,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/search/labels"
   url = append_query(url, "repository_id", parameter_value(repository_id))
@@ -35065,8 +35076,8 @@ pub fn search_repos_request(
   q : String,
   sort? : SearchReposSort,
   order? : SearchReposOrder,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/search/repositories"
   url = append_query(url, "q", parameter_value(q))
@@ -35112,8 +35123,8 @@ pub fn search_repos_decode(
 /// Search topics
 pub fn search_topics_request(
   q : String,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/search/topics"
   url = append_query(url, "q", parameter_value(q))
@@ -35153,8 +35164,8 @@ pub fn search_users_request(
   q : String,
   sort? : SearchUsersSort,
   order? : SearchUsersOrder,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/search/users"
   url = append_query(url, "q", parameter_value(q))
@@ -35198,7 +35209,7 @@ pub fn search_users_decode(
 ///|
 ///
 /// Get a team (Legacy)
-pub fn teams_get_legacy_request(team_id : Int) -> @http.Request {
+pub fn teams_get_legacy_request(team_id : Int32) -> @http.Request {
   @http.Request::get("/teams/" + percent_encode(parameter_value(team_id)))
 }
 
@@ -35224,7 +35235,7 @@ pub fn teams_get_legacy_decode(
 ///
 /// Update a team (Legacy)
 pub fn teams_update_legacy_request(
-  team_id : Int,
+  team_id : Int32,
   body : TeamsUpdateLegacyRequest,
 ) -> @http.Request {
   @http.Request::patch("/teams/" + percent_encode(parameter_value(team_id))).json_body(
@@ -35253,7 +35264,7 @@ pub fn teams_update_legacy_decode(
 ///|
 ///
 /// Delete a team (Legacy) The caller handles the response as @http.Response.
-pub fn teams_delete_legacy_request(team_id : Int) -> @http.Request {
+pub fn teams_delete_legacy_request(team_id : Int32) -> @http.Request {
   @http.Request::delete("/teams/" + percent_encode(parameter_value(team_id)))
 }
 
@@ -35261,9 +35272,9 @@ pub fn teams_delete_legacy_request(team_id : Int) -> @http.Request {
 ///
 /// List pending team invitations (Legacy)
 pub fn teams_list_pending_invitations_legacy_request(
-  team_id : Int,
-  per_page? : Int,
-  page? : Int,
+  team_id : Int32,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/teams/" +
     percent_encode(parameter_value(team_id)) +
@@ -35301,10 +35312,10 @@ pub fn teams_list_pending_invitations_legacy_decode(
 ///
 /// List team members (Legacy)
 pub fn teams_list_members_legacy_request(
-  team_id : Int,
+  team_id : Int32,
   role? : TeamsListMembersLegacyRole,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/teams/" +
     percent_encode(parameter_value(team_id)) +
@@ -35346,7 +35357,7 @@ pub fn teams_list_members_legacy_decode(
 ///
 /// Get team member (Legacy) The caller handles the response as @http.Response.
 pub fn teams_get_member_legacy_request(
-  team_id : Int,
+  team_id : Int32,
   username : String,
 ) -> @http.Request {
   @http.Request::get(
@@ -35361,7 +35372,7 @@ pub fn teams_get_member_legacy_request(
 ///
 /// Add team member (Legacy) The caller handles the response as @http.Response.
 pub fn teams_add_member_legacy_request(
-  team_id : Int,
+  team_id : Int32,
   username : String,
 ) -> @http.Request {
   @http.Request::put(
@@ -35376,7 +35387,7 @@ pub fn teams_add_member_legacy_request(
 ///
 /// Remove team member (Legacy) The caller handles the response as @http.Response.
 pub fn teams_remove_member_legacy_request(
-  team_id : Int,
+  team_id : Int32,
   username : String,
 ) -> @http.Request {
   @http.Request::delete(
@@ -35391,7 +35402,7 @@ pub fn teams_remove_member_legacy_request(
 ///
 /// Get team membership for a user (Legacy)
 pub fn teams_get_membership_for_user_legacy_request(
-  team_id : Int,
+  team_id : Int32,
   username : String,
 ) -> @http.Request {
   @http.Request::get(
@@ -35424,7 +35435,7 @@ pub fn teams_get_membership_for_user_legacy_decode(
 ///
 /// Add or update team membership for a user (Legacy)
 pub fn teams_add_or_update_membership_for_user_legacy_request(
-  team_id : Int,
+  team_id : Int32,
   username : String,
   body : TeamsAddOrUpdateMembershipForUserLegacyRequest,
 ) -> @http.Request {
@@ -35458,7 +35469,7 @@ pub fn teams_add_or_update_membership_for_user_legacy_decode(
 ///
 /// Remove team membership for a user (Legacy) The caller handles the response as @http.Response.
 pub fn teams_remove_membership_for_user_legacy_request(
-  team_id : Int,
+  team_id : Int32,
   username : String,
 ) -> @http.Request {
   @http.Request::delete(
@@ -35473,9 +35484,9 @@ pub fn teams_remove_membership_for_user_legacy_request(
 ///
 /// List team repositories (Legacy)
 pub fn teams_list_repos_legacy_request(
-  team_id : Int,
-  per_page? : Int,
-  page? : Int,
+  team_id : Int32,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/teams/" + percent_encode(parameter_value(team_id)) + "/repos"
   match per_page {
@@ -35511,7 +35522,7 @@ pub fn teams_list_repos_legacy_decode(
 ///
 /// Check team permissions for a repository (Legacy)
 pub fn teams_check_permissions_for_repo_legacy_request(
-  team_id : Int,
+  team_id : Int32,
   owner : String,
   repo : String,
 ) -> @http.Request {
@@ -35547,7 +35558,7 @@ pub fn teams_check_permissions_for_repo_legacy_decode(
 ///
 /// Add or update team repository permissions (Legacy) The caller handles the response as @http.Response.
 pub fn teams_add_or_update_repo_permissions_legacy_request(
-  team_id : Int,
+  team_id : Int32,
   owner : String,
   repo : String,
   body : TeamsAddOrUpdateRepoPermissionsLegacyRequest,
@@ -35566,7 +35577,7 @@ pub fn teams_add_or_update_repo_permissions_legacy_request(
 ///
 /// Remove a repository from a team (Legacy) The caller handles the response as @http.Response.
 pub fn teams_remove_repo_legacy_request(
-  team_id : Int,
+  team_id : Int32,
   owner : String,
   repo : String,
 ) -> @http.Request {
@@ -35584,9 +35595,9 @@ pub fn teams_remove_repo_legacy_request(
 ///
 /// List child teams (Legacy)
 pub fn teams_list_child_legacy_request(
-  team_id : Int,
-  per_page? : Int,
-  page? : Int,
+  team_id : Int32,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/teams/" + percent_encode(parameter_value(team_id)) + "/teams"
   match per_page {
@@ -35674,8 +35685,8 @@ pub fn users_update_authenticated_decode(
 ///
 /// List users blocked by the authenticated user
 pub fn users_list_blocked_by_authenticated_user_request(
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/user/blocks"
   match per_page {
@@ -35738,9 +35749,9 @@ pub fn users_unblock_request(username : String) -> @http.Request {
 ///
 /// List codespaces for the authenticated user
 pub fn codespaces_list_for_authenticated_user_request(
-  per_page? : Int,
-  page? : Int,
-  repository_id? : Int,
+  per_page? : Int32,
+  page? : Int32,
+  repository_id? : Int32,
 ) -> @http.Request {
   let mut url = "/user/codespaces"
   match per_page {
@@ -35808,8 +35819,8 @@ pub fn codespaces_create_for_authenticated_user_decode(
 ///
 /// List secrets for the authenticated user
 pub fn codespaces_list_secrets_for_authenticated_user_request(
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/user/codespaces/secrets"
   match per_page {
@@ -35986,7 +35997,7 @@ pub fn codespaces_set_repositories_for_secret_for_authenticated_user_request(
 /// Add a selected repository to a user secret The caller handles the response as @http.Response.
 pub fn codespaces_add_repository_for_secret_for_authenticated_user_request(
   secret_name : String,
-  repository_id : Int,
+  repository_id : Int32,
 ) -> @http.Request {
   @http.Request::put(
     "/user/codespaces/secrets/" +
@@ -36001,7 +36012,7 @@ pub fn codespaces_add_repository_for_secret_for_authenticated_user_request(
 /// Remove a selected repository from a user secret The caller handles the response as @http.Response.
 pub fn codespaces_remove_repository_for_secret_for_authenticated_user_request(
   secret_name : String,
-  repository_id : Int,
+  repository_id : Int32,
 ) -> @http.Request {
   @http.Request::delete(
     "/user/codespaces/secrets/" +
@@ -36326,8 +36337,8 @@ pub fn users_set_primary_email_visibility_for_authenticated_user_decode(
 ///
 /// List email addresses for the authenticated user
 pub fn users_list_emails_for_authenticated_user_request(
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/user/emails"
   match per_page {
@@ -36399,8 +36410,8 @@ pub fn users_delete_email_for_authenticated_user_request(
 ///
 /// List followers of the authenticated user
 pub fn users_list_followers_for_authenticated_user_request(
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/user/followers"
   match per_page {
@@ -36436,8 +36447,8 @@ pub fn users_list_followers_for_authenticated_user_decode(
 ///
 /// List the people the authenticated user follows
 pub fn users_list_followed_by_authenticated_user_request(
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/user/following"
   match per_page {
@@ -36502,8 +36513,8 @@ pub fn users_unfollow_request(username : String) -> @http.Request {
 ///
 /// List GPG keys for the authenticated user
 pub fn users_list_gpg_keys_for_authenticated_user_request(
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/user/gpg_keys"
   match per_page {
@@ -36566,7 +36577,7 @@ pub fn users_create_gpg_key_for_authenticated_user_decode(
 ///
 /// Get a GPG key for the authenticated user
 pub fn users_get_gpg_key_for_authenticated_user_request(
-  gpg_key_id : Int,
+  gpg_key_id : Int32,
 ) -> @http.Request {
   @http.Request::get(
     "/user/gpg_keys/" + percent_encode(parameter_value(gpg_key_id)),
@@ -36595,7 +36606,7 @@ pub fn users_get_gpg_key_for_authenticated_user_decode(
 ///
 /// Delete a GPG key for the authenticated user The caller handles the response as @http.Response.
 pub fn users_delete_gpg_key_for_authenticated_user_request(
-  gpg_key_id : Int,
+  gpg_key_id : Int32,
 ) -> @http.Request {
   @http.Request::delete(
     "/user/gpg_keys/" + percent_encode(parameter_value(gpg_key_id)),
@@ -36606,8 +36617,8 @@ pub fn users_delete_gpg_key_for_authenticated_user_request(
 ///
 /// List app installations accessible to the user access token
 pub fn apps_list_installations_for_authenticated_user_request(
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/user/installations"
   match per_page {
@@ -36643,9 +36654,9 @@ pub fn apps_list_installations_for_authenticated_user_decode(
 ///
 /// List repositories accessible to the user access token
 pub fn apps_list_installation_repos_for_authenticated_user_request(
-  installation_id : Int,
-  per_page? : Int,
-  page? : Int,
+  installation_id : Int32,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/user/installations/" +
     percent_encode(parameter_value(installation_id)) +
@@ -36683,8 +36694,8 @@ pub fn apps_list_installation_repos_for_authenticated_user_decode(
 ///
 /// Add a repository to an app installation The caller handles the response as @http.Response.
 pub fn apps_add_repo_to_installation_for_authenticated_user_request(
-  installation_id : Int,
-  repository_id : Int,
+  installation_id : Int32,
+  repository_id : Int32,
 ) -> @http.Request {
   @http.Request::put(
     "/user/installations/" +
@@ -36698,8 +36709,8 @@ pub fn apps_add_repo_to_installation_for_authenticated_user_request(
 ///
 /// Remove a repository from an app installation The caller handles the response as @http.Response.
 pub fn apps_remove_repo_from_installation_for_authenticated_user_request(
-  installation_id : Int,
-  repository_id : Int,
+  installation_id : Int32,
+  repository_id : Int32,
 ) -> @http.Request {
   @http.Request::delete(
     "/user/installations/" +
@@ -36778,8 +36789,8 @@ pub fn issues_list_for_authenticated_user_request(
   sort? : IssuesListForAuthenticatedUserSort,
   direction? : IssuesListForAuthenticatedUserDirection,
   since? : String,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/user/issues"
   match filter {
@@ -36839,8 +36850,8 @@ pub fn issues_list_for_authenticated_user_decode(
 ///
 /// List public SSH keys for the authenticated user
 pub fn users_list_public_ssh_keys_for_authenticated_user_request(
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/user/keys"
   match per_page {
@@ -36903,7 +36914,7 @@ pub fn users_create_public_ssh_key_for_authenticated_user_decode(
 ///
 /// Get a public SSH key for the authenticated user
 pub fn users_get_public_ssh_key_for_authenticated_user_request(
-  key_id : Int,
+  key_id : Int32,
 ) -> @http.Request {
   @http.Request::get("/user/keys/" + percent_encode(parameter_value(key_id)))
 }
@@ -36930,7 +36941,7 @@ pub fn users_get_public_ssh_key_for_authenticated_user_decode(
 ///
 /// Delete a public SSH key for the authenticated user The caller handles the response as @http.Response.
 pub fn users_delete_public_ssh_key_for_authenticated_user_request(
-  key_id : Int,
+  key_id : Int32,
 ) -> @http.Request {
   @http.Request::delete("/user/keys/" + percent_encode(parameter_value(key_id)))
 }
@@ -36939,8 +36950,8 @@ pub fn users_delete_public_ssh_key_for_authenticated_user_request(
 ///
 /// List subscriptions for the authenticated user
 pub fn apps_list_subscriptions_for_authenticated_user_request(
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/user/marketplace_purchases"
   match per_page {
@@ -36976,8 +36987,8 @@ pub fn apps_list_subscriptions_for_authenticated_user_decode(
 ///
 /// List subscriptions for the authenticated user (stubbed)
 pub fn apps_list_subscriptions_for_authenticated_user_stubbed_request(
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/user/marketplace_purchases/stubbed"
   match per_page {
@@ -37014,8 +37025,8 @@ pub fn apps_list_subscriptions_for_authenticated_user_stubbed_decode(
 /// List organization memberships for the authenticated user
 pub fn orgs_list_memberships_for_authenticated_user_request(
   state? : OrgsListMembershipsForAuthenticatedUserState,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/user/memberships/orgs"
   match state {
@@ -37114,8 +37125,8 @@ pub fn orgs_update_membership_for_authenticated_user_decode(
 ///
 /// List user migrations
 pub fn migrations_list_for_authenticated_user_request(
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/user/migrations"
   match per_page {
@@ -37178,7 +37189,7 @@ pub fn migrations_start_for_authenticated_user_decode(
 ///
 /// Get a user migration status
 pub fn migrations_get_status_for_authenticated_user_request(
-  migration_id : Int,
+  migration_id : Int32,
   exclude? : Array[String],
 ) -> @http.Request {
   let mut url = "/user/migrations/" +
@@ -37215,7 +37226,7 @@ pub fn migrations_get_status_for_authenticated_user_decode(
 ///
 /// Download a user migration archive The caller handles the response as @http.Response.
 pub fn migrations_get_archive_for_authenticated_user_request(
-  migration_id : Int,
+  migration_id : Int32,
 ) -> @http.Request {
   @http.Request::get(
     "/user/migrations/" +
@@ -37228,7 +37239,7 @@ pub fn migrations_get_archive_for_authenticated_user_request(
 ///
 /// Delete a user migration archive The caller handles the response as @http.Response.
 pub fn migrations_delete_archive_for_authenticated_user_request(
-  migration_id : Int,
+  migration_id : Int32,
 ) -> @http.Request {
   @http.Request::delete(
     "/user/migrations/" +
@@ -37241,7 +37252,7 @@ pub fn migrations_delete_archive_for_authenticated_user_request(
 ///
 /// Unlock a user repository The caller handles the response as @http.Response.
 pub fn migrations_unlock_repo_for_authenticated_user_request(
-  migration_id : Int,
+  migration_id : Int32,
   repo_name : String,
 ) -> @http.Request {
   @http.Request::delete(
@@ -37257,9 +37268,9 @@ pub fn migrations_unlock_repo_for_authenticated_user_request(
 ///
 /// List repositories for a user migration
 pub fn migrations_list_repos_for_authenticated_user_request(
-  migration_id : Int,
-  per_page? : Int,
-  page? : Int,
+  migration_id : Int32,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/user/migrations/" +
     percent_encode(parameter_value(migration_id)) +
@@ -37297,8 +37308,8 @@ pub fn migrations_list_repos_for_authenticated_user_decode(
 ///
 /// List organizations for the authenticated user
 pub fn orgs_list_for_authenticated_user_request(
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/user/orgs"
   match per_page {
@@ -37336,8 +37347,8 @@ pub fn orgs_list_for_authenticated_user_decode(
 pub fn packages_list_packages_for_authenticated_user_request(
   package_type : PackagesListPackagesForAuthenticatedUserPackageType,
   visibility? : PackagesListPackagesForAuthenticatedUserVisibility,
-  page? : Int,
-  per_page? : Int,
+  page? : Int32,
+  per_page? : Int32,
 ) -> @http.Request {
   let mut url = "/user/packages"
   url = append_query(url, "package_type", parameter_value(package_type))
@@ -37448,8 +37459,8 @@ pub fn packages_restore_package_for_authenticated_user_request(
 pub fn packages_get_all_package_versions_for_package_owned_by_authenticated_user_request(
   package_type : PackagesGetAllPackageVersionsForPackageOwnedByAuthenticatedUserPackageType,
   package_name : String,
-  page? : Int,
-  per_page? : Int,
+  page? : Int32,
+  per_page? : Int32,
   state? : PackagesGetAllPackageVersionsForPackageOwnedByAuthenticatedUserState,
 ) -> @http.Request {
   let mut url = "/user/packages/" +
@@ -37496,7 +37507,7 @@ pub fn packages_get_all_package_versions_for_package_owned_by_authenticated_user
 pub fn packages_get_package_version_for_authenticated_user_request(
   package_type : PackagesGetPackageVersionForAuthenticatedUserPackageType,
   package_name : String,
-  package_version_id : Int,
+  package_version_id : Int32,
 ) -> @http.Request {
   @http.Request::get(
     "/user/packages/" +
@@ -37532,7 +37543,7 @@ pub fn packages_get_package_version_for_authenticated_user_decode(
 pub fn packages_delete_package_version_for_authenticated_user_request(
   package_type : PackagesDeletePackageVersionForAuthenticatedUserPackageType,
   package_name : String,
-  package_version_id : Int,
+  package_version_id : Int32,
 ) -> @http.Request {
   @http.Request::delete(
     "/user/packages/" +
@@ -37550,7 +37561,7 @@ pub fn packages_delete_package_version_for_authenticated_user_request(
 pub fn packages_restore_package_version_for_authenticated_user_request(
   package_type : PackagesRestorePackageVersionForAuthenticatedUserPackageType,
   package_name : String,
-  package_version_id : Int,
+  package_version_id : Int32,
 ) -> @http.Request {
   @http.Request::post(
     "/user/packages/" +
@@ -37567,8 +37578,8 @@ pub fn packages_restore_package_version_for_authenticated_user_request(
 ///
 /// List public email addresses for the authenticated user
 pub fn users_list_public_emails_for_authenticated_user_request(
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/user/public_emails"
   match per_page {
@@ -37609,8 +37620,8 @@ pub fn repos_list_for_authenticated_user_request(
   type_? : ReposListForAuthenticatedUserType,
   sort? : ReposListForAuthenticatedUserSort,
   direction? : ReposListForAuthenticatedUserDirection,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
   since? : String,
   before? : String,
 ) -> @http.Request {
@@ -37704,8 +37715,8 @@ pub fn repos_create_for_authenticated_user_decode(
 ///
 /// List repository invitations for the authenticated user
 pub fn repos_list_invitations_for_authenticated_user_request(
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/user/repository_invitations"
   match per_page {
@@ -37741,7 +37752,7 @@ pub fn repos_list_invitations_for_authenticated_user_decode(
 ///
 /// Accept a repository invitation The caller handles the response as @http.Response.
 pub fn repos_accept_invitation_for_authenticated_user_request(
-  invitation_id : Int,
+  invitation_id : Int32,
 ) -> @http.Request {
   @http.Request::patch(
     "/user/repository_invitations/" +
@@ -37753,7 +37764,7 @@ pub fn repos_accept_invitation_for_authenticated_user_request(
 ///
 /// Decline a repository invitation The caller handles the response as @http.Response.
 pub fn repos_decline_invitation_for_authenticated_user_request(
-  invitation_id : Int,
+  invitation_id : Int32,
 ) -> @http.Request {
   @http.Request::delete(
     "/user/repository_invitations/" +
@@ -37765,8 +37776,8 @@ pub fn repos_decline_invitation_for_authenticated_user_request(
 ///
 /// List social accounts for the authenticated user
 pub fn users_list_social_accounts_for_authenticated_user_request(
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/user/social_accounts"
   match per_page {
@@ -37838,8 +37849,8 @@ pub fn users_delete_social_account_for_authenticated_user_request(
 ///
 /// List SSH signing keys for the authenticated user
 pub fn users_list_ssh_signing_keys_for_authenticated_user_request(
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/user/ssh_signing_keys"
   match per_page {
@@ -37902,7 +37913,7 @@ pub fn users_create_ssh_signing_key_for_authenticated_user_decode(
 ///
 /// Get an SSH signing key for the authenticated user
 pub fn users_get_ssh_signing_key_for_authenticated_user_request(
-  ssh_signing_key_id : Int,
+  ssh_signing_key_id : Int32,
 ) -> @http.Request {
   @http.Request::get(
     "/user/ssh_signing_keys/" +
@@ -37932,7 +37943,7 @@ pub fn users_get_ssh_signing_key_for_authenticated_user_decode(
 ///
 /// Delete an SSH signing key for the authenticated user The caller handles the response as @http.Response.
 pub fn users_delete_ssh_signing_key_for_authenticated_user_request(
-  ssh_signing_key_id : Int,
+  ssh_signing_key_id : Int32,
 ) -> @http.Request {
   @http.Request::delete(
     "/user/ssh_signing_keys/" +
@@ -37946,8 +37957,8 @@ pub fn users_delete_ssh_signing_key_for_authenticated_user_request(
 pub fn activity_list_repos_starred_by_authenticated_user_request(
   sort? : ActivityListReposStarredByAuthenticatedUserSort,
   direction? : ActivityListReposStarredByAuthenticatedUserDirection,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/user/starred"
   match sort {
@@ -38036,8 +38047,8 @@ pub fn activity_unstar_repo_for_authenticated_user_request(
 ///
 /// List repositories watched by the authenticated user
 pub fn activity_list_watched_repos_for_authenticated_user_request(
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/user/subscriptions"
   match per_page {
@@ -38073,8 +38084,8 @@ pub fn activity_list_watched_repos_for_authenticated_user_decode(
 ///
 /// List teams for the authenticated user
 pub fn teams_list_for_authenticated_user_request(
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/user/teams"
   match per_page {
@@ -38109,7 +38120,7 @@ pub fn teams_list_for_authenticated_user_decode(
 ///|
 ///
 /// Get a user using their ID
-pub fn users_get_by_id_request(account_id : Int) -> @http.Request {
+pub fn users_get_by_id_request(account_id : Int32) -> @http.Request {
   @http.Request::get("/user/" + percent_encode(parameter_value(account_id)))
 }
 
@@ -38136,7 +38147,7 @@ pub fn users_get_by_id_decode(
 /// Create draft item for user owned project
 pub fn projects_create_draft_item_for_authenticated_user_request(
   user_id : String,
-  project_number : Int,
+  project_number : Int32,
   body : ProjectsCreateDraftItemForAuthenticatedUserRequest,
 ) -> @http.Request {
   @http.Request::post(
@@ -38169,7 +38180,7 @@ pub fn projects_create_draft_item_for_authenticated_user_decode(
 ///|
 ///
 /// List users
-pub fn users_list_request(since? : Int, per_page? : Int) -> @http.Request {
+pub fn users_list_request(since? : Int32, per_page? : Int32) -> @http.Request {
   let mut url = "/users"
   match since {
     Some(value) => url = append_query(url, "since", parameter_value(value))
@@ -38205,7 +38216,7 @@ pub fn users_list_decode(
 /// Create a view for a user-owned project
 pub fn projects_create_view_for_user_request(
   user_id : String,
-  project_number : Int,
+  project_number : Int32,
   body : ProjectsCreateViewForUserRequest,
 ) -> @http.Request {
   @http.Request::post(
@@ -38266,7 +38277,7 @@ pub fn users_get_by_username_decode(
 pub fn users_list_attestations_bulk_request(
   username : String,
   body : UsersListAttestationsBulkRequest,
-  per_page? : Int,
+  per_page? : Int32,
   before? : String,
   after? : String,
 ) -> @http.Request {
@@ -38340,7 +38351,7 @@ pub fn users_delete_attestations_by_subject_digest_request(
 /// Delete attestations by ID The caller handles the response as @http.Response.
 pub fn users_delete_attestations_by_id_request(
   username : String,
-  attestation_id : Int,
+  attestation_id : Int32,
 ) -> @http.Request {
   @http.Request::delete(
     "/users/" +
@@ -38356,7 +38367,7 @@ pub fn users_delete_attestations_by_id_request(
 pub fn users_list_attestations_request(
   username : String,
   subject_digest : String,
-  per_page? : Int,
+  per_page? : Int32,
   before? : String,
   after? : String,
   predicate_type? : String,
@@ -38408,7 +38419,7 @@ pub fn users_list_attestations_decode(
 /// List Copilot Spaces for a user
 pub fn copilot_spaces_list_for_user_request(
   username : String,
-  per_page? : Int,
+  per_page? : Int32,
   before? : String,
   after? : String,
 ) -> @http.Request {
@@ -38483,7 +38494,7 @@ pub fn copilot_spaces_create_for_user_decode(
 /// Get a Copilot Space for a user
 pub fn copilot_spaces_get_for_user_request(
   username : String,
-  space_number : Int,
+  space_number : Int32,
 ) -> @http.Request {
   @http.Request::get(
     "/users/" +
@@ -38516,7 +38527,7 @@ pub fn copilot_spaces_get_for_user_decode(
 /// Set a Copilot Space for a user
 pub fn copilot_spaces_update_for_user_request(
   username : String,
-  space_number : Int,
+  space_number : Int32,
   body : CopilotSpacesUpdateForUserRequest,
 ) -> @http.Request {
   @http.Request::put(
@@ -38550,7 +38561,7 @@ pub fn copilot_spaces_update_for_user_decode(
 /// Delete a Copilot Space for a user The caller handles the response as @http.Response.
 pub fn copilot_spaces_delete_for_user_request(
   username : String,
-  space_number : Int,
+  space_number : Int32,
 ) -> @http.Request {
   @http.Request::delete(
     "/users/" +
@@ -38565,7 +38576,7 @@ pub fn copilot_spaces_delete_for_user_request(
 /// List collaborators for a Copilot Space for a user
 pub fn copilot_spaces_list_collaborators_for_user_request(
   username : String,
-  space_number : Int,
+  space_number : Int32,
 ) -> @http.Request {
   @http.Request::get(
     "/users/" +
@@ -38599,7 +38610,7 @@ pub fn copilot_spaces_list_collaborators_for_user_decode(
 /// Add a collaborator to a Copilot Space for a user
 pub fn copilot_spaces_add_collaborator_for_user_request(
   username : String,
-  space_number : Int,
+  space_number : Int32,
   body : CopilotSpacesAddCollaboratorForUserRequest,
 ) -> @http.Request {
   @http.Request::post(
@@ -38634,7 +38645,7 @@ pub fn copilot_spaces_add_collaborator_for_user_decode(
 /// Set a collaborator role for a Copilot Space for a user
 pub fn copilot_spaces_update_collaborator_for_user_request(
   username : String,
-  space_number : Int,
+  space_number : Int32,
   actor_type : CopilotSpacesUpdateCollaboratorForUserActorType,
   actor_identifier : String,
   body : CopilotSpacesUpdateCollaboratorForUserRequest,
@@ -38674,7 +38685,7 @@ pub fn copilot_spaces_update_collaborator_for_user_decode(
 /// Remove a collaborator from a Copilot Space for a user The caller handles the response as @http.Response.
 pub fn copilot_spaces_remove_collaborator_for_user_request(
   username : String,
-  space_number : Int,
+  space_number : Int32,
   actor_type : CopilotSpacesRemoveCollaboratorForUserActorType,
   actor_identifier : String,
 ) -> @http.Request {
@@ -38695,7 +38706,7 @@ pub fn copilot_spaces_remove_collaborator_for_user_request(
 /// List resources for a Copilot Space for a user
 pub fn copilot_spaces_list_resources_for_user_request(
   username : String,
-  space_number : Int,
+  space_number : Int32,
 ) -> @http.Request {
   @http.Request::get(
     "/users/" +
@@ -38729,7 +38740,7 @@ pub fn copilot_spaces_list_resources_for_user_decode(
 /// Create a resource for a Copilot Space for a user
 pub fn copilot_spaces_create_resource_for_user_request(
   username : String,
-  space_number : Int,
+  space_number : Int32,
   body : CopilotSpacesCreateResourceForUserRequest,
 ) -> @http.Request {
   @http.Request::post(
@@ -38764,8 +38775,8 @@ pub fn copilot_spaces_create_resource_for_user_decode(
 /// Get a resource for a Copilot Space for a user
 pub fn copilot_spaces_get_resource_for_user_request(
   username : String,
-  space_number : Int,
-  space_resource_id : Int,
+  space_number : Int32,
+  space_resource_id : Int32,
 ) -> @http.Request {
   @http.Request::get(
     "/users/" +
@@ -38800,8 +38811,8 @@ pub fn copilot_spaces_get_resource_for_user_decode(
 /// Set a resource for a Copilot Space for a user
 pub fn copilot_spaces_update_resource_for_user_request(
   username : String,
-  space_number : Int,
-  space_resource_id : Int,
+  space_number : Int32,
+  space_resource_id : Int32,
   body : CopilotSpacesUpdateResourceForUserRequest,
 ) -> @http.Request {
   @http.Request::put(
@@ -38837,8 +38848,8 @@ pub fn copilot_spaces_update_resource_for_user_decode(
 /// Delete a resource from a Copilot Space for a user The caller handles the response as @http.Response.
 pub fn copilot_spaces_delete_resource_for_user_request(
   username : String,
-  space_number : Int,
-  space_resource_id : Int,
+  space_number : Int32,
+  space_resource_id : Int32,
 ) -> @http.Request {
   @http.Request::delete(
     "/users/" +
@@ -38884,8 +38895,8 @@ pub fn packages_list_docker_migration_conflicting_packages_for_user_decode(
 /// List events for the authenticated user
 pub fn activity_list_events_for_authenticated_user_request(
   username : String,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/users/" +
     percent_encode(parameter_value(username)) +
@@ -38925,8 +38936,8 @@ pub fn activity_list_events_for_authenticated_user_decode(
 pub fn activity_list_org_events_for_authenticated_user_request(
   username : String,
   org : String,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/users/" +
     percent_encode(parameter_value(username)) +
@@ -38966,8 +38977,8 @@ pub fn activity_list_org_events_for_authenticated_user_decode(
 /// List public events for a user
 pub fn activity_list_public_events_for_user_request(
   username : String,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/users/" +
     percent_encode(parameter_value(username)) +
@@ -39006,8 +39017,8 @@ pub fn activity_list_public_events_for_user_decode(
 /// List followers of a user
 pub fn users_list_followers_for_user_request(
   username : String,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/users/" +
     percent_encode(parameter_value(username)) +
@@ -39046,8 +39057,8 @@ pub fn users_list_followers_for_user_decode(
 /// List the people a user follows
 pub fn users_list_following_for_user_request(
   username : String,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/users/" +
     percent_encode(parameter_value(username)) +
@@ -39102,8 +39113,8 @@ pub fn users_check_following_for_user_request(
 pub fn gists_list_for_user_request(
   username : String,
   since? : String,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/users/" + percent_encode(parameter_value(username)) + "/gists"
   match since {
@@ -39144,8 +39155,8 @@ pub fn gists_list_for_user_decode(
 /// List GPG keys for a user
 pub fn users_list_gpg_keys_for_user_request(
   username : String,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/users/" +
     percent_encode(parameter_value(username)) +
@@ -39252,8 +39263,8 @@ pub fn apps_get_user_installation_decode(
 /// List public keys for a user
 pub fn users_list_public_keys_for_user_request(
   username : String,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/users/" + percent_encode(parameter_value(username)) + "/keys"
   match per_page {
@@ -39290,8 +39301,8 @@ pub fn users_list_public_keys_for_user_decode(
 /// List organizations for a user
 pub fn orgs_list_for_user_request(
   username : String,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/users/" + percent_encode(parameter_value(username)) + "/orgs"
   match per_page {
@@ -39330,8 +39341,8 @@ pub fn packages_list_packages_for_user_request(
   package_type : PackagesListPackagesForUserPackageType,
   username : String,
   visibility? : PackagesListPackagesForUserVisibility,
-  page? : Int,
-  per_page? : Int,
+  page? : Int32,
+  per_page? : Int32,
 ) -> @http.Request {
   let mut url = "/users/" +
     percent_encode(parameter_value(username)) +
@@ -39490,7 +39501,7 @@ pub fn packages_get_all_package_versions_for_package_owned_by_user_decode(
 pub fn packages_get_package_version_for_user_request(
   package_type : PackagesGetPackageVersionForUserPackageType,
   package_name : String,
-  package_version_id : Int,
+  package_version_id : Int32,
   username : String,
 ) -> @http.Request {
   @http.Request::get(
@@ -39530,7 +39541,7 @@ pub fn packages_delete_package_version_for_user_request(
   package_type : PackagesDeletePackageVersionForUserPackageType,
   package_name : String,
   username : String,
-  package_version_id : Int,
+  package_version_id : Int32,
 ) -> @http.Request {
   @http.Request::delete(
     "/users/" +
@@ -39551,7 +39562,7 @@ pub fn packages_restore_package_version_for_user_request(
   package_type : PackagesRestorePackageVersionForUserPackageType,
   package_name : String,
   username : String,
-  package_version_id : Int,
+  package_version_id : Int32,
 ) -> @http.Request {
   @http.Request::post(
     "/users/" +
@@ -39574,7 +39585,7 @@ pub fn projects_list_for_user_request(
   q? : String,
   before? : String,
   after? : String,
-  per_page? : Int,
+  per_page? : Int32,
 ) -> @http.Request {
   let mut url = "/users/" +
     percent_encode(parameter_value(username)) +
@@ -39620,7 +39631,7 @@ pub fn projects_list_for_user_decode(
 ///
 /// Get project for user
 pub fn projects_get_for_user_request(
-  project_number : Int,
+  project_number : Int32,
   username : String,
 ) -> @http.Request {
   @http.Request::get(
@@ -39653,9 +39664,9 @@ pub fn projects_get_for_user_decode(
 ///
 /// List project fields for user
 pub fn projects_list_fields_for_user_request(
-  project_number : Int,
+  project_number : Int32,
   username : String,
-  per_page? : Int,
+  per_page? : Int32,
   before? : String,
   after? : String,
 ) -> @http.Request {
@@ -39702,7 +39713,7 @@ pub fn projects_list_fields_for_user_decode(
 /// Add field to user owned project
 pub fn projects_add_field_for_user_request(
   username : String,
-  project_number : Int,
+  project_number : Int32,
   body : ProjectsAddFieldForUserRequest,
 ) -> @http.Request {
   @http.Request::post(
@@ -39736,8 +39747,8 @@ pub fn projects_add_field_for_user_decode(
 ///
 /// Get project field for user
 pub fn projects_get_field_for_user_request(
-  project_number : Int,
-  field_id : Int,
+  project_number : Int32,
+  field_id : Int32,
   username : String,
 ) -> @http.Request {
   @http.Request::get(
@@ -39772,11 +39783,11 @@ pub fn projects_get_field_for_user_decode(
 ///
 /// List items for a user owned project
 pub fn projects_list_items_for_user_request(
-  project_number : Int,
+  project_number : Int32,
   username : String,
   before? : String,
   after? : String,
-  per_page? : Int,
+  per_page? : Int32,
   q? : String,
   fields? : ProjectsListItemsForUserFields,
 ) -> @http.Request {
@@ -39831,7 +39842,7 @@ pub fn projects_list_items_for_user_decode(
 /// Add item to user owned project
 pub fn projects_add_item_for_user_request(
   username : String,
-  project_number : Int,
+  project_number : Int32,
   body : ProjectsAddItemForUserRequest,
 ) -> @http.Request {
   @http.Request::post(
@@ -39865,9 +39876,9 @@ pub fn projects_add_item_for_user_decode(
 ///
 /// Get an item for a user owned project
 pub fn projects_get_user_item_request(
-  project_number : Int,
+  project_number : Int32,
   username : String,
-  item_id : Int,
+  item_id : Int32,
   fields? : ProjectsGetUserItemFields,
 ) -> @http.Request {
   let mut url = "/users/" +
@@ -39905,9 +39916,9 @@ pub fn projects_get_user_item_decode(
 ///
 /// Update project item for user
 pub fn projects_update_item_for_user_request(
-  project_number : Int,
+  project_number : Int32,
   username : String,
-  item_id : Int,
+  item_id : Int32,
   body : ProjectsUpdateItemForUserRequest,
 ) -> @http.Request {
   @http.Request::patch(
@@ -39942,9 +39953,9 @@ pub fn projects_update_item_for_user_decode(
 ///
 /// Delete project item for user The caller handles the response as @http.Response.
 pub fn projects_delete_item_for_user_request(
-  project_number : Int,
+  project_number : Int32,
   username : String,
-  item_id : Int,
+  item_id : Int32,
 ) -> @http.Request {
   @http.Request::delete(
     "/users/" +
@@ -39960,13 +39971,13 @@ pub fn projects_delete_item_for_user_request(
 ///
 /// List items for a user project view
 pub fn projects_list_view_items_for_user_request(
-  project_number : Int,
+  project_number : Int32,
   username : String,
-  view_number : Int,
+  view_number : Int32,
   fields? : ProjectsListViewItemsForUserFields,
   before? : String,
   after? : String,
-  per_page? : Int,
+  per_page? : Int32,
 ) -> @http.Request {
   let mut url = "/users/" +
     percent_encode(parameter_value(username)) +
@@ -40017,8 +40028,8 @@ pub fn projects_list_view_items_for_user_decode(
 /// List events received by the authenticated user
 pub fn activity_list_received_events_for_user_request(
   username : String,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/users/" +
     percent_encode(parameter_value(username)) +
@@ -40057,8 +40068,8 @@ pub fn activity_list_received_events_for_user_decode(
 /// List public events received by a user
 pub fn activity_list_received_public_events_for_user_request(
   username : String,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/users/" +
     percent_encode(parameter_value(username)) +
@@ -40100,8 +40111,8 @@ pub fn repos_list_for_user_request(
   type_? : ReposListForUserType,
   sort? : ReposListForUserSort,
   direction? : ReposListForUserDirection,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/users/" + percent_encode(parameter_value(username)) + "/repos"
   match type_ {
@@ -40150,9 +40161,9 @@ pub fn repos_list_for_user_decode(
 /// Get billing AI credit usage report for a user The caller handles the response as @http.Response.
 pub fn billing_get_github_billing_ai_credit_usage_report_user_request(
   username : String,
-  year? : Int,
-  month? : Int,
-  day? : Int,
+  year? : Int32,
+  month? : Int32,
+  day? : Int32,
   model? : String,
   product? : String,
 ) -> @http.Request {
@@ -40187,9 +40198,9 @@ pub fn billing_get_github_billing_ai_credit_usage_report_user_request(
 /// Get billing premium request usage report for a user The caller handles the response as @http.Response.
 pub fn billing_get_github_billing_premium_request_usage_report_user_request(
   username : String,
-  year? : Int,
-  month? : Int,
-  day? : Int,
+  year? : Int32,
+  month? : Int32,
+  day? : Int32,
   model? : String,
   product? : String,
 ) -> @http.Request {
@@ -40224,9 +40235,9 @@ pub fn billing_get_github_billing_premium_request_usage_report_user_request(
 /// Get billing usage report for a user The caller handles the response as @http.Response.
 pub fn billing_get_github_billing_usage_report_user_request(
   username : String,
-  year? : Int,
-  month? : Int,
-  day? : Int,
+  year? : Int32,
+  month? : Int32,
+  day? : Int32,
 ) -> @http.Request {
   let mut url = "/users/" +
     percent_encode(parameter_value(username)) +
@@ -40251,9 +40262,9 @@ pub fn billing_get_github_billing_usage_report_user_request(
 /// Get billing usage summary for a user The caller handles the response as @http.Response.
 pub fn billing_get_github_billing_usage_summary_report_user_request(
   username : String,
-  year? : Int,
-  month? : Int,
-  day? : Int,
+  year? : Int32,
+  month? : Int32,
+  day? : Int32,
   repository? : String,
   product? : String,
   sku? : String,
@@ -40293,8 +40304,8 @@ pub fn billing_get_github_billing_usage_summary_report_user_request(
 /// List social accounts for a user
 pub fn users_list_social_accounts_for_user_request(
   username : String,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/users/" +
     percent_encode(parameter_value(username)) +
@@ -40333,8 +40344,8 @@ pub fn users_list_social_accounts_for_user_decode(
 /// List SSH signing keys for a user
 pub fn users_list_ssh_signing_keys_for_user_request(
   username : String,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/users/" +
     percent_encode(parameter_value(username)) +
@@ -40375,8 +40386,8 @@ pub fn activity_list_repos_starred_by_user_request(
   username : String,
   sort? : ActivityListReposStarredByUserSort,
   direction? : ActivityListReposStarredByUserDirection,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/users/" +
     percent_encode(parameter_value(username)) +
@@ -40423,8 +40434,8 @@ pub fn activity_list_repos_starred_by_user_decode(
 /// List repositories watched by a user
 pub fn activity_list_repos_watched_by_user_request(
   username : String,
-  per_page? : Int,
-  page? : Int,
+  per_page? : Int32,
+  page? : Int32,
 ) -> @http.Request {
   let mut url = "/users/" +
     percent_encode(parameter_value(username)) +

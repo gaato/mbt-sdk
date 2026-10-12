@@ -93,7 +93,7 @@ pub fn[T] GitHub::graphql_paginator(
   page : (Json) -> (Array[T], String?) raise @runtime.SdkError,
   query~ : String,
   variables? : Json,
-  cursor_variable? : String = "after",
+  cursor_variable~ : String = "after",
   operation_name? : String,
 ) -> @runtime.Paginator[T, @runtime.SdkError] {
   @runtime.Paginator::with_cursor(cursor => {

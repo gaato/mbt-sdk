@@ -101,7 +101,7 @@ fn decode_chat_completion(
 }
 
 ///|
-fn reasoning_delta_at(value : Json, index : Int) -> String? {
+fn reasoning_delta_at(value : Json, index : Int32) -> String? {
   guard value is Object(root) else { return None }
   guard root.get("choices") is Some(Array(choices)) else { return None }
   guard choices.get(index) is Some(Object(choice)) else { return None }

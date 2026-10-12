@@ -195,7 +195,7 @@ pub impl @json.FromJson for OrderStatus with fn from_json(value, path) {
 pub(all) struct Order {
   id : Int64?
   pet_id : Int64?
-  quantity : Int?
+  quantity : Int32?
   ship_date : String?
   status : OrderStatus?
   complete : Bool?
@@ -213,7 +213,7 @@ pub extend Order with @debug.Debug::{to_repr}
 pub fn Order::new(
   id? : Int64,
   pet_id? : Int64,
-  quantity? : Int,
+  quantity? : Int32,
   ship_date? : String,
   status? : OrderStatus,
   complete? : Bool,
@@ -315,7 +315,7 @@ pub(all) struct User {
   email : String?
   password : String?
   phone : String?
-  user_status : Int?
+  user_status : Int32?
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -335,7 +335,7 @@ pub fn User::new(
   email? : String,
   password? : String,
   phone? : String,
-  user_status? : Int,
+  user_status? : Int32,
 ) -> User {
   { id, username, first_name, last_name, email, password, phone, user_status, }
 }
@@ -552,7 +552,7 @@ pub impl @json.FromJson for Pet with fn from_json(value, path) {
 ///
 /// Generated representation of ApiResponse.
 pub(all) struct ApiResponse {
-  code : Int?
+  code : Int32?
   type_ : String?
   message : String?
 } derive(Eq, @debug.Debug)
@@ -567,7 +567,7 @@ pub extend ApiResponse with @debug.Debug::{to_repr}
 ///
 /// Creates a ApiResponse with omitted optional fields absent.
 pub fn ApiResponse::new(
-  code? : Int,
+  code? : Int32,
   type_? : String,
   message? : String,
 ) -> ApiResponse {

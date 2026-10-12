@@ -9,9 +9,9 @@
 /// request is sent once more on a fresh connection if it is idempotent or
 /// carries an `Idempotency-Key`; other requests surface the failure.
 pub struct AsyncTransport {
-  priv timeout_ms : Int
-  priv max_idle_per_origin : Int
-  priv idle_max_ms : Int
+  priv timeout_ms : Int32
+  priv max_idle_per_origin : Int32
+  priv idle_max_ms : Int32
   priv idle : Map[String, Array[IdleConn]]
   priv mut closed : Bool
 }
@@ -27,9 +27,9 @@ pub struct AsyncTransport {
 /// }
 /// ```
 pub fn AsyncTransport::new(
-  timeout_ms? : Int = 30000,
-  max_idle_per_origin? : Int = 4,
-  idle_max_ms? : Int = 10000,
+  timeout_ms~ : Int32 = 30000,
+  max_idle_per_origin~ : Int32 = 4,
+  idle_max_ms~ : Int32 = 10000,
 ) -> AsyncTransport {
   { timeout_ms, max_idle_per_origin, idle_max_ms, idle: {}, closed: false, }
 }
@@ -84,7 +84,7 @@ pub impl @http.Transport for AsyncTransport with fn send_stream(self, request) {
 /// failure is narrowed to `HttpError`. Cancellation is not an `Error` in
 /// moonbitlang/async, so `catch` never sees it and it propagates untouched.
 async fn[X] bounded(
-  ms : Int,
+  ms : Int32,
   f : async () -> X raise @http.HttpError,
 ) -> X raise @http.HttpError {
   if ms <= 0 {
@@ -106,7 +106,7 @@ priv struct ClientStream {
   user_agent : String?
   client : @ahttp.Client
   keep_alive : Bool
-  timeout_ms : Int
+  timeout_ms : Int32
   mut finished : Bool
   mut closed : Bool
 }

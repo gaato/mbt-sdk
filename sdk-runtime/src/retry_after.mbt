@@ -7,7 +7,7 @@
 ///   assert_eq(@runtime.parse_retry_after("1.2349"), Some(1234))
 /// }
 /// ```
-pub fn parse_retry_after(value : String, now_unix_ms? : Int64) -> Int? {
+pub fn parse_retry_after(value : String, now_unix_ms? : Int64) -> Int32? {
   let value = value.trim().to_owned()
   if decimal_ms(value, 1000) is Some(ms) {
     return Some(ms)
@@ -28,7 +28,7 @@ pub fn parse_retry_after(value : String, now_unix_ms? : Int64) -> Int? {
 ///|
 /// Prefers the first retry-after-ms value; falls back to retry-after when that
 /// header is absent or unparseable, as the official OpenAI SDKs do.
-pub fn retry_after_ms(headers : @http.Headers, now_unix_ms? : Int64) -> Int? {
+pub fn retry_after_ms(headers : @http.Headers, now_unix_ms? : Int64) -> Int32? {
   if headers.get("retry-after-ms") is Some(value) &&
     decimal_ms(value.trim().to_owned(), 1) is Some(ms) {
     return Some(ms)
@@ -41,7 +41,7 @@ pub fn retry_after_ms(headers : @http.Headers, now_unix_ms? : Int64) -> Int? {
 
 ///|
 // Validate the whole input even after saturation. No floating-point rounding.
-fn decimal_ms(value : String, scale : Int) -> Int? {
+fn decimal_ms(value : String, scale : Int32) -> Int32? {
   let mut whole = 0L
   let mut fraction = 0
   let mut weight = scale
@@ -74,7 +74,7 @@ fn decimal_ms(value : String, scale : Int) -> Int? {
 }
 
 ///|
-fn date_digits(s : String, start : Int, count : Int) -> Int? {
+fn date_digits(s : String, start : Int32, count : Int32) -> Int32? {
   let mut n = 0
   for i = start; i < start + count; i = i + 1 {
     guard s[i] >= '0' && s[i] <= '9' else { return None }
@@ -151,7 +151,7 @@ fn http_date_ms(s : String) -> Int64? {
 
 ///|
 // March-based Gregorian eras, with 1970-01-01 as day zero.
-fn days_from_civil(year : Int, month : Int, day : Int) -> Int {
+fn days_from_civil(year : Int32, month : Int32, day : Int32) -> Int32 {
   let y = year - (if month <= 2 { 1 } else { 0 })
   let era = y / 400
   let yoe = y - era * 400

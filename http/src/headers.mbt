@@ -111,7 +111,7 @@ pub fn Headers::each(
 
 ///|
 /// Returns the number of pairs, counting repeated names separately.
-pub fn Headers::length(self : Headers) -> Int {
+pub fn Headers::length(self : Headers) -> Int32 {
   self.pairs.length()
 }
 

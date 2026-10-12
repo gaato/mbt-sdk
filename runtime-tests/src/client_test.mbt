@@ -1,8 +1,8 @@
 ///|
 fn buffered_response(
-  status : Int,
-  headers? : @http.Headers = @http.Headers::new(),
-  body? : Bytes = b"",
+  status : Int32,
+  headers~ : @http.Headers = @http.Headers::new(),
+  body~ : Bytes = b"",
 ) -> @http.Response {
   { status, headers, body, }
 }
@@ -96,7 +96,7 @@ async test "Client stops at max retries and raises the final error" {
 
 ///|
 priv struct ConnectThenSuccess {
-  mut calls : Int
+  mut calls : Int32
 }
 
 ///|
@@ -298,7 +298,7 @@ async test "send_stream returns success and closes classified error streams" {
 /// status, so a test can check that they pair up on every exit.
 priv struct PairingLimiter {
   acquired : Array[(String, Bool)]
-  released : Array[(String, Int)]
+  released : Array[(String, Int32)]
 }
 
 ///|
@@ -338,7 +338,7 @@ impl @http.Transport for AlwaysConnectError with fn send_stream(_self, _request)
 async test "Client releases with status 0 and observes an attempt without a response" {
   bounded(() => {
     let limiter = PairingLimiter::{ acquired: [], released: [], }
-    let attempts : Array[(Int, Int, Bool)] = []
+    let attempts : Array[(Int32, Int32, Bool)] = []
     let clock = @mock.FakeClock::new()
     let client = @runtime.Client::new(
       AlwaysConnectError::{ },
@@ -377,7 +377,7 @@ async test "Client releases with status 0 and observes an attempt without a resp
 /// A limiter whose `release` awaits, as a limiter backed by another process
 /// does, and so can be cut short by cancellation.
 priv struct SuspendingLimiter {
-  mut released : Int
+  mut released : Int32
 }
 
 ///|
@@ -421,7 +421,7 @@ impl @http.Transport for Stalled with fn send_stream(_self, _request) {
 async test "Client observes a cancelled attempt even when the release suspends" {
   bounded(() => {
     let limiter = SuspendingLimiter::{ released: 0, }
-    let attempts : Array[(Int, Int)] = []
+    let attempts : Array[(Int32, Int32)] = []
     let client = @runtime.Client::new(
       Stalled::{ },
       @mock.FakeClock::new(),

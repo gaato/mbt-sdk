@@ -1,8 +1,8 @@
 ///|
 struct TestStream {
   chunks : Array[Bytes]
-  mut cursor : Int
-  mut closes : Int
+  mut cursor : Int32
+  mut closes : Int32
   fail_read : Bool
 }
 

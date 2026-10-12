@@ -48,7 +48,7 @@ async fn async_api_scenario() -> Unit {
   ignore(client.send_stream(@http.Request::get("/"))) catch {
     _ => ()
   }
-  let paginator : @runtime.Paginator[Int, @runtime.SdkError] = @runtime.Paginator::with_cursor(_cursor => @runtime.Page::{
+  let paginator : @runtime.Paginator[Int32, @runtime.SdkError] = @runtime.Paginator::with_cursor(_cursor => @runtime.Page::{
       items: [1],
       next: None,
     },

@@ -1,8 +1,8 @@
 ///|
 fn json_response(
   body : String,
-  status? : Int = 200,
-  headers? : @http.Headers = @http.Headers::new(),
+  status~ : Int32 = 200,
+  headers~ : @http.Headers = @http.Headers::new(),
 ) -> @http.Response {
   { status, headers, body: @utf8.encode(body), }
 }
@@ -13,7 +13,7 @@ fn response_fixture(
   status : String,
   model : String,
   output : String,
-  usage? : String = "null",
+  usage~ : String = "null",
 ) -> String {
   "{\"metadata\":{},\"temperature\":1.0,\"top_p\":1.0,\"previous_response_id\":null,\"model\":\"" +
   model +
@@ -172,7 +172,7 @@ async test "OpenAI operations send exact requests and decode spec examples" {
 fn chat_fixture(
   content : String,
   finish_reason : String,
-  usage? : String = "null",
+  usage~ : String = "null",
 ) -> String {
   "{\"id\":\"chatcmpl-1\",\"object\":\"chat.completion\",\"created\":1750000000,\"model\":\"gpt-chat\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":" +
   content +
@@ -675,7 +675,7 @@ async test "HTTP errors expose API bodies and a 429 retries before success" {
 }
 
 ///|
-fn split_chunks(text : String, ends : Array[Int]) -> Array[Bytes] {
+fn split_chunks(text : String, ends : Array[Int32]) -> Array[Bytes] {
   let bytes = @utf8.encode(text)
   let chunks : Array[Bytes] = []
   let mut start = 0

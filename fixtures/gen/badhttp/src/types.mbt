@@ -739,7 +739,7 @@ pub impl @json.FromJson for GetCompressFlavorFlavor with fn from_json(
 ///
 /// Generated untagged union GetRedirectHopsHops.
 pub(all) enum GetRedirectHopsHops {
-  Int(Int)
+  Int(Int32)
   Text(String)
 } derive(Eq, @debug.Debug)
 
@@ -770,7 +770,7 @@ pub extend GetRedirectHopsHops with @json.FromJson::{from_json}
 ///|
 pub impl @json.FromJson for GetRedirectHopsHops with fn from_json(value, path) {
   if value is Number(_, ..) {
-    let decoded : Int = @json.from_json(value, path~)
+    let decoded : Int32 = @json.from_json(value, path~)
     return Int(decoded)
   }
   if value is String(_) {

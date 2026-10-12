@@ -5,7 +5,7 @@ pub(all) struct SseEvent {
   event : String
   data : String
   id : String?
-  retry : Int?
+  retry : Int32?
 } derive(Eq, Debug)
 
 ///|
@@ -25,7 +25,7 @@ pub struct SseParser {
   priv mut skip_lf : Bool
   priv mut event_type : String
   priv mut last_id : String?
-  priv mut retry : Int?
+  priv mut retry : Int32?
   priv mut finished : Bool
 }
 
@@ -133,7 +133,7 @@ fn SseParser::process_line(self : SseParser, events : Array[SseEvent]) -> Unit {
 }
 
 ///|
-fn parse_retry(value : String) -> Int? {
+fn parse_retry(value : String) -> Int32? {
   if value.is_empty() {
     return None
   }

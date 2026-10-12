@@ -20,7 +20,7 @@ pub(open) trait Transport {
 /// Transport failures, separate from ordinary HTTP response statuses.
 pub(all) suberror HttpError {
   Connect(String)
-  Timeout(Int)
+  Timeout(Int32)
   Protocol(String)
 } derive(Debug)
 

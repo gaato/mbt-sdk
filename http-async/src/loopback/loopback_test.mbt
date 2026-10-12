@@ -21,7 +21,7 @@ async fn with_server(
 ///|
 async fn reply(
   conn : @ahttp.ServerConnection,
-  status : Int,
+  status : Int32,
   body : Bytes,
 ) -> Unit {
   conn.send_response(status, "test", extra_headers={ "X-MiXeD": "yes" })

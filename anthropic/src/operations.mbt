@@ -112,7 +112,7 @@ pub async fn[E : Error] Anthropic::stream_message_params(
 pub async fn Anthropic::count_tokens(
   self : Anthropic,
   request : MessageRequest,
-) -> Int raise @runtime.SdkError {
+) -> Int32 raise @runtime.SdkError {
   let (params, body) = count_tokens_body(request)
   let response = self.client.send(
     @gen.messages_count_tokens_post_request(
@@ -130,7 +130,7 @@ pub async fn Anthropic::count_tokens(
 /// models appear only when `Retired` is requested.
 pub async fn Anthropic::list_models(
   self : Anthropic,
-  limit? : Int,
+  limit? : Int32,
   after_id? : String,
   before_id? : String,
   lifecycle? : Array[ModelsListLifecycleItem],

@@ -64,7 +64,7 @@ fn[T : @json.FromJson] decode_response(
 /// Return the given status code (or a random one from a comma-separated list) The caller handles the response as @http.Response.
 pub fn get_status_code_request(
   code : String,
-  retry_after? : Int,
+  retry_after? : Int32,
 ) -> @http.Request {
   let mut url = "/status/" + percent_encode(parameter_value(code))
   match retry_after {
@@ -105,8 +105,8 @@ pub fn get_delay_seconds_decode(
 /// Stream a chunked body slowly The caller handles the response as @http.Response.
 pub fn get_drip_request(
   duration? : Double,
-  chunks? : Int,
-  code? : Int,
+  chunks? : Int32,
+  code? : Int32,
 ) -> @http.Request {
   let mut url = "/drip"
   match duration {
@@ -127,7 +127,7 @@ pub fn get_drip_request(
 ///|
 ///
 /// Declare a Content-Length, then send fewer bytes and close The caller handles the response as @http.Response.
-pub fn get_truncate_request(length? : Int, send? : Int) -> @http.Request {
+pub fn get_truncate_request(length? : Int32, send? : Int32) -> @http.Request {
   let mut url = "/truncate"
   match length {
     Some(value) => url = append_query(url, "length", parameter_value(value))
@@ -145,7 +145,7 @@ pub fn get_truncate_request(length? : Int, send? : Int) -> @http.Request {
 /// Serve a specific kind of broken or mislabeled JSON The caller handles the response as @http.Response.
 pub fn get_badjson_flavor_request(
   flavor : GetBadjsonFlavorFlavor,
-  code? : Int,
+  code? : Int32,
 ) -> @http.Request {
   let mut url = "/badjson/" + percent_encode(parameter_value(flavor))
   match code {
@@ -183,10 +183,10 @@ pub fn get_sse_decode(
 /// A Server-Sent Events stream that misbehaves in the chosen way; GET /sse lists the flavors The caller handles the response as @http.Response.
 pub fn get_sse_flavor_request(
   flavor : GetSseFlavorFlavor,
-  events? : Int,
-  interval? : Int,
+  events? : Int32,
+  interval? : Int32,
   seconds? : Double,
-  bytes? : Int,
+  bytes? : Int32,
   last_event_id? : String,
 ) -> @http.Request {
   let mut url = "/sse/" + percent_encode(parameter_value(flavor))
@@ -243,7 +243,7 @@ pub fn get_range_decode(
 /// A resumable download that misbehaves in the chosen way; GET /range lists the flavors The caller handles the response as @http.Response.
 pub fn get_range_flavor_request(
   flavor : GetRangeFlavorFlavor,
-  length? : Int,
+  length? : Int32,
   range? : String,
   if_range? : String,
 ) -> @http.Request {
@@ -352,8 +352,8 @@ pub fn get_cookies_decode(
 /// Set-Cookie headers that misbehave in the chosen way; GET /cookies lists the flavors. /cookies/echo reads back what your client sent.
 pub fn get_cookies_flavor_request(
   flavor : GetCookiesFlavorFlavor,
-  count? : Int,
-  bytes? : Int,
+  count? : Int32,
+  bytes? : Int32,
   cookie? : String,
 ) -> @http.Request {
   let mut url = "/cookies/" + percent_encode(parameter_value(flavor))
@@ -528,9 +528,9 @@ pub fn get_compress_decode(
 /// A response whose content coding misbehaves in the chosen way; GET /compress lists the flavors. Send Accept-Encoding: gzip to receive the bytes as sent. The caller handles the response as @http.Response.
 pub fn get_compress_flavor_request(
   flavor : GetCompressFlavorFlavor,
-  length? : Int,
-  code? : Int,
-  size? : Int,
+  length? : Int32,
+  code? : Int32,
+  size? : Int32,
   accept_encoding? : String,
 ) -> @http.Request {
   let mut url = "/compress/" + percent_encode(parameter_value(flavor))
@@ -559,10 +559,10 @@ pub fn get_compress_flavor_request(
 ///
 /// Fail a given percentage of the time
 pub fn get_flaky_percent_request(
-  percent : Int,
-  fail? : Int,
+  percent : Int32,
+  fail? : Int32,
   seed? : String,
-  i? : Int,
+  i? : Int32,
 ) -> @http.Request {
   let mut url = "/flaky/" + percent_encode(parameter_value(percent))
   match fail {
@@ -603,7 +603,7 @@ pub fn get_flaky_percent_decode(
 /// Redirect N times, then 200. Or /redirect/loop, which never ends.
 pub fn get_redirect_hops_request(
   hops : GetRedirectHopsHops,
-  code? : Int,
+  code? : Int32,
   absolute? : Bool,
 ) -> @http.Request {
   let mut url = "/redirect/" + percent_encode(parameter_value(hops))

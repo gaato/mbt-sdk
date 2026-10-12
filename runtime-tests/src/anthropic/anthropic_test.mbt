@@ -1,8 +1,8 @@
 ///|
 fn json_response(
   body : String,
-  status? : Int = 200,
-  headers? : @http.Headers = @http.Headers::new(),
+  status~ : Int32 = 200,
+  headers~ : @http.Headers = @http.Headers::new(),
 ) -> @http.Response {
   { status, headers, body: @utf8.encode(body), }
 }
@@ -367,7 +367,7 @@ async test "HTTP errors expose API bodies and 429 retries before success" {
 }
 
 ///|
-fn split_chunks(text : String, ends : Array[Int]) -> Array[Bytes] {
+fn split_chunks(text : String, ends : Array[Int32]) -> Array[Bytes] {
   let bytes = @utf8.encode(text)
   let chunks : Array[Bytes] = []
   let mut start = 0

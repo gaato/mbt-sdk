@@ -1791,7 +1791,7 @@ pub impl @json.FromJson for ValidationErrorSimple with fn from_json(value, path)
 ///
 /// GitHub apps are a new way to extend GitHub. They can be installed directly on organizations and user accounts and granted access to specific repositories. They come with granular permissions and built-in webhooks. GitHub apps are first class actors within GitHub.
 pub(all) struct Integration {
-  id : Int
+  id : Int32
   slug : String?
   node_id : String
   client_id : String?
@@ -1804,7 +1804,7 @@ pub(all) struct Integration {
   updated_at : String
   permissions : Map[String, String]
   events : Array[String]
-  installations_count : Int?
+  installations_count : Int32?
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -1817,7 +1817,7 @@ pub extend Integration with @debug.Debug::{to_repr}
 ///
 /// Creates a Integration with omitted optional fields absent.
 pub fn Integration::new(
-  id~ : Int,
+  id~ : Int32,
   node_id~ : String,
   owner~ : Json,
   name~ : String,
@@ -1830,7 +1830,7 @@ pub fn Integration::new(
   slug? : String,
   client_id? : String,
   description? : String,
-  installations_count? : Int,
+  installations_count? : Int32,
 ) -> Integration {
   {
     id,
@@ -2026,7 +2026,7 @@ pub(all) struct HookDeliveryItem {
   redelivery : Bool
   duration : Double
   status : String
-  status_code : Int
+  status_code : Int32
   event : String
   action : String?
   installation_id : Int64?
@@ -2050,7 +2050,7 @@ pub fn HookDeliveryItem::new(
   redelivery~ : Bool,
   duration~ : Double,
   status~ : String,
-  status_code~ : Int,
+  status_code~ : Int32,
   event~ : String,
   action? : String,
   installation_id? : Int64,
@@ -2139,7 +2139,7 @@ pub impl @json.FromJson for HookDeliveryItem with fn from_json(value, path) {
 /// Generated untagged union ValidationErrorErrorsItemValue.
 pub(all) enum ValidationErrorErrorsItemValue {
   Text(String)
-  Int(Int)
+  Int(Int32)
   TextArray(Array[String])
 } derive(Eq, @debug.Debug)
 
@@ -2178,7 +2178,7 @@ pub impl @json.FromJson for ValidationErrorErrorsItemValue with fn from_json(
     return Text(decoded)
   }
   if value is Number(_, ..) {
-    let decoded : Int = @json.from_json(value, path~)
+    let decoded : Int32 = @json.from_json(value, path~)
     return Int(decoded)
   }
   if json_array_matches(value, item => item is String(_)) {
@@ -2200,7 +2200,7 @@ pub(all) struct ValidationErrorErrorsItem {
   field : String?
   message : String?
   code : String
-  index : Int?
+  index : Int32?
   value : ValidationErrorErrorsItemValue?
 } derive(Eq, @debug.Debug)
 
@@ -2218,7 +2218,7 @@ pub fn ValidationErrorErrorsItem::new(
   resource? : String,
   field? : String,
   message? : String,
-  index? : Int,
+  index? : Int32,
   value? : ValidationErrorErrorsItemValue,
 ) -> ValidationErrorErrorsItem {
   { resource, field, message, code, index, value, }
@@ -2423,17 +2423,17 @@ pub impl @json.FromJson for HookDeliveryResponse with fn from_json(value, path) 
 ///
 /// Delivery made by a webhook.
 pub(all) struct HookDelivery {
-  id : Int
+  id : Int32
   guid : String
   delivered_at : String
   redelivery : Bool
   duration : Double
   status : String
-  status_code : Int
+  status_code : Int32
   event : String
   action : String?
-  installation_id : Int?
-  repository_id : Int?
+  installation_id : Int32?
+  repository_id : Int32?
   throttled_at : @sdkjson.Presence[String]
   url : String?
   request : HookDeliveryRequest
@@ -2450,19 +2450,19 @@ pub extend HookDelivery with @debug.Debug::{to_repr}
 ///
 /// Creates a HookDelivery with omitted optional fields absent.
 pub fn HookDelivery::new(
-  id~ : Int,
+  id~ : Int32,
   guid~ : String,
   delivered_at~ : String,
   redelivery~ : Bool,
   duration~ : Double,
   status~ : String,
-  status_code~ : Int,
+  status_code~ : Int32,
   event~ : String,
   request~ : HookDeliveryRequest,
   response~ : HookDeliveryResponse,
   action? : String,
-  installation_id? : Int,
-  repository_id? : Int,
+  installation_id? : Int32,
+  repository_id? : Int32,
   throttled_at? : String,
   url? : String,
 ) -> HookDelivery {
@@ -2548,7 +2548,7 @@ pub impl @json.FromJson for HookDelivery with fn from_json(value, path) {
 ///
 /// Request to install an integration on a target
 pub(all) struct IntegrationInstallationRequest {
-  id : Int
+  id : Int32
   node_id : String?
   account : Json
   requester : SimpleUser
@@ -2565,7 +2565,7 @@ pub extend IntegrationInstallationRequest with @debug.Debug::{to_repr}
 ///
 /// Creates a IntegrationInstallationRequest with omitted optional fields absent.
 pub fn IntegrationInstallationRequest::new(
-  id~ : Int,
+  id~ : Int32,
   account~ : Json,
   requester~ : SimpleUser,
   created_at~ : String,
@@ -6112,15 +6112,15 @@ pub impl @json.FromJson for InstallationRepositorySelection with fn from_json(
 ///
 /// Installation
 pub(all) struct Installation {
-  id : Int
+  id : Int32
   account : Json?
   repository_selection : InstallationRepositorySelection
   access_tokens_url : String
   repositories_url : String
   html_url : String
-  app_id : Int
+  app_id : Int32
   client_id : String?
-  target_id : Int
+  target_id : Int32
   target_type : String
   permissions : AppPermissions
   events : Array[String]
@@ -6145,13 +6145,13 @@ pub extend Installation with @debug.Debug::{to_repr}
 ///
 /// Creates a Installation with omitted optional fields absent.
 pub fn Installation::new(
-  id~ : Int,
+  id~ : Int32,
   repository_selection~ : InstallationRepositorySelection,
   access_tokens_url~ : String,
   repositories_url~ : String,
   html_url~ : String,
-  app_id~ : Int,
-  target_id~ : Int,
+  app_id~ : Int32,
+  target_id~ : Int32,
   target_type~ : String,
   permissions~ : AppPermissions,
   events~ : Array[String],
@@ -6737,7 +6737,7 @@ pub(all) struct Repository {
   name : String
   full_name : String
   license : NullableLicenseSimple?
-  forks : Int
+  forks : Int32
   permissions : RepositoryPermissions?
   owner : SimpleUser
   private : Bool
@@ -6788,12 +6788,12 @@ pub(all) struct Repository {
   svn_url : String
   homepage : String?
   language : String?
-  forks_count : Int
-  stargazers_count : Int
-  watchers_count : Int
-  size : Int
+  forks_count : Int32
+  stargazers_count : Int32
+  watchers_count : Int32
+  size : Int32
   default_branch : String
-  open_issues_count : Int
+  open_issues_count : Int32
   is_template : Bool?
   topics : Array[String]?
   has_issues : Bool
@@ -6824,8 +6824,8 @@ pub(all) struct Repository {
   allow_merge_commit : Bool?
   allow_forking : Bool?
   web_commit_signoff_required : Bool?
-  open_issues : Int
-  watchers : Int
+  open_issues : Int32
+  watchers : Int32
   master_branch : String?
   starred_at : String?
   anonymous_access_enabled : Bool?
@@ -6846,7 +6846,7 @@ pub fn Repository::new(
   node_id~ : String,
   name~ : String,
   full_name~ : String,
-  forks~ : Int,
+  forks~ : Int32,
   owner~ : SimpleUser,
   private~ : Bool,
   html_url~ : String,
@@ -6892,12 +6892,12 @@ pub fn Repository::new(
   clone_url~ : String,
   hooks_url~ : String,
   svn_url~ : String,
-  forks_count~ : Int,
-  stargazers_count~ : Int,
-  watchers_count~ : Int,
-  size~ : Int,
+  forks_count~ : Int32,
+  stargazers_count~ : Int32,
+  watchers_count~ : Int32,
+  size~ : Int32,
   default_branch~ : String,
-  open_issues_count~ : Int,
+  open_issues_count~ : Int32,
   has_issues~ : Bool,
   has_projects~ : Bool,
   has_wiki~ : Bool,
@@ -6905,8 +6905,8 @@ pub fn Repository::new(
   has_downloads~ : Bool,
   archived~ : Bool,
   disabled~ : Bool,
-  open_issues~ : Int,
-  watchers~ : Int,
+  open_issues~ : Int32,
+  watchers~ : Int32,
   license? : NullableLicenseSimple,
   permissions? : RepositoryPermissions,
   description? : String,
@@ -7833,7 +7833,7 @@ pub impl @json.FromJson for CodeOfConduct with fn from_json(value, path) {
 ///
 /// GitHub Actions cache retention policy for an enterprise.
 pub(all) struct ActionsCacheRetentionLimitForEnterprise {
-  max_cache_retention_days : Int?
+  max_cache_retention_days : Int32?
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -7846,7 +7846,7 @@ pub extend ActionsCacheRetentionLimitForEnterprise with @debug.Debug::{to_repr}
 ///
 /// Creates a ActionsCacheRetentionLimitForEnterprise with omitted optional fields absent.
 pub fn ActionsCacheRetentionLimitForEnterprise::new(
-  max_cache_retention_days? : Int,
+  max_cache_retention_days? : Int32,
 ) -> ActionsCacheRetentionLimitForEnterprise {
   { max_cache_retention_days, }
 }
@@ -7889,7 +7889,7 @@ pub impl @json.FromJson for ActionsCacheRetentionLimitForEnterprise with fn from
 ///
 /// GitHub Actions cache storage policy for an enterprise.
 pub(all) struct ActionsCacheStorageLimitForEnterprise {
-  max_cache_size_gb : Int?
+  max_cache_size_gb : Int32?
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -7902,7 +7902,7 @@ pub extend ActionsCacheStorageLimitForEnterprise with @debug.Debug::{to_repr}
 ///
 /// Creates a ActionsCacheStorageLimitForEnterprise with omitted optional fields absent.
 pub fn ActionsCacheStorageLimitForEnterprise::new(
-  max_cache_size_gb? : Int,
+  max_cache_size_gb? : Int32,
 ) -> ActionsCacheStorageLimitForEnterprise {
   { max_cache_size_gb, }
 }
@@ -9272,10 +9272,10 @@ pub impl @json.FromJson for CodeSecurityConfigurationSecretScanningDelegatedBypa
 ///
 /// Generated representation of CodeSecurityConfigurationSecretScanningDelegatedBypassOptionsReviewersItem.
 pub(all) struct CodeSecurityConfigurationSecretScanningDelegatedBypassOptionsReviewersItem {
-  reviewer_id : Int
+  reviewer_id : Int32
   reviewer_type : CodeSecurityConfigurationSecretScanningDelegatedBypassOptionsReviewersItemReviewerType
   mode : CodeSecurityConfigurationSecretScanningDelegatedBypassOptionsReviewersItemMode?
-  security_configuration_id : Int?
+  security_configuration_id : Int32?
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -9293,10 +9293,10 @@ pub extend CodeSecurityConfigurationSecretScanningDelegatedBypassOptionsReviewer
 ///
 /// Creates a CodeSecurityConfigurationSecretScanningDelegatedBypassOptionsReviewersItem with omitted optional fields absent.
 pub fn CodeSecurityConfigurationSecretScanningDelegatedBypassOptionsReviewersItem::new(
-  reviewer_id~ : Int,
+  reviewer_id~ : Int32,
   reviewer_type~ : CodeSecurityConfigurationSecretScanningDelegatedBypassOptionsReviewersItemReviewerType,
   mode? : CodeSecurityConfigurationSecretScanningDelegatedBypassOptionsReviewersItemMode,
-  security_configuration_id? : Int,
+  security_configuration_id? : Int32,
 ) -> CodeSecurityConfigurationSecretScanningDelegatedBypassOptionsReviewersItem {
   { reviewer_id, reviewer_type, mode, security_configuration_id, }
 }
@@ -9873,7 +9873,7 @@ pub impl @json.FromJson for CodeSecurityConfigurationEnforcement with fn from_js
 ///
 /// A code security configuration
 pub(all) struct CodeSecurityConfiguration {
-  id : Int?
+  id : Int32?
   name : String?
   target_type : CodeSecurityConfigurationTargetType?
   description : @sdkjson.Presence[String]
@@ -9921,7 +9921,7 @@ pub extend CodeSecurityConfiguration with @debug.Debug::{to_repr}
 ///
 /// Creates a CodeSecurityConfiguration with omitted optional fields absent.
 pub fn CodeSecurityConfiguration::new(
-  id? : Int,
+  id? : Int32,
   name? : String,
   target_type? : CodeSecurityConfigurationTargetType,
   description? : String,
@@ -11832,7 +11832,7 @@ pub impl @json.FromJson for DependabotAlertDismissalRequestSimpleStatus with fn 
 ///
 /// The user who requested the dismissal.
 pub(all) struct DependabotAlertDismissalRequestSimpleRequester {
-  id : Int?
+  id : Int32?
   login : String?
 } derive(Eq, @debug.Debug)
 
@@ -11851,7 +11851,7 @@ pub extend DependabotAlertDismissalRequestSimpleRequester with @debug.Debug::{
 ///
 /// Creates a DependabotAlertDismissalRequestSimpleRequester with omitted optional fields absent.
 pub fn DependabotAlertDismissalRequestSimpleRequester::new(
-  id? : Int,
+  id? : Int32,
   login? : String,
 ) -> DependabotAlertDismissalRequestSimpleRequester {
   { id, login, }
@@ -11892,7 +11892,7 @@ pub impl @json.FromJson for DependabotAlertDismissalRequestSimpleRequester with 
 ///
 /// Information about an active dismissal request for this Dependabot alert.
 pub(all) struct DependabotAlertDismissalRequestSimple {
-  id : Int?
+  id : Int32?
   status : DependabotAlertDismissalRequestSimpleStatus?
   requester : DependabotAlertDismissalRequestSimpleRequester?
   created_at : String?
@@ -11909,7 +11909,7 @@ pub extend DependabotAlertDismissalRequestSimple with @debug.Debug::{to_repr}
 ///
 /// Creates a DependabotAlertDismissalRequestSimple with omitted optional fields absent.
 pub fn DependabotAlertDismissalRequestSimple::new(
-  id? : Int,
+  id? : Int32,
   status? : DependabotAlertDismissalRequestSimpleStatus,
   requester? : DependabotAlertDismissalRequestSimpleRequester,
   created_at? : String,
@@ -12299,7 +12299,7 @@ pub impl @json.FromJson for DependabotAlertWithRepositoryDismissedReason with fn
 ///
 /// A Dependabot alert.
 pub(all) struct DependabotAlertWithRepository {
-  number : Int
+  number : Int32
   state : DependabotAlertWithRepositoryState
   dependency : DependabotAlertWithRepositoryDependency
   security_advisory : DependabotAlertSecurityAdvisory
@@ -12329,7 +12329,7 @@ pub extend DependabotAlertWithRepository with @debug.Debug::{to_repr}
 ///
 /// Creates a DependabotAlertWithRepository with omitted optional fields absent.
 pub fn DependabotAlertWithRepository::new(
-  number~ : Int,
+  number~ : Int32,
   state~ : DependabotAlertWithRepositoryState,
   dependency~ : DependabotAlertWithRepositoryDependency,
   security_advisory~ : DependabotAlertSecurityAdvisory,
@@ -12852,7 +12852,7 @@ pub impl @json.FromJson for DependabotRepositoryAccessDetails with fn from_json(
 ///
 /// Actor
 pub(all) struct Actor {
-  id : Int
+  id : Int32
   login : String
   display_login : String?
   gravatar_id : String?
@@ -12870,7 +12870,7 @@ pub extend Actor with @debug.Debug::{to_repr}
 ///
 /// Creates a Actor with omitted optional fields absent.
 pub fn Actor::new(
-  id~ : Int,
+  id~ : Int32,
   login~ : String,
   url~ : String,
   avatar_url~ : String,
@@ -13077,15 +13077,15 @@ pub(all) struct NullableMilestone {
   url : String
   html_url : String
   labels_url : String
-  id : Int
+  id : Int32
   node_id : String
-  number : Int
+  number : Int32
   state : NullableMilestoneState
   title : String
   description : String?
   creator : NullableSimpleUser?
-  open_issues : Int
-  closed_issues : Int
+  open_issues : Int32
+  closed_issues : Int32
   created_at : String
   updated_at : String
   closed_at : String?
@@ -13105,13 +13105,13 @@ pub fn NullableMilestone::new(
   url~ : String,
   html_url~ : String,
   labels_url~ : String,
-  id~ : Int,
+  id~ : Int32,
   node_id~ : String,
-  number~ : Int,
+  number~ : Int32,
   state~ : NullableMilestoneState,
   title~ : String,
-  open_issues~ : Int,
-  closed_issues~ : Int,
+  open_issues~ : Int32,
+  closed_issues~ : Int32,
   created_at~ : String,
   updated_at~ : String,
   description? : String,
@@ -13270,7 +13270,7 @@ pub impl @json.FromJson for IssueTypeColor with fn from_json(value, path) {
 ///
 /// The type assigned to the issue. This is only present for issues in repositories where issue types are supported.
 pub(all) struct IssueType {
-  id : Int
+  id : Int32
   node_id : String
   name : String
   description : String?
@@ -13290,7 +13290,7 @@ pub extend IssueType with @debug.Debug::{to_repr}
 ///
 /// Creates a IssueType with omitted optional fields absent.
 pub fn IssueType::new(
-  id~ : Int,
+  id~ : Int32,
   node_id~ : String,
   name~ : String,
   description? : String,
@@ -13357,7 +13357,7 @@ pub impl @json.FromJson for IssueType with fn from_json(value, path) {
 ///
 /// GitHub apps are a new way to extend GitHub. They can be installed directly on organizations and user accounts and granted access to specific repositories. They come with granular permissions and built-in webhooks. GitHub apps are first class actors within GitHub.
 pub(all) struct NullableIntegration {
-  id : Int
+  id : Int32
   slug : String?
   node_id : String
   client_id : String?
@@ -13370,7 +13370,7 @@ pub(all) struct NullableIntegration {
   updated_at : String
   permissions : Map[String, String]
   events : Array[String]
-  installations_count : Int?
+  installations_count : Int32?
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -13383,7 +13383,7 @@ pub extend NullableIntegration with @debug.Debug::{to_repr}
 ///
 /// Creates a NullableIntegration with omitted optional fields absent.
 pub fn NullableIntegration::new(
-  id~ : Int,
+  id~ : Int32,
   node_id~ : String,
   owner~ : Json,
   name~ : String,
@@ -13396,7 +13396,7 @@ pub fn NullableIntegration::new(
   slug? : String,
   client_id? : String,
   description? : String,
-  installations_count? : Int,
+  installations_count? : Int32,
 ) -> NullableIntegration {
   {
     id,
@@ -13547,15 +13547,15 @@ pub impl @json.FromJson for AuthorAssociation with fn from_json(value, path) {
 /// Generated representation of ReactionRollup.
 pub(all) struct ReactionRollup {
   url : String
-  total_count : Int
-  plus_1 : Int
-  minus_1 : Int
-  laugh : Int
-  confused : Int
-  heart : Int
-  hooray : Int
-  eyes : Int
-  rocket : Int
+  total_count : Int32
+  plus_1 : Int32
+  minus_1 : Int32
+  laugh : Int32
+  confused : Int32
+  heart : Int32
+  hooray : Int32
+  eyes : Int32
+  rocket : Int32
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -13569,15 +13569,15 @@ pub extend ReactionRollup with @debug.Debug::{to_repr}
 /// Creates a ReactionRollup with omitted optional fields absent.
 pub fn ReactionRollup::new(
   url~ : String,
-  total_count~ : Int,
-  plus_1~ : Int,
-  minus_1~ : Int,
-  laugh~ : Int,
-  confused~ : Int,
-  heart~ : Int,
-  hooray~ : Int,
-  eyes~ : Int,
-  rocket~ : Int,
+  total_count~ : Int32,
+  plus_1~ : Int32,
+  minus_1~ : Int32,
+  laugh~ : Int32,
+  confused~ : Int32,
+  heart~ : Int32,
+  hooray~ : Int32,
+  eyes~ : Int32,
+  rocket~ : Int32,
 ) -> ReactionRollup {
   {
     url,
@@ -13640,9 +13640,9 @@ pub impl @json.FromJson for ReactionRollup with fn from_json(value, path) {
 ///
 /// Generated representation of SubIssuesSummary.
 pub(all) struct SubIssuesSummary {
-  total : Int
-  completed : Int
-  percent_completed : Int
+  total : Int32
+  completed : Int32
+  percent_completed : Int32
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -13655,9 +13655,9 @@ pub extend SubIssuesSummary with @debug.Debug::{to_repr}
 ///
 /// Creates a SubIssuesSummary with omitted optional fields absent.
 pub fn SubIssuesSummary::new(
-  total~ : Int,
-  completed~ : Int,
-  percent_completed~ : Int,
+  total~ : Int32,
+  completed~ : Int32,
+  percent_completed~ : Int32,
 ) -> SubIssuesSummary {
   { total, completed, percent_completed, }
 }
@@ -13925,10 +13925,10 @@ pub impl @json.FromJson for NullableIssueComment with fn from_json(value, path) 
 ///
 /// Generated representation of IssueDependenciesSummary.
 pub(all) struct IssueDependenciesSummary {
-  blocked_by : Int
-  blocking : Int
-  total_blocked_by : Int
-  total_blocking : Int
+  blocked_by : Int32
+  blocking : Int32
+  total_blocked_by : Int32
+  total_blocking : Int32
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -13941,10 +13941,10 @@ pub extend IssueDependenciesSummary with @debug.Debug::{to_repr}
 ///
 /// Creates a IssueDependenciesSummary with omitted optional fields absent.
 pub fn IssueDependenciesSummary::new(
-  blocked_by~ : Int,
-  blocking~ : Int,
-  total_blocked_by~ : Int,
-  total_blocking~ : Int,
+  blocked_by~ : Int32,
+  blocking~ : Int32,
+  total_blocked_by~ : Int32,
+  total_blocking~ : Int32,
 ) -> IssueDependenciesSummary {
   { blocked_by, blocking, total_blocked_by, total_blocking, }
 }
@@ -14568,7 +14568,7 @@ pub(all) struct Issue {
   comments_url : String
   events_url : String
   html_url : String
-  number : Int
+  number : Int32
   state : String
   state_reason : @sdkjson.Presence[IssueStateReason]
   title : String
@@ -14580,7 +14580,7 @@ pub(all) struct Issue {
   milestone : NullableMilestone?
   locked : Bool
   active_lock_reason : @sdkjson.Presence[String]
-  comments : Int
+  comments : Int32
   pull_request : IssuePullRequest?
   closed_at : String?
   created_at : String
@@ -14620,12 +14620,12 @@ pub fn Issue::new(
   comments_url~ : String,
   events_url~ : String,
   html_url~ : String,
-  number~ : Int,
+  number~ : Int32,
   state~ : String,
   title~ : String,
   labels~ : Array[IssueLabelsItem],
   locked~ : Bool,
-  comments~ : Int,
+  comments~ : Int32,
   created_at~ : String,
   updated_at~ : String,
   state_reason? : IssueStateReason,
@@ -15171,7 +15171,7 @@ pub impl @json.FromJson for PullRequestMinimalBase with fn from_json(
 /// Generated representation of PullRequestMinimal.
 pub(all) struct PullRequestMinimal {
   id : Int64
-  number : Int
+  number : Int32
   url : String
   head : PullRequestMinimalHead
   base : PullRequestMinimalBase
@@ -15188,7 +15188,7 @@ pub extend PullRequestMinimal with @debug.Debug::{to_repr}
 /// Creates a PullRequestMinimal with omitted optional fields absent.
 pub fn PullRequestMinimal::new(
   id~ : Int64,
-  number~ : Int,
+  number~ : Int32,
   url~ : String,
   head~ : PullRequestMinimalHead,
   base~ : PullRequestMinimalBase,
@@ -15286,15 +15286,15 @@ pub impl @json.FromJson for ReleaseAssetState with fn from_json(value, path) {
 pub(all) struct ReleaseAsset {
   url : String
   browser_download_url : String
-  id : Int
+  id : Int32
   node_id : String
   name : String
   label : String?
   state : ReleaseAssetState
   content_type : String
-  size : Int
+  size : Int32
   digest : String?
-  download_count : Int
+  download_count : Int32
   created_at : String
   updated_at : String
   uploader : NullableSimpleUser?
@@ -15312,13 +15312,13 @@ pub extend ReleaseAsset with @debug.Debug::{to_repr}
 pub fn ReleaseAsset::new(
   url~ : String,
   browser_download_url~ : String,
-  id~ : Int,
+  id~ : Int32,
   node_id~ : String,
   name~ : String,
   state~ : ReleaseAssetState,
   content_type~ : String,
-  size~ : Int,
-  download_count~ : Int,
+  size~ : Int32,
+  download_count~ : Int32,
   created_at~ : String,
   updated_at~ : String,
   label? : String,
@@ -15404,7 +15404,7 @@ pub(all) struct Release {
   upload_url : String
   tarball_url : String?
   zipball_url : String?
-  id : Int
+  id : Int32
   node_id : String
   tag_name : String
   target_commitish : String
@@ -15420,7 +15420,7 @@ pub(all) struct Release {
   assets : Array[ReleaseAsset]
   body_html : String?
   body_text : String?
-  mentions_count : Int?
+  mentions_count : Int32?
   discussion_url : String?
   reactions : ReactionRollup?
 } derive(Eq, @debug.Debug)
@@ -15439,7 +15439,7 @@ pub fn Release::new(
   html_url~ : String,
   assets_url~ : String,
   upload_url~ : String,
-  id~ : Int,
+  id~ : Int32,
   node_id~ : String,
   tag_name~ : String,
   target_commitish~ : String,
@@ -15457,7 +15457,7 @@ pub fn Release::new(
   updated_at? : String,
   body_html? : String,
   body_text? : String,
-  mentions_count? : Int,
+  mentions_count? : Int32,
   discussion_url? : String,
   reactions? : ReactionRollup,
 ) -> Release {
@@ -15576,7 +15576,7 @@ pub impl @json.FromJson for Release with fn from_json(value, path) {
 ///
 /// Generated representation of EventRepo.
 pub(all) struct EventRepo {
-  id : Int
+  id : Int32
   name : String
   url : String
 } derive(Eq, @debug.Debug)
@@ -15590,7 +15590,7 @@ pub extend EventRepo with @debug.Debug::{to_repr}
 ///|
 ///
 /// Creates a EventRepo with omitted optional fields absent.
-pub fn EventRepo::new(id~ : Int, name~ : String, url~ : String) -> EventRepo {
+pub fn EventRepo::new(id~ : Int32, name~ : String, url~ : String) -> EventRepo {
   { id, name, url, }
 }
 
@@ -15975,7 +15975,7 @@ pub(all) struct BaseGistFilesValue {
   type_ : String?
   language : String?
   raw_url : String?
-  size : Int?
+  size : Int32?
   encoding : String?
 } derive(Eq, @debug.Debug)
 
@@ -15993,7 +15993,7 @@ pub fn BaseGistFilesValue::new(
   type_? : String,
   language? : String,
   raw_url? : String,
-  size? : Int,
+  size? : Int32,
   encoding? : String,
 ) -> BaseGistFilesValue {
   { filename, type_, language, raw_url, size, encoding, }
@@ -16051,7 +16051,7 @@ pub(all) struct BaseGist {
   created_at : String
   updated_at : String
   description : String?
-  comments : Int
+  comments : Int32
   comments_enabled : Bool?
   user : NullableSimpleUser?
   comments_url : String
@@ -16083,7 +16083,7 @@ pub fn BaseGist::new(
   public~ : Bool,
   created_at~ : String,
   updated_at~ : String,
-  comments~ : Int,
+  comments~ : Int32,
   comments_url~ : String,
   description? : String,
   comments_enabled? : Bool,
@@ -16193,10 +16193,10 @@ pub impl @json.FromJson for BaseGist with fn from_json(value, path) {
 ///
 /// Generated representation of PublicUserPlan.
 pub(all) struct PublicUserPlan {
-  collaborators : Int
+  collaborators : Int32
   name : String
-  space : Int
-  private_repos : Int
+  space : Int32
+  private_repos : Int32
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -16209,10 +16209,10 @@ pub extend PublicUserPlan with @debug.Debug::{to_repr}
 ///
 /// Creates a PublicUserPlan with omitted optional fields absent.
 pub fn PublicUserPlan::new(
-  collaborators~ : Int,
+  collaborators~ : Int32,
   name~ : String,
-  space~ : Int,
-  private_repos~ : Int,
+  space~ : Int32,
+  private_repos~ : Int32,
 ) -> PublicUserPlan {
   { collaborators, name, space, private_repos, }
 }
@@ -16279,18 +16279,18 @@ pub(all) struct PublicUser {
   hireable : Bool?
   bio : String?
   twitter_username : @sdkjson.Presence[String]
-  public_repos : Int
-  public_gists : Int
-  followers : Int
-  following : Int
+  public_repos : Int32
+  public_gists : Int32
+  followers : Int32
+  following : Int32
   created_at : String
   updated_at : String
   plan : PublicUserPlan?
-  private_gists : Int?
-  total_private_repos : Int?
-  owned_private_repos : Int?
-  disk_usage : Int?
-  collaborators : Int?
+  private_gists : Int32?
+  total_private_repos : Int32?
+  owned_private_repos : Int32?
+  disk_usage : Int32?
+  collaborators : Int32?
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -16320,10 +16320,10 @@ pub fn PublicUser::new(
   received_events_url~ : String,
   type_~ : String,
   site_admin~ : Bool,
-  public_repos~ : Int,
-  public_gists~ : Int,
-  followers~ : Int,
-  following~ : Int,
+  public_repos~ : Int32,
+  public_gists~ : Int32,
+  followers~ : Int32,
+  following~ : Int32,
   created_at~ : String,
   updated_at~ : String,
   gravatar_id? : String,
@@ -16337,11 +16337,11 @@ pub fn PublicUser::new(
   bio? : String,
   twitter_username? : String,
   plan? : PublicUserPlan,
-  private_gists? : Int,
-  total_private_repos? : Int,
-  owned_private_repos? : Int,
-  disk_usage? : Int,
-  collaborators? : Int,
+  private_gists? : Int32,
+  total_private_repos? : Int32,
+  owned_private_repos? : Int32,
+  disk_usage? : Int32,
+  collaborators? : Int32,
 ) -> PublicUser {
   {
     login,
@@ -16495,9 +16495,9 @@ pub impl @json.FromJson for PublicUser with fn from_json(value, path) {
 ///
 /// Generated representation of GistHistoryChangeStatus.
 pub(all) struct GistHistoryChangeStatus {
-  total : Int?
-  additions : Int?
-  deletions : Int?
+  total : Int32?
+  additions : Int32?
+  deletions : Int32?
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -16510,9 +16510,9 @@ pub extend GistHistoryChangeStatus with @debug.Debug::{to_repr}
 ///
 /// Creates a GistHistoryChangeStatus with omitted optional fields absent.
 pub fn GistHistoryChangeStatus::new(
-  total? : Int,
-  additions? : Int,
-  deletions? : Int,
+  total? : Int32,
+  additions? : Int32,
+  deletions? : Int32,
 ) -> GistHistoryChangeStatus {
   { total, additions, deletions, }
 }
@@ -16689,7 +16689,7 @@ pub(all) struct GistSimpleForkOfFilesValue {
   type_ : String?
   language : String?
   raw_url : String?
-  size : Int?
+  size : Int32?
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -16706,7 +16706,7 @@ pub fn GistSimpleForkOfFilesValue::new(
   type_? : String,
   language? : String,
   raw_url? : String,
-  size? : Int,
+  size? : Int32,
 ) -> GistSimpleForkOfFilesValue {
   { filename, type_, language, raw_url, size, }
 }
@@ -16764,7 +16764,7 @@ pub(all) struct GistSimpleForkOf {
   created_at : String
   updated_at : String
   description : String?
-  comments : Int
+  comments : Int32
   comments_enabled : Bool?
   user : NullableSimpleUser?
   comments_url : String
@@ -16796,7 +16796,7 @@ pub fn GistSimpleForkOf::new(
   public~ : Bool,
   created_at~ : String,
   updated_at~ : String,
-  comments~ : Int,
+  comments~ : Int32,
   comments_url~ : String,
   description? : String,
   comments_enabled? : Bool,
@@ -16910,7 +16910,7 @@ pub(all) struct GistSimpleFilesValue {
   type_ : String?
   language : String?
   raw_url : String?
-  size : Int?
+  size : Int32?
   truncated : Bool?
   content : String?
   encoding : String?
@@ -16930,7 +16930,7 @@ pub fn GistSimpleFilesValue::new(
   type_? : String,
   language? : String,
   raw_url? : String,
-  size? : Int,
+  size? : Int32,
   truncated? : Bool,
   content? : String,
   encoding? : String,
@@ -16997,7 +16997,7 @@ pub(all) struct GistSimple {
   created_at : String?
   updated_at : String?
   description : @sdkjson.Presence[String]
-  comments : Int?
+  comments : Int32?
   comments_enabled : Bool?
   user : @sdkjson.Presence[String]
   comments_url : String?
@@ -17031,7 +17031,7 @@ pub fn GistSimple::new(
   created_at? : String,
   updated_at? : String,
   description? : String,
-  comments? : Int,
+  comments? : Int32,
   comments_enabled? : Bool,
   user? : String,
   comments_url? : String,
@@ -17135,7 +17135,7 @@ pub impl @json.FromJson for GistSimple with fn from_json(value, path) {
 ///
 /// A comment made to a gist.
 pub(all) struct GistComment {
-  id : Int
+  id : Int32
   node_id : String
   url : String
   body : String
@@ -17155,7 +17155,7 @@ pub extend GistComment with @debug.Debug::{to_repr}
 ///
 /// Creates a GistComment with omitted optional fields absent.
 pub fn GistComment::new(
-  id~ : Int,
+  id~ : Int32,
   node_id~ : String,
   url~ : String,
   body~ : String,
@@ -17210,9 +17210,9 @@ pub impl @json.FromJson for GistComment with fn from_json(value, path) {
 ///
 /// Generated representation of GistCommitChangeStatus.
 pub(all) struct GistCommitChangeStatus {
-  total : Int?
-  additions : Int?
-  deletions : Int?
+  total : Int32?
+  additions : Int32?
+  deletions : Int32?
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -17225,9 +17225,9 @@ pub extend GistCommitChangeStatus with @debug.Debug::{to_repr}
 ///
 /// Creates a GistCommitChangeStatus with omitted optional fields absent.
 pub fn GistCommitChangeStatus::new(
-  total? : Int,
-  additions? : Int,
-  deletions? : Int,
+  total? : Int32,
+  additions? : Int32,
+  deletions? : Int32,
 ) -> GistCommitChangeStatus {
   { total, additions, deletions, }
 }
@@ -17617,12 +17617,12 @@ pub impl @json.FromJson for MarketplaceListingPlanPriceModel with fn from_json(
 pub(all) struct MarketplaceListingPlan {
   url : String
   accounts_url : String
-  id : Int
-  number : Int
+  id : Int32
+  number : Int32
   name : String
   description : String
-  monthly_price_in_cents : Int
-  yearly_price_in_cents : Int
+  monthly_price_in_cents : Int32
+  yearly_price_in_cents : Int32
   price_model : MarketplaceListingPlanPriceModel
   has_free_trial : Bool
   unit_name : String?
@@ -17642,12 +17642,12 @@ pub extend MarketplaceListingPlan with @debug.Debug::{to_repr}
 pub fn MarketplaceListingPlan::new(
   url~ : String,
   accounts_url~ : String,
-  id~ : Int,
-  number~ : Int,
+  id~ : Int32,
+  number~ : Int32,
   name~ : String,
   description~ : String,
-  monthly_price_in_cents~ : Int,
-  yearly_price_in_cents~ : Int,
+  monthly_price_in_cents~ : Int32,
+  yearly_price_in_cents~ : Int32,
   price_model~ : MarketplaceListingPlanPriceModel,
   has_free_trial~ : Bool,
   state~ : String,
@@ -17729,8 +17729,8 @@ pub impl @json.FromJson for MarketplaceListingPlan with fn from_json(
 pub(all) struct MarketplacePurchaseMarketplacePendingChange {
   is_installed : Bool?
   effective_date : String?
-  unit_count : @sdkjson.Presence[Int]
-  id : Int?
+  unit_count : @sdkjson.Presence[Int32]
+  id : Int32?
   plan : MarketplaceListingPlan?
 } derive(Eq, @debug.Debug)
 
@@ -17751,8 +17751,8 @@ pub extend MarketplacePurchaseMarketplacePendingChange with @debug.Debug::{
 pub fn MarketplacePurchaseMarketplacePendingChange::new(
   is_installed? : Bool,
   effective_date? : String,
-  unit_count? : Int,
-  id? : Int,
+  unit_count? : Int32,
+  id? : Int32,
   plan? : MarketplaceListingPlan,
 ) -> MarketplacePurchaseMarketplacePendingChange {
   {
@@ -17811,7 +17811,7 @@ pub(all) struct MarketplacePurchaseMarketplacePurchase {
   billing_cycle : String?
   next_billing_date : @sdkjson.Presence[String]
   is_installed : Bool?
-  unit_count : @sdkjson.Presence[Int]
+  unit_count : @sdkjson.Presence[Int32]
   on_free_trial : Bool?
   free_trial_ends_on : @sdkjson.Presence[String]
   updated_at : String?
@@ -17831,7 +17831,7 @@ pub fn MarketplacePurchaseMarketplacePurchase::new(
   billing_cycle? : String,
   next_billing_date? : String,
   is_installed? : Bool,
-  unit_count? : Int,
+  unit_count? : Int32,
   on_free_trial? : Bool,
   free_trial_ends_on? : String,
   updated_at? : String,
@@ -17899,7 +17899,7 @@ pub impl @json.FromJson for MarketplacePurchaseMarketplacePurchase with fn from_
 pub(all) struct MarketplacePurchase {
   url : String
   type_ : String
-  id : Int
+  id : Int32
   login : String
   organization_billing_email : String?
   email : @sdkjson.Presence[String]
@@ -17921,7 +17921,7 @@ pub extend MarketplacePurchase with @debug.Debug::{to_repr}
 pub fn MarketplacePurchase::new(
   url~ : String,
   type_~ : String,
-  id~ : Int,
+  id~ : Int32,
   login~ : String,
   marketplace_purchase~ : MarketplacePurchaseMarketplacePurchase,
   organization_billing_email? : String,
@@ -19558,7 +19558,7 @@ pub impl @json.FromJson for SecurityAndAnalysisSecretScanningDelegatedBypassOpti
 ///
 /// Generated representation of SecurityAndAnalysisSecretScanningDelegatedBypassOptionsReviewersItem.
 pub(all) struct SecurityAndAnalysisSecretScanningDelegatedBypassOptionsReviewersItem {
-  reviewer_id : Int
+  reviewer_id : Int32
   reviewer_type : SecurityAndAnalysisSecretScanningDelegatedBypassOptionsReviewersItemReviewerType
   mode : SecurityAndAnalysisSecretScanningDelegatedBypassOptionsReviewersItemMode?
 } derive(Eq, @debug.Debug)
@@ -19578,7 +19578,7 @@ pub extend SecurityAndAnalysisSecretScanningDelegatedBypassOptionsReviewersItem 
 ///
 /// Creates a SecurityAndAnalysisSecretScanningDelegatedBypassOptionsReviewersItem with omitted optional fields absent.
 pub fn SecurityAndAnalysisSecretScanningDelegatedBypassOptionsReviewersItem::new(
-  reviewer_id~ : Int,
+  reviewer_id~ : Int32,
   reviewer_type~ : SecurityAndAnalysisSecretScanningDelegatedBypassOptionsReviewersItemReviewerType,
   mode? : SecurityAndAnalysisSecretScanningDelegatedBypassOptionsReviewersItemMode,
 ) -> SecurityAndAnalysisSecretScanningDelegatedBypassOptionsReviewersItem {
@@ -20056,12 +20056,12 @@ pub(all) struct MinimalRepository {
   svn_url : String?
   homepage : @sdkjson.Presence[String]
   language : @sdkjson.Presence[String]
-  forks_count : Int?
-  stargazers_count : Int?
-  watchers_count : Int?
-  size : Int?
+  forks_count : Int32?
+  stargazers_count : Int32?
+  watchers_count : Int32?
+  size : Int32?
   default_branch : String?
-  open_issues_count : Int?
+  open_issues_count : Int32?
   is_template : Bool?
   topics : Array[String]?
   has_issues : Bool?
@@ -20082,13 +20082,13 @@ pub(all) struct MinimalRepository {
   role_name : String?
   temp_clone_token : String?
   delete_branch_on_merge : Bool?
-  subscribers_count : Int?
-  network_count : Int?
+  subscribers_count : Int32?
+  network_count : Int32?
   code_of_conduct : CodeOfConduct?
   license : @sdkjson.Presence[MinimalRepositoryLicense]
-  forks : Int?
-  open_issues : Int?
-  watchers : Int?
+  forks : Int32?
+  open_issues : Int32?
+  watchers : Int32?
   allow_forking : Bool?
   web_commit_signoff_required : Bool?
   security_and_analysis : @sdkjson.Presence[SecurityAndAnalysis]
@@ -20158,12 +20158,12 @@ pub fn MinimalRepository::new(
   svn_url? : String,
   homepage? : String,
   language? : String,
-  forks_count? : Int,
-  stargazers_count? : Int,
-  watchers_count? : Int,
-  size? : Int,
+  forks_count? : Int32,
+  stargazers_count? : Int32,
+  watchers_count? : Int32,
+  size? : Int32,
   default_branch? : String,
-  open_issues_count? : Int,
+  open_issues_count? : Int32,
   is_template? : Bool,
   topics? : Array[String],
   has_issues? : Bool,
@@ -20184,13 +20184,13 @@ pub fn MinimalRepository::new(
   role_name? : String,
   temp_clone_token? : String,
   delete_branch_on_merge? : Bool,
-  subscribers_count? : Int,
-  network_count? : Int,
+  subscribers_count? : Int32,
+  network_count? : Int32,
   code_of_conduct? : CodeOfConduct,
   license? : MinimalRepositoryLicense,
-  forks? : Int,
-  open_issues? : Int,
-  watchers? : Int,
+  forks? : Int32,
+  open_issues? : Int32,
+  watchers? : Int32,
   allow_forking? : Bool,
   web_commit_signoff_required? : Bool,
   security_and_analysis? : SecurityAndAnalysis,
@@ -20734,7 +20734,7 @@ pub impl @json.FromJson for ThreadSubscription with fn from_json(value, path) {
 /// A GitHub organization.
 pub(all) struct OrganizationSimple {
   login : String
-  id : Int
+  id : Int32
   node_id : String
   url : String
   repos_url : String
@@ -20758,7 +20758,7 @@ pub extend OrganizationSimple with @debug.Debug::{to_repr}
 /// Creates a OrganizationSimple with omitted optional fields absent.
 pub fn OrganizationSimple::new(
   login~ : String,
-  id~ : Int,
+  id~ : Int32,
   node_id~ : String,
   url~ : String,
   repos_url~ : String,
@@ -20840,7 +20840,7 @@ pub impl @json.FromJson for OrganizationSimple with fn from_json(value, path) {
 ///
 /// GitHub Actions cache retention policy for an organization.
 pub(all) struct ActionsCacheRetentionLimitForOrganization {
-  max_cache_retention_days : Int?
+  max_cache_retention_days : Int32?
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -20855,7 +20855,7 @@ pub extend ActionsCacheRetentionLimitForOrganization with @debug.Debug::{
 ///
 /// Creates a ActionsCacheRetentionLimitForOrganization with omitted optional fields absent.
 pub fn ActionsCacheRetentionLimitForOrganization::new(
-  max_cache_retention_days? : Int,
+  max_cache_retention_days? : Int32,
 ) -> ActionsCacheRetentionLimitForOrganization {
   { max_cache_retention_days, }
 }
@@ -20898,7 +20898,7 @@ pub impl @json.FromJson for ActionsCacheRetentionLimitForOrganization with fn fr
 ///
 /// GitHub Actions cache storage policy for an organization.
 pub(all) struct ActionsCacheStorageLimitForOrganization {
-  max_cache_size_gb : Int?
+  max_cache_size_gb : Int32?
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -20911,7 +20911,7 @@ pub extend ActionsCacheStorageLimitForOrganization with @debug.Debug::{to_repr}
 ///
 /// Creates a ActionsCacheStorageLimitForOrganization with omitted optional fields absent.
 pub fn ActionsCacheStorageLimitForOrganization::new(
-  max_cache_size_gb? : Int,
+  max_cache_size_gb? : Int32,
 ) -> ActionsCacheStorageLimitForOrganization {
   { max_cache_size_gb, }
 }
@@ -21130,7 +21130,7 @@ pub(all) struct CreateBudgetBudget {
   id : String?
   budget_scope : CreateBudgetBudgetBudgetScope?
   budget_entity_name : String?
-  budget_amount : Int?
+  budget_amount : Int32?
   prevent_further_usage : Bool?
   budget_product_sku : String?
   budget_type : CreateBudgetBudgetBudgetType?
@@ -21151,7 +21151,7 @@ pub fn CreateBudgetBudget::new(
   id? : String,
   budget_scope? : CreateBudgetBudgetBudgetScope,
   budget_entity_name? : String,
-  budget_amount? : Int,
+  budget_amount? : Int32,
   prevent_further_usage? : Bool,
   budget_product_sku? : String,
   budget_type? : CreateBudgetBudgetBudgetType,
@@ -21451,7 +21451,7 @@ pub(all) struct UpdateBudgetBudget {
   budget_entity_name : String?
   user : String?
   consumed_amount : Double?
-  budget_amount : Int?
+  budget_amount : Int32?
   prevent_further_usage : Bool?
   budget_product_sku : String?
   budget_type : UpdateBudgetBudgetBudgetType?
@@ -21474,7 +21474,7 @@ pub fn UpdateBudgetBudget::new(
   budget_entity_name? : String,
   user? : String,
   consumed_amount? : Double,
-  budget_amount? : Int,
+  budget_amount? : Int32,
   prevent_further_usage? : Bool,
   budget_product_sku? : String,
   budget_type? : UpdateBudgetBudgetBudgetType,
@@ -21599,10 +21599,10 @@ pub impl @json.FromJson for UpdateBudget with fn from_json(value, path) {
 /// Generated representation of OrganizationFullPlan.
 pub(all) struct OrganizationFullPlan {
   name : String
-  space : Int
-  private_repos : Int
-  filled_seats : Int?
-  seats : Int?
+  space : Int32
+  private_repos : Int32
+  filled_seats : Int32?
+  seats : Int32?
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -21616,10 +21616,10 @@ pub extend OrganizationFullPlan with @debug.Debug::{to_repr}
 /// Creates a OrganizationFullPlan with omitted optional fields absent.
 pub fn OrganizationFullPlan::new(
   name~ : String,
-  space~ : Int,
-  private_repos~ : Int,
-  filled_seats? : Int,
-  seats? : Int,
+  space~ : Int32,
+  private_repos~ : Int32,
+  filled_seats? : Int32,
+  seats? : Int32,
 ) -> OrganizationFullPlan {
   { name, space, private_repos, filled_seats, seats, }
 }
@@ -21662,7 +21662,7 @@ pub impl @json.FromJson for OrganizationFullPlan with fn from_json(value, path) 
 /// Organization Full
 pub(all) struct OrganizationFull {
   login : String
-  id : Int
+  id : Int32
   node_id : String
   url : String
   repos_url : String
@@ -21682,17 +21682,17 @@ pub(all) struct OrganizationFull {
   is_verified : Bool?
   has_organization_projects : Bool
   has_repository_projects : Bool
-  public_repos : Int
-  public_gists : Int
-  followers : Int
-  following : Int
+  public_repos : Int32
+  public_gists : Int32
+  followers : Int32
+  following : Int32
   html_url : String
   type_ : String
-  total_private_repos : Int?
-  owned_private_repos : Int?
-  private_gists : @sdkjson.Presence[Int]
-  disk_usage : @sdkjson.Presence[Int]
-  collaborators : @sdkjson.Presence[Int]
+  total_private_repos : Int32?
+  owned_private_repos : Int32?
+  private_gists : @sdkjson.Presence[Int32]
+  disk_usage : @sdkjson.Presence[Int32]
+  collaborators : @sdkjson.Presence[Int32]
   billing_email : @sdkjson.Presence[String]
   plan : OrganizationFullPlan?
   default_repository_permission : @sdkjson.Presence[String]
@@ -21741,7 +21741,7 @@ pub extend OrganizationFull with @debug.Debug::{to_repr}
 /// Creates a OrganizationFull with omitted optional fields absent.
 pub fn OrganizationFull::new(
   login~ : String,
-  id~ : Int,
+  id~ : Int32,
   node_id~ : String,
   url~ : String,
   repos_url~ : String,
@@ -21753,10 +21753,10 @@ pub fn OrganizationFull::new(
   avatar_url~ : String,
   has_organization_projects~ : Bool,
   has_repository_projects~ : Bool,
-  public_repos~ : Int,
-  public_gists~ : Int,
-  followers~ : Int,
-  following~ : Int,
+  public_repos~ : Int32,
+  public_gists~ : Int32,
+  followers~ : Int32,
+  following~ : Int32,
   html_url~ : String,
   type_~ : String,
   created_at~ : String,
@@ -21769,11 +21769,11 @@ pub fn OrganizationFull::new(
   email? : String,
   twitter_username? : String,
   is_verified? : Bool,
-  total_private_repos? : Int,
-  owned_private_repos? : Int,
-  private_gists? : Int,
-  disk_usage? : Int,
-  collaborators? : Int,
+  total_private_repos? : Int32,
+  owned_private_repos? : Int32,
+  private_gists? : Int32,
+  disk_usage? : Int32,
+  collaborators? : Int32,
   billing_email? : String,
   plan? : OrganizationFullPlan,
   default_repository_permission? : String,
@@ -22185,8 +22185,8 @@ pub impl @json.FromJson for OrganizationFull with fn from_json(value, path) {
 ///
 /// Generated representation of ActionsCacheUsageOrgEnterprise.
 pub(all) struct ActionsCacheUsageOrgEnterprise {
-  total_active_caches_count : Int
-  total_active_caches_size_in_bytes : Int
+  total_active_caches_count : Int32
+  total_active_caches_size_in_bytes : Int32
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -22199,8 +22199,8 @@ pub extend ActionsCacheUsageOrgEnterprise with @debug.Debug::{to_repr}
 ///
 /// Creates a ActionsCacheUsageOrgEnterprise with omitted optional fields absent.
 pub fn ActionsCacheUsageOrgEnterprise::new(
-  total_active_caches_count~ : Int,
-  total_active_caches_size_in_bytes~ : Int,
+  total_active_caches_count~ : Int32,
+  total_active_caches_size_in_bytes~ : Int32,
 ) -> ActionsCacheUsageOrgEnterprise {
   { total_active_caches_count, total_active_caches_size_in_bytes, }
 }
@@ -22247,8 +22247,8 @@ pub impl @json.FromJson for ActionsCacheUsageOrgEnterprise with fn from_json(
 /// GitHub Actions Cache Usage by repository.
 pub(all) struct ActionsCacheUsageByRepository {
   full_name : String
-  active_caches_size_in_bytes : Int
-  active_caches_count : Int
+  active_caches_size_in_bytes : Int32
+  active_caches_count : Int32
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -22262,8 +22262,8 @@ pub extend ActionsCacheUsageByRepository with @debug.Debug::{to_repr}
 /// Creates a ActionsCacheUsageByRepository with omitted optional fields absent.
 pub fn ActionsCacheUsageByRepository::new(
   full_name~ : String,
-  active_caches_size_in_bytes~ : Int,
-  active_caches_count~ : Int,
+  active_caches_size_in_bytes~ : Int32,
+  active_caches_count~ : Int32,
 ) -> ActionsCacheUsageByRepository {
   { full_name, active_caches_size_in_bytes, active_caches_count, }
 }
@@ -22373,7 +22373,7 @@ pub impl @json.FromJson for NullableActionsHostedRunnerPoolImageSource with fn f
 /// Provides details of a hosted runner image
 pub(all) struct NullableActionsHostedRunnerPoolImage {
   id : String
-  size_gb : Int
+  size_gb : Int32
   display_name : String
   source : NullableActionsHostedRunnerPoolImageSource
   version : String?
@@ -22390,7 +22390,7 @@ pub extend NullableActionsHostedRunnerPoolImage with @debug.Debug::{to_repr}
 /// Creates a NullableActionsHostedRunnerPoolImage with omitted optional fields absent.
 pub fn NullableActionsHostedRunnerPoolImage::new(
   id~ : String,
-  size_gb~ : Int,
+  size_gb~ : Int32,
   display_name~ : String,
   source~ : NullableActionsHostedRunnerPoolImageSource,
   version? : String,
@@ -22439,9 +22439,9 @@ pub impl @json.FromJson for NullableActionsHostedRunnerPoolImage with fn from_js
 /// Provides details of a particular machine spec.
 pub(all) struct ActionsHostedRunnerMachineSpec {
   id : String
-  cpu_cores : Int
-  memory_gb : Int
-  storage_gb : Int
+  cpu_cores : Int32
+  memory_gb : Int32
+  storage_gb : Int32
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -22455,9 +22455,9 @@ pub extend ActionsHostedRunnerMachineSpec with @debug.Debug::{to_repr}
 /// Creates a ActionsHostedRunnerMachineSpec with omitted optional fields absent.
 pub fn ActionsHostedRunnerMachineSpec::new(
   id~ : String,
-  cpu_cores~ : Int,
-  memory_gb~ : Int,
-  storage_gb~ : Int,
+  cpu_cores~ : Int32,
+  memory_gb~ : Int32,
+  storage_gb~ : Int32,
 ) -> ActionsHostedRunnerMachineSpec {
   { id, cpu_cores, memory_gb, storage_gb, }
 }
@@ -22502,7 +22502,7 @@ pub impl @json.FromJson for ActionsHostedRunnerMachineSpec with fn from_json(
 pub(all) struct PublicIp {
   enabled : Bool?
   prefix : String?
-  length : Int?
+  length : Int32?
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -22517,7 +22517,7 @@ pub extend PublicIp with @debug.Debug::{to_repr}
 pub fn PublicIp::new(
   enabled? : Bool,
   prefix? : String,
-  length? : Int,
+  length? : Int32,
 ) -> PublicIp {
   { enabled, prefix, length, }
 }
@@ -22618,14 +22618,14 @@ pub impl @json.FromJson for ActionsHostedRunnerStatus with fn from_json(
 ///
 /// A Github-hosted hosted runner.
 pub(all) struct ActionsHostedRunner {
-  id : Int
+  id : Int32
   name : String
-  runner_group_id : Int?
+  runner_group_id : Int32?
   image_details : NullableActionsHostedRunnerPoolImage?
   machine_size_details : ActionsHostedRunnerMachineSpec
   status : ActionsHostedRunnerStatus
   platform : String
-  maximum_runners : Int?
+  maximum_runners : Int32?
   public_ip_enabled : Bool
   public_ips : Array[PublicIp]?
   last_active_on : @sdkjson.Presence[String]
@@ -22642,15 +22642,15 @@ pub extend ActionsHostedRunner with @debug.Debug::{to_repr}
 ///
 /// Creates a ActionsHostedRunner with omitted optional fields absent.
 pub fn ActionsHostedRunner::new(
-  id~ : Int,
+  id~ : Int32,
   name~ : String,
   machine_size_details~ : ActionsHostedRunnerMachineSpec,
   status~ : ActionsHostedRunnerStatus,
   platform~ : String,
   public_ip_enabled~ : Bool,
-  runner_group_id? : Int,
+  runner_group_id? : Int32,
   image_details? : NullableActionsHostedRunnerPoolImage,
-  maximum_runners? : Int,
+  maximum_runners? : Int32,
   public_ips? : Array[PublicIp],
   last_active_on? : String,
   image_gen? : Bool,
@@ -22725,12 +22725,12 @@ pub impl @json.FromJson for ActionsHostedRunner with fn from_json(value, path) {
 ///
 /// Provides details of a custom runner image
 pub(all) struct ActionsHostedRunnerCustomImage {
-  id : Int
+  id : Int32
   platform : String
-  total_versions_size : Int
+  total_versions_size : Int32
   name : String
   source : String
-  versions_count : Int
+  versions_count : Int32
   latest_version : String
   state : String
 } derive(Eq, @debug.Debug)
@@ -22745,12 +22745,12 @@ pub extend ActionsHostedRunnerCustomImage with @debug.Debug::{to_repr}
 ///
 /// Creates a ActionsHostedRunnerCustomImage with omitted optional fields absent.
 pub fn ActionsHostedRunnerCustomImage::new(
-  id~ : Int,
+  id~ : Int32,
   platform~ : String,
-  total_versions_size~ : Int,
+  total_versions_size~ : Int32,
   name~ : String,
   source~ : String,
-  versions_count~ : Int,
+  versions_count~ : Int32,
   latest_version~ : String,
   state~ : String,
 ) -> ActionsHostedRunnerCustomImage {
@@ -22814,7 +22814,7 @@ pub impl @json.FromJson for ActionsHostedRunnerCustomImage with fn from_json(
 pub(all) struct ActionsHostedRunnerCustomImageVersion {
   version : String
   state : String
-  size_gb : Int
+  size_gb : Int32
   created_on : String
   state_details : String
 } derive(Eq, @debug.Debug)
@@ -22831,7 +22831,7 @@ pub extend ActionsHostedRunnerCustomImageVersion with @debug.Debug::{to_repr}
 pub fn ActionsHostedRunnerCustomImageVersion::new(
   version~ : String,
   state~ : String,
-  size_gb~ : Int,
+  size_gb~ : Int32,
   created_on~ : String,
   state_details~ : String,
 ) -> ActionsHostedRunnerCustomImageVersion {
@@ -22941,7 +22941,7 @@ pub impl @json.FromJson for ActionsHostedRunnerCuratedImageSource with fn from_j
 pub(all) struct ActionsHostedRunnerCuratedImage {
   id : String
   platform : String
-  size_gb : Int
+  size_gb : Int32
   display_name : String
   source : ActionsHostedRunnerCuratedImageSource
 } derive(Eq, @debug.Debug)
@@ -22958,7 +22958,7 @@ pub extend ActionsHostedRunnerCuratedImage with @debug.Debug::{to_repr}
 pub fn ActionsHostedRunnerCuratedImage::new(
   id~ : String,
   platform~ : String,
-  size_gb~ : Int,
+  size_gb~ : Int32,
   display_name~ : String,
   source~ : ActionsHostedRunnerCuratedImageSource,
 ) -> ActionsHostedRunnerCuratedImage {
@@ -23005,8 +23005,8 @@ pub impl @json.FromJson for ActionsHostedRunnerCuratedImage with fn from_json(
 ///
 /// Provides details of static public IP limits for GitHub-hosted Hosted Runners
 pub(all) struct ActionsHostedRunnerLimitsPublicIps {
-  maximum : Int
-  current_usage : Int
+  maximum : Int32
+  current_usage : Int32
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -23019,8 +23019,8 @@ pub extend ActionsHostedRunnerLimitsPublicIps with @debug.Debug::{to_repr}
 ///
 /// Creates a ActionsHostedRunnerLimitsPublicIps with omitted optional fields absent.
 pub fn ActionsHostedRunnerLimitsPublicIps::new(
-  maximum~ : Int,
-  current_usage~ : Int,
+  maximum~ : Int32,
+  current_usage~ : Int32,
 ) -> ActionsHostedRunnerLimitsPublicIps {
   { maximum, current_usage, }
 }
@@ -23372,8 +23372,8 @@ pub impl @json.FromJson for ActionsOrganizationPermissions with fn from_json(
 ///
 /// Generated representation of ActionsArtifactAndLogRetentionResponse.
 pub(all) struct ActionsArtifactAndLogRetentionResponse {
-  days : Int
-  maximum_allowed_days : Int
+  days : Int32
+  maximum_allowed_days : Int32
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -23386,8 +23386,8 @@ pub extend ActionsArtifactAndLogRetentionResponse with @debug.Debug::{to_repr}
 ///
 /// Creates a ActionsArtifactAndLogRetentionResponse with omitted optional fields absent.
 pub fn ActionsArtifactAndLogRetentionResponse::new(
-  days~ : Int,
-  maximum_allowed_days~ : Int,
+  days~ : Int32,
+  maximum_allowed_days~ : Int32,
 ) -> ActionsArtifactAndLogRetentionResponse {
   { days, maximum_allowed_days, }
 }
@@ -23428,7 +23428,7 @@ pub impl @json.FromJson for ActionsArtifactAndLogRetentionResponse with fn from_
 ///
 /// Generated representation of ActionsArtifactAndLogRetention.
 pub(all) struct ActionsArtifactAndLogRetention {
-  days : Int
+  days : Int32
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -23441,7 +23441,7 @@ pub extend ActionsArtifactAndLogRetention with @debug.Debug::{to_repr}
 ///
 /// Creates a ActionsArtifactAndLogRetention with omitted optional fields absent.
 pub fn ActionsArtifactAndLogRetention::new(
-  days~ : Int,
+  days~ : Int32,
 ) -> ActionsArtifactAndLogRetention {
   { days, }
 }
@@ -24239,7 +24239,7 @@ pub impl @json.FromJson for ActionsRuleParamsActorType with fn from_json(
 ///
 /// An actor authorized to trigger Actions workflows
 pub(all) struct ActionsRuleParamsActor {
-  id : Int
+  id : Int32
   type_ : ActionsRuleParamsActorType
 } derive(Eq, @debug.Debug)
 
@@ -24253,7 +24253,7 @@ pub extend ActionsRuleParamsActor with @debug.Debug::{to_repr}
 ///
 /// Creates a ActionsRuleParamsActor with omitted optional fields absent.
 pub fn ActionsRuleParamsActor::new(
-  id~ : Int,
+  id~ : Int32,
   type_~ : ActionsRuleParamsActorType,
 ) -> ActionsRuleParamsActor {
   { id, type_, }
@@ -24926,7 +24926,7 @@ pub impl @json.FromJson for ActionsPolicyLinks with fn from_json(value, path) {
 ///
 /// An Actions policy defines rules for workflow execution protection.
 pub(all) struct ActionsPolicy {
-  id : Int
+  id : Int32
   name : String
   source_type : ActionsPolicySourceType
   source : String
@@ -24949,7 +24949,7 @@ pub extend ActionsPolicy with @debug.Debug::{to_repr}
 ///
 /// Creates a ActionsPolicy with omitted optional fields absent.
 pub fn ActionsPolicy::new(
-  id~ : Int,
+  id~ : Int32,
   name~ : String,
   source_type~ : ActionsPolicySourceType,
   source~ : String,
@@ -25206,7 +25206,7 @@ pub impl @json.FromJson for RunnerLabelType with fn from_json(value, path) {
 ///
 /// A label for a self hosted runner
 pub(all) struct RunnerLabel {
-  id : Int?
+  id : Int32?
   name : String
   type_ : RunnerLabelType?
 } derive(Eq, @debug.Debug)
@@ -25222,7 +25222,7 @@ pub extend RunnerLabel with @debug.Debug::{to_repr}
 /// Creates a RunnerLabel with omitted optional fields absent.
 pub fn RunnerLabel::new(
   name~ : String,
-  id? : Int,
+  id? : Int32,
   type_? : RunnerLabelType,
 ) -> RunnerLabel {
   { id, name, type_, }
@@ -25261,8 +25261,8 @@ pub impl @json.FromJson for RunnerLabel with fn from_json(value, path) {
 ///
 /// A self hosted runner
 pub(all) struct Runner {
-  id : Int
-  runner_group_id : Int?
+  id : Int32
+  runner_group_id : Int32?
   name : String
   os : String
   status : String
@@ -25282,13 +25282,13 @@ pub extend Runner with @debug.Debug::{to_repr}
 ///
 /// Creates a Runner with omitted optional fields absent.
 pub fn Runner::new(
-  id~ : Int,
+  id~ : Int32,
   name~ : String,
   os~ : String,
   status~ : String,
   busy~ : Bool,
   labels~ : Array[RunnerLabel],
-  runner_group_id? : Int,
+  runner_group_id? : Int32,
   ephemeral? : Bool,
   version? : String,
 ) -> Runner {
@@ -25681,7 +25681,7 @@ pub impl @json.FromJson for OrganizationActionsSecret with fn from_json(
 pub(all) struct ActionsPublicKey {
   key_id : String
   key : String
-  id : Int?
+  id : Int32?
   url : String?
   title : String?
   created_at : String?
@@ -25699,7 +25699,7 @@ pub extend ActionsPublicKey with @debug.Debug::{to_repr}
 pub fn ActionsPublicKey::new(
   key_id~ : String,
   key~ : String,
-  id? : Int,
+  id? : Int32,
   url? : String,
   title? : String,
   created_at? : String,
@@ -25948,7 +25948,7 @@ pub impl @json.FromJson for ArtifactDeploymentRecordRuntimeRisksItem with fn fro
 ///
 /// Artifact Metadata Deployment Record
 pub(all) struct ArtifactDeploymentRecord {
-  id : Int?
+  id : Int32?
   digest : String?
   logical_environment : String?
   physical_environment : String?
@@ -25958,7 +25958,7 @@ pub(all) struct ArtifactDeploymentRecord {
   runtime_risks : Array[ArtifactDeploymentRecordRuntimeRisksItem]?
   created_at : String?
   updated_at : String?
-  attestation_id : @sdkjson.Presence[Int]
+  attestation_id : @sdkjson.Presence[Int32]
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -25971,7 +25971,7 @@ pub extend ArtifactDeploymentRecord with @debug.Debug::{to_repr}
 ///
 /// Creates a ArtifactDeploymentRecord with omitted optional fields absent.
 pub fn ArtifactDeploymentRecord::new(
-  id? : Int,
+  id? : Int32,
   digest? : String,
   logical_environment? : String,
   physical_environment? : String,
@@ -25981,7 +25981,7 @@ pub fn ArtifactDeploymentRecord::new(
   runtime_risks? : Array[ArtifactDeploymentRecordRuntimeRisksItem],
   created_at? : String,
   updated_at? : String,
-  attestation_id? : Int,
+  attestation_id? : Int32,
 ) -> ArtifactDeploymentRecord {
   {
     id,
@@ -26155,7 +26155,7 @@ pub impl @json.FromJson for NullableTeamSimpleType with fn from_json(
 ///
 /// Groups of organization members that gives permissions on specified repositories.
 pub(all) struct NullableTeamSimple {
-  id : Int
+  id : Int32
   node_id : String
   url : String
   members_url : String
@@ -26169,8 +26169,8 @@ pub(all) struct NullableTeamSimple {
   slug : String
   ldap_dn : String?
   type_ : NullableTeamSimpleType
-  organization_id : Int?
-  enterprise_id : Int?
+  organization_id : Int32?
+  enterprise_id : Int32?
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -26183,7 +26183,7 @@ pub extend NullableTeamSimple with @debug.Debug::{to_repr}
 ///
 /// Creates a NullableTeamSimple with omitted optional fields absent.
 pub fn NullableTeamSimple::new(
-  id~ : Int,
+  id~ : Int32,
   node_id~ : String,
   url~ : String,
   members_url~ : String,
@@ -26197,8 +26197,8 @@ pub fn NullableTeamSimple::new(
   privacy? : String,
   notification_setting? : String,
   ldap_dn? : String,
-  organization_id? : Int,
-  enterprise_id? : Int,
+  organization_id? : Int32,
+  enterprise_id? : Int32,
 ) -> NullableTeamSimple {
   {
     id,
@@ -26450,7 +26450,7 @@ pub impl @json.FromJson for TeamAccessSource with fn from_json(value, path) {
 ///
 /// Groups of organization members that gives permissions on specified repositories.
 pub(all) struct Team {
-  id : Int
+  id : Int32
   node_id : String
   name : String
   slug : String
@@ -26465,8 +26465,8 @@ pub(all) struct Team {
   repositories_url : String
   type_ : TeamType
   access_source : TeamAccessSource?
-  organization_id : Int?
-  enterprise_id : Int?
+  organization_id : Int32?
+  enterprise_id : Int32?
   parent : NullableTeamSimple?
 } derive(Eq, @debug.Debug)
 
@@ -26480,7 +26480,7 @@ pub extend Team with @debug.Debug::{to_repr}
 ///
 /// Creates a Team with omitted optional fields absent.
 pub fn Team::new(
-  id~ : Int,
+  id~ : Int32,
   node_id~ : String,
   name~ : String,
   slug~ : String,
@@ -26495,8 +26495,8 @@ pub fn Team::new(
   notification_setting? : String,
   permissions? : TeamPermissions,
   access_source? : TeamAccessSource,
-  organization_id? : Int,
-  enterprise_id? : Int,
+  organization_id? : Int32,
+  enterprise_id? : Int32,
   parent? : NullableTeamSimple,
 ) -> Team {
   {
@@ -26587,9 +26587,9 @@ pub impl @json.FromJson for Team with fn from_json(value, path) {
 ///
 /// Generated representation of CampaignSummaryAlertStats.
 pub(all) struct CampaignSummaryAlertStats {
-  open_count : Int
-  closed_count : Int
-  in_progress_count : Int
+  open_count : Int32
+  closed_count : Int32
+  in_progress_count : Int32
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -26602,9 +26602,9 @@ pub extend CampaignSummaryAlertStats with @debug.Debug::{to_repr}
 ///
 /// Creates a CampaignSummaryAlertStats with omitted optional fields absent.
 pub fn CampaignSummaryAlertStats::new(
-  open_count~ : Int,
-  closed_count~ : Int,
-  in_progress_count~ : Int,
+  open_count~ : Int32,
+  closed_count~ : Int32,
+  in_progress_count~ : Int32,
 ) -> CampaignSummaryAlertStats {
   { open_count, closed_count, in_progress_count, }
 }
@@ -26645,7 +26645,7 @@ pub impl @json.FromJson for CampaignSummaryAlertStats with fn from_json(
 ///
 /// The campaign metadata and alert stats.
 pub(all) struct CampaignSummary {
-  number : Int
+  number : Int32
   created_at : String
   updated_at : String
   name : String?
@@ -26670,7 +26670,7 @@ pub extend CampaignSummary with @debug.Debug::{to_repr}
 ///
 /// Creates a CampaignSummary with omitted optional fields absent.
 pub fn CampaignSummary::new(
-  number~ : Int,
+  number~ : Int32,
   created_at~ : String,
   updated_at~ : String,
   description~ : String,
@@ -27506,10 +27506,10 @@ pub impl @json.FromJson for CodeScanningAnalysisTool with fn from_json(
 /// Describe a region within a file for the alert.
 pub(all) struct CodeScanningAlertLocation {
   path : String?
-  start_line : Int?
-  end_line : Int?
-  start_column : Int?
-  end_column : Int?
+  start_line : Int32?
+  end_line : Int32?
+  start_column : Int32?
+  end_column : Int32?
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -27523,10 +27523,10 @@ pub extend CodeScanningAlertLocation with @debug.Debug::{to_repr}
 /// Creates a CodeScanningAlertLocation with omitted optional fields absent.
 pub fn CodeScanningAlertLocation::new(
   path? : String,
-  start_line? : Int,
-  end_line? : Int,
-  start_column? : Int,
-  end_column? : Int,
+  start_line? : Int32,
+  end_line? : Int32,
+  start_column? : Int32,
+  end_column? : Int32,
 ) -> CodeScanningAlertLocation {
   { path, start_line, end_line, start_column, end_column, }
 }
@@ -27782,7 +27782,7 @@ pub impl @json.FromJson for CodeScanningAlertInstance with fn from_json(
 ///
 /// Generated representation of CodeScanningOrganizationAlertItems.
 pub(all) struct CodeScanningOrganizationAlertItems {
-  number : Int
+  number : Int32
   created_at : String
   updated_at : String?
   url : String
@@ -27812,7 +27812,7 @@ pub extend CodeScanningOrganizationAlertItems with @debug.Debug::{to_repr}
 ///
 /// Creates a CodeScanningOrganizationAlertItems with omitted optional fields absent.
 pub fn CodeScanningOrganizationAlertItems::new(
-  number~ : Int,
+  number~ : Int32,
   created_at~ : String,
   url~ : String,
   html_url~ : String,
@@ -27999,9 +27999,9 @@ pub(all) struct NullableCodespaceMachine {
   name : String
   display_name : String
   operating_system : String
-  storage_in_bytes : Int
-  memory_in_bytes : Int
-  cpus : Int
+  storage_in_bytes : Int32
+  memory_in_bytes : Int32
+  cpus : Int32
   prebuild_availability : NullableCodespaceMachinePrebuildAvailability?
 } derive(Eq, @debug.Debug)
 
@@ -28018,9 +28018,9 @@ pub fn NullableCodespaceMachine::new(
   name~ : String,
   display_name~ : String,
   operating_system~ : String,
-  storage_in_bytes~ : Int,
-  memory_in_bytes~ : Int,
-  cpus~ : Int,
+  storage_in_bytes~ : Int32,
+  memory_in_bytes~ : Int32,
+  cpus~ : Int32,
   prebuild_availability? : NullableCodespaceMachinePrebuildAvailability,
 ) -> NullableCodespaceMachine {
   {
@@ -28179,8 +28179,8 @@ pub impl @json.FromJson for CodespaceState with fn from_json(value, path) {
 ///
 /// Details about the codespace's git repository.
 pub(all) struct CodespaceGitStatus {
-  ahead : Int?
-  behind : Int?
+  ahead : Int32?
+  behind : Int32?
   has_unpushed_changes : Bool?
   has_uncommitted_changes : Bool?
   ref_ : String?
@@ -28196,8 +28196,8 @@ pub extend CodespaceGitStatus with @debug.Debug::{to_repr}
 ///
 /// Creates a CodespaceGitStatus with omitted optional fields absent.
 pub fn CodespaceGitStatus::new(
-  ahead? : Int,
-  behind? : Int,
+  ahead? : Int32,
+  behind? : Int32,
   has_unpushed_changes? : Bool,
   has_uncommitted_changes? : Bool,
   ref_? : String,
@@ -28374,7 +28374,7 @@ pub(all) struct Codespace {
   url : String
   git_status : CodespaceGitStatus
   location : CodespaceLocation
-  idle_timeout_minutes : Int?
+  idle_timeout_minutes : Int32?
   web_url : String
   machines_url : String
   start_url : String
@@ -28386,7 +28386,7 @@ pub(all) struct Codespace {
   pending_operation : @sdkjson.Presence[Bool]
   pending_operation_disabled_reason : @sdkjson.Presence[String]
   idle_timeout_notice : @sdkjson.Presence[String]
-  retention_period_minutes : @sdkjson.Presence[Int]
+  retention_period_minutes : @sdkjson.Presence[Int32]
   retention_expires_at : @sdkjson.Presence[String]
   last_known_stop_notice : @sdkjson.Presence[String]
 } derive(Eq, @debug.Debug)
@@ -28423,14 +28423,14 @@ pub fn Codespace::new(
   machine? : NullableCodespaceMachine,
   devcontainer_path? : String,
   prebuild? : Bool,
-  idle_timeout_minutes? : Int,
+  idle_timeout_minutes? : Int32,
   publish_url? : String,
   pulls_url? : String,
   runtime_constraints? : CodespaceRuntimeConstraints,
   pending_operation? : Bool,
   pending_operation_disabled_reason? : String,
   idle_timeout_notice? : String,
-  retention_period_minutes? : Int,
+  retention_period_minutes? : Int32,
   retention_expires_at? : String,
   last_known_stop_notice? : String,
 ) -> Codespace {
@@ -28712,7 +28712,7 @@ pub impl @json.FromJson for CodespacesOrgSecret with fn from_json(value, path) {
 pub(all) struct CodespacesPublicKey {
   key_id : String
   key : String
-  id : Int?
+  id : Int32?
   url : String?
   title : String?
   created_at : String?
@@ -28730,7 +28730,7 @@ pub extend CodespacesPublicKey with @debug.Debug::{to_repr}
 pub fn CodespacesPublicKey::new(
   key_id~ : String,
   key~ : String,
-  id? : Int,
+  id? : Int32,
   url? : String,
   title? : String,
   created_at? : String,
@@ -28914,16 +28914,16 @@ pub impl @json.FromJson for CopilotSpaceResourcesAttributesItemResourceType with
 ///
 /// Metadata specific to the resource type.
 pub(all) struct CopilotSpaceResourcesAttributesItemMetadata {
-  repository_id : Int?
+  repository_id : Int32?
   file_path : String?
   text : String?
   name : String?
-  number : Int?
-  copilot_chat_attachment_id : Int?
+  number : Int32?
+  copilot_chat_attachment_id : Int32?
   media_type : String?
   url : String?
-  height : Int?
-  width : Int?
+  height : Int32?
+  width : Int32?
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -28941,16 +28941,16 @@ pub extend CopilotSpaceResourcesAttributesItemMetadata with @debug.Debug::{
 ///
 /// Creates a CopilotSpaceResourcesAttributesItemMetadata with omitted optional fields absent.
 pub fn CopilotSpaceResourcesAttributesItemMetadata::new(
-  repository_id? : Int,
+  repository_id? : Int32,
   file_path? : String,
   text? : String,
   name? : String,
-  number? : Int,
-  copilot_chat_attachment_id? : Int,
+  number? : Int32,
+  copilot_chat_attachment_id? : Int32,
   media_type? : String,
   url? : String,
-  height? : Int,
-  width? : Int,
+  height? : Int32,
+  width? : Int32,
 ) -> CopilotSpaceResourcesAttributesItemMetadata {
   {
     repository_id,
@@ -29107,7 +29107,7 @@ pub impl @json.FromJson for CopilotSpaceResourcesAttributesItem with fn from_jso
 /// A GitHub Copilot Space represents an interactive AI workspace where users can ask questions and get assistance.
 pub(all) struct CopilotSpace {
   id : Int64
-  number : Int
+  number : Int32
   name : String
   description : @sdkjson.Presence[String]
   general_instructions : @sdkjson.Presence[String]
@@ -29132,7 +29132,7 @@ pub extend CopilotSpace with @debug.Debug::{to_repr}
 /// Creates a CopilotSpace with omitted optional fields absent.
 pub fn CopilotSpace::new(
   id~ : Int64,
-  number~ : Int,
+  number~ : Int32,
   name~ : String,
   base_role~ : CopilotSpaceBaseRole,
   owner~ : Json,
@@ -29503,7 +29503,7 @@ pub impl @json.FromJson for CopilotSpaceCollaboratorTeamRole with fn from_json(
 pub(all) struct CopilotSpaceCollaboratorTeam {
   actor_type : String
   role : CopilotSpaceCollaboratorTeamRole
-  id : Int
+  id : Int32
   node_id : String
   name : String
   slug : String
@@ -29514,7 +29514,7 @@ pub(all) struct CopilotSpaceCollaboratorTeam {
   html_url : String?
   members_url : String?
   repositories_url : String?
-  organization_id : Int?
+  organization_id : Int32?
   parent : @sdkjson.Presence[Json]
 } derive(Eq, @debug.Debug)
 
@@ -29530,7 +29530,7 @@ pub extend CopilotSpaceCollaboratorTeam with @debug.Debug::{to_repr}
 pub fn CopilotSpaceCollaboratorTeam::new(
   actor_type~ : String,
   role~ : CopilotSpaceCollaboratorTeamRole,
-  id~ : Int,
+  id~ : Int32,
   node_id~ : String,
   name~ : String,
   slug~ : String,
@@ -29541,7 +29541,7 @@ pub fn CopilotSpaceCollaboratorTeam::new(
   html_url? : String,
   members_url? : String,
   repositories_url? : String,
-  organization_id? : Int,
+  organization_id? : Int32,
   parent? : Json,
 ) -> CopilotSpaceCollaboratorTeam {
   {
@@ -29741,9 +29741,9 @@ pub impl @json.FromJson for CopilotSpaceResourceResourceType with fn from_json(
 ///
 /// A resource attached to a Copilot Space.
 pub(all) struct CopilotSpaceResource {
-  id : Int
+  id : Int32
   resource_type : CopilotSpaceResourceResourceType
-  copilot_chat_attachment_id : @sdkjson.Presence[Int]
+  copilot_chat_attachment_id : @sdkjson.Presence[Int32]
   metadata : Json
   created_at : String
   updated_at : String
@@ -29759,12 +29759,12 @@ pub extend CopilotSpaceResource with @debug.Debug::{to_repr}
 ///
 /// Creates a CopilotSpaceResource with omitted optional fields absent.
 pub fn CopilotSpaceResource::new(
-  id~ : Int,
+  id~ : Int32,
   resource_type~ : CopilotSpaceResourceResourceType,
   metadata~ : Json,
   created_at~ : String,
   updated_at~ : String,
-  copilot_chat_attachment_id? : Int,
+  copilot_chat_attachment_id? : Int32,
 ) -> CopilotSpaceResource {
   {
     id,
@@ -29819,12 +29819,12 @@ pub impl @json.FromJson for CopilotSpaceResource with fn from_json(value, path) 
 ///
 /// The breakdown of Copilot Business seats for the organization.
 pub(all) struct CopilotOrganizationSeatBreakdown {
-  total : Int?
-  added_this_cycle : Int?
-  pending_cancellation : Int?
-  pending_invitation : Int?
-  active_this_cycle : Int?
-  inactive_this_cycle : Int?
+  total : Int32?
+  added_this_cycle : Int32?
+  pending_cancellation : Int32?
+  pending_invitation : Int32?
+  active_this_cycle : Int32?
+  inactive_this_cycle : Int32?
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -29837,12 +29837,12 @@ pub extend CopilotOrganizationSeatBreakdown with @debug.Debug::{to_repr}
 ///
 /// Creates a CopilotOrganizationSeatBreakdown with omitted optional fields absent.
 pub fn CopilotOrganizationSeatBreakdown::new(
-  total? : Int,
-  added_this_cycle? : Int,
-  pending_cancellation? : Int,
-  pending_invitation? : Int,
-  active_this_cycle? : Int,
-  inactive_this_cycle? : Int,
+  total? : Int32,
+  added_this_cycle? : Int32,
+  pending_cancellation? : Int32,
+  pending_invitation? : Int32,
+  active_this_cycle? : Int32,
+  inactive_this_cycle? : Int32,
 ) -> CopilotOrganizationSeatBreakdown {
   {
     total,
@@ -29897,7 +29897,7 @@ pub impl @json.FromJson for CopilotOrganizationSeatBreakdown with fn from_json(
 /// A GitHub organization.
 pub(all) struct NullableOrganizationSimple {
   login : String
-  id : Int
+  id : Int32
   node_id : String
   url : String
   repos_url : String
@@ -29921,7 +29921,7 @@ pub extend NullableOrganizationSimple with @debug.Debug::{to_repr}
 /// Creates a NullableOrganizationSimple with omitted optional fields absent.
 pub fn NullableOrganizationSimple::new(
   login~ : String,
-  id~ : Int,
+  id~ : Int32,
   node_id~ : String,
   url~ : String,
   repos_url~ : String,
@@ -30593,12 +30593,12 @@ pub(all) struct NullableMinimalRepository {
   svn_url : String?
   homepage : @sdkjson.Presence[String]
   language : @sdkjson.Presence[String]
-  forks_count : Int?
-  stargazers_count : Int?
-  watchers_count : Int?
-  size : Int?
+  forks_count : Int32?
+  stargazers_count : Int32?
+  watchers_count : Int32?
+  size : Int32?
   default_branch : String?
-  open_issues_count : Int?
+  open_issues_count : Int32?
   is_template : Bool?
   topics : Array[String]?
   has_issues : Bool?
@@ -30619,13 +30619,13 @@ pub(all) struct NullableMinimalRepository {
   role_name : String?
   temp_clone_token : String?
   delete_branch_on_merge : Bool?
-  subscribers_count : Int?
-  network_count : Int?
+  subscribers_count : Int32?
+  network_count : Int32?
   code_of_conduct : CodeOfConduct?
   license : @sdkjson.Presence[NullableMinimalRepositoryLicense]
-  forks : Int?
-  open_issues : Int?
-  watchers : Int?
+  forks : Int32?
+  open_issues : Int32?
+  watchers : Int32?
   allow_forking : Bool?
   web_commit_signoff_required : Bool?
   security_and_analysis : @sdkjson.Presence[SecurityAndAnalysis]
@@ -30695,12 +30695,12 @@ pub fn NullableMinimalRepository::new(
   svn_url? : String,
   homepage? : String,
   language? : String,
-  forks_count? : Int,
-  stargazers_count? : Int,
-  watchers_count? : Int,
-  size? : Int,
+  forks_count? : Int32,
+  stargazers_count? : Int32,
+  watchers_count? : Int32,
+  size? : Int32,
   default_branch? : String,
-  open_issues_count? : Int,
+  open_issues_count? : Int32,
   is_template? : Bool,
   topics? : Array[String],
   has_issues? : Bool,
@@ -30721,13 +30721,13 @@ pub fn NullableMinimalRepository::new(
   role_name? : String,
   temp_clone_token? : String,
   delete_branch_on_merge? : Bool,
-  subscribers_count? : Int,
-  network_count? : Int,
+  subscribers_count? : Int32,
+  network_count? : Int32,
   code_of_conduct? : CodeOfConduct,
   license? : NullableMinimalRepositoryLicense,
-  forks? : Int,
-  open_issues? : Int,
-  watchers? : Int,
+  forks? : Int32,
+  open_issues? : Int32,
+  watchers? : Int32,
   allow_forking? : Bool,
   web_commit_signoff_required? : Bool,
   security_and_analysis? : SecurityAndAnalysis,
@@ -31162,12 +31162,12 @@ pub impl @json.FromJson for PackageVisibility with fn from_json(value, path) {
 ///
 /// A software package
 pub(all) struct Package {
-  id : Int
+  id : Int32
   name : String
   package_type : PackagePackageType
   url : String
   html_url : String
-  version_count : Int
+  version_count : Int32
   visibility : PackageVisibility
   owner : @sdkjson.Presence[NullableSimpleUser]
   repository : @sdkjson.Presence[NullableMinimalRepository]
@@ -31185,12 +31185,12 @@ pub extend Package with @debug.Debug::{to_repr}
 ///
 /// Creates a Package with omitted optional fields absent.
 pub fn Package::new(
-  id~ : Int,
+  id~ : Int32,
   name~ : String,
   package_type~ : PackagePackageType,
   url~ : String,
   html_url~ : String,
-  version_count~ : Int,
+  version_count~ : Int32,
   visibility~ : PackageVisibility,
   created_at~ : String,
   updated_at~ : String,
@@ -31269,7 +31269,7 @@ pub(all) struct OrganizationInvitation {
   failed_at : @sdkjson.Presence[String]
   failed_reason : @sdkjson.Presence[String]
   inviter : SimpleUser
-  team_count : Int
+  team_count : Int32
   node_id : String
   invitation_teams_url : String
   invitation_source : String?
@@ -31289,7 +31289,7 @@ pub fn OrganizationInvitation::new(
   role~ : String,
   created_at~ : String,
   inviter~ : SimpleUser,
-  team_count~ : Int,
+  team_count~ : Int32,
   node_id~ : String,
   invitation_teams_url~ : String,
   login? : String,
@@ -31427,7 +31427,7 @@ pub impl @json.FromJson for OrgHookConfig with fn from_json(value, path) {
 ///
 /// Org Hook
 pub(all) struct OrgHook {
-  id : Int
+  id : Int32
   url : String
   ping_url : String
   deliveries_url : String?
@@ -31450,7 +31450,7 @@ pub extend OrgHook with @debug.Debug::{to_repr}
 ///
 /// Creates a OrgHook with omitted optional fields absent.
 pub fn OrgHook::new(
-  id~ : Int,
+  id~ : Int32,
   url~ : String,
   ping_url~ : String,
   name~ : String,
@@ -31620,8 +31620,8 @@ pub(all) struct ApiInsightsSubjectStatsItem {
   subject_type : String?
   subject_name : String?
   subject_id : Int64?
-  total_request_count : Int?
-  rate_limited_request_count : Int?
+  total_request_count : Int32?
+  rate_limited_request_count : Int32?
   last_rate_limited_timestamp : @sdkjson.Presence[String]
   last_request_timestamp : String?
 } derive(Eq, @debug.Debug)
@@ -31639,8 +31639,8 @@ pub fn ApiInsightsSubjectStatsItem::new(
   subject_type? : String,
   subject_name? : String,
   subject_id? : Int64,
-  total_request_count? : Int,
-  rate_limited_request_count? : Int,
+  total_request_count? : Int32,
+  rate_limited_request_count? : Int32,
   last_rate_limited_timestamp? : String,
   last_request_timestamp? : String,
 ) -> ApiInsightsSubjectStatsItem {
@@ -31840,8 +31840,8 @@ pub(all) struct ApiInsightsUserStatsItem {
   actor_id : Int64?
   integration_id : @sdkjson.Presence[Int64]
   oauth_application_id : @sdkjson.Presence[Int64]
-  total_request_count : Int?
-  rate_limited_request_count : Int?
+  total_request_count : Int32?
+  rate_limited_request_count : Int32?
   last_rate_limited_timestamp : @sdkjson.Presence[String]
   last_request_timestamp : String?
 } derive(Eq, @debug.Debug)
@@ -31861,8 +31861,8 @@ pub fn ApiInsightsUserStatsItem::new(
   actor_id? : Int64,
   integration_id? : Int64,
   oauth_application_id? : Int64,
-  total_request_count? : Int,
-  rate_limited_request_count? : Int,
+  total_request_count? : Int32,
+  rate_limited_request_count? : Int32,
   last_rate_limited_timestamp? : String,
   last_request_timestamp? : String,
 ) -> ApiInsightsUserStatsItem {
@@ -32349,11 +32349,11 @@ pub impl @json.FromJson for IssueFieldOptionsItemColor with fn from_json(
 ///
 /// Generated representation of IssueFieldOptionsItem.
 pub(all) struct IssueFieldOptionsItem {
-  id : Int
+  id : Int32
   name : String
   description : @sdkjson.Presence[String]
   color : @sdkjson.Presence[IssueFieldOptionsItemColor]
-  priority : @sdkjson.Presence[Int]
+  priority : @sdkjson.Presence[Int32]
   created_at : String?
   updated_at : String?
 } derive(Eq, @debug.Debug)
@@ -32368,11 +32368,11 @@ pub extend IssueFieldOptionsItem with @debug.Debug::{to_repr}
 ///
 /// Creates a IssueFieldOptionsItem with omitted optional fields absent.
 pub fn IssueFieldOptionsItem::new(
-  id~ : Int,
+  id~ : Int32,
   name~ : String,
   description? : String,
   color? : IssueFieldOptionsItemColor,
-  priority? : Int,
+  priority? : Int32,
   created_at? : String,
   updated_at? : String,
 ) -> IssueFieldOptionsItem {
@@ -32428,7 +32428,7 @@ pub impl @json.FromJson for IssueFieldOptionsItem with fn from_json(value, path)
 ///
 /// A custom attribute defined at the organization level for attaching structured data to issues.
 pub(all) struct IssueField {
-  id : Int
+  id : Int32
   node_id : String
   name : String
   description : @sdkjson.Presence[String]
@@ -32449,7 +32449,7 @@ pub extend IssueField with @debug.Debug::{to_repr}
 ///
 /// Creates a IssueField with omitted optional fields absent.
 pub fn IssueField::new(
-  id~ : Int,
+  id~ : Int32,
   node_id~ : String,
   name~ : String,
   data_type~ : IssueFieldDataType,
@@ -32720,7 +32720,7 @@ pub(all) struct OrganizationCreateIssueFieldOptionsItem {
   name : String
   description : @sdkjson.Presence[String]
   color : OrganizationCreateIssueFieldOptionsItemColor
-  priority : Int
+  priority : Int32
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -32735,7 +32735,7 @@ pub extend OrganizationCreateIssueFieldOptionsItem with @debug.Debug::{to_repr}
 pub fn OrganizationCreateIssueFieldOptionsItem::new(
   name~ : String,
   color~ : OrganizationCreateIssueFieldOptionsItemColor,
-  priority~ : Int,
+  priority~ : Int32,
   description? : String,
 ) -> OrganizationCreateIssueFieldOptionsItem {
   {
@@ -32997,11 +32997,11 @@ pub impl @json.FromJson for OrganizationUpdateIssueFieldOptionsItemColor with fn
 ///
 /// Generated representation of OrganizationUpdateIssueFieldOptionsItem.
 pub(all) struct OrganizationUpdateIssueFieldOptionsItem {
-  id : Int?
+  id : Int32?
   name : String
   description : @sdkjson.Presence[String]
   color : OrganizationUpdateIssueFieldOptionsItemColor
-  priority : Int
+  priority : Int32
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -33016,8 +33016,8 @@ pub extend OrganizationUpdateIssueFieldOptionsItem with @debug.Debug::{to_repr}
 pub fn OrganizationUpdateIssueFieldOptionsItem::new(
   name~ : String,
   color~ : OrganizationUpdateIssueFieldOptionsItemColor,
-  priority~ : Int,
-  id? : Int,
+  priority~ : Int32,
+  id? : Int32,
   description? : String,
 ) -> OrganizationUpdateIssueFieldOptionsItem {
   {
@@ -34189,7 +34189,7 @@ pub impl @json.FromJson for TeamRoleAssignmentType with fn from_json(
 /// The Relationship a Team has with a role.
 pub(all) struct TeamRoleAssignment {
   assignment : TeamRoleAssignmentAssignment?
-  id : Int
+  id : Int32
   node_id : String
   name : String
   slug : String
@@ -34204,8 +34204,8 @@ pub(all) struct TeamRoleAssignment {
   repositories_url : String
   parent : NullableTeamSimple?
   type_ : TeamRoleAssignmentType
-  organization_id : Int?
-  enterprise_id : Int?
+  organization_id : Int32?
+  enterprise_id : Int32?
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -34218,7 +34218,7 @@ pub extend TeamRoleAssignment with @debug.Debug::{to_repr}
 ///
 /// Creates a TeamRoleAssignment with omitted optional fields absent.
 pub fn TeamRoleAssignment::new(
-  id~ : Int,
+  id~ : Int32,
   node_id~ : String,
   name~ : String,
   slug~ : String,
@@ -34234,8 +34234,8 @@ pub fn TeamRoleAssignment::new(
   notification_setting? : String,
   permissions? : TeamRoleAssignmentPermissions,
   parent? : NullableTeamSimple,
-  organization_id? : Int,
-  enterprise_id? : Int,
+  organization_id? : Int32,
+  enterprise_id? : Int32,
 ) -> TeamRoleAssignment {
   {
     assignment,
@@ -34376,7 +34376,7 @@ pub impl @json.FromJson for TeamSimpleType with fn from_json(value, path) {
 ///
 /// Groups of organization members that gives permissions on specified repositories.
 pub(all) struct TeamSimple {
-  id : Int
+  id : Int32
   node_id : String
   url : String
   members_url : String
@@ -34390,8 +34390,8 @@ pub(all) struct TeamSimple {
   slug : String
   ldap_dn : String?
   type_ : TeamSimpleType
-  organization_id : Int?
-  enterprise_id : Int?
+  organization_id : Int32?
+  enterprise_id : Int32?
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -34404,7 +34404,7 @@ pub extend TeamSimple with @debug.Debug::{to_repr}
 ///
 /// Creates a TeamSimple with omitted optional fields absent.
 pub fn TeamSimple::new(
-  id~ : Int,
+  id~ : Int32,
   node_id~ : String,
   url~ : String,
   members_url~ : String,
@@ -34418,8 +34418,8 @@ pub fn TeamSimple::new(
   privacy? : String,
   notification_setting? : String,
   ldap_dn? : String,
-  organization_id? : Int,
-  enterprise_id? : Int,
+  organization_id? : Int32,
+  enterprise_id? : Int32,
 ) -> TeamSimple {
   {
     id,
@@ -34565,7 +34565,7 @@ pub(all) struct UserRoleAssignment {
   name : @sdkjson.Presence[String]
   email : @sdkjson.Presence[String]
   login : String
-  id : Int
+  id : Int32
   node_id : String
   avatar_url : String
   gravatar_id : String?
@@ -34597,7 +34597,7 @@ pub extend UserRoleAssignment with @debug.Debug::{to_repr}
 /// Creates a UserRoleAssignment with omitted optional fields absent.
 pub fn UserRoleAssignment::new(
   login~ : String,
-  id~ : Int,
+  id~ : Int32,
   node_id~ : String,
   avatar_url~ : String,
   url~ : String,
@@ -34943,7 +34943,7 @@ pub impl @json.FromJson for PackageVersionMetadata with fn from_json(
 ///
 /// A version of a software package
 pub(all) struct PackageVersion {
-  id : Int
+  id : Int32
   name : String
   url : String
   package_html_url : String
@@ -34966,7 +34966,7 @@ pub extend PackageVersion with @debug.Debug::{to_repr}
 ///
 /// Creates a PackageVersion with omitted optional fields absent.
 pub fn PackageVersion::new(
-  id~ : Int,
+  id~ : Int32,
   name~ : String,
   url~ : String,
   package_html_url~ : String,
@@ -35179,14 +35179,14 @@ pub impl @json.FromJson for OrganizationProgrammaticAccessGrantRequestPermission
 ///
 /// Minimal representation of an organization programmatic access grant request for enumerations
 pub(all) struct OrganizationProgrammaticAccessGrantRequest {
-  id : Int
+  id : Int32
   reason : String?
   owner : SimpleUser
   repository_selection : OrganizationProgrammaticAccessGrantRequestRepositorySelection
   repositories_url : String
   permissions : OrganizationProgrammaticAccessGrantRequestPermissions
   created_at : String
-  token_id : Int
+  token_id : Int32
   token_name : String
   token_expired : Bool
   token_expires_at : String?
@@ -35208,13 +35208,13 @@ pub extend OrganizationProgrammaticAccessGrantRequest with @debug.Debug::{
 ///
 /// Creates a OrganizationProgrammaticAccessGrantRequest with omitted optional fields absent.
 pub fn OrganizationProgrammaticAccessGrantRequest::new(
-  id~ : Int,
+  id~ : Int32,
   owner~ : SimpleUser,
   repository_selection~ : OrganizationProgrammaticAccessGrantRequestRepositorySelection,
   repositories_url~ : String,
   permissions~ : OrganizationProgrammaticAccessGrantRequestPermissions,
   created_at~ : String,
-  token_id~ : Int,
+  token_id~ : Int32,
   token_name~ : String,
   token_expired~ : Bool,
   reason? : String,
@@ -35436,13 +35436,13 @@ pub impl @json.FromJson for OrganizationProgrammaticAccessGrantPermissions with 
 ///
 /// Minimal representation of an organization programmatic access grant for enumerations
 pub(all) struct OrganizationProgrammaticAccessGrant {
-  id : Int
+  id : Int32
   owner : SimpleUser
   repository_selection : OrganizationProgrammaticAccessGrantRepositorySelection
   repositories_url : String
   permissions : OrganizationProgrammaticAccessGrantPermissions
   access_granted_at : String
-  token_id : Int
+  token_id : Int32
   token_name : String
   token_expired : Bool
   token_expires_at : String?
@@ -35459,13 +35459,13 @@ pub extend OrganizationProgrammaticAccessGrant with @debug.Debug::{to_repr}
 ///
 /// Creates a OrganizationProgrammaticAccessGrant with omitted optional fields absent.
 pub fn OrganizationProgrammaticAccessGrant::new(
-  id~ : Int,
+  id~ : Int32,
   owner~ : SimpleUser,
   repository_selection~ : OrganizationProgrammaticAccessGrantRepositorySelection,
   repositories_url~ : String,
   permissions~ : OrganizationProgrammaticAccessGrantPermissions,
   access_granted_at~ : String,
-  token_id~ : Int,
+  token_id~ : Int32,
   token_name~ : String,
   token_expired~ : Bool,
   token_expires_at? : String,
@@ -36214,7 +36214,7 @@ pub(all) struct OrgPrivateRegistryConfigurationWithSelectedRepositories {
   username : String?
   replaces_base : Bool?
   visibility : OrgPrivateRegistryConfigurationWithSelectedRepositoriesVisibility
-  selected_repository_ids : Array[Int]?
+  selected_repository_ids : Array[Int32]?
   tenant_id : String?
   client_id : String?
   aws_region : String?
@@ -36258,7 +36258,7 @@ pub fn OrgPrivateRegistryConfigurationWithSelectedRepositories::new(
   url? : String,
   username? : String,
   replaces_base? : Bool,
-  selected_repository_ids? : Array[Int],
+  selected_repository_ids? : Array[Int32],
   tenant_id? : String,
   client_id? : String,
   aws_region? : String,
@@ -36619,7 +36619,7 @@ pub(all) struct ProjectsV2 {
   closed_at : String?
   created_at : String
   updated_at : String
-  number : Int
+  number : Int32
   short_description : String?
   deleted_at : String?
   deleted_by : NullableSimpleUser?
@@ -36646,7 +36646,7 @@ pub fn ProjectsV2::new(
   public~ : Bool,
   created_at~ : String,
   updated_at~ : String,
-  number~ : Int,
+  number~ : Int32,
   description? : String,
   closed_at? : String,
   short_description? : String,
@@ -36958,10 +36958,10 @@ pub impl @json.FromJson for PullRequestStackBase with fn from_json(value, path) 
 /// The stack information associated with a pull request.
 pub(all) struct PullRequestStack {
   base : PullRequestStackBase
-  size : Int?
-  position : Int?
-  id : Int?
-  number : Int?
+  size : Int32?
+  position : Int32?
+  id : Int32?
+  number : Int32?
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -36975,10 +36975,10 @@ pub extend PullRequestStack with @debug.Debug::{to_repr}
 /// Creates a PullRequestStack with omitted optional fields absent.
 pub fn PullRequestStack::new(
   base~ : PullRequestStackBase,
-  size? : Int,
-  position? : Int,
-  id? : Int,
-  number? : Int,
+  size? : Int32,
+  position? : Int32,
+  id? : Int32,
+  number? : Int32,
 ) -> PullRequestStack {
   { base, size, position, id, number, }
 }
@@ -37326,7 +37326,7 @@ pub(all) struct PullRequestSimple {
   review_comment_url : String
   comments_url : String
   statuses_url : String
-  number : Int
+  number : Int32
   state : String
   locked : Bool
   title : String
@@ -37375,7 +37375,7 @@ pub fn PullRequestSimple::new(
   review_comment_url~ : String,
   comments_url~ : String,
   statuses_url~ : String,
-  number~ : Int,
+  number~ : Int32,
   state~ : String,
   locked~ : Bool,
   title~ : String,
@@ -37933,7 +37933,7 @@ pub impl @json.FromJson for ProjectsV2IterationSettingsTitle with fn from_json(
 pub(all) struct ProjectsV2IterationSettings {
   id : String
   start_date : String
-  duration : Int
+  duration : Int32
   title : ProjectsV2IterationSettingsTitle
   completed : Bool
 } derive(Eq, @debug.Debug)
@@ -37950,7 +37950,7 @@ pub extend ProjectsV2IterationSettings with @debug.Debug::{to_repr}
 pub fn ProjectsV2IterationSettings::new(
   id~ : String,
   start_date~ : String,
-  duration~ : Int,
+  duration~ : Int32,
   title~ : ProjectsV2IterationSettingsTitle,
   completed~ : Bool,
 ) -> ProjectsV2IterationSettings {
@@ -38090,8 +38090,8 @@ pub impl @json.FromJson for ProjectsV2FieldDataType with fn from_json(
 ///
 /// Configuration for iteration fields.
 pub(all) struct ProjectsV2FieldConfiguration {
-  start_day : Int?
-  duration : Int?
+  start_day : Int32?
+  duration : Int32?
   iterations : Array[ProjectsV2IterationSettings]?
 } derive(Eq, @debug.Debug)
 
@@ -38105,8 +38105,8 @@ pub extend ProjectsV2FieldConfiguration with @debug.Debug::{to_repr}
 ///
 /// Creates a ProjectsV2FieldConfiguration with omitted optional fields absent.
 pub fn ProjectsV2FieldConfiguration::new(
-  start_day? : Int,
-  duration? : Int,
+  start_day? : Int32,
+  duration? : Int32,
   iterations? : Array[ProjectsV2IterationSettings],
 ) -> ProjectsV2FieldConfiguration {
   { start_day, duration, iterations, }
@@ -38148,8 +38148,8 @@ pub impl @json.FromJson for ProjectsV2FieldConfiguration with fn from_json(
 ///
 /// A field inside a projects v2 project
 pub(all) struct ProjectsV2Field {
-  id : Int
-  issue_field_id : Int?
+  id : Int32
+  issue_field_id : Int32?
   node_id : String?
   project_url : String
   name : String
@@ -38170,13 +38170,13 @@ pub extend ProjectsV2Field with @debug.Debug::{to_repr}
 ///
 /// Creates a ProjectsV2Field with omitted optional fields absent.
 pub fn ProjectsV2Field::new(
-  id~ : Int,
+  id~ : Int32,
   project_url~ : String,
   name~ : String,
   data_type~ : ProjectsV2FieldDataType,
   created_at~ : String,
   updated_at~ : String,
-  issue_field_id? : Int,
+  issue_field_id? : Int32,
   node_id? : String,
   options? : Array[ProjectsV2SingleSelectOptions],
   configuration? : ProjectsV2FieldConfiguration,
@@ -38376,7 +38376,7 @@ pub impl @json.FromJson for ProjectsV2FieldSingleSelectOption with fn from_json(
 pub(all) struct ProjectsV2FieldIterationConfigurationIterationsItem {
   title : String
   start_date : String
-  duration : Int
+  duration : Int32
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -38396,7 +38396,7 @@ pub extend ProjectsV2FieldIterationConfigurationIterationsItem with @debug.Debug
 pub fn ProjectsV2FieldIterationConfigurationIterationsItem::new(
   title~ : String,
   start_date~ : String,
-  duration~ : Int,
+  duration~ : Int32,
 ) -> ProjectsV2FieldIterationConfigurationIterationsItem {
   { title, start_date, duration, }
 }
@@ -38444,7 +38444,7 @@ pub impl @json.FromJson for ProjectsV2FieldIterationConfigurationIterationsItem 
 /// The configuration for iteration fields.
 pub(all) struct ProjectsV2FieldIterationConfiguration {
   start_date : String
-  duration : Int
+  duration : Int32
   iterations : Array[ProjectsV2FieldIterationConfigurationIterationsItem]?
 } derive(Eq, @debug.Debug)
 
@@ -38459,7 +38459,7 @@ pub extend ProjectsV2FieldIterationConfiguration with @debug.Debug::{to_repr}
 /// Creates a ProjectsV2FieldIterationConfiguration with omitted optional fields absent.
 pub fn ProjectsV2FieldIterationConfiguration::new(
   start_date~ : String,
-  duration~ : Int,
+  duration~ : Int32,
   iterations? : Array[ProjectsV2FieldIterationConfigurationIterationsItem],
 ) -> ProjectsV2FieldIterationConfiguration {
   { start_date, duration, iterations, }
@@ -38662,7 +38662,7 @@ pub impl @json.FromJson for ProjectsV2ViewLayout with fn from_json(value, path) 
 ///
 /// Generated untagged union ProjectsV2ViewSortByItemItem.
 pub(all) enum ProjectsV2ViewSortByItemItem {
-  Int(Int)
+  Int(Int32)
   Text(String)
 } derive(Eq, @debug.Debug)
 
@@ -38696,7 +38696,7 @@ pub impl @json.FromJson for ProjectsV2ViewSortByItemItem with fn from_json(
   path,
 ) {
   if value is Number(_, ..) {
-    let decoded : Int = @json.from_json(value, path~)
+    let decoded : Int32 = @json.from_json(value, path~)
     return Int(decoded)
   }
   if value is String(_) {
@@ -38712,8 +38712,8 @@ pub impl @json.FromJson for ProjectsV2ViewSortByItemItem with fn from_json(
 ///
 /// A view inside a projects v2 project
 pub(all) struct ProjectsV2View {
-  id : Int
-  number : Int
+  id : Int32
+  number : Int32
   name : String
   layout : ProjectsV2ViewLayout
   node_id : String
@@ -38723,10 +38723,10 @@ pub(all) struct ProjectsV2View {
   created_at : String
   updated_at : String
   filter : @sdkjson.Presence[String]
-  visible_fields : Array[Int]
+  visible_fields : Array[Int32]
   sort_by : Array[Array[ProjectsV2ViewSortByItemItem]]
-  group_by : Array[Int]
-  vertical_group_by : Array[Int]
+  group_by : Array[Int32]
+  vertical_group_by : Array[Int32]
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -38739,8 +38739,8 @@ pub extend ProjectsV2View with @debug.Debug::{to_repr}
 ///
 /// Creates a ProjectsV2View with omitted optional fields absent.
 pub fn ProjectsV2View::new(
-  id~ : Int,
-  number~ : Int,
+  id~ : Int32,
+  number~ : Int32,
   name~ : String,
   layout~ : ProjectsV2ViewLayout,
   node_id~ : String,
@@ -38749,10 +38749,10 @@ pub fn ProjectsV2View::new(
   creator~ : SimpleUser,
   created_at~ : String,
   updated_at~ : String,
-  visible_fields~ : Array[Int],
+  visible_fields~ : Array[Int32],
   sort_by~ : Array[Array[ProjectsV2ViewSortByItemItem]],
-  group_by~ : Array[Int],
-  vertical_group_by~ : Array[Int],
+  group_by~ : Array[Int32],
+  vertical_group_by~ : Array[Int32],
   filter? : String,
 ) -> ProjectsV2View {
   {
@@ -38831,7 +38831,7 @@ pub impl @json.FromJson for ProjectsV2View with fn from_json(value, path) {
 ///
 /// The GitHub App installation that was registered.
 pub(all) struct OrganizationExternalPropertyInstallationInstallation {
-  id : Int
+  id : Int32
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -38849,7 +38849,7 @@ pub extend OrganizationExternalPropertyInstallationInstallation with @debug.Debu
 ///
 /// Creates a OrganizationExternalPropertyInstallationInstallation with omitted optional fields absent.
 pub fn OrganizationExternalPropertyInstallationInstallation::new(
-  id~ : Int,
+  id~ : Int32,
 ) -> OrganizationExternalPropertyInstallationInstallation {
   { id, }
 }
@@ -39718,7 +39718,7 @@ pub impl @json.FromJson for CustomPropertySetPayload with fn from_json(
 ///
 /// List of custom property values for a repository
 pub(all) struct OrgRepoCustomPropertyValues {
-  repository_id : Int
+  repository_id : Int32
   repository_name : String
   repository_full_name : String
   properties : Array[CustomPropertyValue]
@@ -39734,7 +39734,7 @@ pub extend OrgRepoCustomPropertyValues with @debug.Debug::{to_repr}
 ///
 /// Creates a OrgRepoCustomPropertyValues with omitted optional fields absent.
 pub fn OrgRepoCustomPropertyValues::new(
-  repository_id~ : Int,
+  repository_id~ : Int32,
   repository_name~ : String,
   repository_full_name~ : String,
   properties~ : Array[CustomPropertyValue],
@@ -40207,7 +40207,7 @@ pub(all) struct NullableRepository {
   name : String
   full_name : String
   license : NullableLicenseSimple?
-  forks : Int
+  forks : Int32
   permissions : NullableRepositoryPermissions?
   owner : SimpleUser
   private : Bool
@@ -40258,12 +40258,12 @@ pub(all) struct NullableRepository {
   svn_url : String
   homepage : String?
   language : String?
-  forks_count : Int
-  stargazers_count : Int
-  watchers_count : Int
-  size : Int
+  forks_count : Int32
+  stargazers_count : Int32
+  watchers_count : Int32
+  size : Int32
   default_branch : String
-  open_issues_count : Int
+  open_issues_count : Int32
   is_template : Bool?
   topics : Array[String]?
   has_issues : Bool
@@ -40294,8 +40294,8 @@ pub(all) struct NullableRepository {
   allow_merge_commit : Bool?
   allow_forking : Bool?
   web_commit_signoff_required : Bool?
-  open_issues : Int
-  watchers : Int
+  open_issues : Int32
+  watchers : Int32
   master_branch : String?
   starred_at : String?
   anonymous_access_enabled : Bool?
@@ -40316,7 +40316,7 @@ pub fn NullableRepository::new(
   node_id~ : String,
   name~ : String,
   full_name~ : String,
-  forks~ : Int,
+  forks~ : Int32,
   owner~ : SimpleUser,
   private~ : Bool,
   html_url~ : String,
@@ -40362,12 +40362,12 @@ pub fn NullableRepository::new(
   clone_url~ : String,
   hooks_url~ : String,
   svn_url~ : String,
-  forks_count~ : Int,
-  stargazers_count~ : Int,
-  watchers_count~ : Int,
-  size~ : Int,
+  forks_count~ : Int32,
+  stargazers_count~ : Int32,
+  watchers_count~ : Int32,
+  size~ : Int32,
   default_branch~ : String,
-  open_issues_count~ : Int,
+  open_issues_count~ : Int32,
   has_issues~ : Bool,
   has_projects~ : Bool,
   has_wiki~ : Bool,
@@ -40375,8 +40375,8 @@ pub fn NullableRepository::new(
   has_downloads~ : Bool,
   archived~ : Bool,
   disabled~ : Bool,
-  open_issues~ : Int,
-  watchers~ : Int,
+  open_issues~ : Int32,
+  watchers~ : Int32,
   license? : NullableLicenseSimple,
   permissions? : NullableRepositoryPermissions,
   description? : String,
@@ -41224,12 +41224,12 @@ pub(all) struct FullRepository {
   svn_url : String
   homepage : String?
   language : String?
-  forks_count : Int
-  stargazers_count : Int
-  watchers_count : Int
-  size : Int
+  forks_count : Int32
+  stargazers_count : Int32
+  watchers_count : Int32
+  size : Int32
   default_branch : String
-  open_issues_count : Int
+  open_issues_count : Int32
   is_template : Bool?
   topics : Array[String]?
   has_issues : Bool
@@ -41262,16 +41262,16 @@ pub(all) struct FullRepository {
   merge_commit_message : FullRepositoryMergeCommitMessage?
   allow_forking : Bool?
   web_commit_signoff_required : Bool?
-  subscribers_count : Int
-  network_count : Int
+  subscribers_count : Int32
+  network_count : Int32
   license : NullableLicenseSimple?
   organization : @sdkjson.Presence[NullableSimpleUser]
   parent : Repository?
   source : Repository?
-  forks : Int
+  forks : Int32
   master_branch : String?
-  open_issues : Int
-  watchers : Int
+  open_issues : Int32
+  watchers : Int32
   anonymous_access_enabled : Bool?
   code_of_conduct : CodeOfConductSimple?
   security_and_analysis : @sdkjson.Presence[SecurityAndAnalysis]
@@ -41337,12 +41337,12 @@ pub fn FullRepository::new(
   clone_url~ : String,
   hooks_url~ : String,
   svn_url~ : String,
-  forks_count~ : Int,
-  stargazers_count~ : Int,
-  watchers_count~ : Int,
-  size~ : Int,
+  forks_count~ : Int32,
+  stargazers_count~ : Int32,
+  watchers_count~ : Int32,
+  size~ : Int32,
   default_branch~ : String,
-  open_issues_count~ : Int,
+  open_issues_count~ : Int32,
   has_issues~ : Bool,
   has_projects~ : Bool,
   has_wiki~ : Bool,
@@ -41353,11 +41353,11 @@ pub fn FullRepository::new(
   pushed_at~ : String,
   created_at~ : String,
   updated_at~ : String,
-  subscribers_count~ : Int,
-  network_count~ : Int,
-  forks~ : Int,
-  open_issues~ : Int,
-  watchers~ : Int,
+  subscribers_count~ : Int32,
+  network_count~ : Int32,
+  forks~ : Int32,
+  open_issues~ : Int32,
+  watchers~ : Int32,
   description? : String,
   mirror_url? : String,
   homepage? : String,
@@ -41891,7 +41891,7 @@ pub impl @json.FromJson for RepositoryRulesetBypassActorBypassMode with fn from_
 ///
 /// An actor that can bypass rules in a ruleset
 pub(all) struct RepositoryRulesetBypassActor {
-  actor_id : @sdkjson.Presence[Int]
+  actor_id : @sdkjson.Presence[Int32]
   actor_type : RepositoryRulesetBypassActorActorType
   bypass_mode : RepositoryRulesetBypassActorBypassMode?
 } derive(Eq, @debug.Debug)
@@ -41907,7 +41907,7 @@ pub extend RepositoryRulesetBypassActor with @debug.Debug::{to_repr}
 /// Creates a RepositoryRulesetBypassActor with omitted optional fields absent.
 pub fn RepositoryRulesetBypassActor::new(
   actor_type~ : RepositoryRulesetBypassActorActorType,
-  actor_id? : Int,
+  actor_id? : Int32,
   bypass_mode? : RepositoryRulesetBypassActorBypassMode,
 ) -> RepositoryRulesetBypassActor {
   {
@@ -42421,13 +42421,13 @@ pub impl @json.FromJson for RepositoryRuleMergeQueueParametersMergeMethod with f
 ///
 /// Generated representation of RepositoryRuleMergeQueueParameters.
 pub(all) struct RepositoryRuleMergeQueueParameters {
-  check_response_timeout_minutes : Int
+  check_response_timeout_minutes : Int32
   grouping_strategy : RepositoryRuleMergeQueueParametersGroupingStrategy
-  max_entries_to_build : Int
-  max_entries_to_merge : Int
+  max_entries_to_build : Int32
+  max_entries_to_merge : Int32
   merge_method : RepositoryRuleMergeQueueParametersMergeMethod
-  min_entries_to_merge : Int
-  min_entries_to_merge_wait_minutes : Int
+  min_entries_to_merge : Int32
+  min_entries_to_merge_wait_minutes : Int32
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -42440,13 +42440,13 @@ pub extend RepositoryRuleMergeQueueParameters with @debug.Debug::{to_repr}
 ///
 /// Creates a RepositoryRuleMergeQueueParameters with omitted optional fields absent.
 pub fn RepositoryRuleMergeQueueParameters::new(
-  check_response_timeout_minutes~ : Int,
+  check_response_timeout_minutes~ : Int32,
   grouping_strategy~ : RepositoryRuleMergeQueueParametersGroupingStrategy,
-  max_entries_to_build~ : Int,
-  max_entries_to_merge~ : Int,
+  max_entries_to_build~ : Int32,
+  max_entries_to_merge~ : Int32,
   merge_method~ : RepositoryRuleMergeQueueParametersMergeMethod,
-  min_entries_to_merge~ : Int,
-  min_entries_to_merge_wait_minutes~ : Int,
+  min_entries_to_merge~ : Int32,
+  min_entries_to_merge_wait_minutes~ : Int32,
 ) -> RepositoryRuleMergeQueueParameters {
   {
     check_response_timeout_minutes,
@@ -42788,7 +42788,7 @@ pub impl @json.FromJson for RepositoryRuleParamsActorType with fn from_json(
 ///
 /// An actor allowed to dismiss pull request reviews
 pub(all) struct RepositoryRuleParamsActor {
-  id : Int
+  id : Int32
   type_ : RepositoryRuleParamsActorType
 } derive(Eq, @debug.Debug)
 
@@ -42802,7 +42802,7 @@ pub extend RepositoryRuleParamsActor with @debug.Debug::{to_repr}
 ///
 /// Creates a RepositoryRuleParamsActor with omitted optional fields absent.
 pub fn RepositoryRuleParamsActor::new(
-  id~ : Int,
+  id~ : Int32,
   type_~ : RepositoryRuleParamsActorType,
 ) -> RepositoryRuleParamsActor {
   { id, type_, }
@@ -42900,7 +42900,7 @@ pub impl @json.FromJson for RepositoryRuleParamsDismissalRestriction with fn fro
 ///
 /// A required reviewing team
 pub(all) struct RepositoryRuleParamsReviewer {
-  id : Int
+  id : Int32
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -42913,7 +42913,7 @@ pub extend RepositoryRuleParamsReviewer with @debug.Debug::{to_repr}
 ///
 /// Creates a RepositoryRuleParamsReviewer with omitted optional fields absent.
 pub fn RepositoryRuleParamsReviewer::new(
-  id~ : Int,
+  id~ : Int32,
 ) -> RepositoryRuleParamsReviewer {
   { id, }
 }
@@ -42947,7 +42947,7 @@ pub impl @json.FromJson for RepositoryRuleParamsReviewer with fn from_json(
 /// A reviewing team, and file patterns describing which files they must approve changes to.
 pub(all) struct RepositoryRuleParamsRequiredReviewerConfiguration {
   file_patterns : Array[String]
-  minimum_approvals : Int
+  minimum_approvals : Int32
   reviewer : RepositoryRuleParamsReviewer
 } derive(Eq, @debug.Debug)
 
@@ -42967,7 +42967,7 @@ pub extend RepositoryRuleParamsRequiredReviewerConfiguration with @debug.Debug::
 /// Creates a RepositoryRuleParamsRequiredReviewerConfiguration with omitted optional fields absent.
 pub fn RepositoryRuleParamsRequiredReviewerConfiguration::new(
   file_patterns~ : Array[String],
-  minimum_approvals~ : Int,
+  minimum_approvals~ : Int32,
   reviewer~ : RepositoryRuleParamsReviewer,
 ) -> RepositoryRuleParamsRequiredReviewerConfiguration {
   { file_patterns, minimum_approvals, reviewer, }
@@ -43090,7 +43090,7 @@ pub(all) struct RepositoryRulePullRequestParameters {
   dismissal_restriction : RepositoryRuleParamsDismissalRestriction?
   require_code_owner_review : Bool
   require_last_push_approval : Bool
-  required_approving_review_count : Int
+  required_approving_review_count : Int32
   required_review_thread_resolution : Bool
   required_reviewers : Array[RepositoryRuleParamsRequiredReviewerConfiguration]?
 } derive(Eq, @debug.Debug)
@@ -43108,7 +43108,7 @@ pub fn RepositoryRulePullRequestParameters::new(
   dismiss_stale_reviews_on_push~ : Bool,
   require_code_owner_review~ : Bool,
   require_last_push_approval~ : Bool,
-  required_approving_review_count~ : Int,
+  required_approving_review_count~ : Int32,
   required_review_thread_resolution~ : Bool,
   allowed_merge_methods? : Array[
     RepositoryRulePullRequestParametersAllowedMergeMethodsItem,
@@ -43249,7 +43249,7 @@ pub impl @json.FromJson for RepositoryRulePullRequest with fn from_json(
 /// Required status check
 pub(all) struct RepositoryRuleParamsStatusCheckConfiguration {
   context : String
-  integration_id : Int?
+  integration_id : Int32?
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -43268,7 +43268,7 @@ pub extend RepositoryRuleParamsStatusCheckConfiguration with @debug.Debug::{
 /// Creates a RepositoryRuleParamsStatusCheckConfiguration with omitted optional fields absent.
 pub fn RepositoryRuleParamsStatusCheckConfiguration::new(
   context~ : String,
-  integration_id? : Int,
+  integration_id? : Int32,
 ) -> RepositoryRuleParamsStatusCheckConfiguration {
   { context, integration_id, }
 }
@@ -44463,7 +44463,7 @@ pub impl @json.FromJson for RepositoryRuleTagNamePattern with fn from_json(
 pub(all) struct RepositoryRuleParamsWorkflowFileReference {
   path : String
   ref_ : String?
-  repository_id : Int
+  repository_id : Int32
   sha : String?
 } derive(Eq, @debug.Debug)
 
@@ -44480,7 +44480,7 @@ pub extend RepositoryRuleParamsWorkflowFileReference with @debug.Debug::{
 /// Creates a RepositoryRuleParamsWorkflowFileReference with omitted optional fields absent.
 pub fn RepositoryRuleParamsWorkflowFileReference::new(
   path~ : String,
-  repository_id~ : Int,
+  repository_id~ : Int32,
   ref_? : String,
   sha? : String,
 ) -> RepositoryRuleParamsWorkflowFileReference {
@@ -45500,7 +45500,7 @@ pub impl @json.FromJson for RepositoryRuleFilePathRestriction with fn from_json(
 ///
 /// Generated representation of RepositoryRuleMaxFilePathLengthParameters.
 pub(all) struct RepositoryRuleMaxFilePathLengthParameters {
-  max_file_path_length : Int
+  max_file_path_length : Int32
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -45515,7 +45515,7 @@ pub extend RepositoryRuleMaxFilePathLengthParameters with @debug.Debug::{
 ///
 /// Creates a RepositoryRuleMaxFilePathLengthParameters with omitted optional fields absent.
 pub fn RepositoryRuleMaxFilePathLengthParameters::new(
-  max_file_path_length~ : Int,
+  max_file_path_length~ : Int32,
 ) -> RepositoryRuleMaxFilePathLengthParameters {
   { max_file_path_length, }
 }
@@ -45727,7 +45727,7 @@ pub impl @json.FromJson for RepositoryRuleFileExtensionRestriction with fn from_
 ///
 /// Generated representation of RepositoryRuleMaxFileSizeParameters.
 pub(all) struct RepositoryRuleMaxFileSizeParameters {
-  max_file_size : Int
+  max_file_size : Int32
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -45740,7 +45740,7 @@ pub extend RepositoryRuleMaxFileSizeParameters with @debug.Debug::{to_repr}
 ///
 /// Creates a RepositoryRuleMaxFileSizeParameters with omitted optional fields absent.
 pub fn RepositoryRuleMaxFileSizeParameters::new(
-  max_file_size~ : Int,
+  max_file_size~ : Int32,
 ) -> RepositoryRuleMaxFileSizeParameters {
   { max_file_size, }
 }
@@ -46274,7 +46274,7 @@ pub impl @json.FromJson for RepositoryRulesetLinks with fn from_json(
 ///
 /// A set of rules to apply when specified conditions are met.
 pub(all) struct RepositoryRuleset {
-  id : Int
+  id : Int32
   name : String
   target : RepositoryRulesetTarget?
   source_type : RepositoryRulesetSourceType?
@@ -46300,7 +46300,7 @@ pub extend RepositoryRuleset with @debug.Debug::{to_repr}
 ///
 /// Creates a RepositoryRuleset with omitted optional fields absent.
 pub fn RepositoryRuleset::new(
-  id~ : Int,
+  id~ : Int32,
   name~ : String,
   source~ : String,
   enforcement~ : RepositoryRuleEnforcement,
@@ -46610,13 +46610,13 @@ pub impl @json.FromJson for RuleSuitesItemEvaluationResult with fn from_json(
 ///
 /// Generated representation of RuleSuitesItem.
 pub(all) struct RuleSuitesItem {
-  id : Int?
-  actor_id : Int?
+  id : Int32?
+  actor_id : Int32?
   actor_name : String?
   before_sha : String?
   after_sha : String?
   ref_ : String?
-  repository_id : Int?
+  repository_id : Int32?
   repository_name : String?
   pushed_at : String?
   result : RuleSuitesItemResult?
@@ -46633,13 +46633,13 @@ pub extend RuleSuitesItem with @debug.Debug::{to_repr}
 ///
 /// Creates a RuleSuitesItem with omitted optional fields absent.
 pub fn RuleSuitesItem::new(
-  id? : Int,
-  actor_id? : Int,
+  id? : Int32,
+  actor_id? : Int32,
   actor_name? : String,
   before_sha? : String,
   after_sha? : String,
   ref_? : String,
-  repository_id? : Int,
+  repository_id? : Int32,
   repository_name? : String,
   pushed_at? : String,
   result? : RuleSuitesItemResult,
@@ -46821,7 +46821,7 @@ pub impl @json.FromJson for RuleSuiteEvaluationResult with fn from_json(
 /// Generated representation of RuleSuiteRuleEvaluationsItemRuleSource.
 pub(all) struct RuleSuiteRuleEvaluationsItemRuleSource {
   type_ : String?
-  id : @sdkjson.Presence[Int]
+  id : @sdkjson.Presence[Int32]
   name : @sdkjson.Presence[String]
 } derive(Eq, @debug.Debug)
 
@@ -46836,7 +46836,7 @@ pub extend RuleSuiteRuleEvaluationsItemRuleSource with @debug.Debug::{to_repr}
 /// Creates a RuleSuiteRuleEvaluationsItemRuleSource with omitted optional fields absent.
 pub fn RuleSuiteRuleEvaluationsItemRuleSource::new(
   type_? : String,
-  id? : Int,
+  id? : Int32,
   name? : String,
 ) -> RuleSuiteRuleEvaluationsItemRuleSource {
   {
@@ -47071,13 +47071,13 @@ pub impl @json.FromJson for RuleSuiteRuleEvaluationsItem with fn from_json(
 ///
 /// Response
 pub(all) struct RuleSuite {
-  id : Int?
-  actor_id : @sdkjson.Presence[Int]
+  id : Int32?
+  actor_id : @sdkjson.Presence[Int32]
   actor_name : @sdkjson.Presence[String]
   before_sha : String?
   after_sha : String?
   ref_ : String?
-  repository_id : Int?
+  repository_id : Int32?
   repository_name : String?
   pushed_at : String?
   result : RuleSuiteResult?
@@ -47095,13 +47095,13 @@ pub extend RuleSuite with @debug.Debug::{to_repr}
 ///
 /// Creates a RuleSuite with omitted optional fields absent.
 pub fn RuleSuite::new(
-  id? : Int,
-  actor_id? : Int,
+  id? : Int32,
+  actor_id? : Int32,
   actor_name? : String,
   before_sha? : String,
   after_sha? : String,
   ref_? : String,
-  repository_id? : Int,
+  repository_id? : Int32,
   repository_name? : String,
   pushed_at? : String,
   result? : RuleSuiteResult,
@@ -47175,7 +47175,7 @@ pub impl @json.FromJson for RuleSuite with fn from_json(value, path) {
 ///
 /// The actor who updated the ruleset
 pub(all) struct RulesetVersionActor {
-  id : Int?
+  id : Int32?
   type_ : String?
 } derive(Eq, @debug.Debug)
 
@@ -47189,7 +47189,7 @@ pub extend RulesetVersionActor with @debug.Debug::{to_repr}
 ///
 /// Creates a RulesetVersionActor with omitted optional fields absent.
 pub fn RulesetVersionActor::new(
-  id? : Int,
+  id? : Int32,
   type_? : String,
 ) -> RulesetVersionActor {
   { id, type_, }
@@ -47223,7 +47223,7 @@ pub impl @json.FromJson for RulesetVersionActor with fn from_json(value, path) {
 ///
 /// The historical version of a ruleset
 pub(all) struct RulesetVersion {
-  version_id : Int
+  version_id : Int32
   actor : RulesetVersionActor
   updated_at : String
 } derive(Eq, @debug.Debug)
@@ -47238,7 +47238,7 @@ pub extend RulesetVersion with @debug.Debug::{to_repr}
 ///
 /// Creates a RulesetVersion with omitted optional fields absent.
 pub fn RulesetVersion::new(
-  version_id~ : Int,
+  version_id~ : Int32,
   actor~ : RulesetVersionActor,
   updated_at~ : String,
 ) -> RulesetVersion {
@@ -47278,7 +47278,7 @@ pub impl @json.FromJson for RulesetVersion with fn from_json(value, path) {
 ///
 /// The actor who updated the ruleset
 pub(all) struct RulesetVersionWithStateActor {
-  id : Int?
+  id : Int32?
   type_ : String?
 } derive(Eq, @debug.Debug)
 
@@ -47292,7 +47292,7 @@ pub extend RulesetVersionWithStateActor with @debug.Debug::{to_repr}
 ///
 /// Creates a RulesetVersionWithStateActor with omitted optional fields absent.
 pub fn RulesetVersionWithStateActor::new(
-  id? : Int,
+  id? : Int32,
   type_? : String,
 ) -> RulesetVersionWithStateActor {
   { id, type_, }
@@ -47329,7 +47329,7 @@ pub impl @json.FromJson for RulesetVersionWithStateActor with fn from_json(
 ///
 /// Generated representation of RulesetVersionWithState.
 pub(all) struct RulesetVersionWithState {
-  version_id : Int
+  version_id : Int32
   actor : RulesetVersionWithStateActor
   updated_at : String
   state : Json
@@ -47345,7 +47345,7 @@ pub extend RulesetVersionWithState with @debug.Debug::{to_repr}
 ///
 /// Creates a RulesetVersionWithState with omitted optional fields absent.
 pub fn RulesetVersionWithState::new(
-  version_id~ : Int,
+  version_id~ : Int32,
   actor~ : RulesetVersionWithStateActor,
   updated_at~ : String,
   state~ : Json,
@@ -47566,7 +47566,7 @@ pub impl @json.FromJson for OrganizationSecretScanningAlertValidity with fn from
 ///
 /// Generated representation of OrganizationSecretScanningAlert.
 pub(all) struct OrganizationSecretScanningAlert {
-  number : Int?
+  number : Int32?
   created_at : String?
   updated_at : @sdkjson.Presence[String]
   url : String?
@@ -47614,7 +47614,7 @@ pub extend OrganizationSecretScanningAlert with @debug.Debug::{to_repr}
 ///
 /// Creates a OrganizationSecretScanningAlert with omitted optional fields absent.
 pub fn OrganizationSecretScanningAlert::new(
-  number? : Int,
+  number? : Int32,
   created_at? : String,
   updated_at? : String,
   url? : String,
@@ -47900,7 +47900,7 @@ pub impl @json.FromJson for SecretScanningCustomPatternState with fn from_json(
 ///
 /// A custom pattern for secret scanning.
 pub(all) struct SecretScanningCustomPattern {
-  id : Int
+  id : Int32
   name : String
   pattern : String
   slug : String
@@ -47925,7 +47925,7 @@ pub extend SecretScanningCustomPattern with @debug.Debug::{to_repr}
 ///
 /// Creates a SecretScanningCustomPattern with omitted optional fields absent.
 pub fn SecretScanningCustomPattern::new(
-  id~ : Int,
+  id~ : Int32,
   name~ : String,
   pattern~ : String,
   slug~ : String,
@@ -48232,7 +48232,7 @@ pub impl @json.FromJson for SecretScanningCustomPatternValidationError with fn f
 ///
 /// A custom pattern to delete in a bulk operation.
 pub(all) struct SecretScanningCustomPatternToDelete {
-  pattern_id : Int
+  pattern_id : Int32
   custom_pattern_version : @sdkjson.Presence[String]
 } derive(Eq, @debug.Debug)
 
@@ -48246,7 +48246,7 @@ pub extend SecretScanningCustomPatternToDelete with @debug.Debug::{to_repr}
 ///
 /// Creates a SecretScanningCustomPatternToDelete with omitted optional fields absent.
 pub fn SecretScanningCustomPatternToDelete::new(
-  pattern_id~ : Int,
+  pattern_id~ : Int32,
   custom_pattern_version? : String,
 ) -> SecretScanningCustomPatternToDelete {
   {
@@ -48565,11 +48565,11 @@ pub(all) struct SecretScanningPatternOverride {
   custom_pattern_version : @sdkjson.Presence[String]
   slug : String?
   display_name : String?
-  alert_total : Int?
-  alert_total_percentage : Int?
-  false_positives : Int?
-  false_positive_rate : Int?
-  bypass_rate : Int?
+  alert_total : Int32?
+  alert_total_percentage : Int32?
+  false_positives : Int32?
+  false_positive_rate : Int32?
+  bypass_rate : Int32?
   default_setting : SecretScanningPatternOverrideDefaultSetting?
   enterprise_setting : @sdkjson.Presence[
     SecretScanningPatternOverrideEnterpriseSetting,
@@ -48591,11 +48591,11 @@ pub fn SecretScanningPatternOverride::new(
   custom_pattern_version? : String,
   slug? : String,
   display_name? : String,
-  alert_total? : Int,
-  alert_total_percentage? : Int,
-  false_positives? : Int,
-  false_positive_rate? : Int,
-  bypass_rate? : Int,
+  alert_total? : Int32,
+  alert_total_percentage? : Int32,
+  false_positives? : Int32,
+  false_positive_rate? : Int32,
+  bypass_rate? : Int32,
   default_setting? : SecretScanningPatternOverrideDefaultSetting,
   enterprise_setting? : SecretScanningPatternOverrideEnterpriseSetting,
   setting? : SecretScanningPatternOverrideSetting,
@@ -50588,10 +50588,10 @@ pub impl @json.FromJson for NetworkSettings with fn from_json(value, path) {
 /// Generated representation of TeamOrganizationPlan.
 pub(all) struct TeamOrganizationPlan {
   name : String
-  space : Int
-  private_repos : Int
-  filled_seats : Int?
-  seats : Int?
+  space : Int32
+  private_repos : Int32
+  filled_seats : Int32?
+  seats : Int32?
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -50605,10 +50605,10 @@ pub extend TeamOrganizationPlan with @debug.Debug::{to_repr}
 /// Creates a TeamOrganizationPlan with omitted optional fields absent.
 pub fn TeamOrganizationPlan::new(
   name~ : String,
-  space~ : Int,
-  private_repos~ : Int,
-  filled_seats? : Int,
-  seats? : Int,
+  space~ : Int32,
+  private_repos~ : Int32,
+  filled_seats? : Int32,
+  seats? : Int32,
 ) -> TeamOrganizationPlan {
   { name, space, private_repos, filled_seats, seats, }
 }
@@ -50651,7 +50651,7 @@ pub impl @json.FromJson for TeamOrganizationPlan with fn from_json(value, path) 
 /// Team Organization
 pub(all) struct TeamOrganization {
   login : String
-  id : Int
+  id : Int32
   node_id : String
   url : String
   repos_url : String
@@ -50671,18 +50671,18 @@ pub(all) struct TeamOrganization {
   is_verified : Bool?
   has_organization_projects : Bool
   has_repository_projects : Bool
-  public_repos : Int
-  public_gists : Int
-  followers : Int
-  following : Int
+  public_repos : Int32
+  public_gists : Int32
+  followers : Int32
+  following : Int32
   html_url : String
   created_at : String
   type_ : String
-  total_private_repos : Int?
-  owned_private_repos : Int?
-  private_gists : @sdkjson.Presence[Int]
-  disk_usage : @sdkjson.Presence[Int]
-  collaborators : @sdkjson.Presence[Int]
+  total_private_repos : Int32?
+  owned_private_repos : Int32?
+  private_gists : @sdkjson.Presence[Int32]
+  disk_usage : @sdkjson.Presence[Int32]
+  collaborators : @sdkjson.Presence[Int32]
   billing_email : @sdkjson.Presence[String]
   plan : TeamOrganizationPlan?
   default_repository_permission : @sdkjson.Presence[String]
@@ -50712,7 +50712,7 @@ pub extend TeamOrganization with @debug.Debug::{to_repr}
 /// Creates a TeamOrganization with omitted optional fields absent.
 pub fn TeamOrganization::new(
   login~ : String,
-  id~ : Int,
+  id~ : Int32,
   node_id~ : String,
   url~ : String,
   repos_url~ : String,
@@ -50724,10 +50724,10 @@ pub fn TeamOrganization::new(
   avatar_url~ : String,
   has_organization_projects~ : Bool,
   has_repository_projects~ : Bool,
-  public_repos~ : Int,
-  public_gists~ : Int,
-  followers~ : Int,
-  following~ : Int,
+  public_repos~ : Int32,
+  public_gists~ : Int32,
+  followers~ : Int32,
+  following~ : Int32,
   html_url~ : String,
   created_at~ : String,
   type_~ : String,
@@ -50740,11 +50740,11 @@ pub fn TeamOrganization::new(
   email? : String,
   twitter_username? : String,
   is_verified? : Bool,
-  total_private_repos? : Int,
-  owned_private_repos? : Int,
-  private_gists? : Int,
-  disk_usage? : Int,
-  collaborators? : Int,
+  total_private_repos? : Int32,
+  owned_private_repos? : Int32,
+  private_gists? : Int32,
+  disk_usage? : Int32,
+  collaborators? : Int32,
   billing_email? : String,
   plan? : TeamOrganizationPlan,
   default_repository_permission? : String,
@@ -51161,7 +51161,7 @@ pub impl @json.FromJson for TeamFullType with fn from_json(value, path) {
 ///
 /// Groups of organization members that gives permissions on specified repositories.
 pub(all) struct TeamFull {
-  id : Int
+  id : Int32
   node_id : String
   url : String
   html_url : String
@@ -51174,15 +51174,15 @@ pub(all) struct TeamFull {
   members_url : String
   repositories_url : String
   parent : @sdkjson.Presence[NullableTeamSimple]
-  members_count : Int
-  repos_count : Int
+  members_count : Int32
+  repos_count : Int32
   created_at : String
   updated_at : String
   organization : TeamOrganization
   ldap_dn : String?
   type_ : TeamFullType
-  organization_id : Int?
-  enterprise_id : Int?
+  organization_id : Int32?
+  enterprise_id : Int32?
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -51195,7 +51195,7 @@ pub extend TeamFull with @debug.Debug::{to_repr}
 ///
 /// Creates a TeamFull with omitted optional fields absent.
 pub fn TeamFull::new(
-  id~ : Int,
+  id~ : Int32,
   node_id~ : String,
   url~ : String,
   html_url~ : String,
@@ -51204,8 +51204,8 @@ pub fn TeamFull::new(
   permission~ : String,
   members_url~ : String,
   repositories_url~ : String,
-  members_count~ : Int,
-  repos_count~ : Int,
+  members_count~ : Int32,
+  repos_count~ : Int32,
   created_at~ : String,
   updated_at~ : String,
   organization~ : TeamOrganization,
@@ -51215,8 +51215,8 @@ pub fn TeamFull::new(
   notification_setting? : TeamFullNotificationSetting,
   parent? : NullableTeamSimple,
   ldap_dn? : String,
-  organization_id? : Int,
-  enterprise_id? : Int,
+  organization_id? : Int32,
+  enterprise_id? : Int32,
 ) -> TeamFull {
   {
     id,
@@ -51759,12 +51759,12 @@ pub impl @json.FromJson for TeamRepositoryPermissions with fn from_json(
 ///
 /// A team's access to a repository.
 pub(all) struct TeamRepository {
-  id : Int
+  id : Int32
   node_id : String
   name : String
   full_name : String
   license : NullableLicenseSimple?
-  forks : Int
+  forks : Int32
   permissions : TeamRepositoryPermissions?
   role_name : String?
   owner : NullableSimpleUser?
@@ -51816,12 +51816,12 @@ pub(all) struct TeamRepository {
   svn_url : String
   homepage : String?
   language : String?
-  forks_count : Int
-  stargazers_count : Int
-  watchers_count : Int
-  size : Int
+  forks_count : Int32
+  stargazers_count : Int32
+  watchers_count : Int32
+  size : Int32
   default_branch : String
-  open_issues_count : Int
+  open_issues_count : Int32
   is_template : Bool?
   topics : Array[String]?
   has_issues : Bool
@@ -51843,10 +51843,10 @@ pub(all) struct TeamRepository {
   allow_merge_commit : Bool?
   allow_forking : Bool?
   web_commit_signoff_required : Bool?
-  subscribers_count : Int?
-  network_count : Int?
-  open_issues : Int
-  watchers : Int
+  subscribers_count : Int32?
+  network_count : Int32?
+  open_issues : Int32
+  watchers : Int32
   master_branch : String?
 } derive(Eq, @debug.Debug)
 
@@ -51860,11 +51860,11 @@ pub extend TeamRepository with @debug.Debug::{to_repr}
 ///
 /// Creates a TeamRepository with omitted optional fields absent.
 pub fn TeamRepository::new(
-  id~ : Int,
+  id~ : Int32,
   node_id~ : String,
   name~ : String,
   full_name~ : String,
-  forks~ : Int,
+  forks~ : Int32,
   private~ : Bool,
   html_url~ : String,
   fork~ : Bool,
@@ -51909,12 +51909,12 @@ pub fn TeamRepository::new(
   clone_url~ : String,
   hooks_url~ : String,
   svn_url~ : String,
-  forks_count~ : Int,
-  stargazers_count~ : Int,
-  watchers_count~ : Int,
-  size~ : Int,
+  forks_count~ : Int32,
+  stargazers_count~ : Int32,
+  watchers_count~ : Int32,
+  size~ : Int32,
   default_branch~ : String,
-  open_issues_count~ : Int,
+  open_issues_count~ : Int32,
   has_issues~ : Bool,
   has_projects~ : Bool,
   has_wiki~ : Bool,
@@ -51922,8 +51922,8 @@ pub fn TeamRepository::new(
   has_downloads~ : Bool,
   archived~ : Bool,
   disabled~ : Bool,
-  open_issues~ : Int,
-  watchers~ : Int,
+  open_issues~ : Int32,
+  watchers~ : Int32,
   license? : NullableLicenseSimple,
   permissions? : TeamRepositoryPermissions,
   role_name? : String,
@@ -51946,8 +51946,8 @@ pub fn TeamRepository::new(
   allow_merge_commit? : Bool,
   allow_forking? : Bool,
   web_commit_signoff_required? : Bool,
-  subscribers_count? : Int,
-  network_count? : Int,
+  subscribers_count? : Int32,
+  network_count? : Int32,
   master_branch? : String,
 ) -> TeamRepository {
   {
@@ -52264,10 +52264,10 @@ pub impl @json.FromJson for TeamRepository with fn from_json(value, path) {
 ///
 /// Generated representation of RateLimit.
 pub(all) struct RateLimit {
-  limit : Int
-  remaining : Int
-  reset : Int
-  used : Int
+  limit : Int32
+  remaining : Int32
+  reset : Int32
+  used : Int32
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -52280,10 +52280,10 @@ pub extend RateLimit with @debug.Debug::{to_repr}
 ///
 /// Creates a RateLimit with omitted optional fields absent.
 pub fn RateLimit::new(
-  limit~ : Int,
-  remaining~ : Int,
-  reset~ : Int,
-  used~ : Int,
+  limit~ : Int32,
+  remaining~ : Int32,
+  reset~ : Int32,
+  used~ : Int32,
 ) -> RateLimit {
   { limit, remaining, reset, used, }
 }
@@ -52487,9 +52487,9 @@ pub impl @json.FromJson for RateLimitOverview with fn from_json(value, path) {
 ///
 /// Generated representation of ArtifactWorkflowRun.
 pub(all) struct ArtifactWorkflowRun {
-  id : Int?
-  repository_id : Int?
-  head_repository_id : Int?
+  id : Int32?
+  repository_id : Int32?
+  head_repository_id : Int32?
   head_branch : String?
   head_sha : String?
 } derive(Eq, @debug.Debug)
@@ -52504,9 +52504,9 @@ pub extend ArtifactWorkflowRun with @debug.Debug::{to_repr}
 ///
 /// Creates a ArtifactWorkflowRun with omitted optional fields absent.
 pub fn ArtifactWorkflowRun::new(
-  id? : Int,
-  repository_id? : Int,
-  head_repository_id? : Int,
+  id? : Int32,
+  repository_id? : Int32,
+  head_repository_id? : Int32,
   head_branch? : String,
   head_sha? : String,
 ) -> ArtifactWorkflowRun {
@@ -52550,10 +52550,10 @@ pub impl @json.FromJson for ArtifactWorkflowRun with fn from_json(value, path) {
 ///
 /// An artifact
 pub(all) struct Artifact {
-  id : Int
+  id : Int32
   node_id : String
   name : String
-  size_in_bytes : Int
+  size_in_bytes : Int32
   url : String
   archive_download_url : String
   expired : Bool
@@ -52574,10 +52574,10 @@ pub extend Artifact with @debug.Debug::{to_repr}
 ///
 /// Creates a Artifact with omitted optional fields absent.
 pub fn Artifact::new(
-  id~ : Int,
+  id~ : Int32,
   node_id~ : String,
   name~ : String,
-  size_in_bytes~ : Int,
+  size_in_bytes~ : Int32,
   url~ : String,
   archive_download_url~ : String,
   expired~ : Bool,
@@ -52663,7 +52663,7 @@ pub impl @json.FromJson for Artifact with fn from_json(value, path) {
 ///
 /// GitHub Actions cache retention policy for a repository.
 pub(all) struct ActionsCacheRetentionLimitForRepository {
-  max_cache_retention_days : Int?
+  max_cache_retention_days : Int32?
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -52676,7 +52676,7 @@ pub extend ActionsCacheRetentionLimitForRepository with @debug.Debug::{to_repr}
 ///
 /// Creates a ActionsCacheRetentionLimitForRepository with omitted optional fields absent.
 pub fn ActionsCacheRetentionLimitForRepository::new(
-  max_cache_retention_days? : Int,
+  max_cache_retention_days? : Int32,
 ) -> ActionsCacheRetentionLimitForRepository {
   { max_cache_retention_days, }
 }
@@ -52719,7 +52719,7 @@ pub impl @json.FromJson for ActionsCacheRetentionLimitForRepository with fn from
 ///
 /// GitHub Actions cache storage policy for a repository.
 pub(all) struct ActionsCacheStorageLimitForRepository {
-  max_cache_size_gb : Int?
+  max_cache_size_gb : Int32?
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -52732,7 +52732,7 @@ pub extend ActionsCacheStorageLimitForRepository with @debug.Debug::{to_repr}
 ///
 /// Creates a ActionsCacheStorageLimitForRepository with omitted optional fields absent.
 pub fn ActionsCacheStorageLimitForRepository::new(
-  max_cache_size_gb? : Int,
+  max_cache_size_gb? : Int32,
 ) -> ActionsCacheStorageLimitForRepository {
   { max_cache_size_gb, }
 }
@@ -52769,13 +52769,13 @@ pub impl @json.FromJson for ActionsCacheStorageLimitForRepository with fn from_j
 ///
 /// Generated representation of ActionsCacheListActionsCachesItem.
 pub(all) struct ActionsCacheListActionsCachesItem {
-  id : Int?
+  id : Int32?
   ref_ : String?
   key : String?
   version : String?
   last_accessed_at : String?
   created_at : String?
-  size_in_bytes : Int?
+  size_in_bytes : Int32?
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -52788,13 +52788,13 @@ pub extend ActionsCacheListActionsCachesItem with @debug.Debug::{to_repr}
 ///
 /// Creates a ActionsCacheListActionsCachesItem with omitted optional fields absent.
 pub fn ActionsCacheListActionsCachesItem::new(
-  id? : Int,
+  id? : Int32,
   ref_? : String,
   key? : String,
   version? : String,
   last_accessed_at? : String,
   created_at? : String,
-  size_in_bytes? : Int,
+  size_in_bytes? : Int32,
 ) -> ActionsCacheListActionsCachesItem {
   { id, ref_, key, version, last_accessed_at, created_at, size_in_bytes, }
 }
@@ -52843,7 +52843,7 @@ pub impl @json.FromJson for ActionsCacheListActionsCachesItem with fn from_json(
 ///
 /// Repository actions caches
 pub(all) struct ActionsCacheList {
-  total_count : Int
+  total_count : Int32
   actions_caches : Array[ActionsCacheListActionsCachesItem]
 } derive(Eq, @debug.Debug)
 
@@ -52857,7 +52857,7 @@ pub extend ActionsCacheList with @debug.Debug::{to_repr}
 ///
 /// Creates a ActionsCacheList with omitted optional fields absent.
 pub fn ActionsCacheList::new(
-  total_count~ : Int,
+  total_count~ : Int32,
   actions_caches~ : Array[ActionsCacheListActionsCachesItem],
 ) -> ActionsCacheList {
   { total_count, actions_caches, }
@@ -52961,7 +52961,7 @@ pub impl @json.FromJson for ConcurrencyGroupListConcurrencyGroupsItem with fn fr
 ///
 /// A list of active concurrency groups for a repository.
 pub(all) struct ConcurrencyGroupList {
-  total_count : Int
+  total_count : Int32
   concurrency_groups : Array[ConcurrencyGroupListConcurrencyGroupsItem]
 } derive(Eq, @debug.Debug)
 
@@ -52975,7 +52975,7 @@ pub extend ConcurrencyGroupList with @debug.Debug::{to_repr}
 ///
 /// Creates a ConcurrencyGroupList with omitted optional fields absent.
 pub fn ConcurrencyGroupList::new(
-  total_count~ : Int,
+  total_count~ : Int32,
   concurrency_groups~ : Array[ConcurrencyGroupListConcurrencyGroupsItem],
 ) -> ConcurrencyGroupList {
   { total_count, concurrency_groups, }
@@ -53068,11 +53068,11 @@ pub impl @json.FromJson for ConcurrencyGroupGroupMembersItemStatus with fn from_
 ///
 /// Generated representation of ConcurrencyGroupGroupMembersItem.
 pub(all) struct ConcurrencyGroupGroupMembersItem {
-  run_id : Int
+  run_id : Int32
   run_name : String
   run_url : String?
   run_html_url : String?
-  job_id : Int?
+  job_id : Int32?
   job_name : String?
   job_url : @sdkjson.Presence[String]
   job_html_url : @sdkjson.Presence[String]
@@ -53089,12 +53089,12 @@ pub extend ConcurrencyGroupGroupMembersItem with @debug.Debug::{to_repr}
 ///
 /// Creates a ConcurrencyGroupGroupMembersItem with omitted optional fields absent.
 pub fn ConcurrencyGroupGroupMembersItem::new(
-  run_id~ : Int,
+  run_id~ : Int32,
   run_name~ : String,
   status~ : ConcurrencyGroupGroupMembersItemStatus,
   run_url? : String,
   run_html_url? : String,
-  job_id? : Int,
+  job_id? : Int32,
   job_name? : String,
   job_url? : String,
   job_html_url? : String,
@@ -53165,7 +53165,7 @@ pub impl @json.FromJson for ConcurrencyGroupGroupMembersItem with fn from_json(
 pub(all) struct ConcurrencyGroup {
   group_name : String
   group_url : String
-  total_count : Int
+  total_count : Int32
   group_members : Array[ConcurrencyGroupGroupMembersItem]
 } derive(Eq, @debug.Debug)
 
@@ -53181,7 +53181,7 @@ pub extend ConcurrencyGroup with @debug.Debug::{to_repr}
 pub fn ConcurrencyGroup::new(
   group_name~ : String,
   group_url~ : String,
-  total_count~ : Int,
+  total_count~ : Int32,
   group_members~ : Array[ConcurrencyGroupGroupMembersItem],
 ) -> ConcurrencyGroup {
   { group_name, group_url, total_count, group_members, }
@@ -53408,7 +53408,7 @@ pub(all) struct JobStepsItem {
   status : JobStepsItemStatus
   conclusion : String?
   name : String
-  number : Int
+  number : Int32
   started_at : @sdkjson.Presence[String]
   completed_at : @sdkjson.Presence[String]
 } derive(Eq, @debug.Debug)
@@ -53425,7 +53425,7 @@ pub extend JobStepsItem with @debug.Debug::{to_repr}
 pub fn JobStepsItem::new(
   status~ : JobStepsItemStatus,
   name~ : String,
-  number~ : Int,
+  number~ : Int32,
   conclusion? : String,
   started_at? : String,
   completed_at? : String,
@@ -53485,7 +53485,7 @@ pub(all) struct Job {
   id : Int64
   run_id : Int64
   run_url : String
-  run_attempt : Int?
+  run_attempt : Int32?
   node_id : String
   head_sha : String
   url : String
@@ -53499,9 +53499,9 @@ pub(all) struct Job {
   steps : Array[JobStepsItem]?
   check_run_url : String
   labels : Array[String]
-  runner_id : Int?
+  runner_id : Int32?
   runner_name : String?
-  runner_group_id : Int?
+  runner_group_id : Int32?
   runner_group_name : String?
   workflow_name : String?
   head_branch : String?
@@ -53529,14 +53529,14 @@ pub fn Job::new(
   name~ : String,
   check_run_url~ : String,
   labels~ : Array[String],
-  run_attempt? : Int,
+  run_attempt? : Int32,
   html_url? : String,
   conclusion? : JobConclusion,
   completed_at? : String,
   steps? : Array[JobStepsItem],
-  runner_id? : Int,
+  runner_id? : Int32,
   runner_name? : String,
-  runner_group_id? : Int,
+  runner_group_id? : Int32,
   runner_group_name? : String,
   workflow_name? : String,
   head_branch? : String,
@@ -54252,13 +54252,13 @@ pub(all) struct WorkflowRun {
   head_branch : String?
   head_sha : String
   path : String
-  run_number : Int
-  run_attempt : Int?
+  run_number : Int32
+  run_attempt : Int32?
   referenced_workflows : @sdkjson.Presence[Array[ReferencedWorkflow]]
   event : String
   status : String?
   conclusion : String?
-  workflow_id : Int
+  workflow_id : Int32
   url : String
   html_url : String
   pull_requests : Array[PullRequestMinimal]?
@@ -54278,7 +54278,7 @@ pub(all) struct WorkflowRun {
   head_commit : NullableSimpleCommit?
   repository : MinimalRepository
   head_repository : MinimalRepository
-  head_repository_id : Int?
+  head_repository_id : Int32?
   display_title : String
 } derive(Eq, @debug.Debug)
 
@@ -54296,9 +54296,9 @@ pub fn WorkflowRun::new(
   node_id~ : String,
   head_sha~ : String,
   path~ : String,
-  run_number~ : Int,
+  run_number~ : Int32,
   event~ : String,
-  workflow_id~ : Int,
+  workflow_id~ : Int32,
   url~ : String,
   html_url~ : String,
   created_at~ : String,
@@ -54317,7 +54317,7 @@ pub fn WorkflowRun::new(
   check_suite_id? : Int64,
   check_suite_node_id? : String,
   head_branch? : String,
-  run_attempt? : Int,
+  run_attempt? : Int32,
   referenced_workflows? : Array[ReferencedWorkflow],
   status? : String,
   conclusion? : String,
@@ -54327,7 +54327,7 @@ pub fn WorkflowRun::new(
   run_started_at? : String,
   previous_attempt_url? : String,
   head_commit? : NullableSimpleCommit,
-  head_repository_id? : Int,
+  head_repository_id? : Int32,
 ) -> WorkflowRun {
   {
     id,
@@ -54487,7 +54487,7 @@ pub impl @json.FromJson for WorkflowRun with fn from_json(value, path) {
 ///
 /// Generated representation of EnvironmentApprovalsEnvironmentsItem.
 pub(all) struct EnvironmentApprovalsEnvironmentsItem {
-  id : Int?
+  id : Int32?
   node_id : String?
   name : String?
   url : String?
@@ -54506,7 +54506,7 @@ pub extend EnvironmentApprovalsEnvironmentsItem with @debug.Debug::{to_repr}
 ///
 /// Creates a EnvironmentApprovalsEnvironmentsItem with omitted optional fields absent.
 pub fn EnvironmentApprovalsEnvironmentsItem::new(
-  id? : Int,
+  id? : Int32,
   node_id? : String,
   name? : String,
   url? : String,
@@ -54742,13 +54742,13 @@ pub impl @json.FromJson for ConcurrencyGroupRunListConcurrencyGroupsItemGroupMem
 ///
 /// Generated representation of ConcurrencyGroupRunListConcurrencyGroupsItemGroupMembersItem.
 pub(all) struct ConcurrencyGroupRunListConcurrencyGroupsItemGroupMembersItem {
-  run_id : Int
+  run_id : Int32
   run_name : String
   run_url : String?
   run_html_url : String?
-  position : Int
+  position : Int32
   position_url : String
-  job_id : @sdkjson.Presence[Int]
+  job_id : @sdkjson.Presence[Int32]
   job_name : @sdkjson.Presence[String]
   job_url : @sdkjson.Presence[String]
   job_html_url : @sdkjson.Presence[String]
@@ -54770,14 +54770,14 @@ pub extend ConcurrencyGroupRunListConcurrencyGroupsItemGroupMembersItem with @de
 ///
 /// Creates a ConcurrencyGroupRunListConcurrencyGroupsItemGroupMembersItem with omitted optional fields absent.
 pub fn ConcurrencyGroupRunListConcurrencyGroupsItemGroupMembersItem::new(
-  run_id~ : Int,
+  run_id~ : Int32,
   run_name~ : String,
-  position~ : Int,
+  position~ : Int32,
   position_url~ : String,
   status~ : ConcurrencyGroupRunListConcurrencyGroupsItemGroupMembersItemStatus,
   run_url? : String,
   run_html_url? : String,
-  job_id? : Int,
+  job_id? : Int32,
   job_name? : String,
   job_url? : String,
   job_html_url? : String,
@@ -54929,7 +54929,7 @@ pub impl @json.FromJson for ConcurrencyGroupRunListConcurrencyGroupsItem with fn
 ///
 /// A list of concurrency groups associated with a workflow run.
 pub(all) struct ConcurrencyGroupRunList {
-  total_count : Int
+  total_count : Int32
   concurrency_groups : Array[ConcurrencyGroupRunListConcurrencyGroupsItem]
 } derive(Eq, @debug.Debug)
 
@@ -54943,7 +54943,7 @@ pub extend ConcurrencyGroupRunList with @debug.Debug::{to_repr}
 ///
 /// Creates a ConcurrencyGroupRunList with omitted optional fields absent.
 pub fn ConcurrencyGroupRunList::new(
-  total_count~ : Int,
+  total_count~ : Int32,
   concurrency_groups~ : Array[ConcurrencyGroupRunListConcurrencyGroupsItem],
 ) -> ConcurrencyGroupRunList {
   { total_count, concurrency_groups, }
@@ -55158,7 +55158,7 @@ pub impl @json.FromJson for PendingDeploymentReviewersItem with fn from_json(
 /// Details of a deployment that is waiting for protection rules to pass
 pub(all) struct PendingDeployment {
   environment : PendingDeploymentEnvironment
-  wait_timer : Int
+  wait_timer : Int32
   wait_timer_started_at : String?
   current_user_can_approve : Bool
   reviewers : Array[PendingDeploymentReviewersItem]
@@ -55175,7 +55175,7 @@ pub extend PendingDeployment with @debug.Debug::{to_repr}
 /// Creates a PendingDeployment with omitted optional fields absent.
 pub fn PendingDeployment::new(
   environment~ : PendingDeploymentEnvironment,
-  wait_timer~ : Int,
+  wait_timer~ : Int32,
   current_user_can_approve~ : Bool,
   reviewers~ : Array[PendingDeploymentReviewersItem],
   wait_timer_started_at? : String,
@@ -55425,8 +55425,8 @@ pub impl @json.FromJson for Deployment with fn from_json(value, path) {
 ///
 /// Generated representation of WorkflowRunUsageBillableUBUNTUJobRunsItem.
 pub(all) struct WorkflowRunUsageBillableUBUNTUJobRunsItem {
-  job_id : Int
-  duration_ms : Int
+  job_id : Int32
+  duration_ms : Int32
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -55441,8 +55441,8 @@ pub extend WorkflowRunUsageBillableUBUNTUJobRunsItem with @debug.Debug::{
 ///
 /// Creates a WorkflowRunUsageBillableUBUNTUJobRunsItem with omitted optional fields absent.
 pub fn WorkflowRunUsageBillableUBUNTUJobRunsItem::new(
-  job_id~ : Int,
-  duration_ms~ : Int,
+  job_id~ : Int32,
+  duration_ms~ : Int32,
 ) -> WorkflowRunUsageBillableUBUNTUJobRunsItem {
   { job_id, duration_ms, }
 }
@@ -55485,8 +55485,8 @@ pub impl @json.FromJson for WorkflowRunUsageBillableUBUNTUJobRunsItem with fn fr
 ///
 /// Generated representation of WorkflowRunUsageBillableUBUNTU.
 pub(all) struct WorkflowRunUsageBillableUBUNTU {
-  total_ms : Int
-  jobs : Int
+  total_ms : Int32
+  jobs : Int32
   job_runs : Array[WorkflowRunUsageBillableUBUNTUJobRunsItem]?
 } derive(Eq, @debug.Debug)
 
@@ -55500,8 +55500,8 @@ pub extend WorkflowRunUsageBillableUBUNTU with @debug.Debug::{to_repr}
 ///
 /// Creates a WorkflowRunUsageBillableUBUNTU with omitted optional fields absent.
 pub fn WorkflowRunUsageBillableUBUNTU::new(
-  total_ms~ : Int,
-  jobs~ : Int,
+  total_ms~ : Int32,
+  jobs~ : Int32,
   job_runs? : Array[WorkflowRunUsageBillableUBUNTUJobRunsItem],
 ) -> WorkflowRunUsageBillableUBUNTU {
   { total_ms, jobs, job_runs, }
@@ -55543,8 +55543,8 @@ pub impl @json.FromJson for WorkflowRunUsageBillableUBUNTU with fn from_json(
 ///
 /// Generated representation of WorkflowRunUsageBillableMACOSJobRunsItem.
 pub(all) struct WorkflowRunUsageBillableMACOSJobRunsItem {
-  job_id : Int
-  duration_ms : Int
+  job_id : Int32
+  duration_ms : Int32
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -55557,8 +55557,8 @@ pub extend WorkflowRunUsageBillableMACOSJobRunsItem with @debug.Debug::{to_repr}
 ///
 /// Creates a WorkflowRunUsageBillableMACOSJobRunsItem with omitted optional fields absent.
 pub fn WorkflowRunUsageBillableMACOSJobRunsItem::new(
-  job_id~ : Int,
-  duration_ms~ : Int,
+  job_id~ : Int32,
+  duration_ms~ : Int32,
 ) -> WorkflowRunUsageBillableMACOSJobRunsItem {
   { job_id, duration_ms, }
 }
@@ -55601,8 +55601,8 @@ pub impl @json.FromJson for WorkflowRunUsageBillableMACOSJobRunsItem with fn fro
 ///
 /// Generated representation of WorkflowRunUsageBillableMACOS.
 pub(all) struct WorkflowRunUsageBillableMACOS {
-  total_ms : Int
-  jobs : Int
+  total_ms : Int32
+  jobs : Int32
   job_runs : Array[WorkflowRunUsageBillableMACOSJobRunsItem]?
 } derive(Eq, @debug.Debug)
 
@@ -55616,8 +55616,8 @@ pub extend WorkflowRunUsageBillableMACOS with @debug.Debug::{to_repr}
 ///
 /// Creates a WorkflowRunUsageBillableMACOS with omitted optional fields absent.
 pub fn WorkflowRunUsageBillableMACOS::new(
-  total_ms~ : Int,
-  jobs~ : Int,
+  total_ms~ : Int32,
+  jobs~ : Int32,
   job_runs? : Array[WorkflowRunUsageBillableMACOSJobRunsItem],
 ) -> WorkflowRunUsageBillableMACOS {
   { total_ms, jobs, job_runs, }
@@ -55659,8 +55659,8 @@ pub impl @json.FromJson for WorkflowRunUsageBillableMACOS with fn from_json(
 ///
 /// Generated representation of WorkflowRunUsageBillableWINDOWSJobRunsItem.
 pub(all) struct WorkflowRunUsageBillableWINDOWSJobRunsItem {
-  job_id : Int
-  duration_ms : Int
+  job_id : Int32
+  duration_ms : Int32
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -55678,8 +55678,8 @@ pub extend WorkflowRunUsageBillableWINDOWSJobRunsItem with @debug.Debug::{
 ///
 /// Creates a WorkflowRunUsageBillableWINDOWSJobRunsItem with omitted optional fields absent.
 pub fn WorkflowRunUsageBillableWINDOWSJobRunsItem::new(
-  job_id~ : Int,
-  duration_ms~ : Int,
+  job_id~ : Int32,
+  duration_ms~ : Int32,
 ) -> WorkflowRunUsageBillableWINDOWSJobRunsItem {
   { job_id, duration_ms, }
 }
@@ -55722,8 +55722,8 @@ pub impl @json.FromJson for WorkflowRunUsageBillableWINDOWSJobRunsItem with fn f
 ///
 /// Generated representation of WorkflowRunUsageBillableWINDOWS.
 pub(all) struct WorkflowRunUsageBillableWINDOWS {
-  total_ms : Int
-  jobs : Int
+  total_ms : Int32
+  jobs : Int32
   job_runs : Array[WorkflowRunUsageBillableWINDOWSJobRunsItem]?
 } derive(Eq, @debug.Debug)
 
@@ -55737,8 +55737,8 @@ pub extend WorkflowRunUsageBillableWINDOWS with @debug.Debug::{to_repr}
 ///
 /// Creates a WorkflowRunUsageBillableWINDOWS with omitted optional fields absent.
 pub fn WorkflowRunUsageBillableWINDOWS::new(
-  total_ms~ : Int,
-  jobs~ : Int,
+  total_ms~ : Int32,
+  jobs~ : Int32,
   job_runs? : Array[WorkflowRunUsageBillableWINDOWSJobRunsItem],
 ) -> WorkflowRunUsageBillableWINDOWS {
   { total_ms, jobs, job_runs, }
@@ -55839,7 +55839,7 @@ pub impl @json.FromJson for WorkflowRunUsageBillable with fn from_json(
 /// Workflow Run Usage
 pub(all) struct WorkflowRunUsage {
   billable : WorkflowRunUsageBillable
-  run_duration_ms : Int?
+  run_duration_ms : Int32?
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -55853,7 +55853,7 @@ pub extend WorkflowRunUsage with @debug.Debug::{to_repr}
 /// Creates a WorkflowRunUsage with omitted optional fields absent.
 pub fn WorkflowRunUsage::new(
   billable~ : WorkflowRunUsageBillable,
-  run_duration_ms? : Int,
+  run_duration_ms? : Int32,
 ) -> WorkflowRunUsage {
   { billable, run_duration_ms, }
 }
@@ -55949,7 +55949,7 @@ pub impl @json.FromJson for WorkflowState with fn from_json(value, path) {
 ///
 /// A GitHub Actions workflow
 pub(all) struct Workflow {
-  id : Int
+  id : Int32
   node_id : String
   name : String
   path : String
@@ -55972,7 +55972,7 @@ pub extend Workflow with @debug.Debug::{to_repr}
 ///
 /// Creates a Workflow with omitted optional fields absent.
 pub fn Workflow::new(
-  id~ : Int,
+  id~ : Int32,
   node_id~ : String,
   name~ : String,
   path~ : String,
@@ -56109,7 +56109,7 @@ pub impl @json.FromJson for WorkflowDispatchResponse with fn from_json(
 ///
 /// Generated representation of WorkflowUsageBillableUBUNTU.
 pub(all) struct WorkflowUsageBillableUBUNTU {
-  total_ms : Int?
+  total_ms : Int32?
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -56122,7 +56122,7 @@ pub extend WorkflowUsageBillableUBUNTU with @debug.Debug::{to_repr}
 ///
 /// Creates a WorkflowUsageBillableUBUNTU with omitted optional fields absent.
 pub fn WorkflowUsageBillableUBUNTU::new(
-  total_ms? : Int,
+  total_ms? : Int32,
 ) -> WorkflowUsageBillableUBUNTU {
   { total_ms, }
 }
@@ -56155,7 +56155,7 @@ pub impl @json.FromJson for WorkflowUsageBillableUBUNTU with fn from_json(
 ///
 /// Generated representation of WorkflowUsageBillableMACOS.
 pub(all) struct WorkflowUsageBillableMACOS {
-  total_ms : Int?
+  total_ms : Int32?
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -56168,7 +56168,7 @@ pub extend WorkflowUsageBillableMACOS with @debug.Debug::{to_repr}
 ///
 /// Creates a WorkflowUsageBillableMACOS with omitted optional fields absent.
 pub fn WorkflowUsageBillableMACOS::new(
-  total_ms? : Int,
+  total_ms? : Int32,
 ) -> WorkflowUsageBillableMACOS {
   { total_ms, }
 }
@@ -56201,7 +56201,7 @@ pub impl @json.FromJson for WorkflowUsageBillableMACOS with fn from_json(
 ///
 /// Generated representation of WorkflowUsageBillableWINDOWS.
 pub(all) struct WorkflowUsageBillableWINDOWS {
-  total_ms : Int?
+  total_ms : Int32?
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -56214,7 +56214,7 @@ pub extend WorkflowUsageBillableWINDOWS with @debug.Debug::{to_repr}
 ///
 /// Creates a WorkflowUsageBillableWINDOWS with omitted optional fields absent.
 pub fn WorkflowUsageBillableWINDOWS::new(
-  total_ms? : Int,
+  total_ms? : Int32,
 ) -> WorkflowUsageBillableWINDOWS {
   { total_ms, }
 }
@@ -56406,7 +56406,7 @@ pub impl @json.FromJson for ActivityActivityType with fn from_json(value, path) 
 ///
 /// Activity
 pub(all) struct Activity {
-  id : Int
+  id : Int32
   node_id : String
   before : String
   after : String
@@ -56426,7 +56426,7 @@ pub extend Activity with @debug.Debug::{to_repr}
 ///
 /// Creates a Activity with omitted optional fields absent.
 pub fn Activity::new(
-  id~ : Int,
+  id~ : Int32,
   node_id~ : String,
   before~ : String,
   after~ : String,
@@ -56481,7 +56481,7 @@ pub impl @json.FromJson for Activity with fn from_json(value, path) {
 ///
 /// An autolink reference.
 pub(all) struct Autolink {
-  id : Int
+  id : Int32
   key_prefix : String
   url_template : String
   is_alphanumeric : Bool
@@ -56498,7 +56498,7 @@ pub extend Autolink with @debug.Debug::{to_repr}
 ///
 /// Creates a Autolink with omitted optional fields absent.
 pub fn Autolink::new(
-  id~ : Int,
+  id~ : Int32,
   key_prefix~ : String,
   url_template~ : String,
   is_alphanumeric~ : Bool,
@@ -56605,7 +56605,7 @@ pub impl @json.FromJson for CheckAutomatedSecurityFixes with fn from_json(
 /// Generated representation of ProtectedBranchRequiredStatusCheckChecksItem.
 pub(all) struct ProtectedBranchRequiredStatusCheckChecksItem {
   context : String
-  app_id : Int?
+  app_id : Int32?
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -56624,7 +56624,7 @@ pub extend ProtectedBranchRequiredStatusCheckChecksItem with @debug.Debug::{
 /// Creates a ProtectedBranchRequiredStatusCheckChecksItem with omitted optional fields absent.
 pub fn ProtectedBranchRequiredStatusCheckChecksItem::new(
   context~ : String,
-  app_id? : Int,
+  app_id? : Int32,
 ) -> ProtectedBranchRequiredStatusCheckChecksItem {
   { context, app_id, }
 }
@@ -56946,7 +56946,7 @@ pub(all) struct ProtectedBranchPullRequestReview {
   bypass_pull_request_allowances : ProtectedBranchPullRequestReviewBypassPullRequestAllowances?
   dismiss_stale_reviews : Bool
   require_code_owner_reviews : Bool
-  required_approving_review_count : Int?
+  required_approving_review_count : Int32?
   require_last_push_approval : Bool?
 } derive(Eq, @debug.Debug)
 
@@ -56965,7 +56965,7 @@ pub fn ProtectedBranchPullRequestReview::new(
   url? : String,
   dismissal_restrictions? : ProtectedBranchPullRequestReviewDismissalRestrictions,
   bypass_pull_request_allowances? : ProtectedBranchPullRequestReviewBypassPullRequestAllowances,
-  required_approving_review_count? : Int,
+  required_approving_review_count? : Int32,
   require_last_push_approval? : Bool,
 ) -> ProtectedBranchPullRequestReview {
   {
@@ -57176,7 +57176,7 @@ pub impl @json.FromJson for BranchRestrictionPolicyUsersItem with fn from_json(
 /// Generated representation of BranchRestrictionPolicyAppsItemOwner.
 pub(all) struct BranchRestrictionPolicyAppsItemOwner {
   login : String?
-  id : Int?
+  id : Int32?
   node_id : String?
   url : String?
   repos_url : String?
@@ -57212,7 +57212,7 @@ pub extend BranchRestrictionPolicyAppsItemOwner with @debug.Debug::{to_repr}
 /// Creates a BranchRestrictionPolicyAppsItemOwner with omitted optional fields absent.
 pub fn BranchRestrictionPolicyAppsItemOwner::new(
   login? : String,
-  id? : Int,
+  id? : Int32,
   node_id? : String,
   url? : String,
   repos_url? : String,
@@ -57413,7 +57413,7 @@ pub impl @json.FromJson for BranchRestrictionPolicyAppsItemPermissions with fn f
 ///
 /// Generated representation of BranchRestrictionPolicyAppsItem.
 pub(all) struct BranchRestrictionPolicyAppsItem {
-  id : Int?
+  id : Int32?
   slug : String?
   node_id : String?
   owner : BranchRestrictionPolicyAppsItemOwner?
@@ -57438,7 +57438,7 @@ pub extend BranchRestrictionPolicyAppsItem with @debug.Debug::{to_repr}
 ///
 /// Creates a BranchRestrictionPolicyAppsItem with omitted optional fields absent.
 pub fn BranchRestrictionPolicyAppsItem::new(
-  id? : Int,
+  id? : Int32,
   slug? : String,
   node_id? : String,
   owner? : BranchRestrictionPolicyAppsItemOwner,
@@ -58425,9 +58425,9 @@ pub(all) struct DiffEntry {
   sha : String?
   filename : String
   status : DiffEntryStatus
-  additions : Int
-  deletions : Int
-  changes : Int
+  additions : Int32
+  deletions : Int32
+  changes : Int32
   blob_url : String
   raw_url : String
   contents_url : String
@@ -58447,9 +58447,9 @@ pub extend DiffEntry with @debug.Debug::{to_repr}
 pub fn DiffEntry::new(
   filename~ : String,
   status~ : DiffEntryStatus,
-  additions~ : Int,
-  deletions~ : Int,
-  changes~ : Int,
+  additions~ : Int32,
+  deletions~ : Int32,
+  changes~ : Int32,
   blob_url~ : String,
   raw_url~ : String,
   contents_url~ : String,
@@ -58573,7 +58573,7 @@ pub(all) struct CommitCommit {
   author : NullableGitUser?
   committer : NullableGitUser?
   message : String
-  comment_count : Int
+  comment_count : Int32
   tree : CommitCommitTree
   verification : Verification?
 } derive(Eq, @debug.Debug)
@@ -58590,7 +58590,7 @@ pub extend CommitCommit with @debug.Debug::{to_repr}
 pub fn CommitCommit::new(
   url~ : String,
   message~ : String,
-  comment_count~ : Int,
+  comment_count~ : Int32,
   tree~ : CommitCommitTree,
   author? : NullableGitUser,
   committer? : NullableGitUser,
@@ -58695,9 +58695,9 @@ pub impl @json.FromJson for CommitParentsItem with fn from_json(value, path) {
 ///
 /// Generated representation of CommitStats.
 pub(all) struct CommitStats {
-  additions : Int?
-  deletions : Int?
-  total : Int?
+  additions : Int32?
+  deletions : Int32?
+  total : Int32?
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -58710,9 +58710,9 @@ pub extend CommitStats with @debug.Debug::{to_repr}
 ///
 /// Creates a CommitStats with omitted optional fields absent.
 pub fn CommitStats::new(
-  additions? : Int,
-  deletions? : Int,
-  total? : Int,
+  additions? : Int32,
+  deletions? : Int32,
+  total? : Int32,
 ) -> CommitStats {
   { additions, deletions, total, }
 }
@@ -58910,7 +58910,7 @@ pub(all) struct BranchWithProtection {
   protection : BranchProtection
   protection_url : String
   pattern : String?
-  required_approving_review_count : Int?
+  required_approving_review_count : Int32?
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -58930,7 +58930,7 @@ pub fn BranchWithProtection::new(
   protection~ : BranchProtection,
   protection_url~ : String,
   pattern? : String,
-  required_approving_review_count? : Int,
+  required_approving_review_count? : Int32,
 ) -> BranchWithProtection {
   {
     name,
@@ -58990,7 +58990,7 @@ pub impl @json.FromJson for BranchWithProtection with fn from_json(value, path) 
 /// Generated representation of StatusCheckPolicyChecksItem.
 pub(all) struct StatusCheckPolicyChecksItem {
   context : String
-  app_id : Int?
+  app_id : Int32?
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -59004,7 +59004,7 @@ pub extend StatusCheckPolicyChecksItem with @debug.Debug::{to_repr}
 /// Creates a StatusCheckPolicyChecksItem with omitted optional fields absent.
 pub fn StatusCheckPolicyChecksItem::new(
   context~ : String,
-  app_id? : Int,
+  app_id? : Int32,
 ) -> StatusCheckPolicyChecksItem {
   { context, app_id, }
 }
@@ -59259,7 +59259,7 @@ pub(all) struct ProtectedBranchRequiredPullRequestReviews {
   url : String
   dismiss_stale_reviews : Bool?
   require_code_owner_reviews : Bool?
-  required_approving_review_count : Int?
+  required_approving_review_count : Int32?
   require_last_push_approval : Bool?
   dismissal_restrictions : ProtectedBranchRequiredPullRequestReviewsDismissalRestrictions?
   bypass_pull_request_allowances : ProtectedBranchRequiredPullRequestReviewsBypassPullRequestAllowances?
@@ -59280,7 +59280,7 @@ pub fn ProtectedBranchRequiredPullRequestReviews::new(
   url~ : String,
   dismiss_stale_reviews? : Bool,
   require_code_owner_reviews? : Bool,
-  required_approving_review_count? : Int,
+  required_approving_review_count? : Int32,
   require_last_push_approval? : Bool,
   dismissal_restrictions? : ProtectedBranchRequiredPullRequestReviewsDismissalRestrictions,
   bypass_pull_request_allowances? : ProtectedBranchRequiredPullRequestReviewsBypassPullRequestAllowances,
@@ -59916,7 +59916,7 @@ pub impl @json.FromJson for ProtectedBranch with fn from_json(value, path) {
 /// A deployment created as the result of an Actions check run from a workflow that references an environment
 pub(all) struct DeploymentSimple {
   url : String
-  id : Int
+  id : Int32
   node_id : String
   task : String
   original_environment : String?
@@ -59942,7 +59942,7 @@ pub extend DeploymentSimple with @debug.Debug::{to_repr}
 /// Creates a DeploymentSimple with omitted optional fields absent.
 pub fn DeploymentSimple::new(
   url~ : String,
-  id~ : Int,
+  id~ : Int32,
   node_id~ : String,
   task~ : String,
   environment~ : String,
@@ -60172,7 +60172,7 @@ pub(all) struct CheckRunOutput {
   title : String?
   summary : String?
   text : String?
-  annotations_count : Int
+  annotations_count : Int32
   annotations_url : String
 } derive(Eq, @debug.Debug)
 
@@ -60186,7 +60186,7 @@ pub extend CheckRunOutput with @debug.Debug::{to_repr}
 ///
 /// Creates a CheckRunOutput with omitted optional fields absent.
 pub fn CheckRunOutput::new(
-  annotations_count~ : Int,
+  annotations_count~ : Int32,
   annotations_url~ : String,
   title? : String,
   summary? : String,
@@ -60232,7 +60232,7 @@ pub impl @json.FromJson for CheckRunOutput with fn from_json(value, path) {
 ///
 /// Generated representation of CheckRunCheckSuite.
 pub(all) struct CheckRunCheckSuite {
-  id : Int
+  id : Int32
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -60244,7 +60244,7 @@ pub extend CheckRunCheckSuite with @debug.Debug::{to_repr}
 ///|
 ///
 /// Creates a CheckRunCheckSuite with omitted optional fields absent.
-pub fn CheckRunCheckSuite::new(id~ : Int) -> CheckRunCheckSuite {
+pub fn CheckRunCheckSuite::new(id~ : Int32) -> CheckRunCheckSuite {
   { id, }
 }
 
@@ -60421,10 +60421,10 @@ pub impl @json.FromJson for CheckRun with fn from_json(value, path) {
 /// Check Annotation
 pub(all) struct CheckAnnotation {
   path : String
-  start_line : Int
-  end_line : Int
-  start_column : Int?
-  end_column : Int?
+  start_line : Int32
+  end_line : Int32
+  start_column : Int32?
+  end_column : Int32?
   annotation_level : String?
   title : String?
   message : String?
@@ -60443,11 +60443,11 @@ pub extend CheckAnnotation with @debug.Debug::{to_repr}
 /// Creates a CheckAnnotation with omitted optional fields absent.
 pub fn CheckAnnotation::new(
   path~ : String,
-  start_line~ : Int,
-  end_line~ : Int,
+  start_line~ : Int32,
+  end_line~ : Int32,
   blob_href~ : String,
-  start_column? : Int,
-  end_column? : Int,
+  start_column? : Int32,
+  end_column? : Int32,
   annotation_level? : String,
   title? : String,
   message? : String,
@@ -60845,7 +60845,7 @@ pub(all) struct CheckSuite {
   created_at : String?
   updated_at : String?
   head_commit : SimpleCommit
-  latest_check_runs_count : Int
+  latest_check_runs_count : Int32
   check_runs_url : String
   rerequestable : Bool?
   runs_rerequestable : Bool?
@@ -60866,7 +60866,7 @@ pub fn CheckSuite::new(
   head_sha~ : String,
   repository~ : MinimalRepository,
   head_commit~ : SimpleCommit,
-  latest_check_runs_count~ : Int,
+  latest_check_runs_count~ : Int32,
   check_runs_url~ : String,
   head_branch? : String,
   status? : CheckSuiteStatus,
@@ -60986,7 +60986,7 @@ pub impl @json.FromJson for CheckSuite with fn from_json(value, path) {
 ///
 /// Generated representation of CheckSuitePreferencePreferencesAutoTriggerChecksItem.
 pub(all) struct CheckSuitePreferencePreferencesAutoTriggerChecksItem {
-  app_id : Int
+  app_id : Int32
   setting : Bool
 } derive(Eq, @debug.Debug)
 
@@ -61005,7 +61005,7 @@ pub extend CheckSuitePreferencePreferencesAutoTriggerChecksItem with @debug.Debu
 ///
 /// Creates a CheckSuitePreferencePreferencesAutoTriggerChecksItem with omitted optional fields absent.
 pub fn CheckSuitePreferencePreferencesAutoTriggerChecksItem::new(
-  app_id~ : Int,
+  app_id~ : Int32,
   setting~ : Bool,
 ) -> CheckSuitePreferencePreferencesAutoTriggerChecksItem {
   { app_id, setting, }
@@ -61342,10 +61342,10 @@ pub impl @json.FromJson for CodeQualityFindingRule with fn from_json(
 /// Code quality file location
 pub(all) struct CodeQualityFindingLocation {
   path : String
-  start_line : Int?
-  start_column : Int?
-  end_line : Int?
-  end_column : Int?
+  start_line : Int32?
+  start_column : Int32?
+  end_line : Int32?
+  end_column : Int32?
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -61359,10 +61359,10 @@ pub extend CodeQualityFindingLocation with @debug.Debug::{to_repr}
 /// Creates a CodeQualityFindingLocation with omitted optional fields absent.
 pub fn CodeQualityFindingLocation::new(
   path~ : String,
-  start_line? : Int,
-  start_column? : Int,
-  end_line? : Int,
-  end_column? : Int,
+  start_line? : Int32,
+  start_column? : Int32,
+  end_line? : Int32,
+  end_column? : Int32,
 ) -> CodeQualityFindingLocation {
   { path, start_line, start_column, end_line, end_column, }
 }
@@ -61515,7 +61515,7 @@ pub impl @json.FromJson for CodeQualityFindingState with fn from_json(
 ///
 /// Code quality finding
 pub(all) struct CodeQualityFinding {
-  number : Int
+  number : Int32
   state : CodeQualityFindingState
   url : String
   rule : CodeQualityFindingRule
@@ -61534,7 +61534,7 @@ pub extend CodeQualityFinding with @debug.Debug::{to_repr}
 ///
 /// Creates a CodeQualityFinding with omitted optional fields absent.
 pub fn CodeQualityFinding::new(
-  number~ : Int,
+  number~ : Int32,
   state~ : CodeQualityFindingState,
   url~ : String,
   rule~ : CodeQualityFindingRule,
@@ -62191,7 +62191,7 @@ pub impl @json.FromJson for CodeQualitySetupUpdate with fn from_json(
 ///
 /// You can use `run_url` to track the status of the run. This includes a property status and conclusion. You should not rely on this always being an actions workflow run object.
 pub(all) struct CodeQualitySetupUpdateResponse {
-  run_id : Int?
+  run_id : Int32?
   run_url : String?
 } derive(Eq, @debug.Debug)
 
@@ -62205,7 +62205,7 @@ pub extend CodeQualitySetupUpdateResponse with @debug.Debug::{to_repr}
 ///
 /// Creates a CodeQualitySetupUpdateResponse with omitted optional fields absent.
 pub fn CodeQualitySetupUpdateResponse::new(
-  run_id? : Int,
+  run_id? : Int32,
   run_url? : String,
 ) -> CodeQualitySetupUpdateResponse {
   { run_id, run_url, }
@@ -62449,7 +62449,7 @@ pub impl @json.FromJson for CodeScanningAiScanEnablementUpdate with fn from_json
 ///
 /// Generated representation of CodeScanningAlertItems.
 pub(all) struct CodeScanningAlertItems {
-  number : Int
+  number : Int32
   created_at : String
   updated_at : String?
   url : String
@@ -62478,7 +62478,7 @@ pub extend CodeScanningAlertItems with @debug.Debug::{to_repr}
 ///
 /// Creates a CodeScanningAlertItems with omitted optional fields absent.
 pub fn CodeScanningAlertItems::new(
-  number~ : Int,
+  number~ : Int32,
   created_at~ : String,
   url~ : String,
   html_url~ : String,
@@ -62816,7 +62816,7 @@ pub impl @json.FromJson for CodeScanningAlertRule with fn from_json(value, path)
 ///
 /// Generated representation of CodeScanningAlert.
 pub(all) struct CodeScanningAlert {
-  number : Int
+  number : Int32
   created_at : String
   updated_at : String?
   url : String
@@ -62846,7 +62846,7 @@ pub extend CodeScanningAlert with @debug.Debug::{to_repr}
 ///
 /// Creates a CodeScanningAlert with omitted optional fields absent.
 pub fn CodeScanningAlert::new(
-  number~ : Int,
+  number~ : Int32,
   created_at~ : String,
   url~ : String,
   html_url~ : String,
@@ -63445,9 +63445,9 @@ pub(all) struct CodeScanningAnalysis {
   category : String?
   error : String
   created_at : String
-  results_count : Int
-  rules_count : Int
-  id : Int
+  results_count : Int32
+  rules_count : Int32
+  id : Int32
   url : String
   sarif_id : String
   tool : CodeScanningAnalysisTool
@@ -63471,9 +63471,9 @@ pub fn CodeScanningAnalysis::new(
   environment~ : String,
   error~ : String,
   created_at~ : String,
-  results_count~ : Int,
-  rules_count~ : Int,
-  id~ : Int,
+  results_count~ : Int32,
+  rules_count~ : Int32,
+  id~ : Int32,
   url~ : String,
   sarif_id~ : String,
   tool~ : CodeScanningAnalysisTool,
@@ -63617,12 +63617,12 @@ pub impl @json.FromJson for CodeScanningAnalysisDeletion with fn from_json(
 ///
 /// A CodeQL database.
 pub(all) struct CodeScanningCodeqlDatabase {
-  id : Int
+  id : Int32
   name : String
   language : String
   uploader : SimpleUser
   content_type : String
-  size : Int
+  size : Int32
   created_at : String
   updated_at : String
   url : String
@@ -63639,12 +63639,12 @@ pub extend CodeScanningCodeqlDatabase with @debug.Debug::{to_repr}
 ///
 /// Creates a CodeScanningCodeqlDatabase with omitted optional fields absent.
 pub fn CodeScanningCodeqlDatabase::new(
-  id~ : Int,
+  id~ : Int32,
   name~ : String,
   language~ : String,
   uploader~ : SimpleUser,
   content_type~ : String,
-  size~ : Int,
+  size~ : Int32,
   created_at~ : String,
   updated_at~ : String,
   url~ : String,
@@ -63792,11 +63792,11 @@ pub impl @json.FromJson for CodeScanningVariantAnalysisLanguage with fn from_jso
 ///
 /// Repository Identifier
 pub(all) struct CodeScanningVariantAnalysisRepository {
-  id : Int
+  id : Int32
   name : String
   full_name : String
   private : Bool
-  stargazers_count : Int
+  stargazers_count : Int32
   updated_at : String?
 } derive(Eq, @debug.Debug)
 
@@ -63810,11 +63810,11 @@ pub extend CodeScanningVariantAnalysisRepository with @debug.Debug::{to_repr}
 ///
 /// Creates a CodeScanningVariantAnalysisRepository with omitted optional fields absent.
 pub fn CodeScanningVariantAnalysisRepository::new(
-  id~ : Int,
+  id~ : Int32,
   name~ : String,
   full_name~ : String,
   private~ : Bool,
-  stargazers_count~ : Int,
+  stargazers_count~ : Int32,
   updated_at? : String,
 ) -> CodeScanningVariantAnalysisRepository {
   { id, name, full_name, private, stargazers_count, updated_at, }
@@ -63933,7 +63933,7 @@ pub impl @json.FromJson for CodeScanningVariantAnalysisStatus with fn from_json(
 ///
 /// Generated representation of CodeScanningVariantAnalysisSkippedRepoGroup.
 pub(all) struct CodeScanningVariantAnalysisSkippedRepoGroup {
-  repository_count : Int
+  repository_count : Int32
   repositories : Array[CodeScanningVariantAnalysisRepository]
 } derive(Eq, @debug.Debug)
 
@@ -63952,7 +63952,7 @@ pub extend CodeScanningVariantAnalysisSkippedRepoGroup with @debug.Debug::{
 ///
 /// Creates a CodeScanningVariantAnalysisSkippedRepoGroup with omitted optional fields absent.
 pub fn CodeScanningVariantAnalysisSkippedRepoGroup::new(
-  repository_count~ : Int,
+  repository_count~ : Int32,
   repositories~ : Array[CodeScanningVariantAnalysisRepository],
 ) -> CodeScanningVariantAnalysisSkippedRepoGroup {
   { repository_count, repositories, }
@@ -64059,8 +64059,8 @@ pub impl @json.FromJson for CodeScanningVariantAnalysisFailureReason with fn fro
 pub(all) struct CodeScanningVariantAnalysisScannedRepositoriesItem {
   repository : CodeScanningVariantAnalysisRepository
   analysis_status : CodeScanningVariantAnalysisStatus
-  result_count : Int?
-  artifact_size_in_bytes : Int?
+  result_count : Int32?
+  artifact_size_in_bytes : Int32?
   failure_message : String?
 } derive(Eq, @debug.Debug)
 
@@ -64081,8 +64081,8 @@ pub extend CodeScanningVariantAnalysisScannedRepositoriesItem with @debug.Debug:
 pub fn CodeScanningVariantAnalysisScannedRepositoriesItem::new(
   repository~ : CodeScanningVariantAnalysisRepository,
   analysis_status~ : CodeScanningVariantAnalysisStatus,
-  result_count? : Int,
-  artifact_size_in_bytes? : Int,
+  result_count? : Int32,
+  artifact_size_in_bytes? : Int32,
   failure_message? : String,
 ) -> CodeScanningVariantAnalysisScannedRepositoriesItem {
   {
@@ -64142,7 +64142,7 @@ pub impl @json.FromJson for CodeScanningVariantAnalysisScannedRepositoriesItem w
 ///
 /// Generated representation of CodeScanningVariantAnalysisSkippedRepositoriesNotFoundRepos.
 pub(all) struct CodeScanningVariantAnalysisSkippedRepositoriesNotFoundRepos {
-  repository_count : Int
+  repository_count : Int32
   repository_full_names : Array[String]
 } derive(Eq, @debug.Debug)
 
@@ -64161,7 +64161,7 @@ pub extend CodeScanningVariantAnalysisSkippedRepositoriesNotFoundRepos with @deb
 ///
 /// Creates a CodeScanningVariantAnalysisSkippedRepositoriesNotFoundRepos with omitted optional fields absent.
 pub fn CodeScanningVariantAnalysisSkippedRepositoriesNotFoundRepos::new(
-  repository_count~ : Int,
+  repository_count~ : Int32,
   repository_full_names~ : Array[String],
 ) -> CodeScanningVariantAnalysisSkippedRepositoriesNotFoundRepos {
   { repository_count, repository_full_names, }
@@ -64283,7 +64283,7 @@ pub impl @json.FromJson for CodeScanningVariantAnalysisSkippedRepositories with 
 ///
 /// A run of a CodeQL query against one or more repositories.
 pub(all) struct CodeScanningVariantAnalysis {
-  id : Int
+  id : Int32
   controller_repo : SimpleRepository
   actor : SimpleUser
   query_language : CodeScanningVariantAnalysisLanguage
@@ -64292,7 +64292,7 @@ pub(all) struct CodeScanningVariantAnalysis {
   updated_at : String?
   completed_at : @sdkjson.Presence[String]
   status : CodeScanningVariantAnalysisStatus
-  actions_workflow_run_id : Int?
+  actions_workflow_run_id : Int32?
   failure_reason : CodeScanningVariantAnalysisFailureReason?
   scanned_repositories : Array[
     CodeScanningVariantAnalysisScannedRepositoriesItem,
@@ -64310,7 +64310,7 @@ pub extend CodeScanningVariantAnalysis with @debug.Debug::{to_repr}
 ///
 /// Creates a CodeScanningVariantAnalysis with omitted optional fields absent.
 pub fn CodeScanningVariantAnalysis::new(
-  id~ : Int,
+  id~ : Int32,
   controller_repo~ : SimpleRepository,
   actor~ : SimpleUser,
   query_language~ : CodeScanningVariantAnalysisLanguage,
@@ -64319,7 +64319,7 @@ pub fn CodeScanningVariantAnalysis::new(
   created_at? : String,
   updated_at? : String,
   completed_at? : String,
-  actions_workflow_run_id? : Int,
+  actions_workflow_run_id? : Int32,
   failure_reason? : CodeScanningVariantAnalysisFailureReason,
   scanned_repositories? : Array[
     CodeScanningVariantAnalysisScannedRepositoriesItem,
@@ -64403,8 +64403,8 @@ pub impl @json.FromJson for CodeScanningVariantAnalysis with fn from_json(
 pub(all) struct CodeScanningVariantAnalysisRepoTask {
   repository : SimpleRepository
   analysis_status : CodeScanningVariantAnalysisStatus
-  artifact_size_in_bytes : Int?
-  result_count : Int?
+  artifact_size_in_bytes : Int32?
+  result_count : Int32?
   failure_message : String?
   database_commit_sha : String?
   source_location_prefix : String?
@@ -64423,8 +64423,8 @@ pub extend CodeScanningVariantAnalysisRepoTask with @debug.Debug::{to_repr}
 pub fn CodeScanningVariantAnalysisRepoTask::new(
   repository~ : SimpleRepository,
   analysis_status~ : CodeScanningVariantAnalysisStatus,
-  artifact_size_in_bytes? : Int,
-  result_count? : Int,
+  artifact_size_in_bytes? : Int32,
+  result_count? : Int32,
   failure_message? : String,
   database_commit_sha? : String,
   source_location_prefix? : String,
@@ -65265,7 +65265,7 @@ pub impl @json.FromJson for CodeScanningDefaultSetupUpdate with fn from_json(
 ///
 /// You can use `run_url` to track the status of the run. This includes a property status and conclusion. You should not rely on this always being an actions workflow run object.
 pub(all) struct CodeScanningDefaultSetupUpdateResponse {
-  run_id : Int?
+  run_id : Int32?
   run_url : String?
 } derive(Eq, @debug.Debug)
 
@@ -65279,7 +65279,7 @@ pub extend CodeScanningDefaultSetupUpdateResponse with @debug.Debug::{to_repr}
 ///
 /// Creates a CodeScanningDefaultSetupUpdateResponse with omitted optional fields absent.
 pub fn CodeScanningDefaultSetupUpdateResponse::new(
-  run_id? : Int,
+  run_id? : Int32,
   run_url? : String,
 ) -> CodeScanningDefaultSetupUpdateResponse {
   { run_id, run_url, }
@@ -65635,8 +65635,8 @@ pub impl @json.FromJson for CodeSecurityConfigurationForRepository with fn from_
 ///
 /// Generated representation of CodeownersErrorsErrorsItem.
 pub(all) struct CodeownersErrorsErrorsItem {
-  line : Int
-  column : Int
+  line : Int32
+  column : Int32
   source : String?
   kind : String
   suggestion : @sdkjson.Presence[String]
@@ -65654,8 +65654,8 @@ pub extend CodeownersErrorsErrorsItem with @debug.Debug::{to_repr}
 ///
 /// Creates a CodeownersErrorsErrorsItem with omitted optional fields absent.
 pub fn CodeownersErrorsErrorsItem::new(
-  line~ : Int,
-  column~ : Int,
+  line~ : Int32,
+  column~ : Int32,
   kind~ : String,
   message~ : String,
   path~ : String,
@@ -65820,9 +65820,9 @@ pub(all) struct CodespaceMachine {
   name : String
   display_name : String
   operating_system : String
-  storage_in_bytes : Int
-  memory_in_bytes : Int
-  cpus : Int
+  storage_in_bytes : Int32
+  memory_in_bytes : Int32
+  cpus : Int32
   prebuild_availability : CodespaceMachinePrebuildAvailability?
 } derive(Eq, @debug.Debug)
 
@@ -65839,9 +65839,9 @@ pub fn CodespaceMachine::new(
   name~ : String,
   display_name~ : String,
   operating_system~ : String,
-  storage_in_bytes~ : Int,
-  memory_in_bytes~ : Int,
-  cpus~ : Int,
+  storage_in_bytes~ : Int32,
+  memory_in_bytes~ : Int32,
+  cpus~ : Int32,
   prebuild_availability? : CodespaceMachinePrebuildAvailability,
 ) -> CodespaceMachine {
   {
@@ -66684,12 +66684,12 @@ pub impl @json.FromJson for RepositoryCollaboratorPermission with fn from_json(
 pub(all) struct CommitComment {
   html_url : String
   url : String
-  id : Int
+  id : Int32
   node_id : String
   body : String
   path : String?
-  position : Int?
-  line : Int?
+  position : Int32?
+  line : Int32?
   commit_id : String
   user : NullableSimpleUser?
   created_at : String
@@ -66710,7 +66710,7 @@ pub extend CommitComment with @debug.Debug::{to_repr}
 pub fn CommitComment::new(
   html_url~ : String,
   url~ : String,
-  id~ : Int,
+  id~ : Int32,
   node_id~ : String,
   body~ : String,
   commit_id~ : String,
@@ -66718,8 +66718,8 @@ pub fn CommitComment::new(
   updated_at~ : String,
   author_association~ : AuthorAssociation,
   path? : String,
-  position? : Int,
-  line? : Int,
+  position? : Int32,
+  line? : Int32,
   user? : NullableSimpleUser,
   reactions? : ReactionRollup,
 ) -> CommitComment {
@@ -66865,7 +66865,7 @@ pub impl @json.FromJson for ReactionContent with fn from_json(value, path) {
 ///
 /// Reactions to conversations provide a way to help people express their feelings more simply and effectively.
 pub(all) struct Reaction {
-  id : Int
+  id : Int32
   node_id : String
   user : NullableSimpleUser?
   content : ReactionContent
@@ -66882,7 +66882,7 @@ pub extend Reaction with @debug.Debug::{to_repr}
 ///
 /// Creates a Reaction with omitted optional fields absent.
 pub fn Reaction::new(
-  id~ : Int,
+  id~ : Int32,
   node_id~ : String,
   content~ : ReactionContent,
   created_at~ : String,
@@ -67035,7 +67035,7 @@ pub impl @json.FromJson for BranchShort with fn from_json(value, path) {
 /// Generated representation of SimpleCommitStatus.
 pub(all) struct SimpleCommitStatus {
   description : String?
-  id : Int
+  id : Int32
   node_id : String
   state : String
   context : String
@@ -67057,7 +67057,7 @@ pub extend SimpleCommitStatus with @debug.Debug::{to_repr}
 ///
 /// Creates a SimpleCommitStatus with omitted optional fields absent.
 pub fn SimpleCommitStatus::new(
-  id~ : Int,
+  id~ : Int32,
   node_id~ : String,
   state~ : String,
   context~ : String,
@@ -67145,7 +67145,7 @@ pub(all) struct CombinedCommitStatus {
   state : String
   statuses : Array[SimpleCommitStatus]
   sha : String
-  total_count : Int
+  total_count : Int32
   repository : MinimalRepository
   commit_url : String
   url : String
@@ -67164,7 +67164,7 @@ pub fn CombinedCommitStatus::new(
   state~ : String,
   statuses~ : Array[SimpleCommitStatus],
   sha~ : String,
-  total_count~ : Int,
+  total_count~ : Int32,
   repository~ : MinimalRepository,
   commit_url~ : String,
   url~ : String,
@@ -67215,7 +67215,7 @@ pub impl @json.FromJson for CombinedCommitStatus with fn from_json(value, path) 
 pub(all) struct Status {
   url : String
   avatar_url : String?
-  id : Int
+  id : Int32
   node_id : String
   state : String
   description : String?
@@ -67237,7 +67237,7 @@ pub extend Status with @debug.Debug::{to_repr}
 /// Creates a Status with omitted optional fields absent.
 pub fn Status::new(
   url~ : String,
-  id~ : Int,
+  id~ : Int32,
   node_id~ : String,
   state~ : String,
   context~ : String,
@@ -67535,7 +67535,7 @@ pub impl @json.FromJson for CommunityProfileFiles with fn from_json(value, path)
 ///
 /// Community Profile
 pub(all) struct CommunityProfile {
-  health_percentage : Int
+  health_percentage : Int32
   description : String?
   documentation : String?
   files : CommunityProfileFiles
@@ -67553,7 +67553,7 @@ pub extend CommunityProfile with @debug.Debug::{to_repr}
 ///
 /// Creates a CommunityProfile with omitted optional fields absent.
 pub fn CommunityProfile::new(
-  health_percentage~ : Int,
+  health_percentage~ : Int32,
   files~ : CommunityProfileFiles,
   description? : String,
   documentation? : String,
@@ -67688,9 +67688,9 @@ pub(all) struct CommitComparison {
   base_commit : Commit
   merge_base_commit : Commit
   status : CommitComparisonStatus
-  ahead_by : Int
-  behind_by : Int
-  total_commits : Int
+  ahead_by : Int32
+  behind_by : Int32
+  total_commits : Int32
   commits : Array[Commit]
   files : Array[DiffEntry]?
 } derive(Eq, @debug.Debug)
@@ -67713,9 +67713,9 @@ pub fn CommitComparison::new(
   base_commit~ : Commit,
   merge_base_commit~ : Commit,
   status~ : CommitComparisonStatus,
-  ahead_by~ : Int,
-  behind_by~ : Int,
-  total_commits~ : Int,
+  ahead_by~ : Int32,
+  behind_by~ : Int32,
+  total_commits~ : Int32,
   commits~ : Array[Commit],
   files? : Array[DiffEntry],
 ) -> CommitComparison {
@@ -67848,7 +67848,7 @@ pub impl @json.FromJson for ContentTreeEntriesItemLinks with fn from_json(
 /// Generated representation of ContentTreeEntriesItem.
 pub(all) struct ContentTreeEntriesItem {
   type_ : String
-  size : Int
+  size : Int32
   name : String
   path : String
   sha : String
@@ -67870,7 +67870,7 @@ pub extend ContentTreeEntriesItem with @debug.Debug::{to_repr}
 /// Creates a ContentTreeEntriesItem with omitted optional fields absent.
 pub fn ContentTreeEntriesItem::new(
   type_~ : String,
-  size~ : Int,
+  size~ : Int32,
   name~ : String,
   path~ : String,
   sha~ : String,
@@ -67992,7 +67992,7 @@ pub impl @json.FromJson for ContentTreeLinks with fn from_json(value, path) {
 /// Content Tree
 pub(all) struct ContentTree {
   type_ : String
-  size : Int
+  size : Int32
   name : String
   path : String
   sha : String
@@ -68017,7 +68017,7 @@ pub extend ContentTree with @debug.Debug::{to_repr}
 /// Creates a ContentTree with omitted optional fields absent.
 pub fn ContentTree::new(
   type_~ : String,
-  size~ : Int,
+  size~ : Int32,
   name~ : String,
   path~ : String,
   sha~ : String,
@@ -68222,7 +68222,7 @@ pub impl @json.FromJson for ContentDirectoryItemLinks with fn from_json(
 /// Generated representation of ContentDirectoryItem.
 pub(all) struct ContentDirectoryItem {
   type_ : ContentDirectoryItemType
-  size : Int
+  size : Int32
   name : String
   path : String
   content : String?
@@ -68245,7 +68245,7 @@ pub extend ContentDirectoryItem with @debug.Debug::{to_repr}
 /// Creates a ContentDirectoryItem with omitted optional fields absent.
 pub fn ContentDirectoryItem::new(
   type_~ : ContentDirectoryItemType,
-  size~ : Int,
+  size~ : Int32,
   name~ : String,
   path~ : String,
   sha~ : String,
@@ -68379,7 +68379,7 @@ pub impl @json.FromJson for ContentFileLinks with fn from_json(value, path) {
 /// Content File
 pub(all) struct ContentFile {
   encoding : String
-  size : Int
+  size : Int32
   name : String
   path : String
   content : String
@@ -68404,7 +68404,7 @@ pub extend ContentFile with @debug.Debug::{to_repr}
 /// Creates a ContentFile with omitted optional fields absent.
 pub fn ContentFile::new(
   encoding~ : String,
-  size~ : Int,
+  size~ : Int32,
   name~ : String,
   path~ : String,
   content~ : String,
@@ -68547,7 +68547,7 @@ pub impl @json.FromJson for ContentSymlinkLinks with fn from_json(value, path) {
 /// An object describing a symlink
 pub(all) struct ContentSymlink {
   target : String
-  size : Int
+  size : Int32
   name : String
   path : String
   sha : String
@@ -68569,7 +68569,7 @@ pub extend ContentSymlink with @debug.Debug::{to_repr}
 /// Creates a ContentSymlink with omitted optional fields absent.
 pub fn ContentSymlink::new(
   target~ : String,
-  size~ : Int,
+  size~ : Int32,
   name~ : String,
   path~ : String,
   sha~ : String,
@@ -68700,7 +68700,7 @@ pub impl @json.FromJson for ContentSubmoduleLinks with fn from_json(value, path)
 /// An object describing a submodule
 pub(all) struct ContentSubmodule {
   submodule_git_url : String
-  size : Int
+  size : Int32
   name : String
   path : String
   sha : String
@@ -68722,7 +68722,7 @@ pub extend ContentSubmodule with @debug.Debug::{to_repr}
 /// Creates a ContentSubmodule with omitted optional fields absent.
 pub fn ContentSubmodule::new(
   submodule_git_url~ : String,
-  size~ : Int,
+  size~ : Int32,
   name~ : String,
   path~ : String,
   sha~ : String,
@@ -68858,7 +68858,7 @@ pub(all) struct FileCommitContent {
   name : String?
   path : String?
   sha : String?
-  size : Int?
+  size : Int32?
   url : String?
   html_url : String?
   git_url : String?
@@ -68880,7 +68880,7 @@ pub fn FileCommitContent::new(
   name? : String,
   path? : String,
   sha? : String,
-  size? : Int,
+  size? : Int32,
   url? : String,
   html_url? : String,
   git_url? : String,
@@ -69616,7 +69616,7 @@ pub impl @json.FromJson for RepositoryRuleViolationError with fn from_json(
 /// Contributor
 pub(all) struct Contributor {
   login : String?
-  id : Int?
+  id : Int32?
   node_id : String?
   avatar_url : String?
   gravatar_id : @sdkjson.Presence[String]
@@ -69633,7 +69633,7 @@ pub(all) struct Contributor {
   received_events_url : String?
   type_ : String
   site_admin : Bool?
-  contributions : Int
+  contributions : Int32
   email : String?
   name : String?
   user_view_type : String?
@@ -69650,9 +69650,9 @@ pub extend Contributor with @debug.Debug::{to_repr}
 /// Creates a Contributor with omitted optional fields absent.
 pub fn Contributor::new(
   type_~ : String,
-  contributions~ : Int,
+  contributions~ : Int32,
   login? : String,
-  id? : Int,
+  id? : Int32,
   node_id? : String,
   avatar_url? : String,
   gravatar_id? : String,
@@ -70072,7 +70072,7 @@ pub impl @json.FromJson for DependabotAlertDismissedReason with fn from_json(
 ///
 /// A Dependabot alert.
 pub(all) struct DependabotAlert {
-  number : Int
+  number : Int32
   state : DependabotAlertState
   dependency : DependabotAlertDependency
   security_advisory : DependabotAlertSecurityAdvisory
@@ -70101,7 +70101,7 @@ pub extend DependabotAlert with @debug.Debug::{to_repr}
 ///
 /// Creates a DependabotAlert with omitted optional fields absent.
 pub fn DependabotAlert::new(
-  number~ : Int,
+  number~ : Int32,
   state~ : DependabotAlertState,
   dependency~ : DependabotAlertDependency,
   security_advisory~ : DependabotAlertSecurityAdvisory,
@@ -71423,7 +71423,7 @@ pub impl @json.FromJson for SnapshotDetector with fn from_json(value, path) {
 ///
 /// Create a new snapshot of a repository's dependencies.
 pub(all) struct Snapshot {
-  version : Int
+  version : Int32
   job : SnapshotJob
   sha : String
   ref_ : String
@@ -71443,7 +71443,7 @@ pub extend Snapshot with @debug.Debug::{to_repr}
 ///
 /// Creates a Snapshot with omitted optional fields absent.
 pub fn Snapshot::new(
-  version~ : Int,
+  version~ : Int32,
   job~ : SnapshotJob,
   sha~ : String,
   ref_~ : String,
@@ -71741,10 +71741,10 @@ pub impl @json.FromJson for DeploymentBranchPolicySettings with fn from_json(
 ///
 /// Generated representation of EnvironmentProtectionRulesItemWaitTimer.
 pub(all) struct EnvironmentProtectionRulesItemWaitTimer {
-  id : Int
+  id : Int32
   node_id : String
   type_ : String
-  wait_timer : Int?
+  wait_timer : Int32?
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -71757,10 +71757,10 @@ pub extend EnvironmentProtectionRulesItemWaitTimer with @debug.Debug::{to_repr}
 ///
 /// Creates a EnvironmentProtectionRulesItemWaitTimer with omitted optional fields absent.
 pub fn EnvironmentProtectionRulesItemWaitTimer::new(
-  id~ : Int,
+  id~ : Int32,
   node_id~ : String,
   type_~ : String,
-  wait_timer? : Int,
+  wait_timer? : Int32,
 ) -> EnvironmentProtectionRulesItemWaitTimer {
   { id, node_id, type_, wait_timer, }
 }
@@ -71872,7 +71872,7 @@ pub impl @json.FromJson for EnvironmentProtectionRulesItemRequiredReviewersRevie
 ///
 /// Generated representation of EnvironmentProtectionRulesItemRequiredReviewers.
 pub(all) struct EnvironmentProtectionRulesItemRequiredReviewers {
-  id : Int
+  id : Int32
   node_id : String
   prevent_self_review : Bool?
   type_ : String
@@ -71896,7 +71896,7 @@ pub extend EnvironmentProtectionRulesItemRequiredReviewers with @debug.Debug::{
 ///
 /// Creates a EnvironmentProtectionRulesItemRequiredReviewers with omitted optional fields absent.
 pub fn EnvironmentProtectionRulesItemRequiredReviewers::new(
-  id~ : Int,
+  id~ : Int32,
   node_id~ : String,
   type_~ : String,
   prevent_self_review? : Bool,
@@ -71953,7 +71953,7 @@ pub impl @json.FromJson for EnvironmentProtectionRulesItemRequiredReviewers with
 ///
 /// Generated representation of EnvironmentProtectionRulesItemBranchPolicy.
 pub(all) struct EnvironmentProtectionRulesItemBranchPolicy {
-  id : Int
+  id : Int32
   node_id : String
   type_ : String
 } derive(Eq, @debug.Debug)
@@ -71973,7 +71973,7 @@ pub extend EnvironmentProtectionRulesItemBranchPolicy with @debug.Debug::{
 ///
 /// Creates a EnvironmentProtectionRulesItemBranchPolicy with omitted optional fields absent.
 pub fn EnvironmentProtectionRulesItemBranchPolicy::new(
-  id~ : Int,
+  id~ : Int32,
   node_id~ : String,
   type_~ : String,
 ) -> EnvironmentProtectionRulesItemBranchPolicy {
@@ -72218,7 +72218,7 @@ pub impl @json.FromJson for DeploymentBranchPolicyType with fn from_json(
 ///
 /// Details of a deployment branch or tag policy.
 pub(all) struct DeploymentBranchPolicy {
-  id : Int?
+  id : Int32?
   node_id : String?
   name : String?
   type_ : DeploymentBranchPolicyType?
@@ -72234,7 +72234,7 @@ pub extend DeploymentBranchPolicy with @debug.Debug::{to_repr}
 ///
 /// Creates a DeploymentBranchPolicy with omitted optional fields absent.
 pub fn DeploymentBranchPolicy::new(
-  id? : Int,
+  id? : Int32,
   node_id? : String,
   name? : String,
   type_? : DeploymentBranchPolicyType,
@@ -72449,7 +72449,7 @@ pub impl @json.FromJson for DeploymentBranchPolicyNamePattern with fn from_json(
 ///
 /// A GitHub App that is providing a custom deployment protection rule.
 pub(all) struct CustomDeploymentRuleApp {
-  id : Int
+  id : Int32
   slug : String
   integration_url : String
   node_id : String
@@ -72465,7 +72465,7 @@ pub extend CustomDeploymentRuleApp with @debug.Debug::{to_repr}
 ///
 /// Creates a CustomDeploymentRuleApp with omitted optional fields absent.
 pub fn CustomDeploymentRuleApp::new(
-  id~ : Int,
+  id~ : Int32,
   slug~ : String,
   integration_url~ : String,
   node_id~ : String,
@@ -72511,7 +72511,7 @@ pub impl @json.FromJson for CustomDeploymentRuleApp with fn from_json(
 ///
 /// Deployment protection rule
 pub(all) struct DeploymentProtectionRule {
-  id : Int
+  id : Int32
   node_id : String
   enabled : Bool
   app : CustomDeploymentRuleApp
@@ -72527,7 +72527,7 @@ pub extend DeploymentProtectionRule with @debug.Debug::{to_repr}
 ///
 /// Creates a DeploymentProtectionRule with omitted optional fields absent.
 pub fn DeploymentProtectionRule::new(
-  id~ : Int,
+  id~ : Int32,
   node_id~ : String,
   enabled~ : Bool,
   app~ : CustomDeploymentRuleApp,
@@ -72625,7 +72625,7 @@ pub(all) struct Blob {
   encoding : String
   url : String
   sha : String
-  size : Int?
+  size : Int32?
   node_id : String
   highlighted_content : String?
 } derive(Eq, @debug.Debug)
@@ -72645,7 +72645,7 @@ pub fn Blob::new(
   url~ : String,
   sha~ : String,
   node_id~ : String,
-  size? : Int,
+  size? : Int32,
   highlighted_content? : String,
 ) -> Blob {
   { content, encoding, url, sha, size, node_id, highlighted_content, }
@@ -73368,7 +73368,7 @@ pub(all) struct GitTreeTreeItem {
   mode : String
   type_ : String
   sha : String
-  size : Int?
+  size : Int32?
   url : String?
 } derive(Eq, @debug.Debug)
 
@@ -73386,7 +73386,7 @@ pub fn GitTreeTreeItem::new(
   mode~ : String,
   type_~ : String,
   sha~ : String,
-  size? : Int,
+  size? : Int32,
   url? : String,
 ) -> GitTreeTreeItem {
   { path, mode, type_, sha, size, url, }
@@ -73592,7 +73592,7 @@ pub impl @json.FromJson for RepositoryHashAlgorithm with fn from_json(
 ///
 /// Generated representation of HookResponse.
 pub(all) struct HookResponse {
-  code : Int?
+  code : Int32?
   status : String?
   message : String?
 } derive(Eq, @debug.Debug)
@@ -73607,7 +73607,7 @@ pub extend HookResponse with @debug.Debug::{to_repr}
 ///
 /// Creates a HookResponse with omitted optional fields absent.
 pub fn HookResponse::new(
-  code? : Int,
+  code? : Int32,
   status? : String,
   message? : String,
 ) -> HookResponse {
@@ -73648,7 +73648,7 @@ pub impl @json.FromJson for HookResponse with fn from_json(value, path) {
 /// Webhooks for repositories.
 pub(all) struct Hook {
   type_ : String
-  id : Int
+  id : Int32
   name : String
   active : Bool
   events : Array[String]
@@ -73673,7 +73673,7 @@ pub extend Hook with @debug.Debug::{to_repr}
 /// Creates a Hook with omitted optional fields absent.
 pub fn Hook::new(
   type_~ : String,
-  id~ : Int,
+  id~ : Int32,
   name~ : String,
   active~ : Bool,
   events~ : Array[String],
@@ -73970,15 +73970,15 @@ pub(all) struct Import {
   status_text : @sdkjson.Presence[String]
   failed_step : @sdkjson.Presence[String]
   error_message : @sdkjson.Presence[String]
-  import_percent : @sdkjson.Presence[Int]
-  commit_count : @sdkjson.Presence[Int]
-  push_percent : @sdkjson.Presence[Int]
+  import_percent : @sdkjson.Presence[Int32]
+  commit_count : @sdkjson.Presence[Int32]
+  push_percent : @sdkjson.Presence[Int32]
   has_large_files : Bool?
-  large_files_size : Int?
-  large_files_count : Int?
+  large_files_size : Int32?
+  large_files_count : Int32?
   project_choices : Array[ImportProjectChoicesItem]?
   message : String?
-  authors_count : @sdkjson.Presence[Int]
+  authors_count : @sdkjson.Presence[Int32]
   url : String
   html_url : String
   authors_url : String
@@ -74009,15 +74009,15 @@ pub fn Import::new(
   status_text? : String,
   failed_step? : String,
   error_message? : String,
-  import_percent? : Int,
-  commit_count? : Int,
-  push_percent? : Int,
+  import_percent? : Int32,
+  commit_count? : Int32,
+  push_percent? : Int32,
   has_large_files? : Bool,
-  large_files_size? : Int,
-  large_files_count? : Int,
+  large_files_size? : Int32,
+  large_files_count? : Int32,
   project_choices? : Array[ImportProjectChoicesItem],
   message? : String,
-  authors_count? : Int,
+  authors_count? : Int32,
   svn_root? : String,
 ) -> Import {
   {
@@ -74120,7 +74120,7 @@ pub impl @json.FromJson for Import with fn from_json(value, path) {
 ///
 /// Porter Author
 pub(all) struct PorterAuthor {
-  id : Int
+  id : Int32
   remote_id : String
   remote_name : String
   email : String
@@ -74139,7 +74139,7 @@ pub extend PorterAuthor with @debug.Debug::{to_repr}
 ///
 /// Creates a PorterAuthor with omitted optional fields absent.
 pub fn PorterAuthor::new(
-  id~ : Int,
+  id~ : Int32,
   remote_id~ : String,
   remote_name~ : String,
   email~ : String,
@@ -74194,7 +74194,7 @@ pub(all) struct PorterLargeFile {
   ref_name : String
   path : String
   oid : String
-  size : Int
+  size : Int32
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -74210,7 +74210,7 @@ pub fn PorterLargeFile::new(
   ref_name~ : String,
   path~ : String,
   oid~ : String,
-  size~ : Int,
+  size~ : Int32,
 ) -> PorterLargeFile {
   { ref_name, path, oid, size, }
 }
@@ -74575,7 +74575,7 @@ pub(all) struct NullableIssue {
   comments_url : String
   events_url : String
   html_url : String
-  number : Int
+  number : Int32
   state : String
   state_reason : @sdkjson.Presence[NullableIssueStateReason]
   title : String
@@ -74587,7 +74587,7 @@ pub(all) struct NullableIssue {
   milestone : NullableMilestone?
   locked : Bool
   active_lock_reason : @sdkjson.Presence[String]
-  comments : Int
+  comments : Int32
   pull_request : NullableIssuePullRequest?
   closed_at : String?
   created_at : String
@@ -74627,12 +74627,12 @@ pub fn NullableIssue::new(
   comments_url~ : String,
   events_url~ : String,
   html_url~ : String,
-  number~ : Int,
+  number~ : Int32,
   state~ : String,
   title~ : String,
   labels~ : Array[NullableIssueLabelsItem],
   locked~ : Bool,
-  comments~ : Int,
+  comments~ : Int32,
   created_at~ : String,
   updated_at~ : String,
   state_reason? : NullableIssueStateReason,
@@ -74866,7 +74866,7 @@ pub impl @json.FromJson for IssueEventLabel with fn from_json(value, path) {
 /// Generated representation of IssueEventDismissedReview.
 pub(all) struct IssueEventDismissedReview {
   state : String
-  review_id : Int
+  review_id : Int32
   dismissal_message : String?
   dismissal_commit_id : @sdkjson.Presence[String]
 } derive(Eq, @debug.Debug)
@@ -74882,7 +74882,7 @@ pub extend IssueEventDismissedReview with @debug.Debug::{to_repr}
 /// Creates a IssueEventDismissedReview with omitted optional fields absent.
 pub fn IssueEventDismissedReview::new(
   state~ : String,
-  review_id~ : Int,
+  review_id~ : Int32,
   dismissal_message? : String,
   dismissal_commit_id? : String,
 ) -> IssueEventDismissedReview {
@@ -74979,9 +74979,9 @@ pub impl @json.FromJson for IssueEventMilestone with fn from_json(value, path) {
 /// Issue Event Project Card
 pub(all) struct IssueEventProjectCard {
   url : String
-  id : Int
+  id : Int32
   project_url : String
-  project_id : Int
+  project_id : Int32
   column_name : String
   previous_column_name : String?
 } derive(Eq, @debug.Debug)
@@ -74997,9 +74997,9 @@ pub extend IssueEventProjectCard with @debug.Debug::{to_repr}
 /// Creates a IssueEventProjectCard with omitted optional fields absent.
 pub fn IssueEventProjectCard::new(
   url~ : String,
-  id~ : Int,
+  id~ : Int32,
   project_url~ : String,
-  project_id~ : Int,
+  project_id~ : Int32,
   column_name~ : String,
   previous_column_name? : String,
 ) -> IssueEventProjectCard {
@@ -75162,7 +75162,7 @@ pub impl @json.FromJson for IssueTypeWebhookColor with fn from_json(value, path)
 ///
 /// The type of issue.
 pub(all) struct IssueTypeWebhook {
-  id : Int
+  id : Int32
   name : String
   color : @sdkjson.Presence[IssueTypeWebhookColor]
 } derive(Eq, @debug.Debug)
@@ -75177,7 +75177,7 @@ pub extend IssueTypeWebhook with @debug.Debug::{to_repr}
 ///
 /// Creates a IssueTypeWebhook with omitted optional fields absent.
 pub fn IssueTypeWebhook::new(
-  id~ : Int,
+  id~ : Int32,
   name~ : String,
   color? : IssueTypeWebhookColor,
 ) -> IssueTypeWebhook {
@@ -75217,7 +75217,7 @@ pub impl @json.FromJson for IssueTypeWebhook with fn from_json(value, path) {
 ///
 /// The type of the referenced issue.
 pub(all) struct NullableIssueReferenceIssueType {
-  id : Int
+  id : Int32
   node_id : String
   name : String
   color : @sdkjson.Presence[String]
@@ -75233,7 +75233,7 @@ pub extend NullableIssueReferenceIssueType with @debug.Debug::{to_repr}
 ///
 /// Creates a NullableIssueReferenceIssueType with omitted optional fields absent.
 pub fn NullableIssueReferenceIssueType::new(
-  id~ : Int,
+  id~ : Int32,
   node_id~ : String,
   name~ : String,
   color? : String,
@@ -75279,7 +75279,7 @@ pub impl @json.FromJson for NullableIssueReferenceIssueType with fn from_json(
 ///
 /// A minimal reference to an issue linked from a timeline event (e.g. sub-issue, parent-issue, or dependency events).
 pub(all) struct NullableIssueReference {
-  number : Int
+  number : Int32
   title : String
   state : String
   state_reason : @sdkjson.Presence[String]
@@ -75297,7 +75297,7 @@ pub extend NullableIssueReference with @debug.Debug::{to_repr}
 ///
 /// Creates a NullableIssueReference with omitted optional fields absent.
 pub fn NullableIssueReference::new(
-  number~ : Int,
+  number~ : Int32,
   title~ : String,
   state~ : String,
   repository~ : SimpleRepository,
@@ -75911,17 +75911,17 @@ pub impl @json.FromJson for IssueSuggestionConfidence with fn from_json(
 ///
 /// An agent-proposed change to an issue that a maintainer can approve or dismiss.
 pub(all) struct IssueSuggestion {
-  id : Int
-  issue_id : Int
+  id : Int32
+  issue_id : Int32
   action : IssueSuggestionAction
   state : IssueSuggestionState
-  target_id : Int?
+  target_id : Int32?
   target_value : IssueSuggestionTargetValue?
   rationale : String?
   confidence : IssueSuggestionConfidence?
-  actor_id : Int?
-  issue_event_id : Int?
-  resolved_by : Int?
+  actor_id : Int32?
+  issue_event_id : Int32?
+  resolved_by : Int32?
   created_at : String
   updated_at : String
 } derive(Eq, @debug.Debug)
@@ -75936,19 +75936,19 @@ pub extend IssueSuggestion with @debug.Debug::{to_repr}
 ///
 /// Creates a IssueSuggestion with omitted optional fields absent.
 pub fn IssueSuggestion::new(
-  id~ : Int,
-  issue_id~ : Int,
+  id~ : Int32,
+  issue_id~ : Int32,
   action~ : IssueSuggestionAction,
   state~ : IssueSuggestionState,
   created_at~ : String,
   updated_at~ : String,
-  target_id? : Int,
+  target_id? : Int32,
   target_value? : IssueSuggestionTargetValue,
   rationale? : String,
   confidence? : IssueSuggestionConfidence,
-  actor_id? : Int,
-  issue_event_id? : Int,
-  resolved_by? : Int,
+  actor_id? : Int32,
+  issue_event_id? : Int32,
+  resolved_by? : Int32,
 ) -> IssueSuggestion {
   {
     id,
@@ -76400,11 +76400,11 @@ pub(all) struct PullRequestReviewComment {
   node_id : String
   diff_hunk : String
   path : String
-  position : Int?
-  original_position : Int?
+  position : Int32?
+  original_position : Int32?
   commit_id : String
   original_commit_id : String
-  in_reply_to_id : Int?
+  in_reply_to_id : Int32?
   user : NullableSimpleUser?
   body : String
   created_at : String
@@ -76413,11 +76413,11 @@ pub(all) struct PullRequestReviewComment {
   pull_request_url : String
   author_association : AuthorAssociation
   links : PullRequestReviewCommentLinks
-  start_line : @sdkjson.Presence[Int]
-  original_start_line : @sdkjson.Presence[Int]
+  start_line : @sdkjson.Presence[Int32]
+  original_start_line : @sdkjson.Presence[Int32]
   start_side : @sdkjson.Presence[PullRequestReviewCommentStartSide]
-  line : Int?
-  original_line : Int?
+  line : Int32?
+  original_line : Int32?
   side : PullRequestReviewCommentSide?
   subject_type : PullRequestReviewCommentSubjectType?
   reactions : ReactionRollup?
@@ -76450,15 +76450,15 @@ pub fn PullRequestReviewComment::new(
   author_association~ : AuthorAssociation,
   links~ : PullRequestReviewCommentLinks,
   pull_request_review_id? : Int64,
-  position? : Int,
-  original_position? : Int,
-  in_reply_to_id? : Int,
+  position? : Int32,
+  original_position? : Int32,
+  in_reply_to_id? : Int32,
   user? : NullableSimpleUser,
-  start_line? : Int,
-  original_start_line? : Int,
+  start_line? : Int32,
+  original_start_line? : Int32,
   start_side? : PullRequestReviewCommentStartSide,
-  line? : Int,
-  original_line? : Int,
+  line? : Int32,
+  original_line? : Int32,
   side? : PullRequestReviewCommentSide,
   subject_type? : PullRequestReviewCommentSubjectType,
   reactions? : ReactionRollup,
@@ -76595,7 +76595,7 @@ pub impl @json.FromJson for PullRequestReviewComment with fn from_json(
 ///
 /// An SSH key granting access to a single repository.
 pub(all) struct DeployKey {
-  id : Int
+  id : Int32
   key : String
   url : String
   title : String
@@ -76617,7 +76617,7 @@ pub extend DeployKey with @debug.Debug::{to_repr}
 ///
 /// Creates a DeployKey with omitted optional fields absent.
 pub fn DeployKey::new(
-  id~ : Int,
+  id~ : Int32,
   key~ : String,
   url~ : String,
   title~ : String,
@@ -76747,7 +76747,7 @@ pub(all) struct LicenseContent {
   name : String
   path : String
   sha : String
-  size : Int
+  size : Int32
   url : String
   html_url : String?
   git_url : String?
@@ -76772,7 +76772,7 @@ pub fn LicenseContent::new(
   name~ : String,
   path~ : String,
   sha~ : String,
-  size~ : Int,
+  size~ : Int32,
   url~ : String,
   type_~ : String,
   content~ : String,
@@ -77022,15 +77022,15 @@ pub(all) struct Milestone {
   url : String
   html_url : String
   labels_url : String
-  id : Int
+  id : Int32
   node_id : String
-  number : Int
+  number : Int32
   state : MilestoneState
   title : String
   description : String?
   creator : NullableSimpleUser?
-  open_issues : Int
-  closed_issues : Int
+  open_issues : Int32
+  closed_issues : Int32
   created_at : String
   updated_at : String
   closed_at : String?
@@ -77050,13 +77050,13 @@ pub fn Milestone::new(
   url~ : String,
   html_url~ : String,
   labels_url~ : String,
-  id~ : Int,
+  id~ : Int32,
   node_id~ : String,
-  number~ : Int,
+  number~ : Int32,
   state~ : MilestoneState,
   title~ : String,
-  open_issues~ : Int,
-  closed_issues~ : Int,
+  open_issues~ : Int32,
+  closed_issues~ : Int32,
   created_at~ : String,
   updated_at~ : String,
   description? : String,
@@ -77662,7 +77662,7 @@ pub(all) struct PageBuild {
   error : PageBuildError
   pusher : NullableSimpleUser?
   commit : String
-  duration : Int
+  duration : Int32
   created_at : String
   updated_at : String
 } derive(Eq, @debug.Debug)
@@ -77681,7 +77681,7 @@ pub fn PageBuild::new(
   status~ : String,
   error~ : PageBuildError,
   commit~ : String,
-  duration~ : Int,
+  duration~ : Int32,
   created_at~ : String,
   updated_at~ : String,
   pusher? : NullableSimpleUser,
@@ -77780,7 +77780,7 @@ pub impl @json.FromJson for PageBuildStatus with fn from_json(value, path) {
 ///
 /// The ID of the GitHub Pages deployment. This is the Git SHA of the deployed commit.
 pub(all) enum PageDeploymentId {
-  Int(Int)
+  Int(Int32)
   Text(String)
 } derive(Eq, @debug.Debug)
 
@@ -77811,7 +77811,7 @@ pub extend PageDeploymentId with @json.FromJson::{from_json}
 ///|
 pub impl @json.FromJson for PageDeploymentId with fn from_json(value, path) {
   if value is Number(_, ..) {
-    let decoded : Int = @json.from_json(value, path~)
+    let decoded : Int32 = @json.from_json(value, path~)
     return Int(decoded)
   }
   if value is String(_) {
@@ -78847,7 +78847,7 @@ pub(all) struct PullRequest {
   review_comment_url : String
   comments_url : String
   statuses_url : String
-  number : Int
+  number : Int32
   state : PullRequestState
   locked : Bool
   title : String
@@ -78877,13 +78877,13 @@ pub(all) struct PullRequest {
   rebaseable : @sdkjson.Presence[Bool]
   mergeable_state : String
   merged_by : NullableSimpleUser?
-  comments : Int
-  review_comments : Int
+  comments : Int32
+  review_comments : Int32
   maintainer_can_modify : Bool
-  commits : Int
-  additions : Int
-  deletions : Int
-  changed_files : Int
+  commits : Int32
+  additions : Int32
+  deletions : Int32
+  changed_files : Int32
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -78908,7 +78908,7 @@ pub fn PullRequest::new(
   review_comment_url~ : String,
   comments_url~ : String,
   statuses_url~ : String,
-  number~ : Int,
+  number~ : Int32,
   state~ : PullRequestState,
   locked~ : Bool,
   title~ : String,
@@ -78922,13 +78922,13 @@ pub fn PullRequest::new(
   author_association~ : AuthorAssociation,
   merged~ : Bool,
   mergeable_state~ : String,
-  comments~ : Int,
-  review_comments~ : Int,
+  comments~ : Int32,
+  review_comments~ : Int32,
   maintainer_can_modify~ : Bool,
-  commits~ : Int,
-  additions~ : Int,
-  deletions~ : Int,
-  changed_files~ : Int,
+  commits~ : Int32,
+  additions~ : Int32,
+  deletions~ : Int32,
+  changed_files~ : Int32,
   body? : String,
   milestone? : NullableMilestone,
   active_lock_reason? : String,
@@ -79831,11 +79831,11 @@ pub(all) struct ReviewComment {
   node_id : String
   diff_hunk : String
   path : String
-  position : Int?
-  original_position : Int
+  position : Int32?
+  original_position : Int32
   commit_id : String
   original_commit_id : String
-  in_reply_to_id : Int?
+  in_reply_to_id : Int32?
   user : NullableSimpleUser?
   body : String
   created_at : String
@@ -79849,10 +79849,10 @@ pub(all) struct ReviewComment {
   reactions : ReactionRollup?
   side : ReviewCommentSide?
   start_side : @sdkjson.Presence[ReviewCommentStartSide]
-  line : Int?
-  original_line : Int?
-  start_line : @sdkjson.Presence[Int]
-  original_start_line : @sdkjson.Presence[Int]
+  line : Int32?
+  original_line : Int32?
+  start_line : @sdkjson.Presence[Int32]
+  original_start_line : @sdkjson.Presence[Int32]
   subject_type : ReviewCommentSubjectType?
 } derive(Eq, @debug.Debug)
 
@@ -79871,7 +79871,7 @@ pub fn ReviewComment::new(
   node_id~ : String,
   diff_hunk~ : String,
   path~ : String,
-  original_position~ : Int,
+  original_position~ : Int32,
   commit_id~ : String,
   original_commit_id~ : String,
   body~ : String,
@@ -79882,18 +79882,18 @@ pub fn ReviewComment::new(
   author_association~ : AuthorAssociation,
   links~ : ReviewCommentLinks,
   pull_request_review_id? : Int64,
-  position? : Int,
-  in_reply_to_id? : Int,
+  position? : Int32,
+  in_reply_to_id? : Int32,
   user? : NullableSimpleUser,
   body_text? : String,
   body_html? : String,
   reactions? : ReactionRollup,
   side? : ReviewCommentSide,
   start_side? : ReviewCommentStartSide,
-  line? : Int,
-  original_line? : Int,
-  start_line? : Int,
-  original_start_line? : Int,
+  line? : Int32,
+  original_line? : Int32,
+  start_line? : Int32,
+  original_start_line? : Int32,
   subject_type? : ReviewCommentSubjectType,
 ) -> ReviewComment {
   {
@@ -80139,7 +80139,7 @@ pub impl @json.FromJson for RepositoryRuleRulesetInfoRulesetSourceType with fn f
 pub(all) struct RepositoryRuleRulesetInfo {
   ruleset_source_type : RepositoryRuleRulesetInfoRulesetSourceType?
   ruleset_source : String?
-  ruleset_id : Int?
+  ruleset_id : Int32?
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -80154,7 +80154,7 @@ pub extend RepositoryRuleRulesetInfo with @debug.Debug::{to_repr}
 pub fn RepositoryRuleRulesetInfo::new(
   ruleset_source_type? : RepositoryRuleRulesetInfoRulesetSourceType,
   ruleset_source? : String,
-  ruleset_id? : Int,
+  ruleset_id? : Int32,
 ) -> RepositoryRuleRulesetInfo {
   { ruleset_source_type, ruleset_source, ruleset_id, }
 }
@@ -80263,7 +80263,7 @@ pub(all) struct RepositoryRuleDetailedCreation {
   type_ : String
   ruleset_source_type : RepositoryRuleDetailedCreationRulesetSourceType?
   ruleset_source : String?
-  ruleset_id : Int?
+  ruleset_id : Int32?
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -80279,7 +80279,7 @@ pub fn RepositoryRuleDetailedCreation::new(
   type_~ : String,
   ruleset_source_type? : RepositoryRuleDetailedCreationRulesetSourceType,
   ruleset_source? : String,
-  ruleset_id? : Int,
+  ruleset_id? : Int32,
 ) -> RepositoryRuleDetailedCreation {
   { type_, ruleset_source_type, ruleset_source, ruleset_id, }
 }
@@ -80443,7 +80443,7 @@ pub(all) struct RepositoryRuleDetailedUpdate {
   parameters : RepositoryRuleDetailedUpdateParameters?
   ruleset_source_type : RepositoryRuleDetailedUpdateRulesetSourceType?
   ruleset_source : String?
-  ruleset_id : Int?
+  ruleset_id : Int32?
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -80460,7 +80460,7 @@ pub fn RepositoryRuleDetailedUpdate::new(
   parameters? : RepositoryRuleDetailedUpdateParameters,
   ruleset_source_type? : RepositoryRuleDetailedUpdateRulesetSourceType,
   ruleset_source? : String,
-  ruleset_id? : Int,
+  ruleset_id? : Int32,
 ) -> RepositoryRuleDetailedUpdate {
   { type_, parameters, ruleset_source_type, ruleset_source, ruleset_id, }
 }
@@ -80573,7 +80573,7 @@ pub(all) struct RepositoryRuleDetailedDeletion {
   type_ : String
   ruleset_source_type : RepositoryRuleDetailedDeletionRulesetSourceType?
   ruleset_source : String?
-  ruleset_id : Int?
+  ruleset_id : Int32?
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -80589,7 +80589,7 @@ pub fn RepositoryRuleDetailedDeletion::new(
   type_~ : String,
   ruleset_source_type? : RepositoryRuleDetailedDeletionRulesetSourceType,
   ruleset_source? : String,
-  ruleset_id? : Int,
+  ruleset_id? : Int32,
 ) -> RepositoryRuleDetailedDeletion {
   { type_, ruleset_source_type, ruleset_source, ruleset_id, }
 }
@@ -80700,7 +80700,7 @@ pub(all) struct RepositoryRuleDetailedRequiredLinearHistory {
   type_ : String
   ruleset_source_type : RepositoryRuleDetailedRequiredLinearHistoryRulesetSourceType?
   ruleset_source : String?
-  ruleset_id : Int?
+  ruleset_id : Int32?
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -80721,7 +80721,7 @@ pub fn RepositoryRuleDetailedRequiredLinearHistory::new(
   type_~ : String,
   ruleset_source_type? : RepositoryRuleDetailedRequiredLinearHistoryRulesetSourceType,
   ruleset_source? : String,
-  ruleset_id? : Int,
+  ruleset_id? : Int32,
 ) -> RepositoryRuleDetailedRequiredLinearHistory {
   { type_, ruleset_source_type, ruleset_source, ruleset_id, }
 }
@@ -80901,13 +80901,13 @@ pub impl @json.FromJson for RepositoryRuleDetailedMergeQueueParametersMergeMetho
 ///
 /// Generated representation of RepositoryRuleDetailedMergeQueueParameters.
 pub(all) struct RepositoryRuleDetailedMergeQueueParameters {
-  check_response_timeout_minutes : Int
+  check_response_timeout_minutes : Int32
   grouping_strategy : RepositoryRuleDetailedMergeQueueParametersGroupingStrategy
-  max_entries_to_build : Int
-  max_entries_to_merge : Int
+  max_entries_to_build : Int32
+  max_entries_to_merge : Int32
   merge_method : RepositoryRuleDetailedMergeQueueParametersMergeMethod
-  min_entries_to_merge : Int
-  min_entries_to_merge_wait_minutes : Int
+  min_entries_to_merge : Int32
+  min_entries_to_merge_wait_minutes : Int32
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -80925,13 +80925,13 @@ pub extend RepositoryRuleDetailedMergeQueueParameters with @debug.Debug::{
 ///
 /// Creates a RepositoryRuleDetailedMergeQueueParameters with omitted optional fields absent.
 pub fn RepositoryRuleDetailedMergeQueueParameters::new(
-  check_response_timeout_minutes~ : Int,
+  check_response_timeout_minutes~ : Int32,
   grouping_strategy~ : RepositoryRuleDetailedMergeQueueParametersGroupingStrategy,
-  max_entries_to_build~ : Int,
-  max_entries_to_merge~ : Int,
+  max_entries_to_build~ : Int32,
+  max_entries_to_merge~ : Int32,
   merge_method~ : RepositoryRuleDetailedMergeQueueParametersMergeMethod,
-  min_entries_to_merge~ : Int,
-  min_entries_to_merge_wait_minutes~ : Int,
+  min_entries_to_merge~ : Int32,
+  min_entries_to_merge_wait_minutes~ : Int32,
 ) -> RepositoryRuleDetailedMergeQueueParameters {
   {
     check_response_timeout_minutes,
@@ -81068,7 +81068,7 @@ pub(all) struct RepositoryRuleDetailedMergeQueue {
   parameters : RepositoryRuleDetailedMergeQueueParameters?
   ruleset_source_type : RepositoryRuleDetailedMergeQueueRulesetSourceType?
   ruleset_source : String?
-  ruleset_id : Int?
+  ruleset_id : Int32?
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -81085,7 +81085,7 @@ pub fn RepositoryRuleDetailedMergeQueue::new(
   parameters? : RepositoryRuleDetailedMergeQueueParameters,
   ruleset_source_type? : RepositoryRuleDetailedMergeQueueRulesetSourceType,
   ruleset_source? : String,
-  ruleset_id? : Int,
+  ruleset_id? : Int32,
 ) -> RepositoryRuleDetailedMergeQueue {
   { type_, parameters, ruleset_source_type, ruleset_source, ruleset_id, }
 }
@@ -81265,7 +81265,7 @@ pub(all) struct RepositoryRuleDetailedRequiredDeployments {
   parameters : RepositoryRuleDetailedRequiredDeploymentsParameters?
   ruleset_source_type : RepositoryRuleDetailedRequiredDeploymentsRulesetSourceType?
   ruleset_source : String?
-  ruleset_id : Int?
+  ruleset_id : Int32?
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -81284,7 +81284,7 @@ pub fn RepositoryRuleDetailedRequiredDeployments::new(
   parameters? : RepositoryRuleDetailedRequiredDeploymentsParameters,
   ruleset_source_type? : RepositoryRuleDetailedRequiredDeploymentsRulesetSourceType,
   ruleset_source? : String,
-  ruleset_id? : Int,
+  ruleset_id? : Int32,
 ) -> RepositoryRuleDetailedRequiredDeployments {
   { type_, parameters, ruleset_source_type, ruleset_source, ruleset_id, }
 }
@@ -81401,7 +81401,7 @@ pub(all) struct RepositoryRuleDetailedRequiredSignatures {
   type_ : String
   ruleset_source_type : RepositoryRuleDetailedRequiredSignaturesRulesetSourceType?
   ruleset_source : String?
-  ruleset_id : Int?
+  ruleset_id : Int32?
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -81417,7 +81417,7 @@ pub fn RepositoryRuleDetailedRequiredSignatures::new(
   type_~ : String,
   ruleset_source_type? : RepositoryRuleDetailedRequiredSignaturesRulesetSourceType,
   ruleset_source? : String,
-  ruleset_id? : Int,
+  ruleset_id? : Int32,
 ) -> RepositoryRuleDetailedRequiredSignatures {
   { type_, ruleset_source_type, ruleset_source, ruleset_id, }
 }
@@ -81539,7 +81539,7 @@ pub(all) struct RepositoryRuleDetailedPullRequestParameters {
   dismissal_restriction : RepositoryRuleParamsDismissalRestriction?
   require_code_owner_review : Bool
   require_last_push_approval : Bool
-  required_approving_review_count : Int
+  required_approving_review_count : Int32
   required_review_thread_resolution : Bool
   required_reviewers : Array[RepositoryRuleParamsRequiredReviewerConfiguration]?
 } derive(Eq, @debug.Debug)
@@ -81562,7 +81562,7 @@ pub fn RepositoryRuleDetailedPullRequestParameters::new(
   dismiss_stale_reviews_on_push~ : Bool,
   require_code_owner_review~ : Bool,
   require_last_push_approval~ : Bool,
-  required_approving_review_count~ : Int,
+  required_approving_review_count~ : Int32,
   required_review_thread_resolution~ : Bool,
   allowed_merge_methods? : Array[
     RepositoryRuleDetailedPullRequestParametersAllowedMergeMethodsItem,
@@ -81721,7 +81721,7 @@ pub(all) struct RepositoryRuleDetailedPullRequest {
   parameters : RepositoryRuleDetailedPullRequestParameters?
   ruleset_source_type : RepositoryRuleDetailedPullRequestRulesetSourceType?
   ruleset_source : String?
-  ruleset_id : Int?
+  ruleset_id : Int32?
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -81738,7 +81738,7 @@ pub fn RepositoryRuleDetailedPullRequest::new(
   parameters? : RepositoryRuleDetailedPullRequestParameters,
   ruleset_source_type? : RepositoryRuleDetailedPullRequestRulesetSourceType,
   ruleset_source? : String,
-  ruleset_id? : Int,
+  ruleset_id? : Int32,
 ) -> RepositoryRuleDetailedPullRequest {
   { type_, parameters, ruleset_source_type, ruleset_source, ruleset_id, }
 }
@@ -81932,7 +81932,7 @@ pub(all) struct RepositoryRuleDetailedRequiredStatusChecks {
   parameters : RepositoryRuleDetailedRequiredStatusChecksParameters?
   ruleset_source_type : RepositoryRuleDetailedRequiredStatusChecksRulesetSourceType?
   ruleset_source : String?
-  ruleset_id : Int?
+  ruleset_id : Int32?
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -81954,7 +81954,7 @@ pub fn RepositoryRuleDetailedRequiredStatusChecks::new(
   parameters? : RepositoryRuleDetailedRequiredStatusChecksParameters,
   ruleset_source_type? : RepositoryRuleDetailedRequiredStatusChecksRulesetSourceType,
   ruleset_source? : String,
-  ruleset_id? : Int,
+  ruleset_id? : Int32,
 ) -> RepositoryRuleDetailedRequiredStatusChecks {
   { type_, parameters, ruleset_source_type, ruleset_source, ruleset_id, }
 }
@@ -82071,7 +82071,7 @@ pub(all) struct RepositoryRuleDetailedNonFastForward {
   type_ : String
   ruleset_source_type : RepositoryRuleDetailedNonFastForwardRulesetSourceType?
   ruleset_source : String?
-  ruleset_id : Int?
+  ruleset_id : Int32?
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -82087,7 +82087,7 @@ pub fn RepositoryRuleDetailedNonFastForward::new(
   type_~ : String,
   ruleset_source_type? : RepositoryRuleDetailedNonFastForwardRulesetSourceType,
   ruleset_source? : String,
-  ruleset_id? : Int,
+  ruleset_id? : Int32,
 ) -> RepositoryRuleDetailedNonFastForward {
   { type_, ruleset_source_type, ruleset_source, ruleset_id, }
 }
@@ -82343,7 +82343,7 @@ pub(all) struct RepositoryRuleDetailedCommitMessagePattern {
   parameters : RepositoryRuleDetailedCommitMessagePatternParameters?
   ruleset_source_type : RepositoryRuleDetailedCommitMessagePatternRulesetSourceType?
   ruleset_source : String?
-  ruleset_id : Int?
+  ruleset_id : Int32?
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -82365,7 +82365,7 @@ pub fn RepositoryRuleDetailedCommitMessagePattern::new(
   parameters? : RepositoryRuleDetailedCommitMessagePatternParameters,
   ruleset_source_type? : RepositoryRuleDetailedCommitMessagePatternRulesetSourceType,
   ruleset_source? : String,
-  ruleset_id? : Int,
+  ruleset_id? : Int32,
 ) -> RepositoryRuleDetailedCommitMessagePattern {
   { type_, parameters, ruleset_source_type, ruleset_source, ruleset_id, }
 }
@@ -82627,7 +82627,7 @@ pub(all) struct RepositoryRuleDetailedCommitAuthorEmailPattern {
   parameters : RepositoryRuleDetailedCommitAuthorEmailPatternParameters?
   ruleset_source_type : RepositoryRuleDetailedCommitAuthorEmailPatternRulesetSourceType?
   ruleset_source : String?
-  ruleset_id : Int?
+  ruleset_id : Int32?
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -82649,7 +82649,7 @@ pub fn RepositoryRuleDetailedCommitAuthorEmailPattern::new(
   parameters? : RepositoryRuleDetailedCommitAuthorEmailPatternParameters,
   ruleset_source_type? : RepositoryRuleDetailedCommitAuthorEmailPatternRulesetSourceType,
   ruleset_source? : String,
-  ruleset_id? : Int,
+  ruleset_id? : Int32,
 ) -> RepositoryRuleDetailedCommitAuthorEmailPattern {
   { type_, parameters, ruleset_source_type, ruleset_source, ruleset_id, }
 }
@@ -82911,7 +82911,7 @@ pub(all) struct RepositoryRuleDetailedCommitterEmailPattern {
   parameters : RepositoryRuleDetailedCommitterEmailPatternParameters?
   ruleset_source_type : RepositoryRuleDetailedCommitterEmailPatternRulesetSourceType?
   ruleset_source : String?
-  ruleset_id : Int?
+  ruleset_id : Int32?
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -82933,7 +82933,7 @@ pub fn RepositoryRuleDetailedCommitterEmailPattern::new(
   parameters? : RepositoryRuleDetailedCommitterEmailPatternParameters,
   ruleset_source_type? : RepositoryRuleDetailedCommitterEmailPatternRulesetSourceType,
   ruleset_source? : String,
-  ruleset_id? : Int,
+  ruleset_id? : Int32,
 ) -> RepositoryRuleDetailedCommitterEmailPattern {
   { type_, parameters, ruleset_source_type, ruleset_source, ruleset_id, }
 }
@@ -83195,7 +83195,7 @@ pub(all) struct RepositoryRuleDetailedBranchNamePattern {
   parameters : RepositoryRuleDetailedBranchNamePatternParameters?
   ruleset_source_type : RepositoryRuleDetailedBranchNamePatternRulesetSourceType?
   ruleset_source : String?
-  ruleset_id : Int?
+  ruleset_id : Int32?
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -83212,7 +83212,7 @@ pub fn RepositoryRuleDetailedBranchNamePattern::new(
   parameters? : RepositoryRuleDetailedBranchNamePatternParameters,
   ruleset_source_type? : RepositoryRuleDetailedBranchNamePatternRulesetSourceType,
   ruleset_source? : String,
-  ruleset_id? : Int,
+  ruleset_id? : Int32,
 ) -> RepositoryRuleDetailedBranchNamePattern {
   { type_, parameters, ruleset_source_type, ruleset_source, ruleset_id, }
 }
@@ -83472,7 +83472,7 @@ pub(all) struct RepositoryRuleDetailedTagNamePattern {
   parameters : RepositoryRuleDetailedTagNamePatternParameters?
   ruleset_source_type : RepositoryRuleDetailedTagNamePatternRulesetSourceType?
   ruleset_source : String?
-  ruleset_id : Int?
+  ruleset_id : Int32?
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -83489,7 +83489,7 @@ pub fn RepositoryRuleDetailedTagNamePattern::new(
   parameters? : RepositoryRuleDetailedTagNamePatternParameters,
   ruleset_source_type? : RepositoryRuleDetailedTagNamePatternRulesetSourceType,
   ruleset_source? : String,
-  ruleset_id? : Int,
+  ruleset_id? : Int32,
 ) -> RepositoryRuleDetailedTagNamePattern {
   { type_, parameters, ruleset_source_type, ruleset_source, ruleset_id, }
 }
@@ -83665,7 +83665,7 @@ pub(all) struct RepositoryRuleDetailedWorkflows {
   parameters : RepositoryRuleDetailedWorkflowsParameters?
   ruleset_source_type : RepositoryRuleDetailedWorkflowsRulesetSourceType?
   ruleset_source : String?
-  ruleset_id : Int?
+  ruleset_id : Int32?
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -83682,7 +83682,7 @@ pub fn RepositoryRuleDetailedWorkflows::new(
   parameters? : RepositoryRuleDetailedWorkflowsParameters,
   ruleset_source_type? : RepositoryRuleDetailedWorkflowsRulesetSourceType,
   ruleset_source? : String,
-  ruleset_id? : Int,
+  ruleset_id? : Int32,
 ) -> RepositoryRuleDetailedWorkflows {
   { type_, parameters, ruleset_source_type, ruleset_source, ruleset_id, }
 }
@@ -83853,7 +83853,7 @@ pub(all) struct RepositoryRuleDetailedCodeScanning {
   parameters : RepositoryRuleDetailedCodeScanningParameters?
   ruleset_source_type : RepositoryRuleDetailedCodeScanningRulesetSourceType?
   ruleset_source : String?
-  ruleset_id : Int?
+  ruleset_id : Int32?
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -83870,7 +83870,7 @@ pub fn RepositoryRuleDetailedCodeScanning::new(
   parameters? : RepositoryRuleDetailedCodeScanningParameters,
   ruleset_source_type? : RepositoryRuleDetailedCodeScanningRulesetSourceType,
   ruleset_source? : String,
-  ruleset_id? : Int,
+  ruleset_id? : Int32,
 ) -> RepositoryRuleDetailedCodeScanning {
   { type_, parameters, ruleset_source_type, ruleset_source, ruleset_id, }
 }
@@ -84110,7 +84110,7 @@ pub(all) struct RepositoryRuleDetailedCodeQuality {
   parameters : RepositoryRuleDetailedCodeQualityParameters?
   ruleset_source_type : RepositoryRuleDetailedCodeQualityRulesetSourceType?
   ruleset_source : String?
-  ruleset_id : Int?
+  ruleset_id : Int32?
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -84127,7 +84127,7 @@ pub fn RepositoryRuleDetailedCodeQuality::new(
   parameters? : RepositoryRuleDetailedCodeQualityParameters,
   ruleset_source_type? : RepositoryRuleDetailedCodeQualityRulesetSourceType,
   ruleset_source? : String,
-  ruleset_id? : Int,
+  ruleset_id? : Int32,
 ) -> RepositoryRuleDetailedCodeQuality {
   { type_, parameters, ruleset_source_type, ruleset_source, ruleset_id, }
 }
@@ -84304,7 +84304,7 @@ pub(all) struct RepositoryRuleDetailedCodeCoverage {
   parameters : RepositoryRuleDetailedCodeCoverageParameters?
   ruleset_source_type : RepositoryRuleDetailedCodeCoverageRulesetSourceType?
   ruleset_source : String?
-  ruleset_id : Int?
+  ruleset_id : Int32?
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -84321,7 +84321,7 @@ pub fn RepositoryRuleDetailedCodeCoverage::new(
   parameters? : RepositoryRuleDetailedCodeCoverageParameters,
   ruleset_source_type? : RepositoryRuleDetailedCodeCoverageRulesetSourceType,
   ruleset_source? : String,
-  ruleset_id? : Int,
+  ruleset_id? : Int32,
 ) -> RepositoryRuleDetailedCodeCoverage {
   { type_, parameters, ruleset_source_type, ruleset_source, ruleset_id, }
 }
@@ -84502,7 +84502,7 @@ pub(all) struct RepositoryRuleDetailedCopilotCodeReview {
   parameters : RepositoryRuleDetailedCopilotCodeReviewParameters?
   ruleset_source_type : RepositoryRuleDetailedCopilotCodeReviewRulesetSourceType?
   ruleset_source : String?
-  ruleset_id : Int?
+  ruleset_id : Int32?
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -84519,7 +84519,7 @@ pub fn RepositoryRuleDetailedCopilotCodeReview::new(
   parameters? : RepositoryRuleDetailedCopilotCodeReviewParameters,
   ruleset_source_type? : RepositoryRuleDetailedCopilotCodeReviewRulesetSourceType,
   ruleset_source? : String,
-  ruleset_id? : Int,
+  ruleset_id? : Int32,
 ) -> RepositoryRuleDetailedCopilotCodeReview {
   { type_, parameters, ruleset_source_type, ruleset_source, ruleset_id, }
 }
@@ -84636,7 +84636,7 @@ pub(all) struct RepositoryRuleDetailedLicenseComplianceScanning {
   type_ : String
   ruleset_source_type : RepositoryRuleDetailedLicenseComplianceScanningRulesetSourceType?
   ruleset_source : String?
-  ruleset_id : Int?
+  ruleset_id : Int32?
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -84657,7 +84657,7 @@ pub fn RepositoryRuleDetailedLicenseComplianceScanning::new(
   type_~ : String,
   ruleset_source_type? : RepositoryRuleDetailedLicenseComplianceScanningRulesetSourceType,
   ruleset_source? : String,
-  ruleset_id? : Int,
+  ruleset_id? : Int32,
 ) -> RepositoryRuleDetailedLicenseComplianceScanning {
   { type_, ruleset_source_type, ruleset_source, ruleset_id, }
 }
@@ -84834,7 +84834,7 @@ pub(all) struct RepositoryRuleDetailedFilePathRestriction {
   parameters : RepositoryRuleDetailedFilePathRestrictionParameters?
   ruleset_source_type : RepositoryRuleDetailedFilePathRestrictionRulesetSourceType?
   ruleset_source : String?
-  ruleset_id : Int?
+  ruleset_id : Int32?
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -84853,7 +84853,7 @@ pub fn RepositoryRuleDetailedFilePathRestriction::new(
   parameters? : RepositoryRuleDetailedFilePathRestrictionParameters,
   ruleset_source_type? : RepositoryRuleDetailedFilePathRestrictionRulesetSourceType,
   ruleset_source? : String,
-  ruleset_id? : Int,
+  ruleset_id? : Int32,
 ) -> RepositoryRuleDetailedFilePathRestriction {
   { type_, parameters, ruleset_source_type, ruleset_source, ruleset_id, }
 }
@@ -84902,7 +84902,7 @@ pub impl @json.FromJson for RepositoryRuleDetailedFilePathRestriction with fn fr
 ///
 /// Generated representation of RepositoryRuleDetailedMaxFilePathLengthParameters.
 pub(all) struct RepositoryRuleDetailedMaxFilePathLengthParameters {
-  max_file_path_length : Int
+  max_file_path_length : Int32
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -84920,7 +84920,7 @@ pub extend RepositoryRuleDetailedMaxFilePathLengthParameters with @debug.Debug::
 ///
 /// Creates a RepositoryRuleDetailedMaxFilePathLengthParameters with omitted optional fields absent.
 pub fn RepositoryRuleDetailedMaxFilePathLengthParameters::new(
-  max_file_path_length~ : Int,
+  max_file_path_length~ : Int32,
 ) -> RepositoryRuleDetailedMaxFilePathLengthParameters {
   { max_file_path_length, }
 }
@@ -85030,7 +85030,7 @@ pub(all) struct RepositoryRuleDetailedMaxFilePathLength {
   parameters : RepositoryRuleDetailedMaxFilePathLengthParameters?
   ruleset_source_type : RepositoryRuleDetailedMaxFilePathLengthRulesetSourceType?
   ruleset_source : String?
-  ruleset_id : Int?
+  ruleset_id : Int32?
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -85047,7 +85047,7 @@ pub fn RepositoryRuleDetailedMaxFilePathLength::new(
   parameters? : RepositoryRuleDetailedMaxFilePathLengthParameters,
   ruleset_source_type? : RepositoryRuleDetailedMaxFilePathLengthRulesetSourceType,
   ruleset_source? : String,
-  ruleset_id? : Int,
+  ruleset_id? : Int32,
 ) -> RepositoryRuleDetailedMaxFilePathLength {
   { type_, parameters, ruleset_source_type, ruleset_source, ruleset_id, }
 }
@@ -85228,7 +85228,7 @@ pub(all) struct RepositoryRuleDetailedFileExtensionRestriction {
   parameters : RepositoryRuleDetailedFileExtensionRestrictionParameters?
   ruleset_source_type : RepositoryRuleDetailedFileExtensionRestrictionRulesetSourceType?
   ruleset_source : String?
-  ruleset_id : Int?
+  ruleset_id : Int32?
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -85250,7 +85250,7 @@ pub fn RepositoryRuleDetailedFileExtensionRestriction::new(
   parameters? : RepositoryRuleDetailedFileExtensionRestrictionParameters,
   ruleset_source_type? : RepositoryRuleDetailedFileExtensionRestrictionRulesetSourceType,
   ruleset_source? : String,
-  ruleset_id? : Int,
+  ruleset_id? : Int32,
 ) -> RepositoryRuleDetailedFileExtensionRestriction {
   { type_, parameters, ruleset_source_type, ruleset_source, ruleset_id, }
 }
@@ -85299,7 +85299,7 @@ pub impl @json.FromJson for RepositoryRuleDetailedFileExtensionRestriction with 
 ///
 /// Generated representation of RepositoryRuleDetailedMaxFileSizeParameters.
 pub(all) struct RepositoryRuleDetailedMaxFileSizeParameters {
-  max_file_size : Int
+  max_file_size : Int32
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -85317,7 +85317,7 @@ pub extend RepositoryRuleDetailedMaxFileSizeParameters with @debug.Debug::{
 ///
 /// Creates a RepositoryRuleDetailedMaxFileSizeParameters with omitted optional fields absent.
 pub fn RepositoryRuleDetailedMaxFileSizeParameters::new(
-  max_file_size~ : Int,
+  max_file_size~ : Int32,
 ) -> RepositoryRuleDetailedMaxFileSizeParameters {
   { max_file_size, }
 }
@@ -85423,7 +85423,7 @@ pub(all) struct RepositoryRuleDetailedMaxFileSize {
   parameters : RepositoryRuleDetailedMaxFileSizeParameters?
   ruleset_source_type : RepositoryRuleDetailedMaxFileSizeRulesetSourceType?
   ruleset_source : String?
-  ruleset_id : Int?
+  ruleset_id : Int32?
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -85440,7 +85440,7 @@ pub fn RepositoryRuleDetailedMaxFileSize::new(
   parameters? : RepositoryRuleDetailedMaxFileSizeParameters,
   ruleset_source_type? : RepositoryRuleDetailedMaxFileSizeRulesetSourceType,
   ruleset_source? : String,
-  ruleset_id? : Int,
+  ruleset_id? : Int32,
 ) -> RepositoryRuleDetailedMaxFileSize {
   { type_, parameters, ruleset_source_type, ruleset_source, ruleset_id, }
 }
@@ -85667,7 +85667,7 @@ pub impl @json.FromJson for SecretScanningAlertValidity with fn from_json(
 ///
 /// Generated representation of SecretScanningAlert.
 pub(all) struct SecretScanningAlert {
-  number : Int?
+  number : Int32?
   created_at : String?
   updated_at : @sdkjson.Presence[String]
   url : String?
@@ -85714,7 +85714,7 @@ pub extend SecretScanningAlert with @debug.Debug::{to_repr}
 ///
 /// Creates a SecretScanningAlert with omitted optional fields absent.
 pub fn SecretScanningAlert::new(
-  number? : Int,
+  number? : Int32,
   created_at? : String,
   updated_at? : String,
   url? : String,
@@ -86054,7 +86054,7 @@ pub impl @json.FromJson for SecretScanningAlertWithMetadataValidity with fn from
 ///
 /// Generated representation of SecretScanningAlertWithMetadata.
 pub(all) struct SecretScanningAlertWithMetadata {
-  number : Int?
+  number : Int32?
   created_at : String?
   updated_at : @sdkjson.Presence[String]
   url : String?
@@ -86102,7 +86102,7 @@ pub extend SecretScanningAlertWithMetadata with @debug.Debug::{to_repr}
 ///
 /// Creates a SecretScanningAlertWithMetadata with omitted optional fields absent.
 pub fn SecretScanningAlertWithMetadata::new(
-  number? : Int,
+  number? : Int32,
   created_at? : String,
   updated_at? : String,
   url? : String,
@@ -87180,7 +87180,7 @@ pub impl @json.FromJson for RepositoryAdvisoryCreate with fn from_json(
 /// Generated untagged union RepositoryAdvisoryDescriptionValidationErrorErrorsItemValue.
 pub(all) enum RepositoryAdvisoryDescriptionValidationErrorErrorsItemValue {
   Text(String)
-  Int(Int)
+  Int(Int32)
   TextArray(Array[String])
 } derive(Eq, @debug.Debug)
 
@@ -87230,7 +87230,7 @@ pub impl @json.FromJson for RepositoryAdvisoryDescriptionValidationErrorErrorsIt
     return Text(decoded)
   }
   if value is Number(_, ..) {
-    let decoded : Int = @json.from_json(value, path~)
+    let decoded : Int32 = @json.from_json(value, path~)
     return Int(decoded)
   }
   if json_array_matches(value, item => item is String(_)) {
@@ -87252,7 +87252,7 @@ pub(all) struct RepositoryAdvisoryDescriptionValidationErrorErrorsItem {
   field : String?
   message : String?
   code : String
-  index : Int?
+  index : Int32?
   value : RepositoryAdvisoryDescriptionValidationErrorErrorsItemValue?
   section : String?
   option : String?
@@ -87277,7 +87277,7 @@ pub fn RepositoryAdvisoryDescriptionValidationErrorErrorsItem::new(
   resource? : String,
   field? : String,
   message? : String,
-  index? : Int,
+  index? : Int32,
   value? : RepositoryAdvisoryDescriptionValidationErrorErrorsItemValue,
   section? : String,
   option? : String,
@@ -88297,7 +88297,7 @@ pub impl @json.FromJson for PullRequestStackMinimalPullRequestsItemHead with fn 
 ///
 /// Generated representation of PullRequestStackMinimalPullRequestsItem.
 pub(all) struct PullRequestStackMinimalPullRequestsItem {
-  number : Int
+  number : Int32
   state : PullRequestStackMinimalPullRequestsItemState
   draft : Bool
   merged_at : String?
@@ -88314,7 +88314,7 @@ pub extend PullRequestStackMinimalPullRequestsItem with @debug.Debug::{to_repr}
 ///
 /// Creates a PullRequestStackMinimalPullRequestsItem with omitted optional fields absent.
 pub fn PullRequestStackMinimalPullRequestsItem::new(
-  number~ : Int,
+  number~ : Int32,
   state~ : PullRequestStackMinimalPullRequestsItemState,
   draft~ : Bool,
   head~ : PullRequestStackMinimalPullRequestsItemHead,
@@ -88367,8 +88367,8 @@ pub impl @json.FromJson for PullRequestStackMinimalPullRequestsItem with fn from
 ///
 /// Generated representation of PullRequestStackMinimal.
 pub(all) struct PullRequestStackMinimal {
-  id : Int
-  number : Int
+  id : Int32
+  number : Int32
   node_id : String
   url : String
   base : PullRequestStackMinimalBase
@@ -88387,8 +88387,8 @@ pub extend PullRequestStackMinimal with @debug.Debug::{to_repr}
 ///
 /// Creates a PullRequestStackMinimal with omitted optional fields absent.
 pub fn PullRequestStackMinimal::new(
-  id~ : Int,
-  number~ : Int,
+  id~ : Int32,
+  number~ : Int32,
   node_id~ : String,
   url~ : String,
   base~ : PullRequestStackMinimalBase,
@@ -88732,7 +88732,7 @@ pub impl @json.FromJson for PullRequestStackPullRequestState with fn from_json(
 /// Generated representation of PullRequestStackPullRequest.
 pub(all) struct PullRequestStackPullRequest {
   id : Int64
-  number : Int
+  number : Int32
   url : String
   head : PullRequestStackPullRequestHead
   base : PullRequestStackPullRequestBase
@@ -88756,7 +88756,7 @@ pub extend PullRequestStackPullRequest with @debug.Debug::{to_repr}
 /// Creates a PullRequestStackPullRequest with omitted optional fields absent.
 pub fn PullRequestStackPullRequest::new(
   id~ : Int64,
-  number~ : Int,
+  number~ : Int32,
   url~ : String,
   head~ : PullRequestStackPullRequestHead,
   base~ : PullRequestStackPullRequestBase,
@@ -88838,9 +88838,9 @@ pub impl @json.FromJson for PullRequestStackPullRequest with fn from_json(
 ///
 /// Stargazer History
 pub(all) struct StargazerHistory {
-  days : Array[Int]
-  total : Int
-  week : Int
+  days : Array[Int32]
+  total : Int32
+  week : Int32
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -88853,9 +88853,9 @@ pub extend StargazerHistory with @debug.Debug::{to_repr}
 ///
 /// Creates a StargazerHistory with omitted optional fields absent.
 pub fn StargazerHistory::new(
-  days~ : Array[Int],
-  total~ : Int,
-  week~ : Int,
+  days~ : Array[Int32],
+  total~ : Int32,
+  week~ : Int32,
 ) -> StargazerHistory {
   { days, total, week, }
 }
@@ -88893,9 +88893,9 @@ pub impl @json.FromJson for StargazerHistory with fn from_json(value, path) {
 ///
 /// Commit Activity
 pub(all) struct CommitActivity {
-  days : Array[Int]
-  total : Int
-  week : Int
+  days : Array[Int32]
+  total : Int32
+  week : Int32
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -88908,9 +88908,9 @@ pub extend CommitActivity with @debug.Debug::{to_repr}
 ///
 /// Creates a CommitActivity with omitted optional fields absent.
 pub fn CommitActivity::new(
-  days~ : Array[Int],
-  total~ : Int,
-  week~ : Int,
+  days~ : Array[Int32],
+  total~ : Int32,
+  week~ : Int32,
 ) -> CommitActivity {
   { days, total, week, }
 }
@@ -88948,10 +88948,10 @@ pub impl @json.FromJson for CommitActivity with fn from_json(value, path) {
 ///
 /// Generated representation of ContributorActivityWeeksItem.
 pub(all) struct ContributorActivityWeeksItem {
-  w : Int?
-  a : Int?
-  d : Int?
-  c : Int?
+  w : Int32?
+  a : Int32?
+  d : Int32?
+  c : Int32?
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -88964,10 +88964,10 @@ pub extend ContributorActivityWeeksItem with @debug.Debug::{to_repr}
 ///
 /// Creates a ContributorActivityWeeksItem with omitted optional fields absent.
 pub fn ContributorActivityWeeksItem::new(
-  w? : Int,
-  a? : Int,
-  d? : Int,
-  c? : Int,
+  w? : Int32,
+  a? : Int32,
+  d? : Int32,
+  c? : Int32,
 ) -> ContributorActivityWeeksItem {
   { w, a, d, c, }
 }
@@ -89011,7 +89011,7 @@ pub impl @json.FromJson for ContributorActivityWeeksItem with fn from_json(
 /// Contributor Activity
 pub(all) struct ContributorActivity {
   author : NullableSimpleUser?
-  total : Int
+  total : Int32
   weeks : Array[ContributorActivityWeeksItem]
 } derive(Eq, @debug.Debug)
 
@@ -89025,7 +89025,7 @@ pub extend ContributorActivity with @debug.Debug::{to_repr}
 ///
 /// Creates a ContributorActivity with omitted optional fields absent.
 pub fn ContributorActivity::new(
-  total~ : Int,
+  total~ : Int32,
   weeks~ : Array[ContributorActivityWeeksItem],
   author? : NullableSimpleUser,
 ) -> ContributorActivity {
@@ -89065,8 +89065,8 @@ pub impl @json.FromJson for ContributorActivity with fn from_json(value, path) {
 ///
 /// Generated representation of ParticipationStats.
 pub(all) struct ParticipationStats {
-  all : Array[Int]
-  owner : Array[Int]
+  all : Array[Int32]
+  owner : Array[Int32]
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -89079,8 +89079,8 @@ pub extend ParticipationStats with @debug.Debug::{to_repr}
 ///
 /// Creates a ParticipationStats with omitted optional fields absent.
 pub fn ParticipationStats::new(
-  all~ : Array[Int],
-  owner~ : Array[Int],
+  all~ : Array[Int32],
+  owner~ : Array[Int32],
 ) -> ParticipationStats {
   { all, owner, }
 }
@@ -89339,8 +89339,8 @@ pub impl @json.FromJson for Topic with fn from_json(value, path) {
 /// Generated representation of Traffic.
 pub(all) struct Traffic {
   timestamp : String
-  uniques : Int
-  count : Int
+  uniques : Int32
+  count : Int32
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -89354,8 +89354,8 @@ pub extend Traffic with @debug.Debug::{to_repr}
 /// Creates a Traffic with omitted optional fields absent.
 pub fn Traffic::new(
   timestamp~ : String,
-  uniques~ : Int,
-  count~ : Int,
+  uniques~ : Int32,
+  count~ : Int32,
 ) -> Traffic {
   { timestamp, uniques, count, }
 }
@@ -89393,8 +89393,8 @@ pub impl @json.FromJson for Traffic with fn from_json(value, path) {
 ///
 /// Clone Traffic
 pub(all) struct CloneTraffic {
-  count : Int
-  uniques : Int
+  count : Int32
+  uniques : Int32
   clones : Array[Traffic]
 } derive(Eq, @debug.Debug)
 
@@ -89408,8 +89408,8 @@ pub extend CloneTraffic with @debug.Debug::{to_repr}
 ///
 /// Creates a CloneTraffic with omitted optional fields absent.
 pub fn CloneTraffic::new(
-  count~ : Int,
-  uniques~ : Int,
+  count~ : Int32,
+  uniques~ : Int32,
   clones~ : Array[Traffic],
 ) -> CloneTraffic {
   { count, uniques, clones, }
@@ -89450,8 +89450,8 @@ pub impl @json.FromJson for CloneTraffic with fn from_json(value, path) {
 pub(all) struct ContentTraffic {
   path : String
   title : String
-  count : Int
-  uniques : Int
+  count : Int32
+  uniques : Int32
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -89466,8 +89466,8 @@ pub extend ContentTraffic with @debug.Debug::{to_repr}
 pub fn ContentTraffic::new(
   path~ : String,
   title~ : String,
-  count~ : Int,
-  uniques~ : Int,
+  count~ : Int32,
+  uniques~ : Int32,
 ) -> ContentTraffic {
   { path, title, count, uniques, }
 }
@@ -89508,8 +89508,8 @@ pub impl @json.FromJson for ContentTraffic with fn from_json(value, path) {
 /// Referrer Traffic
 pub(all) struct ReferrerTraffic {
   referrer : String
-  count : Int
-  uniques : Int
+  count : Int32
+  uniques : Int32
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -89523,8 +89523,8 @@ pub extend ReferrerTraffic with @debug.Debug::{to_repr}
 /// Creates a ReferrerTraffic with omitted optional fields absent.
 pub fn ReferrerTraffic::new(
   referrer~ : String,
-  count~ : Int,
-  uniques~ : Int,
+  count~ : Int32,
+  uniques~ : Int32,
 ) -> ReferrerTraffic {
   { referrer, count, uniques, }
 }
@@ -89562,8 +89562,8 @@ pub impl @json.FromJson for ReferrerTraffic with fn from_json(value, path) {
 ///
 /// View Traffic
 pub(all) struct ViewTraffic {
-  count : Int
-  uniques : Int
+  count : Int32
+  uniques : Int32
   views : Array[Traffic]
 } derive(Eq, @debug.Debug)
 
@@ -89577,8 +89577,8 @@ pub extend ViewTraffic with @debug.Debug::{to_repr}
 ///
 /// Creates a ViewTraffic with omitted optional fields absent.
 pub fn ViewTraffic::new(
-  count~ : Int,
-  uniques~ : Int,
+  count~ : Int32,
+  uniques~ : Int32,
   views~ : Array[Traffic],
 ) -> ViewTraffic {
   { count, uniques, views, }
@@ -89618,7 +89618,7 @@ pub impl @json.FromJson for ViewTraffic with fn from_json(value, path) {
 /// Generated representation of SearchResultTextMatchesItemMatchesItem.
 pub(all) struct SearchResultTextMatchesItemMatchesItem {
   text : String?
-  indices : Array[Int]?
+  indices : Array[Int32]?
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -89632,7 +89632,7 @@ pub extend SearchResultTextMatchesItemMatchesItem with @debug.Debug::{to_repr}
 /// Creates a SearchResultTextMatchesItemMatchesItem with omitted optional fields absent.
 pub fn SearchResultTextMatchesItemMatchesItem::new(
   text? : String,
-  indices? : Array[Int],
+  indices? : Array[Int32],
 ) -> SearchResultTextMatchesItemMatchesItem {
   { text, indices, }
 }
@@ -89753,7 +89753,7 @@ pub(all) struct CodeSearchResultItem {
   html_url : String
   repository : MinimalRepository
   score : Double
-  file_size : Int?
+  file_size : Int32?
   language : @sdkjson.Presence[String]
   last_modified_at : String?
   line_numbers : Array[String]?
@@ -89778,7 +89778,7 @@ pub fn CodeSearchResultItem::new(
   html_url~ : String,
   repository~ : MinimalRepository,
   score~ : Double,
-  file_size? : Int,
+  file_size? : Int32,
   language? : String,
   last_modified_at? : String,
   line_numbers? : Array[String],
@@ -89968,7 +89968,7 @@ pub impl @json.FromJson for CommitSearchResultItemCommitTree with fn from_json(
 pub(all) struct CommitSearchResultItemCommit {
   author : CommitSearchResultItemCommitAuthor
   committer : NullableGitUser?
-  comment_count : Int
+  comment_count : Int32
   message : String
   tree : CommitSearchResultItemCommitTree
   url : String
@@ -89986,7 +89986,7 @@ pub extend CommitSearchResultItemCommit with @debug.Debug::{to_repr}
 /// Creates a CommitSearchResultItemCommit with omitted optional fields absent.
 pub fn CommitSearchResultItemCommit::new(
   author~ : CommitSearchResultItemCommitAuthor,
-  comment_count~ : Int,
+  comment_count~ : Int32,
   message~ : String,
   tree~ : CommitSearchResultItemCommitTree,
   url~ : String,
@@ -90377,7 +90377,7 @@ pub(all) struct IssueSearchResultItem {
   html_url : String
   id : Int64
   node_id : String
-  number : Int
+  number : Int32
   title : String
   locked : Bool
   active_lock_reason : @sdkjson.Presence[String]
@@ -90391,7 +90391,7 @@ pub(all) struct IssueSearchResultItem {
   state_reason : @sdkjson.Presence[String]
   assignee : NullableSimpleUser?
   milestone : NullableMilestone?
-  comments : Int
+  comments : Int32
   created_at : String
   updated_at : String
   closed_at : String?
@@ -90429,12 +90429,12 @@ pub fn IssueSearchResultItem::new(
   html_url~ : String,
   id~ : Int64,
   node_id~ : String,
-  number~ : Int,
+  number~ : Int32,
   title~ : String,
   locked~ : Bool,
   labels~ : Array[IssueSearchResultItemLabelsItem],
   state~ : String,
-  comments~ : Int,
+  comments~ : Int32,
   created_at~ : String,
   updated_at~ : String,
   score~ : Double,
@@ -90619,7 +90619,7 @@ pub impl @json.FromJson for IssueSearchResultItem with fn from_json(value, path)
 ///
 /// Label Search Result Item
 pub(all) struct LabelSearchResultItem {
-  id : Int
+  id : Int32
   node_id : String
   url : String
   name : String
@@ -90642,7 +90642,7 @@ pub extend LabelSearchResultItem with @debug.Debug::{to_repr}
 ///
 /// Creates a LabelSearchResultItem with omitted optional fields absent.
 pub fn LabelSearchResultItem::new(
-  id~ : Int,
+  id~ : Int32,
   node_id~ : String,
   url~ : String,
   name~ : String,
@@ -90856,7 +90856,7 @@ pub impl @json.FromJson for RepoSearchResultItemPermissions with fn from_json(
 ///
 /// Repo Search Result Item
 pub(all) struct RepoSearchResultItem {
-  id : Int
+  id : Int32
   node_id : String
   name : String
   full_name : String
@@ -90870,12 +90870,12 @@ pub(all) struct RepoSearchResultItem {
   updated_at : String
   pushed_at : String
   homepage : String?
-  size : Int
-  stargazers_count : Int
-  watchers_count : Int
+  size : Int32
+  stargazers_count : Int32
+  watchers_count : Int32
   language : String?
-  forks_count : Int
-  open_issues_count : Int
+  forks_count : Int32
+  open_issues_count : Int32
   master_branch : String?
   default_branch : String
   score : Double
@@ -90919,9 +90919,9 @@ pub(all) struct RepoSearchResultItem {
   ssh_url : String
   clone_url : String
   svn_url : String
-  forks : Int
-  open_issues : Int
-  watchers : Int
+  forks : Int32
+  open_issues : Int32
+  watchers : Int32
   topics : Array[String]?
   mirror_url : String?
   has_issues : Bool
@@ -90959,7 +90959,7 @@ pub extend RepoSearchResultItem with @debug.Debug::{to_repr}
 ///
 /// Creates a RepoSearchResultItem with omitted optional fields absent.
 pub fn RepoSearchResultItem::new(
-  id~ : Int,
+  id~ : Int32,
   node_id~ : String,
   name~ : String,
   full_name~ : String,
@@ -90970,11 +90970,11 @@ pub fn RepoSearchResultItem::new(
   created_at~ : String,
   updated_at~ : String,
   pushed_at~ : String,
-  size~ : Int,
-  stargazers_count~ : Int,
-  watchers_count~ : Int,
-  forks_count~ : Int,
-  open_issues_count~ : Int,
+  size~ : Int32,
+  stargazers_count~ : Int32,
+  watchers_count~ : Int32,
+  forks_count~ : Int32,
+  open_issues_count~ : Int32,
   default_branch~ : String,
   score~ : Double,
   forks_url~ : String,
@@ -91017,9 +91017,9 @@ pub fn RepoSearchResultItem::new(
   ssh_url~ : String,
   clone_url~ : String,
   svn_url~ : String,
-  forks~ : Int,
-  open_issues~ : Int,
-  watchers~ : Int,
+  forks~ : Int32,
+  open_issues~ : Int32,
+  watchers~ : Int32,
   has_issues~ : Bool,
   has_projects~ : Bool,
   has_pages~ : Bool,
@@ -91367,9 +91367,9 @@ pub impl @json.FromJson for RepoSearchResultItem with fn from_json(value, path) 
 ///
 /// Generated representation of TopicSearchResultItemRelatedItemTopicRelation.
 pub(all) struct TopicSearchResultItemRelatedItemTopicRelation {
-  id : Int?
+  id : Int32?
   name : String?
-  topic_id : Int?
+  topic_id : Int32?
   relation_type : String?
 } derive(Eq, @debug.Debug)
 
@@ -91388,9 +91388,9 @@ pub extend TopicSearchResultItemRelatedItemTopicRelation with @debug.Debug::{
 ///
 /// Creates a TopicSearchResultItemRelatedItemTopicRelation with omitted optional fields absent.
 pub fn TopicSearchResultItemRelatedItemTopicRelation::new(
-  id? : Int,
+  id? : Int32,
   name? : String,
-  topic_id? : Int,
+  topic_id? : Int32,
   relation_type? : String,
 ) -> TopicSearchResultItemRelatedItemTopicRelation {
   { id, name, topic_id, relation_type, }
@@ -91484,9 +91484,9 @@ pub impl @json.FromJson for TopicSearchResultItemRelatedItem with fn from_json(
 ///
 /// Generated representation of TopicSearchResultItemAliasesItemTopicRelation.
 pub(all) struct TopicSearchResultItemAliasesItemTopicRelation {
-  id : Int?
+  id : Int32?
   name : String?
-  topic_id : Int?
+  topic_id : Int32?
   relation_type : String?
 } derive(Eq, @debug.Debug)
 
@@ -91505,9 +91505,9 @@ pub extend TopicSearchResultItemAliasesItemTopicRelation with @debug.Debug::{
 ///
 /// Creates a TopicSearchResultItemAliasesItemTopicRelation with omitted optional fields absent.
 pub fn TopicSearchResultItemAliasesItemTopicRelation::new(
-  id? : Int,
+  id? : Int32,
   name? : String,
-  topic_id? : Int,
+  topic_id? : Int32,
   relation_type? : String,
 ) -> TopicSearchResultItemAliasesItemTopicRelation {
   { id, name, topic_id, relation_type, }
@@ -91612,7 +91612,7 @@ pub(all) struct TopicSearchResultItem {
   featured : Bool
   curated : Bool
   score : Double
-  repository_count : @sdkjson.Presence[Int]
+  repository_count : @sdkjson.Presence[Int32]
   logo_url : @sdkjson.Presence[String]
   text_matches : Array[SearchResultTextMatchesItem]?
   related : @sdkjson.Presence[Array[TopicSearchResultItemRelatedItem]]
@@ -91640,7 +91640,7 @@ pub fn TopicSearchResultItem::new(
   description? : String,
   created_by? : String,
   released? : String,
-  repository_count? : Int,
+  repository_count? : Int32,
   logo_url? : String,
   text_matches? : Array[SearchResultTextMatchesItem],
   related? : Array[TopicSearchResultItemRelatedItem],
@@ -91755,10 +91755,10 @@ pub(all) struct UserSearchResultItem {
   gists_url : String
   starred_url : String
   events_url : String
-  public_repos : Int?
-  public_gists : Int?
-  followers : Int?
-  following : Int?
+  public_repos : Int32?
+  public_gists : Int32?
+  followers : Int32?
+  following : Int32?
   created_at : String?
   updated_at : String?
   name : @sdkjson.Presence[String]
@@ -91803,10 +91803,10 @@ pub fn UserSearchResultItem::new(
   events_url~ : String,
   site_admin~ : Bool,
   gravatar_id? : String,
-  public_repos? : Int,
-  public_gists? : Int,
-  followers? : Int,
-  following? : Int,
+  public_repos? : Int32,
+  public_gists? : Int32,
+  followers? : Int32,
+  following? : Int32,
   created_at? : String,
   updated_at? : String,
   name? : String,
@@ -91959,10 +91959,10 @@ pub impl @json.FromJson for UserSearchResultItem with fn from_json(value, path) 
 ///
 /// Generated representation of PrivateUserPlan.
 pub(all) struct PrivateUserPlan {
-  collaborators : Int
+  collaborators : Int32
   name : String
-  space : Int
-  private_repos : Int
+  space : Int32
+  private_repos : Int32
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -91975,10 +91975,10 @@ pub extend PrivateUserPlan with @debug.Debug::{to_repr}
 ///
 /// Creates a PrivateUserPlan with omitted optional fields absent.
 pub fn PrivateUserPlan::new(
-  collaborators~ : Int,
+  collaborators~ : Int32,
   name~ : String,
-  space~ : Int,
-  private_repos~ : Int,
+  space~ : Int32,
+  private_repos~ : Int32,
 ) -> PrivateUserPlan {
   { collaborators, name, space, private_repos, }
 }
@@ -92045,17 +92045,17 @@ pub(all) struct PrivateUser {
   hireable : Bool?
   bio : String?
   twitter_username : @sdkjson.Presence[String]
-  public_repos : Int
-  public_gists : Int
-  followers : Int
-  following : Int
+  public_repos : Int32
+  public_gists : Int32
+  followers : Int32
+  following : Int32
   created_at : String
   updated_at : String
-  private_gists : Int
-  total_private_repos : Int
-  owned_private_repos : Int
-  disk_usage : Int
-  collaborators : Int
+  private_gists : Int32
+  total_private_repos : Int32
+  owned_private_repos : Int32
+  disk_usage : Int32
+  collaborators : Int32
   two_factor_authentication : Bool
   plan : PrivateUserPlan?
   business_plus : Bool?
@@ -92089,17 +92089,17 @@ pub fn PrivateUser::new(
   received_events_url~ : String,
   type_~ : String,
   site_admin~ : Bool,
-  public_repos~ : Int,
-  public_gists~ : Int,
-  followers~ : Int,
-  following~ : Int,
+  public_repos~ : Int32,
+  public_gists~ : Int32,
+  followers~ : Int32,
+  following~ : Int32,
   created_at~ : String,
   updated_at~ : String,
-  private_gists~ : Int,
-  total_private_repos~ : Int,
-  owned_private_repos~ : Int,
-  disk_usage~ : Int,
-  collaborators~ : Int,
+  private_gists~ : Int32,
+  total_private_repos~ : Int32,
+  owned_private_repos~ : Int32,
+  disk_usage~ : Int32,
+  collaborators~ : Int32,
   two_factor_authentication~ : Bool,
   gravatar_id? : String,
   name? : String,
@@ -92635,8 +92635,8 @@ pub impl @json.FromJson for CodespaceWithFullRepositoryState with fn from_json(
 ///
 /// Details about the codespace's git repository.
 pub(all) struct CodespaceWithFullRepositoryGitStatus {
-  ahead : Int?
-  behind : Int?
+  ahead : Int32?
+  behind : Int32?
   has_unpushed_changes : Bool?
   has_uncommitted_changes : Bool?
   ref_ : String?
@@ -92652,8 +92652,8 @@ pub extend CodespaceWithFullRepositoryGitStatus with @debug.Debug::{to_repr}
 ///
 /// Creates a CodespaceWithFullRepositoryGitStatus with omitted optional fields absent.
 pub fn CodespaceWithFullRepositoryGitStatus::new(
-  ahead? : Int,
-  behind? : Int,
+  ahead? : Int32,
+  behind? : Int32,
   has_unpushed_changes? : Bool,
   has_uncommitted_changes? : Bool,
   ref_? : String,
@@ -92845,7 +92845,7 @@ pub(all) struct CodespaceWithFullRepository {
   url : String
   git_status : CodespaceWithFullRepositoryGitStatus
   location : CodespaceWithFullRepositoryLocation
-  idle_timeout_minutes : Int?
+  idle_timeout_minutes : Int32?
   web_url : String
   machines_url : String
   start_url : String
@@ -92857,7 +92857,7 @@ pub(all) struct CodespaceWithFullRepository {
   pending_operation : @sdkjson.Presence[Bool]
   pending_operation_disabled_reason : @sdkjson.Presence[String]
   idle_timeout_notice : @sdkjson.Presence[String]
-  retention_period_minutes : @sdkjson.Presence[Int]
+  retention_period_minutes : @sdkjson.Presence[Int32]
   retention_expires_at : @sdkjson.Presence[String]
 } derive(Eq, @debug.Debug)
 
@@ -92893,14 +92893,14 @@ pub fn CodespaceWithFullRepository::new(
   machine? : NullableCodespaceMachine,
   devcontainer_path? : String,
   prebuild? : Bool,
-  idle_timeout_minutes? : Int,
+  idle_timeout_minutes? : Int32,
   publish_url? : String,
   pulls_url? : String,
   runtime_constraints? : CodespaceWithFullRepositoryRuntimeConstraints,
   pending_operation? : Bool,
   pending_operation_disabled_reason? : String,
   idle_timeout_notice? : String,
-  retention_period_minutes? : Int,
+  retention_period_minutes? : Int32,
   retention_expires_at? : String,
 ) -> CodespaceWithFullRepository {
   {
@@ -93221,7 +93221,7 @@ pub impl @json.FromJson for GpgKeySubkeysItemEmailsItem with fn from_json(
 /// Generated representation of GpgKeySubkeysItem.
 pub(all) struct GpgKeySubkeysItem {
   id : Int64?
-  primary_key_id : Int?
+  primary_key_id : Int32?
   key_id : String?
   public_key : String?
   emails : Array[GpgKeySubkeysItemEmailsItem]?
@@ -93247,7 +93247,7 @@ pub extend GpgKeySubkeysItem with @debug.Debug::{to_repr}
 /// Creates a GpgKeySubkeysItem with omitted optional fields absent.
 pub fn GpgKeySubkeysItem::new(
   id? : Int64,
-  primary_key_id? : Int,
+  primary_key_id? : Int32,
   key_id? : String,
   public_key? : String,
   emails? : Array[GpgKeySubkeysItemEmailsItem],
@@ -93336,7 +93336,7 @@ pub impl @json.FromJson for GpgKeySubkeysItem with fn from_json(value, path) {
 pub(all) struct GpgKey {
   id : Int64
   name : @sdkjson.Presence[String]
-  primary_key_id : Int?
+  primary_key_id : Int32?
   key_id : String
   public_key : String
   emails : Array[GpgKeyEmailsItem]
@@ -93373,7 +93373,7 @@ pub fn GpgKey::new(
   created_at~ : String,
   revoked~ : Bool,
   name? : String,
-  primary_key_id? : Int,
+  primary_key_id? : Int32,
   expires_at? : String,
   raw_key? : String,
 ) -> GpgKey {
@@ -93544,7 +93544,7 @@ pub impl @json.FromJson for Key with fn from_json(value, path) {
 /// Generated representation of MarketplaceAccount.
 pub(all) struct MarketplaceAccount {
   url : String
-  id : Int
+  id : Int32
   type_ : String
   node_id : String?
   login : String
@@ -93563,7 +93563,7 @@ pub extend MarketplaceAccount with @debug.Debug::{to_repr}
 /// Creates a MarketplaceAccount with omitted optional fields absent.
 pub fn MarketplaceAccount::new(
   url~ : String,
-  id~ : Int,
+  id~ : Int32,
   type_~ : String,
   login~ : String,
   node_id? : String,
@@ -93628,7 +93628,7 @@ pub impl @json.FromJson for MarketplaceAccount with fn from_json(value, path) {
 pub(all) struct UserMarketplacePurchase {
   billing_cycle : String
   next_billing_date : String?
-  unit_count : Int?
+  unit_count : Int32?
   on_free_trial : Bool
   free_trial_ends_on : String?
   updated_at : String?
@@ -93651,7 +93651,7 @@ pub fn UserMarketplacePurchase::new(
   account~ : MarketplaceAccount,
   plan~ : MarketplaceListingPlan,
   next_billing_date? : String,
-  unit_count? : Int,
+  unit_count? : Int32,
   free_trial_ends_on? : String,
   updated_at? : String,
 ) -> UserMarketplacePurchase {
@@ -93774,7 +93774,7 @@ pub impl @json.FromJson for SocialAccount with fn from_json(value, path) {
 /// A public SSH key used to sign Git commits
 pub(all) struct SshSigningKey {
   key : String
-  id : Int
+  id : Int32
   title : String
   created_at : String
 } derive(Eq, @debug.Debug)
@@ -93790,7 +93790,7 @@ pub extend SshSigningKey with @debug.Debug::{to_repr}
 /// Creates a SshSigningKey with omitted optional fields absent.
 pub fn SshSigningKey::new(
   key~ : String,
-  id~ : Int,
+  id~ : Int32,
   title~ : String,
   created_at~ : String,
 ) -> SshSigningKey {
@@ -93975,7 +93975,7 @@ pub impl @json.FromJson for Hovercard with fn from_json(value, path) {
 ///
 /// Key Simple
 pub(all) struct KeySimple {
-  id : Int
+  id : Int32
   key : String
   created_at : String?
   last_used : @sdkjson.Presence[String]
@@ -93991,7 +93991,7 @@ pub extend KeySimple with @debug.Debug::{to_repr}
 ///
 /// Creates a KeySimple with omitted optional fields absent.
 pub fn KeySimple::new(
-  id~ : Int,
+  id~ : Int32,
   key~ : String,
   created_at? : String,
   last_used? : String,
@@ -95061,7 +95061,7 @@ pub(all) struct AgentTasksListTasksForRepoResponseTasksItem {
   owner : AgentTasksListTasksForRepoResponseTasksItemOwner?
   repository : AgentTasksListTasksForRepoResponseTasksItemRepository?
   state : AgentTasksListTasksForRepoResponseTasksItemState
-  session_count : Int?
+  session_count : Int32?
   artifacts : Array[AgentTasksListTasksForRepoResponseTasksItemArtifactsItem]?
   archived_at : @sdkjson.Presence[String]
   updated_at : String?
@@ -95097,7 +95097,7 @@ pub fn AgentTasksListTasksForRepoResponseTasksItem::new(
   ],
   owner? : AgentTasksListTasksForRepoResponseTasksItemOwner,
   repository? : AgentTasksListTasksForRepoResponseTasksItemRepository,
-  session_count? : Int,
+  session_count? : Int32,
   artifacts? : Array[AgentTasksListTasksForRepoResponseTasksItemArtifactsItem],
   archived_at? : String,
   updated_at? : String,
@@ -95190,8 +95190,8 @@ pub impl @json.FromJson for AgentTasksListTasksForRepoResponseTasksItem with fn 
 /// Generated representation of AgentTasksListTasksForRepoResponse.
 pub(all) struct AgentTasksListTasksForRepoResponse {
   tasks : Array[AgentTasksListTasksForRepoResponseTasksItem]
-  total_active_count : Int?
-  total_archived_count : Int?
+  total_active_count : Int32?
+  total_archived_count : Int32?
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -95205,8 +95205,8 @@ pub extend AgentTasksListTasksForRepoResponse with @debug.Debug::{to_repr}
 /// Creates a AgentTasksListTasksForRepoResponse with omitted optional fields absent.
 pub fn AgentTasksListTasksForRepoResponse::new(
   tasks~ : Array[AgentTasksListTasksForRepoResponseTasksItem],
-  total_active_count? : Int,
-  total_archived_count? : Int,
+  total_active_count? : Int32,
+  total_archived_count? : Int32,
 ) -> AgentTasksListTasksForRepoResponse {
   { tasks, total_active_count, total_archived_count, }
 }
@@ -95822,7 +95822,7 @@ pub(all) struct AgentTasksCreateTaskInRepoResponse {
   owner : AgentTasksCreateTaskInRepoResponseOwner?
   repository : AgentTasksCreateTaskInRepoResponseRepository?
   state : AgentTasksCreateTaskInRepoResponseState
-  session_count : Int?
+  session_count : Int32?
   artifacts : Array[AgentTasksCreateTaskInRepoResponseArtifactsItem]?
   archived_at : @sdkjson.Presence[String]
   updated_at : String?
@@ -95853,7 +95853,7 @@ pub fn AgentTasksCreateTaskInRepoResponse::new(
   ],
   owner? : AgentTasksCreateTaskInRepoResponseOwner,
   repository? : AgentTasksCreateTaskInRepoResponseRepository,
-  session_count? : Int,
+  session_count? : Int32,
   artifacts? : Array[AgentTasksCreateTaskInRepoResponseArtifactsItem],
   archived_at? : String,
   updated_at? : String,
@@ -97039,7 +97039,7 @@ pub(all) struct AgentTasksGetTaskByRepoAndIdResponse {
   owner : AgentTasksGetTaskByRepoAndIdResponseOwner?
   repository : AgentTasksGetTaskByRepoAndIdResponseRepository?
   state : AgentTasksGetTaskByRepoAndIdResponseState
-  session_count : Int?
+  session_count : Int32?
   artifacts : Array[AgentTasksGetTaskByRepoAndIdResponseArtifactsItem]?
   archived_at : @sdkjson.Presence[String]
   updated_at : String?
@@ -97071,7 +97071,7 @@ pub fn AgentTasksGetTaskByRepoAndIdResponse::new(
   ],
   owner? : AgentTasksGetTaskByRepoAndIdResponseOwner,
   repository? : AgentTasksGetTaskByRepoAndIdResponseRepository,
-  session_count? : Int,
+  session_count? : Int32,
   artifacts? : Array[AgentTasksGetTaskByRepoAndIdResponseArtifactsItem],
   archived_at? : String,
   updated_at? : String,
@@ -97784,7 +97784,7 @@ pub(all) struct AgentTasksListTasksResponseTasksItem {
   owner : AgentTasksListTasksResponseTasksItemOwner?
   repository : AgentTasksListTasksResponseTasksItemRepository?
   state : AgentTasksListTasksResponseTasksItemState
-  session_count : Int?
+  session_count : Int32?
   artifacts : Array[AgentTasksListTasksResponseTasksItemArtifactsItem]?
   archived_at : @sdkjson.Presence[String]
   updated_at : String?
@@ -97815,7 +97815,7 @@ pub fn AgentTasksListTasksResponseTasksItem::new(
   ],
   owner? : AgentTasksListTasksResponseTasksItemOwner,
   repository? : AgentTasksListTasksResponseTasksItemRepository,
-  session_count? : Int,
+  session_count? : Int32,
   artifacts? : Array[AgentTasksListTasksResponseTasksItemArtifactsItem],
   archived_at? : String,
   updated_at? : String,
@@ -97904,8 +97904,8 @@ pub impl @json.FromJson for AgentTasksListTasksResponseTasksItem with fn from_js
 /// Generated representation of AgentTasksListTasksResponse.
 pub(all) struct AgentTasksListTasksResponse {
   tasks : Array[AgentTasksListTasksResponseTasksItem]
-  total_active_count : Int?
-  total_archived_count : Int?
+  total_active_count : Int32?
+  total_archived_count : Int32?
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -97919,8 +97919,8 @@ pub extend AgentTasksListTasksResponse with @debug.Debug::{to_repr}
 /// Creates a AgentTasksListTasksResponse with omitted optional fields absent.
 pub fn AgentTasksListTasksResponse::new(
   tasks~ : Array[AgentTasksListTasksResponseTasksItem],
-  total_active_count? : Int,
-  total_archived_count? : Int,
+  total_active_count? : Int32,
+  total_archived_count? : Int32,
 ) -> AgentTasksListTasksResponse {
   { tasks, total_active_count, total_archived_count, }
 }
@@ -99007,7 +99007,7 @@ pub(all) struct AgentTasksGetTaskByIdResponse {
   owner : AgentTasksGetTaskByIdResponseOwner?
   repository : AgentTasksGetTaskByIdResponseRepository?
   state : AgentTasksGetTaskByIdResponseState
-  session_count : Int?
+  session_count : Int32?
   artifacts : Array[AgentTasksGetTaskByIdResponseArtifactsItem]?
   archived_at : @sdkjson.Presence[String]
   updated_at : String?
@@ -99039,7 +99039,7 @@ pub fn AgentTasksGetTaskByIdResponse::new(
   ],
   owner? : AgentTasksGetTaskByIdResponseOwner,
   repository? : AgentTasksGetTaskByIdResponseRepository,
-  session_count? : Int,
+  session_count? : Int32,
   artifacts? : Array[AgentTasksGetTaskByIdResponseArtifactsItem],
   archived_at? : String,
   updated_at? : String,
@@ -99248,7 +99248,7 @@ pub impl @json.FromJson for AppsListWebhookDeliveriesStatus with fn from_json(
 /// Generated representation of AppsCreateInstallationAccessTokenRequest.
 pub(all) struct AppsCreateInstallationAccessTokenRequest {
   repositories : Array[String]?
-  repository_ids : Array[Int]?
+  repository_ids : Array[Int32]?
   permissions : AppPermissions?
 } derive(Eq, @debug.Debug)
 
@@ -99263,7 +99263,7 @@ pub extend AppsCreateInstallationAccessTokenRequest with @debug.Debug::{to_repr}
 /// Creates a AppsCreateInstallationAccessTokenRequest with omitted optional fields absent.
 pub fn AppsCreateInstallationAccessTokenRequest::new(
   repositories? : Array[String],
-  repository_ids? : Array[Int],
+  repository_ids? : Array[Int32],
   permissions? : AppPermissions,
 ) -> AppsCreateInstallationAccessTokenRequest {
   { repositories, repository_ids, permissions, }
@@ -99489,9 +99489,9 @@ pub impl @json.FromJson for AppsDeleteTokenRequest with fn from_json(
 pub(all) struct AppsScopeTokenRequest {
   access_token : String
   target : String?
-  target_id : Int?
+  target_id : Int32?
   repositories : Array[String]?
-  repository_ids : Array[Int]?
+  repository_ids : Array[Int32]?
   permissions : AppPermissions?
 } derive(Eq, @debug.Debug)
 
@@ -99507,9 +99507,9 @@ pub extend AppsScopeTokenRequest with @debug.Debug::{to_repr}
 pub fn AppsScopeTokenRequest::new(
   access_token~ : String,
   target? : String,
-  target_id? : Int,
+  target_id? : Int32,
   repositories? : Array[String],
-  repository_ids? : Array[Int],
+  repository_ids? : Array[Int32],
   permissions? : AppPermissions,
 ) -> AppsScopeTokenRequest {
   {
@@ -103649,8 +103649,8 @@ pub impl @json.FromJson for DependabotListAlertsForEnterpriseDirection with fn f
 ///
 /// Generated representation of DependabotUpdateRepositoryAccessForEnterpriseRequest.
 pub(all) struct DependabotUpdateRepositoryAccessForEnterpriseRequest {
-  repository_ids_to_add : Array[Int]?
-  repository_ids_to_remove : Array[Int]?
+  repository_ids_to_add : Array[Int32]?
+  repository_ids_to_remove : Array[Int32]?
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -103668,8 +103668,8 @@ pub extend DependabotUpdateRepositoryAccessForEnterpriseRequest with @debug.Debu
 ///
 /// Creates a DependabotUpdateRepositoryAccessForEnterpriseRequest with omitted optional fields absent.
 pub fn DependabotUpdateRepositoryAccessForEnterpriseRequest::new(
-  repository_ids_to_add? : Array[Int],
-  repository_ids_to_remove? : Array[Int],
+  repository_ids_to_add? : Array[Int32],
+  repository_ids_to_remove? : Array[Int32],
 ) -> DependabotUpdateRepositoryAccessForEnterpriseRequest {
   { repository_ids_to_add, repository_ids_to_remove, }
 }
@@ -104723,7 +104723,7 @@ pub(all) struct AppsListReposAccessibleToInstallationResponseRepositoriesItem {
   name : String
   full_name : String
   license : NullableLicenseSimple?
-  forks : Int
+  forks : Int32
   permissions : AppsListReposAccessibleToInstallationResponseRepositoriesItemPermissions?
   owner : SimpleUser
   private : Bool
@@ -104774,12 +104774,12 @@ pub(all) struct AppsListReposAccessibleToInstallationResponseRepositoriesItem {
   svn_url : String
   homepage : String?
   language : String?
-  forks_count : Int
-  stargazers_count : Int
-  watchers_count : Int
-  size : Int
+  forks_count : Int32
+  stargazers_count : Int32
+  watchers_count : Int32
+  size : Int32
   default_branch : String
-  open_issues_count : Int
+  open_issues_count : Int32
   is_template : Bool?
   topics : Array[String]?
   has_issues : Bool
@@ -104810,8 +104810,8 @@ pub(all) struct AppsListReposAccessibleToInstallationResponseRepositoriesItem {
   allow_merge_commit : Bool?
   allow_forking : Bool?
   web_commit_signoff_required : Bool?
-  open_issues : Int
-  watchers : Int
+  open_issues : Int32
+  watchers : Int32
   master_branch : String?
   starred_at : String?
   anonymous_access_enabled : Bool?
@@ -104838,7 +104838,7 @@ pub fn AppsListReposAccessibleToInstallationResponseRepositoriesItem::new(
   node_id~ : String,
   name~ : String,
   full_name~ : String,
-  forks~ : Int,
+  forks~ : Int32,
   owner~ : SimpleUser,
   private~ : Bool,
   html_url~ : String,
@@ -104884,12 +104884,12 @@ pub fn AppsListReposAccessibleToInstallationResponseRepositoriesItem::new(
   clone_url~ : String,
   hooks_url~ : String,
   svn_url~ : String,
-  forks_count~ : Int,
-  stargazers_count~ : Int,
-  watchers_count~ : Int,
-  size~ : Int,
+  forks_count~ : Int32,
+  stargazers_count~ : Int32,
+  watchers_count~ : Int32,
+  size~ : Int32,
   default_branch~ : String,
-  open_issues_count~ : Int,
+  open_issues_count~ : Int32,
   has_issues~ : Bool,
   has_projects~ : Bool,
   has_wiki~ : Bool,
@@ -104897,8 +104897,8 @@ pub fn AppsListReposAccessibleToInstallationResponseRepositoriesItem::new(
   has_downloads~ : Bool,
   archived~ : Bool,
   disabled~ : Bool,
-  open_issues~ : Int,
-  watchers~ : Int,
+  open_issues~ : Int32,
+  watchers~ : Int32,
   license? : NullableLicenseSimple,
   permissions? : AppsListReposAccessibleToInstallationResponseRepositoriesItemPermissions,
   description? : String,
@@ -105299,7 +105299,7 @@ pub impl @json.FromJson for AppsListReposAccessibleToInstallationResponseReposit
 ///
 /// Generated representation of AppsListReposAccessibleToInstallationResponse.
 pub(all) struct AppsListReposAccessibleToInstallationResponse {
-  total_count : Int
+  total_count : Int32
   repositories : Array[
     AppsListReposAccessibleToInstallationResponseRepositoriesItem,
   ]
@@ -105321,7 +105321,7 @@ pub extend AppsListReposAccessibleToInstallationResponse with @debug.Debug::{
 ///
 /// Creates a AppsListReposAccessibleToInstallationResponse with omitted optional fields absent.
 pub fn AppsListReposAccessibleToInstallationResponse::new(
-  total_count~ : Int,
+  total_count~ : Int32,
   repositories~ : Array[
     AppsListReposAccessibleToInstallationResponseRepositoriesItem,
   ],
@@ -106343,7 +106343,7 @@ pub impl @json.FromJson for BillingCreateOrganizationBudgetRequestBudgetType wit
 ///
 /// Generated representation of BillingCreateOrganizationBudgetRequest.
 pub(all) struct BillingCreateOrganizationBudgetRequest {
-  budget_amount : Int?
+  budget_amount : Int32?
   prevent_further_usage : Bool?
   budget_alerting : BillingCreateOrganizationBudgetRequestBudgetAlerting?
   budget_scope : BillingCreateOrganizationBudgetRequestBudgetScope?
@@ -106364,7 +106364,7 @@ pub extend BillingCreateOrganizationBudgetRequest with @debug.Debug::{to_repr}
 ///
 /// Creates a BillingCreateOrganizationBudgetRequest with omitted optional fields absent.
 pub fn BillingCreateOrganizationBudgetRequest::new(
-  budget_amount? : Int,
+  budget_amount? : Int32,
   prevent_further_usage? : Bool,
   budget_alerting? : BillingCreateOrganizationBudgetRequestBudgetAlerting,
   budget_scope? : BillingCreateOrganizationBudgetRequestBudgetScope,
@@ -106503,7 +106503,7 @@ pub impl @json.FromJson for BillingUpdateBudgetOrgRequestBudgetAlerting with fn 
 /// The date the budget will expire in `YYYY-MM-DD` format. Only dates in the future are accepted. If not set, the budget will not expire. Setting to `null` or `0` will remove the expiration date from a budget if set. Only supported for existing user-scoped budgets.
 pub(all) enum BillingUpdateBudgetOrgRequestExpiresAt {
   Text(String)
-  Int(Int)
+  Int(Int32)
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -106542,7 +106542,7 @@ pub impl @json.FromJson for BillingUpdateBudgetOrgRequestExpiresAt with fn from_
     return Text(decoded)
   }
   if value is Number(_, ..) {
-    let decoded : Int = @json.from_json(value, path~)
+    let decoded : Int32 = @json.from_json(value, path~)
     return Int(decoded)
   }
   raise @json.JsonDecodeError(
@@ -106556,7 +106556,7 @@ pub impl @json.FromJson for BillingUpdateBudgetOrgRequestExpiresAt with fn from_
 ///
 /// Generated representation of BillingUpdateBudgetOrgRequest.
 pub(all) struct BillingUpdateBudgetOrgRequest {
-  budget_amount : Int?
+  budget_amount : Int32?
   prevent_further_usage : Bool?
   budget_alerting : BillingUpdateBudgetOrgRequestBudgetAlerting?
   expires_at : BillingUpdateBudgetOrgRequestExpiresAt?
@@ -106572,7 +106572,7 @@ pub extend BillingUpdateBudgetOrgRequest with @debug.Debug::{to_repr}
 ///
 /// Creates a BillingUpdateBudgetOrgRequest with omitted optional fields absent.
 pub fn BillingUpdateBudgetOrgRequest::new(
-  budget_amount? : Int,
+  budget_amount? : Int32,
   prevent_further_usage? : Bool,
   budget_alerting? : BillingUpdateBudgetOrgRequestBudgetAlerting,
   expires_at? : BillingUpdateBudgetOrgRequestExpiresAt,
@@ -107040,7 +107040,7 @@ pub impl @json.FromJson for OrgsUpdateRequest with fn from_json(value, path) {
 ///
 /// Generated representation of ActionsGetActionsCacheUsageByRepoForOrgResponse.
 pub(all) struct ActionsGetActionsCacheUsageByRepoForOrgResponse {
-  total_count : Int
+  total_count : Int32
   repository_cache_usages : Array[ActionsCacheUsageByRepository]
 } derive(Eq, @debug.Debug)
 
@@ -107059,7 +107059,7 @@ pub extend ActionsGetActionsCacheUsageByRepoForOrgResponse with @debug.Debug::{
 ///
 /// Creates a ActionsGetActionsCacheUsageByRepoForOrgResponse with omitted optional fields absent.
 pub fn ActionsGetActionsCacheUsageByRepoForOrgResponse::new(
-  total_count~ : Int,
+  total_count~ : Int32,
   repository_cache_usages~ : Array[ActionsCacheUsageByRepository],
 ) -> ActionsGetActionsCacheUsageByRepoForOrgResponse {
   { total_count, repository_cache_usages, }
@@ -107107,7 +107107,7 @@ pub impl @json.FromJson for ActionsGetActionsCacheUsageByRepoForOrgResponse with
 ///
 /// Generated representation of ActionsListHostedRunnersForOrgResponse.
 pub(all) struct ActionsListHostedRunnersForOrgResponse {
-  total_count : Int
+  total_count : Int32
   runners : Array[ActionsHostedRunner]
 } derive(Eq, @debug.Debug)
 
@@ -107121,7 +107121,7 @@ pub extend ActionsListHostedRunnersForOrgResponse with @debug.Debug::{to_repr}
 ///
 /// Creates a ActionsListHostedRunnersForOrgResponse with omitted optional fields absent.
 pub fn ActionsListHostedRunnersForOrgResponse::new(
-  total_count~ : Int,
+  total_count~ : Int32,
   runners~ : Array[ActionsHostedRunner],
 ) -> ActionsListHostedRunnersForOrgResponse {
   { total_count, runners, }
@@ -107301,8 +107301,8 @@ pub(all) struct ActionsCreateHostedRunnerForOrgRequest {
   name : String
   image : ActionsCreateHostedRunnerForOrgRequestImage
   size : String
-  runner_group_id : Int
-  maximum_runners : Int?
+  runner_group_id : Int32
+  maximum_runners : Int32?
   enable_static_ip : Bool?
   image_gen : Bool?
 } derive(Eq, @debug.Debug)
@@ -107320,8 +107320,8 @@ pub fn ActionsCreateHostedRunnerForOrgRequest::new(
   name~ : String,
   image~ : ActionsCreateHostedRunnerForOrgRequestImage,
   size~ : String,
-  runner_group_id~ : Int,
-  maximum_runners? : Int,
+  runner_group_id~ : Int32,
+  maximum_runners? : Int32,
   enable_static_ip? : Bool,
   image_gen? : Bool,
 ) -> ActionsCreateHostedRunnerForOrgRequest {
@@ -107382,7 +107382,7 @@ pub impl @json.FromJson for ActionsCreateHostedRunnerForOrgRequest with fn from_
 ///
 /// Generated representation of ActionsListCustomImagesForOrgResponse.
 pub(all) struct ActionsListCustomImagesForOrgResponse {
-  total_count : Int
+  total_count : Int32
   images : Array[ActionsHostedRunnerCustomImage]
 } derive(Eq, @debug.Debug)
 
@@ -107396,7 +107396,7 @@ pub extend ActionsListCustomImagesForOrgResponse with @debug.Debug::{to_repr}
 ///
 /// Creates a ActionsListCustomImagesForOrgResponse with omitted optional fields absent.
 pub fn ActionsListCustomImagesForOrgResponse::new(
-  total_count~ : Int,
+  total_count~ : Int32,
   images~ : Array[ActionsHostedRunnerCustomImage],
 ) -> ActionsListCustomImagesForOrgResponse {
   { total_count, images, }
@@ -107438,7 +107438,7 @@ pub impl @json.FromJson for ActionsListCustomImagesForOrgResponse with fn from_j
 ///
 /// Generated representation of ActionsListCustomImageVersionsForOrgResponse.
 pub(all) struct ActionsListCustomImageVersionsForOrgResponse {
-  total_count : Int
+  total_count : Int32
   image_versions : Array[ActionsHostedRunnerCustomImageVersion]
 } derive(Eq, @debug.Debug)
 
@@ -107457,7 +107457,7 @@ pub extend ActionsListCustomImageVersionsForOrgResponse with @debug.Debug::{
 ///
 /// Creates a ActionsListCustomImageVersionsForOrgResponse with omitted optional fields absent.
 pub fn ActionsListCustomImageVersionsForOrgResponse::new(
-  total_count~ : Int,
+  total_count~ : Int32,
   image_versions~ : Array[ActionsHostedRunnerCustomImageVersion],
 ) -> ActionsListCustomImageVersionsForOrgResponse {
   { total_count, image_versions, }
@@ -107501,7 +107501,7 @@ pub impl @json.FromJson for ActionsListCustomImageVersionsForOrgResponse with fn
 ///
 /// Generated representation of ActionsGetHostedRunnersGithubOwnedImagesForOrgResponse.
 pub(all) struct ActionsGetHostedRunnersGithubOwnedImagesForOrgResponse {
-  total_count : Int
+  total_count : Int32
   images : Array[ActionsHostedRunnerCuratedImage]
 } derive(Eq, @debug.Debug)
 
@@ -107520,7 +107520,7 @@ pub extend ActionsGetHostedRunnersGithubOwnedImagesForOrgResponse with @debug.De
 ///
 /// Creates a ActionsGetHostedRunnersGithubOwnedImagesForOrgResponse with omitted optional fields absent.
 pub fn ActionsGetHostedRunnersGithubOwnedImagesForOrgResponse::new(
-  total_count~ : Int,
+  total_count~ : Int32,
   images~ : Array[ActionsHostedRunnerCuratedImage],
 ) -> ActionsGetHostedRunnersGithubOwnedImagesForOrgResponse {
   { total_count, images, }
@@ -107566,7 +107566,7 @@ pub impl @json.FromJson for ActionsGetHostedRunnersGithubOwnedImagesForOrgRespon
 ///
 /// Generated representation of ActionsGetHostedRunnersPartnerImagesForOrgResponse.
 pub(all) struct ActionsGetHostedRunnersPartnerImagesForOrgResponse {
-  total_count : Int
+  total_count : Int32
   images : Array[ActionsHostedRunnerCuratedImage]
 } derive(Eq, @debug.Debug)
 
@@ -107585,7 +107585,7 @@ pub extend ActionsGetHostedRunnersPartnerImagesForOrgResponse with @debug.Debug:
 ///
 /// Creates a ActionsGetHostedRunnersPartnerImagesForOrgResponse with omitted optional fields absent.
 pub fn ActionsGetHostedRunnersPartnerImagesForOrgResponse::new(
-  total_count~ : Int,
+  total_count~ : Int32,
   images~ : Array[ActionsHostedRunnerCuratedImage],
 ) -> ActionsGetHostedRunnersPartnerImagesForOrgResponse {
   { total_count, images, }
@@ -107631,7 +107631,7 @@ pub impl @json.FromJson for ActionsGetHostedRunnersPartnerImagesForOrgResponse w
 ///
 /// Generated representation of ActionsGetHostedRunnersMachineSpecsForOrgResponse.
 pub(all) struct ActionsGetHostedRunnersMachineSpecsForOrgResponse {
-  total_count : Int
+  total_count : Int32
   machine_specs : Array[ActionsHostedRunnerMachineSpec]
 } derive(Eq, @debug.Debug)
 
@@ -107650,7 +107650,7 @@ pub extend ActionsGetHostedRunnersMachineSpecsForOrgResponse with @debug.Debug::
 ///
 /// Creates a ActionsGetHostedRunnersMachineSpecsForOrgResponse with omitted optional fields absent.
 pub fn ActionsGetHostedRunnersMachineSpecsForOrgResponse::new(
-  total_count~ : Int,
+  total_count~ : Int32,
   machine_specs~ : Array[ActionsHostedRunnerMachineSpec],
 ) -> ActionsGetHostedRunnersMachineSpecsForOrgResponse {
   { total_count, machine_specs, }
@@ -107696,7 +107696,7 @@ pub impl @json.FromJson for ActionsGetHostedRunnersMachineSpecsForOrgResponse wi
 ///
 /// Generated representation of ActionsGetHostedRunnersPlatformsForOrgResponse.
 pub(all) struct ActionsGetHostedRunnersPlatformsForOrgResponse {
-  total_count : Int
+  total_count : Int32
   platforms : Array[String]
 } derive(Eq, @debug.Debug)
 
@@ -107715,7 +107715,7 @@ pub extend ActionsGetHostedRunnersPlatformsForOrgResponse with @debug.Debug::{
 ///
 /// Creates a ActionsGetHostedRunnersPlatformsForOrgResponse with omitted optional fields absent.
 pub fn ActionsGetHostedRunnersPlatformsForOrgResponse::new(
-  total_count~ : Int,
+  total_count~ : Int32,
   platforms~ : Array[String],
 ) -> ActionsGetHostedRunnersPlatformsForOrgResponse {
   { total_count, platforms, }
@@ -107828,8 +107828,8 @@ pub impl @json.FromJson for ActionsUpdateHostedRunnerForOrgRequestImageSource wi
 /// Generated representation of ActionsUpdateHostedRunnerForOrgRequest.
 pub(all) struct ActionsUpdateHostedRunnerForOrgRequest {
   name : String?
-  runner_group_id : Int?
-  maximum_runners : Int?
+  runner_group_id : Int32?
+  maximum_runners : Int32?
   enable_static_ip : Bool?
   size : String?
   image_source : ActionsUpdateHostedRunnerForOrgRequestImageSource?
@@ -107849,8 +107849,8 @@ pub extend ActionsUpdateHostedRunnerForOrgRequest with @debug.Debug::{to_repr}
 /// Creates a ActionsUpdateHostedRunnerForOrgRequest with omitted optional fields absent.
 pub fn ActionsUpdateHostedRunnerForOrgRequest::new(
   name? : String,
-  runner_group_id? : Int,
-  maximum_runners? : Int,
+  runner_group_id? : Int32,
+  maximum_runners? : Int32,
   enable_static_ip? : Bool,
   size? : String,
   image_source? : ActionsUpdateHostedRunnerForOrgRequestImageSource,
@@ -108120,7 +108120,7 @@ pub impl @json.FromJson for ActionsListSelectedRepositoriesEnabledGithubActionsO
 ///
 /// Generated representation of ActionsSetSelectedRepositoriesEnabledGithubActionsOrganizationRequest.
 pub(all) struct ActionsSetSelectedRepositoriesEnabledGithubActionsOrganizationRequest {
-  selected_repository_ids : Array[Int]
+  selected_repository_ids : Array[Int32]
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -108138,7 +108138,7 @@ pub extend ActionsSetSelectedRepositoriesEnabledGithubActionsOrganizationRequest
 ///
 /// Creates a ActionsSetSelectedRepositoriesEnabledGithubActionsOrganizationRequest with omitted optional fields absent.
 pub fn ActionsSetSelectedRepositoriesEnabledGithubActionsOrganizationRequest::new(
-  selected_repository_ids~ : Array[Int],
+  selected_repository_ids~ : Array[Int32],
 ) -> ActionsSetSelectedRepositoriesEnabledGithubActionsOrganizationRequest {
   { selected_repository_ids, }
 }
@@ -108310,7 +108310,7 @@ pub impl @json.FromJson for ActionsSetSelfHostedRunnersPermissionsOrganizationRe
 ///
 /// Generated representation of ActionsListSelectedRepositoriesSelfHostedRunnersOrganizationResponse.
 pub(all) struct ActionsListSelectedRepositoriesSelfHostedRunnersOrganizationResponse {
-  total_count : Int?
+  total_count : Int32?
   repositories : Array[Repository]?
 } derive(Eq, @debug.Debug)
 
@@ -108329,7 +108329,7 @@ pub extend ActionsListSelectedRepositoriesSelfHostedRunnersOrganizationResponse 
 ///
 /// Creates a ActionsListSelectedRepositoriesSelfHostedRunnersOrganizationResponse with omitted optional fields absent.
 pub fn ActionsListSelectedRepositoriesSelfHostedRunnersOrganizationResponse::new(
-  total_count? : Int,
+  total_count? : Int32,
   repositories? : Array[Repository],
 ) -> ActionsListSelectedRepositoriesSelfHostedRunnersOrganizationResponse {
   { total_count, repositories, }
@@ -108375,7 +108375,7 @@ pub impl @json.FromJson for ActionsListSelectedRepositoriesSelfHostedRunnersOrga
 ///
 /// Generated representation of ActionsSetSelectedRepositoriesSelfHostedRunnersOrganizationRequest.
 pub(all) struct ActionsSetSelectedRepositoriesSelfHostedRunnersOrganizationRequest {
-  selected_repository_ids : Array[Int]
+  selected_repository_ids : Array[Int32]
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -108393,7 +108393,7 @@ pub extend ActionsSetSelectedRepositoriesSelfHostedRunnersOrganizationRequest wi
 ///
 /// Creates a ActionsSetSelectedRepositoriesSelfHostedRunnersOrganizationRequest with omitted optional fields absent.
 pub fn ActionsSetSelectedRepositoriesSelfHostedRunnersOrganizationRequest::new(
-  selected_repository_ids~ : Array[Int],
+  selected_repository_ids~ : Array[Int32],
 ) -> ActionsSetSelectedRepositoriesSelfHostedRunnersOrganizationRequest {
   { selected_repository_ids, }
 }
@@ -108438,7 +108438,7 @@ pub impl @json.FromJson for ActionsSetSelectedRepositoriesSelfHostedRunnersOrgan
 ///
 /// Generated representation of ActionsGetOrgActionsPoliciesResponse.
 pub(all) struct ActionsGetOrgActionsPoliciesResponse {
-  total_count : Int
+  total_count : Int32
   policies : Array[ActionsPolicy]
 } derive(Eq, @debug.Debug)
 
@@ -108452,7 +108452,7 @@ pub extend ActionsGetOrgActionsPoliciesResponse with @debug.Debug::{to_repr}
 ///
 /// Creates a ActionsGetOrgActionsPoliciesResponse with omitted optional fields absent.
 pub fn ActionsGetOrgActionsPoliciesResponse::new(
-  total_count~ : Int,
+  total_count~ : Int32,
   policies~ : Array[ActionsPolicy],
 ) -> ActionsGetOrgActionsPoliciesResponse {
   { total_count, policies, }
@@ -108751,8 +108751,8 @@ pub impl @json.FromJson for ActionsCreateSelfHostedRunnerGroupForOrgRequestVisib
 pub(all) struct ActionsCreateSelfHostedRunnerGroupForOrgRequest {
   name : String
   visibility : ActionsCreateSelfHostedRunnerGroupForOrgRequestVisibility?
-  selected_repository_ids : Array[Int]?
-  runners : Array[Int]?
+  selected_repository_ids : Array[Int32]?
+  runners : Array[Int32]?
   allows_public_repositories : Bool?
   restricted_to_workflows : Bool?
   selected_workflows : Array[String]?
@@ -108776,8 +108776,8 @@ pub extend ActionsCreateSelfHostedRunnerGroupForOrgRequest with @debug.Debug::{
 pub fn ActionsCreateSelfHostedRunnerGroupForOrgRequest::new(
   name~ : String,
   visibility? : ActionsCreateSelfHostedRunnerGroupForOrgRequestVisibility,
-  selected_repository_ids? : Array[Int],
-  runners? : Array[Int],
+  selected_repository_ids? : Array[Int32],
+  runners? : Array[Int32],
   allows_public_repositories? : Bool,
   restricted_to_workflows? : Bool,
   selected_workflows? : Array[String],
@@ -109149,7 +109149,7 @@ pub impl @json.FromJson for ActionsListRepoAccessToSelfHostedRunnerGroupInOrgRes
 ///
 /// Generated representation of ActionsSetRepoAccessToSelfHostedRunnerGroupInOrgRequest.
 pub(all) struct ActionsSetRepoAccessToSelfHostedRunnerGroupInOrgRequest {
-  selected_repository_ids : Array[Int]
+  selected_repository_ids : Array[Int32]
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -109167,7 +109167,7 @@ pub extend ActionsSetRepoAccessToSelfHostedRunnerGroupInOrgRequest with @debug.D
 ///
 /// Creates a ActionsSetRepoAccessToSelfHostedRunnerGroupInOrgRequest with omitted optional fields absent.
 pub fn ActionsSetRepoAccessToSelfHostedRunnerGroupInOrgRequest::new(
-  selected_repository_ids~ : Array[Int],
+  selected_repository_ids~ : Array[Int32],
 ) -> ActionsSetRepoAccessToSelfHostedRunnerGroupInOrgRequest {
   { selected_repository_ids, }
 }
@@ -109277,7 +109277,7 @@ pub impl @json.FromJson for ActionsListSelfHostedRunnersInGroupForOrgResponse wi
 ///
 /// Generated representation of ActionsSetSelfHostedRunnersInGroupForOrgRequest.
 pub(all) struct ActionsSetSelfHostedRunnersInGroupForOrgRequest {
-  runners : Array[Int]
+  runners : Array[Int32]
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -109295,7 +109295,7 @@ pub extend ActionsSetSelfHostedRunnersInGroupForOrgRequest with @debug.Debug::{
 ///
 /// Creates a ActionsSetSelfHostedRunnersInGroupForOrgRequest with omitted optional fields absent.
 pub fn ActionsSetSelfHostedRunnersInGroupForOrgRequest::new(
-  runners~ : Array[Int],
+  runners~ : Array[Int32],
 ) -> ActionsSetSelfHostedRunnersInGroupForOrgRequest {
   { runners, }
 }
@@ -109334,7 +109334,7 @@ pub impl @json.FromJson for ActionsSetSelfHostedRunnersInGroupForOrgRequest with
 ///
 /// Generated representation of ActionsListSelfHostedRunnersForOrgResponse.
 pub(all) struct ActionsListSelfHostedRunnersForOrgResponse {
-  total_count : Int
+  total_count : Int32
   runners : Array[Runner]
 } derive(Eq, @debug.Debug)
 
@@ -109353,7 +109353,7 @@ pub extend ActionsListSelfHostedRunnersForOrgResponse with @debug.Debug::{
 ///
 /// Creates a ActionsListSelfHostedRunnersForOrgResponse with omitted optional fields absent.
 pub fn ActionsListSelfHostedRunnersForOrgResponse::new(
-  total_count~ : Int,
+  total_count~ : Int32,
   runners~ : Array[Runner],
 ) -> ActionsListSelfHostedRunnersForOrgResponse {
   { total_count, runners, }
@@ -109477,7 +109477,7 @@ pub impl @json.FromJson for ActionsGetRunnerVersionDeprecationForOrgResponse wit
 /// Generated representation of ActionsGenerateRunnerJitconfigForOrgRequest.
 pub(all) struct ActionsGenerateRunnerJitconfigForOrgRequest {
   name : String
-  runner_group_id : Int
+  runner_group_id : Int32
   labels : Array[String]
   work_folder : String?
 } derive(Eq, @debug.Debug)
@@ -109498,7 +109498,7 @@ pub extend ActionsGenerateRunnerJitconfigForOrgRequest with @debug.Debug::{
 /// Creates a ActionsGenerateRunnerJitconfigForOrgRequest with omitted optional fields absent.
 pub fn ActionsGenerateRunnerJitconfigForOrgRequest::new(
   name~ : String,
-  runner_group_id~ : Int,
+  runner_group_id~ : Int32,
   labels~ : Array[String],
   work_folder? : String,
 ) -> ActionsGenerateRunnerJitconfigForOrgRequest {
@@ -109661,7 +109661,7 @@ pub impl @json.FromJson for ActionsSetCustomLabelsForSelfHostedRunnerForOrgReque
 ///
 /// Generated representation of ActionsListOrgSecretsResponse.
 pub(all) struct ActionsListOrgSecretsResponse {
-  total_count : Int
+  total_count : Int32
   secrets : Array[OrganizationActionsSecret]
 } derive(Eq, @debug.Debug)
 
@@ -109675,7 +109675,7 @@ pub extend ActionsListOrgSecretsResponse with @debug.Debug::{to_repr}
 ///
 /// Creates a ActionsListOrgSecretsResponse with omitted optional fields absent.
 pub fn ActionsListOrgSecretsResponse::new(
-  total_count~ : Int,
+  total_count~ : Int32,
   secrets~ : Array[OrganizationActionsSecret],
 ) -> ActionsListOrgSecretsResponse {
   { total_count, secrets, }
@@ -109786,7 +109786,7 @@ pub(all) struct ActionsCreateOrUpdateOrgSecretRequest {
   encrypted_value : String
   key_id : String
   visibility : ActionsCreateOrUpdateOrgSecretRequestVisibility
-  selected_repository_ids : Array[Int]?
+  selected_repository_ids : Array[Int32]?
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -109802,7 +109802,7 @@ pub fn ActionsCreateOrUpdateOrgSecretRequest::new(
   encrypted_value~ : String,
   key_id~ : String,
   visibility~ : ActionsCreateOrUpdateOrgSecretRequestVisibility,
-  selected_repository_ids? : Array[Int],
+  selected_repository_ids? : Array[Int32],
 ) -> ActionsCreateOrUpdateOrgSecretRequest {
   { encrypted_value, key_id, visibility, selected_repository_ids, }
 }
@@ -109849,7 +109849,7 @@ pub impl @json.FromJson for ActionsCreateOrUpdateOrgSecretRequest with fn from_j
 ///
 /// Generated representation of ActionsListSelectedReposForOrgSecretResponse.
 pub(all) struct ActionsListSelectedReposForOrgSecretResponse {
-  total_count : Int
+  total_count : Int32
   repositories : Array[MinimalRepository]
 } derive(Eq, @debug.Debug)
 
@@ -109868,7 +109868,7 @@ pub extend ActionsListSelectedReposForOrgSecretResponse with @debug.Debug::{
 ///
 /// Creates a ActionsListSelectedReposForOrgSecretResponse with omitted optional fields absent.
 pub fn ActionsListSelectedReposForOrgSecretResponse::new(
-  total_count~ : Int,
+  total_count~ : Int32,
   repositories~ : Array[MinimalRepository],
 ) -> ActionsListSelectedReposForOrgSecretResponse {
   { total_count, repositories, }
@@ -109912,7 +109912,7 @@ pub impl @json.FromJson for ActionsListSelectedReposForOrgSecretResponse with fn
 ///
 /// Generated representation of ActionsSetSelectedReposForOrgSecretRequest.
 pub(all) struct ActionsSetSelectedReposForOrgSecretRequest {
-  selected_repository_ids : Array[Int]
+  selected_repository_ids : Array[Int32]
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -109930,7 +109930,7 @@ pub extend ActionsSetSelectedReposForOrgSecretRequest with @debug.Debug::{
 ///
 /// Creates a ActionsSetSelectedReposForOrgSecretRequest with omitted optional fields absent.
 pub fn ActionsSetSelectedReposForOrgSecretRequest::new(
-  selected_repository_ids~ : Array[Int],
+  selected_repository_ids~ : Array[Int32],
 ) -> ActionsSetSelectedReposForOrgSecretRequest {
   { selected_repository_ids, }
 }
@@ -109973,7 +109973,7 @@ pub impl @json.FromJson for ActionsSetSelectedReposForOrgSecretRequest with fn f
 ///
 /// Generated representation of ActionsListOrgVariablesResponse.
 pub(all) struct ActionsListOrgVariablesResponse {
-  total_count : Int
+  total_count : Int32
   variables : Array[OrganizationActionsVariable]
 } derive(Eq, @debug.Debug)
 
@@ -109987,7 +109987,7 @@ pub extend ActionsListOrgVariablesResponse with @debug.Debug::{to_repr}
 ///
 /// Creates a ActionsListOrgVariablesResponse with omitted optional fields absent.
 pub fn ActionsListOrgVariablesResponse::new(
-  total_count~ : Int,
+  total_count~ : Int32,
   variables~ : Array[OrganizationActionsVariable],
 ) -> ActionsListOrgVariablesResponse {
   { total_count, variables, }
@@ -110093,7 +110093,7 @@ pub(all) struct ActionsCreateOrgVariableRequest {
   name : String
   value : String
   visibility : ActionsCreateOrgVariableRequestVisibility
-  selected_repository_ids : Array[Int]?
+  selected_repository_ids : Array[Int32]?
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -110109,7 +110109,7 @@ pub fn ActionsCreateOrgVariableRequest::new(
   name~ : String,
   value~ : String,
   visibility~ : ActionsCreateOrgVariableRequestVisibility,
-  selected_repository_ids? : Array[Int],
+  selected_repository_ids? : Array[Int32],
 ) -> ActionsCreateOrgVariableRequest {
   { name, value, visibility, selected_repository_ids, }
 }
@@ -110220,7 +110220,7 @@ pub(all) struct ActionsUpdateOrgVariableRequest {
   name : String?
   value : String?
   visibility : ActionsUpdateOrgVariableRequestVisibility?
-  selected_repository_ids : Array[Int]?
+  selected_repository_ids : Array[Int32]?
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -110236,7 +110236,7 @@ pub fn ActionsUpdateOrgVariableRequest::new(
   name? : String,
   value? : String,
   visibility? : ActionsUpdateOrgVariableRequestVisibility,
-  selected_repository_ids? : Array[Int],
+  selected_repository_ids? : Array[Int32],
 ) -> ActionsUpdateOrgVariableRequest {
   { name, value, visibility, selected_repository_ids, }
 }
@@ -110281,7 +110281,7 @@ pub impl @json.FromJson for ActionsUpdateOrgVariableRequest with fn from_json(
 ///
 /// Generated representation of ActionsListSelectedReposForOrgVariableResponse.
 pub(all) struct ActionsListSelectedReposForOrgVariableResponse {
-  total_count : Int
+  total_count : Int32
   repositories : Array[MinimalRepository]
 } derive(Eq, @debug.Debug)
 
@@ -110300,7 +110300,7 @@ pub extend ActionsListSelectedReposForOrgVariableResponse with @debug.Debug::{
 ///
 /// Creates a ActionsListSelectedReposForOrgVariableResponse with omitted optional fields absent.
 pub fn ActionsListSelectedReposForOrgVariableResponse::new(
-  total_count~ : Int,
+  total_count~ : Int32,
   repositories~ : Array[MinimalRepository],
 ) -> ActionsListSelectedReposForOrgVariableResponse {
   { total_count, repositories, }
@@ -110344,7 +110344,7 @@ pub impl @json.FromJson for ActionsListSelectedReposForOrgVariableResponse with 
 ///
 /// Generated representation of ActionsSetSelectedReposForOrgVariableRequest.
 pub(all) struct ActionsSetSelectedReposForOrgVariableRequest {
-  selected_repository_ids : Array[Int]
+  selected_repository_ids : Array[Int32]
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -110362,7 +110362,7 @@ pub extend ActionsSetSelectedReposForOrgVariableRequest with @debug.Debug::{
 ///
 /// Creates a ActionsSetSelectedReposForOrgVariableRequest with omitted optional fields absent.
 pub fn ActionsSetSelectedReposForOrgVariableRequest::new(
-  selected_repository_ids~ : Array[Int],
+  selected_repository_ids~ : Array[Int32],
 ) -> ActionsSetSelectedReposForOrgVariableRequest {
   { selected_repository_ids, }
 }
@@ -110405,7 +110405,7 @@ pub impl @json.FromJson for ActionsSetSelectedReposForOrgVariableRequest with fn
 ///
 /// Generated representation of AgentsListOrgSecretsResponse.
 pub(all) struct AgentsListOrgSecretsResponse {
-  total_count : Int
+  total_count : Int32
   secrets : Array[OrganizationActionsSecret]
 } derive(Eq, @debug.Debug)
 
@@ -110419,7 +110419,7 @@ pub extend AgentsListOrgSecretsResponse with @debug.Debug::{to_repr}
 ///
 /// Creates a AgentsListOrgSecretsResponse with omitted optional fields absent.
 pub fn AgentsListOrgSecretsResponse::new(
-  total_count~ : Int,
+  total_count~ : Int32,
   secrets~ : Array[OrganizationActionsSecret],
 ) -> AgentsListOrgSecretsResponse {
   { total_count, secrets, }
@@ -110528,7 +110528,7 @@ pub(all) struct AgentsCreateOrUpdateOrgSecretRequest {
   encrypted_value : String
   key_id : String
   visibility : AgentsCreateOrUpdateOrgSecretRequestVisibility
-  selected_repository_ids : Array[Int]?
+  selected_repository_ids : Array[Int32]?
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -110544,7 +110544,7 @@ pub fn AgentsCreateOrUpdateOrgSecretRequest::new(
   encrypted_value~ : String,
   key_id~ : String,
   visibility~ : AgentsCreateOrUpdateOrgSecretRequestVisibility,
-  selected_repository_ids? : Array[Int],
+  selected_repository_ids? : Array[Int32],
 ) -> AgentsCreateOrUpdateOrgSecretRequest {
   { encrypted_value, key_id, visibility, selected_repository_ids, }
 }
@@ -110589,7 +110589,7 @@ pub impl @json.FromJson for AgentsCreateOrUpdateOrgSecretRequest with fn from_js
 ///
 /// Generated representation of AgentsListSelectedReposForOrgSecretResponse.
 pub(all) struct AgentsListSelectedReposForOrgSecretResponse {
-  total_count : Int
+  total_count : Int32
   repositories : Array[MinimalRepository]
 } derive(Eq, @debug.Debug)
 
@@ -110608,7 +110608,7 @@ pub extend AgentsListSelectedReposForOrgSecretResponse with @debug.Debug::{
 ///
 /// Creates a AgentsListSelectedReposForOrgSecretResponse with omitted optional fields absent.
 pub fn AgentsListSelectedReposForOrgSecretResponse::new(
-  total_count~ : Int,
+  total_count~ : Int32,
   repositories~ : Array[MinimalRepository],
 ) -> AgentsListSelectedReposForOrgSecretResponse {
   { total_count, repositories, }
@@ -110652,7 +110652,7 @@ pub impl @json.FromJson for AgentsListSelectedReposForOrgSecretResponse with fn 
 ///
 /// Generated representation of AgentsSetSelectedReposForOrgSecretRequest.
 pub(all) struct AgentsSetSelectedReposForOrgSecretRequest {
-  selected_repository_ids : Array[Int]
+  selected_repository_ids : Array[Int32]
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -110667,7 +110667,7 @@ pub extend AgentsSetSelectedReposForOrgSecretRequest with @debug.Debug::{
 ///
 /// Creates a AgentsSetSelectedReposForOrgSecretRequest with omitted optional fields absent.
 pub fn AgentsSetSelectedReposForOrgSecretRequest::new(
-  selected_repository_ids~ : Array[Int],
+  selected_repository_ids~ : Array[Int32],
 ) -> AgentsSetSelectedReposForOrgSecretRequest {
   { selected_repository_ids, }
 }
@@ -110710,7 +110710,7 @@ pub impl @json.FromJson for AgentsSetSelectedReposForOrgSecretRequest with fn fr
 ///
 /// Generated representation of AgentsListOrgVariablesResponse.
 pub(all) struct AgentsListOrgVariablesResponse {
-  total_count : Int
+  total_count : Int32
   variables : Array[OrganizationActionsVariable]
 } derive(Eq, @debug.Debug)
 
@@ -110724,7 +110724,7 @@ pub extend AgentsListOrgVariablesResponse with @debug.Debug::{to_repr}
 ///
 /// Creates a AgentsListOrgVariablesResponse with omitted optional fields absent.
 pub fn AgentsListOrgVariablesResponse::new(
-  total_count~ : Int,
+  total_count~ : Int32,
   variables~ : Array[OrganizationActionsVariable],
 ) -> AgentsListOrgVariablesResponse {
   { total_count, variables, }
@@ -110828,7 +110828,7 @@ pub(all) struct AgentsCreateOrgVariableRequest {
   name : String
   value : String
   visibility : AgentsCreateOrgVariableRequestVisibility
-  selected_repository_ids : Array[Int]?
+  selected_repository_ids : Array[Int32]?
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -110844,7 +110844,7 @@ pub fn AgentsCreateOrgVariableRequest::new(
   name~ : String,
   value~ : String,
   visibility~ : AgentsCreateOrgVariableRequestVisibility,
-  selected_repository_ids? : Array[Int],
+  selected_repository_ids? : Array[Int32],
 ) -> AgentsCreateOrgVariableRequest {
   { name, value, visibility, selected_repository_ids, }
 }
@@ -110953,7 +110953,7 @@ pub(all) struct AgentsUpdateOrgVariableRequest {
   name : String?
   value : String?
   visibility : AgentsUpdateOrgVariableRequestVisibility?
-  selected_repository_ids : Array[Int]?
+  selected_repository_ids : Array[Int32]?
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -110969,7 +110969,7 @@ pub fn AgentsUpdateOrgVariableRequest::new(
   name? : String,
   value? : String,
   visibility? : AgentsUpdateOrgVariableRequestVisibility,
-  selected_repository_ids? : Array[Int],
+  selected_repository_ids? : Array[Int32],
 ) -> AgentsUpdateOrgVariableRequest {
   { name, value, visibility, selected_repository_ids, }
 }
@@ -111014,7 +111014,7 @@ pub impl @json.FromJson for AgentsUpdateOrgVariableRequest with fn from_json(
 ///
 /// Generated representation of AgentsListSelectedReposForOrgVariableResponse.
 pub(all) struct AgentsListSelectedReposForOrgVariableResponse {
-  total_count : Int
+  total_count : Int32
   repositories : Array[MinimalRepository]
 } derive(Eq, @debug.Debug)
 
@@ -111033,7 +111033,7 @@ pub extend AgentsListSelectedReposForOrgVariableResponse with @debug.Debug::{
 ///
 /// Creates a AgentsListSelectedReposForOrgVariableResponse with omitted optional fields absent.
 pub fn AgentsListSelectedReposForOrgVariableResponse::new(
-  total_count~ : Int,
+  total_count~ : Int32,
   repositories~ : Array[MinimalRepository],
 ) -> AgentsListSelectedReposForOrgVariableResponse {
   { total_count, repositories, }
@@ -111077,7 +111077,7 @@ pub impl @json.FromJson for AgentsListSelectedReposForOrgVariableResponse with f
 ///
 /// Generated representation of AgentsSetSelectedReposForOrgVariableRequest.
 pub(all) struct AgentsSetSelectedReposForOrgVariableRequest {
-  selected_repository_ids : Array[Int]
+  selected_repository_ids : Array[Int32]
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -111095,7 +111095,7 @@ pub extend AgentsSetSelectedReposForOrgVariableRequest with @debug.Debug::{
 ///
 /// Creates a AgentsSetSelectedReposForOrgVariableRequest with omitted optional fields absent.
 pub fn AgentsSetSelectedReposForOrgVariableRequest::new(
-  selected_repository_ids~ : Array[Int],
+  selected_repository_ids~ : Array[Int32],
 ) -> AgentsSetSelectedReposForOrgVariableRequest {
   { selected_repository_ids, }
 }
@@ -111391,7 +111391,7 @@ pub impl @json.FromJson for OrgsCreateArtifactDeploymentRecordRequest with fn fr
 ///
 /// Generated representation of OrgsCreateArtifactDeploymentRecordResponse.
 pub(all) struct OrgsCreateArtifactDeploymentRecordResponse {
-  total_count : Int
+  total_count : Int32
   deployment_records : Array[ArtifactDeploymentRecord]?
 } derive(Eq, @debug.Debug)
 
@@ -111410,7 +111410,7 @@ pub extend OrgsCreateArtifactDeploymentRecordResponse with @debug.Debug::{
 ///
 /// Creates a OrgsCreateArtifactDeploymentRecordResponse with omitted optional fields absent.
 pub fn OrgsCreateArtifactDeploymentRecordResponse::new(
-  total_count~ : Int,
+  total_count~ : Int32,
   deployment_records? : Array[ArtifactDeploymentRecord],
 ) -> OrgsCreateArtifactDeploymentRecordResponse {
   { total_count, deployment_records, }
@@ -111766,7 +111766,7 @@ pub impl @json.FromJson for OrgsSetClusterDeploymentRecordsRequest with fn from_
 ///
 /// Generated representation of OrgsSetClusterDeploymentRecordsResponse.
 pub(all) struct OrgsSetClusterDeploymentRecordsResponse {
-  total_count : Int
+  total_count : Int32
   deployment_records : Array[ArtifactDeploymentRecord]?
 } derive(Eq, @debug.Debug)
 
@@ -111780,7 +111780,7 @@ pub extend OrgsSetClusterDeploymentRecordsResponse with @debug.Debug::{to_repr}
 ///
 /// Creates a OrgsSetClusterDeploymentRecordsResponse with omitted optional fields absent.
 pub fn OrgsSetClusterDeploymentRecordsResponse::new(
-  total_count~ : Int,
+  total_count~ : Int32,
   deployment_records? : Array[ArtifactDeploymentRecord],
 ) -> OrgsSetClusterDeploymentRecordsResponse {
   { total_count, deployment_records, }
@@ -112133,7 +112133,7 @@ pub impl @json.FromJson for OrgsCreateClusterDeploymentRecordsJobRequest with fn
 ///
 /// Generated representation of OrgsCreateClusterDeploymentRecordsJobResponse.
 pub(all) struct OrgsCreateClusterDeploymentRecordsJobResponse {
-  job_id : Int
+  job_id : Int32
   errors : Array[Json]?
 } derive(Eq, @debug.Debug)
 
@@ -112152,7 +112152,7 @@ pub extend OrgsCreateClusterDeploymentRecordsJobResponse with @debug.Debug::{
 ///
 /// Creates a OrgsCreateClusterDeploymentRecordsJobResponse with omitted optional fields absent.
 pub fn OrgsCreateClusterDeploymentRecordsJobResponse::new(
-  job_id~ : Int,
+  job_id~ : Int32,
   errors? : Array[Json],
 ) -> OrgsCreateClusterDeploymentRecordsJobResponse {
   { job_id, errors, }
@@ -112267,10 +112267,10 @@ pub impl @json.FromJson for OrgsGetClusterDeploymentRecordsJobResponseStatus wit
 ///
 /// Generated representation of OrgsGetClusterDeploymentRecordsJobResponse.
 pub(all) struct OrgsGetClusterDeploymentRecordsJobResponse {
-  job_id : Int
+  job_id : Int32
   status : OrgsGetClusterDeploymentRecordsJobResponseStatus
   started_at : String?
-  total_count : Int?
+  total_count : Int32?
   errors : Array[Json]?
 } derive(Eq, @debug.Debug)
 
@@ -112289,10 +112289,10 @@ pub extend OrgsGetClusterDeploymentRecordsJobResponse with @debug.Debug::{
 ///
 /// Creates a OrgsGetClusterDeploymentRecordsJobResponse with omitted optional fields absent.
 pub fn OrgsGetClusterDeploymentRecordsJobResponse::new(
-  job_id~ : Int,
+  job_id~ : Int32,
   status~ : OrgsGetClusterDeploymentRecordsJobResponseStatus,
   started_at? : String,
-  total_count? : Int,
+  total_count? : Int32,
   errors? : Array[Json],
 ) -> OrgsGetClusterDeploymentRecordsJobResponse {
   { job_id, status, started_at, total_count, errors, }
@@ -112507,7 +112507,7 @@ pub impl @json.FromJson for OrgsCreateArtifactStorageRecordRequest with fn from_
 ///
 /// Generated representation of OrgsCreateArtifactStorageRecordResponseStorageRecordsItem.
 pub(all) struct OrgsCreateArtifactStorageRecordResponseStorageRecordsItem {
-  id : Int?
+  id : Int32?
   name : String?
   digest : String?
   artifact_url : @sdkjson.Presence[String]
@@ -112533,7 +112533,7 @@ pub extend OrgsCreateArtifactStorageRecordResponseStorageRecordsItem with @debug
 ///
 /// Creates a OrgsCreateArtifactStorageRecordResponseStorageRecordsItem with omitted optional fields absent.
 pub fn OrgsCreateArtifactStorageRecordResponseStorageRecordsItem::new(
-  id? : Int,
+  id? : Int32,
   name? : String,
   digest? : String,
   artifact_url? : String,
@@ -112610,7 +112610,7 @@ pub impl @json.FromJson for OrgsCreateArtifactStorageRecordResponseStorageRecord
 ///
 /// Generated representation of OrgsCreateArtifactStorageRecordResponse.
 pub(all) struct OrgsCreateArtifactStorageRecordResponse {
-  total_count : Int
+  total_count : Int32
   storage_records : Array[
     OrgsCreateArtifactStorageRecordResponseStorageRecordsItem,
   ]?
@@ -112626,7 +112626,7 @@ pub extend OrgsCreateArtifactStorageRecordResponse with @debug.Debug::{to_repr}
 ///
 /// Creates a OrgsCreateArtifactStorageRecordResponse with omitted optional fields absent.
 pub fn OrgsCreateArtifactStorageRecordResponse::new(
-  total_count~ : Int,
+  total_count~ : Int32,
   storage_records? : Array[
     OrgsCreateArtifactStorageRecordResponseStorageRecordsItem,
   ],
@@ -112672,7 +112672,7 @@ pub impl @json.FromJson for OrgsCreateArtifactStorageRecordResponse with fn from
 ///
 /// Generated representation of OrgsListArtifactDeploymentRecordsResponse.
 pub(all) struct OrgsListArtifactDeploymentRecordsResponse {
-  total_count : Int?
+  total_count : Int32?
   deployment_records : Array[ArtifactDeploymentRecord]?
 } derive(Eq, @debug.Debug)
 
@@ -112688,7 +112688,7 @@ pub extend OrgsListArtifactDeploymentRecordsResponse with @debug.Debug::{
 ///
 /// Creates a OrgsListArtifactDeploymentRecordsResponse with omitted optional fields absent.
 pub fn OrgsListArtifactDeploymentRecordsResponse::new(
-  total_count? : Int,
+  total_count? : Int32,
   deployment_records? : Array[ArtifactDeploymentRecord],
 ) -> OrgsListArtifactDeploymentRecordsResponse {
   { total_count, deployment_records, }
@@ -112732,7 +112732,7 @@ pub impl @json.FromJson for OrgsListArtifactDeploymentRecordsResponse with fn fr
 ///
 /// Generated representation of OrgsListArtifactStorageRecordsResponseStorageRecordsItem.
 pub(all) struct OrgsListArtifactStorageRecordsResponseStorageRecordsItem {
-  id : Int?
+  id : Int32?
   name : String?
   digest : String?
   artifact_url : String?
@@ -112758,7 +112758,7 @@ pub extend OrgsListArtifactStorageRecordsResponseStorageRecordsItem with @debug.
 ///
 /// Creates a OrgsListArtifactStorageRecordsResponseStorageRecordsItem with omitted optional fields absent.
 pub fn OrgsListArtifactStorageRecordsResponseStorageRecordsItem::new(
-  id? : Int,
+  id? : Int32,
   name? : String,
   digest? : String,
   artifact_url? : String,
@@ -112835,7 +112835,7 @@ pub impl @json.FromJson for OrgsListArtifactStorageRecordsResponseStorageRecords
 ///
 /// Generated representation of OrgsListArtifactStorageRecordsResponse.
 pub(all) struct OrgsListArtifactStorageRecordsResponse {
-  total_count : Int?
+  total_count : Int32?
   storage_records : Array[
     OrgsListArtifactStorageRecordsResponseStorageRecordsItem,
   ]?
@@ -112851,7 +112851,7 @@ pub extend OrgsListArtifactStorageRecordsResponse with @debug.Debug::{to_repr}
 ///
 /// Creates a OrgsListArtifactStorageRecordsResponse with omitted optional fields absent.
 pub fn OrgsListArtifactStorageRecordsResponse::new(
-  total_count? : Int,
+  total_count? : Int32,
   storage_records? : Array[
     OrgsListArtifactStorageRecordsResponseStorageRecordsItem,
   ],
@@ -113019,7 +113019,7 @@ pub impl @json.FromJson for OrgsListAttestationsBulkResponseAttestationsSubjectD
 /// Generated representation of OrgsListAttestationsBulkResponseAttestationsSubjectDigestsValueItem.
 pub(all) struct OrgsListAttestationsBulkResponseAttestationsSubjectDigestsValueItem {
   bundle : OrgsListAttestationsBulkResponseAttestationsSubjectDigestsValueItemBundle?
-  repository_id : Int?
+  repository_id : Int32?
   bundle_url : String?
 } derive(Eq, @debug.Debug)
 
@@ -113039,7 +113039,7 @@ pub extend OrgsListAttestationsBulkResponseAttestationsSubjectDigestsValueItem w
 /// Creates a OrgsListAttestationsBulkResponseAttestationsSubjectDigestsValueItem with omitted optional fields absent.
 pub fn OrgsListAttestationsBulkResponseAttestationsSubjectDigestsValueItem::new(
   bundle? : OrgsListAttestationsBulkResponseAttestationsSubjectDigestsValueItemBundle,
-  repository_id? : Int,
+  repository_id? : Int32,
   bundle_url? : String,
 ) -> OrgsListAttestationsBulkResponseAttestationsSubjectDigestsValueItem {
   { bundle, repository_id, bundle_url, }
@@ -113218,7 +113218,7 @@ pub impl @json.FromJson for OrgsListAttestationsBulkResponse with fn from_json(
 ///
 /// Generated representation of OrgsListAttestationRepositoriesResponseItem.
 pub(all) struct OrgsListAttestationRepositoriesResponseItem {
-  id : Int?
+  id : Int32?
   name : String?
 } derive(Eq, @debug.Debug)
 
@@ -113237,7 +113237,7 @@ pub extend OrgsListAttestationRepositoriesResponseItem with @debug.Debug::{
 ///
 /// Creates a OrgsListAttestationRepositoriesResponseItem with omitted optional fields absent.
 pub fn OrgsListAttestationRepositoriesResponseItem::new(
-  id? : Int,
+  id? : Int32,
   name? : String,
 ) -> OrgsListAttestationRepositoriesResponseItem {
   { id, name, }
@@ -113348,7 +113348,7 @@ pub impl @json.FromJson for OrgsListAttestationsResponseAttestationsItemBundle w
 /// Generated representation of OrgsListAttestationsResponseAttestationsItem.
 pub(all) struct OrgsListAttestationsResponseAttestationsItem {
   bundle : @sdkjson.Presence[OrgsListAttestationsResponseAttestationsItemBundle]
-  repository_id : Int?
+  repository_id : Int32?
   bundle_url : String?
   initiator : String?
 } derive(Eq, @debug.Debug)
@@ -113369,7 +113369,7 @@ pub extend OrgsListAttestationsResponseAttestationsItem with @debug.Debug::{
 /// Creates a OrgsListAttestationsResponseAttestationsItem with omitted optional fields absent.
 pub fn OrgsListAttestationsResponseAttestationsItem::new(
   bundle? : OrgsListAttestationsResponseAttestationsItemBundle,
-  repository_id? : Int,
+  repository_id? : Int32,
   bundle_url? : String,
   initiator? : String,
 ) -> OrgsListAttestationsResponseAttestationsItem {
@@ -113583,8 +113583,8 @@ pub impl @json.FromJson for CampaignsListOrgCampaignsSort with fn from_json(
 ///
 /// Generated representation of CampaignsCreateCampaignRequestCodeScanningAlertsItem.
 pub(all) struct CampaignsCreateCampaignRequestCodeScanningAlertsItem {
-  repository_id : Int
-  alert_numbers : Array[Int]
+  repository_id : Int32
+  alert_numbers : Array[Int32]
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -113602,8 +113602,8 @@ pub extend CampaignsCreateCampaignRequestCodeScanningAlertsItem with @debug.Debu
 ///
 /// Creates a CampaignsCreateCampaignRequestCodeScanningAlertsItem with omitted optional fields absent.
 pub fn CampaignsCreateCampaignRequestCodeScanningAlertsItem::new(
-  repository_id~ : Int,
-  alert_numbers~ : Array[Int],
+  repository_id~ : Int32,
+  alert_numbers~ : Array[Int32],
 ) -> CampaignsCreateCampaignRequestCodeScanningAlertsItem {
   { repository_id, alert_numbers, }
 }
@@ -115072,7 +115072,7 @@ pub impl @json.FromJson for CodeSecurityCreateConfigurationRequestSecretScanning
 ///
 /// Generated representation of CodeSecurityCreateConfigurationRequestSecretScanningDelegatedBypassOptionsReviewersItem.
 pub(all) struct CodeSecurityCreateConfigurationRequestSecretScanningDelegatedBypassOptionsReviewersItem {
-  reviewer_id : Int
+  reviewer_id : Int32
   reviewer_type : CodeSecurityCreateConfigurationRequestSecretScanningDelegatedBypassOptionsReviewersItemReviewerType
   mode : CodeSecurityCreateConfigurationRequestSecretScanningDelegatedBypassOptionsReviewersItemMode?
 } derive(Eq, @debug.Debug)
@@ -115092,7 +115092,7 @@ pub extend CodeSecurityCreateConfigurationRequestSecretScanningDelegatedBypassOp
 ///
 /// Creates a CodeSecurityCreateConfigurationRequestSecretScanningDelegatedBypassOptionsReviewersItem with omitted optional fields absent.
 pub fn CodeSecurityCreateConfigurationRequestSecretScanningDelegatedBypassOptionsReviewersItem::new(
-  reviewer_id~ : Int,
+  reviewer_id~ : Int32,
   reviewer_type~ : CodeSecurityCreateConfigurationRequestSecretScanningDelegatedBypassOptionsReviewersItemReviewerType,
   mode? : CodeSecurityCreateConfigurationRequestSecretScanningDelegatedBypassOptionsReviewersItemMode,
 ) -> CodeSecurityCreateConfigurationRequestSecretScanningDelegatedBypassOptionsReviewersItem {
@@ -115922,7 +115922,7 @@ pub impl @json.FromJson for CodeSecurityCreateConfigurationRequest with fn from_
 ///
 /// Generated representation of CodeSecurityDetachConfigurationRequest.
 pub(all) struct CodeSecurityDetachConfigurationRequest {
-  selected_repository_ids : Array[Int]
+  selected_repository_ids : Array[Int32]
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -115935,7 +115935,7 @@ pub extend CodeSecurityDetachConfigurationRequest with @debug.Debug::{to_repr}
 ///
 /// Creates a CodeSecurityDetachConfigurationRequest with omitted optional fields absent.
 pub fn CodeSecurityDetachConfigurationRequest::new(
-  selected_repository_ids~ : Array[Int],
+  selected_repository_ids~ : Array[Int32],
 ) -> CodeSecurityDetachConfigurationRequest {
   { selected_repository_ids, }
 }
@@ -117052,7 +117052,7 @@ pub impl @json.FromJson for CodeSecurityUpdateConfigurationRequestSecretScanning
 ///
 /// Generated representation of CodeSecurityUpdateConfigurationRequestSecretScanningDelegatedBypassOptionsReviewersItem.
 pub(all) struct CodeSecurityUpdateConfigurationRequestSecretScanningDelegatedBypassOptionsReviewersItem {
-  reviewer_id : Int
+  reviewer_id : Int32
   reviewer_type : CodeSecurityUpdateConfigurationRequestSecretScanningDelegatedBypassOptionsReviewersItemReviewerType
   mode : CodeSecurityUpdateConfigurationRequestSecretScanningDelegatedBypassOptionsReviewersItemMode?
 } derive(Eq, @debug.Debug)
@@ -117072,7 +117072,7 @@ pub extend CodeSecurityUpdateConfigurationRequestSecretScanningDelegatedBypassOp
 ///
 /// Creates a CodeSecurityUpdateConfigurationRequestSecretScanningDelegatedBypassOptionsReviewersItem with omitted optional fields absent.
 pub fn CodeSecurityUpdateConfigurationRequestSecretScanningDelegatedBypassOptionsReviewersItem::new(
-  reviewer_id~ : Int,
+  reviewer_id~ : Int32,
   reviewer_type~ : CodeSecurityUpdateConfigurationRequestSecretScanningDelegatedBypassOptionsReviewersItemReviewerType,
   mode? : CodeSecurityUpdateConfigurationRequestSecretScanningDelegatedBypassOptionsReviewersItemMode,
 ) -> CodeSecurityUpdateConfigurationRequestSecretScanningDelegatedBypassOptionsReviewersItem {
@@ -117975,7 +117975,7 @@ pub impl @json.FromJson for CodeSecurityAttachConfigurationRequestScope with fn 
 /// Generated representation of CodeSecurityAttachConfigurationRequest.
 pub(all) struct CodeSecurityAttachConfigurationRequest {
   scope : CodeSecurityAttachConfigurationRequestScope
-  selected_repository_ids : Array[Int]?
+  selected_repository_ids : Array[Int32]?
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -117989,7 +117989,7 @@ pub extend CodeSecurityAttachConfigurationRequest with @debug.Debug::{to_repr}
 /// Creates a CodeSecurityAttachConfigurationRequest with omitted optional fields absent.
 pub fn CodeSecurityAttachConfigurationRequest::new(
   scope~ : CodeSecurityAttachConfigurationRequestScope,
-  selected_repository_ids? : Array[Int],
+  selected_repository_ids? : Array[Int32],
 ) -> CodeSecurityAttachConfigurationRequest {
   { scope, selected_repository_ids, }
 }
@@ -118300,7 +118300,7 @@ pub impl @json.FromJson for CodeSecuritySetConfigurationAsDefaultResponse with f
 ///
 /// Generated representation of CodespacesListInOrganizationResponse.
 pub(all) struct CodespacesListInOrganizationResponse {
-  total_count : Int
+  total_count : Int32
   codespaces : Array[Codespace]
 } derive(Eq, @debug.Debug)
 
@@ -118314,7 +118314,7 @@ pub extend CodespacesListInOrganizationResponse with @debug.Debug::{to_repr}
 ///
 /// Creates a CodespacesListInOrganizationResponse with omitted optional fields absent.
 pub fn CodespacesListInOrganizationResponse::new(
-  total_count~ : Int,
+  total_count~ : Int32,
   codespaces~ : Array[Codespace],
 ) -> CodespacesListInOrganizationResponse {
   { total_count, codespaces, }
@@ -118589,7 +118589,7 @@ pub impl @json.FromJson for CodespacesDeleteCodespacesAccessUsersRequest with fn
 ///
 /// Generated representation of CodespacesListOrgSecretsResponse.
 pub(all) struct CodespacesListOrgSecretsResponse {
-  total_count : Int
+  total_count : Int32
   secrets : Array[CodespacesOrgSecret]
 } derive(Eq, @debug.Debug)
 
@@ -118603,7 +118603,7 @@ pub extend CodespacesListOrgSecretsResponse with @debug.Debug::{to_repr}
 ///
 /// Creates a CodespacesListOrgSecretsResponse with omitted optional fields absent.
 pub fn CodespacesListOrgSecretsResponse::new(
-  total_count~ : Int,
+  total_count~ : Int32,
   secrets~ : Array[CodespacesOrgSecret],
 ) -> CodespacesListOrgSecretsResponse {
   { total_count, secrets, }
@@ -118714,7 +118714,7 @@ pub(all) struct CodespacesCreateOrUpdateOrgSecretRequest {
   encrypted_value : String?
   key_id : String?
   visibility : CodespacesCreateOrUpdateOrgSecretRequestVisibility
-  selected_repository_ids : Array[Int]?
+  selected_repository_ids : Array[Int32]?
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -118730,7 +118730,7 @@ pub fn CodespacesCreateOrUpdateOrgSecretRequest::new(
   visibility~ : CodespacesCreateOrUpdateOrgSecretRequestVisibility,
   encrypted_value? : String,
   key_id? : String,
-  selected_repository_ids? : Array[Int],
+  selected_repository_ids? : Array[Int32],
 ) -> CodespacesCreateOrUpdateOrgSecretRequest {
   { encrypted_value, key_id, visibility, selected_repository_ids, }
 }
@@ -118779,7 +118779,7 @@ pub impl @json.FromJson for CodespacesCreateOrUpdateOrgSecretRequest with fn fro
 ///
 /// Generated representation of CodespacesListSelectedReposForOrgSecretResponse.
 pub(all) struct CodespacesListSelectedReposForOrgSecretResponse {
-  total_count : Int
+  total_count : Int32
   repositories : Array[MinimalRepository]
 } derive(Eq, @debug.Debug)
 
@@ -118798,7 +118798,7 @@ pub extend CodespacesListSelectedReposForOrgSecretResponse with @debug.Debug::{
 ///
 /// Creates a CodespacesListSelectedReposForOrgSecretResponse with omitted optional fields absent.
 pub fn CodespacesListSelectedReposForOrgSecretResponse::new(
-  total_count~ : Int,
+  total_count~ : Int32,
   repositories~ : Array[MinimalRepository],
 ) -> CodespacesListSelectedReposForOrgSecretResponse {
   { total_count, repositories, }
@@ -118844,7 +118844,7 @@ pub impl @json.FromJson for CodespacesListSelectedReposForOrgSecretResponse with
 ///
 /// Generated representation of CodespacesSetSelectedReposForOrgSecretRequest.
 pub(all) struct CodespacesSetSelectedReposForOrgSecretRequest {
-  selected_repository_ids : Array[Int]
+  selected_repository_ids : Array[Int32]
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -118862,7 +118862,7 @@ pub extend CodespacesSetSelectedReposForOrgSecretRequest with @debug.Debug::{
 ///
 /// Creates a CodespacesSetSelectedReposForOrgSecretRequest with omitted optional fields absent.
 pub fn CodespacesSetSelectedReposForOrgSecretRequest::new(
-  selected_repository_ids~ : Array[Int],
+  selected_repository_ids~ : Array[Int32],
 ) -> CodespacesSetSelectedReposForOrgSecretRequest {
   { selected_repository_ids, }
 }
@@ -119095,11 +119095,11 @@ pub impl @json.FromJson for CopilotSpacesCreateForOrgRequestResourcesAttributesI
 ///
 /// Metadata specific to the resource type.
 pub(all) struct CopilotSpacesCreateForOrgRequestResourcesAttributesItemMetadata {
-  repository_id : Int?
+  repository_id : Int32?
   file_path : String?
   text : String?
   name : String?
-  number : Int?
+  number : Int32?
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -119117,11 +119117,11 @@ pub extend CopilotSpacesCreateForOrgRequestResourcesAttributesItemMetadata with 
 ///
 /// Creates a CopilotSpacesCreateForOrgRequestResourcesAttributesItemMetadata with omitted optional fields absent.
 pub fn CopilotSpacesCreateForOrgRequestResourcesAttributesItemMetadata::new(
-  repository_id? : Int,
+  repository_id? : Int32,
   file_path? : String,
   text? : String,
   name? : String,
-  number? : Int,
+  number? : Int32,
 ) -> CopilotSpacesCreateForOrgRequestResourcesAttributesItemMetadata {
   { repository_id, file_path, text, name, number, }
 }
@@ -119451,11 +119451,11 @@ pub impl @json.FromJson for CopilotSpacesUpdateForOrgRequestResourcesAttributesI
 ///
 /// Metadata specific to the resource type.
 pub(all) struct CopilotSpacesUpdateForOrgRequestResourcesAttributesItemMetadata {
-  repository_id : Int?
+  repository_id : Int32?
   file_path : String?
   text : String?
   name : String?
-  number : Int?
+  number : Int32?
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -119473,11 +119473,11 @@ pub extend CopilotSpacesUpdateForOrgRequestResourcesAttributesItemMetadata with 
 ///
 /// Creates a CopilotSpacesUpdateForOrgRequestResourcesAttributesItemMetadata with omitted optional fields absent.
 pub fn CopilotSpacesUpdateForOrgRequestResourcesAttributesItemMetadata::new(
-  repository_id? : Int,
+  repository_id? : Int32,
   file_path? : String,
   text? : String,
   name? : String,
-  number? : Int,
+  number? : Int32,
 ) -> CopilotSpacesUpdateForOrgRequestResourcesAttributesItemMetadata {
   { repository_id, file_path, text, name, number, }
 }
@@ -120397,7 +120397,7 @@ pub impl @json.FromJson for CopilotSpacesUpdateResourceForOrgRequest with fn fro
 ///
 /// Generated representation of CopilotListCopilotSeatsResponse.
 pub(all) struct CopilotListCopilotSeatsResponse {
-  total_seats : Int?
+  total_seats : Int32?
   seats : Array[CopilotSeatDetails]?
 } derive(Eq, @debug.Debug)
 
@@ -120411,7 +120411,7 @@ pub extend CopilotListCopilotSeatsResponse with @debug.Debug::{to_repr}
 ///
 /// Creates a CopilotListCopilotSeatsResponse with omitted optional fields absent.
 pub fn CopilotListCopilotSeatsResponse::new(
-  total_seats? : Int,
+  total_seats? : Int32,
   seats? : Array[CopilotSeatDetails],
 ) -> CopilotListCopilotSeatsResponse {
   { total_seats, seats, }
@@ -120501,7 +120501,7 @@ pub impl @json.FromJson for CopilotAddCopilotSeatsForTeamsRequest with fn from_j
 ///
 /// The total number of seats created for members of the specified team(s).
 pub(all) struct CopilotAddCopilotSeatsForTeamsResponse {
-  seats_created : Int
+  seats_created : Int32
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -120514,7 +120514,7 @@ pub extend CopilotAddCopilotSeatsForTeamsResponse with @debug.Debug::{to_repr}
 ///
 /// Creates a CopilotAddCopilotSeatsForTeamsResponse with omitted optional fields absent.
 pub fn CopilotAddCopilotSeatsForTeamsResponse::new(
-  seats_created~ : Int,
+  seats_created~ : Int32,
 ) -> CopilotAddCopilotSeatsForTeamsResponse {
   { seats_created, }
 }
@@ -120608,7 +120608,7 @@ pub impl @json.FromJson for CopilotCancelCopilotSeatAssignmentForTeamsRequest wi
 ///
 /// The total number of seats set to "pending cancellation" for members of the specified team(s).
 pub(all) struct CopilotCancelCopilotSeatAssignmentForTeamsResponse {
-  seats_cancelled : Int
+  seats_cancelled : Int32
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -120626,7 +120626,7 @@ pub extend CopilotCancelCopilotSeatAssignmentForTeamsResponse with @debug.Debug:
 ///
 /// Creates a CopilotCancelCopilotSeatAssignmentForTeamsResponse with omitted optional fields absent.
 pub fn CopilotCancelCopilotSeatAssignmentForTeamsResponse::new(
-  seats_cancelled~ : Int,
+  seats_cancelled~ : Int32,
 ) -> CopilotCancelCopilotSeatAssignmentForTeamsResponse {
   { seats_cancelled, }
 }
@@ -120717,7 +120717,7 @@ pub impl @json.FromJson for CopilotAddCopilotSeatsForUsersRequest with fn from_j
 ///
 /// The total number of seats created for the specified user(s).
 pub(all) struct CopilotAddCopilotSeatsForUsersResponse {
-  seats_created : Int
+  seats_created : Int32
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -120730,7 +120730,7 @@ pub extend CopilotAddCopilotSeatsForUsersResponse with @debug.Debug::{to_repr}
 ///
 /// Creates a CopilotAddCopilotSeatsForUsersResponse with omitted optional fields absent.
 pub fn CopilotAddCopilotSeatsForUsersResponse::new(
-  seats_created~ : Int,
+  seats_created~ : Int32,
 ) -> CopilotAddCopilotSeatsForUsersResponse {
   { seats_created, }
 }
@@ -120824,7 +120824,7 @@ pub impl @json.FromJson for CopilotCancelCopilotSeatAssignmentForUsersRequest wi
 ///
 /// The total number of seats set to "pending cancellation" for the specified users.
 pub(all) struct CopilotCancelCopilotSeatAssignmentForUsersResponse {
-  seats_cancelled : Int
+  seats_cancelled : Int32
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -120842,7 +120842,7 @@ pub extend CopilotCancelCopilotSeatAssignmentForUsersResponse with @debug.Debug:
 ///
 /// Creates a CopilotCancelCopilotSeatAssignmentForUsersResponse with omitted optional fields absent.
 pub fn CopilotCancelCopilotSeatAssignmentForUsersResponse::new(
-  seats_cancelled~ : Int,
+  seats_cancelled~ : Int32,
 ) -> CopilotCancelCopilotSeatAssignmentForUsersResponse {
   { seats_cancelled, }
 }
@@ -121145,7 +121145,7 @@ pub impl @json.FromJson for CopilotSetCopilotCodingAgentPermissionsOrganizationR
 ///
 /// Generated representation of CopilotListCopilotCodingAgentSelectedRepositoriesForOrganizationResponse.
 pub(all) struct CopilotListCopilotCodingAgentSelectedRepositoriesForOrganizationResponse {
-  total_count : Int
+  total_count : Int32
   repositories : Array[MinimalRepository]
 } derive(Eq, @debug.Debug)
 
@@ -121164,7 +121164,7 @@ pub extend CopilotListCopilotCodingAgentSelectedRepositoriesForOrganizationRespo
 ///
 /// Creates a CopilotListCopilotCodingAgentSelectedRepositoriesForOrganizationResponse with omitted optional fields absent.
 pub fn CopilotListCopilotCodingAgentSelectedRepositoriesForOrganizationResponse::new(
-  total_count~ : Int,
+  total_count~ : Int32,
   repositories~ : Array[MinimalRepository],
 ) -> CopilotListCopilotCodingAgentSelectedRepositoriesForOrganizationResponse {
   { total_count, repositories, }
@@ -121210,7 +121210,7 @@ pub impl @json.FromJson for CopilotListCopilotCodingAgentSelectedRepositoriesFor
 ///
 /// Generated representation of CopilotSetCopilotCodingAgentSelectedRepositoriesForOrganizationRequest.
 pub(all) struct CopilotSetCopilotCodingAgentSelectedRepositoriesForOrganizationRequest {
-  selected_repository_ids : Array[Int]
+  selected_repository_ids : Array[Int32]
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -121228,7 +121228,7 @@ pub extend CopilotSetCopilotCodingAgentSelectedRepositoriesForOrganizationReques
 ///
 /// Creates a CopilotSetCopilotCodingAgentSelectedRepositoriesForOrganizationRequest with omitted optional fields absent.
 pub fn CopilotSetCopilotCodingAgentSelectedRepositoriesForOrganizationRequest::new(
-  selected_repository_ids~ : Array[Int],
+  selected_repository_ids~ : Array[Int32],
 ) -> CopilotSetCopilotCodingAgentSelectedRepositoriesForOrganizationRequest {
   { selected_repository_ids, }
 }
@@ -121613,8 +121613,8 @@ pub impl @json.FromJson for DependabotListAlertsForOrgDirection with fn from_jso
 ///
 /// Generated representation of DependabotUpdateRepositoryAccessForOrgRequest.
 pub(all) struct DependabotUpdateRepositoryAccessForOrgRequest {
-  repository_ids_to_add : Array[Int]?
-  repository_ids_to_remove : Array[Int]?
+  repository_ids_to_add : Array[Int32]?
+  repository_ids_to_remove : Array[Int32]?
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -121632,8 +121632,8 @@ pub extend DependabotUpdateRepositoryAccessForOrgRequest with @debug.Debug::{
 ///
 /// Creates a DependabotUpdateRepositoryAccessForOrgRequest with omitted optional fields absent.
 pub fn DependabotUpdateRepositoryAccessForOrgRequest::new(
-  repository_ids_to_add? : Array[Int],
-  repository_ids_to_remove? : Array[Int],
+  repository_ids_to_add? : Array[Int32],
+  repository_ids_to_remove? : Array[Int32],
 ) -> DependabotUpdateRepositoryAccessForOrgRequest {
   { repository_ids_to_add, repository_ids_to_remove, }
 }
@@ -121802,7 +121802,7 @@ pub impl @json.FromJson for DependabotSetRepositoryAccessDefaultLevelRequest wit
 ///
 /// Generated representation of DependabotListOrgSecretsResponse.
 pub(all) struct DependabotListOrgSecretsResponse {
-  total_count : Int
+  total_count : Int32
   secrets : Array[OrganizationDependabotSecret]
 } derive(Eq, @debug.Debug)
 
@@ -121816,7 +121816,7 @@ pub extend DependabotListOrgSecretsResponse with @debug.Debug::{to_repr}
 ///
 /// Creates a DependabotListOrgSecretsResponse with omitted optional fields absent.
 pub fn DependabotListOrgSecretsResponse::new(
-  total_count~ : Int,
+  total_count~ : Int32,
   secrets~ : Array[OrganizationDependabotSecret],
 ) -> DependabotListOrgSecretsResponse {
   { total_count, secrets, }
@@ -121924,7 +121924,7 @@ pub impl @json.FromJson for DependabotCreateOrUpdateOrgSecretRequestVisibility w
 ///
 /// Generated untagged union DependabotCreateOrUpdateOrgSecretRequestSelectedRepositoryIdsItem.
 pub(all) enum DependabotCreateOrUpdateOrgSecretRequestSelectedRepositoryIdsItem {
-  Int(Int)
+  Int(Int32)
   Text(String)
 } derive(Eq, @debug.Debug)
 
@@ -121969,7 +121969,7 @@ pub impl @json.FromJson for DependabotCreateOrUpdateOrgSecretRequestSelectedRepo
   path,
 ) {
   if value is Number(_, ..) {
-    let decoded : Int = @json.from_json(value, path~)
+    let decoded : Int32 = @json.from_json(value, path~)
     return Int(decoded)
   }
   if value is String(_) {
@@ -122059,7 +122059,7 @@ pub impl @json.FromJson for DependabotCreateOrUpdateOrgSecretRequest with fn fro
 ///
 /// Generated representation of DependabotListSelectedReposForOrgSecretResponse.
 pub(all) struct DependabotListSelectedReposForOrgSecretResponse {
-  total_count : Int
+  total_count : Int32
   repositories : Array[MinimalRepository]
 } derive(Eq, @debug.Debug)
 
@@ -122078,7 +122078,7 @@ pub extend DependabotListSelectedReposForOrgSecretResponse with @debug.Debug::{
 ///
 /// Creates a DependabotListSelectedReposForOrgSecretResponse with omitted optional fields absent.
 pub fn DependabotListSelectedReposForOrgSecretResponse::new(
-  total_count~ : Int,
+  total_count~ : Int32,
   repositories~ : Array[MinimalRepository],
 ) -> DependabotListSelectedReposForOrgSecretResponse {
   { total_count, repositories, }
@@ -122124,7 +122124,7 @@ pub impl @json.FromJson for DependabotListSelectedReposForOrgSecretResponse with
 ///
 /// Generated representation of DependabotSetSelectedReposForOrgSecretRequest.
 pub(all) struct DependabotSetSelectedReposForOrgSecretRequest {
-  selected_repository_ids : Array[Int]
+  selected_repository_ids : Array[Int32]
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -122142,7 +122142,7 @@ pub extend DependabotSetSelectedReposForOrgSecretRequest with @debug.Debug::{
 ///
 /// Creates a DependabotSetSelectedReposForOrgSecretRequest with omitted optional fields absent.
 pub fn DependabotSetSelectedReposForOrgSecretRequest::new(
-  selected_repository_ids~ : Array[Int],
+  selected_repository_ids~ : Array[Int32],
 ) -> DependabotSetSelectedReposForOrgSecretRequest {
   { selected_repository_ids, }
 }
@@ -123125,7 +123125,7 @@ pub impl @json.FromJson for ApiInsightsGetUserStatsSortItem with fn from_json(
 ///
 /// Generated representation of OrgsListAppInstallationsResponse.
 pub(all) struct OrgsListAppInstallationsResponse {
-  total_count : Int
+  total_count : Int32
   installations : Array[Installation]
 } derive(Eq, @debug.Debug)
 
@@ -123139,7 +123139,7 @@ pub extend OrgsListAppInstallationsResponse with @debug.Debug::{to_repr}
 ///
 /// Creates a OrgsListAppInstallationsResponse with omitted optional fields absent.
 pub fn OrgsListAppInstallationsResponse::new(
-  total_count~ : Int,
+  total_count~ : Int32,
   installations~ : Array[Installation],
 ) -> OrgsListAppInstallationsResponse {
   { total_count, installations, }
@@ -123180,7 +123180,7 @@ pub impl @json.FromJson for OrgsListAppInstallationsResponse with fn from_json(
 /// Generated representation of InteractionsGetPullRequestCreationCapForOrgResponse.
 pub(all) struct InteractionsGetPullRequestCreationCapForOrgResponse {
   enabled : Bool
-  max_open_pull_requests : Int
+  max_open_pull_requests : Int32
   include_drafts : Bool?
 } derive(Eq, @debug.Debug)
 
@@ -123200,7 +123200,7 @@ pub extend InteractionsGetPullRequestCreationCapForOrgResponse with @debug.Debug
 /// Creates a InteractionsGetPullRequestCreationCapForOrgResponse with omitted optional fields absent.
 pub fn InteractionsGetPullRequestCreationCapForOrgResponse::new(
   enabled~ : Bool,
-  max_open_pull_requests~ : Int,
+  max_open_pull_requests~ : Int32,
   include_drafts? : Bool,
 ) -> InteractionsGetPullRequestCreationCapForOrgResponse {
   { enabled, max_open_pull_requests, include_drafts, }
@@ -123249,7 +123249,7 @@ pub impl @json.FromJson for InteractionsGetPullRequestCreationCapForOrgResponse 
 /// Generated representation of InteractionsUpdatePullRequestCreationCapForOrgRequest.
 pub(all) struct InteractionsUpdatePullRequestCreationCapForOrgRequest {
   enabled : Bool
-  max_open_pull_requests : Int?
+  max_open_pull_requests : Int32?
   include_drafts : Bool?
 } derive(Eq, @debug.Debug)
 
@@ -123269,7 +123269,7 @@ pub extend InteractionsUpdatePullRequestCreationCapForOrgRequest with @debug.Deb
 /// Creates a InteractionsUpdatePullRequestCreationCapForOrgRequest with omitted optional fields absent.
 pub fn InteractionsUpdatePullRequestCreationCapForOrgRequest::new(
   enabled~ : Bool,
-  max_open_pull_requests? : Int,
+  max_open_pull_requests? : Int32,
   include_drafts? : Bool,
 ) -> InteractionsUpdatePullRequestCreationCapForOrgRequest {
   { enabled, max_open_pull_requests, include_drafts, }
@@ -123320,7 +123320,7 @@ pub impl @json.FromJson for InteractionsUpdatePullRequestCreationCapForOrgReques
 /// Generated representation of InteractionsUpdatePullRequestCreationCapForOrgResponse.
 pub(all) struct InteractionsUpdatePullRequestCreationCapForOrgResponse {
   enabled : Bool
-  max_open_pull_requests : Int
+  max_open_pull_requests : Int32
   include_drafts : Bool?
 } derive(Eq, @debug.Debug)
 
@@ -123340,7 +123340,7 @@ pub extend InteractionsUpdatePullRequestCreationCapForOrgResponse with @debug.De
 /// Creates a InteractionsUpdatePullRequestCreationCapForOrgResponse with omitted optional fields absent.
 pub fn InteractionsUpdatePullRequestCreationCapForOrgResponse::new(
   enabled~ : Bool,
-  max_open_pull_requests~ : Int,
+  max_open_pull_requests~ : Int32,
   include_drafts? : Bool,
 ) -> InteractionsUpdatePullRequestCreationCapForOrgResponse {
   { enabled, max_open_pull_requests, include_drafts, }
@@ -123577,10 +123577,10 @@ pub impl @json.FromJson for OrgsCreateInvitationRequestRole with fn from_json(
 ///
 /// Generated representation of OrgsCreateInvitationRequest.
 pub(all) struct OrgsCreateInvitationRequest {
-  invitee_id : Int?
+  invitee_id : Int32?
   email : String?
   role : OrgsCreateInvitationRequestRole?
-  team_ids : Array[Int]?
+  team_ids : Array[Int32]?
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -123593,10 +123593,10 @@ pub extend OrgsCreateInvitationRequest with @debug.Debug::{to_repr}
 ///
 /// Creates a OrgsCreateInvitationRequest with omitted optional fields absent.
 pub fn OrgsCreateInvitationRequest::new(
-  invitee_id? : Int,
+  invitee_id? : Int32,
   email? : String,
   role? : OrgsCreateInvitationRequestRole,
-  team_ids? : Array[Int],
+  team_ids? : Array[Int32],
 ) -> OrgsCreateInvitationRequest {
   { invitee_id, email, role, team_ids, }
 }
@@ -123975,7 +123975,7 @@ pub impl @json.FromJson for OrgsListMembersRole with fn from_json(value, path) {
 ///
 /// Generated representation of CodespacesGetCodespacesForUserInOrgResponse.
 pub(all) struct CodespacesGetCodespacesForUserInOrgResponse {
-  total_count : Int
+  total_count : Int32
   codespaces : Array[Codespace]
 } derive(Eq, @debug.Debug)
 
@@ -123994,7 +123994,7 @@ pub extend CodespacesGetCodespacesForUserInOrgResponse with @debug.Debug::{
 ///
 /// Creates a CodespacesGetCodespacesForUserInOrgResponse with omitted optional fields absent.
 pub fn CodespacesGetCodespacesForUserInOrgResponse::new(
-  total_count~ : Int,
+  total_count~ : Int32,
   codespaces~ : Array[Codespace],
 ) -> CodespacesGetCodespacesForUserInOrgResponse {
   { total_count, codespaces, }
@@ -124232,7 +124232,7 @@ pub impl @json.FromJson for MigrationsStartForOrgRequest with fn from_json(
 ///
 /// Generated representation of OrgsListOrgRolesResponse.
 pub(all) struct OrgsListOrgRolesResponse {
-  total_count : Int?
+  total_count : Int32?
   roles : Array[OrganizationRole]?
 } derive(Eq, @debug.Debug)
 
@@ -124246,7 +124246,7 @@ pub extend OrgsListOrgRolesResponse with @debug.Debug::{to_repr}
 ///
 /// Creates a OrgsListOrgRolesResponse with omitted optional fields absent.
 pub fn OrgsListOrgRolesResponse::new(
-  total_count? : Int,
+  total_count? : Int32,
   roles? : Array[OrganizationRole],
 ) -> OrgsListOrgRolesResponse {
   { total_count, roles, }
@@ -125285,7 +125285,7 @@ pub impl @json.FromJson for OrgsReviewPatGrantRequestsInBulkRequestAction with f
 ///
 /// Generated representation of OrgsReviewPatGrantRequestsInBulkRequest.
 pub(all) struct OrgsReviewPatGrantRequestsInBulkRequest {
-  pat_request_ids : Array[Int]?
+  pat_request_ids : Array[Int32]?
   action : OrgsReviewPatGrantRequestsInBulkRequestAction
   reason : @sdkjson.Presence[String]
 } derive(Eq, @debug.Debug)
@@ -125301,7 +125301,7 @@ pub extend OrgsReviewPatGrantRequestsInBulkRequest with @debug.Debug::{to_repr}
 /// Creates a OrgsReviewPatGrantRequestsInBulkRequest with omitted optional fields absent.
 pub fn OrgsReviewPatGrantRequestsInBulkRequest::new(
   action~ : OrgsReviewPatGrantRequestsInBulkRequestAction,
-  pat_request_ids? : Array[Int],
+  pat_request_ids? : Array[Int32],
   reason? : String,
 ) -> OrgsReviewPatGrantRequestsInBulkRequest {
   { pat_request_ids, action, reason: @sdkjson.Presence::from_option(reason), }
@@ -125511,7 +125511,7 @@ pub impl @json.FromJson for OrgsListPatGrantsDirection with fn from_json(
 ///
 /// Generated representation of OrgsUpdatePatAccessesRequest.
 pub(all) struct OrgsUpdatePatAccessesRequest {
-  pat_ids : Array[Int]
+  pat_ids : Array[Int32]
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -125524,7 +125524,7 @@ pub extend OrgsUpdatePatAccessesRequest with @debug.Debug::{to_repr}
 ///
 /// Creates a OrgsUpdatePatAccessesRequest with omitted optional fields absent.
 pub fn OrgsUpdatePatAccessesRequest::new(
-  pat_ids~ : Array[Int],
+  pat_ids~ : Array[Int32],
 ) -> OrgsUpdatePatAccessesRequest {
   { pat_ids, }
 }
@@ -125595,7 +125595,7 @@ pub impl @json.FromJson for OrgsUpdatePatAccessRequest with fn from_json(
 ///
 /// Generated representation of PrivateRegistriesListOrgPrivateRegistriesResponse.
 pub(all) struct PrivateRegistriesListOrgPrivateRegistriesResponse {
-  total_count : Int
+  total_count : Int32
   configurations : Array[OrgPrivateRegistryConfiguration]
 } derive(Eq, @debug.Debug)
 
@@ -125614,7 +125614,7 @@ pub extend PrivateRegistriesListOrgPrivateRegistriesResponse with @debug.Debug::
 ///
 /// Creates a PrivateRegistriesListOrgPrivateRegistriesResponse with omitted optional fields absent.
 pub fn PrivateRegistriesListOrgPrivateRegistriesResponse::new(
-  total_count~ : Int,
+  total_count~ : Int32,
   configurations~ : Array[OrgPrivateRegistryConfiguration],
 ) -> PrivateRegistriesListOrgPrivateRegistriesResponse {
   { total_count, configurations, }
@@ -125919,7 +125919,7 @@ pub(all) struct PrivateRegistriesCreateOrgPrivateRegistryRequest {
   encrypted_value : String?
   key_id : String?
   visibility : PrivateRegistriesCreateOrgPrivateRegistryRequestVisibility
-  selected_repository_ids : Array[Int]?
+  selected_repository_ids : Array[Int32]?
   auth_type : PrivateRegistriesCreateOrgPrivateRegistryRequestAuthType?
   tenant_id : String?
   client_id : String?
@@ -125960,7 +125960,7 @@ pub fn PrivateRegistriesCreateOrgPrivateRegistryRequest::new(
   replaces_base? : Bool,
   encrypted_value? : String,
   key_id? : String,
-  selected_repository_ids? : Array[Int],
+  selected_repository_ids? : Array[Int32],
   auth_type? : PrivateRegistriesCreateOrgPrivateRegistryRequestAuthType,
   tenant_id? : String,
   client_id? : String,
@@ -126415,7 +126415,7 @@ pub(all) struct PrivateRegistriesUpdateOrgPrivateRegistryRequest {
   encrypted_value : String?
   key_id : String?
   visibility : PrivateRegistriesUpdateOrgPrivateRegistryRequestVisibility?
-  selected_repository_ids : Array[Int]?
+  selected_repository_ids : Array[Int32]?
   auth_type : PrivateRegistriesUpdateOrgPrivateRegistryRequestAuthType?
   tenant_id : String?
   client_id : String?
@@ -126456,7 +126456,7 @@ pub fn PrivateRegistriesUpdateOrgPrivateRegistryRequest::new(
   encrypted_value? : String,
   key_id? : String,
   visibility? : PrivateRegistriesUpdateOrgPrivateRegistryRequestVisibility,
-  selected_repository_ids? : Array[Int],
+  selected_repository_ids? : Array[Int32],
   auth_type? : PrivateRegistriesUpdateOrgPrivateRegistryRequestAuthType,
   tenant_id? : String,
   client_id? : String,
@@ -126755,10 +126755,10 @@ pub impl @json.FromJson for ProjectsAddItemForOrgRequestType with fn from_json(
 /// Generated representation of ProjectsAddItemForOrgRequest.
 pub(all) struct ProjectsAddItemForOrgRequest {
   type_ : ProjectsAddItemForOrgRequestType
-  id : Int?
+  id : Int32?
   owner : String?
   repo : String?
-  number : Int?
+  number : Int32?
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -126772,10 +126772,10 @@ pub extend ProjectsAddItemForOrgRequest with @debug.Debug::{to_repr}
 /// Creates a ProjectsAddItemForOrgRequest with omitted optional fields absent.
 pub fn ProjectsAddItemForOrgRequest::new(
   type_~ : ProjectsAddItemForOrgRequestType,
-  id? : Int,
+  id? : Int32,
   owner? : String,
   repo? : String,
-  number? : Int,
+  number? : Int32,
 ) -> ProjectsAddItemForOrgRequest {
   { type_, id, owner, repo, number, }
 }
@@ -126931,7 +126931,7 @@ pub impl @json.FromJson for ProjectsUpdateItemForOrgRequestFieldsItemValue with 
 ///
 /// Generated representation of ProjectsUpdateItemForOrgRequestFieldsItem.
 pub(all) struct ProjectsUpdateItemForOrgRequestFieldsItem {
-  id : Int
+  id : Int32
   value : ProjectsUpdateItemForOrgRequestFieldsItemValue?
 } derive(Eq, @debug.Debug)
 
@@ -126947,7 +126947,7 @@ pub extend ProjectsUpdateItemForOrgRequestFieldsItem with @debug.Debug::{
 ///
 /// Creates a ProjectsUpdateItemForOrgRequestFieldsItem with omitted optional fields absent.
 pub fn ProjectsUpdateItemForOrgRequestFieldsItem::new(
-  id~ : Int,
+  id~ : Int32,
   value? : ProjectsUpdateItemForOrgRequestFieldsItemValue,
 ) -> ProjectsUpdateItemForOrgRequestFieldsItem {
   { id, value, }
@@ -127096,7 +127096,7 @@ pub impl @json.FromJson for ProjectsCreateViewForOrgRequestLayout with fn from_j
 ///
 /// Generated untagged union ProjectsCreateViewForOrgRequestSortByItemItem.
 pub(all) enum ProjectsCreateViewForOrgRequestSortByItemItem {
-  Int(Int)
+  Int(Int32)
   Text(String)
 } derive(Eq, @debug.Debug)
 
@@ -127139,7 +127139,7 @@ pub impl @json.FromJson for ProjectsCreateViewForOrgRequestSortByItemItem with f
   path,
 ) {
   if value is Number(_, ..) {
-    let decoded : Int = @json.from_json(value, path~)
+    let decoded : Int32 = @json.from_json(value, path~)
     return Int(decoded)
   }
   if value is String(_) {
@@ -127160,10 +127160,10 @@ pub(all) struct ProjectsCreateViewForOrgRequest {
   name : String
   layout : ProjectsCreateViewForOrgRequestLayout
   filter : String?
-  visible_fields : Array[Int]?
+  visible_fields : Array[Int32]?
   sort_by : Array[Array[ProjectsCreateViewForOrgRequestSortByItemItem]]?
-  group_by : Array[Int]?
-  vertical_group_by : Array[Int]?
+  group_by : Array[Int32]?
+  vertical_group_by : Array[Int32]?
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -127179,10 +127179,10 @@ pub fn ProjectsCreateViewForOrgRequest::new(
   name~ : String,
   layout~ : ProjectsCreateViewForOrgRequestLayout,
   filter? : String,
-  visible_fields? : Array[Int],
+  visible_fields? : Array[Int32],
   sort_by? : Array[Array[ProjectsCreateViewForOrgRequestSortByItemItem]],
-  group_by? : Array[Int],
-  vertical_group_by? : Array[Int],
+  group_by? : Array[Int32],
+  vertical_group_by? : Array[Int32],
 ) -> ProjectsCreateViewForOrgRequest {
   {
     name,
@@ -127291,7 +127291,7 @@ pub impl @json.FromJson for ProjectsListViewItemsForOrgFields with fn from_json(
 ///
 /// Generated representation of OrgsExternalPropertiesForReposRegisterOrganizationAppInstallationRequest.
 pub(all) struct OrgsExternalPropertiesForReposRegisterOrganizationAppInstallationRequest {
-  installation_id : Int?
+  installation_id : Int32?
   display_name : String
 } derive(Eq, @debug.Debug)
 
@@ -127311,7 +127311,7 @@ pub extend OrgsExternalPropertiesForReposRegisterOrganizationAppInstallationRequ
 /// Creates a OrgsExternalPropertiesForReposRegisterOrganizationAppInstallationRequest with omitted optional fields absent.
 pub fn OrgsExternalPropertiesForReposRegisterOrganizationAppInstallationRequest::new(
   display_name~ : String,
-  installation_id? : Int,
+  installation_id? : Int32,
 ) -> OrgsExternalPropertiesForReposRegisterOrganizationAppInstallationRequest {
   { installation_id, display_name, }
 }
@@ -128092,7 +128092,7 @@ pub(all) struct ReposCreateInOrgRequest {
   has_wiki : Bool?
   has_downloads : Bool?
   is_template : Bool?
-  team_id : Int?
+  team_id : Int32?
   auto_init : Bool?
   gitignore_template : String?
   license_template : String?
@@ -128129,7 +128129,7 @@ pub fn ReposCreateInOrgRequest::new(
   has_wiki? : Bool,
   has_downloads? : Bool,
   is_template? : Bool,
-  team_id? : Int,
+  team_id? : Int32,
   auto_init? : Bool,
   gitignore_template? : String,
   license_template? : String,
@@ -130058,7 +130058,7 @@ pub impl @json.FromJson for OrgsSetImmutableReleasesSettingsRequestEnforcedRepos
 /// Generated representation of OrgsSetImmutableReleasesSettingsRequest.
 pub(all) struct OrgsSetImmutableReleasesSettingsRequest {
   enforced_repositories : OrgsSetImmutableReleasesSettingsRequestEnforcedRepositories
-  selected_repository_ids : Array[Int]?
+  selected_repository_ids : Array[Int32]?
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -130072,7 +130072,7 @@ pub extend OrgsSetImmutableReleasesSettingsRequest with @debug.Debug::{to_repr}
 /// Creates a OrgsSetImmutableReleasesSettingsRequest with omitted optional fields absent.
 pub fn OrgsSetImmutableReleasesSettingsRequest::new(
   enforced_repositories~ : OrgsSetImmutableReleasesSettingsRequestEnforcedRepositories,
-  selected_repository_ids? : Array[Int],
+  selected_repository_ids? : Array[Int32],
 ) -> OrgsSetImmutableReleasesSettingsRequest {
   { enforced_repositories, selected_repository_ids, }
 }
@@ -130117,7 +130117,7 @@ pub impl @json.FromJson for OrgsSetImmutableReleasesSettingsRequest with fn from
 ///
 /// Generated representation of OrgsGetImmutableReleasesSettingsRepositoriesResponse.
 pub(all) struct OrgsGetImmutableReleasesSettingsRepositoriesResponse {
-  total_count : Int
+  total_count : Int32
   repositories : Array[MinimalRepository]
 } derive(Eq, @debug.Debug)
 
@@ -130136,7 +130136,7 @@ pub extend OrgsGetImmutableReleasesSettingsRepositoriesResponse with @debug.Debu
 ///
 /// Creates a OrgsGetImmutableReleasesSettingsRepositoriesResponse with omitted optional fields absent.
 pub fn OrgsGetImmutableReleasesSettingsRepositoriesResponse::new(
-  total_count~ : Int,
+  total_count~ : Int32,
   repositories~ : Array[MinimalRepository],
 ) -> OrgsGetImmutableReleasesSettingsRepositoriesResponse {
   { total_count, repositories, }
@@ -130182,7 +130182,7 @@ pub impl @json.FromJson for OrgsGetImmutableReleasesSettingsRepositoriesResponse
 ///
 /// Generated representation of OrgsSetImmutableReleasesSettingsRepositoriesRequest.
 pub(all) struct OrgsSetImmutableReleasesSettingsRepositoriesRequest {
-  selected_repository_ids : Array[Int]
+  selected_repository_ids : Array[Int32]
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -130200,7 +130200,7 @@ pub extend OrgsSetImmutableReleasesSettingsRepositoriesRequest with @debug.Debug
 ///
 /// Creates a OrgsSetImmutableReleasesSettingsRepositoriesRequest with omitted optional fields absent.
 pub fn OrgsSetImmutableReleasesSettingsRepositoriesRequest::new(
-  selected_repository_ids~ : Array[Int],
+  selected_repository_ids~ : Array[Int32],
 ) -> OrgsSetImmutableReleasesSettingsRepositoriesRequest {
   { selected_repository_ids, }
 }
@@ -130245,7 +130245,7 @@ pub impl @json.FromJson for OrgsSetImmutableReleasesSettingsRepositoriesRequest 
 ///
 /// Generated representation of HostedComputeListNetworkConfigurationsForOrgResponse.
 pub(all) struct HostedComputeListNetworkConfigurationsForOrgResponse {
-  total_count : Int
+  total_count : Int32
   network_configurations : Array[NetworkConfiguration]
 } derive(Eq, @debug.Debug)
 
@@ -130264,7 +130264,7 @@ pub extend HostedComputeListNetworkConfigurationsForOrgResponse with @debug.Debu
 ///
 /// Creates a HostedComputeListNetworkConfigurationsForOrgResponse with omitted optional fields absent.
 pub fn HostedComputeListNetworkConfigurationsForOrgResponse::new(
-  total_count~ : Int,
+  total_count~ : Int32,
   network_configurations~ : Array[NetworkConfiguration],
 ) -> HostedComputeListNetworkConfigurationsForOrgResponse {
   { total_count, network_configurations, }
@@ -130839,7 +130839,7 @@ pub(all) struct TeamsCreateRequest {
   privacy : TeamsCreateRequestPrivacy?
   notification_setting : TeamsCreateRequestNotificationSetting?
   permission : TeamsCreateRequestPermission?
-  parent_team_id : Int?
+  parent_team_id : Int32?
   parent_team_slug : String?
 } derive(Eq, @debug.Debug)
 
@@ -130860,7 +130860,7 @@ pub fn TeamsCreateRequest::new(
   privacy? : TeamsCreateRequestPrivacy,
   notification_setting? : TeamsCreateRequestNotificationSetting,
   permission? : TeamsCreateRequestPermission,
-  parent_team_id? : Int,
+  parent_team_id? : Int32,
   parent_team_slug? : String,
 ) -> TeamsCreateRequest {
   {
@@ -131100,7 +131100,7 @@ pub(all) struct TeamsUpdateInOrgRequest {
   privacy : TeamsUpdateInOrgRequestPrivacy?
   notification_setting : TeamsUpdateInOrgRequestNotificationSetting?
   permission : TeamsUpdateInOrgRequestPermission?
-  parent_team_id : @sdkjson.Presence[Int]
+  parent_team_id : @sdkjson.Presence[Int32]
   parent_team_slug : @sdkjson.Presence[String]
 } derive(Eq, @debug.Debug)
 
@@ -131119,7 +131119,7 @@ pub fn TeamsUpdateInOrgRequest::new(
   privacy? : TeamsUpdateInOrgRequestPrivacy,
   notification_setting? : TeamsUpdateInOrgRequestNotificationSetting,
   permission? : TeamsUpdateInOrgRequestPermission,
-  parent_team_id? : Int,
+  parent_team_id? : Int32,
   parent_team_slug? : String,
 ) -> TeamsUpdateInOrgRequest {
   {
@@ -132316,7 +132316,7 @@ pub impl @json.FromJson for ReposUpdateRequestSecurityAndAnalysisSecretScanningD
 ///
 /// Generated representation of ReposUpdateRequestSecurityAndAnalysisSecretScanningDelegatedBypassOptionsReviewersItem.
 pub(all) struct ReposUpdateRequestSecurityAndAnalysisSecretScanningDelegatedBypassOptionsReviewersItem {
-  reviewer_id : Int
+  reviewer_id : Int32
   reviewer_type : ReposUpdateRequestSecurityAndAnalysisSecretScanningDelegatedBypassOptionsReviewersItemReviewerType
   mode : ReposUpdateRequestSecurityAndAnalysisSecretScanningDelegatedBypassOptionsReviewersItemMode?
 } derive(Eq, @debug.Debug)
@@ -132336,7 +132336,7 @@ pub extend ReposUpdateRequestSecurityAndAnalysisSecretScanningDelegatedBypassOpt
 ///
 /// Creates a ReposUpdateRequestSecurityAndAnalysisSecretScanningDelegatedBypassOptionsReviewersItem with omitted optional fields absent.
 pub fn ReposUpdateRequestSecurityAndAnalysisSecretScanningDelegatedBypassOptionsReviewersItem::new(
-  reviewer_id~ : Int,
+  reviewer_id~ : Int32,
   reviewer_type~ : ReposUpdateRequestSecurityAndAnalysisSecretScanningDelegatedBypassOptionsReviewersItemReviewerType,
   mode? : ReposUpdateRequestSecurityAndAnalysisSecretScanningDelegatedBypassOptionsReviewersItemMode,
 ) -> ReposUpdateRequestSecurityAndAnalysisSecretScanningDelegatedBypassOptionsReviewersItem {
@@ -133057,7 +133057,7 @@ pub impl @json.FromJson for ReposUpdateRequest with fn from_json(value, path) {
 ///
 /// Generated representation of ActionsListArtifactsForRepoResponse.
 pub(all) struct ActionsListArtifactsForRepoResponse {
-  total_count : Int
+  total_count : Int32
   artifacts : Array[Artifact]
 } derive(Eq, @debug.Debug)
 
@@ -133071,7 +133071,7 @@ pub extend ActionsListArtifactsForRepoResponse with @debug.Debug::{to_repr}
 ///
 /// Creates a ActionsListArtifactsForRepoResponse with omitted optional fields absent.
 pub fn ActionsListArtifactsForRepoResponse::new(
-  total_count~ : Int,
+  total_count~ : Int32,
   artifacts~ : Array[Artifact],
 ) -> ActionsListArtifactsForRepoResponse {
   { total_count, artifacts, }
@@ -133345,7 +133345,7 @@ pub impl @json.FromJson for ActionsSetCustomOidcSubClaimForRepoRequest with fn f
 ///
 /// Generated representation of ActionsListRepoOrganizationSecretsResponse.
 pub(all) struct ActionsListRepoOrganizationSecretsResponse {
-  total_count : Int
+  total_count : Int32
   secrets : Array[ActionsSecret]
 } derive(Eq, @debug.Debug)
 
@@ -133364,7 +133364,7 @@ pub extend ActionsListRepoOrganizationSecretsResponse with @debug.Debug::{
 ///
 /// Creates a ActionsListRepoOrganizationSecretsResponse with omitted optional fields absent.
 pub fn ActionsListRepoOrganizationSecretsResponse::new(
-  total_count~ : Int,
+  total_count~ : Int32,
   secrets~ : Array[ActionsSecret],
 ) -> ActionsListRepoOrganizationSecretsResponse {
   { total_count, secrets, }
@@ -133408,7 +133408,7 @@ pub impl @json.FromJson for ActionsListRepoOrganizationSecretsResponse with fn f
 ///
 /// Generated representation of ActionsListRepoOrganizationVariablesResponse.
 pub(all) struct ActionsListRepoOrganizationVariablesResponse {
-  total_count : Int
+  total_count : Int32
   variables : Array[ActionsVariable]
 } derive(Eq, @debug.Debug)
 
@@ -133427,7 +133427,7 @@ pub extend ActionsListRepoOrganizationVariablesResponse with @debug.Debug::{
 ///
 /// Creates a ActionsListRepoOrganizationVariablesResponse with omitted optional fields absent.
 pub fn ActionsListRepoOrganizationVariablesResponse::new(
-  total_count~ : Int,
+  total_count~ : Int32,
   variables~ : Array[ActionsVariable],
 ) -> ActionsListRepoOrganizationVariablesResponse {
   { total_count, variables, }
@@ -133540,7 +133540,7 @@ pub impl @json.FromJson for ActionsSetGithubActionsPermissionsRepositoryRequest 
 ///
 /// Generated representation of ActionsGetRepoActionsPoliciesResponse.
 pub(all) struct ActionsGetRepoActionsPoliciesResponse {
-  total_count : Int
+  total_count : Int32
   policies : Array[ActionsPolicy]
 } derive(Eq, @debug.Debug)
 
@@ -133554,7 +133554,7 @@ pub extend ActionsGetRepoActionsPoliciesResponse with @debug.Debug::{to_repr}
 ///
 /// Creates a ActionsGetRepoActionsPoliciesResponse with omitted optional fields absent.
 pub fn ActionsGetRepoActionsPoliciesResponse::new(
-  total_count~ : Int,
+  total_count~ : Int32,
   policies~ : Array[ActionsPolicy],
 ) -> ActionsGetRepoActionsPoliciesResponse {
   { total_count, policies, }
@@ -133724,7 +133724,7 @@ pub impl @json.FromJson for ActionsUpdateRepoActionsPolicyRequest with fn from_j
 ///
 /// Generated representation of ActionsListSelfHostedRunnersForRepoResponse.
 pub(all) struct ActionsListSelfHostedRunnersForRepoResponse {
-  total_count : Int
+  total_count : Int32
   runners : Array[Runner]
 } derive(Eq, @debug.Debug)
 
@@ -133743,7 +133743,7 @@ pub extend ActionsListSelfHostedRunnersForRepoResponse with @debug.Debug::{
 ///
 /// Creates a ActionsListSelfHostedRunnersForRepoResponse with omitted optional fields absent.
 pub fn ActionsListSelfHostedRunnersForRepoResponse::new(
-  total_count~ : Int,
+  total_count~ : Int32,
   runners~ : Array[Runner],
 ) -> ActionsListSelfHostedRunnersForRepoResponse {
   { total_count, runners, }
@@ -133867,7 +133867,7 @@ pub impl @json.FromJson for ActionsGetRunnerVersionDeprecationForRepoResponse wi
 /// Generated representation of ActionsGenerateRunnerJitconfigForRepoRequest.
 pub(all) struct ActionsGenerateRunnerJitconfigForRepoRequest {
   name : String
-  runner_group_id : Int
+  runner_group_id : Int32
   labels : Array[String]
   work_folder : String?
 } derive(Eq, @debug.Debug)
@@ -133888,7 +133888,7 @@ pub extend ActionsGenerateRunnerJitconfigForRepoRequest with @debug.Debug::{
 /// Creates a ActionsGenerateRunnerJitconfigForRepoRequest with omitted optional fields absent.
 pub fn ActionsGenerateRunnerJitconfigForRepoRequest::new(
   name~ : String,
-  runner_group_id~ : Int,
+  runner_group_id~ : Int32,
   labels~ : Array[String],
   work_folder? : String,
 ) -> ActionsGenerateRunnerJitconfigForRepoRequest {
@@ -134141,7 +134141,7 @@ pub impl @json.FromJson for ActionsListWorkflowRunsForRepoStatus with fn from_js
 ///
 /// Generated representation of ActionsListWorkflowRunsForRepoResponse.
 pub(all) struct ActionsListWorkflowRunsForRepoResponse {
-  total_count : Int
+  total_count : Int32
   workflow_runs : Array[WorkflowRun]
 } derive(Eq, @debug.Debug)
 
@@ -134155,7 +134155,7 @@ pub extend ActionsListWorkflowRunsForRepoResponse with @debug.Debug::{to_repr}
 ///
 /// Creates a ActionsListWorkflowRunsForRepoResponse with omitted optional fields absent.
 pub fn ActionsListWorkflowRunsForRepoResponse::new(
-  total_count~ : Int,
+  total_count~ : Int32,
   workflow_runs~ : Array[WorkflowRun],
 ) -> ActionsListWorkflowRunsForRepoResponse {
   { total_count, workflow_runs, }
@@ -134255,7 +134255,7 @@ pub impl @json.FromJson for ActionsListWorkflowRunArtifactsDirection with fn fro
 ///
 /// Generated representation of ActionsListWorkflowRunArtifactsResponse.
 pub(all) struct ActionsListWorkflowRunArtifactsResponse {
-  total_count : Int
+  total_count : Int32
   artifacts : Array[Artifact]
 } derive(Eq, @debug.Debug)
 
@@ -134269,7 +134269,7 @@ pub extend ActionsListWorkflowRunArtifactsResponse with @debug.Debug::{to_repr}
 ///
 /// Creates a ActionsListWorkflowRunArtifactsResponse with omitted optional fields absent.
 pub fn ActionsListWorkflowRunArtifactsResponse::new(
-  total_count~ : Int,
+  total_count~ : Int32,
   artifacts~ : Array[Artifact],
 ) -> ActionsListWorkflowRunArtifactsResponse {
   { total_count, artifacts, }
@@ -134313,7 +134313,7 @@ pub impl @json.FromJson for ActionsListWorkflowRunArtifactsResponse with fn from
 ///
 /// Generated representation of ActionsListJobsForWorkflowRunAttemptResponse.
 pub(all) struct ActionsListJobsForWorkflowRunAttemptResponse {
-  total_count : Int
+  total_count : Int32
   jobs : Array[Job]
 } derive(Eq, @debug.Debug)
 
@@ -134332,7 +134332,7 @@ pub extend ActionsListJobsForWorkflowRunAttemptResponse with @debug.Debug::{
 ///
 /// Creates a ActionsListJobsForWorkflowRunAttemptResponse with omitted optional fields absent.
 pub fn ActionsListJobsForWorkflowRunAttemptResponse::new(
-  total_count~ : Int,
+  total_count~ : Int32,
   jobs~ : Array[Job],
 ) -> ActionsListJobsForWorkflowRunAttemptResponse {
   { total_count, jobs, }
@@ -134430,7 +134430,7 @@ pub impl @json.FromJson for ActionsListJobsForWorkflowRunFilter with fn from_jso
 ///
 /// Generated representation of ActionsListJobsForWorkflowRunResponse.
 pub(all) struct ActionsListJobsForWorkflowRunResponse {
-  total_count : Int
+  total_count : Int32
   jobs : Array[Job]
 } derive(Eq, @debug.Debug)
 
@@ -134444,7 +134444,7 @@ pub extend ActionsListJobsForWorkflowRunResponse with @debug.Debug::{to_repr}
 ///
 /// Creates a ActionsListJobsForWorkflowRunResponse with omitted optional fields absent.
 pub fn ActionsListJobsForWorkflowRunResponse::new(
-  total_count~ : Int,
+  total_count~ : Int32,
   jobs~ : Array[Job],
 ) -> ActionsListJobsForWorkflowRunResponse {
   { total_count, jobs, }
@@ -134551,7 +134551,7 @@ pub impl @json.FromJson for ActionsReviewPendingDeploymentsForRunRequestState wi
 ///
 /// Generated representation of ActionsReviewPendingDeploymentsForRunRequest.
 pub(all) struct ActionsReviewPendingDeploymentsForRunRequest {
-  environment_ids : Array[Int]
+  environment_ids : Array[Int32]
   state : ActionsReviewPendingDeploymentsForRunRequestState
   comment : String
 } derive(Eq, @debug.Debug)
@@ -134571,7 +134571,7 @@ pub extend ActionsReviewPendingDeploymentsForRunRequest with @debug.Debug::{
 ///
 /// Creates a ActionsReviewPendingDeploymentsForRunRequest with omitted optional fields absent.
 pub fn ActionsReviewPendingDeploymentsForRunRequest::new(
-  environment_ids~ : Array[Int],
+  environment_ids~ : Array[Int32],
   state~ : ActionsReviewPendingDeploymentsForRunRequestState,
   comment~ : String,
 ) -> ActionsReviewPendingDeploymentsForRunRequest {
@@ -134720,7 +134720,7 @@ pub impl @json.FromJson for ActionsReRunWorkflowFailedJobsRequest with fn from_j
 ///
 /// Generated representation of ActionsListRepoSecretsResponse.
 pub(all) struct ActionsListRepoSecretsResponse {
-  total_count : Int
+  total_count : Int32
   secrets : Array[ActionsSecret]
 } derive(Eq, @debug.Debug)
 
@@ -134734,7 +134734,7 @@ pub extend ActionsListRepoSecretsResponse with @debug.Debug::{to_repr}
 ///
 /// Creates a ActionsListRepoSecretsResponse with omitted optional fields absent.
 pub fn ActionsListRepoSecretsResponse::new(
-  total_count~ : Int,
+  total_count~ : Int32,
   secrets~ : Array[ActionsSecret],
 ) -> ActionsListRepoSecretsResponse {
   { total_count, secrets, }
@@ -134830,7 +134830,7 @@ pub impl @json.FromJson for ActionsCreateOrUpdateRepoSecretRequest with fn from_
 ///
 /// Generated representation of ActionsListRepoVariablesResponse.
 pub(all) struct ActionsListRepoVariablesResponse {
-  total_count : Int
+  total_count : Int32
   variables : Array[ActionsVariable]
 } derive(Eq, @debug.Debug)
 
@@ -134844,7 +134844,7 @@ pub extend ActionsListRepoVariablesResponse with @debug.Debug::{to_repr}
 ///
 /// Creates a ActionsListRepoVariablesResponse with omitted optional fields absent.
 pub fn ActionsListRepoVariablesResponse::new(
-  total_count~ : Int,
+  total_count~ : Int32,
   variables~ : Array[ActionsVariable],
 ) -> ActionsListRepoVariablesResponse {
   { total_count, variables, }
@@ -134992,7 +134992,7 @@ pub impl @json.FromJson for ActionsUpdateRepoVariableRequest with fn from_json(
 ///
 /// Generated representation of ActionsListRepoWorkflowsResponse.
 pub(all) struct ActionsListRepoWorkflowsResponse {
-  total_count : Int
+  total_count : Int32
   workflows : Array[Workflow]
 } derive(Eq, @debug.Debug)
 
@@ -135006,7 +135006,7 @@ pub extend ActionsListRepoWorkflowsResponse with @debug.Debug::{to_repr}
 ///
 /// Creates a ActionsListRepoWorkflowsResponse with omitted optional fields absent.
 pub fn ActionsListRepoWorkflowsResponse::new(
-  total_count~ : Int,
+  total_count~ : Int32,
   workflows~ : Array[Workflow],
 ) -> ActionsListRepoWorkflowsResponse {
   { total_count, workflows, }
@@ -135046,7 +135046,7 @@ pub impl @json.FromJson for ActionsListRepoWorkflowsResponse with fn from_json(
 ///
 /// Generated untagged union ActionsGetWorkflowWorkflowId.
 pub(all) enum ActionsGetWorkflowWorkflowId {
-  Int(Int)
+  Int(Int32)
   Text(String)
 } derive(Eq, @debug.Debug)
 
@@ -135080,7 +135080,7 @@ pub impl @json.FromJson for ActionsGetWorkflowWorkflowId with fn from_json(
   path,
 ) {
   if value is Number(_, ..) {
-    let decoded : Int = @json.from_json(value, path~)
+    let decoded : Int32 = @json.from_json(value, path~)
     return Int(decoded)
   }
   if value is String(_) {
@@ -135096,7 +135096,7 @@ pub impl @json.FromJson for ActionsGetWorkflowWorkflowId with fn from_json(
 ///
 /// Generated untagged union ActionsDisableWorkflowWorkflowId.
 pub(all) enum ActionsDisableWorkflowWorkflowId {
-  Int(Int)
+  Int(Int32)
   Text(String)
 } derive(Eq, @debug.Debug)
 
@@ -135130,7 +135130,7 @@ pub impl @json.FromJson for ActionsDisableWorkflowWorkflowId with fn from_json(
   path,
 ) {
   if value is Number(_, ..) {
-    let decoded : Int = @json.from_json(value, path~)
+    let decoded : Int32 = @json.from_json(value, path~)
     return Int(decoded)
   }
   if value is String(_) {
@@ -135148,7 +135148,7 @@ pub impl @json.FromJson for ActionsDisableWorkflowWorkflowId with fn from_json(
 ///
 /// Generated untagged union ActionsCreateWorkflowDispatchWorkflowId.
 pub(all) enum ActionsCreateWorkflowDispatchWorkflowId {
-  Int(Int)
+  Int(Int32)
   Text(String)
 } derive(Eq, @debug.Debug)
 
@@ -135186,7 +135186,7 @@ pub impl @json.FromJson for ActionsCreateWorkflowDispatchWorkflowId with fn from
   path,
 ) {
   if value is Number(_, ..) {
-    let decoded : Int = @json.from_json(value, path~)
+    let decoded : Int32 = @json.from_json(value, path~)
     return Int(decoded)
   }
   if value is String(_) {
@@ -135262,7 +135262,7 @@ pub impl @json.FromJson for ActionsCreateWorkflowDispatchRequest with fn from_js
 ///
 /// Generated untagged union ActionsEnableWorkflowWorkflowId.
 pub(all) enum ActionsEnableWorkflowWorkflowId {
-  Int(Int)
+  Int(Int32)
   Text(String)
 } derive(Eq, @debug.Debug)
 
@@ -135296,7 +135296,7 @@ pub impl @json.FromJson for ActionsEnableWorkflowWorkflowId with fn from_json(
   path,
 ) {
   if value is Number(_, ..) {
-    let decoded : Int = @json.from_json(value, path~)
+    let decoded : Int32 = @json.from_json(value, path~)
     return Int(decoded)
   }
   if value is String(_) {
@@ -135314,7 +135314,7 @@ pub impl @json.FromJson for ActionsEnableWorkflowWorkflowId with fn from_json(
 ///
 /// Generated untagged union ActionsListWorkflowRunsWorkflowId.
 pub(all) enum ActionsListWorkflowRunsWorkflowId {
-  Int(Int)
+  Int(Int32)
   Text(String)
 } derive(Eq, @debug.Debug)
 
@@ -135348,7 +135348,7 @@ pub impl @json.FromJson for ActionsListWorkflowRunsWorkflowId with fn from_json(
   path,
 ) {
   if value is Number(_, ..) {
-    let decoded : Int = @json.from_json(value, path~)
+    let decoded : Int32 = @json.from_json(value, path~)
     return Int(decoded)
   }
   if value is String(_) {
@@ -135456,7 +135456,7 @@ pub impl @json.FromJson for ActionsListWorkflowRunsStatus with fn from_json(
 ///
 /// Generated representation of ActionsListWorkflowRunsResponse.
 pub(all) struct ActionsListWorkflowRunsResponse {
-  total_count : Int
+  total_count : Int32
   workflow_runs : Array[WorkflowRun]
 } derive(Eq, @debug.Debug)
 
@@ -135470,7 +135470,7 @@ pub extend ActionsListWorkflowRunsResponse with @debug.Debug::{to_repr}
 ///
 /// Creates a ActionsListWorkflowRunsResponse with omitted optional fields absent.
 pub fn ActionsListWorkflowRunsResponse::new(
-  total_count~ : Int,
+  total_count~ : Int32,
   workflow_runs~ : Array[WorkflowRun],
 ) -> ActionsListWorkflowRunsResponse {
   { total_count, workflow_runs, }
@@ -135510,7 +135510,7 @@ pub impl @json.FromJson for ActionsListWorkflowRunsResponse with fn from_json(
 ///
 /// Generated untagged union ActionsGetWorkflowUsageWorkflowId.
 pub(all) enum ActionsGetWorkflowUsageWorkflowId {
-  Int(Int)
+  Int(Int32)
   Text(String)
 } derive(Eq, @debug.Debug)
 
@@ -135544,7 +135544,7 @@ pub impl @json.FromJson for ActionsGetWorkflowUsageWorkflowId with fn from_json(
   path,
 ) {
   if value is Number(_, ..) {
-    let decoded : Int = @json.from_json(value, path~)
+    let decoded : Int32 = @json.from_json(value, path~)
     return Int(decoded)
   }
   if value is String(_) {
@@ -135745,7 +135745,7 @@ pub impl @json.FromJson for ReposListActivitiesActivityType with fn from_json(
 ///
 /// Generated representation of AgentsListRepoOrganizationSecretsResponse.
 pub(all) struct AgentsListRepoOrganizationSecretsResponse {
-  total_count : Int
+  total_count : Int32
   secrets : Array[ActionsSecret]
 } derive(Eq, @debug.Debug)
 
@@ -135761,7 +135761,7 @@ pub extend AgentsListRepoOrganizationSecretsResponse with @debug.Debug::{
 ///
 /// Creates a AgentsListRepoOrganizationSecretsResponse with omitted optional fields absent.
 pub fn AgentsListRepoOrganizationSecretsResponse::new(
-  total_count~ : Int,
+  total_count~ : Int32,
   secrets~ : Array[ActionsSecret],
 ) -> AgentsListRepoOrganizationSecretsResponse {
   { total_count, secrets, }
@@ -135805,7 +135805,7 @@ pub impl @json.FromJson for AgentsListRepoOrganizationSecretsResponse with fn fr
 ///
 /// Generated representation of AgentsListRepoOrganizationVariablesResponse.
 pub(all) struct AgentsListRepoOrganizationVariablesResponse {
-  total_count : Int
+  total_count : Int32
   variables : Array[ActionsVariable]
 } derive(Eq, @debug.Debug)
 
@@ -135824,7 +135824,7 @@ pub extend AgentsListRepoOrganizationVariablesResponse with @debug.Debug::{
 ///
 /// Creates a AgentsListRepoOrganizationVariablesResponse with omitted optional fields absent.
 pub fn AgentsListRepoOrganizationVariablesResponse::new(
-  total_count~ : Int,
+  total_count~ : Int32,
   variables~ : Array[ActionsVariable],
 ) -> AgentsListRepoOrganizationVariablesResponse {
   { total_count, variables, }
@@ -135868,7 +135868,7 @@ pub impl @json.FromJson for AgentsListRepoOrganizationVariablesResponse with fn 
 ///
 /// Generated representation of AgentsListRepoSecretsResponse.
 pub(all) struct AgentsListRepoSecretsResponse {
-  total_count : Int
+  total_count : Int32
   secrets : Array[ActionsSecret]
 } derive(Eq, @debug.Debug)
 
@@ -135882,7 +135882,7 @@ pub extend AgentsListRepoSecretsResponse with @debug.Debug::{to_repr}
 ///
 /// Creates a AgentsListRepoSecretsResponse with omitted optional fields absent.
 pub fn AgentsListRepoSecretsResponse::new(
-  total_count~ : Int,
+  total_count~ : Int32,
   secrets~ : Array[ActionsSecret],
 ) -> AgentsListRepoSecretsResponse {
   { total_count, secrets, }
@@ -135978,7 +135978,7 @@ pub impl @json.FromJson for AgentsCreateOrUpdateRepoSecretRequest with fn from_j
 ///
 /// Generated representation of AgentsListRepoVariablesResponse.
 pub(all) struct AgentsListRepoVariablesResponse {
-  total_count : Int
+  total_count : Int32
   variables : Array[ActionsVariable]
 } derive(Eq, @debug.Debug)
 
@@ -135992,7 +135992,7 @@ pub extend AgentsListRepoVariablesResponse with @debug.Debug::{to_repr}
 ///
 /// Creates a AgentsListRepoVariablesResponse with omitted optional fields absent.
 pub fn AgentsListRepoVariablesResponse::new(
-  total_count~ : Int,
+  total_count~ : Int32,
   variables~ : Array[ActionsVariable],
 ) -> AgentsListRepoVariablesResponse {
   { total_count, variables, }
@@ -136244,7 +136244,7 @@ pub impl @json.FromJson for ReposCreateAttestationRequest with fn from_json(
 ///
 /// Generated representation of ReposCreateAttestationResponse.
 pub(all) struct ReposCreateAttestationResponse {
-  id : Int?
+  id : Int32?
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -136257,7 +136257,7 @@ pub extend ReposCreateAttestationResponse with @debug.Debug::{to_repr}
 ///
 /// Creates a ReposCreateAttestationResponse with omitted optional fields absent.
 pub fn ReposCreateAttestationResponse::new(
-  id? : Int,
+  id? : Int32,
 ) -> ReposCreateAttestationResponse {
   { id, }
 }
@@ -136360,7 +136360,7 @@ pub impl @json.FromJson for ReposListAttestationsResponseAttestationsItemBundle 
 /// Generated representation of ReposListAttestationsResponseAttestationsItem.
 pub(all) struct ReposListAttestationsResponseAttestationsItem {
   bundle : ReposListAttestationsResponseAttestationsItemBundle?
-  repository_id : Int?
+  repository_id : Int32?
   bundle_url : String?
   initiator : String?
 } derive(Eq, @debug.Debug)
@@ -136381,7 +136381,7 @@ pub extend ReposListAttestationsResponseAttestationsItem with @debug.Debug::{
 /// Creates a ReposListAttestationsResponseAttestationsItem with omitted optional fields absent.
 pub fn ReposListAttestationsResponseAttestationsItem::new(
   bundle? : ReposListAttestationsResponseAttestationsItemBundle,
-  repository_id? : Int,
+  repository_id? : Int32,
   bundle_url? : String,
   initiator? : String,
 ) -> ReposListAttestationsResponseAttestationsItem {
@@ -136535,7 +136535,7 @@ pub impl @json.FromJson for ReposCreateAutolinkRequest with fn from_json(
 /// Generated representation of ReposUpdateBranchProtectionRequestRequiredStatusChecksChecksItem.
 pub(all) struct ReposUpdateBranchProtectionRequestRequiredStatusChecksChecksItem {
   context : String
-  app_id : Int?
+  app_id : Int32?
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -136554,7 +136554,7 @@ pub extend ReposUpdateBranchProtectionRequestRequiredStatusChecksChecksItem with
 /// Creates a ReposUpdateBranchProtectionRequestRequiredStatusChecksChecksItem with omitted optional fields absent.
 pub fn ReposUpdateBranchProtectionRequestRequiredStatusChecksChecksItem::new(
   context~ : String,
-  app_id? : Int,
+  app_id? : Int32,
 ) -> ReposUpdateBranchProtectionRequestRequiredStatusChecksChecksItem {
   { context, app_id, }
 }
@@ -136813,7 +136813,7 @@ pub(all) struct ReposUpdateBranchProtectionRequestRequiredPullRequestReviews {
   dismissal_restrictions : ReposUpdateBranchProtectionRequestRequiredPullRequestReviewsDismissalRestrictions?
   dismiss_stale_reviews : Bool?
   require_code_owner_reviews : Bool?
-  required_approving_review_count : Int?
+  required_approving_review_count : Int32?
   require_last_push_approval : Bool?
   bypass_pull_request_allowances : ReposUpdateBranchProtectionRequestRequiredPullRequestReviewsBypassPullRequestAllowances?
 } derive(Eq, @debug.Debug)
@@ -136836,7 +136836,7 @@ pub fn ReposUpdateBranchProtectionRequestRequiredPullRequestReviews::new(
   dismissal_restrictions? : ReposUpdateBranchProtectionRequestRequiredPullRequestReviewsDismissalRestrictions,
   dismiss_stale_reviews? : Bool,
   require_code_owner_reviews? : Bool,
-  required_approving_review_count? : Int,
+  required_approving_review_count? : Int32,
   require_last_push_approval? : Bool,
   bypass_pull_request_allowances? : ReposUpdateBranchProtectionRequestRequiredPullRequestReviewsBypassPullRequestAllowances,
 ) -> ReposUpdateBranchProtectionRequestRequiredPullRequestReviews {
@@ -137243,7 +137243,7 @@ pub(all) struct ReposUpdatePullRequestReviewProtectionRequest {
   dismissal_restrictions : ReposUpdatePullRequestReviewProtectionRequestDismissalRestrictions?
   dismiss_stale_reviews : Bool?
   require_code_owner_reviews : Bool?
-  required_approving_review_count : Int?
+  required_approving_review_count : Int32?
   require_last_push_approval : Bool?
   bypass_pull_request_allowances : ReposUpdatePullRequestReviewProtectionRequestBypassPullRequestAllowances?
 } derive(Eq, @debug.Debug)
@@ -137266,7 +137266,7 @@ pub fn ReposUpdatePullRequestReviewProtectionRequest::new(
   dismissal_restrictions? : ReposUpdatePullRequestReviewProtectionRequestDismissalRestrictions,
   dismiss_stale_reviews? : Bool,
   require_code_owner_reviews? : Bool,
-  required_approving_review_count? : Int,
+  required_approving_review_count? : Int32,
   require_last_push_approval? : Bool,
   bypass_pull_request_allowances? : ReposUpdatePullRequestReviewProtectionRequestBypassPullRequestAllowances,
 ) -> ReposUpdatePullRequestReviewProtectionRequest {
@@ -137339,7 +137339,7 @@ pub impl @json.FromJson for ReposUpdatePullRequestReviewProtectionRequest with f
 /// Generated representation of ReposUpdateStatusCheckProtectionRequestChecksItem.
 pub(all) struct ReposUpdateStatusCheckProtectionRequestChecksItem {
   context : String
-  app_id : Int?
+  app_id : Int32?
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -137358,7 +137358,7 @@ pub extend ReposUpdateStatusCheckProtectionRequestChecksItem with @debug.Debug::
 /// Creates a ReposUpdateStatusCheckProtectionRequestChecksItem with omitted optional fields absent.
 pub fn ReposUpdateStatusCheckProtectionRequestChecksItem::new(
   context~ : String,
-  app_id? : Int,
+  app_id? : Int32,
 ) -> ReposUpdateStatusCheckProtectionRequestChecksItem {
   { context, app_id, }
 }
@@ -138666,10 +138666,10 @@ pub impl @json.FromJson for ChecksCreateRequestOutputAnnotationsItemAnnotationLe
 /// Generated representation of ChecksCreateRequestOutputAnnotationsItem.
 pub(all) struct ChecksCreateRequestOutputAnnotationsItem {
   path : String
-  start_line : Int
-  end_line : Int
-  start_column : Int?
-  end_column : Int?
+  start_line : Int32
+  end_line : Int32
+  start_column : Int32?
+  end_column : Int32?
   annotation_level : ChecksCreateRequestOutputAnnotationsItemAnnotationLevel
   message : String
   title : String?
@@ -138687,12 +138687,12 @@ pub extend ChecksCreateRequestOutputAnnotationsItem with @debug.Debug::{to_repr}
 /// Creates a ChecksCreateRequestOutputAnnotationsItem with omitted optional fields absent.
 pub fn ChecksCreateRequestOutputAnnotationsItem::new(
   path~ : String,
-  start_line~ : Int,
-  end_line~ : Int,
+  start_line~ : Int32,
+  end_line~ : Int32,
   annotation_level~ : ChecksCreateRequestOutputAnnotationsItemAnnotationLevel,
   message~ : String,
-  start_column? : Int,
-  end_column? : Int,
+  start_column? : Int32,
+  end_column? : Int32,
   title? : String,
   raw_details? : String,
 ) -> ChecksCreateRequestOutputAnnotationsItem {
@@ -139244,10 +139244,10 @@ pub impl @json.FromJson for ChecksUpdateRequestOutputAnnotationsItemAnnotationLe
 /// Generated representation of ChecksUpdateRequestOutputAnnotationsItem.
 pub(all) struct ChecksUpdateRequestOutputAnnotationsItem {
   path : String
-  start_line : Int
-  end_line : Int
-  start_column : Int?
-  end_column : Int?
+  start_line : Int32
+  end_line : Int32
+  start_column : Int32?
+  end_column : Int32?
   annotation_level : ChecksUpdateRequestOutputAnnotationsItemAnnotationLevel
   message : String
   title : String?
@@ -139265,12 +139265,12 @@ pub extend ChecksUpdateRequestOutputAnnotationsItem with @debug.Debug::{to_repr}
 /// Creates a ChecksUpdateRequestOutputAnnotationsItem with omitted optional fields absent.
 pub fn ChecksUpdateRequestOutputAnnotationsItem::new(
   path~ : String,
-  start_line~ : Int,
-  end_line~ : Int,
+  start_line~ : Int32,
+  end_line~ : Int32,
   annotation_level~ : ChecksUpdateRequestOutputAnnotationsItemAnnotationLevel,
   message~ : String,
-  start_column? : Int,
-  end_column? : Int,
+  start_column? : Int32,
+  end_column? : Int32,
   title? : String,
   raw_details? : String,
 ) -> ChecksUpdateRequestOutputAnnotationsItem {
@@ -139656,7 +139656,7 @@ pub impl @json.FromJson for ChecksCreateSuiteRequest with fn from_json(
 ///
 /// Generated representation of ChecksSetSuitesPreferencesRequestAutoTriggerChecksItem.
 pub(all) struct ChecksSetSuitesPreferencesRequestAutoTriggerChecksItem {
-  app_id : Int
+  app_id : Int32
   setting : Bool
 } derive(Eq, @debug.Debug)
 
@@ -139675,7 +139675,7 @@ pub extend ChecksSetSuitesPreferencesRequestAutoTriggerChecksItem with @debug.De
 ///
 /// Creates a ChecksSetSuitesPreferencesRequestAutoTriggerChecksItem with omitted optional fields absent.
 pub fn ChecksSetSuitesPreferencesRequestAutoTriggerChecksItem::new(
-  app_id~ : Int,
+  app_id~ : Int32,
   setting~ : Bool,
 ) -> ChecksSetSuitesPreferencesRequestAutoTriggerChecksItem {
   { app_id, setting, }
@@ -139884,7 +139884,7 @@ pub impl @json.FromJson for ChecksListForSuiteFilter with fn from_json(
 ///
 /// Generated representation of ChecksListForSuiteResponse.
 pub(all) struct ChecksListForSuiteResponse {
-  total_count : Int
+  total_count : Int32
   check_runs : Array[CheckRun]
 } derive(Eq, @debug.Debug)
 
@@ -139898,7 +139898,7 @@ pub extend ChecksListForSuiteResponse with @debug.Debug::{to_repr}
 ///
 /// Creates a ChecksListForSuiteResponse with omitted optional fields absent.
 pub fn ChecksListForSuiteResponse::new(
-  total_count~ : Int,
+  total_count~ : Int32,
   check_runs~ : Array[CheckRun],
 ) -> ChecksListForSuiteResponse {
   { total_count, check_runs, }
@@ -140434,7 +140434,7 @@ pub impl @json.FromJson for CodeScanningUploadSarifRequest with fn from_json(
 ///
 /// Generated representation of CodespacesListInRepositoryForAuthenticatedUserResponse.
 pub(all) struct CodespacesListInRepositoryForAuthenticatedUserResponse {
-  total_count : Int
+  total_count : Int32
   codespaces : Array[Codespace]
 } derive(Eq, @debug.Debug)
 
@@ -140453,7 +140453,7 @@ pub extend CodespacesListInRepositoryForAuthenticatedUserResponse with @debug.De
 ///
 /// Creates a CodespacesListInRepositoryForAuthenticatedUserResponse with omitted optional fields absent.
 pub fn CodespacesListInRepositoryForAuthenticatedUserResponse::new(
-  total_count~ : Int,
+  total_count~ : Int32,
   codespaces~ : Array[Codespace],
 ) -> CodespacesListInRepositoryForAuthenticatedUserResponse {
   { total_count, codespaces, }
@@ -140578,9 +140578,9 @@ pub(all) struct CodespacesCreateWithRepoForAuthenticatedUserRequest {
   devcontainer_path : String?
   multi_repo_permissions_opt_out : Bool?
   working_directory : String?
-  idle_timeout_minutes : Int?
+  idle_timeout_minutes : Int32?
   display_name : String?
-  retention_period_minutes : Int?
+  retention_period_minutes : Int32?
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -140606,9 +140606,9 @@ pub fn CodespacesCreateWithRepoForAuthenticatedUserRequest::new(
   devcontainer_path? : String,
   multi_repo_permissions_opt_out? : Bool,
   working_directory? : String,
-  idle_timeout_minutes? : Int,
+  idle_timeout_minutes? : Int32,
   display_name? : String,
-  retention_period_minutes? : Int,
+  retention_period_minutes? : Int32,
 ) -> CodespacesCreateWithRepoForAuthenticatedUserRequest {
   {
     ref_,
@@ -140756,7 +140756,7 @@ pub impl @json.FromJson for CodespacesListDevcontainersInRepositoryForAuthentica
 ///
 /// Generated representation of CodespacesListDevcontainersInRepositoryForAuthenticatedUserResponse.
 pub(all) struct CodespacesListDevcontainersInRepositoryForAuthenticatedUserResponse {
-  total_count : Int
+  total_count : Int32
   devcontainers : Array[
     CodespacesListDevcontainersInRepositoryForAuthenticatedUserResponseDevcontainersItem,
   ]
@@ -140777,7 +140777,7 @@ pub extend CodespacesListDevcontainersInRepositoryForAuthenticatedUserResponse w
 ///
 /// Creates a CodespacesListDevcontainersInRepositoryForAuthenticatedUserResponse with omitted optional fields absent.
 pub fn CodespacesListDevcontainersInRepositoryForAuthenticatedUserResponse::new(
-  total_count~ : Int,
+  total_count~ : Int32,
   devcontainers~ : Array[
     CodespacesListDevcontainersInRepositoryForAuthenticatedUserResponseDevcontainersItem,
   ],
@@ -140825,7 +140825,7 @@ pub impl @json.FromJson for CodespacesListDevcontainersInRepositoryForAuthentica
 ///
 /// Generated representation of CodespacesRepoMachinesForAuthenticatedUserResponse.
 pub(all) struct CodespacesRepoMachinesForAuthenticatedUserResponse {
-  total_count : Int
+  total_count : Int32
   machines : Array[CodespaceMachine]
 } derive(Eq, @debug.Debug)
 
@@ -140844,7 +140844,7 @@ pub extend CodespacesRepoMachinesForAuthenticatedUserResponse with @debug.Debug:
 ///
 /// Creates a CodespacesRepoMachinesForAuthenticatedUserResponse with omitted optional fields absent.
 pub fn CodespacesRepoMachinesForAuthenticatedUserResponse::new(
-  total_count~ : Int,
+  total_count~ : Int32,
   machines~ : Array[CodespaceMachine],
 ) -> CodespacesRepoMachinesForAuthenticatedUserResponse {
   { total_count, machines, }
@@ -141023,7 +141023,7 @@ pub impl @json.FromJson for CodespacesPreFlightWithRepoForAuthenticatedUserRespo
 ///
 /// Generated representation of CodespacesListRepoSecretsResponse.
 pub(all) struct CodespacesListRepoSecretsResponse {
-  total_count : Int
+  total_count : Int32
   secrets : Array[RepoCodespacesSecret]
 } derive(Eq, @debug.Debug)
 
@@ -141037,7 +141037,7 @@ pub extend CodespacesListRepoSecretsResponse with @debug.Debug::{to_repr}
 ///
 /// Creates a CodespacesListRepoSecretsResponse with omitted optional fields absent.
 pub fn CodespacesListRepoSecretsResponse::new(
-  total_count~ : Int,
+  total_count~ : Int32,
   secrets~ : Array[RepoCodespacesSecret],
 ) -> CodespacesListRepoSecretsResponse {
   { total_count, secrets, }
@@ -141555,8 +141555,8 @@ pub impl @json.FromJson for ReactionsCreateForCommitCommentRequest with fn from_
 pub(all) struct ReposCreateCommitCommentRequest {
   body : String
   path : String?
-  position : Int?
-  line : Int?
+  position : Int32?
+  line : Int32?
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -141571,8 +141571,8 @@ pub extend ReposCreateCommitCommentRequest with @debug.Debug::{to_repr}
 pub fn ReposCreateCommitCommentRequest::new(
   body~ : String,
   path? : String,
-  position? : Int,
-  line? : Int,
+  position? : Int32,
+  line? : Int32,
 ) -> ReposCreateCommitCommentRequest {
   { body, path, position, line, }
 }
@@ -141726,7 +141726,7 @@ pub impl @json.FromJson for ChecksListForRefFilter with fn from_json(
 ///
 /// Generated representation of ChecksListForRefResponse.
 pub(all) struct ChecksListForRefResponse {
-  total_count : Int
+  total_count : Int32
   check_runs : Array[CheckRun]
 } derive(Eq, @debug.Debug)
 
@@ -141740,7 +141740,7 @@ pub extend ChecksListForRefResponse with @debug.Debug::{to_repr}
 ///
 /// Creates a ChecksListForRefResponse with omitted optional fields absent.
 pub fn ChecksListForRefResponse::new(
-  total_count~ : Int,
+  total_count~ : Int32,
   check_runs~ : Array[CheckRun],
 ) -> ChecksListForRefResponse {
   { total_count, check_runs, }
@@ -141780,7 +141780,7 @@ pub impl @json.FromJson for ChecksListForRefResponse with fn from_json(
 ///
 /// Generated representation of ChecksListSuitesForRefResponse.
 pub(all) struct ChecksListSuitesForRefResponse {
-  total_count : Int
+  total_count : Int32
   check_suites : Array[CheckSuite]
 } derive(Eq, @debug.Debug)
 
@@ -141794,7 +141794,7 @@ pub extend ChecksListSuitesForRefResponse with @debug.Debug::{to_repr}
 ///
 /// Creates a ChecksListSuitesForRefResponse with omitted optional fields absent.
 pub fn ChecksListSuitesForRefResponse::new(
-  total_count~ : Int,
+  total_count~ : Int32,
   check_suites~ : Array[CheckSuite],
 ) -> ChecksListSuitesForRefResponse {
   { total_count, check_suites, }
@@ -142992,7 +142992,7 @@ pub impl @json.FromJson for DependabotUpdateAlertRequest with fn from_json(
 ///
 /// Generated representation of DependabotListRepoSecretsResponse.
 pub(all) struct DependabotListRepoSecretsResponse {
-  total_count : Int
+  total_count : Int32
   secrets : Array[DependabotSecret]
 } derive(Eq, @debug.Debug)
 
@@ -143006,7 +143006,7 @@ pub extend DependabotListRepoSecretsResponse with @debug.Debug::{to_repr}
 ///
 /// Creates a DependabotListRepoSecretsResponse with omitted optional fields absent.
 pub fn DependabotListRepoSecretsResponse::new(
-  total_count~ : Int,
+  total_count~ : Int32,
   secrets~ : Array[DependabotSecret],
 ) -> DependabotListRepoSecretsResponse {
   { total_count, secrets, }
@@ -143158,7 +143158,7 @@ pub impl @json.FromJson for DependencyGraphGenerateSbomReportResponse with fn fr
 ///
 /// Generated representation of DependencyGraphCreateRepositorySnapshotResponse.
 pub(all) struct DependencyGraphCreateRepositorySnapshotResponse {
-  id : Int
+  id : Int32
   created_at : String
   result : String
   message : String
@@ -143179,7 +143179,7 @@ pub extend DependencyGraphCreateRepositorySnapshotResponse with @debug.Debug::{
 ///
 /// Creates a DependencyGraphCreateRepositorySnapshotResponse with omitted optional fields absent.
 pub fn DependencyGraphCreateRepositorySnapshotResponse::new(
-  id~ : Int,
+  id~ : Int32,
   created_at~ : String,
   result~ : String,
   message~ : String,
@@ -143588,7 +143588,7 @@ pub impl @json.FromJson for ReposCreateDispatchEventRequest with fn from_json(
 ///
 /// Generated representation of ReposGetAllEnvironmentsResponse.
 pub(all) struct ReposGetAllEnvironmentsResponse {
-  total_count : Int?
+  total_count : Int32?
   environments : Array[Environment]?
 } derive(Eq, @debug.Debug)
 
@@ -143602,7 +143602,7 @@ pub extend ReposGetAllEnvironmentsResponse with @debug.Debug::{to_repr}
 ///
 /// Creates a ReposGetAllEnvironmentsResponse with omitted optional fields absent.
 pub fn ReposGetAllEnvironmentsResponse::new(
-  total_count? : Int,
+  total_count? : Int32,
   environments? : Array[Environment],
 ) -> ReposGetAllEnvironmentsResponse {
   { total_count, environments, }
@@ -143643,7 +143643,7 @@ pub impl @json.FromJson for ReposGetAllEnvironmentsResponse with fn from_json(
 /// Generated representation of ReposCreateOrUpdateEnvironmentRequestReviewersItem.
 pub(all) struct ReposCreateOrUpdateEnvironmentRequestReviewersItem {
   type_ : DeploymentReviewerType?
-  id : Int?
+  id : Int32?
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -143662,7 +143662,7 @@ pub extend ReposCreateOrUpdateEnvironmentRequestReviewersItem with @debug.Debug:
 /// Creates a ReposCreateOrUpdateEnvironmentRequestReviewersItem with omitted optional fields absent.
 pub fn ReposCreateOrUpdateEnvironmentRequestReviewersItem::new(
   type_? : DeploymentReviewerType,
-  id? : Int,
+  id? : Int32,
 ) -> ReposCreateOrUpdateEnvironmentRequestReviewersItem {
   { type_, id, }
 }
@@ -143704,7 +143704,7 @@ pub impl @json.FromJson for ReposCreateOrUpdateEnvironmentRequestReviewersItem w
 ///
 /// Generated representation of ReposCreateOrUpdateEnvironmentRequest.
 pub(all) struct ReposCreateOrUpdateEnvironmentRequest {
-  wait_timer : Int?
+  wait_timer : Int32?
   prevent_self_review : Bool?
   reviewers : @sdkjson.Presence[
     Array[ReposCreateOrUpdateEnvironmentRequestReviewersItem],
@@ -143722,7 +143722,7 @@ pub extend ReposCreateOrUpdateEnvironmentRequest with @debug.Debug::{to_repr}
 ///
 /// Creates a ReposCreateOrUpdateEnvironmentRequest with omitted optional fields absent.
 pub fn ReposCreateOrUpdateEnvironmentRequest::new(
-  wait_timer? : Int,
+  wait_timer? : Int32,
   prevent_self_review? : Bool,
   reviewers? : Array[ReposCreateOrUpdateEnvironmentRequestReviewersItem],
   deployment_branch_policy? : DeploymentBranchPolicySettings,
@@ -143779,7 +143779,7 @@ pub impl @json.FromJson for ReposCreateOrUpdateEnvironmentRequest with fn from_j
 ///
 /// Generated representation of ReposListDeploymentBranchPoliciesResponse.
 pub(all) struct ReposListDeploymentBranchPoliciesResponse {
-  total_count : Int
+  total_count : Int32
   branch_policies : Array[DeploymentBranchPolicy]
 } derive(Eq, @debug.Debug)
 
@@ -143795,7 +143795,7 @@ pub extend ReposListDeploymentBranchPoliciesResponse with @debug.Debug::{
 ///
 /// Creates a ReposListDeploymentBranchPoliciesResponse with omitted optional fields absent.
 pub fn ReposListDeploymentBranchPoliciesResponse::new(
-  total_count~ : Int,
+  total_count~ : Int32,
   branch_policies~ : Array[DeploymentBranchPolicy],
 ) -> ReposListDeploymentBranchPoliciesResponse {
   { total_count, branch_policies, }
@@ -143839,7 +143839,7 @@ pub impl @json.FromJson for ReposListDeploymentBranchPoliciesResponse with fn fr
 ///
 /// Generated representation of ReposGetAllDeploymentProtectionRulesResponse.
 pub(all) struct ReposGetAllDeploymentProtectionRulesResponse {
-  total_count : Int?
+  total_count : Int32?
   custom_deployment_protection_rules : Array[DeploymentProtectionRule]?
 } derive(Eq, @debug.Debug)
 
@@ -143858,7 +143858,7 @@ pub extend ReposGetAllDeploymentProtectionRulesResponse with @debug.Debug::{
 ///
 /// Creates a ReposGetAllDeploymentProtectionRulesResponse with omitted optional fields absent.
 pub fn ReposGetAllDeploymentProtectionRulesResponse::new(
-  total_count? : Int,
+  total_count? : Int32,
   custom_deployment_protection_rules? : Array[DeploymentProtectionRule],
 ) -> ReposGetAllDeploymentProtectionRulesResponse {
   { total_count, custom_deployment_protection_rules, }
@@ -143907,7 +143907,7 @@ pub impl @json.FromJson for ReposGetAllDeploymentProtectionRulesResponse with fn
 ///
 /// Generated representation of ReposCreateDeploymentProtectionRuleRequest.
 pub(all) struct ReposCreateDeploymentProtectionRuleRequest {
-  integration_id : Int?
+  integration_id : Int32?
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -143925,7 +143925,7 @@ pub extend ReposCreateDeploymentProtectionRuleRequest with @debug.Debug::{
 ///
 /// Creates a ReposCreateDeploymentProtectionRuleRequest with omitted optional fields absent.
 pub fn ReposCreateDeploymentProtectionRuleRequest::new(
-  integration_id? : Int,
+  integration_id? : Int32,
 ) -> ReposCreateDeploymentProtectionRuleRequest {
   { integration_id, }
 }
@@ -143962,7 +143962,7 @@ pub impl @json.FromJson for ReposCreateDeploymentProtectionRuleRequest with fn f
 ///
 /// Generated representation of ReposListCustomDeploymentRuleIntegrationsResponse.
 pub(all) struct ReposListCustomDeploymentRuleIntegrationsResponse {
-  total_count : Int?
+  total_count : Int32?
   available_custom_deployment_protection_rule_integrations : Array[
     CustomDeploymentRuleApp,
   ]?
@@ -143983,7 +143983,7 @@ pub extend ReposListCustomDeploymentRuleIntegrationsResponse with @debug.Debug::
 ///
 /// Creates a ReposListCustomDeploymentRuleIntegrationsResponse with omitted optional fields absent.
 pub fn ReposListCustomDeploymentRuleIntegrationsResponse::new(
-  total_count? : Int,
+  total_count? : Int32,
   available_custom_deployment_protection_rule_integrations? : Array[
     CustomDeploymentRuleApp,
   ],
@@ -144036,7 +144036,7 @@ pub impl @json.FromJson for ReposListCustomDeploymentRuleIntegrationsResponse wi
 ///
 /// Generated representation of ActionsListEnvironmentSecretsResponse.
 pub(all) struct ActionsListEnvironmentSecretsResponse {
-  total_count : Int
+  total_count : Int32
   secrets : Array[ActionsSecret]
 } derive(Eq, @debug.Debug)
 
@@ -144050,7 +144050,7 @@ pub extend ActionsListEnvironmentSecretsResponse with @debug.Debug::{to_repr}
 ///
 /// Creates a ActionsListEnvironmentSecretsResponse with omitted optional fields absent.
 pub fn ActionsListEnvironmentSecretsResponse::new(
-  total_count~ : Int,
+  total_count~ : Int32,
   secrets~ : Array[ActionsSecret],
 ) -> ActionsListEnvironmentSecretsResponse {
   { total_count, secrets, }
@@ -144155,7 +144155,7 @@ pub impl @json.FromJson for ActionsCreateOrUpdateEnvironmentSecretRequest with f
 ///
 /// Generated representation of ActionsListEnvironmentVariablesResponse.
 pub(all) struct ActionsListEnvironmentVariablesResponse {
-  total_count : Int
+  total_count : Int32
   variables : Array[ActionsVariable]
 } derive(Eq, @debug.Debug)
 
@@ -144169,7 +144169,7 @@ pub extend ActionsListEnvironmentVariablesResponse with @debug.Debug::{to_repr}
 ///
 /// Creates a ActionsListEnvironmentVariablesResponse with omitted optional fields absent.
 pub fn ActionsListEnvironmentVariablesResponse::new(
-  total_count~ : Int,
+  total_count~ : Int32,
   variables~ : Array[ActionsVariable],
 ) -> ActionsListEnvironmentVariablesResponse {
   { total_count, variables, }
@@ -145913,7 +145913,7 @@ pub impl @json.FromJson for MigrationsSetLfsPreferenceRequest with fn from_json(
 /// Generated representation of InteractionsGetPullRequestCreationCapForRepoResponse.
 pub(all) struct InteractionsGetPullRequestCreationCapForRepoResponse {
   enabled : Bool
-  max_open_pull_requests : Int
+  max_open_pull_requests : Int32
   include_drafts : Bool?
 } derive(Eq, @debug.Debug)
 
@@ -145933,7 +145933,7 @@ pub extend InteractionsGetPullRequestCreationCapForRepoResponse with @debug.Debu
 /// Creates a InteractionsGetPullRequestCreationCapForRepoResponse with omitted optional fields absent.
 pub fn InteractionsGetPullRequestCreationCapForRepoResponse::new(
   enabled~ : Bool,
-  max_open_pull_requests~ : Int,
+  max_open_pull_requests~ : Int32,
   include_drafts? : Bool,
 ) -> InteractionsGetPullRequestCreationCapForRepoResponse {
   { enabled, max_open_pull_requests, include_drafts, }
@@ -145982,7 +145982,7 @@ pub impl @json.FromJson for InteractionsGetPullRequestCreationCapForRepoResponse
 /// Generated representation of InteractionsUpdatePullRequestCreationCapForRepoRequest.
 pub(all) struct InteractionsUpdatePullRequestCreationCapForRepoRequest {
   enabled : Bool
-  max_open_pull_requests : Int?
+  max_open_pull_requests : Int32?
   include_drafts : Bool?
 } derive(Eq, @debug.Debug)
 
@@ -146002,7 +146002,7 @@ pub extend InteractionsUpdatePullRequestCreationCapForRepoRequest with @debug.De
 /// Creates a InteractionsUpdatePullRequestCreationCapForRepoRequest with omitted optional fields absent.
 pub fn InteractionsUpdatePullRequestCreationCapForRepoRequest::new(
   enabled~ : Bool,
-  max_open_pull_requests? : Int,
+  max_open_pull_requests? : Int32,
   include_drafts? : Bool,
 ) -> InteractionsUpdatePullRequestCreationCapForRepoRequest {
   { enabled, max_open_pull_requests, include_drafts, }
@@ -146053,7 +146053,7 @@ pub impl @json.FromJson for InteractionsUpdatePullRequestCreationCapForRepoReque
 /// Generated representation of InteractionsUpdatePullRequestCreationCapForRepoResponse.
 pub(all) struct InteractionsUpdatePullRequestCreationCapForRepoResponse {
   enabled : Bool
-  max_open_pull_requests : Int
+  max_open_pull_requests : Int32
   include_drafts : Bool?
 } derive(Eq, @debug.Debug)
 
@@ -146073,7 +146073,7 @@ pub extend InteractionsUpdatePullRequestCreationCapForRepoResponse with @debug.D
 /// Creates a InteractionsUpdatePullRequestCreationCapForRepoResponse with omitted optional fields absent.
 pub fn InteractionsUpdatePullRequestCreationCapForRepoResponse::new(
   enabled~ : Bool,
-  max_open_pull_requests~ : Int,
+  max_open_pull_requests~ : Int32,
   include_drafts? : Bool,
 ) -> InteractionsUpdatePullRequestCreationCapForRepoResponse {
   { enabled, max_open_pull_requests, include_drafts, }
@@ -146400,7 +146400,7 @@ pub impl @json.FromJson for IssuesListForRepoDirection with fn from_json(
 /// The title of the issue.
 pub(all) enum IssuesCreateRequestTitle {
   Text(String)
-  Int(Int)
+  Int(Int32)
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -146437,7 +146437,7 @@ pub impl @json.FromJson for IssuesCreateRequestTitle with fn from_json(
     return Text(decoded)
   }
   if value is Number(_, ..) {
-    let decoded : Int = @json.from_json(value, path~)
+    let decoded : Int32 = @json.from_json(value, path~)
     return Int(decoded)
   }
   raise @json.JsonDecodeError(
@@ -146450,7 +146450,7 @@ pub impl @json.FromJson for IssuesCreateRequestTitle with fn from_json(
 /// Generated untagged union IssuesCreateRequestMilestone.
 pub(all) enum IssuesCreateRequestMilestone {
   Text(String)
-  Int(Int)
+  Int(Int32)
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -146487,7 +146487,7 @@ pub impl @json.FromJson for IssuesCreateRequestMilestone with fn from_json(
     return Text(decoded)
   }
   if value is Number(_, ..) {
-    let decoded : Int = @json.from_json(value, path~)
+    let decoded : Int32 = @json.from_json(value, path~)
     return Int(decoded)
   }
   raise @json.JsonDecodeError(
@@ -146499,7 +146499,7 @@ pub impl @json.FromJson for IssuesCreateRequestMilestone with fn from_json(
 ///
 /// Generated representation of IssuesCreateRequestLabelsItemObject.
 pub(all) struct IssuesCreateRequestLabelsItemObject {
-  id : Int?
+  id : Int32?
   name : String?
   description : @sdkjson.Presence[String]
   color : @sdkjson.Presence[String]
@@ -146515,7 +146515,7 @@ pub extend IssuesCreateRequestLabelsItemObject with @debug.Debug::{to_repr}
 ///
 /// Creates a IssuesCreateRequestLabelsItemObject with omitted optional fields absent.
 pub fn IssuesCreateRequestLabelsItemObject::new(
-  id? : Int,
+  id? : Int32,
   name? : String,
   description? : String,
   color? : String,
@@ -146688,7 +146688,7 @@ pub impl @json.FromJson for IssuesCreateRequestIssueFieldValuesItemValue with fn
 ///
 /// Generated representation of IssuesCreateRequestIssueFieldValuesItem.
 pub(all) struct IssuesCreateRequestIssueFieldValuesItem {
-  field_id : Int
+  field_id : Int32
   value : IssuesCreateRequestIssueFieldValuesItemValue
 } derive(Eq, @debug.Debug)
 
@@ -146702,7 +146702,7 @@ pub extend IssuesCreateRequestIssueFieldValuesItem with @debug.Debug::{to_repr}
 ///
 /// Creates a IssuesCreateRequestIssueFieldValuesItem with omitted optional fields absent.
 pub fn IssuesCreateRequestIssueFieldValuesItem::new(
-  field_id~ : Int,
+  field_id~ : Int32,
   value~ : IssuesCreateRequestIssueFieldValuesItemValue,
 ) -> IssuesCreateRequestIssueFieldValuesItem {
   { field_id, value, }
@@ -146754,7 +146754,7 @@ pub(all) struct IssuesCreateRequest {
   assignees : Array[String]?
   issue_field_values : Array[IssuesCreateRequestIssueFieldValuesItem]?
   type_ : @sdkjson.Presence[String]
-  parent_issue_id : Int?
+  parent_issue_id : Int32?
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -146775,7 +146775,7 @@ pub fn IssuesCreateRequest::new(
   assignees? : Array[String],
   issue_field_values? : Array[IssuesCreateRequestIssueFieldValuesItem],
   type_? : String,
-  parent_issue_id? : Int,
+  parent_issue_id? : Int32,
 ) -> IssuesCreateRequest {
   {
     title,
@@ -147191,7 +147191,7 @@ pub impl @json.FromJson for ReactionsCreateForIssueCommentRequest with fn from_j
 /// The title of the issue.
 pub(all) enum IssuesUpdateRequestTitle {
   Text(String)
-  Int(Int)
+  Int(Int32)
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -147228,7 +147228,7 @@ pub impl @json.FromJson for IssuesUpdateRequestTitle with fn from_json(
     return Text(decoded)
   }
   if value is Number(_, ..) {
-    let decoded : Int = @json.from_json(value, path~)
+    let decoded : Int32 = @json.from_json(value, path~)
     return Int(decoded)
   }
   raise @json.JsonDecodeError(
@@ -147355,7 +147355,7 @@ pub impl @json.FromJson for IssuesUpdateRequestStateReason with fn from_json(
 /// Generated untagged union IssuesUpdateRequestMilestone.
 pub(all) enum IssuesUpdateRequestMilestone {
   Text(String)
-  Int(Int)
+  Int(Int32)
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -147392,7 +147392,7 @@ pub impl @json.FromJson for IssuesUpdateRequestMilestone with fn from_json(
     return Text(decoded)
   }
   if value is Number(_, ..) {
-    let decoded : Int = @json.from_json(value, path~)
+    let decoded : Int32 = @json.from_json(value, path~)
     return Int(decoded)
   }
   raise @json.JsonDecodeError(
@@ -147470,7 +147470,7 @@ pub impl @json.FromJson for IssuesUpdateRequestLabelsItemObjectConfidence with f
 ///
 /// Generated representation of IssuesUpdateRequestLabelsItemObject.
 pub(all) struct IssuesUpdateRequestLabelsItemObject {
-  id : Int?
+  id : Int32?
   name : String?
   description : @sdkjson.Presence[String]
   color : @sdkjson.Presence[String]
@@ -147489,7 +147489,7 @@ pub extend IssuesUpdateRequestLabelsItemObject with @debug.Debug::{to_repr}
 ///
 /// Creates a IssuesUpdateRequestLabelsItemObject with omitted optional fields absent.
 pub fn IssuesUpdateRequestLabelsItemObject::new(
-  id? : Int,
+  id? : Int32,
   name? : String,
   description? : String,
   color? : String,
@@ -147929,7 +147929,7 @@ pub impl @json.FromJson for IssuesUpdateRequestIssueFieldValuesItemConfidence wi
 ///
 /// Generated representation of IssuesUpdateRequestIssueFieldValuesItem.
 pub(all) struct IssuesUpdateRequestIssueFieldValuesItem {
-  field_id : Int
+  field_id : Int32
   value : IssuesUpdateRequestIssueFieldValuesItemValue
   rationale : String?
   suggest : Bool?
@@ -147946,7 +147946,7 @@ pub extend IssuesUpdateRequestIssueFieldValuesItem with @debug.Debug::{to_repr}
 ///
 /// Creates a IssuesUpdateRequestIssueFieldValuesItem with omitted optional fields absent.
 pub fn IssuesUpdateRequestIssueFieldValuesItem::new(
-  field_id~ : Int,
+  field_id~ : Int32,
   value~ : IssuesUpdateRequestIssueFieldValuesItemValue,
   rationale? : String,
   suggest? : Bool,
@@ -148182,7 +148182,7 @@ pub(all) struct IssuesUpdateRequest {
   assignee : @sdkjson.Presence[String]
   state : IssuesUpdateRequestState?
   state_reason : @sdkjson.Presence[IssuesUpdateRequestStateReason]
-  duplicate_issue_id : Int?
+  duplicate_issue_id : Int32?
   milestone : @sdkjson.Presence[IssuesUpdateRequestMilestone]
   labels : Array[IssuesUpdateRequestLabelsItem]?
   assignees : Array[IssuesUpdateRequestAssigneesItem]?
@@ -148205,7 +148205,7 @@ pub fn IssuesUpdateRequest::new(
   assignee? : String,
   state? : IssuesUpdateRequestState,
   state_reason? : IssuesUpdateRequestStateReason,
-  duplicate_issue_id? : Int,
+  duplicate_issue_id? : Int32,
   milestone? : IssuesUpdateRequestMilestone,
   labels? : Array[IssuesUpdateRequestLabelsItem],
   assignees? : Array[IssuesUpdateRequestAssigneesItem],
@@ -149130,7 +149130,7 @@ pub impl @json.FromJson for IssuesUpdateResponseSuggestionsIssueFieldValuesItemI
 ///
 /// Generated representation of IssuesUpdateResponseSuggestionsIssueFieldValuesItem.
 pub(all) struct IssuesUpdateResponseSuggestionsIssueFieldValuesItem {
-  field_id : Int?
+  field_id : Int32?
   value : IssuesUpdateResponseSuggestionsIssueFieldValuesItemValue?
   rationale : String?
   suggest : Bool?
@@ -149154,7 +149154,7 @@ pub extend IssuesUpdateResponseSuggestionsIssueFieldValuesItem with @debug.Debug
 ///
 /// Creates a IssuesUpdateResponseSuggestionsIssueFieldValuesItem with omitted optional fields absent.
 pub fn IssuesUpdateResponseSuggestionsIssueFieldValuesItem::new(
-  field_id? : Int,
+  field_id? : Int32,
   value? : IssuesUpdateResponseSuggestionsIssueFieldValuesItemValue,
   rationale? : String,
   suggest? : Bool,
@@ -149771,7 +149771,7 @@ pub impl @json.FromJson for IssuesUpdateResponseSuggestionsStateItemIgnoredReaso
 pub(all) struct IssuesUpdateResponseSuggestionsStateItem {
   value : String?
   state_reason : String?
-  duplicate_issue_id : Int?
+  duplicate_issue_id : Int32?
   rationale : String?
   suggest : Bool?
   confidence : IssuesUpdateResponseSuggestionsStateItemConfidence?
@@ -149791,7 +149791,7 @@ pub extend IssuesUpdateResponseSuggestionsStateItem with @debug.Debug::{to_repr}
 pub fn IssuesUpdateResponseSuggestionsStateItem::new(
   value? : String,
   state_reason? : String,
-  duplicate_issue_id? : Int,
+  duplicate_issue_id? : Int32,
   rationale? : String,
   suggest? : Bool,
   confidence? : IssuesUpdateResponseSuggestionsStateItemConfidence,
@@ -149938,7 +149938,7 @@ pub(all) struct IssuesUpdateResponse {
   comments_url : String
   events_url : String
   html_url : String
-  number : Int
+  number : Int32
   state : String
   state_reason : @sdkjson.Presence[IssuesUpdateResponseStateReason]
   title : String
@@ -149950,7 +149950,7 @@ pub(all) struct IssuesUpdateResponse {
   milestone : NullableMilestone?
   locked : Bool
   active_lock_reason : @sdkjson.Presence[String]
-  comments : Int
+  comments : Int32
   pull_request : IssuesUpdateResponsePullRequest?
   closed_at : String?
   created_at : String
@@ -149991,12 +149991,12 @@ pub fn IssuesUpdateResponse::new(
   comments_url~ : String,
   events_url~ : String,
   html_url~ : String,
-  number~ : Int,
+  number~ : Int32,
   state~ : String,
   title~ : String,
   labels~ : Array[IssuesUpdateResponseLabelsItem],
   locked~ : Bool,
-  comments~ : Int,
+  comments~ : Int32,
   created_at~ : String,
   updated_at~ : String,
   state_reason? : IssuesUpdateResponseStateReason,
@@ -150519,7 +150519,7 @@ pub impl @json.FromJson for IssuesCreateCommentRequest with fn from_json(
 ///
 /// Generated representation of IssuesAddBlockedByDependencyRequest.
 pub(all) struct IssuesAddBlockedByDependencyRequest {
-  issue_id : Int
+  issue_id : Int32
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -150532,7 +150532,7 @@ pub extend IssuesAddBlockedByDependencyRequest with @debug.Debug::{to_repr}
 ///
 /// Creates a IssuesAddBlockedByDependencyRequest with omitted optional fields absent.
 pub fn IssuesAddBlockedByDependencyRequest::new(
-  issue_id~ : Int,
+  issue_id~ : Int32,
 ) -> IssuesAddBlockedByDependencyRequest {
   { issue_id, }
 }
@@ -150634,7 +150634,7 @@ pub impl @json.FromJson for IssuesAddIssueFieldValuesRequestIssueFieldValuesItem
 ///
 /// Generated representation of IssuesAddIssueFieldValuesRequestIssueFieldValuesItem.
 pub(all) struct IssuesAddIssueFieldValuesRequestIssueFieldValuesItem {
-  field_id : Int
+  field_id : Int32
   value : IssuesAddIssueFieldValuesRequestIssueFieldValuesItemValue
 } derive(Eq, @debug.Debug)
 
@@ -150653,7 +150653,7 @@ pub extend IssuesAddIssueFieldValuesRequestIssueFieldValuesItem with @debug.Debu
 ///
 /// Creates a IssuesAddIssueFieldValuesRequestIssueFieldValuesItem with omitted optional fields absent.
 pub fn IssuesAddIssueFieldValuesRequestIssueFieldValuesItem::new(
-  field_id~ : Int,
+  field_id~ : Int32,
   value~ : IssuesAddIssueFieldValuesRequestIssueFieldValuesItemValue,
 ) -> IssuesAddIssueFieldValuesRequestIssueFieldValuesItem {
   { field_id, value, }
@@ -150814,7 +150814,7 @@ pub impl @json.FromJson for IssuesSetIssueFieldValuesRequestIssueFieldValuesItem
 ///
 /// Generated representation of IssuesSetIssueFieldValuesRequestIssueFieldValuesItem.
 pub(all) struct IssuesSetIssueFieldValuesRequestIssueFieldValuesItem {
-  field_id : Int
+  field_id : Int32
   value : IssuesSetIssueFieldValuesRequestIssueFieldValuesItemValue
 } derive(Eq, @debug.Debug)
 
@@ -150833,7 +150833,7 @@ pub extend IssuesSetIssueFieldValuesRequestIssueFieldValuesItem with @debug.Debu
 ///
 /// Creates a IssuesSetIssueFieldValuesRequestIssueFieldValuesItem with omitted optional fields absent.
 pub fn IssuesSetIssueFieldValuesRequestIssueFieldValuesItem::new(
-  field_id~ : Int,
+  field_id~ : Int32,
   value~ : IssuesSetIssueFieldValuesRequestIssueFieldValuesItemValue,
 ) -> IssuesSetIssueFieldValuesRequestIssueFieldValuesItem {
   { field_id, value, }
@@ -151659,7 +151659,7 @@ pub impl @json.FromJson for ReactionsCreateForIssueRequest with fn from_json(
 ///
 /// Generated representation of IssuesAddRelatesToRequest.
 pub(all) struct IssuesAddRelatesToRequest {
-  issue_id : Int
+  issue_id : Int32
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -151672,7 +151672,7 @@ pub extend IssuesAddRelatesToRequest with @debug.Debug::{to_repr}
 ///
 /// Creates a IssuesAddRelatesToRequest with omitted optional fields absent.
 pub fn IssuesAddRelatesToRequest::new(
-  issue_id~ : Int,
+  issue_id~ : Int32,
 ) -> IssuesAddRelatesToRequest {
   { issue_id, }
 }
@@ -151705,7 +151705,7 @@ pub impl @json.FromJson for IssuesAddRelatesToRequest with fn from_json(
 ///
 /// Generated representation of IssuesRemoveSubIssueRequest.
 pub(all) struct IssuesRemoveSubIssueRequest {
-  sub_issue_id : Int
+  sub_issue_id : Int32
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -151718,7 +151718,7 @@ pub extend IssuesRemoveSubIssueRequest with @debug.Debug::{to_repr}
 ///
 /// Creates a IssuesRemoveSubIssueRequest with omitted optional fields absent.
 pub fn IssuesRemoveSubIssueRequest::new(
-  sub_issue_id~ : Int,
+  sub_issue_id~ : Int32,
 ) -> IssuesRemoveSubIssueRequest {
   { sub_issue_id, }
 }
@@ -151751,7 +151751,7 @@ pub impl @json.FromJson for IssuesRemoveSubIssueRequest with fn from_json(
 ///
 /// Generated representation of IssuesAddSubIssueRequest.
 pub(all) struct IssuesAddSubIssueRequest {
-  sub_issue_id : Int
+  sub_issue_id : Int32
   replace_parent : Bool?
 } derive(Eq, @debug.Debug)
 
@@ -151765,7 +151765,7 @@ pub extend IssuesAddSubIssueRequest with @debug.Debug::{to_repr}
 ///
 /// Creates a IssuesAddSubIssueRequest with omitted optional fields absent.
 pub fn IssuesAddSubIssueRequest::new(
-  sub_issue_id~ : Int,
+  sub_issue_id~ : Int32,
   replace_parent? : Bool,
 ) -> IssuesAddSubIssueRequest {
   { sub_issue_id, replace_parent, }
@@ -151805,9 +151805,9 @@ pub impl @json.FromJson for IssuesAddSubIssueRequest with fn from_json(
 ///
 /// Generated representation of IssuesReprioritizeSubIssueRequest.
 pub(all) struct IssuesReprioritizeSubIssueRequest {
-  sub_issue_id : Int
-  after_id : Int?
-  before_id : Int?
+  sub_issue_id : Int32
+  after_id : Int32?
+  before_id : Int32?
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -151820,9 +151820,9 @@ pub extend IssuesReprioritizeSubIssueRequest with @debug.Debug::{to_repr}
 ///
 /// Creates a IssuesReprioritizeSubIssueRequest with omitted optional fields absent.
 pub fn IssuesReprioritizeSubIssueRequest::new(
-  sub_issue_id~ : Int,
-  after_id? : Int,
-  before_id? : Int,
+  sub_issue_id~ : Int32,
+  after_id? : Int32,
+  before_id? : Int32,
 ) -> IssuesReprioritizeSubIssueRequest {
   { sub_issue_id, after_id, before_id, }
 }
@@ -153481,7 +153481,7 @@ pub impl @json.FromJson for ReposCreatePagesDeploymentRequest with fn from_json(
 ///
 /// Generated untagged union ReposGetPagesDeploymentPagesDeploymentId.
 pub(all) enum ReposGetPagesDeploymentPagesDeploymentId {
-  Int(Int)
+  Int(Int32)
   Text(String)
 } derive(Eq, @debug.Debug)
 
@@ -153519,7 +153519,7 @@ pub impl @json.FromJson for ReposGetPagesDeploymentPagesDeploymentId with fn fro
   path,
 ) {
   if value is Number(_, ..) {
-    let decoded : Int = @json.from_json(value, path~)
+    let decoded : Int32 = @json.from_json(value, path~)
     return Int(decoded)
   }
   if value is String(_) {
@@ -153537,7 +153537,7 @@ pub impl @json.FromJson for ReposGetPagesDeploymentPagesDeploymentId with fn fro
 ///
 /// Generated untagged union ReposCancelPagesDeploymentPagesDeploymentId.
 pub(all) enum ReposCancelPagesDeploymentPagesDeploymentId {
-  Int(Int)
+  Int(Int32)
   Text(String)
 } derive(Eq, @debug.Debug)
 
@@ -153580,7 +153580,7 @@ pub impl @json.FromJson for ReposCancelPagesDeploymentPagesDeploymentId with fn 
   path,
 ) {
   if value is Number(_, ..) {
-    let decoded : Int = @json.from_json(value, path~)
+    let decoded : Int32 = @json.from_json(value, path~)
     return Int(decoded)
   }
   if value is String(_) {
@@ -154532,9 +154532,9 @@ pub(all) struct CodespacesCreateWithPrForAuthenticatedUserRequest {
   devcontainer_path : String?
   multi_repo_permissions_opt_out : Bool?
   working_directory : String?
-  idle_timeout_minutes : Int?
+  idle_timeout_minutes : Int32?
   display_name : String?
-  retention_period_minutes : Int?
+  retention_period_minutes : Int32?
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -154559,9 +154559,9 @@ pub fn CodespacesCreateWithPrForAuthenticatedUserRequest::new(
   devcontainer_path? : String,
   multi_repo_permissions_opt_out? : Bool,
   working_directory? : String,
-  idle_timeout_minutes? : Int,
+  idle_timeout_minutes? : Int32,
   display_name? : String,
-  retention_period_minutes? : Int,
+  retention_period_minutes? : Int32,
 ) -> CodespacesCreateWithPrForAuthenticatedUserRequest {
   {
     location,
@@ -154926,12 +154926,12 @@ pub(all) struct PullsCreateReviewCommentRequest {
   body : String
   commit_id : String
   path : String
-  position : Int?
+  position : Int32?
   side : PullsCreateReviewCommentRequestSide?
-  line : Int?
-  start_line : Int?
+  line : Int32?
+  start_line : Int32?
   start_side : PullsCreateReviewCommentRequestStartSide?
-  in_reply_to : Int?
+  in_reply_to : Int32?
   subject_type : PullsCreateReviewCommentRequestSubjectType?
 } derive(Eq, @debug.Debug)
 
@@ -154948,12 +154948,12 @@ pub fn PullsCreateReviewCommentRequest::new(
   body~ : String,
   commit_id~ : String,
   path~ : String,
-  position? : Int,
+  position? : Int32,
   side? : PullsCreateReviewCommentRequestSide,
-  line? : Int,
-  start_line? : Int,
+  line? : Int32,
+  start_line? : Int32,
   start_side? : PullsCreateReviewCommentRequestStartSide,
-  in_reply_to? : Int,
+  in_reply_to? : Int32,
   subject_type? : PullsCreateReviewCommentRequestSubjectType,
 ) -> PullsCreateReviewCommentRequest {
   {
@@ -155597,11 +155597,11 @@ pub impl @json.FromJson for PullsCreateReviewRequestEvent with fn from_json(
 /// Generated representation of PullsCreateReviewRequestCommentsItem.
 pub(all) struct PullsCreateReviewRequestCommentsItem {
   path : String
-  position : Int?
+  position : Int32?
   body : String
-  line : Int?
+  line : Int32?
   side : String?
-  start_line : Int?
+  start_line : Int32?
   start_side : String?
 } derive(Eq, @debug.Debug)
 
@@ -155617,10 +155617,10 @@ pub extend PullsCreateReviewRequestCommentsItem with @debug.Debug::{to_repr}
 pub fn PullsCreateReviewRequestCommentsItem::new(
   path~ : String,
   body~ : String,
-  position? : Int,
-  line? : Int,
+  position? : Int32,
+  line? : Int32,
   side? : String,
-  start_line? : Int,
+  start_line? : Int32,
   start_side? : String,
 ) -> PullsCreateReviewRequestCommentsItem {
   { path, position, body, line, side, start_line, start_side, }
@@ -158134,7 +158134,7 @@ pub impl @json.FromJson for SecurityAdvisoriesListRepositoryAdvisoriesState with
 ///
 /// Generated representation of PullRequestStacksCreateRequest.
 pub(all) struct PullRequestStacksCreateRequest {
-  pull_requests : Array[Int]
+  pull_requests : Array[Int32]
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -158147,7 +158147,7 @@ pub extend PullRequestStacksCreateRequest with @debug.Debug::{to_repr}
 ///
 /// Creates a PullRequestStacksCreateRequest with omitted optional fields absent.
 pub fn PullRequestStacksCreateRequest::new(
-  pull_requests~ : Array[Int],
+  pull_requests~ : Array[Int32],
 ) -> PullRequestStacksCreateRequest {
   { pull_requests, }
 }
@@ -158226,8 +158226,8 @@ pub impl @json.FromJson for PullRequestStacksCreateResponseBase with fn from_jso
 ///
 /// Generated representation of PullRequestStacksCreateResponse.
 pub(all) struct PullRequestStacksCreateResponse {
-  id : Int
-  number : Int
+  id : Int32
+  number : Int32
   node_id : String
   url : String
   base : PullRequestStacksCreateResponseBase
@@ -158246,8 +158246,8 @@ pub extend PullRequestStacksCreateResponse with @debug.Debug::{to_repr}
 ///
 /// Creates a PullRequestStacksCreateResponse with omitted optional fields absent.
 pub fn PullRequestStacksCreateResponse::new(
-  id~ : Int,
-  number~ : Int,
+  id~ : Int32,
+  number~ : Int32,
   node_id~ : String,
   url~ : String,
   base~ : PullRequestStacksCreateResponseBase,
@@ -158350,8 +158350,8 @@ pub impl @json.FromJson for PullRequestStacksGetResponseBase with fn from_json(
 ///
 /// Generated representation of PullRequestStacksGetResponse.
 pub(all) struct PullRequestStacksGetResponse {
-  id : Int
-  number : Int
+  id : Int32
+  number : Int32
   node_id : String
   url : String
   base : PullRequestStacksGetResponseBase
@@ -158370,8 +158370,8 @@ pub extend PullRequestStacksGetResponse with @debug.Debug::{to_repr}
 ///
 /// Creates a PullRequestStacksGetResponse with omitted optional fields absent.
 pub fn PullRequestStacksGetResponse::new(
-  id~ : Int,
-  number~ : Int,
+  id~ : Int32,
+  number~ : Int32,
   node_id~ : String,
   url~ : String,
   base~ : PullRequestStacksGetResponseBase,
@@ -158428,7 +158428,7 @@ pub impl @json.FromJson for PullRequestStacksGetResponse with fn from_json(
 ///
 /// Generated representation of PullRequestStacksAddRequest.
 pub(all) struct PullRequestStacksAddRequest {
-  pull_requests : Array[Int]
+  pull_requests : Array[Int32]
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -158441,7 +158441,7 @@ pub extend PullRequestStacksAddRequest with @debug.Debug::{to_repr}
 ///
 /// Creates a PullRequestStacksAddRequest with omitted optional fields absent.
 pub fn PullRequestStacksAddRequest::new(
-  pull_requests~ : Array[Int],
+  pull_requests~ : Array[Int32],
 ) -> PullRequestStacksAddRequest {
   { pull_requests, }
 }
@@ -158520,8 +158520,8 @@ pub impl @json.FromJson for PullRequestStacksAddResponseBase with fn from_json(
 ///
 /// Generated representation of PullRequestStacksAddResponse.
 pub(all) struct PullRequestStacksAddResponse {
-  id : Int
-  number : Int
+  id : Int32
+  number : Int32
   node_id : String
   url : String
   base : PullRequestStacksAddResponseBase
@@ -158540,8 +158540,8 @@ pub extend PullRequestStacksAddResponse with @debug.Debug::{to_repr}
 ///
 /// Creates a PullRequestStacksAddResponse with omitted optional fields absent.
 pub fn PullRequestStacksAddResponse::new(
-  id~ : Int,
-  number~ : Int,
+  id~ : Int32,
+  number~ : Int32,
   node_id~ : String,
   url~ : String,
   base~ : PullRequestStacksAddResponseBase,
@@ -158644,8 +158644,8 @@ pub impl @json.FromJson for PullRequestStacksUnstackResponseBase with fn from_js
 ///
 /// Generated representation of PullRequestStacksUnstackResponse.
 pub(all) struct PullRequestStacksUnstackResponse {
-  id : Int
-  number : Int
+  id : Int32
+  number : Int32
   node_id : String
   url : String
   base : PullRequestStacksUnstackResponseBase
@@ -158664,8 +158664,8 @@ pub extend PullRequestStacksUnstackResponse with @debug.Debug::{to_repr}
 ///
 /// Creates a PullRequestStacksUnstackResponse with omitted optional fields absent.
 pub fn PullRequestStacksUnstackResponse::new(
-  id~ : Int,
-  number~ : Int,
+  id~ : Int32,
+  number~ : Int32,
   node_id~ : String,
   url~ : String,
   base~ : PullRequestStacksUnstackResponseBase,
@@ -158722,7 +158722,7 @@ pub impl @json.FromJson for PullRequestStacksUnstackResponse with fn from_json(
 ///
 /// Generated representation of ActivityGetStargazerCountForRepoResponse.
 pub(all) struct ActivityGetStargazerCountForRepoResponse {
-  count : Int
+  count : Int32
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -158735,7 +158735,7 @@ pub extend ActivityGetStargazerCountForRepoResponse with @debug.Debug::{to_repr}
 ///
 /// Creates a ActivityGetStargazerCountForRepoResponse with omitted optional fields absent.
 pub fn ActivityGetStargazerCountForRepoResponse::new(
-  count~ : Int,
+  count~ : Int32,
 ) -> ActivityGetStargazerCountForRepoResponse {
   { count, }
 }
@@ -159103,7 +159103,7 @@ pub impl @json.FromJson for ReposGetViewsPer with fn from_json(value, path) {
 pub(all) struct ReposTransferRequest {
   new_owner : String
   new_name : String?
-  team_ids : Array[Int]?
+  team_ids : Array[Int32]?
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -159118,7 +159118,7 @@ pub extend ReposTransferRequest with @debug.Debug::{to_repr}
 pub fn ReposTransferRequest::new(
   new_owner~ : String,
   new_name? : String,
-  team_ids? : Array[Int],
+  team_ids? : Array[Int32],
 ) -> ReposTransferRequest {
   { new_owner, new_name, team_ids, }
 }
@@ -159273,7 +159273,7 @@ pub impl @json.FromJson for SearchCodeOrder with fn from_json(value, path) {
 ///
 /// Generated representation of SearchCodeResponse.
 pub(all) struct SearchCodeResponse {
-  total_count : Int
+  total_count : Int32
   incomplete_results : Bool
   items : Array[CodeSearchResultItem]
 } derive(Eq, @debug.Debug)
@@ -159288,7 +159288,7 @@ pub extend SearchCodeResponse with @debug.Debug::{to_repr}
 ///
 /// Creates a SearchCodeResponse with omitted optional fields absent.
 pub fn SearchCodeResponse::new(
-  total_count~ : Int,
+  total_count~ : Int32,
   incomplete_results~ : Bool,
   items~ : Array[CodeSearchResultItem],
 ) -> SearchCodeResponse {
@@ -159430,7 +159430,7 @@ pub impl @json.FromJson for SearchCommitsOrder with fn from_json(value, path) {
 ///
 /// Generated representation of SearchCommitsResponse.
 pub(all) struct SearchCommitsResponse {
-  total_count : Int
+  total_count : Int32
   incomplete_results : Bool
   items : Array[CommitSearchResultItem]
 } derive(Eq, @debug.Debug)
@@ -159445,7 +159445,7 @@ pub extend SearchCommitsResponse with @debug.Debug::{to_repr}
 ///
 /// Creates a SearchCommitsResponse with omitted optional fields absent.
 pub fn SearchCommitsResponse::new(
-  total_count~ : Int,
+  total_count~ : Int32,
   incomplete_results~ : Bool,
   items~ : Array[CommitSearchResultItem],
 ) -> SearchCommitsResponse {
@@ -159826,7 +159826,7 @@ pub impl @json.FromJson for SearchIssuesAndPullRequestsResponseLexicalFallbackRe
 ///
 /// Generated representation of SearchIssuesAndPullRequestsResponse.
 pub(all) struct SearchIssuesAndPullRequestsResponse {
-  total_count : Int
+  total_count : Int32
   incomplete_results : Bool
   items : Array[IssueSearchResultItem]
   search_type : SearchIssuesAndPullRequestsResponseSearchType
@@ -159845,7 +159845,7 @@ pub extend SearchIssuesAndPullRequestsResponse with @debug.Debug::{to_repr}
 ///
 /// Creates a SearchIssuesAndPullRequestsResponse with omitted optional fields absent.
 pub fn SearchIssuesAndPullRequestsResponse::new(
-  total_count~ : Int,
+  total_count~ : Int32,
   incomplete_results~ : Bool,
   items~ : Array[IssueSearchResultItem],
   search_type~ : SearchIssuesAndPullRequestsResponseSearchType,
@@ -160006,7 +160006,7 @@ pub impl @json.FromJson for SearchLabelsOrder with fn from_json(value, path) {
 ///
 /// Generated representation of SearchLabelsResponse.
 pub(all) struct SearchLabelsResponse {
-  total_count : Int
+  total_count : Int32
   incomplete_results : Bool
   items : Array[LabelSearchResultItem]
 } derive(Eq, @debug.Debug)
@@ -160021,7 +160021,7 @@ pub extend SearchLabelsResponse with @debug.Debug::{to_repr}
 ///
 /// Creates a SearchLabelsResponse with omitted optional fields absent.
 pub fn SearchLabelsResponse::new(
-  total_count~ : Int,
+  total_count~ : Int32,
   incomplete_results~ : Bool,
   items~ : Array[LabelSearchResultItem],
 ) -> SearchLabelsResponse {
@@ -160169,7 +160169,7 @@ pub impl @json.FromJson for SearchReposOrder with fn from_json(value, path) {
 ///
 /// Generated representation of SearchReposResponse.
 pub(all) struct SearchReposResponse {
-  total_count : Int
+  total_count : Int32
   incomplete_results : Bool
   items : Array[RepoSearchResultItem]
 } derive(Eq, @debug.Debug)
@@ -160184,7 +160184,7 @@ pub extend SearchReposResponse with @debug.Debug::{to_repr}
 ///
 /// Creates a SearchReposResponse with omitted optional fields absent.
 pub fn SearchReposResponse::new(
-  total_count~ : Int,
+  total_count~ : Int32,
   incomplete_results~ : Bool,
   items~ : Array[RepoSearchResultItem],
 ) -> SearchReposResponse {
@@ -160224,7 +160224,7 @@ pub impl @json.FromJson for SearchReposResponse with fn from_json(value, path) {
 ///
 /// Generated representation of SearchTopicsResponse.
 pub(all) struct SearchTopicsResponse {
-  total_count : Int
+  total_count : Int32
   incomplete_results : Bool
   items : Array[TopicSearchResultItem]
 } derive(Eq, @debug.Debug)
@@ -160239,7 +160239,7 @@ pub extend SearchTopicsResponse with @debug.Debug::{to_repr}
 ///
 /// Creates a SearchTopicsResponse with omitted optional fields absent.
 pub fn SearchTopicsResponse::new(
-  total_count~ : Int,
+  total_count~ : Int32,
   incomplete_results~ : Bool,
   items~ : Array[TopicSearchResultItem],
 ) -> SearchTopicsResponse {
@@ -160384,7 +160384,7 @@ pub impl @json.FromJson for SearchUsersOrder with fn from_json(value, path) {
 ///
 /// Generated representation of SearchUsersResponse.
 pub(all) struct SearchUsersResponse {
-  total_count : Int
+  total_count : Int32
   incomplete_results : Bool
   items : Array[UserSearchResultItem]
 } derive(Eq, @debug.Debug)
@@ -160399,7 +160399,7 @@ pub extend SearchUsersResponse with @debug.Debug::{to_repr}
 ///
 /// Creates a SearchUsersResponse with omitted optional fields absent.
 pub fn SearchUsersResponse::new(
-  total_count~ : Int,
+  total_count~ : Int32,
   incomplete_results~ : Bool,
   items~ : Array[UserSearchResultItem],
 ) -> SearchUsersResponse {
@@ -160618,7 +160618,7 @@ pub(all) struct TeamsUpdateLegacyRequest {
   privacy : TeamsUpdateLegacyRequestPrivacy?
   notification_setting : TeamsUpdateLegacyRequestNotificationSetting?
   permission : TeamsUpdateLegacyRequestPermission?
-  parent_team_id : @sdkjson.Presence[Int]
+  parent_team_id : @sdkjson.Presence[Int32]
   parent_team_slug : @sdkjson.Presence[String]
 } derive(Eq, @debug.Debug)
 
@@ -160637,7 +160637,7 @@ pub fn TeamsUpdateLegacyRequest::new(
   privacy? : TeamsUpdateLegacyRequestPrivacy,
   notification_setting? : TeamsUpdateLegacyRequestNotificationSetting,
   permission? : TeamsUpdateLegacyRequestPermission,
-  parent_team_id? : Int,
+  parent_team_id? : Int32,
   parent_team_slug? : String,
 ) -> TeamsUpdateLegacyRequest {
   {
@@ -161130,7 +161130,7 @@ pub impl @json.FromJson for UsersUpdateAuthenticatedRequest with fn from_json(
 ///
 /// Generated representation of CodespacesListForAuthenticatedUserResponse.
 pub(all) struct CodespacesListForAuthenticatedUserResponse {
-  total_count : Int
+  total_count : Int32
   codespaces : Array[Codespace]
 } derive(Eq, @debug.Debug)
 
@@ -161149,7 +161149,7 @@ pub extend CodespacesListForAuthenticatedUserResponse with @debug.Debug::{
 ///
 /// Creates a CodespacesListForAuthenticatedUserResponse with omitted optional fields absent.
 pub fn CodespacesListForAuthenticatedUserResponse::new(
-  total_count~ : Int,
+  total_count~ : Int32,
   codespaces~ : Array[Codespace],
 ) -> CodespacesListForAuthenticatedUserResponse {
   { total_count, codespaces, }
@@ -161193,7 +161193,7 @@ pub impl @json.FromJson for CodespacesListForAuthenticatedUserResponse with fn f
 ///
 /// Generated representation of CodespacesListSecretsForAuthenticatedUserResponse.
 pub(all) struct CodespacesListSecretsForAuthenticatedUserResponse {
-  total_count : Int
+  total_count : Int32
   secrets : Array[CodespacesSecret]
 } derive(Eq, @debug.Debug)
 
@@ -161212,7 +161212,7 @@ pub extend CodespacesListSecretsForAuthenticatedUserResponse with @debug.Debug::
 ///
 /// Creates a CodespacesListSecretsForAuthenticatedUserResponse with omitted optional fields absent.
 pub fn CodespacesListSecretsForAuthenticatedUserResponse::new(
-  total_count~ : Int,
+  total_count~ : Int32,
   secrets~ : Array[CodespacesSecret],
 ) -> CodespacesListSecretsForAuthenticatedUserResponse {
   { total_count, secrets, }
@@ -161258,7 +161258,7 @@ pub impl @json.FromJson for CodespacesListSecretsForAuthenticatedUserResponse wi
 ///
 /// Generated untagged union CodespacesCreateOrUpdateSecretForAuthenticatedUserRequestSelectedRepositoryIdsItem.
 pub(all) enum CodespacesCreateOrUpdateSecretForAuthenticatedUserRequestSelectedRepositoryIdsItem {
-  Int(Int)
+  Int(Int32)
   Text(String)
 } derive(Eq, @debug.Debug)
 
@@ -161303,7 +161303,7 @@ pub impl @json.FromJson for CodespacesCreateOrUpdateSecretForAuthenticatedUserRe
   path,
 ) {
   if value is Number(_, ..) {
-    let decoded : Int = @json.from_json(value, path~)
+    let decoded : Int32 = @json.from_json(value, path~)
     return Int(decoded)
   }
   if value is String(_) {
@@ -161396,7 +161396,7 @@ pub impl @json.FromJson for CodespacesCreateOrUpdateSecretForAuthenticatedUserRe
 ///
 /// Generated representation of CodespacesListRepositoriesForSecretForAuthenticatedUserResponse.
 pub(all) struct CodespacesListRepositoriesForSecretForAuthenticatedUserResponse {
-  total_count : Int
+  total_count : Int32
   repositories : Array[MinimalRepository]
 } derive(Eq, @debug.Debug)
 
@@ -161415,7 +161415,7 @@ pub extend CodespacesListRepositoriesForSecretForAuthenticatedUserResponse with 
 ///
 /// Creates a CodespacesListRepositoriesForSecretForAuthenticatedUserResponse with omitted optional fields absent.
 pub fn CodespacesListRepositoriesForSecretForAuthenticatedUserResponse::new(
-  total_count~ : Int,
+  total_count~ : Int32,
   repositories~ : Array[MinimalRepository],
 ) -> CodespacesListRepositoriesForSecretForAuthenticatedUserResponse {
   { total_count, repositories, }
@@ -161461,7 +161461,7 @@ pub impl @json.FromJson for CodespacesListRepositoriesForSecretForAuthenticatedU
 ///
 /// Generated representation of CodespacesSetRepositoriesForSecretForAuthenticatedUserRequest.
 pub(all) struct CodespacesSetRepositoriesForSecretForAuthenticatedUserRequest {
-  selected_repository_ids : Array[Int]
+  selected_repository_ids : Array[Int32]
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -161479,7 +161479,7 @@ pub extend CodespacesSetRepositoriesForSecretForAuthenticatedUserRequest with @d
 ///
 /// Creates a CodespacesSetRepositoriesForSecretForAuthenticatedUserRequest with omitted optional fields absent.
 pub fn CodespacesSetRepositoriesForSecretForAuthenticatedUserRequest::new(
-  selected_repository_ids~ : Array[Int],
+  selected_repository_ids~ : Array[Int32],
 ) -> CodespacesSetRepositoriesForSecretForAuthenticatedUserRequest {
   { selected_repository_ids, }
 }
@@ -161591,7 +161591,7 @@ pub impl @json.FromJson for CodespacesUpdateForAuthenticatedUserRequest with fn 
 ///
 /// Generated representation of CodespacesCodespaceMachinesForAuthenticatedUserResponse.
 pub(all) struct CodespacesCodespaceMachinesForAuthenticatedUserResponse {
-  total_count : Int
+  total_count : Int32
   machines : Array[CodespaceMachine]
 } derive(Eq, @debug.Debug)
 
@@ -161610,7 +161610,7 @@ pub extend CodespacesCodespaceMachinesForAuthenticatedUserResponse with @debug.D
 ///
 /// Creates a CodespacesCodespaceMachinesForAuthenticatedUserResponse with omitted optional fields absent.
 pub fn CodespacesCodespaceMachinesForAuthenticatedUserResponse::new(
-  total_count~ : Int,
+  total_count~ : Int32,
   machines~ : Array[CodespaceMachine],
 ) -> CodespacesCodespaceMachinesForAuthenticatedUserResponse {
   { total_count, machines, }
@@ -162151,7 +162151,7 @@ pub impl @json.FromJson for UsersCreateGpgKeyForAuthenticatedUserRequest with fn
 ///
 /// Generated representation of AppsListInstallationsForAuthenticatedUserResponse.
 pub(all) struct AppsListInstallationsForAuthenticatedUserResponse {
-  total_count : Int
+  total_count : Int32
   installations : Array[Installation]
 } derive(Eq, @debug.Debug)
 
@@ -162170,7 +162170,7 @@ pub extend AppsListInstallationsForAuthenticatedUserResponse with @debug.Debug::
 ///
 /// Creates a AppsListInstallationsForAuthenticatedUserResponse with omitted optional fields absent.
 pub fn AppsListInstallationsForAuthenticatedUserResponse::new(
-  total_count~ : Int,
+  total_count~ : Int32,
   installations~ : Array[Installation],
 ) -> AppsListInstallationsForAuthenticatedUserResponse {
   { total_count, installations, }
@@ -162694,7 +162694,7 @@ pub(all) struct AppsListInstallationReposForAuthenticatedUserResponseRepositorie
   name : String
   full_name : String
   license : NullableLicenseSimple?
-  forks : Int
+  forks : Int32
   permissions : AppsListInstallationReposForAuthenticatedUserResponseRepositoriesItemPermissions?
   owner : SimpleUser
   private : Bool
@@ -162745,12 +162745,12 @@ pub(all) struct AppsListInstallationReposForAuthenticatedUserResponseRepositorie
   svn_url : String
   homepage : String?
   language : String?
-  forks_count : Int
-  stargazers_count : Int
-  watchers_count : Int
-  size : Int
+  forks_count : Int32
+  stargazers_count : Int32
+  watchers_count : Int32
+  size : Int32
   default_branch : String
-  open_issues_count : Int
+  open_issues_count : Int32
   is_template : Bool?
   topics : Array[String]?
   has_issues : Bool
@@ -162781,8 +162781,8 @@ pub(all) struct AppsListInstallationReposForAuthenticatedUserResponseRepositorie
   allow_merge_commit : Bool?
   allow_forking : Bool?
   web_commit_signoff_required : Bool?
-  open_issues : Int
-  watchers : Int
+  open_issues : Int32
+  watchers : Int32
   master_branch : String?
   starred_at : String?
   anonymous_access_enabled : Bool?
@@ -162809,7 +162809,7 @@ pub fn AppsListInstallationReposForAuthenticatedUserResponseRepositoriesItem::ne
   node_id~ : String,
   name~ : String,
   full_name~ : String,
-  forks~ : Int,
+  forks~ : Int32,
   owner~ : SimpleUser,
   private~ : Bool,
   html_url~ : String,
@@ -162855,12 +162855,12 @@ pub fn AppsListInstallationReposForAuthenticatedUserResponseRepositoriesItem::ne
   clone_url~ : String,
   hooks_url~ : String,
   svn_url~ : String,
-  forks_count~ : Int,
-  stargazers_count~ : Int,
-  watchers_count~ : Int,
-  size~ : Int,
+  forks_count~ : Int32,
+  stargazers_count~ : Int32,
+  watchers_count~ : Int32,
+  size~ : Int32,
   default_branch~ : String,
-  open_issues_count~ : Int,
+  open_issues_count~ : Int32,
   has_issues~ : Bool,
   has_projects~ : Bool,
   has_wiki~ : Bool,
@@ -162868,8 +162868,8 @@ pub fn AppsListInstallationReposForAuthenticatedUserResponseRepositoriesItem::ne
   has_downloads~ : Bool,
   archived~ : Bool,
   disabled~ : Bool,
-  open_issues~ : Int,
-  watchers~ : Int,
+  open_issues~ : Int32,
+  watchers~ : Int32,
   license? : NullableLicenseSimple,
   permissions? : AppsListInstallationReposForAuthenticatedUserResponseRepositoriesItemPermissions,
   description? : String,
@@ -163270,7 +163270,7 @@ pub impl @json.FromJson for AppsListInstallationReposForAuthenticatedUserRespons
 ///
 /// Generated representation of AppsListInstallationReposForAuthenticatedUserResponse.
 pub(all) struct AppsListInstallationReposForAuthenticatedUserResponse {
-  total_count : Int
+  total_count : Int32
   repository_selection : String?
   repositories : Array[
     AppsListInstallationReposForAuthenticatedUserResponseRepositoriesItem,
@@ -163292,7 +163292,7 @@ pub extend AppsListInstallationReposForAuthenticatedUserResponse with @debug.Deb
 ///
 /// Creates a AppsListInstallationReposForAuthenticatedUserResponse with omitted optional fields absent.
 pub fn AppsListInstallationReposForAuthenticatedUserResponse::new(
-  total_count~ : Int,
+  total_count~ : Int32,
   repositories~ : Array[
     AppsListInstallationReposForAuthenticatedUserResponseRepositoriesItem,
   ],
@@ -165124,7 +165124,7 @@ pub(all) struct ReposCreateForAuthenticatedUserRequest {
   has_projects : Bool?
   has_wiki : Bool?
   has_discussions : Bool?
-  team_id : Int?
+  team_id : Int32?
   auto_init : Bool?
   gitignore_template : String?
   license_template : String?
@@ -165159,7 +165159,7 @@ pub fn ReposCreateForAuthenticatedUserRequest::new(
   has_projects? : Bool,
   has_wiki? : Bool,
   has_discussions? : Bool,
-  team_id? : Int,
+  team_id? : Int32,
   auto_init? : Bool,
   gitignore_template? : String,
   license_template? : String,
@@ -165764,7 +165764,7 @@ pub impl @json.FromJson for ProjectsCreateViewForUserRequestLayout with fn from_
 ///
 /// Generated untagged union ProjectsCreateViewForUserRequestSortByItemItem.
 pub(all) enum ProjectsCreateViewForUserRequestSortByItemItem {
-  Int(Int)
+  Int(Int32)
   Text(String)
 } derive(Eq, @debug.Debug)
 
@@ -165807,7 +165807,7 @@ pub impl @json.FromJson for ProjectsCreateViewForUserRequestSortByItemItem with 
   path,
 ) {
   if value is Number(_, ..) {
-    let decoded : Int = @json.from_json(value, path~)
+    let decoded : Int32 = @json.from_json(value, path~)
     return Int(decoded)
   }
   if value is String(_) {
@@ -165828,10 +165828,10 @@ pub(all) struct ProjectsCreateViewForUserRequest {
   name : String
   layout : ProjectsCreateViewForUserRequestLayout
   filter : String?
-  visible_fields : Array[Int]?
+  visible_fields : Array[Int32]?
   sort_by : Array[Array[ProjectsCreateViewForUserRequestSortByItemItem]]?
-  group_by : Array[Int]?
-  vertical_group_by : Array[Int]?
+  group_by : Array[Int32]?
+  vertical_group_by : Array[Int32]?
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -165847,10 +165847,10 @@ pub fn ProjectsCreateViewForUserRequest::new(
   name~ : String,
   layout~ : ProjectsCreateViewForUserRequestLayout,
   filter? : String,
-  visible_fields? : Array[Int],
+  visible_fields? : Array[Int32],
   sort_by? : Array[Array[ProjectsCreateViewForUserRequestSortByItemItem]],
-  group_by? : Array[Int],
-  vertical_group_by? : Array[Int],
+  group_by? : Array[Int32],
+  vertical_group_by? : Array[Int32],
 ) -> ProjectsCreateViewForUserRequest {
   {
     name,
@@ -166079,7 +166079,7 @@ pub impl @json.FromJson for UsersListAttestationsBulkResponseAttestationsSubject
 /// Generated representation of UsersListAttestationsBulkResponseAttestationsSubjectDigestsValueItem.
 pub(all) struct UsersListAttestationsBulkResponseAttestationsSubjectDigestsValueItem {
   bundle : UsersListAttestationsBulkResponseAttestationsSubjectDigestsValueItemBundle?
-  repository_id : Int?
+  repository_id : Int32?
   bundle_url : String?
 } derive(Eq, @debug.Debug)
 
@@ -166099,7 +166099,7 @@ pub extend UsersListAttestationsBulkResponseAttestationsSubjectDigestsValueItem 
 /// Creates a UsersListAttestationsBulkResponseAttestationsSubjectDigestsValueItem with omitted optional fields absent.
 pub fn UsersListAttestationsBulkResponseAttestationsSubjectDigestsValueItem::new(
   bundle? : UsersListAttestationsBulkResponseAttestationsSubjectDigestsValueItemBundle,
-  repository_id? : Int,
+  repository_id? : Int32,
   bundle_url? : String,
 ) -> UsersListAttestationsBulkResponseAttestationsSubjectDigestsValueItem {
   { bundle, repository_id, bundle_url, }
@@ -166350,7 +166350,7 @@ pub impl @json.FromJson for UsersListAttestationsResponseAttestationsItemBundle 
 /// Generated representation of UsersListAttestationsResponseAttestationsItem.
 pub(all) struct UsersListAttestationsResponseAttestationsItem {
   bundle : UsersListAttestationsResponseAttestationsItemBundle?
-  repository_id : Int?
+  repository_id : Int32?
   bundle_url : String?
   initiator : String?
 } derive(Eq, @debug.Debug)
@@ -166371,7 +166371,7 @@ pub extend UsersListAttestationsResponseAttestationsItem with @debug.Debug::{
 /// Creates a UsersListAttestationsResponseAttestationsItem with omitted optional fields absent.
 pub fn UsersListAttestationsResponseAttestationsItem::new(
   bundle? : UsersListAttestationsResponseAttestationsItemBundle,
-  repository_id? : Int,
+  repository_id? : Int32,
   bundle_url? : String,
   initiator? : String,
 ) -> UsersListAttestationsResponseAttestationsItem {
@@ -166652,11 +166652,11 @@ pub impl @json.FromJson for CopilotSpacesCreateForUserRequestResourcesAttributes
 ///
 /// Metadata specific to the resource type.
 pub(all) struct CopilotSpacesCreateForUserRequestResourcesAttributesItemMetadata {
-  repository_id : Int?
+  repository_id : Int32?
   file_path : String?
   text : String?
   name : String?
-  number : Int?
+  number : Int32?
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -166674,11 +166674,11 @@ pub extend CopilotSpacesCreateForUserRequestResourcesAttributesItemMetadata with
 ///
 /// Creates a CopilotSpacesCreateForUserRequestResourcesAttributesItemMetadata with omitted optional fields absent.
 pub fn CopilotSpacesCreateForUserRequestResourcesAttributesItemMetadata::new(
-  repository_id? : Int,
+  repository_id? : Int32,
   file_path? : String,
   text? : String,
   name? : String,
-  number? : Int,
+  number? : Int32,
 ) -> CopilotSpacesCreateForUserRequestResourcesAttributesItemMetadata {
   { repository_id, file_path, text, name, number, }
 }
@@ -167004,11 +167004,11 @@ pub impl @json.FromJson for CopilotSpacesUpdateForUserRequestResourcesAttributes
 ///
 /// Metadata specific to the resource type.
 pub(all) struct CopilotSpacesUpdateForUserRequestResourcesAttributesItemMetadata {
-  repository_id : Int?
+  repository_id : Int32?
   file_path : String?
   text : String?
   name : String?
-  number : Int?
+  number : Int32?
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -167026,11 +167026,11 @@ pub extend CopilotSpacesUpdateForUserRequestResourcesAttributesItemMetadata with
 ///
 /// Creates a CopilotSpacesUpdateForUserRequestResourcesAttributesItemMetadata with omitted optional fields absent.
 pub fn CopilotSpacesUpdateForUserRequestResourcesAttributesItemMetadata::new(
-  repository_id? : Int,
+  repository_id? : Int32,
   file_path? : String,
   text? : String,
   name? : String,
-  number? : Int,
+  number? : Int32,
 ) -> CopilotSpacesUpdateForUserRequestResourcesAttributesItemMetadata {
   { repository_id, file_path, text, name, number, }
 }
@@ -169058,10 +169058,10 @@ pub impl @json.FromJson for ProjectsAddItemForUserRequestType with fn from_json(
 /// Generated representation of ProjectsAddItemForUserRequest.
 pub(all) struct ProjectsAddItemForUserRequest {
   type_ : ProjectsAddItemForUserRequestType
-  id : Int?
+  id : Int32?
   owner : String?
   repo : String?
-  number : Int?
+  number : Int32?
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -169075,10 +169075,10 @@ pub extend ProjectsAddItemForUserRequest with @debug.Debug::{to_repr}
 /// Creates a ProjectsAddItemForUserRequest with omitted optional fields absent.
 pub fn ProjectsAddItemForUserRequest::new(
   type_~ : ProjectsAddItemForUserRequestType,
-  id? : Int,
+  id? : Int32,
   owner? : String,
   repo? : String,
-  number? : Int,
+  number? : Int32,
 ) -> ProjectsAddItemForUserRequest {
   { type_, id, owner, repo, number, }
 }
@@ -169236,7 +169236,7 @@ pub impl @json.FromJson for ProjectsUpdateItemForUserRequestFieldsItemValue with
 ///
 /// Generated representation of ProjectsUpdateItemForUserRequestFieldsItem.
 pub(all) struct ProjectsUpdateItemForUserRequestFieldsItem {
-  id : Int
+  id : Int32
   value : ProjectsUpdateItemForUserRequestFieldsItemValue?
 } derive(Eq, @debug.Debug)
 
@@ -169255,7 +169255,7 @@ pub extend ProjectsUpdateItemForUserRequestFieldsItem with @debug.Debug::{
 ///
 /// Creates a ProjectsUpdateItemForUserRequestFieldsItem with omitted optional fields absent.
 pub fn ProjectsUpdateItemForUserRequestFieldsItem::new(
-  id~ : Int,
+  id~ : Int32,
   value? : ProjectsUpdateItemForUserRequestFieldsItemValue,
 ) -> ProjectsUpdateItemForUserRequestFieldsItem {
   { id, value, }
