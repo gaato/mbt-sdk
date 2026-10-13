@@ -257,6 +257,362 @@ pub fn security_advisories_get_global_advisory_decode(
 
 ///|
 ///
+/// List automations for user
+pub fn agent_automations_list_automations_request(
+  page? : Int32,
+  per_page? : Int32,
+  owner_type? : AgentAutomationsListAutomationsOwnerType,
+) -> @http.Request {
+  let mut url = "/agents/automations"
+  match page {
+    Some(value) => url = append_query(url, "page", parameter_value(value))
+    None => ()
+  }
+  match per_page {
+    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    None => ()
+  }
+  match owner_type {
+    Some(value) => url = append_query(url, "owner_type", parameter_value(value))
+    None => ()
+  }
+  @http.Request::get(url)
+}
+
+///|
+///
+/// Decodes a parsed successful agent-automations/list-automations response.
+pub fn agent_automations_list_automations_decode_json(
+  value : Json,
+) -> Array[AgentAutomationsListAutomationsResponseItem] raise @json.JsonDecodeError {
+  @json.from_json(value)
+}
+
+///|
+///
+/// Decodes a successful agent-automations/list-automations response.
+pub fn agent_automations_list_automations_decode(
+  response : @http.Response,
+) -> Array[AgentAutomationsListAutomationsResponseItem] raise @runtime.SdkError {
+  decode_response(response)
+}
+
+///|
+///
+/// List available automation tools
+pub fn agent_automations_list_available_automation_tools_request() -> @http.Request {
+  @http.Request::get("/agents/automations/available-tools")
+}
+
+///|
+///
+/// Decodes a parsed successful agent-automations/list-available-automation-tools response.
+pub fn agent_automations_list_available_automation_tools_decode_json(
+  value : Json,
+) -> Array[AgentAutomationsListAvailableAutomationToolsResponseItem] raise @json.JsonDecodeError {
+  @json.from_json(value)
+}
+
+///|
+///
+/// Decodes a successful agent-automations/list-available-automation-tools response.
+pub fn agent_automations_list_available_automation_tools_decode(
+  response : @http.Response,
+) -> Array[AgentAutomationsListAvailableAutomationToolsResponseItem] raise @runtime.SdkError {
+  decode_response(response)
+}
+
+///|
+///
+/// List available automation triggers
+pub fn agent_automations_list_available_automation_triggers_request() -> @http.Request {
+  @http.Request::get("/agents/automations/available-triggers")
+}
+
+///|
+///
+/// Decodes a parsed successful agent-automations/list-available-automation-triggers response.
+pub fn agent_automations_list_available_automation_triggers_decode_json(
+  value : Json,
+) -> Array[AgentAutomationsListAvailableAutomationTriggersResponseItem] raise @json.JsonDecodeError {
+  @json.from_json(value)
+}
+
+///|
+///
+/// Decodes a successful agent-automations/list-available-automation-triggers response.
+pub fn agent_automations_list_available_automation_triggers_decode(
+  response : @http.Response,
+) -> Array[AgentAutomationsListAvailableAutomationTriggersResponseItem] raise @runtime.SdkError {
+  decode_response(response)
+}
+
+///|
+///
+/// Get an automation by ID
+pub fn agent_automations_get_automation_request(
+  automation_id : String,
+) -> @http.Request {
+  @http.Request::get(
+    "/agents/automations/" + percent_encode(parameter_value(automation_id)),
+  )
+}
+
+///|
+///
+/// Decodes a parsed successful agent-automations/get-automation response.
+pub fn agent_automations_get_automation_decode_json(
+  value : Json,
+) -> AgentAutomationsGetAutomationResponse raise @json.JsonDecodeError {
+  @json.from_json(value)
+}
+
+///|
+///
+/// Decodes a successful agent-automations/get-automation response.
+pub fn agent_automations_get_automation_decode(
+  response : @http.Response,
+) -> AgentAutomationsGetAutomationResponse raise @runtime.SdkError {
+  decode_response(response)
+}
+
+///|
+///
+/// List tasks for an automation
+pub fn agent_automations_list_automation_tasks_request(
+  automation_id : String,
+  per_page? : Int32,
+  page? : Int32,
+  sort? : AgentAutomationsListAutomationTasksSort,
+  direction? : AgentAutomationsListAutomationTasksDirection,
+  state? : String,
+  is_archived? : Bool,
+) -> @http.Request {
+  let mut url = "/agents/automations/" +
+    percent_encode(parameter_value(automation_id)) +
+    "/tasks"
+  match per_page {
+    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    None => ()
+  }
+  match page {
+    Some(value) => url = append_query(url, "page", parameter_value(value))
+    None => ()
+  }
+  match sort {
+    Some(value) => url = append_query(url, "sort", parameter_value(value))
+    None => ()
+  }
+  match direction {
+    Some(value) => url = append_query(url, "direction", parameter_value(value))
+    None => ()
+  }
+  match state {
+    Some(value) => url = append_query(url, "state", parameter_value(value))
+    None => ()
+  }
+  match is_archived {
+    Some(value) =>
+      url = append_query(url, "is_archived", parameter_value(value))
+    None => ()
+  }
+  @http.Request::get(url)
+}
+
+///|
+///
+/// Decodes a parsed successful agent-automations/list-automation-tasks response.
+pub fn agent_automations_list_automation_tasks_decode_json(
+  value : Json,
+) -> AgentAutomationsListAutomationTasksResponse raise @json.JsonDecodeError {
+  @json.from_json(value)
+}
+
+///|
+///
+/// Decodes a successful agent-automations/list-automation-tasks response.
+pub fn agent_automations_list_automation_tasks_decode(
+  response : @http.Response,
+) -> AgentAutomationsListAutomationTasksResponse raise @runtime.SdkError {
+  decode_response(response)
+}
+
+///|
+///
+/// List automations for a repository
+pub fn agent_automations_list_repo_automations_request(
+  owner : String,
+  repo : String,
+  page? : Int32,
+  per_page? : Int32,
+  owner_type? : AgentAutomationsListRepoAutomationsOwnerType,
+) -> @http.Request {
+  let mut url = "/agents/repos/" +
+    percent_encode(parameter_value(owner)) +
+    "/" +
+    percent_encode(parameter_value(repo)) +
+    "/automations"
+  match page {
+    Some(value) => url = append_query(url, "page", parameter_value(value))
+    None => ()
+  }
+  match per_page {
+    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    None => ()
+  }
+  match owner_type {
+    Some(value) => url = append_query(url, "owner_type", parameter_value(value))
+    None => ()
+  }
+  @http.Request::get(url)
+}
+
+///|
+///
+/// Decodes a parsed successful agent-automations/list-repo-automations response.
+pub fn agent_automations_list_repo_automations_decode_json(
+  value : Json,
+) -> AgentAutomationsListRepoAutomationsResponse raise @json.JsonDecodeError {
+  @json.from_json(value)
+}
+
+///|
+///
+/// Decodes a successful agent-automations/list-repo-automations response.
+pub fn agent_automations_list_repo_automations_decode(
+  response : @http.Response,
+) -> AgentAutomationsListRepoAutomationsResponse raise @runtime.SdkError {
+  decode_response(response)
+}
+
+///|
+///
+/// Create an automation for a repository
+pub fn agent_automations_create_repo_automation_request(
+  owner : String,
+  repo : String,
+  body : AgentAutomationsCreateRepoAutomationRequest,
+) -> @http.Request {
+  @http.Request::post(
+    "/agents/repos/" +
+    percent_encode(parameter_value(owner)) +
+    "/" +
+    percent_encode(parameter_value(repo)) +
+    "/automations",
+  ).json_body(Json(body))
+}
+
+///|
+///
+/// Decodes a parsed successful agent-automations/create-repo-automation response.
+pub fn agent_automations_create_repo_automation_decode_json(
+  value : Json,
+) -> AgentAutomationsCreateRepoAutomationResponse raise @json.JsonDecodeError {
+  @json.from_json(value)
+}
+
+///|
+///
+/// Decodes a successful agent-automations/create-repo-automation response.
+pub fn agent_automations_create_repo_automation_decode(
+  response : @http.Response,
+) -> AgentAutomationsCreateRepoAutomationResponse raise @runtime.SdkError {
+  decode_response(response)
+}
+
+///|
+///
+/// Get an automation for a repository
+pub fn agent_automations_get_repo_automation_request(
+  owner : String,
+  repo : String,
+  automation_id : String,
+) -> @http.Request {
+  @http.Request::get(
+    "/agents/repos/" +
+    percent_encode(parameter_value(owner)) +
+    "/" +
+    percent_encode(parameter_value(repo)) +
+    "/automations/" +
+    percent_encode(parameter_value(automation_id)),
+  )
+}
+
+///|
+///
+/// Decodes a parsed successful agent-automations/get-repo-automation response.
+pub fn agent_automations_get_repo_automation_decode_json(
+  value : Json,
+) -> AgentAutomationsGetRepoAutomationResponse raise @json.JsonDecodeError {
+  @json.from_json(value)
+}
+
+///|
+///
+/// Decodes a successful agent-automations/get-repo-automation response.
+pub fn agent_automations_get_repo_automation_decode(
+  response : @http.Response,
+) -> AgentAutomationsGetRepoAutomationResponse raise @runtime.SdkError {
+  decode_response(response)
+}
+
+///|
+///
+/// Edit an automation for a repository
+pub fn agent_automations_edit_repo_automation_request(
+  owner : String,
+  repo : String,
+  automation_id : String,
+  body : AgentAutomationsEditRepoAutomationRequest,
+) -> @http.Request {
+  @http.Request::patch(
+    "/agents/repos/" +
+    percent_encode(parameter_value(owner)) +
+    "/" +
+    percent_encode(parameter_value(repo)) +
+    "/automations/" +
+    percent_encode(parameter_value(automation_id)),
+  ).json_body(Json(body))
+}
+
+///|
+///
+/// Decodes a parsed successful agent-automations/edit-repo-automation response.
+pub fn agent_automations_edit_repo_automation_decode_json(
+  value : Json,
+) -> AgentAutomationsEditRepoAutomationResponse raise @json.JsonDecodeError {
+  @json.from_json(value)
+}
+
+///|
+///
+/// Decodes a successful agent-automations/edit-repo-automation response.
+pub fn agent_automations_edit_repo_automation_decode(
+  response : @http.Response,
+) -> AgentAutomationsEditRepoAutomationResponse raise @runtime.SdkError {
+  decode_response(response)
+}
+
+///|
+///
+/// Delete an automation for a repository The caller handles the response as @http.Response.
+pub fn agent_automations_delete_repo_automation_request(
+  owner : String,
+  repo : String,
+  automation_id : String,
+) -> @http.Request {
+  @http.Request::delete(
+    "/agents/repos/" +
+    percent_encode(parameter_value(owner)) +
+    "/" +
+    percent_encode(parameter_value(repo)) +
+    "/automations/" +
+    percent_encode(parameter_value(automation_id)),
+  )
+}
+
+///|
+///
 /// List tasks for repository
 pub fn agent_tasks_list_tasks_for_repo_request(
   owner : String,

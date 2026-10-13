@@ -3,7 +3,7 @@
 
 name = "gaato/github"
 
-version = "0.8.2"
+version = "0.9.0"
 
 license = "Apache-2.0"
 

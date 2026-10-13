@@ -35653,6 +35653,7 @@ pub(all) enum OrgPrivateRegistryConfigurationAuthType {
   OidcJfrog
   OidcCloudsmith
   OidcGcp
+  Anonymous
   Unknown(String)
 } derive(Eq, @debug.Debug)
 
@@ -35679,6 +35680,7 @@ pub impl ToJson for OrgPrivateRegistryConfigurationAuthType with fn to_json(
     OidcJfrog => "oidc_jfrog"
     OidcCloudsmith => "oidc_cloudsmith"
     OidcGcp => "oidc_gcp"
+    Anonymous => "anonymous"
     Unknown(raw) => raw
   }
   Json(raw)
@@ -35708,6 +35710,7 @@ pub impl @json.FromJson for OrgPrivateRegistryConfigurationAuthType with fn from
         "oidc_jfrog" => Some(OidcJfrog)
         "oidc_cloudsmith" => Some(OidcCloudsmith)
         "oidc_gcp" => Some(OidcGcp)
+        "anonymous" => Some(Anonymous)
         _ => None
       }
     },
@@ -36066,6 +36069,7 @@ pub(all) enum OrgPrivateRegistryConfigurationWithSelectedRepositoriesAuthType {
   OidcJfrog
   OidcCloudsmith
   OidcGcp
+  Anonymous
   Unknown(String)
 } derive(Eq, @debug.Debug)
 
@@ -36099,6 +36103,7 @@ pub impl ToJson for OrgPrivateRegistryConfigurationWithSelectedRepositoriesAuthT
     OidcJfrog => "oidc_jfrog"
     OidcCloudsmith => "oidc_cloudsmith"
     OidcGcp => "oidc_gcp"
+    Anonymous => "anonymous"
     Unknown(raw) => raw
   }
   Json(raw)
@@ -36128,6 +36133,7 @@ pub impl @json.FromJson for OrgPrivateRegistryConfigurationWithSelectedRepositor
         "oidc_jfrog" => Some(OidcJfrog)
         "oidc_cloudsmith" => Some(OidcCloudsmith)
         "oidc_gcp" => Some(OidcGcp)
+        "anonymous" => Some(Anonymous)
         _ => None
       }
     },
@@ -94426,6 +94432,30476 @@ pub impl @json.FromJson for SecurityAdvisoriesListGlobalAdvisoriesSort with fn f
 
 ///|
 ///
+/// Generated string enum AgentAutomationsListAutomationsOwnerType.
+pub(all) enum AgentAutomationsListAutomationsOwnerType {
+  User
+  Repository
+  Custom(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsListAutomationsOwnerType with Eq::{equal, not_equal}
+
+///|
+pub extend AgentAutomationsListAutomationsOwnerType with @debug.Debug::{to_repr}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsListAutomationsOwnerType with ToJson::{to_json}
+
+///|
+pub impl ToJson for AgentAutomationsListAutomationsOwnerType with fn to_json(
+  self,
+) {
+  let raw = match self {
+    User => "user"
+    Repository => "repository"
+    Custom(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsListAutomationsOwnerType with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsListAutomationsOwnerType with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "user" => Some(User)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Custom(raw),
+  )
+}
+
+///|
+///
+/// Repository identity for an automation in cross-repository list responses.
+pub(all) struct AgentAutomationsListAutomationsResponseItemRepository {
+  id : Int64
+  owner : String
+  name : String
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsListAutomationsResponseItemRepository with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsListAutomationsResponseItemRepository with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsListAutomationsResponseItemRepository with omitted optional fields absent.
+pub fn AgentAutomationsListAutomationsResponseItemRepository::new(
+  id~ : Int64,
+  owner~ : String,
+  name~ : String,
+) -> AgentAutomationsListAutomationsResponseItemRepository {
+  { id, owner, name, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsListAutomationsResponseItemRepository with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsListAutomationsResponseItemRepository with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .field("id", json_int64_to_json(self.id))
+  .field("owner", self.owner)
+  .field("name", self.name)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsListAutomationsResponseItemRepository with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsListAutomationsResponseItemRepository with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    id: json_int64(required_field(obj, "id", path), path.add_key("id")),
+    owner: required_field(obj, "owner", path),
+    name: required_field(obj, "name", path),
+  }
+}
+
+///|
+///
+/// Who owns the automation. `user` keeps it private to its creator and its runs act as that user. `repository` makes it belong to the repository, visible to anyone with read access to the repository, and its runs act as the Copilot app rather than as a person.
+pub(all) enum AgentAutomationsListAutomationsResponseItemOwnerType {
+  User
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsListAutomationsResponseItemOwnerType with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsListAutomationsResponseItemOwnerType with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsListAutomationsResponseItemOwnerType with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsListAutomationsResponseItemOwnerType with fn to_json(
+  self,
+) {
+  let raw = match self {
+    User => "user"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsListAutomationsResponseItemOwnerType with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsListAutomationsResponseItemOwnerType with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "user" => Some(User)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Controls which repository resources a run may modify. `trigger` limits writes to the resource that started the run, when one exists, and resources created during the run; `repository` allows writes to any resource in the repository. Supported values: `trigger`, `repository`.
+pub(all) enum AgentAutomationsListAutomationsResponseItemWriteScope {
+  Trigger
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsListAutomationsResponseItemWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsListAutomationsResponseItemWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsListAutomationsResponseItemWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsListAutomationsResponseItemWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsListAutomationsResponseItemWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsListAutomationsResponseItemWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated string enum AgentAutomationsListAutomationsResponseItemTriggersIntervalCadenceItem.
+pub(all) enum AgentAutomationsListAutomationsResponseItemTriggersIntervalCadenceItem {
+  Hourly
+  Daily
+  Weekly
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsListAutomationsResponseItemTriggersIntervalCadenceItem with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsListAutomationsResponseItemTriggersIntervalCadenceItem with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsListAutomationsResponseItemTriggersIntervalCadenceItem with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsListAutomationsResponseItemTriggersIntervalCadenceItem with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Hourly => "hourly"
+    Daily => "daily"
+    Weekly => "weekly"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsListAutomationsResponseItemTriggersIntervalCadenceItem with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsListAutomationsResponseItemTriggersIntervalCadenceItem with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "hourly" => Some(Hourly)
+        "daily" => Some(Daily)
+        "weekly" => Some(Weekly)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsListAutomationsResponseItemTriggersIntervalWriteScope {
+  Trigger
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsListAutomationsResponseItemTriggersIntervalWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsListAutomationsResponseItemTriggersIntervalWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsListAutomationsResponseItemTriggersIntervalWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsListAutomationsResponseItemTriggersIntervalWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsListAutomationsResponseItemTriggersIntervalWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsListAutomationsResponseItemTriggersIntervalWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsListAutomationsResponseItemTriggersInterval.
+pub(all) struct AgentAutomationsListAutomationsResponseItemTriggersInterval {
+  cadence : Array[
+    AgentAutomationsListAutomationsResponseItemTriggersIntervalCadenceItem,
+  ]
+  hour_utc : Int32?
+  day_of_week : Int32?
+  minute_utc : Int32?
+  write_scope : AgentAutomationsListAutomationsResponseItemTriggersIntervalWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsListAutomationsResponseItemTriggersInterval with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsListAutomationsResponseItemTriggersInterval with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsListAutomationsResponseItemTriggersInterval with omitted optional fields absent.
+pub fn AgentAutomationsListAutomationsResponseItemTriggersInterval::new(
+  cadence~ : Array[
+    AgentAutomationsListAutomationsResponseItemTriggersIntervalCadenceItem,
+  ],
+  hour_utc? : Int32,
+  day_of_week? : Int32,
+  minute_utc? : Int32,
+  write_scope? : AgentAutomationsListAutomationsResponseItemTriggersIntervalWriteScope,
+) -> AgentAutomationsListAutomationsResponseItemTriggersInterval {
+  { cadence, hour_utc, day_of_week, minute_utc, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsListAutomationsResponseItemTriggersInterval with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsListAutomationsResponseItemTriggersInterval with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .field("cadence", self.cadence)
+  .opt("hour_utc", self.hour_utc)
+  .opt("day_of_week", self.day_of_week)
+  .opt("minute_utc", self.minute_utc)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsListAutomationsResponseItemTriggersInterval with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsListAutomationsResponseItemTriggersInterval with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    cadence: required_field(obj, "cadence", path),
+    hour_utc: @sdkjson.opt_field(obj, "hour_utc", path),
+    day_of_week: @sdkjson.opt_field(obj, "day_of_week", path),
+    minute_utc: @sdkjson.opt_field(obj, "minute_utc", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsListAutomationsResponseItemTriggersIssueOpenedWriteScope {
+  Trigger
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsListAutomationsResponseItemTriggersIssueOpenedWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsListAutomationsResponseItemTriggersIssueOpenedWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsListAutomationsResponseItemTriggersIssueOpenedWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsListAutomationsResponseItemTriggersIssueOpenedWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsListAutomationsResponseItemTriggersIssueOpenedWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsListAutomationsResponseItemTriggersIssueOpenedWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsListAutomationsResponseItemTriggersIssueOpened.
+pub(all) struct AgentAutomationsListAutomationsResponseItemTriggersIssueOpened {
+  query : String?
+  write_scope : AgentAutomationsListAutomationsResponseItemTriggersIssueOpenedWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsListAutomationsResponseItemTriggersIssueOpened with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsListAutomationsResponseItemTriggersIssueOpened with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsListAutomationsResponseItemTriggersIssueOpened with omitted optional fields absent.
+pub fn AgentAutomationsListAutomationsResponseItemTriggersIssueOpened::new(
+  query? : String,
+  write_scope? : AgentAutomationsListAutomationsResponseItemTriggersIssueOpenedWriteScope,
+) -> AgentAutomationsListAutomationsResponseItemTriggersIssueOpened {
+  { query, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsListAutomationsResponseItemTriggersIssueOpened with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsListAutomationsResponseItemTriggersIssueOpened with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("query", self.query)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsListAutomationsResponseItemTriggersIssueOpened with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsListAutomationsResponseItemTriggersIssueOpened with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    query: @sdkjson.opt_field(obj, "query", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsListAutomationsResponseItemTriggersIssueLabeledWriteScope {
+  Trigger
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsListAutomationsResponseItemTriggersIssueLabeledWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsListAutomationsResponseItemTriggersIssueLabeledWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsListAutomationsResponseItemTriggersIssueLabeledWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsListAutomationsResponseItemTriggersIssueLabeledWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsListAutomationsResponseItemTriggersIssueLabeledWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsListAutomationsResponseItemTriggersIssueLabeledWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsListAutomationsResponseItemTriggersIssueLabeled.
+pub(all) struct AgentAutomationsListAutomationsResponseItemTriggersIssueLabeled {
+  query : String?
+  labels : Array[String]?
+  write_scope : AgentAutomationsListAutomationsResponseItemTriggersIssueLabeledWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsListAutomationsResponseItemTriggersIssueLabeled with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsListAutomationsResponseItemTriggersIssueLabeled with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsListAutomationsResponseItemTriggersIssueLabeled with omitted optional fields absent.
+pub fn AgentAutomationsListAutomationsResponseItemTriggersIssueLabeled::new(
+  query? : String,
+  labels? : Array[String],
+  write_scope? : AgentAutomationsListAutomationsResponseItemTriggersIssueLabeledWriteScope,
+) -> AgentAutomationsListAutomationsResponseItemTriggersIssueLabeled {
+  { query, labels, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsListAutomationsResponseItemTriggersIssueLabeled with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsListAutomationsResponseItemTriggersIssueLabeled with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("query", self.query)
+  .opt("labels", self.labels)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsListAutomationsResponseItemTriggersIssueLabeled with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsListAutomationsResponseItemTriggersIssueLabeled with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    query: @sdkjson.opt_field(obj, "query", path),
+    labels: @sdkjson.opt_field(obj, "labels", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsListAutomationsResponseItemTriggersWorkflowRunWriteScope {
+  Trigger
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsListAutomationsResponseItemTriggersWorkflowRunWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsListAutomationsResponseItemTriggersWorkflowRunWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsListAutomationsResponseItemTriggersWorkflowRunWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsListAutomationsResponseItemTriggersWorkflowRunWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsListAutomationsResponseItemTriggersWorkflowRunWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsListAutomationsResponseItemTriggersWorkflowRunWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsListAutomationsResponseItemTriggersWorkflowRun.
+pub(all) struct AgentAutomationsListAutomationsResponseItemTriggersWorkflowRun {
+  workflows : Array[String]
+  conclusions : Array[String]
+  query : String?
+  write_scope : AgentAutomationsListAutomationsResponseItemTriggersWorkflowRunWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsListAutomationsResponseItemTriggersWorkflowRun with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsListAutomationsResponseItemTriggersWorkflowRun with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsListAutomationsResponseItemTriggersWorkflowRun with omitted optional fields absent.
+pub fn AgentAutomationsListAutomationsResponseItemTriggersWorkflowRun::new(
+  workflows~ : Array[String],
+  conclusions~ : Array[String],
+  query? : String,
+  write_scope? : AgentAutomationsListAutomationsResponseItemTriggersWorkflowRunWriteScope,
+) -> AgentAutomationsListAutomationsResponseItemTriggersWorkflowRun {
+  { workflows, conclusions, query, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsListAutomationsResponseItemTriggersWorkflowRun with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsListAutomationsResponseItemTriggersWorkflowRun with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .field("workflows", self.workflows)
+  .field("conclusions", self.conclusions)
+  .opt("query", self.query)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsListAutomationsResponseItemTriggersWorkflowRun with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsListAutomationsResponseItemTriggersWorkflowRun with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    workflows: required_field(obj, "workflows", path),
+    conclusions: required_field(obj, "conclusions", path),
+    query: @sdkjson.opt_field(obj, "query", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsListAutomationsResponseItemTriggersPullRequestOpenedWriteScope {
+  Trigger
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsListAutomationsResponseItemTriggersPullRequestOpenedWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsListAutomationsResponseItemTriggersPullRequestOpenedWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsListAutomationsResponseItemTriggersPullRequestOpenedWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsListAutomationsResponseItemTriggersPullRequestOpenedWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsListAutomationsResponseItemTriggersPullRequestOpenedWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsListAutomationsResponseItemTriggersPullRequestOpenedWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsListAutomationsResponseItemTriggersPullRequestOpened.
+pub(all) struct AgentAutomationsListAutomationsResponseItemTriggersPullRequestOpened {
+  query : String?
+  paths : Array[String]?
+  write_scope : AgentAutomationsListAutomationsResponseItemTriggersPullRequestOpenedWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsListAutomationsResponseItemTriggersPullRequestOpened with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsListAutomationsResponseItemTriggersPullRequestOpened with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsListAutomationsResponseItemTriggersPullRequestOpened with omitted optional fields absent.
+pub fn AgentAutomationsListAutomationsResponseItemTriggersPullRequestOpened::new(
+  query? : String,
+  paths? : Array[String],
+  write_scope? : AgentAutomationsListAutomationsResponseItemTriggersPullRequestOpenedWriteScope,
+) -> AgentAutomationsListAutomationsResponseItemTriggersPullRequestOpened {
+  { query, paths, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsListAutomationsResponseItemTriggersPullRequestOpened with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsListAutomationsResponseItemTriggersPullRequestOpened with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("query", self.query)
+  .opt("paths", self.paths)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsListAutomationsResponseItemTriggersPullRequestOpened with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsListAutomationsResponseItemTriggersPullRequestOpened with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    query: @sdkjson.opt_field(obj, "query", path),
+    paths: @sdkjson.opt_field(obj, "paths", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsListAutomationsResponseItemTriggersPullRequestSynchronizeWriteScope {
+  Trigger
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsListAutomationsResponseItemTriggersPullRequestSynchronizeWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsListAutomationsResponseItemTriggersPullRequestSynchronizeWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsListAutomationsResponseItemTriggersPullRequestSynchronizeWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsListAutomationsResponseItemTriggersPullRequestSynchronizeWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsListAutomationsResponseItemTriggersPullRequestSynchronizeWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsListAutomationsResponseItemTriggersPullRequestSynchronizeWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsListAutomationsResponseItemTriggersPullRequestSynchronize.
+pub(all) struct AgentAutomationsListAutomationsResponseItemTriggersPullRequestSynchronize {
+  query : String?
+  paths : Array[String]?
+  write_scope : AgentAutomationsListAutomationsResponseItemTriggersPullRequestSynchronizeWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsListAutomationsResponseItemTriggersPullRequestSynchronize with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsListAutomationsResponseItemTriggersPullRequestSynchronize with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsListAutomationsResponseItemTriggersPullRequestSynchronize with omitted optional fields absent.
+pub fn AgentAutomationsListAutomationsResponseItemTriggersPullRequestSynchronize::new(
+  query? : String,
+  paths? : Array[String],
+  write_scope? : AgentAutomationsListAutomationsResponseItemTriggersPullRequestSynchronizeWriteScope,
+) -> AgentAutomationsListAutomationsResponseItemTriggersPullRequestSynchronize {
+  { query, paths, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsListAutomationsResponseItemTriggersPullRequestSynchronize with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsListAutomationsResponseItemTriggersPullRequestSynchronize with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("query", self.query)
+  .opt("paths", self.paths)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsListAutomationsResponseItemTriggersPullRequestSynchronize with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsListAutomationsResponseItemTriggersPullRequestSynchronize with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    query: @sdkjson.opt_field(obj, "query", path),
+    paths: @sdkjson.opt_field(obj, "paths", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsListAutomationsResponseItemTriggersPullRequestMergedWriteScope {
+  Trigger
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsListAutomationsResponseItemTriggersPullRequestMergedWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsListAutomationsResponseItemTriggersPullRequestMergedWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsListAutomationsResponseItemTriggersPullRequestMergedWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsListAutomationsResponseItemTriggersPullRequestMergedWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsListAutomationsResponseItemTriggersPullRequestMergedWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsListAutomationsResponseItemTriggersPullRequestMergedWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsListAutomationsResponseItemTriggersPullRequestMerged.
+pub(all) struct AgentAutomationsListAutomationsResponseItemTriggersPullRequestMerged {
+  query : String?
+  paths : Array[String]?
+  write_scope : AgentAutomationsListAutomationsResponseItemTriggersPullRequestMergedWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsListAutomationsResponseItemTriggersPullRequestMerged with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsListAutomationsResponseItemTriggersPullRequestMerged with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsListAutomationsResponseItemTriggersPullRequestMerged with omitted optional fields absent.
+pub fn AgentAutomationsListAutomationsResponseItemTriggersPullRequestMerged::new(
+  query? : String,
+  paths? : Array[String],
+  write_scope? : AgentAutomationsListAutomationsResponseItemTriggersPullRequestMergedWriteScope,
+) -> AgentAutomationsListAutomationsResponseItemTriggersPullRequestMerged {
+  { query, paths, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsListAutomationsResponseItemTriggersPullRequestMerged with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsListAutomationsResponseItemTriggersPullRequestMerged with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("query", self.query)
+  .opt("paths", self.paths)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsListAutomationsResponseItemTriggersPullRequestMerged with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsListAutomationsResponseItemTriggersPullRequestMerged with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    query: @sdkjson.opt_field(obj, "query", path),
+    paths: @sdkjson.opt_field(obj, "paths", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsListAutomationsResponseItemTriggersIssueCommentWriteScope {
+  Trigger
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsListAutomationsResponseItemTriggersIssueCommentWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsListAutomationsResponseItemTriggersIssueCommentWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsListAutomationsResponseItemTriggersIssueCommentWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsListAutomationsResponseItemTriggersIssueCommentWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsListAutomationsResponseItemTriggersIssueCommentWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsListAutomationsResponseItemTriggersIssueCommentWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsListAutomationsResponseItemTriggersIssueComment.
+pub(all) struct AgentAutomationsListAutomationsResponseItemTriggersIssueComment {
+  body_substring : String?
+  write_scope : AgentAutomationsListAutomationsResponseItemTriggersIssueCommentWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsListAutomationsResponseItemTriggersIssueComment with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsListAutomationsResponseItemTriggersIssueComment with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsListAutomationsResponseItemTriggersIssueComment with omitted optional fields absent.
+pub fn AgentAutomationsListAutomationsResponseItemTriggersIssueComment::new(
+  body_substring? : String,
+  write_scope? : AgentAutomationsListAutomationsResponseItemTriggersIssueCommentWriteScope,
+) -> AgentAutomationsListAutomationsResponseItemTriggersIssueComment {
+  { body_substring, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsListAutomationsResponseItemTriggersIssueComment with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsListAutomationsResponseItemTriggersIssueComment with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("body_substring", self.body_substring)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsListAutomationsResponseItemTriggersIssueComment with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsListAutomationsResponseItemTriggersIssueComment with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    body_substring: @sdkjson.opt_field(obj, "body_substring", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Generated string enum AgentAutomationsListAutomationsResponseItemTriggersPullRequestCommentCommentTypesItem.
+pub(all) enum AgentAutomationsListAutomationsResponseItemTriggersPullRequestCommentCommentTypesItem {
+  TimelineComment
+  ReviewComment
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsListAutomationsResponseItemTriggersPullRequestCommentCommentTypesItem with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsListAutomationsResponseItemTriggersPullRequestCommentCommentTypesItem with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsListAutomationsResponseItemTriggersPullRequestCommentCommentTypesItem with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsListAutomationsResponseItemTriggersPullRequestCommentCommentTypesItem with fn to_json(
+  self,
+) {
+  let raw = match self {
+    TimelineComment => "timeline_comment"
+    ReviewComment => "review_comment"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsListAutomationsResponseItemTriggersPullRequestCommentCommentTypesItem with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsListAutomationsResponseItemTriggersPullRequestCommentCommentTypesItem with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "timeline_comment" => Some(TimelineComment)
+        "review_comment" => Some(ReviewComment)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsListAutomationsResponseItemTriggersPullRequestCommentWriteScope {
+  Trigger
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsListAutomationsResponseItemTriggersPullRequestCommentWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsListAutomationsResponseItemTriggersPullRequestCommentWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsListAutomationsResponseItemTriggersPullRequestCommentWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsListAutomationsResponseItemTriggersPullRequestCommentWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsListAutomationsResponseItemTriggersPullRequestCommentWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsListAutomationsResponseItemTriggersPullRequestCommentWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsListAutomationsResponseItemTriggersPullRequestComment.
+pub(all) struct AgentAutomationsListAutomationsResponseItemTriggersPullRequestComment {
+  comment_types : Array[
+    AgentAutomationsListAutomationsResponseItemTriggersPullRequestCommentCommentTypesItem,
+  ]
+  body_substring : String?
+  write_scope : AgentAutomationsListAutomationsResponseItemTriggersPullRequestCommentWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsListAutomationsResponseItemTriggersPullRequestComment with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsListAutomationsResponseItemTriggersPullRequestComment with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsListAutomationsResponseItemTriggersPullRequestComment with omitted optional fields absent.
+pub fn AgentAutomationsListAutomationsResponseItemTriggersPullRequestComment::new(
+  comment_types~ : Array[
+    AgentAutomationsListAutomationsResponseItemTriggersPullRequestCommentCommentTypesItem,
+  ],
+  body_substring? : String,
+  write_scope? : AgentAutomationsListAutomationsResponseItemTriggersPullRequestCommentWriteScope,
+) -> AgentAutomationsListAutomationsResponseItemTriggersPullRequestComment {
+  { comment_types, body_substring, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsListAutomationsResponseItemTriggersPullRequestComment with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsListAutomationsResponseItemTriggersPullRequestComment with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .field("comment_types", self.comment_types)
+  .opt("body_substring", self.body_substring)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsListAutomationsResponseItemTriggersPullRequestComment with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsListAutomationsResponseItemTriggersPullRequestComment with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    comment_types: required_field(obj, "comment_types", path),
+    body_substring: @sdkjson.opt_field(obj, "body_substring", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsListAutomationsResponseItemTriggersDiscussionOpenedWriteScope {
+  Trigger
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsListAutomationsResponseItemTriggersDiscussionOpenedWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsListAutomationsResponseItemTriggersDiscussionOpenedWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsListAutomationsResponseItemTriggersDiscussionOpenedWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsListAutomationsResponseItemTriggersDiscussionOpenedWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsListAutomationsResponseItemTriggersDiscussionOpenedWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsListAutomationsResponseItemTriggersDiscussionOpenedWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsListAutomationsResponseItemTriggersDiscussionOpened.
+pub(all) struct AgentAutomationsListAutomationsResponseItemTriggersDiscussionOpened {
+  categories : Array[String]?
+  body_substring : String?
+  write_scope : AgentAutomationsListAutomationsResponseItemTriggersDiscussionOpenedWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsListAutomationsResponseItemTriggersDiscussionOpened with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsListAutomationsResponseItemTriggersDiscussionOpened with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsListAutomationsResponseItemTriggersDiscussionOpened with omitted optional fields absent.
+pub fn AgentAutomationsListAutomationsResponseItemTriggersDiscussionOpened::new(
+  categories? : Array[String],
+  body_substring? : String,
+  write_scope? : AgentAutomationsListAutomationsResponseItemTriggersDiscussionOpenedWriteScope,
+) -> AgentAutomationsListAutomationsResponseItemTriggersDiscussionOpened {
+  { categories, body_substring, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsListAutomationsResponseItemTriggersDiscussionOpened with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsListAutomationsResponseItemTriggersDiscussionOpened with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("categories", self.categories)
+  .opt("body_substring", self.body_substring)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsListAutomationsResponseItemTriggersDiscussionOpened with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsListAutomationsResponseItemTriggersDiscussionOpened with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    categories: @sdkjson.opt_field(obj, "categories", path),
+    body_substring: @sdkjson.opt_field(obj, "body_substring", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsListAutomationsResponseItemTriggersDiscussionUpdatedWriteScope {
+  Trigger
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsListAutomationsResponseItemTriggersDiscussionUpdatedWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsListAutomationsResponseItemTriggersDiscussionUpdatedWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsListAutomationsResponseItemTriggersDiscussionUpdatedWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsListAutomationsResponseItemTriggersDiscussionUpdatedWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsListAutomationsResponseItemTriggersDiscussionUpdatedWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsListAutomationsResponseItemTriggersDiscussionUpdatedWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsListAutomationsResponseItemTriggersDiscussionUpdated.
+pub(all) struct AgentAutomationsListAutomationsResponseItemTriggersDiscussionUpdated {
+  categories : Array[String]?
+  body_substring : String?
+  write_scope : AgentAutomationsListAutomationsResponseItemTriggersDiscussionUpdatedWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsListAutomationsResponseItemTriggersDiscussionUpdated with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsListAutomationsResponseItemTriggersDiscussionUpdated with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsListAutomationsResponseItemTriggersDiscussionUpdated with omitted optional fields absent.
+pub fn AgentAutomationsListAutomationsResponseItemTriggersDiscussionUpdated::new(
+  categories? : Array[String],
+  body_substring? : String,
+  write_scope? : AgentAutomationsListAutomationsResponseItemTriggersDiscussionUpdatedWriteScope,
+) -> AgentAutomationsListAutomationsResponseItemTriggersDiscussionUpdated {
+  { categories, body_substring, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsListAutomationsResponseItemTriggersDiscussionUpdated with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsListAutomationsResponseItemTriggersDiscussionUpdated with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("categories", self.categories)
+  .opt("body_substring", self.body_substring)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsListAutomationsResponseItemTriggersDiscussionUpdated with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsListAutomationsResponseItemTriggersDiscussionUpdated with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    categories: @sdkjson.opt_field(obj, "categories", path),
+    body_substring: @sdkjson.opt_field(obj, "body_substring", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Generated string enum AgentAutomationsListAutomationsResponseItemTriggersDiscussionCommentCommentTypesItem.
+pub(all) enum AgentAutomationsListAutomationsResponseItemTriggersDiscussionCommentCommentTypesItem {
+  Comment
+  Reply
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsListAutomationsResponseItemTriggersDiscussionCommentCommentTypesItem with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsListAutomationsResponseItemTriggersDiscussionCommentCommentTypesItem with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsListAutomationsResponseItemTriggersDiscussionCommentCommentTypesItem with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsListAutomationsResponseItemTriggersDiscussionCommentCommentTypesItem with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Comment => "comment"
+    Reply => "reply"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsListAutomationsResponseItemTriggersDiscussionCommentCommentTypesItem with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsListAutomationsResponseItemTriggersDiscussionCommentCommentTypesItem with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "comment" => Some(Comment)
+        "reply" => Some(Reply)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsListAutomationsResponseItemTriggersDiscussionCommentWriteScope {
+  Trigger
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsListAutomationsResponseItemTriggersDiscussionCommentWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsListAutomationsResponseItemTriggersDiscussionCommentWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsListAutomationsResponseItemTriggersDiscussionCommentWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsListAutomationsResponseItemTriggersDiscussionCommentWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsListAutomationsResponseItemTriggersDiscussionCommentWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsListAutomationsResponseItemTriggersDiscussionCommentWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsListAutomationsResponseItemTriggersDiscussionComment.
+pub(all) struct AgentAutomationsListAutomationsResponseItemTriggersDiscussionComment {
+  comment_types : Array[
+    AgentAutomationsListAutomationsResponseItemTriggersDiscussionCommentCommentTypesItem,
+  ]?
+  categories : Array[String]?
+  body_substring : String?
+  write_scope : AgentAutomationsListAutomationsResponseItemTriggersDiscussionCommentWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsListAutomationsResponseItemTriggersDiscussionComment with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsListAutomationsResponseItemTriggersDiscussionComment with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsListAutomationsResponseItemTriggersDiscussionComment with omitted optional fields absent.
+pub fn AgentAutomationsListAutomationsResponseItemTriggersDiscussionComment::new(
+  comment_types? : Array[
+    AgentAutomationsListAutomationsResponseItemTriggersDiscussionCommentCommentTypesItem,
+  ],
+  categories? : Array[String],
+  body_substring? : String,
+  write_scope? : AgentAutomationsListAutomationsResponseItemTriggersDiscussionCommentWriteScope,
+) -> AgentAutomationsListAutomationsResponseItemTriggersDiscussionComment {
+  { comment_types, categories, body_substring, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsListAutomationsResponseItemTriggersDiscussionComment with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsListAutomationsResponseItemTriggersDiscussionComment with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("comment_types", self.comment_types)
+  .opt("categories", self.categories)
+  .opt("body_substring", self.body_substring)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsListAutomationsResponseItemTriggersDiscussionComment with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsListAutomationsResponseItemTriggersDiscussionComment with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    comment_types: @sdkjson.opt_field(obj, "comment_types", path),
+    categories: @sdkjson.opt_field(obj, "categories", path),
+    body_substring: @sdkjson.opt_field(obj, "body_substring", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsListAutomationsResponseItemTriggersIssueAssignedWriteScope {
+  Trigger
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsListAutomationsResponseItemTriggersIssueAssignedWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsListAutomationsResponseItemTriggersIssueAssignedWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsListAutomationsResponseItemTriggersIssueAssignedWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsListAutomationsResponseItemTriggersIssueAssignedWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsListAutomationsResponseItemTriggersIssueAssignedWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsListAutomationsResponseItemTriggersIssueAssignedWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsListAutomationsResponseItemTriggersIssueAssigned.
+pub(all) struct AgentAutomationsListAutomationsResponseItemTriggersIssueAssigned {
+  query : String?
+  assignees : Array[String]?
+  write_scope : AgentAutomationsListAutomationsResponseItemTriggersIssueAssignedWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsListAutomationsResponseItemTriggersIssueAssigned with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsListAutomationsResponseItemTriggersIssueAssigned with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsListAutomationsResponseItemTriggersIssueAssigned with omitted optional fields absent.
+pub fn AgentAutomationsListAutomationsResponseItemTriggersIssueAssigned::new(
+  query? : String,
+  assignees? : Array[String],
+  write_scope? : AgentAutomationsListAutomationsResponseItemTriggersIssueAssignedWriteScope,
+) -> AgentAutomationsListAutomationsResponseItemTriggersIssueAssigned {
+  { query, assignees, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsListAutomationsResponseItemTriggersIssueAssigned with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsListAutomationsResponseItemTriggersIssueAssigned with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("query", self.query)
+  .opt("assignees", self.assignees)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsListAutomationsResponseItemTriggersIssueAssigned with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsListAutomationsResponseItemTriggersIssueAssigned with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    query: @sdkjson.opt_field(obj, "query", path),
+    assignees: @sdkjson.opt_field(obj, "assignees", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsListAutomationsResponseItemTriggersPullRequestAssignedWriteScope {
+  Trigger
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsListAutomationsResponseItemTriggersPullRequestAssignedWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsListAutomationsResponseItemTriggersPullRequestAssignedWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsListAutomationsResponseItemTriggersPullRequestAssignedWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsListAutomationsResponseItemTriggersPullRequestAssignedWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsListAutomationsResponseItemTriggersPullRequestAssignedWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsListAutomationsResponseItemTriggersPullRequestAssignedWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsListAutomationsResponseItemTriggersPullRequestAssigned.
+pub(all) struct AgentAutomationsListAutomationsResponseItemTriggersPullRequestAssigned {
+  query : String?
+  paths : Array[String]?
+  assignees : Array[String]?
+  write_scope : AgentAutomationsListAutomationsResponseItemTriggersPullRequestAssignedWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsListAutomationsResponseItemTriggersPullRequestAssigned with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsListAutomationsResponseItemTriggersPullRequestAssigned with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsListAutomationsResponseItemTriggersPullRequestAssigned with omitted optional fields absent.
+pub fn AgentAutomationsListAutomationsResponseItemTriggersPullRequestAssigned::new(
+  query? : String,
+  paths? : Array[String],
+  assignees? : Array[String],
+  write_scope? : AgentAutomationsListAutomationsResponseItemTriggersPullRequestAssignedWriteScope,
+) -> AgentAutomationsListAutomationsResponseItemTriggersPullRequestAssigned {
+  { query, paths, assignees, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsListAutomationsResponseItemTriggersPullRequestAssigned with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsListAutomationsResponseItemTriggersPullRequestAssigned with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("query", self.query)
+  .opt("paths", self.paths)
+  .opt("assignees", self.assignees)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsListAutomationsResponseItemTriggersPullRequestAssigned with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsListAutomationsResponseItemTriggersPullRequestAssigned with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    query: @sdkjson.opt_field(obj, "query", path),
+    paths: @sdkjson.opt_field(obj, "paths", path),
+    assignees: @sdkjson.opt_field(obj, "assignees", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsListAutomationsResponseItemTriggersSubIssueAddedWriteScope {
+  Trigger
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsListAutomationsResponseItemTriggersSubIssueAddedWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsListAutomationsResponseItemTriggersSubIssueAddedWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsListAutomationsResponseItemTriggersSubIssueAddedWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsListAutomationsResponseItemTriggersSubIssueAddedWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsListAutomationsResponseItemTriggersSubIssueAddedWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsListAutomationsResponseItemTriggersSubIssueAddedWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsListAutomationsResponseItemTriggersSubIssueAdded.
+pub(all) struct AgentAutomationsListAutomationsResponseItemTriggersSubIssueAdded {
+  query : String?
+  write_scope : AgentAutomationsListAutomationsResponseItemTriggersSubIssueAddedWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsListAutomationsResponseItemTriggersSubIssueAdded with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsListAutomationsResponseItemTriggersSubIssueAdded with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsListAutomationsResponseItemTriggersSubIssueAdded with omitted optional fields absent.
+pub fn AgentAutomationsListAutomationsResponseItemTriggersSubIssueAdded::new(
+  query? : String,
+  write_scope? : AgentAutomationsListAutomationsResponseItemTriggersSubIssueAddedWriteScope,
+) -> AgentAutomationsListAutomationsResponseItemTriggersSubIssueAdded {
+  { query, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsListAutomationsResponseItemTriggersSubIssueAdded with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsListAutomationsResponseItemTriggersSubIssueAdded with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("query", self.query)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsListAutomationsResponseItemTriggersSubIssueAdded with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsListAutomationsResponseItemTriggersSubIssueAdded with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    query: @sdkjson.opt_field(obj, "query", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsListAutomationsResponseItemTriggersPullRequestReadyForReviewWriteScope {
+  Trigger
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsListAutomationsResponseItemTriggersPullRequestReadyForReviewWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsListAutomationsResponseItemTriggersPullRequestReadyForReviewWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsListAutomationsResponseItemTriggersPullRequestReadyForReviewWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsListAutomationsResponseItemTriggersPullRequestReadyForReviewWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsListAutomationsResponseItemTriggersPullRequestReadyForReviewWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsListAutomationsResponseItemTriggersPullRequestReadyForReviewWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsListAutomationsResponseItemTriggersPullRequestReadyForReview.
+pub(all) struct AgentAutomationsListAutomationsResponseItemTriggersPullRequestReadyForReview {
+  query : String?
+  paths : Array[String]?
+  write_scope : AgentAutomationsListAutomationsResponseItemTriggersPullRequestReadyForReviewWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsListAutomationsResponseItemTriggersPullRequestReadyForReview with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsListAutomationsResponseItemTriggersPullRequestReadyForReview with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsListAutomationsResponseItemTriggersPullRequestReadyForReview with omitted optional fields absent.
+pub fn AgentAutomationsListAutomationsResponseItemTriggersPullRequestReadyForReview::new(
+  query? : String,
+  paths? : Array[String],
+  write_scope? : AgentAutomationsListAutomationsResponseItemTriggersPullRequestReadyForReviewWriteScope,
+) -> AgentAutomationsListAutomationsResponseItemTriggersPullRequestReadyForReview {
+  { query, paths, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsListAutomationsResponseItemTriggersPullRequestReadyForReview with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsListAutomationsResponseItemTriggersPullRequestReadyForReview with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("query", self.query)
+  .opt("paths", self.paths)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsListAutomationsResponseItemTriggersPullRequestReadyForReview with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsListAutomationsResponseItemTriggersPullRequestReadyForReview with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    query: @sdkjson.opt_field(obj, "query", path),
+    paths: @sdkjson.opt_field(obj, "paths", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsListAutomationsResponseItemTriggersPullRequestLabeledWriteScope {
+  Trigger
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsListAutomationsResponseItemTriggersPullRequestLabeledWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsListAutomationsResponseItemTriggersPullRequestLabeledWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsListAutomationsResponseItemTriggersPullRequestLabeledWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsListAutomationsResponseItemTriggersPullRequestLabeledWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsListAutomationsResponseItemTriggersPullRequestLabeledWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsListAutomationsResponseItemTriggersPullRequestLabeledWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsListAutomationsResponseItemTriggersPullRequestLabeled.
+pub(all) struct AgentAutomationsListAutomationsResponseItemTriggersPullRequestLabeled {
+  query : String?
+  paths : Array[String]?
+  labels : Array[String]?
+  write_scope : AgentAutomationsListAutomationsResponseItemTriggersPullRequestLabeledWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsListAutomationsResponseItemTriggersPullRequestLabeled with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsListAutomationsResponseItemTriggersPullRequestLabeled with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsListAutomationsResponseItemTriggersPullRequestLabeled with omitted optional fields absent.
+pub fn AgentAutomationsListAutomationsResponseItemTriggersPullRequestLabeled::new(
+  query? : String,
+  paths? : Array[String],
+  labels? : Array[String],
+  write_scope? : AgentAutomationsListAutomationsResponseItemTriggersPullRequestLabeledWriteScope,
+) -> AgentAutomationsListAutomationsResponseItemTriggersPullRequestLabeled {
+  { query, paths, labels, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsListAutomationsResponseItemTriggersPullRequestLabeled with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsListAutomationsResponseItemTriggersPullRequestLabeled with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("query", self.query)
+  .opt("paths", self.paths)
+  .opt("labels", self.labels)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsListAutomationsResponseItemTriggersPullRequestLabeled with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsListAutomationsResponseItemTriggersPullRequestLabeled with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    query: @sdkjson.opt_field(obj, "query", path),
+    paths: @sdkjson.opt_field(obj, "paths", path),
+    labels: @sdkjson.opt_field(obj, "labels", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsListAutomationsResponseItemTriggersPullRequestMergeConflictWriteScope {
+  Trigger
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsListAutomationsResponseItemTriggersPullRequestMergeConflictWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsListAutomationsResponseItemTriggersPullRequestMergeConflictWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsListAutomationsResponseItemTriggersPullRequestMergeConflictWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsListAutomationsResponseItemTriggersPullRequestMergeConflictWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsListAutomationsResponseItemTriggersPullRequestMergeConflictWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsListAutomationsResponseItemTriggersPullRequestMergeConflictWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsListAutomationsResponseItemTriggersPullRequestMergeConflict.
+pub(all) struct AgentAutomationsListAutomationsResponseItemTriggersPullRequestMergeConflict {
+  query : String?
+  paths : Array[String]?
+  write_scope : AgentAutomationsListAutomationsResponseItemTriggersPullRequestMergeConflictWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsListAutomationsResponseItemTriggersPullRequestMergeConflict with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsListAutomationsResponseItemTriggersPullRequestMergeConflict with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsListAutomationsResponseItemTriggersPullRequestMergeConflict with omitted optional fields absent.
+pub fn AgentAutomationsListAutomationsResponseItemTriggersPullRequestMergeConflict::new(
+  query? : String,
+  paths? : Array[String],
+  write_scope? : AgentAutomationsListAutomationsResponseItemTriggersPullRequestMergeConflictWriteScope,
+) -> AgentAutomationsListAutomationsResponseItemTriggersPullRequestMergeConflict {
+  { query, paths, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsListAutomationsResponseItemTriggersPullRequestMergeConflict with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsListAutomationsResponseItemTriggersPullRequestMergeConflict with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("query", self.query)
+  .opt("paths", self.paths)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsListAutomationsResponseItemTriggersPullRequestMergeConflict with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsListAutomationsResponseItemTriggersPullRequestMergeConflict with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    query: @sdkjson.opt_field(obj, "query", path),
+    paths: @sdkjson.opt_field(obj, "paths", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Generated string enum AgentAutomationsListAutomationsResponseItemTriggersPullRequestReviewSubmittedStatesItem.
+pub(all) enum AgentAutomationsListAutomationsResponseItemTriggersPullRequestReviewSubmittedStatesItem {
+  Approved
+  ChangesRequested
+  Commented
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsListAutomationsResponseItemTriggersPullRequestReviewSubmittedStatesItem with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsListAutomationsResponseItemTriggersPullRequestReviewSubmittedStatesItem with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsListAutomationsResponseItemTriggersPullRequestReviewSubmittedStatesItem with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsListAutomationsResponseItemTriggersPullRequestReviewSubmittedStatesItem with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Approved => "approved"
+    ChangesRequested => "changes_requested"
+    Commented => "commented"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsListAutomationsResponseItemTriggersPullRequestReviewSubmittedStatesItem with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsListAutomationsResponseItemTriggersPullRequestReviewSubmittedStatesItem with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "approved" => Some(Approved)
+        "changes_requested" => Some(ChangesRequested)
+        "commented" => Some(Commented)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsListAutomationsResponseItemTriggersPullRequestReviewSubmittedWriteScope {
+  Trigger
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsListAutomationsResponseItemTriggersPullRequestReviewSubmittedWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsListAutomationsResponseItemTriggersPullRequestReviewSubmittedWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsListAutomationsResponseItemTriggersPullRequestReviewSubmittedWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsListAutomationsResponseItemTriggersPullRequestReviewSubmittedWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsListAutomationsResponseItemTriggersPullRequestReviewSubmittedWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsListAutomationsResponseItemTriggersPullRequestReviewSubmittedWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsListAutomationsResponseItemTriggersPullRequestReviewSubmitted.
+pub(all) struct AgentAutomationsListAutomationsResponseItemTriggersPullRequestReviewSubmitted {
+  query : String?
+  paths : Array[String]?
+  states : Array[
+    AgentAutomationsListAutomationsResponseItemTriggersPullRequestReviewSubmittedStatesItem,
+  ]
+  write_scope : AgentAutomationsListAutomationsResponseItemTriggersPullRequestReviewSubmittedWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsListAutomationsResponseItemTriggersPullRequestReviewSubmitted with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsListAutomationsResponseItemTriggersPullRequestReviewSubmitted with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsListAutomationsResponseItemTriggersPullRequestReviewSubmitted with omitted optional fields absent.
+pub fn AgentAutomationsListAutomationsResponseItemTriggersPullRequestReviewSubmitted::new(
+  states~ : Array[
+    AgentAutomationsListAutomationsResponseItemTriggersPullRequestReviewSubmittedStatesItem,
+  ],
+  query? : String,
+  paths? : Array[String],
+  write_scope? : AgentAutomationsListAutomationsResponseItemTriggersPullRequestReviewSubmittedWriteScope,
+) -> AgentAutomationsListAutomationsResponseItemTriggersPullRequestReviewSubmitted {
+  { query, paths, states, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsListAutomationsResponseItemTriggersPullRequestReviewSubmitted with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsListAutomationsResponseItemTriggersPullRequestReviewSubmitted with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("query", self.query)
+  .opt("paths", self.paths)
+  .field("states", self.states)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsListAutomationsResponseItemTriggersPullRequestReviewSubmitted with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsListAutomationsResponseItemTriggersPullRequestReviewSubmitted with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    query: @sdkjson.opt_field(obj, "query", path),
+    paths: @sdkjson.opt_field(obj, "paths", path),
+    states: required_field(obj, "states", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsListAutomationsResponseItemTriggersPullRequestReviewRequestedWriteScope {
+  Trigger
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsListAutomationsResponseItemTriggersPullRequestReviewRequestedWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsListAutomationsResponseItemTriggersPullRequestReviewRequestedWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsListAutomationsResponseItemTriggersPullRequestReviewRequestedWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsListAutomationsResponseItemTriggersPullRequestReviewRequestedWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsListAutomationsResponseItemTriggersPullRequestReviewRequestedWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsListAutomationsResponseItemTriggersPullRequestReviewRequestedWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsListAutomationsResponseItemTriggersPullRequestReviewRequested.
+pub(all) struct AgentAutomationsListAutomationsResponseItemTriggersPullRequestReviewRequested {
+  query : String?
+  paths : Array[String]?
+  write_scope : AgentAutomationsListAutomationsResponseItemTriggersPullRequestReviewRequestedWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsListAutomationsResponseItemTriggersPullRequestReviewRequested with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsListAutomationsResponseItemTriggersPullRequestReviewRequested with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsListAutomationsResponseItemTriggersPullRequestReviewRequested with omitted optional fields absent.
+pub fn AgentAutomationsListAutomationsResponseItemTriggersPullRequestReviewRequested::new(
+  query? : String,
+  paths? : Array[String],
+  write_scope? : AgentAutomationsListAutomationsResponseItemTriggersPullRequestReviewRequestedWriteScope,
+) -> AgentAutomationsListAutomationsResponseItemTriggersPullRequestReviewRequested {
+  { query, paths, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsListAutomationsResponseItemTriggersPullRequestReviewRequested with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsListAutomationsResponseItemTriggersPullRequestReviewRequested with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("query", self.query)
+  .opt("paths", self.paths)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsListAutomationsResponseItemTriggersPullRequestReviewRequested with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsListAutomationsResponseItemTriggersPullRequestReviewRequested with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    query: @sdkjson.opt_field(obj, "query", path),
+    paths: @sdkjson.opt_field(obj, "paths", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsListAutomationsResponseItemTriggersAutomationCompletedWriteScope {
+  Trigger
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsListAutomationsResponseItemTriggersAutomationCompletedWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsListAutomationsResponseItemTriggersAutomationCompletedWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsListAutomationsResponseItemTriggersAutomationCompletedWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsListAutomationsResponseItemTriggersAutomationCompletedWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsListAutomationsResponseItemTriggersAutomationCompletedWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsListAutomationsResponseItemTriggersAutomationCompletedWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsListAutomationsResponseItemTriggersAutomationCompleted.
+pub(all) struct AgentAutomationsListAutomationsResponseItemTriggersAutomationCompleted {
+  automation_ids : Array[String]
+  write_scope : AgentAutomationsListAutomationsResponseItemTriggersAutomationCompletedWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsListAutomationsResponseItemTriggersAutomationCompleted with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsListAutomationsResponseItemTriggersAutomationCompleted with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsListAutomationsResponseItemTriggersAutomationCompleted with omitted optional fields absent.
+pub fn AgentAutomationsListAutomationsResponseItemTriggersAutomationCompleted::new(
+  automation_ids~ : Array[String],
+  write_scope? : AgentAutomationsListAutomationsResponseItemTriggersAutomationCompletedWriteScope,
+) -> AgentAutomationsListAutomationsResponseItemTriggersAutomationCompleted {
+  { automation_ids, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsListAutomationsResponseItemTriggersAutomationCompleted with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsListAutomationsResponseItemTriggersAutomationCompleted with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .field("automation_ids", self.automation_ids)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsListAutomationsResponseItemTriggersAutomationCompleted with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsListAutomationsResponseItemTriggersAutomationCompleted with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    automation_ids: required_field(obj, "automation_ids", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Public trigger configuration keyed by stable public trigger identifier. Each trigger has a closed, trigger-specific configuration schema.
+pub(all) struct AgentAutomationsListAutomationsResponseItemTriggers {
+  interval : AgentAutomationsListAutomationsResponseItemTriggersInterval?
+  issue_opened : AgentAutomationsListAutomationsResponseItemTriggersIssueOpened?
+  issue_labeled : AgentAutomationsListAutomationsResponseItemTriggersIssueLabeled?
+  workflow_run : AgentAutomationsListAutomationsResponseItemTriggersWorkflowRun?
+  pull_request_opened : AgentAutomationsListAutomationsResponseItemTriggersPullRequestOpened?
+  pull_request_synchronize : AgentAutomationsListAutomationsResponseItemTriggersPullRequestSynchronize?
+  pull_request_merged : AgentAutomationsListAutomationsResponseItemTriggersPullRequestMerged?
+  issue_comment : AgentAutomationsListAutomationsResponseItemTriggersIssueComment?
+  pull_request_comment : AgentAutomationsListAutomationsResponseItemTriggersPullRequestComment?
+  discussion_opened : AgentAutomationsListAutomationsResponseItemTriggersDiscussionOpened?
+  discussion_updated : AgentAutomationsListAutomationsResponseItemTriggersDiscussionUpdated?
+  discussion_comment : AgentAutomationsListAutomationsResponseItemTriggersDiscussionComment?
+  issue_assigned : AgentAutomationsListAutomationsResponseItemTriggersIssueAssigned?
+  pull_request_assigned : AgentAutomationsListAutomationsResponseItemTriggersPullRequestAssigned?
+  sub_issue_added : AgentAutomationsListAutomationsResponseItemTriggersSubIssueAdded?
+  pull_request_ready_for_review : AgentAutomationsListAutomationsResponseItemTriggersPullRequestReadyForReview?
+  pull_request_labeled : AgentAutomationsListAutomationsResponseItemTriggersPullRequestLabeled?
+  pull_request_merge_conflict : AgentAutomationsListAutomationsResponseItemTriggersPullRequestMergeConflict?
+  pull_request_review_submitted : AgentAutomationsListAutomationsResponseItemTriggersPullRequestReviewSubmitted?
+  pull_request_review_requested : AgentAutomationsListAutomationsResponseItemTriggersPullRequestReviewRequested?
+  automation_completed : AgentAutomationsListAutomationsResponseItemTriggersAutomationCompleted?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsListAutomationsResponseItemTriggers with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsListAutomationsResponseItemTriggers with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsListAutomationsResponseItemTriggers with omitted optional fields absent.
+pub fn AgentAutomationsListAutomationsResponseItemTriggers::new(
+  interval? : AgentAutomationsListAutomationsResponseItemTriggersInterval,
+  issue_opened? : AgentAutomationsListAutomationsResponseItemTriggersIssueOpened,
+  issue_labeled? : AgentAutomationsListAutomationsResponseItemTriggersIssueLabeled,
+  workflow_run? : AgentAutomationsListAutomationsResponseItemTriggersWorkflowRun,
+  pull_request_opened? : AgentAutomationsListAutomationsResponseItemTriggersPullRequestOpened,
+  pull_request_synchronize? : AgentAutomationsListAutomationsResponseItemTriggersPullRequestSynchronize,
+  pull_request_merged? : AgentAutomationsListAutomationsResponseItemTriggersPullRequestMerged,
+  issue_comment? : AgentAutomationsListAutomationsResponseItemTriggersIssueComment,
+  pull_request_comment? : AgentAutomationsListAutomationsResponseItemTriggersPullRequestComment,
+  discussion_opened? : AgentAutomationsListAutomationsResponseItemTriggersDiscussionOpened,
+  discussion_updated? : AgentAutomationsListAutomationsResponseItemTriggersDiscussionUpdated,
+  discussion_comment? : AgentAutomationsListAutomationsResponseItemTriggersDiscussionComment,
+  issue_assigned? : AgentAutomationsListAutomationsResponseItemTriggersIssueAssigned,
+  pull_request_assigned? : AgentAutomationsListAutomationsResponseItemTriggersPullRequestAssigned,
+  sub_issue_added? : AgentAutomationsListAutomationsResponseItemTriggersSubIssueAdded,
+  pull_request_ready_for_review? : AgentAutomationsListAutomationsResponseItemTriggersPullRequestReadyForReview,
+  pull_request_labeled? : AgentAutomationsListAutomationsResponseItemTriggersPullRequestLabeled,
+  pull_request_merge_conflict? : AgentAutomationsListAutomationsResponseItemTriggersPullRequestMergeConflict,
+  pull_request_review_submitted? : AgentAutomationsListAutomationsResponseItemTriggersPullRequestReviewSubmitted,
+  pull_request_review_requested? : AgentAutomationsListAutomationsResponseItemTriggersPullRequestReviewRequested,
+  automation_completed? : AgentAutomationsListAutomationsResponseItemTriggersAutomationCompleted,
+) -> AgentAutomationsListAutomationsResponseItemTriggers {
+  {
+    interval,
+    issue_opened,
+    issue_labeled,
+    workflow_run,
+    pull_request_opened,
+    pull_request_synchronize,
+    pull_request_merged,
+    issue_comment,
+    pull_request_comment,
+    discussion_opened,
+    discussion_updated,
+    discussion_comment,
+    issue_assigned,
+    pull_request_assigned,
+    sub_issue_added,
+    pull_request_ready_for_review,
+    pull_request_labeled,
+    pull_request_merge_conflict,
+    pull_request_review_submitted,
+    pull_request_review_requested,
+    automation_completed,
+  }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsListAutomationsResponseItemTriggers with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsListAutomationsResponseItemTriggers with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("interval", self.interval)
+  .opt("issue_opened", self.issue_opened)
+  .opt("issue_labeled", self.issue_labeled)
+  .opt("workflow_run", self.workflow_run)
+  .opt("pull_request_opened", self.pull_request_opened)
+  .opt("pull_request_synchronize", self.pull_request_synchronize)
+  .opt("pull_request_merged", self.pull_request_merged)
+  .opt("issue_comment", self.issue_comment)
+  .opt("pull_request_comment", self.pull_request_comment)
+  .opt("discussion_opened", self.discussion_opened)
+  .opt("discussion_updated", self.discussion_updated)
+  .opt("discussion_comment", self.discussion_comment)
+  .opt("issue_assigned", self.issue_assigned)
+  .opt("pull_request_assigned", self.pull_request_assigned)
+  .opt("sub_issue_added", self.sub_issue_added)
+  .opt("pull_request_ready_for_review", self.pull_request_ready_for_review)
+  .opt("pull_request_labeled", self.pull_request_labeled)
+  .opt("pull_request_merge_conflict", self.pull_request_merge_conflict)
+  .opt("pull_request_review_submitted", self.pull_request_review_submitted)
+  .opt("pull_request_review_requested", self.pull_request_review_requested)
+  .opt("automation_completed", self.automation_completed)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsListAutomationsResponseItemTriggers with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsListAutomationsResponseItemTriggers with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    interval: @sdkjson.opt_field(obj, "interval", path),
+    issue_opened: @sdkjson.opt_field(obj, "issue_opened", path),
+    issue_labeled: @sdkjson.opt_field(obj, "issue_labeled", path),
+    workflow_run: @sdkjson.opt_field(obj, "workflow_run", path),
+    pull_request_opened: @sdkjson.opt_field(obj, "pull_request_opened", path),
+    pull_request_synchronize: @sdkjson.opt_field(
+      obj, "pull_request_synchronize", path,
+    ),
+    pull_request_merged: @sdkjson.opt_field(obj, "pull_request_merged", path),
+    issue_comment: @sdkjson.opt_field(obj, "issue_comment", path),
+    pull_request_comment: @sdkjson.opt_field(obj, "pull_request_comment", path),
+    discussion_opened: @sdkjson.opt_field(obj, "discussion_opened", path),
+    discussion_updated: @sdkjson.opt_field(obj, "discussion_updated", path),
+    discussion_comment: @sdkjson.opt_field(obj, "discussion_comment", path),
+    issue_assigned: @sdkjson.opt_field(obj, "issue_assigned", path),
+    pull_request_assigned: @sdkjson.opt_field(
+      obj, "pull_request_assigned", path,
+    ),
+    sub_issue_added: @sdkjson.opt_field(obj, "sub_issue_added", path),
+    pull_request_ready_for_review: @sdkjson.opt_field(
+      obj, "pull_request_ready_for_review", path,
+    ),
+    pull_request_labeled: @sdkjson.opt_field(obj, "pull_request_labeled", path),
+    pull_request_merge_conflict: @sdkjson.opt_field(
+      obj, "pull_request_merge_conflict", path,
+    ),
+    pull_request_review_submitted: @sdkjson.opt_field(
+      obj, "pull_request_review_submitted", path,
+    ),
+    pull_request_review_requested: @sdkjson.opt_field(
+      obj, "pull_request_review_requested", path,
+    ),
+    automation_completed: @sdkjson.opt_field(obj, "automation_completed", path),
+  }
+}
+
+///|
+///
+/// A GitHub user
+pub(all) struct AgentAutomationsListAutomationsResponseItemCreatedBy {
+  id : Int64?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsListAutomationsResponseItemCreatedBy with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsListAutomationsResponseItemCreatedBy with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsListAutomationsResponseItemCreatedBy with omitted optional fields absent.
+pub fn AgentAutomationsListAutomationsResponseItemCreatedBy::new(
+  id? : Int64,
+) -> AgentAutomationsListAutomationsResponseItemCreatedBy {
+  { id, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsListAutomationsResponseItemCreatedBy with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsListAutomationsResponseItemCreatedBy with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("id", self.id.map(value => json_int64_to_json(value)))
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsListAutomationsResponseItemCreatedBy with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsListAutomationsResponseItemCreatedBy with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  { id: decode_optional_int64(obj, "id", path), }
+}
+
+///|
+///
+/// A summary representation of an automation including repository identity (used in cross-repository list responses).
+pub(all) struct AgentAutomationsListAutomationsResponseItem {
+  id : String
+  repository : AgentAutomationsListAutomationsResponseItemRepository
+  name : String
+  enabled : Bool?
+  owner_type : AgentAutomationsListAutomationsResponseItemOwnerType?
+  write_scope : AgentAutomationsListAutomationsResponseItemWriteScope?
+  require_actor_write_permission : Bool?
+  model : String?
+  reasoning_effort : String?
+  triggers : AgentAutomationsListAutomationsResponseItemTriggers?
+  created_at : String
+  updated_at : String
+  created_by : AgentAutomationsListAutomationsResponseItemCreatedBy
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsListAutomationsResponseItem with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsListAutomationsResponseItem with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsListAutomationsResponseItem with omitted optional fields absent.
+pub fn AgentAutomationsListAutomationsResponseItem::new(
+  id~ : String,
+  repository~ : AgentAutomationsListAutomationsResponseItemRepository,
+  name~ : String,
+  created_at~ : String,
+  updated_at~ : String,
+  created_by~ : AgentAutomationsListAutomationsResponseItemCreatedBy,
+  enabled? : Bool,
+  owner_type? : AgentAutomationsListAutomationsResponseItemOwnerType,
+  write_scope? : AgentAutomationsListAutomationsResponseItemWriteScope,
+  require_actor_write_permission? : Bool,
+  model? : String,
+  reasoning_effort? : String,
+  triggers? : AgentAutomationsListAutomationsResponseItemTriggers,
+) -> AgentAutomationsListAutomationsResponseItem {
+  {
+    id,
+    repository,
+    name,
+    enabled,
+    owner_type,
+    write_scope,
+    require_actor_write_permission,
+    model,
+    reasoning_effort,
+    triggers,
+    created_at,
+    updated_at,
+    created_by,
+  }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsListAutomationsResponseItem with ToJson::{to_json}
+
+///|
+pub impl ToJson for AgentAutomationsListAutomationsResponseItem with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .field("id", self.id)
+  .field("repository", self.repository)
+  .field("name", self.name)
+  .opt("enabled", self.enabled)
+  .opt("owner_type", self.owner_type)
+  .opt("write_scope", self.write_scope)
+  .opt("require_actor_write_permission", self.require_actor_write_permission)
+  .opt("model", self.model)
+  .opt("reasoning_effort", self.reasoning_effort)
+  .opt("triggers", self.triggers)
+  .field("created_at", self.created_at)
+  .field("updated_at", self.updated_at)
+  .field("created_by", self.created_by)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsListAutomationsResponseItem with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsListAutomationsResponseItem with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    id: required_field(obj, "id", path),
+    repository: required_field(obj, "repository", path),
+    name: required_field(obj, "name", path),
+    enabled: @sdkjson.opt_field(obj, "enabled", path),
+    owner_type: @sdkjson.opt_field(obj, "owner_type", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+    require_actor_write_permission: @sdkjson.opt_field(
+      obj, "require_actor_write_permission", path,
+    ),
+    model: @sdkjson.opt_field(obj, "model", path),
+    reasoning_effort: @sdkjson.opt_field(obj, "reasoning_effort", path),
+    triggers: @sdkjson.opt_field(obj, "triggers", path),
+    created_at: required_field(obj, "created_at", path),
+    updated_at: required_field(obj, "updated_at", path),
+    created_by: required_field(obj, "created_by", path),
+  }
+}
+
+///|
+///
+/// The tool's behavior level. `read` tools only retrieve data. `write` tools can change data. This describes tool behavior, not a specific GitHub token permission.
+pub(all) enum AgentAutomationsListAvailableAutomationToolsResponseItemToolsItemScope {
+  Read
+  Write
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsListAvailableAutomationToolsResponseItemToolsItemScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsListAvailableAutomationToolsResponseItemToolsItemScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsListAvailableAutomationToolsResponseItemToolsItemScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsListAvailableAutomationToolsResponseItemToolsItemScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Read => "read"
+    Write => "write"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsListAvailableAutomationToolsResponseItemToolsItemScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsListAvailableAutomationToolsResponseItemToolsItemScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "read" => Some(Read)
+        "write" => Some(Write)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// A tool that can be selected in an Automation.
+pub(all) struct AgentAutomationsListAvailableAutomationToolsResponseItemToolsItem {
+  id : String
+  title : String
+  description : String
+  scope : AgentAutomationsListAvailableAutomationToolsResponseItemToolsItemScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsListAvailableAutomationToolsResponseItemToolsItem with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsListAvailableAutomationToolsResponseItemToolsItem with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsListAvailableAutomationToolsResponseItemToolsItem with omitted optional fields absent.
+pub fn AgentAutomationsListAvailableAutomationToolsResponseItemToolsItem::new(
+  id~ : String,
+  title~ : String,
+  description~ : String,
+  scope? : AgentAutomationsListAvailableAutomationToolsResponseItemToolsItemScope,
+) -> AgentAutomationsListAvailableAutomationToolsResponseItemToolsItem {
+  { id, title, description, scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsListAvailableAutomationToolsResponseItemToolsItem with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsListAvailableAutomationToolsResponseItemToolsItem with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .field("id", self.id)
+  .field("title", self.title)
+  .field("description", self.description)
+  .opt("scope", self.scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsListAvailableAutomationToolsResponseItemToolsItem with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsListAvailableAutomationToolsResponseItemToolsItem with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    id: required_field(obj, "id", path),
+    title: required_field(obj, "title", path),
+    description: required_field(obj, "description", path),
+    scope: @sdkjson.opt_field(obj, "scope", path),
+  }
+}
+
+///|
+///
+/// A CMC-controlled presentation category for Automation tools. Clients must not depend on group identifiers, membership, or ordering remaining stable.
+pub(all) struct AgentAutomationsListAvailableAutomationToolsResponseItem {
+  id : String
+  title : String
+  tools : Array[
+    AgentAutomationsListAvailableAutomationToolsResponseItemToolsItem,
+  ]
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsListAvailableAutomationToolsResponseItem with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsListAvailableAutomationToolsResponseItem with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsListAvailableAutomationToolsResponseItem with omitted optional fields absent.
+pub fn AgentAutomationsListAvailableAutomationToolsResponseItem::new(
+  id~ : String,
+  title~ : String,
+  tools~ : Array[
+    AgentAutomationsListAvailableAutomationToolsResponseItemToolsItem,
+  ],
+) -> AgentAutomationsListAvailableAutomationToolsResponseItem {
+  { id, title, tools, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsListAvailableAutomationToolsResponseItem with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsListAvailableAutomationToolsResponseItem with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .field("id", self.id)
+  .field("title", self.title)
+  .field("tools", self.tools)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsListAvailableAutomationToolsResponseItem with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsListAvailableAutomationToolsResponseItem with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    id: required_field(obj, "id", path),
+    title: required_field(obj, "title", path),
+    tools: required_field(obj, "tools", path),
+  }
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsListAvailableAutomationTriggersResponseItemFieldsItemSchemaString.
+pub(all) struct AgentAutomationsListAvailableAutomationTriggersResponseItemFieldsItemSchemaString {
+  type_ : String
+  enum_ : Array[String]?
+  min_length : Int32?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsListAvailableAutomationTriggersResponseItemFieldsItemSchemaString with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsListAvailableAutomationTriggersResponseItemFieldsItemSchemaString with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsListAvailableAutomationTriggersResponseItemFieldsItemSchemaString with omitted optional fields absent.
+pub fn AgentAutomationsListAvailableAutomationTriggersResponseItemFieldsItemSchemaString::new(
+  type_~ : String,
+  enum_? : Array[String],
+  min_length? : Int32,
+) -> AgentAutomationsListAvailableAutomationTriggersResponseItemFieldsItemSchemaString {
+  { type_, enum_, min_length, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsListAvailableAutomationTriggersResponseItemFieldsItemSchemaString with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsListAvailableAutomationTriggersResponseItemFieldsItemSchemaString with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .field("type", self.type_)
+  .opt("enum", self.enum_)
+  .opt("minLength", self.min_length)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsListAvailableAutomationTriggersResponseItemFieldsItemSchemaString with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsListAvailableAutomationTriggersResponseItemFieldsItemSchemaString with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    type_: required_field(obj, "type", path),
+    enum_: @sdkjson.opt_field(obj, "enum", path),
+    min_length: @sdkjson.opt_field(obj, "minLength", path),
+  }
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsListAvailableAutomationTriggersResponseItemFieldsItemSchemaArrayItems.
+pub(all) struct AgentAutomationsListAvailableAutomationTriggersResponseItemFieldsItemSchemaArrayItems {
+  enum_ : Array[String]?
+  min_length : Int32?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsListAvailableAutomationTriggersResponseItemFieldsItemSchemaArrayItems with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsListAvailableAutomationTriggersResponseItemFieldsItemSchemaArrayItems with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsListAvailableAutomationTriggersResponseItemFieldsItemSchemaArrayItems with omitted optional fields absent.
+pub fn AgentAutomationsListAvailableAutomationTriggersResponseItemFieldsItemSchemaArrayItems::new(
+  enum_? : Array[String],
+  min_length? : Int32,
+) -> AgentAutomationsListAvailableAutomationTriggersResponseItemFieldsItemSchemaArrayItems {
+  { enum_, min_length, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsListAvailableAutomationTriggersResponseItemFieldsItemSchemaArrayItems with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsListAvailableAutomationTriggersResponseItemFieldsItemSchemaArrayItems with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .field("type", "string")
+  .opt("enum", self.enum_)
+  .opt("minLength", self.min_length)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsListAvailableAutomationTriggersResponseItemFieldsItemSchemaArrayItems with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsListAvailableAutomationTriggersResponseItemFieldsItemSchemaArrayItems with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    enum_: @sdkjson.opt_field(obj, "enum", path),
+    min_length: @sdkjson.opt_field(obj, "minLength", path),
+  }
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsListAvailableAutomationTriggersResponseItemFieldsItemSchemaArray.
+pub(all) struct AgentAutomationsListAvailableAutomationTriggersResponseItemFieldsItemSchemaArray {
+  type_ : String
+  items : AgentAutomationsListAvailableAutomationTriggersResponseItemFieldsItemSchemaArrayItems
+  min_items : Int32?
+  max_items : Int32?
+  unique_items : Bool?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsListAvailableAutomationTriggersResponseItemFieldsItemSchemaArray with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsListAvailableAutomationTriggersResponseItemFieldsItemSchemaArray with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsListAvailableAutomationTriggersResponseItemFieldsItemSchemaArray with omitted optional fields absent.
+pub fn AgentAutomationsListAvailableAutomationTriggersResponseItemFieldsItemSchemaArray::new(
+  type_~ : String,
+  items~ : AgentAutomationsListAvailableAutomationTriggersResponseItemFieldsItemSchemaArrayItems,
+  min_items? : Int32,
+  max_items? : Int32,
+  unique_items? : Bool,
+) -> AgentAutomationsListAvailableAutomationTriggersResponseItemFieldsItemSchemaArray {
+  { type_, items, min_items, max_items, unique_items, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsListAvailableAutomationTriggersResponseItemFieldsItemSchemaArray with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsListAvailableAutomationTriggersResponseItemFieldsItemSchemaArray with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .field("type", self.type_)
+  .field("items", self.items)
+  .opt("minItems", self.min_items)
+  .opt("maxItems", self.max_items)
+  .opt("uniqueItems", self.unique_items)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsListAvailableAutomationTriggersResponseItemFieldsItemSchemaArray with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsListAvailableAutomationTriggersResponseItemFieldsItemSchemaArray with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    type_: required_field(obj, "type", path),
+    items: required_field(obj, "items", path),
+    min_items: @sdkjson.opt_field(obj, "minItems", path),
+    max_items: @sdkjson.opt_field(obj, "maxItems", path),
+    unique_items: @sdkjson.opt_field(obj, "uniqueItems", path),
+  }
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsListAvailableAutomationTriggersResponseItemFieldsItemSchemaInteger.
+pub(all) struct AgentAutomationsListAvailableAutomationTriggersResponseItemFieldsItemSchemaInteger {
+  type_ : String
+  enum_ : Array[Int32]?
+  minimum : Int32?
+  maximum : Int32?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsListAvailableAutomationTriggersResponseItemFieldsItemSchemaInteger with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsListAvailableAutomationTriggersResponseItemFieldsItemSchemaInteger with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsListAvailableAutomationTriggersResponseItemFieldsItemSchemaInteger with omitted optional fields absent.
+pub fn AgentAutomationsListAvailableAutomationTriggersResponseItemFieldsItemSchemaInteger::new(
+  type_~ : String,
+  enum_? : Array[Int32],
+  minimum? : Int32,
+  maximum? : Int32,
+) -> AgentAutomationsListAvailableAutomationTriggersResponseItemFieldsItemSchemaInteger {
+  { type_, enum_, minimum, maximum, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsListAvailableAutomationTriggersResponseItemFieldsItemSchemaInteger with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsListAvailableAutomationTriggersResponseItemFieldsItemSchemaInteger with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .field("type", self.type_)
+  .opt("enum", self.enum_)
+  .opt("minimum", self.minimum)
+  .opt("maximum", self.maximum)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsListAvailableAutomationTriggersResponseItemFieldsItemSchemaInteger with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsListAvailableAutomationTriggersResponseItemFieldsItemSchemaInteger with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    type_: required_field(obj, "type", path),
+    enum_: @sdkjson.opt_field(obj, "enum", path),
+    minimum: @sdkjson.opt_field(obj, "minimum", path),
+    maximum: @sdkjson.opt_field(obj, "maximum", path),
+  }
+}
+
+///|
+///
+/// A restricted JSON Schema fragment describing the field value accepted by Automation create and update requests.
+pub(all) enum AgentAutomationsListAvailableAutomationTriggersResponseItemFieldsItemSchema {
+  String(
+    AgentAutomationsListAvailableAutomationTriggersResponseItemFieldsItemSchemaString
+  )
+  Array(
+    AgentAutomationsListAvailableAutomationTriggersResponseItemFieldsItemSchemaArray
+  )
+  Integer(
+    AgentAutomationsListAvailableAutomationTriggersResponseItemFieldsItemSchemaInteger
+  )
+  Unknown(String, Json)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsListAvailableAutomationTriggersResponseItemFieldsItemSchema with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsListAvailableAutomationTriggersResponseItemFieldsItemSchema with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this tagged union as JSON.
+pub extend AgentAutomationsListAvailableAutomationTriggersResponseItemFieldsItemSchema with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsListAvailableAutomationTriggersResponseItemFieldsItemSchema with fn to_json(
+  self,
+) {
+  match self {
+    String(value) => Json(value)
+    Array(value) => Json(value)
+    Integer(value) => Json(value)
+    Unknown(_, value) => value
+  }
+}
+
+///|
+///
+/// Decodes this tagged union from JSON.
+pub extend AgentAutomationsListAvailableAutomationTriggersResponseItemFieldsItemSchema with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsListAvailableAutomationTriggersResponseItemFieldsItemSchema with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  let tag : String = required_field(obj, "type", path)
+  match tag {
+    "string" => String(@json.from_json(value, path~))
+    "array" => Array(@json.from_json(value, path~))
+    "integer" => Integer(@json.from_json(value, path~))
+    other => Unknown(other, value)
+  }
+}
+
+///|
+///
+/// A configurable field in a public Automation trigger definition.
+pub(all) struct AgentAutomationsListAvailableAutomationTriggersResponseItemFieldsItem {
+  id : String
+  label : String
+  required : Bool
+  description : String?
+  schema : AgentAutomationsListAvailableAutomationTriggersResponseItemFieldsItemSchema
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsListAvailableAutomationTriggersResponseItemFieldsItem with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsListAvailableAutomationTriggersResponseItemFieldsItem with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsListAvailableAutomationTriggersResponseItemFieldsItem with omitted optional fields absent.
+pub fn AgentAutomationsListAvailableAutomationTriggersResponseItemFieldsItem::new(
+  id~ : String,
+  label~ : String,
+  required~ : Bool,
+  schema~ : AgentAutomationsListAvailableAutomationTriggersResponseItemFieldsItemSchema,
+  description? : String,
+) -> AgentAutomationsListAvailableAutomationTriggersResponseItemFieldsItem {
+  { id, label, required, description, schema, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsListAvailableAutomationTriggersResponseItemFieldsItem with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsListAvailableAutomationTriggersResponseItemFieldsItem with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .field("id", self.id)
+  .field("label", self.label)
+  .field("required", self.required)
+  .opt("description", self.description)
+  .field("schema", self.schema)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsListAvailableAutomationTriggersResponseItemFieldsItem with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsListAvailableAutomationTriggersResponseItemFieldsItem with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    id: required_field(obj, "id", path),
+    label: required_field(obj, "label", path),
+    required: required_field(obj, "required", path),
+    description: @sdkjson.opt_field(obj, "description", path),
+    schema: required_field(obj, "schema", path),
+  }
+}
+
+///|
+///
+/// A public Automation trigger and its configurable fields.
+pub(all) struct AgentAutomationsListAvailableAutomationTriggersResponseItem {
+  id : String
+  title : String
+  description : String
+  fields : Array[
+    AgentAutomationsListAvailableAutomationTriggersResponseItemFieldsItem,
+  ]
+  supports_run_now : Bool?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsListAvailableAutomationTriggersResponseItem with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsListAvailableAutomationTriggersResponseItem with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsListAvailableAutomationTriggersResponseItem with omitted optional fields absent.
+pub fn AgentAutomationsListAvailableAutomationTriggersResponseItem::new(
+  id~ : String,
+  title~ : String,
+  description~ : String,
+  fields~ : Array[
+    AgentAutomationsListAvailableAutomationTriggersResponseItemFieldsItem,
+  ],
+  supports_run_now? : Bool,
+) -> AgentAutomationsListAvailableAutomationTriggersResponseItem {
+  { id, title, description, fields, supports_run_now, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsListAvailableAutomationTriggersResponseItem with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsListAvailableAutomationTriggersResponseItem with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .field("id", self.id)
+  .field("title", self.title)
+  .field("description", self.description)
+  .field("fields", self.fields)
+  .opt("supports_run_now", self.supports_run_now)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsListAvailableAutomationTriggersResponseItem with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsListAvailableAutomationTriggersResponseItem with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    id: required_field(obj, "id", path),
+    title: required_field(obj, "title", path),
+    description: required_field(obj, "description", path),
+    fields: required_field(obj, "fields", path),
+    supports_run_now: @sdkjson.opt_field(obj, "supports_run_now", path),
+  }
+}
+
+///|
+///
+/// Repository identity for an automation in cross-repository list responses.
+pub(all) struct AgentAutomationsGetAutomationResponseRepository {
+  id : Int64
+  owner : String
+  name : String
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsGetAutomationResponseRepository with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsGetAutomationResponseRepository with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsGetAutomationResponseRepository with omitted optional fields absent.
+pub fn AgentAutomationsGetAutomationResponseRepository::new(
+  id~ : Int64,
+  owner~ : String,
+  name~ : String,
+) -> AgentAutomationsGetAutomationResponseRepository {
+  { id, owner, name, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsGetAutomationResponseRepository with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsGetAutomationResponseRepository with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .field("id", json_int64_to_json(self.id))
+  .field("owner", self.owner)
+  .field("name", self.name)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsGetAutomationResponseRepository with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsGetAutomationResponseRepository with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    id: json_int64(required_field(obj, "id", path), path.add_key("id")),
+    owner: required_field(obj, "owner", path),
+    name: required_field(obj, "name", path),
+  }
+}
+
+///|
+///
+/// Who owns the automation. `user` keeps it private to its creator and its runs act as that user. `repository` makes it belong to the repository, visible to anyone with read access to the repository, and its runs act as the Copilot app rather than as a person.
+pub(all) enum AgentAutomationsGetAutomationResponseOwnerType {
+  User
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsGetAutomationResponseOwnerType with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsGetAutomationResponseOwnerType with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsGetAutomationResponseOwnerType with ToJson::{to_json}
+
+///|
+pub impl ToJson for AgentAutomationsGetAutomationResponseOwnerType with fn to_json(
+  self,
+) {
+  let raw = match self {
+    User => "user"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsGetAutomationResponseOwnerType with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsGetAutomationResponseOwnerType with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "user" => Some(User)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Controls which repository resources a run may modify. `trigger` limits writes to the resource that started the run, when one exists, and resources created during the run; `repository` allows writes to any resource in the repository. Supported values: `trigger`, `repository`.
+pub(all) enum AgentAutomationsGetAutomationResponseWriteScope {
+  Trigger
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsGetAutomationResponseWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsGetAutomationResponseWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsGetAutomationResponseWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsGetAutomationResponseWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsGetAutomationResponseWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsGetAutomationResponseWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated string enum AgentAutomationsGetAutomationResponseTriggersIntervalCadenceItem.
+pub(all) enum AgentAutomationsGetAutomationResponseTriggersIntervalCadenceItem {
+  Hourly
+  Daily
+  Weekly
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsGetAutomationResponseTriggersIntervalCadenceItem with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsGetAutomationResponseTriggersIntervalCadenceItem with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsGetAutomationResponseTriggersIntervalCadenceItem with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsGetAutomationResponseTriggersIntervalCadenceItem with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Hourly => "hourly"
+    Daily => "daily"
+    Weekly => "weekly"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsGetAutomationResponseTriggersIntervalCadenceItem with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsGetAutomationResponseTriggersIntervalCadenceItem with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "hourly" => Some(Hourly)
+        "daily" => Some(Daily)
+        "weekly" => Some(Weekly)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsGetAutomationResponseTriggersIntervalWriteScope {
+  Trigger
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsGetAutomationResponseTriggersIntervalWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsGetAutomationResponseTriggersIntervalWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsGetAutomationResponseTriggersIntervalWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsGetAutomationResponseTriggersIntervalWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsGetAutomationResponseTriggersIntervalWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsGetAutomationResponseTriggersIntervalWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsGetAutomationResponseTriggersInterval.
+pub(all) struct AgentAutomationsGetAutomationResponseTriggersInterval {
+  cadence : Array[
+    AgentAutomationsGetAutomationResponseTriggersIntervalCadenceItem,
+  ]
+  hour_utc : Int32?
+  day_of_week : Int32?
+  minute_utc : Int32?
+  write_scope : AgentAutomationsGetAutomationResponseTriggersIntervalWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsGetAutomationResponseTriggersInterval with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsGetAutomationResponseTriggersInterval with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsGetAutomationResponseTriggersInterval with omitted optional fields absent.
+pub fn AgentAutomationsGetAutomationResponseTriggersInterval::new(
+  cadence~ : Array[
+    AgentAutomationsGetAutomationResponseTriggersIntervalCadenceItem,
+  ],
+  hour_utc? : Int32,
+  day_of_week? : Int32,
+  minute_utc? : Int32,
+  write_scope? : AgentAutomationsGetAutomationResponseTriggersIntervalWriteScope,
+) -> AgentAutomationsGetAutomationResponseTriggersInterval {
+  { cadence, hour_utc, day_of_week, minute_utc, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsGetAutomationResponseTriggersInterval with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsGetAutomationResponseTriggersInterval with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .field("cadence", self.cadence)
+  .opt("hour_utc", self.hour_utc)
+  .opt("day_of_week", self.day_of_week)
+  .opt("minute_utc", self.minute_utc)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsGetAutomationResponseTriggersInterval with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsGetAutomationResponseTriggersInterval with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    cadence: required_field(obj, "cadence", path),
+    hour_utc: @sdkjson.opt_field(obj, "hour_utc", path),
+    day_of_week: @sdkjson.opt_field(obj, "day_of_week", path),
+    minute_utc: @sdkjson.opt_field(obj, "minute_utc", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsGetAutomationResponseTriggersIssueOpenedWriteScope {
+  Trigger
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsGetAutomationResponseTriggersIssueOpenedWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsGetAutomationResponseTriggersIssueOpenedWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsGetAutomationResponseTriggersIssueOpenedWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsGetAutomationResponseTriggersIssueOpenedWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsGetAutomationResponseTriggersIssueOpenedWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsGetAutomationResponseTriggersIssueOpenedWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsGetAutomationResponseTriggersIssueOpened.
+pub(all) struct AgentAutomationsGetAutomationResponseTriggersIssueOpened {
+  query : String?
+  write_scope : AgentAutomationsGetAutomationResponseTriggersIssueOpenedWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsGetAutomationResponseTriggersIssueOpened with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsGetAutomationResponseTriggersIssueOpened with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsGetAutomationResponseTriggersIssueOpened with omitted optional fields absent.
+pub fn AgentAutomationsGetAutomationResponseTriggersIssueOpened::new(
+  query? : String,
+  write_scope? : AgentAutomationsGetAutomationResponseTriggersIssueOpenedWriteScope,
+) -> AgentAutomationsGetAutomationResponseTriggersIssueOpened {
+  { query, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsGetAutomationResponseTriggersIssueOpened with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsGetAutomationResponseTriggersIssueOpened with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("query", self.query)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsGetAutomationResponseTriggersIssueOpened with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsGetAutomationResponseTriggersIssueOpened with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    query: @sdkjson.opt_field(obj, "query", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsGetAutomationResponseTriggersIssueLabeledWriteScope {
+  Trigger
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsGetAutomationResponseTriggersIssueLabeledWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsGetAutomationResponseTriggersIssueLabeledWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsGetAutomationResponseTriggersIssueLabeledWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsGetAutomationResponseTriggersIssueLabeledWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsGetAutomationResponseTriggersIssueLabeledWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsGetAutomationResponseTriggersIssueLabeledWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsGetAutomationResponseTriggersIssueLabeled.
+pub(all) struct AgentAutomationsGetAutomationResponseTriggersIssueLabeled {
+  query : String?
+  labels : Array[String]?
+  write_scope : AgentAutomationsGetAutomationResponseTriggersIssueLabeledWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsGetAutomationResponseTriggersIssueLabeled with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsGetAutomationResponseTriggersIssueLabeled with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsGetAutomationResponseTriggersIssueLabeled with omitted optional fields absent.
+pub fn AgentAutomationsGetAutomationResponseTriggersIssueLabeled::new(
+  query? : String,
+  labels? : Array[String],
+  write_scope? : AgentAutomationsGetAutomationResponseTriggersIssueLabeledWriteScope,
+) -> AgentAutomationsGetAutomationResponseTriggersIssueLabeled {
+  { query, labels, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsGetAutomationResponseTriggersIssueLabeled with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsGetAutomationResponseTriggersIssueLabeled with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("query", self.query)
+  .opt("labels", self.labels)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsGetAutomationResponseTriggersIssueLabeled with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsGetAutomationResponseTriggersIssueLabeled with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    query: @sdkjson.opt_field(obj, "query", path),
+    labels: @sdkjson.opt_field(obj, "labels", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsGetAutomationResponseTriggersWorkflowRunWriteScope {
+  Trigger
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsGetAutomationResponseTriggersWorkflowRunWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsGetAutomationResponseTriggersWorkflowRunWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsGetAutomationResponseTriggersWorkflowRunWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsGetAutomationResponseTriggersWorkflowRunWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsGetAutomationResponseTriggersWorkflowRunWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsGetAutomationResponseTriggersWorkflowRunWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsGetAutomationResponseTriggersWorkflowRun.
+pub(all) struct AgentAutomationsGetAutomationResponseTriggersWorkflowRun {
+  workflows : Array[String]
+  conclusions : Array[String]
+  query : String?
+  write_scope : AgentAutomationsGetAutomationResponseTriggersWorkflowRunWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsGetAutomationResponseTriggersWorkflowRun with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsGetAutomationResponseTriggersWorkflowRun with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsGetAutomationResponseTriggersWorkflowRun with omitted optional fields absent.
+pub fn AgentAutomationsGetAutomationResponseTriggersWorkflowRun::new(
+  workflows~ : Array[String],
+  conclusions~ : Array[String],
+  query? : String,
+  write_scope? : AgentAutomationsGetAutomationResponseTriggersWorkflowRunWriteScope,
+) -> AgentAutomationsGetAutomationResponseTriggersWorkflowRun {
+  { workflows, conclusions, query, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsGetAutomationResponseTriggersWorkflowRun with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsGetAutomationResponseTriggersWorkflowRun with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .field("workflows", self.workflows)
+  .field("conclusions", self.conclusions)
+  .opt("query", self.query)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsGetAutomationResponseTriggersWorkflowRun with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsGetAutomationResponseTriggersWorkflowRun with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    workflows: required_field(obj, "workflows", path),
+    conclusions: required_field(obj, "conclusions", path),
+    query: @sdkjson.opt_field(obj, "query", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsGetAutomationResponseTriggersPullRequestOpenedWriteScope {
+  Trigger
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsGetAutomationResponseTriggersPullRequestOpenedWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsGetAutomationResponseTriggersPullRequestOpenedWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsGetAutomationResponseTriggersPullRequestOpenedWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsGetAutomationResponseTriggersPullRequestOpenedWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsGetAutomationResponseTriggersPullRequestOpenedWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsGetAutomationResponseTriggersPullRequestOpenedWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsGetAutomationResponseTriggersPullRequestOpened.
+pub(all) struct AgentAutomationsGetAutomationResponseTriggersPullRequestOpened {
+  query : String?
+  paths : Array[String]?
+  write_scope : AgentAutomationsGetAutomationResponseTriggersPullRequestOpenedWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsGetAutomationResponseTriggersPullRequestOpened with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsGetAutomationResponseTriggersPullRequestOpened with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsGetAutomationResponseTriggersPullRequestOpened with omitted optional fields absent.
+pub fn AgentAutomationsGetAutomationResponseTriggersPullRequestOpened::new(
+  query? : String,
+  paths? : Array[String],
+  write_scope? : AgentAutomationsGetAutomationResponseTriggersPullRequestOpenedWriteScope,
+) -> AgentAutomationsGetAutomationResponseTriggersPullRequestOpened {
+  { query, paths, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsGetAutomationResponseTriggersPullRequestOpened with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsGetAutomationResponseTriggersPullRequestOpened with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("query", self.query)
+  .opt("paths", self.paths)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsGetAutomationResponseTriggersPullRequestOpened with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsGetAutomationResponseTriggersPullRequestOpened with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    query: @sdkjson.opt_field(obj, "query", path),
+    paths: @sdkjson.opt_field(obj, "paths", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsGetAutomationResponseTriggersPullRequestSynchronizeWriteScope {
+  Trigger
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsGetAutomationResponseTriggersPullRequestSynchronizeWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsGetAutomationResponseTriggersPullRequestSynchronizeWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsGetAutomationResponseTriggersPullRequestSynchronizeWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsGetAutomationResponseTriggersPullRequestSynchronizeWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsGetAutomationResponseTriggersPullRequestSynchronizeWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsGetAutomationResponseTriggersPullRequestSynchronizeWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsGetAutomationResponseTriggersPullRequestSynchronize.
+pub(all) struct AgentAutomationsGetAutomationResponseTriggersPullRequestSynchronize {
+  query : String?
+  paths : Array[String]?
+  write_scope : AgentAutomationsGetAutomationResponseTriggersPullRequestSynchronizeWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsGetAutomationResponseTriggersPullRequestSynchronize with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsGetAutomationResponseTriggersPullRequestSynchronize with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsGetAutomationResponseTriggersPullRequestSynchronize with omitted optional fields absent.
+pub fn AgentAutomationsGetAutomationResponseTriggersPullRequestSynchronize::new(
+  query? : String,
+  paths? : Array[String],
+  write_scope? : AgentAutomationsGetAutomationResponseTriggersPullRequestSynchronizeWriteScope,
+) -> AgentAutomationsGetAutomationResponseTriggersPullRequestSynchronize {
+  { query, paths, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsGetAutomationResponseTriggersPullRequestSynchronize with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsGetAutomationResponseTriggersPullRequestSynchronize with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("query", self.query)
+  .opt("paths", self.paths)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsGetAutomationResponseTriggersPullRequestSynchronize with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsGetAutomationResponseTriggersPullRequestSynchronize with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    query: @sdkjson.opt_field(obj, "query", path),
+    paths: @sdkjson.opt_field(obj, "paths", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsGetAutomationResponseTriggersPullRequestMergedWriteScope {
+  Trigger
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsGetAutomationResponseTriggersPullRequestMergedWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsGetAutomationResponseTriggersPullRequestMergedWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsGetAutomationResponseTriggersPullRequestMergedWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsGetAutomationResponseTriggersPullRequestMergedWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsGetAutomationResponseTriggersPullRequestMergedWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsGetAutomationResponseTriggersPullRequestMergedWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsGetAutomationResponseTriggersPullRequestMerged.
+pub(all) struct AgentAutomationsGetAutomationResponseTriggersPullRequestMerged {
+  query : String?
+  paths : Array[String]?
+  write_scope : AgentAutomationsGetAutomationResponseTriggersPullRequestMergedWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsGetAutomationResponseTriggersPullRequestMerged with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsGetAutomationResponseTriggersPullRequestMerged with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsGetAutomationResponseTriggersPullRequestMerged with omitted optional fields absent.
+pub fn AgentAutomationsGetAutomationResponseTriggersPullRequestMerged::new(
+  query? : String,
+  paths? : Array[String],
+  write_scope? : AgentAutomationsGetAutomationResponseTriggersPullRequestMergedWriteScope,
+) -> AgentAutomationsGetAutomationResponseTriggersPullRequestMerged {
+  { query, paths, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsGetAutomationResponseTriggersPullRequestMerged with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsGetAutomationResponseTriggersPullRequestMerged with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("query", self.query)
+  .opt("paths", self.paths)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsGetAutomationResponseTriggersPullRequestMerged with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsGetAutomationResponseTriggersPullRequestMerged with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    query: @sdkjson.opt_field(obj, "query", path),
+    paths: @sdkjson.opt_field(obj, "paths", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsGetAutomationResponseTriggersIssueCommentWriteScope {
+  Trigger
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsGetAutomationResponseTriggersIssueCommentWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsGetAutomationResponseTriggersIssueCommentWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsGetAutomationResponseTriggersIssueCommentWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsGetAutomationResponseTriggersIssueCommentWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsGetAutomationResponseTriggersIssueCommentWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsGetAutomationResponseTriggersIssueCommentWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsGetAutomationResponseTriggersIssueComment.
+pub(all) struct AgentAutomationsGetAutomationResponseTriggersIssueComment {
+  body_substring : String?
+  write_scope : AgentAutomationsGetAutomationResponseTriggersIssueCommentWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsGetAutomationResponseTriggersIssueComment with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsGetAutomationResponseTriggersIssueComment with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsGetAutomationResponseTriggersIssueComment with omitted optional fields absent.
+pub fn AgentAutomationsGetAutomationResponseTriggersIssueComment::new(
+  body_substring? : String,
+  write_scope? : AgentAutomationsGetAutomationResponseTriggersIssueCommentWriteScope,
+) -> AgentAutomationsGetAutomationResponseTriggersIssueComment {
+  { body_substring, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsGetAutomationResponseTriggersIssueComment with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsGetAutomationResponseTriggersIssueComment with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("body_substring", self.body_substring)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsGetAutomationResponseTriggersIssueComment with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsGetAutomationResponseTriggersIssueComment with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    body_substring: @sdkjson.opt_field(obj, "body_substring", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Generated string enum AgentAutomationsGetAutomationResponseTriggersPullRequestCommentCommentTypesItem.
+pub(all) enum AgentAutomationsGetAutomationResponseTriggersPullRequestCommentCommentTypesItem {
+  TimelineComment
+  ReviewComment
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsGetAutomationResponseTriggersPullRequestCommentCommentTypesItem with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsGetAutomationResponseTriggersPullRequestCommentCommentTypesItem with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsGetAutomationResponseTriggersPullRequestCommentCommentTypesItem with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsGetAutomationResponseTriggersPullRequestCommentCommentTypesItem with fn to_json(
+  self,
+) {
+  let raw = match self {
+    TimelineComment => "timeline_comment"
+    ReviewComment => "review_comment"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsGetAutomationResponseTriggersPullRequestCommentCommentTypesItem with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsGetAutomationResponseTriggersPullRequestCommentCommentTypesItem with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "timeline_comment" => Some(TimelineComment)
+        "review_comment" => Some(ReviewComment)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsGetAutomationResponseTriggersPullRequestCommentWriteScope {
+  Trigger
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsGetAutomationResponseTriggersPullRequestCommentWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsGetAutomationResponseTriggersPullRequestCommentWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsGetAutomationResponseTriggersPullRequestCommentWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsGetAutomationResponseTriggersPullRequestCommentWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsGetAutomationResponseTriggersPullRequestCommentWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsGetAutomationResponseTriggersPullRequestCommentWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsGetAutomationResponseTriggersPullRequestComment.
+pub(all) struct AgentAutomationsGetAutomationResponseTriggersPullRequestComment {
+  comment_types : Array[
+    AgentAutomationsGetAutomationResponseTriggersPullRequestCommentCommentTypesItem,
+  ]
+  body_substring : String?
+  write_scope : AgentAutomationsGetAutomationResponseTriggersPullRequestCommentWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsGetAutomationResponseTriggersPullRequestComment with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsGetAutomationResponseTriggersPullRequestComment with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsGetAutomationResponseTriggersPullRequestComment with omitted optional fields absent.
+pub fn AgentAutomationsGetAutomationResponseTriggersPullRequestComment::new(
+  comment_types~ : Array[
+    AgentAutomationsGetAutomationResponseTriggersPullRequestCommentCommentTypesItem,
+  ],
+  body_substring? : String,
+  write_scope? : AgentAutomationsGetAutomationResponseTriggersPullRequestCommentWriteScope,
+) -> AgentAutomationsGetAutomationResponseTriggersPullRequestComment {
+  { comment_types, body_substring, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsGetAutomationResponseTriggersPullRequestComment with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsGetAutomationResponseTriggersPullRequestComment with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .field("comment_types", self.comment_types)
+  .opt("body_substring", self.body_substring)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsGetAutomationResponseTriggersPullRequestComment with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsGetAutomationResponseTriggersPullRequestComment with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    comment_types: required_field(obj, "comment_types", path),
+    body_substring: @sdkjson.opt_field(obj, "body_substring", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsGetAutomationResponseTriggersDiscussionOpenedWriteScope {
+  Trigger
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsGetAutomationResponseTriggersDiscussionOpenedWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsGetAutomationResponseTriggersDiscussionOpenedWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsGetAutomationResponseTriggersDiscussionOpenedWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsGetAutomationResponseTriggersDiscussionOpenedWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsGetAutomationResponseTriggersDiscussionOpenedWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsGetAutomationResponseTriggersDiscussionOpenedWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsGetAutomationResponseTriggersDiscussionOpened.
+pub(all) struct AgentAutomationsGetAutomationResponseTriggersDiscussionOpened {
+  categories : Array[String]?
+  body_substring : String?
+  write_scope : AgentAutomationsGetAutomationResponseTriggersDiscussionOpenedWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsGetAutomationResponseTriggersDiscussionOpened with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsGetAutomationResponseTriggersDiscussionOpened with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsGetAutomationResponseTriggersDiscussionOpened with omitted optional fields absent.
+pub fn AgentAutomationsGetAutomationResponseTriggersDiscussionOpened::new(
+  categories? : Array[String],
+  body_substring? : String,
+  write_scope? : AgentAutomationsGetAutomationResponseTriggersDiscussionOpenedWriteScope,
+) -> AgentAutomationsGetAutomationResponseTriggersDiscussionOpened {
+  { categories, body_substring, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsGetAutomationResponseTriggersDiscussionOpened with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsGetAutomationResponseTriggersDiscussionOpened with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("categories", self.categories)
+  .opt("body_substring", self.body_substring)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsGetAutomationResponseTriggersDiscussionOpened with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsGetAutomationResponseTriggersDiscussionOpened with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    categories: @sdkjson.opt_field(obj, "categories", path),
+    body_substring: @sdkjson.opt_field(obj, "body_substring", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsGetAutomationResponseTriggersDiscussionUpdatedWriteScope {
+  Trigger
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsGetAutomationResponseTriggersDiscussionUpdatedWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsGetAutomationResponseTriggersDiscussionUpdatedWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsGetAutomationResponseTriggersDiscussionUpdatedWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsGetAutomationResponseTriggersDiscussionUpdatedWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsGetAutomationResponseTriggersDiscussionUpdatedWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsGetAutomationResponseTriggersDiscussionUpdatedWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsGetAutomationResponseTriggersDiscussionUpdated.
+pub(all) struct AgentAutomationsGetAutomationResponseTriggersDiscussionUpdated {
+  categories : Array[String]?
+  body_substring : String?
+  write_scope : AgentAutomationsGetAutomationResponseTriggersDiscussionUpdatedWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsGetAutomationResponseTriggersDiscussionUpdated with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsGetAutomationResponseTriggersDiscussionUpdated with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsGetAutomationResponseTriggersDiscussionUpdated with omitted optional fields absent.
+pub fn AgentAutomationsGetAutomationResponseTriggersDiscussionUpdated::new(
+  categories? : Array[String],
+  body_substring? : String,
+  write_scope? : AgentAutomationsGetAutomationResponseTriggersDiscussionUpdatedWriteScope,
+) -> AgentAutomationsGetAutomationResponseTriggersDiscussionUpdated {
+  { categories, body_substring, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsGetAutomationResponseTriggersDiscussionUpdated with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsGetAutomationResponseTriggersDiscussionUpdated with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("categories", self.categories)
+  .opt("body_substring", self.body_substring)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsGetAutomationResponseTriggersDiscussionUpdated with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsGetAutomationResponseTriggersDiscussionUpdated with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    categories: @sdkjson.opt_field(obj, "categories", path),
+    body_substring: @sdkjson.opt_field(obj, "body_substring", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Generated string enum AgentAutomationsGetAutomationResponseTriggersDiscussionCommentCommentTypesItem.
+pub(all) enum AgentAutomationsGetAutomationResponseTriggersDiscussionCommentCommentTypesItem {
+  Comment
+  Reply
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsGetAutomationResponseTriggersDiscussionCommentCommentTypesItem with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsGetAutomationResponseTriggersDiscussionCommentCommentTypesItem with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsGetAutomationResponseTriggersDiscussionCommentCommentTypesItem with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsGetAutomationResponseTriggersDiscussionCommentCommentTypesItem with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Comment => "comment"
+    Reply => "reply"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsGetAutomationResponseTriggersDiscussionCommentCommentTypesItem with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsGetAutomationResponseTriggersDiscussionCommentCommentTypesItem with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "comment" => Some(Comment)
+        "reply" => Some(Reply)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsGetAutomationResponseTriggersDiscussionCommentWriteScope {
+  Trigger
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsGetAutomationResponseTriggersDiscussionCommentWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsGetAutomationResponseTriggersDiscussionCommentWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsGetAutomationResponseTriggersDiscussionCommentWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsGetAutomationResponseTriggersDiscussionCommentWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsGetAutomationResponseTriggersDiscussionCommentWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsGetAutomationResponseTriggersDiscussionCommentWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsGetAutomationResponseTriggersDiscussionComment.
+pub(all) struct AgentAutomationsGetAutomationResponseTriggersDiscussionComment {
+  comment_types : Array[
+    AgentAutomationsGetAutomationResponseTriggersDiscussionCommentCommentTypesItem,
+  ]?
+  categories : Array[String]?
+  body_substring : String?
+  write_scope : AgentAutomationsGetAutomationResponseTriggersDiscussionCommentWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsGetAutomationResponseTriggersDiscussionComment with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsGetAutomationResponseTriggersDiscussionComment with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsGetAutomationResponseTriggersDiscussionComment with omitted optional fields absent.
+pub fn AgentAutomationsGetAutomationResponseTriggersDiscussionComment::new(
+  comment_types? : Array[
+    AgentAutomationsGetAutomationResponseTriggersDiscussionCommentCommentTypesItem,
+  ],
+  categories? : Array[String],
+  body_substring? : String,
+  write_scope? : AgentAutomationsGetAutomationResponseTriggersDiscussionCommentWriteScope,
+) -> AgentAutomationsGetAutomationResponseTriggersDiscussionComment {
+  { comment_types, categories, body_substring, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsGetAutomationResponseTriggersDiscussionComment with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsGetAutomationResponseTriggersDiscussionComment with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("comment_types", self.comment_types)
+  .opt("categories", self.categories)
+  .opt("body_substring", self.body_substring)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsGetAutomationResponseTriggersDiscussionComment with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsGetAutomationResponseTriggersDiscussionComment with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    comment_types: @sdkjson.opt_field(obj, "comment_types", path),
+    categories: @sdkjson.opt_field(obj, "categories", path),
+    body_substring: @sdkjson.opt_field(obj, "body_substring", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsGetAutomationResponseTriggersIssueAssignedWriteScope {
+  Trigger
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsGetAutomationResponseTriggersIssueAssignedWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsGetAutomationResponseTriggersIssueAssignedWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsGetAutomationResponseTriggersIssueAssignedWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsGetAutomationResponseTriggersIssueAssignedWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsGetAutomationResponseTriggersIssueAssignedWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsGetAutomationResponseTriggersIssueAssignedWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsGetAutomationResponseTriggersIssueAssigned.
+pub(all) struct AgentAutomationsGetAutomationResponseTriggersIssueAssigned {
+  query : String?
+  assignees : Array[String]?
+  write_scope : AgentAutomationsGetAutomationResponseTriggersIssueAssignedWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsGetAutomationResponseTriggersIssueAssigned with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsGetAutomationResponseTriggersIssueAssigned with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsGetAutomationResponseTriggersIssueAssigned with omitted optional fields absent.
+pub fn AgentAutomationsGetAutomationResponseTriggersIssueAssigned::new(
+  query? : String,
+  assignees? : Array[String],
+  write_scope? : AgentAutomationsGetAutomationResponseTriggersIssueAssignedWriteScope,
+) -> AgentAutomationsGetAutomationResponseTriggersIssueAssigned {
+  { query, assignees, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsGetAutomationResponseTriggersIssueAssigned with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsGetAutomationResponseTriggersIssueAssigned with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("query", self.query)
+  .opt("assignees", self.assignees)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsGetAutomationResponseTriggersIssueAssigned with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsGetAutomationResponseTriggersIssueAssigned with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    query: @sdkjson.opt_field(obj, "query", path),
+    assignees: @sdkjson.opt_field(obj, "assignees", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsGetAutomationResponseTriggersPullRequestAssignedWriteScope {
+  Trigger
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsGetAutomationResponseTriggersPullRequestAssignedWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsGetAutomationResponseTriggersPullRequestAssignedWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsGetAutomationResponseTriggersPullRequestAssignedWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsGetAutomationResponseTriggersPullRequestAssignedWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsGetAutomationResponseTriggersPullRequestAssignedWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsGetAutomationResponseTriggersPullRequestAssignedWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsGetAutomationResponseTriggersPullRequestAssigned.
+pub(all) struct AgentAutomationsGetAutomationResponseTriggersPullRequestAssigned {
+  query : String?
+  paths : Array[String]?
+  assignees : Array[String]?
+  write_scope : AgentAutomationsGetAutomationResponseTriggersPullRequestAssignedWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsGetAutomationResponseTriggersPullRequestAssigned with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsGetAutomationResponseTriggersPullRequestAssigned with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsGetAutomationResponseTriggersPullRequestAssigned with omitted optional fields absent.
+pub fn AgentAutomationsGetAutomationResponseTriggersPullRequestAssigned::new(
+  query? : String,
+  paths? : Array[String],
+  assignees? : Array[String],
+  write_scope? : AgentAutomationsGetAutomationResponseTriggersPullRequestAssignedWriteScope,
+) -> AgentAutomationsGetAutomationResponseTriggersPullRequestAssigned {
+  { query, paths, assignees, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsGetAutomationResponseTriggersPullRequestAssigned with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsGetAutomationResponseTriggersPullRequestAssigned with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("query", self.query)
+  .opt("paths", self.paths)
+  .opt("assignees", self.assignees)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsGetAutomationResponseTriggersPullRequestAssigned with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsGetAutomationResponseTriggersPullRequestAssigned with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    query: @sdkjson.opt_field(obj, "query", path),
+    paths: @sdkjson.opt_field(obj, "paths", path),
+    assignees: @sdkjson.opt_field(obj, "assignees", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsGetAutomationResponseTriggersSubIssueAddedWriteScope {
+  Trigger
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsGetAutomationResponseTriggersSubIssueAddedWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsGetAutomationResponseTriggersSubIssueAddedWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsGetAutomationResponseTriggersSubIssueAddedWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsGetAutomationResponseTriggersSubIssueAddedWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsGetAutomationResponseTriggersSubIssueAddedWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsGetAutomationResponseTriggersSubIssueAddedWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsGetAutomationResponseTriggersSubIssueAdded.
+pub(all) struct AgentAutomationsGetAutomationResponseTriggersSubIssueAdded {
+  query : String?
+  write_scope : AgentAutomationsGetAutomationResponseTriggersSubIssueAddedWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsGetAutomationResponseTriggersSubIssueAdded with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsGetAutomationResponseTriggersSubIssueAdded with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsGetAutomationResponseTriggersSubIssueAdded with omitted optional fields absent.
+pub fn AgentAutomationsGetAutomationResponseTriggersSubIssueAdded::new(
+  query? : String,
+  write_scope? : AgentAutomationsGetAutomationResponseTriggersSubIssueAddedWriteScope,
+) -> AgentAutomationsGetAutomationResponseTriggersSubIssueAdded {
+  { query, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsGetAutomationResponseTriggersSubIssueAdded with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsGetAutomationResponseTriggersSubIssueAdded with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("query", self.query)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsGetAutomationResponseTriggersSubIssueAdded with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsGetAutomationResponseTriggersSubIssueAdded with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    query: @sdkjson.opt_field(obj, "query", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsGetAutomationResponseTriggersPullRequestReadyForReviewWriteScope {
+  Trigger
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsGetAutomationResponseTriggersPullRequestReadyForReviewWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsGetAutomationResponseTriggersPullRequestReadyForReviewWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsGetAutomationResponseTriggersPullRequestReadyForReviewWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsGetAutomationResponseTriggersPullRequestReadyForReviewWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsGetAutomationResponseTriggersPullRequestReadyForReviewWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsGetAutomationResponseTriggersPullRequestReadyForReviewWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsGetAutomationResponseTriggersPullRequestReadyForReview.
+pub(all) struct AgentAutomationsGetAutomationResponseTriggersPullRequestReadyForReview {
+  query : String?
+  paths : Array[String]?
+  write_scope : AgentAutomationsGetAutomationResponseTriggersPullRequestReadyForReviewWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsGetAutomationResponseTriggersPullRequestReadyForReview with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsGetAutomationResponseTriggersPullRequestReadyForReview with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsGetAutomationResponseTriggersPullRequestReadyForReview with omitted optional fields absent.
+pub fn AgentAutomationsGetAutomationResponseTriggersPullRequestReadyForReview::new(
+  query? : String,
+  paths? : Array[String],
+  write_scope? : AgentAutomationsGetAutomationResponseTriggersPullRequestReadyForReviewWriteScope,
+) -> AgentAutomationsGetAutomationResponseTriggersPullRequestReadyForReview {
+  { query, paths, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsGetAutomationResponseTriggersPullRequestReadyForReview with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsGetAutomationResponseTriggersPullRequestReadyForReview with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("query", self.query)
+  .opt("paths", self.paths)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsGetAutomationResponseTriggersPullRequestReadyForReview with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsGetAutomationResponseTriggersPullRequestReadyForReview with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    query: @sdkjson.opt_field(obj, "query", path),
+    paths: @sdkjson.opt_field(obj, "paths", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsGetAutomationResponseTriggersPullRequestLabeledWriteScope {
+  Trigger
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsGetAutomationResponseTriggersPullRequestLabeledWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsGetAutomationResponseTriggersPullRequestLabeledWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsGetAutomationResponseTriggersPullRequestLabeledWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsGetAutomationResponseTriggersPullRequestLabeledWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsGetAutomationResponseTriggersPullRequestLabeledWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsGetAutomationResponseTriggersPullRequestLabeledWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsGetAutomationResponseTriggersPullRequestLabeled.
+pub(all) struct AgentAutomationsGetAutomationResponseTriggersPullRequestLabeled {
+  query : String?
+  paths : Array[String]?
+  labels : Array[String]?
+  write_scope : AgentAutomationsGetAutomationResponseTriggersPullRequestLabeledWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsGetAutomationResponseTriggersPullRequestLabeled with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsGetAutomationResponseTriggersPullRequestLabeled with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsGetAutomationResponseTriggersPullRequestLabeled with omitted optional fields absent.
+pub fn AgentAutomationsGetAutomationResponseTriggersPullRequestLabeled::new(
+  query? : String,
+  paths? : Array[String],
+  labels? : Array[String],
+  write_scope? : AgentAutomationsGetAutomationResponseTriggersPullRequestLabeledWriteScope,
+) -> AgentAutomationsGetAutomationResponseTriggersPullRequestLabeled {
+  { query, paths, labels, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsGetAutomationResponseTriggersPullRequestLabeled with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsGetAutomationResponseTriggersPullRequestLabeled with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("query", self.query)
+  .opt("paths", self.paths)
+  .opt("labels", self.labels)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsGetAutomationResponseTriggersPullRequestLabeled with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsGetAutomationResponseTriggersPullRequestLabeled with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    query: @sdkjson.opt_field(obj, "query", path),
+    paths: @sdkjson.opt_field(obj, "paths", path),
+    labels: @sdkjson.opt_field(obj, "labels", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsGetAutomationResponseTriggersPullRequestMergeConflictWriteScope {
+  Trigger
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsGetAutomationResponseTriggersPullRequestMergeConflictWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsGetAutomationResponseTriggersPullRequestMergeConflictWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsGetAutomationResponseTriggersPullRequestMergeConflictWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsGetAutomationResponseTriggersPullRequestMergeConflictWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsGetAutomationResponseTriggersPullRequestMergeConflictWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsGetAutomationResponseTriggersPullRequestMergeConflictWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsGetAutomationResponseTriggersPullRequestMergeConflict.
+pub(all) struct AgentAutomationsGetAutomationResponseTriggersPullRequestMergeConflict {
+  query : String?
+  paths : Array[String]?
+  write_scope : AgentAutomationsGetAutomationResponseTriggersPullRequestMergeConflictWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsGetAutomationResponseTriggersPullRequestMergeConflict with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsGetAutomationResponseTriggersPullRequestMergeConflict with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsGetAutomationResponseTriggersPullRequestMergeConflict with omitted optional fields absent.
+pub fn AgentAutomationsGetAutomationResponseTriggersPullRequestMergeConflict::new(
+  query? : String,
+  paths? : Array[String],
+  write_scope? : AgentAutomationsGetAutomationResponseTriggersPullRequestMergeConflictWriteScope,
+) -> AgentAutomationsGetAutomationResponseTriggersPullRequestMergeConflict {
+  { query, paths, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsGetAutomationResponseTriggersPullRequestMergeConflict with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsGetAutomationResponseTriggersPullRequestMergeConflict with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("query", self.query)
+  .opt("paths", self.paths)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsGetAutomationResponseTriggersPullRequestMergeConflict with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsGetAutomationResponseTriggersPullRequestMergeConflict with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    query: @sdkjson.opt_field(obj, "query", path),
+    paths: @sdkjson.opt_field(obj, "paths", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Generated string enum AgentAutomationsGetAutomationResponseTriggersPullRequestReviewSubmittedStatesItem.
+pub(all) enum AgentAutomationsGetAutomationResponseTriggersPullRequestReviewSubmittedStatesItem {
+  Approved
+  ChangesRequested
+  Commented
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsGetAutomationResponseTriggersPullRequestReviewSubmittedStatesItem with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsGetAutomationResponseTriggersPullRequestReviewSubmittedStatesItem with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsGetAutomationResponseTriggersPullRequestReviewSubmittedStatesItem with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsGetAutomationResponseTriggersPullRequestReviewSubmittedStatesItem with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Approved => "approved"
+    ChangesRequested => "changes_requested"
+    Commented => "commented"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsGetAutomationResponseTriggersPullRequestReviewSubmittedStatesItem with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsGetAutomationResponseTriggersPullRequestReviewSubmittedStatesItem with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "approved" => Some(Approved)
+        "changes_requested" => Some(ChangesRequested)
+        "commented" => Some(Commented)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsGetAutomationResponseTriggersPullRequestReviewSubmittedWriteScope {
+  Trigger
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsGetAutomationResponseTriggersPullRequestReviewSubmittedWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsGetAutomationResponseTriggersPullRequestReviewSubmittedWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsGetAutomationResponseTriggersPullRequestReviewSubmittedWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsGetAutomationResponseTriggersPullRequestReviewSubmittedWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsGetAutomationResponseTriggersPullRequestReviewSubmittedWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsGetAutomationResponseTriggersPullRequestReviewSubmittedWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsGetAutomationResponseTriggersPullRequestReviewSubmitted.
+pub(all) struct AgentAutomationsGetAutomationResponseTriggersPullRequestReviewSubmitted {
+  query : String?
+  paths : Array[String]?
+  states : Array[
+    AgentAutomationsGetAutomationResponseTriggersPullRequestReviewSubmittedStatesItem,
+  ]
+  write_scope : AgentAutomationsGetAutomationResponseTriggersPullRequestReviewSubmittedWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsGetAutomationResponseTriggersPullRequestReviewSubmitted with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsGetAutomationResponseTriggersPullRequestReviewSubmitted with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsGetAutomationResponseTriggersPullRequestReviewSubmitted with omitted optional fields absent.
+pub fn AgentAutomationsGetAutomationResponseTriggersPullRequestReviewSubmitted::new(
+  states~ : Array[
+    AgentAutomationsGetAutomationResponseTriggersPullRequestReviewSubmittedStatesItem,
+  ],
+  query? : String,
+  paths? : Array[String],
+  write_scope? : AgentAutomationsGetAutomationResponseTriggersPullRequestReviewSubmittedWriteScope,
+) -> AgentAutomationsGetAutomationResponseTriggersPullRequestReviewSubmitted {
+  { query, paths, states, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsGetAutomationResponseTriggersPullRequestReviewSubmitted with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsGetAutomationResponseTriggersPullRequestReviewSubmitted with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("query", self.query)
+  .opt("paths", self.paths)
+  .field("states", self.states)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsGetAutomationResponseTriggersPullRequestReviewSubmitted with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsGetAutomationResponseTriggersPullRequestReviewSubmitted with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    query: @sdkjson.opt_field(obj, "query", path),
+    paths: @sdkjson.opt_field(obj, "paths", path),
+    states: required_field(obj, "states", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsGetAutomationResponseTriggersPullRequestReviewRequestedWriteScope {
+  Trigger
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsGetAutomationResponseTriggersPullRequestReviewRequestedWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsGetAutomationResponseTriggersPullRequestReviewRequestedWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsGetAutomationResponseTriggersPullRequestReviewRequestedWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsGetAutomationResponseTriggersPullRequestReviewRequestedWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsGetAutomationResponseTriggersPullRequestReviewRequestedWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsGetAutomationResponseTriggersPullRequestReviewRequestedWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsGetAutomationResponseTriggersPullRequestReviewRequested.
+pub(all) struct AgentAutomationsGetAutomationResponseTriggersPullRequestReviewRequested {
+  query : String?
+  paths : Array[String]?
+  write_scope : AgentAutomationsGetAutomationResponseTriggersPullRequestReviewRequestedWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsGetAutomationResponseTriggersPullRequestReviewRequested with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsGetAutomationResponseTriggersPullRequestReviewRequested with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsGetAutomationResponseTriggersPullRequestReviewRequested with omitted optional fields absent.
+pub fn AgentAutomationsGetAutomationResponseTriggersPullRequestReviewRequested::new(
+  query? : String,
+  paths? : Array[String],
+  write_scope? : AgentAutomationsGetAutomationResponseTriggersPullRequestReviewRequestedWriteScope,
+) -> AgentAutomationsGetAutomationResponseTriggersPullRequestReviewRequested {
+  { query, paths, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsGetAutomationResponseTriggersPullRequestReviewRequested with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsGetAutomationResponseTriggersPullRequestReviewRequested with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("query", self.query)
+  .opt("paths", self.paths)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsGetAutomationResponseTriggersPullRequestReviewRequested with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsGetAutomationResponseTriggersPullRequestReviewRequested with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    query: @sdkjson.opt_field(obj, "query", path),
+    paths: @sdkjson.opt_field(obj, "paths", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsGetAutomationResponseTriggersAutomationCompletedWriteScope {
+  Trigger
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsGetAutomationResponseTriggersAutomationCompletedWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsGetAutomationResponseTriggersAutomationCompletedWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsGetAutomationResponseTriggersAutomationCompletedWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsGetAutomationResponseTriggersAutomationCompletedWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsGetAutomationResponseTriggersAutomationCompletedWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsGetAutomationResponseTriggersAutomationCompletedWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsGetAutomationResponseTriggersAutomationCompleted.
+pub(all) struct AgentAutomationsGetAutomationResponseTriggersAutomationCompleted {
+  automation_ids : Array[String]
+  write_scope : AgentAutomationsGetAutomationResponseTriggersAutomationCompletedWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsGetAutomationResponseTriggersAutomationCompleted with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsGetAutomationResponseTriggersAutomationCompleted with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsGetAutomationResponseTriggersAutomationCompleted with omitted optional fields absent.
+pub fn AgentAutomationsGetAutomationResponseTriggersAutomationCompleted::new(
+  automation_ids~ : Array[String],
+  write_scope? : AgentAutomationsGetAutomationResponseTriggersAutomationCompletedWriteScope,
+) -> AgentAutomationsGetAutomationResponseTriggersAutomationCompleted {
+  { automation_ids, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsGetAutomationResponseTriggersAutomationCompleted with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsGetAutomationResponseTriggersAutomationCompleted with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .field("automation_ids", self.automation_ids)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsGetAutomationResponseTriggersAutomationCompleted with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsGetAutomationResponseTriggersAutomationCompleted with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    automation_ids: required_field(obj, "automation_ids", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Public trigger configuration keyed by stable public trigger identifier. Each trigger has a closed, trigger-specific configuration schema.
+pub(all) struct AgentAutomationsGetAutomationResponseTriggers {
+  interval : AgentAutomationsGetAutomationResponseTriggersInterval?
+  issue_opened : AgentAutomationsGetAutomationResponseTriggersIssueOpened?
+  issue_labeled : AgentAutomationsGetAutomationResponseTriggersIssueLabeled?
+  workflow_run : AgentAutomationsGetAutomationResponseTriggersWorkflowRun?
+  pull_request_opened : AgentAutomationsGetAutomationResponseTriggersPullRequestOpened?
+  pull_request_synchronize : AgentAutomationsGetAutomationResponseTriggersPullRequestSynchronize?
+  pull_request_merged : AgentAutomationsGetAutomationResponseTriggersPullRequestMerged?
+  issue_comment : AgentAutomationsGetAutomationResponseTriggersIssueComment?
+  pull_request_comment : AgentAutomationsGetAutomationResponseTriggersPullRequestComment?
+  discussion_opened : AgentAutomationsGetAutomationResponseTriggersDiscussionOpened?
+  discussion_updated : AgentAutomationsGetAutomationResponseTriggersDiscussionUpdated?
+  discussion_comment : AgentAutomationsGetAutomationResponseTriggersDiscussionComment?
+  issue_assigned : AgentAutomationsGetAutomationResponseTriggersIssueAssigned?
+  pull_request_assigned : AgentAutomationsGetAutomationResponseTriggersPullRequestAssigned?
+  sub_issue_added : AgentAutomationsGetAutomationResponseTriggersSubIssueAdded?
+  pull_request_ready_for_review : AgentAutomationsGetAutomationResponseTriggersPullRequestReadyForReview?
+  pull_request_labeled : AgentAutomationsGetAutomationResponseTriggersPullRequestLabeled?
+  pull_request_merge_conflict : AgentAutomationsGetAutomationResponseTriggersPullRequestMergeConflict?
+  pull_request_review_submitted : AgentAutomationsGetAutomationResponseTriggersPullRequestReviewSubmitted?
+  pull_request_review_requested : AgentAutomationsGetAutomationResponseTriggersPullRequestReviewRequested?
+  automation_completed : AgentAutomationsGetAutomationResponseTriggersAutomationCompleted?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsGetAutomationResponseTriggers with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsGetAutomationResponseTriggers with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsGetAutomationResponseTriggers with omitted optional fields absent.
+pub fn AgentAutomationsGetAutomationResponseTriggers::new(
+  interval? : AgentAutomationsGetAutomationResponseTriggersInterval,
+  issue_opened? : AgentAutomationsGetAutomationResponseTriggersIssueOpened,
+  issue_labeled? : AgentAutomationsGetAutomationResponseTriggersIssueLabeled,
+  workflow_run? : AgentAutomationsGetAutomationResponseTriggersWorkflowRun,
+  pull_request_opened? : AgentAutomationsGetAutomationResponseTriggersPullRequestOpened,
+  pull_request_synchronize? : AgentAutomationsGetAutomationResponseTriggersPullRequestSynchronize,
+  pull_request_merged? : AgentAutomationsGetAutomationResponseTriggersPullRequestMerged,
+  issue_comment? : AgentAutomationsGetAutomationResponseTriggersIssueComment,
+  pull_request_comment? : AgentAutomationsGetAutomationResponseTriggersPullRequestComment,
+  discussion_opened? : AgentAutomationsGetAutomationResponseTriggersDiscussionOpened,
+  discussion_updated? : AgentAutomationsGetAutomationResponseTriggersDiscussionUpdated,
+  discussion_comment? : AgentAutomationsGetAutomationResponseTriggersDiscussionComment,
+  issue_assigned? : AgentAutomationsGetAutomationResponseTriggersIssueAssigned,
+  pull_request_assigned? : AgentAutomationsGetAutomationResponseTriggersPullRequestAssigned,
+  sub_issue_added? : AgentAutomationsGetAutomationResponseTriggersSubIssueAdded,
+  pull_request_ready_for_review? : AgentAutomationsGetAutomationResponseTriggersPullRequestReadyForReview,
+  pull_request_labeled? : AgentAutomationsGetAutomationResponseTriggersPullRequestLabeled,
+  pull_request_merge_conflict? : AgentAutomationsGetAutomationResponseTriggersPullRequestMergeConflict,
+  pull_request_review_submitted? : AgentAutomationsGetAutomationResponseTriggersPullRequestReviewSubmitted,
+  pull_request_review_requested? : AgentAutomationsGetAutomationResponseTriggersPullRequestReviewRequested,
+  automation_completed? : AgentAutomationsGetAutomationResponseTriggersAutomationCompleted,
+) -> AgentAutomationsGetAutomationResponseTriggers {
+  {
+    interval,
+    issue_opened,
+    issue_labeled,
+    workflow_run,
+    pull_request_opened,
+    pull_request_synchronize,
+    pull_request_merged,
+    issue_comment,
+    pull_request_comment,
+    discussion_opened,
+    discussion_updated,
+    discussion_comment,
+    issue_assigned,
+    pull_request_assigned,
+    sub_issue_added,
+    pull_request_ready_for_review,
+    pull_request_labeled,
+    pull_request_merge_conflict,
+    pull_request_review_submitted,
+    pull_request_review_requested,
+    automation_completed,
+  }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsGetAutomationResponseTriggers with ToJson::{to_json}
+
+///|
+pub impl ToJson for AgentAutomationsGetAutomationResponseTriggers with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("interval", self.interval)
+  .opt("issue_opened", self.issue_opened)
+  .opt("issue_labeled", self.issue_labeled)
+  .opt("workflow_run", self.workflow_run)
+  .opt("pull_request_opened", self.pull_request_opened)
+  .opt("pull_request_synchronize", self.pull_request_synchronize)
+  .opt("pull_request_merged", self.pull_request_merged)
+  .opt("issue_comment", self.issue_comment)
+  .opt("pull_request_comment", self.pull_request_comment)
+  .opt("discussion_opened", self.discussion_opened)
+  .opt("discussion_updated", self.discussion_updated)
+  .opt("discussion_comment", self.discussion_comment)
+  .opt("issue_assigned", self.issue_assigned)
+  .opt("pull_request_assigned", self.pull_request_assigned)
+  .opt("sub_issue_added", self.sub_issue_added)
+  .opt("pull_request_ready_for_review", self.pull_request_ready_for_review)
+  .opt("pull_request_labeled", self.pull_request_labeled)
+  .opt("pull_request_merge_conflict", self.pull_request_merge_conflict)
+  .opt("pull_request_review_submitted", self.pull_request_review_submitted)
+  .opt("pull_request_review_requested", self.pull_request_review_requested)
+  .opt("automation_completed", self.automation_completed)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsGetAutomationResponseTriggers with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsGetAutomationResponseTriggers with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    interval: @sdkjson.opt_field(obj, "interval", path),
+    issue_opened: @sdkjson.opt_field(obj, "issue_opened", path),
+    issue_labeled: @sdkjson.opt_field(obj, "issue_labeled", path),
+    workflow_run: @sdkjson.opt_field(obj, "workflow_run", path),
+    pull_request_opened: @sdkjson.opt_field(obj, "pull_request_opened", path),
+    pull_request_synchronize: @sdkjson.opt_field(
+      obj, "pull_request_synchronize", path,
+    ),
+    pull_request_merged: @sdkjson.opt_field(obj, "pull_request_merged", path),
+    issue_comment: @sdkjson.opt_field(obj, "issue_comment", path),
+    pull_request_comment: @sdkjson.opt_field(obj, "pull_request_comment", path),
+    discussion_opened: @sdkjson.opt_field(obj, "discussion_opened", path),
+    discussion_updated: @sdkjson.opt_field(obj, "discussion_updated", path),
+    discussion_comment: @sdkjson.opt_field(obj, "discussion_comment", path),
+    issue_assigned: @sdkjson.opt_field(obj, "issue_assigned", path),
+    pull_request_assigned: @sdkjson.opt_field(
+      obj, "pull_request_assigned", path,
+    ),
+    sub_issue_added: @sdkjson.opt_field(obj, "sub_issue_added", path),
+    pull_request_ready_for_review: @sdkjson.opt_field(
+      obj, "pull_request_ready_for_review", path,
+    ),
+    pull_request_labeled: @sdkjson.opt_field(obj, "pull_request_labeled", path),
+    pull_request_merge_conflict: @sdkjson.opt_field(
+      obj, "pull_request_merge_conflict", path,
+    ),
+    pull_request_review_submitted: @sdkjson.opt_field(
+      obj, "pull_request_review_submitted", path,
+    ),
+    pull_request_review_requested: @sdkjson.opt_field(
+      obj, "pull_request_review_requested", path,
+    ),
+    automation_completed: @sdkjson.opt_field(obj, "automation_completed", path),
+  }
+}
+
+///|
+///
+/// A GitHub user
+pub(all) struct AgentAutomationsGetAutomationResponseCreatedBy {
+  id : Int64?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsGetAutomationResponseCreatedBy with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsGetAutomationResponseCreatedBy with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsGetAutomationResponseCreatedBy with omitted optional fields absent.
+pub fn AgentAutomationsGetAutomationResponseCreatedBy::new(
+  id? : Int64,
+) -> AgentAutomationsGetAutomationResponseCreatedBy {
+  { id, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsGetAutomationResponseCreatedBy with ToJson::{to_json}
+
+///|
+pub impl ToJson for AgentAutomationsGetAutomationResponseCreatedBy with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("id", self.id.map(value => json_int64_to_json(value)))
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsGetAutomationResponseCreatedBy with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsGetAutomationResponseCreatedBy with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  { id: decode_optional_int64(obj, "id", path), }
+}
+
+///|
+///
+/// A full representation of an automation including all configuration fields and repository identity (used in cross-repository get responses).
+pub(all) struct AgentAutomationsGetAutomationResponse {
+  id : String
+  repository : AgentAutomationsGetAutomationResponseRepository
+  name : String
+  enabled : Bool?
+  owner_type : AgentAutomationsGetAutomationResponseOwnerType?
+  write_scope : AgentAutomationsGetAutomationResponseWriteScope?
+  require_actor_write_permission : Bool?
+  triggers : AgentAutomationsGetAutomationResponseTriggers?
+  prompt : String
+  tools : Array[String]?
+  allowed_custom_agents : Array[String]?
+  model : String?
+  reasoning_effort : String?
+  created_at : String
+  updated_at : String
+  created_by : AgentAutomationsGetAutomationResponseCreatedBy
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsGetAutomationResponse with Eq::{equal, not_equal}
+
+///|
+pub extend AgentAutomationsGetAutomationResponse with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a AgentAutomationsGetAutomationResponse with omitted optional fields absent.
+pub fn AgentAutomationsGetAutomationResponse::new(
+  id~ : String,
+  repository~ : AgentAutomationsGetAutomationResponseRepository,
+  name~ : String,
+  prompt~ : String,
+  created_at~ : String,
+  updated_at~ : String,
+  created_by~ : AgentAutomationsGetAutomationResponseCreatedBy,
+  enabled? : Bool,
+  owner_type? : AgentAutomationsGetAutomationResponseOwnerType,
+  write_scope? : AgentAutomationsGetAutomationResponseWriteScope,
+  require_actor_write_permission? : Bool,
+  triggers? : AgentAutomationsGetAutomationResponseTriggers,
+  tools? : Array[String],
+  allowed_custom_agents? : Array[String],
+  model? : String,
+  reasoning_effort? : String,
+) -> AgentAutomationsGetAutomationResponse {
+  {
+    id,
+    repository,
+    name,
+    enabled,
+    owner_type,
+    write_scope,
+    require_actor_write_permission,
+    triggers,
+    prompt,
+    tools,
+    allowed_custom_agents,
+    model,
+    reasoning_effort,
+    created_at,
+    updated_at,
+    created_by,
+  }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsGetAutomationResponse with ToJson::{to_json}
+
+///|
+pub impl ToJson for AgentAutomationsGetAutomationResponse with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("id", self.id)
+  .field("repository", self.repository)
+  .field("name", self.name)
+  .opt("enabled", self.enabled)
+  .opt("owner_type", self.owner_type)
+  .opt("write_scope", self.write_scope)
+  .opt("require_actor_write_permission", self.require_actor_write_permission)
+  .opt("triggers", self.triggers)
+  .field("prompt", self.prompt)
+  .opt("tools", self.tools)
+  .opt("allowed_custom_agents", self.allowed_custom_agents)
+  .opt("model", self.model)
+  .opt("reasoning_effort", self.reasoning_effort)
+  .field("created_at", self.created_at)
+  .field("updated_at", self.updated_at)
+  .field("created_by", self.created_by)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsGetAutomationResponse with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsGetAutomationResponse with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    id: required_field(obj, "id", path),
+    repository: required_field(obj, "repository", path),
+    name: required_field(obj, "name", path),
+    enabled: @sdkjson.opt_field(obj, "enabled", path),
+    owner_type: @sdkjson.opt_field(obj, "owner_type", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+    require_actor_write_permission: @sdkjson.opt_field(
+      obj, "require_actor_write_permission", path,
+    ),
+    triggers: @sdkjson.opt_field(obj, "triggers", path),
+    prompt: required_field(obj, "prompt", path),
+    tools: @sdkjson.opt_field(obj, "tools", path),
+    allowed_custom_agents: @sdkjson.opt_field(
+      obj, "allowed_custom_agents", path,
+    ),
+    model: @sdkjson.opt_field(obj, "model", path),
+    reasoning_effort: @sdkjson.opt_field(obj, "reasoning_effort", path),
+    created_at: required_field(obj, "created_at", path),
+    updated_at: required_field(obj, "updated_at", path),
+    created_by: required_field(obj, "created_by", path),
+  }
+}
+
+///|
+///
+/// Generated string enum AgentAutomationsListAutomationTasksSort.
+pub(all) enum AgentAutomationsListAutomationTasksSort {
+  UpdatedAt
+  CreatedAt
+  Custom(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsListAutomationTasksSort with Eq::{equal, not_equal}
+
+///|
+pub extend AgentAutomationsListAutomationTasksSort with @debug.Debug::{to_repr}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsListAutomationTasksSort with ToJson::{to_json}
+
+///|
+pub impl ToJson for AgentAutomationsListAutomationTasksSort with fn to_json(
+  self,
+) {
+  let raw = match self {
+    UpdatedAt => "updated_at"
+    CreatedAt => "created_at"
+    Custom(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsListAutomationTasksSort with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsListAutomationTasksSort with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "updated_at" => Some(UpdatedAt)
+        "created_at" => Some(CreatedAt)
+        _ => None
+      }
+    },
+    raw => Custom(raw),
+  )
+}
+
+///|
+///
+/// Generated string enum AgentAutomationsListAutomationTasksDirection.
+pub(all) enum AgentAutomationsListAutomationTasksDirection {
+  Asc
+  Desc
+  Custom(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsListAutomationTasksDirection with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsListAutomationTasksDirection with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsListAutomationTasksDirection with ToJson::{to_json}
+
+///|
+pub impl ToJson for AgentAutomationsListAutomationTasksDirection with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Asc => "asc"
+    Desc => "desc"
+    Custom(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsListAutomationTasksDirection with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsListAutomationTasksDirection with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "asc" => Some(Asc)
+        "desc" => Some(Desc)
+        _ => None
+      }
+    },
+    raw => Custom(raw),
+  )
+}
+
+///|
+///
+/// Type of the task creator
+pub(all) enum AgentAutomationsListAutomationTasksResponseTasksItemCreatorType {
+  User
+  Organization
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsListAutomationTasksResponseTasksItemCreatorType with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsListAutomationTasksResponseTasksItemCreatorType with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsListAutomationTasksResponseTasksItemCreatorType with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsListAutomationTasksResponseTasksItemCreatorType with fn to_json(
+  self,
+) {
+  let raw = match self {
+    User => "user"
+    Organization => "organization"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsListAutomationTasksResponseTasksItemCreatorType with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsListAutomationTasksResponseTasksItemCreatorType with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "user" => Some(User)
+        "organization" => Some(Organization)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// A GitHub user
+pub(all) struct AgentAutomationsListAutomationTasksResponseTasksItemUserCollaboratorsItem {
+  id : Int64?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsListAutomationTasksResponseTasksItemUserCollaboratorsItem with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsListAutomationTasksResponseTasksItemUserCollaboratorsItem with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsListAutomationTasksResponseTasksItemUserCollaboratorsItem with omitted optional fields absent.
+pub fn AgentAutomationsListAutomationTasksResponseTasksItemUserCollaboratorsItem::new(
+  id? : Int64,
+) -> AgentAutomationsListAutomationTasksResponseTasksItemUserCollaboratorsItem {
+  { id, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsListAutomationTasksResponseTasksItemUserCollaboratorsItem with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsListAutomationTasksResponseTasksItemUserCollaboratorsItem with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("id", self.id.map(value => json_int64_to_json(value)))
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsListAutomationTasksResponseTasksItemUserCollaboratorsItem with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsListAutomationTasksResponseTasksItemUserCollaboratorsItem with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  { id: decode_optional_int64(obj, "id", path), }
+}
+
+///|
+///
+/// The owner of the repository
+pub(all) struct AgentAutomationsListAutomationTasksResponseTasksItemOwner {
+  id : Int64?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsListAutomationTasksResponseTasksItemOwner with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsListAutomationTasksResponseTasksItemOwner with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsListAutomationTasksResponseTasksItemOwner with omitted optional fields absent.
+pub fn AgentAutomationsListAutomationTasksResponseTasksItemOwner::new(
+  id? : Int64,
+) -> AgentAutomationsListAutomationTasksResponseTasksItemOwner {
+  { id, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsListAutomationTasksResponseTasksItemOwner with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsListAutomationTasksResponseTasksItemOwner with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("id", self.id.map(value => json_int64_to_json(value)))
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsListAutomationTasksResponseTasksItemOwner with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsListAutomationTasksResponseTasksItemOwner with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  { id: decode_optional_int64(obj, "id", path), }
+}
+
+///|
+///
+/// The repository this task belongs to
+pub(all) struct AgentAutomationsListAutomationTasksResponseTasksItemRepository {
+  id : Int64?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsListAutomationTasksResponseTasksItemRepository with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsListAutomationTasksResponseTasksItemRepository with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsListAutomationTasksResponseTasksItemRepository with omitted optional fields absent.
+pub fn AgentAutomationsListAutomationTasksResponseTasksItemRepository::new(
+  id? : Int64,
+) -> AgentAutomationsListAutomationTasksResponseTasksItemRepository {
+  { id, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsListAutomationTasksResponseTasksItemRepository with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsListAutomationTasksResponseTasksItemRepository with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("id", self.id.map(value => json_int64_to_json(value)))
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsListAutomationTasksResponseTasksItemRepository with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsListAutomationTasksResponseTasksItemRepository with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  { id: decode_optional_int64(obj, "id", path), }
+}
+
+///|
+///
+/// Current state of the task, derived from its most recent session
+pub(all) enum AgentAutomationsListAutomationTasksResponseTasksItemState {
+  Queued
+  InProgress
+  Completed
+  Failed
+  Idle
+  WaitingForUser
+  TimedOut
+  Cancelled
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsListAutomationTasksResponseTasksItemState with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsListAutomationTasksResponseTasksItemState with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsListAutomationTasksResponseTasksItemState with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsListAutomationTasksResponseTasksItemState with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Queued => "queued"
+    InProgress => "in_progress"
+    Completed => "completed"
+    Failed => "failed"
+    Idle => "idle"
+    WaitingForUser => "waiting_for_user"
+    TimedOut => "timed_out"
+    Cancelled => "cancelled"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsListAutomationTasksResponseTasksItemState with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsListAutomationTasksResponseTasksItemState with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "queued" => Some(Queued)
+        "in_progress" => Some(InProgress)
+        "completed" => Some(Completed)
+        "failed" => Some(Failed)
+        "idle" => Some(Idle)
+        "waiting_for_user" => Some(WaitingForUser)
+        "timed_out" => Some(TimedOut)
+        "cancelled" => Some(Cancelled)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Type of artifact. Available Values: `pull`, `branch`.
+pub(all) enum AgentAutomationsListAutomationTasksResponseTasksItemArtifactsItemType {
+  Pull
+  Branch
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsListAutomationTasksResponseTasksItemArtifactsItemType with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsListAutomationTasksResponseTasksItemArtifactsItemType with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsListAutomationTasksResponseTasksItemArtifactsItemType with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsListAutomationTasksResponseTasksItemArtifactsItemType with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Pull => "pull"
+    Branch => "branch"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsListAutomationTasksResponseTasksItemArtifactsItemType with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsListAutomationTasksResponseTasksItemArtifactsItemType with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "pull" => Some(Pull)
+        "branch" => Some(Branch)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// A resource generated by the task
+pub(all) struct AgentAutomationsListAutomationTasksResponseTasksItemArtifactsItem {
+  type_ : AgentAutomationsListAutomationTasksResponseTasksItemArtifactsItemType
+  data : Json
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsListAutomationTasksResponseTasksItemArtifactsItem with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsListAutomationTasksResponseTasksItemArtifactsItem with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsListAutomationTasksResponseTasksItemArtifactsItem with omitted optional fields absent.
+pub fn AgentAutomationsListAutomationTasksResponseTasksItemArtifactsItem::new(
+  type_~ : AgentAutomationsListAutomationTasksResponseTasksItemArtifactsItemType,
+  data~ : Json,
+) -> AgentAutomationsListAutomationTasksResponseTasksItemArtifactsItem {
+  { type_, data, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsListAutomationTasksResponseTasksItemArtifactsItem with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsListAutomationTasksResponseTasksItemArtifactsItem with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .field("provider", "github")
+  .field("type", self.type_)
+  .field("data", self.data)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsListAutomationTasksResponseTasksItemArtifactsItem with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsListAutomationTasksResponseTasksItemArtifactsItem with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    type_: required_field(obj, "type", path),
+    data: required_field(obj, "data", path),
+  }
+}
+
+///|
+///
+/// Custom agent metadata associated with this task
+pub(all) struct AgentAutomationsListAutomationTasksResponseTasksItemCustomAgent {
+  id : String?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsListAutomationTasksResponseTasksItemCustomAgent with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsListAutomationTasksResponseTasksItemCustomAgent with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsListAutomationTasksResponseTasksItemCustomAgent with omitted optional fields absent.
+pub fn AgentAutomationsListAutomationTasksResponseTasksItemCustomAgent::new(
+  id? : String,
+) -> AgentAutomationsListAutomationTasksResponseTasksItemCustomAgent {
+  { id, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsListAutomationTasksResponseTasksItemCustomAgent with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsListAutomationTasksResponseTasksItemCustomAgent with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new().opt("id", self.id).build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsListAutomationTasksResponseTasksItemCustomAgent with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsListAutomationTasksResponseTasksItemCustomAgent with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  { id: @sdkjson.opt_field(obj, "id", path), }
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsListAutomationTasksResponseTasksItem.
+pub(all) struct AgentAutomationsListAutomationTasksResponseTasksItem {
+  id : String
+  url : String?
+  html_url : String?
+  name : String?
+  creator : Json?
+  creator_type : AgentAutomationsListAutomationTasksResponseTasksItemCreatorType?
+  user_collaborators : Array[
+    AgentAutomationsListAutomationTasksResponseTasksItemUserCollaboratorsItem,
+  ]?
+  owner : AgentAutomationsListAutomationTasksResponseTasksItemOwner?
+  repository : AgentAutomationsListAutomationTasksResponseTasksItemRepository?
+  state : AgentAutomationsListAutomationTasksResponseTasksItemState
+  session_count : Int32?
+  artifacts : Array[
+    AgentAutomationsListAutomationTasksResponseTasksItemArtifactsItem,
+  ]?
+  archived_at : @sdkjson.Presence[String]
+  updated_at : String?
+  created_at : String
+  custom_agent : AgentAutomationsListAutomationTasksResponseTasksItemCustomAgent?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsListAutomationTasksResponseTasksItem with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsListAutomationTasksResponseTasksItem with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsListAutomationTasksResponseTasksItem with omitted optional fields absent.
+pub fn AgentAutomationsListAutomationTasksResponseTasksItem::new(
+  id~ : String,
+  state~ : AgentAutomationsListAutomationTasksResponseTasksItemState,
+  created_at~ : String,
+  url? : String,
+  html_url? : String,
+  name? : String,
+  creator? : Json,
+  creator_type? : AgentAutomationsListAutomationTasksResponseTasksItemCreatorType,
+  user_collaborators? : Array[
+    AgentAutomationsListAutomationTasksResponseTasksItemUserCollaboratorsItem,
+  ],
+  owner? : AgentAutomationsListAutomationTasksResponseTasksItemOwner,
+  repository? : AgentAutomationsListAutomationTasksResponseTasksItemRepository,
+  session_count? : Int32,
+  artifacts? : Array[
+    AgentAutomationsListAutomationTasksResponseTasksItemArtifactsItem,
+  ],
+  archived_at? : String,
+  updated_at? : String,
+  custom_agent? : AgentAutomationsListAutomationTasksResponseTasksItemCustomAgent,
+) -> AgentAutomationsListAutomationTasksResponseTasksItem {
+  {
+    id,
+    url,
+    html_url,
+    name,
+    creator,
+    creator_type,
+    user_collaborators,
+    owner,
+    repository,
+    state,
+    session_count,
+    artifacts,
+    archived_at: @sdkjson.Presence::from_option(archived_at),
+    updated_at,
+    created_at,
+    custom_agent,
+  }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsListAutomationTasksResponseTasksItem with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsListAutomationTasksResponseTasksItem with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .field("id", self.id)
+  .opt("url", self.url)
+  .opt("html_url", self.html_url)
+  .opt("name", self.name)
+  .opt("creator", self.creator)
+  .opt("creator_type", self.creator_type)
+  .opt("user_collaborators", self.user_collaborators)
+  .opt("owner", self.owner)
+  .opt("repository", self.repository)
+  .field("state", self.state)
+  .opt("session_count", self.session_count)
+  .opt("artifacts", self.artifacts)
+  .presence("archived_at", self.archived_at)
+  .opt("updated_at", self.updated_at)
+  .field("created_at", self.created_at)
+  .opt("custom_agent", self.custom_agent)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsListAutomationTasksResponseTasksItem with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsListAutomationTasksResponseTasksItem with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    id: required_field(obj, "id", path),
+    url: @sdkjson.opt_field(obj, "url", path),
+    html_url: @sdkjson.opt_field(obj, "html_url", path),
+    name: @sdkjson.opt_field(obj, "name", path),
+    creator: @sdkjson.opt_field(obj, "creator", path),
+    creator_type: @sdkjson.opt_field(obj, "creator_type", path),
+    user_collaborators: @sdkjson.opt_field(obj, "user_collaborators", path),
+    owner: @sdkjson.opt_field(obj, "owner", path),
+    repository: @sdkjson.opt_field(obj, "repository", path),
+    state: required_field(obj, "state", path),
+    session_count: @sdkjson.opt_field(obj, "session_count", path),
+    artifacts: @sdkjson.opt_field(obj, "artifacts", path),
+    archived_at: @sdkjson.presence_field(obj, "archived_at", path),
+    updated_at: @sdkjson.opt_field(obj, "updated_at", path),
+    created_at: required_field(obj, "created_at", path),
+    custom_agent: @sdkjson.opt_field(obj, "custom_agent", path),
+  }
+}
+
+///|
+///
+/// A page of tasks created by an automation.
+pub(all) struct AgentAutomationsListAutomationTasksResponse {
+  tasks : Array[AgentAutomationsListAutomationTasksResponseTasksItem]
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsListAutomationTasksResponse with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsListAutomationTasksResponse with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsListAutomationTasksResponse with omitted optional fields absent.
+pub fn AgentAutomationsListAutomationTasksResponse::new(
+  tasks~ : Array[AgentAutomationsListAutomationTasksResponseTasksItem],
+) -> AgentAutomationsListAutomationTasksResponse {
+  { tasks, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsListAutomationTasksResponse with ToJson::{to_json}
+
+///|
+pub impl ToJson for AgentAutomationsListAutomationTasksResponse with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new().field("tasks", self.tasks).build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsListAutomationTasksResponse with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsListAutomationTasksResponse with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  { tasks: required_field(obj, "tasks", path), }
+}
+
+///|
+///
+/// Generated string enum AgentAutomationsListRepoAutomationsOwnerType.
+pub(all) enum AgentAutomationsListRepoAutomationsOwnerType {
+  User
+  Repository
+  Custom(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsListRepoAutomationsOwnerType with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsListRepoAutomationsOwnerType with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsListRepoAutomationsOwnerType with ToJson::{to_json}
+
+///|
+pub impl ToJson for AgentAutomationsListRepoAutomationsOwnerType with fn to_json(
+  self,
+) {
+  let raw = match self {
+    User => "user"
+    Repository => "repository"
+    Custom(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsListRepoAutomationsOwnerType with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsListRepoAutomationsOwnerType with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "user" => Some(User)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Custom(raw),
+  )
+}
+
+///|
+///
+/// Who owns the automation. `user` keeps it private to its creator and its runs act as that user. `repository` makes it belong to the repository, visible to anyone with read access to the repository, and its runs act as the Copilot app rather than as a person.
+pub(all) enum AgentAutomationsListRepoAutomationsResponseAutomationsItemOwnerType {
+  User
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemOwnerType with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemOwnerType with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemOwnerType with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemOwnerType with fn to_json(
+  self,
+) {
+  let raw = match self {
+    User => "user"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemOwnerType with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemOwnerType with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "user" => Some(User)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Controls which repository resources a run may modify. `trigger` limits writes to the resource that started the run, when one exists, and resources created during the run; `repository` allows writes to any resource in the repository. Supported values: `trigger`, `repository`.
+pub(all) enum AgentAutomationsListRepoAutomationsResponseAutomationsItemWriteScope {
+  Trigger
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated string enum AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersIntervalCadenceItem.
+pub(all) enum AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersIntervalCadenceItem {
+  Hourly
+  Daily
+  Weekly
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersIntervalCadenceItem with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersIntervalCadenceItem with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersIntervalCadenceItem with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersIntervalCadenceItem with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Hourly => "hourly"
+    Daily => "daily"
+    Weekly => "weekly"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersIntervalCadenceItem with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersIntervalCadenceItem with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "hourly" => Some(Hourly)
+        "daily" => Some(Daily)
+        "weekly" => Some(Weekly)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersIntervalWriteScope {
+  Trigger
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersIntervalWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersIntervalWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersIntervalWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersIntervalWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersIntervalWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersIntervalWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersInterval.
+pub(all) struct AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersInterval {
+  cadence : Array[
+    AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersIntervalCadenceItem,
+  ]
+  hour_utc : Int32?
+  day_of_week : Int32?
+  minute_utc : Int32?
+  write_scope : AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersIntervalWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersInterval with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersInterval with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersInterval with omitted optional fields absent.
+pub fn AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersInterval::new(
+  cadence~ : Array[
+    AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersIntervalCadenceItem,
+  ],
+  hour_utc? : Int32,
+  day_of_week? : Int32,
+  minute_utc? : Int32,
+  write_scope? : AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersIntervalWriteScope,
+) -> AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersInterval {
+  { cadence, hour_utc, day_of_week, minute_utc, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersInterval with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersInterval with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .field("cadence", self.cadence)
+  .opt("hour_utc", self.hour_utc)
+  .opt("day_of_week", self.day_of_week)
+  .opt("minute_utc", self.minute_utc)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersInterval with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersInterval with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    cadence: required_field(obj, "cadence", path),
+    hour_utc: @sdkjson.opt_field(obj, "hour_utc", path),
+    day_of_week: @sdkjson.opt_field(obj, "day_of_week", path),
+    minute_utc: @sdkjson.opt_field(obj, "minute_utc", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersIssueOpenedWriteScope {
+  Trigger
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersIssueOpenedWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersIssueOpenedWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersIssueOpenedWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersIssueOpenedWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersIssueOpenedWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersIssueOpenedWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersIssueOpened.
+pub(all) struct AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersIssueOpened {
+  query : String?
+  write_scope : AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersIssueOpenedWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersIssueOpened with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersIssueOpened with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersIssueOpened with omitted optional fields absent.
+pub fn AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersIssueOpened::new(
+  query? : String,
+  write_scope? : AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersIssueOpenedWriteScope,
+) -> AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersIssueOpened {
+  { query, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersIssueOpened with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersIssueOpened with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("query", self.query)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersIssueOpened with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersIssueOpened with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    query: @sdkjson.opt_field(obj, "query", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersIssueLabeledWriteScope {
+  Trigger
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersIssueLabeledWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersIssueLabeledWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersIssueLabeledWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersIssueLabeledWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersIssueLabeledWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersIssueLabeledWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersIssueLabeled.
+pub(all) struct AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersIssueLabeled {
+  query : String?
+  labels : Array[String]?
+  write_scope : AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersIssueLabeledWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersIssueLabeled with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersIssueLabeled with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersIssueLabeled with omitted optional fields absent.
+pub fn AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersIssueLabeled::new(
+  query? : String,
+  labels? : Array[String],
+  write_scope? : AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersIssueLabeledWriteScope,
+) -> AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersIssueLabeled {
+  { query, labels, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersIssueLabeled with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersIssueLabeled with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("query", self.query)
+  .opt("labels", self.labels)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersIssueLabeled with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersIssueLabeled with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    query: @sdkjson.opt_field(obj, "query", path),
+    labels: @sdkjson.opt_field(obj, "labels", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersWorkflowRunWriteScope {
+  Trigger
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersWorkflowRunWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersWorkflowRunWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersWorkflowRunWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersWorkflowRunWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersWorkflowRunWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersWorkflowRunWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersWorkflowRun.
+pub(all) struct AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersWorkflowRun {
+  workflows : Array[String]
+  conclusions : Array[String]
+  query : String?
+  write_scope : AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersWorkflowRunWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersWorkflowRun with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersWorkflowRun with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersWorkflowRun with omitted optional fields absent.
+pub fn AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersWorkflowRun::new(
+  workflows~ : Array[String],
+  conclusions~ : Array[String],
+  query? : String,
+  write_scope? : AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersWorkflowRunWriteScope,
+) -> AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersWorkflowRun {
+  { workflows, conclusions, query, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersWorkflowRun with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersWorkflowRun with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .field("workflows", self.workflows)
+  .field("conclusions", self.conclusions)
+  .opt("query", self.query)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersWorkflowRun with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersWorkflowRun with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    workflows: required_field(obj, "workflows", path),
+    conclusions: required_field(obj, "conclusions", path),
+    query: @sdkjson.opt_field(obj, "query", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestOpenedWriteScope {
+  Trigger
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestOpenedWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestOpenedWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestOpenedWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestOpenedWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestOpenedWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestOpenedWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestOpened.
+pub(all) struct AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestOpened {
+  query : String?
+  paths : Array[String]?
+  write_scope : AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestOpenedWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestOpened with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestOpened with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestOpened with omitted optional fields absent.
+pub fn AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestOpened::new(
+  query? : String,
+  paths? : Array[String],
+  write_scope? : AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestOpenedWriteScope,
+) -> AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestOpened {
+  { query, paths, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestOpened with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestOpened with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("query", self.query)
+  .opt("paths", self.paths)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestOpened with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestOpened with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    query: @sdkjson.opt_field(obj, "query", path),
+    paths: @sdkjson.opt_field(obj, "paths", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestSynchronizeWriteScope {
+  Trigger
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestSynchronizeWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestSynchronizeWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestSynchronizeWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestSynchronizeWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestSynchronizeWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestSynchronizeWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestSynchronize.
+pub(all) struct AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestSynchronize {
+  query : String?
+  paths : Array[String]?
+  write_scope : AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestSynchronizeWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestSynchronize with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestSynchronize with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestSynchronize with omitted optional fields absent.
+pub fn AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestSynchronize::new(
+  query? : String,
+  paths? : Array[String],
+  write_scope? : AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestSynchronizeWriteScope,
+) -> AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestSynchronize {
+  { query, paths, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestSynchronize with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestSynchronize with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("query", self.query)
+  .opt("paths", self.paths)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestSynchronize with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestSynchronize with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    query: @sdkjson.opt_field(obj, "query", path),
+    paths: @sdkjson.opt_field(obj, "paths", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestMergedWriteScope {
+  Trigger
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestMergedWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestMergedWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestMergedWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestMergedWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestMergedWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestMergedWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestMerged.
+pub(all) struct AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestMerged {
+  query : String?
+  paths : Array[String]?
+  write_scope : AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestMergedWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestMerged with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestMerged with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestMerged with omitted optional fields absent.
+pub fn AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestMerged::new(
+  query? : String,
+  paths? : Array[String],
+  write_scope? : AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestMergedWriteScope,
+) -> AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestMerged {
+  { query, paths, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestMerged with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestMerged with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("query", self.query)
+  .opt("paths", self.paths)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestMerged with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestMerged with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    query: @sdkjson.opt_field(obj, "query", path),
+    paths: @sdkjson.opt_field(obj, "paths", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersIssueCommentWriteScope {
+  Trigger
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersIssueCommentWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersIssueCommentWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersIssueCommentWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersIssueCommentWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersIssueCommentWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersIssueCommentWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersIssueComment.
+pub(all) struct AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersIssueComment {
+  body_substring : String?
+  write_scope : AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersIssueCommentWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersIssueComment with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersIssueComment with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersIssueComment with omitted optional fields absent.
+pub fn AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersIssueComment::new(
+  body_substring? : String,
+  write_scope? : AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersIssueCommentWriteScope,
+) -> AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersIssueComment {
+  { body_substring, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersIssueComment with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersIssueComment with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("body_substring", self.body_substring)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersIssueComment with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersIssueComment with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    body_substring: @sdkjson.opt_field(obj, "body_substring", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Generated string enum AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestCommentCommentTypesItem.
+pub(all) enum AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestCommentCommentTypesItem {
+  TimelineComment
+  ReviewComment
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestCommentCommentTypesItem with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestCommentCommentTypesItem with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestCommentCommentTypesItem with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestCommentCommentTypesItem with fn to_json(
+  self,
+) {
+  let raw = match self {
+    TimelineComment => "timeline_comment"
+    ReviewComment => "review_comment"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestCommentCommentTypesItem with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestCommentCommentTypesItem with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "timeline_comment" => Some(TimelineComment)
+        "review_comment" => Some(ReviewComment)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestCommentWriteScope {
+  Trigger
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestCommentWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestCommentWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestCommentWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestCommentWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestCommentWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestCommentWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestComment.
+pub(all) struct AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestComment {
+  comment_types : Array[
+    AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestCommentCommentTypesItem,
+  ]
+  body_substring : String?
+  write_scope : AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestCommentWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestComment with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestComment with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestComment with omitted optional fields absent.
+pub fn AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestComment::new(
+  comment_types~ : Array[
+    AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestCommentCommentTypesItem,
+  ],
+  body_substring? : String,
+  write_scope? : AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestCommentWriteScope,
+) -> AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestComment {
+  { comment_types, body_substring, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestComment with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestComment with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .field("comment_types", self.comment_types)
+  .opt("body_substring", self.body_substring)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestComment with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestComment with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    comment_types: required_field(obj, "comment_types", path),
+    body_substring: @sdkjson.opt_field(obj, "body_substring", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersDiscussionOpenedWriteScope {
+  Trigger
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersDiscussionOpenedWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersDiscussionOpenedWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersDiscussionOpenedWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersDiscussionOpenedWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersDiscussionOpenedWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersDiscussionOpenedWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersDiscussionOpened.
+pub(all) struct AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersDiscussionOpened {
+  categories : Array[String]?
+  body_substring : String?
+  write_scope : AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersDiscussionOpenedWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersDiscussionOpened with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersDiscussionOpened with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersDiscussionOpened with omitted optional fields absent.
+pub fn AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersDiscussionOpened::new(
+  categories? : Array[String],
+  body_substring? : String,
+  write_scope? : AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersDiscussionOpenedWriteScope,
+) -> AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersDiscussionOpened {
+  { categories, body_substring, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersDiscussionOpened with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersDiscussionOpened with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("categories", self.categories)
+  .opt("body_substring", self.body_substring)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersDiscussionOpened with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersDiscussionOpened with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    categories: @sdkjson.opt_field(obj, "categories", path),
+    body_substring: @sdkjson.opt_field(obj, "body_substring", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersDiscussionUpdatedWriteScope {
+  Trigger
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersDiscussionUpdatedWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersDiscussionUpdatedWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersDiscussionUpdatedWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersDiscussionUpdatedWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersDiscussionUpdatedWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersDiscussionUpdatedWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersDiscussionUpdated.
+pub(all) struct AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersDiscussionUpdated {
+  categories : Array[String]?
+  body_substring : String?
+  write_scope : AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersDiscussionUpdatedWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersDiscussionUpdated with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersDiscussionUpdated with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersDiscussionUpdated with omitted optional fields absent.
+pub fn AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersDiscussionUpdated::new(
+  categories? : Array[String],
+  body_substring? : String,
+  write_scope? : AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersDiscussionUpdatedWriteScope,
+) -> AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersDiscussionUpdated {
+  { categories, body_substring, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersDiscussionUpdated with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersDiscussionUpdated with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("categories", self.categories)
+  .opt("body_substring", self.body_substring)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersDiscussionUpdated with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersDiscussionUpdated with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    categories: @sdkjson.opt_field(obj, "categories", path),
+    body_substring: @sdkjson.opt_field(obj, "body_substring", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Generated string enum AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersDiscussionCommentCommentTypesItem.
+pub(all) enum AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersDiscussionCommentCommentTypesItem {
+  Comment
+  Reply
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersDiscussionCommentCommentTypesItem with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersDiscussionCommentCommentTypesItem with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersDiscussionCommentCommentTypesItem with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersDiscussionCommentCommentTypesItem with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Comment => "comment"
+    Reply => "reply"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersDiscussionCommentCommentTypesItem with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersDiscussionCommentCommentTypesItem with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "comment" => Some(Comment)
+        "reply" => Some(Reply)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersDiscussionCommentWriteScope {
+  Trigger
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersDiscussionCommentWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersDiscussionCommentWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersDiscussionCommentWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersDiscussionCommentWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersDiscussionCommentWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersDiscussionCommentWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersDiscussionComment.
+pub(all) struct AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersDiscussionComment {
+  comment_types : Array[
+    AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersDiscussionCommentCommentTypesItem,
+  ]?
+  categories : Array[String]?
+  body_substring : String?
+  write_scope : AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersDiscussionCommentWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersDiscussionComment with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersDiscussionComment with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersDiscussionComment with omitted optional fields absent.
+pub fn AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersDiscussionComment::new(
+  comment_types? : Array[
+    AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersDiscussionCommentCommentTypesItem,
+  ],
+  categories? : Array[String],
+  body_substring? : String,
+  write_scope? : AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersDiscussionCommentWriteScope,
+) -> AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersDiscussionComment {
+  { comment_types, categories, body_substring, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersDiscussionComment with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersDiscussionComment with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("comment_types", self.comment_types)
+  .opt("categories", self.categories)
+  .opt("body_substring", self.body_substring)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersDiscussionComment with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersDiscussionComment with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    comment_types: @sdkjson.opt_field(obj, "comment_types", path),
+    categories: @sdkjson.opt_field(obj, "categories", path),
+    body_substring: @sdkjson.opt_field(obj, "body_substring", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersIssueAssignedWriteScope {
+  Trigger
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersIssueAssignedWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersIssueAssignedWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersIssueAssignedWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersIssueAssignedWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersIssueAssignedWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersIssueAssignedWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersIssueAssigned.
+pub(all) struct AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersIssueAssigned {
+  query : String?
+  assignees : Array[String]?
+  write_scope : AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersIssueAssignedWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersIssueAssigned with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersIssueAssigned with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersIssueAssigned with omitted optional fields absent.
+pub fn AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersIssueAssigned::new(
+  query? : String,
+  assignees? : Array[String],
+  write_scope? : AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersIssueAssignedWriteScope,
+) -> AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersIssueAssigned {
+  { query, assignees, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersIssueAssigned with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersIssueAssigned with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("query", self.query)
+  .opt("assignees", self.assignees)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersIssueAssigned with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersIssueAssigned with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    query: @sdkjson.opt_field(obj, "query", path),
+    assignees: @sdkjson.opt_field(obj, "assignees", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestAssignedWriteScope {
+  Trigger
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestAssignedWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestAssignedWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestAssignedWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestAssignedWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestAssignedWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestAssignedWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestAssigned.
+pub(all) struct AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestAssigned {
+  query : String?
+  paths : Array[String]?
+  assignees : Array[String]?
+  write_scope : AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestAssignedWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestAssigned with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestAssigned with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestAssigned with omitted optional fields absent.
+pub fn AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestAssigned::new(
+  query? : String,
+  paths? : Array[String],
+  assignees? : Array[String],
+  write_scope? : AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestAssignedWriteScope,
+) -> AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestAssigned {
+  { query, paths, assignees, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestAssigned with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestAssigned with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("query", self.query)
+  .opt("paths", self.paths)
+  .opt("assignees", self.assignees)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestAssigned with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestAssigned with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    query: @sdkjson.opt_field(obj, "query", path),
+    paths: @sdkjson.opt_field(obj, "paths", path),
+    assignees: @sdkjson.opt_field(obj, "assignees", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersSubIssueAddedWriteScope {
+  Trigger
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersSubIssueAddedWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersSubIssueAddedWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersSubIssueAddedWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersSubIssueAddedWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersSubIssueAddedWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersSubIssueAddedWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersSubIssueAdded.
+pub(all) struct AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersSubIssueAdded {
+  query : String?
+  write_scope : AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersSubIssueAddedWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersSubIssueAdded with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersSubIssueAdded with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersSubIssueAdded with omitted optional fields absent.
+pub fn AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersSubIssueAdded::new(
+  query? : String,
+  write_scope? : AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersSubIssueAddedWriteScope,
+) -> AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersSubIssueAdded {
+  { query, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersSubIssueAdded with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersSubIssueAdded with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("query", self.query)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersSubIssueAdded with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersSubIssueAdded with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    query: @sdkjson.opt_field(obj, "query", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestReadyForReviewWriteScope {
+  Trigger
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestReadyForReviewWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestReadyForReviewWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestReadyForReviewWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestReadyForReviewWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestReadyForReviewWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestReadyForReviewWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestReadyForReview.
+pub(all) struct AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestReadyForReview {
+  query : String?
+  paths : Array[String]?
+  write_scope : AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestReadyForReviewWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestReadyForReview with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestReadyForReview with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestReadyForReview with omitted optional fields absent.
+pub fn AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestReadyForReview::new(
+  query? : String,
+  paths? : Array[String],
+  write_scope? : AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestReadyForReviewWriteScope,
+) -> AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestReadyForReview {
+  { query, paths, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestReadyForReview with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestReadyForReview with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("query", self.query)
+  .opt("paths", self.paths)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestReadyForReview with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestReadyForReview with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    query: @sdkjson.opt_field(obj, "query", path),
+    paths: @sdkjson.opt_field(obj, "paths", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestLabeledWriteScope {
+  Trigger
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestLabeledWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestLabeledWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestLabeledWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestLabeledWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestLabeledWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestLabeledWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestLabeled.
+pub(all) struct AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestLabeled {
+  query : String?
+  paths : Array[String]?
+  labels : Array[String]?
+  write_scope : AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestLabeledWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestLabeled with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestLabeled with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestLabeled with omitted optional fields absent.
+pub fn AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestLabeled::new(
+  query? : String,
+  paths? : Array[String],
+  labels? : Array[String],
+  write_scope? : AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestLabeledWriteScope,
+) -> AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestLabeled {
+  { query, paths, labels, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestLabeled with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestLabeled with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("query", self.query)
+  .opt("paths", self.paths)
+  .opt("labels", self.labels)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestLabeled with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestLabeled with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    query: @sdkjson.opt_field(obj, "query", path),
+    paths: @sdkjson.opt_field(obj, "paths", path),
+    labels: @sdkjson.opt_field(obj, "labels", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestMergeConflictWriteScope {
+  Trigger
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestMergeConflictWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestMergeConflictWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestMergeConflictWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestMergeConflictWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestMergeConflictWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestMergeConflictWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestMergeConflict.
+pub(all) struct AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestMergeConflict {
+  query : String?
+  paths : Array[String]?
+  write_scope : AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestMergeConflictWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestMergeConflict with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestMergeConflict with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestMergeConflict with omitted optional fields absent.
+pub fn AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestMergeConflict::new(
+  query? : String,
+  paths? : Array[String],
+  write_scope? : AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestMergeConflictWriteScope,
+) -> AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestMergeConflict {
+  { query, paths, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestMergeConflict with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestMergeConflict with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("query", self.query)
+  .opt("paths", self.paths)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestMergeConflict with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestMergeConflict with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    query: @sdkjson.opt_field(obj, "query", path),
+    paths: @sdkjson.opt_field(obj, "paths", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Generated string enum AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestReviewSubmittedStatesItem.
+pub(all) enum AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestReviewSubmittedStatesItem {
+  Approved
+  ChangesRequested
+  Commented
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestReviewSubmittedStatesItem with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestReviewSubmittedStatesItem with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestReviewSubmittedStatesItem with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestReviewSubmittedStatesItem with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Approved => "approved"
+    ChangesRequested => "changes_requested"
+    Commented => "commented"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestReviewSubmittedStatesItem with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestReviewSubmittedStatesItem with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "approved" => Some(Approved)
+        "changes_requested" => Some(ChangesRequested)
+        "commented" => Some(Commented)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestReviewSubmittedWriteScope {
+  Trigger
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestReviewSubmittedWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestReviewSubmittedWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestReviewSubmittedWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestReviewSubmittedWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestReviewSubmittedWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestReviewSubmittedWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestReviewSubmitted.
+pub(all) struct AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestReviewSubmitted {
+  query : String?
+  paths : Array[String]?
+  states : Array[
+    AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestReviewSubmittedStatesItem,
+  ]
+  write_scope : AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestReviewSubmittedWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestReviewSubmitted with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestReviewSubmitted with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestReviewSubmitted with omitted optional fields absent.
+pub fn AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestReviewSubmitted::new(
+  states~ : Array[
+    AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestReviewSubmittedStatesItem,
+  ],
+  query? : String,
+  paths? : Array[String],
+  write_scope? : AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestReviewSubmittedWriteScope,
+) -> AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestReviewSubmitted {
+  { query, paths, states, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestReviewSubmitted with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestReviewSubmitted with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("query", self.query)
+  .opt("paths", self.paths)
+  .field("states", self.states)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestReviewSubmitted with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestReviewSubmitted with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    query: @sdkjson.opt_field(obj, "query", path),
+    paths: @sdkjson.opt_field(obj, "paths", path),
+    states: required_field(obj, "states", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestReviewRequestedWriteScope {
+  Trigger
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestReviewRequestedWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestReviewRequestedWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestReviewRequestedWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestReviewRequestedWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestReviewRequestedWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestReviewRequestedWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestReviewRequested.
+pub(all) struct AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestReviewRequested {
+  query : String?
+  paths : Array[String]?
+  write_scope : AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestReviewRequestedWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestReviewRequested with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestReviewRequested with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestReviewRequested with omitted optional fields absent.
+pub fn AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestReviewRequested::new(
+  query? : String,
+  paths? : Array[String],
+  write_scope? : AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestReviewRequestedWriteScope,
+) -> AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestReviewRequested {
+  { query, paths, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestReviewRequested with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestReviewRequested with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("query", self.query)
+  .opt("paths", self.paths)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestReviewRequested with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestReviewRequested with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    query: @sdkjson.opt_field(obj, "query", path),
+    paths: @sdkjson.opt_field(obj, "paths", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersAutomationCompletedWriteScope {
+  Trigger
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersAutomationCompletedWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersAutomationCompletedWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersAutomationCompletedWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersAutomationCompletedWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersAutomationCompletedWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersAutomationCompletedWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersAutomationCompleted.
+pub(all) struct AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersAutomationCompleted {
+  automation_ids : Array[String]
+  write_scope : AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersAutomationCompletedWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersAutomationCompleted with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersAutomationCompleted with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersAutomationCompleted with omitted optional fields absent.
+pub fn AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersAutomationCompleted::new(
+  automation_ids~ : Array[String],
+  write_scope? : AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersAutomationCompletedWriteScope,
+) -> AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersAutomationCompleted {
+  { automation_ids, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersAutomationCompleted with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersAutomationCompleted with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .field("automation_ids", self.automation_ids)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersAutomationCompleted with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersAutomationCompleted with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    automation_ids: required_field(obj, "automation_ids", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Public trigger configuration keyed by stable public trigger identifier. Each trigger has a closed, trigger-specific configuration schema.
+pub(all) struct AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggers {
+  interval : AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersInterval?
+  issue_opened : AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersIssueOpened?
+  issue_labeled : AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersIssueLabeled?
+  workflow_run : AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersWorkflowRun?
+  pull_request_opened : AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestOpened?
+  pull_request_synchronize : AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestSynchronize?
+  pull_request_merged : AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestMerged?
+  issue_comment : AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersIssueComment?
+  pull_request_comment : AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestComment?
+  discussion_opened : AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersDiscussionOpened?
+  discussion_updated : AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersDiscussionUpdated?
+  discussion_comment : AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersDiscussionComment?
+  issue_assigned : AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersIssueAssigned?
+  pull_request_assigned : AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestAssigned?
+  sub_issue_added : AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersSubIssueAdded?
+  pull_request_ready_for_review : AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestReadyForReview?
+  pull_request_labeled : AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestLabeled?
+  pull_request_merge_conflict : AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestMergeConflict?
+  pull_request_review_submitted : AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestReviewSubmitted?
+  pull_request_review_requested : AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestReviewRequested?
+  automation_completed : AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersAutomationCompleted?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggers with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggers with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggers with omitted optional fields absent.
+pub fn AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggers::new(
+  interval? : AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersInterval,
+  issue_opened? : AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersIssueOpened,
+  issue_labeled? : AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersIssueLabeled,
+  workflow_run? : AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersWorkflowRun,
+  pull_request_opened? : AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestOpened,
+  pull_request_synchronize? : AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestSynchronize,
+  pull_request_merged? : AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestMerged,
+  issue_comment? : AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersIssueComment,
+  pull_request_comment? : AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestComment,
+  discussion_opened? : AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersDiscussionOpened,
+  discussion_updated? : AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersDiscussionUpdated,
+  discussion_comment? : AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersDiscussionComment,
+  issue_assigned? : AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersIssueAssigned,
+  pull_request_assigned? : AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestAssigned,
+  sub_issue_added? : AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersSubIssueAdded,
+  pull_request_ready_for_review? : AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestReadyForReview,
+  pull_request_labeled? : AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestLabeled,
+  pull_request_merge_conflict? : AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestMergeConflict,
+  pull_request_review_submitted? : AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestReviewSubmitted,
+  pull_request_review_requested? : AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestReviewRequested,
+  automation_completed? : AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersAutomationCompleted,
+) -> AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggers {
+  {
+    interval,
+    issue_opened,
+    issue_labeled,
+    workflow_run,
+    pull_request_opened,
+    pull_request_synchronize,
+    pull_request_merged,
+    issue_comment,
+    pull_request_comment,
+    discussion_opened,
+    discussion_updated,
+    discussion_comment,
+    issue_assigned,
+    pull_request_assigned,
+    sub_issue_added,
+    pull_request_ready_for_review,
+    pull_request_labeled,
+    pull_request_merge_conflict,
+    pull_request_review_submitted,
+    pull_request_review_requested,
+    automation_completed,
+  }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggers with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggers with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("interval", self.interval)
+  .opt("issue_opened", self.issue_opened)
+  .opt("issue_labeled", self.issue_labeled)
+  .opt("workflow_run", self.workflow_run)
+  .opt("pull_request_opened", self.pull_request_opened)
+  .opt("pull_request_synchronize", self.pull_request_synchronize)
+  .opt("pull_request_merged", self.pull_request_merged)
+  .opt("issue_comment", self.issue_comment)
+  .opt("pull_request_comment", self.pull_request_comment)
+  .opt("discussion_opened", self.discussion_opened)
+  .opt("discussion_updated", self.discussion_updated)
+  .opt("discussion_comment", self.discussion_comment)
+  .opt("issue_assigned", self.issue_assigned)
+  .opt("pull_request_assigned", self.pull_request_assigned)
+  .opt("sub_issue_added", self.sub_issue_added)
+  .opt("pull_request_ready_for_review", self.pull_request_ready_for_review)
+  .opt("pull_request_labeled", self.pull_request_labeled)
+  .opt("pull_request_merge_conflict", self.pull_request_merge_conflict)
+  .opt("pull_request_review_submitted", self.pull_request_review_submitted)
+  .opt("pull_request_review_requested", self.pull_request_review_requested)
+  .opt("automation_completed", self.automation_completed)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggers with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggers with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    interval: @sdkjson.opt_field(obj, "interval", path),
+    issue_opened: @sdkjson.opt_field(obj, "issue_opened", path),
+    issue_labeled: @sdkjson.opt_field(obj, "issue_labeled", path),
+    workflow_run: @sdkjson.opt_field(obj, "workflow_run", path),
+    pull_request_opened: @sdkjson.opt_field(obj, "pull_request_opened", path),
+    pull_request_synchronize: @sdkjson.opt_field(
+      obj, "pull_request_synchronize", path,
+    ),
+    pull_request_merged: @sdkjson.opt_field(obj, "pull_request_merged", path),
+    issue_comment: @sdkjson.opt_field(obj, "issue_comment", path),
+    pull_request_comment: @sdkjson.opt_field(obj, "pull_request_comment", path),
+    discussion_opened: @sdkjson.opt_field(obj, "discussion_opened", path),
+    discussion_updated: @sdkjson.opt_field(obj, "discussion_updated", path),
+    discussion_comment: @sdkjson.opt_field(obj, "discussion_comment", path),
+    issue_assigned: @sdkjson.opt_field(obj, "issue_assigned", path),
+    pull_request_assigned: @sdkjson.opt_field(
+      obj, "pull_request_assigned", path,
+    ),
+    sub_issue_added: @sdkjson.opt_field(obj, "sub_issue_added", path),
+    pull_request_ready_for_review: @sdkjson.opt_field(
+      obj, "pull_request_ready_for_review", path,
+    ),
+    pull_request_labeled: @sdkjson.opt_field(obj, "pull_request_labeled", path),
+    pull_request_merge_conflict: @sdkjson.opt_field(
+      obj, "pull_request_merge_conflict", path,
+    ),
+    pull_request_review_submitted: @sdkjson.opt_field(
+      obj, "pull_request_review_submitted", path,
+    ),
+    pull_request_review_requested: @sdkjson.opt_field(
+      obj, "pull_request_review_requested", path,
+    ),
+    automation_completed: @sdkjson.opt_field(obj, "automation_completed", path),
+  }
+}
+
+///|
+///
+/// A GitHub user
+pub(all) struct AgentAutomationsListRepoAutomationsResponseAutomationsItemCreatedBy {
+  id : Int64?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemCreatedBy with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemCreatedBy with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsListRepoAutomationsResponseAutomationsItemCreatedBy with omitted optional fields absent.
+pub fn AgentAutomationsListRepoAutomationsResponseAutomationsItemCreatedBy::new(
+  id? : Int64,
+) -> AgentAutomationsListRepoAutomationsResponseAutomationsItemCreatedBy {
+  { id, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemCreatedBy with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemCreatedBy with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("id", self.id.map(value => json_int64_to_json(value)))
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItemCreatedBy with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsListRepoAutomationsResponseAutomationsItemCreatedBy with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  { id: decode_optional_int64(obj, "id", path), }
+}
+
+///|
+///
+/// A summary representation of an automation (used in list responses).
+pub(all) struct AgentAutomationsListRepoAutomationsResponseAutomationsItem {
+  id : String
+  name : String
+  enabled : Bool?
+  owner_type : AgentAutomationsListRepoAutomationsResponseAutomationsItemOwnerType?
+  write_scope : AgentAutomationsListRepoAutomationsResponseAutomationsItemWriteScope?
+  require_actor_write_permission : Bool?
+  model : String?
+  reasoning_effort : String?
+  triggers : AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggers?
+  created_at : String
+  updated_at : String
+  created_by : AgentAutomationsListRepoAutomationsResponseAutomationsItemCreatedBy
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItem with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItem with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsListRepoAutomationsResponseAutomationsItem with omitted optional fields absent.
+pub fn AgentAutomationsListRepoAutomationsResponseAutomationsItem::new(
+  id~ : String,
+  name~ : String,
+  created_at~ : String,
+  updated_at~ : String,
+  created_by~ : AgentAutomationsListRepoAutomationsResponseAutomationsItemCreatedBy,
+  enabled? : Bool,
+  owner_type? : AgentAutomationsListRepoAutomationsResponseAutomationsItemOwnerType,
+  write_scope? : AgentAutomationsListRepoAutomationsResponseAutomationsItemWriteScope,
+  require_actor_write_permission? : Bool,
+  model? : String,
+  reasoning_effort? : String,
+  triggers? : AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggers,
+) -> AgentAutomationsListRepoAutomationsResponseAutomationsItem {
+  {
+    id,
+    name,
+    enabled,
+    owner_type,
+    write_scope,
+    require_actor_write_permission,
+    model,
+    reasoning_effort,
+    triggers,
+    created_at,
+    updated_at,
+    created_by,
+  }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItem with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsListRepoAutomationsResponseAutomationsItem with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .field("id", self.id)
+  .field("name", self.name)
+  .opt("enabled", self.enabled)
+  .opt("owner_type", self.owner_type)
+  .opt("write_scope", self.write_scope)
+  .opt("require_actor_write_permission", self.require_actor_write_permission)
+  .opt("model", self.model)
+  .opt("reasoning_effort", self.reasoning_effort)
+  .opt("triggers", self.triggers)
+  .field("created_at", self.created_at)
+  .field("updated_at", self.updated_at)
+  .field("created_by", self.created_by)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsListRepoAutomationsResponseAutomationsItem with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsListRepoAutomationsResponseAutomationsItem with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    id: required_field(obj, "id", path),
+    name: required_field(obj, "name", path),
+    enabled: @sdkjson.opt_field(obj, "enabled", path),
+    owner_type: @sdkjson.opt_field(obj, "owner_type", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+    require_actor_write_permission: @sdkjson.opt_field(
+      obj, "require_actor_write_permission", path,
+    ),
+    model: @sdkjson.opt_field(obj, "model", path),
+    reasoning_effort: @sdkjson.opt_field(obj, "reasoning_effort", path),
+    triggers: @sdkjson.opt_field(obj, "triggers", path),
+    created_at: required_field(obj, "created_at", path),
+    updated_at: required_field(obj, "updated_at", path),
+    created_by: required_field(obj, "created_by", path),
+  }
+}
+
+///|
+///
+/// A page of automations for a repository and the complete filtered result count.
+pub(all) struct AgentAutomationsListRepoAutomationsResponse {
+  automations : Array[
+    AgentAutomationsListRepoAutomationsResponseAutomationsItem,
+  ]
+  total_count : Int32
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsListRepoAutomationsResponse with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsListRepoAutomationsResponse with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsListRepoAutomationsResponse with omitted optional fields absent.
+pub fn AgentAutomationsListRepoAutomationsResponse::new(
+  automations~ : Array[
+    AgentAutomationsListRepoAutomationsResponseAutomationsItem,
+  ],
+  total_count~ : Int32,
+) -> AgentAutomationsListRepoAutomationsResponse {
+  { automations, total_count, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsListRepoAutomationsResponse with ToJson::{to_json}
+
+///|
+pub impl ToJson for AgentAutomationsListRepoAutomationsResponse with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .field("automations", self.automations)
+  .field("total_count", self.total_count)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsListRepoAutomationsResponse with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsListRepoAutomationsResponse with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    automations: required_field(obj, "automations", path),
+    total_count: required_field(obj, "total_count", path),
+  }
+}
+
+///|
+///
+/// Generated string enum AgentAutomationsCreateRepoAutomationRequestTriggersIntervalCadenceItem.
+pub(all) enum AgentAutomationsCreateRepoAutomationRequestTriggersIntervalCadenceItem {
+  Hourly
+  Daily
+  Weekly
+  Custom(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersIntervalCadenceItem with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersIntervalCadenceItem with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersIntervalCadenceItem with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsCreateRepoAutomationRequestTriggersIntervalCadenceItem with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Hourly => "hourly"
+    Daily => "daily"
+    Weekly => "weekly"
+    Custom(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersIntervalCadenceItem with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationRequestTriggersIntervalCadenceItem with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "hourly" => Some(Hourly)
+        "daily" => Some(Daily)
+        "weekly" => Some(Weekly)
+        _ => None
+      }
+    },
+    raw => Custom(raw),
+  )
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsCreateRepoAutomationRequestTriggersIntervalWriteScope {
+  Trigger
+  Repository
+  Custom(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersIntervalWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersIntervalWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersIntervalWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsCreateRepoAutomationRequestTriggersIntervalWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Custom(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersIntervalWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationRequestTriggersIntervalWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Custom(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsCreateRepoAutomationRequestTriggersInterval.
+pub(all) struct AgentAutomationsCreateRepoAutomationRequestTriggersInterval {
+  cadence : Array[
+    AgentAutomationsCreateRepoAutomationRequestTriggersIntervalCadenceItem,
+  ]
+  hour_utc : Int32?
+  day_of_week : Int32?
+  minute_utc : Int32?
+  write_scope : AgentAutomationsCreateRepoAutomationRequestTriggersIntervalWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersInterval with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersInterval with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsCreateRepoAutomationRequestTriggersInterval with omitted optional fields absent.
+pub fn AgentAutomationsCreateRepoAutomationRequestTriggersInterval::new(
+  cadence~ : Array[
+    AgentAutomationsCreateRepoAutomationRequestTriggersIntervalCadenceItem,
+  ],
+  hour_utc? : Int32,
+  day_of_week? : Int32,
+  minute_utc? : Int32,
+  write_scope? : AgentAutomationsCreateRepoAutomationRequestTriggersIntervalWriteScope,
+) -> AgentAutomationsCreateRepoAutomationRequestTriggersInterval {
+  { cadence, hour_utc, day_of_week, minute_utc, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersInterval with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsCreateRepoAutomationRequestTriggersInterval with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .field("cadence", self.cadence)
+  .opt("hour_utc", self.hour_utc)
+  .opt("day_of_week", self.day_of_week)
+  .opt("minute_utc", self.minute_utc)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersInterval with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationRequestTriggersInterval with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    cadence: required_field(obj, "cadence", path),
+    hour_utc: @sdkjson.opt_field(obj, "hour_utc", path),
+    day_of_week: @sdkjson.opt_field(obj, "day_of_week", path),
+    minute_utc: @sdkjson.opt_field(obj, "minute_utc", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsCreateRepoAutomationRequestTriggersIssueOpenedWriteScope {
+  Trigger
+  Repository
+  Custom(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersIssueOpenedWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersIssueOpenedWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersIssueOpenedWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsCreateRepoAutomationRequestTriggersIssueOpenedWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Custom(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersIssueOpenedWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationRequestTriggersIssueOpenedWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Custom(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsCreateRepoAutomationRequestTriggersIssueOpened.
+pub(all) struct AgentAutomationsCreateRepoAutomationRequestTriggersIssueOpened {
+  query : String?
+  write_scope : AgentAutomationsCreateRepoAutomationRequestTriggersIssueOpenedWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersIssueOpened with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersIssueOpened with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsCreateRepoAutomationRequestTriggersIssueOpened with omitted optional fields absent.
+pub fn AgentAutomationsCreateRepoAutomationRequestTriggersIssueOpened::new(
+  query? : String,
+  write_scope? : AgentAutomationsCreateRepoAutomationRequestTriggersIssueOpenedWriteScope,
+) -> AgentAutomationsCreateRepoAutomationRequestTriggersIssueOpened {
+  { query, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersIssueOpened with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsCreateRepoAutomationRequestTriggersIssueOpened with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("query", self.query)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersIssueOpened with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationRequestTriggersIssueOpened with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    query: @sdkjson.opt_field(obj, "query", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsCreateRepoAutomationRequestTriggersIssueLabeledWriteScope {
+  Trigger
+  Repository
+  Custom(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersIssueLabeledWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersIssueLabeledWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersIssueLabeledWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsCreateRepoAutomationRequestTriggersIssueLabeledWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Custom(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersIssueLabeledWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationRequestTriggersIssueLabeledWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Custom(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsCreateRepoAutomationRequestTriggersIssueLabeled.
+pub(all) struct AgentAutomationsCreateRepoAutomationRequestTriggersIssueLabeled {
+  query : String?
+  labels : Array[String]?
+  write_scope : AgentAutomationsCreateRepoAutomationRequestTriggersIssueLabeledWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersIssueLabeled with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersIssueLabeled with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsCreateRepoAutomationRequestTriggersIssueLabeled with omitted optional fields absent.
+pub fn AgentAutomationsCreateRepoAutomationRequestTriggersIssueLabeled::new(
+  query? : String,
+  labels? : Array[String],
+  write_scope? : AgentAutomationsCreateRepoAutomationRequestTriggersIssueLabeledWriteScope,
+) -> AgentAutomationsCreateRepoAutomationRequestTriggersIssueLabeled {
+  { query, labels, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersIssueLabeled with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsCreateRepoAutomationRequestTriggersIssueLabeled with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("query", self.query)
+  .opt("labels", self.labels)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersIssueLabeled with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationRequestTriggersIssueLabeled with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    query: @sdkjson.opt_field(obj, "query", path),
+    labels: @sdkjson.opt_field(obj, "labels", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsCreateRepoAutomationRequestTriggersWorkflowRunWriteScope {
+  Trigger
+  Repository
+  Custom(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersWorkflowRunWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersWorkflowRunWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersWorkflowRunWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsCreateRepoAutomationRequestTriggersWorkflowRunWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Custom(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersWorkflowRunWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationRequestTriggersWorkflowRunWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Custom(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsCreateRepoAutomationRequestTriggersWorkflowRun.
+pub(all) struct AgentAutomationsCreateRepoAutomationRequestTriggersWorkflowRun {
+  workflows : Array[String]
+  conclusions : Array[String]
+  query : String?
+  write_scope : AgentAutomationsCreateRepoAutomationRequestTriggersWorkflowRunWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersWorkflowRun with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersWorkflowRun with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsCreateRepoAutomationRequestTriggersWorkflowRun with omitted optional fields absent.
+pub fn AgentAutomationsCreateRepoAutomationRequestTriggersWorkflowRun::new(
+  workflows~ : Array[String],
+  conclusions~ : Array[String],
+  query? : String,
+  write_scope? : AgentAutomationsCreateRepoAutomationRequestTriggersWorkflowRunWriteScope,
+) -> AgentAutomationsCreateRepoAutomationRequestTriggersWorkflowRun {
+  { workflows, conclusions, query, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersWorkflowRun with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsCreateRepoAutomationRequestTriggersWorkflowRun with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .field("workflows", self.workflows)
+  .field("conclusions", self.conclusions)
+  .opt("query", self.query)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersWorkflowRun with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationRequestTriggersWorkflowRun with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    workflows: required_field(obj, "workflows", path),
+    conclusions: required_field(obj, "conclusions", path),
+    query: @sdkjson.opt_field(obj, "query", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestOpenedWriteScope {
+  Trigger
+  Repository
+  Custom(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestOpenedWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestOpenedWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestOpenedWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestOpenedWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Custom(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestOpenedWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestOpenedWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Custom(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestOpened.
+pub(all) struct AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestOpened {
+  query : String?
+  paths : Array[String]?
+  write_scope : AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestOpenedWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestOpened with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestOpened with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestOpened with omitted optional fields absent.
+pub fn AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestOpened::new(
+  query? : String,
+  paths? : Array[String],
+  write_scope? : AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestOpenedWriteScope,
+) -> AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestOpened {
+  { query, paths, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestOpened with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestOpened with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("query", self.query)
+  .opt("paths", self.paths)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestOpened with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestOpened with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    query: @sdkjson.opt_field(obj, "query", path),
+    paths: @sdkjson.opt_field(obj, "paths", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestSynchronizeWriteScope {
+  Trigger
+  Repository
+  Custom(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestSynchronizeWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestSynchronizeWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestSynchronizeWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestSynchronizeWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Custom(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestSynchronizeWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestSynchronizeWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Custom(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestSynchronize.
+pub(all) struct AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestSynchronize {
+  query : String?
+  paths : Array[String]?
+  write_scope : AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestSynchronizeWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestSynchronize with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestSynchronize with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestSynchronize with omitted optional fields absent.
+pub fn AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestSynchronize::new(
+  query? : String,
+  paths? : Array[String],
+  write_scope? : AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestSynchronizeWriteScope,
+) -> AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestSynchronize {
+  { query, paths, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestSynchronize with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestSynchronize with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("query", self.query)
+  .opt("paths", self.paths)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestSynchronize with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestSynchronize with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    query: @sdkjson.opt_field(obj, "query", path),
+    paths: @sdkjson.opt_field(obj, "paths", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestMergedWriteScope {
+  Trigger
+  Repository
+  Custom(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestMergedWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestMergedWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestMergedWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestMergedWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Custom(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestMergedWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestMergedWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Custom(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestMerged.
+pub(all) struct AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestMerged {
+  query : String?
+  paths : Array[String]?
+  write_scope : AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestMergedWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestMerged with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestMerged with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestMerged with omitted optional fields absent.
+pub fn AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestMerged::new(
+  query? : String,
+  paths? : Array[String],
+  write_scope? : AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestMergedWriteScope,
+) -> AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestMerged {
+  { query, paths, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestMerged with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestMerged with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("query", self.query)
+  .opt("paths", self.paths)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestMerged with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestMerged with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    query: @sdkjson.opt_field(obj, "query", path),
+    paths: @sdkjson.opt_field(obj, "paths", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsCreateRepoAutomationRequestTriggersIssueCommentWriteScope {
+  Trigger
+  Repository
+  Custom(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersIssueCommentWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersIssueCommentWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersIssueCommentWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsCreateRepoAutomationRequestTriggersIssueCommentWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Custom(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersIssueCommentWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationRequestTriggersIssueCommentWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Custom(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsCreateRepoAutomationRequestTriggersIssueComment.
+pub(all) struct AgentAutomationsCreateRepoAutomationRequestTriggersIssueComment {
+  body_substring : String?
+  write_scope : AgentAutomationsCreateRepoAutomationRequestTriggersIssueCommentWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersIssueComment with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersIssueComment with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsCreateRepoAutomationRequestTriggersIssueComment with omitted optional fields absent.
+pub fn AgentAutomationsCreateRepoAutomationRequestTriggersIssueComment::new(
+  body_substring? : String,
+  write_scope? : AgentAutomationsCreateRepoAutomationRequestTriggersIssueCommentWriteScope,
+) -> AgentAutomationsCreateRepoAutomationRequestTriggersIssueComment {
+  { body_substring, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersIssueComment with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsCreateRepoAutomationRequestTriggersIssueComment with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("body_substring", self.body_substring)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersIssueComment with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationRequestTriggersIssueComment with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    body_substring: @sdkjson.opt_field(obj, "body_substring", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Generated string enum AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestCommentCommentTypesItem.
+pub(all) enum AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestCommentCommentTypesItem {
+  TimelineComment
+  ReviewComment
+  Custom(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestCommentCommentTypesItem with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestCommentCommentTypesItem with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestCommentCommentTypesItem with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestCommentCommentTypesItem with fn to_json(
+  self,
+) {
+  let raw = match self {
+    TimelineComment => "timeline_comment"
+    ReviewComment => "review_comment"
+    Custom(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestCommentCommentTypesItem with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestCommentCommentTypesItem with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "timeline_comment" => Some(TimelineComment)
+        "review_comment" => Some(ReviewComment)
+        _ => None
+      }
+    },
+    raw => Custom(raw),
+  )
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestCommentWriteScope {
+  Trigger
+  Repository
+  Custom(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestCommentWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestCommentWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestCommentWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestCommentWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Custom(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestCommentWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestCommentWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Custom(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestComment.
+pub(all) struct AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestComment {
+  comment_types : Array[
+    AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestCommentCommentTypesItem,
+  ]
+  body_substring : String?
+  write_scope : AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestCommentWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestComment with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestComment with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestComment with omitted optional fields absent.
+pub fn AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestComment::new(
+  comment_types~ : Array[
+    AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestCommentCommentTypesItem,
+  ],
+  body_substring? : String,
+  write_scope? : AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestCommentWriteScope,
+) -> AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestComment {
+  { comment_types, body_substring, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestComment with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestComment with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .field("comment_types", self.comment_types)
+  .opt("body_substring", self.body_substring)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestComment with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestComment with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    comment_types: required_field(obj, "comment_types", path),
+    body_substring: @sdkjson.opt_field(obj, "body_substring", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsCreateRepoAutomationRequestTriggersDiscussionOpenedWriteScope {
+  Trigger
+  Repository
+  Custom(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersDiscussionOpenedWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersDiscussionOpenedWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersDiscussionOpenedWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsCreateRepoAutomationRequestTriggersDiscussionOpenedWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Custom(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersDiscussionOpenedWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationRequestTriggersDiscussionOpenedWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Custom(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsCreateRepoAutomationRequestTriggersDiscussionOpened.
+pub(all) struct AgentAutomationsCreateRepoAutomationRequestTriggersDiscussionOpened {
+  categories : Array[String]?
+  body_substring : String?
+  write_scope : AgentAutomationsCreateRepoAutomationRequestTriggersDiscussionOpenedWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersDiscussionOpened with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersDiscussionOpened with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsCreateRepoAutomationRequestTriggersDiscussionOpened with omitted optional fields absent.
+pub fn AgentAutomationsCreateRepoAutomationRequestTriggersDiscussionOpened::new(
+  categories? : Array[String],
+  body_substring? : String,
+  write_scope? : AgentAutomationsCreateRepoAutomationRequestTriggersDiscussionOpenedWriteScope,
+) -> AgentAutomationsCreateRepoAutomationRequestTriggersDiscussionOpened {
+  { categories, body_substring, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersDiscussionOpened with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsCreateRepoAutomationRequestTriggersDiscussionOpened with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("categories", self.categories)
+  .opt("body_substring", self.body_substring)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersDiscussionOpened with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationRequestTriggersDiscussionOpened with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    categories: @sdkjson.opt_field(obj, "categories", path),
+    body_substring: @sdkjson.opt_field(obj, "body_substring", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsCreateRepoAutomationRequestTriggersDiscussionUpdatedWriteScope {
+  Trigger
+  Repository
+  Custom(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersDiscussionUpdatedWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersDiscussionUpdatedWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersDiscussionUpdatedWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsCreateRepoAutomationRequestTriggersDiscussionUpdatedWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Custom(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersDiscussionUpdatedWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationRequestTriggersDiscussionUpdatedWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Custom(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsCreateRepoAutomationRequestTriggersDiscussionUpdated.
+pub(all) struct AgentAutomationsCreateRepoAutomationRequestTriggersDiscussionUpdated {
+  categories : Array[String]?
+  body_substring : String?
+  write_scope : AgentAutomationsCreateRepoAutomationRequestTriggersDiscussionUpdatedWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersDiscussionUpdated with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersDiscussionUpdated with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsCreateRepoAutomationRequestTriggersDiscussionUpdated with omitted optional fields absent.
+pub fn AgentAutomationsCreateRepoAutomationRequestTriggersDiscussionUpdated::new(
+  categories? : Array[String],
+  body_substring? : String,
+  write_scope? : AgentAutomationsCreateRepoAutomationRequestTriggersDiscussionUpdatedWriteScope,
+) -> AgentAutomationsCreateRepoAutomationRequestTriggersDiscussionUpdated {
+  { categories, body_substring, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersDiscussionUpdated with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsCreateRepoAutomationRequestTriggersDiscussionUpdated with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("categories", self.categories)
+  .opt("body_substring", self.body_substring)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersDiscussionUpdated with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationRequestTriggersDiscussionUpdated with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    categories: @sdkjson.opt_field(obj, "categories", path),
+    body_substring: @sdkjson.opt_field(obj, "body_substring", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Generated string enum AgentAutomationsCreateRepoAutomationRequestTriggersDiscussionCommentCommentTypesItem.
+pub(all) enum AgentAutomationsCreateRepoAutomationRequestTriggersDiscussionCommentCommentTypesItem {
+  Comment
+  Reply
+  Custom(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersDiscussionCommentCommentTypesItem with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersDiscussionCommentCommentTypesItem with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersDiscussionCommentCommentTypesItem with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsCreateRepoAutomationRequestTriggersDiscussionCommentCommentTypesItem with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Comment => "comment"
+    Reply => "reply"
+    Custom(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersDiscussionCommentCommentTypesItem with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationRequestTriggersDiscussionCommentCommentTypesItem with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "comment" => Some(Comment)
+        "reply" => Some(Reply)
+        _ => None
+      }
+    },
+    raw => Custom(raw),
+  )
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsCreateRepoAutomationRequestTriggersDiscussionCommentWriteScope {
+  Trigger
+  Repository
+  Custom(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersDiscussionCommentWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersDiscussionCommentWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersDiscussionCommentWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsCreateRepoAutomationRequestTriggersDiscussionCommentWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Custom(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersDiscussionCommentWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationRequestTriggersDiscussionCommentWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Custom(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsCreateRepoAutomationRequestTriggersDiscussionComment.
+pub(all) struct AgentAutomationsCreateRepoAutomationRequestTriggersDiscussionComment {
+  comment_types : Array[
+    AgentAutomationsCreateRepoAutomationRequestTriggersDiscussionCommentCommentTypesItem,
+  ]?
+  categories : Array[String]?
+  body_substring : String?
+  write_scope : AgentAutomationsCreateRepoAutomationRequestTriggersDiscussionCommentWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersDiscussionComment with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersDiscussionComment with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsCreateRepoAutomationRequestTriggersDiscussionComment with omitted optional fields absent.
+pub fn AgentAutomationsCreateRepoAutomationRequestTriggersDiscussionComment::new(
+  comment_types? : Array[
+    AgentAutomationsCreateRepoAutomationRequestTriggersDiscussionCommentCommentTypesItem,
+  ],
+  categories? : Array[String],
+  body_substring? : String,
+  write_scope? : AgentAutomationsCreateRepoAutomationRequestTriggersDiscussionCommentWriteScope,
+) -> AgentAutomationsCreateRepoAutomationRequestTriggersDiscussionComment {
+  { comment_types, categories, body_substring, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersDiscussionComment with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsCreateRepoAutomationRequestTriggersDiscussionComment with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("comment_types", self.comment_types)
+  .opt("categories", self.categories)
+  .opt("body_substring", self.body_substring)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersDiscussionComment with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationRequestTriggersDiscussionComment with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    comment_types: @sdkjson.opt_field(obj, "comment_types", path),
+    categories: @sdkjson.opt_field(obj, "categories", path),
+    body_substring: @sdkjson.opt_field(obj, "body_substring", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsCreateRepoAutomationRequestTriggersIssueAssignedWriteScope {
+  Trigger
+  Repository
+  Custom(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersIssueAssignedWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersIssueAssignedWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersIssueAssignedWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsCreateRepoAutomationRequestTriggersIssueAssignedWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Custom(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersIssueAssignedWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationRequestTriggersIssueAssignedWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Custom(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsCreateRepoAutomationRequestTriggersIssueAssigned.
+pub(all) struct AgentAutomationsCreateRepoAutomationRequestTriggersIssueAssigned {
+  query : String?
+  assignees : Array[String]?
+  write_scope : AgentAutomationsCreateRepoAutomationRequestTriggersIssueAssignedWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersIssueAssigned with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersIssueAssigned with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsCreateRepoAutomationRequestTriggersIssueAssigned with omitted optional fields absent.
+pub fn AgentAutomationsCreateRepoAutomationRequestTriggersIssueAssigned::new(
+  query? : String,
+  assignees? : Array[String],
+  write_scope? : AgentAutomationsCreateRepoAutomationRequestTriggersIssueAssignedWriteScope,
+) -> AgentAutomationsCreateRepoAutomationRequestTriggersIssueAssigned {
+  { query, assignees, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersIssueAssigned with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsCreateRepoAutomationRequestTriggersIssueAssigned with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("query", self.query)
+  .opt("assignees", self.assignees)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersIssueAssigned with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationRequestTriggersIssueAssigned with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    query: @sdkjson.opt_field(obj, "query", path),
+    assignees: @sdkjson.opt_field(obj, "assignees", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestAssignedWriteScope {
+  Trigger
+  Repository
+  Custom(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestAssignedWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestAssignedWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestAssignedWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestAssignedWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Custom(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestAssignedWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestAssignedWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Custom(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestAssigned.
+pub(all) struct AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestAssigned {
+  query : String?
+  paths : Array[String]?
+  assignees : Array[String]?
+  write_scope : AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestAssignedWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestAssigned with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestAssigned with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestAssigned with omitted optional fields absent.
+pub fn AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestAssigned::new(
+  query? : String,
+  paths? : Array[String],
+  assignees? : Array[String],
+  write_scope? : AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestAssignedWriteScope,
+) -> AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestAssigned {
+  { query, paths, assignees, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestAssigned with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestAssigned with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("query", self.query)
+  .opt("paths", self.paths)
+  .opt("assignees", self.assignees)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestAssigned with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestAssigned with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    query: @sdkjson.opt_field(obj, "query", path),
+    paths: @sdkjson.opt_field(obj, "paths", path),
+    assignees: @sdkjson.opt_field(obj, "assignees", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsCreateRepoAutomationRequestTriggersSubIssueAddedWriteScope {
+  Trigger
+  Repository
+  Custom(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersSubIssueAddedWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersSubIssueAddedWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersSubIssueAddedWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsCreateRepoAutomationRequestTriggersSubIssueAddedWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Custom(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersSubIssueAddedWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationRequestTriggersSubIssueAddedWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Custom(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsCreateRepoAutomationRequestTriggersSubIssueAdded.
+pub(all) struct AgentAutomationsCreateRepoAutomationRequestTriggersSubIssueAdded {
+  query : String?
+  write_scope : AgentAutomationsCreateRepoAutomationRequestTriggersSubIssueAddedWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersSubIssueAdded with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersSubIssueAdded with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsCreateRepoAutomationRequestTriggersSubIssueAdded with omitted optional fields absent.
+pub fn AgentAutomationsCreateRepoAutomationRequestTriggersSubIssueAdded::new(
+  query? : String,
+  write_scope? : AgentAutomationsCreateRepoAutomationRequestTriggersSubIssueAddedWriteScope,
+) -> AgentAutomationsCreateRepoAutomationRequestTriggersSubIssueAdded {
+  { query, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersSubIssueAdded with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsCreateRepoAutomationRequestTriggersSubIssueAdded with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("query", self.query)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersSubIssueAdded with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationRequestTriggersSubIssueAdded with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    query: @sdkjson.opt_field(obj, "query", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestReadyForReviewWriteScope {
+  Trigger
+  Repository
+  Custom(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestReadyForReviewWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestReadyForReviewWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestReadyForReviewWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestReadyForReviewWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Custom(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestReadyForReviewWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestReadyForReviewWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Custom(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestReadyForReview.
+pub(all) struct AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestReadyForReview {
+  query : String?
+  paths : Array[String]?
+  write_scope : AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestReadyForReviewWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestReadyForReview with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestReadyForReview with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestReadyForReview with omitted optional fields absent.
+pub fn AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestReadyForReview::new(
+  query? : String,
+  paths? : Array[String],
+  write_scope? : AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestReadyForReviewWriteScope,
+) -> AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestReadyForReview {
+  { query, paths, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestReadyForReview with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestReadyForReview with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("query", self.query)
+  .opt("paths", self.paths)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestReadyForReview with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestReadyForReview with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    query: @sdkjson.opt_field(obj, "query", path),
+    paths: @sdkjson.opt_field(obj, "paths", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestLabeledWriteScope {
+  Trigger
+  Repository
+  Custom(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestLabeledWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestLabeledWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestLabeledWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestLabeledWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Custom(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestLabeledWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestLabeledWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Custom(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestLabeled.
+pub(all) struct AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestLabeled {
+  query : String?
+  paths : Array[String]?
+  labels : Array[String]?
+  write_scope : AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestLabeledWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestLabeled with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestLabeled with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestLabeled with omitted optional fields absent.
+pub fn AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestLabeled::new(
+  query? : String,
+  paths? : Array[String],
+  labels? : Array[String],
+  write_scope? : AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestLabeledWriteScope,
+) -> AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestLabeled {
+  { query, paths, labels, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestLabeled with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestLabeled with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("query", self.query)
+  .opt("paths", self.paths)
+  .opt("labels", self.labels)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestLabeled with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestLabeled with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    query: @sdkjson.opt_field(obj, "query", path),
+    paths: @sdkjson.opt_field(obj, "paths", path),
+    labels: @sdkjson.opt_field(obj, "labels", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestMergeConflictWriteScope {
+  Trigger
+  Repository
+  Custom(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestMergeConflictWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestMergeConflictWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestMergeConflictWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestMergeConflictWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Custom(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestMergeConflictWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestMergeConflictWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Custom(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestMergeConflict.
+pub(all) struct AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestMergeConflict {
+  query : String?
+  paths : Array[String]?
+  write_scope : AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestMergeConflictWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestMergeConflict with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestMergeConflict with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestMergeConflict with omitted optional fields absent.
+pub fn AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestMergeConflict::new(
+  query? : String,
+  paths? : Array[String],
+  write_scope? : AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestMergeConflictWriteScope,
+) -> AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestMergeConflict {
+  { query, paths, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestMergeConflict with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestMergeConflict with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("query", self.query)
+  .opt("paths", self.paths)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestMergeConflict with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestMergeConflict with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    query: @sdkjson.opt_field(obj, "query", path),
+    paths: @sdkjson.opt_field(obj, "paths", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Generated string enum AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestReviewSubmittedStatesItem.
+pub(all) enum AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestReviewSubmittedStatesItem {
+  Approved
+  ChangesRequested
+  Commented
+  Custom(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestReviewSubmittedStatesItem with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestReviewSubmittedStatesItem with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestReviewSubmittedStatesItem with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestReviewSubmittedStatesItem with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Approved => "approved"
+    ChangesRequested => "changes_requested"
+    Commented => "commented"
+    Custom(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestReviewSubmittedStatesItem with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestReviewSubmittedStatesItem with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "approved" => Some(Approved)
+        "changes_requested" => Some(ChangesRequested)
+        "commented" => Some(Commented)
+        _ => None
+      }
+    },
+    raw => Custom(raw),
+  )
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestReviewSubmittedWriteScope {
+  Trigger
+  Repository
+  Custom(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestReviewSubmittedWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestReviewSubmittedWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestReviewSubmittedWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestReviewSubmittedWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Custom(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestReviewSubmittedWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestReviewSubmittedWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Custom(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestReviewSubmitted.
+pub(all) struct AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestReviewSubmitted {
+  query : String?
+  paths : Array[String]?
+  states : Array[
+    AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestReviewSubmittedStatesItem,
+  ]
+  write_scope : AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestReviewSubmittedWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestReviewSubmitted with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestReviewSubmitted with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestReviewSubmitted with omitted optional fields absent.
+pub fn AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestReviewSubmitted::new(
+  states~ : Array[
+    AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestReviewSubmittedStatesItem,
+  ],
+  query? : String,
+  paths? : Array[String],
+  write_scope? : AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestReviewSubmittedWriteScope,
+) -> AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestReviewSubmitted {
+  { query, paths, states, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestReviewSubmitted with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestReviewSubmitted with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("query", self.query)
+  .opt("paths", self.paths)
+  .field("states", self.states)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestReviewSubmitted with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestReviewSubmitted with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    query: @sdkjson.opt_field(obj, "query", path),
+    paths: @sdkjson.opt_field(obj, "paths", path),
+    states: required_field(obj, "states", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestReviewRequestedWriteScope {
+  Trigger
+  Repository
+  Custom(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestReviewRequestedWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestReviewRequestedWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestReviewRequestedWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestReviewRequestedWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Custom(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestReviewRequestedWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestReviewRequestedWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Custom(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestReviewRequested.
+pub(all) struct AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestReviewRequested {
+  query : String?
+  paths : Array[String]?
+  write_scope : AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestReviewRequestedWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestReviewRequested with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestReviewRequested with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestReviewRequested with omitted optional fields absent.
+pub fn AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestReviewRequested::new(
+  query? : String,
+  paths? : Array[String],
+  write_scope? : AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestReviewRequestedWriteScope,
+) -> AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestReviewRequested {
+  { query, paths, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestReviewRequested with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestReviewRequested with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("query", self.query)
+  .opt("paths", self.paths)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestReviewRequested with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestReviewRequested with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    query: @sdkjson.opt_field(obj, "query", path),
+    paths: @sdkjson.opt_field(obj, "paths", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsCreateRepoAutomationRequestTriggersAutomationCompletedWriteScope {
+  Trigger
+  Repository
+  Custom(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersAutomationCompletedWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersAutomationCompletedWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersAutomationCompletedWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsCreateRepoAutomationRequestTriggersAutomationCompletedWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Custom(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersAutomationCompletedWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationRequestTriggersAutomationCompletedWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Custom(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsCreateRepoAutomationRequestTriggersAutomationCompleted.
+pub(all) struct AgentAutomationsCreateRepoAutomationRequestTriggersAutomationCompleted {
+  automation_ids : Array[String]
+  write_scope : AgentAutomationsCreateRepoAutomationRequestTriggersAutomationCompletedWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersAutomationCompleted with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersAutomationCompleted with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsCreateRepoAutomationRequestTriggersAutomationCompleted with omitted optional fields absent.
+pub fn AgentAutomationsCreateRepoAutomationRequestTriggersAutomationCompleted::new(
+  automation_ids~ : Array[String],
+  write_scope? : AgentAutomationsCreateRepoAutomationRequestTriggersAutomationCompletedWriteScope,
+) -> AgentAutomationsCreateRepoAutomationRequestTriggersAutomationCompleted {
+  { automation_ids, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersAutomationCompleted with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsCreateRepoAutomationRequestTriggersAutomationCompleted with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .field("automation_ids", self.automation_ids)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggersAutomationCompleted with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationRequestTriggersAutomationCompleted with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    automation_ids: required_field(obj, "automation_ids", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Public trigger configuration keyed by stable public trigger identifier. Each trigger has a closed, trigger-specific configuration schema.
+pub(all) struct AgentAutomationsCreateRepoAutomationRequestTriggers {
+  interval : AgentAutomationsCreateRepoAutomationRequestTriggersInterval?
+  issue_opened : AgentAutomationsCreateRepoAutomationRequestTriggersIssueOpened?
+  issue_labeled : AgentAutomationsCreateRepoAutomationRequestTriggersIssueLabeled?
+  workflow_run : AgentAutomationsCreateRepoAutomationRequestTriggersWorkflowRun?
+  pull_request_opened : AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestOpened?
+  pull_request_synchronize : AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestSynchronize?
+  pull_request_merged : AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestMerged?
+  issue_comment : AgentAutomationsCreateRepoAutomationRequestTriggersIssueComment?
+  pull_request_comment : AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestComment?
+  discussion_opened : AgentAutomationsCreateRepoAutomationRequestTriggersDiscussionOpened?
+  discussion_updated : AgentAutomationsCreateRepoAutomationRequestTriggersDiscussionUpdated?
+  discussion_comment : AgentAutomationsCreateRepoAutomationRequestTriggersDiscussionComment?
+  issue_assigned : AgentAutomationsCreateRepoAutomationRequestTriggersIssueAssigned?
+  pull_request_assigned : AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestAssigned?
+  sub_issue_added : AgentAutomationsCreateRepoAutomationRequestTriggersSubIssueAdded?
+  pull_request_ready_for_review : AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestReadyForReview?
+  pull_request_labeled : AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestLabeled?
+  pull_request_merge_conflict : AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestMergeConflict?
+  pull_request_review_submitted : AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestReviewSubmitted?
+  pull_request_review_requested : AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestReviewRequested?
+  automation_completed : AgentAutomationsCreateRepoAutomationRequestTriggersAutomationCompleted?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggers with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggers with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsCreateRepoAutomationRequestTriggers with omitted optional fields absent.
+pub fn AgentAutomationsCreateRepoAutomationRequestTriggers::new(
+  interval? : AgentAutomationsCreateRepoAutomationRequestTriggersInterval,
+  issue_opened? : AgentAutomationsCreateRepoAutomationRequestTriggersIssueOpened,
+  issue_labeled? : AgentAutomationsCreateRepoAutomationRequestTriggersIssueLabeled,
+  workflow_run? : AgentAutomationsCreateRepoAutomationRequestTriggersWorkflowRun,
+  pull_request_opened? : AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestOpened,
+  pull_request_synchronize? : AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestSynchronize,
+  pull_request_merged? : AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestMerged,
+  issue_comment? : AgentAutomationsCreateRepoAutomationRequestTriggersIssueComment,
+  pull_request_comment? : AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestComment,
+  discussion_opened? : AgentAutomationsCreateRepoAutomationRequestTriggersDiscussionOpened,
+  discussion_updated? : AgentAutomationsCreateRepoAutomationRequestTriggersDiscussionUpdated,
+  discussion_comment? : AgentAutomationsCreateRepoAutomationRequestTriggersDiscussionComment,
+  issue_assigned? : AgentAutomationsCreateRepoAutomationRequestTriggersIssueAssigned,
+  pull_request_assigned? : AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestAssigned,
+  sub_issue_added? : AgentAutomationsCreateRepoAutomationRequestTriggersSubIssueAdded,
+  pull_request_ready_for_review? : AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestReadyForReview,
+  pull_request_labeled? : AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestLabeled,
+  pull_request_merge_conflict? : AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestMergeConflict,
+  pull_request_review_submitted? : AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestReviewSubmitted,
+  pull_request_review_requested? : AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestReviewRequested,
+  automation_completed? : AgentAutomationsCreateRepoAutomationRequestTriggersAutomationCompleted,
+) -> AgentAutomationsCreateRepoAutomationRequestTriggers {
+  {
+    interval,
+    issue_opened,
+    issue_labeled,
+    workflow_run,
+    pull_request_opened,
+    pull_request_synchronize,
+    pull_request_merged,
+    issue_comment,
+    pull_request_comment,
+    discussion_opened,
+    discussion_updated,
+    discussion_comment,
+    issue_assigned,
+    pull_request_assigned,
+    sub_issue_added,
+    pull_request_ready_for_review,
+    pull_request_labeled,
+    pull_request_merge_conflict,
+    pull_request_review_submitted,
+    pull_request_review_requested,
+    automation_completed,
+  }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggers with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsCreateRepoAutomationRequestTriggers with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("interval", self.interval)
+  .opt("issue_opened", self.issue_opened)
+  .opt("issue_labeled", self.issue_labeled)
+  .opt("workflow_run", self.workflow_run)
+  .opt("pull_request_opened", self.pull_request_opened)
+  .opt("pull_request_synchronize", self.pull_request_synchronize)
+  .opt("pull_request_merged", self.pull_request_merged)
+  .opt("issue_comment", self.issue_comment)
+  .opt("pull_request_comment", self.pull_request_comment)
+  .opt("discussion_opened", self.discussion_opened)
+  .opt("discussion_updated", self.discussion_updated)
+  .opt("discussion_comment", self.discussion_comment)
+  .opt("issue_assigned", self.issue_assigned)
+  .opt("pull_request_assigned", self.pull_request_assigned)
+  .opt("sub_issue_added", self.sub_issue_added)
+  .opt("pull_request_ready_for_review", self.pull_request_ready_for_review)
+  .opt("pull_request_labeled", self.pull_request_labeled)
+  .opt("pull_request_merge_conflict", self.pull_request_merge_conflict)
+  .opt("pull_request_review_submitted", self.pull_request_review_submitted)
+  .opt("pull_request_review_requested", self.pull_request_review_requested)
+  .opt("automation_completed", self.automation_completed)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsCreateRepoAutomationRequestTriggers with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationRequestTriggers with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    interval: @sdkjson.opt_field(obj, "interval", path),
+    issue_opened: @sdkjson.opt_field(obj, "issue_opened", path),
+    issue_labeled: @sdkjson.opt_field(obj, "issue_labeled", path),
+    workflow_run: @sdkjson.opt_field(obj, "workflow_run", path),
+    pull_request_opened: @sdkjson.opt_field(obj, "pull_request_opened", path),
+    pull_request_synchronize: @sdkjson.opt_field(
+      obj, "pull_request_synchronize", path,
+    ),
+    pull_request_merged: @sdkjson.opt_field(obj, "pull_request_merged", path),
+    issue_comment: @sdkjson.opt_field(obj, "issue_comment", path),
+    pull_request_comment: @sdkjson.opt_field(obj, "pull_request_comment", path),
+    discussion_opened: @sdkjson.opt_field(obj, "discussion_opened", path),
+    discussion_updated: @sdkjson.opt_field(obj, "discussion_updated", path),
+    discussion_comment: @sdkjson.opt_field(obj, "discussion_comment", path),
+    issue_assigned: @sdkjson.opt_field(obj, "issue_assigned", path),
+    pull_request_assigned: @sdkjson.opt_field(
+      obj, "pull_request_assigned", path,
+    ),
+    sub_issue_added: @sdkjson.opt_field(obj, "sub_issue_added", path),
+    pull_request_ready_for_review: @sdkjson.opt_field(
+      obj, "pull_request_ready_for_review", path,
+    ),
+    pull_request_labeled: @sdkjson.opt_field(obj, "pull_request_labeled", path),
+    pull_request_merge_conflict: @sdkjson.opt_field(
+      obj, "pull_request_merge_conflict", path,
+    ),
+    pull_request_review_submitted: @sdkjson.opt_field(
+      obj, "pull_request_review_submitted", path,
+    ),
+    pull_request_review_requested: @sdkjson.opt_field(
+      obj, "pull_request_review_requested", path,
+    ),
+    automation_completed: @sdkjson.opt_field(obj, "automation_completed", path),
+  }
+}
+
+///|
+///
+/// Who owns the automation, fixed at creation. `user` keeps it private to its creator and its runs act as that user. `repository` makes it belong to the repository, visible to anyone with read access to the repository and maintainable by anyone with write access to the repository, and its runs act as the Copilot app rather than as a person. `repository` is rejected when repository ownership is not available for the repository. Supported values: `user`, `repository`. Defaults to `user`.
+pub(all) enum AgentAutomationsCreateRepoAutomationRequestOwnerType {
+  User
+  Repository
+  Custom(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationRequestOwnerType with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationRequestOwnerType with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsCreateRepoAutomationRequestOwnerType with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsCreateRepoAutomationRequestOwnerType with fn to_json(
+  self,
+) {
+  let raw = match self {
+    User => "user"
+    Repository => "repository"
+    Custom(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsCreateRepoAutomationRequestOwnerType with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationRequestOwnerType with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "user" => Some(User)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Custom(raw),
+  )
+}
+
+///|
+///
+/// Controls which repository resources a run may modify. `trigger` limits writes to the resource that started the run, when one exists, and resources created during the run; `repository` allows writes to any resource in the repository. Supported values: `trigger`, `repository`.
+pub(all) enum AgentAutomationsCreateRepoAutomationRequestWriteScope {
+  Trigger
+  Repository
+  Custom(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationRequestWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationRequestWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsCreateRepoAutomationRequestWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsCreateRepoAutomationRequestWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Custom(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsCreateRepoAutomationRequestWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationRequestWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Custom(raw),
+  )
+}
+
+///|
+///
+/// Request body for creating an automation.
+pub(all) struct AgentAutomationsCreateRepoAutomationRequest {
+  name : String
+  triggers : AgentAutomationsCreateRepoAutomationRequestTriggers?
+  prompt : String
+  model : String?
+  reasoning_effort : String?
+  tools : Array[String]?
+  allowed_custom_agents : Array[String]?
+  enabled : Bool?
+  owner_type : AgentAutomationsCreateRepoAutomationRequestOwnerType?
+  write_scope : AgentAutomationsCreateRepoAutomationRequestWriteScope?
+  require_actor_write_permission : Bool?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationRequest with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationRequest with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsCreateRepoAutomationRequest with omitted optional fields absent.
+pub fn AgentAutomationsCreateRepoAutomationRequest::new(
+  name~ : String,
+  prompt~ : String,
+  triggers? : AgentAutomationsCreateRepoAutomationRequestTriggers,
+  model? : String,
+  reasoning_effort? : String,
+  tools? : Array[String],
+  allowed_custom_agents? : Array[String],
+  enabled? : Bool,
+  owner_type? : AgentAutomationsCreateRepoAutomationRequestOwnerType,
+  write_scope? : AgentAutomationsCreateRepoAutomationRequestWriteScope,
+  require_actor_write_permission? : Bool,
+) -> AgentAutomationsCreateRepoAutomationRequest {
+  {
+    name,
+    triggers,
+    prompt,
+    model,
+    reasoning_effort,
+    tools,
+    allowed_custom_agents,
+    enabled,
+    owner_type,
+    write_scope,
+    require_actor_write_permission,
+  }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsCreateRepoAutomationRequest with ToJson::{to_json}
+
+///|
+pub impl ToJson for AgentAutomationsCreateRepoAutomationRequest with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .field("name", self.name)
+  .opt("triggers", self.triggers)
+  .field("prompt", self.prompt)
+  .opt("model", self.model)
+  .opt("reasoning_effort", self.reasoning_effort)
+  .opt("tools", self.tools)
+  .opt("allowed_custom_agents", self.allowed_custom_agents)
+  .opt("enabled", self.enabled)
+  .opt("owner_type", self.owner_type)
+  .opt("write_scope", self.write_scope)
+  .opt("require_actor_write_permission", self.require_actor_write_permission)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsCreateRepoAutomationRequest with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationRequest with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    name: required_field(obj, "name", path),
+    triggers: @sdkjson.opt_field(obj, "triggers", path),
+    prompt: required_field(obj, "prompt", path),
+    model: @sdkjson.opt_field(obj, "model", path),
+    reasoning_effort: @sdkjson.opt_field(obj, "reasoning_effort", path),
+    tools: @sdkjson.opt_field(obj, "tools", path),
+    allowed_custom_agents: @sdkjson.opt_field(
+      obj, "allowed_custom_agents", path,
+    ),
+    enabled: @sdkjson.opt_field(obj, "enabled", path),
+    owner_type: @sdkjson.opt_field(obj, "owner_type", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+    require_actor_write_permission: @sdkjson.opt_field(
+      obj, "require_actor_write_permission", path,
+    ),
+  }
+}
+
+///|
+///
+/// Who owns the automation. `user` keeps it private to its creator and its runs act as that user. `repository` makes it belong to the repository, visible to anyone with read access to the repository, and its runs act as the Copilot app rather than as a person.
+pub(all) enum AgentAutomationsCreateRepoAutomationResponseOwnerType {
+  User
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationResponseOwnerType with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationResponseOwnerType with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsCreateRepoAutomationResponseOwnerType with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsCreateRepoAutomationResponseOwnerType with fn to_json(
+  self,
+) {
+  let raw = match self {
+    User => "user"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsCreateRepoAutomationResponseOwnerType with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationResponseOwnerType with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "user" => Some(User)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Controls which repository resources a run may modify. `trigger` limits writes to the resource that started the run, when one exists, and resources created during the run; `repository` allows writes to any resource in the repository. Supported values: `trigger`, `repository`.
+pub(all) enum AgentAutomationsCreateRepoAutomationResponseWriteScope {
+  Trigger
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationResponseWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationResponseWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsCreateRepoAutomationResponseWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsCreateRepoAutomationResponseWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsCreateRepoAutomationResponseWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationResponseWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated string enum AgentAutomationsCreateRepoAutomationResponseTriggersIntervalCadenceItem.
+pub(all) enum AgentAutomationsCreateRepoAutomationResponseTriggersIntervalCadenceItem {
+  Hourly
+  Daily
+  Weekly
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersIntervalCadenceItem with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersIntervalCadenceItem with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersIntervalCadenceItem with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsCreateRepoAutomationResponseTriggersIntervalCadenceItem with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Hourly => "hourly"
+    Daily => "daily"
+    Weekly => "weekly"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersIntervalCadenceItem with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationResponseTriggersIntervalCadenceItem with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "hourly" => Some(Hourly)
+        "daily" => Some(Daily)
+        "weekly" => Some(Weekly)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsCreateRepoAutomationResponseTriggersIntervalWriteScope {
+  Trigger
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersIntervalWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersIntervalWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersIntervalWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsCreateRepoAutomationResponseTriggersIntervalWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersIntervalWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationResponseTriggersIntervalWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsCreateRepoAutomationResponseTriggersInterval.
+pub(all) struct AgentAutomationsCreateRepoAutomationResponseTriggersInterval {
+  cadence : Array[
+    AgentAutomationsCreateRepoAutomationResponseTriggersIntervalCadenceItem,
+  ]
+  hour_utc : Int32?
+  day_of_week : Int32?
+  minute_utc : Int32?
+  write_scope : AgentAutomationsCreateRepoAutomationResponseTriggersIntervalWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersInterval with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersInterval with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsCreateRepoAutomationResponseTriggersInterval with omitted optional fields absent.
+pub fn AgentAutomationsCreateRepoAutomationResponseTriggersInterval::new(
+  cadence~ : Array[
+    AgentAutomationsCreateRepoAutomationResponseTriggersIntervalCadenceItem,
+  ],
+  hour_utc? : Int32,
+  day_of_week? : Int32,
+  minute_utc? : Int32,
+  write_scope? : AgentAutomationsCreateRepoAutomationResponseTriggersIntervalWriteScope,
+) -> AgentAutomationsCreateRepoAutomationResponseTriggersInterval {
+  { cadence, hour_utc, day_of_week, minute_utc, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersInterval with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsCreateRepoAutomationResponseTriggersInterval with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .field("cadence", self.cadence)
+  .opt("hour_utc", self.hour_utc)
+  .opt("day_of_week", self.day_of_week)
+  .opt("minute_utc", self.minute_utc)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersInterval with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationResponseTriggersInterval with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    cadence: required_field(obj, "cadence", path),
+    hour_utc: @sdkjson.opt_field(obj, "hour_utc", path),
+    day_of_week: @sdkjson.opt_field(obj, "day_of_week", path),
+    minute_utc: @sdkjson.opt_field(obj, "minute_utc", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsCreateRepoAutomationResponseTriggersIssueOpenedWriteScope {
+  Trigger
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersIssueOpenedWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersIssueOpenedWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersIssueOpenedWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsCreateRepoAutomationResponseTriggersIssueOpenedWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersIssueOpenedWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationResponseTriggersIssueOpenedWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsCreateRepoAutomationResponseTriggersIssueOpened.
+pub(all) struct AgentAutomationsCreateRepoAutomationResponseTriggersIssueOpened {
+  query : String?
+  write_scope : AgentAutomationsCreateRepoAutomationResponseTriggersIssueOpenedWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersIssueOpened with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersIssueOpened with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsCreateRepoAutomationResponseTriggersIssueOpened with omitted optional fields absent.
+pub fn AgentAutomationsCreateRepoAutomationResponseTriggersIssueOpened::new(
+  query? : String,
+  write_scope? : AgentAutomationsCreateRepoAutomationResponseTriggersIssueOpenedWriteScope,
+) -> AgentAutomationsCreateRepoAutomationResponseTriggersIssueOpened {
+  { query, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersIssueOpened with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsCreateRepoAutomationResponseTriggersIssueOpened with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("query", self.query)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersIssueOpened with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationResponseTriggersIssueOpened with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    query: @sdkjson.opt_field(obj, "query", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsCreateRepoAutomationResponseTriggersIssueLabeledWriteScope {
+  Trigger
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersIssueLabeledWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersIssueLabeledWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersIssueLabeledWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsCreateRepoAutomationResponseTriggersIssueLabeledWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersIssueLabeledWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationResponseTriggersIssueLabeledWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsCreateRepoAutomationResponseTriggersIssueLabeled.
+pub(all) struct AgentAutomationsCreateRepoAutomationResponseTriggersIssueLabeled {
+  query : String?
+  labels : Array[String]?
+  write_scope : AgentAutomationsCreateRepoAutomationResponseTriggersIssueLabeledWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersIssueLabeled with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersIssueLabeled with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsCreateRepoAutomationResponseTriggersIssueLabeled with omitted optional fields absent.
+pub fn AgentAutomationsCreateRepoAutomationResponseTriggersIssueLabeled::new(
+  query? : String,
+  labels? : Array[String],
+  write_scope? : AgentAutomationsCreateRepoAutomationResponseTriggersIssueLabeledWriteScope,
+) -> AgentAutomationsCreateRepoAutomationResponseTriggersIssueLabeled {
+  { query, labels, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersIssueLabeled with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsCreateRepoAutomationResponseTriggersIssueLabeled with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("query", self.query)
+  .opt("labels", self.labels)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersIssueLabeled with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationResponseTriggersIssueLabeled with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    query: @sdkjson.opt_field(obj, "query", path),
+    labels: @sdkjson.opt_field(obj, "labels", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsCreateRepoAutomationResponseTriggersWorkflowRunWriteScope {
+  Trigger
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersWorkflowRunWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersWorkflowRunWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersWorkflowRunWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsCreateRepoAutomationResponseTriggersWorkflowRunWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersWorkflowRunWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationResponseTriggersWorkflowRunWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsCreateRepoAutomationResponseTriggersWorkflowRun.
+pub(all) struct AgentAutomationsCreateRepoAutomationResponseTriggersWorkflowRun {
+  workflows : Array[String]
+  conclusions : Array[String]
+  query : String?
+  write_scope : AgentAutomationsCreateRepoAutomationResponseTriggersWorkflowRunWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersWorkflowRun with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersWorkflowRun with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsCreateRepoAutomationResponseTriggersWorkflowRun with omitted optional fields absent.
+pub fn AgentAutomationsCreateRepoAutomationResponseTriggersWorkflowRun::new(
+  workflows~ : Array[String],
+  conclusions~ : Array[String],
+  query? : String,
+  write_scope? : AgentAutomationsCreateRepoAutomationResponseTriggersWorkflowRunWriteScope,
+) -> AgentAutomationsCreateRepoAutomationResponseTriggersWorkflowRun {
+  { workflows, conclusions, query, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersWorkflowRun with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsCreateRepoAutomationResponseTriggersWorkflowRun with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .field("workflows", self.workflows)
+  .field("conclusions", self.conclusions)
+  .opt("query", self.query)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersWorkflowRun with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationResponseTriggersWorkflowRun with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    workflows: required_field(obj, "workflows", path),
+    conclusions: required_field(obj, "conclusions", path),
+    query: @sdkjson.opt_field(obj, "query", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestOpenedWriteScope {
+  Trigger
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestOpenedWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestOpenedWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestOpenedWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestOpenedWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestOpenedWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestOpenedWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestOpened.
+pub(all) struct AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestOpened {
+  query : String?
+  paths : Array[String]?
+  write_scope : AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestOpenedWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestOpened with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestOpened with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestOpened with omitted optional fields absent.
+pub fn AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestOpened::new(
+  query? : String,
+  paths? : Array[String],
+  write_scope? : AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestOpenedWriteScope,
+) -> AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestOpened {
+  { query, paths, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestOpened with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestOpened with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("query", self.query)
+  .opt("paths", self.paths)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestOpened with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestOpened with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    query: @sdkjson.opt_field(obj, "query", path),
+    paths: @sdkjson.opt_field(obj, "paths", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestSynchronizeWriteScope {
+  Trigger
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestSynchronizeWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestSynchronizeWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestSynchronizeWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestSynchronizeWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestSynchronizeWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestSynchronizeWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestSynchronize.
+pub(all) struct AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestSynchronize {
+  query : String?
+  paths : Array[String]?
+  write_scope : AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestSynchronizeWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestSynchronize with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestSynchronize with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestSynchronize with omitted optional fields absent.
+pub fn AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestSynchronize::new(
+  query? : String,
+  paths? : Array[String],
+  write_scope? : AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestSynchronizeWriteScope,
+) -> AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestSynchronize {
+  { query, paths, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestSynchronize with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestSynchronize with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("query", self.query)
+  .opt("paths", self.paths)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestSynchronize with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestSynchronize with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    query: @sdkjson.opt_field(obj, "query", path),
+    paths: @sdkjson.opt_field(obj, "paths", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestMergedWriteScope {
+  Trigger
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestMergedWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestMergedWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestMergedWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestMergedWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestMergedWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestMergedWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestMerged.
+pub(all) struct AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestMerged {
+  query : String?
+  paths : Array[String]?
+  write_scope : AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestMergedWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestMerged with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestMerged with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestMerged with omitted optional fields absent.
+pub fn AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestMerged::new(
+  query? : String,
+  paths? : Array[String],
+  write_scope? : AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestMergedWriteScope,
+) -> AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestMerged {
+  { query, paths, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestMerged with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestMerged with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("query", self.query)
+  .opt("paths", self.paths)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestMerged with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestMerged with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    query: @sdkjson.opt_field(obj, "query", path),
+    paths: @sdkjson.opt_field(obj, "paths", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsCreateRepoAutomationResponseTriggersIssueCommentWriteScope {
+  Trigger
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersIssueCommentWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersIssueCommentWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersIssueCommentWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsCreateRepoAutomationResponseTriggersIssueCommentWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersIssueCommentWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationResponseTriggersIssueCommentWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsCreateRepoAutomationResponseTriggersIssueComment.
+pub(all) struct AgentAutomationsCreateRepoAutomationResponseTriggersIssueComment {
+  body_substring : String?
+  write_scope : AgentAutomationsCreateRepoAutomationResponseTriggersIssueCommentWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersIssueComment with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersIssueComment with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsCreateRepoAutomationResponseTriggersIssueComment with omitted optional fields absent.
+pub fn AgentAutomationsCreateRepoAutomationResponseTriggersIssueComment::new(
+  body_substring? : String,
+  write_scope? : AgentAutomationsCreateRepoAutomationResponseTriggersIssueCommentWriteScope,
+) -> AgentAutomationsCreateRepoAutomationResponseTriggersIssueComment {
+  { body_substring, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersIssueComment with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsCreateRepoAutomationResponseTriggersIssueComment with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("body_substring", self.body_substring)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersIssueComment with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationResponseTriggersIssueComment with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    body_substring: @sdkjson.opt_field(obj, "body_substring", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Generated string enum AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestCommentCommentTypesItem.
+pub(all) enum AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestCommentCommentTypesItem {
+  TimelineComment
+  ReviewComment
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestCommentCommentTypesItem with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestCommentCommentTypesItem with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestCommentCommentTypesItem with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestCommentCommentTypesItem with fn to_json(
+  self,
+) {
+  let raw = match self {
+    TimelineComment => "timeline_comment"
+    ReviewComment => "review_comment"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestCommentCommentTypesItem with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestCommentCommentTypesItem with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "timeline_comment" => Some(TimelineComment)
+        "review_comment" => Some(ReviewComment)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestCommentWriteScope {
+  Trigger
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestCommentWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestCommentWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestCommentWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestCommentWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestCommentWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestCommentWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestComment.
+pub(all) struct AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestComment {
+  comment_types : Array[
+    AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestCommentCommentTypesItem,
+  ]
+  body_substring : String?
+  write_scope : AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestCommentWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestComment with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestComment with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestComment with omitted optional fields absent.
+pub fn AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestComment::new(
+  comment_types~ : Array[
+    AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestCommentCommentTypesItem,
+  ],
+  body_substring? : String,
+  write_scope? : AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestCommentWriteScope,
+) -> AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestComment {
+  { comment_types, body_substring, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestComment with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestComment with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .field("comment_types", self.comment_types)
+  .opt("body_substring", self.body_substring)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestComment with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestComment with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    comment_types: required_field(obj, "comment_types", path),
+    body_substring: @sdkjson.opt_field(obj, "body_substring", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsCreateRepoAutomationResponseTriggersDiscussionOpenedWriteScope {
+  Trigger
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersDiscussionOpenedWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersDiscussionOpenedWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersDiscussionOpenedWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsCreateRepoAutomationResponseTriggersDiscussionOpenedWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersDiscussionOpenedWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationResponseTriggersDiscussionOpenedWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsCreateRepoAutomationResponseTriggersDiscussionOpened.
+pub(all) struct AgentAutomationsCreateRepoAutomationResponseTriggersDiscussionOpened {
+  categories : Array[String]?
+  body_substring : String?
+  write_scope : AgentAutomationsCreateRepoAutomationResponseTriggersDiscussionOpenedWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersDiscussionOpened with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersDiscussionOpened with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsCreateRepoAutomationResponseTriggersDiscussionOpened with omitted optional fields absent.
+pub fn AgentAutomationsCreateRepoAutomationResponseTriggersDiscussionOpened::new(
+  categories? : Array[String],
+  body_substring? : String,
+  write_scope? : AgentAutomationsCreateRepoAutomationResponseTriggersDiscussionOpenedWriteScope,
+) -> AgentAutomationsCreateRepoAutomationResponseTriggersDiscussionOpened {
+  { categories, body_substring, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersDiscussionOpened with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsCreateRepoAutomationResponseTriggersDiscussionOpened with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("categories", self.categories)
+  .opt("body_substring", self.body_substring)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersDiscussionOpened with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationResponseTriggersDiscussionOpened with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    categories: @sdkjson.opt_field(obj, "categories", path),
+    body_substring: @sdkjson.opt_field(obj, "body_substring", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsCreateRepoAutomationResponseTriggersDiscussionUpdatedWriteScope {
+  Trigger
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersDiscussionUpdatedWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersDiscussionUpdatedWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersDiscussionUpdatedWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsCreateRepoAutomationResponseTriggersDiscussionUpdatedWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersDiscussionUpdatedWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationResponseTriggersDiscussionUpdatedWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsCreateRepoAutomationResponseTriggersDiscussionUpdated.
+pub(all) struct AgentAutomationsCreateRepoAutomationResponseTriggersDiscussionUpdated {
+  categories : Array[String]?
+  body_substring : String?
+  write_scope : AgentAutomationsCreateRepoAutomationResponseTriggersDiscussionUpdatedWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersDiscussionUpdated with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersDiscussionUpdated with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsCreateRepoAutomationResponseTriggersDiscussionUpdated with omitted optional fields absent.
+pub fn AgentAutomationsCreateRepoAutomationResponseTriggersDiscussionUpdated::new(
+  categories? : Array[String],
+  body_substring? : String,
+  write_scope? : AgentAutomationsCreateRepoAutomationResponseTriggersDiscussionUpdatedWriteScope,
+) -> AgentAutomationsCreateRepoAutomationResponseTriggersDiscussionUpdated {
+  { categories, body_substring, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersDiscussionUpdated with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsCreateRepoAutomationResponseTriggersDiscussionUpdated with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("categories", self.categories)
+  .opt("body_substring", self.body_substring)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersDiscussionUpdated with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationResponseTriggersDiscussionUpdated with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    categories: @sdkjson.opt_field(obj, "categories", path),
+    body_substring: @sdkjson.opt_field(obj, "body_substring", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Generated string enum AgentAutomationsCreateRepoAutomationResponseTriggersDiscussionCommentCommentTypesItem.
+pub(all) enum AgentAutomationsCreateRepoAutomationResponseTriggersDiscussionCommentCommentTypesItem {
+  Comment
+  Reply
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersDiscussionCommentCommentTypesItem with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersDiscussionCommentCommentTypesItem with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersDiscussionCommentCommentTypesItem with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsCreateRepoAutomationResponseTriggersDiscussionCommentCommentTypesItem with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Comment => "comment"
+    Reply => "reply"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersDiscussionCommentCommentTypesItem with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationResponseTriggersDiscussionCommentCommentTypesItem with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "comment" => Some(Comment)
+        "reply" => Some(Reply)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsCreateRepoAutomationResponseTriggersDiscussionCommentWriteScope {
+  Trigger
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersDiscussionCommentWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersDiscussionCommentWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersDiscussionCommentWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsCreateRepoAutomationResponseTriggersDiscussionCommentWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersDiscussionCommentWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationResponseTriggersDiscussionCommentWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsCreateRepoAutomationResponseTriggersDiscussionComment.
+pub(all) struct AgentAutomationsCreateRepoAutomationResponseTriggersDiscussionComment {
+  comment_types : Array[
+    AgentAutomationsCreateRepoAutomationResponseTriggersDiscussionCommentCommentTypesItem,
+  ]?
+  categories : Array[String]?
+  body_substring : String?
+  write_scope : AgentAutomationsCreateRepoAutomationResponseTriggersDiscussionCommentWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersDiscussionComment with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersDiscussionComment with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsCreateRepoAutomationResponseTriggersDiscussionComment with omitted optional fields absent.
+pub fn AgentAutomationsCreateRepoAutomationResponseTriggersDiscussionComment::new(
+  comment_types? : Array[
+    AgentAutomationsCreateRepoAutomationResponseTriggersDiscussionCommentCommentTypesItem,
+  ],
+  categories? : Array[String],
+  body_substring? : String,
+  write_scope? : AgentAutomationsCreateRepoAutomationResponseTriggersDiscussionCommentWriteScope,
+) -> AgentAutomationsCreateRepoAutomationResponseTriggersDiscussionComment {
+  { comment_types, categories, body_substring, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersDiscussionComment with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsCreateRepoAutomationResponseTriggersDiscussionComment with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("comment_types", self.comment_types)
+  .opt("categories", self.categories)
+  .opt("body_substring", self.body_substring)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersDiscussionComment with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationResponseTriggersDiscussionComment with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    comment_types: @sdkjson.opt_field(obj, "comment_types", path),
+    categories: @sdkjson.opt_field(obj, "categories", path),
+    body_substring: @sdkjson.opt_field(obj, "body_substring", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsCreateRepoAutomationResponseTriggersIssueAssignedWriteScope {
+  Trigger
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersIssueAssignedWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersIssueAssignedWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersIssueAssignedWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsCreateRepoAutomationResponseTriggersIssueAssignedWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersIssueAssignedWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationResponseTriggersIssueAssignedWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsCreateRepoAutomationResponseTriggersIssueAssigned.
+pub(all) struct AgentAutomationsCreateRepoAutomationResponseTriggersIssueAssigned {
+  query : String?
+  assignees : Array[String]?
+  write_scope : AgentAutomationsCreateRepoAutomationResponseTriggersIssueAssignedWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersIssueAssigned with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersIssueAssigned with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsCreateRepoAutomationResponseTriggersIssueAssigned with omitted optional fields absent.
+pub fn AgentAutomationsCreateRepoAutomationResponseTriggersIssueAssigned::new(
+  query? : String,
+  assignees? : Array[String],
+  write_scope? : AgentAutomationsCreateRepoAutomationResponseTriggersIssueAssignedWriteScope,
+) -> AgentAutomationsCreateRepoAutomationResponseTriggersIssueAssigned {
+  { query, assignees, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersIssueAssigned with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsCreateRepoAutomationResponseTriggersIssueAssigned with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("query", self.query)
+  .opt("assignees", self.assignees)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersIssueAssigned with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationResponseTriggersIssueAssigned with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    query: @sdkjson.opt_field(obj, "query", path),
+    assignees: @sdkjson.opt_field(obj, "assignees", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestAssignedWriteScope {
+  Trigger
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestAssignedWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestAssignedWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestAssignedWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestAssignedWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestAssignedWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestAssignedWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestAssigned.
+pub(all) struct AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestAssigned {
+  query : String?
+  paths : Array[String]?
+  assignees : Array[String]?
+  write_scope : AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestAssignedWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestAssigned with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestAssigned with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestAssigned with omitted optional fields absent.
+pub fn AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestAssigned::new(
+  query? : String,
+  paths? : Array[String],
+  assignees? : Array[String],
+  write_scope? : AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestAssignedWriteScope,
+) -> AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestAssigned {
+  { query, paths, assignees, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestAssigned with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestAssigned with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("query", self.query)
+  .opt("paths", self.paths)
+  .opt("assignees", self.assignees)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestAssigned with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestAssigned with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    query: @sdkjson.opt_field(obj, "query", path),
+    paths: @sdkjson.opt_field(obj, "paths", path),
+    assignees: @sdkjson.opt_field(obj, "assignees", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsCreateRepoAutomationResponseTriggersSubIssueAddedWriteScope {
+  Trigger
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersSubIssueAddedWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersSubIssueAddedWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersSubIssueAddedWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsCreateRepoAutomationResponseTriggersSubIssueAddedWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersSubIssueAddedWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationResponseTriggersSubIssueAddedWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsCreateRepoAutomationResponseTriggersSubIssueAdded.
+pub(all) struct AgentAutomationsCreateRepoAutomationResponseTriggersSubIssueAdded {
+  query : String?
+  write_scope : AgentAutomationsCreateRepoAutomationResponseTriggersSubIssueAddedWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersSubIssueAdded with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersSubIssueAdded with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsCreateRepoAutomationResponseTriggersSubIssueAdded with omitted optional fields absent.
+pub fn AgentAutomationsCreateRepoAutomationResponseTriggersSubIssueAdded::new(
+  query? : String,
+  write_scope? : AgentAutomationsCreateRepoAutomationResponseTriggersSubIssueAddedWriteScope,
+) -> AgentAutomationsCreateRepoAutomationResponseTriggersSubIssueAdded {
+  { query, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersSubIssueAdded with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsCreateRepoAutomationResponseTriggersSubIssueAdded with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("query", self.query)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersSubIssueAdded with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationResponseTriggersSubIssueAdded with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    query: @sdkjson.opt_field(obj, "query", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestReadyForReviewWriteScope {
+  Trigger
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestReadyForReviewWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestReadyForReviewWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestReadyForReviewWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestReadyForReviewWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestReadyForReviewWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestReadyForReviewWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestReadyForReview.
+pub(all) struct AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestReadyForReview {
+  query : String?
+  paths : Array[String]?
+  write_scope : AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestReadyForReviewWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestReadyForReview with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestReadyForReview with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestReadyForReview with omitted optional fields absent.
+pub fn AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestReadyForReview::new(
+  query? : String,
+  paths? : Array[String],
+  write_scope? : AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestReadyForReviewWriteScope,
+) -> AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestReadyForReview {
+  { query, paths, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestReadyForReview with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestReadyForReview with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("query", self.query)
+  .opt("paths", self.paths)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestReadyForReview with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestReadyForReview with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    query: @sdkjson.opt_field(obj, "query", path),
+    paths: @sdkjson.opt_field(obj, "paths", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestLabeledWriteScope {
+  Trigger
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestLabeledWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestLabeledWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestLabeledWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestLabeledWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestLabeledWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestLabeledWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestLabeled.
+pub(all) struct AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestLabeled {
+  query : String?
+  paths : Array[String]?
+  labels : Array[String]?
+  write_scope : AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestLabeledWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestLabeled with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestLabeled with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestLabeled with omitted optional fields absent.
+pub fn AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestLabeled::new(
+  query? : String,
+  paths? : Array[String],
+  labels? : Array[String],
+  write_scope? : AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestLabeledWriteScope,
+) -> AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestLabeled {
+  { query, paths, labels, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestLabeled with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestLabeled with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("query", self.query)
+  .opt("paths", self.paths)
+  .opt("labels", self.labels)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestLabeled with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestLabeled with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    query: @sdkjson.opt_field(obj, "query", path),
+    paths: @sdkjson.opt_field(obj, "paths", path),
+    labels: @sdkjson.opt_field(obj, "labels", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestMergeConflictWriteScope {
+  Trigger
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestMergeConflictWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestMergeConflictWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestMergeConflictWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestMergeConflictWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestMergeConflictWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestMergeConflictWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestMergeConflict.
+pub(all) struct AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestMergeConflict {
+  query : String?
+  paths : Array[String]?
+  write_scope : AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestMergeConflictWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestMergeConflict with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestMergeConflict with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestMergeConflict with omitted optional fields absent.
+pub fn AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestMergeConflict::new(
+  query? : String,
+  paths? : Array[String],
+  write_scope? : AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestMergeConflictWriteScope,
+) -> AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestMergeConflict {
+  { query, paths, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestMergeConflict with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestMergeConflict with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("query", self.query)
+  .opt("paths", self.paths)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestMergeConflict with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestMergeConflict with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    query: @sdkjson.opt_field(obj, "query", path),
+    paths: @sdkjson.opt_field(obj, "paths", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Generated string enum AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestReviewSubmittedStatesItem.
+pub(all) enum AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestReviewSubmittedStatesItem {
+  Approved
+  ChangesRequested
+  Commented
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestReviewSubmittedStatesItem with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestReviewSubmittedStatesItem with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestReviewSubmittedStatesItem with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestReviewSubmittedStatesItem with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Approved => "approved"
+    ChangesRequested => "changes_requested"
+    Commented => "commented"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestReviewSubmittedStatesItem with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestReviewSubmittedStatesItem with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "approved" => Some(Approved)
+        "changes_requested" => Some(ChangesRequested)
+        "commented" => Some(Commented)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestReviewSubmittedWriteScope {
+  Trigger
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestReviewSubmittedWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestReviewSubmittedWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestReviewSubmittedWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestReviewSubmittedWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestReviewSubmittedWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestReviewSubmittedWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestReviewSubmitted.
+pub(all) struct AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestReviewSubmitted {
+  query : String?
+  paths : Array[String]?
+  states : Array[
+    AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestReviewSubmittedStatesItem,
+  ]
+  write_scope : AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestReviewSubmittedWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestReviewSubmitted with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestReviewSubmitted with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestReviewSubmitted with omitted optional fields absent.
+pub fn AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestReviewSubmitted::new(
+  states~ : Array[
+    AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestReviewSubmittedStatesItem,
+  ],
+  query? : String,
+  paths? : Array[String],
+  write_scope? : AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestReviewSubmittedWriteScope,
+) -> AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestReviewSubmitted {
+  { query, paths, states, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestReviewSubmitted with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestReviewSubmitted with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("query", self.query)
+  .opt("paths", self.paths)
+  .field("states", self.states)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestReviewSubmitted with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestReviewSubmitted with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    query: @sdkjson.opt_field(obj, "query", path),
+    paths: @sdkjson.opt_field(obj, "paths", path),
+    states: required_field(obj, "states", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestReviewRequestedWriteScope {
+  Trigger
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestReviewRequestedWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestReviewRequestedWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestReviewRequestedWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestReviewRequestedWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestReviewRequestedWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestReviewRequestedWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestReviewRequested.
+pub(all) struct AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestReviewRequested {
+  query : String?
+  paths : Array[String]?
+  write_scope : AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestReviewRequestedWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestReviewRequested with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestReviewRequested with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestReviewRequested with omitted optional fields absent.
+pub fn AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestReviewRequested::new(
+  query? : String,
+  paths? : Array[String],
+  write_scope? : AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestReviewRequestedWriteScope,
+) -> AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestReviewRequested {
+  { query, paths, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestReviewRequested with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestReviewRequested with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("query", self.query)
+  .opt("paths", self.paths)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestReviewRequested with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestReviewRequested with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    query: @sdkjson.opt_field(obj, "query", path),
+    paths: @sdkjson.opt_field(obj, "paths", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsCreateRepoAutomationResponseTriggersAutomationCompletedWriteScope {
+  Trigger
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersAutomationCompletedWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersAutomationCompletedWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersAutomationCompletedWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsCreateRepoAutomationResponseTriggersAutomationCompletedWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersAutomationCompletedWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationResponseTriggersAutomationCompletedWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsCreateRepoAutomationResponseTriggersAutomationCompleted.
+pub(all) struct AgentAutomationsCreateRepoAutomationResponseTriggersAutomationCompleted {
+  automation_ids : Array[String]
+  write_scope : AgentAutomationsCreateRepoAutomationResponseTriggersAutomationCompletedWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersAutomationCompleted with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersAutomationCompleted with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsCreateRepoAutomationResponseTriggersAutomationCompleted with omitted optional fields absent.
+pub fn AgentAutomationsCreateRepoAutomationResponseTriggersAutomationCompleted::new(
+  automation_ids~ : Array[String],
+  write_scope? : AgentAutomationsCreateRepoAutomationResponseTriggersAutomationCompletedWriteScope,
+) -> AgentAutomationsCreateRepoAutomationResponseTriggersAutomationCompleted {
+  { automation_ids, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersAutomationCompleted with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsCreateRepoAutomationResponseTriggersAutomationCompleted with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .field("automation_ids", self.automation_ids)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggersAutomationCompleted with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationResponseTriggersAutomationCompleted with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    automation_ids: required_field(obj, "automation_ids", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Public trigger configuration keyed by stable public trigger identifier. Each trigger has a closed, trigger-specific configuration schema.
+pub(all) struct AgentAutomationsCreateRepoAutomationResponseTriggers {
+  interval : AgentAutomationsCreateRepoAutomationResponseTriggersInterval?
+  issue_opened : AgentAutomationsCreateRepoAutomationResponseTriggersIssueOpened?
+  issue_labeled : AgentAutomationsCreateRepoAutomationResponseTriggersIssueLabeled?
+  workflow_run : AgentAutomationsCreateRepoAutomationResponseTriggersWorkflowRun?
+  pull_request_opened : AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestOpened?
+  pull_request_synchronize : AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestSynchronize?
+  pull_request_merged : AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestMerged?
+  issue_comment : AgentAutomationsCreateRepoAutomationResponseTriggersIssueComment?
+  pull_request_comment : AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestComment?
+  discussion_opened : AgentAutomationsCreateRepoAutomationResponseTriggersDiscussionOpened?
+  discussion_updated : AgentAutomationsCreateRepoAutomationResponseTriggersDiscussionUpdated?
+  discussion_comment : AgentAutomationsCreateRepoAutomationResponseTriggersDiscussionComment?
+  issue_assigned : AgentAutomationsCreateRepoAutomationResponseTriggersIssueAssigned?
+  pull_request_assigned : AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestAssigned?
+  sub_issue_added : AgentAutomationsCreateRepoAutomationResponseTriggersSubIssueAdded?
+  pull_request_ready_for_review : AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestReadyForReview?
+  pull_request_labeled : AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestLabeled?
+  pull_request_merge_conflict : AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestMergeConflict?
+  pull_request_review_submitted : AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestReviewSubmitted?
+  pull_request_review_requested : AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestReviewRequested?
+  automation_completed : AgentAutomationsCreateRepoAutomationResponseTriggersAutomationCompleted?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggers with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggers with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsCreateRepoAutomationResponseTriggers with omitted optional fields absent.
+pub fn AgentAutomationsCreateRepoAutomationResponseTriggers::new(
+  interval? : AgentAutomationsCreateRepoAutomationResponseTriggersInterval,
+  issue_opened? : AgentAutomationsCreateRepoAutomationResponseTriggersIssueOpened,
+  issue_labeled? : AgentAutomationsCreateRepoAutomationResponseTriggersIssueLabeled,
+  workflow_run? : AgentAutomationsCreateRepoAutomationResponseTriggersWorkflowRun,
+  pull_request_opened? : AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestOpened,
+  pull_request_synchronize? : AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestSynchronize,
+  pull_request_merged? : AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestMerged,
+  issue_comment? : AgentAutomationsCreateRepoAutomationResponseTriggersIssueComment,
+  pull_request_comment? : AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestComment,
+  discussion_opened? : AgentAutomationsCreateRepoAutomationResponseTriggersDiscussionOpened,
+  discussion_updated? : AgentAutomationsCreateRepoAutomationResponseTriggersDiscussionUpdated,
+  discussion_comment? : AgentAutomationsCreateRepoAutomationResponseTriggersDiscussionComment,
+  issue_assigned? : AgentAutomationsCreateRepoAutomationResponseTriggersIssueAssigned,
+  pull_request_assigned? : AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestAssigned,
+  sub_issue_added? : AgentAutomationsCreateRepoAutomationResponseTriggersSubIssueAdded,
+  pull_request_ready_for_review? : AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestReadyForReview,
+  pull_request_labeled? : AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestLabeled,
+  pull_request_merge_conflict? : AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestMergeConflict,
+  pull_request_review_submitted? : AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestReviewSubmitted,
+  pull_request_review_requested? : AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestReviewRequested,
+  automation_completed? : AgentAutomationsCreateRepoAutomationResponseTriggersAutomationCompleted,
+) -> AgentAutomationsCreateRepoAutomationResponseTriggers {
+  {
+    interval,
+    issue_opened,
+    issue_labeled,
+    workflow_run,
+    pull_request_opened,
+    pull_request_synchronize,
+    pull_request_merged,
+    issue_comment,
+    pull_request_comment,
+    discussion_opened,
+    discussion_updated,
+    discussion_comment,
+    issue_assigned,
+    pull_request_assigned,
+    sub_issue_added,
+    pull_request_ready_for_review,
+    pull_request_labeled,
+    pull_request_merge_conflict,
+    pull_request_review_submitted,
+    pull_request_review_requested,
+    automation_completed,
+  }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggers with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsCreateRepoAutomationResponseTriggers with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("interval", self.interval)
+  .opt("issue_opened", self.issue_opened)
+  .opt("issue_labeled", self.issue_labeled)
+  .opt("workflow_run", self.workflow_run)
+  .opt("pull_request_opened", self.pull_request_opened)
+  .opt("pull_request_synchronize", self.pull_request_synchronize)
+  .opt("pull_request_merged", self.pull_request_merged)
+  .opt("issue_comment", self.issue_comment)
+  .opt("pull_request_comment", self.pull_request_comment)
+  .opt("discussion_opened", self.discussion_opened)
+  .opt("discussion_updated", self.discussion_updated)
+  .opt("discussion_comment", self.discussion_comment)
+  .opt("issue_assigned", self.issue_assigned)
+  .opt("pull_request_assigned", self.pull_request_assigned)
+  .opt("sub_issue_added", self.sub_issue_added)
+  .opt("pull_request_ready_for_review", self.pull_request_ready_for_review)
+  .opt("pull_request_labeled", self.pull_request_labeled)
+  .opt("pull_request_merge_conflict", self.pull_request_merge_conflict)
+  .opt("pull_request_review_submitted", self.pull_request_review_submitted)
+  .opt("pull_request_review_requested", self.pull_request_review_requested)
+  .opt("automation_completed", self.automation_completed)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsCreateRepoAutomationResponseTriggers with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationResponseTriggers with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    interval: @sdkjson.opt_field(obj, "interval", path),
+    issue_opened: @sdkjson.opt_field(obj, "issue_opened", path),
+    issue_labeled: @sdkjson.opt_field(obj, "issue_labeled", path),
+    workflow_run: @sdkjson.opt_field(obj, "workflow_run", path),
+    pull_request_opened: @sdkjson.opt_field(obj, "pull_request_opened", path),
+    pull_request_synchronize: @sdkjson.opt_field(
+      obj, "pull_request_synchronize", path,
+    ),
+    pull_request_merged: @sdkjson.opt_field(obj, "pull_request_merged", path),
+    issue_comment: @sdkjson.opt_field(obj, "issue_comment", path),
+    pull_request_comment: @sdkjson.opt_field(obj, "pull_request_comment", path),
+    discussion_opened: @sdkjson.opt_field(obj, "discussion_opened", path),
+    discussion_updated: @sdkjson.opt_field(obj, "discussion_updated", path),
+    discussion_comment: @sdkjson.opt_field(obj, "discussion_comment", path),
+    issue_assigned: @sdkjson.opt_field(obj, "issue_assigned", path),
+    pull_request_assigned: @sdkjson.opt_field(
+      obj, "pull_request_assigned", path,
+    ),
+    sub_issue_added: @sdkjson.opt_field(obj, "sub_issue_added", path),
+    pull_request_ready_for_review: @sdkjson.opt_field(
+      obj, "pull_request_ready_for_review", path,
+    ),
+    pull_request_labeled: @sdkjson.opt_field(obj, "pull_request_labeled", path),
+    pull_request_merge_conflict: @sdkjson.opt_field(
+      obj, "pull_request_merge_conflict", path,
+    ),
+    pull_request_review_submitted: @sdkjson.opt_field(
+      obj, "pull_request_review_submitted", path,
+    ),
+    pull_request_review_requested: @sdkjson.opt_field(
+      obj, "pull_request_review_requested", path,
+    ),
+    automation_completed: @sdkjson.opt_field(obj, "automation_completed", path),
+  }
+}
+
+///|
+///
+/// A GitHub user
+pub(all) struct AgentAutomationsCreateRepoAutomationResponseCreatedBy {
+  id : Int64?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationResponseCreatedBy with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationResponseCreatedBy with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsCreateRepoAutomationResponseCreatedBy with omitted optional fields absent.
+pub fn AgentAutomationsCreateRepoAutomationResponseCreatedBy::new(
+  id? : Int64,
+) -> AgentAutomationsCreateRepoAutomationResponseCreatedBy {
+  { id, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsCreateRepoAutomationResponseCreatedBy with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsCreateRepoAutomationResponseCreatedBy with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("id", self.id.map(value => json_int64_to_json(value)))
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsCreateRepoAutomationResponseCreatedBy with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationResponseCreatedBy with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  { id: decode_optional_int64(obj, "id", path), }
+}
+
+///|
+///
+/// A full representation of an automation including all configuration fields.
+pub(all) struct AgentAutomationsCreateRepoAutomationResponse {
+  id : String
+  name : String
+  enabled : Bool?
+  owner_type : AgentAutomationsCreateRepoAutomationResponseOwnerType?
+  write_scope : AgentAutomationsCreateRepoAutomationResponseWriteScope?
+  require_actor_write_permission : Bool?
+  triggers : AgentAutomationsCreateRepoAutomationResponseTriggers?
+  prompt : String
+  tools : Array[String]?
+  allowed_custom_agents : Array[String]?
+  model : String?
+  reasoning_effort : String?
+  created_at : String
+  updated_at : String
+  created_by : AgentAutomationsCreateRepoAutomationResponseCreatedBy
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationResponse with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsCreateRepoAutomationResponse with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsCreateRepoAutomationResponse with omitted optional fields absent.
+pub fn AgentAutomationsCreateRepoAutomationResponse::new(
+  id~ : String,
+  name~ : String,
+  prompt~ : String,
+  created_at~ : String,
+  updated_at~ : String,
+  created_by~ : AgentAutomationsCreateRepoAutomationResponseCreatedBy,
+  enabled? : Bool,
+  owner_type? : AgentAutomationsCreateRepoAutomationResponseOwnerType,
+  write_scope? : AgentAutomationsCreateRepoAutomationResponseWriteScope,
+  require_actor_write_permission? : Bool,
+  triggers? : AgentAutomationsCreateRepoAutomationResponseTriggers,
+  tools? : Array[String],
+  allowed_custom_agents? : Array[String],
+  model? : String,
+  reasoning_effort? : String,
+) -> AgentAutomationsCreateRepoAutomationResponse {
+  {
+    id,
+    name,
+    enabled,
+    owner_type,
+    write_scope,
+    require_actor_write_permission,
+    triggers,
+    prompt,
+    tools,
+    allowed_custom_agents,
+    model,
+    reasoning_effort,
+    created_at,
+    updated_at,
+    created_by,
+  }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsCreateRepoAutomationResponse with ToJson::{to_json}
+
+///|
+pub impl ToJson for AgentAutomationsCreateRepoAutomationResponse with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .field("id", self.id)
+  .field("name", self.name)
+  .opt("enabled", self.enabled)
+  .opt("owner_type", self.owner_type)
+  .opt("write_scope", self.write_scope)
+  .opt("require_actor_write_permission", self.require_actor_write_permission)
+  .opt("triggers", self.triggers)
+  .field("prompt", self.prompt)
+  .opt("tools", self.tools)
+  .opt("allowed_custom_agents", self.allowed_custom_agents)
+  .opt("model", self.model)
+  .opt("reasoning_effort", self.reasoning_effort)
+  .field("created_at", self.created_at)
+  .field("updated_at", self.updated_at)
+  .field("created_by", self.created_by)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsCreateRepoAutomationResponse with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationResponse with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    id: required_field(obj, "id", path),
+    name: required_field(obj, "name", path),
+    enabled: @sdkjson.opt_field(obj, "enabled", path),
+    owner_type: @sdkjson.opt_field(obj, "owner_type", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+    require_actor_write_permission: @sdkjson.opt_field(
+      obj, "require_actor_write_permission", path,
+    ),
+    triggers: @sdkjson.opt_field(obj, "triggers", path),
+    prompt: required_field(obj, "prompt", path),
+    tools: @sdkjson.opt_field(obj, "tools", path),
+    allowed_custom_agents: @sdkjson.opt_field(
+      obj, "allowed_custom_agents", path,
+    ),
+    model: @sdkjson.opt_field(obj, "model", path),
+    reasoning_effort: @sdkjson.opt_field(obj, "reasoning_effort", path),
+    created_at: required_field(obj, "created_at", path),
+    updated_at: required_field(obj, "updated_at", path),
+    created_by: required_field(obj, "created_by", path),
+  }
+}
+
+///|
+///
+/// Who owns the automation. `user` keeps it private to its creator and its runs act as that user. `repository` makes it belong to the repository, visible to anyone with read access to the repository, and its runs act as the Copilot app rather than as a person.
+pub(all) enum AgentAutomationsGetRepoAutomationResponseOwnerType {
+  User
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsGetRepoAutomationResponseOwnerType with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsGetRepoAutomationResponseOwnerType with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsGetRepoAutomationResponseOwnerType with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsGetRepoAutomationResponseOwnerType with fn to_json(
+  self,
+) {
+  let raw = match self {
+    User => "user"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsGetRepoAutomationResponseOwnerType with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsGetRepoAutomationResponseOwnerType with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "user" => Some(User)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Controls which repository resources a run may modify. `trigger` limits writes to the resource that started the run, when one exists, and resources created during the run; `repository` allows writes to any resource in the repository. Supported values: `trigger`, `repository`.
+pub(all) enum AgentAutomationsGetRepoAutomationResponseWriteScope {
+  Trigger
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsGetRepoAutomationResponseWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsGetRepoAutomationResponseWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsGetRepoAutomationResponseWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsGetRepoAutomationResponseWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsGetRepoAutomationResponseWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsGetRepoAutomationResponseWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated string enum AgentAutomationsGetRepoAutomationResponseTriggersIntervalCadenceItem.
+pub(all) enum AgentAutomationsGetRepoAutomationResponseTriggersIntervalCadenceItem {
+  Hourly
+  Daily
+  Weekly
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersIntervalCadenceItem with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersIntervalCadenceItem with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersIntervalCadenceItem with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsGetRepoAutomationResponseTriggersIntervalCadenceItem with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Hourly => "hourly"
+    Daily => "daily"
+    Weekly => "weekly"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersIntervalCadenceItem with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsGetRepoAutomationResponseTriggersIntervalCadenceItem with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "hourly" => Some(Hourly)
+        "daily" => Some(Daily)
+        "weekly" => Some(Weekly)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsGetRepoAutomationResponseTriggersIntervalWriteScope {
+  Trigger
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersIntervalWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersIntervalWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersIntervalWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsGetRepoAutomationResponseTriggersIntervalWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersIntervalWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsGetRepoAutomationResponseTriggersIntervalWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsGetRepoAutomationResponseTriggersInterval.
+pub(all) struct AgentAutomationsGetRepoAutomationResponseTriggersInterval {
+  cadence : Array[
+    AgentAutomationsGetRepoAutomationResponseTriggersIntervalCadenceItem,
+  ]
+  hour_utc : Int32?
+  day_of_week : Int32?
+  minute_utc : Int32?
+  write_scope : AgentAutomationsGetRepoAutomationResponseTriggersIntervalWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersInterval with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersInterval with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsGetRepoAutomationResponseTriggersInterval with omitted optional fields absent.
+pub fn AgentAutomationsGetRepoAutomationResponseTriggersInterval::new(
+  cadence~ : Array[
+    AgentAutomationsGetRepoAutomationResponseTriggersIntervalCadenceItem,
+  ],
+  hour_utc? : Int32,
+  day_of_week? : Int32,
+  minute_utc? : Int32,
+  write_scope? : AgentAutomationsGetRepoAutomationResponseTriggersIntervalWriteScope,
+) -> AgentAutomationsGetRepoAutomationResponseTriggersInterval {
+  { cadence, hour_utc, day_of_week, minute_utc, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersInterval with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsGetRepoAutomationResponseTriggersInterval with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .field("cadence", self.cadence)
+  .opt("hour_utc", self.hour_utc)
+  .opt("day_of_week", self.day_of_week)
+  .opt("minute_utc", self.minute_utc)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersInterval with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsGetRepoAutomationResponseTriggersInterval with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    cadence: required_field(obj, "cadence", path),
+    hour_utc: @sdkjson.opt_field(obj, "hour_utc", path),
+    day_of_week: @sdkjson.opt_field(obj, "day_of_week", path),
+    minute_utc: @sdkjson.opt_field(obj, "minute_utc", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsGetRepoAutomationResponseTriggersIssueOpenedWriteScope {
+  Trigger
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersIssueOpenedWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersIssueOpenedWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersIssueOpenedWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsGetRepoAutomationResponseTriggersIssueOpenedWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersIssueOpenedWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsGetRepoAutomationResponseTriggersIssueOpenedWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsGetRepoAutomationResponseTriggersIssueOpened.
+pub(all) struct AgentAutomationsGetRepoAutomationResponseTriggersIssueOpened {
+  query : String?
+  write_scope : AgentAutomationsGetRepoAutomationResponseTriggersIssueOpenedWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersIssueOpened with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersIssueOpened with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsGetRepoAutomationResponseTriggersIssueOpened with omitted optional fields absent.
+pub fn AgentAutomationsGetRepoAutomationResponseTriggersIssueOpened::new(
+  query? : String,
+  write_scope? : AgentAutomationsGetRepoAutomationResponseTriggersIssueOpenedWriteScope,
+) -> AgentAutomationsGetRepoAutomationResponseTriggersIssueOpened {
+  { query, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersIssueOpened with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsGetRepoAutomationResponseTriggersIssueOpened with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("query", self.query)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersIssueOpened with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsGetRepoAutomationResponseTriggersIssueOpened with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    query: @sdkjson.opt_field(obj, "query", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsGetRepoAutomationResponseTriggersIssueLabeledWriteScope {
+  Trigger
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersIssueLabeledWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersIssueLabeledWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersIssueLabeledWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsGetRepoAutomationResponseTriggersIssueLabeledWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersIssueLabeledWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsGetRepoAutomationResponseTriggersIssueLabeledWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsGetRepoAutomationResponseTriggersIssueLabeled.
+pub(all) struct AgentAutomationsGetRepoAutomationResponseTriggersIssueLabeled {
+  query : String?
+  labels : Array[String]?
+  write_scope : AgentAutomationsGetRepoAutomationResponseTriggersIssueLabeledWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersIssueLabeled with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersIssueLabeled with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsGetRepoAutomationResponseTriggersIssueLabeled with omitted optional fields absent.
+pub fn AgentAutomationsGetRepoAutomationResponseTriggersIssueLabeled::new(
+  query? : String,
+  labels? : Array[String],
+  write_scope? : AgentAutomationsGetRepoAutomationResponseTriggersIssueLabeledWriteScope,
+) -> AgentAutomationsGetRepoAutomationResponseTriggersIssueLabeled {
+  { query, labels, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersIssueLabeled with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsGetRepoAutomationResponseTriggersIssueLabeled with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("query", self.query)
+  .opt("labels", self.labels)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersIssueLabeled with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsGetRepoAutomationResponseTriggersIssueLabeled with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    query: @sdkjson.opt_field(obj, "query", path),
+    labels: @sdkjson.opt_field(obj, "labels", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsGetRepoAutomationResponseTriggersWorkflowRunWriteScope {
+  Trigger
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersWorkflowRunWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersWorkflowRunWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersWorkflowRunWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsGetRepoAutomationResponseTriggersWorkflowRunWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersWorkflowRunWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsGetRepoAutomationResponseTriggersWorkflowRunWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsGetRepoAutomationResponseTriggersWorkflowRun.
+pub(all) struct AgentAutomationsGetRepoAutomationResponseTriggersWorkflowRun {
+  workflows : Array[String]
+  conclusions : Array[String]
+  query : String?
+  write_scope : AgentAutomationsGetRepoAutomationResponseTriggersWorkflowRunWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersWorkflowRun with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersWorkflowRun with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsGetRepoAutomationResponseTriggersWorkflowRun with omitted optional fields absent.
+pub fn AgentAutomationsGetRepoAutomationResponseTriggersWorkflowRun::new(
+  workflows~ : Array[String],
+  conclusions~ : Array[String],
+  query? : String,
+  write_scope? : AgentAutomationsGetRepoAutomationResponseTriggersWorkflowRunWriteScope,
+) -> AgentAutomationsGetRepoAutomationResponseTriggersWorkflowRun {
+  { workflows, conclusions, query, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersWorkflowRun with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsGetRepoAutomationResponseTriggersWorkflowRun with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .field("workflows", self.workflows)
+  .field("conclusions", self.conclusions)
+  .opt("query", self.query)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersWorkflowRun with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsGetRepoAutomationResponseTriggersWorkflowRun with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    workflows: required_field(obj, "workflows", path),
+    conclusions: required_field(obj, "conclusions", path),
+    query: @sdkjson.opt_field(obj, "query", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsGetRepoAutomationResponseTriggersPullRequestOpenedWriteScope {
+  Trigger
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersPullRequestOpenedWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersPullRequestOpenedWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersPullRequestOpenedWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsGetRepoAutomationResponseTriggersPullRequestOpenedWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersPullRequestOpenedWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsGetRepoAutomationResponseTriggersPullRequestOpenedWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsGetRepoAutomationResponseTriggersPullRequestOpened.
+pub(all) struct AgentAutomationsGetRepoAutomationResponseTriggersPullRequestOpened {
+  query : String?
+  paths : Array[String]?
+  write_scope : AgentAutomationsGetRepoAutomationResponseTriggersPullRequestOpenedWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersPullRequestOpened with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersPullRequestOpened with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsGetRepoAutomationResponseTriggersPullRequestOpened with omitted optional fields absent.
+pub fn AgentAutomationsGetRepoAutomationResponseTriggersPullRequestOpened::new(
+  query? : String,
+  paths? : Array[String],
+  write_scope? : AgentAutomationsGetRepoAutomationResponseTriggersPullRequestOpenedWriteScope,
+) -> AgentAutomationsGetRepoAutomationResponseTriggersPullRequestOpened {
+  { query, paths, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersPullRequestOpened with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsGetRepoAutomationResponseTriggersPullRequestOpened with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("query", self.query)
+  .opt("paths", self.paths)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersPullRequestOpened with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsGetRepoAutomationResponseTriggersPullRequestOpened with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    query: @sdkjson.opt_field(obj, "query", path),
+    paths: @sdkjson.opt_field(obj, "paths", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsGetRepoAutomationResponseTriggersPullRequestSynchronizeWriteScope {
+  Trigger
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersPullRequestSynchronizeWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersPullRequestSynchronizeWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersPullRequestSynchronizeWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsGetRepoAutomationResponseTriggersPullRequestSynchronizeWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersPullRequestSynchronizeWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsGetRepoAutomationResponseTriggersPullRequestSynchronizeWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsGetRepoAutomationResponseTriggersPullRequestSynchronize.
+pub(all) struct AgentAutomationsGetRepoAutomationResponseTriggersPullRequestSynchronize {
+  query : String?
+  paths : Array[String]?
+  write_scope : AgentAutomationsGetRepoAutomationResponseTriggersPullRequestSynchronizeWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersPullRequestSynchronize with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersPullRequestSynchronize with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsGetRepoAutomationResponseTriggersPullRequestSynchronize with omitted optional fields absent.
+pub fn AgentAutomationsGetRepoAutomationResponseTriggersPullRequestSynchronize::new(
+  query? : String,
+  paths? : Array[String],
+  write_scope? : AgentAutomationsGetRepoAutomationResponseTriggersPullRequestSynchronizeWriteScope,
+) -> AgentAutomationsGetRepoAutomationResponseTriggersPullRequestSynchronize {
+  { query, paths, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersPullRequestSynchronize with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsGetRepoAutomationResponseTriggersPullRequestSynchronize with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("query", self.query)
+  .opt("paths", self.paths)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersPullRequestSynchronize with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsGetRepoAutomationResponseTriggersPullRequestSynchronize with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    query: @sdkjson.opt_field(obj, "query", path),
+    paths: @sdkjson.opt_field(obj, "paths", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsGetRepoAutomationResponseTriggersPullRequestMergedWriteScope {
+  Trigger
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersPullRequestMergedWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersPullRequestMergedWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersPullRequestMergedWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsGetRepoAutomationResponseTriggersPullRequestMergedWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersPullRequestMergedWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsGetRepoAutomationResponseTriggersPullRequestMergedWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsGetRepoAutomationResponseTriggersPullRequestMerged.
+pub(all) struct AgentAutomationsGetRepoAutomationResponseTriggersPullRequestMerged {
+  query : String?
+  paths : Array[String]?
+  write_scope : AgentAutomationsGetRepoAutomationResponseTriggersPullRequestMergedWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersPullRequestMerged with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersPullRequestMerged with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsGetRepoAutomationResponseTriggersPullRequestMerged with omitted optional fields absent.
+pub fn AgentAutomationsGetRepoAutomationResponseTriggersPullRequestMerged::new(
+  query? : String,
+  paths? : Array[String],
+  write_scope? : AgentAutomationsGetRepoAutomationResponseTriggersPullRequestMergedWriteScope,
+) -> AgentAutomationsGetRepoAutomationResponseTriggersPullRequestMerged {
+  { query, paths, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersPullRequestMerged with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsGetRepoAutomationResponseTriggersPullRequestMerged with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("query", self.query)
+  .opt("paths", self.paths)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersPullRequestMerged with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsGetRepoAutomationResponseTriggersPullRequestMerged with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    query: @sdkjson.opt_field(obj, "query", path),
+    paths: @sdkjson.opt_field(obj, "paths", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsGetRepoAutomationResponseTriggersIssueCommentWriteScope {
+  Trigger
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersIssueCommentWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersIssueCommentWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersIssueCommentWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsGetRepoAutomationResponseTriggersIssueCommentWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersIssueCommentWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsGetRepoAutomationResponseTriggersIssueCommentWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsGetRepoAutomationResponseTriggersIssueComment.
+pub(all) struct AgentAutomationsGetRepoAutomationResponseTriggersIssueComment {
+  body_substring : String?
+  write_scope : AgentAutomationsGetRepoAutomationResponseTriggersIssueCommentWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersIssueComment with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersIssueComment with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsGetRepoAutomationResponseTriggersIssueComment with omitted optional fields absent.
+pub fn AgentAutomationsGetRepoAutomationResponseTriggersIssueComment::new(
+  body_substring? : String,
+  write_scope? : AgentAutomationsGetRepoAutomationResponseTriggersIssueCommentWriteScope,
+) -> AgentAutomationsGetRepoAutomationResponseTriggersIssueComment {
+  { body_substring, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersIssueComment with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsGetRepoAutomationResponseTriggersIssueComment with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("body_substring", self.body_substring)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersIssueComment with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsGetRepoAutomationResponseTriggersIssueComment with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    body_substring: @sdkjson.opt_field(obj, "body_substring", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Generated string enum AgentAutomationsGetRepoAutomationResponseTriggersPullRequestCommentCommentTypesItem.
+pub(all) enum AgentAutomationsGetRepoAutomationResponseTriggersPullRequestCommentCommentTypesItem {
+  TimelineComment
+  ReviewComment
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersPullRequestCommentCommentTypesItem with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersPullRequestCommentCommentTypesItem with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersPullRequestCommentCommentTypesItem with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsGetRepoAutomationResponseTriggersPullRequestCommentCommentTypesItem with fn to_json(
+  self,
+) {
+  let raw = match self {
+    TimelineComment => "timeline_comment"
+    ReviewComment => "review_comment"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersPullRequestCommentCommentTypesItem with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsGetRepoAutomationResponseTriggersPullRequestCommentCommentTypesItem with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "timeline_comment" => Some(TimelineComment)
+        "review_comment" => Some(ReviewComment)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsGetRepoAutomationResponseTriggersPullRequestCommentWriteScope {
+  Trigger
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersPullRequestCommentWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersPullRequestCommentWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersPullRequestCommentWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsGetRepoAutomationResponseTriggersPullRequestCommentWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersPullRequestCommentWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsGetRepoAutomationResponseTriggersPullRequestCommentWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsGetRepoAutomationResponseTriggersPullRequestComment.
+pub(all) struct AgentAutomationsGetRepoAutomationResponseTriggersPullRequestComment {
+  comment_types : Array[
+    AgentAutomationsGetRepoAutomationResponseTriggersPullRequestCommentCommentTypesItem,
+  ]
+  body_substring : String?
+  write_scope : AgentAutomationsGetRepoAutomationResponseTriggersPullRequestCommentWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersPullRequestComment with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersPullRequestComment with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsGetRepoAutomationResponseTriggersPullRequestComment with omitted optional fields absent.
+pub fn AgentAutomationsGetRepoAutomationResponseTriggersPullRequestComment::new(
+  comment_types~ : Array[
+    AgentAutomationsGetRepoAutomationResponseTriggersPullRequestCommentCommentTypesItem,
+  ],
+  body_substring? : String,
+  write_scope? : AgentAutomationsGetRepoAutomationResponseTriggersPullRequestCommentWriteScope,
+) -> AgentAutomationsGetRepoAutomationResponseTriggersPullRequestComment {
+  { comment_types, body_substring, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersPullRequestComment with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsGetRepoAutomationResponseTriggersPullRequestComment with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .field("comment_types", self.comment_types)
+  .opt("body_substring", self.body_substring)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersPullRequestComment with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsGetRepoAutomationResponseTriggersPullRequestComment with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    comment_types: required_field(obj, "comment_types", path),
+    body_substring: @sdkjson.opt_field(obj, "body_substring", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsGetRepoAutomationResponseTriggersDiscussionOpenedWriteScope {
+  Trigger
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersDiscussionOpenedWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersDiscussionOpenedWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersDiscussionOpenedWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsGetRepoAutomationResponseTriggersDiscussionOpenedWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersDiscussionOpenedWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsGetRepoAutomationResponseTriggersDiscussionOpenedWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsGetRepoAutomationResponseTriggersDiscussionOpened.
+pub(all) struct AgentAutomationsGetRepoAutomationResponseTriggersDiscussionOpened {
+  categories : Array[String]?
+  body_substring : String?
+  write_scope : AgentAutomationsGetRepoAutomationResponseTriggersDiscussionOpenedWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersDiscussionOpened with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersDiscussionOpened with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsGetRepoAutomationResponseTriggersDiscussionOpened with omitted optional fields absent.
+pub fn AgentAutomationsGetRepoAutomationResponseTriggersDiscussionOpened::new(
+  categories? : Array[String],
+  body_substring? : String,
+  write_scope? : AgentAutomationsGetRepoAutomationResponseTriggersDiscussionOpenedWriteScope,
+) -> AgentAutomationsGetRepoAutomationResponseTriggersDiscussionOpened {
+  { categories, body_substring, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersDiscussionOpened with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsGetRepoAutomationResponseTriggersDiscussionOpened with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("categories", self.categories)
+  .opt("body_substring", self.body_substring)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersDiscussionOpened with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsGetRepoAutomationResponseTriggersDiscussionOpened with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    categories: @sdkjson.opt_field(obj, "categories", path),
+    body_substring: @sdkjson.opt_field(obj, "body_substring", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsGetRepoAutomationResponseTriggersDiscussionUpdatedWriteScope {
+  Trigger
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersDiscussionUpdatedWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersDiscussionUpdatedWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersDiscussionUpdatedWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsGetRepoAutomationResponseTriggersDiscussionUpdatedWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersDiscussionUpdatedWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsGetRepoAutomationResponseTriggersDiscussionUpdatedWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsGetRepoAutomationResponseTriggersDiscussionUpdated.
+pub(all) struct AgentAutomationsGetRepoAutomationResponseTriggersDiscussionUpdated {
+  categories : Array[String]?
+  body_substring : String?
+  write_scope : AgentAutomationsGetRepoAutomationResponseTriggersDiscussionUpdatedWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersDiscussionUpdated with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersDiscussionUpdated with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsGetRepoAutomationResponseTriggersDiscussionUpdated with omitted optional fields absent.
+pub fn AgentAutomationsGetRepoAutomationResponseTriggersDiscussionUpdated::new(
+  categories? : Array[String],
+  body_substring? : String,
+  write_scope? : AgentAutomationsGetRepoAutomationResponseTriggersDiscussionUpdatedWriteScope,
+) -> AgentAutomationsGetRepoAutomationResponseTriggersDiscussionUpdated {
+  { categories, body_substring, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersDiscussionUpdated with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsGetRepoAutomationResponseTriggersDiscussionUpdated with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("categories", self.categories)
+  .opt("body_substring", self.body_substring)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersDiscussionUpdated with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsGetRepoAutomationResponseTriggersDiscussionUpdated with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    categories: @sdkjson.opt_field(obj, "categories", path),
+    body_substring: @sdkjson.opt_field(obj, "body_substring", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Generated string enum AgentAutomationsGetRepoAutomationResponseTriggersDiscussionCommentCommentTypesItem.
+pub(all) enum AgentAutomationsGetRepoAutomationResponseTriggersDiscussionCommentCommentTypesItem {
+  Comment
+  Reply
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersDiscussionCommentCommentTypesItem with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersDiscussionCommentCommentTypesItem with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersDiscussionCommentCommentTypesItem with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsGetRepoAutomationResponseTriggersDiscussionCommentCommentTypesItem with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Comment => "comment"
+    Reply => "reply"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersDiscussionCommentCommentTypesItem with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsGetRepoAutomationResponseTriggersDiscussionCommentCommentTypesItem with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "comment" => Some(Comment)
+        "reply" => Some(Reply)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsGetRepoAutomationResponseTriggersDiscussionCommentWriteScope {
+  Trigger
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersDiscussionCommentWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersDiscussionCommentWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersDiscussionCommentWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsGetRepoAutomationResponseTriggersDiscussionCommentWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersDiscussionCommentWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsGetRepoAutomationResponseTriggersDiscussionCommentWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsGetRepoAutomationResponseTriggersDiscussionComment.
+pub(all) struct AgentAutomationsGetRepoAutomationResponseTriggersDiscussionComment {
+  comment_types : Array[
+    AgentAutomationsGetRepoAutomationResponseTriggersDiscussionCommentCommentTypesItem,
+  ]?
+  categories : Array[String]?
+  body_substring : String?
+  write_scope : AgentAutomationsGetRepoAutomationResponseTriggersDiscussionCommentWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersDiscussionComment with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersDiscussionComment with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsGetRepoAutomationResponseTriggersDiscussionComment with omitted optional fields absent.
+pub fn AgentAutomationsGetRepoAutomationResponseTriggersDiscussionComment::new(
+  comment_types? : Array[
+    AgentAutomationsGetRepoAutomationResponseTriggersDiscussionCommentCommentTypesItem,
+  ],
+  categories? : Array[String],
+  body_substring? : String,
+  write_scope? : AgentAutomationsGetRepoAutomationResponseTriggersDiscussionCommentWriteScope,
+) -> AgentAutomationsGetRepoAutomationResponseTriggersDiscussionComment {
+  { comment_types, categories, body_substring, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersDiscussionComment with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsGetRepoAutomationResponseTriggersDiscussionComment with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("comment_types", self.comment_types)
+  .opt("categories", self.categories)
+  .opt("body_substring", self.body_substring)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersDiscussionComment with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsGetRepoAutomationResponseTriggersDiscussionComment with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    comment_types: @sdkjson.opt_field(obj, "comment_types", path),
+    categories: @sdkjson.opt_field(obj, "categories", path),
+    body_substring: @sdkjson.opt_field(obj, "body_substring", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsGetRepoAutomationResponseTriggersIssueAssignedWriteScope {
+  Trigger
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersIssueAssignedWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersIssueAssignedWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersIssueAssignedWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsGetRepoAutomationResponseTriggersIssueAssignedWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersIssueAssignedWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsGetRepoAutomationResponseTriggersIssueAssignedWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsGetRepoAutomationResponseTriggersIssueAssigned.
+pub(all) struct AgentAutomationsGetRepoAutomationResponseTriggersIssueAssigned {
+  query : String?
+  assignees : Array[String]?
+  write_scope : AgentAutomationsGetRepoAutomationResponseTriggersIssueAssignedWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersIssueAssigned with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersIssueAssigned with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsGetRepoAutomationResponseTriggersIssueAssigned with omitted optional fields absent.
+pub fn AgentAutomationsGetRepoAutomationResponseTriggersIssueAssigned::new(
+  query? : String,
+  assignees? : Array[String],
+  write_scope? : AgentAutomationsGetRepoAutomationResponseTriggersIssueAssignedWriteScope,
+) -> AgentAutomationsGetRepoAutomationResponseTriggersIssueAssigned {
+  { query, assignees, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersIssueAssigned with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsGetRepoAutomationResponseTriggersIssueAssigned with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("query", self.query)
+  .opt("assignees", self.assignees)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersIssueAssigned with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsGetRepoAutomationResponseTriggersIssueAssigned with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    query: @sdkjson.opt_field(obj, "query", path),
+    assignees: @sdkjson.opt_field(obj, "assignees", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsGetRepoAutomationResponseTriggersPullRequestAssignedWriteScope {
+  Trigger
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersPullRequestAssignedWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersPullRequestAssignedWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersPullRequestAssignedWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsGetRepoAutomationResponseTriggersPullRequestAssignedWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersPullRequestAssignedWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsGetRepoAutomationResponseTriggersPullRequestAssignedWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsGetRepoAutomationResponseTriggersPullRequestAssigned.
+pub(all) struct AgentAutomationsGetRepoAutomationResponseTriggersPullRequestAssigned {
+  query : String?
+  paths : Array[String]?
+  assignees : Array[String]?
+  write_scope : AgentAutomationsGetRepoAutomationResponseTriggersPullRequestAssignedWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersPullRequestAssigned with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersPullRequestAssigned with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsGetRepoAutomationResponseTriggersPullRequestAssigned with omitted optional fields absent.
+pub fn AgentAutomationsGetRepoAutomationResponseTriggersPullRequestAssigned::new(
+  query? : String,
+  paths? : Array[String],
+  assignees? : Array[String],
+  write_scope? : AgentAutomationsGetRepoAutomationResponseTriggersPullRequestAssignedWriteScope,
+) -> AgentAutomationsGetRepoAutomationResponseTriggersPullRequestAssigned {
+  { query, paths, assignees, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersPullRequestAssigned with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsGetRepoAutomationResponseTriggersPullRequestAssigned with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("query", self.query)
+  .opt("paths", self.paths)
+  .opt("assignees", self.assignees)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersPullRequestAssigned with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsGetRepoAutomationResponseTriggersPullRequestAssigned with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    query: @sdkjson.opt_field(obj, "query", path),
+    paths: @sdkjson.opt_field(obj, "paths", path),
+    assignees: @sdkjson.opt_field(obj, "assignees", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsGetRepoAutomationResponseTriggersSubIssueAddedWriteScope {
+  Trigger
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersSubIssueAddedWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersSubIssueAddedWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersSubIssueAddedWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsGetRepoAutomationResponseTriggersSubIssueAddedWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersSubIssueAddedWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsGetRepoAutomationResponseTriggersSubIssueAddedWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsGetRepoAutomationResponseTriggersSubIssueAdded.
+pub(all) struct AgentAutomationsGetRepoAutomationResponseTriggersSubIssueAdded {
+  query : String?
+  write_scope : AgentAutomationsGetRepoAutomationResponseTriggersSubIssueAddedWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersSubIssueAdded with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersSubIssueAdded with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsGetRepoAutomationResponseTriggersSubIssueAdded with omitted optional fields absent.
+pub fn AgentAutomationsGetRepoAutomationResponseTriggersSubIssueAdded::new(
+  query? : String,
+  write_scope? : AgentAutomationsGetRepoAutomationResponseTriggersSubIssueAddedWriteScope,
+) -> AgentAutomationsGetRepoAutomationResponseTriggersSubIssueAdded {
+  { query, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersSubIssueAdded with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsGetRepoAutomationResponseTriggersSubIssueAdded with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("query", self.query)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersSubIssueAdded with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsGetRepoAutomationResponseTriggersSubIssueAdded with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    query: @sdkjson.opt_field(obj, "query", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsGetRepoAutomationResponseTriggersPullRequestReadyForReviewWriteScope {
+  Trigger
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersPullRequestReadyForReviewWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersPullRequestReadyForReviewWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersPullRequestReadyForReviewWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsGetRepoAutomationResponseTriggersPullRequestReadyForReviewWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersPullRequestReadyForReviewWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsGetRepoAutomationResponseTriggersPullRequestReadyForReviewWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsGetRepoAutomationResponseTriggersPullRequestReadyForReview.
+pub(all) struct AgentAutomationsGetRepoAutomationResponseTriggersPullRequestReadyForReview {
+  query : String?
+  paths : Array[String]?
+  write_scope : AgentAutomationsGetRepoAutomationResponseTriggersPullRequestReadyForReviewWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersPullRequestReadyForReview with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersPullRequestReadyForReview with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsGetRepoAutomationResponseTriggersPullRequestReadyForReview with omitted optional fields absent.
+pub fn AgentAutomationsGetRepoAutomationResponseTriggersPullRequestReadyForReview::new(
+  query? : String,
+  paths? : Array[String],
+  write_scope? : AgentAutomationsGetRepoAutomationResponseTriggersPullRequestReadyForReviewWriteScope,
+) -> AgentAutomationsGetRepoAutomationResponseTriggersPullRequestReadyForReview {
+  { query, paths, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersPullRequestReadyForReview with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsGetRepoAutomationResponseTriggersPullRequestReadyForReview with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("query", self.query)
+  .opt("paths", self.paths)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersPullRequestReadyForReview with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsGetRepoAutomationResponseTriggersPullRequestReadyForReview with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    query: @sdkjson.opt_field(obj, "query", path),
+    paths: @sdkjson.opt_field(obj, "paths", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsGetRepoAutomationResponseTriggersPullRequestLabeledWriteScope {
+  Trigger
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersPullRequestLabeledWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersPullRequestLabeledWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersPullRequestLabeledWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsGetRepoAutomationResponseTriggersPullRequestLabeledWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersPullRequestLabeledWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsGetRepoAutomationResponseTriggersPullRequestLabeledWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsGetRepoAutomationResponseTriggersPullRequestLabeled.
+pub(all) struct AgentAutomationsGetRepoAutomationResponseTriggersPullRequestLabeled {
+  query : String?
+  paths : Array[String]?
+  labels : Array[String]?
+  write_scope : AgentAutomationsGetRepoAutomationResponseTriggersPullRequestLabeledWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersPullRequestLabeled with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersPullRequestLabeled with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsGetRepoAutomationResponseTriggersPullRequestLabeled with omitted optional fields absent.
+pub fn AgentAutomationsGetRepoAutomationResponseTriggersPullRequestLabeled::new(
+  query? : String,
+  paths? : Array[String],
+  labels? : Array[String],
+  write_scope? : AgentAutomationsGetRepoAutomationResponseTriggersPullRequestLabeledWriteScope,
+) -> AgentAutomationsGetRepoAutomationResponseTriggersPullRequestLabeled {
+  { query, paths, labels, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersPullRequestLabeled with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsGetRepoAutomationResponseTriggersPullRequestLabeled with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("query", self.query)
+  .opt("paths", self.paths)
+  .opt("labels", self.labels)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersPullRequestLabeled with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsGetRepoAutomationResponseTriggersPullRequestLabeled with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    query: @sdkjson.opt_field(obj, "query", path),
+    paths: @sdkjson.opt_field(obj, "paths", path),
+    labels: @sdkjson.opt_field(obj, "labels", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsGetRepoAutomationResponseTriggersPullRequestMergeConflictWriteScope {
+  Trigger
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersPullRequestMergeConflictWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersPullRequestMergeConflictWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersPullRequestMergeConflictWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsGetRepoAutomationResponseTriggersPullRequestMergeConflictWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersPullRequestMergeConflictWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsGetRepoAutomationResponseTriggersPullRequestMergeConflictWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsGetRepoAutomationResponseTriggersPullRequestMergeConflict.
+pub(all) struct AgentAutomationsGetRepoAutomationResponseTriggersPullRequestMergeConflict {
+  query : String?
+  paths : Array[String]?
+  write_scope : AgentAutomationsGetRepoAutomationResponseTriggersPullRequestMergeConflictWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersPullRequestMergeConflict with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersPullRequestMergeConflict with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsGetRepoAutomationResponseTriggersPullRequestMergeConflict with omitted optional fields absent.
+pub fn AgentAutomationsGetRepoAutomationResponseTriggersPullRequestMergeConflict::new(
+  query? : String,
+  paths? : Array[String],
+  write_scope? : AgentAutomationsGetRepoAutomationResponseTriggersPullRequestMergeConflictWriteScope,
+) -> AgentAutomationsGetRepoAutomationResponseTriggersPullRequestMergeConflict {
+  { query, paths, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersPullRequestMergeConflict with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsGetRepoAutomationResponseTriggersPullRequestMergeConflict with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("query", self.query)
+  .opt("paths", self.paths)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersPullRequestMergeConflict with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsGetRepoAutomationResponseTriggersPullRequestMergeConflict with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    query: @sdkjson.opt_field(obj, "query", path),
+    paths: @sdkjson.opt_field(obj, "paths", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Generated string enum AgentAutomationsGetRepoAutomationResponseTriggersPullRequestReviewSubmittedStatesItem.
+pub(all) enum AgentAutomationsGetRepoAutomationResponseTriggersPullRequestReviewSubmittedStatesItem {
+  Approved
+  ChangesRequested
+  Commented
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersPullRequestReviewSubmittedStatesItem with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersPullRequestReviewSubmittedStatesItem with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersPullRequestReviewSubmittedStatesItem with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsGetRepoAutomationResponseTriggersPullRequestReviewSubmittedStatesItem with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Approved => "approved"
+    ChangesRequested => "changes_requested"
+    Commented => "commented"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersPullRequestReviewSubmittedStatesItem with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsGetRepoAutomationResponseTriggersPullRequestReviewSubmittedStatesItem with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "approved" => Some(Approved)
+        "changes_requested" => Some(ChangesRequested)
+        "commented" => Some(Commented)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsGetRepoAutomationResponseTriggersPullRequestReviewSubmittedWriteScope {
+  Trigger
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersPullRequestReviewSubmittedWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersPullRequestReviewSubmittedWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersPullRequestReviewSubmittedWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsGetRepoAutomationResponseTriggersPullRequestReviewSubmittedWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersPullRequestReviewSubmittedWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsGetRepoAutomationResponseTriggersPullRequestReviewSubmittedWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsGetRepoAutomationResponseTriggersPullRequestReviewSubmitted.
+pub(all) struct AgentAutomationsGetRepoAutomationResponseTriggersPullRequestReviewSubmitted {
+  query : String?
+  paths : Array[String]?
+  states : Array[
+    AgentAutomationsGetRepoAutomationResponseTriggersPullRequestReviewSubmittedStatesItem,
+  ]
+  write_scope : AgentAutomationsGetRepoAutomationResponseTriggersPullRequestReviewSubmittedWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersPullRequestReviewSubmitted with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersPullRequestReviewSubmitted with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsGetRepoAutomationResponseTriggersPullRequestReviewSubmitted with omitted optional fields absent.
+pub fn AgentAutomationsGetRepoAutomationResponseTriggersPullRequestReviewSubmitted::new(
+  states~ : Array[
+    AgentAutomationsGetRepoAutomationResponseTriggersPullRequestReviewSubmittedStatesItem,
+  ],
+  query? : String,
+  paths? : Array[String],
+  write_scope? : AgentAutomationsGetRepoAutomationResponseTriggersPullRequestReviewSubmittedWriteScope,
+) -> AgentAutomationsGetRepoAutomationResponseTriggersPullRequestReviewSubmitted {
+  { query, paths, states, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersPullRequestReviewSubmitted with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsGetRepoAutomationResponseTriggersPullRequestReviewSubmitted with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("query", self.query)
+  .opt("paths", self.paths)
+  .field("states", self.states)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersPullRequestReviewSubmitted with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsGetRepoAutomationResponseTriggersPullRequestReviewSubmitted with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    query: @sdkjson.opt_field(obj, "query", path),
+    paths: @sdkjson.opt_field(obj, "paths", path),
+    states: required_field(obj, "states", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsGetRepoAutomationResponseTriggersPullRequestReviewRequestedWriteScope {
+  Trigger
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersPullRequestReviewRequestedWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersPullRequestReviewRequestedWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersPullRequestReviewRequestedWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsGetRepoAutomationResponseTriggersPullRequestReviewRequestedWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersPullRequestReviewRequestedWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsGetRepoAutomationResponseTriggersPullRequestReviewRequestedWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsGetRepoAutomationResponseTriggersPullRequestReviewRequested.
+pub(all) struct AgentAutomationsGetRepoAutomationResponseTriggersPullRequestReviewRequested {
+  query : String?
+  paths : Array[String]?
+  write_scope : AgentAutomationsGetRepoAutomationResponseTriggersPullRequestReviewRequestedWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersPullRequestReviewRequested with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersPullRequestReviewRequested with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsGetRepoAutomationResponseTriggersPullRequestReviewRequested with omitted optional fields absent.
+pub fn AgentAutomationsGetRepoAutomationResponseTriggersPullRequestReviewRequested::new(
+  query? : String,
+  paths? : Array[String],
+  write_scope? : AgentAutomationsGetRepoAutomationResponseTriggersPullRequestReviewRequestedWriteScope,
+) -> AgentAutomationsGetRepoAutomationResponseTriggersPullRequestReviewRequested {
+  { query, paths, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersPullRequestReviewRequested with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsGetRepoAutomationResponseTriggersPullRequestReviewRequested with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("query", self.query)
+  .opt("paths", self.paths)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersPullRequestReviewRequested with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsGetRepoAutomationResponseTriggersPullRequestReviewRequested with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    query: @sdkjson.opt_field(obj, "query", path),
+    paths: @sdkjson.opt_field(obj, "paths", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsGetRepoAutomationResponseTriggersAutomationCompletedWriteScope {
+  Trigger
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersAutomationCompletedWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersAutomationCompletedWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersAutomationCompletedWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsGetRepoAutomationResponseTriggersAutomationCompletedWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersAutomationCompletedWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsGetRepoAutomationResponseTriggersAutomationCompletedWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsGetRepoAutomationResponseTriggersAutomationCompleted.
+pub(all) struct AgentAutomationsGetRepoAutomationResponseTriggersAutomationCompleted {
+  automation_ids : Array[String]
+  write_scope : AgentAutomationsGetRepoAutomationResponseTriggersAutomationCompletedWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersAutomationCompleted with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersAutomationCompleted with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsGetRepoAutomationResponseTriggersAutomationCompleted with omitted optional fields absent.
+pub fn AgentAutomationsGetRepoAutomationResponseTriggersAutomationCompleted::new(
+  automation_ids~ : Array[String],
+  write_scope? : AgentAutomationsGetRepoAutomationResponseTriggersAutomationCompletedWriteScope,
+) -> AgentAutomationsGetRepoAutomationResponseTriggersAutomationCompleted {
+  { automation_ids, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersAutomationCompleted with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsGetRepoAutomationResponseTriggersAutomationCompleted with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .field("automation_ids", self.automation_ids)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsGetRepoAutomationResponseTriggersAutomationCompleted with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsGetRepoAutomationResponseTriggersAutomationCompleted with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    automation_ids: required_field(obj, "automation_ids", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Public trigger configuration keyed by stable public trigger identifier. Each trigger has a closed, trigger-specific configuration schema.
+pub(all) struct AgentAutomationsGetRepoAutomationResponseTriggers {
+  interval : AgentAutomationsGetRepoAutomationResponseTriggersInterval?
+  issue_opened : AgentAutomationsGetRepoAutomationResponseTriggersIssueOpened?
+  issue_labeled : AgentAutomationsGetRepoAutomationResponseTriggersIssueLabeled?
+  workflow_run : AgentAutomationsGetRepoAutomationResponseTriggersWorkflowRun?
+  pull_request_opened : AgentAutomationsGetRepoAutomationResponseTriggersPullRequestOpened?
+  pull_request_synchronize : AgentAutomationsGetRepoAutomationResponseTriggersPullRequestSynchronize?
+  pull_request_merged : AgentAutomationsGetRepoAutomationResponseTriggersPullRequestMerged?
+  issue_comment : AgentAutomationsGetRepoAutomationResponseTriggersIssueComment?
+  pull_request_comment : AgentAutomationsGetRepoAutomationResponseTriggersPullRequestComment?
+  discussion_opened : AgentAutomationsGetRepoAutomationResponseTriggersDiscussionOpened?
+  discussion_updated : AgentAutomationsGetRepoAutomationResponseTriggersDiscussionUpdated?
+  discussion_comment : AgentAutomationsGetRepoAutomationResponseTriggersDiscussionComment?
+  issue_assigned : AgentAutomationsGetRepoAutomationResponseTriggersIssueAssigned?
+  pull_request_assigned : AgentAutomationsGetRepoAutomationResponseTriggersPullRequestAssigned?
+  sub_issue_added : AgentAutomationsGetRepoAutomationResponseTriggersSubIssueAdded?
+  pull_request_ready_for_review : AgentAutomationsGetRepoAutomationResponseTriggersPullRequestReadyForReview?
+  pull_request_labeled : AgentAutomationsGetRepoAutomationResponseTriggersPullRequestLabeled?
+  pull_request_merge_conflict : AgentAutomationsGetRepoAutomationResponseTriggersPullRequestMergeConflict?
+  pull_request_review_submitted : AgentAutomationsGetRepoAutomationResponseTriggersPullRequestReviewSubmitted?
+  pull_request_review_requested : AgentAutomationsGetRepoAutomationResponseTriggersPullRequestReviewRequested?
+  automation_completed : AgentAutomationsGetRepoAutomationResponseTriggersAutomationCompleted?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsGetRepoAutomationResponseTriggers with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsGetRepoAutomationResponseTriggers with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsGetRepoAutomationResponseTriggers with omitted optional fields absent.
+pub fn AgentAutomationsGetRepoAutomationResponseTriggers::new(
+  interval? : AgentAutomationsGetRepoAutomationResponseTriggersInterval,
+  issue_opened? : AgentAutomationsGetRepoAutomationResponseTriggersIssueOpened,
+  issue_labeled? : AgentAutomationsGetRepoAutomationResponseTriggersIssueLabeled,
+  workflow_run? : AgentAutomationsGetRepoAutomationResponseTriggersWorkflowRun,
+  pull_request_opened? : AgentAutomationsGetRepoAutomationResponseTriggersPullRequestOpened,
+  pull_request_synchronize? : AgentAutomationsGetRepoAutomationResponseTriggersPullRequestSynchronize,
+  pull_request_merged? : AgentAutomationsGetRepoAutomationResponseTriggersPullRequestMerged,
+  issue_comment? : AgentAutomationsGetRepoAutomationResponseTriggersIssueComment,
+  pull_request_comment? : AgentAutomationsGetRepoAutomationResponseTriggersPullRequestComment,
+  discussion_opened? : AgentAutomationsGetRepoAutomationResponseTriggersDiscussionOpened,
+  discussion_updated? : AgentAutomationsGetRepoAutomationResponseTriggersDiscussionUpdated,
+  discussion_comment? : AgentAutomationsGetRepoAutomationResponseTriggersDiscussionComment,
+  issue_assigned? : AgentAutomationsGetRepoAutomationResponseTriggersIssueAssigned,
+  pull_request_assigned? : AgentAutomationsGetRepoAutomationResponseTriggersPullRequestAssigned,
+  sub_issue_added? : AgentAutomationsGetRepoAutomationResponseTriggersSubIssueAdded,
+  pull_request_ready_for_review? : AgentAutomationsGetRepoAutomationResponseTriggersPullRequestReadyForReview,
+  pull_request_labeled? : AgentAutomationsGetRepoAutomationResponseTriggersPullRequestLabeled,
+  pull_request_merge_conflict? : AgentAutomationsGetRepoAutomationResponseTriggersPullRequestMergeConflict,
+  pull_request_review_submitted? : AgentAutomationsGetRepoAutomationResponseTriggersPullRequestReviewSubmitted,
+  pull_request_review_requested? : AgentAutomationsGetRepoAutomationResponseTriggersPullRequestReviewRequested,
+  automation_completed? : AgentAutomationsGetRepoAutomationResponseTriggersAutomationCompleted,
+) -> AgentAutomationsGetRepoAutomationResponseTriggers {
+  {
+    interval,
+    issue_opened,
+    issue_labeled,
+    workflow_run,
+    pull_request_opened,
+    pull_request_synchronize,
+    pull_request_merged,
+    issue_comment,
+    pull_request_comment,
+    discussion_opened,
+    discussion_updated,
+    discussion_comment,
+    issue_assigned,
+    pull_request_assigned,
+    sub_issue_added,
+    pull_request_ready_for_review,
+    pull_request_labeled,
+    pull_request_merge_conflict,
+    pull_request_review_submitted,
+    pull_request_review_requested,
+    automation_completed,
+  }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsGetRepoAutomationResponseTriggers with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsGetRepoAutomationResponseTriggers with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("interval", self.interval)
+  .opt("issue_opened", self.issue_opened)
+  .opt("issue_labeled", self.issue_labeled)
+  .opt("workflow_run", self.workflow_run)
+  .opt("pull_request_opened", self.pull_request_opened)
+  .opt("pull_request_synchronize", self.pull_request_synchronize)
+  .opt("pull_request_merged", self.pull_request_merged)
+  .opt("issue_comment", self.issue_comment)
+  .opt("pull_request_comment", self.pull_request_comment)
+  .opt("discussion_opened", self.discussion_opened)
+  .opt("discussion_updated", self.discussion_updated)
+  .opt("discussion_comment", self.discussion_comment)
+  .opt("issue_assigned", self.issue_assigned)
+  .opt("pull_request_assigned", self.pull_request_assigned)
+  .opt("sub_issue_added", self.sub_issue_added)
+  .opt("pull_request_ready_for_review", self.pull_request_ready_for_review)
+  .opt("pull_request_labeled", self.pull_request_labeled)
+  .opt("pull_request_merge_conflict", self.pull_request_merge_conflict)
+  .opt("pull_request_review_submitted", self.pull_request_review_submitted)
+  .opt("pull_request_review_requested", self.pull_request_review_requested)
+  .opt("automation_completed", self.automation_completed)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsGetRepoAutomationResponseTriggers with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsGetRepoAutomationResponseTriggers with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    interval: @sdkjson.opt_field(obj, "interval", path),
+    issue_opened: @sdkjson.opt_field(obj, "issue_opened", path),
+    issue_labeled: @sdkjson.opt_field(obj, "issue_labeled", path),
+    workflow_run: @sdkjson.opt_field(obj, "workflow_run", path),
+    pull_request_opened: @sdkjson.opt_field(obj, "pull_request_opened", path),
+    pull_request_synchronize: @sdkjson.opt_field(
+      obj, "pull_request_synchronize", path,
+    ),
+    pull_request_merged: @sdkjson.opt_field(obj, "pull_request_merged", path),
+    issue_comment: @sdkjson.opt_field(obj, "issue_comment", path),
+    pull_request_comment: @sdkjson.opt_field(obj, "pull_request_comment", path),
+    discussion_opened: @sdkjson.opt_field(obj, "discussion_opened", path),
+    discussion_updated: @sdkjson.opt_field(obj, "discussion_updated", path),
+    discussion_comment: @sdkjson.opt_field(obj, "discussion_comment", path),
+    issue_assigned: @sdkjson.opt_field(obj, "issue_assigned", path),
+    pull_request_assigned: @sdkjson.opt_field(
+      obj, "pull_request_assigned", path,
+    ),
+    sub_issue_added: @sdkjson.opt_field(obj, "sub_issue_added", path),
+    pull_request_ready_for_review: @sdkjson.opt_field(
+      obj, "pull_request_ready_for_review", path,
+    ),
+    pull_request_labeled: @sdkjson.opt_field(obj, "pull_request_labeled", path),
+    pull_request_merge_conflict: @sdkjson.opt_field(
+      obj, "pull_request_merge_conflict", path,
+    ),
+    pull_request_review_submitted: @sdkjson.opt_field(
+      obj, "pull_request_review_submitted", path,
+    ),
+    pull_request_review_requested: @sdkjson.opt_field(
+      obj, "pull_request_review_requested", path,
+    ),
+    automation_completed: @sdkjson.opt_field(obj, "automation_completed", path),
+  }
+}
+
+///|
+///
+/// A GitHub user
+pub(all) struct AgentAutomationsGetRepoAutomationResponseCreatedBy {
+  id : Int64?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsGetRepoAutomationResponseCreatedBy with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsGetRepoAutomationResponseCreatedBy with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsGetRepoAutomationResponseCreatedBy with omitted optional fields absent.
+pub fn AgentAutomationsGetRepoAutomationResponseCreatedBy::new(
+  id? : Int64,
+) -> AgentAutomationsGetRepoAutomationResponseCreatedBy {
+  { id, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsGetRepoAutomationResponseCreatedBy with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsGetRepoAutomationResponseCreatedBy with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("id", self.id.map(value => json_int64_to_json(value)))
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsGetRepoAutomationResponseCreatedBy with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsGetRepoAutomationResponseCreatedBy with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  { id: decode_optional_int64(obj, "id", path), }
+}
+
+///|
+///
+/// A full representation of an automation including all configuration fields.
+pub(all) struct AgentAutomationsGetRepoAutomationResponse {
+  id : String
+  name : String
+  enabled : Bool?
+  owner_type : AgentAutomationsGetRepoAutomationResponseOwnerType?
+  write_scope : AgentAutomationsGetRepoAutomationResponseWriteScope?
+  require_actor_write_permission : Bool?
+  triggers : AgentAutomationsGetRepoAutomationResponseTriggers?
+  prompt : String
+  tools : Array[String]?
+  allowed_custom_agents : Array[String]?
+  model : String?
+  reasoning_effort : String?
+  created_at : String
+  updated_at : String
+  created_by : AgentAutomationsGetRepoAutomationResponseCreatedBy
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsGetRepoAutomationResponse with Eq::{equal, not_equal}
+
+///|
+pub extend AgentAutomationsGetRepoAutomationResponse with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsGetRepoAutomationResponse with omitted optional fields absent.
+pub fn AgentAutomationsGetRepoAutomationResponse::new(
+  id~ : String,
+  name~ : String,
+  prompt~ : String,
+  created_at~ : String,
+  updated_at~ : String,
+  created_by~ : AgentAutomationsGetRepoAutomationResponseCreatedBy,
+  enabled? : Bool,
+  owner_type? : AgentAutomationsGetRepoAutomationResponseOwnerType,
+  write_scope? : AgentAutomationsGetRepoAutomationResponseWriteScope,
+  require_actor_write_permission? : Bool,
+  triggers? : AgentAutomationsGetRepoAutomationResponseTriggers,
+  tools? : Array[String],
+  allowed_custom_agents? : Array[String],
+  model? : String,
+  reasoning_effort? : String,
+) -> AgentAutomationsGetRepoAutomationResponse {
+  {
+    id,
+    name,
+    enabled,
+    owner_type,
+    write_scope,
+    require_actor_write_permission,
+    triggers,
+    prompt,
+    tools,
+    allowed_custom_agents,
+    model,
+    reasoning_effort,
+    created_at,
+    updated_at,
+    created_by,
+  }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsGetRepoAutomationResponse with ToJson::{to_json}
+
+///|
+pub impl ToJson for AgentAutomationsGetRepoAutomationResponse with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .field("id", self.id)
+  .field("name", self.name)
+  .opt("enabled", self.enabled)
+  .opt("owner_type", self.owner_type)
+  .opt("write_scope", self.write_scope)
+  .opt("require_actor_write_permission", self.require_actor_write_permission)
+  .opt("triggers", self.triggers)
+  .field("prompt", self.prompt)
+  .opt("tools", self.tools)
+  .opt("allowed_custom_agents", self.allowed_custom_agents)
+  .opt("model", self.model)
+  .opt("reasoning_effort", self.reasoning_effort)
+  .field("created_at", self.created_at)
+  .field("updated_at", self.updated_at)
+  .field("created_by", self.created_by)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsGetRepoAutomationResponse with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsGetRepoAutomationResponse with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    id: required_field(obj, "id", path),
+    name: required_field(obj, "name", path),
+    enabled: @sdkjson.opt_field(obj, "enabled", path),
+    owner_type: @sdkjson.opt_field(obj, "owner_type", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+    require_actor_write_permission: @sdkjson.opt_field(
+      obj, "require_actor_write_permission", path,
+    ),
+    triggers: @sdkjson.opt_field(obj, "triggers", path),
+    prompt: required_field(obj, "prompt", path),
+    tools: @sdkjson.opt_field(obj, "tools", path),
+    allowed_custom_agents: @sdkjson.opt_field(
+      obj, "allowed_custom_agents", path,
+    ),
+    model: @sdkjson.opt_field(obj, "model", path),
+    reasoning_effort: @sdkjson.opt_field(obj, "reasoning_effort", path),
+    created_at: required_field(obj, "created_at", path),
+    updated_at: required_field(obj, "updated_at", path),
+    created_by: required_field(obj, "created_by", path),
+  }
+}
+
+///|
+///
+/// Controls which repository resources a run may modify. `trigger` limits writes to the resource that started the run, when one exists, and resources created during the run; `repository` allows writes to any resource in the repository. Supported values: `trigger`, `repository`. Omit to leave unchanged.
+pub(all) enum AgentAutomationsEditRepoAutomationRequestWriteScope {
+  Trigger
+  Repository
+  Custom(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsEditRepoAutomationRequestWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsEditRepoAutomationRequestWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsEditRepoAutomationRequestWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsEditRepoAutomationRequestWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Custom(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsEditRepoAutomationRequestWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsEditRepoAutomationRequestWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Custom(raw),
+  )
+}
+
+///|
+///
+/// Generated string enum AgentAutomationsEditRepoAutomationRequestTriggersIntervalCadenceItem.
+pub(all) enum AgentAutomationsEditRepoAutomationRequestTriggersIntervalCadenceItem {
+  Hourly
+  Daily
+  Weekly
+  Custom(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersIntervalCadenceItem with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersIntervalCadenceItem with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersIntervalCadenceItem with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsEditRepoAutomationRequestTriggersIntervalCadenceItem with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Hourly => "hourly"
+    Daily => "daily"
+    Weekly => "weekly"
+    Custom(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersIntervalCadenceItem with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsEditRepoAutomationRequestTriggersIntervalCadenceItem with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "hourly" => Some(Hourly)
+        "daily" => Some(Daily)
+        "weekly" => Some(Weekly)
+        _ => None
+      }
+    },
+    raw => Custom(raw),
+  )
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsEditRepoAutomationRequestTriggersIntervalWriteScope {
+  Trigger
+  Repository
+  Custom(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersIntervalWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersIntervalWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersIntervalWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsEditRepoAutomationRequestTriggersIntervalWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Custom(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersIntervalWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsEditRepoAutomationRequestTriggersIntervalWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Custom(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsEditRepoAutomationRequestTriggersInterval.
+pub(all) struct AgentAutomationsEditRepoAutomationRequestTriggersInterval {
+  cadence : Array[
+    AgentAutomationsEditRepoAutomationRequestTriggersIntervalCadenceItem,
+  ]
+  hour_utc : Int32?
+  day_of_week : Int32?
+  minute_utc : Int32?
+  write_scope : AgentAutomationsEditRepoAutomationRequestTriggersIntervalWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersInterval with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersInterval with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsEditRepoAutomationRequestTriggersInterval with omitted optional fields absent.
+pub fn AgentAutomationsEditRepoAutomationRequestTriggersInterval::new(
+  cadence~ : Array[
+    AgentAutomationsEditRepoAutomationRequestTriggersIntervalCadenceItem,
+  ],
+  hour_utc? : Int32,
+  day_of_week? : Int32,
+  minute_utc? : Int32,
+  write_scope? : AgentAutomationsEditRepoAutomationRequestTriggersIntervalWriteScope,
+) -> AgentAutomationsEditRepoAutomationRequestTriggersInterval {
+  { cadence, hour_utc, day_of_week, minute_utc, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersInterval with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsEditRepoAutomationRequestTriggersInterval with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .field("cadence", self.cadence)
+  .opt("hour_utc", self.hour_utc)
+  .opt("day_of_week", self.day_of_week)
+  .opt("minute_utc", self.minute_utc)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersInterval with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsEditRepoAutomationRequestTriggersInterval with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    cadence: required_field(obj, "cadence", path),
+    hour_utc: @sdkjson.opt_field(obj, "hour_utc", path),
+    day_of_week: @sdkjson.opt_field(obj, "day_of_week", path),
+    minute_utc: @sdkjson.opt_field(obj, "minute_utc", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsEditRepoAutomationRequestTriggersIssueOpenedWriteScope {
+  Trigger
+  Repository
+  Custom(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersIssueOpenedWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersIssueOpenedWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersIssueOpenedWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsEditRepoAutomationRequestTriggersIssueOpenedWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Custom(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersIssueOpenedWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsEditRepoAutomationRequestTriggersIssueOpenedWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Custom(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsEditRepoAutomationRequestTriggersIssueOpened.
+pub(all) struct AgentAutomationsEditRepoAutomationRequestTriggersIssueOpened {
+  query : String?
+  write_scope : AgentAutomationsEditRepoAutomationRequestTriggersIssueOpenedWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersIssueOpened with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersIssueOpened with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsEditRepoAutomationRequestTriggersIssueOpened with omitted optional fields absent.
+pub fn AgentAutomationsEditRepoAutomationRequestTriggersIssueOpened::new(
+  query? : String,
+  write_scope? : AgentAutomationsEditRepoAutomationRequestTriggersIssueOpenedWriteScope,
+) -> AgentAutomationsEditRepoAutomationRequestTriggersIssueOpened {
+  { query, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersIssueOpened with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsEditRepoAutomationRequestTriggersIssueOpened with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("query", self.query)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersIssueOpened with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsEditRepoAutomationRequestTriggersIssueOpened with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    query: @sdkjson.opt_field(obj, "query", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsEditRepoAutomationRequestTriggersIssueLabeledWriteScope {
+  Trigger
+  Repository
+  Custom(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersIssueLabeledWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersIssueLabeledWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersIssueLabeledWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsEditRepoAutomationRequestTriggersIssueLabeledWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Custom(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersIssueLabeledWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsEditRepoAutomationRequestTriggersIssueLabeledWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Custom(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsEditRepoAutomationRequestTriggersIssueLabeled.
+pub(all) struct AgentAutomationsEditRepoAutomationRequestTriggersIssueLabeled {
+  query : String?
+  labels : Array[String]?
+  write_scope : AgentAutomationsEditRepoAutomationRequestTriggersIssueLabeledWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersIssueLabeled with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersIssueLabeled with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsEditRepoAutomationRequestTriggersIssueLabeled with omitted optional fields absent.
+pub fn AgentAutomationsEditRepoAutomationRequestTriggersIssueLabeled::new(
+  query? : String,
+  labels? : Array[String],
+  write_scope? : AgentAutomationsEditRepoAutomationRequestTriggersIssueLabeledWriteScope,
+) -> AgentAutomationsEditRepoAutomationRequestTriggersIssueLabeled {
+  { query, labels, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersIssueLabeled with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsEditRepoAutomationRequestTriggersIssueLabeled with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("query", self.query)
+  .opt("labels", self.labels)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersIssueLabeled with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsEditRepoAutomationRequestTriggersIssueLabeled with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    query: @sdkjson.opt_field(obj, "query", path),
+    labels: @sdkjson.opt_field(obj, "labels", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsEditRepoAutomationRequestTriggersWorkflowRunWriteScope {
+  Trigger
+  Repository
+  Custom(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersWorkflowRunWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersWorkflowRunWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersWorkflowRunWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsEditRepoAutomationRequestTriggersWorkflowRunWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Custom(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersWorkflowRunWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsEditRepoAutomationRequestTriggersWorkflowRunWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Custom(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsEditRepoAutomationRequestTriggersWorkflowRun.
+pub(all) struct AgentAutomationsEditRepoAutomationRequestTriggersWorkflowRun {
+  workflows : Array[String]
+  conclusions : Array[String]
+  query : String?
+  write_scope : AgentAutomationsEditRepoAutomationRequestTriggersWorkflowRunWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersWorkflowRun with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersWorkflowRun with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsEditRepoAutomationRequestTriggersWorkflowRun with omitted optional fields absent.
+pub fn AgentAutomationsEditRepoAutomationRequestTriggersWorkflowRun::new(
+  workflows~ : Array[String],
+  conclusions~ : Array[String],
+  query? : String,
+  write_scope? : AgentAutomationsEditRepoAutomationRequestTriggersWorkflowRunWriteScope,
+) -> AgentAutomationsEditRepoAutomationRequestTriggersWorkflowRun {
+  { workflows, conclusions, query, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersWorkflowRun with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsEditRepoAutomationRequestTriggersWorkflowRun with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .field("workflows", self.workflows)
+  .field("conclusions", self.conclusions)
+  .opt("query", self.query)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersWorkflowRun with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsEditRepoAutomationRequestTriggersWorkflowRun with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    workflows: required_field(obj, "workflows", path),
+    conclusions: required_field(obj, "conclusions", path),
+    query: @sdkjson.opt_field(obj, "query", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsEditRepoAutomationRequestTriggersPullRequestOpenedWriteScope {
+  Trigger
+  Repository
+  Custom(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersPullRequestOpenedWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersPullRequestOpenedWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersPullRequestOpenedWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsEditRepoAutomationRequestTriggersPullRequestOpenedWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Custom(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersPullRequestOpenedWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsEditRepoAutomationRequestTriggersPullRequestOpenedWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Custom(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsEditRepoAutomationRequestTriggersPullRequestOpened.
+pub(all) struct AgentAutomationsEditRepoAutomationRequestTriggersPullRequestOpened {
+  query : String?
+  paths : Array[String]?
+  write_scope : AgentAutomationsEditRepoAutomationRequestTriggersPullRequestOpenedWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersPullRequestOpened with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersPullRequestOpened with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsEditRepoAutomationRequestTriggersPullRequestOpened with omitted optional fields absent.
+pub fn AgentAutomationsEditRepoAutomationRequestTriggersPullRequestOpened::new(
+  query? : String,
+  paths? : Array[String],
+  write_scope? : AgentAutomationsEditRepoAutomationRequestTriggersPullRequestOpenedWriteScope,
+) -> AgentAutomationsEditRepoAutomationRequestTriggersPullRequestOpened {
+  { query, paths, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersPullRequestOpened with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsEditRepoAutomationRequestTriggersPullRequestOpened with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("query", self.query)
+  .opt("paths", self.paths)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersPullRequestOpened with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsEditRepoAutomationRequestTriggersPullRequestOpened with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    query: @sdkjson.opt_field(obj, "query", path),
+    paths: @sdkjson.opt_field(obj, "paths", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsEditRepoAutomationRequestTriggersPullRequestSynchronizeWriteScope {
+  Trigger
+  Repository
+  Custom(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersPullRequestSynchronizeWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersPullRequestSynchronizeWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersPullRequestSynchronizeWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsEditRepoAutomationRequestTriggersPullRequestSynchronizeWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Custom(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersPullRequestSynchronizeWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsEditRepoAutomationRequestTriggersPullRequestSynchronizeWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Custom(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsEditRepoAutomationRequestTriggersPullRequestSynchronize.
+pub(all) struct AgentAutomationsEditRepoAutomationRequestTriggersPullRequestSynchronize {
+  query : String?
+  paths : Array[String]?
+  write_scope : AgentAutomationsEditRepoAutomationRequestTriggersPullRequestSynchronizeWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersPullRequestSynchronize with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersPullRequestSynchronize with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsEditRepoAutomationRequestTriggersPullRequestSynchronize with omitted optional fields absent.
+pub fn AgentAutomationsEditRepoAutomationRequestTriggersPullRequestSynchronize::new(
+  query? : String,
+  paths? : Array[String],
+  write_scope? : AgentAutomationsEditRepoAutomationRequestTriggersPullRequestSynchronizeWriteScope,
+) -> AgentAutomationsEditRepoAutomationRequestTriggersPullRequestSynchronize {
+  { query, paths, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersPullRequestSynchronize with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsEditRepoAutomationRequestTriggersPullRequestSynchronize with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("query", self.query)
+  .opt("paths", self.paths)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersPullRequestSynchronize with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsEditRepoAutomationRequestTriggersPullRequestSynchronize with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    query: @sdkjson.opt_field(obj, "query", path),
+    paths: @sdkjson.opt_field(obj, "paths", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsEditRepoAutomationRequestTriggersPullRequestMergedWriteScope {
+  Trigger
+  Repository
+  Custom(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersPullRequestMergedWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersPullRequestMergedWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersPullRequestMergedWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsEditRepoAutomationRequestTriggersPullRequestMergedWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Custom(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersPullRequestMergedWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsEditRepoAutomationRequestTriggersPullRequestMergedWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Custom(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsEditRepoAutomationRequestTriggersPullRequestMerged.
+pub(all) struct AgentAutomationsEditRepoAutomationRequestTriggersPullRequestMerged {
+  query : String?
+  paths : Array[String]?
+  write_scope : AgentAutomationsEditRepoAutomationRequestTriggersPullRequestMergedWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersPullRequestMerged with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersPullRequestMerged with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsEditRepoAutomationRequestTriggersPullRequestMerged with omitted optional fields absent.
+pub fn AgentAutomationsEditRepoAutomationRequestTriggersPullRequestMerged::new(
+  query? : String,
+  paths? : Array[String],
+  write_scope? : AgentAutomationsEditRepoAutomationRequestTriggersPullRequestMergedWriteScope,
+) -> AgentAutomationsEditRepoAutomationRequestTriggersPullRequestMerged {
+  { query, paths, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersPullRequestMerged with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsEditRepoAutomationRequestTriggersPullRequestMerged with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("query", self.query)
+  .opt("paths", self.paths)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersPullRequestMerged with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsEditRepoAutomationRequestTriggersPullRequestMerged with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    query: @sdkjson.opt_field(obj, "query", path),
+    paths: @sdkjson.opt_field(obj, "paths", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsEditRepoAutomationRequestTriggersIssueCommentWriteScope {
+  Trigger
+  Repository
+  Custom(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersIssueCommentWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersIssueCommentWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersIssueCommentWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsEditRepoAutomationRequestTriggersIssueCommentWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Custom(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersIssueCommentWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsEditRepoAutomationRequestTriggersIssueCommentWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Custom(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsEditRepoAutomationRequestTriggersIssueComment.
+pub(all) struct AgentAutomationsEditRepoAutomationRequestTriggersIssueComment {
+  body_substring : String?
+  write_scope : AgentAutomationsEditRepoAutomationRequestTriggersIssueCommentWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersIssueComment with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersIssueComment with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsEditRepoAutomationRequestTriggersIssueComment with omitted optional fields absent.
+pub fn AgentAutomationsEditRepoAutomationRequestTriggersIssueComment::new(
+  body_substring? : String,
+  write_scope? : AgentAutomationsEditRepoAutomationRequestTriggersIssueCommentWriteScope,
+) -> AgentAutomationsEditRepoAutomationRequestTriggersIssueComment {
+  { body_substring, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersIssueComment with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsEditRepoAutomationRequestTriggersIssueComment with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("body_substring", self.body_substring)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersIssueComment with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsEditRepoAutomationRequestTriggersIssueComment with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    body_substring: @sdkjson.opt_field(obj, "body_substring", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Generated string enum AgentAutomationsEditRepoAutomationRequestTriggersPullRequestCommentCommentTypesItem.
+pub(all) enum AgentAutomationsEditRepoAutomationRequestTriggersPullRequestCommentCommentTypesItem {
+  TimelineComment
+  ReviewComment
+  Custom(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersPullRequestCommentCommentTypesItem with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersPullRequestCommentCommentTypesItem with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersPullRequestCommentCommentTypesItem with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsEditRepoAutomationRequestTriggersPullRequestCommentCommentTypesItem with fn to_json(
+  self,
+) {
+  let raw = match self {
+    TimelineComment => "timeline_comment"
+    ReviewComment => "review_comment"
+    Custom(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersPullRequestCommentCommentTypesItem with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsEditRepoAutomationRequestTriggersPullRequestCommentCommentTypesItem with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "timeline_comment" => Some(TimelineComment)
+        "review_comment" => Some(ReviewComment)
+        _ => None
+      }
+    },
+    raw => Custom(raw),
+  )
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsEditRepoAutomationRequestTriggersPullRequestCommentWriteScope {
+  Trigger
+  Repository
+  Custom(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersPullRequestCommentWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersPullRequestCommentWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersPullRequestCommentWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsEditRepoAutomationRequestTriggersPullRequestCommentWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Custom(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersPullRequestCommentWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsEditRepoAutomationRequestTriggersPullRequestCommentWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Custom(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsEditRepoAutomationRequestTriggersPullRequestComment.
+pub(all) struct AgentAutomationsEditRepoAutomationRequestTriggersPullRequestComment {
+  comment_types : Array[
+    AgentAutomationsEditRepoAutomationRequestTriggersPullRequestCommentCommentTypesItem,
+  ]
+  body_substring : String?
+  write_scope : AgentAutomationsEditRepoAutomationRequestTriggersPullRequestCommentWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersPullRequestComment with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersPullRequestComment with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsEditRepoAutomationRequestTriggersPullRequestComment with omitted optional fields absent.
+pub fn AgentAutomationsEditRepoAutomationRequestTriggersPullRequestComment::new(
+  comment_types~ : Array[
+    AgentAutomationsEditRepoAutomationRequestTriggersPullRequestCommentCommentTypesItem,
+  ],
+  body_substring? : String,
+  write_scope? : AgentAutomationsEditRepoAutomationRequestTriggersPullRequestCommentWriteScope,
+) -> AgentAutomationsEditRepoAutomationRequestTriggersPullRequestComment {
+  { comment_types, body_substring, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersPullRequestComment with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsEditRepoAutomationRequestTriggersPullRequestComment with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .field("comment_types", self.comment_types)
+  .opt("body_substring", self.body_substring)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersPullRequestComment with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsEditRepoAutomationRequestTriggersPullRequestComment with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    comment_types: required_field(obj, "comment_types", path),
+    body_substring: @sdkjson.opt_field(obj, "body_substring", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsEditRepoAutomationRequestTriggersDiscussionOpenedWriteScope {
+  Trigger
+  Repository
+  Custom(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersDiscussionOpenedWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersDiscussionOpenedWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersDiscussionOpenedWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsEditRepoAutomationRequestTriggersDiscussionOpenedWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Custom(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersDiscussionOpenedWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsEditRepoAutomationRequestTriggersDiscussionOpenedWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Custom(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsEditRepoAutomationRequestTriggersDiscussionOpened.
+pub(all) struct AgentAutomationsEditRepoAutomationRequestTriggersDiscussionOpened {
+  categories : Array[String]?
+  body_substring : String?
+  write_scope : AgentAutomationsEditRepoAutomationRequestTriggersDiscussionOpenedWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersDiscussionOpened with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersDiscussionOpened with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsEditRepoAutomationRequestTriggersDiscussionOpened with omitted optional fields absent.
+pub fn AgentAutomationsEditRepoAutomationRequestTriggersDiscussionOpened::new(
+  categories? : Array[String],
+  body_substring? : String,
+  write_scope? : AgentAutomationsEditRepoAutomationRequestTriggersDiscussionOpenedWriteScope,
+) -> AgentAutomationsEditRepoAutomationRequestTriggersDiscussionOpened {
+  { categories, body_substring, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersDiscussionOpened with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsEditRepoAutomationRequestTriggersDiscussionOpened with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("categories", self.categories)
+  .opt("body_substring", self.body_substring)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersDiscussionOpened with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsEditRepoAutomationRequestTriggersDiscussionOpened with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    categories: @sdkjson.opt_field(obj, "categories", path),
+    body_substring: @sdkjson.opt_field(obj, "body_substring", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsEditRepoAutomationRequestTriggersDiscussionUpdatedWriteScope {
+  Trigger
+  Repository
+  Custom(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersDiscussionUpdatedWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersDiscussionUpdatedWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersDiscussionUpdatedWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsEditRepoAutomationRequestTriggersDiscussionUpdatedWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Custom(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersDiscussionUpdatedWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsEditRepoAutomationRequestTriggersDiscussionUpdatedWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Custom(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsEditRepoAutomationRequestTriggersDiscussionUpdated.
+pub(all) struct AgentAutomationsEditRepoAutomationRequestTriggersDiscussionUpdated {
+  categories : Array[String]?
+  body_substring : String?
+  write_scope : AgentAutomationsEditRepoAutomationRequestTriggersDiscussionUpdatedWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersDiscussionUpdated with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersDiscussionUpdated with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsEditRepoAutomationRequestTriggersDiscussionUpdated with omitted optional fields absent.
+pub fn AgentAutomationsEditRepoAutomationRequestTriggersDiscussionUpdated::new(
+  categories? : Array[String],
+  body_substring? : String,
+  write_scope? : AgentAutomationsEditRepoAutomationRequestTriggersDiscussionUpdatedWriteScope,
+) -> AgentAutomationsEditRepoAutomationRequestTriggersDiscussionUpdated {
+  { categories, body_substring, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersDiscussionUpdated with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsEditRepoAutomationRequestTriggersDiscussionUpdated with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("categories", self.categories)
+  .opt("body_substring", self.body_substring)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersDiscussionUpdated with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsEditRepoAutomationRequestTriggersDiscussionUpdated with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    categories: @sdkjson.opt_field(obj, "categories", path),
+    body_substring: @sdkjson.opt_field(obj, "body_substring", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Generated string enum AgentAutomationsEditRepoAutomationRequestTriggersDiscussionCommentCommentTypesItem.
+pub(all) enum AgentAutomationsEditRepoAutomationRequestTriggersDiscussionCommentCommentTypesItem {
+  Comment
+  Reply
+  Custom(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersDiscussionCommentCommentTypesItem with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersDiscussionCommentCommentTypesItem with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersDiscussionCommentCommentTypesItem with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsEditRepoAutomationRequestTriggersDiscussionCommentCommentTypesItem with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Comment => "comment"
+    Reply => "reply"
+    Custom(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersDiscussionCommentCommentTypesItem with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsEditRepoAutomationRequestTriggersDiscussionCommentCommentTypesItem with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "comment" => Some(Comment)
+        "reply" => Some(Reply)
+        _ => None
+      }
+    },
+    raw => Custom(raw),
+  )
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsEditRepoAutomationRequestTriggersDiscussionCommentWriteScope {
+  Trigger
+  Repository
+  Custom(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersDiscussionCommentWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersDiscussionCommentWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersDiscussionCommentWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsEditRepoAutomationRequestTriggersDiscussionCommentWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Custom(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersDiscussionCommentWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsEditRepoAutomationRequestTriggersDiscussionCommentWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Custom(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsEditRepoAutomationRequestTriggersDiscussionComment.
+pub(all) struct AgentAutomationsEditRepoAutomationRequestTriggersDiscussionComment {
+  comment_types : Array[
+    AgentAutomationsEditRepoAutomationRequestTriggersDiscussionCommentCommentTypesItem,
+  ]?
+  categories : Array[String]?
+  body_substring : String?
+  write_scope : AgentAutomationsEditRepoAutomationRequestTriggersDiscussionCommentWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersDiscussionComment with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersDiscussionComment with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsEditRepoAutomationRequestTriggersDiscussionComment with omitted optional fields absent.
+pub fn AgentAutomationsEditRepoAutomationRequestTriggersDiscussionComment::new(
+  comment_types? : Array[
+    AgentAutomationsEditRepoAutomationRequestTriggersDiscussionCommentCommentTypesItem,
+  ],
+  categories? : Array[String],
+  body_substring? : String,
+  write_scope? : AgentAutomationsEditRepoAutomationRequestTriggersDiscussionCommentWriteScope,
+) -> AgentAutomationsEditRepoAutomationRequestTriggersDiscussionComment {
+  { comment_types, categories, body_substring, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersDiscussionComment with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsEditRepoAutomationRequestTriggersDiscussionComment with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("comment_types", self.comment_types)
+  .opt("categories", self.categories)
+  .opt("body_substring", self.body_substring)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersDiscussionComment with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsEditRepoAutomationRequestTriggersDiscussionComment with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    comment_types: @sdkjson.opt_field(obj, "comment_types", path),
+    categories: @sdkjson.opt_field(obj, "categories", path),
+    body_substring: @sdkjson.opt_field(obj, "body_substring", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsEditRepoAutomationRequestTriggersIssueAssignedWriteScope {
+  Trigger
+  Repository
+  Custom(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersIssueAssignedWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersIssueAssignedWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersIssueAssignedWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsEditRepoAutomationRequestTriggersIssueAssignedWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Custom(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersIssueAssignedWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsEditRepoAutomationRequestTriggersIssueAssignedWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Custom(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsEditRepoAutomationRequestTriggersIssueAssigned.
+pub(all) struct AgentAutomationsEditRepoAutomationRequestTriggersIssueAssigned {
+  query : String?
+  assignees : Array[String]?
+  write_scope : AgentAutomationsEditRepoAutomationRequestTriggersIssueAssignedWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersIssueAssigned with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersIssueAssigned with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsEditRepoAutomationRequestTriggersIssueAssigned with omitted optional fields absent.
+pub fn AgentAutomationsEditRepoAutomationRequestTriggersIssueAssigned::new(
+  query? : String,
+  assignees? : Array[String],
+  write_scope? : AgentAutomationsEditRepoAutomationRequestTriggersIssueAssignedWriteScope,
+) -> AgentAutomationsEditRepoAutomationRequestTriggersIssueAssigned {
+  { query, assignees, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersIssueAssigned with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsEditRepoAutomationRequestTriggersIssueAssigned with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("query", self.query)
+  .opt("assignees", self.assignees)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersIssueAssigned with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsEditRepoAutomationRequestTriggersIssueAssigned with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    query: @sdkjson.opt_field(obj, "query", path),
+    assignees: @sdkjson.opt_field(obj, "assignees", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsEditRepoAutomationRequestTriggersPullRequestAssignedWriteScope {
+  Trigger
+  Repository
+  Custom(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersPullRequestAssignedWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersPullRequestAssignedWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersPullRequestAssignedWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsEditRepoAutomationRequestTriggersPullRequestAssignedWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Custom(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersPullRequestAssignedWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsEditRepoAutomationRequestTriggersPullRequestAssignedWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Custom(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsEditRepoAutomationRequestTriggersPullRequestAssigned.
+pub(all) struct AgentAutomationsEditRepoAutomationRequestTriggersPullRequestAssigned {
+  query : String?
+  paths : Array[String]?
+  assignees : Array[String]?
+  write_scope : AgentAutomationsEditRepoAutomationRequestTriggersPullRequestAssignedWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersPullRequestAssigned with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersPullRequestAssigned with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsEditRepoAutomationRequestTriggersPullRequestAssigned with omitted optional fields absent.
+pub fn AgentAutomationsEditRepoAutomationRequestTriggersPullRequestAssigned::new(
+  query? : String,
+  paths? : Array[String],
+  assignees? : Array[String],
+  write_scope? : AgentAutomationsEditRepoAutomationRequestTriggersPullRequestAssignedWriteScope,
+) -> AgentAutomationsEditRepoAutomationRequestTriggersPullRequestAssigned {
+  { query, paths, assignees, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersPullRequestAssigned with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsEditRepoAutomationRequestTriggersPullRequestAssigned with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("query", self.query)
+  .opt("paths", self.paths)
+  .opt("assignees", self.assignees)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersPullRequestAssigned with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsEditRepoAutomationRequestTriggersPullRequestAssigned with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    query: @sdkjson.opt_field(obj, "query", path),
+    paths: @sdkjson.opt_field(obj, "paths", path),
+    assignees: @sdkjson.opt_field(obj, "assignees", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsEditRepoAutomationRequestTriggersSubIssueAddedWriteScope {
+  Trigger
+  Repository
+  Custom(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersSubIssueAddedWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersSubIssueAddedWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersSubIssueAddedWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsEditRepoAutomationRequestTriggersSubIssueAddedWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Custom(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersSubIssueAddedWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsEditRepoAutomationRequestTriggersSubIssueAddedWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Custom(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsEditRepoAutomationRequestTriggersSubIssueAdded.
+pub(all) struct AgentAutomationsEditRepoAutomationRequestTriggersSubIssueAdded {
+  query : String?
+  write_scope : AgentAutomationsEditRepoAutomationRequestTriggersSubIssueAddedWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersSubIssueAdded with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersSubIssueAdded with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsEditRepoAutomationRequestTriggersSubIssueAdded with omitted optional fields absent.
+pub fn AgentAutomationsEditRepoAutomationRequestTriggersSubIssueAdded::new(
+  query? : String,
+  write_scope? : AgentAutomationsEditRepoAutomationRequestTriggersSubIssueAddedWriteScope,
+) -> AgentAutomationsEditRepoAutomationRequestTriggersSubIssueAdded {
+  { query, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersSubIssueAdded with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsEditRepoAutomationRequestTriggersSubIssueAdded with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("query", self.query)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersSubIssueAdded with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsEditRepoAutomationRequestTriggersSubIssueAdded with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    query: @sdkjson.opt_field(obj, "query", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsEditRepoAutomationRequestTriggersPullRequestReadyForReviewWriteScope {
+  Trigger
+  Repository
+  Custom(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersPullRequestReadyForReviewWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersPullRequestReadyForReviewWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersPullRequestReadyForReviewWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsEditRepoAutomationRequestTriggersPullRequestReadyForReviewWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Custom(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersPullRequestReadyForReviewWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsEditRepoAutomationRequestTriggersPullRequestReadyForReviewWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Custom(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsEditRepoAutomationRequestTriggersPullRequestReadyForReview.
+pub(all) struct AgentAutomationsEditRepoAutomationRequestTriggersPullRequestReadyForReview {
+  query : String?
+  paths : Array[String]?
+  write_scope : AgentAutomationsEditRepoAutomationRequestTriggersPullRequestReadyForReviewWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersPullRequestReadyForReview with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersPullRequestReadyForReview with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsEditRepoAutomationRequestTriggersPullRequestReadyForReview with omitted optional fields absent.
+pub fn AgentAutomationsEditRepoAutomationRequestTriggersPullRequestReadyForReview::new(
+  query? : String,
+  paths? : Array[String],
+  write_scope? : AgentAutomationsEditRepoAutomationRequestTriggersPullRequestReadyForReviewWriteScope,
+) -> AgentAutomationsEditRepoAutomationRequestTriggersPullRequestReadyForReview {
+  { query, paths, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersPullRequestReadyForReview with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsEditRepoAutomationRequestTriggersPullRequestReadyForReview with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("query", self.query)
+  .opt("paths", self.paths)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersPullRequestReadyForReview with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsEditRepoAutomationRequestTriggersPullRequestReadyForReview with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    query: @sdkjson.opt_field(obj, "query", path),
+    paths: @sdkjson.opt_field(obj, "paths", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsEditRepoAutomationRequestTriggersPullRequestLabeledWriteScope {
+  Trigger
+  Repository
+  Custom(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersPullRequestLabeledWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersPullRequestLabeledWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersPullRequestLabeledWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsEditRepoAutomationRequestTriggersPullRequestLabeledWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Custom(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersPullRequestLabeledWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsEditRepoAutomationRequestTriggersPullRequestLabeledWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Custom(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsEditRepoAutomationRequestTriggersPullRequestLabeled.
+pub(all) struct AgentAutomationsEditRepoAutomationRequestTriggersPullRequestLabeled {
+  query : String?
+  paths : Array[String]?
+  labels : Array[String]?
+  write_scope : AgentAutomationsEditRepoAutomationRequestTriggersPullRequestLabeledWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersPullRequestLabeled with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersPullRequestLabeled with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsEditRepoAutomationRequestTriggersPullRequestLabeled with omitted optional fields absent.
+pub fn AgentAutomationsEditRepoAutomationRequestTriggersPullRequestLabeled::new(
+  query? : String,
+  paths? : Array[String],
+  labels? : Array[String],
+  write_scope? : AgentAutomationsEditRepoAutomationRequestTriggersPullRequestLabeledWriteScope,
+) -> AgentAutomationsEditRepoAutomationRequestTriggersPullRequestLabeled {
+  { query, paths, labels, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersPullRequestLabeled with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsEditRepoAutomationRequestTriggersPullRequestLabeled with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("query", self.query)
+  .opt("paths", self.paths)
+  .opt("labels", self.labels)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersPullRequestLabeled with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsEditRepoAutomationRequestTriggersPullRequestLabeled with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    query: @sdkjson.opt_field(obj, "query", path),
+    paths: @sdkjson.opt_field(obj, "paths", path),
+    labels: @sdkjson.opt_field(obj, "labels", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsEditRepoAutomationRequestTriggersPullRequestMergeConflictWriteScope {
+  Trigger
+  Repository
+  Custom(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersPullRequestMergeConflictWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersPullRequestMergeConflictWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersPullRequestMergeConflictWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsEditRepoAutomationRequestTriggersPullRequestMergeConflictWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Custom(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersPullRequestMergeConflictWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsEditRepoAutomationRequestTriggersPullRequestMergeConflictWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Custom(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsEditRepoAutomationRequestTriggersPullRequestMergeConflict.
+pub(all) struct AgentAutomationsEditRepoAutomationRequestTriggersPullRequestMergeConflict {
+  query : String?
+  paths : Array[String]?
+  write_scope : AgentAutomationsEditRepoAutomationRequestTriggersPullRequestMergeConflictWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersPullRequestMergeConflict with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersPullRequestMergeConflict with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsEditRepoAutomationRequestTriggersPullRequestMergeConflict with omitted optional fields absent.
+pub fn AgentAutomationsEditRepoAutomationRequestTriggersPullRequestMergeConflict::new(
+  query? : String,
+  paths? : Array[String],
+  write_scope? : AgentAutomationsEditRepoAutomationRequestTriggersPullRequestMergeConflictWriteScope,
+) -> AgentAutomationsEditRepoAutomationRequestTriggersPullRequestMergeConflict {
+  { query, paths, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersPullRequestMergeConflict with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsEditRepoAutomationRequestTriggersPullRequestMergeConflict with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("query", self.query)
+  .opt("paths", self.paths)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersPullRequestMergeConflict with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsEditRepoAutomationRequestTriggersPullRequestMergeConflict with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    query: @sdkjson.opt_field(obj, "query", path),
+    paths: @sdkjson.opt_field(obj, "paths", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Generated string enum AgentAutomationsEditRepoAutomationRequestTriggersPullRequestReviewSubmittedStatesItem.
+pub(all) enum AgentAutomationsEditRepoAutomationRequestTriggersPullRequestReviewSubmittedStatesItem {
+  Approved
+  ChangesRequested
+  Commented
+  Custom(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersPullRequestReviewSubmittedStatesItem with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersPullRequestReviewSubmittedStatesItem with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersPullRequestReviewSubmittedStatesItem with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsEditRepoAutomationRequestTriggersPullRequestReviewSubmittedStatesItem with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Approved => "approved"
+    ChangesRequested => "changes_requested"
+    Commented => "commented"
+    Custom(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersPullRequestReviewSubmittedStatesItem with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsEditRepoAutomationRequestTriggersPullRequestReviewSubmittedStatesItem with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "approved" => Some(Approved)
+        "changes_requested" => Some(ChangesRequested)
+        "commented" => Some(Commented)
+        _ => None
+      }
+    },
+    raw => Custom(raw),
+  )
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsEditRepoAutomationRequestTriggersPullRequestReviewSubmittedWriteScope {
+  Trigger
+  Repository
+  Custom(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersPullRequestReviewSubmittedWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersPullRequestReviewSubmittedWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersPullRequestReviewSubmittedWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsEditRepoAutomationRequestTriggersPullRequestReviewSubmittedWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Custom(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersPullRequestReviewSubmittedWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsEditRepoAutomationRequestTriggersPullRequestReviewSubmittedWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Custom(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsEditRepoAutomationRequestTriggersPullRequestReviewSubmitted.
+pub(all) struct AgentAutomationsEditRepoAutomationRequestTriggersPullRequestReviewSubmitted {
+  query : String?
+  paths : Array[String]?
+  states : Array[
+    AgentAutomationsEditRepoAutomationRequestTriggersPullRequestReviewSubmittedStatesItem,
+  ]
+  write_scope : AgentAutomationsEditRepoAutomationRequestTriggersPullRequestReviewSubmittedWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersPullRequestReviewSubmitted with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersPullRequestReviewSubmitted with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsEditRepoAutomationRequestTriggersPullRequestReviewSubmitted with omitted optional fields absent.
+pub fn AgentAutomationsEditRepoAutomationRequestTriggersPullRequestReviewSubmitted::new(
+  states~ : Array[
+    AgentAutomationsEditRepoAutomationRequestTriggersPullRequestReviewSubmittedStatesItem,
+  ],
+  query? : String,
+  paths? : Array[String],
+  write_scope? : AgentAutomationsEditRepoAutomationRequestTriggersPullRequestReviewSubmittedWriteScope,
+) -> AgentAutomationsEditRepoAutomationRequestTriggersPullRequestReviewSubmitted {
+  { query, paths, states, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersPullRequestReviewSubmitted with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsEditRepoAutomationRequestTriggersPullRequestReviewSubmitted with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("query", self.query)
+  .opt("paths", self.paths)
+  .field("states", self.states)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersPullRequestReviewSubmitted with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsEditRepoAutomationRequestTriggersPullRequestReviewSubmitted with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    query: @sdkjson.opt_field(obj, "query", path),
+    paths: @sdkjson.opt_field(obj, "paths", path),
+    states: required_field(obj, "states", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsEditRepoAutomationRequestTriggersPullRequestReviewRequestedWriteScope {
+  Trigger
+  Repository
+  Custom(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersPullRequestReviewRequestedWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersPullRequestReviewRequestedWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersPullRequestReviewRequestedWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsEditRepoAutomationRequestTriggersPullRequestReviewRequestedWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Custom(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersPullRequestReviewRequestedWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsEditRepoAutomationRequestTriggersPullRequestReviewRequestedWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Custom(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsEditRepoAutomationRequestTriggersPullRequestReviewRequested.
+pub(all) struct AgentAutomationsEditRepoAutomationRequestTriggersPullRequestReviewRequested {
+  query : String?
+  paths : Array[String]?
+  write_scope : AgentAutomationsEditRepoAutomationRequestTriggersPullRequestReviewRequestedWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersPullRequestReviewRequested with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersPullRequestReviewRequested with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsEditRepoAutomationRequestTriggersPullRequestReviewRequested with omitted optional fields absent.
+pub fn AgentAutomationsEditRepoAutomationRequestTriggersPullRequestReviewRequested::new(
+  query? : String,
+  paths? : Array[String],
+  write_scope? : AgentAutomationsEditRepoAutomationRequestTriggersPullRequestReviewRequestedWriteScope,
+) -> AgentAutomationsEditRepoAutomationRequestTriggersPullRequestReviewRequested {
+  { query, paths, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersPullRequestReviewRequested with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsEditRepoAutomationRequestTriggersPullRequestReviewRequested with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("query", self.query)
+  .opt("paths", self.paths)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersPullRequestReviewRequested with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsEditRepoAutomationRequestTriggersPullRequestReviewRequested with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    query: @sdkjson.opt_field(obj, "query", path),
+    paths: @sdkjson.opt_field(obj, "paths", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsEditRepoAutomationRequestTriggersAutomationCompletedWriteScope {
+  Trigger
+  Repository
+  Custom(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersAutomationCompletedWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersAutomationCompletedWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersAutomationCompletedWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsEditRepoAutomationRequestTriggersAutomationCompletedWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Custom(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersAutomationCompletedWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsEditRepoAutomationRequestTriggersAutomationCompletedWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Custom(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsEditRepoAutomationRequestTriggersAutomationCompleted.
+pub(all) struct AgentAutomationsEditRepoAutomationRequestTriggersAutomationCompleted {
+  automation_ids : Array[String]
+  write_scope : AgentAutomationsEditRepoAutomationRequestTriggersAutomationCompletedWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersAutomationCompleted with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersAutomationCompleted with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsEditRepoAutomationRequestTriggersAutomationCompleted with omitted optional fields absent.
+pub fn AgentAutomationsEditRepoAutomationRequestTriggersAutomationCompleted::new(
+  automation_ids~ : Array[String],
+  write_scope? : AgentAutomationsEditRepoAutomationRequestTriggersAutomationCompletedWriteScope,
+) -> AgentAutomationsEditRepoAutomationRequestTriggersAutomationCompleted {
+  { automation_ids, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersAutomationCompleted with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsEditRepoAutomationRequestTriggersAutomationCompleted with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .field("automation_ids", self.automation_ids)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsEditRepoAutomationRequestTriggersAutomationCompleted with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsEditRepoAutomationRequestTriggersAutomationCompleted with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    automation_ids: required_field(obj, "automation_ids", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Public trigger configuration keyed by stable public trigger identifier. Each trigger has a closed, trigger-specific configuration schema.
+pub(all) struct AgentAutomationsEditRepoAutomationRequestTriggers {
+  interval : AgentAutomationsEditRepoAutomationRequestTriggersInterval?
+  issue_opened : AgentAutomationsEditRepoAutomationRequestTriggersIssueOpened?
+  issue_labeled : AgentAutomationsEditRepoAutomationRequestTriggersIssueLabeled?
+  workflow_run : AgentAutomationsEditRepoAutomationRequestTriggersWorkflowRun?
+  pull_request_opened : AgentAutomationsEditRepoAutomationRequestTriggersPullRequestOpened?
+  pull_request_synchronize : AgentAutomationsEditRepoAutomationRequestTriggersPullRequestSynchronize?
+  pull_request_merged : AgentAutomationsEditRepoAutomationRequestTriggersPullRequestMerged?
+  issue_comment : AgentAutomationsEditRepoAutomationRequestTriggersIssueComment?
+  pull_request_comment : AgentAutomationsEditRepoAutomationRequestTriggersPullRequestComment?
+  discussion_opened : AgentAutomationsEditRepoAutomationRequestTriggersDiscussionOpened?
+  discussion_updated : AgentAutomationsEditRepoAutomationRequestTriggersDiscussionUpdated?
+  discussion_comment : AgentAutomationsEditRepoAutomationRequestTriggersDiscussionComment?
+  issue_assigned : AgentAutomationsEditRepoAutomationRequestTriggersIssueAssigned?
+  pull_request_assigned : AgentAutomationsEditRepoAutomationRequestTriggersPullRequestAssigned?
+  sub_issue_added : AgentAutomationsEditRepoAutomationRequestTriggersSubIssueAdded?
+  pull_request_ready_for_review : AgentAutomationsEditRepoAutomationRequestTriggersPullRequestReadyForReview?
+  pull_request_labeled : AgentAutomationsEditRepoAutomationRequestTriggersPullRequestLabeled?
+  pull_request_merge_conflict : AgentAutomationsEditRepoAutomationRequestTriggersPullRequestMergeConflict?
+  pull_request_review_submitted : AgentAutomationsEditRepoAutomationRequestTriggersPullRequestReviewSubmitted?
+  pull_request_review_requested : AgentAutomationsEditRepoAutomationRequestTriggersPullRequestReviewRequested?
+  automation_completed : AgentAutomationsEditRepoAutomationRequestTriggersAutomationCompleted?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsEditRepoAutomationRequestTriggers with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsEditRepoAutomationRequestTriggers with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsEditRepoAutomationRequestTriggers with omitted optional fields absent.
+pub fn AgentAutomationsEditRepoAutomationRequestTriggers::new(
+  interval? : AgentAutomationsEditRepoAutomationRequestTriggersInterval,
+  issue_opened? : AgentAutomationsEditRepoAutomationRequestTriggersIssueOpened,
+  issue_labeled? : AgentAutomationsEditRepoAutomationRequestTriggersIssueLabeled,
+  workflow_run? : AgentAutomationsEditRepoAutomationRequestTriggersWorkflowRun,
+  pull_request_opened? : AgentAutomationsEditRepoAutomationRequestTriggersPullRequestOpened,
+  pull_request_synchronize? : AgentAutomationsEditRepoAutomationRequestTriggersPullRequestSynchronize,
+  pull_request_merged? : AgentAutomationsEditRepoAutomationRequestTriggersPullRequestMerged,
+  issue_comment? : AgentAutomationsEditRepoAutomationRequestTriggersIssueComment,
+  pull_request_comment? : AgentAutomationsEditRepoAutomationRequestTriggersPullRequestComment,
+  discussion_opened? : AgentAutomationsEditRepoAutomationRequestTriggersDiscussionOpened,
+  discussion_updated? : AgentAutomationsEditRepoAutomationRequestTriggersDiscussionUpdated,
+  discussion_comment? : AgentAutomationsEditRepoAutomationRequestTriggersDiscussionComment,
+  issue_assigned? : AgentAutomationsEditRepoAutomationRequestTriggersIssueAssigned,
+  pull_request_assigned? : AgentAutomationsEditRepoAutomationRequestTriggersPullRequestAssigned,
+  sub_issue_added? : AgentAutomationsEditRepoAutomationRequestTriggersSubIssueAdded,
+  pull_request_ready_for_review? : AgentAutomationsEditRepoAutomationRequestTriggersPullRequestReadyForReview,
+  pull_request_labeled? : AgentAutomationsEditRepoAutomationRequestTriggersPullRequestLabeled,
+  pull_request_merge_conflict? : AgentAutomationsEditRepoAutomationRequestTriggersPullRequestMergeConflict,
+  pull_request_review_submitted? : AgentAutomationsEditRepoAutomationRequestTriggersPullRequestReviewSubmitted,
+  pull_request_review_requested? : AgentAutomationsEditRepoAutomationRequestTriggersPullRequestReviewRequested,
+  automation_completed? : AgentAutomationsEditRepoAutomationRequestTriggersAutomationCompleted,
+) -> AgentAutomationsEditRepoAutomationRequestTriggers {
+  {
+    interval,
+    issue_opened,
+    issue_labeled,
+    workflow_run,
+    pull_request_opened,
+    pull_request_synchronize,
+    pull_request_merged,
+    issue_comment,
+    pull_request_comment,
+    discussion_opened,
+    discussion_updated,
+    discussion_comment,
+    issue_assigned,
+    pull_request_assigned,
+    sub_issue_added,
+    pull_request_ready_for_review,
+    pull_request_labeled,
+    pull_request_merge_conflict,
+    pull_request_review_submitted,
+    pull_request_review_requested,
+    automation_completed,
+  }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsEditRepoAutomationRequestTriggers with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsEditRepoAutomationRequestTriggers with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("interval", self.interval)
+  .opt("issue_opened", self.issue_opened)
+  .opt("issue_labeled", self.issue_labeled)
+  .opt("workflow_run", self.workflow_run)
+  .opt("pull_request_opened", self.pull_request_opened)
+  .opt("pull_request_synchronize", self.pull_request_synchronize)
+  .opt("pull_request_merged", self.pull_request_merged)
+  .opt("issue_comment", self.issue_comment)
+  .opt("pull_request_comment", self.pull_request_comment)
+  .opt("discussion_opened", self.discussion_opened)
+  .opt("discussion_updated", self.discussion_updated)
+  .opt("discussion_comment", self.discussion_comment)
+  .opt("issue_assigned", self.issue_assigned)
+  .opt("pull_request_assigned", self.pull_request_assigned)
+  .opt("sub_issue_added", self.sub_issue_added)
+  .opt("pull_request_ready_for_review", self.pull_request_ready_for_review)
+  .opt("pull_request_labeled", self.pull_request_labeled)
+  .opt("pull_request_merge_conflict", self.pull_request_merge_conflict)
+  .opt("pull_request_review_submitted", self.pull_request_review_submitted)
+  .opt("pull_request_review_requested", self.pull_request_review_requested)
+  .opt("automation_completed", self.automation_completed)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsEditRepoAutomationRequestTriggers with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsEditRepoAutomationRequestTriggers with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    interval: @sdkjson.opt_field(obj, "interval", path),
+    issue_opened: @sdkjson.opt_field(obj, "issue_opened", path),
+    issue_labeled: @sdkjson.opt_field(obj, "issue_labeled", path),
+    workflow_run: @sdkjson.opt_field(obj, "workflow_run", path),
+    pull_request_opened: @sdkjson.opt_field(obj, "pull_request_opened", path),
+    pull_request_synchronize: @sdkjson.opt_field(
+      obj, "pull_request_synchronize", path,
+    ),
+    pull_request_merged: @sdkjson.opt_field(obj, "pull_request_merged", path),
+    issue_comment: @sdkjson.opt_field(obj, "issue_comment", path),
+    pull_request_comment: @sdkjson.opt_field(obj, "pull_request_comment", path),
+    discussion_opened: @sdkjson.opt_field(obj, "discussion_opened", path),
+    discussion_updated: @sdkjson.opt_field(obj, "discussion_updated", path),
+    discussion_comment: @sdkjson.opt_field(obj, "discussion_comment", path),
+    issue_assigned: @sdkjson.opt_field(obj, "issue_assigned", path),
+    pull_request_assigned: @sdkjson.opt_field(
+      obj, "pull_request_assigned", path,
+    ),
+    sub_issue_added: @sdkjson.opt_field(obj, "sub_issue_added", path),
+    pull_request_ready_for_review: @sdkjson.opt_field(
+      obj, "pull_request_ready_for_review", path,
+    ),
+    pull_request_labeled: @sdkjson.opt_field(obj, "pull_request_labeled", path),
+    pull_request_merge_conflict: @sdkjson.opt_field(
+      obj, "pull_request_merge_conflict", path,
+    ),
+    pull_request_review_submitted: @sdkjson.opt_field(
+      obj, "pull_request_review_submitted", path,
+    ),
+    pull_request_review_requested: @sdkjson.opt_field(
+      obj, "pull_request_review_requested", path,
+    ),
+    automation_completed: @sdkjson.opt_field(obj, "automation_completed", path),
+  }
+}
+
+///|
+///
+/// Request body for editing an automation. Omitted fields are left unchanged. Explicit null values are rejected.
+pub(all) struct AgentAutomationsEditRepoAutomationRequest {
+  name : String?
+  enabled : Bool?
+  write_scope : AgentAutomationsEditRepoAutomationRequestWriteScope?
+  require_actor_write_permission : Bool?
+  model : String?
+  reasoning_effort : String?
+  triggers : AgentAutomationsEditRepoAutomationRequestTriggers?
+  prompt : String?
+  tools : Array[String]?
+  allowed_custom_agents : Array[String]?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsEditRepoAutomationRequest with Eq::{equal, not_equal}
+
+///|
+pub extend AgentAutomationsEditRepoAutomationRequest with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsEditRepoAutomationRequest with omitted optional fields absent.
+pub fn AgentAutomationsEditRepoAutomationRequest::new(
+  name? : String,
+  enabled? : Bool,
+  write_scope? : AgentAutomationsEditRepoAutomationRequestWriteScope,
+  require_actor_write_permission? : Bool,
+  model? : String,
+  reasoning_effort? : String,
+  triggers? : AgentAutomationsEditRepoAutomationRequestTriggers,
+  prompt? : String,
+  tools? : Array[String],
+  allowed_custom_agents? : Array[String],
+) -> AgentAutomationsEditRepoAutomationRequest {
+  {
+    name,
+    enabled,
+    write_scope,
+    require_actor_write_permission,
+    model,
+    reasoning_effort,
+    triggers,
+    prompt,
+    tools,
+    allowed_custom_agents,
+  }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsEditRepoAutomationRequest with ToJson::{to_json}
+
+///|
+pub impl ToJson for AgentAutomationsEditRepoAutomationRequest with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("name", self.name)
+  .opt("enabled", self.enabled)
+  .opt("write_scope", self.write_scope)
+  .opt("require_actor_write_permission", self.require_actor_write_permission)
+  .opt("model", self.model)
+  .opt("reasoning_effort", self.reasoning_effort)
+  .opt("triggers", self.triggers)
+  .opt("prompt", self.prompt)
+  .opt("tools", self.tools)
+  .opt("allowed_custom_agents", self.allowed_custom_agents)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsEditRepoAutomationRequest with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsEditRepoAutomationRequest with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    name: @sdkjson.opt_field(obj, "name", path),
+    enabled: @sdkjson.opt_field(obj, "enabled", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+    require_actor_write_permission: @sdkjson.opt_field(
+      obj, "require_actor_write_permission", path,
+    ),
+    model: @sdkjson.opt_field(obj, "model", path),
+    reasoning_effort: @sdkjson.opt_field(obj, "reasoning_effort", path),
+    triggers: @sdkjson.opt_field(obj, "triggers", path),
+    prompt: @sdkjson.opt_field(obj, "prompt", path),
+    tools: @sdkjson.opt_field(obj, "tools", path),
+    allowed_custom_agents: @sdkjson.opt_field(
+      obj, "allowed_custom_agents", path,
+    ),
+  }
+}
+
+///|
+///
+/// Who owns the automation. `user` keeps it private to its creator and its runs act as that user. `repository` makes it belong to the repository, visible to anyone with read access to the repository, and its runs act as the Copilot app rather than as a person.
+pub(all) enum AgentAutomationsEditRepoAutomationResponseOwnerType {
+  User
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsEditRepoAutomationResponseOwnerType with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsEditRepoAutomationResponseOwnerType with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsEditRepoAutomationResponseOwnerType with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsEditRepoAutomationResponseOwnerType with fn to_json(
+  self,
+) {
+  let raw = match self {
+    User => "user"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsEditRepoAutomationResponseOwnerType with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsEditRepoAutomationResponseOwnerType with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "user" => Some(User)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Controls which repository resources a run may modify. `trigger` limits writes to the resource that started the run, when one exists, and resources created during the run; `repository` allows writes to any resource in the repository. Supported values: `trigger`, `repository`.
+pub(all) enum AgentAutomationsEditRepoAutomationResponseWriteScope {
+  Trigger
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsEditRepoAutomationResponseWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsEditRepoAutomationResponseWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsEditRepoAutomationResponseWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsEditRepoAutomationResponseWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsEditRepoAutomationResponseWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsEditRepoAutomationResponseWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated string enum AgentAutomationsEditRepoAutomationResponseTriggersIntervalCadenceItem.
+pub(all) enum AgentAutomationsEditRepoAutomationResponseTriggersIntervalCadenceItem {
+  Hourly
+  Daily
+  Weekly
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersIntervalCadenceItem with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersIntervalCadenceItem with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersIntervalCadenceItem with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsEditRepoAutomationResponseTriggersIntervalCadenceItem with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Hourly => "hourly"
+    Daily => "daily"
+    Weekly => "weekly"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersIntervalCadenceItem with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsEditRepoAutomationResponseTriggersIntervalCadenceItem with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "hourly" => Some(Hourly)
+        "daily" => Some(Daily)
+        "weekly" => Some(Weekly)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsEditRepoAutomationResponseTriggersIntervalWriteScope {
+  Trigger
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersIntervalWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersIntervalWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersIntervalWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsEditRepoAutomationResponseTriggersIntervalWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersIntervalWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsEditRepoAutomationResponseTriggersIntervalWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsEditRepoAutomationResponseTriggersInterval.
+pub(all) struct AgentAutomationsEditRepoAutomationResponseTriggersInterval {
+  cadence : Array[
+    AgentAutomationsEditRepoAutomationResponseTriggersIntervalCadenceItem,
+  ]
+  hour_utc : Int32?
+  day_of_week : Int32?
+  minute_utc : Int32?
+  write_scope : AgentAutomationsEditRepoAutomationResponseTriggersIntervalWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersInterval with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersInterval with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsEditRepoAutomationResponseTriggersInterval with omitted optional fields absent.
+pub fn AgentAutomationsEditRepoAutomationResponseTriggersInterval::new(
+  cadence~ : Array[
+    AgentAutomationsEditRepoAutomationResponseTriggersIntervalCadenceItem,
+  ],
+  hour_utc? : Int32,
+  day_of_week? : Int32,
+  minute_utc? : Int32,
+  write_scope? : AgentAutomationsEditRepoAutomationResponseTriggersIntervalWriteScope,
+) -> AgentAutomationsEditRepoAutomationResponseTriggersInterval {
+  { cadence, hour_utc, day_of_week, minute_utc, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersInterval with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsEditRepoAutomationResponseTriggersInterval with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .field("cadence", self.cadence)
+  .opt("hour_utc", self.hour_utc)
+  .opt("day_of_week", self.day_of_week)
+  .opt("minute_utc", self.minute_utc)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersInterval with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsEditRepoAutomationResponseTriggersInterval with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    cadence: required_field(obj, "cadence", path),
+    hour_utc: @sdkjson.opt_field(obj, "hour_utc", path),
+    day_of_week: @sdkjson.opt_field(obj, "day_of_week", path),
+    minute_utc: @sdkjson.opt_field(obj, "minute_utc", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsEditRepoAutomationResponseTriggersIssueOpenedWriteScope {
+  Trigger
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersIssueOpenedWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersIssueOpenedWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersIssueOpenedWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsEditRepoAutomationResponseTriggersIssueOpenedWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersIssueOpenedWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsEditRepoAutomationResponseTriggersIssueOpenedWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsEditRepoAutomationResponseTriggersIssueOpened.
+pub(all) struct AgentAutomationsEditRepoAutomationResponseTriggersIssueOpened {
+  query : String?
+  write_scope : AgentAutomationsEditRepoAutomationResponseTriggersIssueOpenedWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersIssueOpened with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersIssueOpened with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsEditRepoAutomationResponseTriggersIssueOpened with omitted optional fields absent.
+pub fn AgentAutomationsEditRepoAutomationResponseTriggersIssueOpened::new(
+  query? : String,
+  write_scope? : AgentAutomationsEditRepoAutomationResponseTriggersIssueOpenedWriteScope,
+) -> AgentAutomationsEditRepoAutomationResponseTriggersIssueOpened {
+  { query, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersIssueOpened with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsEditRepoAutomationResponseTriggersIssueOpened with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("query", self.query)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersIssueOpened with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsEditRepoAutomationResponseTriggersIssueOpened with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    query: @sdkjson.opt_field(obj, "query", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsEditRepoAutomationResponseTriggersIssueLabeledWriteScope {
+  Trigger
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersIssueLabeledWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersIssueLabeledWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersIssueLabeledWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsEditRepoAutomationResponseTriggersIssueLabeledWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersIssueLabeledWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsEditRepoAutomationResponseTriggersIssueLabeledWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsEditRepoAutomationResponseTriggersIssueLabeled.
+pub(all) struct AgentAutomationsEditRepoAutomationResponseTriggersIssueLabeled {
+  query : String?
+  labels : Array[String]?
+  write_scope : AgentAutomationsEditRepoAutomationResponseTriggersIssueLabeledWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersIssueLabeled with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersIssueLabeled with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsEditRepoAutomationResponseTriggersIssueLabeled with omitted optional fields absent.
+pub fn AgentAutomationsEditRepoAutomationResponseTriggersIssueLabeled::new(
+  query? : String,
+  labels? : Array[String],
+  write_scope? : AgentAutomationsEditRepoAutomationResponseTriggersIssueLabeledWriteScope,
+) -> AgentAutomationsEditRepoAutomationResponseTriggersIssueLabeled {
+  { query, labels, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersIssueLabeled with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsEditRepoAutomationResponseTriggersIssueLabeled with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("query", self.query)
+  .opt("labels", self.labels)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersIssueLabeled with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsEditRepoAutomationResponseTriggersIssueLabeled with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    query: @sdkjson.opt_field(obj, "query", path),
+    labels: @sdkjson.opt_field(obj, "labels", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsEditRepoAutomationResponseTriggersWorkflowRunWriteScope {
+  Trigger
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersWorkflowRunWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersWorkflowRunWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersWorkflowRunWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsEditRepoAutomationResponseTriggersWorkflowRunWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersWorkflowRunWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsEditRepoAutomationResponseTriggersWorkflowRunWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsEditRepoAutomationResponseTriggersWorkflowRun.
+pub(all) struct AgentAutomationsEditRepoAutomationResponseTriggersWorkflowRun {
+  workflows : Array[String]
+  conclusions : Array[String]
+  query : String?
+  write_scope : AgentAutomationsEditRepoAutomationResponseTriggersWorkflowRunWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersWorkflowRun with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersWorkflowRun with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsEditRepoAutomationResponseTriggersWorkflowRun with omitted optional fields absent.
+pub fn AgentAutomationsEditRepoAutomationResponseTriggersWorkflowRun::new(
+  workflows~ : Array[String],
+  conclusions~ : Array[String],
+  query? : String,
+  write_scope? : AgentAutomationsEditRepoAutomationResponseTriggersWorkflowRunWriteScope,
+) -> AgentAutomationsEditRepoAutomationResponseTriggersWorkflowRun {
+  { workflows, conclusions, query, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersWorkflowRun with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsEditRepoAutomationResponseTriggersWorkflowRun with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .field("workflows", self.workflows)
+  .field("conclusions", self.conclusions)
+  .opt("query", self.query)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersWorkflowRun with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsEditRepoAutomationResponseTriggersWorkflowRun with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    workflows: required_field(obj, "workflows", path),
+    conclusions: required_field(obj, "conclusions", path),
+    query: @sdkjson.opt_field(obj, "query", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsEditRepoAutomationResponseTriggersPullRequestOpenedWriteScope {
+  Trigger
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersPullRequestOpenedWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersPullRequestOpenedWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersPullRequestOpenedWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsEditRepoAutomationResponseTriggersPullRequestOpenedWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersPullRequestOpenedWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsEditRepoAutomationResponseTriggersPullRequestOpenedWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsEditRepoAutomationResponseTriggersPullRequestOpened.
+pub(all) struct AgentAutomationsEditRepoAutomationResponseTriggersPullRequestOpened {
+  query : String?
+  paths : Array[String]?
+  write_scope : AgentAutomationsEditRepoAutomationResponseTriggersPullRequestOpenedWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersPullRequestOpened with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersPullRequestOpened with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsEditRepoAutomationResponseTriggersPullRequestOpened with omitted optional fields absent.
+pub fn AgentAutomationsEditRepoAutomationResponseTriggersPullRequestOpened::new(
+  query? : String,
+  paths? : Array[String],
+  write_scope? : AgentAutomationsEditRepoAutomationResponseTriggersPullRequestOpenedWriteScope,
+) -> AgentAutomationsEditRepoAutomationResponseTriggersPullRequestOpened {
+  { query, paths, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersPullRequestOpened with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsEditRepoAutomationResponseTriggersPullRequestOpened with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("query", self.query)
+  .opt("paths", self.paths)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersPullRequestOpened with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsEditRepoAutomationResponseTriggersPullRequestOpened with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    query: @sdkjson.opt_field(obj, "query", path),
+    paths: @sdkjson.opt_field(obj, "paths", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsEditRepoAutomationResponseTriggersPullRequestSynchronizeWriteScope {
+  Trigger
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersPullRequestSynchronizeWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersPullRequestSynchronizeWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersPullRequestSynchronizeWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsEditRepoAutomationResponseTriggersPullRequestSynchronizeWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersPullRequestSynchronizeWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsEditRepoAutomationResponseTriggersPullRequestSynchronizeWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsEditRepoAutomationResponseTriggersPullRequestSynchronize.
+pub(all) struct AgentAutomationsEditRepoAutomationResponseTriggersPullRequestSynchronize {
+  query : String?
+  paths : Array[String]?
+  write_scope : AgentAutomationsEditRepoAutomationResponseTriggersPullRequestSynchronizeWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersPullRequestSynchronize with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersPullRequestSynchronize with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsEditRepoAutomationResponseTriggersPullRequestSynchronize with omitted optional fields absent.
+pub fn AgentAutomationsEditRepoAutomationResponseTriggersPullRequestSynchronize::new(
+  query? : String,
+  paths? : Array[String],
+  write_scope? : AgentAutomationsEditRepoAutomationResponseTriggersPullRequestSynchronizeWriteScope,
+) -> AgentAutomationsEditRepoAutomationResponseTriggersPullRequestSynchronize {
+  { query, paths, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersPullRequestSynchronize with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsEditRepoAutomationResponseTriggersPullRequestSynchronize with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("query", self.query)
+  .opt("paths", self.paths)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersPullRequestSynchronize with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsEditRepoAutomationResponseTriggersPullRequestSynchronize with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    query: @sdkjson.opt_field(obj, "query", path),
+    paths: @sdkjson.opt_field(obj, "paths", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsEditRepoAutomationResponseTriggersPullRequestMergedWriteScope {
+  Trigger
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersPullRequestMergedWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersPullRequestMergedWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersPullRequestMergedWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsEditRepoAutomationResponseTriggersPullRequestMergedWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersPullRequestMergedWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsEditRepoAutomationResponseTriggersPullRequestMergedWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsEditRepoAutomationResponseTriggersPullRequestMerged.
+pub(all) struct AgentAutomationsEditRepoAutomationResponseTriggersPullRequestMerged {
+  query : String?
+  paths : Array[String]?
+  write_scope : AgentAutomationsEditRepoAutomationResponseTriggersPullRequestMergedWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersPullRequestMerged with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersPullRequestMerged with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsEditRepoAutomationResponseTriggersPullRequestMerged with omitted optional fields absent.
+pub fn AgentAutomationsEditRepoAutomationResponseTriggersPullRequestMerged::new(
+  query? : String,
+  paths? : Array[String],
+  write_scope? : AgentAutomationsEditRepoAutomationResponseTriggersPullRequestMergedWriteScope,
+) -> AgentAutomationsEditRepoAutomationResponseTriggersPullRequestMerged {
+  { query, paths, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersPullRequestMerged with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsEditRepoAutomationResponseTriggersPullRequestMerged with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("query", self.query)
+  .opt("paths", self.paths)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersPullRequestMerged with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsEditRepoAutomationResponseTriggersPullRequestMerged with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    query: @sdkjson.opt_field(obj, "query", path),
+    paths: @sdkjson.opt_field(obj, "paths", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsEditRepoAutomationResponseTriggersIssueCommentWriteScope {
+  Trigger
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersIssueCommentWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersIssueCommentWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersIssueCommentWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsEditRepoAutomationResponseTriggersIssueCommentWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersIssueCommentWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsEditRepoAutomationResponseTriggersIssueCommentWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsEditRepoAutomationResponseTriggersIssueComment.
+pub(all) struct AgentAutomationsEditRepoAutomationResponseTriggersIssueComment {
+  body_substring : String?
+  write_scope : AgentAutomationsEditRepoAutomationResponseTriggersIssueCommentWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersIssueComment with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersIssueComment with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsEditRepoAutomationResponseTriggersIssueComment with omitted optional fields absent.
+pub fn AgentAutomationsEditRepoAutomationResponseTriggersIssueComment::new(
+  body_substring? : String,
+  write_scope? : AgentAutomationsEditRepoAutomationResponseTriggersIssueCommentWriteScope,
+) -> AgentAutomationsEditRepoAutomationResponseTriggersIssueComment {
+  { body_substring, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersIssueComment with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsEditRepoAutomationResponseTriggersIssueComment with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("body_substring", self.body_substring)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersIssueComment with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsEditRepoAutomationResponseTriggersIssueComment with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    body_substring: @sdkjson.opt_field(obj, "body_substring", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Generated string enum AgentAutomationsEditRepoAutomationResponseTriggersPullRequestCommentCommentTypesItem.
+pub(all) enum AgentAutomationsEditRepoAutomationResponseTriggersPullRequestCommentCommentTypesItem {
+  TimelineComment
+  ReviewComment
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersPullRequestCommentCommentTypesItem with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersPullRequestCommentCommentTypesItem with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersPullRequestCommentCommentTypesItem with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsEditRepoAutomationResponseTriggersPullRequestCommentCommentTypesItem with fn to_json(
+  self,
+) {
+  let raw = match self {
+    TimelineComment => "timeline_comment"
+    ReviewComment => "review_comment"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersPullRequestCommentCommentTypesItem with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsEditRepoAutomationResponseTriggersPullRequestCommentCommentTypesItem with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "timeline_comment" => Some(TimelineComment)
+        "review_comment" => Some(ReviewComment)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsEditRepoAutomationResponseTriggersPullRequestCommentWriteScope {
+  Trigger
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersPullRequestCommentWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersPullRequestCommentWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersPullRequestCommentWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsEditRepoAutomationResponseTriggersPullRequestCommentWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersPullRequestCommentWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsEditRepoAutomationResponseTriggersPullRequestCommentWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsEditRepoAutomationResponseTriggersPullRequestComment.
+pub(all) struct AgentAutomationsEditRepoAutomationResponseTriggersPullRequestComment {
+  comment_types : Array[
+    AgentAutomationsEditRepoAutomationResponseTriggersPullRequestCommentCommentTypesItem,
+  ]
+  body_substring : String?
+  write_scope : AgentAutomationsEditRepoAutomationResponseTriggersPullRequestCommentWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersPullRequestComment with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersPullRequestComment with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsEditRepoAutomationResponseTriggersPullRequestComment with omitted optional fields absent.
+pub fn AgentAutomationsEditRepoAutomationResponseTriggersPullRequestComment::new(
+  comment_types~ : Array[
+    AgentAutomationsEditRepoAutomationResponseTriggersPullRequestCommentCommentTypesItem,
+  ],
+  body_substring? : String,
+  write_scope? : AgentAutomationsEditRepoAutomationResponseTriggersPullRequestCommentWriteScope,
+) -> AgentAutomationsEditRepoAutomationResponseTriggersPullRequestComment {
+  { comment_types, body_substring, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersPullRequestComment with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsEditRepoAutomationResponseTriggersPullRequestComment with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .field("comment_types", self.comment_types)
+  .opt("body_substring", self.body_substring)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersPullRequestComment with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsEditRepoAutomationResponseTriggersPullRequestComment with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    comment_types: required_field(obj, "comment_types", path),
+    body_substring: @sdkjson.opt_field(obj, "body_substring", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsEditRepoAutomationResponseTriggersDiscussionOpenedWriteScope {
+  Trigger
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersDiscussionOpenedWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersDiscussionOpenedWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersDiscussionOpenedWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsEditRepoAutomationResponseTriggersDiscussionOpenedWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersDiscussionOpenedWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsEditRepoAutomationResponseTriggersDiscussionOpenedWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsEditRepoAutomationResponseTriggersDiscussionOpened.
+pub(all) struct AgentAutomationsEditRepoAutomationResponseTriggersDiscussionOpened {
+  categories : Array[String]?
+  body_substring : String?
+  write_scope : AgentAutomationsEditRepoAutomationResponseTriggersDiscussionOpenedWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersDiscussionOpened with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersDiscussionOpened with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsEditRepoAutomationResponseTriggersDiscussionOpened with omitted optional fields absent.
+pub fn AgentAutomationsEditRepoAutomationResponseTriggersDiscussionOpened::new(
+  categories? : Array[String],
+  body_substring? : String,
+  write_scope? : AgentAutomationsEditRepoAutomationResponseTriggersDiscussionOpenedWriteScope,
+) -> AgentAutomationsEditRepoAutomationResponseTriggersDiscussionOpened {
+  { categories, body_substring, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersDiscussionOpened with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsEditRepoAutomationResponseTriggersDiscussionOpened with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("categories", self.categories)
+  .opt("body_substring", self.body_substring)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersDiscussionOpened with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsEditRepoAutomationResponseTriggersDiscussionOpened with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    categories: @sdkjson.opt_field(obj, "categories", path),
+    body_substring: @sdkjson.opt_field(obj, "body_substring", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsEditRepoAutomationResponseTriggersDiscussionUpdatedWriteScope {
+  Trigger
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersDiscussionUpdatedWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersDiscussionUpdatedWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersDiscussionUpdatedWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsEditRepoAutomationResponseTriggersDiscussionUpdatedWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersDiscussionUpdatedWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsEditRepoAutomationResponseTriggersDiscussionUpdatedWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsEditRepoAutomationResponseTriggersDiscussionUpdated.
+pub(all) struct AgentAutomationsEditRepoAutomationResponseTriggersDiscussionUpdated {
+  categories : Array[String]?
+  body_substring : String?
+  write_scope : AgentAutomationsEditRepoAutomationResponseTriggersDiscussionUpdatedWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersDiscussionUpdated with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersDiscussionUpdated with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsEditRepoAutomationResponseTriggersDiscussionUpdated with omitted optional fields absent.
+pub fn AgentAutomationsEditRepoAutomationResponseTriggersDiscussionUpdated::new(
+  categories? : Array[String],
+  body_substring? : String,
+  write_scope? : AgentAutomationsEditRepoAutomationResponseTriggersDiscussionUpdatedWriteScope,
+) -> AgentAutomationsEditRepoAutomationResponseTriggersDiscussionUpdated {
+  { categories, body_substring, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersDiscussionUpdated with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsEditRepoAutomationResponseTriggersDiscussionUpdated with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("categories", self.categories)
+  .opt("body_substring", self.body_substring)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersDiscussionUpdated with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsEditRepoAutomationResponseTriggersDiscussionUpdated with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    categories: @sdkjson.opt_field(obj, "categories", path),
+    body_substring: @sdkjson.opt_field(obj, "body_substring", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Generated string enum AgentAutomationsEditRepoAutomationResponseTriggersDiscussionCommentCommentTypesItem.
+pub(all) enum AgentAutomationsEditRepoAutomationResponseTriggersDiscussionCommentCommentTypesItem {
+  Comment
+  Reply
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersDiscussionCommentCommentTypesItem with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersDiscussionCommentCommentTypesItem with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersDiscussionCommentCommentTypesItem with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsEditRepoAutomationResponseTriggersDiscussionCommentCommentTypesItem with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Comment => "comment"
+    Reply => "reply"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersDiscussionCommentCommentTypesItem with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsEditRepoAutomationResponseTriggersDiscussionCommentCommentTypesItem with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "comment" => Some(Comment)
+        "reply" => Some(Reply)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsEditRepoAutomationResponseTriggersDiscussionCommentWriteScope {
+  Trigger
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersDiscussionCommentWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersDiscussionCommentWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersDiscussionCommentWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsEditRepoAutomationResponseTriggersDiscussionCommentWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersDiscussionCommentWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsEditRepoAutomationResponseTriggersDiscussionCommentWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsEditRepoAutomationResponseTriggersDiscussionComment.
+pub(all) struct AgentAutomationsEditRepoAutomationResponseTriggersDiscussionComment {
+  comment_types : Array[
+    AgentAutomationsEditRepoAutomationResponseTriggersDiscussionCommentCommentTypesItem,
+  ]?
+  categories : Array[String]?
+  body_substring : String?
+  write_scope : AgentAutomationsEditRepoAutomationResponseTriggersDiscussionCommentWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersDiscussionComment with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersDiscussionComment with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsEditRepoAutomationResponseTriggersDiscussionComment with omitted optional fields absent.
+pub fn AgentAutomationsEditRepoAutomationResponseTriggersDiscussionComment::new(
+  comment_types? : Array[
+    AgentAutomationsEditRepoAutomationResponseTriggersDiscussionCommentCommentTypesItem,
+  ],
+  categories? : Array[String],
+  body_substring? : String,
+  write_scope? : AgentAutomationsEditRepoAutomationResponseTriggersDiscussionCommentWriteScope,
+) -> AgentAutomationsEditRepoAutomationResponseTriggersDiscussionComment {
+  { comment_types, categories, body_substring, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersDiscussionComment with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsEditRepoAutomationResponseTriggersDiscussionComment with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("comment_types", self.comment_types)
+  .opt("categories", self.categories)
+  .opt("body_substring", self.body_substring)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersDiscussionComment with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsEditRepoAutomationResponseTriggersDiscussionComment with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    comment_types: @sdkjson.opt_field(obj, "comment_types", path),
+    categories: @sdkjson.opt_field(obj, "categories", path),
+    body_substring: @sdkjson.opt_field(obj, "body_substring", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsEditRepoAutomationResponseTriggersIssueAssignedWriteScope {
+  Trigger
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersIssueAssignedWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersIssueAssignedWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersIssueAssignedWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsEditRepoAutomationResponseTriggersIssueAssignedWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersIssueAssignedWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsEditRepoAutomationResponseTriggersIssueAssignedWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsEditRepoAutomationResponseTriggersIssueAssigned.
+pub(all) struct AgentAutomationsEditRepoAutomationResponseTriggersIssueAssigned {
+  query : String?
+  assignees : Array[String]?
+  write_scope : AgentAutomationsEditRepoAutomationResponseTriggersIssueAssignedWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersIssueAssigned with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersIssueAssigned with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsEditRepoAutomationResponseTriggersIssueAssigned with omitted optional fields absent.
+pub fn AgentAutomationsEditRepoAutomationResponseTriggersIssueAssigned::new(
+  query? : String,
+  assignees? : Array[String],
+  write_scope? : AgentAutomationsEditRepoAutomationResponseTriggersIssueAssignedWriteScope,
+) -> AgentAutomationsEditRepoAutomationResponseTriggersIssueAssigned {
+  { query, assignees, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersIssueAssigned with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsEditRepoAutomationResponseTriggersIssueAssigned with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("query", self.query)
+  .opt("assignees", self.assignees)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersIssueAssigned with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsEditRepoAutomationResponseTriggersIssueAssigned with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    query: @sdkjson.opt_field(obj, "query", path),
+    assignees: @sdkjson.opt_field(obj, "assignees", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsEditRepoAutomationResponseTriggersPullRequestAssignedWriteScope {
+  Trigger
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersPullRequestAssignedWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersPullRequestAssignedWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersPullRequestAssignedWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsEditRepoAutomationResponseTriggersPullRequestAssignedWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersPullRequestAssignedWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsEditRepoAutomationResponseTriggersPullRequestAssignedWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsEditRepoAutomationResponseTriggersPullRequestAssigned.
+pub(all) struct AgentAutomationsEditRepoAutomationResponseTriggersPullRequestAssigned {
+  query : String?
+  paths : Array[String]?
+  assignees : Array[String]?
+  write_scope : AgentAutomationsEditRepoAutomationResponseTriggersPullRequestAssignedWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersPullRequestAssigned with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersPullRequestAssigned with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsEditRepoAutomationResponseTriggersPullRequestAssigned with omitted optional fields absent.
+pub fn AgentAutomationsEditRepoAutomationResponseTriggersPullRequestAssigned::new(
+  query? : String,
+  paths? : Array[String],
+  assignees? : Array[String],
+  write_scope? : AgentAutomationsEditRepoAutomationResponseTriggersPullRequestAssignedWriteScope,
+) -> AgentAutomationsEditRepoAutomationResponseTriggersPullRequestAssigned {
+  { query, paths, assignees, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersPullRequestAssigned with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsEditRepoAutomationResponseTriggersPullRequestAssigned with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("query", self.query)
+  .opt("paths", self.paths)
+  .opt("assignees", self.assignees)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersPullRequestAssigned with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsEditRepoAutomationResponseTriggersPullRequestAssigned with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    query: @sdkjson.opt_field(obj, "query", path),
+    paths: @sdkjson.opt_field(obj, "paths", path),
+    assignees: @sdkjson.opt_field(obj, "assignees", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsEditRepoAutomationResponseTriggersSubIssueAddedWriteScope {
+  Trigger
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersSubIssueAddedWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersSubIssueAddedWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersSubIssueAddedWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsEditRepoAutomationResponseTriggersSubIssueAddedWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersSubIssueAddedWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsEditRepoAutomationResponseTriggersSubIssueAddedWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsEditRepoAutomationResponseTriggersSubIssueAdded.
+pub(all) struct AgentAutomationsEditRepoAutomationResponseTriggersSubIssueAdded {
+  query : String?
+  write_scope : AgentAutomationsEditRepoAutomationResponseTriggersSubIssueAddedWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersSubIssueAdded with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersSubIssueAdded with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsEditRepoAutomationResponseTriggersSubIssueAdded with omitted optional fields absent.
+pub fn AgentAutomationsEditRepoAutomationResponseTriggersSubIssueAdded::new(
+  query? : String,
+  write_scope? : AgentAutomationsEditRepoAutomationResponseTriggersSubIssueAddedWriteScope,
+) -> AgentAutomationsEditRepoAutomationResponseTriggersSubIssueAdded {
+  { query, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersSubIssueAdded with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsEditRepoAutomationResponseTriggersSubIssueAdded with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("query", self.query)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersSubIssueAdded with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsEditRepoAutomationResponseTriggersSubIssueAdded with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    query: @sdkjson.opt_field(obj, "query", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsEditRepoAutomationResponseTriggersPullRequestReadyForReviewWriteScope {
+  Trigger
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersPullRequestReadyForReviewWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersPullRequestReadyForReviewWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersPullRequestReadyForReviewWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsEditRepoAutomationResponseTriggersPullRequestReadyForReviewWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersPullRequestReadyForReviewWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsEditRepoAutomationResponseTriggersPullRequestReadyForReviewWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsEditRepoAutomationResponseTriggersPullRequestReadyForReview.
+pub(all) struct AgentAutomationsEditRepoAutomationResponseTriggersPullRequestReadyForReview {
+  query : String?
+  paths : Array[String]?
+  write_scope : AgentAutomationsEditRepoAutomationResponseTriggersPullRequestReadyForReviewWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersPullRequestReadyForReview with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersPullRequestReadyForReview with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsEditRepoAutomationResponseTriggersPullRequestReadyForReview with omitted optional fields absent.
+pub fn AgentAutomationsEditRepoAutomationResponseTriggersPullRequestReadyForReview::new(
+  query? : String,
+  paths? : Array[String],
+  write_scope? : AgentAutomationsEditRepoAutomationResponseTriggersPullRequestReadyForReviewWriteScope,
+) -> AgentAutomationsEditRepoAutomationResponseTriggersPullRequestReadyForReview {
+  { query, paths, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersPullRequestReadyForReview with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsEditRepoAutomationResponseTriggersPullRequestReadyForReview with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("query", self.query)
+  .opt("paths", self.paths)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersPullRequestReadyForReview with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsEditRepoAutomationResponseTriggersPullRequestReadyForReview with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    query: @sdkjson.opt_field(obj, "query", path),
+    paths: @sdkjson.opt_field(obj, "paths", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsEditRepoAutomationResponseTriggersPullRequestLabeledWriteScope {
+  Trigger
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersPullRequestLabeledWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersPullRequestLabeledWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersPullRequestLabeledWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsEditRepoAutomationResponseTriggersPullRequestLabeledWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersPullRequestLabeledWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsEditRepoAutomationResponseTriggersPullRequestLabeledWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsEditRepoAutomationResponseTriggersPullRequestLabeled.
+pub(all) struct AgentAutomationsEditRepoAutomationResponseTriggersPullRequestLabeled {
+  query : String?
+  paths : Array[String]?
+  labels : Array[String]?
+  write_scope : AgentAutomationsEditRepoAutomationResponseTriggersPullRequestLabeledWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersPullRequestLabeled with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersPullRequestLabeled with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsEditRepoAutomationResponseTriggersPullRequestLabeled with omitted optional fields absent.
+pub fn AgentAutomationsEditRepoAutomationResponseTriggersPullRequestLabeled::new(
+  query? : String,
+  paths? : Array[String],
+  labels? : Array[String],
+  write_scope? : AgentAutomationsEditRepoAutomationResponseTriggersPullRequestLabeledWriteScope,
+) -> AgentAutomationsEditRepoAutomationResponseTriggersPullRequestLabeled {
+  { query, paths, labels, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersPullRequestLabeled with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsEditRepoAutomationResponseTriggersPullRequestLabeled with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("query", self.query)
+  .opt("paths", self.paths)
+  .opt("labels", self.labels)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersPullRequestLabeled with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsEditRepoAutomationResponseTriggersPullRequestLabeled with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    query: @sdkjson.opt_field(obj, "query", path),
+    paths: @sdkjson.opt_field(obj, "paths", path),
+    labels: @sdkjson.opt_field(obj, "labels", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsEditRepoAutomationResponseTriggersPullRequestMergeConflictWriteScope {
+  Trigger
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersPullRequestMergeConflictWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersPullRequestMergeConflictWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersPullRequestMergeConflictWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsEditRepoAutomationResponseTriggersPullRequestMergeConflictWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersPullRequestMergeConflictWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsEditRepoAutomationResponseTriggersPullRequestMergeConflictWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsEditRepoAutomationResponseTriggersPullRequestMergeConflict.
+pub(all) struct AgentAutomationsEditRepoAutomationResponseTriggersPullRequestMergeConflict {
+  query : String?
+  paths : Array[String]?
+  write_scope : AgentAutomationsEditRepoAutomationResponseTriggersPullRequestMergeConflictWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersPullRequestMergeConflict with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersPullRequestMergeConflict with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsEditRepoAutomationResponseTriggersPullRequestMergeConflict with omitted optional fields absent.
+pub fn AgentAutomationsEditRepoAutomationResponseTriggersPullRequestMergeConflict::new(
+  query? : String,
+  paths? : Array[String],
+  write_scope? : AgentAutomationsEditRepoAutomationResponseTriggersPullRequestMergeConflictWriteScope,
+) -> AgentAutomationsEditRepoAutomationResponseTriggersPullRequestMergeConflict {
+  { query, paths, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersPullRequestMergeConflict with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsEditRepoAutomationResponseTriggersPullRequestMergeConflict with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("query", self.query)
+  .opt("paths", self.paths)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersPullRequestMergeConflict with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsEditRepoAutomationResponseTriggersPullRequestMergeConflict with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    query: @sdkjson.opt_field(obj, "query", path),
+    paths: @sdkjson.opt_field(obj, "paths", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Generated string enum AgentAutomationsEditRepoAutomationResponseTriggersPullRequestReviewSubmittedStatesItem.
+pub(all) enum AgentAutomationsEditRepoAutomationResponseTriggersPullRequestReviewSubmittedStatesItem {
+  Approved
+  ChangesRequested
+  Commented
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersPullRequestReviewSubmittedStatesItem with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersPullRequestReviewSubmittedStatesItem with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersPullRequestReviewSubmittedStatesItem with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsEditRepoAutomationResponseTriggersPullRequestReviewSubmittedStatesItem with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Approved => "approved"
+    ChangesRequested => "changes_requested"
+    Commented => "commented"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersPullRequestReviewSubmittedStatesItem with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsEditRepoAutomationResponseTriggersPullRequestReviewSubmittedStatesItem with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "approved" => Some(Approved)
+        "changes_requested" => Some(ChangesRequested)
+        "commented" => Some(Commented)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsEditRepoAutomationResponseTriggersPullRequestReviewSubmittedWriteScope {
+  Trigger
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersPullRequestReviewSubmittedWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersPullRequestReviewSubmittedWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersPullRequestReviewSubmittedWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsEditRepoAutomationResponseTriggersPullRequestReviewSubmittedWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersPullRequestReviewSubmittedWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsEditRepoAutomationResponseTriggersPullRequestReviewSubmittedWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsEditRepoAutomationResponseTriggersPullRequestReviewSubmitted.
+pub(all) struct AgentAutomationsEditRepoAutomationResponseTriggersPullRequestReviewSubmitted {
+  query : String?
+  paths : Array[String]?
+  states : Array[
+    AgentAutomationsEditRepoAutomationResponseTriggersPullRequestReviewSubmittedStatesItem,
+  ]
+  write_scope : AgentAutomationsEditRepoAutomationResponseTriggersPullRequestReviewSubmittedWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersPullRequestReviewSubmitted with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersPullRequestReviewSubmitted with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsEditRepoAutomationResponseTriggersPullRequestReviewSubmitted with omitted optional fields absent.
+pub fn AgentAutomationsEditRepoAutomationResponseTriggersPullRequestReviewSubmitted::new(
+  states~ : Array[
+    AgentAutomationsEditRepoAutomationResponseTriggersPullRequestReviewSubmittedStatesItem,
+  ],
+  query? : String,
+  paths? : Array[String],
+  write_scope? : AgentAutomationsEditRepoAutomationResponseTriggersPullRequestReviewSubmittedWriteScope,
+) -> AgentAutomationsEditRepoAutomationResponseTriggersPullRequestReviewSubmitted {
+  { query, paths, states, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersPullRequestReviewSubmitted with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsEditRepoAutomationResponseTriggersPullRequestReviewSubmitted with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("query", self.query)
+  .opt("paths", self.paths)
+  .field("states", self.states)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersPullRequestReviewSubmitted with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsEditRepoAutomationResponseTriggersPullRequestReviewSubmitted with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    query: @sdkjson.opt_field(obj, "query", path),
+    paths: @sdkjson.opt_field(obj, "paths", path),
+    states: required_field(obj, "states", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsEditRepoAutomationResponseTriggersPullRequestReviewRequestedWriteScope {
+  Trigger
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersPullRequestReviewRequestedWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersPullRequestReviewRequestedWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersPullRequestReviewRequestedWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsEditRepoAutomationResponseTriggersPullRequestReviewRequestedWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersPullRequestReviewRequestedWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsEditRepoAutomationResponseTriggersPullRequestReviewRequestedWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsEditRepoAutomationResponseTriggersPullRequestReviewRequested.
+pub(all) struct AgentAutomationsEditRepoAutomationResponseTriggersPullRequestReviewRequested {
+  query : String?
+  paths : Array[String]?
+  write_scope : AgentAutomationsEditRepoAutomationResponseTriggersPullRequestReviewRequestedWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersPullRequestReviewRequested with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersPullRequestReviewRequested with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsEditRepoAutomationResponseTriggersPullRequestReviewRequested with omitted optional fields absent.
+pub fn AgentAutomationsEditRepoAutomationResponseTriggersPullRequestReviewRequested::new(
+  query? : String,
+  paths? : Array[String],
+  write_scope? : AgentAutomationsEditRepoAutomationResponseTriggersPullRequestReviewRequestedWriteScope,
+) -> AgentAutomationsEditRepoAutomationResponseTriggersPullRequestReviewRequested {
+  { query, paths, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersPullRequestReviewRequested with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsEditRepoAutomationResponseTriggersPullRequestReviewRequested with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("query", self.query)
+  .opt("paths", self.paths)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersPullRequestReviewRequested with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsEditRepoAutomationResponseTriggersPullRequestReviewRequested with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    query: @sdkjson.opt_field(obj, "query", path),
+    paths: @sdkjson.opt_field(obj, "paths", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+pub(all) enum AgentAutomationsEditRepoAutomationResponseTriggersAutomationCompletedWriteScope {
+  Trigger
+  Repository
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersAutomationCompletedWriteScope with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersAutomationCompletedWriteScope with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersAutomationCompletedWriteScope with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsEditRepoAutomationResponseTriggersAutomationCompletedWriteScope with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Trigger => "trigger"
+    Repository => "repository"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersAutomationCompletedWriteScope with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsEditRepoAutomationResponseTriggersAutomationCompletedWriteScope with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "trigger" => Some(Trigger)
+        "repository" => Some(Repository)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of AgentAutomationsEditRepoAutomationResponseTriggersAutomationCompleted.
+pub(all) struct AgentAutomationsEditRepoAutomationResponseTriggersAutomationCompleted {
+  automation_ids : Array[String]
+  write_scope : AgentAutomationsEditRepoAutomationResponseTriggersAutomationCompletedWriteScope?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersAutomationCompleted with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersAutomationCompleted with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsEditRepoAutomationResponseTriggersAutomationCompleted with omitted optional fields absent.
+pub fn AgentAutomationsEditRepoAutomationResponseTriggersAutomationCompleted::new(
+  automation_ids~ : Array[String],
+  write_scope? : AgentAutomationsEditRepoAutomationResponseTriggersAutomationCompletedWriteScope,
+) -> AgentAutomationsEditRepoAutomationResponseTriggersAutomationCompleted {
+  { automation_ids, write_scope, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersAutomationCompleted with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsEditRepoAutomationResponseTriggersAutomationCompleted with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .field("automation_ids", self.automation_ids)
+  .opt("write_scope", self.write_scope)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsEditRepoAutomationResponseTriggersAutomationCompleted with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsEditRepoAutomationResponseTriggersAutomationCompleted with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    automation_ids: required_field(obj, "automation_ids", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+  }
+}
+
+///|
+///
+/// Public trigger configuration keyed by stable public trigger identifier. Each trigger has a closed, trigger-specific configuration schema.
+pub(all) struct AgentAutomationsEditRepoAutomationResponseTriggers {
+  interval : AgentAutomationsEditRepoAutomationResponseTriggersInterval?
+  issue_opened : AgentAutomationsEditRepoAutomationResponseTriggersIssueOpened?
+  issue_labeled : AgentAutomationsEditRepoAutomationResponseTriggersIssueLabeled?
+  workflow_run : AgentAutomationsEditRepoAutomationResponseTriggersWorkflowRun?
+  pull_request_opened : AgentAutomationsEditRepoAutomationResponseTriggersPullRequestOpened?
+  pull_request_synchronize : AgentAutomationsEditRepoAutomationResponseTriggersPullRequestSynchronize?
+  pull_request_merged : AgentAutomationsEditRepoAutomationResponseTriggersPullRequestMerged?
+  issue_comment : AgentAutomationsEditRepoAutomationResponseTriggersIssueComment?
+  pull_request_comment : AgentAutomationsEditRepoAutomationResponseTriggersPullRequestComment?
+  discussion_opened : AgentAutomationsEditRepoAutomationResponseTriggersDiscussionOpened?
+  discussion_updated : AgentAutomationsEditRepoAutomationResponseTriggersDiscussionUpdated?
+  discussion_comment : AgentAutomationsEditRepoAutomationResponseTriggersDiscussionComment?
+  issue_assigned : AgentAutomationsEditRepoAutomationResponseTriggersIssueAssigned?
+  pull_request_assigned : AgentAutomationsEditRepoAutomationResponseTriggersPullRequestAssigned?
+  sub_issue_added : AgentAutomationsEditRepoAutomationResponseTriggersSubIssueAdded?
+  pull_request_ready_for_review : AgentAutomationsEditRepoAutomationResponseTriggersPullRequestReadyForReview?
+  pull_request_labeled : AgentAutomationsEditRepoAutomationResponseTriggersPullRequestLabeled?
+  pull_request_merge_conflict : AgentAutomationsEditRepoAutomationResponseTriggersPullRequestMergeConflict?
+  pull_request_review_submitted : AgentAutomationsEditRepoAutomationResponseTriggersPullRequestReviewSubmitted?
+  pull_request_review_requested : AgentAutomationsEditRepoAutomationResponseTriggersPullRequestReviewRequested?
+  automation_completed : AgentAutomationsEditRepoAutomationResponseTriggersAutomationCompleted?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsEditRepoAutomationResponseTriggers with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsEditRepoAutomationResponseTriggers with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsEditRepoAutomationResponseTriggers with omitted optional fields absent.
+pub fn AgentAutomationsEditRepoAutomationResponseTriggers::new(
+  interval? : AgentAutomationsEditRepoAutomationResponseTriggersInterval,
+  issue_opened? : AgentAutomationsEditRepoAutomationResponseTriggersIssueOpened,
+  issue_labeled? : AgentAutomationsEditRepoAutomationResponseTriggersIssueLabeled,
+  workflow_run? : AgentAutomationsEditRepoAutomationResponseTriggersWorkflowRun,
+  pull_request_opened? : AgentAutomationsEditRepoAutomationResponseTriggersPullRequestOpened,
+  pull_request_synchronize? : AgentAutomationsEditRepoAutomationResponseTriggersPullRequestSynchronize,
+  pull_request_merged? : AgentAutomationsEditRepoAutomationResponseTriggersPullRequestMerged,
+  issue_comment? : AgentAutomationsEditRepoAutomationResponseTriggersIssueComment,
+  pull_request_comment? : AgentAutomationsEditRepoAutomationResponseTriggersPullRequestComment,
+  discussion_opened? : AgentAutomationsEditRepoAutomationResponseTriggersDiscussionOpened,
+  discussion_updated? : AgentAutomationsEditRepoAutomationResponseTriggersDiscussionUpdated,
+  discussion_comment? : AgentAutomationsEditRepoAutomationResponseTriggersDiscussionComment,
+  issue_assigned? : AgentAutomationsEditRepoAutomationResponseTriggersIssueAssigned,
+  pull_request_assigned? : AgentAutomationsEditRepoAutomationResponseTriggersPullRequestAssigned,
+  sub_issue_added? : AgentAutomationsEditRepoAutomationResponseTriggersSubIssueAdded,
+  pull_request_ready_for_review? : AgentAutomationsEditRepoAutomationResponseTriggersPullRequestReadyForReview,
+  pull_request_labeled? : AgentAutomationsEditRepoAutomationResponseTriggersPullRequestLabeled,
+  pull_request_merge_conflict? : AgentAutomationsEditRepoAutomationResponseTriggersPullRequestMergeConflict,
+  pull_request_review_submitted? : AgentAutomationsEditRepoAutomationResponseTriggersPullRequestReviewSubmitted,
+  pull_request_review_requested? : AgentAutomationsEditRepoAutomationResponseTriggersPullRequestReviewRequested,
+  automation_completed? : AgentAutomationsEditRepoAutomationResponseTriggersAutomationCompleted,
+) -> AgentAutomationsEditRepoAutomationResponseTriggers {
+  {
+    interval,
+    issue_opened,
+    issue_labeled,
+    workflow_run,
+    pull_request_opened,
+    pull_request_synchronize,
+    pull_request_merged,
+    issue_comment,
+    pull_request_comment,
+    discussion_opened,
+    discussion_updated,
+    discussion_comment,
+    issue_assigned,
+    pull_request_assigned,
+    sub_issue_added,
+    pull_request_ready_for_review,
+    pull_request_labeled,
+    pull_request_merge_conflict,
+    pull_request_review_submitted,
+    pull_request_review_requested,
+    automation_completed,
+  }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsEditRepoAutomationResponseTriggers with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsEditRepoAutomationResponseTriggers with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("interval", self.interval)
+  .opt("issue_opened", self.issue_opened)
+  .opt("issue_labeled", self.issue_labeled)
+  .opt("workflow_run", self.workflow_run)
+  .opt("pull_request_opened", self.pull_request_opened)
+  .opt("pull_request_synchronize", self.pull_request_synchronize)
+  .opt("pull_request_merged", self.pull_request_merged)
+  .opt("issue_comment", self.issue_comment)
+  .opt("pull_request_comment", self.pull_request_comment)
+  .opt("discussion_opened", self.discussion_opened)
+  .opt("discussion_updated", self.discussion_updated)
+  .opt("discussion_comment", self.discussion_comment)
+  .opt("issue_assigned", self.issue_assigned)
+  .opt("pull_request_assigned", self.pull_request_assigned)
+  .opt("sub_issue_added", self.sub_issue_added)
+  .opt("pull_request_ready_for_review", self.pull_request_ready_for_review)
+  .opt("pull_request_labeled", self.pull_request_labeled)
+  .opt("pull_request_merge_conflict", self.pull_request_merge_conflict)
+  .opt("pull_request_review_submitted", self.pull_request_review_submitted)
+  .opt("pull_request_review_requested", self.pull_request_review_requested)
+  .opt("automation_completed", self.automation_completed)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsEditRepoAutomationResponseTriggers with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsEditRepoAutomationResponseTriggers with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    interval: @sdkjson.opt_field(obj, "interval", path),
+    issue_opened: @sdkjson.opt_field(obj, "issue_opened", path),
+    issue_labeled: @sdkjson.opt_field(obj, "issue_labeled", path),
+    workflow_run: @sdkjson.opt_field(obj, "workflow_run", path),
+    pull_request_opened: @sdkjson.opt_field(obj, "pull_request_opened", path),
+    pull_request_synchronize: @sdkjson.opt_field(
+      obj, "pull_request_synchronize", path,
+    ),
+    pull_request_merged: @sdkjson.opt_field(obj, "pull_request_merged", path),
+    issue_comment: @sdkjson.opt_field(obj, "issue_comment", path),
+    pull_request_comment: @sdkjson.opt_field(obj, "pull_request_comment", path),
+    discussion_opened: @sdkjson.opt_field(obj, "discussion_opened", path),
+    discussion_updated: @sdkjson.opt_field(obj, "discussion_updated", path),
+    discussion_comment: @sdkjson.opt_field(obj, "discussion_comment", path),
+    issue_assigned: @sdkjson.opt_field(obj, "issue_assigned", path),
+    pull_request_assigned: @sdkjson.opt_field(
+      obj, "pull_request_assigned", path,
+    ),
+    sub_issue_added: @sdkjson.opt_field(obj, "sub_issue_added", path),
+    pull_request_ready_for_review: @sdkjson.opt_field(
+      obj, "pull_request_ready_for_review", path,
+    ),
+    pull_request_labeled: @sdkjson.opt_field(obj, "pull_request_labeled", path),
+    pull_request_merge_conflict: @sdkjson.opt_field(
+      obj, "pull_request_merge_conflict", path,
+    ),
+    pull_request_review_submitted: @sdkjson.opt_field(
+      obj, "pull_request_review_submitted", path,
+    ),
+    pull_request_review_requested: @sdkjson.opt_field(
+      obj, "pull_request_review_requested", path,
+    ),
+    automation_completed: @sdkjson.opt_field(obj, "automation_completed", path),
+  }
+}
+
+///|
+///
+/// A GitHub user
+pub(all) struct AgentAutomationsEditRepoAutomationResponseCreatedBy {
+  id : Int64?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsEditRepoAutomationResponseCreatedBy with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsEditRepoAutomationResponseCreatedBy with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsEditRepoAutomationResponseCreatedBy with omitted optional fields absent.
+pub fn AgentAutomationsEditRepoAutomationResponseCreatedBy::new(
+  id? : Int64,
+) -> AgentAutomationsEditRepoAutomationResponseCreatedBy {
+  { id, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsEditRepoAutomationResponseCreatedBy with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for AgentAutomationsEditRepoAutomationResponseCreatedBy with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .opt("id", self.id.map(value => json_int64_to_json(value)))
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsEditRepoAutomationResponseCreatedBy with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsEditRepoAutomationResponseCreatedBy with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  { id: decode_optional_int64(obj, "id", path), }
+}
+
+///|
+///
+/// A full representation of an automation including all configuration fields.
+pub(all) struct AgentAutomationsEditRepoAutomationResponse {
+  id : String
+  name : String
+  enabled : Bool?
+  owner_type : AgentAutomationsEditRepoAutomationResponseOwnerType?
+  write_scope : AgentAutomationsEditRepoAutomationResponseWriteScope?
+  require_actor_write_permission : Bool?
+  triggers : AgentAutomationsEditRepoAutomationResponseTriggers?
+  prompt : String
+  tools : Array[String]?
+  allowed_custom_agents : Array[String]?
+  model : String?
+  reasoning_effort : String?
+  created_at : String
+  updated_at : String
+  created_by : AgentAutomationsEditRepoAutomationResponseCreatedBy
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AgentAutomationsEditRepoAutomationResponse with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend AgentAutomationsEditRepoAutomationResponse with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a AgentAutomationsEditRepoAutomationResponse with omitted optional fields absent.
+pub fn AgentAutomationsEditRepoAutomationResponse::new(
+  id~ : String,
+  name~ : String,
+  prompt~ : String,
+  created_at~ : String,
+  updated_at~ : String,
+  created_by~ : AgentAutomationsEditRepoAutomationResponseCreatedBy,
+  enabled? : Bool,
+  owner_type? : AgentAutomationsEditRepoAutomationResponseOwnerType,
+  write_scope? : AgentAutomationsEditRepoAutomationResponseWriteScope,
+  require_actor_write_permission? : Bool,
+  triggers? : AgentAutomationsEditRepoAutomationResponseTriggers,
+  tools? : Array[String],
+  allowed_custom_agents? : Array[String],
+  model? : String,
+  reasoning_effort? : String,
+) -> AgentAutomationsEditRepoAutomationResponse {
+  {
+    id,
+    name,
+    enabled,
+    owner_type,
+    write_scope,
+    require_actor_write_permission,
+    triggers,
+    prompt,
+    tools,
+    allowed_custom_agents,
+    model,
+    reasoning_effort,
+    created_at,
+    updated_at,
+    created_by,
+  }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AgentAutomationsEditRepoAutomationResponse with ToJson::{to_json}
+
+///|
+pub impl ToJson for AgentAutomationsEditRepoAutomationResponse with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .field("id", self.id)
+  .field("name", self.name)
+  .opt("enabled", self.enabled)
+  .opt("owner_type", self.owner_type)
+  .opt("write_scope", self.write_scope)
+  .opt("require_actor_write_permission", self.require_actor_write_permission)
+  .opt("triggers", self.triggers)
+  .field("prompt", self.prompt)
+  .opt("tools", self.tools)
+  .opt("allowed_custom_agents", self.allowed_custom_agents)
+  .opt("model", self.model)
+  .opt("reasoning_effort", self.reasoning_effort)
+  .field("created_at", self.created_at)
+  .field("updated_at", self.updated_at)
+  .field("created_by", self.created_by)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AgentAutomationsEditRepoAutomationResponse with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AgentAutomationsEditRepoAutomationResponse with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    id: required_field(obj, "id", path),
+    name: required_field(obj, "name", path),
+    enabled: @sdkjson.opt_field(obj, "enabled", path),
+    owner_type: @sdkjson.opt_field(obj, "owner_type", path),
+    write_scope: @sdkjson.opt_field(obj, "write_scope", path),
+    require_actor_write_permission: @sdkjson.opt_field(
+      obj, "require_actor_write_permission", path,
+    ),
+    triggers: @sdkjson.opt_field(obj, "triggers", path),
+    prompt: required_field(obj, "prompt", path),
+    tools: @sdkjson.opt_field(obj, "tools", path),
+    allowed_custom_agents: @sdkjson.opt_field(
+      obj, "allowed_custom_agents", path,
+    ),
+    model: @sdkjson.opt_field(obj, "model", path),
+    reasoning_effort: @sdkjson.opt_field(obj, "reasoning_effort", path),
+    created_at: required_field(obj, "created_at", path),
+    updated_at: required_field(obj, "updated_at", path),
+    created_by: required_field(obj, "created_by", path),
+  }
+}
+
+///|
+///
 /// Generated string enum AgentTasksListTasksForRepoSort.
 pub(all) enum AgentTasksListTasksForRepoSort {
   UpdatedAt
@@ -125830,7 +156306,7 @@ pub impl @json.FromJson for PrivateRegistriesCreateOrgPrivateRegistryRequestVisi
 
 ///|
 ///
-/// The authentication type for the private registry. Defaults to `token` if not specified. Use `oidc_azure`, `oidc_aws`, `oidc_jfrog`, `oidc_cloudsmith`, or `oidc_gcp` for OIDC authentication.
+/// The authentication type for the private registry. Defaults to `token` if not specified. Use `oidc_azure`, `oidc_aws`, `oidc_jfrog`, `oidc_cloudsmith`, or `oidc_gcp` for OIDC authentication. Use `anonymous` for registries that do not require authentication; `username`, `encrypted_value`, and `key_id` must be omitted.
 pub(all) enum PrivateRegistriesCreateOrgPrivateRegistryRequestAuthType {
   Token
   UsernamePassword
@@ -125839,6 +156315,7 @@ pub(all) enum PrivateRegistriesCreateOrgPrivateRegistryRequestAuthType {
   OidcJfrog
   OidcCloudsmith
   OidcGcp
+  Anonymous
   Custom(String)
 } derive(Eq, @debug.Debug)
 
@@ -125872,6 +156349,7 @@ pub impl ToJson for PrivateRegistriesCreateOrgPrivateRegistryRequestAuthType wit
     OidcJfrog => "oidc_jfrog"
     OidcCloudsmith => "oidc_cloudsmith"
     OidcGcp => "oidc_gcp"
+    Anonymous => "anonymous"
     Custom(raw) => raw
   }
   Json(raw)
@@ -125901,6 +156379,7 @@ pub impl @json.FromJson for PrivateRegistriesCreateOrgPrivateRegistryRequestAuth
         "oidc_jfrog" => Some(OidcJfrog)
         "oidc_cloudsmith" => Some(OidcCloudsmith)
         "oidc_gcp" => Some(OidcGcp)
+        "anonymous" => Some(Anonymous)
         _ => None
       }
     },
@@ -126335,6 +156814,7 @@ pub(all) enum PrivateRegistriesUpdateOrgPrivateRegistryRequestAuthType {
   OidcJfrog
   OidcCloudsmith
   OidcGcp
+  Anonymous
   Custom(String)
 } derive(Eq, @debug.Debug)
 
@@ -126368,6 +156848,7 @@ pub impl ToJson for PrivateRegistriesUpdateOrgPrivateRegistryRequestAuthType wit
     OidcJfrog => "oidc_jfrog"
     OidcCloudsmith => "oidc_cloudsmith"
     OidcGcp => "oidc_gcp"
+    Anonymous => "anonymous"
     Custom(raw) => raw
   }
   Json(raw)
@@ -126397,6 +156878,7 @@ pub impl @json.FromJson for PrivateRegistriesUpdateOrgPrivateRegistryRequestAuth
         "oidc_jfrog" => Some(OidcJfrog)
         "oidc_cloudsmith" => Some(OidcCloudsmith)
         "oidc_gcp" => Some(OidcGcp)
+        "anonymous" => Some(Anonymous)
         _ => None
       }
     },
