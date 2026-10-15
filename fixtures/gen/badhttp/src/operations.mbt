@@ -16,35 +16,6 @@ fn[T : ToJson] parameter_value(value : T) -> String {
 }
 
 ///|
-fn percent_encode(value : String) -> String {
-  let hex = b"0123456789ABCDEF"
-  let output : Array[Byte] = []
-  for byte in @utf8.encode(value) {
-    let code = byte.to_int()
-    if (code >= 65 && code <= 90) ||
-      (code >= 97 && code <= 122) ||
-      (code >= 48 && code <= 57) ||
-      byte == b'-' ||
-      byte == b'.' ||
-      byte == b'_' ||
-      byte == b'~' {
-      output.push(byte)
-    } else {
-      output.push(b'%')
-      output.push(hex[code >> 4])
-      output.push(hex[code & 15])
-    }
-  }
-  try! @utf8.decode(Bytes::from_array(output))
-}
-
-///|
-fn append_query(url : String, name : String, value : String) -> String {
-  let separator = if url.contains("?") { "&" } else { "?" }
-  url + separator + percent_encode(name) + "=" + percent_encode(value)
-}
-
-///|
 fn parse_json_body(body : Bytes) -> Json raise {
   @json.parse(@utf8.decode(body))
 }
@@ -66,10 +37,10 @@ pub fn get_status_code_request(
   code : String,
   retry_after? : Int32,
 ) -> @http.Request {
-  let mut url = "/status/" + percent_encode(parameter_value(code))
+  let mut url = "/status/" + @http.percent_encode(parameter_value(code))
   match retry_after {
     Some(value) =>
-      url = append_query(url, "retry-after", parameter_value(value))
+      url = @http.append_query(url, "retry-after", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -79,7 +50,7 @@ pub fn get_status_code_request(
 ///
 /// Wait before responding
 pub fn get_delay_seconds_request(seconds : Double) -> @http.Request {
-  @http.Request::get("/delay/" + percent_encode(parameter_value(seconds)))
+  @http.Request::get("/delay/" + @http.percent_encode(parameter_value(seconds)))
 }
 
 ///|
@@ -110,15 +81,17 @@ pub fn get_drip_request(
 ) -> @http.Request {
   let mut url = "/drip"
   match duration {
-    Some(value) => url = append_query(url, "duration", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "duration", parameter_value(value))
     None => ()
   }
   match chunks {
-    Some(value) => url = append_query(url, "chunks", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "chunks", parameter_value(value))
     None => ()
   }
   match code {
-    Some(value) => url = append_query(url, "code", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "code", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -130,11 +103,12 @@ pub fn get_drip_request(
 pub fn get_truncate_request(length? : Int32, send? : Int32) -> @http.Request {
   let mut url = "/truncate"
   match length {
-    Some(value) => url = append_query(url, "length", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "length", parameter_value(value))
     None => ()
   }
   match send {
-    Some(value) => url = append_query(url, "send", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "send", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -147,9 +121,9 @@ pub fn get_badjson_flavor_request(
   flavor : GetBadjsonFlavorFlavor,
   code? : Int32,
 ) -> @http.Request {
-  let mut url = "/badjson/" + percent_encode(parameter_value(flavor))
+  let mut url = "/badjson/" + @http.percent_encode(parameter_value(flavor))
   match code {
-    Some(value) => url = append_query(url, "code", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "code", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -189,21 +163,25 @@ pub fn get_sse_flavor_request(
   bytes? : Int32,
   last_event_id? : String,
 ) -> @http.Request {
-  let mut url = "/sse/" + percent_encode(parameter_value(flavor))
+  let mut url = "/sse/" + @http.percent_encode(parameter_value(flavor))
   match events {
-    Some(value) => url = append_query(url, "events", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "events", parameter_value(value))
     None => ()
   }
   match interval {
-    Some(value) => url = append_query(url, "interval", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "interval", parameter_value(value))
     None => ()
   }
   match seconds {
-    Some(value) => url = append_query(url, "seconds", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "seconds", parameter_value(value))
     None => ()
   }
   match bytes {
-    Some(value) => url = append_query(url, "bytes", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "bytes", parameter_value(value))
     None => ()
   }
   let mut request = @http.Request::get(url)
@@ -247,9 +225,10 @@ pub fn get_range_flavor_request(
   range? : String,
   if_range? : String,
 ) -> @http.Request {
-  let mut url = "/range/" + percent_encode(parameter_value(flavor))
+  let mut url = "/range/" + @http.percent_encode(parameter_value(flavor))
   match length {
-    Some(value) => url = append_query(url, "length", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "length", parameter_value(value))
     None => ()
   }
   let mut request = @http.Request::get(url)
@@ -298,7 +277,7 @@ pub fn get_etag_flavor_request(
   if_unmodified_since? : String,
 ) -> @http.Request {
   let mut request = @http.Request::get(
-    "/etag/" + percent_encode(parameter_value(flavor)),
+    "/etag/" + @http.percent_encode(parameter_value(flavor)),
   )
   match if_none_match {
     Some(value) =>
@@ -356,13 +335,15 @@ pub fn get_cookies_flavor_request(
   bytes? : Int32,
   cookie? : String,
 ) -> @http.Request {
-  let mut url = "/cookies/" + percent_encode(parameter_value(flavor))
+  let mut url = "/cookies/" + @http.percent_encode(parameter_value(flavor))
   match count {
-    Some(value) => url = append_query(url, "count", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "count", parameter_value(value))
     None => ()
   }
   match bytes {
-    Some(value) => url = append_query(url, "bytes", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "bytes", parameter_value(value))
     None => ()
   }
   let mut request = @http.Request::get(url)
@@ -418,7 +399,7 @@ pub fn get_auth_decode(
 ///
 /// HTTP authentication that misbehaves in the chosen way; GET /auth lists the flavors and the public fake test credentials
 pub fn get_auth_flavor_request(flavor : GetAuthFlavorFlavor) -> @http.Request {
-  @http.Request::get("/auth/" + percent_encode(parameter_value(flavor)))
+  @http.Request::get("/auth/" + @http.percent_encode(parameter_value(flavor)))
 }
 
 ///|
@@ -495,7 +476,9 @@ pub fn get_crosshost_land_decode(
 pub fn get_crosshost_flavor_request(
   flavor : GetCrosshostFlavorFlavor,
 ) -> @http.Request {
-  @http.Request::get("/crosshost/" + percent_encode(parameter_value(flavor)))
+  @http.Request::get(
+    "/crosshost/" + @http.percent_encode(parameter_value(flavor)),
+  )
 }
 
 ///|
@@ -533,17 +516,18 @@ pub fn get_compress_flavor_request(
   size? : Int32,
   accept_encoding? : String,
 ) -> @http.Request {
-  let mut url = "/compress/" + percent_encode(parameter_value(flavor))
+  let mut url = "/compress/" + @http.percent_encode(parameter_value(flavor))
   match length {
-    Some(value) => url = append_query(url, "length", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "length", parameter_value(value))
     None => ()
   }
   match code {
-    Some(value) => url = append_query(url, "code", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "code", parameter_value(value))
     None => ()
   }
   match size {
-    Some(value) => url = append_query(url, "size", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "size", parameter_value(value))
     None => ()
   }
   let mut request = @http.Request::get(url)
@@ -564,17 +548,17 @@ pub fn get_flaky_percent_request(
   seed? : String,
   i? : Int32,
 ) -> @http.Request {
-  let mut url = "/flaky/" + percent_encode(parameter_value(percent))
+  let mut url = "/flaky/" + @http.percent_encode(parameter_value(percent))
   match fail {
-    Some(value) => url = append_query(url, "fail", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "fail", parameter_value(value))
     None => ()
   }
   match seed {
-    Some(value) => url = append_query(url, "seed", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "seed", parameter_value(value))
     None => ()
   }
   match i {
-    Some(value) => url = append_query(url, "i", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "i", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -606,13 +590,14 @@ pub fn get_redirect_hops_request(
   code? : Int32,
   absolute? : Bool,
 ) -> @http.Request {
-  let mut url = "/redirect/" + percent_encode(parameter_value(hops))
+  let mut url = "/redirect/" + @http.percent_encode(parameter_value(hops))
   match code {
-    Some(value) => url = append_query(url, "code", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "code", parameter_value(value))
     None => ()
   }
   match absolute {
-    Some(value) => url = append_query(url, "absolute", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "absolute", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -801,11 +786,13 @@ pub fn get_402_pay_request(
 ) -> @http.Request {
   let mut url = "/402/pay"
   match network {
-    Some(value) => url = append_query(url, "network", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "network", parameter_value(value))
     None => ()
   }
   match amount {
-    Some(value) => url = append_query(url, "amount", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "amount", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -817,7 +804,8 @@ pub fn get_402_pay_request(
 pub fn get_402_pay_base_request(amount? : Double) -> @http.Request {
   let mut url = "/402/pay/base"
   match amount {
-    Some(value) => url = append_query(url, "amount", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "amount", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -829,7 +817,8 @@ pub fn get_402_pay_base_request(amount? : Double) -> @http.Request {
 pub fn get_402_pay_base_sepolia_request(amount? : Double) -> @http.Request {
   let mut url = "/402/pay/base-sepolia"
   match amount {
-    Some(value) => url = append_query(url, "amount", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "amount", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -845,21 +834,25 @@ pub fn get_402_scenario_request(
   reason? : String,
   seconds? : Double,
 ) -> @http.Request {
-  let mut url = "/402/" + percent_encode(parameter_value(scenario))
+  let mut url = "/402/" + @http.percent_encode(parameter_value(scenario))
   match network {
-    Some(value) => url = append_query(url, "network", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "network", parameter_value(value))
     None => ()
   }
   match amount {
-    Some(value) => url = append_query(url, "amount", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "amount", parameter_value(value))
     None => ()
   }
   match reason {
-    Some(value) => url = append_query(url, "reason", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "reason", parameter_value(value))
     None => ()
   }
   match seconds {
-    Some(value) => url = append_query(url, "seconds", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "seconds", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -873,13 +866,15 @@ pub fn get_402_broken_flavor_request(
   network? : Get402BrokenFlavorNetwork,
   amount? : Double,
 ) -> @http.Request {
-  let mut url = "/402/broken/" + percent_encode(parameter_value(flavor))
+  let mut url = "/402/broken/" + @http.percent_encode(parameter_value(flavor))
   match network {
-    Some(value) => url = append_query(url, "network", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "network", parameter_value(value))
     None => ()
   }
   match amount {
-    Some(value) => url = append_query(url, "amount", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "amount", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)

@@ -775,13 +775,10 @@ class IRTests(unittest.TestCase):
         self.assertIn("tag : Array[String]", source)
         self.assertIn("limit? : Int32", source)
         self.assertIn("mode? : TestOperationMode", source)
-        self.assertIn('append_query(url, "tag", parameter_value(value))', source)
-        self.assertIn('url + separator + percent_encode(name) + "=" + percent_encode(value)', source)
-        self.assertIn("for byte in @utf8.encode(value)", source)
-        self.assertIn("output.push(b'%')", source)
-        # UTF-8 byte encoding plus unreserved-only passthrough covers spaces,
-        # Japanese text, ampersands, and equals signs uniformly.
-        self.assertIn("byte == b'~'", source)
+        self.assertIn('@http.append_query(url, "tag", parameter_value(value))', source)
+        self.assertNotIn("fn append_query", source)
+        self.assertNotIn("fn percent_encode", source)
+        self.assertIn('"gaato/http"', emit(ir)["moon.pkg"])
 
     def test_deep_object_query_serializes_bracketed_map_keys(self):
         parameter = {
@@ -948,13 +945,12 @@ class IRTests(unittest.TestCase):
         ir = IRBuilder(contents({"x-moonbit-path-segments": True}), "example/gen").build()
         self.assertEqual([parameter.path_segments for parameter in ir.operations[0].parameters], [False, True])
         source = emit(ir)["operations.mbt"]
-        self.assertIn('"/repos/" + percent_encode(parameter_value(owner)) + "/contents/" + percent_encode_segments(parameter_value(path))', source)
-        self.assertIn("fn percent_encode_segments(value : String) -> String {", source)
-        self.assertIn("byte == b'/'", source)
+        self.assertIn('"/repos/" + @http.percent_encode(parameter_value(owner)) + "/contents/" + @http.percent_encode_path(parameter_value(path))', source)
+        self.assertNotIn("fn percent_encode", source)
         # Without the knob the same parameter escapes `/` like any other value.
         plain = emit(IRBuilder(contents({}), "example/gen").build())["operations.mbt"]
-        self.assertNotIn("percent_encode_segments", plain)
-        self.assertIn('"/contents/" + percent_encode(parameter_value(path))', plain)
+        self.assertNotIn("@http.percent_encode_path", plain)
+        self.assertIn('"/contents/" + @http.percent_encode(parameter_value(path))', plain)
 
     def test_path_segments_only_operation_omits_the_plain_encoder(self):
         parameters = [{"name": "ref", "in": "path", "required": True, "schema": {"type": "string"}, "x-moonbit-path-segments": True}]
@@ -963,10 +959,16 @@ class IRTests(unittest.TestCase):
             "paths": {"/git/ref/{ref}": {"get": operation(parameters=parameters, operation_id="gitGetRef")}},
             "components": {"schemas": {}},
         }
-        source = emit(IRBuilder(doc, "example/gen").build())["operations.mbt"]
-        # `--deny-warn` rejects an unused helper, so only the encoder in use is emitted.
-        self.assertNotIn("fn percent_encode(value : String) -> String {", source)
-        self.assertIn("fn percent_encode_segments(value : String) -> String {", source)
+        sources = emit(IRBuilder(doc, "example/gen").build())
+        source = sources["operations.mbt"]
+        self.assertNotIn("fn percent_encode", source)
+        self.assertIn("@http.percent_encode_path(parameter_value(ref_))", source)
+        self.assertIn('"gaato/http"', sources["moon.pkg"])
+        self.assertIn('"moonbitlang/core/encoding/utf8"', sources["moon.pkg"])
+        doc["paths"]["/git/ref/{ref}"]["get"]["responses"] = {"204": {"description": "No content"}}
+        sources = emit(IRBuilder(doc, "example/gen").build())
+        self.assertIn('"gaato/http"', sources["moon.pkg"])
+        self.assertNotIn('"moonbitlang/core/encoding/utf8"', sources["moon.pkg"])
 
     def test_path_segments_outside_a_path_parameter_is_a_diagnostic(self):
         parameters = [{"name": "q", "in": "query", "required": True, "schema": {"type": "string"}, "x-moonbit-path-segments": True}]

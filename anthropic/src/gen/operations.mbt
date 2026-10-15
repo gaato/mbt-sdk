@@ -16,35 +16,6 @@ fn[T : ToJson] parameter_value(value : T) -> String {
 }
 
 ///|
-fn percent_encode(value : String) -> String {
-  let hex = b"0123456789ABCDEF"
-  let output : Array[Byte] = []
-  for byte in @utf8.encode(value) {
-    let code = byte.to_int()
-    if (code >= 65 && code <= 90) ||
-      (code >= 97 && code <= 122) ||
-      (code >= 48 && code <= 57) ||
-      byte == b'-' ||
-      byte == b'.' ||
-      byte == b'_' ||
-      byte == b'~' {
-      output.push(byte)
-    } else {
-      output.push(b'%')
-      output.push(hex[code >> 4])
-      output.push(hex[code & 15])
-    }
-  }
-  try! @utf8.decode(Bytes::from_array(output))
-}
-
-///|
-fn append_query(url : String, name : String, value : String) -> String {
-  let separator = if url.contains("?") { "&" } else { "?" }
-  url + separator + percent_encode(name) + "=" + percent_encode(value)
-}
-
-///|
 fn parse_json_body(body : Bytes) -> Json raise {
   @json.parse(@utf8.decode(body))
 }
@@ -123,21 +94,24 @@ pub fn models_list_request(
 ) -> @http.Request {
   let mut url = "/v1/models"
   match before_id {
-    Some(value) => url = append_query(url, "before_id", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "before_id", parameter_value(value))
     None => ()
   }
   match after_id {
-    Some(value) => url = append_query(url, "after_id", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "after_id", parameter_value(value))
     None => ()
   }
   match limit {
-    Some(value) => url = append_query(url, "limit", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "limit", parameter_value(value))
     None => ()
   }
   match lifecycle {
     Some(values) =>
       for value in values {
-        url = append_query(url, "lifecycle[]", parameter_value(value))
+        url = @http.append_query(url, "lifecycle[]", parameter_value(value))
       }
     None => ()
   }
@@ -196,7 +170,7 @@ pub fn models_get_request(
   anthropic_workspace_id? : String,
 ) -> @http.Request {
   let mut request = @http.Request::get(
-    "/v1/models/" + percent_encode(parameter_value(model_id)),
+    "/v1/models/" + @http.percent_encode(parameter_value(model_id)),
   )
   match anthropic_version {
     Some(value) =>

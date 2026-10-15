@@ -662,7 +662,7 @@ def _path_expression(operation: Operation) -> str:
             continue
         if part in parameters:
             parameter = parameters[part]
-            encoder = "percent_encode_segments" if parameter.path_segments else "percent_encode"
+            encoder = "@http.percent_encode_path" if parameter.path_segments else "@http.percent_encode"
             expressions.append(f"{encoder}(parameter_value({parameter.moon_name}))")
         else:
             expressions.append(_moon_string(part))
@@ -736,18 +736,18 @@ def _operation(operation: Operation) -> str:
             name = _moon_string(parameter.json_name)
             if parameter.style == "deepObject":
                 if parameter.required:
-                    lines.extend([f"  for key, value in {parameter.moon_name} {{", f"    url = append_query(url, {name} + \"[\" + key + \"]\", parameter_value(value))", "  }"])
+                    lines.extend([f"  for key, value in {parameter.moon_name} {{", f"    url = @http.append_query(url, {name} + \"[\" + key + \"]\", parameter_value(value))", "  }"])
                 else:
-                    lines.extend([f"  match {parameter.moon_name} {{", "    Some(values) =>", "      for key, value in values {", f"        url = append_query(url, {name} + \"[\" + key + \"]\", parameter_value(value))", "      }", "    None => ()", "  }"])
+                    lines.extend([f"  match {parameter.moon_name} {{", "    Some(values) =>", "      for key, value in values {", f"        url = @http.append_query(url, {name} + \"[\" + key + \"]\", parameter_value(value))", "      }", "    None => ()", "  }"])
             elif parameter.type.kind == "array":
                 if parameter.required:
-                    lines.extend([f"  for value in {parameter.moon_name} {{", f"    url = append_query(url, {name}, parameter_value(value))", "  }"])
+                    lines.extend([f"  for value in {parameter.moon_name} {{", f"    url = @http.append_query(url, {name}, parameter_value(value))", "  }"])
                 else:
-                    lines.extend([f"  match {parameter.moon_name} {{", "    Some(values) =>", "      for value in values {", f"        url = append_query(url, {name}, parameter_value(value))", "      }", "    None => ()", "  }"])
+                    lines.extend([f"  match {parameter.moon_name} {{", "    Some(values) =>", "      for value in values {", f"        url = @http.append_query(url, {name}, parameter_value(value))", "      }", "    None => ()", "  }"])
             elif parameter.required:
-                lines.append(f"  url = append_query(url, {name}, parameter_value({parameter.moon_name}))")
+                lines.append(f"  url = @http.append_query(url, {name}, parameter_value({parameter.moon_name}))")
             else:
-                lines.extend([f"  match {parameter.moon_name} {{", f"    Some(value) => url = append_query(url, {name}, parameter_value(value))", "    None => ()", "  }"])
+                lines.extend([f"  match {parameter.moon_name} {{", f"    Some(value) => url = @http.append_query(url, {name}, parameter_value(value))", "    None => ()", "  }"])
         path_expression = "url"
     else:
         path_expression = _path_expression(operation)
@@ -865,57 +865,6 @@ def _operation(operation: Operation) -> str:
     return "\n".join(lines)
 
 
-PERCENT_ENCODE_HELPER = r'''///|
-fn percent_encode(value : String) -> String {
-  let hex = b"0123456789ABCDEF"
-  let output : Array[Byte] = []
-  for byte in @utf8.encode(value) {
-    let code = byte.to_int()
-    if (code >= 65 && code <= 90) ||
-      (code >= 97 && code <= 122) ||
-      (code >= 48 && code <= 57) ||
-      byte == b'-' ||
-      byte == b'.' ||
-      byte == b'_' ||
-      byte == b'~' {
-      output.push(byte)
-    } else {
-      output.push(b'%')
-      output.push(hex[code >> 4])
-      output.push(hex[code & 15])
-    }
-  }
-  try! @utf8.decode(Bytes::from_array(output))
-}'''
-
-
-PERCENT_ENCODE_SEGMENTS_HELPER = r'''///|
-/// Percent-encodes a multi-segment path parameter (x-moonbit-path-segments): `/` stays a
-/// path separator, everything outside the RFC 3986 unreserved set is escaped.
-fn percent_encode_segments(value : String) -> String {
-  let hex = b"0123456789ABCDEF"
-  let output : Array[Byte] = []
-  for byte in @utf8.encode(value) {
-    let code = byte.to_int()
-    if (code >= 65 && code <= 90) ||
-      (code >= 97 && code <= 122) ||
-      (code >= 48 && code <= 57) ||
-      byte == b'-' ||
-      byte == b'.' ||
-      byte == b'_' ||
-      byte == b'~' ||
-      byte == b'/' {
-      output.push(byte)
-    } else {
-      output.push(b'%')
-      output.push(hex[code >> 4])
-      output.push(hex[code & 15])
-    }
-  }
-  try! @utf8.decode(Bytes::from_array(output))
-}'''
-
-
 PARAMETER_VALUE_HELPER = r'''///|
 fn[T : ToJson] parameter_value(value : T) -> String {
   match Json(value) {
@@ -929,13 +878,6 @@ fn[T : ToJson] parameter_value(value : T) -> String {
       }
     other => other.stringify()
   }
-}'''
-
-
-APPEND_QUERY_HELPER = r'''///|
-fn append_query(url : String, name : String, value : String) -> String {
-  let separator = if url.contains("?") { "&" } else { "?" }
-  url + separator + percent_encode(name) + "=" + percent_encode(value)
 }'''
 
 
@@ -1057,16 +999,6 @@ fn json_array_matches(
     operation_helpers: list[str] = []
     if any(operation.parameters or operation.multipart_fields for operation in ir.operations):
         operation_helpers.append(PARAMETER_VALUE_HELPER)
-    if any(
-        parameter.location == "query" or (parameter.location == "path" and not parameter.path_segments)
-        for operation in ir.operations
-        for parameter in operation.parameters
-    ):
-        operation_helpers.append(PERCENT_ENCODE_HELPER)
-    if any(parameter.path_segments for operation in ir.operations for parameter in operation.parameters):
-        operation_helpers.append(PERCENT_ENCODE_SEGMENTS_HELPER)
-    if any(parameter.location == "query" for operation in ir.operations for parameter in operation.parameters):
-        operation_helpers.append(APPEND_QUERY_HELPER)
     if any(operation.response_type is not None for operation in ir.operations):
         operation_helpers.append(DECODE_HELPERS)
     operations = HEADER + "\n\n".join(operation_helpers + operation_sources) + "\n"

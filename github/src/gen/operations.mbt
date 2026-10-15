@@ -16,61 +16,6 @@ fn[T : ToJson] parameter_value(value : T) -> String {
 }
 
 ///|
-fn percent_encode(value : String) -> String {
-  let hex = b"0123456789ABCDEF"
-  let output : Array[Byte] = []
-  for byte in @utf8.encode(value) {
-    let code = byte.to_int()
-    if (code >= 65 && code <= 90) ||
-      (code >= 97 && code <= 122) ||
-      (code >= 48 && code <= 57) ||
-      byte == b'-' ||
-      byte == b'.' ||
-      byte == b'_' ||
-      byte == b'~' {
-      output.push(byte)
-    } else {
-      output.push(b'%')
-      output.push(hex[code >> 4])
-      output.push(hex[code & 15])
-    }
-  }
-  try! @utf8.decode(Bytes::from_array(output))
-}
-
-///|
-/// Percent-encodes a multi-segment path parameter (x-moonbit-path-segments): `/` stays a
-/// path separator, everything outside the RFC 3986 unreserved set is escaped.
-fn percent_encode_segments(value : String) -> String {
-  let hex = b"0123456789ABCDEF"
-  let output : Array[Byte] = []
-  for byte in @utf8.encode(value) {
-    let code = byte.to_int()
-    if (code >= 65 && code <= 90) ||
-      (code >= 97 && code <= 122) ||
-      (code >= 48 && code <= 57) ||
-      byte == b'-' ||
-      byte == b'.' ||
-      byte == b'_' ||
-      byte == b'~' ||
-      byte == b'/' {
-      output.push(byte)
-    } else {
-      output.push(b'%')
-      output.push(hex[code >> 4])
-      output.push(hex[code & 15])
-    }
-  }
-  try! @utf8.decode(Bytes::from_array(output))
-}
-
-///|
-fn append_query(url : String, name : String, value : String) -> String {
-  let separator = if url.contains("?") { "&" } else { "?" }
-  url + separator + percent_encode(name) + "=" + percent_encode(value)
-}
-
-///|
 fn parse_json_body(body : Bytes) -> Json raise {
   @json.parse(@utf8.decode(body))
 }
@@ -133,78 +78,90 @@ pub fn security_advisories_list_global_advisories_request(
 ) -> @http.Request {
   let mut url = "/advisories"
   match ghsa_id {
-    Some(value) => url = append_query(url, "ghsa_id", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "ghsa_id", parameter_value(value))
     None => ()
   }
   match type_ {
-    Some(value) => url = append_query(url, "type", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "type", parameter_value(value))
     None => ()
   }
   match cve_id {
-    Some(value) => url = append_query(url, "cve_id", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "cve_id", parameter_value(value))
     None => ()
   }
   match ecosystem {
-    Some(value) => url = append_query(url, "ecosystem", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "ecosystem", parameter_value(value))
     None => ()
   }
   match severity {
-    Some(value) => url = append_query(url, "severity", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "severity", parameter_value(value))
     None => ()
   }
   match cwes {
-    Some(value) => url = append_query(url, "cwes", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "cwes", parameter_value(value))
     None => ()
   }
   match is_withdrawn {
     Some(value) =>
-      url = append_query(url, "is_withdrawn", parameter_value(value))
+      url = @http.append_query(url, "is_withdrawn", parameter_value(value))
     None => ()
   }
   match affects {
-    Some(value) => url = append_query(url, "affects", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "affects", parameter_value(value))
     None => ()
   }
   match published {
-    Some(value) => url = append_query(url, "published", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "published", parameter_value(value))
     None => ()
   }
   match updated {
-    Some(value) => url = append_query(url, "updated", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "updated", parameter_value(value))
     None => ()
   }
   match modified {
-    Some(value) => url = append_query(url, "modified", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "modified", parameter_value(value))
     None => ()
   }
   match epss_percentage {
     Some(value) =>
-      url = append_query(url, "epss_percentage", parameter_value(value))
+      url = @http.append_query(url, "epss_percentage", parameter_value(value))
     None => ()
   }
   match epss_percentile {
     Some(value) =>
-      url = append_query(url, "epss_percentile", parameter_value(value))
+      url = @http.append_query(url, "epss_percentile", parameter_value(value))
     None => ()
   }
   match before {
-    Some(value) => url = append_query(url, "before", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "before", parameter_value(value))
     None => ()
   }
   match after {
-    Some(value) => url = append_query(url, "after", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "after", parameter_value(value))
     None => ()
   }
   match direction {
-    Some(value) => url = append_query(url, "direction", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "direction", parameter_value(value))
     None => ()
   }
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match sort {
-    Some(value) => url = append_query(url, "sort", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "sort", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -234,7 +191,9 @@ pub fn security_advisories_list_global_advisories_decode(
 pub fn security_advisories_get_global_advisory_request(
   ghsa_id : String,
 ) -> @http.Request {
-  @http.Request::get("/advisories/" + percent_encode(parameter_value(ghsa_id)))
+  @http.Request::get(
+    "/advisories/" + @http.percent_encode(parameter_value(ghsa_id)),
+  )
 }
 
 ///|
@@ -265,15 +224,17 @@ pub fn agent_automations_list_automations_request(
 ) -> @http.Request {
   let mut url = "/agents/automations"
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match owner_type {
-    Some(value) => url = append_query(url, "owner_type", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "owner_type", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -354,7 +315,8 @@ pub fn agent_automations_get_automation_request(
   automation_id : String,
 ) -> @http.Request {
   @http.Request::get(
-    "/agents/automations/" + percent_encode(parameter_value(automation_id)),
+    "/agents/automations/" +
+    @http.percent_encode(parameter_value(automation_id)),
   )
 }
 
@@ -389,31 +351,34 @@ pub fn agent_automations_list_automation_tasks_request(
   is_archived? : Bool,
 ) -> @http.Request {
   let mut url = "/agents/automations/" +
-    percent_encode(parameter_value(automation_id)) +
+    @http.percent_encode(parameter_value(automation_id)) +
     "/tasks"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   match sort {
-    Some(value) => url = append_query(url, "sort", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "sort", parameter_value(value))
     None => ()
   }
   match direction {
-    Some(value) => url = append_query(url, "direction", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "direction", parameter_value(value))
     None => ()
   }
   match state {
-    Some(value) => url = append_query(url, "state", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "state", parameter_value(value))
     None => ()
   }
   match is_archived {
     Some(value) =>
-      url = append_query(url, "is_archived", parameter_value(value))
+      url = @http.append_query(url, "is_archived", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -448,20 +413,22 @@ pub fn agent_automations_list_repo_automations_request(
   owner_type? : AgentAutomationsListRepoAutomationsOwnerType,
 ) -> @http.Request {
   let mut url = "/agents/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/automations"
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match owner_type {
-    Some(value) => url = append_query(url, "owner_type", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "owner_type", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -495,9 +462,9 @@ pub fn agent_automations_create_repo_automation_request(
 ) -> @http.Request {
   @http.Request::post(
     "/agents/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/automations",
   ).json_body(Json(body))
 }
@@ -530,11 +497,11 @@ pub fn agent_automations_get_repo_automation_request(
 ) -> @http.Request {
   @http.Request::get(
     "/agents/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/automations/" +
-    percent_encode(parameter_value(automation_id)),
+    @http.percent_encode(parameter_value(automation_id)),
   )
 }
 
@@ -567,11 +534,11 @@ pub fn agent_automations_edit_repo_automation_request(
 ) -> @http.Request {
   @http.Request::patch(
     "/agents/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/automations/" +
-    percent_encode(parameter_value(automation_id)),
+    @http.percent_encode(parameter_value(automation_id)),
   ).json_body(Json(body))
 }
 
@@ -603,11 +570,11 @@ pub fn agent_automations_delete_repo_automation_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/agents/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/automations/" +
-    percent_encode(parameter_value(automation_id)),
+    @http.percent_encode(parameter_value(automation_id)),
   )
 }
 
@@ -627,43 +594,47 @@ pub fn agent_tasks_list_tasks_for_repo_request(
   creator_id? : Array[Int32],
 ) -> @http.Request {
   let mut url = "/agents/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/tasks"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   match sort {
-    Some(value) => url = append_query(url, "sort", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "sort", parameter_value(value))
     None => ()
   }
   match direction {
-    Some(value) => url = append_query(url, "direction", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "direction", parameter_value(value))
     None => ()
   }
   match state {
-    Some(value) => url = append_query(url, "state", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "state", parameter_value(value))
     None => ()
   }
   match is_archived {
     Some(value) =>
-      url = append_query(url, "is_archived", parameter_value(value))
+      url = @http.append_query(url, "is_archived", parameter_value(value))
     None => ()
   }
   match since {
-    Some(value) => url = append_query(url, "since", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "since", parameter_value(value))
     None => ()
   }
   match creator_id {
     Some(values) =>
       for value in values {
-        url = append_query(url, "creator_id", parameter_value(value))
+        url = @http.append_query(url, "creator_id", parameter_value(value))
       }
     None => ()
   }
@@ -698,9 +669,9 @@ pub fn agent_tasks_create_task_in_repo_request(
 ) -> @http.Request {
   @http.Request::post(
     "/agents/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/tasks",
   ).json_body(Json(body))
 }
@@ -733,11 +704,11 @@ pub fn agent_tasks_get_task_by_repo_and_id_request(
 ) -> @http.Request {
   @http.Request::get(
     "/agents/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/tasks/" +
-    percent_encode(parameter_value(task_id)),
+    @http.percent_encode(parameter_value(task_id)),
   )
 }
 
@@ -773,32 +744,36 @@ pub fn agent_tasks_list_tasks_request(
 ) -> @http.Request {
   let mut url = "/agents/tasks"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   match sort {
-    Some(value) => url = append_query(url, "sort", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "sort", parameter_value(value))
     None => ()
   }
   match direction {
-    Some(value) => url = append_query(url, "direction", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "direction", parameter_value(value))
     None => ()
   }
   match state {
-    Some(value) => url = append_query(url, "state", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "state", parameter_value(value))
     None => ()
   }
   match is_archived {
     Some(value) =>
-      url = append_query(url, "is_archived", parameter_value(value))
+      url = @http.append_query(url, "is_archived", parameter_value(value))
     None => ()
   }
   match since {
-    Some(value) => url = append_query(url, "since", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "since", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -827,7 +802,7 @@ pub fn agent_tasks_list_tasks_decode(
 /// Get a task by ID
 pub fn agent_tasks_get_task_by_id_request(task_id : String) -> @http.Request {
   @http.Request::get(
-    "/agents/tasks/" + percent_encode(parameter_value(task_id)),
+    "/agents/tasks/" + @http.percent_encode(parameter_value(task_id)),
   )
 }
 
@@ -879,7 +854,9 @@ pub fn apps_get_authenticated_decode(
 /// Create a GitHub App from a manifest
 pub fn apps_create_from_manifest_request(code : String) -> @http.Request {
   @http.Request::post(
-    "/app-manifests/" + percent_encode(parameter_value(code)) + "/conversions",
+    "/app-manifests/" +
+    @http.percent_encode(parameter_value(code)) +
+    "/conversions",
   )
 }
 
@@ -963,15 +940,18 @@ pub fn apps_list_webhook_deliveries_request(
 ) -> @http.Request {
   let mut url = "/app/hook/deliveries"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match cursor {
-    Some(value) => url = append_query(url, "cursor", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "cursor", parameter_value(value))
     None => ()
   }
   match status {
-    Some(value) => url = append_query(url, "status", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "status", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -1000,7 +980,7 @@ pub fn apps_list_webhook_deliveries_decode(
 /// Get a delivery for an app webhook
 pub fn apps_get_webhook_delivery_request(delivery_id : Int32) -> @http.Request {
   @http.Request::get(
-    "/app/hook/deliveries/" + percent_encode(parameter_value(delivery_id)),
+    "/app/hook/deliveries/" + @http.percent_encode(parameter_value(delivery_id)),
   )
 }
 
@@ -1030,7 +1010,7 @@ pub fn apps_redeliver_webhook_delivery_request(
 ) -> @http.Request {
   @http.Request::post(
     "/app/hook/deliveries/" +
-    percent_encode(parameter_value(delivery_id)) +
+    @http.percent_encode(parameter_value(delivery_id)) +
     "/attempts",
   )
 }
@@ -1044,11 +1024,12 @@ pub fn apps_list_installation_requests_for_authenticated_app_request(
 ) -> @http.Request {
   let mut url = "/app/installation-requests"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -1083,19 +1064,22 @@ pub fn apps_list_installations_request(
 ) -> @http.Request {
   let mut url = "/app/installations"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   match since {
-    Some(value) => url = append_query(url, "since", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "since", parameter_value(value))
     None => ()
   }
   match outdated {
-    Some(value) => url = append_query(url, "outdated", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "outdated", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -1124,7 +1108,8 @@ pub fn apps_list_installations_decode(
 /// Get an installation for the authenticated app
 pub fn apps_get_installation_request(installation_id : Int32) -> @http.Request {
   @http.Request::get(
-    "/app/installations/" + percent_encode(parameter_value(installation_id)),
+    "/app/installations/" +
+    @http.percent_encode(parameter_value(installation_id)),
   )
 }
 
@@ -1153,7 +1138,8 @@ pub fn apps_delete_installation_request(
   installation_id : Int32,
 ) -> @http.Request {
   @http.Request::delete(
-    "/app/installations/" + percent_encode(parameter_value(installation_id)),
+    "/app/installations/" +
+    @http.percent_encode(parameter_value(installation_id)),
   )
 }
 
@@ -1166,7 +1152,7 @@ pub fn apps_create_installation_access_token_request(
 ) -> @http.Request {
   @http.Request::post(
     "/app/installations/" +
-    percent_encode(parameter_value(installation_id)) +
+    @http.percent_encode(parameter_value(installation_id)) +
     "/access_tokens",
   ).json_body(Json(body))
 }
@@ -1197,7 +1183,7 @@ pub fn apps_suspend_installation_request(
 ) -> @http.Request {
   @http.Request::put(
     "/app/installations/" +
-    percent_encode(parameter_value(installation_id)) +
+    @http.percent_encode(parameter_value(installation_id)) +
     "/suspended",
   )
 }
@@ -1210,7 +1196,7 @@ pub fn apps_unsuspend_installation_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/app/installations/" +
-    percent_encode(parameter_value(installation_id)) +
+    @http.percent_encode(parameter_value(installation_id)) +
     "/suspended",
   )
 }
@@ -1223,7 +1209,9 @@ pub fn apps_delete_authorization_request(
   body : AppsDeleteAuthorizationRequest,
 ) -> @http.Request {
   @http.Request::delete(
-    "/applications/" + percent_encode(parameter_value(client_id)) + "/grant",
+    "/applications/" +
+    @http.percent_encode(parameter_value(client_id)) +
+    "/grant",
   ).json_body(Json(body))
 }
 
@@ -1235,7 +1223,9 @@ pub fn apps_check_token_request(
   body : AppsCheckTokenRequest,
 ) -> @http.Request {
   @http.Request::post(
-    "/applications/" + percent_encode(parameter_value(client_id)) + "/token",
+    "/applications/" +
+    @http.percent_encode(parameter_value(client_id)) +
+    "/token",
   ).json_body(Json(body))
 }
 
@@ -1265,7 +1255,9 @@ pub fn apps_reset_token_request(
   body : AppsResetTokenRequest,
 ) -> @http.Request {
   @http.Request::patch(
-    "/applications/" + percent_encode(parameter_value(client_id)) + "/token",
+    "/applications/" +
+    @http.percent_encode(parameter_value(client_id)) +
+    "/token",
   ).json_body(Json(body))
 }
 
@@ -1295,7 +1287,9 @@ pub fn apps_delete_token_request(
   body : AppsDeleteTokenRequest,
 ) -> @http.Request {
   @http.Request::delete(
-    "/applications/" + percent_encode(parameter_value(client_id)) + "/token",
+    "/applications/" +
+    @http.percent_encode(parameter_value(client_id)) +
+    "/token",
   ).json_body(Json(body))
 }
 
@@ -1308,7 +1302,7 @@ pub fn apps_scope_token_request(
 ) -> @http.Request {
   @http.Request::post(
     "/applications/" +
-    percent_encode(parameter_value(client_id)) +
+    @http.percent_encode(parameter_value(client_id)) +
     "/token/scoped",
   ).json_body(Json(body))
 }
@@ -1335,7 +1329,7 @@ pub fn apps_scope_token_decode(
 ///
 /// Get an app
 pub fn apps_get_by_slug_request(app_slug : String) -> @http.Request {
-  @http.Request::get("/apps/" + percent_encode(parameter_value(app_slug)))
+  @http.Request::get("/apps/" + @http.percent_encode(parameter_value(app_slug)))
 }
 
 ///|
@@ -1363,7 +1357,7 @@ pub fn classroom_get_an_assignment_request(
   assignment_id : Int32,
 ) -> @http.Request {
   @http.Request::get(
-    "/assignments/" + percent_encode(parameter_value(assignment_id)),
+    "/assignments/" + @http.percent_encode(parameter_value(assignment_id)),
   )
 }
 
@@ -1375,7 +1369,7 @@ pub fn classroom_list_accepted_assignments_for_an_assignment_request(
 ) -> @http.Request {
   @http.Request::get(
     "/assignments/" +
-    percent_encode(parameter_value(assignment_id)) +
+    @http.percent_encode(parameter_value(assignment_id)) +
     "/accepted_assignments",
   )
 }
@@ -1387,7 +1381,9 @@ pub fn classroom_get_assignment_grades_request(
   assignment_id : Int32,
 ) -> @http.Request {
   @http.Request::get(
-    "/assignments/" + percent_encode(parameter_value(assignment_id)) + "/grades",
+    "/assignments/" +
+    @http.percent_encode(parameter_value(assignment_id)) +
+    "/grades",
   )
 }
 
@@ -1403,7 +1399,7 @@ pub fn classroom_list_classrooms_request() -> @http.Request {
 /// Closed - Get a classroom The caller handles the response as @http.Response.
 pub fn classroom_get_a_classroom_request(classroom_id : Int32) -> @http.Request {
   @http.Request::get(
-    "/classrooms/" + percent_encode(parameter_value(classroom_id)),
+    "/classrooms/" + @http.percent_encode(parameter_value(classroom_id)),
   )
 }
 
@@ -1415,7 +1411,7 @@ pub fn classroom_list_assignments_for_a_classroom_request(
 ) -> @http.Request {
   @http.Request::get(
     "/classrooms/" +
-    percent_encode(parameter_value(classroom_id)) +
+    @http.percent_encode(parameter_value(classroom_id)) +
     "/assignments",
   )
 }
@@ -1450,7 +1446,7 @@ pub fn codes_of_conduct_get_all_codes_of_conduct_decode(
 /// Get a code of conduct
 pub fn codes_of_conduct_get_conduct_code_request(key : String) -> @http.Request {
   @http.Request::get(
-    "/codes_of_conduct/" + percent_encode(parameter_value(key)),
+    "/codes_of_conduct/" + @http.percent_encode(parameter_value(key)),
   )
 }
 
@@ -1514,7 +1510,7 @@ pub fn actions_get_actions_cache_retention_limit_for_enterprise_request(
 ) -> @http.Request {
   @http.Request::get(
     "/enterprises/" +
-    percent_encode(parameter_value(enterprise)) +
+    @http.percent_encode(parameter_value(enterprise)) +
     "/actions/cache/retention-limit",
   )
 }
@@ -1546,7 +1542,7 @@ pub fn actions_set_actions_cache_retention_limit_for_enterprise_request(
 ) -> @http.Request {
   @http.Request::put(
     "/enterprises/" +
-    percent_encode(parameter_value(enterprise)) +
+    @http.percent_encode(parameter_value(enterprise)) +
     "/actions/cache/retention-limit",
   ).json_body(Json(body))
 }
@@ -1559,7 +1555,7 @@ pub fn actions_get_actions_cache_storage_limit_for_enterprise_request(
 ) -> @http.Request {
   @http.Request::get(
     "/enterprises/" +
-    percent_encode(parameter_value(enterprise)) +
+    @http.percent_encode(parameter_value(enterprise)) +
     "/actions/cache/storage-limit",
   )
 }
@@ -1591,7 +1587,7 @@ pub fn actions_set_actions_cache_storage_limit_for_enterprise_request(
 ) -> @http.Request {
   @http.Request::put(
     "/enterprises/" +
-    percent_encode(parameter_value(enterprise)) +
+    @http.percent_encode(parameter_value(enterprise)) +
     "/actions/cache/storage-limit",
   ).json_body(Json(body))
 }
@@ -1604,7 +1600,7 @@ pub fn oidc_list_oidc_custom_property_inclusions_for_enterprise_request(
 ) -> @http.Request {
   @http.Request::get(
     "/enterprises/" +
-    percent_encode(parameter_value(enterprise)) +
+    @http.percent_encode(parameter_value(enterprise)) +
     "/actions/oidc/customization/properties/repo",
   )
 }
@@ -1636,7 +1632,7 @@ pub fn oidc_create_oidc_custom_property_inclusion_for_enterprise_request(
 ) -> @http.Request {
   @http.Request::post(
     "/enterprises/" +
-    percent_encode(parameter_value(enterprise)) +
+    @http.percent_encode(parameter_value(enterprise)) +
     "/actions/oidc/customization/properties/repo",
   ).json_body(Json(body))
 }
@@ -1668,9 +1664,9 @@ pub fn oidc_delete_oidc_custom_property_inclusion_for_enterprise_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/enterprises/" +
-    percent_encode(parameter_value(enterprise)) +
+    @http.percent_encode(parameter_value(enterprise)) +
     "/actions/oidc/customization/properties/repo/" +
-    percent_encode(parameter_value(custom_property_name)),
+    @http.percent_encode(parameter_value(custom_property_name)),
   )
 }
 
@@ -1684,18 +1680,21 @@ pub fn code_security_get_configurations_for_enterprise_request(
   after? : String,
 ) -> @http.Request {
   let mut url = "/enterprises/" +
-    percent_encode(parameter_value(enterprise)) +
+    @http.percent_encode(parameter_value(enterprise)) +
     "/code-security/configurations"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match before {
-    Some(value) => url = append_query(url, "before", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "before", parameter_value(value))
     None => ()
   }
   match after {
-    Some(value) => url = append_query(url, "after", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "after", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -1728,7 +1727,7 @@ pub fn code_security_create_configuration_for_enterprise_request(
 ) -> @http.Request {
   @http.Request::post(
     "/enterprises/" +
-    percent_encode(parameter_value(enterprise)) +
+    @http.percent_encode(parameter_value(enterprise)) +
     "/code-security/configurations",
   ).json_body(Json(body))
 }
@@ -1759,7 +1758,7 @@ pub fn code_security_get_default_configurations_for_enterprise_request(
 ) -> @http.Request {
   @http.Request::get(
     "/enterprises/" +
-    percent_encode(parameter_value(enterprise)) +
+    @http.percent_encode(parameter_value(enterprise)) +
     "/code-security/configurations/defaults",
   )
 }
@@ -1791,9 +1790,9 @@ pub fn code_security_get_single_configuration_for_enterprise_request(
 ) -> @http.Request {
   @http.Request::get(
     "/enterprises/" +
-    percent_encode(parameter_value(enterprise)) +
+    @http.percent_encode(parameter_value(enterprise)) +
     "/code-security/configurations/" +
-    percent_encode(parameter_value(configuration_id)),
+    @http.percent_encode(parameter_value(configuration_id)),
   )
 }
 
@@ -1825,9 +1824,9 @@ pub fn code_security_update_enterprise_configuration_request(
 ) -> @http.Request {
   @http.Request::patch(
     "/enterprises/" +
-    percent_encode(parameter_value(enterprise)) +
+    @http.percent_encode(parameter_value(enterprise)) +
     "/code-security/configurations/" +
-    percent_encode(parameter_value(configuration_id)),
+    @http.percent_encode(parameter_value(configuration_id)),
   ).json_body(Json(body))
 }
 
@@ -1858,9 +1857,9 @@ pub fn code_security_delete_configuration_for_enterprise_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/enterprises/" +
-    percent_encode(parameter_value(enterprise)) +
+    @http.percent_encode(parameter_value(enterprise)) +
     "/code-security/configurations/" +
-    percent_encode(parameter_value(configuration_id)),
+    @http.percent_encode(parameter_value(configuration_id)),
   )
 }
 
@@ -1874,9 +1873,9 @@ pub fn code_security_attach_enterprise_configuration_request(
 ) -> @http.Request {
   @http.Request::post(
     "/enterprises/" +
-    percent_encode(parameter_value(enterprise)) +
+    @http.percent_encode(parameter_value(enterprise)) +
     "/code-security/configurations/" +
-    percent_encode(parameter_value(configuration_id)) +
+    @http.percent_encode(parameter_value(configuration_id)) +
     "/attach",
   ).json_body(Json(body))
 }
@@ -1891,9 +1890,9 @@ pub fn code_security_set_configuration_as_default_for_enterprise_request(
 ) -> @http.Request {
   @http.Request::put(
     "/enterprises/" +
-    percent_encode(parameter_value(enterprise)) +
+    @http.percent_encode(parameter_value(enterprise)) +
     "/code-security/configurations/" +
-    percent_encode(parameter_value(configuration_id)) +
+    @http.percent_encode(parameter_value(configuration_id)) +
     "/defaults",
   ).json_body(Json(body))
 }
@@ -1928,24 +1927,28 @@ pub fn code_security_get_repositories_for_enterprise_configuration_request(
   status? : String,
 ) -> @http.Request {
   let mut url = "/enterprises/" +
-    percent_encode(parameter_value(enterprise)) +
+    @http.percent_encode(parameter_value(enterprise)) +
     "/code-security/configurations/" +
-    percent_encode(parameter_value(configuration_id)) +
+    @http.percent_encode(parameter_value(configuration_id)) +
     "/repositories"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match before {
-    Some(value) => url = append_query(url, "before", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "before", parameter_value(value))
     None => ()
   }
   match after {
-    Some(value) => url = append_query(url, "after", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "after", parameter_value(value))
     None => ()
   }
   match status {
-    Some(value) => url = append_query(url, "status", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "status", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -1977,9 +1980,9 @@ pub fn copilot_copilot_enterprise_one_day_usage_metrics_request(
   day : String,
 ) -> @http.Request {
   let mut url = "/enterprises/" +
-    percent_encode(parameter_value(enterprise)) +
+    @http.percent_encode(parameter_value(enterprise)) +
     "/copilot/metrics/reports/enterprise-1-day"
-  url = append_query(url, "day", parameter_value(day))
+  url = @http.append_query(url, "day", parameter_value(day))
   @http.Request::get(url)
 }
 
@@ -2009,7 +2012,7 @@ pub fn copilot_copilot_enterprise_usage_metrics_request(
 ) -> @http.Request {
   @http.Request::get(
     "/enterprises/" +
-    percent_encode(parameter_value(enterprise)) +
+    @http.percent_encode(parameter_value(enterprise)) +
     "/copilot/metrics/reports/enterprise-28-day/latest",
   )
 }
@@ -2040,9 +2043,9 @@ pub fn copilot_copilot_enterprise_repos_one_day_report_request(
   day : String,
 ) -> @http.Request {
   let mut url = "/enterprises/" +
-    percent_encode(parameter_value(enterprise)) +
+    @http.percent_encode(parameter_value(enterprise)) +
     "/copilot/metrics/reports/repos-1-day"
-  url = append_query(url, "day", parameter_value(day))
+  url = @http.append_query(url, "day", parameter_value(day))
   @http.Request::get(url)
 }
 
@@ -2072,9 +2075,9 @@ pub fn copilot_copilot_enterprise_user_teams_one_day_report_request(
   day : String,
 ) -> @http.Request {
   let mut url = "/enterprises/" +
-    percent_encode(parameter_value(enterprise)) +
+    @http.percent_encode(parameter_value(enterprise)) +
     "/copilot/metrics/reports/user-teams-1-day"
-  url = append_query(url, "day", parameter_value(day))
+  url = @http.append_query(url, "day", parameter_value(day))
   @http.Request::get(url)
 }
 
@@ -2104,9 +2107,9 @@ pub fn copilot_copilot_users_one_day_usage_metrics_request(
   day : String,
 ) -> @http.Request {
   let mut url = "/enterprises/" +
-    percent_encode(parameter_value(enterprise)) +
+    @http.percent_encode(parameter_value(enterprise)) +
     "/copilot/metrics/reports/users-1-day"
-  url = append_query(url, "day", parameter_value(day))
+  url = @http.append_query(url, "day", parameter_value(day))
   @http.Request::get(url)
 }
 
@@ -2136,7 +2139,7 @@ pub fn copilot_copilot_users_usage_metrics_request(
 ) -> @http.Request {
   @http.Request::get(
     "/enterprises/" +
-    percent_encode(parameter_value(enterprise)) +
+    @http.percent_encode(parameter_value(enterprise)) +
     "/copilot/metrics/reports/users-28-day/latest",
   )
 }
@@ -2168,7 +2171,7 @@ pub fn copilot_set_enterprise_coding_agent_policy_request(
 ) -> @http.Request {
   @http.Request::put(
     "/enterprises/" +
-    percent_encode(parameter_value(enterprise)) +
+    @http.percent_encode(parameter_value(enterprise)) +
     "/copilot/policies/coding_agent",
   ).json_body(Json(body))
 }
@@ -2182,7 +2185,7 @@ pub fn copilot_add_organizations_to_enterprise_coding_agent_policy_request(
 ) -> @http.Request {
   @http.Request::post(
     "/enterprises/" +
-    percent_encode(parameter_value(enterprise)) +
+    @http.percent_encode(parameter_value(enterprise)) +
     "/copilot/policies/coding_agent/organizations",
   ).json_body(Json(body))
 }
@@ -2196,7 +2199,7 @@ pub fn copilot_remove_organizations_from_enterprise_coding_agent_policy_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/enterprises/" +
-    percent_encode(parameter_value(enterprise)) +
+    @http.percent_encode(parameter_value(enterprise)) +
     "/copilot/policies/coding_agent/organizations",
   ).json_body(Json(body))
 }
@@ -2223,69 +2226,79 @@ pub fn dependabot_list_alerts_for_enterprise_request(
   per_page? : Int32,
 ) -> @http.Request {
   let mut url = "/enterprises/" +
-    percent_encode(parameter_value(enterprise)) +
+    @http.percent_encode(parameter_value(enterprise)) +
     "/dependabot/alerts"
   match classification {
     Some(value) =>
-      url = append_query(url, "classification", parameter_value(value))
+      url = @http.append_query(url, "classification", parameter_value(value))
     None => ()
   }
   match state {
-    Some(value) => url = append_query(url, "state", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "state", parameter_value(value))
     None => ()
   }
   match severity {
-    Some(value) => url = append_query(url, "severity", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "severity", parameter_value(value))
     None => ()
   }
   match ecosystem {
-    Some(value) => url = append_query(url, "ecosystem", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "ecosystem", parameter_value(value))
     None => ()
   }
   match package_ {
-    Some(value) => url = append_query(url, "package", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "package", parameter_value(value))
     None => ()
   }
   match epss_percentage {
     Some(value) =>
-      url = append_query(url, "epss_percentage", parameter_value(value))
+      url = @http.append_query(url, "epss_percentage", parameter_value(value))
     None => ()
   }
   match has {
-    Some(value) => url = append_query(url, "has", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "has", parameter_value(value))
     None => ()
   }
   match assignee {
-    Some(value) => url = append_query(url, "assignee", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "assignee", parameter_value(value))
     None => ()
   }
   match scope {
-    Some(value) => url = append_query(url, "scope", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "scope", parameter_value(value))
     None => ()
   }
   match relationship {
     Some(value) =>
-      url = append_query(url, "relationship", parameter_value(value))
+      url = @http.append_query(url, "relationship", parameter_value(value))
     None => ()
   }
   match sort {
-    Some(value) => url = append_query(url, "sort", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "sort", parameter_value(value))
     None => ()
   }
   match direction {
-    Some(value) => url = append_query(url, "direction", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "direction", parameter_value(value))
     None => ()
   }
   match before {
-    Some(value) => url = append_query(url, "before", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "before", parameter_value(value))
     None => ()
   }
   match after {
-    Some(value) => url = append_query(url, "after", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "after", parameter_value(value))
     None => ()
   }
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -2318,14 +2331,15 @@ pub fn dependabot_repository_access_for_enterprise_request(
   per_page? : Int32,
 ) -> @http.Request {
   let mut url = "/enterprises/" +
-    percent_encode(parameter_value(enterprise)) +
+    @http.percent_encode(parameter_value(enterprise)) +
     "/dependabot/repository-access"
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -2358,7 +2372,7 @@ pub fn dependabot_update_repository_access_for_enterprise_request(
 ) -> @http.Request {
   @http.Request::patch(
     "/enterprises/" +
-    percent_encode(parameter_value(enterprise)) +
+    @http.percent_encode(parameter_value(enterprise)) +
     "/dependabot/repository-access",
   ).json_body(Json(body))
 }
@@ -2372,7 +2386,7 @@ pub fn dependabot_set_repository_access_default_level_for_enterprise_request(
 ) -> @http.Request {
   @http.Request::put(
     "/enterprises/" +
-    percent_encode(parameter_value(enterprise)) +
+    @http.percent_encode(parameter_value(enterprise)) +
     "/dependabot/repository-access/default-level",
   ).json_body(Json(body))
 }
@@ -2386,11 +2400,12 @@ pub fn activity_list_public_events_request(
 ) -> @http.Request {
   let mut url = "/events"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -2449,15 +2464,17 @@ pub fn gists_list_request(
 ) -> @http.Request {
   let mut url = "/gists"
   match since {
-    Some(value) => url = append_query(url, "since", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "since", parameter_value(value))
     None => ()
   }
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -2516,15 +2533,17 @@ pub fn gists_list_public_request(
 ) -> @http.Request {
   let mut url = "/gists/public"
   match since {
-    Some(value) => url = append_query(url, "since", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "since", parameter_value(value))
     None => ()
   }
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -2558,15 +2577,17 @@ pub fn gists_list_starred_request(
 ) -> @http.Request {
   let mut url = "/gists/starred"
   match since {
-    Some(value) => url = append_query(url, "since", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "since", parameter_value(value))
     None => ()
   }
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -2594,7 +2615,7 @@ pub fn gists_list_starred_decode(
 ///
 /// Get a gist
 pub fn gists_get_request(gist_id : String) -> @http.Request {
-  @http.Request::get("/gists/" + percent_encode(parameter_value(gist_id)))
+  @http.Request::get("/gists/" + @http.percent_encode(parameter_value(gist_id)))
 }
 
 ///|
@@ -2622,9 +2643,9 @@ pub fn gists_update_request(
   gist_id : String,
   body : GistsUpdateRequest,
 ) -> @http.Request {
-  @http.Request::patch("/gists/" + percent_encode(parameter_value(gist_id))).json_body(
-    Json(body),
-  )
+  @http.Request::patch(
+    "/gists/" + @http.percent_encode(parameter_value(gist_id)),
+  ).json_body(Json(body))
 }
 
 ///|
@@ -2649,7 +2670,9 @@ pub fn gists_update_decode(
 ///
 /// Delete a gist The caller handles the response as @http.Response.
 pub fn gists_delete_request(gist_id : String) -> @http.Request {
-  @http.Request::delete("/gists/" + percent_encode(parameter_value(gist_id)))
+  @http.Request::delete(
+    "/gists/" + @http.percent_encode(parameter_value(gist_id)),
+  )
 }
 
 ///|
@@ -2661,14 +2684,15 @@ pub fn gists_list_comments_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/gists/" +
-    percent_encode(parameter_value(gist_id)) +
+    @http.percent_encode(parameter_value(gist_id)) +
     "/comments"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -2700,7 +2724,7 @@ pub fn gists_create_comment_request(
   body : GistsCreateCommentRequest,
 ) -> @http.Request {
   @http.Request::post(
-    "/gists/" + percent_encode(parameter_value(gist_id)) + "/comments",
+    "/gists/" + @http.percent_encode(parameter_value(gist_id)) + "/comments",
   ).json_body(Json(body))
 }
 
@@ -2731,9 +2755,9 @@ pub fn gists_get_comment_request(
 ) -> @http.Request {
   @http.Request::get(
     "/gists/" +
-    percent_encode(parameter_value(gist_id)) +
+    @http.percent_encode(parameter_value(gist_id)) +
     "/comments/" +
-    percent_encode(parameter_value(comment_id)),
+    @http.percent_encode(parameter_value(comment_id)),
   )
 }
 
@@ -2765,9 +2789,9 @@ pub fn gists_update_comment_request(
 ) -> @http.Request {
   @http.Request::patch(
     "/gists/" +
-    percent_encode(parameter_value(gist_id)) +
+    @http.percent_encode(parameter_value(gist_id)) +
     "/comments/" +
-    percent_encode(parameter_value(comment_id)),
+    @http.percent_encode(parameter_value(comment_id)),
   ).json_body(Json(body))
 }
 
@@ -2798,9 +2822,9 @@ pub fn gists_delete_comment_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/gists/" +
-    percent_encode(parameter_value(gist_id)) +
+    @http.percent_encode(parameter_value(gist_id)) +
     "/comments/" +
-    percent_encode(parameter_value(comment_id)),
+    @http.percent_encode(parameter_value(comment_id)),
   )
 }
 
@@ -2813,14 +2837,15 @@ pub fn gists_list_commits_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/gists/" +
-    percent_encode(parameter_value(gist_id)) +
+    @http.percent_encode(parameter_value(gist_id)) +
     "/commits"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -2852,13 +2877,16 @@ pub fn gists_list_forks_request(
   per_page? : Int32,
   page? : Int32,
 ) -> @http.Request {
-  let mut url = "/gists/" + percent_encode(parameter_value(gist_id)) + "/forks"
+  let mut url = "/gists/" +
+    @http.percent_encode(parameter_value(gist_id)) +
+    "/forks"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -2887,7 +2915,7 @@ pub fn gists_list_forks_decode(
 /// Fork a gist
 pub fn gists_fork_request(gist_id : String) -> @http.Request {
   @http.Request::post(
-    "/gists/" + percent_encode(parameter_value(gist_id)) + "/forks",
+    "/gists/" + @http.percent_encode(parameter_value(gist_id)) + "/forks",
   )
 }
 
@@ -2914,7 +2942,7 @@ pub fn gists_fork_decode(
 /// Check if a gist is starred The caller handles the response as @http.Response.
 pub fn gists_check_is_starred_request(gist_id : String) -> @http.Request {
   @http.Request::get(
-    "/gists/" + percent_encode(parameter_value(gist_id)) + "/star",
+    "/gists/" + @http.percent_encode(parameter_value(gist_id)) + "/star",
   )
 }
 
@@ -2923,7 +2951,7 @@ pub fn gists_check_is_starred_request(gist_id : String) -> @http.Request {
 /// Star a gist The caller handles the response as @http.Response.
 pub fn gists_star_request(gist_id : String) -> @http.Request {
   @http.Request::put(
-    "/gists/" + percent_encode(parameter_value(gist_id)) + "/star",
+    "/gists/" + @http.percent_encode(parameter_value(gist_id)) + "/star",
   )
 }
 
@@ -2932,7 +2960,7 @@ pub fn gists_star_request(gist_id : String) -> @http.Request {
 /// Unstar a gist The caller handles the response as @http.Response.
 pub fn gists_unstar_request(gist_id : String) -> @http.Request {
   @http.Request::delete(
-    "/gists/" + percent_encode(parameter_value(gist_id)) + "/star",
+    "/gists/" + @http.percent_encode(parameter_value(gist_id)) + "/star",
   )
 }
 
@@ -2945,9 +2973,9 @@ pub fn gists_get_revision_request(
 ) -> @http.Request {
   @http.Request::get(
     "/gists/" +
-    percent_encode(parameter_value(gist_id)) +
+    @http.percent_encode(parameter_value(gist_id)) +
     "/" +
-    percent_encode(parameter_value(sha)),
+    @http.percent_encode(parameter_value(sha)),
   )
 }
 
@@ -2999,7 +3027,7 @@ pub fn gitignore_get_all_templates_decode(
 /// Get a gitignore template
 pub fn gitignore_get_template_request(name : String) -> @http.Request {
   @http.Request::get(
-    "/gitignore/templates/" + percent_encode(parameter_value(name)),
+    "/gitignore/templates/" + @http.percent_encode(parameter_value(name)),
   )
 }
 
@@ -3030,11 +3058,12 @@ pub fn apps_list_repos_accessible_to_installation_request(
 ) -> @http.Request {
   let mut url = "/installation/repositories"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -3084,51 +3113,60 @@ pub fn issues_list_request(
 ) -> @http.Request {
   let mut url = "/issues"
   match filter {
-    Some(value) => url = append_query(url, "filter", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "filter", parameter_value(value))
     None => ()
   }
   match state {
-    Some(value) => url = append_query(url, "state", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "state", parameter_value(value))
     None => ()
   }
   match labels {
-    Some(value) => url = append_query(url, "labels", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "labels", parameter_value(value))
     None => ()
   }
   match sort {
-    Some(value) => url = append_query(url, "sort", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "sort", parameter_value(value))
     None => ()
   }
   match direction {
-    Some(value) => url = append_query(url, "direction", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "direction", parameter_value(value))
     None => ()
   }
   match since {
-    Some(value) => url = append_query(url, "since", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "since", parameter_value(value))
     None => ()
   }
   match collab {
-    Some(value) => url = append_query(url, "collab", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "collab", parameter_value(value))
     None => ()
   }
   match orgs {
-    Some(value) => url = append_query(url, "orgs", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "orgs", parameter_value(value))
     None => ()
   }
   match owned {
-    Some(value) => url = append_query(url, "owned", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "owned", parameter_value(value))
     None => ()
   }
   match pulls {
-    Some(value) => url = append_query(url, "pulls", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "pulls", parameter_value(value))
     None => ()
   }
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -3162,15 +3200,17 @@ pub fn licenses_get_all_commonly_used_request(
 ) -> @http.Request {
   let mut url = "/licenses"
   match featured {
-    Some(value) => url = append_query(url, "featured", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "featured", parameter_value(value))
     None => ()
   }
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -3198,7 +3238,9 @@ pub fn licenses_get_all_commonly_used_decode(
 ///
 /// Get a license
 pub fn licenses_get_request(license : String) -> @http.Request {
-  @http.Request::get("/licenses/" + percent_encode(parameter_value(license)))
+  @http.Request::get(
+    "/licenses/" + @http.percent_encode(parameter_value(license)),
+  )
 }
 
 ///|
@@ -3241,7 +3283,7 @@ pub fn apps_get_subscription_plan_for_account_request(
 ) -> @http.Request {
   @http.Request::get(
     "/marketplace_listing/accounts/" +
-    percent_encode(parameter_value(account_id)),
+    @http.percent_encode(parameter_value(account_id)),
   )
 }
 
@@ -3272,11 +3314,12 @@ pub fn apps_list_plans_request(
 ) -> @http.Request {
   let mut url = "/marketplace_listing/plans"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -3311,22 +3354,24 @@ pub fn apps_list_accounts_for_plan_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/marketplace_listing/plans/" +
-    percent_encode(parameter_value(plan_id)) +
+    @http.percent_encode(parameter_value(plan_id)) +
     "/accounts"
   match sort {
-    Some(value) => url = append_query(url, "sort", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "sort", parameter_value(value))
     None => ()
   }
   match direction {
-    Some(value) => url = append_query(url, "direction", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "direction", parameter_value(value))
     None => ()
   }
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -3358,7 +3403,7 @@ pub fn apps_get_subscription_plan_for_account_stubbed_request(
 ) -> @http.Request {
   @http.Request::get(
     "/marketplace_listing/stubbed/accounts/" +
-    percent_encode(parameter_value(account_id)),
+    @http.percent_encode(parameter_value(account_id)),
   )
 }
 
@@ -3389,11 +3434,12 @@ pub fn apps_list_plans_stubbed_request(
 ) -> @http.Request {
   let mut url = "/marketplace_listing/stubbed/plans"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -3428,22 +3474,24 @@ pub fn apps_list_accounts_for_plan_stubbed_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/marketplace_listing/stubbed/plans/" +
-    percent_encode(parameter_value(plan_id)) +
+    @http.percent_encode(parameter_value(plan_id)) +
     "/accounts"
   match sort {
-    Some(value) => url = append_query(url, "sort", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "sort", parameter_value(value))
     None => ()
   }
   match direction {
-    Some(value) => url = append_query(url, "direction", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "direction", parameter_value(value))
     None => ()
   }
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -3502,16 +3550,17 @@ pub fn activity_list_public_events_for_repo_network_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/networks/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/events"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -3548,28 +3597,31 @@ pub fn activity_list_notifications_for_authenticated_user_request(
 ) -> @http.Request {
   let mut url = "/notifications"
   match all {
-    Some(value) => url = append_query(url, "all", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "all", parameter_value(value))
     None => ()
   }
   match participating {
     Some(value) =>
-      url = append_query(url, "participating", parameter_value(value))
+      url = @http.append_query(url, "participating", parameter_value(value))
     None => ()
   }
   match since {
-    Some(value) => url = append_query(url, "since", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "since", parameter_value(value))
     None => ()
   }
   match before {
-    Some(value) => url = append_query(url, "before", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "before", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -3625,7 +3677,7 @@ pub fn activity_mark_notifications_as_read_decode(
 /// Get a thread
 pub fn activity_get_thread_request(thread_id : Int32) -> @http.Request {
   @http.Request::get(
-    "/notifications/threads/" + percent_encode(parameter_value(thread_id)),
+    "/notifications/threads/" + @http.percent_encode(parameter_value(thread_id)),
   )
 }
 
@@ -3652,7 +3704,7 @@ pub fn activity_get_thread_decode(
 /// Mark a thread as read The caller handles the response as @http.Response.
 pub fn activity_mark_thread_as_read_request(thread_id : Int32) -> @http.Request {
   @http.Request::patch(
-    "/notifications/threads/" + percent_encode(parameter_value(thread_id)),
+    "/notifications/threads/" + @http.percent_encode(parameter_value(thread_id)),
   )
 }
 
@@ -3661,7 +3713,7 @@ pub fn activity_mark_thread_as_read_request(thread_id : Int32) -> @http.Request 
 /// Mark a thread as done The caller handles the response as @http.Response.
 pub fn activity_mark_thread_as_done_request(thread_id : Int32) -> @http.Request {
   @http.Request::delete(
-    "/notifications/threads/" + percent_encode(parameter_value(thread_id)),
+    "/notifications/threads/" + @http.percent_encode(parameter_value(thread_id)),
   )
 }
 
@@ -3673,7 +3725,7 @@ pub fn activity_get_thread_subscription_for_authenticated_user_request(
 ) -> @http.Request {
   @http.Request::get(
     "/notifications/threads/" +
-    percent_encode(parameter_value(thread_id)) +
+    @http.percent_encode(parameter_value(thread_id)) +
     "/subscription",
   )
 }
@@ -3705,7 +3757,7 @@ pub fn activity_set_thread_subscription_request(
 ) -> @http.Request {
   @http.Request::put(
     "/notifications/threads/" +
-    percent_encode(parameter_value(thread_id)) +
+    @http.percent_encode(parameter_value(thread_id)) +
     "/subscription",
   ).json_body(Json(body))
 }
@@ -3736,7 +3788,7 @@ pub fn activity_delete_thread_subscription_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/notifications/threads/" +
-    percent_encode(parameter_value(thread_id)) +
+    @http.percent_encode(parameter_value(thread_id)) +
     "/subscription",
   )
 }
@@ -3747,7 +3799,7 @@ pub fn activity_delete_thread_subscription_request(
 pub fn meta_get_octocat_request(s? : String) -> @http.Request {
   let mut url = "/octocat"
   match s {
-    Some(value) => url = append_query(url, "s", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "s", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -3759,11 +3811,13 @@ pub fn meta_get_octocat_request(s? : String) -> @http.Request {
 pub fn orgs_list_request(since? : Int32, per_page? : Int32) -> @http.Request {
   let mut url = "/organizations"
   match since {
-    Some(value) => url = append_query(url, "since", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "since", parameter_value(value))
     None => ()
   }
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -3795,7 +3849,7 @@ pub fn actions_get_actions_cache_retention_limit_for_organization_request(
 ) -> @http.Request {
   @http.Request::get(
     "/organizations/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/actions/cache/retention-limit",
   )
 }
@@ -3827,7 +3881,7 @@ pub fn actions_set_actions_cache_retention_limit_for_organization_request(
 ) -> @http.Request {
   @http.Request::put(
     "/organizations/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/actions/cache/retention-limit",
   ).json_body(Json(body))
 }
@@ -3840,7 +3894,7 @@ pub fn actions_get_actions_cache_storage_limit_for_organization_request(
 ) -> @http.Request {
   @http.Request::get(
     "/organizations/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/actions/cache/storage-limit",
   )
 }
@@ -3872,7 +3926,7 @@ pub fn actions_set_actions_cache_storage_limit_for_organization_request(
 ) -> @http.Request {
   @http.Request::put(
     "/organizations/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/actions/cache/storage-limit",
   ).json_body(Json(body))
 }
@@ -3890,30 +3944,33 @@ pub fn billing_get_github_billing_ai_credit_usage_report_org_request(
   product? : String,
 ) -> @http.Request {
   let mut url = "/organizations/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/settings/billing/ai_credit/usage"
   match year {
-    Some(value) => url = append_query(url, "year", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "year", parameter_value(value))
     None => ()
   }
   match month {
-    Some(value) => url = append_query(url, "month", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "month", parameter_value(value))
     None => ()
   }
   match day {
-    Some(value) => url = append_query(url, "day", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "day", parameter_value(value))
     None => ()
   }
   match user {
-    Some(value) => url = append_query(url, "user", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "user", parameter_value(value))
     None => ()
   }
   match model {
-    Some(value) => url = append_query(url, "model", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "model", parameter_value(value))
     None => ()
   }
   match product {
-    Some(value) => url = append_query(url, "product", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "product", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -3930,22 +3987,24 @@ pub fn billing_get_all_budgets_org_request(
   user? : String,
 ) -> @http.Request {
   let mut url = "/organizations/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/settings/billing/budgets"
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match scope {
-    Some(value) => url = append_query(url, "scope", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "scope", parameter_value(value))
     None => ()
   }
   match user {
-    Some(value) => url = append_query(url, "user", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "user", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -3960,7 +4019,7 @@ pub fn billing_create_organization_budget_request(
 ) -> @http.Request {
   @http.Request::post(
     "/organizations/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/settings/billing/budgets",
   ).json_body(Json(body))
 }
@@ -3992,9 +4051,9 @@ pub fn billing_get_budget_org_request(
 ) -> @http.Request {
   @http.Request::get(
     "/organizations/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/settings/billing/budgets/" +
-    percent_encode(parameter_value(budget_id)),
+    @http.percent_encode(parameter_value(budget_id)),
   )
 }
 
@@ -4008,9 +4067,9 @@ pub fn billing_update_budget_org_request(
 ) -> @http.Request {
   @http.Request::patch(
     "/organizations/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/settings/billing/budgets/" +
-    percent_encode(parameter_value(budget_id)),
+    @http.percent_encode(parameter_value(budget_id)),
   ).json_body(Json(body))
 }
 
@@ -4041,9 +4100,9 @@ pub fn billing_delete_budget_org_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/organizations/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/settings/billing/budgets/" +
-    percent_encode(parameter_value(budget_id)),
+    @http.percent_encode(parameter_value(budget_id)),
   )
 }
 
@@ -4060,30 +4119,33 @@ pub fn billing_get_github_billing_premium_request_usage_report_org_request(
   product? : String,
 ) -> @http.Request {
   let mut url = "/organizations/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/settings/billing/premium_request/usage"
   match year {
-    Some(value) => url = append_query(url, "year", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "year", parameter_value(value))
     None => ()
   }
   match month {
-    Some(value) => url = append_query(url, "month", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "month", parameter_value(value))
     None => ()
   }
   match day {
-    Some(value) => url = append_query(url, "day", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "day", parameter_value(value))
     None => ()
   }
   match user {
-    Some(value) => url = append_query(url, "user", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "user", parameter_value(value))
     None => ()
   }
   match model {
-    Some(value) => url = append_query(url, "model", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "model", parameter_value(value))
     None => ()
   }
   match product {
-    Some(value) => url = append_query(url, "product", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "product", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -4099,18 +4161,19 @@ pub fn billing_get_github_billing_usage_report_org_request(
   day? : Int32,
 ) -> @http.Request {
   let mut url = "/organizations/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/settings/billing/usage"
   match year {
-    Some(value) => url = append_query(url, "year", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "year", parameter_value(value))
     None => ()
   }
   match month {
-    Some(value) => url = append_query(url, "month", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "month", parameter_value(value))
     None => ()
   }
   match day {
-    Some(value) => url = append_query(url, "day", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "day", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -4129,30 +4192,33 @@ pub fn billing_get_github_billing_usage_summary_report_org_request(
   sku? : String,
 ) -> @http.Request {
   let mut url = "/organizations/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/settings/billing/usage/summary"
   match year {
-    Some(value) => url = append_query(url, "year", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "year", parameter_value(value))
     None => ()
   }
   match month {
-    Some(value) => url = append_query(url, "month", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "month", parameter_value(value))
     None => ()
   }
   match day {
-    Some(value) => url = append_query(url, "day", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "day", parameter_value(value))
     None => ()
   }
   match repository {
-    Some(value) => url = append_query(url, "repository", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "repository", parameter_value(value))
     None => ()
   }
   match product {
-    Some(value) => url = append_query(url, "product", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "product", parameter_value(value))
     None => ()
   }
   match sku {
-    Some(value) => url = append_query(url, "sku", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "sku", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -4162,7 +4228,7 @@ pub fn billing_get_github_billing_usage_summary_report_org_request(
 ///
 /// Get an organization
 pub fn orgs_get_request(org : String) -> @http.Request {
-  @http.Request::get("/orgs/" + percent_encode(parameter_value(org)))
+  @http.Request::get("/orgs/" + @http.percent_encode(parameter_value(org)))
 }
 
 ///|
@@ -4190,7 +4256,7 @@ pub fn orgs_update_request(
   org : String,
   body : OrgsUpdateRequest,
 ) -> @http.Request {
-  @http.Request::patch("/orgs/" + percent_encode(parameter_value(org))).json_body(
+  @http.Request::patch("/orgs/" + @http.percent_encode(parameter_value(org))).json_body(
     Json(body),
   )
 }
@@ -4217,7 +4283,7 @@ pub fn orgs_update_decode(
 ///
 /// Delete an organization The caller handles the response as @http.Response.
 pub fn orgs_delete_request(org : String) -> @http.Request {
-  @http.Request::delete("/orgs/" + percent_encode(parameter_value(org)))
+  @http.Request::delete("/orgs/" + @http.percent_encode(parameter_value(org)))
 }
 
 ///|
@@ -4227,7 +4293,9 @@ pub fn actions_get_actions_cache_usage_for_org_request(
   org : String,
 ) -> @http.Request {
   @http.Request::get(
-    "/orgs/" + percent_encode(parameter_value(org)) + "/actions/cache/usage",
+    "/orgs/" +
+    @http.percent_encode(parameter_value(org)) +
+    "/actions/cache/usage",
   )
 }
 
@@ -4258,14 +4326,15 @@ pub fn actions_get_actions_cache_usage_by_repo_for_org_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/actions/cache/usage-by-repository"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -4298,14 +4367,15 @@ pub fn actions_list_hosted_runners_for_org_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/actions/hosted-runners"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -4337,7 +4407,9 @@ pub fn actions_create_hosted_runner_for_org_request(
   body : ActionsCreateHostedRunnerForOrgRequest,
 ) -> @http.Request {
   @http.Request::post(
-    "/orgs/" + percent_encode(parameter_value(org)) + "/actions/hosted-runners",
+    "/orgs/" +
+    @http.percent_encode(parameter_value(org)) +
+    "/actions/hosted-runners",
   ).json_body(Json(body))
 }
 
@@ -4367,7 +4439,7 @@ pub fn actions_list_custom_images_for_org_request(
 ) -> @http.Request {
   @http.Request::get(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/actions/hosted-runners/images/custom",
   )
 }
@@ -4399,9 +4471,9 @@ pub fn actions_get_custom_image_for_org_request(
 ) -> @http.Request {
   @http.Request::get(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/actions/hosted-runners/images/custom/" +
-    percent_encode(parameter_value(image_definition_id)),
+    @http.percent_encode(parameter_value(image_definition_id)),
   )
 }
 
@@ -4432,9 +4504,9 @@ pub fn actions_delete_custom_image_from_org_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/actions/hosted-runners/images/custom/" +
-    percent_encode(parameter_value(image_definition_id)),
+    @http.percent_encode(parameter_value(image_definition_id)),
   )
 }
 
@@ -4447,9 +4519,9 @@ pub fn actions_list_custom_image_versions_for_org_request(
 ) -> @http.Request {
   @http.Request::get(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/actions/hosted-runners/images/custom/" +
-    percent_encode(parameter_value(image_definition_id)) +
+    @http.percent_encode(parameter_value(image_definition_id)) +
     "/versions",
   )
 }
@@ -4482,11 +4554,11 @@ pub fn actions_get_custom_image_version_for_org_request(
 ) -> @http.Request {
   @http.Request::get(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/actions/hosted-runners/images/custom/" +
-    percent_encode(parameter_value(image_definition_id)) +
+    @http.percent_encode(parameter_value(image_definition_id)) +
     "/versions/" +
-    percent_encode(parameter_value(version)),
+    @http.percent_encode(parameter_value(version)),
   )
 }
 
@@ -4518,11 +4590,11 @@ pub fn actions_delete_custom_image_version_from_org_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/actions/hosted-runners/images/custom/" +
-    percent_encode(parameter_value(image_definition_id)) +
+    @http.percent_encode(parameter_value(image_definition_id)) +
     "/versions/" +
-    percent_encode(parameter_value(version)),
+    @http.percent_encode(parameter_value(version)),
   )
 }
 
@@ -4534,7 +4606,7 @@ pub fn actions_get_hosted_runners_github_owned_images_for_org_request(
 ) -> @http.Request {
   @http.Request::get(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/actions/hosted-runners/images/github-owned",
   )
 }
@@ -4565,7 +4637,7 @@ pub fn actions_get_hosted_runners_partner_images_for_org_request(
 ) -> @http.Request {
   @http.Request::get(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/actions/hosted-runners/images/partner",
   )
 }
@@ -4596,7 +4668,7 @@ pub fn actions_get_hosted_runners_limits_for_org_request(
 ) -> @http.Request {
   @http.Request::get(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/actions/hosted-runners/limits",
   )
 }
@@ -4627,7 +4699,7 @@ pub fn actions_get_hosted_runners_machine_specs_for_org_request(
 ) -> @http.Request {
   @http.Request::get(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/actions/hosted-runners/machine-sizes",
   )
 }
@@ -4658,7 +4730,7 @@ pub fn actions_get_hosted_runners_platforms_for_org_request(
 ) -> @http.Request {
   @http.Request::get(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/actions/hosted-runners/platforms",
   )
 }
@@ -4690,9 +4762,9 @@ pub fn actions_get_hosted_runner_for_org_request(
 ) -> @http.Request {
   @http.Request::get(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/actions/hosted-runners/" +
-    percent_encode(parameter_value(hosted_runner_id)),
+    @http.percent_encode(parameter_value(hosted_runner_id)),
   )
 }
 
@@ -4724,9 +4796,9 @@ pub fn actions_update_hosted_runner_for_org_request(
 ) -> @http.Request {
   @http.Request::patch(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/actions/hosted-runners/" +
-    percent_encode(parameter_value(hosted_runner_id)),
+    @http.percent_encode(parameter_value(hosted_runner_id)),
   ).json_body(Json(body))
 }
 
@@ -4757,9 +4829,9 @@ pub fn actions_delete_hosted_runner_for_org_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/actions/hosted-runners/" +
-    percent_encode(parameter_value(hosted_runner_id)),
+    @http.percent_encode(parameter_value(hosted_runner_id)),
   )
 }
 
@@ -4789,7 +4861,7 @@ pub fn oidc_list_oidc_custom_property_inclusions_for_org_request(
 ) -> @http.Request {
   @http.Request::get(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/actions/oidc/customization/properties/repo",
   )
 }
@@ -4821,7 +4893,7 @@ pub fn oidc_create_oidc_custom_property_inclusion_for_org_request(
 ) -> @http.Request {
   @http.Request::post(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/actions/oidc/customization/properties/repo",
   ).json_body(Json(body))
 }
@@ -4853,9 +4925,9 @@ pub fn oidc_delete_oidc_custom_property_inclusion_for_org_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/actions/oidc/customization/properties/repo/" +
-    percent_encode(parameter_value(custom_property_name)),
+    @http.percent_encode(parameter_value(custom_property_name)),
   )
 }
 
@@ -4867,7 +4939,7 @@ pub fn oidc_get_oidc_custom_sub_template_for_org_request(
 ) -> @http.Request {
   @http.Request::get(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/actions/oidc/customization/sub",
   )
 }
@@ -4899,7 +4971,7 @@ pub fn oidc_update_oidc_custom_sub_template_for_org_request(
 ) -> @http.Request {
   @http.Request::put(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/actions/oidc/customization/sub",
   ).json_body(Json(body))
 }
@@ -4929,7 +5001,9 @@ pub fn actions_get_github_actions_permissions_organization_request(
   org : String,
 ) -> @http.Request {
   @http.Request::get(
-    "/orgs/" + percent_encode(parameter_value(org)) + "/actions/permissions",
+    "/orgs/" +
+    @http.percent_encode(parameter_value(org)) +
+    "/actions/permissions",
   )
 }
 
@@ -4959,7 +5033,9 @@ pub fn actions_set_github_actions_permissions_organization_request(
   body : ActionsSetGithubActionsPermissionsOrganizationRequest,
 ) -> @http.Request {
   @http.Request::put(
-    "/orgs/" + percent_encode(parameter_value(org)) + "/actions/permissions",
+    "/orgs/" +
+    @http.percent_encode(parameter_value(org)) +
+    "/actions/permissions",
   ).json_body(Json(body))
 }
 
@@ -4971,7 +5047,7 @@ pub fn actions_get_artifact_and_log_retention_settings_organization_request(
 ) -> @http.Request {
   @http.Request::get(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/actions/permissions/artifact-and-log-retention",
   )
 }
@@ -5003,7 +5079,7 @@ pub fn actions_set_artifact_and_log_retention_settings_organization_request(
 ) -> @http.Request {
   @http.Request::put(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/actions/permissions/artifact-and-log-retention",
   ).json_body(Json(body))
 }
@@ -5016,7 +5092,7 @@ pub fn actions_get_fork_pr_contributor_approval_permissions_organization_request
 ) -> @http.Request {
   @http.Request::get(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/actions/permissions/fork-pr-contributor-approval",
   )
 }
@@ -5048,7 +5124,7 @@ pub fn actions_set_fork_pr_contributor_approval_permissions_organization_request
 ) -> @http.Request {
   @http.Request::put(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/actions/permissions/fork-pr-contributor-approval",
   ).json_body(Json(body))
 }
@@ -5061,7 +5137,7 @@ pub fn actions_get_private_repo_fork_pr_workflows_settings_organization_request(
 ) -> @http.Request {
   @http.Request::get(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/actions/permissions/fork-pr-workflows-private-repos",
   )
 }
@@ -5093,7 +5169,7 @@ pub fn actions_set_private_repo_fork_pr_workflows_settings_organization_request(
 ) -> @http.Request {
   @http.Request::put(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/actions/permissions/fork-pr-workflows-private-repos",
   ).json_body(Json(body))
 }
@@ -5107,14 +5183,15 @@ pub fn actions_list_selected_repositories_enabled_github_actions_organization_re
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/actions/permissions/repositories"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -5147,7 +5224,7 @@ pub fn actions_set_selected_repositories_enabled_github_actions_organization_req
 ) -> @http.Request {
   @http.Request::put(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/actions/permissions/repositories",
   ).json_body(Json(body))
 }
@@ -5161,9 +5238,9 @@ pub fn actions_enable_selected_repository_github_actions_organization_request(
 ) -> @http.Request {
   @http.Request::put(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/actions/permissions/repositories/" +
-    percent_encode(parameter_value(repository_id)),
+    @http.percent_encode(parameter_value(repository_id)),
   )
 }
 
@@ -5176,9 +5253,9 @@ pub fn actions_disable_selected_repository_github_actions_organization_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/actions/permissions/repositories/" +
-    percent_encode(parameter_value(repository_id)),
+    @http.percent_encode(parameter_value(repository_id)),
   )
 }
 
@@ -5190,7 +5267,7 @@ pub fn actions_get_allowed_actions_organization_request(
 ) -> @http.Request {
   @http.Request::get(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/actions/permissions/selected-actions",
   )
 }
@@ -5222,7 +5299,7 @@ pub fn actions_set_allowed_actions_organization_request(
 ) -> @http.Request {
   @http.Request::put(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/actions/permissions/selected-actions",
   ).json_body(Json(body))
 }
@@ -5235,7 +5312,7 @@ pub fn actions_get_self_hosted_runners_permissions_organization_request(
 ) -> @http.Request {
   @http.Request::get(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/actions/permissions/self-hosted-runners",
   )
 }
@@ -5267,7 +5344,7 @@ pub fn actions_set_self_hosted_runners_permissions_organization_request(
 ) -> @http.Request {
   @http.Request::put(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/actions/permissions/self-hosted-runners",
   ).json_body(Json(body))
 }
@@ -5281,14 +5358,15 @@ pub fn actions_list_selected_repositories_self_hosted_runners_organization_reque
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/actions/permissions/self-hosted-runners/repositories"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -5321,7 +5399,7 @@ pub fn actions_set_selected_repositories_self_hosted_runners_organization_reques
 ) -> @http.Request {
   @http.Request::put(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/actions/permissions/self-hosted-runners/repositories",
   ).json_body(Json(body))
 }
@@ -5335,9 +5413,9 @@ pub fn actions_enable_selected_repository_self_hosted_runners_organization_reque
 ) -> @http.Request {
   @http.Request::put(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/actions/permissions/self-hosted-runners/repositories/" +
-    percent_encode(parameter_value(repository_id)),
+    @http.percent_encode(parameter_value(repository_id)),
   )
 }
 
@@ -5350,9 +5428,9 @@ pub fn actions_disable_selected_repository_self_hosted_runners_organization_requ
 ) -> @http.Request {
   @http.Request::delete(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/actions/permissions/self-hosted-runners/repositories/" +
-    percent_encode(parameter_value(repository_id)),
+    @http.percent_encode(parameter_value(repository_id)),
   )
 }
 
@@ -5364,7 +5442,7 @@ pub fn actions_get_github_actions_default_workflow_permissions_organization_requ
 ) -> @http.Request {
   @http.Request::get(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/actions/permissions/workflow",
   )
 }
@@ -5396,7 +5474,7 @@ pub fn actions_set_github_actions_default_workflow_permissions_organization_requ
 ) -> @http.Request {
   @http.Request::put(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/actions/permissions/workflow",
   ).json_body(Json(body))
 }
@@ -5411,19 +5489,20 @@ pub fn actions_get_org_actions_policies_request(
   has_parents? : Bool,
 ) -> @http.Request {
   let mut url = "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/actions/policies"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   match has_parents {
     Some(value) =>
-      url = append_query(url, "has_parents", parameter_value(value))
+      url = @http.append_query(url, "has_parents", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -5455,7 +5534,7 @@ pub fn actions_create_org_actions_policy_request(
   body : ActionsCreateOrgActionsPolicyRequest,
 ) -> @http.Request {
   @http.Request::post(
-    "/orgs/" + percent_encode(parameter_value(org)) + "/actions/policies",
+    "/orgs/" + @http.percent_encode(parameter_value(org)) + "/actions/policies",
   ).json_body(Json(body))
 }
 
@@ -5486,9 +5565,9 @@ pub fn actions_get_org_actions_policy_request(
 ) -> @http.Request {
   @http.Request::get(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/actions/policies/" +
-    percent_encode(parameter_value(policy_id)),
+    @http.percent_encode(parameter_value(policy_id)),
   )
 }
 
@@ -5520,9 +5599,9 @@ pub fn actions_update_org_actions_policy_request(
 ) -> @http.Request {
   @http.Request::put(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/actions/policies/" +
-    percent_encode(parameter_value(policy_id)),
+    @http.percent_encode(parameter_value(policy_id)),
   ).json_body(Json(body))
 }
 
@@ -5553,9 +5632,9 @@ pub fn actions_delete_org_actions_policy_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/actions/policies/" +
-    percent_encode(parameter_value(policy_id)),
+    @http.percent_encode(parameter_value(policy_id)),
   )
 }
 
@@ -5569,19 +5648,24 @@ pub fn actions_list_self_hosted_runner_groups_for_org_request(
   visible_to_repository? : String,
 ) -> @http.Request {
   let mut url = "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/actions/runner-groups"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   match visible_to_repository {
     Some(value) =>
-      url = append_query(url, "visible_to_repository", parameter_value(value))
+      url = @http.append_query(
+        url,
+        "visible_to_repository",
+        parameter_value(value),
+      )
     None => ()
   }
   @http.Request::get(url)
@@ -5613,7 +5697,9 @@ pub fn actions_create_self_hosted_runner_group_for_org_request(
   body : ActionsCreateSelfHostedRunnerGroupForOrgRequest,
 ) -> @http.Request {
   @http.Request::post(
-    "/orgs/" + percent_encode(parameter_value(org)) + "/actions/runner-groups",
+    "/orgs/" +
+    @http.percent_encode(parameter_value(org)) +
+    "/actions/runner-groups",
   ).json_body(Json(body))
 }
 
@@ -5644,9 +5730,9 @@ pub fn actions_get_self_hosted_runner_group_for_org_request(
 ) -> @http.Request {
   @http.Request::get(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/actions/runner-groups/" +
-    percent_encode(parameter_value(runner_group_id)),
+    @http.percent_encode(parameter_value(runner_group_id)),
   )
 }
 
@@ -5678,9 +5764,9 @@ pub fn actions_update_self_hosted_runner_group_for_org_request(
 ) -> @http.Request {
   @http.Request::patch(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/actions/runner-groups/" +
-    percent_encode(parameter_value(runner_group_id)),
+    @http.percent_encode(parameter_value(runner_group_id)),
   ).json_body(Json(body))
 }
 
@@ -5711,9 +5797,9 @@ pub fn actions_delete_self_hosted_runner_group_from_org_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/actions/runner-groups/" +
-    percent_encode(parameter_value(runner_group_id)),
+    @http.percent_encode(parameter_value(runner_group_id)),
   )
 }
 
@@ -5727,16 +5813,17 @@ pub fn actions_list_github_hosted_runners_in_group_for_org_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/actions/runner-groups/" +
-    percent_encode(parameter_value(runner_group_id)) +
+    @http.percent_encode(parameter_value(runner_group_id)) +
     "/hosted-runners"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -5770,16 +5857,17 @@ pub fn actions_list_repo_access_to_self_hosted_runner_group_in_org_request(
   per_page? : Int32,
 ) -> @http.Request {
   let mut url = "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/actions/runner-groups/" +
-    percent_encode(parameter_value(runner_group_id)) +
+    @http.percent_encode(parameter_value(runner_group_id)) +
     "/repositories"
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -5813,9 +5901,9 @@ pub fn actions_set_repo_access_to_self_hosted_runner_group_in_org_request(
 ) -> @http.Request {
   @http.Request::put(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/actions/runner-groups/" +
-    percent_encode(parameter_value(runner_group_id)) +
+    @http.percent_encode(parameter_value(runner_group_id)) +
     "/repositories",
   ).json_body(Json(body))
 }
@@ -5830,11 +5918,11 @@ pub fn actions_add_repo_access_to_self_hosted_runner_group_in_org_request(
 ) -> @http.Request {
   @http.Request::put(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/actions/runner-groups/" +
-    percent_encode(parameter_value(runner_group_id)) +
+    @http.percent_encode(parameter_value(runner_group_id)) +
     "/repositories/" +
-    percent_encode(parameter_value(repository_id)),
+    @http.percent_encode(parameter_value(repository_id)),
   )
 }
 
@@ -5848,11 +5936,11 @@ pub fn actions_remove_repo_access_to_self_hosted_runner_group_in_org_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/actions/runner-groups/" +
-    percent_encode(parameter_value(runner_group_id)) +
+    @http.percent_encode(parameter_value(runner_group_id)) +
     "/repositories/" +
-    percent_encode(parameter_value(repository_id)),
+    @http.percent_encode(parameter_value(repository_id)),
   )
 }
 
@@ -5866,16 +5954,17 @@ pub fn actions_list_self_hosted_runners_in_group_for_org_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/actions/runner-groups/" +
-    percent_encode(parameter_value(runner_group_id)) +
+    @http.percent_encode(parameter_value(runner_group_id)) +
     "/runners"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -5909,9 +5998,9 @@ pub fn actions_set_self_hosted_runners_in_group_for_org_request(
 ) -> @http.Request {
   @http.Request::put(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/actions/runner-groups/" +
-    percent_encode(parameter_value(runner_group_id)) +
+    @http.percent_encode(parameter_value(runner_group_id)) +
     "/runners",
   ).json_body(Json(body))
 }
@@ -5926,11 +6015,11 @@ pub fn actions_add_self_hosted_runner_to_group_for_org_request(
 ) -> @http.Request {
   @http.Request::put(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/actions/runner-groups/" +
-    percent_encode(parameter_value(runner_group_id)) +
+    @http.percent_encode(parameter_value(runner_group_id)) +
     "/runners/" +
-    percent_encode(parameter_value(runner_id)),
+    @http.percent_encode(parameter_value(runner_id)),
   )
 }
 
@@ -5944,11 +6033,11 @@ pub fn actions_remove_self_hosted_runner_from_group_for_org_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/actions/runner-groups/" +
-    percent_encode(parameter_value(runner_group_id)) +
+    @http.percent_encode(parameter_value(runner_group_id)) +
     "/runners/" +
-    percent_encode(parameter_value(runner_id)),
+    @http.percent_encode(parameter_value(runner_id)),
   )
 }
 
@@ -5962,18 +6051,19 @@ pub fn actions_list_self_hosted_runners_for_org_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/actions/runners"
   match name {
-    Some(value) => url = append_query(url, "name", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "name", parameter_value(value))
     None => ()
   }
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -6006,9 +6096,9 @@ pub fn actions_get_runner_version_deprecation_for_org_request(
 ) -> @http.Request {
   @http.Request::get(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/actions/runners/deprecations/" +
-    percent_encode(parameter_value(version)),
+    @http.percent_encode(parameter_value(version)),
   )
 }
 
@@ -6038,7 +6128,7 @@ pub fn actions_list_runner_applications_for_org_request(
 ) -> @http.Request {
   @http.Request::get(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/actions/runners/downloads",
   )
 }
@@ -6070,7 +6160,7 @@ pub fn actions_generate_runner_jitconfig_for_org_request(
 ) -> @http.Request {
   @http.Request::post(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/actions/runners/generate-jitconfig",
   ).json_body(Json(body))
 }
@@ -6083,7 +6173,7 @@ pub fn actions_create_registration_token_for_org_request(
 ) -> @http.Request {
   @http.Request::post(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/actions/runners/registration-token",
   )
 }
@@ -6114,7 +6204,7 @@ pub fn actions_create_remove_token_for_org_request(
 ) -> @http.Request {
   @http.Request::post(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/actions/runners/remove-token",
   )
 }
@@ -6146,9 +6236,9 @@ pub fn actions_get_self_hosted_runner_for_org_request(
 ) -> @http.Request {
   @http.Request::get(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/actions/runners/" +
-    percent_encode(parameter_value(runner_id)),
+    @http.percent_encode(parameter_value(runner_id)),
   )
 }
 
@@ -6179,9 +6269,9 @@ pub fn actions_delete_self_hosted_runner_from_org_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/actions/runners/" +
-    percent_encode(parameter_value(runner_id)),
+    @http.percent_encode(parameter_value(runner_id)),
   )
 }
 
@@ -6194,9 +6284,9 @@ pub fn actions_list_labels_for_self_hosted_runner_for_org_request(
 ) -> @http.Request {
   @http.Request::get(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/actions/runners/" +
-    percent_encode(parameter_value(runner_id)) +
+    @http.percent_encode(parameter_value(runner_id)) +
     "/labels",
   )
 }
@@ -6211,9 +6301,9 @@ pub fn actions_add_custom_labels_to_self_hosted_runner_for_org_request(
 ) -> @http.Request {
   @http.Request::post(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/actions/runners/" +
-    percent_encode(parameter_value(runner_id)) +
+    @http.percent_encode(parameter_value(runner_id)) +
     "/labels",
   ).json_body(Json(body))
 }
@@ -6228,9 +6318,9 @@ pub fn actions_set_custom_labels_for_self_hosted_runner_for_org_request(
 ) -> @http.Request {
   @http.Request::put(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/actions/runners/" +
-    percent_encode(parameter_value(runner_id)) +
+    @http.percent_encode(parameter_value(runner_id)) +
     "/labels",
   ).json_body(Json(body))
 }
@@ -6244,9 +6334,9 @@ pub fn actions_remove_all_custom_labels_from_self_hosted_runner_for_org_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/actions/runners/" +
-    percent_encode(parameter_value(runner_id)) +
+    @http.percent_encode(parameter_value(runner_id)) +
     "/labels",
   )
 }
@@ -6261,11 +6351,11 @@ pub fn actions_remove_custom_label_from_self_hosted_runner_for_org_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/actions/runners/" +
-    percent_encode(parameter_value(runner_id)) +
+    @http.percent_encode(parameter_value(runner_id)) +
     "/labels/" +
-    percent_encode(parameter_value(name)),
+    @http.percent_encode(parameter_value(name)),
   )
 }
 
@@ -6278,14 +6368,15 @@ pub fn actions_list_org_secrets_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/actions/secrets"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -6315,7 +6406,7 @@ pub fn actions_list_org_secrets_decode(
 pub fn actions_get_org_public_key_request(org : String) -> @http.Request {
   @http.Request::get(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/actions/secrets/public-key",
   )
 }
@@ -6347,9 +6438,9 @@ pub fn actions_get_org_secret_request(
 ) -> @http.Request {
   @http.Request::get(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/actions/secrets/" +
-    percent_encode(parameter_value(secret_name)),
+    @http.percent_encode(parameter_value(secret_name)),
   )
 }
 
@@ -6381,9 +6472,9 @@ pub fn actions_create_or_update_org_secret_request(
 ) -> @http.Request {
   @http.Request::put(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/actions/secrets/" +
-    percent_encode(parameter_value(secret_name)),
+    @http.percent_encode(parameter_value(secret_name)),
   ).json_body(Json(body))
 }
 
@@ -6414,9 +6505,9 @@ pub fn actions_delete_org_secret_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/actions/secrets/" +
-    percent_encode(parameter_value(secret_name)),
+    @http.percent_encode(parameter_value(secret_name)),
   )
 }
 
@@ -6430,16 +6521,17 @@ pub fn actions_list_selected_repos_for_org_secret_request(
   per_page? : Int32,
 ) -> @http.Request {
   let mut url = "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/actions/secrets/" +
-    percent_encode(parameter_value(secret_name)) +
+    @http.percent_encode(parameter_value(secret_name)) +
     "/repositories"
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -6473,9 +6565,9 @@ pub fn actions_set_selected_repos_for_org_secret_request(
 ) -> @http.Request {
   @http.Request::put(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/actions/secrets/" +
-    percent_encode(parameter_value(secret_name)) +
+    @http.percent_encode(parameter_value(secret_name)) +
     "/repositories",
   ).json_body(Json(body))
 }
@@ -6490,11 +6582,11 @@ pub fn actions_add_selected_repo_to_org_secret_request(
 ) -> @http.Request {
   @http.Request::put(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/actions/secrets/" +
-    percent_encode(parameter_value(secret_name)) +
+    @http.percent_encode(parameter_value(secret_name)) +
     "/repositories/" +
-    percent_encode(parameter_value(repository_id)),
+    @http.percent_encode(parameter_value(repository_id)),
   )
 }
 
@@ -6508,11 +6600,11 @@ pub fn actions_remove_selected_repo_from_org_secret_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/actions/secrets/" +
-    percent_encode(parameter_value(secret_name)) +
+    @http.percent_encode(parameter_value(secret_name)) +
     "/repositories/" +
-    percent_encode(parameter_value(repository_id)),
+    @http.percent_encode(parameter_value(repository_id)),
   )
 }
 
@@ -6525,14 +6617,15 @@ pub fn actions_list_org_variables_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/actions/variables"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -6564,7 +6657,7 @@ pub fn actions_create_org_variable_request(
   body : ActionsCreateOrgVariableRequest,
 ) -> @http.Request {
   @http.Request::post(
-    "/orgs/" + percent_encode(parameter_value(org)) + "/actions/variables",
+    "/orgs/" + @http.percent_encode(parameter_value(org)) + "/actions/variables",
   ).json_body(Json(body))
 }
 
@@ -6595,9 +6688,9 @@ pub fn actions_get_org_variable_request(
 ) -> @http.Request {
   @http.Request::get(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/actions/variables/" +
-    percent_encode(parameter_value(name)),
+    @http.percent_encode(parameter_value(name)),
   )
 }
 
@@ -6629,9 +6722,9 @@ pub fn actions_update_org_variable_request(
 ) -> @http.Request {
   @http.Request::patch(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/actions/variables/" +
-    percent_encode(parameter_value(name)),
+    @http.percent_encode(parameter_value(name)),
   ).json_body(Json(body))
 }
 
@@ -6644,9 +6737,9 @@ pub fn actions_delete_org_variable_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/actions/variables/" +
-    percent_encode(parameter_value(name)),
+    @http.percent_encode(parameter_value(name)),
   )
 }
 
@@ -6660,16 +6753,17 @@ pub fn actions_list_selected_repos_for_org_variable_request(
   per_page? : Int32,
 ) -> @http.Request {
   let mut url = "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/actions/variables/" +
-    percent_encode(parameter_value(name)) +
+    @http.percent_encode(parameter_value(name)) +
     "/repositories"
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -6703,9 +6797,9 @@ pub fn actions_set_selected_repos_for_org_variable_request(
 ) -> @http.Request {
   @http.Request::put(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/actions/variables/" +
-    percent_encode(parameter_value(name)) +
+    @http.percent_encode(parameter_value(name)) +
     "/repositories",
   ).json_body(Json(body))
 }
@@ -6720,11 +6814,11 @@ pub fn actions_add_selected_repo_to_org_variable_request(
 ) -> @http.Request {
   @http.Request::put(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/actions/variables/" +
-    percent_encode(parameter_value(name)) +
+    @http.percent_encode(parameter_value(name)) +
     "/repositories/" +
-    percent_encode(parameter_value(repository_id)),
+    @http.percent_encode(parameter_value(repository_id)),
   )
 }
 
@@ -6738,11 +6832,11 @@ pub fn actions_remove_selected_repo_from_org_variable_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/actions/variables/" +
-    percent_encode(parameter_value(name)) +
+    @http.percent_encode(parameter_value(name)) +
     "/repositories/" +
-    percent_encode(parameter_value(repository_id)),
+    @http.percent_encode(parameter_value(repository_id)),
   )
 }
 
@@ -6755,14 +6849,15 @@ pub fn agents_list_org_secrets_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/agents/secrets"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -6792,7 +6887,7 @@ pub fn agents_list_org_secrets_decode(
 pub fn agents_get_org_public_key_request(org : String) -> @http.Request {
   @http.Request::get(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/agents/secrets/public-key",
   )
 }
@@ -6824,9 +6919,9 @@ pub fn agents_get_org_secret_request(
 ) -> @http.Request {
   @http.Request::get(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/agents/secrets/" +
-    percent_encode(parameter_value(secret_name)),
+    @http.percent_encode(parameter_value(secret_name)),
   )
 }
 
@@ -6858,9 +6953,9 @@ pub fn agents_create_or_update_org_secret_request(
 ) -> @http.Request {
   @http.Request::put(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/agents/secrets/" +
-    percent_encode(parameter_value(secret_name)),
+    @http.percent_encode(parameter_value(secret_name)),
   ).json_body(Json(body))
 }
 
@@ -6891,9 +6986,9 @@ pub fn agents_delete_org_secret_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/agents/secrets/" +
-    percent_encode(parameter_value(secret_name)),
+    @http.percent_encode(parameter_value(secret_name)),
   )
 }
 
@@ -6907,16 +7002,17 @@ pub fn agents_list_selected_repos_for_org_secret_request(
   per_page? : Int32,
 ) -> @http.Request {
   let mut url = "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/agents/secrets/" +
-    percent_encode(parameter_value(secret_name)) +
+    @http.percent_encode(parameter_value(secret_name)) +
     "/repositories"
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -6950,9 +7046,9 @@ pub fn agents_set_selected_repos_for_org_secret_request(
 ) -> @http.Request {
   @http.Request::put(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/agents/secrets/" +
-    percent_encode(parameter_value(secret_name)) +
+    @http.percent_encode(parameter_value(secret_name)) +
     "/repositories",
   ).json_body(Json(body))
 }
@@ -6967,11 +7063,11 @@ pub fn agents_add_selected_repo_to_org_secret_request(
 ) -> @http.Request {
   @http.Request::put(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/agents/secrets/" +
-    percent_encode(parameter_value(secret_name)) +
+    @http.percent_encode(parameter_value(secret_name)) +
     "/repositories/" +
-    percent_encode(parameter_value(repository_id)),
+    @http.percent_encode(parameter_value(repository_id)),
   )
 }
 
@@ -6985,11 +7081,11 @@ pub fn agents_remove_selected_repo_from_org_secret_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/agents/secrets/" +
-    percent_encode(parameter_value(secret_name)) +
+    @http.percent_encode(parameter_value(secret_name)) +
     "/repositories/" +
-    percent_encode(parameter_value(repository_id)),
+    @http.percent_encode(parameter_value(repository_id)),
   )
 }
 
@@ -7002,14 +7098,15 @@ pub fn agents_list_org_variables_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/agents/variables"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -7041,7 +7138,7 @@ pub fn agents_create_org_variable_request(
   body : AgentsCreateOrgVariableRequest,
 ) -> @http.Request {
   @http.Request::post(
-    "/orgs/" + percent_encode(parameter_value(org)) + "/agents/variables",
+    "/orgs/" + @http.percent_encode(parameter_value(org)) + "/agents/variables",
   ).json_body(Json(body))
 }
 
@@ -7072,9 +7169,9 @@ pub fn agents_get_org_variable_request(
 ) -> @http.Request {
   @http.Request::get(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/agents/variables/" +
-    percent_encode(parameter_value(name)),
+    @http.percent_encode(parameter_value(name)),
   )
 }
 
@@ -7106,9 +7203,9 @@ pub fn agents_update_org_variable_request(
 ) -> @http.Request {
   @http.Request::patch(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/agents/variables/" +
-    percent_encode(parameter_value(name)),
+    @http.percent_encode(parameter_value(name)),
   ).json_body(Json(body))
 }
 
@@ -7121,9 +7218,9 @@ pub fn agents_delete_org_variable_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/agents/variables/" +
-    percent_encode(parameter_value(name)),
+    @http.percent_encode(parameter_value(name)),
   )
 }
 
@@ -7137,16 +7234,17 @@ pub fn agents_list_selected_repos_for_org_variable_request(
   per_page? : Int32,
 ) -> @http.Request {
   let mut url = "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/agents/variables/" +
-    percent_encode(parameter_value(name)) +
+    @http.percent_encode(parameter_value(name)) +
     "/repositories"
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -7180,9 +7278,9 @@ pub fn agents_set_selected_repos_for_org_variable_request(
 ) -> @http.Request {
   @http.Request::put(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/agents/variables/" +
-    percent_encode(parameter_value(name)) +
+    @http.percent_encode(parameter_value(name)) +
     "/repositories",
   ).json_body(Json(body))
 }
@@ -7197,11 +7295,11 @@ pub fn agents_add_selected_repo_to_org_variable_request(
 ) -> @http.Request {
   @http.Request::put(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/agents/variables/" +
-    percent_encode(parameter_value(name)) +
+    @http.percent_encode(parameter_value(name)) +
     "/repositories/" +
-    percent_encode(parameter_value(repository_id)),
+    @http.percent_encode(parameter_value(repository_id)),
   )
 }
 
@@ -7215,11 +7313,11 @@ pub fn agents_remove_selected_repo_from_org_variable_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/agents/variables/" +
-    percent_encode(parameter_value(name)) +
+    @http.percent_encode(parameter_value(name)) +
     "/repositories/" +
-    percent_encode(parameter_value(repository_id)),
+    @http.percent_encode(parameter_value(repository_id)),
   )
 }
 
@@ -7232,7 +7330,7 @@ pub fn orgs_create_artifact_deployment_record_request(
 ) -> @http.Request {
   @http.Request::post(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/artifacts/metadata/deployment-record",
   ).json_body(Json(body))
 }
@@ -7265,9 +7363,9 @@ pub fn orgs_set_cluster_deployment_records_request(
 ) -> @http.Request {
   @http.Request::post(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/artifacts/metadata/deployment-record/cluster/" +
-    percent_encode(parameter_value(cluster)),
+    @http.percent_encode(parameter_value(cluster)),
   ).json_body(Json(body))
 }
 
@@ -7299,9 +7397,9 @@ pub fn orgs_create_cluster_deployment_records_job_request(
 ) -> @http.Request {
   @http.Request::post(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/artifacts/metadata/deployment-record/cluster/" +
-    percent_encode(parameter_value(cluster)) +
+    @http.percent_encode(parameter_value(cluster)) +
     "/jobs",
   ).json_body(Json(body))
 }
@@ -7334,11 +7432,11 @@ pub fn orgs_get_cluster_deployment_records_job_request(
 ) -> @http.Request {
   @http.Request::get(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/artifacts/metadata/deployment-record/cluster/" +
-    percent_encode(parameter_value(cluster)) +
+    @http.percent_encode(parameter_value(cluster)) +
     "/jobs/" +
-    percent_encode(parameter_value(job_id)),
+    @http.percent_encode(parameter_value(job_id)),
   )
 }
 
@@ -7369,7 +7467,7 @@ pub fn orgs_create_artifact_storage_record_request(
 ) -> @http.Request {
   @http.Request::post(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/artifacts/metadata/storage-record",
   ).json_body(Json(body))
 }
@@ -7401,9 +7499,9 @@ pub fn orgs_list_artifact_deployment_records_request(
 ) -> @http.Request {
   @http.Request::get(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/artifacts/" +
-    percent_encode(parameter_value(subject_digest)) +
+    @http.percent_encode(parameter_value(subject_digest)) +
     "/metadata/deployment-records",
   )
 }
@@ -7435,9 +7533,9 @@ pub fn orgs_list_artifact_storage_records_request(
 ) -> @http.Request {
   @http.Request::get(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/artifacts/" +
-    percent_encode_segments(parameter_value(subject_digest)) +
+    @http.percent_encode_path(parameter_value(subject_digest)) +
     "/metadata/storage-records",
   )
 }
@@ -7471,18 +7569,21 @@ pub fn orgs_list_attestations_bulk_request(
   after? : String,
 ) -> @http.Request {
   let mut url = "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/attestations/bulk-list"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match before {
-    Some(value) => url = append_query(url, "before", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "before", parameter_value(value))
     None => ()
   }
   match after {
-    Some(value) => url = append_query(url, "after", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "after", parameter_value(value))
     None => ()
   }
   @http.Request::post(url).json_body(Json(body))
@@ -7515,7 +7616,7 @@ pub fn orgs_delete_attestations_bulk_request(
 ) -> @http.Request {
   @http.Request::post(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/attestations/delete-request",
   ).json_body(body)
 }
@@ -7529,9 +7630,9 @@ pub fn orgs_delete_attestations_by_subject_digest_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/attestations/digest/" +
-    percent_encode_segments(parameter_value(subject_digest)),
+    @http.percent_encode_path(parameter_value(subject_digest)),
   )
 }
 
@@ -7546,23 +7647,26 @@ pub fn orgs_list_attestation_repositories_request(
   predicate_type? : String,
 ) -> @http.Request {
   let mut url = "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/attestations/repositories"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match before {
-    Some(value) => url = append_query(url, "before", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "before", parameter_value(value))
     None => ()
   }
   match after {
-    Some(value) => url = append_query(url, "after", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "after", parameter_value(value))
     None => ()
   }
   match predicate_type {
     Some(value) =>
-      url = append_query(url, "predicate_type", parameter_value(value))
+      url = @http.append_query(url, "predicate_type", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -7595,9 +7699,9 @@ pub fn orgs_delete_attestations_by_id_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/attestations/" +
-    percent_encode(parameter_value(attestation_id)),
+    @http.percent_encode(parameter_value(attestation_id)),
   )
 }
 
@@ -7613,24 +7717,27 @@ pub fn orgs_list_attestations_request(
   predicate_type? : String,
 ) -> @http.Request {
   let mut url = "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/attestations/" +
-    percent_encode_segments(parameter_value(subject_digest))
+    @http.percent_encode_path(parameter_value(subject_digest))
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match before {
-    Some(value) => url = append_query(url, "before", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "before", parameter_value(value))
     None => ()
   }
   match after {
-    Some(value) => url = append_query(url, "after", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "after", parameter_value(value))
     None => ()
   }
   match predicate_type {
     Some(value) =>
-      url = append_query(url, "predicate_type", parameter_value(value))
+      url = @http.append_query(url, "predicate_type", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -7662,13 +7769,16 @@ pub fn orgs_list_blocked_users_request(
   per_page? : Int32,
   page? : Int32,
 ) -> @http.Request {
-  let mut url = "/orgs/" + percent_encode(parameter_value(org)) + "/blocks"
+  let mut url = "/orgs/" +
+    @http.percent_encode(parameter_value(org)) +
+    "/blocks"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -7701,9 +7811,9 @@ pub fn orgs_check_blocked_user_request(
 ) -> @http.Request {
   @http.Request::get(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/blocks/" +
-    percent_encode(parameter_value(username)),
+    @http.percent_encode(parameter_value(username)),
   )
 }
 
@@ -7716,9 +7826,9 @@ pub fn orgs_block_user_request(
 ) -> @http.Request {
   @http.Request::put(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/blocks/" +
-    percent_encode(parameter_value(username)),
+    @http.percent_encode(parameter_value(username)),
   )
 }
 
@@ -7731,9 +7841,9 @@ pub fn orgs_unblock_user_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/blocks/" +
-    percent_encode(parameter_value(username)),
+    @http.percent_encode(parameter_value(username)),
   )
 }
 
@@ -7748,25 +7858,30 @@ pub fn campaigns_list_org_campaigns_request(
   state? : CampaignState,
   sort? : CampaignsListOrgCampaignsSort,
 ) -> @http.Request {
-  let mut url = "/orgs/" + percent_encode(parameter_value(org)) + "/campaigns"
+  let mut url = "/orgs/" +
+    @http.percent_encode(parameter_value(org)) +
+    "/campaigns"
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match direction {
-    Some(value) => url = append_query(url, "direction", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "direction", parameter_value(value))
     None => ()
   }
   match state {
-    Some(value) => url = append_query(url, "state", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "state", parameter_value(value))
     None => ()
   }
   match sort {
-    Some(value) => url = append_query(url, "sort", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "sort", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -7798,7 +7913,7 @@ pub fn campaigns_create_campaign_request(
   body : CampaignsCreateCampaignRequest,
 ) -> @http.Request {
   @http.Request::post(
-    "/orgs/" + percent_encode(parameter_value(org)) + "/campaigns",
+    "/orgs/" + @http.percent_encode(parameter_value(org)) + "/campaigns",
   ).json_body(Json(body))
 }
 
@@ -7829,9 +7944,9 @@ pub fn campaigns_get_campaign_summary_request(
 ) -> @http.Request {
   @http.Request::get(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/campaigns/" +
-    percent_encode(parameter_value(campaign_number)),
+    @http.percent_encode(parameter_value(campaign_number)),
   )
 }
 
@@ -7863,9 +7978,9 @@ pub fn campaigns_update_campaign_request(
 ) -> @http.Request {
   @http.Request::patch(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/campaigns/" +
-    percent_encode(parameter_value(campaign_number)),
+    @http.percent_encode(parameter_value(campaign_number)),
   ).json_body(Json(body))
 }
 
@@ -7896,9 +8011,9 @@ pub fn campaigns_delete_campaign_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/campaigns/" +
-    percent_encode(parameter_value(campaign_number)),
+    @http.percent_encode(parameter_value(campaign_number)),
   )
 }
 
@@ -7909,7 +8024,9 @@ pub fn code_scanning_get_ai_scan_enablement_for_org_request(
   org : String,
 ) -> @http.Request {
   @http.Request::get(
-    "/orgs/" + percent_encode(parameter_value(org)) + "/code-scanning/ai-scan",
+    "/orgs/" +
+    @http.percent_encode(parameter_value(org)) +
+    "/code-scanning/ai-scan",
   )
 }
 
@@ -7939,7 +8056,9 @@ pub fn code_scanning_update_ai_scan_enablement_for_org_request(
   body : CodeScanningAiScanOrgEnablementUpdate,
 ) -> @http.Request {
   @http.Request::patch(
-    "/orgs/" + percent_encode(parameter_value(org)) + "/code-scanning/ai-scan",
+    "/orgs/" +
+    @http.percent_encode(parameter_value(org)) +
+    "/code-scanning/ai-scan",
   ).json_body(Json(body))
 }
 
@@ -7979,50 +8098,59 @@ pub fn code_scanning_list_alerts_for_org_request(
   assignees? : String,
 ) -> @http.Request {
   let mut url = "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/code-scanning/alerts"
   match tool_name {
-    Some(value) => url = append_query(url, "tool_name", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "tool_name", parameter_value(value))
     None => ()
   }
   match tool_guid {
-    Some(value) => url = append_query(url, "tool_guid", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "tool_guid", parameter_value(value))
     None => ()
   }
   match before {
-    Some(value) => url = append_query(url, "before", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "before", parameter_value(value))
     None => ()
   }
   match after {
-    Some(value) => url = append_query(url, "after", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "after", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match direction {
-    Some(value) => url = append_query(url, "direction", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "direction", parameter_value(value))
     None => ()
   }
   match state {
-    Some(value) => url = append_query(url, "state", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "state", parameter_value(value))
     None => ()
   }
   match sort {
-    Some(value) => url = append_query(url, "sort", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "sort", parameter_value(value))
     None => ()
   }
   match severity {
-    Some(value) => url = append_query(url, "severity", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "severity", parameter_value(value))
     None => ()
   }
   match assignees {
-    Some(value) => url = append_query(url, "assignees", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "assignees", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -8057,23 +8185,26 @@ pub fn code_security_get_configurations_for_org_request(
   after? : String,
 ) -> @http.Request {
   let mut url = "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/code-security/configurations"
   match target_type {
     Some(value) =>
-      url = append_query(url, "target_type", parameter_value(value))
+      url = @http.append_query(url, "target_type", parameter_value(value))
     None => ()
   }
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match before {
-    Some(value) => url = append_query(url, "before", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "before", parameter_value(value))
     None => ()
   }
   match after {
-    Some(value) => url = append_query(url, "after", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "after", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -8106,7 +8237,7 @@ pub fn code_security_create_configuration_request(
 ) -> @http.Request {
   @http.Request::post(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/code-security/configurations",
   ).json_body(Json(body))
 }
@@ -8137,7 +8268,7 @@ pub fn code_security_get_default_configurations_request(
 ) -> @http.Request {
   @http.Request::get(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/code-security/configurations/defaults",
   )
 }
@@ -8169,7 +8300,7 @@ pub fn code_security_detach_configuration_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/code-security/configurations/detach",
   ).json_body(Json(body))
 }
@@ -8183,9 +8314,9 @@ pub fn code_security_get_configuration_request(
 ) -> @http.Request {
   @http.Request::get(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/code-security/configurations/" +
-    percent_encode(parameter_value(configuration_id)),
+    @http.percent_encode(parameter_value(configuration_id)),
   )
 }
 
@@ -8217,9 +8348,9 @@ pub fn code_security_update_configuration_request(
 ) -> @http.Request {
   @http.Request::patch(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/code-security/configurations/" +
-    percent_encode(parameter_value(configuration_id)),
+    @http.percent_encode(parameter_value(configuration_id)),
   ).json_body(Json(body))
 }
 
@@ -8250,9 +8381,9 @@ pub fn code_security_delete_configuration_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/code-security/configurations/" +
-    percent_encode(parameter_value(configuration_id)),
+    @http.percent_encode(parameter_value(configuration_id)),
   )
 }
 
@@ -8266,9 +8397,9 @@ pub fn code_security_attach_configuration_request(
 ) -> @http.Request {
   @http.Request::post(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/code-security/configurations/" +
-    percent_encode(parameter_value(configuration_id)) +
+    @http.percent_encode(parameter_value(configuration_id)) +
     "/attach",
   ).json_body(Json(body))
 }
@@ -8283,9 +8414,9 @@ pub fn code_security_set_configuration_as_default_request(
 ) -> @http.Request {
   @http.Request::put(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/code-security/configurations/" +
-    percent_encode(parameter_value(configuration_id)) +
+    @http.percent_encode(parameter_value(configuration_id)) +
     "/defaults",
   ).json_body(Json(body))
 }
@@ -8320,24 +8451,28 @@ pub fn code_security_get_repositories_for_configuration_request(
   status? : String,
 ) -> @http.Request {
   let mut url = "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/code-security/configurations/" +
-    percent_encode(parameter_value(configuration_id)) +
+    @http.percent_encode(parameter_value(configuration_id)) +
     "/repositories"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match before {
-    Some(value) => url = append_query(url, "before", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "before", parameter_value(value))
     None => ()
   }
   match after {
-    Some(value) => url = append_query(url, "after", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "after", parameter_value(value))
     None => ()
   }
   match status {
-    Some(value) => url = append_query(url, "status", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "status", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -8369,13 +8504,16 @@ pub fn codespaces_list_in_organization_request(
   per_page? : Int32,
   page? : Int32,
 ) -> @http.Request {
-  let mut url = "/orgs/" + percent_encode(parameter_value(org)) + "/codespaces"
+  let mut url = "/orgs/" +
+    @http.percent_encode(parameter_value(org)) +
+    "/codespaces"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -8407,7 +8545,7 @@ pub fn codespaces_set_codespaces_access_request(
   body : CodespacesSetCodespacesAccessRequest,
 ) -> @http.Request {
   @http.Request::put(
-    "/orgs/" + percent_encode(parameter_value(org)) + "/codespaces/access",
+    "/orgs/" + @http.percent_encode(parameter_value(org)) + "/codespaces/access",
   ).json_body(Json(body))
 }
 
@@ -8420,7 +8558,7 @@ pub fn codespaces_set_codespaces_access_users_request(
 ) -> @http.Request {
   @http.Request::post(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/codespaces/access/selected_users",
   ).json_body(Json(body))
 }
@@ -8434,7 +8572,7 @@ pub fn codespaces_delete_codespaces_access_users_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/codespaces/access/selected_users",
   ).json_body(Json(body))
 }
@@ -8448,14 +8586,15 @@ pub fn codespaces_list_org_secrets_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/codespaces/secrets"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -8485,7 +8624,7 @@ pub fn codespaces_list_org_secrets_decode(
 pub fn codespaces_get_org_public_key_request(org : String) -> @http.Request {
   @http.Request::get(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/codespaces/secrets/public-key",
   )
 }
@@ -8517,9 +8656,9 @@ pub fn codespaces_get_org_secret_request(
 ) -> @http.Request {
   @http.Request::get(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/codespaces/secrets/" +
-    percent_encode(parameter_value(secret_name)),
+    @http.percent_encode(parameter_value(secret_name)),
   )
 }
 
@@ -8551,9 +8690,9 @@ pub fn codespaces_create_or_update_org_secret_request(
 ) -> @http.Request {
   @http.Request::put(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/codespaces/secrets/" +
-    percent_encode(parameter_value(secret_name)),
+    @http.percent_encode(parameter_value(secret_name)),
   ).json_body(Json(body))
 }
 
@@ -8584,9 +8723,9 @@ pub fn codespaces_delete_org_secret_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/codespaces/secrets/" +
-    percent_encode(parameter_value(secret_name)),
+    @http.percent_encode(parameter_value(secret_name)),
   )
 }
 
@@ -8600,16 +8739,17 @@ pub fn codespaces_list_selected_repos_for_org_secret_request(
   per_page? : Int32,
 ) -> @http.Request {
   let mut url = "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/codespaces/secrets/" +
-    percent_encode(parameter_value(secret_name)) +
+    @http.percent_encode(parameter_value(secret_name)) +
     "/repositories"
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -8643,9 +8783,9 @@ pub fn codespaces_set_selected_repos_for_org_secret_request(
 ) -> @http.Request {
   @http.Request::put(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/codespaces/secrets/" +
-    percent_encode(parameter_value(secret_name)) +
+    @http.percent_encode(parameter_value(secret_name)) +
     "/repositories",
   ).json_body(Json(body))
 }
@@ -8660,11 +8800,11 @@ pub fn codespaces_add_selected_repo_to_org_secret_request(
 ) -> @http.Request {
   @http.Request::put(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/codespaces/secrets/" +
-    percent_encode(parameter_value(secret_name)) +
+    @http.percent_encode(parameter_value(secret_name)) +
     "/repositories/" +
-    percent_encode(parameter_value(repository_id)),
+    @http.percent_encode(parameter_value(repository_id)),
   )
 }
 
@@ -8678,11 +8818,11 @@ pub fn codespaces_remove_selected_repo_from_org_secret_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/codespaces/secrets/" +
-    percent_encode(parameter_value(secret_name)) +
+    @http.percent_encode(parameter_value(secret_name)) +
     "/repositories/" +
-    percent_encode(parameter_value(repository_id)),
+    @http.percent_encode(parameter_value(repository_id)),
   )
 }
 
@@ -8696,18 +8836,21 @@ pub fn copilot_spaces_list_for_org_request(
   after? : String,
 ) -> @http.Request {
   let mut url = "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/copilot-spaces"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match before {
-    Some(value) => url = append_query(url, "before", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "before", parameter_value(value))
     None => ()
   }
   match after {
-    Some(value) => url = append_query(url, "after", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "after", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -8739,7 +8882,7 @@ pub fn copilot_spaces_create_for_org_request(
   body : CopilotSpacesCreateForOrgRequest,
 ) -> @http.Request {
   @http.Request::post(
-    "/orgs/" + percent_encode(parameter_value(org)) + "/copilot-spaces",
+    "/orgs/" + @http.percent_encode(parameter_value(org)) + "/copilot-spaces",
   ).json_body(Json(body))
 }
 
@@ -8770,9 +8913,9 @@ pub fn copilot_spaces_get_for_org_request(
 ) -> @http.Request {
   @http.Request::get(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/copilot-spaces/" +
-    percent_encode(parameter_value(space_number)),
+    @http.percent_encode(parameter_value(space_number)),
   )
 }
 
@@ -8804,9 +8947,9 @@ pub fn copilot_spaces_update_for_org_request(
 ) -> @http.Request {
   @http.Request::put(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/copilot-spaces/" +
-    percent_encode(parameter_value(space_number)),
+    @http.percent_encode(parameter_value(space_number)),
   ).json_body(Json(body))
 }
 
@@ -8837,9 +8980,9 @@ pub fn copilot_spaces_delete_for_org_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/copilot-spaces/" +
-    percent_encode(parameter_value(space_number)),
+    @http.percent_encode(parameter_value(space_number)),
   )
 }
 
@@ -8852,9 +8995,9 @@ pub fn copilot_spaces_list_collaborators_for_org_request(
 ) -> @http.Request {
   @http.Request::get(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/copilot-spaces/" +
-    percent_encode(parameter_value(space_number)) +
+    @http.percent_encode(parameter_value(space_number)) +
     "/collaborators",
   )
 }
@@ -8887,9 +9030,9 @@ pub fn copilot_spaces_add_collaborator_for_org_request(
 ) -> @http.Request {
   @http.Request::post(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/copilot-spaces/" +
-    percent_encode(parameter_value(space_number)) +
+    @http.percent_encode(parameter_value(space_number)) +
     "/collaborators",
   ).json_body(Json(body))
 }
@@ -8924,13 +9067,13 @@ pub fn copilot_spaces_update_collaborator_for_org_request(
 ) -> @http.Request {
   @http.Request::put(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/copilot-spaces/" +
-    percent_encode(parameter_value(space_number)) +
+    @http.percent_encode(parameter_value(space_number)) +
     "/collaborators/" +
-    percent_encode(parameter_value(actor_type)) +
+    @http.percent_encode(parameter_value(actor_type)) +
     "/" +
-    percent_encode(parameter_value(actor_identifier)),
+    @http.percent_encode(parameter_value(actor_identifier)),
   ).json_body(Json(body))
 }
 
@@ -8963,13 +9106,13 @@ pub fn copilot_spaces_remove_collaborator_for_org_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/copilot-spaces/" +
-    percent_encode(parameter_value(space_number)) +
+    @http.percent_encode(parameter_value(space_number)) +
     "/collaborators/" +
-    percent_encode(parameter_value(actor_type)) +
+    @http.percent_encode(parameter_value(actor_type)) +
     "/" +
-    percent_encode(parameter_value(actor_identifier)),
+    @http.percent_encode(parameter_value(actor_identifier)),
   )
 }
 
@@ -8982,9 +9125,9 @@ pub fn copilot_spaces_list_resources_for_org_request(
 ) -> @http.Request {
   @http.Request::get(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/copilot-spaces/" +
-    percent_encode(parameter_value(space_number)) +
+    @http.percent_encode(parameter_value(space_number)) +
     "/resources",
   )
 }
@@ -9017,9 +9160,9 @@ pub fn copilot_spaces_create_resource_for_org_request(
 ) -> @http.Request {
   @http.Request::post(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/copilot-spaces/" +
-    percent_encode(parameter_value(space_number)) +
+    @http.percent_encode(parameter_value(space_number)) +
     "/resources",
   ).json_body(Json(body))
 }
@@ -9052,11 +9195,11 @@ pub fn copilot_spaces_get_resource_for_org_request(
 ) -> @http.Request {
   @http.Request::get(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/copilot-spaces/" +
-    percent_encode(parameter_value(space_number)) +
+    @http.percent_encode(parameter_value(space_number)) +
     "/resources/" +
-    percent_encode(parameter_value(space_resource_id)),
+    @http.percent_encode(parameter_value(space_resource_id)),
   )
 }
 
@@ -9089,11 +9232,11 @@ pub fn copilot_spaces_update_resource_for_org_request(
 ) -> @http.Request {
   @http.Request::put(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/copilot-spaces/" +
-    percent_encode(parameter_value(space_number)) +
+    @http.percent_encode(parameter_value(space_number)) +
     "/resources/" +
-    percent_encode(parameter_value(space_resource_id)),
+    @http.percent_encode(parameter_value(space_resource_id)),
   ).json_body(Json(body))
 }
 
@@ -9125,11 +9268,11 @@ pub fn copilot_spaces_delete_resource_for_org_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/copilot-spaces/" +
-    percent_encode(parameter_value(space_number)) +
+    @http.percent_encode(parameter_value(space_number)) +
     "/resources/" +
-    percent_encode(parameter_value(space_resource_id)),
+    @http.percent_encode(parameter_value(space_resource_id)),
   )
 }
 
@@ -9140,7 +9283,7 @@ pub fn copilot_get_copilot_organization_details_request(
   org : String,
 ) -> @http.Request {
   @http.Request::get(
-    "/orgs/" + percent_encode(parameter_value(org)) + "/copilot/billing",
+    "/orgs/" + @http.percent_encode(parameter_value(org)) + "/copilot/billing",
   )
 }
 
@@ -9171,14 +9314,15 @@ pub fn copilot_list_copilot_seats_request(
   per_page? : Int32,
 ) -> @http.Request {
   let mut url = "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/copilot/billing/seats"
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -9211,7 +9355,7 @@ pub fn copilot_add_copilot_seats_for_teams_request(
 ) -> @http.Request {
   @http.Request::post(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/copilot/billing/selected_teams",
   ).json_body(Json(body))
 }
@@ -9243,7 +9387,7 @@ pub fn copilot_cancel_copilot_seat_assignment_for_teams_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/copilot/billing/selected_teams",
   ).json_body(Json(body))
 }
@@ -9275,7 +9419,7 @@ pub fn copilot_add_copilot_seats_for_users_request(
 ) -> @http.Request {
   @http.Request::post(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/copilot/billing/selected_users",
   ).json_body(Json(body))
 }
@@ -9307,7 +9451,7 @@ pub fn copilot_cancel_copilot_seat_assignment_for_users_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/copilot/billing/selected_users",
   ).json_body(Json(body))
 }
@@ -9338,7 +9482,7 @@ pub fn copilot_get_copilot_coding_agent_permissions_organization_request(
 ) -> @http.Request {
   @http.Request::get(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/copilot/coding-agent/permissions",
   )
 }
@@ -9370,7 +9514,7 @@ pub fn copilot_set_copilot_coding_agent_permissions_organization_request(
 ) -> @http.Request {
   @http.Request::put(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/copilot/coding-agent/permissions",
   ).json_body(Json(body))
 }
@@ -9384,14 +9528,15 @@ pub fn copilot_list_copilot_coding_agent_selected_repositories_for_organization_
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/copilot/coding-agent/permissions/repositories"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -9424,7 +9569,7 @@ pub fn copilot_set_copilot_coding_agent_selected_repositories_for_organization_r
 ) -> @http.Request {
   @http.Request::put(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/copilot/coding-agent/permissions/repositories",
   ).json_body(Json(body))
 }
@@ -9438,9 +9583,9 @@ pub fn copilot_enable_copilot_coding_agent_for_repository_in_organization_reques
 ) -> @http.Request {
   @http.Request::put(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/copilot/coding-agent/permissions/repositories/" +
-    percent_encode(parameter_value(repository_id)),
+    @http.percent_encode(parameter_value(repository_id)),
   )
 }
 
@@ -9453,9 +9598,9 @@ pub fn copilot_disable_copilot_coding_agent_for_repository_in_organization_reque
 ) -> @http.Request {
   @http.Request::delete(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/copilot/coding-agent/permissions/repositories/" +
-    percent_encode(parameter_value(repository_id)),
+    @http.percent_encode(parameter_value(repository_id)),
   )
 }
 
@@ -9467,7 +9612,7 @@ pub fn copilot_copilot_content_exclusion_for_organization_request(
 ) -> @http.Request {
   @http.Request::get(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/copilot/content_exclusion",
   )
 }
@@ -9499,7 +9644,7 @@ pub fn copilot_set_copilot_content_exclusion_for_organization_request(
 ) -> @http.Request {
   @http.Request::put(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/copilot/content_exclusion",
   ).json_body(Json(body))
 }
@@ -9530,9 +9675,9 @@ pub fn copilot_copilot_organization_one_day_usage_metrics_request(
   day : String,
 ) -> @http.Request {
   let mut url = "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/copilot/metrics/reports/organization-1-day"
-  url = append_query(url, "day", parameter_value(day))
+  url = @http.append_query(url, "day", parameter_value(day))
   @http.Request::get(url)
 }
 
@@ -9562,7 +9707,7 @@ pub fn copilot_copilot_organization_usage_metrics_request(
 ) -> @http.Request {
   @http.Request::get(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/copilot/metrics/reports/organization-28-day/latest",
   )
 }
@@ -9593,9 +9738,9 @@ pub fn copilot_copilot_organization_repos_one_day_report_request(
   day : String,
 ) -> @http.Request {
   let mut url = "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/copilot/metrics/reports/repos-1-day"
-  url = append_query(url, "day", parameter_value(day))
+  url = @http.append_query(url, "day", parameter_value(day))
   @http.Request::get(url)
 }
 
@@ -9625,9 +9770,9 @@ pub fn copilot_copilot_organization_user_teams_one_day_report_request(
   day : String,
 ) -> @http.Request {
   let mut url = "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/copilot/metrics/reports/user-teams-1-day"
-  url = append_query(url, "day", parameter_value(day))
+  url = @http.append_query(url, "day", parameter_value(day))
   @http.Request::get(url)
 }
 
@@ -9657,9 +9802,9 @@ pub fn copilot_copilot_organization_users_one_day_usage_metrics_request(
   day : String,
 ) -> @http.Request {
   let mut url = "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/copilot/metrics/reports/users-1-day"
-  url = append_query(url, "day", parameter_value(day))
+  url = @http.append_query(url, "day", parameter_value(day))
   @http.Request::get(url)
 }
 
@@ -9689,7 +9834,7 @@ pub fn copilot_copilot_organization_users_usage_metrics_request(
 ) -> @http.Request {
   @http.Request::get(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/copilot/metrics/reports/users-28-day/latest",
   )
 }
@@ -9737,84 +9882,98 @@ pub fn dependabot_list_alerts_for_org_request(
   per_page? : Int32,
 ) -> @http.Request {
   let mut url = "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/dependabot/alerts"
   match classification {
     Some(value) =>
-      url = append_query(url, "classification", parameter_value(value))
+      url = @http.append_query(url, "classification", parameter_value(value))
     None => ()
   }
   match state {
-    Some(value) => url = append_query(url, "state", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "state", parameter_value(value))
     None => ()
   }
   match severity {
-    Some(value) => url = append_query(url, "severity", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "severity", parameter_value(value))
     None => ()
   }
   match ecosystem {
-    Some(value) => url = append_query(url, "ecosystem", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "ecosystem", parameter_value(value))
     None => ()
   }
   match package_ {
-    Some(value) => url = append_query(url, "package", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "package", parameter_value(value))
     None => ()
   }
   match epss_percentage {
     Some(value) =>
-      url = append_query(url, "epss_percentage", parameter_value(value))
+      url = @http.append_query(url, "epss_percentage", parameter_value(value))
     None => ()
   }
   match artifact_registry_url {
     Some(value) =>
-      url = append_query(url, "artifact_registry_url", parameter_value(value))
+      url = @http.append_query(
+        url,
+        "artifact_registry_url",
+        parameter_value(value),
+      )
     None => ()
   }
   match artifact_registry {
     Some(value) =>
-      url = append_query(url, "artifact_registry", parameter_value(value))
+      url = @http.append_query(url, "artifact_registry", parameter_value(value))
     None => ()
   }
   match has {
-    Some(value) => url = append_query(url, "has", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "has", parameter_value(value))
     None => ()
   }
   match assignee {
-    Some(value) => url = append_query(url, "assignee", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "assignee", parameter_value(value))
     None => ()
   }
   match runtime_risk {
     Some(value) =>
-      url = append_query(url, "runtime_risk", parameter_value(value))
+      url = @http.append_query(url, "runtime_risk", parameter_value(value))
     None => ()
   }
   match scope {
-    Some(value) => url = append_query(url, "scope", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "scope", parameter_value(value))
     None => ()
   }
   match relationship {
     Some(value) =>
-      url = append_query(url, "relationship", parameter_value(value))
+      url = @http.append_query(url, "relationship", parameter_value(value))
     None => ()
   }
   match sort {
-    Some(value) => url = append_query(url, "sort", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "sort", parameter_value(value))
     None => ()
   }
   match direction {
-    Some(value) => url = append_query(url, "direction", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "direction", parameter_value(value))
     None => ()
   }
   match before {
-    Some(value) => url = append_query(url, "before", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "before", parameter_value(value))
     None => ()
   }
   match after {
-    Some(value) => url = append_query(url, "after", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "after", parameter_value(value))
     None => ()
   }
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -9847,14 +10006,15 @@ pub fn dependabot_repository_access_for_org_request(
   per_page? : Int32,
 ) -> @http.Request {
   let mut url = "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/dependabot/repository-access"
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -9887,7 +10047,7 @@ pub fn dependabot_update_repository_access_for_org_request(
 ) -> @http.Request {
   @http.Request::patch(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/dependabot/repository-access",
   ).json_body(Json(body))
 }
@@ -9901,7 +10061,7 @@ pub fn dependabot_set_repository_access_default_level_request(
 ) -> @http.Request {
   @http.Request::put(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/dependabot/repository-access/default-level",
   ).json_body(Json(body))
 }
@@ -9915,14 +10075,15 @@ pub fn dependabot_list_org_secrets_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/dependabot/secrets"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -9952,7 +10113,7 @@ pub fn dependabot_list_org_secrets_decode(
 pub fn dependabot_get_org_public_key_request(org : String) -> @http.Request {
   @http.Request::get(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/dependabot/secrets/public-key",
   )
 }
@@ -9984,9 +10145,9 @@ pub fn dependabot_get_org_secret_request(
 ) -> @http.Request {
   @http.Request::get(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/dependabot/secrets/" +
-    percent_encode(parameter_value(secret_name)),
+    @http.percent_encode(parameter_value(secret_name)),
   )
 }
 
@@ -10018,9 +10179,9 @@ pub fn dependabot_create_or_update_org_secret_request(
 ) -> @http.Request {
   @http.Request::put(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/dependabot/secrets/" +
-    percent_encode(parameter_value(secret_name)),
+    @http.percent_encode(parameter_value(secret_name)),
   ).json_body(Json(body))
 }
 
@@ -10051,9 +10212,9 @@ pub fn dependabot_delete_org_secret_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/dependabot/secrets/" +
-    percent_encode(parameter_value(secret_name)),
+    @http.percent_encode(parameter_value(secret_name)),
   )
 }
 
@@ -10067,16 +10228,17 @@ pub fn dependabot_list_selected_repos_for_org_secret_request(
   per_page? : Int32,
 ) -> @http.Request {
   let mut url = "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/dependabot/secrets/" +
-    percent_encode(parameter_value(secret_name)) +
+    @http.percent_encode(parameter_value(secret_name)) +
     "/repositories"
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -10110,9 +10272,9 @@ pub fn dependabot_set_selected_repos_for_org_secret_request(
 ) -> @http.Request {
   @http.Request::put(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/dependabot/secrets/" +
-    percent_encode(parameter_value(secret_name)) +
+    @http.percent_encode(parameter_value(secret_name)) +
     "/repositories",
   ).json_body(Json(body))
 }
@@ -10127,11 +10289,11 @@ pub fn dependabot_add_selected_repo_to_org_secret_request(
 ) -> @http.Request {
   @http.Request::put(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/dependabot/secrets/" +
-    percent_encode(parameter_value(secret_name)) +
+    @http.percent_encode(parameter_value(secret_name)) +
     "/repositories/" +
-    percent_encode(parameter_value(repository_id)),
+    @http.percent_encode(parameter_value(repository_id)),
   )
 }
 
@@ -10145,11 +10307,11 @@ pub fn dependabot_remove_selected_repo_from_org_secret_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/dependabot/secrets/" +
-    percent_encode(parameter_value(secret_name)) +
+    @http.percent_encode(parameter_value(secret_name)) +
     "/repositories/" +
-    percent_encode(parameter_value(repository_id)),
+    @http.percent_encode(parameter_value(repository_id)),
   )
 }
 
@@ -10160,7 +10322,7 @@ pub fn packages_list_docker_migration_conflicting_packages_for_organization_requ
   org : String,
 ) -> @http.Request {
   @http.Request::get(
-    "/orgs/" + percent_encode(parameter_value(org)) + "/docker/conflicts",
+    "/orgs/" + @http.percent_encode(parameter_value(org)) + "/docker/conflicts",
   )
 }
 
@@ -10190,13 +10352,16 @@ pub fn activity_list_public_org_events_request(
   per_page? : Int32,
   page? : Int32,
 ) -> @http.Request {
-  let mut url = "/orgs/" + percent_encode(parameter_value(org)) + "/events"
+  let mut url = "/orgs/" +
+    @http.percent_encode(parameter_value(org)) +
+    "/events"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -10229,14 +10394,15 @@ pub fn orgs_list_failed_invitations_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/failed_invitations"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -10268,13 +10434,14 @@ pub fn orgs_list_webhooks_request(
   per_page? : Int32,
   page? : Int32,
 ) -> @http.Request {
-  let mut url = "/orgs/" + percent_encode(parameter_value(org)) + "/hooks"
+  let mut url = "/orgs/" + @http.percent_encode(parameter_value(org)) + "/hooks"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -10306,7 +10473,7 @@ pub fn orgs_create_webhook_request(
   body : OrgsCreateWebhookRequest,
 ) -> @http.Request {
   @http.Request::post(
-    "/orgs/" + percent_encode(parameter_value(org)) + "/hooks",
+    "/orgs/" + @http.percent_encode(parameter_value(org)) + "/hooks",
   ).json_body(Json(body))
 }
 
@@ -10334,9 +10501,9 @@ pub fn orgs_create_webhook_decode(
 pub fn orgs_get_webhook_request(org : String, hook_id : Int32) -> @http.Request {
   @http.Request::get(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/hooks/" +
-    percent_encode(parameter_value(hook_id)),
+    @http.percent_encode(parameter_value(hook_id)),
   )
 }
 
@@ -10368,9 +10535,9 @@ pub fn orgs_update_webhook_request(
 ) -> @http.Request {
   @http.Request::patch(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/hooks/" +
-    percent_encode(parameter_value(hook_id)),
+    @http.percent_encode(parameter_value(hook_id)),
   ).json_body(Json(body))
 }
 
@@ -10401,9 +10568,9 @@ pub fn orgs_delete_webhook_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/hooks/" +
-    percent_encode(parameter_value(hook_id)),
+    @http.percent_encode(parameter_value(hook_id)),
   )
 }
 
@@ -10416,9 +10583,9 @@ pub fn orgs_get_webhook_config_for_org_request(
 ) -> @http.Request {
   @http.Request::get(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/hooks/" +
-    percent_encode(parameter_value(hook_id)) +
+    @http.percent_encode(parameter_value(hook_id)) +
     "/config",
   )
 }
@@ -10451,9 +10618,9 @@ pub fn orgs_update_webhook_config_for_org_request(
 ) -> @http.Request {
   @http.Request::patch(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/hooks/" +
-    percent_encode(parameter_value(hook_id)) +
+    @http.percent_encode(parameter_value(hook_id)) +
     "/config",
   ).json_body(Json(body))
 }
@@ -10487,20 +10654,23 @@ pub fn orgs_list_webhook_deliveries_request(
   status? : OrgsListWebhookDeliveriesStatus,
 ) -> @http.Request {
   let mut url = "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/hooks/" +
-    percent_encode(parameter_value(hook_id)) +
+    @http.percent_encode(parameter_value(hook_id)) +
     "/deliveries"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match cursor {
-    Some(value) => url = append_query(url, "cursor", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "cursor", parameter_value(value))
     None => ()
   }
   match status {
-    Some(value) => url = append_query(url, "status", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "status", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -10534,11 +10704,11 @@ pub fn orgs_get_webhook_delivery_request(
 ) -> @http.Request {
   @http.Request::get(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/hooks/" +
-    percent_encode(parameter_value(hook_id)) +
+    @http.percent_encode(parameter_value(hook_id)) +
     "/deliveries/" +
-    percent_encode(parameter_value(delivery_id)),
+    @http.percent_encode(parameter_value(delivery_id)),
   )
 }
 
@@ -10570,11 +10740,11 @@ pub fn orgs_redeliver_webhook_delivery_request(
 ) -> @http.Request {
   @http.Request::post(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/hooks/" +
-    percent_encode(parameter_value(hook_id)) +
+    @http.percent_encode(parameter_value(hook_id)) +
     "/deliveries/" +
-    percent_encode(parameter_value(delivery_id)) +
+    @http.percent_encode(parameter_value(delivery_id)) +
     "/attempts",
   )
 }
@@ -10588,9 +10758,9 @@ pub fn orgs_ping_webhook_request(
 ) -> @http.Request {
   @http.Request::post(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/hooks/" +
-    percent_encode(parameter_value(hook_id)) +
+    @http.percent_encode(parameter_value(hook_id)) +
     "/pings",
   )
 }
@@ -10611,39 +10781,45 @@ pub fn api_insights_get_route_stats_by_actor_request(
   api_route_substring? : String,
 ) -> @http.Request {
   let mut url = "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/insights/api/route-stats/" +
-    percent_encode(parameter_value(actor_type)) +
+    @http.percent_encode(parameter_value(actor_type)) +
     "/" +
-    percent_encode(parameter_value(actor_id))
-  url = append_query(url, "min_timestamp", parameter_value(min_timestamp))
+    @http.percent_encode(parameter_value(actor_id))
+  url = @http.append_query(url, "min_timestamp", parameter_value(min_timestamp))
   match max_timestamp {
     Some(value) =>
-      url = append_query(url, "max_timestamp", parameter_value(value))
+      url = @http.append_query(url, "max_timestamp", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match direction {
-    Some(value) => url = append_query(url, "direction", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "direction", parameter_value(value))
     None => ()
   }
   match sort {
     Some(values) =>
       for value in values {
-        url = append_query(url, "sort", parameter_value(value))
+        url = @http.append_query(url, "sort", parameter_value(value))
       }
     None => ()
   }
   match api_route_substring {
     Some(value) =>
-      url = append_query(url, "api_route_substring", parameter_value(value))
+      url = @http.append_query(
+        url,
+        "api_route_substring",
+        parameter_value(value),
+      )
     None => ()
   }
   @http.Request::get(url)
@@ -10681,36 +10857,42 @@ pub fn api_insights_get_subject_stats_request(
   subject_name_substring? : String,
 ) -> @http.Request {
   let mut url = "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/insights/api/subject-stats"
-  url = append_query(url, "min_timestamp", parameter_value(min_timestamp))
+  url = @http.append_query(url, "min_timestamp", parameter_value(min_timestamp))
   match max_timestamp {
     Some(value) =>
-      url = append_query(url, "max_timestamp", parameter_value(value))
+      url = @http.append_query(url, "max_timestamp", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match direction {
-    Some(value) => url = append_query(url, "direction", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "direction", parameter_value(value))
     None => ()
   }
   match sort {
     Some(values) =>
       for value in values {
-        url = append_query(url, "sort", parameter_value(value))
+        url = @http.append_query(url, "sort", parameter_value(value))
       }
     None => ()
   }
   match subject_name_substring {
     Some(value) =>
-      url = append_query(url, "subject_name_substring", parameter_value(value))
+      url = @http.append_query(
+        url,
+        "subject_name_substring",
+        parameter_value(value),
+      )
     None => ()
   }
   @http.Request::get(url)
@@ -10743,12 +10925,12 @@ pub fn api_insights_get_summary_stats_request(
   max_timestamp? : String,
 ) -> @http.Request {
   let mut url = "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/insights/api/summary-stats"
-  url = append_query(url, "min_timestamp", parameter_value(min_timestamp))
+  url = @http.append_query(url, "min_timestamp", parameter_value(min_timestamp))
   match max_timestamp {
     Some(value) =>
-      url = append_query(url, "max_timestamp", parameter_value(value))
+      url = @http.append_query(url, "max_timestamp", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -10782,13 +10964,13 @@ pub fn api_insights_get_summary_stats_by_user_request(
   max_timestamp? : String,
 ) -> @http.Request {
   let mut url = "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/insights/api/summary-stats/users/" +
-    percent_encode(parameter_value(user_id))
-  url = append_query(url, "min_timestamp", parameter_value(min_timestamp))
+    @http.percent_encode(parameter_value(user_id))
+  url = @http.append_query(url, "min_timestamp", parameter_value(min_timestamp))
   match max_timestamp {
     Some(value) =>
-      url = append_query(url, "max_timestamp", parameter_value(value))
+      url = @http.append_query(url, "max_timestamp", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -10823,15 +11005,15 @@ pub fn api_insights_get_summary_stats_by_actor_request(
   max_timestamp? : String,
 ) -> @http.Request {
   let mut url = "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/insights/api/summary-stats/" +
-    percent_encode(parameter_value(actor_type)) +
+    @http.percent_encode(parameter_value(actor_type)) +
     "/" +
-    percent_encode(parameter_value(actor_id))
-  url = append_query(url, "min_timestamp", parameter_value(min_timestamp))
+    @http.percent_encode(parameter_value(actor_id))
+  url = @http.append_query(url, "min_timestamp", parameter_value(min_timestamp))
   match max_timestamp {
     Some(value) =>
-      url = append_query(url, "max_timestamp", parameter_value(value))
+      url = @http.append_query(url, "max_timestamp", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -10865,15 +11047,15 @@ pub fn api_insights_get_time_stats_request(
   max_timestamp? : String,
 ) -> @http.Request {
   let mut url = "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/insights/api/time-stats"
-  url = append_query(url, "min_timestamp", parameter_value(min_timestamp))
+  url = @http.append_query(url, "min_timestamp", parameter_value(min_timestamp))
   match max_timestamp {
     Some(value) =>
-      url = append_query(url, "max_timestamp", parameter_value(value))
+      url = @http.append_query(url, "max_timestamp", parameter_value(value))
     None => ()
   }
-  url = append_query(
+  url = @http.append_query(
     url,
     "timestamp_increment",
     parameter_value(timestamp_increment),
@@ -10910,16 +11092,16 @@ pub fn api_insights_get_time_stats_by_user_request(
   max_timestamp? : String,
 ) -> @http.Request {
   let mut url = "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/insights/api/time-stats/users/" +
-    percent_encode(parameter_value(user_id))
-  url = append_query(url, "min_timestamp", parameter_value(min_timestamp))
+    @http.percent_encode(parameter_value(user_id))
+  url = @http.append_query(url, "min_timestamp", parameter_value(min_timestamp))
   match max_timestamp {
     Some(value) =>
-      url = append_query(url, "max_timestamp", parameter_value(value))
+      url = @http.append_query(url, "max_timestamp", parameter_value(value))
     None => ()
   }
-  url = append_query(
+  url = @http.append_query(
     url,
     "timestamp_increment",
     parameter_value(timestamp_increment),
@@ -10957,18 +11139,18 @@ pub fn api_insights_get_time_stats_by_actor_request(
   max_timestamp? : String,
 ) -> @http.Request {
   let mut url = "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/insights/api/time-stats/" +
-    percent_encode(parameter_value(actor_type)) +
+    @http.percent_encode(parameter_value(actor_type)) +
     "/" +
-    percent_encode(parameter_value(actor_id))
-  url = append_query(url, "min_timestamp", parameter_value(min_timestamp))
+    @http.percent_encode(parameter_value(actor_id))
+  url = @http.append_query(url, "min_timestamp", parameter_value(min_timestamp))
   match max_timestamp {
     Some(value) =>
-      url = append_query(url, "max_timestamp", parameter_value(value))
+      url = @http.append_query(url, "max_timestamp", parameter_value(value))
     None => ()
   }
-  url = append_query(
+  url = @http.append_query(
     url,
     "timestamp_increment",
     parameter_value(timestamp_increment),
@@ -11009,37 +11191,43 @@ pub fn api_insights_get_user_stats_request(
   actor_name_substring? : String,
 ) -> @http.Request {
   let mut url = "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/insights/api/user-stats/" +
-    percent_encode(parameter_value(user_id))
-  url = append_query(url, "min_timestamp", parameter_value(min_timestamp))
+    @http.percent_encode(parameter_value(user_id))
+  url = @http.append_query(url, "min_timestamp", parameter_value(min_timestamp))
   match max_timestamp {
     Some(value) =>
-      url = append_query(url, "max_timestamp", parameter_value(value))
+      url = @http.append_query(url, "max_timestamp", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match direction {
-    Some(value) => url = append_query(url, "direction", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "direction", parameter_value(value))
     None => ()
   }
   match sort {
     Some(values) =>
       for value in values {
-        url = append_query(url, "sort", parameter_value(value))
+        url = @http.append_query(url, "sort", parameter_value(value))
       }
     None => ()
   }
   match actor_name_substring {
     Some(value) =>
-      url = append_query(url, "actor_name_substring", parameter_value(value))
+      url = @http.append_query(
+        url,
+        "actor_name_substring",
+        parameter_value(value),
+      )
     None => ()
   }
   @http.Request::get(url)
@@ -11068,7 +11256,7 @@ pub fn api_insights_get_user_stats_decode(
 /// Get an organization installation for the authenticated app
 pub fn apps_get_org_installation_request(org : String) -> @http.Request {
   @http.Request::get(
-    "/orgs/" + percent_encode(parameter_value(org)) + "/installation",
+    "/orgs/" + @http.percent_encode(parameter_value(org)) + "/installation",
   )
 }
 
@@ -11099,14 +11287,15 @@ pub fn orgs_list_app_installations_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/installations"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -11137,7 +11326,9 @@ pub fn interactions_get_restrictions_for_org_request(
   org : String,
 ) -> @http.Request {
   @http.Request::get(
-    "/orgs/" + percent_encode(parameter_value(org)) + "/interaction-limits",
+    "/orgs/" +
+    @http.percent_encode(parameter_value(org)) +
+    "/interaction-limits",
   )
 }
 
@@ -11167,7 +11358,9 @@ pub fn interactions_set_restrictions_for_org_request(
   body : InteractionLimit,
 ) -> @http.Request {
   @http.Request::put(
-    "/orgs/" + percent_encode(parameter_value(org)) + "/interaction-limits",
+    "/orgs/" +
+    @http.percent_encode(parameter_value(org)) +
+    "/interaction-limits",
   ).json_body(Json(body))
 }
 
@@ -11196,7 +11389,9 @@ pub fn interactions_remove_restrictions_for_org_request(
   org : String,
 ) -> @http.Request {
   @http.Request::delete(
-    "/orgs/" + percent_encode(parameter_value(org)) + "/interaction-limits",
+    "/orgs/" +
+    @http.percent_encode(parameter_value(org)) +
+    "/interaction-limits",
   )
 }
 
@@ -11208,7 +11403,7 @@ pub fn interactions_get_pull_request_creation_cap_for_org_request(
 ) -> @http.Request {
   @http.Request::get(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/interaction-limits/pulls/creation-cap",
   )
 }
@@ -11240,7 +11435,7 @@ pub fn interactions_update_pull_request_creation_cap_for_org_request(
 ) -> @http.Request {
   @http.Request::patch(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/interaction-limits/pulls/creation-cap",
   ).json_body(Json(body))
 }
@@ -11273,22 +11468,25 @@ pub fn orgs_list_pending_invitations_request(
   role? : OrgsListPendingInvitationsRole,
   invitation_source? : OrgsListPendingInvitationsInvitationSource,
 ) -> @http.Request {
-  let mut url = "/orgs/" + percent_encode(parameter_value(org)) + "/invitations"
+  let mut url = "/orgs/" +
+    @http.percent_encode(parameter_value(org)) +
+    "/invitations"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   match role {
-    Some(value) => url = append_query(url, "role", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "role", parameter_value(value))
     None => ()
   }
   match invitation_source {
     Some(value) =>
-      url = append_query(url, "invitation_source", parameter_value(value))
+      url = @http.append_query(url, "invitation_source", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -11320,7 +11518,7 @@ pub fn orgs_create_invitation_request(
   body : OrgsCreateInvitationRequest,
 ) -> @http.Request {
   @http.Request::post(
-    "/orgs/" + percent_encode(parameter_value(org)) + "/invitations",
+    "/orgs/" + @http.percent_encode(parameter_value(org)) + "/invitations",
   ).json_body(Json(body))
 }
 
@@ -11351,9 +11549,9 @@ pub fn orgs_cancel_invitation_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/invitations/" +
-    percent_encode(parameter_value(invitation_id)),
+    @http.percent_encode(parameter_value(invitation_id)),
   )
 }
 
@@ -11367,16 +11565,17 @@ pub fn orgs_list_invitation_teams_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/invitations/" +
-    percent_encode(parameter_value(invitation_id)) +
+    @http.percent_encode(parameter_value(invitation_id)) +
     "/teams"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -11405,7 +11604,7 @@ pub fn orgs_list_invitation_teams_decode(
 /// List issue fields for an organization
 pub fn orgs_list_issue_fields_request(org : String) -> @http.Request {
   @http.Request::get(
-    "/orgs/" + percent_encode(parameter_value(org)) + "/issue-fields",
+    "/orgs/" + @http.percent_encode(parameter_value(org)) + "/issue-fields",
   )
 }
 
@@ -11435,7 +11634,7 @@ pub fn orgs_create_issue_field_request(
   body : OrganizationCreateIssueField,
 ) -> @http.Request {
   @http.Request::post(
-    "/orgs/" + percent_encode(parameter_value(org)) + "/issue-fields",
+    "/orgs/" + @http.percent_encode(parameter_value(org)) + "/issue-fields",
   ).json_body(Json(body))
 }
 
@@ -11467,9 +11666,9 @@ pub fn orgs_update_issue_field_request(
 ) -> @http.Request {
   @http.Request::patch(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/issue-fields/" +
-    percent_encode(parameter_value(issue_field_id)),
+    @http.percent_encode(parameter_value(issue_field_id)),
   ).json_body(Json(body))
 }
 
@@ -11500,9 +11699,9 @@ pub fn orgs_delete_issue_field_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/issue-fields/" +
-    percent_encode(parameter_value(issue_field_id)),
+    @http.percent_encode(parameter_value(issue_field_id)),
   )
 }
 
@@ -11511,7 +11710,7 @@ pub fn orgs_delete_issue_field_request(
 /// List issue types for an organization
 pub fn orgs_list_issue_types_request(org : String) -> @http.Request {
   @http.Request::get(
-    "/orgs/" + percent_encode(parameter_value(org)) + "/issue-types",
+    "/orgs/" + @http.percent_encode(parameter_value(org)) + "/issue-types",
   )
 }
 
@@ -11541,7 +11740,7 @@ pub fn orgs_create_issue_type_request(
   body : OrganizationCreateIssueType,
 ) -> @http.Request {
   @http.Request::post(
-    "/orgs/" + percent_encode(parameter_value(org)) + "/issue-types",
+    "/orgs/" + @http.percent_encode(parameter_value(org)) + "/issue-types",
   ).json_body(Json(body))
 }
 
@@ -11573,9 +11772,9 @@ pub fn orgs_update_issue_type_request(
 ) -> @http.Request {
   @http.Request::put(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/issue-types/" +
-    percent_encode(parameter_value(issue_type_id)),
+    @http.percent_encode(parameter_value(issue_type_id)),
   ).json_body(Json(body))
 }
 
@@ -11606,9 +11805,9 @@ pub fn orgs_delete_issue_type_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/issue-types/" +
-    percent_encode(parameter_value(issue_type_id)),
+    @http.percent_encode(parameter_value(issue_type_id)),
   )
 }
 
@@ -11627,41 +11826,49 @@ pub fn issues_list_for_org_request(
   per_page? : Int32,
   page? : Int32,
 ) -> @http.Request {
-  let mut url = "/orgs/" + percent_encode(parameter_value(org)) + "/issues"
+  let mut url = "/orgs/" +
+    @http.percent_encode(parameter_value(org)) +
+    "/issues"
   match filter {
-    Some(value) => url = append_query(url, "filter", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "filter", parameter_value(value))
     None => ()
   }
   match state {
-    Some(value) => url = append_query(url, "state", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "state", parameter_value(value))
     None => ()
   }
   match labels {
-    Some(value) => url = append_query(url, "labels", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "labels", parameter_value(value))
     None => ()
   }
   match type_ {
-    Some(value) => url = append_query(url, "type", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "type", parameter_value(value))
     None => ()
   }
   match sort {
-    Some(value) => url = append_query(url, "sort", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "sort", parameter_value(value))
     None => ()
   }
   match direction {
-    Some(value) => url = append_query(url, "direction", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "direction", parameter_value(value))
     None => ()
   }
   match since {
-    Some(value) => url = append_query(url, "since", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "since", parameter_value(value))
     None => ()
   }
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -11695,21 +11902,25 @@ pub fn orgs_list_members_request(
   per_page? : Int32,
   page? : Int32,
 ) -> @http.Request {
-  let mut url = "/orgs/" + percent_encode(parameter_value(org)) + "/members"
+  let mut url = "/orgs/" +
+    @http.percent_encode(parameter_value(org)) +
+    "/members"
   match filter {
-    Some(value) => url = append_query(url, "filter", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "filter", parameter_value(value))
     None => ()
   }
   match role {
-    Some(value) => url = append_query(url, "role", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "role", parameter_value(value))
     None => ()
   }
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -11742,9 +11953,9 @@ pub fn orgs_check_membership_for_user_request(
 ) -> @http.Request {
   @http.Request::get(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/members/" +
-    percent_encode(parameter_value(username)),
+    @http.percent_encode(parameter_value(username)),
   )
 }
 
@@ -11757,9 +11968,9 @@ pub fn orgs_remove_member_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/members/" +
-    percent_encode(parameter_value(username)),
+    @http.percent_encode(parameter_value(username)),
   )
 }
 
@@ -11773,16 +11984,17 @@ pub fn codespaces_get_codespaces_for_user_in_org_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/members/" +
-    percent_encode(parameter_value(username)) +
+    @http.percent_encode(parameter_value(username)) +
     "/codespaces"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -11816,11 +12028,11 @@ pub fn codespaces_delete_from_organization_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/members/" +
-    percent_encode(parameter_value(username)) +
+    @http.percent_encode(parameter_value(username)) +
     "/codespaces/" +
-    percent_encode(parameter_value(codespace_name)),
+    @http.percent_encode(parameter_value(codespace_name)),
   )
 }
 
@@ -11834,11 +12046,11 @@ pub fn codespaces_stop_in_organization_request(
 ) -> @http.Request {
   @http.Request::post(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/members/" +
-    percent_encode(parameter_value(username)) +
+    @http.percent_encode(parameter_value(username)) +
     "/codespaces/" +
-    percent_encode(parameter_value(codespace_name)) +
+    @http.percent_encode(parameter_value(codespace_name)) +
     "/stop",
   )
 }
@@ -11870,9 +12082,9 @@ pub fn copilot_get_copilot_seat_details_for_user_request(
 ) -> @http.Request {
   @http.Request::get(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/members/" +
-    percent_encode(parameter_value(username)) +
+    @http.percent_encode(parameter_value(username)) +
     "/copilot",
   )
 }
@@ -11904,9 +12116,9 @@ pub fn orgs_get_membership_for_user_request(
 ) -> @http.Request {
   @http.Request::get(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/memberships/" +
-    percent_encode(parameter_value(username)),
+    @http.percent_encode(parameter_value(username)),
   )
 }
 
@@ -11938,9 +12150,9 @@ pub fn orgs_set_membership_for_user_request(
 ) -> @http.Request {
   @http.Request::put(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/memberships/" +
-    percent_encode(parameter_value(username)),
+    @http.percent_encode(parameter_value(username)),
   ).json_body(Json(body))
 }
 
@@ -11971,9 +12183,9 @@ pub fn orgs_remove_membership_for_user_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/memberships/" +
-    percent_encode(parameter_value(username)),
+    @http.percent_encode(parameter_value(username)),
   )
 }
 
@@ -11986,19 +12198,22 @@ pub fn migrations_list_for_org_request(
   page? : Int32,
   exclude? : Array[String],
 ) -> @http.Request {
-  let mut url = "/orgs/" + percent_encode(parameter_value(org)) + "/migrations"
+  let mut url = "/orgs/" +
+    @http.percent_encode(parameter_value(org)) +
+    "/migrations"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   match exclude {
     Some(values) =>
       for value in values {
-        url = append_query(url, "exclude", parameter_value(value))
+        url = @http.append_query(url, "exclude", parameter_value(value))
       }
     None => ()
   }
@@ -12031,7 +12246,7 @@ pub fn migrations_start_for_org_request(
   body : MigrationsStartForOrgRequest,
 ) -> @http.Request {
   @http.Request::post(
-    "/orgs/" + percent_encode(parameter_value(org)) + "/migrations",
+    "/orgs/" + @http.percent_encode(parameter_value(org)) + "/migrations",
   ).json_body(Json(body))
 }
 
@@ -12062,13 +12277,13 @@ pub fn migrations_get_status_for_org_request(
   exclude? : Array[String],
 ) -> @http.Request {
   let mut url = "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/migrations/" +
-    percent_encode(parameter_value(migration_id))
+    @http.percent_encode(parameter_value(migration_id))
   match exclude {
     Some(values) =>
       for value in values {
-        url = append_query(url, "exclude", parameter_value(value))
+        url = @http.append_query(url, "exclude", parameter_value(value))
       }
     None => ()
   }
@@ -12102,9 +12317,9 @@ pub fn migrations_download_archive_for_org_request(
 ) -> @http.Request {
   @http.Request::get(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/migrations/" +
-    percent_encode(parameter_value(migration_id)) +
+    @http.percent_encode(parameter_value(migration_id)) +
     "/archive",
   )
 }
@@ -12118,9 +12333,9 @@ pub fn migrations_delete_archive_for_org_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/migrations/" +
-    percent_encode(parameter_value(migration_id)) +
+    @http.percent_encode(parameter_value(migration_id)) +
     "/archive",
   )
 }
@@ -12135,11 +12350,11 @@ pub fn migrations_unlock_repo_for_org_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/migrations/" +
-    percent_encode(parameter_value(migration_id)) +
+    @http.percent_encode(parameter_value(migration_id)) +
     "/repos/" +
-    percent_encode(parameter_value(repo_name)) +
+    @http.percent_encode(parameter_value(repo_name)) +
     "/lock",
   )
 }
@@ -12154,16 +12369,17 @@ pub fn migrations_list_repos_for_org_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/migrations/" +
-    percent_encode(parameter_value(migration_id)) +
+    @http.percent_encode(parameter_value(migration_id)) +
     "/repositories"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -12192,7 +12408,9 @@ pub fn migrations_list_repos_for_org_decode(
 /// Get all organization roles for an organization
 pub fn orgs_list_org_roles_request(org : String) -> @http.Request {
   @http.Request::get(
-    "/orgs/" + percent_encode(parameter_value(org)) + "/organization-roles",
+    "/orgs/" +
+    @http.percent_encode(parameter_value(org)) +
+    "/organization-roles",
   )
 }
 
@@ -12223,9 +12441,9 @@ pub fn orgs_revoke_all_org_roles_team_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/organization-roles/teams/" +
-    percent_encode(parameter_value(team_slug)),
+    @http.percent_encode(parameter_value(team_slug)),
   )
 }
 
@@ -12239,11 +12457,11 @@ pub fn orgs_assign_team_to_org_role_request(
 ) -> @http.Request {
   @http.Request::put(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/organization-roles/teams/" +
-    percent_encode(parameter_value(team_slug)) +
+    @http.percent_encode(parameter_value(team_slug)) +
     "/" +
-    percent_encode(parameter_value(role_id)),
+    @http.percent_encode(parameter_value(role_id)),
   )
 }
 
@@ -12257,11 +12475,11 @@ pub fn orgs_revoke_org_role_team_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/organization-roles/teams/" +
-    percent_encode(parameter_value(team_slug)) +
+    @http.percent_encode(parameter_value(team_slug)) +
     "/" +
-    percent_encode(parameter_value(role_id)),
+    @http.percent_encode(parameter_value(role_id)),
   )
 }
 
@@ -12274,9 +12492,9 @@ pub fn orgs_revoke_all_org_roles_user_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/organization-roles/users/" +
-    percent_encode(parameter_value(username)),
+    @http.percent_encode(parameter_value(username)),
   )
 }
 
@@ -12290,11 +12508,11 @@ pub fn orgs_assign_user_to_org_role_request(
 ) -> @http.Request {
   @http.Request::put(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/organization-roles/users/" +
-    percent_encode(parameter_value(username)) +
+    @http.percent_encode(parameter_value(username)) +
     "/" +
-    percent_encode(parameter_value(role_id)),
+    @http.percent_encode(parameter_value(role_id)),
   )
 }
 
@@ -12308,11 +12526,11 @@ pub fn orgs_revoke_org_role_user_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/organization-roles/users/" +
-    percent_encode(parameter_value(username)) +
+    @http.percent_encode(parameter_value(username)) +
     "/" +
-    percent_encode(parameter_value(role_id)),
+    @http.percent_encode(parameter_value(role_id)),
   )
 }
 
@@ -12325,9 +12543,9 @@ pub fn orgs_get_org_role_request(
 ) -> @http.Request {
   @http.Request::get(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/organization-roles/" +
-    percent_encode(parameter_value(role_id)),
+    @http.percent_encode(parameter_value(role_id)),
   )
 }
 
@@ -12359,16 +12577,17 @@ pub fn orgs_list_org_role_teams_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/organization-roles/" +
-    percent_encode(parameter_value(role_id)) +
+    @http.percent_encode(parameter_value(role_id)) +
     "/teams"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -12402,16 +12621,17 @@ pub fn orgs_list_org_role_users_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/organization-roles/" +
-    percent_encode(parameter_value(role_id)) +
+    @http.percent_encode(parameter_value(role_id)) +
     "/users"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -12445,18 +12665,20 @@ pub fn orgs_list_outside_collaborators_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/outside_collaborators"
   match filter {
-    Some(value) => url = append_query(url, "filter", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "filter", parameter_value(value))
     None => ()
   }
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -12490,9 +12712,9 @@ pub fn orgs_convert_member_to_outside_collaborator_request(
 ) -> @http.Request {
   @http.Request::put(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/outside_collaborators/" +
-    percent_encode(parameter_value(username)),
+    @http.percent_encode(parameter_value(username)),
   ).json_body(Json(body))
 }
 
@@ -12523,9 +12745,9 @@ pub fn orgs_remove_outside_collaborator_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/outside_collaborators/" +
-    percent_encode(parameter_value(username)),
+    @http.percent_encode(parameter_value(username)),
   )
 }
 
@@ -12539,18 +12761,22 @@ pub fn packages_list_packages_for_organization_request(
   page? : Int32,
   per_page? : Int32,
 ) -> @http.Request {
-  let mut url = "/orgs/" + percent_encode(parameter_value(org)) + "/packages"
-  url = append_query(url, "package_type", parameter_value(package_type))
+  let mut url = "/orgs/" +
+    @http.percent_encode(parameter_value(org)) +
+    "/packages"
+  url = @http.append_query(url, "package_type", parameter_value(package_type))
   match visibility {
-    Some(value) => url = append_query(url, "visibility", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "visibility", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -12584,11 +12810,11 @@ pub fn packages_get_package_for_organization_request(
 ) -> @http.Request {
   @http.Request::get(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/packages/" +
-    percent_encode(parameter_value(package_type)) +
+    @http.percent_encode(parameter_value(package_type)) +
     "/" +
-    percent_encode(parameter_value(package_name)),
+    @http.percent_encode(parameter_value(package_name)),
   )
 }
 
@@ -12620,11 +12846,11 @@ pub fn packages_delete_package_for_org_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/packages/" +
-    percent_encode(parameter_value(package_type)) +
+    @http.percent_encode(parameter_value(package_type)) +
     "/" +
-    percent_encode(parameter_value(package_name)),
+    @http.percent_encode(parameter_value(package_name)),
   )
 }
 
@@ -12638,14 +12864,15 @@ pub fn packages_restore_package_for_org_request(
   token? : String,
 ) -> @http.Request {
   let mut url = "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/packages/" +
-    percent_encode(parameter_value(package_type)) +
+    @http.percent_encode(parameter_value(package_type)) +
     "/" +
-    percent_encode(parameter_value(package_name)) +
+    @http.percent_encode(parameter_value(package_name)) +
     "/restore"
   match token {
-    Some(value) => url = append_query(url, "token", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "token", parameter_value(value))
     None => ()
   }
   @http.Request::post(url)
@@ -12663,22 +12890,24 @@ pub fn packages_get_all_package_versions_for_package_owned_by_org_request(
   state? : PackagesGetAllPackageVersionsForPackageOwnedByOrgState,
 ) -> @http.Request {
   let mut url = "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/packages/" +
-    percent_encode(parameter_value(package_type)) +
+    @http.percent_encode(parameter_value(package_type)) +
     "/" +
-    percent_encode(parameter_value(package_name)) +
+    @http.percent_encode(parameter_value(package_name)) +
     "/versions"
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match state {
-    Some(value) => url = append_query(url, "state", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "state", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -12713,13 +12942,13 @@ pub fn packages_get_package_version_for_organization_request(
 ) -> @http.Request {
   @http.Request::get(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/packages/" +
-    percent_encode(parameter_value(package_type)) +
+    @http.percent_encode(parameter_value(package_type)) +
     "/" +
-    percent_encode(parameter_value(package_name)) +
+    @http.percent_encode(parameter_value(package_name)) +
     "/versions/" +
-    percent_encode(parameter_value(package_version_id)),
+    @http.percent_encode(parameter_value(package_version_id)),
   )
 }
 
@@ -12752,13 +12981,13 @@ pub fn packages_delete_package_version_for_org_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/packages/" +
-    percent_encode(parameter_value(package_type)) +
+    @http.percent_encode(parameter_value(package_type)) +
     "/" +
-    percent_encode(parameter_value(package_name)) +
+    @http.percent_encode(parameter_value(package_name)) +
     "/versions/" +
-    percent_encode(parameter_value(package_version_id)),
+    @http.percent_encode(parameter_value(package_version_id)),
   )
 }
 
@@ -12773,13 +13002,13 @@ pub fn packages_restore_package_version_for_org_request(
 ) -> @http.Request {
   @http.Request::post(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/packages/" +
-    percent_encode(parameter_value(package_type)) +
+    @http.percent_encode(parameter_value(package_type)) +
     "/" +
-    percent_encode(parameter_value(package_name)) +
+    @http.percent_encode(parameter_value(package_name)) +
     "/versions/" +
-    percent_encode(parameter_value(package_version_id)) +
+    @http.percent_encode(parameter_value(package_version_id)) +
     "/restore",
   )
 }
@@ -12801,53 +13030,57 @@ pub fn orgs_list_pat_grant_requests_request(
   token_id? : Array[String],
 ) -> @http.Request {
   let mut url = "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/personal-access-token-requests"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   match sort {
-    Some(value) => url = append_query(url, "sort", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "sort", parameter_value(value))
     None => ()
   }
   match direction {
-    Some(value) => url = append_query(url, "direction", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "direction", parameter_value(value))
     None => ()
   }
   match owner {
     Some(values) =>
       for value in values {
-        url = append_query(url, "owner", parameter_value(value))
+        url = @http.append_query(url, "owner", parameter_value(value))
       }
     None => ()
   }
   match repository {
-    Some(value) => url = append_query(url, "repository", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "repository", parameter_value(value))
     None => ()
   }
   match permission {
-    Some(value) => url = append_query(url, "permission", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "permission", parameter_value(value))
     None => ()
   }
   match last_used_before {
     Some(value) =>
-      url = append_query(url, "last_used_before", parameter_value(value))
+      url = @http.append_query(url, "last_used_before", parameter_value(value))
     None => ()
   }
   match last_used_after {
     Some(value) =>
-      url = append_query(url, "last_used_after", parameter_value(value))
+      url = @http.append_query(url, "last_used_after", parameter_value(value))
     None => ()
   }
   match token_id {
     Some(values) =>
       for value in values {
-        url = append_query(url, "token_id", parameter_value(value))
+        url = @http.append_query(url, "token_id", parameter_value(value))
       }
     None => ()
   }
@@ -12881,7 +13114,7 @@ pub fn orgs_review_pat_grant_requests_in_bulk_request(
 ) -> @http.Request {
   @http.Request::post(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/personal-access-token-requests",
   ).json_body(Json(body))
 }
@@ -12896,9 +13129,9 @@ pub fn orgs_review_pat_grant_request_request(
 ) -> @http.Request {
   @http.Request::post(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/personal-access-token-requests/" +
-    percent_encode(parameter_value(pat_request_id)),
+    @http.percent_encode(parameter_value(pat_request_id)),
   ).json_body(Json(body))
 }
 
@@ -12912,16 +13145,17 @@ pub fn orgs_list_pat_grant_request_repositories_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/personal-access-token-requests/" +
-    percent_encode(parameter_value(pat_request_id)) +
+    @http.percent_encode(parameter_value(pat_request_id)) +
     "/repositories"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -12962,53 +13196,57 @@ pub fn orgs_list_pat_grants_request(
   token_id? : Array[String],
 ) -> @http.Request {
   let mut url = "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/personal-access-tokens"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   match sort {
-    Some(value) => url = append_query(url, "sort", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "sort", parameter_value(value))
     None => ()
   }
   match direction {
-    Some(value) => url = append_query(url, "direction", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "direction", parameter_value(value))
     None => ()
   }
   match owner {
     Some(values) =>
       for value in values {
-        url = append_query(url, "owner", parameter_value(value))
+        url = @http.append_query(url, "owner", parameter_value(value))
       }
     None => ()
   }
   match repository {
-    Some(value) => url = append_query(url, "repository", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "repository", parameter_value(value))
     None => ()
   }
   match permission {
-    Some(value) => url = append_query(url, "permission", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "permission", parameter_value(value))
     None => ()
   }
   match last_used_before {
     Some(value) =>
-      url = append_query(url, "last_used_before", parameter_value(value))
+      url = @http.append_query(url, "last_used_before", parameter_value(value))
     None => ()
   }
   match last_used_after {
     Some(value) =>
-      url = append_query(url, "last_used_after", parameter_value(value))
+      url = @http.append_query(url, "last_used_after", parameter_value(value))
     None => ()
   }
   match token_id {
     Some(values) =>
       for value in values {
-        url = append_query(url, "token_id", parameter_value(value))
+        url = @http.append_query(url, "token_id", parameter_value(value))
       }
     None => ()
   }
@@ -13041,7 +13279,9 @@ pub fn orgs_update_pat_accesses_request(
   body : OrgsUpdatePatAccessesRequest,
 ) -> @http.Request {
   @http.Request::post(
-    "/orgs/" + percent_encode(parameter_value(org)) + "/personal-access-tokens",
+    "/orgs/" +
+    @http.percent_encode(parameter_value(org)) +
+    "/personal-access-tokens",
   ).json_body(Json(body))
 }
 
@@ -13055,9 +13295,9 @@ pub fn orgs_update_pat_access_request(
 ) -> @http.Request {
   @http.Request::post(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/personal-access-tokens/" +
-    percent_encode(parameter_value(pat_id)),
+    @http.percent_encode(parameter_value(pat_id)),
   ).json_body(Json(body))
 }
 
@@ -13071,16 +13311,17 @@ pub fn orgs_list_pat_grant_repositories_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/personal-access-tokens/" +
-    percent_encode(parameter_value(pat_id)) +
+    @http.percent_encode(parameter_value(pat_id)) +
     "/repositories"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -13113,14 +13354,15 @@ pub fn private_registries_list_org_private_registries_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/private-registries"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -13152,7 +13394,9 @@ pub fn private_registries_create_org_private_registry_request(
   body : PrivateRegistriesCreateOrgPrivateRegistryRequest,
 ) -> @http.Request {
   @http.Request::post(
-    "/orgs/" + percent_encode(parameter_value(org)) + "/private-registries",
+    "/orgs/" +
+    @http.percent_encode(parameter_value(org)) +
+    "/private-registries",
   ).json_body(Json(body))
 }
 
@@ -13182,7 +13426,7 @@ pub fn private_registries_get_org_public_key_request(
 ) -> @http.Request {
   @http.Request::get(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/private-registries/public-key",
   )
 }
@@ -13214,9 +13458,9 @@ pub fn private_registries_get_org_private_registry_request(
 ) -> @http.Request {
   @http.Request::get(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/private-registries/" +
-    percent_encode(parameter_value(secret_name)),
+    @http.percent_encode(parameter_value(secret_name)),
   )
 }
 
@@ -13248,9 +13492,9 @@ pub fn private_registries_update_org_private_registry_request(
 ) -> @http.Request {
   @http.Request::patch(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/private-registries/" +
-    percent_encode(parameter_value(secret_name)),
+    @http.percent_encode(parameter_value(secret_name)),
   ).json_body(Json(body))
 }
 
@@ -13263,9 +13507,9 @@ pub fn private_registries_delete_org_private_registry_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/private-registries/" +
-    percent_encode(parameter_value(secret_name)),
+    @http.percent_encode(parameter_value(secret_name)),
   )
 }
 
@@ -13279,21 +13523,26 @@ pub fn projects_list_for_org_request(
   after? : String,
   per_page? : Int32,
 ) -> @http.Request {
-  let mut url = "/orgs/" + percent_encode(parameter_value(org)) + "/projectsV2"
+  let mut url = "/orgs/" +
+    @http.percent_encode(parameter_value(org)) +
+    "/projectsV2"
   match q {
-    Some(value) => url = append_query(url, "q", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "q", parameter_value(value))
     None => ()
   }
   match before {
-    Some(value) => url = append_query(url, "before", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "before", parameter_value(value))
     None => ()
   }
   match after {
-    Some(value) => url = append_query(url, "after", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "after", parameter_value(value))
     None => ()
   }
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -13326,9 +13575,9 @@ pub fn projects_get_for_org_request(
 ) -> @http.Request {
   @http.Request::get(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/projectsV2/" +
-    percent_encode(parameter_value(project_number)),
+    @http.percent_encode(parameter_value(project_number)),
   )
 }
 
@@ -13360,9 +13609,9 @@ pub fn projects_create_draft_item_for_org_request(
 ) -> @http.Request {
   @http.Request::post(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/projectsV2/" +
-    percent_encode(parameter_value(project_number)) +
+    @http.percent_encode(parameter_value(project_number)) +
     "/drafts",
   ).json_body(Json(body))
 }
@@ -13396,20 +13645,23 @@ pub fn projects_list_fields_for_org_request(
   after? : String,
 ) -> @http.Request {
   let mut url = "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/projectsV2/" +
-    percent_encode(parameter_value(project_number)) +
+    @http.percent_encode(parameter_value(project_number)) +
     "/fields"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match before {
-    Some(value) => url = append_query(url, "before", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "before", parameter_value(value))
     None => ()
   }
   match after {
-    Some(value) => url = append_query(url, "after", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "after", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -13443,9 +13695,9 @@ pub fn projects_add_field_for_org_request(
 ) -> @http.Request {
   @http.Request::post(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/projectsV2/" +
-    percent_encode(parameter_value(project_number)) +
+    @http.percent_encode(parameter_value(project_number)) +
     "/fields",
   ).json_body(body)
 }
@@ -13478,11 +13730,11 @@ pub fn projects_get_field_for_org_request(
 ) -> @http.Request {
   @http.Request::get(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/projectsV2/" +
-    percent_encode(parameter_value(project_number)) +
+    @http.percent_encode(parameter_value(project_number)) +
     "/fields/" +
-    percent_encode(parameter_value(field_id)),
+    @http.percent_encode(parameter_value(field_id)),
   )
 }
 
@@ -13517,28 +13769,32 @@ pub fn projects_list_items_for_org_request(
   per_page? : Int32,
 ) -> @http.Request {
   let mut url = "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/projectsV2/" +
-    percent_encode(parameter_value(project_number)) +
+    @http.percent_encode(parameter_value(project_number)) +
     "/items"
   match q {
-    Some(value) => url = append_query(url, "q", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "q", parameter_value(value))
     None => ()
   }
   match fields {
-    Some(value) => url = append_query(url, "fields", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "fields", parameter_value(value))
     None => ()
   }
   match before {
-    Some(value) => url = append_query(url, "before", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "before", parameter_value(value))
     None => ()
   }
   match after {
-    Some(value) => url = append_query(url, "after", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "after", parameter_value(value))
     None => ()
   }
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -13572,9 +13828,9 @@ pub fn projects_add_item_for_org_request(
 ) -> @http.Request {
   @http.Request::post(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/projectsV2/" +
-    percent_encode(parameter_value(project_number)) +
+    @http.percent_encode(parameter_value(project_number)) +
     "/items",
   ).json_body(Json(body))
 }
@@ -13607,13 +13863,14 @@ pub fn projects_get_org_item_request(
   fields? : ProjectsGetOrgItemFields,
 ) -> @http.Request {
   let mut url = "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/projectsV2/" +
-    percent_encode(parameter_value(project_number)) +
+    @http.percent_encode(parameter_value(project_number)) +
     "/items/" +
-    percent_encode(parameter_value(item_id))
+    @http.percent_encode(parameter_value(item_id))
   match fields {
-    Some(value) => url = append_query(url, "fields", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "fields", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -13648,11 +13905,11 @@ pub fn projects_update_item_for_org_request(
 ) -> @http.Request {
   @http.Request::patch(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/projectsV2/" +
-    percent_encode(parameter_value(project_number)) +
+    @http.percent_encode(parameter_value(project_number)) +
     "/items/" +
-    percent_encode(parameter_value(item_id)),
+    @http.percent_encode(parameter_value(item_id)),
   ).json_body(Json(body))
 }
 
@@ -13684,11 +13941,11 @@ pub fn projects_delete_item_for_org_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/projectsV2/" +
-    percent_encode(parameter_value(project_number)) +
+    @http.percent_encode(parameter_value(project_number)) +
     "/items/" +
-    percent_encode(parameter_value(item_id)),
+    @http.percent_encode(parameter_value(item_id)),
   )
 }
 
@@ -13702,9 +13959,9 @@ pub fn projects_create_view_for_org_request(
 ) -> @http.Request {
   @http.Request::post(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/projectsV2/" +
-    percent_encode(parameter_value(project_number)) +
+    @http.percent_encode(parameter_value(project_number)) +
     "/views",
   ).json_body(Json(body))
 }
@@ -13740,26 +13997,30 @@ pub fn projects_list_view_items_for_org_request(
   per_page? : Int32,
 ) -> @http.Request {
   let mut url = "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/projectsV2/" +
-    percent_encode(parameter_value(project_number)) +
+    @http.percent_encode(parameter_value(project_number)) +
     "/views/" +
-    percent_encode(parameter_value(view_number)) +
+    @http.percent_encode(parameter_value(view_number)) +
     "/items"
   match fields {
-    Some(value) => url = append_query(url, "fields", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "fields", parameter_value(value))
     None => ()
   }
   match before {
-    Some(value) => url = append_query(url, "before", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "before", parameter_value(value))
     None => ()
   }
   match after {
-    Some(value) => url = append_query(url, "after", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "after", parameter_value(value))
     None => ()
   }
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -13791,7 +14052,7 @@ pub fn orgs_external_properties_for_repos_get_organization_app_installations_req
 ) -> @http.Request {
   @http.Request::get(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/properties/installations",
   )
 }
@@ -13823,7 +14084,7 @@ pub fn orgs_external_properties_for_repos_register_organization_app_installation
 ) -> @http.Request {
   @http.Request::post(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/properties/installations",
   ).json_body(Json(body))
 }
@@ -13854,7 +14115,7 @@ pub fn orgs_external_properties_for_repos_get_organization_definitions_request(
 ) -> @http.Request {
   @http.Request::get(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/properties/installations/schema",
   )
 }
@@ -13886,7 +14147,7 @@ pub fn orgs_external_properties_for_repos_create_or_update_organization_values_r
 ) -> @http.Request {
   @http.Request::patch(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/properties/installations/values",
   ).json_body(Json(body))
 }
@@ -13901,9 +14162,9 @@ pub fn orgs_external_properties_for_repos_create_or_update_values_for_organizati
 ) -> @http.Request {
   @http.Request::patch(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/properties/installations/values/" +
-    percent_encode(parameter_value(property_name)),
+    @http.percent_encode(parameter_value(property_name)),
   ).json_body(Json(body))
 }
 
@@ -13916,9 +14177,9 @@ pub fn orgs_external_properties_for_repos_delete_organization_values_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/properties/installations/values/" +
-    percent_encode(parameter_value(property_name)),
+    @http.percent_encode(parameter_value(property_name)),
   )
 }
 
@@ -13929,7 +14190,7 @@ pub fn orgs_custom_properties_for_repos_get_organization_definitions_request(
   org : String,
 ) -> @http.Request {
   @http.Request::get(
-    "/orgs/" + percent_encode(parameter_value(org)) + "/properties/schema",
+    "/orgs/" + @http.percent_encode(parameter_value(org)) + "/properties/schema",
   )
 }
 
@@ -13959,7 +14220,7 @@ pub fn orgs_custom_properties_for_repos_create_or_update_organization_definition
   body : OrgsCustomPropertiesForReposCreateOrUpdateOrganizationDefinitionsRequest,
 ) -> @http.Request {
   @http.Request::patch(
-    "/orgs/" + percent_encode(parameter_value(org)) + "/properties/schema",
+    "/orgs/" + @http.percent_encode(parameter_value(org)) + "/properties/schema",
   ).json_body(Json(body))
 }
 
@@ -13990,9 +14251,9 @@ pub fn orgs_custom_properties_for_repos_get_organization_definition_request(
 ) -> @http.Request {
   @http.Request::get(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/properties/schema/" +
-    percent_encode(parameter_value(custom_property_name)),
+    @http.percent_encode(parameter_value(custom_property_name)),
   )
 }
 
@@ -14024,9 +14285,9 @@ pub fn orgs_custom_properties_for_repos_create_or_update_organization_definition
 ) -> @http.Request {
   @http.Request::put(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/properties/schema/" +
-    percent_encode(parameter_value(custom_property_name)),
+    @http.percent_encode(parameter_value(custom_property_name)),
   ).json_body(Json(body))
 }
 
@@ -14057,9 +14318,9 @@ pub fn orgs_custom_properties_for_repos_delete_organization_definition_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/properties/schema/" +
-    percent_encode(parameter_value(custom_property_name)),
+    @http.percent_encode(parameter_value(custom_property_name)),
   )
 }
 
@@ -14073,19 +14334,20 @@ pub fn orgs_custom_properties_for_repos_get_organization_values_request(
   repository_query? : String,
 ) -> @http.Request {
   let mut url = "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/properties/values"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   match repository_query {
     Some(value) =>
-      url = append_query(url, "repository_query", parameter_value(value))
+      url = @http.append_query(url, "repository_query", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -14117,7 +14379,7 @@ pub fn orgs_custom_properties_for_repos_create_or_update_organization_values_req
   body : OrgsCustomPropertiesForReposCreateOrUpdateOrganizationValuesRequest,
 ) -> @http.Request {
   @http.Request::patch(
-    "/orgs/" + percent_encode(parameter_value(org)) + "/properties/values",
+    "/orgs/" + @http.percent_encode(parameter_value(org)) + "/properties/values",
   ).json_body(Json(body))
 }
 
@@ -14130,14 +14392,15 @@ pub fn orgs_list_public_members_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/public_members"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -14170,9 +14433,9 @@ pub fn orgs_check_public_membership_for_user_request(
 ) -> @http.Request {
   @http.Request::get(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/public_members/" +
-    percent_encode(parameter_value(username)),
+    @http.percent_encode(parameter_value(username)),
   )
 }
 
@@ -14185,9 +14448,9 @@ pub fn orgs_set_public_membership_for_authenticated_user_request(
 ) -> @http.Request {
   @http.Request::put(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/public_members/" +
-    percent_encode(parameter_value(username)),
+    @http.percent_encode(parameter_value(username)),
   )
 }
 
@@ -14200,9 +14463,9 @@ pub fn orgs_remove_public_membership_for_authenticated_user_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/public_members/" +
-    percent_encode(parameter_value(username)),
+    @http.percent_encode(parameter_value(username)),
   )
 }
 
@@ -14217,25 +14480,27 @@ pub fn repos_list_for_org_request(
   per_page? : Int32,
   page? : Int32,
 ) -> @http.Request {
-  let mut url = "/orgs/" + percent_encode(parameter_value(org)) + "/repos"
+  let mut url = "/orgs/" + @http.percent_encode(parameter_value(org)) + "/repos"
   match type_ {
-    Some(value) => url = append_query(url, "type", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "type", parameter_value(value))
     None => ()
   }
   match sort {
-    Some(value) => url = append_query(url, "sort", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "sort", parameter_value(value))
     None => ()
   }
   match direction {
-    Some(value) => url = append_query(url, "direction", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "direction", parameter_value(value))
     None => ()
   }
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -14267,7 +14532,7 @@ pub fn repos_create_in_org_request(
   body : ReposCreateInOrgRequest,
 ) -> @http.Request {
   @http.Request::post(
-    "/orgs/" + percent_encode(parameter_value(org)) + "/repos",
+    "/orgs/" + @http.percent_encode(parameter_value(org)) + "/repos",
   ).json_body(Json(body))
 }
 
@@ -14298,17 +14563,21 @@ pub fn repos_get_org_rulesets_request(
   page? : Int32,
   targets? : String,
 ) -> @http.Request {
-  let mut url = "/orgs/" + percent_encode(parameter_value(org)) + "/rulesets"
+  let mut url = "/orgs/" +
+    @http.percent_encode(parameter_value(org)) +
+    "/rulesets"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   match targets {
-    Some(value) => url = append_query(url, "targets", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "targets", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -14340,7 +14609,7 @@ pub fn repos_create_org_ruleset_request(
   body : ReposCreateOrgRulesetRequest,
 ) -> @http.Request {
   @http.Request::post(
-    "/orgs/" + percent_encode(parameter_value(org)) + "/rulesets",
+    "/orgs/" + @http.percent_encode(parameter_value(org)) + "/rulesets",
   ).json_body(Json(body))
 }
 
@@ -14377,42 +14646,44 @@ pub fn repos_get_org_rule_suites_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/rulesets/rule-suites"
   match ref_ {
-    Some(value) => url = append_query(url, "ref", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "ref", parameter_value(value))
     None => ()
   }
   match repository_name {
     Some(value) =>
-      url = append_query(url, "repository_name", parameter_value(value))
+      url = @http.append_query(url, "repository_name", parameter_value(value))
     None => ()
   }
   match time_period {
     Some(value) =>
-      url = append_query(url, "time_period", parameter_value(value))
+      url = @http.append_query(url, "time_period", parameter_value(value))
     None => ()
   }
   match actor_name {
-    Some(value) => url = append_query(url, "actor_name", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "actor_name", parameter_value(value))
     None => ()
   }
   match rule_suite_result {
     Some(value) =>
-      url = append_query(url, "rule_suite_result", parameter_value(value))
+      url = @http.append_query(url, "rule_suite_result", parameter_value(value))
     None => ()
   }
   match evaluate_status {
     Some(value) =>
-      url = append_query(url, "evaluate_status", parameter_value(value))
+      url = @http.append_query(url, "evaluate_status", parameter_value(value))
     None => ()
   }
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -14445,9 +14716,9 @@ pub fn repos_get_org_rule_suite_request(
 ) -> @http.Request {
   @http.Request::get(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/rulesets/rule-suites/" +
-    percent_encode(parameter_value(rule_suite_id)),
+    @http.percent_encode(parameter_value(rule_suite_id)),
   )
 }
 
@@ -14478,9 +14749,9 @@ pub fn repos_get_org_ruleset_request(
 ) -> @http.Request {
   @http.Request::get(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/rulesets/" +
-    percent_encode(parameter_value(ruleset_id)),
+    @http.percent_encode(parameter_value(ruleset_id)),
   )
 }
 
@@ -14512,9 +14783,9 @@ pub fn repos_update_org_ruleset_request(
 ) -> @http.Request {
   @http.Request::put(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/rulesets/" +
-    percent_encode(parameter_value(ruleset_id)),
+    @http.percent_encode(parameter_value(ruleset_id)),
   ).json_body(Json(body))
 }
 
@@ -14545,9 +14816,9 @@ pub fn repos_delete_org_ruleset_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/rulesets/" +
-    percent_encode(parameter_value(ruleset_id)),
+    @http.percent_encode(parameter_value(ruleset_id)),
   )
 }
 
@@ -14561,16 +14832,17 @@ pub fn orgs_get_org_ruleset_history_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/rulesets/" +
-    percent_encode(parameter_value(ruleset_id)) +
+    @http.percent_encode(parameter_value(ruleset_id)) +
     "/history"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -14604,11 +14876,11 @@ pub fn orgs_get_org_ruleset_version_request(
 ) -> @http.Request {
   @http.Request::get(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/rulesets/" +
-    percent_encode(parameter_value(ruleset_id)) +
+    @http.percent_encode(parameter_value(ruleset_id)) +
     "/history/" +
-    percent_encode(parameter_value(version_id)),
+    @http.percent_encode(parameter_value(version_id)),
   )
 }
 
@@ -14657,95 +14929,112 @@ pub fn secret_scanning_list_alerts_for_org_request(
   owner_email_hash? : String,
 ) -> @http.Request {
   let mut url = "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/secret-scanning/alerts"
   match state {
-    Some(value) => url = append_query(url, "state", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "state", parameter_value(value))
     None => ()
   }
   match secret_type {
     Some(value) =>
-      url = append_query(url, "secret_type", parameter_value(value))
+      url = @http.append_query(url, "secret_type", parameter_value(value))
     None => ()
   }
   match exclude_secret_types {
     Some(value) =>
-      url = append_query(url, "exclude_secret_types", parameter_value(value))
+      url = @http.append_query(
+        url,
+        "exclude_secret_types",
+        parameter_value(value),
+      )
     None => ()
   }
   match exclude_providers {
     Some(value) =>
-      url = append_query(url, "exclude_providers", parameter_value(value))
+      url = @http.append_query(url, "exclude_providers", parameter_value(value))
     None => ()
   }
   match providers {
-    Some(value) => url = append_query(url, "providers", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "providers", parameter_value(value))
     None => ()
   }
   match resolution {
-    Some(value) => url = append_query(url, "resolution", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "resolution", parameter_value(value))
     None => ()
   }
   match assignee {
-    Some(value) => url = append_query(url, "assignee", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "assignee", parameter_value(value))
     None => ()
   }
   match sort {
-    Some(value) => url = append_query(url, "sort", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "sort", parameter_value(value))
     None => ()
   }
   match direction {
-    Some(value) => url = append_query(url, "direction", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "direction", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match before {
-    Some(value) => url = append_query(url, "before", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "before", parameter_value(value))
     None => ()
   }
   match after {
-    Some(value) => url = append_query(url, "after", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "after", parameter_value(value))
     None => ()
   }
   match validity {
-    Some(value) => url = append_query(url, "validity", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "validity", parameter_value(value))
     None => ()
   }
   match is_publicly_leaked {
     Some(value) =>
-      url = append_query(url, "is_publicly_leaked", parameter_value(value))
+      url = @http.append_query(
+        url,
+        "is_publicly_leaked",
+        parameter_value(value),
+      )
     None => ()
   }
   match is_multi_repo {
     Some(value) =>
-      url = append_query(url, "is_multi_repo", parameter_value(value))
+      url = @http.append_query(url, "is_multi_repo", parameter_value(value))
     None => ()
   }
   match hide_secret {
     Some(value) =>
-      url = append_query(url, "hide_secret", parameter_value(value))
+      url = @http.append_query(url, "hide_secret", parameter_value(value))
     None => ()
   }
   match is_bypassed {
     Some(value) =>
-      url = append_query(url, "is_bypassed", parameter_value(value))
+      url = @http.append_query(url, "is_bypassed", parameter_value(value))
     None => ()
   }
   match included_metadata {
     Some(value) =>
-      url = append_query(url, "included_metadata", parameter_value(value))
+      url = @http.append_query(url, "included_metadata", parameter_value(value))
     None => ()
   }
   match owner_email_hash {
     Some(value) =>
-      url = append_query(url, "owner_email_hash", parameter_value(value))
+      url = @http.append_query(url, "owner_email_hash", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -14782,31 +15071,35 @@ pub fn secret_scanning_list_org_custom_patterns_request(
   after? : String,
 ) -> @http.Request {
   let mut url = "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/secret-scanning/custom-patterns"
   match state {
-    Some(value) => url = append_query(url, "state", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "state", parameter_value(value))
     None => ()
   }
   match push_protection {
     Some(value) =>
-      url = append_query(url, "push_protection", parameter_value(value))
+      url = @http.append_query(url, "push_protection", parameter_value(value))
     None => ()
   }
   match sort {
-    Some(value) => url = append_query(url, "sort", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "sort", parameter_value(value))
     None => ()
   }
   match direction {
-    Some(value) => url = append_query(url, "direction", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "direction", parameter_value(value))
     None => ()
   }
   match before {
-    Some(value) => url = append_query(url, "before", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "before", parameter_value(value))
     None => ()
   }
   match after {
-    Some(value) => url = append_query(url, "after", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "after", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -14839,7 +15132,7 @@ pub fn secret_scanning_bulk_create_org_custom_patterns_request(
 ) -> @http.Request {
   @http.Request::post(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/secret-scanning/custom-patterns",
   ).json_body(Json(body))
 }
@@ -14871,7 +15164,7 @@ pub fn secret_scanning_bulk_delete_org_custom_patterns_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/secret-scanning/custom-patterns",
   ).json_body(Json(body))
 }
@@ -14886,9 +15179,9 @@ pub fn secret_scanning_update_org_custom_pattern_request(
 ) -> @http.Request {
   @http.Request::patch(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/secret-scanning/custom-patterns/" +
-    percent_encode(parameter_value(pattern_id)),
+    @http.percent_encode(parameter_value(pattern_id)),
   ).json_body(Json(body))
 }
 
@@ -14918,7 +15211,7 @@ pub fn secret_scanning_list_org_pattern_configs_request(
 ) -> @http.Request {
   @http.Request::get(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/secret-scanning/pattern-configurations",
   )
 }
@@ -14950,7 +15243,7 @@ pub fn secret_scanning_update_org_pattern_configs_request(
 ) -> @http.Request {
   @http.Request::patch(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/secret-scanning/pattern-configurations",
   ).json_body(Json(body))
 }
@@ -14986,30 +15279,35 @@ pub fn security_advisories_list_org_repository_advisories_request(
   state? : SecurityAdvisoriesListOrgRepositoryAdvisoriesState,
 ) -> @http.Request {
   let mut url = "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/security-advisories"
   match direction {
-    Some(value) => url = append_query(url, "direction", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "direction", parameter_value(value))
     None => ()
   }
   match sort {
-    Some(value) => url = append_query(url, "sort", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "sort", parameter_value(value))
     None => ()
   }
   match before {
-    Some(value) => url = append_query(url, "before", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "before", parameter_value(value))
     None => ()
   }
   match after {
-    Some(value) => url = append_query(url, "after", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "after", parameter_value(value))
     None => ()
   }
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match state {
-    Some(value) => url = append_query(url, "state", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "state", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -15038,7 +15336,7 @@ pub fn security_advisories_list_org_repository_advisories_decode(
 /// List security manager teams
 pub fn orgs_list_security_manager_teams_request(org : String) -> @http.Request {
   @http.Request::get(
-    "/orgs/" + percent_encode(parameter_value(org)) + "/security-managers",
+    "/orgs/" + @http.percent_encode(parameter_value(org)) + "/security-managers",
   )
 }
 
@@ -15069,9 +15367,9 @@ pub fn orgs_add_security_manager_team_request(
 ) -> @http.Request {
   @http.Request::put(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/security-managers/teams/" +
-    percent_encode(parameter_value(team_slug)),
+    @http.percent_encode(parameter_value(team_slug)),
   )
 }
 
@@ -15084,9 +15382,9 @@ pub fn orgs_remove_security_manager_team_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/security-managers/teams/" +
-    percent_encode(parameter_value(team_slug)),
+    @http.percent_encode(parameter_value(team_slug)),
   )
 }
 
@@ -15098,7 +15396,7 @@ pub fn orgs_get_immutable_releases_settings_request(
 ) -> @http.Request {
   @http.Request::get(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/settings/immutable-releases",
   )
 }
@@ -15130,7 +15428,7 @@ pub fn orgs_set_immutable_releases_settings_request(
 ) -> @http.Request {
   @http.Request::put(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/settings/immutable-releases",
   ).json_body(Json(body))
 }
@@ -15144,14 +15442,15 @@ pub fn orgs_get_immutable_releases_settings_repositories_request(
   per_page? : Int32,
 ) -> @http.Request {
   let mut url = "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/settings/immutable-releases/repositories"
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -15184,7 +15483,7 @@ pub fn orgs_set_immutable_releases_settings_repositories_request(
 ) -> @http.Request {
   @http.Request::put(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/settings/immutable-releases/repositories",
   ).json_body(Json(body))
 }
@@ -15198,9 +15497,9 @@ pub fn orgs_enable_selected_repository_immutable_releases_organization_request(
 ) -> @http.Request {
   @http.Request::put(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/settings/immutable-releases/repositories/" +
-    percent_encode(parameter_value(repository_id)),
+    @http.percent_encode(parameter_value(repository_id)),
   )
 }
 
@@ -15213,9 +15512,9 @@ pub fn orgs_disable_selected_repository_immutable_releases_organization_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/settings/immutable-releases/repositories/" +
-    percent_encode(parameter_value(repository_id)),
+    @http.percent_encode(parameter_value(repository_id)),
   )
 }
 
@@ -15228,14 +15527,15 @@ pub fn hosted_compute_list_network_configurations_for_org_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/settings/network-configurations"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -15268,7 +15568,7 @@ pub fn hosted_compute_create_network_configuration_for_org_request(
 ) -> @http.Request {
   @http.Request::post(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/settings/network-configurations",
   ).json_body(Json(body))
 }
@@ -15300,9 +15600,9 @@ pub fn hosted_compute_get_network_configuration_for_org_request(
 ) -> @http.Request {
   @http.Request::get(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/settings/network-configurations/" +
-    percent_encode(parameter_value(network_configuration_id)),
+    @http.percent_encode(parameter_value(network_configuration_id)),
   )
 }
 
@@ -15334,9 +15634,9 @@ pub fn hosted_compute_update_network_configuration_for_org_request(
 ) -> @http.Request {
   @http.Request::patch(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/settings/network-configurations/" +
-    percent_encode(parameter_value(network_configuration_id)),
+    @http.percent_encode(parameter_value(network_configuration_id)),
   ).json_body(Json(body))
 }
 
@@ -15367,9 +15667,9 @@ pub fn hosted_compute_delete_network_configuration_from_org_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/settings/network-configurations/" +
-    percent_encode(parameter_value(network_configuration_id)),
+    @http.percent_encode(parameter_value(network_configuration_id)),
   )
 }
 
@@ -15382,9 +15682,9 @@ pub fn hosted_compute_get_network_settings_for_org_request(
 ) -> @http.Request {
   @http.Request::get(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/settings/network-settings/" +
-    percent_encode(parameter_value(network_settings_id)),
+    @http.percent_encode(parameter_value(network_settings_id)),
   )
 }
 
@@ -15415,17 +15715,19 @@ pub fn teams_list_request(
   page? : Int32,
   team_type? : TeamsListTeamType,
 ) -> @http.Request {
-  let mut url = "/orgs/" + percent_encode(parameter_value(org)) + "/teams"
+  let mut url = "/orgs/" + @http.percent_encode(parameter_value(org)) + "/teams"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   match team_type {
-    Some(value) => url = append_query(url, "team_type", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "team_type", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -15457,7 +15759,7 @@ pub fn teams_create_request(
   body : TeamsCreateRequest,
 ) -> @http.Request {
   @http.Request::post(
-    "/orgs/" + percent_encode(parameter_value(org)) + "/teams",
+    "/orgs/" + @http.percent_encode(parameter_value(org)) + "/teams",
   ).json_body(Json(body))
 }
 
@@ -15488,9 +15790,9 @@ pub fn teams_get_by_name_request(
 ) -> @http.Request {
   @http.Request::get(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/teams/" +
-    percent_encode(parameter_value(team_slug)),
+    @http.percent_encode(parameter_value(team_slug)),
   )
 }
 
@@ -15522,9 +15824,9 @@ pub fn teams_update_in_org_request(
 ) -> @http.Request {
   @http.Request::patch(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/teams/" +
-    percent_encode(parameter_value(team_slug)),
+    @http.percent_encode(parameter_value(team_slug)),
   ).json_body(Json(body))
 }
 
@@ -15555,9 +15857,9 @@ pub fn teams_delete_in_org_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/teams/" +
-    percent_encode(parameter_value(team_slug)),
+    @http.percent_encode(parameter_value(team_slug)),
   )
 }
 
@@ -15571,16 +15873,17 @@ pub fn teams_list_pending_invitations_in_org_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/teams/" +
-    percent_encode(parameter_value(team_slug)) +
+    @http.percent_encode(parameter_value(team_slug)) +
     "/invitations"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -15615,20 +15918,21 @@ pub fn teams_list_members_in_org_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/teams/" +
-    percent_encode(parameter_value(team_slug)) +
+    @http.percent_encode(parameter_value(team_slug)) +
     "/members"
   match role {
-    Some(value) => url = append_query(url, "role", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "role", parameter_value(value))
     None => ()
   }
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -15662,11 +15966,11 @@ pub fn teams_get_membership_for_user_in_org_request(
 ) -> @http.Request {
   @http.Request::get(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/teams/" +
-    percent_encode(parameter_value(team_slug)) +
+    @http.percent_encode(parameter_value(team_slug)) +
     "/memberships/" +
-    percent_encode(parameter_value(username)),
+    @http.percent_encode(parameter_value(username)),
   )
 }
 
@@ -15699,11 +16003,11 @@ pub fn teams_add_or_update_membership_for_user_in_org_request(
 ) -> @http.Request {
   @http.Request::put(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/teams/" +
-    percent_encode(parameter_value(team_slug)) +
+    @http.percent_encode(parameter_value(team_slug)) +
     "/memberships/" +
-    percent_encode(parameter_value(username)),
+    @http.percent_encode(parameter_value(username)),
   ).json_body(Json(body))
 }
 
@@ -15735,11 +16039,11 @@ pub fn teams_remove_membership_for_user_in_org_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/teams/" +
-    percent_encode(parameter_value(team_slug)) +
+    @http.percent_encode(parameter_value(team_slug)) +
     "/memberships/" +
-    percent_encode(parameter_value(username)),
+    @http.percent_encode(parameter_value(username)),
   )
 }
 
@@ -15753,16 +16057,17 @@ pub fn teams_list_repos_in_org_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/teams/" +
-    percent_encode(parameter_value(team_slug)) +
+    @http.percent_encode(parameter_value(team_slug)) +
     "/repos"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -15797,13 +16102,13 @@ pub fn teams_check_permissions_for_repo_in_org_request(
 ) -> @http.Request {
   @http.Request::get(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/teams/" +
-    percent_encode(parameter_value(team_slug)) +
+    @http.percent_encode(parameter_value(team_slug)) +
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)),
+    @http.percent_encode(parameter_value(repo)),
   )
 }
 
@@ -15837,13 +16142,13 @@ pub fn teams_add_or_update_repo_permissions_in_org_request(
 ) -> @http.Request {
   @http.Request::put(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/teams/" +
-    percent_encode(parameter_value(team_slug)) +
+    @http.percent_encode(parameter_value(team_slug)) +
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)),
+    @http.percent_encode(parameter_value(repo)),
   ).json_body(Json(body))
 }
 
@@ -15858,13 +16163,13 @@ pub fn teams_remove_repo_in_org_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/teams/" +
-    percent_encode(parameter_value(team_slug)) +
+    @http.percent_encode(parameter_value(team_slug)) +
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)),
+    @http.percent_encode(parameter_value(repo)),
   )
 }
 
@@ -15878,16 +16183,17 @@ pub fn teams_list_child_in_org_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/teams/" +
-    percent_encode(parameter_value(team_slug)) +
+    @http.percent_encode(parameter_value(team_slug)) +
     "/teams"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -15922,11 +16228,11 @@ pub fn orgs_enable_or_disable_security_product_on_all_org_repos_request(
 ) -> @http.Request {
   @http.Request::post(
     "/orgs/" +
-    percent_encode(parameter_value(org)) +
+    @http.percent_encode(parameter_value(org)) +
     "/" +
-    percent_encode(parameter_value(security_product)) +
+    @http.percent_encode(parameter_value(security_product)) +
     "/" +
-    percent_encode(parameter_value(enablement)),
+    @http.percent_encode(parameter_value(enablement)),
   ).json_body(Json(body))
 }
 
@@ -15961,9 +16267,9 @@ pub fn rate_limit_get_decode(
 pub fn repos_get_request(owner : String, repo : String) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)),
+    @http.percent_encode(parameter_value(repo)),
   )
 }
 
@@ -15995,9 +16301,9 @@ pub fn repos_update_request(
 ) -> @http.Request {
   @http.Request::patch(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)),
+    @http.percent_encode(parameter_value(repo)),
   ).json_body(Json(body))
 }
 
@@ -16025,9 +16331,9 @@ pub fn repos_update_decode(
 pub fn repos_delete_request(owner : String, repo : String) -> @http.Request {
   @http.Request::delete(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)),
+    @http.percent_encode(parameter_value(repo)),
   )
 }
 
@@ -16042,20 +16348,21 @@ pub fn actions_list_artifacts_for_repo_request(
   name? : String,
 ) -> @http.Request {
   let mut url = "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/actions/artifacts"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   match name {
-    Some(value) => url = append_query(url, "name", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "name", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -16089,11 +16396,11 @@ pub fn actions_get_artifact_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/actions/artifacts/" +
-    percent_encode(parameter_value(artifact_id)),
+    @http.percent_encode(parameter_value(artifact_id)),
   )
 }
 
@@ -16125,11 +16432,11 @@ pub fn actions_delete_artifact_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/actions/artifacts/" +
-    percent_encode(parameter_value(artifact_id)),
+    @http.percent_encode(parameter_value(artifact_id)),
   )
 }
 
@@ -16144,13 +16451,13 @@ pub fn actions_download_artifact_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/actions/artifacts/" +
-    percent_encode(parameter_value(artifact_id)) +
+    @http.percent_encode(parameter_value(artifact_id)) +
     "/" +
-    percent_encode(parameter_value(archive_format)),
+    @http.percent_encode(parameter_value(archive_format)),
   )
 }
 
@@ -16163,9 +16470,9 @@ pub fn actions_get_actions_cache_retention_limit_for_repository_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/actions/cache/retention-limit",
   )
 }
@@ -16198,9 +16505,9 @@ pub fn actions_set_actions_cache_retention_limit_for_repository_request(
 ) -> @http.Request {
   @http.Request::put(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/actions/cache/retention-limit",
   ).json_body(Json(body))
 }
@@ -16214,9 +16521,9 @@ pub fn actions_get_actions_cache_storage_limit_for_repository_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/actions/cache/storage-limit",
   )
 }
@@ -16249,9 +16556,9 @@ pub fn actions_set_actions_cache_storage_limit_for_repository_request(
 ) -> @http.Request {
   @http.Request::put(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/actions/cache/storage-limit",
   ).json_body(Json(body))
 }
@@ -16265,9 +16572,9 @@ pub fn actions_get_actions_cache_usage_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/actions/cache/usage",
   )
 }
@@ -16304,32 +16611,34 @@ pub fn actions_get_actions_cache_list_request(
   direction? : ActionsGetActionsCacheListDirection,
 ) -> @http.Request {
   let mut url = "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/actions/caches"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   match ref_ {
-    Some(value) => url = append_query(url, "ref", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "ref", parameter_value(value))
     None => ()
   }
   match key {
-    Some(value) => url = append_query(url, "key", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "key", parameter_value(value))
     None => ()
   }
   match sort {
-    Some(value) => url = append_query(url, "sort", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "sort", parameter_value(value))
     None => ()
   }
   match direction {
-    Some(value) => url = append_query(url, "direction", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "direction", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -16363,13 +16672,13 @@ pub fn actions_delete_actions_cache_by_key_request(
   ref_? : String,
 ) -> @http.Request {
   let mut url = "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/actions/caches"
-  url = append_query(url, "key", parameter_value(key))
+  url = @http.append_query(url, "key", parameter_value(key))
   match ref_ {
-    Some(value) => url = append_query(url, "ref", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "ref", parameter_value(value))
     None => ()
   }
   @http.Request::delete(url)
@@ -16403,11 +16712,11 @@ pub fn actions_delete_actions_cache_by_id_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/actions/caches/" +
-    percent_encode(parameter_value(cache_id)),
+    @http.percent_encode(parameter_value(cache_id)),
   )
 }
 
@@ -16421,16 +16730,18 @@ pub fn actions_list_concurrency_groups_for_repository_request(
   after? : String,
 ) -> @http.Request {
   let mut url = "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/actions/concurrency_groups"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match after {
-    Some(value) => url = append_query(url, "after", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "after", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -16465,19 +16776,19 @@ pub fn actions_get_concurrency_group_for_repository_request(
   ahead_of_job? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/actions/concurrency_groups/" +
-    percent_encode(parameter_value(concurrency_group_name))
+    @http.percent_encode(parameter_value(concurrency_group_name))
   match ahead_of_run {
     Some(value) =>
-      url = append_query(url, "ahead_of_run", parameter_value(value))
+      url = @http.append_query(url, "ahead_of_run", parameter_value(value))
     None => ()
   }
   match ahead_of_job {
     Some(value) =>
-      url = append_query(url, "ahead_of_job", parameter_value(value))
+      url = @http.append_query(url, "ahead_of_job", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -16511,11 +16822,11 @@ pub fn actions_get_job_for_workflow_run_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/actions/jobs/" +
-    percent_encode(parameter_value(job_id)),
+    @http.percent_encode(parameter_value(job_id)),
   )
 }
 
@@ -16547,11 +16858,11 @@ pub fn actions_download_job_logs_for_workflow_run_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/actions/jobs/" +
-    percent_encode(parameter_value(job_id)) +
+    @http.percent_encode(parameter_value(job_id)) +
     "/logs",
   )
 }
@@ -16567,11 +16878,11 @@ pub fn actions_re_run_job_for_workflow_run_request(
 ) -> @http.Request {
   @http.Request::post(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/actions/jobs/" +
-    percent_encode(parameter_value(job_id)) +
+    @http.percent_encode(parameter_value(job_id)) +
     "/rerun",
   ).json_body(Json(body))
 }
@@ -16605,13 +16916,13 @@ pub fn actions_download_step_logs_for_workflow_run_job_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/actions/jobs/" +
-    percent_encode(parameter_value(job_id)) +
+    @http.percent_encode(parameter_value(job_id)) +
     "/steps/" +
-    percent_encode(parameter_value(step_number)) +
+    @http.percent_encode(parameter_value(step_number)) +
     "/logs",
   )
 }
@@ -16625,9 +16936,9 @@ pub fn actions_get_custom_oidc_sub_claim_for_repo_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/actions/oidc/customization/sub",
   )
 }
@@ -16660,9 +16971,9 @@ pub fn actions_set_custom_oidc_sub_claim_for_repo_request(
 ) -> @http.Request {
   @http.Request::put(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/actions/oidc/customization/sub",
   ).json_body(Json(body))
 }
@@ -16695,16 +17006,17 @@ pub fn actions_list_repo_organization_secrets_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/actions/organization-secrets"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -16738,16 +17050,17 @@ pub fn actions_list_repo_organization_variables_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/actions/organization-variables"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -16780,9 +17093,9 @@ pub fn actions_get_github_actions_permissions_repository_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/actions/permissions",
   )
 }
@@ -16815,9 +17128,9 @@ pub fn actions_set_github_actions_permissions_repository_request(
 ) -> @http.Request {
   @http.Request::put(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/actions/permissions",
   ).json_body(Json(body))
 }
@@ -16831,9 +17144,9 @@ pub fn actions_get_workflow_access_to_repository_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/actions/permissions/access",
   )
 }
@@ -16866,9 +17179,9 @@ pub fn actions_set_workflow_access_to_repository_request(
 ) -> @http.Request {
   @http.Request::put(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/actions/permissions/access",
   ).json_body(Json(body))
 }
@@ -16882,9 +17195,9 @@ pub fn actions_get_artifact_and_log_retention_settings_repository_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/actions/permissions/artifact-and-log-retention",
   )
 }
@@ -16917,9 +17230,9 @@ pub fn actions_set_artifact_and_log_retention_settings_repository_request(
 ) -> @http.Request {
   @http.Request::put(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/actions/permissions/artifact-and-log-retention",
   ).json_body(Json(body))
 }
@@ -16933,9 +17246,9 @@ pub fn actions_get_fork_pr_contributor_approval_permissions_repository_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/actions/permissions/fork-pr-contributor-approval",
   )
 }
@@ -16968,9 +17281,9 @@ pub fn actions_set_fork_pr_contributor_approval_permissions_repository_request(
 ) -> @http.Request {
   @http.Request::put(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/actions/permissions/fork-pr-contributor-approval",
   ).json_body(Json(body))
 }
@@ -16984,9 +17297,9 @@ pub fn actions_get_private_repo_fork_pr_workflows_settings_repository_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/actions/permissions/fork-pr-workflows-private-repos",
   )
 }
@@ -17019,9 +17332,9 @@ pub fn actions_set_private_repo_fork_pr_workflows_settings_repository_request(
 ) -> @http.Request {
   @http.Request::put(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/actions/permissions/fork-pr-workflows-private-repos",
   ).json_body(Json(body))
 }
@@ -17035,9 +17348,9 @@ pub fn actions_get_allowed_actions_repository_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/actions/permissions/selected-actions",
   )
 }
@@ -17070,9 +17383,9 @@ pub fn actions_set_allowed_actions_repository_request(
 ) -> @http.Request {
   @http.Request::put(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/actions/permissions/selected-actions",
   ).json_body(Json(body))
 }
@@ -17086,9 +17399,9 @@ pub fn actions_get_github_actions_default_workflow_permissions_repository_reques
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/actions/permissions/workflow",
   )
 }
@@ -17121,9 +17434,9 @@ pub fn actions_set_github_actions_default_workflow_permissions_repository_reques
 ) -> @http.Request {
   @http.Request::put(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/actions/permissions/workflow",
   ).json_body(Json(body))
 }
@@ -17139,21 +17452,22 @@ pub fn actions_get_repo_actions_policies_request(
   has_parents? : Bool,
 ) -> @http.Request {
   let mut url = "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/actions/policies"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   match has_parents {
     Some(value) =>
-      url = append_query(url, "has_parents", parameter_value(value))
+      url = @http.append_query(url, "has_parents", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -17187,9 +17501,9 @@ pub fn actions_create_repo_actions_policy_request(
 ) -> @http.Request {
   @http.Request::post(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/actions/policies",
   ).json_body(Json(body))
 }
@@ -17222,11 +17536,11 @@ pub fn actions_get_repo_actions_policy_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/actions/policies/" +
-    percent_encode(parameter_value(policy_id)),
+    @http.percent_encode(parameter_value(policy_id)),
   )
 }
 
@@ -17259,11 +17573,11 @@ pub fn actions_update_repo_actions_policy_request(
 ) -> @http.Request {
   @http.Request::put(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/actions/policies/" +
-    percent_encode(parameter_value(policy_id)),
+    @http.percent_encode(parameter_value(policy_id)),
   ).json_body(Json(body))
 }
 
@@ -17295,11 +17609,11 @@ pub fn actions_delete_repo_actions_policy_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/actions/policies/" +
-    percent_encode(parameter_value(policy_id)),
+    @http.percent_encode(parameter_value(policy_id)),
   )
 }
 
@@ -17314,20 +17628,21 @@ pub fn actions_list_self_hosted_runners_for_repo_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/actions/runners"
   match name {
-    Some(value) => url = append_query(url, "name", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "name", parameter_value(value))
     None => ()
   }
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -17361,11 +17676,11 @@ pub fn actions_get_runner_version_deprecation_for_repo_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/actions/runners/deprecations/" +
-    percent_encode(parameter_value(version)),
+    @http.percent_encode(parameter_value(version)),
   )
 }
 
@@ -17396,9 +17711,9 @@ pub fn actions_list_runner_applications_for_repo_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/actions/runners/downloads",
   )
 }
@@ -17431,9 +17746,9 @@ pub fn actions_generate_runner_jitconfig_for_repo_request(
 ) -> @http.Request {
   @http.Request::post(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/actions/runners/generate-jitconfig",
   ).json_body(Json(body))
 }
@@ -17447,9 +17762,9 @@ pub fn actions_create_registration_token_for_repo_request(
 ) -> @http.Request {
   @http.Request::post(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/actions/runners/registration-token",
   )
 }
@@ -17481,9 +17796,9 @@ pub fn actions_create_remove_token_for_repo_request(
 ) -> @http.Request {
   @http.Request::post(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/actions/runners/remove-token",
   )
 }
@@ -17516,11 +17831,11 @@ pub fn actions_get_self_hosted_runner_for_repo_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/actions/runners/" +
-    percent_encode(parameter_value(runner_id)),
+    @http.percent_encode(parameter_value(runner_id)),
   )
 }
 
@@ -17552,11 +17867,11 @@ pub fn actions_delete_self_hosted_runner_from_repo_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/actions/runners/" +
-    percent_encode(parameter_value(runner_id)),
+    @http.percent_encode(parameter_value(runner_id)),
   )
 }
 
@@ -17570,11 +17885,11 @@ pub fn actions_list_labels_for_self_hosted_runner_for_repo_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/actions/runners/" +
-    percent_encode(parameter_value(runner_id)) +
+    @http.percent_encode(parameter_value(runner_id)) +
     "/labels",
   )
 }
@@ -17590,11 +17905,11 @@ pub fn actions_add_custom_labels_to_self_hosted_runner_for_repo_request(
 ) -> @http.Request {
   @http.Request::post(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/actions/runners/" +
-    percent_encode(parameter_value(runner_id)) +
+    @http.percent_encode(parameter_value(runner_id)) +
     "/labels",
   ).json_body(Json(body))
 }
@@ -17610,11 +17925,11 @@ pub fn actions_set_custom_labels_for_self_hosted_runner_for_repo_request(
 ) -> @http.Request {
   @http.Request::put(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/actions/runners/" +
-    percent_encode(parameter_value(runner_id)) +
+    @http.percent_encode(parameter_value(runner_id)) +
     "/labels",
   ).json_body(Json(body))
 }
@@ -17629,11 +17944,11 @@ pub fn actions_remove_all_custom_labels_from_self_hosted_runner_for_repo_request
 ) -> @http.Request {
   @http.Request::delete(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/actions/runners/" +
-    percent_encode(parameter_value(runner_id)) +
+    @http.percent_encode(parameter_value(runner_id)) +
     "/labels",
   )
 }
@@ -17649,13 +17964,13 @@ pub fn actions_remove_custom_label_from_self_hosted_runner_for_repo_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/actions/runners/" +
-    percent_encode(parameter_value(runner_id)) +
+    @http.percent_encode(parameter_value(runner_id)) +
     "/labels/" +
-    percent_encode(parameter_value(name)),
+    @http.percent_encode(parameter_value(name)),
   )
 }
 
@@ -17677,50 +17992,61 @@ pub fn actions_list_workflow_runs_for_repo_request(
   head_sha? : String,
 ) -> @http.Request {
   let mut url = "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/actions/runs"
   match actor {
-    Some(value) => url = append_query(url, "actor", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "actor", parameter_value(value))
     None => ()
   }
   match branch {
-    Some(value) => url = append_query(url, "branch", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "branch", parameter_value(value))
     None => ()
   }
   match event {
-    Some(value) => url = append_query(url, "event", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "event", parameter_value(value))
     None => ()
   }
   match status {
-    Some(value) => url = append_query(url, "status", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "status", parameter_value(value))
     None => ()
   }
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   match created {
-    Some(value) => url = append_query(url, "created", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "created", parameter_value(value))
     None => ()
   }
   match exclude_pull_requests {
     Some(value) =>
-      url = append_query(url, "exclude_pull_requests", parameter_value(value))
+      url = @http.append_query(
+        url,
+        "exclude_pull_requests",
+        parameter_value(value),
+      )
     None => ()
   }
   match check_suite_id {
     Some(value) =>
-      url = append_query(url, "check_suite_id", parameter_value(value))
+      url = @http.append_query(url, "check_suite_id", parameter_value(value))
     None => ()
   }
   match head_sha {
-    Some(value) => url = append_query(url, "head_sha", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "head_sha", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -17754,14 +18080,18 @@ pub fn actions_get_workflow_run_request(
   exclude_pull_requests? : Bool,
 ) -> @http.Request {
   let mut url = "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/actions/runs/" +
-    percent_encode(parameter_value(run_id))
+    @http.percent_encode(parameter_value(run_id))
   match exclude_pull_requests {
     Some(value) =>
-      url = append_query(url, "exclude_pull_requests", parameter_value(value))
+      url = @http.append_query(
+        url,
+        "exclude_pull_requests",
+        parameter_value(value),
+      )
     None => ()
   }
   @http.Request::get(url)
@@ -17795,11 +18125,11 @@ pub fn actions_delete_workflow_run_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/actions/runs/" +
-    percent_encode(parameter_value(run_id)),
+    @http.percent_encode(parameter_value(run_id)),
   )
 }
 
@@ -17813,11 +18143,11 @@ pub fn actions_get_reviews_for_run_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/actions/runs/" +
-    percent_encode(parameter_value(run_id)) +
+    @http.percent_encode(parameter_value(run_id)) +
     "/approvals",
   )
 }
@@ -17850,11 +18180,11 @@ pub fn actions_approve_workflow_run_request(
 ) -> @http.Request {
   @http.Request::post(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/actions/runs/" +
-    percent_encode(parameter_value(run_id)) +
+    @http.percent_encode(parameter_value(run_id)) +
     "/approve",
   )
 }
@@ -17890,26 +18220,28 @@ pub fn actions_list_workflow_run_artifacts_request(
   direction? : ActionsListWorkflowRunArtifactsDirection,
 ) -> @http.Request {
   let mut url = "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/actions/runs/" +
-    percent_encode(parameter_value(run_id)) +
+    @http.percent_encode(parameter_value(run_id)) +
     "/artifacts"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   match name {
-    Some(value) => url = append_query(url, "name", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "name", parameter_value(value))
     None => ()
   }
   match direction {
-    Some(value) => url = append_query(url, "direction", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "direction", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -17944,16 +18276,20 @@ pub fn actions_get_workflow_run_attempt_request(
   exclude_pull_requests? : Bool,
 ) -> @http.Request {
   let mut url = "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/actions/runs/" +
-    percent_encode(parameter_value(run_id)) +
+    @http.percent_encode(parameter_value(run_id)) +
     "/attempts/" +
-    percent_encode(parameter_value(attempt_number))
+    @http.percent_encode(parameter_value(attempt_number))
   match exclude_pull_requests {
     Some(value) =>
-      url = append_query(url, "exclude_pull_requests", parameter_value(value))
+      url = @http.append_query(
+        url,
+        "exclude_pull_requests",
+        parameter_value(value),
+      )
     None => ()
   }
   @http.Request::get(url)
@@ -17989,20 +18325,21 @@ pub fn actions_list_jobs_for_workflow_run_attempt_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/actions/runs/" +
-    percent_encode(parameter_value(run_id)) +
+    @http.percent_encode(parameter_value(run_id)) +
     "/attempts/" +
-    percent_encode(parameter_value(attempt_number)) +
+    @http.percent_encode(parameter_value(attempt_number)) +
     "/jobs"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -18037,13 +18374,13 @@ pub fn actions_download_workflow_run_attempt_logs_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/actions/runs/" +
-    percent_encode(parameter_value(run_id)) +
+    @http.percent_encode(parameter_value(run_id)) +
     "/attempts/" +
-    percent_encode(parameter_value(attempt_number)) +
+    @http.percent_encode(parameter_value(attempt_number)) +
     "/logs",
   )
 }
@@ -18058,11 +18395,11 @@ pub fn actions_cancel_workflow_run_request(
 ) -> @http.Request {
   @http.Request::post(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/actions/runs/" +
-    percent_encode(parameter_value(run_id)) +
+    @http.percent_encode(parameter_value(run_id)) +
     "/cancel",
   )
 }
@@ -18097,22 +18434,25 @@ pub fn actions_list_concurrency_groups_for_workflow_run_request(
   after? : String,
 ) -> @http.Request {
   let mut url = "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/actions/runs/" +
-    percent_encode(parameter_value(run_id)) +
+    @http.percent_encode(parameter_value(run_id)) +
     "/concurrency_groups"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match before {
-    Some(value) => url = append_query(url, "before", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "before", parameter_value(value))
     None => ()
   }
   match after {
-    Some(value) => url = append_query(url, "after", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "after", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -18147,11 +18487,11 @@ pub fn actions_review_custom_gates_for_run_request(
 ) -> @http.Request {
   @http.Request::post(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/actions/runs/" +
-    percent_encode(parameter_value(run_id)) +
+    @http.percent_encode(parameter_value(run_id)) +
     "/deployment_protection_rule",
   ).json_body(body)
 }
@@ -18166,11 +18506,11 @@ pub fn actions_force_cancel_workflow_run_request(
 ) -> @http.Request {
   @http.Request::post(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/actions/runs/" +
-    percent_encode(parameter_value(run_id)) +
+    @http.percent_encode(parameter_value(run_id)) +
     "/force-cancel",
   )
 }
@@ -18205,22 +18545,24 @@ pub fn actions_list_jobs_for_workflow_run_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/actions/runs/" +
-    percent_encode(parameter_value(run_id)) +
+    @http.percent_encode(parameter_value(run_id)) +
     "/jobs"
   match filter {
-    Some(value) => url = append_query(url, "filter", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "filter", parameter_value(value))
     None => ()
   }
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -18254,11 +18596,11 @@ pub fn actions_download_workflow_run_logs_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/actions/runs/" +
-    percent_encode(parameter_value(run_id)) +
+    @http.percent_encode(parameter_value(run_id)) +
     "/logs",
   )
 }
@@ -18273,11 +18615,11 @@ pub fn actions_delete_workflow_run_logs_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/actions/runs/" +
-    percent_encode(parameter_value(run_id)) +
+    @http.percent_encode(parameter_value(run_id)) +
     "/logs",
   )
 }
@@ -18292,11 +18634,11 @@ pub fn actions_get_pending_deployments_for_run_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/actions/runs/" +
-    percent_encode(parameter_value(run_id)) +
+    @http.percent_encode(parameter_value(run_id)) +
     "/pending_deployments",
   )
 }
@@ -18330,11 +18672,11 @@ pub fn actions_review_pending_deployments_for_run_request(
 ) -> @http.Request {
   @http.Request::post(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/actions/runs/" +
-    percent_encode(parameter_value(run_id)) +
+    @http.percent_encode(parameter_value(run_id)) +
     "/pending_deployments",
   ).json_body(Json(body))
 }
@@ -18368,11 +18710,11 @@ pub fn actions_re_run_workflow_request(
 ) -> @http.Request {
   @http.Request::post(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/actions/runs/" +
-    percent_encode(parameter_value(run_id)) +
+    @http.percent_encode(parameter_value(run_id)) +
     "/rerun",
   ).json_body(Json(body))
 }
@@ -18406,11 +18748,11 @@ pub fn actions_re_run_workflow_failed_jobs_request(
 ) -> @http.Request {
   @http.Request::post(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/actions/runs/" +
-    percent_encode(parameter_value(run_id)) +
+    @http.percent_encode(parameter_value(run_id)) +
     "/rerun-failed-jobs",
   ).json_body(Json(body))
 }
@@ -18443,11 +18785,11 @@ pub fn actions_get_workflow_run_usage_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/actions/runs/" +
-    percent_encode(parameter_value(run_id)) +
+    @http.percent_encode(parameter_value(run_id)) +
     "/timing",
   )
 }
@@ -18480,16 +18822,17 @@ pub fn actions_list_repo_secrets_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/actions/secrets"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -18522,9 +18865,9 @@ pub fn actions_get_repo_public_key_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/actions/secrets/public-key",
   )
 }
@@ -18557,11 +18900,11 @@ pub fn actions_get_repo_secret_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/actions/secrets/" +
-    percent_encode(parameter_value(secret_name)),
+    @http.percent_encode(parameter_value(secret_name)),
   )
 }
 
@@ -18594,11 +18937,11 @@ pub fn actions_create_or_update_repo_secret_request(
 ) -> @http.Request {
   @http.Request::put(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/actions/secrets/" +
-    percent_encode(parameter_value(secret_name)),
+    @http.percent_encode(parameter_value(secret_name)),
   ).json_body(Json(body))
 }
 
@@ -18630,11 +18973,11 @@ pub fn actions_delete_repo_secret_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/actions/secrets/" +
-    percent_encode(parameter_value(secret_name)),
+    @http.percent_encode(parameter_value(secret_name)),
   )
 }
 
@@ -18648,16 +18991,17 @@ pub fn actions_list_repo_variables_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/actions/variables"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -18691,9 +19035,9 @@ pub fn actions_create_repo_variable_request(
 ) -> @http.Request {
   @http.Request::post(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/actions/variables",
   ).json_body(Json(body))
 }
@@ -18726,11 +19070,11 @@ pub fn actions_get_repo_variable_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/actions/variables/" +
-    percent_encode(parameter_value(name)),
+    @http.percent_encode(parameter_value(name)),
   )
 }
 
@@ -18763,11 +19107,11 @@ pub fn actions_update_repo_variable_request(
 ) -> @http.Request {
   @http.Request::patch(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/actions/variables/" +
-    percent_encode(parameter_value(name)),
+    @http.percent_encode(parameter_value(name)),
   ).json_body(Json(body))
 }
 
@@ -18781,11 +19125,11 @@ pub fn actions_delete_repo_variable_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/actions/variables/" +
-    percent_encode(parameter_value(name)),
+    @http.percent_encode(parameter_value(name)),
   )
 }
 
@@ -18799,16 +19143,17 @@ pub fn actions_list_repo_workflows_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/actions/workflows"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -18842,11 +19187,11 @@ pub fn actions_get_workflow_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/actions/workflows/" +
-    percent_encode(parameter_value(workflow_id)),
+    @http.percent_encode(parameter_value(workflow_id)),
   )
 }
 
@@ -18878,11 +19223,11 @@ pub fn actions_disable_workflow_request(
 ) -> @http.Request {
   @http.Request::put(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/actions/workflows/" +
-    percent_encode(parameter_value(workflow_id)) +
+    @http.percent_encode(parameter_value(workflow_id)) +
     "/disable",
   )
 }
@@ -18898,11 +19243,11 @@ pub fn actions_create_workflow_dispatch_request(
 ) -> @http.Request {
   @http.Request::post(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/actions/workflows/" +
-    percent_encode(parameter_value(workflow_id)) +
+    @http.percent_encode(parameter_value(workflow_id)) +
     "/dispatches",
   ).json_body(Json(body))
 }
@@ -18935,11 +19280,11 @@ pub fn actions_enable_workflow_request(
 ) -> @http.Request {
   @http.Request::put(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/actions/workflows/" +
-    percent_encode(parameter_value(workflow_id)) +
+    @http.percent_encode(parameter_value(workflow_id)) +
     "/enable",
   )
 }
@@ -18963,52 +19308,63 @@ pub fn actions_list_workflow_runs_request(
   head_sha? : String,
 ) -> @http.Request {
   let mut url = "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/actions/workflows/" +
-    percent_encode(parameter_value(workflow_id)) +
+    @http.percent_encode(parameter_value(workflow_id)) +
     "/runs"
   match actor {
-    Some(value) => url = append_query(url, "actor", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "actor", parameter_value(value))
     None => ()
   }
   match branch {
-    Some(value) => url = append_query(url, "branch", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "branch", parameter_value(value))
     None => ()
   }
   match event {
-    Some(value) => url = append_query(url, "event", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "event", parameter_value(value))
     None => ()
   }
   match status {
-    Some(value) => url = append_query(url, "status", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "status", parameter_value(value))
     None => ()
   }
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   match created {
-    Some(value) => url = append_query(url, "created", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "created", parameter_value(value))
     None => ()
   }
   match exclude_pull_requests {
     Some(value) =>
-      url = append_query(url, "exclude_pull_requests", parameter_value(value))
+      url = @http.append_query(
+        url,
+        "exclude_pull_requests",
+        parameter_value(value),
+      )
     None => ()
   }
   match check_suite_id {
     Some(value) =>
-      url = append_query(url, "check_suite_id", parameter_value(value))
+      url = @http.append_query(url, "check_suite_id", parameter_value(value))
     None => ()
   }
   match head_sha {
-    Some(value) => url = append_query(url, "head_sha", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "head_sha", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -19042,11 +19398,11 @@ pub fn actions_get_workflow_usage_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/actions/workflows/" +
-    percent_encode(parameter_value(workflow_id)) +
+    @http.percent_encode(parameter_value(workflow_id)) +
     "/timing",
   )
 }
@@ -19085,42 +19441,47 @@ pub fn repos_list_activities_request(
   activity_type? : ReposListActivitiesActivityType,
 ) -> @http.Request {
   let mut url = "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/activity"
   match direction {
-    Some(value) => url = append_query(url, "direction", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "direction", parameter_value(value))
     None => ()
   }
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match before {
-    Some(value) => url = append_query(url, "before", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "before", parameter_value(value))
     None => ()
   }
   match after {
-    Some(value) => url = append_query(url, "after", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "after", parameter_value(value))
     None => ()
   }
   match ref_ {
-    Some(value) => url = append_query(url, "ref", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "ref", parameter_value(value))
     None => ()
   }
   match actor {
-    Some(value) => url = append_query(url, "actor", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "actor", parameter_value(value))
     None => ()
   }
   match time_period {
     Some(value) =>
-      url = append_query(url, "time_period", parameter_value(value))
+      url = @http.append_query(url, "time_period", parameter_value(value))
     None => ()
   }
   match activity_type {
     Some(value) =>
-      url = append_query(url, "activity_type", parameter_value(value))
+      url = @http.append_query(url, "activity_type", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -19154,16 +19515,17 @@ pub fn agents_list_repo_organization_secrets_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/agents/organization-secrets"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -19197,16 +19559,17 @@ pub fn agents_list_repo_organization_variables_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/agents/organization-variables"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -19240,16 +19603,17 @@ pub fn agents_list_repo_secrets_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/agents/secrets"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -19282,9 +19646,9 @@ pub fn agents_get_repo_public_key_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/agents/secrets/public-key",
   )
 }
@@ -19317,11 +19681,11 @@ pub fn agents_get_repo_secret_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/agents/secrets/" +
-    percent_encode(parameter_value(secret_name)),
+    @http.percent_encode(parameter_value(secret_name)),
   )
 }
 
@@ -19354,11 +19718,11 @@ pub fn agents_create_or_update_repo_secret_request(
 ) -> @http.Request {
   @http.Request::put(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/agents/secrets/" +
-    percent_encode(parameter_value(secret_name)),
+    @http.percent_encode(parameter_value(secret_name)),
   ).json_body(Json(body))
 }
 
@@ -19390,11 +19754,11 @@ pub fn agents_delete_repo_secret_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/agents/secrets/" +
-    percent_encode(parameter_value(secret_name)),
+    @http.percent_encode(parameter_value(secret_name)),
   )
 }
 
@@ -19408,16 +19772,17 @@ pub fn agents_list_repo_variables_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/agents/variables"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -19451,9 +19816,9 @@ pub fn agents_create_repo_variable_request(
 ) -> @http.Request {
   @http.Request::post(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/agents/variables",
   ).json_body(Json(body))
 }
@@ -19486,11 +19851,11 @@ pub fn agents_get_repo_variable_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/agents/variables/" +
-    percent_encode(parameter_value(name)),
+    @http.percent_encode(parameter_value(name)),
   )
 }
 
@@ -19523,11 +19888,11 @@ pub fn agents_update_repo_variable_request(
 ) -> @http.Request {
   @http.Request::patch(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/agents/variables/" +
-    percent_encode(parameter_value(name)),
+    @http.percent_encode(parameter_value(name)),
   ).json_body(Json(body))
 }
 
@@ -19541,11 +19906,11 @@ pub fn agents_delete_repo_variable_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/agents/variables/" +
-    percent_encode(parameter_value(name)),
+    @http.percent_encode(parameter_value(name)),
   )
 }
 
@@ -19559,16 +19924,17 @@ pub fn issues_list_assignees_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/assignees"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -19602,11 +19968,11 @@ pub fn issues_check_user_can_be_assigned_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/assignees/" +
-    percent_encode(parameter_value(assignee)),
+    @http.percent_encode(parameter_value(assignee)),
   )
 }
 
@@ -19620,9 +19986,9 @@ pub fn repos_create_attestation_request(
 ) -> @http.Request {
   @http.Request::post(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/attestations",
   ).json_body(Json(body))
 }
@@ -19658,26 +20024,29 @@ pub fn repos_list_attestations_request(
   predicate_type? : String,
 ) -> @http.Request {
   let mut url = "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/attestations/" +
-    percent_encode_segments(parameter_value(subject_digest))
+    @http.percent_encode_path(parameter_value(subject_digest))
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match before {
-    Some(value) => url = append_query(url, "before", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "before", parameter_value(value))
     None => ()
   }
   match after {
-    Some(value) => url = append_query(url, "after", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "after", parameter_value(value))
     None => ()
   }
   match predicate_type {
     Some(value) =>
-      url = append_query(url, "predicate_type", parameter_value(value))
+      url = @http.append_query(url, "predicate_type", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -19710,9 +20079,9 @@ pub fn repos_list_autolinks_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/autolinks",
   )
 }
@@ -19745,9 +20114,9 @@ pub fn repos_create_autolink_request(
 ) -> @http.Request {
   @http.Request::post(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/autolinks",
   ).json_body(Json(body))
 }
@@ -19780,11 +20149,11 @@ pub fn repos_get_autolink_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/autolinks/" +
-    percent_encode(parameter_value(autolink_id)),
+    @http.percent_encode(parameter_value(autolink_id)),
   )
 }
 
@@ -19816,11 +20185,11 @@ pub fn repos_delete_autolink_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/autolinks/" +
-    percent_encode(parameter_value(autolink_id)),
+    @http.percent_encode(parameter_value(autolink_id)),
   )
 }
 
@@ -19833,9 +20202,9 @@ pub fn repos_check_automated_security_fixes_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/automated-security-fixes",
   )
 }
@@ -19867,9 +20236,9 @@ pub fn repos_enable_automated_security_fixes_request(
 ) -> @http.Request {
   @http.Request::put(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/automated-security-fixes",
   )
 }
@@ -19883,9 +20252,9 @@ pub fn repos_disable_automated_security_fixes_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/automated-security-fixes",
   )
 }
@@ -19901,20 +20270,22 @@ pub fn repos_list_branches_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/branches"
   match protected_ {
-    Some(value) => url = append_query(url, "protected", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "protected", parameter_value(value))
     None => ()
   }
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -19948,11 +20319,11 @@ pub fn repos_get_branch_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/branches/" +
-    percent_encode_segments(parameter_value(branch)),
+    @http.percent_encode_path(parameter_value(branch)),
   )
 }
 
@@ -19984,11 +20355,11 @@ pub fn repos_get_branch_protection_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/branches/" +
-    percent_encode_segments(parameter_value(branch)) +
+    @http.percent_encode_path(parameter_value(branch)) +
     "/protection",
   )
 }
@@ -20022,11 +20393,11 @@ pub fn repos_update_branch_protection_request(
 ) -> @http.Request {
   @http.Request::put(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/branches/" +
-    percent_encode_segments(parameter_value(branch)) +
+    @http.percent_encode_path(parameter_value(branch)) +
     "/protection",
   ).json_body(Json(body))
 }
@@ -20059,11 +20430,11 @@ pub fn repos_delete_branch_protection_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/branches/" +
-    percent_encode_segments(parameter_value(branch)) +
+    @http.percent_encode_path(parameter_value(branch)) +
     "/protection",
   )
 }
@@ -20078,11 +20449,11 @@ pub fn repos_get_admin_branch_protection_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/branches/" +
-    percent_encode_segments(parameter_value(branch)) +
+    @http.percent_encode_path(parameter_value(branch)) +
     "/protection/enforce_admins",
   )
 }
@@ -20115,11 +20486,11 @@ pub fn repos_set_admin_branch_protection_request(
 ) -> @http.Request {
   @http.Request::post(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/branches/" +
-    percent_encode_segments(parameter_value(branch)) +
+    @http.percent_encode_path(parameter_value(branch)) +
     "/protection/enforce_admins",
   )
 }
@@ -20152,11 +20523,11 @@ pub fn repos_delete_admin_branch_protection_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/branches/" +
-    percent_encode_segments(parameter_value(branch)) +
+    @http.percent_encode_path(parameter_value(branch)) +
     "/protection/enforce_admins",
   )
 }
@@ -20171,11 +20542,11 @@ pub fn repos_get_pull_request_review_protection_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/branches/" +
-    percent_encode_segments(parameter_value(branch)) +
+    @http.percent_encode_path(parameter_value(branch)) +
     "/protection/required_pull_request_reviews",
   )
 }
@@ -20209,11 +20580,11 @@ pub fn repos_update_pull_request_review_protection_request(
 ) -> @http.Request {
   @http.Request::patch(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/branches/" +
-    percent_encode_segments(parameter_value(branch)) +
+    @http.percent_encode_path(parameter_value(branch)) +
     "/protection/required_pull_request_reviews",
   ).json_body(Json(body))
 }
@@ -20246,11 +20617,11 @@ pub fn repos_delete_pull_request_review_protection_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/branches/" +
-    percent_encode_segments(parameter_value(branch)) +
+    @http.percent_encode_path(parameter_value(branch)) +
     "/protection/required_pull_request_reviews",
   )
 }
@@ -20265,11 +20636,11 @@ pub fn repos_get_commit_signature_protection_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/branches/" +
-    percent_encode_segments(parameter_value(branch)) +
+    @http.percent_encode_path(parameter_value(branch)) +
     "/protection/required_signatures",
   )
 }
@@ -20302,11 +20673,11 @@ pub fn repos_create_commit_signature_protection_request(
 ) -> @http.Request {
   @http.Request::post(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/branches/" +
-    percent_encode_segments(parameter_value(branch)) +
+    @http.percent_encode_path(parameter_value(branch)) +
     "/protection/required_signatures",
   )
 }
@@ -20339,11 +20710,11 @@ pub fn repos_delete_commit_signature_protection_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/branches/" +
-    percent_encode_segments(parameter_value(branch)) +
+    @http.percent_encode_path(parameter_value(branch)) +
     "/protection/required_signatures",
   )
 }
@@ -20358,11 +20729,11 @@ pub fn repos_get_status_checks_protection_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/branches/" +
-    percent_encode_segments(parameter_value(branch)) +
+    @http.percent_encode_path(parameter_value(branch)) +
     "/protection/required_status_checks",
   )
 }
@@ -20396,11 +20767,11 @@ pub fn repos_update_status_check_protection_request(
 ) -> @http.Request {
   @http.Request::patch(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/branches/" +
-    percent_encode_segments(parameter_value(branch)) +
+    @http.percent_encode_path(parameter_value(branch)) +
     "/protection/required_status_checks",
   ).json_body(Json(body))
 }
@@ -20433,11 +20804,11 @@ pub fn repos_remove_status_check_protection_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/branches/" +
-    percent_encode_segments(parameter_value(branch)) +
+    @http.percent_encode_path(parameter_value(branch)) +
     "/protection/required_status_checks",
   )
 }
@@ -20452,11 +20823,11 @@ pub fn repos_get_all_status_check_contexts_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/branches/" +
-    percent_encode_segments(parameter_value(branch)) +
+    @http.percent_encode_path(parameter_value(branch)) +
     "/protection/required_status_checks/contexts",
   )
 }
@@ -20490,11 +20861,11 @@ pub fn repos_add_status_check_contexts_request(
 ) -> @http.Request {
   @http.Request::post(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/branches/" +
-    percent_encode_segments(parameter_value(branch)) +
+    @http.percent_encode_path(parameter_value(branch)) +
     "/protection/required_status_checks/contexts",
   ).json_body(Json(body))
 }
@@ -20528,11 +20899,11 @@ pub fn repos_set_status_check_contexts_request(
 ) -> @http.Request {
   @http.Request::put(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/branches/" +
-    percent_encode_segments(parameter_value(branch)) +
+    @http.percent_encode_path(parameter_value(branch)) +
     "/protection/required_status_checks/contexts",
   ).json_body(Json(body))
 }
@@ -20566,11 +20937,11 @@ pub fn repos_remove_status_check_contexts_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/branches/" +
-    percent_encode_segments(parameter_value(branch)) +
+    @http.percent_encode_path(parameter_value(branch)) +
     "/protection/required_status_checks/contexts",
   ).json_body(Json(body))
 }
@@ -20603,11 +20974,11 @@ pub fn repos_get_access_restrictions_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/branches/" +
-    percent_encode_segments(parameter_value(branch)) +
+    @http.percent_encode_path(parameter_value(branch)) +
     "/protection/restrictions",
   )
 }
@@ -20640,11 +21011,11 @@ pub fn repos_delete_access_restrictions_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/branches/" +
-    percent_encode_segments(parameter_value(branch)) +
+    @http.percent_encode_path(parameter_value(branch)) +
     "/protection/restrictions",
   )
 }
@@ -20659,11 +21030,11 @@ pub fn repos_get_apps_with_access_to_protected_branch_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/branches/" +
-    percent_encode_segments(parameter_value(branch)) +
+    @http.percent_encode_path(parameter_value(branch)) +
     "/protection/restrictions/apps",
   )
 }
@@ -20697,11 +21068,11 @@ pub fn repos_add_app_access_restrictions_request(
 ) -> @http.Request {
   @http.Request::post(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/branches/" +
-    percent_encode_segments(parameter_value(branch)) +
+    @http.percent_encode_path(parameter_value(branch)) +
     "/protection/restrictions/apps",
   ).json_body(Json(body))
 }
@@ -20735,11 +21106,11 @@ pub fn repos_set_app_access_restrictions_request(
 ) -> @http.Request {
   @http.Request::put(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/branches/" +
-    percent_encode_segments(parameter_value(branch)) +
+    @http.percent_encode_path(parameter_value(branch)) +
     "/protection/restrictions/apps",
   ).json_body(Json(body))
 }
@@ -20773,11 +21144,11 @@ pub fn repos_remove_app_access_restrictions_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/branches/" +
-    percent_encode_segments(parameter_value(branch)) +
+    @http.percent_encode_path(parameter_value(branch)) +
     "/protection/restrictions/apps",
   ).json_body(Json(body))
 }
@@ -20810,11 +21181,11 @@ pub fn repos_get_teams_with_access_to_protected_branch_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/branches/" +
-    percent_encode_segments(parameter_value(branch)) +
+    @http.percent_encode_path(parameter_value(branch)) +
     "/protection/restrictions/teams",
   )
 }
@@ -20848,11 +21219,11 @@ pub fn repos_add_team_access_restrictions_request(
 ) -> @http.Request {
   @http.Request::post(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/branches/" +
-    percent_encode_segments(parameter_value(branch)) +
+    @http.percent_encode_path(parameter_value(branch)) +
     "/protection/restrictions/teams",
   ).json_body(Json(body))
 }
@@ -20886,11 +21257,11 @@ pub fn repos_set_team_access_restrictions_request(
 ) -> @http.Request {
   @http.Request::put(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/branches/" +
-    percent_encode_segments(parameter_value(branch)) +
+    @http.percent_encode_path(parameter_value(branch)) +
     "/protection/restrictions/teams",
   ).json_body(Json(body))
 }
@@ -20924,11 +21295,11 @@ pub fn repos_remove_team_access_restrictions_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/branches/" +
-    percent_encode_segments(parameter_value(branch)) +
+    @http.percent_encode_path(parameter_value(branch)) +
     "/protection/restrictions/teams",
   ).json_body(Json(body))
 }
@@ -20961,11 +21332,11 @@ pub fn repos_get_users_with_access_to_protected_branch_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/branches/" +
-    percent_encode_segments(parameter_value(branch)) +
+    @http.percent_encode_path(parameter_value(branch)) +
     "/protection/restrictions/users",
   )
 }
@@ -20999,11 +21370,11 @@ pub fn repos_add_user_access_restrictions_request(
 ) -> @http.Request {
   @http.Request::post(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/branches/" +
-    percent_encode_segments(parameter_value(branch)) +
+    @http.percent_encode_path(parameter_value(branch)) +
     "/protection/restrictions/users",
   ).json_body(Json(body))
 }
@@ -21037,11 +21408,11 @@ pub fn repos_set_user_access_restrictions_request(
 ) -> @http.Request {
   @http.Request::put(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/branches/" +
-    percent_encode_segments(parameter_value(branch)) +
+    @http.percent_encode_path(parameter_value(branch)) +
     "/protection/restrictions/users",
   ).json_body(Json(body))
 }
@@ -21075,11 +21446,11 @@ pub fn repos_remove_user_access_restrictions_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/branches/" +
-    percent_encode_segments(parameter_value(branch)) +
+    @http.percent_encode_path(parameter_value(branch)) +
     "/protection/restrictions/users",
   ).json_body(Json(body))
 }
@@ -21113,11 +21484,11 @@ pub fn repos_rename_branch_request(
 ) -> @http.Request {
   @http.Request::post(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/branches/" +
-    percent_encode_segments(parameter_value(branch)) +
+    @http.percent_encode_path(parameter_value(branch)) +
     "/rename",
   ).json_body(Json(body))
 }
@@ -21150,9 +21521,9 @@ pub fn checks_create_request(
 ) -> @http.Request {
   @http.Request::post(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/check-runs",
   ).json_body(Json(body))
 }
@@ -21185,11 +21556,11 @@ pub fn checks_get_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/check-runs/" +
-    percent_encode(parameter_value(check_run_id)),
+    @http.percent_encode(parameter_value(check_run_id)),
   )
 }
 
@@ -21222,11 +21593,11 @@ pub fn checks_update_request(
 ) -> @http.Request {
   @http.Request::patch(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/check-runs/" +
-    percent_encode(parameter_value(check_run_id)),
+    @http.percent_encode(parameter_value(check_run_id)),
   ).json_body(Json(body))
 }
 
@@ -21259,18 +21630,19 @@ pub fn checks_list_annotations_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/check-runs/" +
-    percent_encode(parameter_value(check_run_id)) +
+    @http.percent_encode(parameter_value(check_run_id)) +
     "/annotations"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -21304,11 +21676,11 @@ pub fn checks_rerequest_run_request(
 ) -> @http.Request {
   @http.Request::post(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/check-runs/" +
-    percent_encode(parameter_value(check_run_id)) +
+    @http.percent_encode(parameter_value(check_run_id)) +
     "/rerequest",
   )
 }
@@ -21341,9 +21713,9 @@ pub fn checks_create_suite_request(
 ) -> @http.Request {
   @http.Request::post(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/check-suites",
   ).json_body(Json(body))
 }
@@ -21376,9 +21748,9 @@ pub fn checks_set_suites_preferences_request(
 ) -> @http.Request {
   @http.Request::patch(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/check-suites/preferences",
   ).json_body(Json(body))
 }
@@ -21411,11 +21783,11 @@ pub fn checks_get_suite_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/check-suites/" +
-    percent_encode(parameter_value(check_suite_id)),
+    @http.percent_encode(parameter_value(check_suite_id)),
   )
 }
 
@@ -21451,30 +21823,34 @@ pub fn checks_list_for_suite_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/check-suites/" +
-    percent_encode(parameter_value(check_suite_id)) +
+    @http.percent_encode(parameter_value(check_suite_id)) +
     "/check-runs"
   match check_name {
-    Some(value) => url = append_query(url, "check_name", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "check_name", parameter_value(value))
     None => ()
   }
   match status {
-    Some(value) => url = append_query(url, "status", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "status", parameter_value(value))
     None => ()
   }
   match filter {
-    Some(value) => url = append_query(url, "filter", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "filter", parameter_value(value))
     None => ()
   }
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -21508,11 +21884,11 @@ pub fn checks_rerequest_suite_request(
 ) -> @http.Request {
   @http.Request::post(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/check-suites/" +
-    percent_encode(parameter_value(check_suite_id)) +
+    @http.percent_encode(parameter_value(check_suite_id)) +
     "/rerequest",
   )
 }
@@ -21548,28 +21924,33 @@ pub fn code_quality_list_findings_for_repo_request(
   state? : CodeQualityListFindingsForRepoState,
 ) -> @http.Request {
   let mut url = "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/code-quality/findings"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match direction {
-    Some(value) => url = append_query(url, "direction", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "direction", parameter_value(value))
     None => ()
   }
   match before {
-    Some(value) => url = append_query(url, "before", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "before", parameter_value(value))
     None => ()
   }
   match after {
-    Some(value) => url = append_query(url, "after", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "after", parameter_value(value))
     None => ()
   }
   match state {
-    Some(value) => url = append_query(url, "state", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "state", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -21603,11 +21984,11 @@ pub fn code_quality_get_finding_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/code-quality/findings/" +
-    percent_encode(parameter_value(finding_number)),
+    @http.percent_encode(parameter_value(finding_number)),
   )
 }
 
@@ -21638,9 +22019,9 @@ pub fn code_quality_get_setup_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/code-quality/setup",
   )
 }
@@ -21673,9 +22054,9 @@ pub fn code_quality_update_setup_request(
 ) -> @http.Request {
   @http.Request::patch(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/code-quality/setup",
   ).json_body(Json(body))
 }
@@ -21707,9 +22088,9 @@ pub fn code_scanning_get_ai_scan_enablement_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/code-scanning/ai-scan",
   )
 }
@@ -21742,9 +22123,9 @@ pub fn code_scanning_update_ai_scan_enablement_request(
 ) -> @http.Request {
   @http.Request::patch(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/code-scanning/ai-scan",
   ).json_body(Json(body))
 }
@@ -21788,60 +22169,69 @@ pub fn code_scanning_list_alerts_for_repo_request(
   assignees? : String,
 ) -> @http.Request {
   let mut url = "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/code-scanning/alerts"
   match tool_name {
-    Some(value) => url = append_query(url, "tool_name", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "tool_name", parameter_value(value))
     None => ()
   }
   match tool_guid {
-    Some(value) => url = append_query(url, "tool_guid", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "tool_guid", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match ref_ {
-    Some(value) => url = append_query(url, "ref", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "ref", parameter_value(value))
     None => ()
   }
   match pr {
-    Some(value) => url = append_query(url, "pr", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "pr", parameter_value(value))
     None => ()
   }
   match direction {
-    Some(value) => url = append_query(url, "direction", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "direction", parameter_value(value))
     None => ()
   }
   match before {
-    Some(value) => url = append_query(url, "before", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "before", parameter_value(value))
     None => ()
   }
   match after {
-    Some(value) => url = append_query(url, "after", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "after", parameter_value(value))
     None => ()
   }
   match sort {
-    Some(value) => url = append_query(url, "sort", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "sort", parameter_value(value))
     None => ()
   }
   match state {
-    Some(value) => url = append_query(url, "state", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "state", parameter_value(value))
     None => ()
   }
   match severity {
-    Some(value) => url = append_query(url, "severity", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "severity", parameter_value(value))
     None => ()
   }
   match assignees {
-    Some(value) => url = append_query(url, "assignees", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "assignees", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -21875,11 +22265,11 @@ pub fn code_scanning_get_alert_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/code-scanning/alerts/" +
-    percent_encode(parameter_value(alert_number)),
+    @http.percent_encode(parameter_value(alert_number)),
   )
 }
 
@@ -21912,11 +22302,11 @@ pub fn code_scanning_update_alert_request(
 ) -> @http.Request {
   @http.Request::patch(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/code-scanning/alerts/" +
-    percent_encode(parameter_value(alert_number)),
+    @http.percent_encode(parameter_value(alert_number)),
   ).json_body(Json(body))
 }
 
@@ -21948,11 +22338,11 @@ pub fn code_scanning_get_autofix_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/code-scanning/alerts/" +
-    percent_encode(parameter_value(alert_number)) +
+    @http.percent_encode(parameter_value(alert_number)) +
     "/autofix",
   )
 }
@@ -21985,11 +22375,11 @@ pub fn code_scanning_create_autofix_request(
 ) -> @http.Request {
   @http.Request::post(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/code-scanning/alerts/" +
-    percent_encode(parameter_value(alert_number)) +
+    @http.percent_encode(parameter_value(alert_number)) +
     "/autofix",
   )
 }
@@ -22023,11 +22413,11 @@ pub fn code_scanning_commit_autofix_request(
 ) -> @http.Request {
   @http.Request::post(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/code-scanning/alerts/" +
-    percent_encode(parameter_value(alert_number)) +
+    @http.percent_encode(parameter_value(alert_number)) +
     "/autofix/commits",
   ).json_body(Json(body))
 }
@@ -22063,26 +22453,27 @@ pub fn code_scanning_list_alert_instances_request(
   pr? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/code-scanning/alerts/" +
-    percent_encode(parameter_value(alert_number)) +
+    @http.percent_encode(parameter_value(alert_number)) +
     "/instances"
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match ref_ {
-    Some(value) => url = append_query(url, "ref", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "ref", parameter_value(value))
     None => ()
   }
   match pr {
-    Some(value) => url = append_query(url, "pr", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "pr", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -22123,44 +22514,49 @@ pub fn code_scanning_list_recent_analyses_request(
   sort? : String,
 ) -> @http.Request {
   let mut url = "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/code-scanning/analyses"
   match tool_name {
-    Some(value) => url = append_query(url, "tool_name", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "tool_name", parameter_value(value))
     None => ()
   }
   match tool_guid {
-    Some(value) => url = append_query(url, "tool_guid", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "tool_guid", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match pr {
-    Some(value) => url = append_query(url, "pr", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "pr", parameter_value(value))
     None => ()
   }
   match ref_ {
-    Some(value) => url = append_query(url, "ref", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "ref", parameter_value(value))
     None => ()
   }
   match sarif_id {
-    Some(value) => url = append_query(url, "sarif_id", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "sarif_id", parameter_value(value))
     None => ()
   }
   match direction {
-    Some(value) => url = append_query(url, "direction", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "direction", parameter_value(value))
     None => ()
   }
   match sort {
-    Some(value) => url = append_query(url, "sort", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "sort", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -22194,11 +22590,11 @@ pub fn code_scanning_get_analysis_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/code-scanning/analyses/" +
-    percent_encode(parameter_value(analysis_id)),
+    @http.percent_encode(parameter_value(analysis_id)),
   )
 }
 
@@ -22230,14 +22626,14 @@ pub fn code_scanning_delete_analysis_request(
   confirm_delete? : String,
 ) -> @http.Request {
   let mut url = "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/code-scanning/analyses/" +
-    percent_encode(parameter_value(analysis_id))
+    @http.percent_encode(parameter_value(analysis_id))
   match confirm_delete {
     Some(value) =>
-      url = append_query(url, "confirm_delete", parameter_value(value))
+      url = @http.append_query(url, "confirm_delete", parameter_value(value))
     None => ()
   }
   @http.Request::delete(url)
@@ -22270,9 +22666,9 @@ pub fn code_scanning_list_codeql_databases_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/code-scanning/codeql/databases",
   )
 }
@@ -22305,11 +22701,11 @@ pub fn code_scanning_get_codeql_database_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/code-scanning/codeql/databases/" +
-    percent_encode(parameter_value(language)),
+    @http.percent_encode(parameter_value(language)),
   )
 }
 
@@ -22341,11 +22737,11 @@ pub fn code_scanning_delete_codeql_database_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/code-scanning/codeql/databases/" +
-    percent_encode(parameter_value(language)),
+    @http.percent_encode(parameter_value(language)),
   )
 }
 
@@ -22359,9 +22755,9 @@ pub fn code_scanning_create_variant_analysis_request(
 ) -> @http.Request {
   @http.Request::post(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/code-scanning/codeql/variant-analyses",
   ).json_body(Json(body))
 }
@@ -22394,11 +22790,11 @@ pub fn code_scanning_get_variant_analysis_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/code-scanning/codeql/variant-analyses/" +
-    percent_encode(parameter_value(codeql_variant_analysis_id)),
+    @http.percent_encode(parameter_value(codeql_variant_analysis_id)),
   )
 }
 
@@ -22432,15 +22828,15 @@ pub fn code_scanning_get_variant_analysis_repo_task_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/code-scanning/codeql/variant-analyses/" +
-    percent_encode(parameter_value(codeql_variant_analysis_id)) +
+    @http.percent_encode(parameter_value(codeql_variant_analysis_id)) +
     "/repos/" +
-    percent_encode(parameter_value(repo_owner)) +
+    @http.percent_encode(parameter_value(repo_owner)) +
     "/" +
-    percent_encode(parameter_value(repo_name)),
+    @http.percent_encode(parameter_value(repo_name)),
   )
 }
 
@@ -22471,9 +22867,9 @@ pub fn code_scanning_get_default_setup_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/code-scanning/default-setup",
   )
 }
@@ -22506,9 +22902,9 @@ pub fn code_scanning_update_default_setup_request(
 ) -> @http.Request {
   @http.Request::patch(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/code-scanning/default-setup",
   ).json_body(Json(body))
 }
@@ -22541,9 +22937,9 @@ pub fn code_scanning_upload_sarif_request(
 ) -> @http.Request {
   @http.Request::post(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/code-scanning/sarifs",
   ).json_body(Json(body))
 }
@@ -22576,11 +22972,11 @@ pub fn code_scanning_get_sarif_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/code-scanning/sarifs/" +
-    percent_encode(parameter_value(sarif_id)),
+    @http.percent_encode(parameter_value(sarif_id)),
   )
 }
 
@@ -22611,9 +23007,9 @@ pub fn code_security_get_configuration_for_repository_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/code-security-configuration",
   )
 }
@@ -22645,12 +23041,12 @@ pub fn repos_codeowners_errors_request(
   ref_? : String,
 ) -> @http.Request {
   let mut url = "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/codeowners/errors"
   match ref_ {
-    Some(value) => url = append_query(url, "ref", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "ref", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -22684,16 +23080,17 @@ pub fn codespaces_list_in_repository_for_authenticated_user_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/codespaces"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -22727,9 +23124,9 @@ pub fn codespaces_create_with_repo_for_authenticated_user_request(
 ) -> @http.Request {
   @http.Request::post(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/codespaces",
   ).json_body(Json(body))
 }
@@ -22762,16 +23159,17 @@ pub fn codespaces_list_devcontainers_in_repository_for_authenticated_user_reques
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/codespaces/devcontainers"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -22806,20 +23204,22 @@ pub fn codespaces_repo_machines_for_authenticated_user_request(
   ref_? : String,
 ) -> @http.Request {
   let mut url = "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/codespaces/machines"
   match location {
-    Some(value) => url = append_query(url, "location", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "location", parameter_value(value))
     None => ()
   }
   match client_ip {
-    Some(value) => url = append_query(url, "client_ip", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "client_ip", parameter_value(value))
     None => ()
   }
   match ref_ {
-    Some(value) => url = append_query(url, "ref", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "ref", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -22853,16 +23253,17 @@ pub fn codespaces_pre_flight_with_repo_for_authenticated_user_request(
   client_ip? : String,
 ) -> @http.Request {
   let mut url = "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/codespaces/new"
   match ref_ {
-    Some(value) => url = append_query(url, "ref", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "ref", parameter_value(value))
     None => ()
   }
   match client_ip {
-    Some(value) => url = append_query(url, "client_ip", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "client_ip", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -22896,12 +23297,12 @@ pub fn codespaces_check_permissions_for_devcontainer_request(
   devcontainer_path : String,
 ) -> @http.Request {
   let mut url = "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/codespaces/permissions_check"
-  url = append_query(url, "ref", parameter_value(ref_))
-  url = append_query(
+  url = @http.append_query(url, "ref", parameter_value(ref_))
+  url = @http.append_query(
     url,
     "devcontainer_path",
     parameter_value(devcontainer_path),
@@ -22937,16 +23338,17 @@ pub fn codespaces_list_repo_secrets_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/codespaces/secrets"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -22979,9 +23381,9 @@ pub fn codespaces_get_repo_public_key_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/codespaces/secrets/public-key",
   )
 }
@@ -23014,11 +23416,11 @@ pub fn codespaces_get_repo_secret_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/codespaces/secrets/" +
-    percent_encode(parameter_value(secret_name)),
+    @http.percent_encode(parameter_value(secret_name)),
   )
 }
 
@@ -23051,11 +23453,11 @@ pub fn codespaces_create_or_update_repo_secret_request(
 ) -> @http.Request {
   @http.Request::put(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/codespaces/secrets/" +
-    percent_encode(parameter_value(secret_name)),
+    @http.percent_encode(parameter_value(secret_name)),
   ).json_body(Json(body))
 }
 
@@ -23087,11 +23489,11 @@ pub fn codespaces_delete_repo_secret_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/codespaces/secrets/" +
-    percent_encode(parameter_value(secret_name)),
+    @http.percent_encode(parameter_value(secret_name)),
   )
 }
 
@@ -23107,25 +23509,27 @@ pub fn repos_list_collaborators_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/collaborators"
   match affiliation {
     Some(value) =>
-      url = append_query(url, "affiliation", parameter_value(value))
+      url = @http.append_query(url, "affiliation", parameter_value(value))
     None => ()
   }
   match permission {
-    Some(value) => url = append_query(url, "permission", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "permission", parameter_value(value))
     None => ()
   }
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -23159,11 +23563,11 @@ pub fn repos_check_collaborator_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/collaborators/" +
-    percent_encode(parameter_value(username)),
+    @http.percent_encode(parameter_value(username)),
   )
 }
 
@@ -23178,11 +23582,11 @@ pub fn repos_add_collaborator_request(
 ) -> @http.Request {
   @http.Request::put(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/collaborators/" +
-    percent_encode(parameter_value(username)),
+    @http.percent_encode(parameter_value(username)),
   ).json_body(Json(body))
 }
 
@@ -23214,11 +23618,11 @@ pub fn repos_remove_collaborator_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/collaborators/" +
-    percent_encode(parameter_value(username)),
+    @http.percent_encode(parameter_value(username)),
   )
 }
 
@@ -23232,11 +23636,11 @@ pub fn repos_get_collaborator_permission_level_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/collaborators/" +
-    percent_encode(parameter_value(username)) +
+    @http.percent_encode(parameter_value(username)) +
     "/permission",
   )
 }
@@ -23269,16 +23673,17 @@ pub fn repos_list_commit_comments_for_repo_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/comments"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -23312,11 +23717,11 @@ pub fn repos_get_commit_comment_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/comments/" +
-    percent_encode(parameter_value(comment_id)),
+    @http.percent_encode(parameter_value(comment_id)),
   )
 }
 
@@ -23349,11 +23754,11 @@ pub fn repos_update_commit_comment_request(
 ) -> @http.Request {
   @http.Request::patch(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/comments/" +
-    percent_encode(parameter_value(comment_id)),
+    @http.percent_encode(parameter_value(comment_id)),
   ).json_body(Json(body))
 }
 
@@ -23385,11 +23790,11 @@ pub fn repos_delete_commit_comment_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/comments/" +
-    percent_encode(parameter_value(comment_id)),
+    @http.percent_encode(parameter_value(comment_id)),
   )
 }
 
@@ -23405,22 +23810,24 @@ pub fn reactions_list_for_commit_comment_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/comments/" +
-    percent_encode(parameter_value(comment_id)) +
+    @http.percent_encode(parameter_value(comment_id)) +
     "/reactions"
   match content {
-    Some(value) => url = append_query(url, "content", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "content", parameter_value(value))
     None => ()
   }
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -23455,11 +23862,11 @@ pub fn reactions_create_for_commit_comment_request(
 ) -> @http.Request {
   @http.Request::post(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/comments/" +
-    percent_encode(parameter_value(comment_id)) +
+    @http.percent_encode(parameter_value(comment_id)) +
     "/reactions",
   ).json_body(Json(body))
 }
@@ -23493,13 +23900,13 @@ pub fn reactions_delete_for_commit_comment_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/comments/" +
-    percent_encode(parameter_value(comment_id)) +
+    @http.percent_encode(parameter_value(comment_id)) +
     "/reactions/" +
-    percent_encode(parameter_value(reaction_id)),
+    @http.percent_encode(parameter_value(reaction_id)),
   )
 }
 
@@ -23519,40 +23926,45 @@ pub fn repos_list_commits_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/commits"
   match sha {
-    Some(value) => url = append_query(url, "sha", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "sha", parameter_value(value))
     None => ()
   }
   match path {
-    Some(value) => url = append_query(url, "path", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "path", parameter_value(value))
     None => ()
   }
   match author {
-    Some(value) => url = append_query(url, "author", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "author", parameter_value(value))
     None => ()
   }
   match committer {
-    Some(value) => url = append_query(url, "committer", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "committer", parameter_value(value))
     None => ()
   }
   match since {
-    Some(value) => url = append_query(url, "since", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "since", parameter_value(value))
     None => ()
   }
   match until {
-    Some(value) => url = append_query(url, "until", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "until", parameter_value(value))
     None => ()
   }
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -23586,11 +23998,11 @@ pub fn repos_list_branches_for_head_commit_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/commits/" +
-    percent_encode_segments(parameter_value(commit_sha)) +
+    @http.percent_encode_path(parameter_value(commit_sha)) +
     "/branches-where-head",
   )
 }
@@ -23624,18 +24036,19 @@ pub fn repos_list_comments_for_commit_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/commits/" +
-    percent_encode_segments(parameter_value(commit_sha)) +
+    @http.percent_encode_path(parameter_value(commit_sha)) +
     "/comments"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -23670,11 +24083,11 @@ pub fn repos_create_commit_comment_request(
 ) -> @http.Request {
   @http.Request::post(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/commits/" +
-    percent_encode_segments(parameter_value(commit_sha)) +
+    @http.percent_encode_path(parameter_value(commit_sha)) +
     "/comments",
   ).json_body(Json(body))
 }
@@ -23708,18 +24121,19 @@ pub fn repos_list_pull_requests_associated_with_commit_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/commits/" +
-    percent_encode_segments(parameter_value(commit_sha)) +
+    @http.percent_encode_path(parameter_value(commit_sha)) +
     "/pulls"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -23754,17 +24168,18 @@ pub fn repos_get_commit_request(
   per_page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/commits/" +
-    percent_encode_segments(parameter_value(ref_))
+    @http.percent_encode_path(parameter_value(ref_))
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -23803,34 +24218,39 @@ pub fn checks_list_for_ref_request(
   app_id? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/commits/" +
-    percent_encode_segments(parameter_value(ref_)) +
+    @http.percent_encode_path(parameter_value(ref_)) +
     "/check-runs"
   match check_name {
-    Some(value) => url = append_query(url, "check_name", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "check_name", parameter_value(value))
     None => ()
   }
   match status {
-    Some(value) => url = append_query(url, "status", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "status", parameter_value(value))
     None => ()
   }
   match filter {
-    Some(value) => url = append_query(url, "filter", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "filter", parameter_value(value))
     None => ()
   }
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   match app_id {
-    Some(value) => url = append_query(url, "app_id", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "app_id", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -23867,26 +24287,29 @@ pub fn checks_list_suites_for_ref_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/commits/" +
-    percent_encode_segments(parameter_value(ref_)) +
+    @http.percent_encode_path(parameter_value(ref_)) +
     "/check-suites"
   match app_id {
-    Some(value) => url = append_query(url, "app_id", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "app_id", parameter_value(value))
     None => ()
   }
   match check_name {
-    Some(value) => url = append_query(url, "check_name", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "check_name", parameter_value(value))
     None => ()
   }
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -23921,18 +24344,19 @@ pub fn repos_get_combined_status_for_ref_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/commits/" +
-    percent_encode_segments(parameter_value(ref_)) +
+    @http.percent_encode_path(parameter_value(ref_)) +
     "/status"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -23967,18 +24391,19 @@ pub fn repos_list_commit_statuses_for_ref_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/commits/" +
-    percent_encode_segments(parameter_value(ref_)) +
+    @http.percent_encode_path(parameter_value(ref_)) +
     "/statuses"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -24011,9 +24436,9 @@ pub fn repos_get_community_profile_metrics_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/community/profile",
   )
 }
@@ -24047,17 +24472,18 @@ pub fn repos_compare_commits_request(
   per_page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/compare/" +
-    percent_encode_segments(parameter_value(basehead))
+    @http.percent_encode_path(parameter_value(basehead))
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -24091,13 +24517,13 @@ pub fn repos_get_content_request(
   ref_? : String,
 ) -> @http.Request {
   let mut url = "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/contents/" +
-    percent_encode_segments(parameter_value(path))
+    @http.percent_encode_path(parameter_value(path))
   match ref_ {
-    Some(value) => url = append_query(url, "ref", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "ref", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -24132,11 +24558,11 @@ pub fn repos_create_or_update_file_contents_request(
 ) -> @http.Request {
   @http.Request::put(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/contents/" +
-    percent_encode_segments(parameter_value(path)),
+    @http.percent_encode_path(parameter_value(path)),
   ).json_body(Json(body))
 }
 
@@ -24169,11 +24595,11 @@ pub fn repos_delete_file_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/contents/" +
-    percent_encode_segments(parameter_value(path)),
+    @http.percent_encode_path(parameter_value(path)),
   ).json_body(Json(body))
 }
 
@@ -24206,20 +24632,21 @@ pub fn repos_list_contributors_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/contributors"
   match anon {
-    Some(value) => url = append_query(url, "anon", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "anon", parameter_value(value))
     None => ()
   }
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -24252,9 +24679,9 @@ pub fn copilot_get_copilot_cloud_agent_configuration_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/copilot/cloud-agent/configuration",
   )
 }
@@ -24301,75 +24728,86 @@ pub fn dependabot_list_alerts_for_repo_request(
   per_page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/dependabot/alerts"
   match classification {
     Some(value) =>
-      url = append_query(url, "classification", parameter_value(value))
+      url = @http.append_query(url, "classification", parameter_value(value))
     None => ()
   }
   match state {
-    Some(value) => url = append_query(url, "state", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "state", parameter_value(value))
     None => ()
   }
   match severity {
-    Some(value) => url = append_query(url, "severity", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "severity", parameter_value(value))
     None => ()
   }
   match ecosystem {
-    Some(value) => url = append_query(url, "ecosystem", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "ecosystem", parameter_value(value))
     None => ()
   }
   match package_ {
-    Some(value) => url = append_query(url, "package", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "package", parameter_value(value))
     None => ()
   }
   match manifest {
-    Some(value) => url = append_query(url, "manifest", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "manifest", parameter_value(value))
     None => ()
   }
   match epss_percentage {
     Some(value) =>
-      url = append_query(url, "epss_percentage", parameter_value(value))
+      url = @http.append_query(url, "epss_percentage", parameter_value(value))
     None => ()
   }
   match has {
-    Some(value) => url = append_query(url, "has", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "has", parameter_value(value))
     None => ()
   }
   match assignee {
-    Some(value) => url = append_query(url, "assignee", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "assignee", parameter_value(value))
     None => ()
   }
   match scope {
-    Some(value) => url = append_query(url, "scope", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "scope", parameter_value(value))
     None => ()
   }
   match relationship {
     Some(value) =>
-      url = append_query(url, "relationship", parameter_value(value))
+      url = @http.append_query(url, "relationship", parameter_value(value))
     None => ()
   }
   match sort {
-    Some(value) => url = append_query(url, "sort", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "sort", parameter_value(value))
     None => ()
   }
   match direction {
-    Some(value) => url = append_query(url, "direction", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "direction", parameter_value(value))
     None => ()
   }
   match before {
-    Some(value) => url = append_query(url, "before", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "before", parameter_value(value))
     None => ()
   }
   match after {
-    Some(value) => url = append_query(url, "after", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "after", parameter_value(value))
     None => ()
   }
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -24403,11 +24841,11 @@ pub fn dependabot_get_alert_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/dependabot/alerts/" +
-    percent_encode(parameter_value(alert_number)),
+    @http.percent_encode(parameter_value(alert_number)),
   )
 }
 
@@ -24440,11 +24878,11 @@ pub fn dependabot_update_alert_request(
 ) -> @http.Request {
   @http.Request::patch(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/dependabot/alerts/" +
-    percent_encode(parameter_value(alert_number)),
+    @http.percent_encode(parameter_value(alert_number)),
   ).json_body(Json(body))
 }
 
@@ -24476,16 +24914,17 @@ pub fn dependabot_list_repo_secrets_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/dependabot/secrets"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -24518,9 +24957,9 @@ pub fn dependabot_get_repo_public_key_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/dependabot/secrets/public-key",
   )
 }
@@ -24553,11 +24992,11 @@ pub fn dependabot_get_repo_secret_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/dependabot/secrets/" +
-    percent_encode(parameter_value(secret_name)),
+    @http.percent_encode(parameter_value(secret_name)),
   )
 }
 
@@ -24590,11 +25029,11 @@ pub fn dependabot_create_or_update_repo_secret_request(
 ) -> @http.Request {
   @http.Request::put(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/dependabot/secrets/" +
-    percent_encode(parameter_value(secret_name)),
+    @http.percent_encode(parameter_value(secret_name)),
   ).json_body(Json(body))
 }
 
@@ -24626,11 +25065,11 @@ pub fn dependabot_delete_repo_secret_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/dependabot/secrets/" +
-    percent_encode(parameter_value(secret_name)),
+    @http.percent_encode(parameter_value(secret_name)),
   )
 }
 
@@ -24644,13 +25083,13 @@ pub fn dependency_graph_diff_range_request(
   name? : String,
 ) -> @http.Request {
   let mut url = "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/dependency-graph/compare/" +
-    percent_encode(parameter_value(basehead))
+    @http.percent_encode(parameter_value(basehead))
   match name {
-    Some(value) => url = append_query(url, "name", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "name", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -24683,9 +25122,9 @@ pub fn dependency_graph_export_sbom_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/dependency-graph/sbom",
   )
 }
@@ -24718,11 +25157,11 @@ pub fn dependency_graph_fetch_sbom_report_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/dependency-graph/sbom/fetch-report/" +
-    percent_encode(parameter_value(sbom_uuid)),
+    @http.percent_encode(parameter_value(sbom_uuid)),
   )
 }
 
@@ -24735,9 +25174,9 @@ pub fn dependency_graph_generate_sbom_report_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/dependency-graph/sbom/generate-report",
   )
 }
@@ -24770,9 +25209,9 @@ pub fn dependency_graph_create_repository_snapshot_request(
 ) -> @http.Request {
   @http.Request::post(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/dependency-graph/snapshots",
   ).json_body(Json(body))
 }
@@ -24809,33 +25248,34 @@ pub fn repos_list_deployments_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/deployments"
   match sha {
-    Some(value) => url = append_query(url, "sha", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "sha", parameter_value(value))
     None => ()
   }
   match ref_ {
-    Some(value) => url = append_query(url, "ref", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "ref", parameter_value(value))
     None => ()
   }
   match task {
-    Some(value) => url = append_query(url, "task", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "task", parameter_value(value))
     None => ()
   }
   match environment {
     Some(value) =>
-      url = append_query(url, "environment", parameter_value(value))
+      url = @http.append_query(url, "environment", parameter_value(value))
     None => ()
   }
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -24869,9 +25309,9 @@ pub fn repos_create_deployment_request(
 ) -> @http.Request {
   @http.Request::post(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/deployments",
   ).json_body(Json(body))
 }
@@ -24904,11 +25344,11 @@ pub fn repos_get_deployment_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/deployments/" +
-    percent_encode(parameter_value(deployment_id)),
+    @http.percent_encode(parameter_value(deployment_id)),
   )
 }
 
@@ -24940,11 +25380,11 @@ pub fn repos_delete_deployment_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/deployments/" +
-    percent_encode(parameter_value(deployment_id)),
+    @http.percent_encode(parameter_value(deployment_id)),
   )
 }
 
@@ -24959,18 +25399,19 @@ pub fn repos_list_deployment_statuses_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/deployments/" +
-    percent_encode(parameter_value(deployment_id)) +
+    @http.percent_encode(parameter_value(deployment_id)) +
     "/statuses"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -25005,11 +25446,11 @@ pub fn repos_create_deployment_status_request(
 ) -> @http.Request {
   @http.Request::post(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/deployments/" +
-    percent_encode(parameter_value(deployment_id)) +
+    @http.percent_encode(parameter_value(deployment_id)) +
     "/statuses",
   ).json_body(Json(body))
 }
@@ -25043,13 +25484,13 @@ pub fn repos_get_deployment_status_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/deployments/" +
-    percent_encode(parameter_value(deployment_id)) +
+    @http.percent_encode(parameter_value(deployment_id)) +
     "/statuses/" +
-    percent_encode(parameter_value(status_id)),
+    @http.percent_encode(parameter_value(status_id)),
   )
 }
 
@@ -25081,9 +25522,9 @@ pub fn repos_create_dispatch_event_request(
 ) -> @http.Request {
   @http.Request::post(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/dispatches",
   ).json_body(Json(body))
 }
@@ -25098,16 +25539,17 @@ pub fn repos_get_all_environments_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/environments"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -25141,11 +25583,11 @@ pub fn repos_get_environment_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/environments/" +
-    percent_encode(parameter_value(environment_name)),
+    @http.percent_encode(parameter_value(environment_name)),
   )
 }
 
@@ -25178,11 +25620,11 @@ pub fn repos_create_or_update_environment_request(
 ) -> @http.Request {
   @http.Request::put(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/environments/" +
-    percent_encode(parameter_value(environment_name)),
+    @http.percent_encode(parameter_value(environment_name)),
   ).json_body(Json(body))
 }
 
@@ -25214,11 +25656,11 @@ pub fn repos_delete_an_environment_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/environments/" +
-    percent_encode(parameter_value(environment_name)),
+    @http.percent_encode(parameter_value(environment_name)),
   )
 }
 
@@ -25233,18 +25675,19 @@ pub fn repos_list_deployment_branch_policies_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/environments/" +
-    percent_encode(parameter_value(environment_name)) +
+    @http.percent_encode(parameter_value(environment_name)) +
     "/deployment-branch-policies"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -25279,11 +25722,11 @@ pub fn repos_create_deployment_branch_policy_request(
 ) -> @http.Request {
   @http.Request::post(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/environments/" +
-    percent_encode(parameter_value(environment_name)) +
+    @http.percent_encode(parameter_value(environment_name)) +
     "/deployment-branch-policies",
   ).json_body(Json(body))
 }
@@ -25317,13 +25760,13 @@ pub fn repos_get_deployment_branch_policy_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/environments/" +
-    percent_encode(parameter_value(environment_name)) +
+    @http.percent_encode(parameter_value(environment_name)) +
     "/deployment-branch-policies/" +
-    percent_encode(parameter_value(branch_policy_id)),
+    @http.percent_encode(parameter_value(branch_policy_id)),
   )
 }
 
@@ -25357,13 +25800,13 @@ pub fn repos_update_deployment_branch_policy_request(
 ) -> @http.Request {
   @http.Request::put(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/environments/" +
-    percent_encode(parameter_value(environment_name)) +
+    @http.percent_encode(parameter_value(environment_name)) +
     "/deployment-branch-policies/" +
-    percent_encode(parameter_value(branch_policy_id)),
+    @http.percent_encode(parameter_value(branch_policy_id)),
   ).json_body(Json(body))
 }
 
@@ -25396,13 +25839,13 @@ pub fn repos_delete_deployment_branch_policy_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/environments/" +
-    percent_encode(parameter_value(environment_name)) +
+    @http.percent_encode(parameter_value(environment_name)) +
     "/deployment-branch-policies/" +
-    percent_encode(parameter_value(branch_policy_id)),
+    @http.percent_encode(parameter_value(branch_policy_id)),
   )
 }
 
@@ -25416,11 +25859,11 @@ pub fn repos_get_all_deployment_protection_rules_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/environments/" +
-    percent_encode(parameter_value(environment_name)) +
+    @http.percent_encode(parameter_value(environment_name)) +
     "/deployment_protection_rules",
   )
 }
@@ -25454,11 +25897,11 @@ pub fn repos_create_deployment_protection_rule_request(
 ) -> @http.Request {
   @http.Request::post(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/environments/" +
-    percent_encode(parameter_value(environment_name)) +
+    @http.percent_encode(parameter_value(environment_name)) +
     "/deployment_protection_rules",
   ).json_body(Json(body))
 }
@@ -25492,18 +25935,19 @@ pub fn repos_list_custom_deployment_rule_integrations_request(
   per_page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/environments/" +
-    percent_encode(parameter_value(environment_name)) +
+    @http.percent_encode(parameter_value(environment_name)) +
     "/deployment_protection_rules/apps"
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -25538,13 +25982,13 @@ pub fn repos_get_custom_deployment_protection_rule_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/environments/" +
-    percent_encode(parameter_value(environment_name)) +
+    @http.percent_encode(parameter_value(environment_name)) +
     "/deployment_protection_rules/" +
-    percent_encode(parameter_value(protection_rule_id)),
+    @http.percent_encode(parameter_value(protection_rule_id)),
   )
 }
 
@@ -25577,13 +26021,13 @@ pub fn repos_disable_deployment_protection_rule_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/environments/" +
-    percent_encode(parameter_value(environment_name)) +
+    @http.percent_encode(parameter_value(environment_name)) +
     "/deployment_protection_rules/" +
-    percent_encode(parameter_value(protection_rule_id)),
+    @http.percent_encode(parameter_value(protection_rule_id)),
   )
 }
 
@@ -25598,18 +26042,19 @@ pub fn actions_list_environment_secrets_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/environments/" +
-    percent_encode(parameter_value(environment_name)) +
+    @http.percent_encode(parameter_value(environment_name)) +
     "/secrets"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -25643,11 +26088,11 @@ pub fn actions_get_environment_public_key_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/environments/" +
-    percent_encode(parameter_value(environment_name)) +
+    @http.percent_encode(parameter_value(environment_name)) +
     "/secrets/public-key",
   )
 }
@@ -25681,13 +26126,13 @@ pub fn actions_get_environment_secret_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/environments/" +
-    percent_encode(parameter_value(environment_name)) +
+    @http.percent_encode(parameter_value(environment_name)) +
     "/secrets/" +
-    percent_encode(parameter_value(secret_name)),
+    @http.percent_encode(parameter_value(secret_name)),
   )
 }
 
@@ -25721,13 +26166,13 @@ pub fn actions_create_or_update_environment_secret_request(
 ) -> @http.Request {
   @http.Request::put(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/environments/" +
-    percent_encode(parameter_value(environment_name)) +
+    @http.percent_encode(parameter_value(environment_name)) +
     "/secrets/" +
-    percent_encode(parameter_value(secret_name)),
+    @http.percent_encode(parameter_value(secret_name)),
   ).json_body(Json(body))
 }
 
@@ -25760,13 +26205,13 @@ pub fn actions_delete_environment_secret_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/environments/" +
-    percent_encode(parameter_value(environment_name)) +
+    @http.percent_encode(parameter_value(environment_name)) +
     "/secrets/" +
-    percent_encode(parameter_value(secret_name)),
+    @http.percent_encode(parameter_value(secret_name)),
   )
 }
 
@@ -25781,18 +26226,19 @@ pub fn actions_list_environment_variables_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/environments/" +
-    percent_encode(parameter_value(environment_name)) +
+    @http.percent_encode(parameter_value(environment_name)) +
     "/variables"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -25827,11 +26273,11 @@ pub fn actions_create_environment_variable_request(
 ) -> @http.Request {
   @http.Request::post(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/environments/" +
-    percent_encode(parameter_value(environment_name)) +
+    @http.percent_encode(parameter_value(environment_name)) +
     "/variables",
   ).json_body(Json(body))
 }
@@ -25865,13 +26311,13 @@ pub fn actions_get_environment_variable_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/environments/" +
-    percent_encode(parameter_value(environment_name)) +
+    @http.percent_encode(parameter_value(environment_name)) +
     "/variables/" +
-    percent_encode(parameter_value(name)),
+    @http.percent_encode(parameter_value(name)),
   )
 }
 
@@ -25905,13 +26351,13 @@ pub fn actions_update_environment_variable_request(
 ) -> @http.Request {
   @http.Request::patch(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/environments/" +
-    percent_encode(parameter_value(environment_name)) +
+    @http.percent_encode(parameter_value(environment_name)) +
     "/variables/" +
-    percent_encode(parameter_value(name)),
+    @http.percent_encode(parameter_value(name)),
   ).json_body(Json(body))
 }
 
@@ -25926,13 +26372,13 @@ pub fn actions_delete_environment_variable_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/environments/" +
-    percent_encode(parameter_value(environment_name)) +
+    @http.percent_encode(parameter_value(environment_name)) +
     "/variables/" +
-    percent_encode(parameter_value(name)),
+    @http.percent_encode(parameter_value(name)),
   )
 }
 
@@ -25946,16 +26392,17 @@ pub fn activity_list_repo_events_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/events"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -25990,20 +26437,21 @@ pub fn repos_list_forks_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/forks"
   match sort {
-    Some(value) => url = append_query(url, "sort", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "sort", parameter_value(value))
     None => ()
   }
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -26037,9 +26485,9 @@ pub fn repos_create_fork_request(
 ) -> @http.Request {
   @http.Request::post(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/forks",
   ).json_body(Json(body))
 }
@@ -26072,9 +26520,9 @@ pub fn git_create_blob_request(
 ) -> @http.Request {
   @http.Request::post(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/git/blobs",
   ).json_body(Json(body))
 }
@@ -26107,11 +26555,11 @@ pub fn git_get_blob_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/git/blobs/" +
-    percent_encode(parameter_value(file_sha)),
+    @http.percent_encode(parameter_value(file_sha)),
   )
 }
 
@@ -26143,9 +26591,9 @@ pub fn git_create_commit_request(
 ) -> @http.Request {
   @http.Request::post(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/git/commits",
   ).json_body(Json(body))
 }
@@ -26178,11 +26626,11 @@ pub fn git_get_commit_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/git/commits/" +
-    percent_encode_segments(parameter_value(commit_sha)),
+    @http.percent_encode_path(parameter_value(commit_sha)),
   )
 }
 
@@ -26214,11 +26662,11 @@ pub fn git_list_matching_refs_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/git/matching-refs/" +
-    percent_encode_segments(parameter_value(ref_)),
+    @http.percent_encode_path(parameter_value(ref_)),
   )
 }
 
@@ -26250,11 +26698,11 @@ pub fn git_get_ref_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/git/ref/" +
-    percent_encode_segments(parameter_value(ref_)),
+    @http.percent_encode_path(parameter_value(ref_)),
   )
 }
 
@@ -26286,9 +26734,9 @@ pub fn git_create_ref_request(
 ) -> @http.Request {
   @http.Request::post(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/git/refs",
   ).json_body(Json(body))
 }
@@ -26322,11 +26770,11 @@ pub fn git_update_ref_request(
 ) -> @http.Request {
   @http.Request::patch(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/git/refs/" +
-    percent_encode_segments(parameter_value(ref_)),
+    @http.percent_encode_path(parameter_value(ref_)),
   ).json_body(Json(body))
 }
 
@@ -26358,11 +26806,11 @@ pub fn git_delete_ref_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/git/refs/" +
-    percent_encode_segments(parameter_value(ref_)),
+    @http.percent_encode_path(parameter_value(ref_)),
   )
 }
 
@@ -26376,9 +26824,9 @@ pub fn git_create_tag_request(
 ) -> @http.Request {
   @http.Request::post(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/git/tags",
   ).json_body(Json(body))
 }
@@ -26411,11 +26859,11 @@ pub fn git_get_tag_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/git/tags/" +
-    percent_encode(parameter_value(tag_sha)),
+    @http.percent_encode(parameter_value(tag_sha)),
   )
 }
 
@@ -26447,9 +26895,9 @@ pub fn git_create_tree_request(
 ) -> @http.Request {
   @http.Request::post(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/git/trees",
   ).json_body(Json(body))
 }
@@ -26482,13 +26930,14 @@ pub fn git_get_tree_request(
   recursive? : String,
 ) -> @http.Request {
   let mut url = "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/git/trees/" +
-    percent_encode_segments(parameter_value(tree_sha))
+    @http.percent_encode_path(parameter_value(tree_sha))
   match recursive {
-    Some(value) => url = append_query(url, "recursive", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "recursive", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -26521,9 +26970,9 @@ pub fn repos_get_hash_algorithm_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/hash-algorithm",
   )
 }
@@ -26556,16 +27005,17 @@ pub fn repos_list_webhooks_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/hooks"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -26599,9 +27049,9 @@ pub fn repos_create_webhook_request(
 ) -> @http.Request {
   @http.Request::post(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/hooks",
   ).json_body(Json(body))
 }
@@ -26634,11 +27084,11 @@ pub fn repos_get_webhook_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/hooks/" +
-    percent_encode(parameter_value(hook_id)),
+    @http.percent_encode(parameter_value(hook_id)),
   )
 }
 
@@ -26671,11 +27121,11 @@ pub fn repos_update_webhook_request(
 ) -> @http.Request {
   @http.Request::patch(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/hooks/" +
-    percent_encode(parameter_value(hook_id)),
+    @http.percent_encode(parameter_value(hook_id)),
   ).json_body(Json(body))
 }
 
@@ -26707,11 +27157,11 @@ pub fn repos_delete_webhook_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/hooks/" +
-    percent_encode(parameter_value(hook_id)),
+    @http.percent_encode(parameter_value(hook_id)),
   )
 }
 
@@ -26725,11 +27175,11 @@ pub fn repos_get_webhook_config_for_repo_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/hooks/" +
-    percent_encode(parameter_value(hook_id)) +
+    @http.percent_encode(parameter_value(hook_id)) +
     "/config",
   )
 }
@@ -26763,11 +27213,11 @@ pub fn repos_update_webhook_config_for_repo_request(
 ) -> @http.Request {
   @http.Request::patch(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/hooks/" +
-    percent_encode(parameter_value(hook_id)) +
+    @http.percent_encode(parameter_value(hook_id)) +
     "/config",
   ).json_body(Json(body))
 }
@@ -26802,22 +27252,25 @@ pub fn repos_list_webhook_deliveries_request(
   status? : ReposListWebhookDeliveriesStatus,
 ) -> @http.Request {
   let mut url = "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/hooks/" +
-    percent_encode(parameter_value(hook_id)) +
+    @http.percent_encode(parameter_value(hook_id)) +
     "/deliveries"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match cursor {
-    Some(value) => url = append_query(url, "cursor", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "cursor", parameter_value(value))
     None => ()
   }
   match status {
-    Some(value) => url = append_query(url, "status", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "status", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -26852,13 +27305,13 @@ pub fn repos_get_webhook_delivery_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/hooks/" +
-    percent_encode(parameter_value(hook_id)) +
+    @http.percent_encode(parameter_value(hook_id)) +
     "/deliveries/" +
-    percent_encode(parameter_value(delivery_id)),
+    @http.percent_encode(parameter_value(delivery_id)),
   )
 }
 
@@ -26891,13 +27344,13 @@ pub fn repos_redeliver_webhook_delivery_request(
 ) -> @http.Request {
   @http.Request::post(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/hooks/" +
-    percent_encode(parameter_value(hook_id)) +
+    @http.percent_encode(parameter_value(hook_id)) +
     "/deliveries/" +
-    percent_encode(parameter_value(delivery_id)) +
+    @http.percent_encode(parameter_value(delivery_id)) +
     "/attempts",
   )
 }
@@ -26912,11 +27365,11 @@ pub fn repos_ping_webhook_request(
 ) -> @http.Request {
   @http.Request::post(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/hooks/" +
-    percent_encode(parameter_value(hook_id)) +
+    @http.percent_encode(parameter_value(hook_id)) +
     "/pings",
   )
 }
@@ -26931,11 +27384,11 @@ pub fn repos_test_push_webhook_request(
 ) -> @http.Request {
   @http.Request::post(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/hooks/" +
-    percent_encode(parameter_value(hook_id)) +
+    @http.percent_encode(parameter_value(hook_id)) +
     "/tests",
   )
 }
@@ -26949,9 +27402,9 @@ pub fn repos_check_immutable_releases_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/immutable-releases",
   )
 }
@@ -26983,9 +27436,9 @@ pub fn repos_enable_immutable_releases_request(
 ) -> @http.Request {
   @http.Request::put(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/immutable-releases",
   )
 }
@@ -26999,9 +27452,9 @@ pub fn repos_disable_immutable_releases_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/immutable-releases",
   )
 }
@@ -27015,9 +27468,9 @@ pub fn migrations_get_import_status_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/import",
   )
 }
@@ -27050,9 +27503,9 @@ pub fn migrations_start_import_request(
 ) -> @http.Request {
   @http.Request::put(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/import",
   ).json_body(Json(body))
 }
@@ -27085,9 +27538,9 @@ pub fn migrations_update_import_request(
 ) -> @http.Request {
   @http.Request::patch(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/import",
   ).json_body(Json(body))
 }
@@ -27119,9 +27572,9 @@ pub fn migrations_cancel_import_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/import",
   )
 }
@@ -27135,12 +27588,13 @@ pub fn migrations_get_commit_authors_request(
   since? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/import/authors"
   match since {
-    Some(value) => url = append_query(url, "since", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "since", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -27175,11 +27629,11 @@ pub fn migrations_map_commit_author_request(
 ) -> @http.Request {
   @http.Request::patch(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/import/authors/" +
-    percent_encode(parameter_value(author_id)),
+    @http.percent_encode(parameter_value(author_id)),
   ).json_body(Json(body))
 }
 
@@ -27210,9 +27664,9 @@ pub fn migrations_get_large_files_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/import/large_files",
   )
 }
@@ -27245,9 +27699,9 @@ pub fn migrations_set_lfs_preference_request(
 ) -> @http.Request {
   @http.Request::patch(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/import/lfs",
   ).json_body(Json(body))
 }
@@ -27279,9 +27733,9 @@ pub fn apps_get_repo_installation_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/installation",
   )
 }
@@ -27313,9 +27767,9 @@ pub fn interactions_get_restrictions_for_repo_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/interaction-limits",
   )
 }
@@ -27348,9 +27802,9 @@ pub fn interactions_set_restrictions_for_repo_request(
 ) -> @http.Request {
   @http.Request::put(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/interaction-limits",
   ).json_body(Json(body))
 }
@@ -27382,9 +27836,9 @@ pub fn interactions_remove_restrictions_for_repo_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/interaction-limits",
   )
 }
@@ -27398,9 +27852,9 @@ pub fn interactions_get_pull_request_bypass_list_for_repo_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/interaction-limits/pulls/bypass-list",
   )
 }
@@ -27433,9 +27887,9 @@ pub fn interactions_set_pull_request_bypass_list_for_repo_request(
 ) -> @http.Request {
   @http.Request::put(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/interaction-limits/pulls/bypass-list",
   ).json_body(Json(body))
 }
@@ -27450,9 +27904,9 @@ pub fn interactions_remove_pull_request_bypass_list_for_repo_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/interaction-limits/pulls/bypass-list",
   ).json_body(Json(body))
 }
@@ -27466,9 +27920,9 @@ pub fn interactions_get_pull_request_creation_cap_for_repo_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/interaction-limits/pulls/creation-cap",
   )
 }
@@ -27501,9 +27955,9 @@ pub fn interactions_update_pull_request_creation_cap_for_repo_request(
 ) -> @http.Request {
   @http.Request::patch(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/interaction-limits/pulls/creation-cap",
   ).json_body(Json(body))
 }
@@ -27536,16 +27990,17 @@ pub fn repos_list_invitations_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/invitations"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -27580,11 +28035,11 @@ pub fn repos_update_invitation_request(
 ) -> @http.Request {
   @http.Request::patch(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/invitations/" +
-    percent_encode(parameter_value(invitation_id)),
+    @http.percent_encode(parameter_value(invitation_id)),
   ).json_body(Json(body))
 }
 
@@ -27616,11 +28071,11 @@ pub fn repos_delete_invitation_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/invitations/" +
-    percent_encode(parameter_value(invitation_id)),
+    @http.percent_encode(parameter_value(invitation_id)),
   )
 }
 
@@ -27633,9 +28088,9 @@ pub fn repos_list_issue_types_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/issue-types",
   )
 }
@@ -27679,61 +28134,74 @@ pub fn issues_list_for_repo_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/issues"
   match milestone {
-    Some(value) => url = append_query(url, "milestone", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "milestone", parameter_value(value))
     None => ()
   }
   match state {
-    Some(value) => url = append_query(url, "state", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "state", parameter_value(value))
     None => ()
   }
   match assignee {
-    Some(value) => url = append_query(url, "assignee", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "assignee", parameter_value(value))
     None => ()
   }
   match type_ {
-    Some(value) => url = append_query(url, "type", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "type", parameter_value(value))
     None => ()
   }
   match creator {
-    Some(value) => url = append_query(url, "creator", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "creator", parameter_value(value))
     None => ()
   }
   match mentioned {
-    Some(value) => url = append_query(url, "mentioned", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "mentioned", parameter_value(value))
     None => ()
   }
   match issue_field_values {
     Some(value) =>
-      url = append_query(url, "issue_field_values", parameter_value(value))
+      url = @http.append_query(
+        url,
+        "issue_field_values",
+        parameter_value(value),
+      )
     None => ()
   }
   match labels {
-    Some(value) => url = append_query(url, "labels", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "labels", parameter_value(value))
     None => ()
   }
   match sort {
-    Some(value) => url = append_query(url, "sort", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "sort", parameter_value(value))
     None => ()
   }
   match direction {
-    Some(value) => url = append_query(url, "direction", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "direction", parameter_value(value))
     None => ()
   }
   match since {
-    Some(value) => url = append_query(url, "since", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "since", parameter_value(value))
     None => ()
   }
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -27767,9 +28235,9 @@ pub fn issues_create_request(
 ) -> @http.Request {
   @http.Request::post(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/issues",
   ).json_body(Json(body))
 }
@@ -27805,28 +28273,31 @@ pub fn issues_list_comments_for_repo_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/issues/comments"
   match sort {
-    Some(value) => url = append_query(url, "sort", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "sort", parameter_value(value))
     None => ()
   }
   match direction {
-    Some(value) => url = append_query(url, "direction", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "direction", parameter_value(value))
     None => ()
   }
   match since {
-    Some(value) => url = append_query(url, "since", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "since", parameter_value(value))
     None => ()
   }
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -27860,11 +28331,11 @@ pub fn issues_get_comment_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/issues/comments/" +
-    percent_encode(parameter_value(comment_id)),
+    @http.percent_encode(parameter_value(comment_id)),
   )
 }
 
@@ -27897,11 +28368,11 @@ pub fn issues_update_comment_request(
 ) -> @http.Request {
   @http.Request::patch(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/issues/comments/" +
-    percent_encode(parameter_value(comment_id)),
+    @http.percent_encode(parameter_value(comment_id)),
   ).json_body(Json(body))
 }
 
@@ -27933,11 +28404,11 @@ pub fn issues_delete_comment_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/issues/comments/" +
-    percent_encode(parameter_value(comment_id)),
+    @http.percent_encode(parameter_value(comment_id)),
   )
 }
 
@@ -27951,11 +28422,11 @@ pub fn issues_pin_comment_request(
 ) -> @http.Request {
   @http.Request::put(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/issues/comments/" +
-    percent_encode(parameter_value(comment_id)) +
+    @http.percent_encode(parameter_value(comment_id)) +
     "/pin",
   )
 }
@@ -27988,11 +28459,11 @@ pub fn issues_unpin_comment_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/issues/comments/" +
-    percent_encode(parameter_value(comment_id)) +
+    @http.percent_encode(parameter_value(comment_id)) +
     "/pin",
   )
 }
@@ -28009,22 +28480,24 @@ pub fn reactions_list_for_issue_comment_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/issues/comments/" +
-    percent_encode(parameter_value(comment_id)) +
+    @http.percent_encode(parameter_value(comment_id)) +
     "/reactions"
   match content {
-    Some(value) => url = append_query(url, "content", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "content", parameter_value(value))
     None => ()
   }
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -28059,11 +28532,11 @@ pub fn reactions_create_for_issue_comment_request(
 ) -> @http.Request {
   @http.Request::post(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/issues/comments/" +
-    percent_encode(parameter_value(comment_id)) +
+    @http.percent_encode(parameter_value(comment_id)) +
     "/reactions",
   ).json_body(Json(body))
 }
@@ -28097,13 +28570,13 @@ pub fn reactions_delete_for_issue_comment_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/issues/comments/" +
-    percent_encode(parameter_value(comment_id)) +
+    @http.percent_encode(parameter_value(comment_id)) +
     "/reactions/" +
-    percent_encode(parameter_value(reaction_id)),
+    @http.percent_encode(parameter_value(reaction_id)),
   )
 }
 
@@ -28117,16 +28590,17 @@ pub fn issues_list_events_for_repo_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/issues/events"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -28160,11 +28634,11 @@ pub fn issues_get_event_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/issues/events/" +
-    percent_encode(parameter_value(event_id)),
+    @http.percent_encode(parameter_value(event_id)),
   )
 }
 
@@ -28196,11 +28670,11 @@ pub fn issues_get_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/issues/" +
-    percent_encode(parameter_value(issue_number)),
+    @http.percent_encode(parameter_value(issue_number)),
   )
 }
 
@@ -28233,11 +28707,11 @@ pub fn issues_update_request(
 ) -> @http.Request {
   @http.Request::patch(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/issues/" +
-    percent_encode(parameter_value(issue_number)),
+    @http.percent_encode(parameter_value(issue_number)),
   ).json_body(Json(body))
 }
 
@@ -28270,11 +28744,11 @@ pub fn issues_add_assignees_request(
 ) -> @http.Request {
   @http.Request::post(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/issues/" +
-    percent_encode(parameter_value(issue_number)) +
+    @http.percent_encode(parameter_value(issue_number)) +
     "/assignees",
   ).json_body(Json(body))
 }
@@ -28308,11 +28782,11 @@ pub fn issues_remove_assignees_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/issues/" +
-    percent_encode(parameter_value(issue_number)) +
+    @http.percent_encode(parameter_value(issue_number)) +
     "/assignees",
   ).json_body(Json(body))
 }
@@ -28346,13 +28820,13 @@ pub fn issues_check_user_can_be_assigned_to_issue_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/issues/" +
-    percent_encode(parameter_value(issue_number)) +
+    @http.percent_encode(parameter_value(issue_number)) +
     "/assignees/" +
-    percent_encode(parameter_value(assignee)),
+    @http.percent_encode(parameter_value(assignee)),
   )
 }
 
@@ -28368,22 +28842,24 @@ pub fn issues_list_comments_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/issues/" +
-    percent_encode(parameter_value(issue_number)) +
+    @http.percent_encode(parameter_value(issue_number)) +
     "/comments"
   match since {
-    Some(value) => url = append_query(url, "since", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "since", parameter_value(value))
     None => ()
   }
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -28418,11 +28894,11 @@ pub fn issues_create_comment_request(
 ) -> @http.Request {
   @http.Request::post(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/issues/" +
-    percent_encode(parameter_value(issue_number)) +
+    @http.percent_encode(parameter_value(issue_number)) +
     "/comments",
   ).json_body(Json(body))
 }
@@ -28456,18 +28932,19 @@ pub fn issues_list_dependencies_blocked_by_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/issues/" +
-    percent_encode(parameter_value(issue_number)) +
+    @http.percent_encode(parameter_value(issue_number)) +
     "/dependencies/blocked_by"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -28502,11 +28979,11 @@ pub fn issues_add_blocked_by_dependency_request(
 ) -> @http.Request {
   @http.Request::post(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/issues/" +
-    percent_encode(parameter_value(issue_number)) +
+    @http.percent_encode(parameter_value(issue_number)) +
     "/dependencies/blocked_by",
   ).json_body(Json(body))
 }
@@ -28540,13 +29017,13 @@ pub fn issues_remove_dependency_blocked_by_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/issues/" +
-    percent_encode(parameter_value(issue_number)) +
+    @http.percent_encode(parameter_value(issue_number)) +
     "/dependencies/blocked_by/" +
-    percent_encode(parameter_value(issue_id)),
+    @http.percent_encode(parameter_value(issue_id)),
   )
 }
 
@@ -28579,18 +29056,19 @@ pub fn issues_list_dependencies_blocking_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/issues/" +
-    percent_encode(parameter_value(issue_number)) +
+    @http.percent_encode(parameter_value(issue_number)) +
     "/dependencies/blocking"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -28625,18 +29103,19 @@ pub fn issues_list_events_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/issues/" +
-    percent_encode(parameter_value(issue_number)) +
+    @http.percent_encode(parameter_value(issue_number)) +
     "/events"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -28671,18 +29150,19 @@ pub fn issues_list_issue_field_values_for_issue_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/issues/" +
-    percent_encode(parameter_value(issue_number)) +
+    @http.percent_encode(parameter_value(issue_number)) +
     "/issue-field-values"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -28717,11 +29197,11 @@ pub fn issues_add_issue_field_values_request(
 ) -> @http.Request {
   @http.Request::post(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/issues/" +
-    percent_encode(parameter_value(issue_number)) +
+    @http.percent_encode(parameter_value(issue_number)) +
     "/issue-field-values",
   ).json_body(Json(body))
 }
@@ -28755,11 +29235,11 @@ pub fn issues_set_issue_field_values_request(
 ) -> @http.Request {
   @http.Request::put(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/issues/" +
-    percent_encode(parameter_value(issue_number)) +
+    @http.percent_encode(parameter_value(issue_number)) +
     "/issue-field-values",
   ).json_body(Json(body))
 }
@@ -28793,13 +29273,13 @@ pub fn issues_delete_issue_field_value_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/issues/" +
-    percent_encode(parameter_value(issue_number)) +
+    @http.percent_encode(parameter_value(issue_number)) +
     "/issue-field-values/" +
-    percent_encode(parameter_value(issue_field_id)),
+    @http.percent_encode(parameter_value(issue_field_id)),
   )
 }
 
@@ -28814,18 +29294,19 @@ pub fn issues_list_labels_on_issue_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/issues/" +
-    percent_encode(parameter_value(issue_number)) +
+    @http.percent_encode(parameter_value(issue_number)) +
     "/labels"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -28860,11 +29341,11 @@ pub fn issues_add_labels_request(
 ) -> @http.Request {
   @http.Request::post(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/issues/" +
-    percent_encode(parameter_value(issue_number)) +
+    @http.percent_encode(parameter_value(issue_number)) +
     "/labels",
   ).json_body(Json(body))
 }
@@ -28898,11 +29379,11 @@ pub fn issues_set_labels_request(
 ) -> @http.Request {
   @http.Request::put(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/issues/" +
-    percent_encode(parameter_value(issue_number)) +
+    @http.percent_encode(parameter_value(issue_number)) +
     "/labels",
   ).json_body(body)
 }
@@ -28935,11 +29416,11 @@ pub fn issues_remove_all_labels_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/issues/" +
-    percent_encode(parameter_value(issue_number)) +
+    @http.percent_encode(parameter_value(issue_number)) +
     "/labels",
   )
 }
@@ -28955,13 +29436,13 @@ pub fn issues_remove_label_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/issues/" +
-    percent_encode(parameter_value(issue_number)) +
+    @http.percent_encode(parameter_value(issue_number)) +
     "/labels/" +
-    percent_encode(parameter_value(name)),
+    @http.percent_encode(parameter_value(name)),
   )
 }
 
@@ -28994,11 +29475,11 @@ pub fn issues_lock_request(
 ) -> @http.Request {
   @http.Request::put(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/issues/" +
-    percent_encode(parameter_value(issue_number)) +
+    @http.percent_encode(parameter_value(issue_number)) +
     "/lock",
   ).json_body(Json(body))
 }
@@ -29013,11 +29494,11 @@ pub fn issues_unlock_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/issues/" +
-    percent_encode(parameter_value(issue_number)) +
+    @http.percent_encode(parameter_value(issue_number)) +
     "/lock",
   )
 }
@@ -29032,11 +29513,11 @@ pub fn issues_get_parent_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/issues/" +
-    percent_encode(parameter_value(issue_number)) +
+    @http.percent_encode(parameter_value(issue_number)) +
     "/parent",
   )
 }
@@ -29071,22 +29552,24 @@ pub fn reactions_list_for_issue_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/issues/" +
-    percent_encode(parameter_value(issue_number)) +
+    @http.percent_encode(parameter_value(issue_number)) +
     "/reactions"
   match content {
-    Some(value) => url = append_query(url, "content", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "content", parameter_value(value))
     None => ()
   }
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -29121,11 +29604,11 @@ pub fn reactions_create_for_issue_request(
 ) -> @http.Request {
   @http.Request::post(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/issues/" +
-    percent_encode(parameter_value(issue_number)) +
+    @http.percent_encode(parameter_value(issue_number)) +
     "/reactions",
   ).json_body(Json(body))
 }
@@ -29159,13 +29642,13 @@ pub fn reactions_delete_for_issue_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/issues/" +
-    percent_encode(parameter_value(issue_number)) +
+    @http.percent_encode(parameter_value(issue_number)) +
     "/reactions/" +
-    percent_encode(parameter_value(reaction_id)),
+    @http.percent_encode(parameter_value(reaction_id)),
   )
 }
 
@@ -29180,18 +29663,19 @@ pub fn issues_list_relates_to_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/issues/" +
-    percent_encode(parameter_value(issue_number)) +
+    @http.percent_encode(parameter_value(issue_number)) +
     "/relates_to"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -29226,11 +29710,11 @@ pub fn issues_add_relates_to_request(
 ) -> @http.Request {
   @http.Request::post(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/issues/" +
-    percent_encode(parameter_value(issue_number)) +
+    @http.percent_encode(parameter_value(issue_number)) +
     "/relates_to",
   ).json_body(Json(body))
 }
@@ -29264,13 +29748,13 @@ pub fn issues_remove_relates_to_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/issues/" +
-    percent_encode(parameter_value(issue_number)) +
+    @http.percent_encode(parameter_value(issue_number)) +
     "/relates_to/" +
-    percent_encode(parameter_value(issue_id)),
+    @http.percent_encode(parameter_value(issue_id)),
   )
 }
 
@@ -29303,11 +29787,11 @@ pub fn issues_remove_sub_issue_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/issues/" +
-    percent_encode(parameter_value(issue_number)) +
+    @http.percent_encode(parameter_value(issue_number)) +
     "/sub_issue",
   ).json_body(Json(body))
 }
@@ -29341,18 +29825,19 @@ pub fn issues_list_sub_issues_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/issues/" +
-    percent_encode(parameter_value(issue_number)) +
+    @http.percent_encode(parameter_value(issue_number)) +
     "/sub_issues"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -29387,11 +29872,11 @@ pub fn issues_add_sub_issue_request(
 ) -> @http.Request {
   @http.Request::post(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/issues/" +
-    percent_encode(parameter_value(issue_number)) +
+    @http.percent_encode(parameter_value(issue_number)) +
     "/sub_issues",
   ).json_body(Json(body))
 }
@@ -29425,11 +29910,11 @@ pub fn issues_reprioritize_sub_issue_request(
 ) -> @http.Request {
   @http.Request::patch(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/issues/" +
-    percent_encode(parameter_value(issue_number)) +
+    @http.percent_encode(parameter_value(issue_number)) +
     "/sub_issues/priority",
   ).json_body(Json(body))
 }
@@ -29465,26 +29950,29 @@ pub fn issues_list_suggestions_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/issues/" +
-    percent_encode(parameter_value(issue_number)) +
+    @http.percent_encode(parameter_value(issue_number)) +
     "/suggestions"
   match state {
-    Some(value) => url = append_query(url, "state", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "state", parameter_value(value))
     None => ()
   }
   match action {
-    Some(value) => url = append_query(url, "action", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "action", parameter_value(value))
     None => ()
   }
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -29519,13 +30007,13 @@ pub fn issues_approve_suggestion_request(
 ) -> @http.Request {
   @http.Request::post(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/issues/" +
-    percent_encode(parameter_value(issue_number)) +
+    @http.percent_encode(parameter_value(issue_number)) +
     "/suggestions/" +
-    percent_encode(parameter_value(suggestion_id)) +
+    @http.percent_encode(parameter_value(suggestion_id)) +
     "/approve",
   )
 }
@@ -29559,13 +30047,13 @@ pub fn issues_dismiss_suggestion_request(
 ) -> @http.Request {
   @http.Request::post(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/issues/" +
-    percent_encode(parameter_value(issue_number)) +
+    @http.percent_encode(parameter_value(issue_number)) +
     "/suggestions/" +
-    percent_encode(parameter_value(suggestion_id)) +
+    @http.percent_encode(parameter_value(suggestion_id)) +
     "/dismiss",
   )
 }
@@ -29600,22 +30088,24 @@ pub fn issues_list_events_for_timeline_request(
   exclude? : String,
 ) -> @http.Request {
   let mut url = "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/issues/" +
-    percent_encode(parameter_value(issue_number)) +
+    @http.percent_encode(parameter_value(issue_number)) +
     "/timeline"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   match exclude {
-    Some(value) => url = append_query(url, "exclude", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "exclude", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -29649,16 +30139,17 @@ pub fn repos_list_deploy_keys_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/keys"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -29692,9 +30183,9 @@ pub fn repos_create_deploy_key_request(
 ) -> @http.Request {
   @http.Request::post(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/keys",
   ).json_body(Json(body))
 }
@@ -29727,11 +30218,11 @@ pub fn repos_get_deploy_key_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/keys/" +
-    percent_encode(parameter_value(key_id)),
+    @http.percent_encode(parameter_value(key_id)),
   )
 }
 
@@ -29763,11 +30254,11 @@ pub fn repos_delete_deploy_key_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/keys/" +
-    percent_encode(parameter_value(key_id)),
+    @http.percent_encode(parameter_value(key_id)),
   )
 }
 
@@ -29781,16 +30272,17 @@ pub fn issues_list_labels_for_repo_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/labels"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -29824,9 +30316,9 @@ pub fn issues_create_label_request(
 ) -> @http.Request {
   @http.Request::post(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/labels",
   ).json_body(Json(body))
 }
@@ -29859,11 +30351,11 @@ pub fn issues_get_label_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/labels/" +
-    percent_encode(parameter_value(name)),
+    @http.percent_encode(parameter_value(name)),
   )
 }
 
@@ -29896,11 +30388,11 @@ pub fn issues_update_label_request(
 ) -> @http.Request {
   @http.Request::patch(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/labels/" +
-    percent_encode(parameter_value(name)),
+    @http.percent_encode(parameter_value(name)),
   ).json_body(Json(body))
 }
 
@@ -29932,11 +30424,11 @@ pub fn issues_delete_label_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/labels/" +
-    percent_encode(parameter_value(name)),
+    @http.percent_encode(parameter_value(name)),
   )
 }
 
@@ -29949,9 +30441,9 @@ pub fn repos_list_languages_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/languages",
   )
 }
@@ -29983,12 +30475,12 @@ pub fn licenses_get_for_repo_request(
   ref_? : String,
 ) -> @http.Request {
   let mut url = "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/license"
   match ref_ {
-    Some(value) => url = append_query(url, "ref", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "ref", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -30022,9 +30514,9 @@ pub fn repos_merge_upstream_request(
 ) -> @http.Request {
   @http.Request::post(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/merge-upstream",
   ).json_body(Json(body))
 }
@@ -30057,9 +30549,9 @@ pub fn repos_merge_request(
 ) -> @http.Request {
   @http.Request::post(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/merges",
   ).json_body(Json(body))
 }
@@ -30095,28 +30587,31 @@ pub fn issues_list_milestones_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/milestones"
   match state {
-    Some(value) => url = append_query(url, "state", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "state", parameter_value(value))
     None => ()
   }
   match sort {
-    Some(value) => url = append_query(url, "sort", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "sort", parameter_value(value))
     None => ()
   }
   match direction {
-    Some(value) => url = append_query(url, "direction", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "direction", parameter_value(value))
     None => ()
   }
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -30150,9 +30645,9 @@ pub fn issues_create_milestone_request(
 ) -> @http.Request {
   @http.Request::post(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/milestones",
   ).json_body(Json(body))
 }
@@ -30185,11 +30680,11 @@ pub fn issues_get_milestone_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/milestones/" +
-    percent_encode(parameter_value(milestone_number)),
+    @http.percent_encode(parameter_value(milestone_number)),
   )
 }
 
@@ -30222,11 +30717,11 @@ pub fn issues_update_milestone_request(
 ) -> @http.Request {
   @http.Request::patch(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/milestones/" +
-    percent_encode(parameter_value(milestone_number)),
+    @http.percent_encode(parameter_value(milestone_number)),
   ).json_body(Json(body))
 }
 
@@ -30258,11 +30753,11 @@ pub fn issues_delete_milestone_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/milestones/" +
-    percent_encode(parameter_value(milestone_number)),
+    @http.percent_encode(parameter_value(milestone_number)),
   )
 }
 
@@ -30277,18 +30772,19 @@ pub fn issues_list_labels_for_milestone_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/milestones/" +
-    percent_encode(parameter_value(milestone_number)) +
+    @http.percent_encode(parameter_value(milestone_number)) +
     "/labels"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -30326,33 +30822,36 @@ pub fn activity_list_repo_notifications_for_authenticated_user_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/notifications"
   match all {
-    Some(value) => url = append_query(url, "all", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "all", parameter_value(value))
     None => ()
   }
   match participating {
     Some(value) =>
-      url = append_query(url, "participating", parameter_value(value))
+      url = @http.append_query(url, "participating", parameter_value(value))
     None => ()
   }
   match since {
-    Some(value) => url = append_query(url, "since", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "since", parameter_value(value))
     None => ()
   }
   match before {
-    Some(value) => url = append_query(url, "before", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "before", parameter_value(value))
     None => ()
   }
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -30386,9 +30885,9 @@ pub fn activity_mark_repo_notifications_as_read_request(
 ) -> @http.Request {
   @http.Request::put(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/notifications",
   ).json_body(Json(body))
 }
@@ -30417,9 +30916,9 @@ pub fn activity_mark_repo_notifications_as_read_decode(
 pub fn repos_get_pages_request(owner : String, repo : String) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/pages",
   )
 }
@@ -30452,9 +30951,9 @@ pub fn repos_create_pages_site_request(
 ) -> @http.Request {
   @http.Request::post(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/pages",
   ).json_body(Json(body))
 }
@@ -30487,9 +30986,9 @@ pub fn repos_update_information_about_pages_site_request(
 ) -> @http.Request {
   @http.Request::put(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/pages",
   ).json_body(Json(body))
 }
@@ -30503,9 +31002,9 @@ pub fn repos_delete_pages_site_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/pages",
   )
 }
@@ -30520,16 +31019,17 @@ pub fn repos_list_pages_builds_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/pages/builds"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -30562,9 +31062,9 @@ pub fn repos_request_pages_build_request(
 ) -> @http.Request {
   @http.Request::post(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/pages/builds",
   )
 }
@@ -30596,9 +31096,9 @@ pub fn repos_get_latest_pages_build_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/pages/builds/latest",
   )
 }
@@ -30631,11 +31131,11 @@ pub fn repos_get_pages_build_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/pages/builds/" +
-    percent_encode(parameter_value(build_id)),
+    @http.percent_encode(parameter_value(build_id)),
   )
 }
 
@@ -30667,9 +31167,9 @@ pub fn repos_create_pages_deployment_request(
 ) -> @http.Request {
   @http.Request::post(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/pages/deployments",
   ).json_body(Json(body))
 }
@@ -30702,11 +31202,11 @@ pub fn repos_get_pages_deployment_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/pages/deployments/" +
-    percent_encode(parameter_value(pages_deployment_id)),
+    @http.percent_encode(parameter_value(pages_deployment_id)),
   )
 }
 
@@ -30738,11 +31238,11 @@ pub fn repos_cancel_pages_deployment_request(
 ) -> @http.Request {
   @http.Request::post(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/pages/deployments/" +
-    percent_encode(parameter_value(pages_deployment_id)) +
+    @http.percent_encode(parameter_value(pages_deployment_id)) +
     "/cancel",
   )
 }
@@ -30756,9 +31256,9 @@ pub fn repos_get_pages_health_check_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/pages/health",
   )
 }
@@ -30790,9 +31290,9 @@ pub fn repos_check_private_vulnerability_reporting_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/private-vulnerability-reporting",
   )
 }
@@ -30824,9 +31324,9 @@ pub fn repos_enable_private_vulnerability_reporting_request(
 ) -> @http.Request {
   @http.Request::put(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/private-vulnerability-reporting",
   )
 }
@@ -30840,9 +31340,9 @@ pub fn repos_disable_private_vulnerability_reporting_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/private-vulnerability-reporting",
   )
 }
@@ -30856,9 +31356,9 @@ pub fn repos_custom_properties_for_repos_get_repository_values_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/properties/values",
   )
 }
@@ -30891,9 +31391,9 @@ pub fn repos_custom_properties_for_repos_create_or_update_repository_values_requ
 ) -> @http.Request {
   @http.Request::patch(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/properties/values",
   ).json_body(Json(body))
 }
@@ -30913,36 +31413,39 @@ pub fn pulls_list_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/pulls"
   match state {
-    Some(value) => url = append_query(url, "state", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "state", parameter_value(value))
     None => ()
   }
   match head {
-    Some(value) => url = append_query(url, "head", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "head", parameter_value(value))
     None => ()
   }
   match base {
-    Some(value) => url = append_query(url, "base", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "base", parameter_value(value))
     None => ()
   }
   match sort {
-    Some(value) => url = append_query(url, "sort", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "sort", parameter_value(value))
     None => ()
   }
   match direction {
-    Some(value) => url = append_query(url, "direction", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "direction", parameter_value(value))
     None => ()
   }
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -30976,9 +31479,9 @@ pub fn pulls_create_request(
 ) -> @http.Request {
   @http.Request::post(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/pulls",
   ).json_body(Json(body))
 }
@@ -31014,28 +31517,31 @@ pub fn pulls_list_review_comments_for_repo_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/pulls/comments"
   match sort {
-    Some(value) => url = append_query(url, "sort", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "sort", parameter_value(value))
     None => ()
   }
   match direction {
-    Some(value) => url = append_query(url, "direction", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "direction", parameter_value(value))
     None => ()
   }
   match since {
-    Some(value) => url = append_query(url, "since", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "since", parameter_value(value))
     None => ()
   }
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -31069,11 +31575,11 @@ pub fn pulls_get_review_comment_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/pulls/comments/" +
-    percent_encode(parameter_value(comment_id)),
+    @http.percent_encode(parameter_value(comment_id)),
   )
 }
 
@@ -31106,11 +31612,11 @@ pub fn pulls_update_review_comment_request(
 ) -> @http.Request {
   @http.Request::patch(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/pulls/comments/" +
-    percent_encode(parameter_value(comment_id)),
+    @http.percent_encode(parameter_value(comment_id)),
   ).json_body(Json(body))
 }
 
@@ -31142,11 +31648,11 @@ pub fn pulls_delete_review_comment_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/pulls/comments/" +
-    percent_encode(parameter_value(comment_id)),
+    @http.percent_encode(parameter_value(comment_id)),
   )
 }
 
@@ -31162,22 +31668,24 @@ pub fn reactions_list_for_pull_request_review_comment_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/pulls/comments/" +
-    percent_encode(parameter_value(comment_id)) +
+    @http.percent_encode(parameter_value(comment_id)) +
     "/reactions"
   match content {
-    Some(value) => url = append_query(url, "content", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "content", parameter_value(value))
     None => ()
   }
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -31212,11 +31720,11 @@ pub fn reactions_create_for_pull_request_review_comment_request(
 ) -> @http.Request {
   @http.Request::post(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/pulls/comments/" +
-    percent_encode(parameter_value(comment_id)) +
+    @http.percent_encode(parameter_value(comment_id)) +
     "/reactions",
   ).json_body(Json(body))
 }
@@ -31250,13 +31758,13 @@ pub fn reactions_delete_for_pull_request_comment_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/pulls/comments/" +
-    percent_encode(parameter_value(comment_id)) +
+    @http.percent_encode(parameter_value(comment_id)) +
     "/reactions/" +
-    percent_encode(parameter_value(reaction_id)),
+    @http.percent_encode(parameter_value(reaction_id)),
   )
 }
 
@@ -31270,11 +31778,11 @@ pub fn pulls_get_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/pulls/" +
-    percent_encode(parameter_value(pull_number)),
+    @http.percent_encode(parameter_value(pull_number)),
   )
 }
 
@@ -31307,11 +31815,11 @@ pub fn pulls_update_request(
 ) -> @http.Request {
   @http.Request::patch(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/pulls/" +
-    percent_encode(parameter_value(pull_number)),
+    @http.percent_encode(parameter_value(pull_number)),
   ).json_body(Json(body))
 }
 
@@ -31344,11 +31852,11 @@ pub fn codespaces_create_with_pr_for_authenticated_user_request(
 ) -> @http.Request {
   @http.Request::post(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/pulls/" +
-    percent_encode(parameter_value(pull_number)) +
+    @http.percent_encode(parameter_value(pull_number)) +
     "/codespaces",
   ).json_body(Json(body))
 }
@@ -31385,30 +31893,33 @@ pub fn pulls_list_review_comments_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/pulls/" +
-    percent_encode(parameter_value(pull_number)) +
+    @http.percent_encode(parameter_value(pull_number)) +
     "/comments"
   match sort {
-    Some(value) => url = append_query(url, "sort", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "sort", parameter_value(value))
     None => ()
   }
   match direction {
-    Some(value) => url = append_query(url, "direction", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "direction", parameter_value(value))
     None => ()
   }
   match since {
-    Some(value) => url = append_query(url, "since", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "since", parameter_value(value))
     None => ()
   }
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -31443,11 +31954,11 @@ pub fn pulls_create_review_comment_request(
 ) -> @http.Request {
   @http.Request::post(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/pulls/" +
-    percent_encode(parameter_value(pull_number)) +
+    @http.percent_encode(parameter_value(pull_number)) +
     "/comments",
   ).json_body(Json(body))
 }
@@ -31482,13 +31993,13 @@ pub fn pulls_create_reply_for_review_comment_request(
 ) -> @http.Request {
   @http.Request::post(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/pulls/" +
-    percent_encode(parameter_value(pull_number)) +
+    @http.percent_encode(parameter_value(pull_number)) +
     "/comments/" +
-    percent_encode(parameter_value(comment_id)) +
+    @http.percent_encode(parameter_value(comment_id)) +
     "/replies",
   ).json_body(Json(body))
 }
@@ -31522,18 +32033,19 @@ pub fn pulls_list_commits_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/pulls/" +
-    percent_encode(parameter_value(pull_number)) +
+    @http.percent_encode(parameter_value(pull_number)) +
     "/commits"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -31568,18 +32080,19 @@ pub fn pulls_list_files_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/pulls/" +
-    percent_encode(parameter_value(pull_number)) +
+    @http.percent_encode(parameter_value(pull_number)) +
     "/files"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -31613,11 +32126,11 @@ pub fn pulls_check_if_merged_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/pulls/" +
-    percent_encode(parameter_value(pull_number)) +
+    @http.percent_encode(parameter_value(pull_number)) +
     "/merge",
   )
 }
@@ -31633,11 +32146,11 @@ pub fn pulls_merge_request(
 ) -> @http.Request {
   @http.Request::put(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/pulls/" +
-    percent_encode(parameter_value(pull_number)) +
+    @http.percent_encode(parameter_value(pull_number)) +
     "/merge",
   ).json_body(Json(body))
 }
@@ -31671,11 +32184,11 @@ pub fn pulls_merge_async_request(
 ) -> @http.Request {
   @http.Request::put(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/pulls/" +
-    percent_encode(parameter_value(pull_number)) +
+    @http.percent_encode(parameter_value(pull_number)) +
     "/merge-async",
   ).json_body(Json(body))
 }
@@ -31709,13 +32222,13 @@ pub fn pulls_get_merge_async_result_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/pulls/" +
-    percent_encode(parameter_value(pull_number)) +
+    @http.percent_encode(parameter_value(pull_number)) +
     "/merge-async/" +
-    percent_encode(parameter_value(uuid)),
+    @http.percent_encode(parameter_value(uuid)),
   )
 }
 
@@ -31747,11 +32260,11 @@ pub fn pulls_list_requested_reviewers_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/pulls/" +
-    percent_encode(parameter_value(pull_number)) +
+    @http.percent_encode(parameter_value(pull_number)) +
     "/requested_reviewers",
   )
 }
@@ -31785,11 +32298,11 @@ pub fn pulls_request_reviewers_request(
 ) -> @http.Request {
   @http.Request::post(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/pulls/" +
-    percent_encode(parameter_value(pull_number)) +
+    @http.percent_encode(parameter_value(pull_number)) +
     "/requested_reviewers",
   ).json_body(Json(body))
 }
@@ -31823,11 +32336,11 @@ pub fn pulls_remove_requested_reviewers_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/pulls/" +
-    percent_encode(parameter_value(pull_number)) +
+    @http.percent_encode(parameter_value(pull_number)) +
     "/requested_reviewers",
   ).json_body(Json(body))
 }
@@ -31861,11 +32374,11 @@ pub fn pulls_rerequest_reviewers_request(
 ) -> @http.Request {
   @http.Request::post(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/pulls/" +
-    percent_encode(parameter_value(pull_number)) +
+    @http.percent_encode(parameter_value(pull_number)) +
     "/requested_reviewers/rerequest",
   ).json_body(Json(body))
 }
@@ -31899,18 +32412,19 @@ pub fn pulls_list_reviews_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/pulls/" +
-    percent_encode(parameter_value(pull_number)) +
+    @http.percent_encode(parameter_value(pull_number)) +
     "/reviews"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -31945,11 +32459,11 @@ pub fn pulls_create_review_request(
 ) -> @http.Request {
   @http.Request::post(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/pulls/" +
-    percent_encode(parameter_value(pull_number)) +
+    @http.percent_encode(parameter_value(pull_number)) +
     "/reviews",
   ).json_body(Json(body))
 }
@@ -31983,13 +32497,13 @@ pub fn pulls_get_review_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/pulls/" +
-    percent_encode(parameter_value(pull_number)) +
+    @http.percent_encode(parameter_value(pull_number)) +
     "/reviews/" +
-    percent_encode(parameter_value(review_id)),
+    @http.percent_encode(parameter_value(review_id)),
   )
 }
 
@@ -32023,13 +32537,13 @@ pub fn pulls_update_review_request(
 ) -> @http.Request {
   @http.Request::put(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/pulls/" +
-    percent_encode(parameter_value(pull_number)) +
+    @http.percent_encode(parameter_value(pull_number)) +
     "/reviews/" +
-    percent_encode(parameter_value(review_id)),
+    @http.percent_encode(parameter_value(review_id)),
   ).json_body(Json(body))
 }
 
@@ -32062,13 +32576,13 @@ pub fn pulls_delete_pending_review_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/pulls/" +
-    percent_encode(parameter_value(pull_number)) +
+    @http.percent_encode(parameter_value(pull_number)) +
     "/reviews/" +
-    percent_encode(parameter_value(review_id)),
+    @http.percent_encode(parameter_value(review_id)),
   )
 }
 
@@ -32102,20 +32616,21 @@ pub fn pulls_list_comments_for_review_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/pulls/" +
-    percent_encode(parameter_value(pull_number)) +
+    @http.percent_encode(parameter_value(pull_number)) +
     "/reviews/" +
-    percent_encode(parameter_value(review_id)) +
+    @http.percent_encode(parameter_value(review_id)) +
     "/comments"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -32151,13 +32666,13 @@ pub fn pulls_dismiss_review_request(
 ) -> @http.Request {
   @http.Request::put(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/pulls/" +
-    percent_encode(parameter_value(pull_number)) +
+    @http.percent_encode(parameter_value(pull_number)) +
     "/reviews/" +
-    percent_encode(parameter_value(review_id)) +
+    @http.percent_encode(parameter_value(review_id)) +
     "/dismissals",
   ).json_body(Json(body))
 }
@@ -32192,13 +32707,13 @@ pub fn pulls_submit_review_request(
 ) -> @http.Request {
   @http.Request::post(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/pulls/" +
-    percent_encode(parameter_value(pull_number)) +
+    @http.percent_encode(parameter_value(pull_number)) +
     "/reviews/" +
-    percent_encode(parameter_value(review_id)) +
+    @http.percent_encode(parameter_value(review_id)) +
     "/events",
   ).json_body(Json(body))
 }
@@ -32232,11 +32747,11 @@ pub fn pulls_update_branch_request(
 ) -> @http.Request {
   @http.Request::put(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/pulls/" +
-    percent_encode(parameter_value(pull_number)) +
+    @http.percent_encode(parameter_value(pull_number)) +
     "/update-branch",
   ).json_body(Json(body))
 }
@@ -32268,12 +32783,12 @@ pub fn repos_get_readme_request(
   ref_? : String,
 ) -> @http.Request {
   let mut url = "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/readme"
   match ref_ {
-    Some(value) => url = append_query(url, "ref", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "ref", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -32307,13 +32822,13 @@ pub fn repos_get_readme_in_directory_request(
   ref_? : String,
 ) -> @http.Request {
   let mut url = "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/readme/" +
-    percent_encode_segments(parameter_value(dir))
+    @http.percent_encode_path(parameter_value(dir))
   match ref_ {
-    Some(value) => url = append_query(url, "ref", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "ref", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -32347,16 +32862,17 @@ pub fn repos_list_releases_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/releases"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -32390,9 +32906,9 @@ pub fn repos_create_release_request(
 ) -> @http.Request {
   @http.Request::post(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/releases",
   ).json_body(Json(body))
 }
@@ -32425,11 +32941,11 @@ pub fn repos_get_release_asset_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/releases/assets/" +
-    percent_encode(parameter_value(asset_id)),
+    @http.percent_encode(parameter_value(asset_id)),
   )
 }
 
@@ -32462,11 +32978,11 @@ pub fn repos_update_release_asset_request(
 ) -> @http.Request {
   @http.Request::patch(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/releases/assets/" +
-    percent_encode(parameter_value(asset_id)),
+    @http.percent_encode(parameter_value(asset_id)),
   ).json_body(Json(body))
 }
 
@@ -32498,11 +33014,11 @@ pub fn repos_delete_release_asset_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/releases/assets/" +
-    percent_encode(parameter_value(asset_id)),
+    @http.percent_encode(parameter_value(asset_id)),
   )
 }
 
@@ -32516,9 +33032,9 @@ pub fn repos_generate_release_notes_request(
 ) -> @http.Request {
   @http.Request::post(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/releases/generate-notes",
   ).json_body(Json(body))
 }
@@ -32550,9 +33066,9 @@ pub fn repos_get_latest_release_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/releases/latest",
   )
 }
@@ -32585,11 +33101,11 @@ pub fn repos_get_release_by_tag_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/releases/tags/" +
-    percent_encode_segments(parameter_value(tag)),
+    @http.percent_encode_path(parameter_value(tag)),
   )
 }
 
@@ -32621,11 +33137,11 @@ pub fn repos_get_release_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/releases/" +
-    percent_encode(parameter_value(release_id)),
+    @http.percent_encode(parameter_value(release_id)),
   )
 }
 
@@ -32658,11 +33174,11 @@ pub fn repos_update_release_request(
 ) -> @http.Request {
   @http.Request::patch(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/releases/" +
-    percent_encode(parameter_value(release_id)),
+    @http.percent_encode(parameter_value(release_id)),
   ).json_body(Json(body))
 }
 
@@ -32694,11 +33210,11 @@ pub fn repos_delete_release_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/releases/" +
-    percent_encode(parameter_value(release_id)),
+    @http.percent_encode(parameter_value(release_id)),
   )
 }
 
@@ -32713,18 +33229,19 @@ pub fn repos_list_release_assets_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/releases/" +
-    percent_encode(parameter_value(release_id)) +
+    @http.percent_encode(parameter_value(release_id)) +
     "/assets"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -32759,15 +33276,16 @@ pub fn repos_upload_release_asset_request(
   label? : String,
 ) -> @http.Request {
   let mut url = "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/releases/" +
-    percent_encode(parameter_value(release_id)) +
+    @http.percent_encode(parameter_value(release_id)) +
     "/assets"
-  url = append_query(url, "name", parameter_value(name))
+  url = @http.append_query(url, "name", parameter_value(name))
   match label {
-    Some(value) => url = append_query(url, "label", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "label", parameter_value(value))
     None => ()
   }
   @http.Request::post(url)
@@ -32803,22 +33321,24 @@ pub fn reactions_list_for_release_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/releases/" +
-    percent_encode(parameter_value(release_id)) +
+    @http.percent_encode(parameter_value(release_id)) +
     "/reactions"
   match content {
-    Some(value) => url = append_query(url, "content", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "content", parameter_value(value))
     None => ()
   }
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -32853,11 +33373,11 @@ pub fn reactions_create_for_release_request(
 ) -> @http.Request {
   @http.Request::post(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/releases/" +
-    percent_encode(parameter_value(release_id)) +
+    @http.percent_encode(parameter_value(release_id)) +
     "/reactions",
   ).json_body(Json(body))
 }
@@ -32891,13 +33411,13 @@ pub fn reactions_delete_for_release_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/releases/" +
-    percent_encode(parameter_value(release_id)) +
+    @http.percent_encode(parameter_value(release_id)) +
     "/reactions/" +
-    percent_encode(parameter_value(reaction_id)),
+    @http.percent_encode(parameter_value(reaction_id)),
   )
 }
 
@@ -32912,17 +33432,18 @@ pub fn repos_get_branch_rules_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/rules/branches/" +
-    percent_encode_segments(parameter_value(branch))
+    @http.percent_encode_path(parameter_value(branch))
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -32958,25 +33479,27 @@ pub fn repos_get_repo_rulesets_request(
   targets? : String,
 ) -> @http.Request {
   let mut url = "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/rulesets"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   match includes_parents {
     Some(value) =>
-      url = append_query(url, "includes_parents", parameter_value(value))
+      url = @http.append_query(url, "includes_parents", parameter_value(value))
     None => ()
   }
   match targets {
-    Some(value) => url = append_query(url, "targets", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "targets", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -33010,9 +33533,9 @@ pub fn repos_create_repo_ruleset_request(
 ) -> @http.Request {
   @http.Request::post(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/rulesets",
   ).json_body(Json(body))
 }
@@ -33050,39 +33573,41 @@ pub fn repos_get_repo_rule_suites_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/rulesets/rule-suites"
   match ref_ {
-    Some(value) => url = append_query(url, "ref", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "ref", parameter_value(value))
     None => ()
   }
   match time_period {
     Some(value) =>
-      url = append_query(url, "time_period", parameter_value(value))
+      url = @http.append_query(url, "time_period", parameter_value(value))
     None => ()
   }
   match actor_name {
-    Some(value) => url = append_query(url, "actor_name", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "actor_name", parameter_value(value))
     None => ()
   }
   match rule_suite_result {
     Some(value) =>
-      url = append_query(url, "rule_suite_result", parameter_value(value))
+      url = @http.append_query(url, "rule_suite_result", parameter_value(value))
     None => ()
   }
   match evaluate_status {
     Some(value) =>
-      url = append_query(url, "evaluate_status", parameter_value(value))
+      url = @http.append_query(url, "evaluate_status", parameter_value(value))
     None => ()
   }
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -33116,11 +33641,11 @@ pub fn repos_get_repo_rule_suite_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/rulesets/rule-suites/" +
-    percent_encode(parameter_value(rule_suite_id)),
+    @http.percent_encode(parameter_value(rule_suite_id)),
   )
 }
 
@@ -33152,14 +33677,14 @@ pub fn repos_get_repo_ruleset_request(
   includes_parents? : Bool,
 ) -> @http.Request {
   let mut url = "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/rulesets/" +
-    percent_encode(parameter_value(ruleset_id))
+    @http.percent_encode(parameter_value(ruleset_id))
   match includes_parents {
     Some(value) =>
-      url = append_query(url, "includes_parents", parameter_value(value))
+      url = @http.append_query(url, "includes_parents", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -33194,11 +33719,11 @@ pub fn repos_update_repo_ruleset_request(
 ) -> @http.Request {
   @http.Request::put(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/rulesets/" +
-    percent_encode(parameter_value(ruleset_id)),
+    @http.percent_encode(parameter_value(ruleset_id)),
   ).json_body(Json(body))
 }
 
@@ -33230,11 +33755,11 @@ pub fn repos_delete_repo_ruleset_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/rulesets/" +
-    percent_encode(parameter_value(ruleset_id)),
+    @http.percent_encode(parameter_value(ruleset_id)),
   )
 }
 
@@ -33249,18 +33774,19 @@ pub fn repos_get_repo_ruleset_history_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/rulesets/" +
-    percent_encode(parameter_value(ruleset_id)) +
+    @http.percent_encode(parameter_value(ruleset_id)) +
     "/history"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -33295,13 +33821,13 @@ pub fn repos_get_repo_ruleset_version_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/rulesets/" +
-    percent_encode(parameter_value(ruleset_id)) +
+    @http.percent_encode(parameter_value(ruleset_id)) +
     "/history/" +
-    percent_encode(parameter_value(version_id)),
+    @http.percent_encode(parameter_value(version_id)),
   )
 }
 
@@ -33351,97 +33877,114 @@ pub fn secret_scanning_list_alerts_for_repo_request(
   owner_email_hash? : String,
 ) -> @http.Request {
   let mut url = "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/secret-scanning/alerts"
   match state {
-    Some(value) => url = append_query(url, "state", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "state", parameter_value(value))
     None => ()
   }
   match secret_type {
     Some(value) =>
-      url = append_query(url, "secret_type", parameter_value(value))
+      url = @http.append_query(url, "secret_type", parameter_value(value))
     None => ()
   }
   match exclude_secret_types {
     Some(value) =>
-      url = append_query(url, "exclude_secret_types", parameter_value(value))
+      url = @http.append_query(
+        url,
+        "exclude_secret_types",
+        parameter_value(value),
+      )
     None => ()
   }
   match exclude_providers {
     Some(value) =>
-      url = append_query(url, "exclude_providers", parameter_value(value))
+      url = @http.append_query(url, "exclude_providers", parameter_value(value))
     None => ()
   }
   match providers {
-    Some(value) => url = append_query(url, "providers", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "providers", parameter_value(value))
     None => ()
   }
   match resolution {
-    Some(value) => url = append_query(url, "resolution", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "resolution", parameter_value(value))
     None => ()
   }
   match assignee {
-    Some(value) => url = append_query(url, "assignee", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "assignee", parameter_value(value))
     None => ()
   }
   match sort {
-    Some(value) => url = append_query(url, "sort", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "sort", parameter_value(value))
     None => ()
   }
   match direction {
-    Some(value) => url = append_query(url, "direction", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "direction", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match before {
-    Some(value) => url = append_query(url, "before", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "before", parameter_value(value))
     None => ()
   }
   match after {
-    Some(value) => url = append_query(url, "after", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "after", parameter_value(value))
     None => ()
   }
   match validity {
-    Some(value) => url = append_query(url, "validity", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "validity", parameter_value(value))
     None => ()
   }
   match is_publicly_leaked {
     Some(value) =>
-      url = append_query(url, "is_publicly_leaked", parameter_value(value))
+      url = @http.append_query(
+        url,
+        "is_publicly_leaked",
+        parameter_value(value),
+      )
     None => ()
   }
   match is_multi_repo {
     Some(value) =>
-      url = append_query(url, "is_multi_repo", parameter_value(value))
+      url = @http.append_query(url, "is_multi_repo", parameter_value(value))
     None => ()
   }
   match hide_secret {
     Some(value) =>
-      url = append_query(url, "hide_secret", parameter_value(value))
+      url = @http.append_query(url, "hide_secret", parameter_value(value))
     None => ()
   }
   match is_bypassed {
     Some(value) =>
-      url = append_query(url, "is_bypassed", parameter_value(value))
+      url = @http.append_query(url, "is_bypassed", parameter_value(value))
     None => ()
   }
   match included_metadata {
     Some(value) =>
-      url = append_query(url, "included_metadata", parameter_value(value))
+      url = @http.append_query(url, "included_metadata", parameter_value(value))
     None => ()
   }
   match owner_email_hash {
     Some(value) =>
-      url = append_query(url, "owner_email_hash", parameter_value(value))
+      url = @http.append_query(url, "owner_email_hash", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -33475,14 +34018,14 @@ pub fn secret_scanning_get_alert_request(
   hide_secret? : Bool,
 ) -> @http.Request {
   let mut url = "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/secret-scanning/alerts/" +
-    percent_encode(parameter_value(alert_number))
+    @http.percent_encode(parameter_value(alert_number))
   match hide_secret {
     Some(value) =>
-      url = append_query(url, "hide_secret", parameter_value(value))
+      url = @http.append_query(url, "hide_secret", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -33517,11 +34060,11 @@ pub fn secret_scanning_update_alert_request(
 ) -> @http.Request {
   @http.Request::patch(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/secret-scanning/alerts/" +
-    percent_encode(parameter_value(alert_number)),
+    @http.percent_encode(parameter_value(alert_number)),
   ).json_body(Json(body))
 }
 
@@ -33554,18 +34097,19 @@ pub fn secret_scanning_list_locations_for_alert_request(
   per_page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/secret-scanning/alerts/" +
-    percent_encode(parameter_value(alert_number)) +
+    @http.percent_encode(parameter_value(alert_number)) +
     "/locations"
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -33603,33 +34147,37 @@ pub fn secret_scanning_list_repo_custom_patterns_request(
   after? : String,
 ) -> @http.Request {
   let mut url = "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/secret-scanning/custom-patterns"
   match state {
-    Some(value) => url = append_query(url, "state", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "state", parameter_value(value))
     None => ()
   }
   match push_protection {
     Some(value) =>
-      url = append_query(url, "push_protection", parameter_value(value))
+      url = @http.append_query(url, "push_protection", parameter_value(value))
     None => ()
   }
   match sort {
-    Some(value) => url = append_query(url, "sort", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "sort", parameter_value(value))
     None => ()
   }
   match direction {
-    Some(value) => url = append_query(url, "direction", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "direction", parameter_value(value))
     None => ()
   }
   match before {
-    Some(value) => url = append_query(url, "before", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "before", parameter_value(value))
     None => ()
   }
   match after {
-    Some(value) => url = append_query(url, "after", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "after", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -33663,9 +34211,9 @@ pub fn secret_scanning_bulk_create_repo_custom_patterns_request(
 ) -> @http.Request {
   @http.Request::post(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/secret-scanning/custom-patterns",
   ).json_body(Json(body))
 }
@@ -33698,9 +34246,9 @@ pub fn secret_scanning_bulk_delete_repo_custom_patterns_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/secret-scanning/custom-patterns",
   ).json_body(Json(body))
 }
@@ -33716,11 +34264,11 @@ pub fn secret_scanning_update_repo_custom_pattern_request(
 ) -> @http.Request {
   @http.Request::patch(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/secret-scanning/custom-patterns/" +
-    percent_encode(parameter_value(pattern_id)),
+    @http.percent_encode(parameter_value(pattern_id)),
   ).json_body(Json(body))
 }
 
@@ -33752,9 +34300,9 @@ pub fn secret_scanning_create_push_protection_bypass_request(
 ) -> @http.Request {
   @http.Request::post(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/secret-scanning/push-protection-bypasses",
   ).json_body(Json(body))
 }
@@ -33786,9 +34334,9 @@ pub fn secret_scanning_get_scan_history_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/secret-scanning/scan-history",
   )
 }
@@ -33825,32 +34373,37 @@ pub fn security_advisories_list_repository_advisories_request(
   state? : SecurityAdvisoriesListRepositoryAdvisoriesState,
 ) -> @http.Request {
   let mut url = "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/security-advisories"
   match direction {
-    Some(value) => url = append_query(url, "direction", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "direction", parameter_value(value))
     None => ()
   }
   match sort {
-    Some(value) => url = append_query(url, "sort", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "sort", parameter_value(value))
     None => ()
   }
   match before {
-    Some(value) => url = append_query(url, "before", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "before", parameter_value(value))
     None => ()
   }
   match after {
-    Some(value) => url = append_query(url, "after", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "after", parameter_value(value))
     None => ()
   }
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match state {
-    Some(value) => url = append_query(url, "state", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "state", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -33884,9 +34437,9 @@ pub fn security_advisories_create_repository_advisory_request(
 ) -> @http.Request {
   @http.Request::post(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/security-advisories",
   ).json_body(Json(body))
 }
@@ -33919,9 +34472,9 @@ pub fn security_advisories_create_private_vulnerability_report_request(
 ) -> @http.Request {
   @http.Request::post(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/security-advisories/reports",
   ).json_body(Json(body))
 }
@@ -33954,11 +34507,11 @@ pub fn security_advisories_get_repository_advisory_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/security-advisories/" +
-    percent_encode(parameter_value(ghsa_id)),
+    @http.percent_encode(parameter_value(ghsa_id)),
   )
 }
 
@@ -33991,11 +34544,11 @@ pub fn security_advisories_update_repository_advisory_request(
 ) -> @http.Request {
   @http.Request::patch(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/security-advisories/" +
-    percent_encode(parameter_value(ghsa_id)),
+    @http.percent_encode(parameter_value(ghsa_id)),
   ).json_body(Json(body))
 }
 
@@ -34027,11 +34580,11 @@ pub fn security_advisories_create_repository_advisory_cve_request_request(
 ) -> @http.Request {
   @http.Request::post(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/security-advisories/" +
-    percent_encode(parameter_value(ghsa_id)) +
+    @http.percent_encode(parameter_value(ghsa_id)) +
     "/cve",
   )
 }
@@ -34046,11 +34599,11 @@ pub fn security_advisories_create_fork_request(
 ) -> @http.Request {
   @http.Request::post(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/security-advisories/" +
-    percent_encode(parameter_value(ghsa_id)) +
+    @http.percent_encode(parameter_value(ghsa_id)) +
     "/forks",
   )
 }
@@ -34084,21 +34637,22 @@ pub fn pull_request_stacks_list_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/stacks"
   match pull_request {
     Some(value) =>
-      url = append_query(url, "pull_request", parameter_value(value))
+      url = @http.append_query(url, "pull_request", parameter_value(value))
     None => ()
   }
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -34132,9 +34686,9 @@ pub fn pull_request_stacks_create_request(
 ) -> @http.Request {
   @http.Request::post(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/stacks",
   ).json_body(Json(body))
 }
@@ -34167,11 +34721,11 @@ pub fn pull_request_stacks_get_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/stacks/" +
-    percent_encode(parameter_value(stack_number)),
+    @http.percent_encode(parameter_value(stack_number)),
   )
 }
 
@@ -34204,11 +34758,11 @@ pub fn pull_request_stacks_add_request(
 ) -> @http.Request {
   @http.Request::post(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/stacks/" +
-    percent_encode(parameter_value(stack_number)) +
+    @http.percent_encode(parameter_value(stack_number)) +
     "/add",
   ).json_body(Json(body))
 }
@@ -34241,11 +34795,11 @@ pub fn pull_request_stacks_unstack_request(
 ) -> @http.Request {
   @http.Request::post(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/stacks/" +
-    percent_encode(parameter_value(stack_number)) +
+    @http.percent_encode(parameter_value(stack_number)) +
     "/unstack",
   )
 }
@@ -34278,16 +34832,17 @@ pub fn activity_list_stargazers_for_repo_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/stargazers"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -34320,9 +34875,9 @@ pub fn activity_get_stargazer_count_for_repo_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/stargazers/count",
   )
 }
@@ -34355,16 +34910,17 @@ pub fn activity_get_stargazer_history_for_repo_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/stargazers/history"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -34397,9 +34953,9 @@ pub fn repos_get_code_frequency_stats_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/stats/code_frequency",
   )
 }
@@ -34431,9 +34987,9 @@ pub fn repos_get_commit_activity_stats_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/stats/commit_activity",
   )
 }
@@ -34465,9 +35021,9 @@ pub fn repos_get_contributors_stats_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/stats/contributors",
   )
 }
@@ -34499,9 +35055,9 @@ pub fn repos_get_participation_stats_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/stats/participation",
   )
 }
@@ -34533,9 +35089,9 @@ pub fn repos_get_punch_card_stats_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/stats/punch_card",
   )
 }
@@ -34569,11 +35125,11 @@ pub fn repos_create_commit_status_request(
 ) -> @http.Request {
   @http.Request::post(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/statuses/" +
-    percent_encode_segments(parameter_value(sha)),
+    @http.percent_encode_path(parameter_value(sha)),
   ).json_body(Json(body))
 }
 
@@ -34605,16 +35161,17 @@ pub fn activity_list_watchers_for_repo_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/subscribers"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -34647,9 +35204,9 @@ pub fn activity_get_repo_subscription_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/subscription",
   )
 }
@@ -34682,9 +35239,9 @@ pub fn activity_set_repo_subscription_request(
 ) -> @http.Request {
   @http.Request::put(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/subscription",
   ).json_body(Json(body))
 }
@@ -34716,9 +35273,9 @@ pub fn activity_delete_repo_subscription_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/subscription",
   )
 }
@@ -34733,16 +35290,17 @@ pub fn repos_list_tags_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/tags"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -34776,11 +35334,11 @@ pub fn repos_download_tarball_archive_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/tarball/" +
-    percent_encode_segments(parameter_value(ref_)),
+    @http.percent_encode_path(parameter_value(ref_)),
   )
 }
 
@@ -34794,16 +35352,17 @@ pub fn repos_list_teams_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/teams"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -34837,16 +35396,17 @@ pub fn repos_get_all_topics_request(
   per_page? : Int32,
 ) -> @http.Request {
   let mut url = "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/topics"
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -34880,9 +35440,9 @@ pub fn repos_replace_all_topics_request(
 ) -> @http.Request {
   @http.Request::put(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/topics",
   ).json_body(Json(body))
 }
@@ -34914,12 +35474,12 @@ pub fn repos_get_clones_request(
   per? : ReposGetClonesPer,
 ) -> @http.Request {
   let mut url = "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/traffic/clones"
   match per {
-    Some(value) => url = append_query(url, "per", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "per", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -34952,9 +35512,9 @@ pub fn repos_get_top_paths_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/traffic/popular/paths",
   )
 }
@@ -34986,9 +35546,9 @@ pub fn repos_get_top_referrers_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/traffic/popular/referrers",
   )
 }
@@ -35020,12 +35580,12 @@ pub fn repos_get_views_request(
   per? : ReposGetViewsPer,
 ) -> @http.Request {
   let mut url = "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/traffic/views"
   match per {
-    Some(value) => url = append_query(url, "per", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "per", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -35059,9 +35619,9 @@ pub fn repos_transfer_request(
 ) -> @http.Request {
   @http.Request::post(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/transfer",
   ).json_body(Json(body))
 }
@@ -35093,9 +35653,9 @@ pub fn repos_check_vulnerability_alerts_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/vulnerability-alerts",
   )
 }
@@ -35109,9 +35669,9 @@ pub fn repos_enable_vulnerability_alerts_request(
 ) -> @http.Request {
   @http.Request::put(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/vulnerability-alerts",
   )
 }
@@ -35125,9 +35685,9 @@ pub fn repos_disable_vulnerability_alerts_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/vulnerability-alerts",
   )
 }
@@ -35142,11 +35702,11 @@ pub fn repos_download_zipball_archive_request(
 ) -> @http.Request {
   @http.Request::get(
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)) +
+    @http.percent_encode(parameter_value(repo)) +
     "/zipball/" +
-    percent_encode_segments(parameter_value(ref_)),
+    @http.percent_encode_path(parameter_value(ref_)),
   )
 }
 
@@ -35160,9 +35720,9 @@ pub fn repos_create_using_template_request(
 ) -> @http.Request {
   @http.Request::post(
     "/repos/" +
-    percent_encode(parameter_value(template_owner)) +
+    @http.percent_encode(parameter_value(template_owner)) +
     "/" +
-    percent_encode(parameter_value(template_repo)) +
+    @http.percent_encode(parameter_value(template_repo)) +
     "/generate",
   ).json_body(Json(body))
 }
@@ -35191,7 +35751,8 @@ pub fn repos_create_using_template_decode(
 pub fn repos_list_public_request(since? : Int32) -> @http.Request {
   let mut url = "/repositories"
   match since {
-    Some(value) => url = append_query(url, "since", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "since", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -35226,21 +35787,23 @@ pub fn search_code_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/search/code"
-  url = append_query(url, "q", parameter_value(q))
+  url = @http.append_query(url, "q", parameter_value(q))
   match sort {
-    Some(value) => url = append_query(url, "sort", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "sort", parameter_value(value))
     None => ()
   }
   match order {
-    Some(value) => url = append_query(url, "order", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "order", parameter_value(value))
     None => ()
   }
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -35275,21 +35838,23 @@ pub fn search_commits_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/search/commits"
-  url = append_query(url, "q", parameter_value(q))
+  url = @http.append_query(url, "q", parameter_value(q))
   match sort {
-    Some(value) => url = append_query(url, "sort", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "sort", parameter_value(value))
     None => ()
   }
   match order {
-    Some(value) => url = append_query(url, "order", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "order", parameter_value(value))
     None => ()
   }
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -35326,31 +35891,33 @@ pub fn search_issues_and_pull_requests_request(
   search_type? : SearchIssuesAndPullRequestsSearchType,
 ) -> @http.Request {
   let mut url = "/search/issues"
-  url = append_query(url, "q", parameter_value(q))
+  url = @http.append_query(url, "q", parameter_value(q))
   match sort {
-    Some(value) => url = append_query(url, "sort", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "sort", parameter_value(value))
     None => ()
   }
   match order {
-    Some(value) => url = append_query(url, "order", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "order", parameter_value(value))
     None => ()
   }
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   match advanced_search {
     Some(value) =>
-      url = append_query(url, "advanced_search", parameter_value(value))
+      url = @http.append_query(url, "advanced_search", parameter_value(value))
     None => ()
   }
   match search_type {
     Some(value) =>
-      url = append_query(url, "search_type", parameter_value(value))
+      url = @http.append_query(url, "search_type", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -35386,22 +35953,24 @@ pub fn search_labels_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/search/labels"
-  url = append_query(url, "repository_id", parameter_value(repository_id))
-  url = append_query(url, "q", parameter_value(q))
+  url = @http.append_query(url, "repository_id", parameter_value(repository_id))
+  url = @http.append_query(url, "q", parameter_value(q))
   match sort {
-    Some(value) => url = append_query(url, "sort", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "sort", parameter_value(value))
     None => ()
   }
   match order {
-    Some(value) => url = append_query(url, "order", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "order", parameter_value(value))
     None => ()
   }
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -35436,21 +36005,23 @@ pub fn search_repos_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/search/repositories"
-  url = append_query(url, "q", parameter_value(q))
+  url = @http.append_query(url, "q", parameter_value(q))
   match sort {
-    Some(value) => url = append_query(url, "sort", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "sort", parameter_value(value))
     None => ()
   }
   match order {
-    Some(value) => url = append_query(url, "order", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "order", parameter_value(value))
     None => ()
   }
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -35483,13 +36054,14 @@ pub fn search_topics_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/search/topics"
-  url = append_query(url, "q", parameter_value(q))
+  url = @http.append_query(url, "q", parameter_value(q))
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -35524,21 +36096,23 @@ pub fn search_users_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/search/users"
-  url = append_query(url, "q", parameter_value(q))
+  url = @http.append_query(url, "q", parameter_value(q))
   match sort {
-    Some(value) => url = append_query(url, "sort", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "sort", parameter_value(value))
     None => ()
   }
   match order {
-    Some(value) => url = append_query(url, "order", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "order", parameter_value(value))
     None => ()
   }
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -35566,7 +36140,7 @@ pub fn search_users_decode(
 ///
 /// Get a team (Legacy)
 pub fn teams_get_legacy_request(team_id : Int32) -> @http.Request {
-  @http.Request::get("/teams/" + percent_encode(parameter_value(team_id)))
+  @http.Request::get("/teams/" + @http.percent_encode(parameter_value(team_id)))
 }
 
 ///|
@@ -35594,9 +36168,9 @@ pub fn teams_update_legacy_request(
   team_id : Int32,
   body : TeamsUpdateLegacyRequest,
 ) -> @http.Request {
-  @http.Request::patch("/teams/" + percent_encode(parameter_value(team_id))).json_body(
-    Json(body),
-  )
+  @http.Request::patch(
+    "/teams/" + @http.percent_encode(parameter_value(team_id)),
+  ).json_body(Json(body))
 }
 
 ///|
@@ -35621,7 +36195,9 @@ pub fn teams_update_legacy_decode(
 ///
 /// Delete a team (Legacy) The caller handles the response as @http.Response.
 pub fn teams_delete_legacy_request(team_id : Int32) -> @http.Request {
-  @http.Request::delete("/teams/" + percent_encode(parameter_value(team_id)))
+  @http.Request::delete(
+    "/teams/" + @http.percent_encode(parameter_value(team_id)),
+  )
 }
 
 ///|
@@ -35633,14 +36209,15 @@ pub fn teams_list_pending_invitations_legacy_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/teams/" +
-    percent_encode(parameter_value(team_id)) +
+    @http.percent_encode(parameter_value(team_id)) +
     "/invitations"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -35674,18 +36251,19 @@ pub fn teams_list_members_legacy_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/teams/" +
-    percent_encode(parameter_value(team_id)) +
+    @http.percent_encode(parameter_value(team_id)) +
     "/members"
   match role {
-    Some(value) => url = append_query(url, "role", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "role", parameter_value(value))
     None => ()
   }
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -35718,9 +36296,9 @@ pub fn teams_get_member_legacy_request(
 ) -> @http.Request {
   @http.Request::get(
     "/teams/" +
-    percent_encode(parameter_value(team_id)) +
+    @http.percent_encode(parameter_value(team_id)) +
     "/members/" +
-    percent_encode(parameter_value(username)),
+    @http.percent_encode(parameter_value(username)),
   )
 }
 
@@ -35733,9 +36311,9 @@ pub fn teams_add_member_legacy_request(
 ) -> @http.Request {
   @http.Request::put(
     "/teams/" +
-    percent_encode(parameter_value(team_id)) +
+    @http.percent_encode(parameter_value(team_id)) +
     "/members/" +
-    percent_encode(parameter_value(username)),
+    @http.percent_encode(parameter_value(username)),
   )
 }
 
@@ -35748,9 +36326,9 @@ pub fn teams_remove_member_legacy_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/teams/" +
-    percent_encode(parameter_value(team_id)) +
+    @http.percent_encode(parameter_value(team_id)) +
     "/members/" +
-    percent_encode(parameter_value(username)),
+    @http.percent_encode(parameter_value(username)),
   )
 }
 
@@ -35763,9 +36341,9 @@ pub fn teams_get_membership_for_user_legacy_request(
 ) -> @http.Request {
   @http.Request::get(
     "/teams/" +
-    percent_encode(parameter_value(team_id)) +
+    @http.percent_encode(parameter_value(team_id)) +
     "/memberships/" +
-    percent_encode(parameter_value(username)),
+    @http.percent_encode(parameter_value(username)),
   )
 }
 
@@ -35797,9 +36375,9 @@ pub fn teams_add_or_update_membership_for_user_legacy_request(
 ) -> @http.Request {
   @http.Request::put(
     "/teams/" +
-    percent_encode(parameter_value(team_id)) +
+    @http.percent_encode(parameter_value(team_id)) +
     "/memberships/" +
-    percent_encode(parameter_value(username)),
+    @http.percent_encode(parameter_value(username)),
   ).json_body(Json(body))
 }
 
@@ -35830,9 +36408,9 @@ pub fn teams_remove_membership_for_user_legacy_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/teams/" +
-    percent_encode(parameter_value(team_id)) +
+    @http.percent_encode(parameter_value(team_id)) +
     "/memberships/" +
-    percent_encode(parameter_value(username)),
+    @http.percent_encode(parameter_value(username)),
   )
 }
 
@@ -35844,13 +36422,16 @@ pub fn teams_list_repos_legacy_request(
   per_page? : Int32,
   page? : Int32,
 ) -> @http.Request {
-  let mut url = "/teams/" + percent_encode(parameter_value(team_id)) + "/repos"
+  let mut url = "/teams/" +
+    @http.percent_encode(parameter_value(team_id)) +
+    "/repos"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -35884,11 +36465,11 @@ pub fn teams_check_permissions_for_repo_legacy_request(
 ) -> @http.Request {
   @http.Request::get(
     "/teams/" +
-    percent_encode(parameter_value(team_id)) +
+    @http.percent_encode(parameter_value(team_id)) +
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)),
+    @http.percent_encode(parameter_value(repo)),
   )
 }
 
@@ -35921,11 +36502,11 @@ pub fn teams_add_or_update_repo_permissions_legacy_request(
 ) -> @http.Request {
   @http.Request::put(
     "/teams/" +
-    percent_encode(parameter_value(team_id)) +
+    @http.percent_encode(parameter_value(team_id)) +
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)),
+    @http.percent_encode(parameter_value(repo)),
   ).json_body(Json(body))
 }
 
@@ -35939,11 +36520,11 @@ pub fn teams_remove_repo_legacy_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/teams/" +
-    percent_encode(parameter_value(team_id)) +
+    @http.percent_encode(parameter_value(team_id)) +
     "/repos/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)),
+    @http.percent_encode(parameter_value(repo)),
   )
 }
 
@@ -35955,13 +36536,16 @@ pub fn teams_list_child_legacy_request(
   per_page? : Int32,
   page? : Int32,
 ) -> @http.Request {
-  let mut url = "/teams/" + percent_encode(parameter_value(team_id)) + "/teams"
+  let mut url = "/teams/" +
+    @http.percent_encode(parameter_value(team_id)) +
+    "/teams"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -36046,11 +36630,12 @@ pub fn users_list_blocked_by_authenticated_user_request(
 ) -> @http.Request {
   let mut url = "/user/blocks"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -36079,7 +36664,7 @@ pub fn users_list_blocked_by_authenticated_user_decode(
 /// Check if a user is blocked by the authenticated user The caller handles the response as @http.Response.
 pub fn users_check_blocked_request(username : String) -> @http.Request {
   @http.Request::get(
-    "/user/blocks/" + percent_encode(parameter_value(username)),
+    "/user/blocks/" + @http.percent_encode(parameter_value(username)),
   )
 }
 
@@ -36088,7 +36673,7 @@ pub fn users_check_blocked_request(username : String) -> @http.Request {
 /// Block a user The caller handles the response as @http.Response.
 pub fn users_block_request(username : String) -> @http.Request {
   @http.Request::put(
-    "/user/blocks/" + percent_encode(parameter_value(username)),
+    "/user/blocks/" + @http.percent_encode(parameter_value(username)),
   )
 }
 
@@ -36097,7 +36682,7 @@ pub fn users_block_request(username : String) -> @http.Request {
 /// Unblock a user The caller handles the response as @http.Response.
 pub fn users_unblock_request(username : String) -> @http.Request {
   @http.Request::delete(
-    "/user/blocks/" + percent_encode(parameter_value(username)),
+    "/user/blocks/" + @http.percent_encode(parameter_value(username)),
   )
 }
 
@@ -36111,16 +36696,17 @@ pub fn codespaces_list_for_authenticated_user_request(
 ) -> @http.Request {
   let mut url = "/user/codespaces"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   match repository_id {
     Some(value) =>
-      url = append_query(url, "repository_id", parameter_value(value))
+      url = @http.append_query(url, "repository_id", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -36180,11 +36766,12 @@ pub fn codespaces_list_secrets_for_authenticated_user_request(
 ) -> @http.Request {
   let mut url = "/user/codespaces/secrets"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -36240,7 +36827,8 @@ pub fn codespaces_get_secret_for_authenticated_user_request(
   secret_name : String,
 ) -> @http.Request {
   @http.Request::get(
-    "/user/codespaces/secrets/" + percent_encode(parameter_value(secret_name)),
+    "/user/codespaces/secrets/" +
+    @http.percent_encode(parameter_value(secret_name)),
   )
 }
 
@@ -36270,7 +36858,8 @@ pub fn codespaces_create_or_update_secret_for_authenticated_user_request(
   body : CodespacesCreateOrUpdateSecretForAuthenticatedUserRequest,
 ) -> @http.Request {
   @http.Request::put(
-    "/user/codespaces/secrets/" + percent_encode(parameter_value(secret_name)),
+    "/user/codespaces/secrets/" +
+    @http.percent_encode(parameter_value(secret_name)),
   ).json_body(Json(body))
 }
 
@@ -36299,7 +36888,8 @@ pub fn codespaces_delete_secret_for_authenticated_user_request(
   secret_name : String,
 ) -> @http.Request {
   @http.Request::delete(
-    "/user/codespaces/secrets/" + percent_encode(parameter_value(secret_name)),
+    "/user/codespaces/secrets/" +
+    @http.percent_encode(parameter_value(secret_name)),
   )
 }
 
@@ -36311,7 +36901,7 @@ pub fn codespaces_list_repositories_for_secret_for_authenticated_user_request(
 ) -> @http.Request {
   @http.Request::get(
     "/user/codespaces/secrets/" +
-    percent_encode(parameter_value(secret_name)) +
+    @http.percent_encode(parameter_value(secret_name)) +
     "/repositories",
   )
 }
@@ -36343,7 +36933,7 @@ pub fn codespaces_set_repositories_for_secret_for_authenticated_user_request(
 ) -> @http.Request {
   @http.Request::put(
     "/user/codespaces/secrets/" +
-    percent_encode(parameter_value(secret_name)) +
+    @http.percent_encode(parameter_value(secret_name)) +
     "/repositories",
   ).json_body(Json(body))
 }
@@ -36357,9 +36947,9 @@ pub fn codespaces_add_repository_for_secret_for_authenticated_user_request(
 ) -> @http.Request {
   @http.Request::put(
     "/user/codespaces/secrets/" +
-    percent_encode(parameter_value(secret_name)) +
+    @http.percent_encode(parameter_value(secret_name)) +
     "/repositories/" +
-    percent_encode(parameter_value(repository_id)),
+    @http.percent_encode(parameter_value(repository_id)),
   )
 }
 
@@ -36372,9 +36962,9 @@ pub fn codespaces_remove_repository_for_secret_for_authenticated_user_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/user/codespaces/secrets/" +
-    percent_encode(parameter_value(secret_name)) +
+    @http.percent_encode(parameter_value(secret_name)) +
     "/repositories/" +
-    percent_encode(parameter_value(repository_id)),
+    @http.percent_encode(parameter_value(repository_id)),
   )
 }
 
@@ -36385,7 +36975,7 @@ pub fn codespaces_get_for_authenticated_user_request(
   codespace_name : String,
 ) -> @http.Request {
   @http.Request::get(
-    "/user/codespaces/" + percent_encode(parameter_value(codespace_name)),
+    "/user/codespaces/" + @http.percent_encode(parameter_value(codespace_name)),
   )
 }
 
@@ -36415,7 +37005,7 @@ pub fn codespaces_update_for_authenticated_user_request(
   body : CodespacesUpdateForAuthenticatedUserRequest,
 ) -> @http.Request {
   @http.Request::patch(
-    "/user/codespaces/" + percent_encode(parameter_value(codespace_name)),
+    "/user/codespaces/" + @http.percent_encode(parameter_value(codespace_name)),
   ).json_body(Json(body))
 }
 
@@ -36444,7 +37034,7 @@ pub fn codespaces_delete_for_authenticated_user_request(
   codespace_name : String,
 ) -> @http.Request {
   @http.Request::delete(
-    "/user/codespaces/" + percent_encode(parameter_value(codespace_name)),
+    "/user/codespaces/" + @http.percent_encode(parameter_value(codespace_name)),
   )
 }
 
@@ -36456,7 +37046,7 @@ pub fn codespaces_export_for_authenticated_user_request(
 ) -> @http.Request {
   @http.Request::post(
     "/user/codespaces/" +
-    percent_encode(parameter_value(codespace_name)) +
+    @http.percent_encode(parameter_value(codespace_name)) +
     "/exports",
   )
 }
@@ -36488,9 +37078,9 @@ pub fn codespaces_get_export_details_for_authenticated_user_request(
 ) -> @http.Request {
   @http.Request::get(
     "/user/codespaces/" +
-    percent_encode(parameter_value(codespace_name)) +
+    @http.percent_encode(parameter_value(codespace_name)) +
     "/exports/" +
-    percent_encode(parameter_value(export_id)),
+    @http.percent_encode(parameter_value(export_id)),
   )
 }
 
@@ -36520,7 +37110,7 @@ pub fn codespaces_codespace_machines_for_authenticated_user_request(
 ) -> @http.Request {
   @http.Request::get(
     "/user/codespaces/" +
-    percent_encode(parameter_value(codespace_name)) +
+    @http.percent_encode(parameter_value(codespace_name)) +
     "/machines",
   )
 }
@@ -36552,7 +37142,7 @@ pub fn codespaces_publish_for_authenticated_user_request(
 ) -> @http.Request {
   @http.Request::post(
     "/user/codespaces/" +
-    percent_encode(parameter_value(codespace_name)) +
+    @http.percent_encode(parameter_value(codespace_name)) +
     "/publish",
   ).json_body(Json(body))
 }
@@ -36583,7 +37173,7 @@ pub fn codespaces_start_for_authenticated_user_request(
 ) -> @http.Request {
   @http.Request::post(
     "/user/codespaces/" +
-    percent_encode(parameter_value(codespace_name)) +
+    @http.percent_encode(parameter_value(codespace_name)) +
     "/start",
   )
 }
@@ -36614,7 +37204,7 @@ pub fn codespaces_stop_for_authenticated_user_request(
 ) -> @http.Request {
   @http.Request::post(
     "/user/codespaces/" +
-    percent_encode(parameter_value(codespace_name)) +
+    @http.percent_encode(parameter_value(codespace_name)) +
     "/stop",
   )
 }
@@ -36698,11 +37288,12 @@ pub fn users_list_emails_for_authenticated_user_request(
 ) -> @http.Request {
   let mut url = "/user/emails"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -36771,11 +37362,12 @@ pub fn users_list_followers_for_authenticated_user_request(
 ) -> @http.Request {
   let mut url = "/user/followers"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -36808,11 +37400,12 @@ pub fn users_list_followed_by_authenticated_user_request(
 ) -> @http.Request {
   let mut url = "/user/following"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -36843,7 +37436,7 @@ pub fn users_check_person_is_followed_by_authenticated_request(
   username : String,
 ) -> @http.Request {
   @http.Request::get(
-    "/user/following/" + percent_encode(parameter_value(username)),
+    "/user/following/" + @http.percent_encode(parameter_value(username)),
   )
 }
 
@@ -36852,7 +37445,7 @@ pub fn users_check_person_is_followed_by_authenticated_request(
 /// Follow a user The caller handles the response as @http.Response.
 pub fn users_follow_request(username : String) -> @http.Request {
   @http.Request::put(
-    "/user/following/" + percent_encode(parameter_value(username)),
+    "/user/following/" + @http.percent_encode(parameter_value(username)),
   )
 }
 
@@ -36861,7 +37454,7 @@ pub fn users_follow_request(username : String) -> @http.Request {
 /// Unfollow a user The caller handles the response as @http.Response.
 pub fn users_unfollow_request(username : String) -> @http.Request {
   @http.Request::delete(
-    "/user/following/" + percent_encode(parameter_value(username)),
+    "/user/following/" + @http.percent_encode(parameter_value(username)),
   )
 }
 
@@ -36874,11 +37467,12 @@ pub fn users_list_gpg_keys_for_authenticated_user_request(
 ) -> @http.Request {
   let mut url = "/user/gpg_keys"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -36936,7 +37530,7 @@ pub fn users_get_gpg_key_for_authenticated_user_request(
   gpg_key_id : Int32,
 ) -> @http.Request {
   @http.Request::get(
-    "/user/gpg_keys/" + percent_encode(parameter_value(gpg_key_id)),
+    "/user/gpg_keys/" + @http.percent_encode(parameter_value(gpg_key_id)),
   )
 }
 
@@ -36965,7 +37559,7 @@ pub fn users_delete_gpg_key_for_authenticated_user_request(
   gpg_key_id : Int32,
 ) -> @http.Request {
   @http.Request::delete(
-    "/user/gpg_keys/" + percent_encode(parameter_value(gpg_key_id)),
+    "/user/gpg_keys/" + @http.percent_encode(parameter_value(gpg_key_id)),
   )
 }
 
@@ -36978,11 +37572,12 @@ pub fn apps_list_installations_for_authenticated_user_request(
 ) -> @http.Request {
   let mut url = "/user/installations"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -37015,14 +37610,15 @@ pub fn apps_list_installation_repos_for_authenticated_user_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/user/installations/" +
-    percent_encode(parameter_value(installation_id)) +
+    @http.percent_encode(parameter_value(installation_id)) +
     "/repositories"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -37055,9 +37651,9 @@ pub fn apps_add_repo_to_installation_for_authenticated_user_request(
 ) -> @http.Request {
   @http.Request::put(
     "/user/installations/" +
-    percent_encode(parameter_value(installation_id)) +
+    @http.percent_encode(parameter_value(installation_id)) +
     "/repositories/" +
-    percent_encode(parameter_value(repository_id)),
+    @http.percent_encode(parameter_value(repository_id)),
   )
 }
 
@@ -37070,9 +37666,9 @@ pub fn apps_remove_repo_from_installation_for_authenticated_user_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/user/installations/" +
-    percent_encode(parameter_value(installation_id)) +
+    @http.percent_encode(parameter_value(installation_id)) +
     "/repositories/" +
-    percent_encode(parameter_value(repository_id)),
+    @http.percent_encode(parameter_value(repository_id)),
   )
 }
 
@@ -37150,35 +37746,41 @@ pub fn issues_list_for_authenticated_user_request(
 ) -> @http.Request {
   let mut url = "/user/issues"
   match filter {
-    Some(value) => url = append_query(url, "filter", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "filter", parameter_value(value))
     None => ()
   }
   match state {
-    Some(value) => url = append_query(url, "state", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "state", parameter_value(value))
     None => ()
   }
   match labels {
-    Some(value) => url = append_query(url, "labels", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "labels", parameter_value(value))
     None => ()
   }
   match sort {
-    Some(value) => url = append_query(url, "sort", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "sort", parameter_value(value))
     None => ()
   }
   match direction {
-    Some(value) => url = append_query(url, "direction", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "direction", parameter_value(value))
     None => ()
   }
   match since {
-    Some(value) => url = append_query(url, "since", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "since", parameter_value(value))
     None => ()
   }
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -37211,11 +37813,12 @@ pub fn users_list_public_ssh_keys_for_authenticated_user_request(
 ) -> @http.Request {
   let mut url = "/user/keys"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -37272,7 +37875,9 @@ pub fn users_create_public_ssh_key_for_authenticated_user_decode(
 pub fn users_get_public_ssh_key_for_authenticated_user_request(
   key_id : Int32,
 ) -> @http.Request {
-  @http.Request::get("/user/keys/" + percent_encode(parameter_value(key_id)))
+  @http.Request::get(
+    "/user/keys/" + @http.percent_encode(parameter_value(key_id)),
+  )
 }
 
 ///|
@@ -37299,7 +37904,9 @@ pub fn users_get_public_ssh_key_for_authenticated_user_decode(
 pub fn users_delete_public_ssh_key_for_authenticated_user_request(
   key_id : Int32,
 ) -> @http.Request {
-  @http.Request::delete("/user/keys/" + percent_encode(parameter_value(key_id)))
+  @http.Request::delete(
+    "/user/keys/" + @http.percent_encode(parameter_value(key_id)),
+  )
 }
 
 ///|
@@ -37311,11 +37918,12 @@ pub fn apps_list_subscriptions_for_authenticated_user_request(
 ) -> @http.Request {
   let mut url = "/user/marketplace_purchases"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -37348,11 +37956,12 @@ pub fn apps_list_subscriptions_for_authenticated_user_stubbed_request(
 ) -> @http.Request {
   let mut url = "/user/marketplace_purchases/stubbed"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -37386,15 +37995,17 @@ pub fn orgs_list_memberships_for_authenticated_user_request(
 ) -> @http.Request {
   let mut url = "/user/memberships/orgs"
   match state {
-    Some(value) => url = append_query(url, "state", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "state", parameter_value(value))
     None => ()
   }
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -37425,7 +38036,7 @@ pub fn orgs_get_membership_for_authenticated_user_request(
   org : String,
 ) -> @http.Request {
   @http.Request::get(
-    "/user/memberships/orgs/" + percent_encode(parameter_value(org)),
+    "/user/memberships/orgs/" + @http.percent_encode(parameter_value(org)),
   )
 }
 
@@ -37455,7 +38066,7 @@ pub fn orgs_update_membership_for_authenticated_user_request(
   body : OrgsUpdateMembershipForAuthenticatedUserRequest,
 ) -> @http.Request {
   @http.Request::patch(
-    "/user/memberships/orgs/" + percent_encode(parameter_value(org)),
+    "/user/memberships/orgs/" + @http.percent_encode(parameter_value(org)),
   ).json_body(Json(body))
 }
 
@@ -37486,11 +38097,12 @@ pub fn migrations_list_for_authenticated_user_request(
 ) -> @http.Request {
   let mut url = "/user/migrations"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -37549,11 +38161,11 @@ pub fn migrations_get_status_for_authenticated_user_request(
   exclude? : Array[String],
 ) -> @http.Request {
   let mut url = "/user/migrations/" +
-    percent_encode(parameter_value(migration_id))
+    @http.percent_encode(parameter_value(migration_id))
   match exclude {
     Some(values) =>
       for value in values {
-        url = append_query(url, "exclude", parameter_value(value))
+        url = @http.append_query(url, "exclude", parameter_value(value))
       }
     None => ()
   }
@@ -37586,7 +38198,7 @@ pub fn migrations_get_archive_for_authenticated_user_request(
 ) -> @http.Request {
   @http.Request::get(
     "/user/migrations/" +
-    percent_encode(parameter_value(migration_id)) +
+    @http.percent_encode(parameter_value(migration_id)) +
     "/archive",
   )
 }
@@ -37599,7 +38211,7 @@ pub fn migrations_delete_archive_for_authenticated_user_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/user/migrations/" +
-    percent_encode(parameter_value(migration_id)) +
+    @http.percent_encode(parameter_value(migration_id)) +
     "/archive",
   )
 }
@@ -37613,9 +38225,9 @@ pub fn migrations_unlock_repo_for_authenticated_user_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/user/migrations/" +
-    percent_encode(parameter_value(migration_id)) +
+    @http.percent_encode(parameter_value(migration_id)) +
     "/repos/" +
-    percent_encode(parameter_value(repo_name)) +
+    @http.percent_encode(parameter_value(repo_name)) +
     "/lock",
   )
 }
@@ -37629,14 +38241,15 @@ pub fn migrations_list_repos_for_authenticated_user_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/user/migrations/" +
-    percent_encode(parameter_value(migration_id)) +
+    @http.percent_encode(parameter_value(migration_id)) +
     "/repositories"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -37669,11 +38282,12 @@ pub fn orgs_list_for_authenticated_user_request(
 ) -> @http.Request {
   let mut url = "/user/orgs"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -37707,17 +38321,19 @@ pub fn packages_list_packages_for_authenticated_user_request(
   per_page? : Int32,
 ) -> @http.Request {
   let mut url = "/user/packages"
-  url = append_query(url, "package_type", parameter_value(package_type))
+  url = @http.append_query(url, "package_type", parameter_value(package_type))
   match visibility {
-    Some(value) => url = append_query(url, "visibility", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "visibility", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -37750,9 +38366,9 @@ pub fn packages_get_package_for_authenticated_user_request(
 ) -> @http.Request {
   @http.Request::get(
     "/user/packages/" +
-    percent_encode(parameter_value(package_type)) +
+    @http.percent_encode(parameter_value(package_type)) +
     "/" +
-    percent_encode(parameter_value(package_name)),
+    @http.percent_encode(parameter_value(package_name)),
   )
 }
 
@@ -37783,9 +38399,9 @@ pub fn packages_delete_package_for_authenticated_user_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/user/packages/" +
-    percent_encode(parameter_value(package_type)) +
+    @http.percent_encode(parameter_value(package_type)) +
     "/" +
-    percent_encode(parameter_value(package_name)),
+    @http.percent_encode(parameter_value(package_name)),
   )
 }
 
@@ -37798,12 +38414,13 @@ pub fn packages_restore_package_for_authenticated_user_request(
   token? : String,
 ) -> @http.Request {
   let mut url = "/user/packages/" +
-    percent_encode(parameter_value(package_type)) +
+    @http.percent_encode(parameter_value(package_type)) +
     "/" +
-    percent_encode(parameter_value(package_name)) +
+    @http.percent_encode(parameter_value(package_name)) +
     "/restore"
   match token {
-    Some(value) => url = append_query(url, "token", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "token", parameter_value(value))
     None => ()
   }
   @http.Request::post(url)
@@ -37820,20 +38437,22 @@ pub fn packages_get_all_package_versions_for_package_owned_by_authenticated_user
   state? : PackagesGetAllPackageVersionsForPackageOwnedByAuthenticatedUserState,
 ) -> @http.Request {
   let mut url = "/user/packages/" +
-    percent_encode(parameter_value(package_type)) +
+    @http.percent_encode(parameter_value(package_type)) +
     "/" +
-    percent_encode(parameter_value(package_name)) +
+    @http.percent_encode(parameter_value(package_name)) +
     "/versions"
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match state {
-    Some(value) => url = append_query(url, "state", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "state", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -37867,11 +38486,11 @@ pub fn packages_get_package_version_for_authenticated_user_request(
 ) -> @http.Request {
   @http.Request::get(
     "/user/packages/" +
-    percent_encode(parameter_value(package_type)) +
+    @http.percent_encode(parameter_value(package_type)) +
     "/" +
-    percent_encode(parameter_value(package_name)) +
+    @http.percent_encode(parameter_value(package_name)) +
     "/versions/" +
-    percent_encode(parameter_value(package_version_id)),
+    @http.percent_encode(parameter_value(package_version_id)),
   )
 }
 
@@ -37903,11 +38522,11 @@ pub fn packages_delete_package_version_for_authenticated_user_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/user/packages/" +
-    percent_encode(parameter_value(package_type)) +
+    @http.percent_encode(parameter_value(package_type)) +
     "/" +
-    percent_encode(parameter_value(package_name)) +
+    @http.percent_encode(parameter_value(package_name)) +
     "/versions/" +
-    percent_encode(parameter_value(package_version_id)),
+    @http.percent_encode(parameter_value(package_version_id)),
   )
 }
 
@@ -37921,11 +38540,11 @@ pub fn packages_restore_package_version_for_authenticated_user_request(
 ) -> @http.Request {
   @http.Request::post(
     "/user/packages/" +
-    percent_encode(parameter_value(package_type)) +
+    @http.percent_encode(parameter_value(package_type)) +
     "/" +
-    percent_encode(parameter_value(package_name)) +
+    @http.percent_encode(parameter_value(package_name)) +
     "/versions/" +
-    percent_encode(parameter_value(package_version_id)) +
+    @http.percent_encode(parameter_value(package_version_id)) +
     "/restore",
   )
 }
@@ -37939,11 +38558,12 @@ pub fn users_list_public_emails_for_authenticated_user_request(
 ) -> @http.Request {
   let mut url = "/user/public_emails"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -37983,40 +38603,45 @@ pub fn repos_list_for_authenticated_user_request(
 ) -> @http.Request {
   let mut url = "/user/repos"
   match visibility {
-    Some(value) => url = append_query(url, "visibility", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "visibility", parameter_value(value))
     None => ()
   }
   match affiliation {
     Some(value) =>
-      url = append_query(url, "affiliation", parameter_value(value))
+      url = @http.append_query(url, "affiliation", parameter_value(value))
     None => ()
   }
   match type_ {
-    Some(value) => url = append_query(url, "type", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "type", parameter_value(value))
     None => ()
   }
   match sort {
-    Some(value) => url = append_query(url, "sort", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "sort", parameter_value(value))
     None => ()
   }
   match direction {
-    Some(value) => url = append_query(url, "direction", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "direction", parameter_value(value))
     None => ()
   }
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   match since {
-    Some(value) => url = append_query(url, "since", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "since", parameter_value(value))
     None => ()
   }
   match before {
-    Some(value) => url = append_query(url, "before", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "before", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -38076,11 +38701,12 @@ pub fn repos_list_invitations_for_authenticated_user_request(
 ) -> @http.Request {
   let mut url = "/user/repository_invitations"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -38112,7 +38738,7 @@ pub fn repos_accept_invitation_for_authenticated_user_request(
 ) -> @http.Request {
   @http.Request::patch(
     "/user/repository_invitations/" +
-    percent_encode(parameter_value(invitation_id)),
+    @http.percent_encode(parameter_value(invitation_id)),
   )
 }
 
@@ -38124,7 +38750,7 @@ pub fn repos_decline_invitation_for_authenticated_user_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/user/repository_invitations/" +
-    percent_encode(parameter_value(invitation_id)),
+    @http.percent_encode(parameter_value(invitation_id)),
   )
 }
 
@@ -38137,11 +38763,12 @@ pub fn users_list_social_accounts_for_authenticated_user_request(
 ) -> @http.Request {
   let mut url = "/user/social_accounts"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -38210,11 +38837,12 @@ pub fn users_list_ssh_signing_keys_for_authenticated_user_request(
 ) -> @http.Request {
   let mut url = "/user/ssh_signing_keys"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -38273,7 +38901,7 @@ pub fn users_get_ssh_signing_key_for_authenticated_user_request(
 ) -> @http.Request {
   @http.Request::get(
     "/user/ssh_signing_keys/" +
-    percent_encode(parameter_value(ssh_signing_key_id)),
+    @http.percent_encode(parameter_value(ssh_signing_key_id)),
   )
 }
 
@@ -38303,7 +38931,7 @@ pub fn users_delete_ssh_signing_key_for_authenticated_user_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/user/ssh_signing_keys/" +
-    percent_encode(parameter_value(ssh_signing_key_id)),
+    @http.percent_encode(parameter_value(ssh_signing_key_id)),
   )
 }
 
@@ -38318,19 +38946,21 @@ pub fn activity_list_repos_starred_by_authenticated_user_request(
 ) -> @http.Request {
   let mut url = "/user/starred"
   match sort {
-    Some(value) => url = append_query(url, "sort", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "sort", parameter_value(value))
     None => ()
   }
   match direction {
-    Some(value) => url = append_query(url, "direction", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "direction", parameter_value(value))
     None => ()
   }
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -38363,9 +38993,9 @@ pub fn activity_check_repo_is_starred_by_authenticated_user_request(
 ) -> @http.Request {
   @http.Request::get(
     "/user/starred/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)),
+    @http.percent_encode(parameter_value(repo)),
   )
 }
 
@@ -38378,9 +39008,9 @@ pub fn activity_star_repo_for_authenticated_user_request(
 ) -> @http.Request {
   @http.Request::put(
     "/user/starred/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)),
+    @http.percent_encode(parameter_value(repo)),
   )
 }
 
@@ -38393,9 +39023,9 @@ pub fn activity_unstar_repo_for_authenticated_user_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/user/starred/" +
-    percent_encode(parameter_value(owner)) +
+    @http.percent_encode(parameter_value(owner)) +
     "/" +
-    percent_encode(parameter_value(repo)),
+    @http.percent_encode(parameter_value(repo)),
   )
 }
 
@@ -38408,11 +39038,12 @@ pub fn activity_list_watched_repos_for_authenticated_user_request(
 ) -> @http.Request {
   let mut url = "/user/subscriptions"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -38445,11 +39076,12 @@ pub fn teams_list_for_authenticated_user_request(
 ) -> @http.Request {
   let mut url = "/user/teams"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -38477,7 +39109,9 @@ pub fn teams_list_for_authenticated_user_decode(
 ///
 /// Get a user using their ID
 pub fn users_get_by_id_request(account_id : Int32) -> @http.Request {
-  @http.Request::get("/user/" + percent_encode(parameter_value(account_id)))
+  @http.Request::get(
+    "/user/" + @http.percent_encode(parameter_value(account_id)),
+  )
 }
 
 ///|
@@ -38508,9 +39142,9 @@ pub fn projects_create_draft_item_for_authenticated_user_request(
 ) -> @http.Request {
   @http.Request::post(
     "/user/" +
-    percent_encode(parameter_value(user_id)) +
+    @http.percent_encode(parameter_value(user_id)) +
     "/projectsV2/" +
-    percent_encode(parameter_value(project_number)) +
+    @http.percent_encode(parameter_value(project_number)) +
     "/drafts",
   ).json_body(Json(body))
 }
@@ -38539,11 +39173,13 @@ pub fn projects_create_draft_item_for_authenticated_user_decode(
 pub fn users_list_request(since? : Int32, per_page? : Int32) -> @http.Request {
   let mut url = "/users"
   match since {
-    Some(value) => url = append_query(url, "since", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "since", parameter_value(value))
     None => ()
   }
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -38577,9 +39213,9 @@ pub fn projects_create_view_for_user_request(
 ) -> @http.Request {
   @http.Request::post(
     "/users/" +
-    percent_encode(parameter_value(user_id)) +
+    @http.percent_encode(parameter_value(user_id)) +
     "/projectsV2/" +
-    percent_encode(parameter_value(project_number)) +
+    @http.percent_encode(parameter_value(project_number)) +
     "/views",
   ).json_body(Json(body))
 }
@@ -38606,7 +39242,9 @@ pub fn projects_create_view_for_user_decode(
 ///
 /// Get a user
 pub fn users_get_by_username_request(username : String) -> @http.Request {
-  @http.Request::get("/users/" + percent_encode(parameter_value(username)))
+  @http.Request::get(
+    "/users/" + @http.percent_encode(parameter_value(username)),
+  )
 }
 
 ///|
@@ -38638,18 +39276,21 @@ pub fn users_list_attestations_bulk_request(
   after? : String,
 ) -> @http.Request {
   let mut url = "/users/" +
-    percent_encode(parameter_value(username)) +
+    @http.percent_encode(parameter_value(username)) +
     "/attestations/bulk-list"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match before {
-    Some(value) => url = append_query(url, "before", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "before", parameter_value(value))
     None => ()
   }
   match after {
-    Some(value) => url = append_query(url, "after", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "after", parameter_value(value))
     None => ()
   }
   @http.Request::post(url).json_body(Json(body))
@@ -38682,7 +39323,7 @@ pub fn users_delete_attestations_bulk_request(
 ) -> @http.Request {
   @http.Request::post(
     "/users/" +
-    percent_encode(parameter_value(username)) +
+    @http.percent_encode(parameter_value(username)) +
     "/attestations/delete-request",
   ).json_body(body)
 }
@@ -38696,9 +39337,9 @@ pub fn users_delete_attestations_by_subject_digest_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/users/" +
-    percent_encode(parameter_value(username)) +
+    @http.percent_encode(parameter_value(username)) +
     "/attestations/digest/" +
-    percent_encode_segments(parameter_value(subject_digest)),
+    @http.percent_encode_path(parameter_value(subject_digest)),
   )
 }
 
@@ -38711,9 +39352,9 @@ pub fn users_delete_attestations_by_id_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/users/" +
-    percent_encode(parameter_value(username)) +
+    @http.percent_encode(parameter_value(username)) +
     "/attestations/" +
-    percent_encode(parameter_value(attestation_id)),
+    @http.percent_encode(parameter_value(attestation_id)),
   )
 }
 
@@ -38729,24 +39370,27 @@ pub fn users_list_attestations_request(
   predicate_type? : String,
 ) -> @http.Request {
   let mut url = "/users/" +
-    percent_encode(parameter_value(username)) +
+    @http.percent_encode(parameter_value(username)) +
     "/attestations/" +
-    percent_encode_segments(parameter_value(subject_digest))
+    @http.percent_encode_path(parameter_value(subject_digest))
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match before {
-    Some(value) => url = append_query(url, "before", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "before", parameter_value(value))
     None => ()
   }
   match after {
-    Some(value) => url = append_query(url, "after", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "after", parameter_value(value))
     None => ()
   }
   match predicate_type {
     Some(value) =>
-      url = append_query(url, "predicate_type", parameter_value(value))
+      url = @http.append_query(url, "predicate_type", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -38780,18 +39424,21 @@ pub fn copilot_spaces_list_for_user_request(
   after? : String,
 ) -> @http.Request {
   let mut url = "/users/" +
-    percent_encode(parameter_value(username)) +
+    @http.percent_encode(parameter_value(username)) +
     "/copilot-spaces"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match before {
-    Some(value) => url = append_query(url, "before", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "before", parameter_value(value))
     None => ()
   }
   match after {
-    Some(value) => url = append_query(url, "after", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "after", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -38823,7 +39470,9 @@ pub fn copilot_spaces_create_for_user_request(
   body : CopilotSpacesCreateForUserRequest,
 ) -> @http.Request {
   @http.Request::post(
-    "/users/" + percent_encode(parameter_value(username)) + "/copilot-spaces",
+    "/users/" +
+    @http.percent_encode(parameter_value(username)) +
+    "/copilot-spaces",
   ).json_body(Json(body))
 }
 
@@ -38854,9 +39503,9 @@ pub fn copilot_spaces_get_for_user_request(
 ) -> @http.Request {
   @http.Request::get(
     "/users/" +
-    percent_encode(parameter_value(username)) +
+    @http.percent_encode(parameter_value(username)) +
     "/copilot-spaces/" +
-    percent_encode(parameter_value(space_number)),
+    @http.percent_encode(parameter_value(space_number)),
   )
 }
 
@@ -38888,9 +39537,9 @@ pub fn copilot_spaces_update_for_user_request(
 ) -> @http.Request {
   @http.Request::put(
     "/users/" +
-    percent_encode(parameter_value(username)) +
+    @http.percent_encode(parameter_value(username)) +
     "/copilot-spaces/" +
-    percent_encode(parameter_value(space_number)),
+    @http.percent_encode(parameter_value(space_number)),
   ).json_body(Json(body))
 }
 
@@ -38921,9 +39570,9 @@ pub fn copilot_spaces_delete_for_user_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/users/" +
-    percent_encode(parameter_value(username)) +
+    @http.percent_encode(parameter_value(username)) +
     "/copilot-spaces/" +
-    percent_encode(parameter_value(space_number)),
+    @http.percent_encode(parameter_value(space_number)),
   )
 }
 
@@ -38936,9 +39585,9 @@ pub fn copilot_spaces_list_collaborators_for_user_request(
 ) -> @http.Request {
   @http.Request::get(
     "/users/" +
-    percent_encode(parameter_value(username)) +
+    @http.percent_encode(parameter_value(username)) +
     "/copilot-spaces/" +
-    percent_encode(parameter_value(space_number)) +
+    @http.percent_encode(parameter_value(space_number)) +
     "/collaborators",
   )
 }
@@ -38971,9 +39620,9 @@ pub fn copilot_spaces_add_collaborator_for_user_request(
 ) -> @http.Request {
   @http.Request::post(
     "/users/" +
-    percent_encode(parameter_value(username)) +
+    @http.percent_encode(parameter_value(username)) +
     "/copilot-spaces/" +
-    percent_encode(parameter_value(space_number)) +
+    @http.percent_encode(parameter_value(space_number)) +
     "/collaborators",
   ).json_body(Json(body))
 }
@@ -39008,13 +39657,13 @@ pub fn copilot_spaces_update_collaborator_for_user_request(
 ) -> @http.Request {
   @http.Request::put(
     "/users/" +
-    percent_encode(parameter_value(username)) +
+    @http.percent_encode(parameter_value(username)) +
     "/copilot-spaces/" +
-    percent_encode(parameter_value(space_number)) +
+    @http.percent_encode(parameter_value(space_number)) +
     "/collaborators/" +
-    percent_encode(parameter_value(actor_type)) +
+    @http.percent_encode(parameter_value(actor_type)) +
     "/" +
-    percent_encode(parameter_value(actor_identifier)),
+    @http.percent_encode(parameter_value(actor_identifier)),
   ).json_body(Json(body))
 }
 
@@ -39047,13 +39696,13 @@ pub fn copilot_spaces_remove_collaborator_for_user_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/users/" +
-    percent_encode(parameter_value(username)) +
+    @http.percent_encode(parameter_value(username)) +
     "/copilot-spaces/" +
-    percent_encode(parameter_value(space_number)) +
+    @http.percent_encode(parameter_value(space_number)) +
     "/collaborators/" +
-    percent_encode(parameter_value(actor_type)) +
+    @http.percent_encode(parameter_value(actor_type)) +
     "/" +
-    percent_encode(parameter_value(actor_identifier)),
+    @http.percent_encode(parameter_value(actor_identifier)),
   )
 }
 
@@ -39066,9 +39715,9 @@ pub fn copilot_spaces_list_resources_for_user_request(
 ) -> @http.Request {
   @http.Request::get(
     "/users/" +
-    percent_encode(parameter_value(username)) +
+    @http.percent_encode(parameter_value(username)) +
     "/copilot-spaces/" +
-    percent_encode(parameter_value(space_number)) +
+    @http.percent_encode(parameter_value(space_number)) +
     "/resources",
   )
 }
@@ -39101,9 +39750,9 @@ pub fn copilot_spaces_create_resource_for_user_request(
 ) -> @http.Request {
   @http.Request::post(
     "/users/" +
-    percent_encode(parameter_value(username)) +
+    @http.percent_encode(parameter_value(username)) +
     "/copilot-spaces/" +
-    percent_encode(parameter_value(space_number)) +
+    @http.percent_encode(parameter_value(space_number)) +
     "/resources",
   ).json_body(Json(body))
 }
@@ -39136,11 +39785,11 @@ pub fn copilot_spaces_get_resource_for_user_request(
 ) -> @http.Request {
   @http.Request::get(
     "/users/" +
-    percent_encode(parameter_value(username)) +
+    @http.percent_encode(parameter_value(username)) +
     "/copilot-spaces/" +
-    percent_encode(parameter_value(space_number)) +
+    @http.percent_encode(parameter_value(space_number)) +
     "/resources/" +
-    percent_encode(parameter_value(space_resource_id)),
+    @http.percent_encode(parameter_value(space_resource_id)),
   )
 }
 
@@ -39173,11 +39822,11 @@ pub fn copilot_spaces_update_resource_for_user_request(
 ) -> @http.Request {
   @http.Request::put(
     "/users/" +
-    percent_encode(parameter_value(username)) +
+    @http.percent_encode(parameter_value(username)) +
     "/copilot-spaces/" +
-    percent_encode(parameter_value(space_number)) +
+    @http.percent_encode(parameter_value(space_number)) +
     "/resources/" +
-    percent_encode(parameter_value(space_resource_id)),
+    @http.percent_encode(parameter_value(space_resource_id)),
   ).json_body(Json(body))
 }
 
@@ -39209,11 +39858,11 @@ pub fn copilot_spaces_delete_resource_for_user_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/users/" +
-    percent_encode(parameter_value(username)) +
+    @http.percent_encode(parameter_value(username)) +
     "/copilot-spaces/" +
-    percent_encode(parameter_value(space_number)) +
+    @http.percent_encode(parameter_value(space_number)) +
     "/resources/" +
-    percent_encode(parameter_value(space_resource_id)),
+    @http.percent_encode(parameter_value(space_resource_id)),
   )
 }
 
@@ -39224,7 +39873,9 @@ pub fn packages_list_docker_migration_conflicting_packages_for_user_request(
   username : String,
 ) -> @http.Request {
   @http.Request::get(
-    "/users/" + percent_encode(parameter_value(username)) + "/docker/conflicts",
+    "/users/" +
+    @http.percent_encode(parameter_value(username)) +
+    "/docker/conflicts",
   )
 }
 
@@ -39255,14 +39906,15 @@ pub fn activity_list_events_for_authenticated_user_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/users/" +
-    percent_encode(parameter_value(username)) +
+    @http.percent_encode(parameter_value(username)) +
     "/events"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -39296,15 +39948,16 @@ pub fn activity_list_org_events_for_authenticated_user_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/users/" +
-    percent_encode(parameter_value(username)) +
+    @http.percent_encode(parameter_value(username)) +
     "/events/orgs/" +
-    percent_encode(parameter_value(org))
+    @http.percent_encode(parameter_value(org))
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -39337,14 +39990,15 @@ pub fn activity_list_public_events_for_user_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/users/" +
-    percent_encode(parameter_value(username)) +
+    @http.percent_encode(parameter_value(username)) +
     "/events/public"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -39377,14 +40031,15 @@ pub fn users_list_followers_for_user_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/users/" +
-    percent_encode(parameter_value(username)) +
+    @http.percent_encode(parameter_value(username)) +
     "/followers"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -39417,14 +40072,15 @@ pub fn users_list_following_for_user_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/users/" +
-    percent_encode(parameter_value(username)) +
+    @http.percent_encode(parameter_value(username)) +
     "/following"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -39457,9 +40113,9 @@ pub fn users_check_following_for_user_request(
 ) -> @http.Request {
   @http.Request::get(
     "/users/" +
-    percent_encode(parameter_value(username)) +
+    @http.percent_encode(parameter_value(username)) +
     "/following/" +
-    percent_encode(parameter_value(target_user)),
+    @http.percent_encode(parameter_value(target_user)),
   )
 }
 
@@ -39472,17 +40128,21 @@ pub fn gists_list_for_user_request(
   per_page? : Int32,
   page? : Int32,
 ) -> @http.Request {
-  let mut url = "/users/" + percent_encode(parameter_value(username)) + "/gists"
+  let mut url = "/users/" +
+    @http.percent_encode(parameter_value(username)) +
+    "/gists"
   match since {
-    Some(value) => url = append_query(url, "since", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "since", parameter_value(value))
     None => ()
   }
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -39515,14 +40175,15 @@ pub fn users_list_gpg_keys_for_user_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/users/" +
-    percent_encode(parameter_value(username)) +
+    @http.percent_encode(parameter_value(username)) +
     "/gpg_keys"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -39555,15 +40216,16 @@ pub fn users_get_context_for_user_request(
   subject_id? : String,
 ) -> @http.Request {
   let mut url = "/users/" +
-    percent_encode(parameter_value(username)) +
+    @http.percent_encode(parameter_value(username)) +
     "/hovercard"
   match subject_type {
     Some(value) =>
-      url = append_query(url, "subject_type", parameter_value(value))
+      url = @http.append_query(url, "subject_type", parameter_value(value))
     None => ()
   }
   match subject_id {
-    Some(value) => url = append_query(url, "subject_id", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "subject_id", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -39592,7 +40254,9 @@ pub fn users_get_context_for_user_decode(
 /// Get a user installation for the authenticated app
 pub fn apps_get_user_installation_request(username : String) -> @http.Request {
   @http.Request::get(
-    "/users/" + percent_encode(parameter_value(username)) + "/installation",
+    "/users/" +
+    @http.percent_encode(parameter_value(username)) +
+    "/installation",
   )
 }
 
@@ -39622,13 +40286,16 @@ pub fn users_list_public_keys_for_user_request(
   per_page? : Int32,
   page? : Int32,
 ) -> @http.Request {
-  let mut url = "/users/" + percent_encode(parameter_value(username)) + "/keys"
+  let mut url = "/users/" +
+    @http.percent_encode(parameter_value(username)) +
+    "/keys"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -39660,13 +40327,16 @@ pub fn orgs_list_for_user_request(
   per_page? : Int32,
   page? : Int32,
 ) -> @http.Request {
-  let mut url = "/users/" + percent_encode(parameter_value(username)) + "/orgs"
+  let mut url = "/users/" +
+    @http.percent_encode(parameter_value(username)) +
+    "/orgs"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -39701,19 +40371,21 @@ pub fn packages_list_packages_for_user_request(
   per_page? : Int32,
 ) -> @http.Request {
   let mut url = "/users/" +
-    percent_encode(parameter_value(username)) +
+    @http.percent_encode(parameter_value(username)) +
     "/packages"
-  url = append_query(url, "package_type", parameter_value(package_type))
+  url = @http.append_query(url, "package_type", parameter_value(package_type))
   match visibility {
-    Some(value) => url = append_query(url, "visibility", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "visibility", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -39747,11 +40419,11 @@ pub fn packages_get_package_for_user_request(
 ) -> @http.Request {
   @http.Request::get(
     "/users/" +
-    percent_encode(parameter_value(username)) +
+    @http.percent_encode(parameter_value(username)) +
     "/packages/" +
-    percent_encode(parameter_value(package_type)) +
+    @http.percent_encode(parameter_value(package_type)) +
     "/" +
-    percent_encode(parameter_value(package_name)),
+    @http.percent_encode(parameter_value(package_name)),
   )
 }
 
@@ -39783,11 +40455,11 @@ pub fn packages_delete_package_for_user_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/users/" +
-    percent_encode(parameter_value(username)) +
+    @http.percent_encode(parameter_value(username)) +
     "/packages/" +
-    percent_encode(parameter_value(package_type)) +
+    @http.percent_encode(parameter_value(package_type)) +
     "/" +
-    percent_encode(parameter_value(package_name)),
+    @http.percent_encode(parameter_value(package_name)),
   )
 }
 
@@ -39801,14 +40473,15 @@ pub fn packages_restore_package_for_user_request(
   token? : String,
 ) -> @http.Request {
   let mut url = "/users/" +
-    percent_encode(parameter_value(username)) +
+    @http.percent_encode(parameter_value(username)) +
     "/packages/" +
-    percent_encode(parameter_value(package_type)) +
+    @http.percent_encode(parameter_value(package_type)) +
     "/" +
-    percent_encode(parameter_value(package_name)) +
+    @http.percent_encode(parameter_value(package_name)) +
     "/restore"
   match token {
-    Some(value) => url = append_query(url, "token", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "token", parameter_value(value))
     None => ()
   }
   @http.Request::post(url)
@@ -39824,11 +40497,11 @@ pub fn packages_get_all_package_versions_for_package_owned_by_user_request(
 ) -> @http.Request {
   @http.Request::get(
     "/users/" +
-    percent_encode(parameter_value(username)) +
+    @http.percent_encode(parameter_value(username)) +
     "/packages/" +
-    percent_encode(parameter_value(package_type)) +
+    @http.percent_encode(parameter_value(package_type)) +
     "/" +
-    percent_encode(parameter_value(package_name)) +
+    @http.percent_encode(parameter_value(package_name)) +
     "/versions",
   )
 }
@@ -39862,13 +40535,13 @@ pub fn packages_get_package_version_for_user_request(
 ) -> @http.Request {
   @http.Request::get(
     "/users/" +
-    percent_encode(parameter_value(username)) +
+    @http.percent_encode(parameter_value(username)) +
     "/packages/" +
-    percent_encode(parameter_value(package_type)) +
+    @http.percent_encode(parameter_value(package_type)) +
     "/" +
-    percent_encode(parameter_value(package_name)) +
+    @http.percent_encode(parameter_value(package_name)) +
     "/versions/" +
-    percent_encode(parameter_value(package_version_id)),
+    @http.percent_encode(parameter_value(package_version_id)),
   )
 }
 
@@ -39901,13 +40574,13 @@ pub fn packages_delete_package_version_for_user_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/users/" +
-    percent_encode(parameter_value(username)) +
+    @http.percent_encode(parameter_value(username)) +
     "/packages/" +
-    percent_encode(parameter_value(package_type)) +
+    @http.percent_encode(parameter_value(package_type)) +
     "/" +
-    percent_encode(parameter_value(package_name)) +
+    @http.percent_encode(parameter_value(package_name)) +
     "/versions/" +
-    percent_encode(parameter_value(package_version_id)),
+    @http.percent_encode(parameter_value(package_version_id)),
   )
 }
 
@@ -39922,13 +40595,13 @@ pub fn packages_restore_package_version_for_user_request(
 ) -> @http.Request {
   @http.Request::post(
     "/users/" +
-    percent_encode(parameter_value(username)) +
+    @http.percent_encode(parameter_value(username)) +
     "/packages/" +
-    percent_encode(parameter_value(package_type)) +
+    @http.percent_encode(parameter_value(package_type)) +
     "/" +
-    percent_encode(parameter_value(package_name)) +
+    @http.percent_encode(parameter_value(package_name)) +
     "/versions/" +
-    percent_encode(parameter_value(package_version_id)) +
+    @http.percent_encode(parameter_value(package_version_id)) +
     "/restore",
   )
 }
@@ -39944,22 +40617,25 @@ pub fn projects_list_for_user_request(
   per_page? : Int32,
 ) -> @http.Request {
   let mut url = "/users/" +
-    percent_encode(parameter_value(username)) +
+    @http.percent_encode(parameter_value(username)) +
     "/projectsV2"
   match q {
-    Some(value) => url = append_query(url, "q", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "q", parameter_value(value))
     None => ()
   }
   match before {
-    Some(value) => url = append_query(url, "before", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "before", parameter_value(value))
     None => ()
   }
   match after {
-    Some(value) => url = append_query(url, "after", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "after", parameter_value(value))
     None => ()
   }
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -39992,9 +40668,9 @@ pub fn projects_get_for_user_request(
 ) -> @http.Request {
   @http.Request::get(
     "/users/" +
-    percent_encode(parameter_value(username)) +
+    @http.percent_encode(parameter_value(username)) +
     "/projectsV2/" +
-    percent_encode(parameter_value(project_number)),
+    @http.percent_encode(parameter_value(project_number)),
   )
 }
 
@@ -40027,20 +40703,23 @@ pub fn projects_list_fields_for_user_request(
   after? : String,
 ) -> @http.Request {
   let mut url = "/users/" +
-    percent_encode(parameter_value(username)) +
+    @http.percent_encode(parameter_value(username)) +
     "/projectsV2/" +
-    percent_encode(parameter_value(project_number)) +
+    @http.percent_encode(parameter_value(project_number)) +
     "/fields"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match before {
-    Some(value) => url = append_query(url, "before", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "before", parameter_value(value))
     None => ()
   }
   match after {
-    Some(value) => url = append_query(url, "after", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "after", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -40074,9 +40753,9 @@ pub fn projects_add_field_for_user_request(
 ) -> @http.Request {
   @http.Request::post(
     "/users/" +
-    percent_encode(parameter_value(username)) +
+    @http.percent_encode(parameter_value(username)) +
     "/projectsV2/" +
-    percent_encode(parameter_value(project_number)) +
+    @http.percent_encode(parameter_value(project_number)) +
     "/fields",
   ).json_body(Json(body))
 }
@@ -40109,11 +40788,11 @@ pub fn projects_get_field_for_user_request(
 ) -> @http.Request {
   @http.Request::get(
     "/users/" +
-    percent_encode(parameter_value(username)) +
+    @http.percent_encode(parameter_value(username)) +
     "/projectsV2/" +
-    percent_encode(parameter_value(project_number)) +
+    @http.percent_encode(parameter_value(project_number)) +
     "/fields/" +
-    percent_encode(parameter_value(field_id)),
+    @http.percent_encode(parameter_value(field_id)),
   )
 }
 
@@ -40148,28 +40827,32 @@ pub fn projects_list_items_for_user_request(
   fields? : ProjectsListItemsForUserFields,
 ) -> @http.Request {
   let mut url = "/users/" +
-    percent_encode(parameter_value(username)) +
+    @http.percent_encode(parameter_value(username)) +
     "/projectsV2/" +
-    percent_encode(parameter_value(project_number)) +
+    @http.percent_encode(parameter_value(project_number)) +
     "/items"
   match before {
-    Some(value) => url = append_query(url, "before", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "before", parameter_value(value))
     None => ()
   }
   match after {
-    Some(value) => url = append_query(url, "after", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "after", parameter_value(value))
     None => ()
   }
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match q {
-    Some(value) => url = append_query(url, "q", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "q", parameter_value(value))
     None => ()
   }
   match fields {
-    Some(value) => url = append_query(url, "fields", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "fields", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -40203,9 +40886,9 @@ pub fn projects_add_item_for_user_request(
 ) -> @http.Request {
   @http.Request::post(
     "/users/" +
-    percent_encode(parameter_value(username)) +
+    @http.percent_encode(parameter_value(username)) +
     "/projectsV2/" +
-    percent_encode(parameter_value(project_number)) +
+    @http.percent_encode(parameter_value(project_number)) +
     "/items",
   ).json_body(Json(body))
 }
@@ -40238,13 +40921,14 @@ pub fn projects_get_user_item_request(
   fields? : ProjectsGetUserItemFields,
 ) -> @http.Request {
   let mut url = "/users/" +
-    percent_encode(parameter_value(username)) +
+    @http.percent_encode(parameter_value(username)) +
     "/projectsV2/" +
-    percent_encode(parameter_value(project_number)) +
+    @http.percent_encode(parameter_value(project_number)) +
     "/items/" +
-    percent_encode(parameter_value(item_id))
+    @http.percent_encode(parameter_value(item_id))
   match fields {
-    Some(value) => url = append_query(url, "fields", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "fields", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -40279,11 +40963,11 @@ pub fn projects_update_item_for_user_request(
 ) -> @http.Request {
   @http.Request::patch(
     "/users/" +
-    percent_encode(parameter_value(username)) +
+    @http.percent_encode(parameter_value(username)) +
     "/projectsV2/" +
-    percent_encode(parameter_value(project_number)) +
+    @http.percent_encode(parameter_value(project_number)) +
     "/items/" +
-    percent_encode(parameter_value(item_id)),
+    @http.percent_encode(parameter_value(item_id)),
   ).json_body(Json(body))
 }
 
@@ -40315,11 +40999,11 @@ pub fn projects_delete_item_for_user_request(
 ) -> @http.Request {
   @http.Request::delete(
     "/users/" +
-    percent_encode(parameter_value(username)) +
+    @http.percent_encode(parameter_value(username)) +
     "/projectsV2/" +
-    percent_encode(parameter_value(project_number)) +
+    @http.percent_encode(parameter_value(project_number)) +
     "/items/" +
-    percent_encode(parameter_value(item_id)),
+    @http.percent_encode(parameter_value(item_id)),
   )
 }
 
@@ -40336,26 +41020,30 @@ pub fn projects_list_view_items_for_user_request(
   per_page? : Int32,
 ) -> @http.Request {
   let mut url = "/users/" +
-    percent_encode(parameter_value(username)) +
+    @http.percent_encode(parameter_value(username)) +
     "/projectsV2/" +
-    percent_encode(parameter_value(project_number)) +
+    @http.percent_encode(parameter_value(project_number)) +
     "/views/" +
-    percent_encode(parameter_value(view_number)) +
+    @http.percent_encode(parameter_value(view_number)) +
     "/items"
   match fields {
-    Some(value) => url = append_query(url, "fields", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "fields", parameter_value(value))
     None => ()
   }
   match before {
-    Some(value) => url = append_query(url, "before", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "before", parameter_value(value))
     None => ()
   }
   match after {
-    Some(value) => url = append_query(url, "after", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "after", parameter_value(value))
     None => ()
   }
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -40388,14 +41076,15 @@ pub fn activity_list_received_events_for_user_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/users/" +
-    percent_encode(parameter_value(username)) +
+    @http.percent_encode(parameter_value(username)) +
     "/received_events"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -40428,14 +41117,15 @@ pub fn activity_list_received_public_events_for_user_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/users/" +
-    percent_encode(parameter_value(username)) +
+    @http.percent_encode(parameter_value(username)) +
     "/received_events/public"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -40470,25 +41160,29 @@ pub fn repos_list_for_user_request(
   per_page? : Int32,
   page? : Int32,
 ) -> @http.Request {
-  let mut url = "/users/" + percent_encode(parameter_value(username)) + "/repos"
+  let mut url = "/users/" +
+    @http.percent_encode(parameter_value(username)) +
+    "/repos"
   match type_ {
-    Some(value) => url = append_query(url, "type", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "type", parameter_value(value))
     None => ()
   }
   match sort {
-    Some(value) => url = append_query(url, "sort", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "sort", parameter_value(value))
     None => ()
   }
   match direction {
-    Some(value) => url = append_query(url, "direction", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "direction", parameter_value(value))
     None => ()
   }
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -40524,26 +41218,29 @@ pub fn billing_get_github_billing_ai_credit_usage_report_user_request(
   product? : String,
 ) -> @http.Request {
   let mut url = "/users/" +
-    percent_encode(parameter_value(username)) +
+    @http.percent_encode(parameter_value(username)) +
     "/settings/billing/ai_credit/usage"
   match year {
-    Some(value) => url = append_query(url, "year", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "year", parameter_value(value))
     None => ()
   }
   match month {
-    Some(value) => url = append_query(url, "month", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "month", parameter_value(value))
     None => ()
   }
   match day {
-    Some(value) => url = append_query(url, "day", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "day", parameter_value(value))
     None => ()
   }
   match model {
-    Some(value) => url = append_query(url, "model", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "model", parameter_value(value))
     None => ()
   }
   match product {
-    Some(value) => url = append_query(url, "product", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "product", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -40561,26 +41258,29 @@ pub fn billing_get_github_billing_premium_request_usage_report_user_request(
   product? : String,
 ) -> @http.Request {
   let mut url = "/users/" +
-    percent_encode(parameter_value(username)) +
+    @http.percent_encode(parameter_value(username)) +
     "/settings/billing/premium_request/usage"
   match year {
-    Some(value) => url = append_query(url, "year", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "year", parameter_value(value))
     None => ()
   }
   match month {
-    Some(value) => url = append_query(url, "month", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "month", parameter_value(value))
     None => ()
   }
   match day {
-    Some(value) => url = append_query(url, "day", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "day", parameter_value(value))
     None => ()
   }
   match model {
-    Some(value) => url = append_query(url, "model", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "model", parameter_value(value))
     None => ()
   }
   match product {
-    Some(value) => url = append_query(url, "product", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "product", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -40596,18 +41296,19 @@ pub fn billing_get_github_billing_usage_report_user_request(
   day? : Int32,
 ) -> @http.Request {
   let mut url = "/users/" +
-    percent_encode(parameter_value(username)) +
+    @http.percent_encode(parameter_value(username)) +
     "/settings/billing/usage"
   match year {
-    Some(value) => url = append_query(url, "year", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "year", parameter_value(value))
     None => ()
   }
   match month {
-    Some(value) => url = append_query(url, "month", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "month", parameter_value(value))
     None => ()
   }
   match day {
-    Some(value) => url = append_query(url, "day", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "day", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -40626,30 +41327,33 @@ pub fn billing_get_github_billing_usage_summary_report_user_request(
   sku? : String,
 ) -> @http.Request {
   let mut url = "/users/" +
-    percent_encode(parameter_value(username)) +
+    @http.percent_encode(parameter_value(username)) +
     "/settings/billing/usage/summary"
   match year {
-    Some(value) => url = append_query(url, "year", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "year", parameter_value(value))
     None => ()
   }
   match month {
-    Some(value) => url = append_query(url, "month", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "month", parameter_value(value))
     None => ()
   }
   match day {
-    Some(value) => url = append_query(url, "day", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "day", parameter_value(value))
     None => ()
   }
   match repository {
-    Some(value) => url = append_query(url, "repository", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "repository", parameter_value(value))
     None => ()
   }
   match product {
-    Some(value) => url = append_query(url, "product", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "product", parameter_value(value))
     None => ()
   }
   match sku {
-    Some(value) => url = append_query(url, "sku", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "sku", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -40664,14 +41368,15 @@ pub fn users_list_social_accounts_for_user_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/users/" +
-    percent_encode(parameter_value(username)) +
+    @http.percent_encode(parameter_value(username)) +
     "/social_accounts"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -40704,14 +41409,15 @@ pub fn users_list_ssh_signing_keys_for_user_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/users/" +
-    percent_encode(parameter_value(username)) +
+    @http.percent_encode(parameter_value(username)) +
     "/ssh_signing_keys"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -40746,22 +41452,24 @@ pub fn activity_list_repos_starred_by_user_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/users/" +
-    percent_encode(parameter_value(username)) +
+    @http.percent_encode(parameter_value(username)) +
     "/starred"
   match sort {
-    Some(value) => url = append_query(url, "sort", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "sort", parameter_value(value))
     None => ()
   }
   match direction {
-    Some(value) => url = append_query(url, "direction", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "direction", parameter_value(value))
     None => ()
   }
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -40794,14 +41502,15 @@ pub fn activity_list_repos_watched_by_user_request(
   page? : Int32,
 ) -> @http.Request {
   let mut url = "/users/" +
-    percent_encode(parameter_value(username)) +
+    @http.percent_encode(parameter_value(username)) +
     "/subscriptions"
   match per_page {
-    Some(value) => url = append_query(url, "per_page", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
   match page {
-    Some(value) => url = append_query(url, "page", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)

@@ -16,35 +16,6 @@ fn[T : ToJson] parameter_value(value : T) -> String {
 }
 
 ///|
-fn percent_encode(value : String) -> String {
-  let hex = b"0123456789ABCDEF"
-  let output : Array[Byte] = []
-  for byte in @utf8.encode(value) {
-    let code = byte.to_int()
-    if (code >= 65 && code <= 90) ||
-      (code >= 97 && code <= 122) ||
-      (code >= 48 && code <= 57) ||
-      byte == b'-' ||
-      byte == b'.' ||
-      byte == b'_' ||
-      byte == b'~' {
-      output.push(byte)
-    } else {
-      output.push(b'%')
-      output.push(hex[code >> 4])
-      output.push(hex[code & 15])
-    }
-  }
-  try! @utf8.decode(Bytes::from_array(output))
-}
-
-///|
-fn append_query(url : String, name : String, value : String) -> String {
-  let separator = if url.contains("?") { "&" } else { "?" }
-  url + separator + percent_encode(name) + "=" + percent_encode(value)
-}
-
-///|
 fn parse_json_body(body : Bytes) -> Json raise {
   @json.parse(@utf8.decode(body))
 }
@@ -110,7 +81,7 @@ pub fn find_pets_by_status_request(
   status : FindPetsByStatusStatus,
 ) -> @http.Request {
   let mut url = "/pet/findByStatus"
-  url = append_query(url, "status", parameter_value(status))
+  url = @http.append_query(url, "status", parameter_value(status))
   @http.Request::get(url)
 }
 
@@ -138,7 +109,7 @@ pub fn find_pets_by_status_decode(
 pub fn find_pets_by_tags_request(tags : Array[String]) -> @http.Request {
   let mut url = "/pet/findByTags"
   for value in tags {
-    url = append_query(url, "tags", parameter_value(value))
+    url = @http.append_query(url, "tags", parameter_value(value))
   }
   @http.Request::get(url)
 }
@@ -165,7 +136,7 @@ pub fn find_pets_by_tags_decode(
 ///
 /// Find pet by ID.
 pub fn get_pet_by_id_request(pet_id : Int64) -> @http.Request {
-  @http.Request::get("/pet/" + percent_encode(parameter_value(pet_id)))
+  @http.Request::get("/pet/" + @http.percent_encode(parameter_value(pet_id)))
 }
 
 ///|
@@ -194,13 +165,14 @@ pub fn update_pet_with_form_request(
   name? : String,
   status? : String,
 ) -> @http.Request {
-  let mut url = "/pet/" + percent_encode(parameter_value(pet_id))
+  let mut url = "/pet/" + @http.percent_encode(parameter_value(pet_id))
   match name {
-    Some(value) => url = append_query(url, "name", parameter_value(value))
+    Some(value) => url = @http.append_query(url, "name", parameter_value(value))
     None => ()
   }
   match status {
-    Some(value) => url = append_query(url, "status", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "status", parameter_value(value))
     None => ()
   }
   @http.Request::post(url)
@@ -229,7 +201,7 @@ pub fn update_pet_with_form_decode(
 /// Deletes a pet. The caller handles the response as @http.Response.
 pub fn delete_pet_request(pet_id : Int64, api_key? : String) -> @http.Request {
   let mut request = @http.Request::delete(
-    "/pet/" + percent_encode(parameter_value(pet_id)),
+    "/pet/" + @http.percent_encode(parameter_value(pet_id)),
   )
   match api_key {
     Some(value) => request = request.header("api_key", parameter_value(value))
@@ -246,11 +218,15 @@ pub fn upload_file_request(
   additional_metadata? : String,
 ) -> @http.Request {
   let mut url = "/pet/" +
-    percent_encode(parameter_value(pet_id)) +
+    @http.percent_encode(parameter_value(pet_id)) +
     "/uploadImage"
   match additional_metadata {
     Some(value) =>
-      url = append_query(url, "additionalMetadata", parameter_value(value))
+      url = @http.append_query(
+        url,
+        "additionalMetadata",
+        parameter_value(value),
+      )
     None => ()
   }
   @http.Request::post(url)
@@ -329,7 +305,7 @@ pub fn place_order_decode(
 /// Find purchase order by ID.
 pub fn get_order_by_id_request(order_id : Int64) -> @http.Request {
   @http.Request::get(
-    "/store/order/" + percent_encode(parameter_value(order_id)),
+    "/store/order/" + @http.percent_encode(parameter_value(order_id)),
   )
 }
 
@@ -356,7 +332,7 @@ pub fn get_order_by_id_decode(
 /// Delete purchase order by identifier. The caller handles the response as @http.Response.
 pub fn delete_order_request(order_id : Int64) -> @http.Request {
   @http.Request::delete(
-    "/store/order/" + percent_encode(parameter_value(order_id)),
+    "/store/order/" + @http.percent_encode(parameter_value(order_id)),
   )
 }
 
@@ -421,11 +397,13 @@ pub fn login_user_request(
 ) -> @http.Request {
   let mut url = "/user/login"
   match username {
-    Some(value) => url = append_query(url, "username", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "username", parameter_value(value))
     None => ()
   }
   match password {
-    Some(value) => url = append_query(url, "password", parameter_value(value))
+    Some(value) =>
+      url = @http.append_query(url, "password", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -460,7 +438,7 @@ pub fn logout_user_request() -> @http.Request {
 ///
 /// Get user by user name.
 pub fn get_user_by_name_request(username : String) -> @http.Request {
-  @http.Request::get("/user/" + percent_encode(parameter_value(username)))
+  @http.Request::get("/user/" + @http.percent_encode(parameter_value(username)))
 }
 
 ///|
@@ -485,7 +463,7 @@ pub fn get_user_by_name_decode(
 ///
 /// Update user resource. The caller handles the response as @http.Response.
 pub fn update_user_request(username : String, body : User) -> @http.Request {
-  @http.Request::put("/user/" + percent_encode(parameter_value(username))).json_body(
+  @http.Request::put("/user/" + @http.percent_encode(parameter_value(username))).json_body(
     Json(body),
   )
 }
@@ -494,5 +472,7 @@ pub fn update_user_request(username : String, body : User) -> @http.Request {
 ///
 /// Delete user resource. The caller handles the response as @http.Response.
 pub fn delete_user_request(username : String) -> @http.Request {
-  @http.Request::delete("/user/" + percent_encode(parameter_value(username)))
+  @http.Request::delete(
+    "/user/" + @http.percent_encode(parameter_value(username)),
+  )
 }

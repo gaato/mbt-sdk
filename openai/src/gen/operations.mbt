@@ -16,29 +16,6 @@ fn[T : ToJson] parameter_value(value : T) -> String {
 }
 
 ///|
-fn percent_encode(value : String) -> String {
-  let hex = b"0123456789ABCDEF"
-  let output : Array[Byte] = []
-  for byte in @utf8.encode(value) {
-    let code = byte.to_int()
-    if (code >= 65 && code <= 90) ||
-      (code >= 97 && code <= 122) ||
-      (code >= 48 && code <= 57) ||
-      byte == b'-' ||
-      byte == b'.' ||
-      byte == b'_' ||
-      byte == b'~' {
-      output.push(byte)
-    } else {
-      output.push(b'%')
-      output.push(hex[code >> 4])
-      output.push(hex[code & 15])
-    }
-  }
-  try! @utf8.decode(Bytes::from_array(output))
-}
-
-///|
 fn parse_json_body(body : Bytes) -> Json raise {
   @json.parse(@utf8.decode(body))
 }
@@ -134,7 +111,7 @@ pub fn list_models_decode(
 ///
 /// Retrieves a model instance, providing basic information about the model such as the owner and permissioning.
 pub fn retrieve_model_request(model : String) -> @http.Request {
-  @http.Request::get("/models/" + percent_encode(parameter_value(model)))
+  @http.Request::get("/models/" + @http.percent_encode(parameter_value(model)))
 }
 
 ///|
