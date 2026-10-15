@@ -4,6 +4,7 @@ package "gaato/http-async"
 import {
   "gaato/http",
   "gaato/http/clock",
+  "gaato/http/sync",
 }
 
 // Values
@@ -27,6 +28,22 @@ pub fn AsyncTransport::new(timeout_ms? : Int, max_idle_per_origin? : Int, idle_m
 pub async fn AsyncTransport::send(Self, @http.Request) -> @http.Response raise @http.HttpError
 pub async fn AsyncTransport::send_stream(Self, @http.Request) -> (@http.ResponseHead, &@http.BodyStream) raise @http.HttpError
 pub impl @http.Transport for AsyncTransport
+
+pub struct DeadlineTransport {
+  // private fields
+}
+pub fn DeadlineTransport::new(&@http.Transport, timeout_ms~ : Int) -> Self
+pub async fn DeadlineTransport::send(Self, @http.Request) -> @http.Response raise @http.HttpError
+pub async fn DeadlineTransport::send_stream(Self, @http.Request) -> (@http.ResponseHead, &@http.BodyStream) raise @http.HttpError
+pub impl @http.Transport for DeadlineTransport
+
+pub struct SemaphoreGate {
+  // private fields
+}
+pub async fn SemaphoreGate::acquire(Self) -> Unit noraise
+pub fn SemaphoreGate::new(permits? : Int) -> Self
+pub fn SemaphoreGate::release(Self) -> Unit
+pub impl @sync.Gate for SemaphoreGate
 
 // Type aliases
 
