@@ -7,6 +7,12 @@ import {
 }
 
 // Values
+pub fn append_query(String, String, String) -> String
+
+pub fn percent_encode(String) -> String
+
+pub fn percent_encode_path(String) -> String
+
 pub async fn send_with(&Transport, Array[async (Request, async (Request) -> Response raise HttpError) -> Response raise HttpError], Request) -> Response raise HttpError
 
 // Errors
