@@ -44,6 +44,12 @@ pub async fn GitHub::send(Self, @http.Request) -> @http.Response raise @sdk-runt
 pub fn GitHub::to_repr(Self) -> @debug.Repr
 pub impl @debug.Debug for GitHub
 
+pub(all) struct GitHubRetry {
+  policy : @sdk-runtime.RetryPolicy
+}
+pub fn GitHubRetry::next_delay_ms(Self, @sdk-runtime.SdkError, @http.Request, Int, Double) -> Int?
+pub impl @sdk-runtime.RetryDecider for GitHubRetry
+
 pub(all) struct GraphqlError {
   message : String
   type_ : String?

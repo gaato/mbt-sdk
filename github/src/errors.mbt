@@ -70,7 +70,7 @@ pub fn is_not_modified(error : @runtime.SdkError) -> Bool {
 /// points in a minute, too much content creation — is a separate mechanism,
 /// reported with `403` or `429` plus a `retry-after` header, or a body whose
 /// message names it. It leaves `x-ratelimit-remaining` untouched, so no limiter
-/// can anticipate it: the caller has to back off and retry.
+/// can anticipate it: `GitHubRetry` waits and retries after it occurs.
 ///
 /// The runtime's taxonomy classifies only `429` as `RateLimited`, so a
 /// secondary limit delivered as `403` arrives as `Status`. This predicate spans
