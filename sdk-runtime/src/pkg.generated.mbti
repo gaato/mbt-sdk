@@ -4,6 +4,7 @@ package "gaato/sdk-runtime"
 import {
   "gaato/http",
   "gaato/http/clock",
+  "gaato/http/sync",
   "moonbitlang/core/debug",
 }
 
@@ -75,6 +76,14 @@ pub async fn Client::send(Self, @http.Request, bucket? : String, global_exempt? 
 pub async fn Client::send_json(Self, @http.Request, bucket? : String, global_exempt? : Bool, body? : () -> Bytes) -> Json raise SdkError
 pub async fn Client::send_stream(Self, @http.Request, bucket? : String, global_exempt? : Bool, body? : () -> Bytes) -> (@http.ResponseHead, &@http.BodyStream) raise SdkError
 
+pub(all) struct GlobalWindow {
+  limit : Int
+  window_ms : Int
+} derive(Eq, @debug.Debug)
+pub fn GlobalWindow::equal(Self, Self) -> Bool
+pub fn GlobalWindow::not_equal(Self, Self) -> Bool
+pub fn GlobalWindow::to_repr(Self) -> @debug.Repr
+
 pub struct NoLimiter {
 }
 pub async fn NoLimiter::acquire(Self, String, global_exempt~ : Bool) -> Unit
@@ -122,7 +131,7 @@ pub struct WindowLimiter {
   // private fields
 }
 pub async fn WindowLimiter::acquire(Self, String, global_exempt~ : Bool) -> Unit
-pub fn WindowLimiter::new(&@clock.Clock, (@http.Headers, Int64) -> RateLimitState?) -> Self
+pub fn WindowLimiter::new(&@clock.Clock, (@http.Headers, Int64) -> RateLimitState?, gate? : () -> &@sync.Gate, global? : GlobalWindow, global_block? : (@http.Headers) -> Bool, default_retry_after_ms? : Int) -> Self
 pub async fn WindowLimiter::release(Self, String, status~ : Int, headers~ : @http.Headers) -> Unit
 pub fn WindowLimiter::state(Self, String) -> RateLimitState?
 pub impl RateLimiter for WindowLimiter

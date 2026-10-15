@@ -78,20 +78,122 @@ pub impl RateLimiter for NoLimiter with fn release(
 }
 
 ///|
+/// An account-wide admission window counted across buckets.
+pub(all) struct GlobalWindow {
+  limit : Int32
+  window_ms : Int32
+} derive(Eq, Debug)
+
+///|
+/// Equality for global windows.
+pub extend GlobalWindow with Eq::{equal, not_equal}
+
+///|
+/// Debug representation of global windows.
+pub extend GlobalWindow with @debug.Debug::{to_repr}
+
+///|
 /// A mutable per-bucket fixed-window limiter driven by an injected clock.
 pub struct WindowLimiter {
   priv clock : &@clock.Clock
   priv parse : (@http.Headers, Int64) -> RateLimitState?
   priv states : Map[String, RateLimitState]
+  priv gate : (() -> &@sync.Gate)?
+  priv gates : Map[String, &@sync.Gate]
+  priv held : Map[String, Int32]
+  priv global : GlobalWindow?
+  priv global_block : ((@http.Headers) -> Bool)?
+  priv default_retry_after_ms : Int32?
+  priv mut global_window_start : Int64?
+  priv mut global_count : Int32
+  priv mut global_blocked_until : Int64?
 }
 
 ///|
 /// Creates a limiter using an API-specific response-header parser.
+/// `gate` creates one gate per bucket, held until the paired release.
+/// `global` limits non-exempt admissions across buckets (positive values).
+/// `global_block` identifies account-wide 429 responses.
+/// `default_retry_after_ms` supplies a delay when a 429 has no Retry-After.
+/// Negative fallback delays are treated as zero.
 pub fn WindowLimiter::new(
   clock : &@clock.Clock,
   parse : (@http.Headers, Int64) -> RateLimitState?,
+  gate? : () -> &@sync.Gate,
+  global? : GlobalWindow,
+  global_block? : (@http.Headers) -> Bool,
+  default_retry_after_ms? : Int32,
 ) -> WindowLimiter {
-  { clock, parse, states: Map([]), }
+  {
+    clock,
+    parse,
+    states: Map([]),
+    gate,
+    gates: Map([]),
+    held: Map([]),
+    global,
+    global_block,
+    default_retry_after_ms,
+    global_window_start: None,
+    global_count: 0,
+    global_blocked_until: None,
+  }
+}
+
+///|
+async fn WindowLimiter::wait_for_global(self : WindowLimiter) -> Unit {
+  for ;; {
+    let now = self.clock.now_unix_ms()
+    if self.global_blocked_until is Some(until) && now < until {
+      self.sleep_until(until, now)
+      continue
+    }
+    guard self.global is Some(window) else { return }
+    let start = match self.global_window_start {
+      Some(start) => start
+      None => now
+    }
+    let end = saturating_add_ms(start, window.window_ms)
+    if self.global_window_start is None || now >= end {
+      self.global_window_start = Some(now)
+      self.global_count = 0
+    }
+    if self.global_count < window.limit {
+      self.global_count += 1
+      return
+    }
+    self.sleep_until(end, now)
+  }
+}
+
+///|
+async fn WindowLimiter::sleep_until(
+  self : WindowLimiter,
+  until : Int64,
+  now : Int64,
+) -> Unit {
+  let delta = if now < 0L && until > 9223372036854775807L + now {
+    9223372036854775807L
+  } else {
+    until - now
+  }
+  self.clock.sleep(
+    if delta > 2147483647L {
+      2147483647
+    } else {
+      delta.to_int()
+    },
+  )
+}
+
+///|
+fn WindowLimiter::release_gate(self : WindowLimiter, bucket : String) -> Unit {
+  if self.held.get(bucket) is Some(count) && count > 0 {
+    self.held[bucket] = count - 1
+    if self.gates.get(bucket) is Some(gate) {
+      gate.release()
+    }
+  }
 }
 
 ///|
@@ -109,13 +211,29 @@ pub fn WindowLimiter::state(
 
 ///|
 /// Rechecks the bucket after every sleep because another task may update it.
-/// There is no account-wide window here, so `global_exempt` is ignored.
 pub impl RateLimiter for WindowLimiter with fn acquire(
   self,
   bucket,
   global_exempt~,
 ) {
-  ignore(global_exempt)
+  if !global_exempt {
+    self.wait_for_global()
+  }
+  let gate = self.gate.map(make => {
+    match self.gates.get(bucket) {
+      Some(gate) => gate
+      None => {
+        let gate = make()
+        self.gates[bucket] = gate
+        gate
+      }
+    }
+  })
+  if gate is Some(gate) {
+    gate.acquire()
+    self.held[bucket] = self.held.get(bucket).unwrap_or(0) + 1
+  }
+  errdefer self.release_gate(bucket)
   for ;; {
     guard self.states.get(bucket) is Some(state) else { return }
     let now = self.clock.now_unix_ms()
@@ -142,6 +260,7 @@ pub impl RateLimiter for WindowLimiter with fn release(
   status~,
   headers~,
 ) {
+  defer self.release_gate(bucket)
   if status == 0 {
     return
   }
@@ -149,10 +268,21 @@ pub impl RateLimiter for WindowLimiter with fn release(
   if (self.parse)(headers, now_unix_ms) is Some(state) {
     self.states[bucket] = state
   }
-  if status == 429 && retry_after_ms(headers, now_unix_ms~) is Some(ms) {
-    self.states[bucket] = {
-      remaining: 0,
-      reset_at_unix_ms: saturating_add_ms(now_unix_ms, ms),
+  let delay = match retry_after_ms(headers, now_unix_ms~) {
+    Some(ms) => Some(ms)
+    None => self.default_retry_after_ms
+  }
+  if status == 429 && delay is Some(ms) {
+    let until = saturating_add_ms(now_unix_ms, ms.max(0))
+    if self.global_block is Some(is_global) && is_global(headers) {
+      self.global_blocked_until = Some(
+        match self.global_blocked_until {
+          Some(previous) => previous.max(until)
+          None => until
+        },
+      )
+    } else {
+      self.states[bucket] = { remaining: 0, reset_at_unix_ms: until, }
     }
   }
 }

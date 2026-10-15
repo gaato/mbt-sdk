@@ -201,3 +201,13 @@ pub fn apply(request : @http.Request, parts : Array[Part], boundary : String) ->
 - `Paginator::collect(max <= 0)` は fetch しない。上限が page の途中なら残り item は捨てるが、その page の `next` cursor は保持する。fetch failure 前には state を変更しない。
 - `FakeTransport` の既存契約には transport error を台本化する公開 API が無いため、Connect retry の実行テストだけ runtime-tests 内の private transport を使い、その他の Client/stream tests は `@mock.FakeTransport`、全 timing tests は `@mock.FakeClock` を使う。mock の公開 API は増やさない。
 - `AsyncClock` の実行テストは契約どおり native-only の nested package に分けた。他の runtime-tests は同じ source で native / js の両方を対象にし、各 async test を 5 秒以下の outer timeout で囲んだ。
+
+## Gate injection
+
+`WindowLimiter` accepts a per-bucket gate factory. `Gate` lives in
+`gaato/http/sync`, and `SemaphoreGate` in `gaato/http-async` implements it.
+Like `Clock`, this keeps the async runtime outside `sdk-runtime`: the caller
+injects synchronization, held from admission through the paired release.
+Polling with `Clock.sleep` cannot implement a gate because `FakeClock.sleep`
+advances time without yielding. Cancellation while waiting for a bucket reset
+unwinds through `errdefer`, returning the acquired gate.
