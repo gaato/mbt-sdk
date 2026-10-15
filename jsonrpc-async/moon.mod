@@ -20,5 +20,5 @@ preferred_target = "native"
 
 import {
   "gaato/jsonrpc@0.1.0",
-  "moonbitlang/async@0.22.4",
+  "moonbitlang/async@0.22.5",
 }

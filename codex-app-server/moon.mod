@@ -18,5 +18,5 @@ import {
   "gaato/codex-protocol@0.1.0",
   "gaato/jsonrpc@0.1.0",
   "gaato/jsonrpc-async@0.1.0",
-  "moonbitlang/async@0.22.4",
+  "moonbitlang/async@0.22.5",
 }
