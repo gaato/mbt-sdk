@@ -10,6 +10,8 @@ import {
 // Values
 pub fn classify(@http.Response, now_unix_ms? : Int64) -> @http.Response raise SdkError
 
+pub fn default_random() -> Double
+
 pub fn is_idempotent(@http.Request) -> Bool
 
 pub fn parse_link_next(@http.Headers) -> String?

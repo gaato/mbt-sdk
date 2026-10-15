@@ -13,6 +13,10 @@ pub fn encode(Array[Part], String) -> (String, Bytes) raise MultipartError
 
 pub fn encode_segments(Array[Part], String) -> (String, Array[Bytes]) raise MultipartError
 
+pub fn encode_segments_fresh(Array[Part], random? : () -> Double, attempts? : Int) -> (String, Array[Bytes]) raise MultipartError
+
+pub fn join_segments(Array[Bytes]) -> Bytes
+
 pub fn make_boundary(() -> Double) -> String
 
 // Errors

@@ -219,3 +219,73 @@ test "encode_segments concatenates to encode and keeps part bodies uncopied" {
   // An empty body contributes no segment of its own.
   assert_false(segments.iter().any(segment => segment.is_empty()))
 }
+
+///|
+test "fresh encoding redraws collisions and joins exactly" {
+  let boundary = @multipart.make_boundary(() => 0.0)
+  let parts = [@multipart.Part::text("x", "--" + boundary)]
+  let mut draws = 0
+  let (content_type, segments) = @multipart.encode_segments_fresh(parts, random=() => {
+    draws += 1
+    if draws <= 32 {
+      0.0
+    } else {
+      0.5
+    }
+  })
+  assert_eq(draws, 64)
+  let second = @multipart.make_boundary(() => 0.5)
+  let (expected_type, expected) = @multipart.encode(parts, second)
+  assert_eq(content_type, expected_type)
+  assert_eq(@multipart.join_segments(segments), expected)
+  assert_eq(@multipart.join_segments([]), b"")
+  draws = 0
+  expect_error(
+    () => {
+      ignore(
+        @multipart.encode_segments_fresh(
+          parts,
+          random=() => {
+            draws += 1
+            0.0
+          },
+          attempts=2,
+        ),
+      )
+    },
+    "BoundaryCollision",
+  )
+  assert_eq(draws, 64)
+  expect_error(
+    () => {
+      ignore(
+        @multipart.encode_segments_fresh(
+          [],
+          random=() => {
+            draws += 1
+            0.0
+          },
+          attempts=0,
+        ),
+      )
+    },
+    "BoundaryCollision",
+  )
+  assert_eq(draws, 64)
+  expect_error(
+    () => {
+      ignore(
+        @multipart.encode_segments_fresh(
+          [@multipart.Part::file("x", "x", "bad\rheader", b"")],
+          random=() => {
+            draws += 1
+            0.0
+          },
+        ),
+      )
+    },
+    "InvalidHeaderValue:bad\rheader",
+  )
+  assert_eq(draws, 96)
+  ignore(@multipart.encode_segments_fresh([]))
+}

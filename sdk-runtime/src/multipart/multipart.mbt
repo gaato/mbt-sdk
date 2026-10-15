@@ -303,3 +303,34 @@ pub fn apply(
   result.headers.set("content-type", content_type)
   result
 }
+
+///|
+/// Encodes with a fresh random boundary, retrying only BoundaryCollision up to
+/// `attempts` draws. Nonpositive attempts raise BoundaryCollision without drawing.
+pub fn encode_segments_fresh(
+  parts : Array[Part],
+  random~ : () -> Double = @runtime.default_random,
+  attempts~ : Int32 = 16,
+) -> (String, Array[Bytes]) raise MultipartError {
+  for _ in 0..<attempts {
+    let boundary = make_boundary(random)
+    try encode_segments(parts, boundary) catch {
+      BoundaryCollision => continue
+      other => raise other
+    } noraise {
+      result => return result
+    }
+  }
+  raise BoundaryCollision
+}
+
+///|
+/// Joins encoded segments into one buffer, preserving their order.
+pub fn join_segments(segments : Array[Bytes]) -> Bytes {
+  let size = segments.fold(init=0, (size, segment) => size + segment.length())
+  let buffer = Buffer(size_hint=size)
+  for segment in segments {
+    buffer.write_bytes(segment)
+  }
+  buffer.to_bytes()
+}
