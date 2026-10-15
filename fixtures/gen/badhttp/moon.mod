@@ -4,6 +4,8 @@ name = "gaato/fixture-badhttp"
 
 version = "0.0.0"
 
+private = true
+
 license = "Apache-2.0"
 
 source = "src"
