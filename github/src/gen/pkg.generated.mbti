@@ -45747,6 +45747,23 @@ pub fn RunnerLabelType::to_repr(Self) -> @debug.Repr
 pub impl ToJson for RunnerLabelType
 pub impl @moonbitlang/core/json.FromJson for RunnerLabelType
 
+pub(all) struct ScimError {
+  message : @gaato/sdk-runtime/json.Presence[String]
+  documentation_url : @gaato/sdk-runtime/json.Presence[String]
+  detail : @gaato/sdk-runtime/json.Presence[String]
+  status : Int?
+  scim_type : @gaato/sdk-runtime/json.Presence[String]
+  schemas : Array[String]?
+} derive(Eq, @debug.Debug)
+pub fn ScimError::equal(Self, Self) -> Bool
+pub fn ScimError::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ScimError::new(message? : String, documentation_url? : String, detail? : String, status? : Int, scim_type? : String, schemas? : Array[String]) -> Self
+pub fn ScimError::not_equal(Self, Self) -> Bool
+pub fn ScimError::to_json(Self) -> Json
+pub fn ScimError::to_repr(Self) -> @debug.Repr
+pub impl ToJson for ScimError
+pub impl @moonbitlang/core/json.FromJson for ScimError
+
 pub(all) enum SearchCodeOrder {
   Desc
   Asc

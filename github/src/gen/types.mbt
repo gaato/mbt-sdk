@@ -2136,6 +2136,80 @@ pub impl @json.FromJson for HookDeliveryItem with fn from_json(value, path) {
 
 ///|
 ///
+/// Scim Error
+pub(all) struct ScimError {
+  message : @sdkjson.Presence[String]
+  documentation_url : @sdkjson.Presence[String]
+  detail : @sdkjson.Presence[String]
+  status : Int32?
+  scim_type : @sdkjson.Presence[String]
+  schemas : Array[String]?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ScimError with Eq::{equal, not_equal}
+
+///|
+pub extend ScimError with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a ScimError with omitted optional fields absent.
+pub fn ScimError::new(
+  message? : String,
+  documentation_url? : String,
+  detail? : String,
+  status? : Int32,
+  scim_type? : String,
+  schemas? : Array[String],
+) -> ScimError {
+  {
+    message: @sdkjson.Presence::from_option(message),
+    documentation_url: @sdkjson.Presence::from_option(documentation_url),
+    detail: @sdkjson.Presence::from_option(detail),
+    status,
+    scim_type: @sdkjson.Presence::from_option(scim_type),
+    schemas,
+  }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend ScimError with ToJson::{to_json}
+
+///|
+pub impl ToJson for ScimError with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .presence("message", self.message)
+  .presence("documentation_url", self.documentation_url)
+  .presence("detail", self.detail)
+  .opt("status", self.status)
+  .presence("scimType", self.scim_type)
+  .opt("schemas", self.schemas)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend ScimError with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for ScimError with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    message: @sdkjson.presence_field(obj, "message", path),
+    documentation_url: @sdkjson.presence_field(obj, "documentation_url", path),
+    detail: @sdkjson.presence_field(obj, "detail", path),
+    status: @sdkjson.opt_field(obj, "status", path),
+    scim_type: @sdkjson.presence_field(obj, "scimType", path),
+    schemas: @sdkjson.opt_field(obj, "schemas", path),
+  }
+}
+
+///|
+///
 /// Generated untagged union ValidationErrorErrorsItemValue.
 pub(all) enum ValidationErrorErrorsItemValue {
   Text(String)
@@ -5756,6 +5830,7 @@ pub impl ToJson for AppPermissions with fn to_json(self) {
     "organization_copilot_agent_settings",
     self.organization_copilot_agent_settings,
   )
+  .field("organization_copilot_requests", "read")
   .opt(
     "organization_external_properties_for_repos",
     self.organization_external_properties_for_repos,
