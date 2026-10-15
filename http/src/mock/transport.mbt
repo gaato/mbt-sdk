@@ -13,6 +13,7 @@ pub extend MockError with @debug.Debug::{to_repr}
 
 ///|
 priv enum Reply {
+  Failure(@http.HttpError)
   Buffered(@http.Response)
   Streaming(@http.ResponseHead, Array[Bytes])
 }
@@ -156,6 +157,7 @@ fn FakeTransport::take(
     )
   }
   let expected_streaming = match expected.reply {
+    Failure(_) => streaming
     Streaming(_, _) => true
     Buffered(_) => false
   }
@@ -171,6 +173,7 @@ fn FakeTransport::take(
 /// Consumes the next buffered expectation, without interpreting its status.
 pub impl @http.Transport for FakeTransport with fn send(self, request) {
   match self.take(request, false) {
+    Failure(error) => raise error
     Buffered(response) => response
     Streaming(_, _) => self.reject("expected a buffered response")
   }
@@ -180,6 +183,7 @@ pub impl @http.Transport for FakeTransport with fn send(self, request) {
 /// Consumes the next stream expectation and returns a closable chunk stream.
 pub impl @http.Transport for FakeTransport with fn send_stream(self, request) {
   match self.take(request, true) {
+    Failure(error) => raise error
     Streaming(head, chunks) =>
       (head, ScriptStream::{ owner: self, chunks, cursor: 0, closed: false, })
     Buffered(_) => self.reject("expected a streaming response")
@@ -212,4 +216,19 @@ impl @http.BodyStream for ScriptStream with fn close(self) {
     self.closed = true
     self.owner.closed += 1
   }
+}
+
+///|
+/// Appends an error expectation accepted by either send or send_stream.
+pub fn FakeTransport::expect_error(
+  self : FakeTransport,
+  http_method : String,
+  url_suffix : String,
+  error : @http.HttpError,
+) -> Unit {
+  self.expectations.push({
+    http_method: http_method.to_lower(),
+    url_suffix,
+    reply: Failure(error),
+  })
 }

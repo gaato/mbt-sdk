@@ -1,0 +1,16 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "gaato/http/sync"
+
+// Values
+
+// Errors
+
+// Types and methods
+
+// Type aliases
+
+// Traits
+pub(open) trait Gate {
+  async fn acquire(Self) -> Unit noraise
+  fn release(Self) -> Unit
+}

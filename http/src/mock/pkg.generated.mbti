@@ -34,6 +34,7 @@ pub struct FakeTransport {
 }
 pub fn FakeTransport::assert_complete(Self) -> Unit raise MockError
 pub fn FakeTransport::expect(Self, String, String, @http.Response) -> Unit
+pub fn FakeTransport::expect_error(Self, String, String, @http.HttpError) -> Unit
 pub fn FakeTransport::expect_stream(Self, String, String, @http.ResponseHead, Array[Bytes]) -> Unit
 pub fn FakeTransport::new() -> Self
 pub async fn FakeTransport::send(Self, @http.Request) -> @http.Response raise @http.HttpError
