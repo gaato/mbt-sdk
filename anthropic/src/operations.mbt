@@ -149,6 +149,26 @@ pub async fn Anthropic::list_models(
 }
 
 ///|
+/// Iterates over every model page by page, following `has_more` with `after_id = last_id`.
+pub fn Anthropic::paginate_models(
+  self : Anthropic,
+  limit? : Int32,
+  lifecycle? : Array[ModelsListLifecycleItem],
+) -> @runtime.Paginator[ModelInfo, @runtime.SdkError] {
+  @runtime.Paginator::with_cursor(cursor => {
+    let page = self.list_models(limit?, lifecycle?, after_id?=cursor)
+    @runtime.Page::{
+      items: page.data,
+      next: if page.has_more {
+        page.last_id
+      } else {
+        None
+      },
+    }
+  })
+}
+
+///|
 /// Retrieves one model by identifier or alias.
 pub async fn Anthropic::retrieve_model(
   self : Anthropic,

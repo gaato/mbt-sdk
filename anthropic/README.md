@@ -6,7 +6,7 @@ Unofficial and experimental. Source, issues and design notes: https://github.com
 
 Request and response types in `gaato/anthropic/gen` are generated from the official Python SDK's vendored `scripts/mock-spec.json.gz`. The selected API surface is Messages (buffered and streaming), token counting, and Models (list and retrieve). Beta APIs, batches, files, and other endpoints are not included. See [spec provenance](spec/SOURCE.md) and [generation overlays](overlays/moonbit.yaml).
 
-The facade exposes `create_message`, `stream_message`, `count_tokens`, `list_models`, and `retrieve_model`. `MessageRequest` accepts typed input blocks, tool choice, thinking, output configuration, and metadata. Use `create_message_params` or `stream_message_params` with generated `CreateMessageParams` for the wider request vocabulary. Responses retain both the generated `message` and original `raw` JSON.
+The facade exposes `create_message`, `stream_message`, `count_tokens`, `list_models`, and `retrieve_model`. Use `client.paginate_models(limit=100).collect(max=1000)` to collect up to 1000 models across pages automatically. `MessageRequest` accepts typed input blocks, tool choice, thinking, output configuration, and metadata. Use `create_message_params` or `stream_message_params` with generated `CreateMessageParams` for the wider request vocabulary. Responses retain both the generated `message` and original `raw` JSON.
 
 Migration from 0.1.0's handwritten API:
 
