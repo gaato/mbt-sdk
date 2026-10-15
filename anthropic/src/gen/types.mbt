@@ -16016,6 +16016,57 @@ pub impl @json.FromJson for OutputConfig with fn from_json(value, path) {
 
 ///|
 ///
+/// Generated string enum Speed.
+pub(all) enum Speed {
+  Standard
+  Fast
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend Speed with Eq::{equal, not_equal}
+
+///|
+pub extend Speed with @debug.Debug::{to_repr}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend Speed with ToJson::{to_json}
+
+///|
+pub impl ToJson for Speed with fn to_json(self) {
+  let raw = match self {
+    Standard => "standard"
+    Fast => "fast"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend Speed with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for Speed with fn from_json(value, path) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "standard" => Some(Standard)
+        "fast" => Some(Fast)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
 /// System prompt. A system prompt is a way of providing context and instructions to Claude, such as specifying a particular goal or role. See our [guide to system prompts](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices#give-claude-a-role).
 pub(all) enum CountMessageTokensParamsSystem {
   Text(String)
@@ -19356,6 +19407,7 @@ pub(all) struct CountMessageTokensParams {
   messages : Array[InputMessage]
   model : String
   output_config : OutputConfig?
+  speed : @sdkjson.Presence[Speed]
   system : CountMessageTokensParamsSystem?
   thinking : ThinkingConfigParam?
   tool_choice : ToolChoice?
@@ -19376,6 +19428,7 @@ pub fn CountMessageTokensParams::new(
   model~ : String,
   cache_control? : CountMessageTokensParamsCacheControl,
   output_config? : OutputConfig,
+  speed? : Speed,
   system? : CountMessageTokensParamsSystem,
   thinking? : ThinkingConfigParam,
   tool_choice? : ToolChoice,
@@ -19386,6 +19439,7 @@ pub fn CountMessageTokensParams::new(
     messages,
     model,
     output_config,
+    speed: @sdkjson.Presence::from_option(speed),
     system,
     thinking,
     tool_choice,
@@ -19405,6 +19459,7 @@ pub impl ToJson for CountMessageTokensParams with fn to_json(self) {
   .field("messages", self.messages)
   .field("model", self.model)
   .opt("output_config", self.output_config)
+  .presence("speed", self.speed)
   .opt("system", self.system)
   .opt("thinking", self.thinking)
   .opt("tool_choice", self.tool_choice)
@@ -19428,6 +19483,7 @@ pub impl @json.FromJson for CountMessageTokensParams with fn from_json(
     messages: required_field(obj, "messages", path),
     model: required_field(obj, "model", path),
     output_config: @sdkjson.opt_field(obj, "output_config", path),
+    speed: @sdkjson.presence_field(obj, "speed", path),
     system: @sdkjson.opt_field(obj, "system", path),
     thinking: @sdkjson.opt_field(obj, "thinking", path),
     tool_choice: @sdkjson.opt_field(obj, "tool_choice", path),
@@ -19906,6 +19962,7 @@ pub(all) struct CreateMessageParams {
   metadata : Metadata?
   output_config : OutputConfig?
   service_tier : CreateMessageParamsServiceTier?
+  speed : @sdkjson.Presence[Speed]
   stop_sequences : Array[String]?
   stream : Bool?
   system : CreateMessageParamsSystem?
@@ -19937,6 +19994,7 @@ pub fn CreateMessageParams::new(
   metadata? : Metadata,
   output_config? : OutputConfig,
   service_tier? : CreateMessageParamsServiceTier,
+  speed? : Speed,
   stop_sequences? : Array[String],
   stream? : Bool,
   system? : CreateMessageParamsSystem,
@@ -19958,6 +20016,7 @@ pub fn CreateMessageParams::new(
     metadata,
     output_config,
     service_tier,
+    speed: @sdkjson.Presence::from_option(speed),
     stop_sequences,
     stream,
     system,
@@ -19988,6 +20047,7 @@ pub impl ToJson for CreateMessageParams with fn to_json(self) {
   .opt("metadata", self.metadata)
   .opt("output_config", self.output_config)
   .opt("service_tier", self.service_tier)
+  .presence("speed", self.speed)
   .opt("stop_sequences", self.stop_sequences)
   .opt("stream", self.stream)
   .opt("system", self.system)
@@ -20019,6 +20079,7 @@ pub impl @json.FromJson for CreateMessageParams with fn from_json(value, path) {
     metadata: @sdkjson.opt_field(obj, "metadata", path),
     output_config: @sdkjson.opt_field(obj, "output_config", path),
     service_tier: @sdkjson.opt_field(obj, "service_tier", path),
+    speed: @sdkjson.presence_field(obj, "speed", path),
     stop_sequences: @sdkjson.opt_field(obj, "stop_sequences", path),
     stream: @sdkjson.opt_field(obj, "stream", path),
     system: @sdkjson.opt_field(obj, "system", path),
@@ -20668,6 +20729,7 @@ pub impl @json.FromJson for ServerToolsCapability with fn from_json(value, path)
 /// Which `thinking.type` values the model accepts on requests. Read each key on its own: for example, `enabled` can be false while `disabled` is true.
 pub(all) struct ThinkingTypes {
   adaptive : CapabilitySupport
+  between_tools : CapabilitySupport
   disabled : CapabilitySupport
   enabled : CapabilitySupport
 } derive(Eq, @debug.Debug)
@@ -20683,10 +20745,11 @@ pub extend ThinkingTypes with @debug.Debug::{to_repr}
 /// Creates a ThinkingTypes with omitted optional fields absent.
 pub fn ThinkingTypes::new(
   adaptive~ : CapabilitySupport,
+  between_tools~ : CapabilitySupport,
   disabled~ : CapabilitySupport,
   enabled~ : CapabilitySupport,
 ) -> ThinkingTypes {
-  { adaptive, disabled, enabled, }
+  { adaptive, between_tools, disabled, enabled, }
 }
 
 ///|
@@ -20698,6 +20761,7 @@ pub extend ThinkingTypes with ToJson::{to_json}
 pub impl ToJson for ThinkingTypes with fn to_json(self) {
   @sdkjson.ObjBuilder::new()
   .field("adaptive", self.adaptive)
+  .field("between_tools", self.between_tools)
   .field("disabled", self.disabled)
   .field("enabled", self.enabled)
   .build()
@@ -20713,6 +20777,7 @@ pub impl @json.FromJson for ThinkingTypes with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
   {
     adaptive: required_field(obj, "adaptive", path),
+    between_tools: required_field(obj, "between_tools", path),
     disabled: required_field(obj, "disabled", path),
     enabled: required_field(obj, "enabled", path),
   }
@@ -21572,6 +21637,7 @@ pub(all) struct Usage {
   output_tokens_details : @sdkjson.Presence[OutputTokensDetails]
   server_tool_use : @sdkjson.Presence[ServerToolUsage]
   service_tier : @sdkjson.Presence[UsageServiceTier]
+  speed : @sdkjson.Presence[Speed]
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -21593,6 +21659,7 @@ pub fn Usage::new(
   output_tokens_details? : OutputTokensDetails,
   server_tool_use? : ServerToolUsage,
   service_tier? : UsageServiceTier,
+  speed? : Speed,
 ) -> Usage {
   {
     cache_creation: @sdkjson.Presence::from_option(cache_creation),
@@ -21608,6 +21675,7 @@ pub fn Usage::new(
     output_tokens_details: @sdkjson.Presence::from_option(output_tokens_details),
     server_tool_use: @sdkjson.Presence::from_option(server_tool_use),
     service_tier: @sdkjson.Presence::from_option(service_tier),
+    speed: @sdkjson.Presence::from_option(speed),
   }
 }
 
@@ -21628,6 +21696,7 @@ pub impl ToJson for Usage with fn to_json(self) {
   .presence("output_tokens_details", self.output_tokens_details)
   .presence("server_tool_use", self.server_tool_use)
   .presence("service_tier", self.service_tier)
+  .presence("speed", self.speed)
   .build()
 }
 
@@ -21655,6 +21724,7 @@ pub impl @json.FromJson for Usage with fn from_json(value, path) {
     ),
     server_tool_use: @sdkjson.presence_field(obj, "server_tool_use", path),
     service_tier: @sdkjson.presence_field(obj, "service_tier", path),
+    speed: @sdkjson.presence_field(obj, "speed", path),
   }
 }
 

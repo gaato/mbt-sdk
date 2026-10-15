@@ -1650,6 +1650,7 @@ pub(all) struct CountMessageTokensParams {
   messages : Array[InputMessage]
   model : String
   output_config : OutputConfig?
+  speed : @gaato/sdk-runtime/json.Presence[Speed]
   system : CountMessageTokensParamsSystem?
   thinking : ThinkingConfigParam?
   tool_choice : ToolChoice?
@@ -1657,7 +1658,7 @@ pub(all) struct CountMessageTokensParams {
 } derive(Eq, @debug.Debug)
 pub fn CountMessageTokensParams::equal(Self, Self) -> Bool
 pub fn CountMessageTokensParams::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
-pub fn CountMessageTokensParams::new(messages~ : Array[InputMessage], model~ : String, cache_control? : CountMessageTokensParamsCacheControl, output_config? : OutputConfig, system? : CountMessageTokensParamsSystem, thinking? : ThinkingConfigParam, tool_choice? : ToolChoice, tools? : Array[CountMessageTokensParamsToolsItem]) -> Self
+pub fn CountMessageTokensParams::new(messages~ : Array[InputMessage], model~ : String, cache_control? : CountMessageTokensParamsCacheControl, output_config? : OutputConfig, speed? : Speed, system? : CountMessageTokensParamsSystem, thinking? : ThinkingConfigParam, tool_choice? : ToolChoice, tools? : Array[CountMessageTokensParamsToolsItem]) -> Self
 pub fn CountMessageTokensParams::not_equal(Self, Self) -> Bool
 pub fn CountMessageTokensParams::to_json(Self) -> Json
 pub fn CountMessageTokensParams::to_repr(Self) -> @debug.Repr
@@ -1743,6 +1744,7 @@ pub(all) struct CreateMessageParams {
   metadata : Metadata?
   output_config : OutputConfig?
   service_tier : CreateMessageParamsServiceTier?
+  speed : @gaato/sdk-runtime/json.Presence[Speed]
   stop_sequences : Array[String]?
   stream : Bool?
   system : CreateMessageParamsSystem?
@@ -1755,7 +1757,7 @@ pub(all) struct CreateMessageParams {
 } derive(Eq, @debug.Debug)
 pub fn CreateMessageParams::equal(Self, Self) -> Bool
 pub fn CreateMessageParams::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
-pub fn CreateMessageParams::new(model~ : String, messages~ : Array[InputMessage], max_tokens~ : Int, cache_control? : CreateMessageParamsCacheControl, container? : CreateMessageParamsContainer, diagnostics? : DiagnosticsParam, inference_geo? : String, metadata? : Metadata, output_config? : OutputConfig, service_tier? : CreateMessageParamsServiceTier, stop_sequences? : Array[String], stream? : Bool, system? : CreateMessageParamsSystem, temperature? : Double, thinking? : ThinkingConfigParam, tool_choice? : ToolChoice, tools? : Array[CreateMessageParamsToolsItem], top_k? : Int, top_p? : Double) -> Self
+pub fn CreateMessageParams::new(model~ : String, messages~ : Array[InputMessage], max_tokens~ : Int, cache_control? : CreateMessageParamsCacheControl, container? : CreateMessageParamsContainer, diagnostics? : DiagnosticsParam, inference_geo? : String, metadata? : Metadata, output_config? : OutputConfig, service_tier? : CreateMessageParamsServiceTier, speed? : Speed, stop_sequences? : Array[String], stream? : Bool, system? : CreateMessageParamsSystem, temperature? : Double, thinking? : ThinkingConfigParam, tool_choice? : ToolChoice, tools? : Array[CreateMessageParamsToolsItem], top_k? : Int, top_p? : Double) -> Self
 pub fn CreateMessageParams::not_equal(Self, Self) -> Bool
 pub fn CreateMessageParams::to_json(Self) -> Json
 pub fn CreateMessageParams::to_repr(Self) -> @debug.Repr
@@ -4440,6 +4442,19 @@ pub fn SkillReadBlockedUndecryptableErrorDetails::to_repr(Self) -> @debug.Repr
 pub impl ToJson for SkillReadBlockedUndecryptableErrorDetails
 pub impl @moonbitlang/core/json.FromJson for SkillReadBlockedUndecryptableErrorDetails
 
+pub(all) enum Speed {
+  Standard
+  Fast
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+pub fn Speed::equal(Self, Self) -> Bool
+pub fn Speed::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn Speed::not_equal(Self, Self) -> Bool
+pub fn Speed::to_json(Self) -> Json
+pub fn Speed::to_repr(Self) -> @debug.Repr
+pub impl ToJson for Speed
+pub impl @moonbitlang/core/json.FromJson for Speed
+
 pub(all) enum StopReason {
   EndTurn
   MaxTokens
@@ -4682,12 +4697,13 @@ pub impl @moonbitlang/core/json.FromJson for ThinkingDisplayMode
 
 pub(all) struct ThinkingTypes {
   adaptive : CapabilitySupport
+  between_tools : CapabilitySupport
   disabled : CapabilitySupport
   enabled : CapabilitySupport
 } derive(Eq, @debug.Debug)
 pub fn ThinkingTypes::equal(Self, Self) -> Bool
 pub fn ThinkingTypes::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
-pub fn ThinkingTypes::new(adaptive~ : CapabilitySupport, disabled~ : CapabilitySupport, enabled~ : CapabilitySupport) -> Self
+pub fn ThinkingTypes::new(adaptive~ : CapabilitySupport, between_tools~ : CapabilitySupport, disabled~ : CapabilitySupport, enabled~ : CapabilitySupport) -> Self
 pub fn ThinkingTypes::not_equal(Self, Self) -> Bool
 pub fn ThinkingTypes::to_json(Self) -> Json
 pub fn ThinkingTypes::to_repr(Self) -> @debug.Repr
@@ -4947,10 +4963,11 @@ pub(all) struct Usage {
   output_tokens_details : @gaato/sdk-runtime/json.Presence[OutputTokensDetails]
   server_tool_use : @gaato/sdk-runtime/json.Presence[ServerToolUsage]
   service_tier : @gaato/sdk-runtime/json.Presence[UsageServiceTier]
+  speed : @gaato/sdk-runtime/json.Presence[Speed]
 } derive(Eq, @debug.Debug)
 pub fn Usage::equal(Self, Self) -> Bool
 pub fn Usage::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
-pub fn Usage::new(input_tokens~ : Int, output_tokens~ : Int, cache_creation? : CacheCreation, cache_creation_input_tokens? : Int, cache_read_input_tokens? : Int, inference_geo? : String, output_tokens_details? : OutputTokensDetails, server_tool_use? : ServerToolUsage, service_tier? : UsageServiceTier) -> Self
+pub fn Usage::new(input_tokens~ : Int, output_tokens~ : Int, cache_creation? : CacheCreation, cache_creation_input_tokens? : Int, cache_read_input_tokens? : Int, inference_geo? : String, output_tokens_details? : OutputTokensDetails, server_tool_use? : ServerToolUsage, service_tier? : UsageServiceTier, speed? : Speed) -> Self
 pub fn Usage::not_equal(Self, Self) -> Bool
 pub fn Usage::to_json(Self) -> Json
 pub fn Usage::to_repr(Self) -> @debug.Repr
