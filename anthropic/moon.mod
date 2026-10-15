@@ -3,7 +3,7 @@
 
 name = "gaato/anthropic"
 
-version = "0.5.1"
+version = "0.6.0"
 
 license = "Apache-2.0"
 
@@ -20,6 +20,6 @@ source = "src"
 preferred_target = "wasm-gc"
 
 import {
-  "gaato/http@0.1.0",
-  "gaato/sdk-runtime@0.2.1",
+  "gaato/http@0.1.1",
+  "gaato/sdk-runtime@0.2.2",
 }
