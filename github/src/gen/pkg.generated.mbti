@@ -4966,7 +4966,7 @@ pub fn repos_get_org_rule_suite_decode(@http.Response) -> RuleSuite raise @sdk-r
 
 pub fn repos_get_org_rule_suite_decode_json(Json) -> RuleSuite raise @moonbitlang/core/json.JsonDecodeError
 
-pub fn repos_get_org_rule_suite_request(String, Int) -> @http.Request
+pub fn repos_get_org_rule_suite_request(String, Int, include_metadata? : Bool) -> @http.Request
 
 pub fn repos_get_org_rule_suites_decode(@http.Response) -> Array[RuleSuitesItem] raise @sdk-runtime.SdkError
 
@@ -5062,7 +5062,7 @@ pub fn repos_get_repo_rule_suite_decode(@http.Response) -> RuleSuite raise @sdk-
 
 pub fn repos_get_repo_rule_suite_decode_json(Json) -> RuleSuite raise @moonbitlang/core/json.JsonDecodeError
 
-pub fn repos_get_repo_rule_suite_request(String, String, Int) -> @http.Request
+pub fn repos_get_repo_rule_suite_request(String, String, Int, include_metadata? : Bool) -> @http.Request
 
 pub fn repos_get_repo_rule_suites_decode(@http.Response) -> Array[RuleSuitesItem] raise @sdk-runtime.SdkError
 
@@ -45501,11 +45501,12 @@ pub(all) struct RuleSuiteRuleEvaluationsItem {
   enforcement : RuleSuiteRuleEvaluationsItemEnforcement?
   result : RuleSuiteRuleEvaluationsItemResult?
   rule_type : String?
+  metadata : @gaato/sdk-runtime/json.Presence[Json]
   details : @gaato/sdk-runtime/json.Presence[String]
 } derive(Eq, @debug.Debug)
 pub fn RuleSuiteRuleEvaluationsItem::equal(Self, Self) -> Bool
 pub fn RuleSuiteRuleEvaluationsItem::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
-pub fn RuleSuiteRuleEvaluationsItem::new(rule_source? : RuleSuiteRuleEvaluationsItemRuleSource, enforcement? : RuleSuiteRuleEvaluationsItemEnforcement, result? : RuleSuiteRuleEvaluationsItemResult, rule_type? : String, details? : String) -> Self
+pub fn RuleSuiteRuleEvaluationsItem::new(rule_source? : RuleSuiteRuleEvaluationsItemRuleSource, enforcement? : RuleSuiteRuleEvaluationsItemEnforcement, result? : RuleSuiteRuleEvaluationsItemResult, rule_type? : String, metadata? : Json, details? : String) -> Self
 pub fn RuleSuiteRuleEvaluationsItem::not_equal(Self, Self) -> Bool
 pub fn RuleSuiteRuleEvaluationsItem::to_json(Self) -> Json
 pub fn RuleSuiteRuleEvaluationsItem::to_repr(Self) -> @debug.Repr

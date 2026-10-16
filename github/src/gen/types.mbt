@@ -47084,6 +47084,7 @@ pub(all) struct RuleSuiteRuleEvaluationsItem {
   enforcement : RuleSuiteRuleEvaluationsItemEnforcement?
   result : RuleSuiteRuleEvaluationsItemResult?
   rule_type : String?
+  metadata : @sdkjson.Presence[Json]
   details : @sdkjson.Presence[String]
 } derive(Eq, @debug.Debug)
 
@@ -47101,6 +47102,7 @@ pub fn RuleSuiteRuleEvaluationsItem::new(
   enforcement? : RuleSuiteRuleEvaluationsItemEnforcement,
   result? : RuleSuiteRuleEvaluationsItemResult,
   rule_type? : String,
+  metadata? : Json,
   details? : String,
 ) -> RuleSuiteRuleEvaluationsItem {
   {
@@ -47108,6 +47110,7 @@ pub fn RuleSuiteRuleEvaluationsItem::new(
     enforcement,
     result,
     rule_type,
+    metadata: @sdkjson.Presence::from_option(metadata),
     details: @sdkjson.Presence::from_option(details),
   }
 }
@@ -47124,6 +47127,7 @@ pub impl ToJson for RuleSuiteRuleEvaluationsItem with fn to_json(self) {
   .opt("enforcement", self.enforcement)
   .opt("result", self.result)
   .opt("rule_type", self.rule_type)
+  .presence("metadata", self.metadata)
   .presence("details", self.details)
   .build()
 }
@@ -47144,6 +47148,7 @@ pub impl @json.FromJson for RuleSuiteRuleEvaluationsItem with fn from_json(
     enforcement: @sdkjson.opt_field(obj, "enforcement", path),
     result: @sdkjson.opt_field(obj, "result", path),
     rule_type: @sdkjson.opt_field(obj, "rule_type", path),
+    metadata: @sdkjson.presence_field(obj, "metadata", path),
     details: @sdkjson.presence_field(obj, "details", path),
   }
 }

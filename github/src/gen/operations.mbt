@@ -14713,13 +14713,18 @@ pub fn repos_get_org_rule_suites_decode(
 pub fn repos_get_org_rule_suite_request(
   org : String,
   rule_suite_id : Int32,
+  include_metadata? : Bool,
 ) -> @http.Request {
-  @http.Request::get(
-    "/orgs/" +
+  let mut url = "/orgs/" +
     @http.percent_encode(parameter_value(org)) +
     "/rulesets/rule-suites/" +
-    @http.percent_encode(parameter_value(rule_suite_id)),
-  )
+    @http.percent_encode(parameter_value(rule_suite_id))
+  match include_metadata {
+    Some(value) =>
+      url = @http.append_query(url, "include_metadata", parameter_value(value))
+    None => ()
+  }
+  @http.Request::get(url)
 }
 
 ///|
@@ -33638,15 +33643,20 @@ pub fn repos_get_repo_rule_suite_request(
   owner : String,
   repo : String,
   rule_suite_id : Int32,
+  include_metadata? : Bool,
 ) -> @http.Request {
-  @http.Request::get(
-    "/repos/" +
+  let mut url = "/repos/" +
     @http.percent_encode(parameter_value(owner)) +
     "/" +
     @http.percent_encode(parameter_value(repo)) +
     "/rulesets/rule-suites/" +
-    @http.percent_encode(parameter_value(rule_suite_id)),
-  )
+    @http.percent_encode(parameter_value(rule_suite_id))
+  match include_metadata {
+    Some(value) =>
+      url = @http.append_query(url, "include_metadata", parameter_value(value))
+    None => ()
+  }
+  @http.Request::get(url)
 }
 
 ///|

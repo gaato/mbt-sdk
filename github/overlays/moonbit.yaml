@@ -256,6 +256,15 @@ actions:
       `{message}` branch is a subset of the other two.
     update:
       x-moonbit-json: true
+  - target: "$['components']['schemas']['rule-suite']['properties']['rule_evaluations']['items']['properties']['metadata']"
+    description: >-
+      `rule-suite-pull-request` (`{pull_request}`) or `rule-suite-required-status-checks`
+      (`{checks}`), returned only with `include_metadata=true`. The union names `rule_type` as its
+      discriminator, but neither branch declares a `rule_type`: the value (`pull_request` /
+      `required_status_checks`) is the sibling `rule_evaluations[].rule_type`, outside `metadata`.
+      Within `metadata` both branches are all-optional, so `{}` validates against either.
+    update:
+      x-moonbit-json: true
   - target: "$['paths']['/orgs/{org}/interaction-limits','/repos/{owner}/{repo}/interaction-limits','/user/interaction-limits']['get']['responses']['200']['content']['application/json']['schema']"
     description: >-
       `interaction-limit-response` or `{}`, where `{}` is what GitHub returns when no interaction
