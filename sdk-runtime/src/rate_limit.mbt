@@ -93,14 +93,28 @@ pub extend GlobalWindow with Eq::{equal, not_equal}
 pub extend GlobalWindow with @debug.Debug::{to_repr}
 
 ///|
+/// One bucket's gate and the tasks that hold it or wait on it. The limiter
+/// drops the entry once both counts are zero, so a later caller makes a fresh
+/// gate only when no task can still touch this one.
+priv struct BucketGate {
+  gate : &@sync.Gate
+  mut holders : Int32
+  mut waiters : Int32
+}
+
+///|
+/// The fewest recorded states at which `release` sweeps out expired ones.
+let states_sweep_floor : Int32 = 64
+
+///|
 /// A mutable per-bucket fixed-window limiter driven by an injected clock.
 pub struct WindowLimiter {
   priv clock : &@clock.Clock
   priv parse : (@http.Headers, Int64) -> RateLimitState?
   priv states : Map[String, RateLimitState]
+  priv mut states_sweep_at : Int32
   priv gate : (() -> &@sync.Gate)?
-  priv gates : Map[String, &@sync.Gate]
-  priv held : Map[String, Int32]
+  priv gates : Map[String, BucketGate]
   priv global : GlobalWindow?
   priv global_block : ((@http.Headers) -> Bool)?
   priv default_retry_after_ms : Int32?
@@ -111,7 +125,9 @@ pub struct WindowLimiter {
 
 ///|
 /// Creates a limiter using an API-specific response-header parser.
-/// `gate` creates one gate per bucket, held until the paired release.
+/// `gate` creates a bucket's gate, held from `acquire` until the paired
+/// release; a bucket nobody holds or waits on forgets its gate and gets a new
+/// one on its next acquire.
 /// `global` limits non-exempt admissions across buckets (positive values).
 /// `global_block` identifies account-wide 429 responses.
 /// `default_retry_after_ms` supplies a delay when a 429 has no Retry-After.
@@ -128,9 +144,9 @@ pub fn WindowLimiter::new(
     clock,
     parse,
     states: Map([]),
+    states_sweep_at: states_sweep_floor,
     gate,
     gates: Map([]),
-    held: Map([]),
     global,
     global_block,
     default_retry_after_ms,
@@ -187,13 +203,72 @@ async fn WindowLimiter::sleep_until(
 }
 
 ///|
-fn WindowLimiter::release_gate(self : WindowLimiter, bucket : String) -> Unit {
-  if self.held.get(bucket) is Some(count) && count > 0 {
-    self.held[bucket] = count - 1
-    if self.gates.get(bucket) is Some(gate) {
-      gate.release()
+/// Returns the bucket's gate, counting the caller as a waiter on it. The count
+/// is taken before any suspension, so the entry outlives every task that
+/// might still acquire or release this gate.
+fn WindowLimiter::join_gate(
+  self : WindowLimiter,
+  bucket : String,
+  make : () -> &@sync.Gate,
+) -> BucketGate {
+  let entry = match self.gates.get(bucket) {
+    Some(entry) => entry
+    None => {
+      let entry = { gate: make(), holders: 0, waiters: 0, }
+      self.gates[bucket] = entry
+      entry
     }
   }
+  entry.waiters += 1
+  entry
+}
+
+///|
+/// Stops counting the caller on the bucket's gate, returning its slot when
+/// `holding`, and forgets the gate once nobody holds it or waits on it.
+fn WindowLimiter::leave_gate(
+  self : WindowLimiter,
+  bucket : String,
+  holding~ : Bool,
+) -> Unit {
+  guard self.gates.get(bucket) is Some(entry) else { return }
+  if holding {
+    guard entry.holders > 0 else { return }
+    entry.holders -= 1
+    entry.gate.release()
+  } else {
+    guard entry.waiters > 0 else { return }
+    entry.waiters -= 1
+  }
+  if entry.holders == 0 && entry.waiters == 0 {
+    self.gates.remove(bucket)
+  }
+}
+
+///|
+/// Records a bucket's state. Each time the map has doubled since the last
+/// sweep (and holds at least `states_sweep_floor` entries), states whose reset
+/// has passed are dropped first, so buckets that are never seen again cost
+/// amortised constant work and do not accumulate.
+fn WindowLimiter::record_state(
+  self : WindowLimiter,
+  bucket : String,
+  state : RateLimitState,
+  now : Int64,
+) -> Unit {
+  if self.states.length() >= self.states_sweep_at {
+    let expired = []
+    for key, recorded in self.states {
+      if recorded.reset_at_unix_ms <= now {
+        expired.push(key)
+      }
+    }
+    for key in expired {
+      self.states.remove(key)
+    }
+    self.states_sweep_at = (self.states.length() * 2).max(states_sweep_floor)
+  }
+  self.states[bucket] = state
 }
 
 ///|
@@ -219,21 +294,16 @@ pub impl RateLimiter for WindowLimiter with fn acquire(
   if !global_exempt {
     self.wait_for_global()
   }
-  let gate = self.gate.map(make => {
-    match self.gates.get(bucket) {
-      Some(gate) => gate
-      None => {
-        let gate = make()
-        self.gates[bucket] = gate
-        gate
-      }
-    }
-  })
-  if gate is Some(gate) {
-    gate.acquire()
-    self.held[bucket] = self.held.get(bucket).unwrap_or(0) + 1
+  let entry = self.gate.map(make => self.join_gate(bucket, make))
+  let mut holding = false
+  errdefer self.leave_gate(bucket, holding~)
+  if entry is Some(entry) {
+    // A cancelled `acquire` unwinds without a slot; one that returns holds it.
+    entry.gate.acquire()
+    entry.waiters -= 1
+    entry.holders += 1
+    holding = true
   }
-  errdefer self.release_gate(bucket)
   for ;; {
     guard self.states.get(bucket) is Some(state) else { return }
     let now = self.clock.now_unix_ms()
@@ -260,13 +330,13 @@ pub impl RateLimiter for WindowLimiter with fn release(
   status~,
   headers~,
 ) {
-  defer self.release_gate(bucket)
+  defer self.leave_gate(bucket, holding=true)
   if status == 0 {
     return
   }
   let now_unix_ms = self.clock.now_unix_ms()
   if (self.parse)(headers, now_unix_ms) is Some(state) {
-    self.states[bucket] = state
+    self.record_state(bucket, state, now_unix_ms)
   }
   let delay = match retry_after_ms(headers, now_unix_ms~) {
     Some(ms) => Some(ms)
@@ -282,7 +352,11 @@ pub impl RateLimiter for WindowLimiter with fn release(
         },
       )
     } else {
-      self.states[bucket] = { remaining: 0, reset_at_unix_ms: until, }
+      self.record_state(
+        bucket,
+        { remaining: 0, reset_at_unix_ms: until, },
+        now_unix_ms,
+      )
     }
   }
 }
