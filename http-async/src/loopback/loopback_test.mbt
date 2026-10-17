@@ -406,3 +406,66 @@ async test "outer cancellation bypasses catch and closes the in-flight request" 
     )
   }
 }
+
+///|
+async test "max_body_bytes bounds buffered bodies but not streams" {
+  // A body of exactly the limit passes.
+  with_server(
+    conn => {
+      ignore(conn.read_request())
+      reply(conn, 200, Bytes::make(1000, b'a'))
+    },
+    url => {
+      let transport = @adapter.AsyncTransport::new(max_body_bytes=1000)
+      let response = transport.send(@http.Request::get(url))
+      assert_eq(response.body.length(), 1000)
+    },
+  )
+  // One byte more fails and closes the connection.
+  let closed = @async.Queue(kind=Unbounded)
+  with_server(
+    conn => {
+      ignore(conn.read_request())
+      // Writing into or reading from the closed connection may also see a reset.
+      try {
+        conn.send_response(200, "OK")
+        conn.write(Bytes::make(600, b'a'))
+        conn.flush()
+        conn.write(Bytes::make(401, b'b'))
+        conn.end_response()
+        conn.read_request()
+      } catch {
+        _ => closed.put(true)
+      } noraise {
+        _ => fail("expected the client to close")
+      }
+    },
+    url => {
+      let transport = @adapter.AsyncTransport::new(max_body_bytes=1000)
+      try transport.send(@http.Request::get(url)) |> ignore catch {
+        @http.HttpError::Protocol(message) =>
+          assert_eq(message, "response body larger than 1000 bytes")
+        _ => fail("expected Protocol")
+      } noraise {
+        _ => fail("an oversized body was accepted")
+      }
+      assert_true(closed.get())
+    },
+  )
+  // A stream's reader decides what to keep.
+  with_server(
+    conn => {
+      ignore(conn.read_request())
+      reply(conn, 200, Bytes::make(1001, b'a'))
+    },
+    url => {
+      let transport = @adapter.AsyncTransport::new(max_body_bytes=10)
+      let (_, stream) = transport.send_stream(@http.Request::get(url))
+      let mut length = 0
+      while stream.read_some() is Some(chunk) {
+        length += chunk.length()
+      }
+      assert_eq(length, 1001)
+    },
+  )
+}
