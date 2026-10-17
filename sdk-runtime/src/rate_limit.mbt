@@ -254,32 +254,28 @@ fn WindowLimiter::leave_gate(
 }
 
 ///|
-/// Records a bucket's state. States whose reset has passed are dropped first
-/// each time the map has doubled since the last sweep (and holds at least
-/// `states_sweep_floor` entries), so buckets that are never seen again cost
-/// amortised constant work, and at least every `states_sweep_interval_ms`, so
-/// a burst's expired states do not stay once traffic returns to a few buckets.
-fn WindowLimiter::record_state(
-  self : WindowLimiter,
-  bucket : String,
-  state : RateLimitState,
-  now : Int64,
-) -> Unit {
-  if self.states.length() >= self.states_sweep_at ||
-    now - self.states_swept_at_ms >= states_sweep_interval_ms {
-    let expired = []
-    for key, recorded in self.states {
-      if recorded.reset_at_unix_ms <= now {
-        expired.push(key)
-      }
-    }
-    for key in expired {
-      self.states.remove(key)
-    }
-    self.states_sweep_at = (self.states.length() * 2).max(states_sweep_floor)
-    self.states_swept_at_ms = now
+/// Drop states whose reset has passed, each time the map has doubled since the
+/// last sweep (and holds at least `states_sweep_floor` entries), so buckets
+/// that are never seen again cost amortised constant work, and at least every
+/// `states_sweep_interval_ms`, so a burst's expired states do not stay once
+/// traffic returns to a few buckets. Every release checks, whether or not its
+/// response records a state.
+fn WindowLimiter::sweep_states(self : WindowLimiter, now : Int64) -> Unit {
+  guard self.states.length() >= self.states_sweep_at ||
+    now - self.states_swept_at_ms >= states_sweep_interval_ms else {
+    return
   }
-  self.states[bucket] = state
+  let expired = []
+  for key, recorded in self.states {
+    if recorded.reset_at_unix_ms <= now {
+      expired.push(key)
+    }
+  }
+  for key in expired {
+    self.states.remove(key)
+  }
+  self.states_sweep_at = (self.states.length() * 2).max(states_sweep_floor)
+  self.states_swept_at_ms = now
 }
 
 ///|
@@ -342,12 +338,13 @@ pub impl RateLimiter for WindowLimiter with fn release(
   headers~,
 ) {
   defer self.leave_gate(bucket, holding=true)
+  let now_unix_ms = self.clock.now_unix_ms()
+  self.sweep_states(now_unix_ms)
   if status == 0 {
     return
   }
-  let now_unix_ms = self.clock.now_unix_ms()
   if (self.parse)(headers, now_unix_ms) is Some(state) {
-    self.record_state(bucket, state, now_unix_ms)
+    self.states[bucket] = state
   }
   let delay = match retry_after_ms(headers, now_unix_ms~) {
     Some(ms) => Some(ms)
@@ -363,11 +360,7 @@ pub impl RateLimiter for WindowLimiter with fn release(
         },
       )
     } else {
-      self.record_state(
-        bucket,
-        { remaining: 0, reset_at_unix_ms: until, },
-        now_unix_ms,
-      )
+      self.states[bucket] = { remaining: 0, reset_at_unix_ms: until, }
     }
   }
 }

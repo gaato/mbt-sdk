@@ -288,3 +288,20 @@ test "a burst's expired states go once traffic settles on one bucket" {
   assert_eq(limiter.states.length(), 1)
   assert_true(limiter.state("steady") is Some(_))
 }
+
+///|
+test "responses without rate-limit headers still sweep expired states" {
+  let clock = @mock.FakeClock::new(start_unix_ms=0L)
+  let limiter = WindowLimiter::new(
+    clock,
+    rate_limit_headers(remaining="remaining", reset_after_seconds="reset-after"),
+  )
+  run_now(() => {
+    for i in 0..<50 {
+      limiter.release("burst-\{i}", status=200, headers=headers("1", "1"))
+    }
+    clock.advance(61_000)
+    limiter.release("plain", status=200, headers=@http.Headers::new())
+  })
+  assert_eq(limiter.states.length(), 0)
+}
