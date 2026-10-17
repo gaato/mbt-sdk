@@ -170,7 +170,9 @@ async test "gates serialize one bucket and status zero preserves its state" {
       waiter.wait()
       assert_true(entered.val)
     })
-    assert_eq(made.val, 2)
+    // The waiter on "a" reuses the holder's gate; "b" is idle between its three
+    // acquires, so each one starts with a fresh gate.
+    assert_eq(made.val, 4)
   })
 }
 
