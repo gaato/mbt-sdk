@@ -1,0 +1,34 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "gaato/http-async/mock"
+
+import {
+  "gaato/http/clock",
+  "moonbitlang/core/debug",
+}
+
+// Values
+
+// Errors
+pub suberror NoQuiescence {
+  NoQuiescence(rounds~ : Int)
+} derive(@debug.Debug)
+pub fn NoQuiescence::to_repr(Self) -> @debug.Repr
+
+// Types and methods
+pub struct VirtualClock {
+  // private fields
+}
+pub fn VirtualClock::VirtualClock(start_ms? : Int64) -> Self
+pub async fn VirtualClock::advance(Self, Int) -> Unit raise NoQuiescence
+pub async fn VirtualClock::advance_to_next(Self) -> Bool raise NoQuiescence
+pub fn VirtualClock::next_deadline(Self) -> Int64?
+pub fn VirtualClock::now_unix_ms(Self) -> Int64
+pub fn VirtualClock::pending(Self) -> Array[Int]
+pub async fn VirtualClock::settle(Self, stable_rounds? : Int, max_rounds? : Int) -> Unit raise NoQuiescence
+pub async fn VirtualClock::sleep(Self, Int) -> Unit noraise
+pub fn VirtualClock::touch(Self) -> Unit
+pub impl @clock.Clock for VirtualClock
+
+// Type aliases
+
+// Traits
