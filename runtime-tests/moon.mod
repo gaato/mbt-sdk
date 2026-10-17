@@ -16,8 +16,8 @@ preferred_target = "native"
 
 import {
   "gaato/http@0.1.2",
-  "gaato/http-async@0.1.4",
-  "gaato/sdk-runtime@0.2.2",
+  "gaato/http-async@0.1.5",
+  "gaato/sdk-runtime@0.2.3",
   "gaato/openai@0.2.1",
   "gaato/anthropic@0.7.0",
   "gaato/github@0.12.0",

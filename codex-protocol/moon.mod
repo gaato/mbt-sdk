@@ -13,5 +13,5 @@ source = "src"
 preferred_target = "wasm-gc"
 
 import {
-  "gaato/sdk-runtime@0.2.2",
+  "gaato/sdk-runtime@0.2.3",
 }

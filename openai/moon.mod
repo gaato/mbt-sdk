@@ -22,5 +22,5 @@ preferred_target = "wasm-gc"
 
 import {
   "gaato/http@0.1.1",
-  "gaato/sdk-runtime@0.2.2",
+  "gaato/sdk-runtime@0.2.3",
 }
