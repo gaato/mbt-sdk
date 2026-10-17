@@ -263,3 +263,28 @@ test "a sweep keeps states whose reset is still ahead" {
   assert_eq(limiter.state("old-1"), None)
   assert_eq(limiter.states_sweep_at, states_sweep_floor)
 }
+
+///|
+test "a burst's expired states go once traffic settles on one bucket" {
+  let clock = @mock.FakeClock::new(start_unix_ms=0L)
+  let limiter = WindowLimiter::new(
+    clock,
+    rate_limit_headers(remaining="remaining", reset_after_seconds="reset-after"),
+  )
+  run_now(() => {
+    for i in 0..<100 {
+      limiter.release("burst-\{i}", status=200, headers=headers("1", "1"))
+    }
+  })
+  // The doubling sweep at 64 kept the 64 live states, so the next one waits
+  // for 128 entries, which steady traffic on one bucket never reaches.
+  assert_true(limiter.states.length() >= 64)
+  run_now(() => {
+    for _ in 0..<120 {
+      clock.advance(1000)
+      limiter.release("steady", status=200, headers=headers("1", "1"))
+    }
+  })
+  assert_eq(limiter.states.length(), 1)
+  assert_true(limiter.state("steady") is Some(_))
+}

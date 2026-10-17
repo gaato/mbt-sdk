@@ -107,12 +107,19 @@ priv struct BucketGate {
 let states_sweep_floor : Int32 = 64
 
 ///|
+/// The longest a recorded state outlives its reset when the map stops
+/// growing: `release` also sweeps once this long has passed since the last
+/// sweep.
+let states_sweep_interval_ms : Int64 = 60_000L
+
+///|
 /// A mutable per-bucket fixed-window limiter driven by an injected clock.
 pub struct WindowLimiter {
   priv clock : &@clock.Clock
   priv parse : (@http.Headers, Int64) -> RateLimitState?
   priv states : Map[String, RateLimitState]
   priv mut states_sweep_at : Int32
+  priv mut states_swept_at_ms : Int64
   priv gate : (() -> &@sync.Gate)?
   priv gates : Map[String, BucketGate]
   priv global : GlobalWindow?
@@ -145,6 +152,7 @@ pub fn WindowLimiter::new(
     parse,
     states: Map([]),
     states_sweep_at: states_sweep_floor,
+    states_swept_at_ms: clock.now_unix_ms(),
     gate,
     gates: Map([]),
     global,
@@ -246,17 +254,19 @@ fn WindowLimiter::leave_gate(
 }
 
 ///|
-/// Records a bucket's state. Each time the map has doubled since the last
-/// sweep (and holds at least `states_sweep_floor` entries), states whose reset
-/// has passed are dropped first, so buckets that are never seen again cost
-/// amortised constant work and do not accumulate.
+/// Records a bucket's state. States whose reset has passed are dropped first
+/// each time the map has doubled since the last sweep (and holds at least
+/// `states_sweep_floor` entries), so buckets that are never seen again cost
+/// amortised constant work, and at least every `states_sweep_interval_ms`, so
+/// a burst's expired states do not stay once traffic returns to a few buckets.
 fn WindowLimiter::record_state(
   self : WindowLimiter,
   bucket : String,
   state : RateLimitState,
   now : Int64,
 ) -> Unit {
-  if self.states.length() >= self.states_sweep_at {
+  if self.states.length() >= self.states_sweep_at ||
+    now - self.states_swept_at_ms >= states_sweep_interval_ms {
     let expired = []
     for key, recorded in self.states {
       if recorded.reset_at_unix_ms <= now {
@@ -267,6 +277,7 @@ fn WindowLimiter::record_state(
       self.states.remove(key)
     }
     self.states_sweep_at = (self.states.length() * 2).max(states_sweep_floor)
+    self.states_swept_at_ms = now
   }
   self.states[bucket] = state
 }
