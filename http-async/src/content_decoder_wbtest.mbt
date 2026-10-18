@@ -46,6 +46,33 @@ let hello_zlib : Bytes = b"\x78\x9c\xcb\x48\xcd\xc9\xc9\xd7\x51\xc8\x40\xa2\x00\
 let hello_raw : Bytes = b"\xcb\x48\xcd\xc9\xc9\xd7\x51\xc8\x40\xa2\x00"
 
 ///|
+/// `brotli.compress(b"hello, hello, hello")` from Python's brotli 1.2.0,
+/// which declares a 4 MiB window.
+let hello_br : Bytes = b"\x1b\x12\x00\xf8\x8d\x94\x6e\xde\x44\x09\x52\x86\x96\x6c\x2c\x6f\x11\x4f\x24\xd0\x71\x00"
+
+///|
+/// The same with `lgwin=24`: RFC 7932's largest window, 16 MiB.
+let hello_br_16m : Bytes = b"\x1f\x12\x00\xf8\x8d\x94\x6e\xde\x44\x09\x52\x86\x96\x6c\x2c\x6f\x11\x4f\x24\xd0\x71\x00"
+
+///|
+/// The same with `lgwin=10`, the smallest window, 1 KiB.
+let hello_br_1k : Bytes = b"\xa1\x90\x00\xc0\x6f\xa4\x74\xf3\x26\x4a\x90\x32\xb4\x64\x63\x79\x8b\x78\x22\x81\x8e\x03"
+
+///|
+/// `brotli.compress(gzip.compress(b"hello, hello, hello", mtime=0))`: the
+/// body of `Content-Encoding: gzip, br`.
+let hello_gzip_br : Bytes = b"\x0b\x0e\x80\x1f\x8b\x08\x00\x00\x00\x00\x00\x02\xff\xcb\x48\xcd\xc9\xc9\xd7\x51\xc8\x40\xa2\x00\x9f\xa1\xca\x09\x13\x00\x00\x00\x03"
+
+///|
+/// `brotli.compress(b"a" * 512 * 1024)`: 14 bytes that decode to 512 KiB.
+let a_512k_br : Bytes = b"\x5b\xff\xff\x87\x5f\x22\x2c\x1e\x0b\x04\x72\xef\x0f\x00"
+
+///|
+/// `brotli.compress(bytes(2 * 1024 * 1024), lgwin=24)`: 14 bytes that decode
+/// to 2 MiB of zeros, declaring a 16 MiB window.
+let zeros_2m_br : Bytes = b"\x9f\xff\xff\x1f\xf8\x27\x00\xe2\xb1\x40\x20\xf7\xfe\x03"
+
+///|
 test "ContentDecoder undoes each coding and chain" {
   let hello : Result[Bytes, String] = Ok(b"hello, hello, hello")
   let empty : Result[Bytes, String] = Ok(b"")
@@ -68,6 +95,18 @@ test "ContentDecoder undoes each coding and chain" {
     ("an empty gzip body", [Gzip], b"", empty),
     ("an empty deflate body", [Deflate], b"", empty),
     ("an empty chained body", [Gzip, Deflate], b"", empty),
+    ("br", [Brotli], hello_br, hello),
+    ("br declaring a 16 MiB window", [Brotli], hello_br_16m, hello),
+    ("br declaring a 1 KiB window", [Brotli], hello_br_1k, hello),
+    ("gzip, br: br undone first", [Brotli, Gzip], hello_gzip_br, hello),
+    (
+      "br, gzip: gzip undone first",
+      [Gzip, Brotli],
+      @gzip.compress(hello_br),
+      hello,
+    ),
+    ("an empty br body", [Brotli], b"", empty),
+    ("br of nothing", [Brotli], b"\x3b", empty),
     (
       "gzip of nothing",
       [Gzip],
@@ -129,6 +168,36 @@ test "ContentDecoder undoes each coding and chain" {
       [Deflate],
       hello_zlib[:hello_zlib.length() - 1].to_owned() + b"\x00",
       Err("malformed deflate response body: zlib: Adler-32 mismatch"),
+    ),
+    (
+      "a truncated br body",
+      [Brotli],
+      hello_br[:hello_br.length() - 1].to_owned(),
+      Err("malformed br response body: the stream ends early"),
+    ),
+    (
+      "data after a br body",
+      [Brotli],
+      hello_br + b"x",
+      Err("malformed br response body: data after the end of the stream"),
+    ),
+    (
+      "a corrupt br body",
+      [Brotli],
+      b"hello, world",
+      Err("malformed br response body: invalid code length code"),
+    ),
+    (
+      "a large-window br stream, which is not RFC 7932",
+      [Brotli],
+      b"\x11",
+      Err("malformed br response body: large-window streams are not RFC 7932"),
+    ),
+    (
+      "an inner br stream with data after it",
+      [Gzip, Brotli],
+      @gzip.compress(hello_br + b"x"),
+      Err("malformed br response body: data after the end of the stream"),
     ),
     (
       "not gzip at all",
@@ -231,11 +300,76 @@ test "ContentDecoder does not depend on how the wire is chunked" {
 }
 
 ///|
+/// Three rounds of a sentence, 1000 bytes cycling through 0..250, and a long
+/// run of one byte: text for Brotli's dictionary and runs that cross slices.
+fn mixed_body() -> Bytes {
+  let body = Buffer()
+  for round in 0..<3 {
+    for _ in 0..<20 {
+      body.write_bytes(b"The quick brown fox jumps over the lazy dog. ")
+    }
+    for i in 0..<1000 {
+      body.write_byte((i * 31 % 251).to_byte())
+    }
+    body.write_bytes(Bytes::make(40_000 + round * 15_000, round.to_byte()))
+  }
+  body.to_bytes()
+}
+
+///|
+/// `brotli.compress` of `mixed_body()` from Python's brotli 1.2.0.
+let mixed_br : Bytes = b"\x5b\xcb\x9a\x02\xc8\xa2\xc0\x6e\x38\x36\x52\xa7\x6f\x8d\x03\x06\x46\x7c\x0e\x9b\x11\x40\x88\x06\xcf\x11\x2e\x08\x26\x34\xe7\x89\x57\x3d\x22\x47\xd6\xb5\xa3\x5e\x2a\x10\x42\xca\x80\x5b\x83\x34\x6c\xdc\x9e\x81\x18\xb6\x0d\x18\xeb\xb0\x6a\xb1\x58\x51\x46\xc5\x73\xc3\x54\x09\xc9\x98\x45\x11\xff\xf0\xec\xeb\xe4\xc0\xe1\x02\x79\x11\x51\xeb\xe7\x4b\x80\x1a\x38\xe6\x29\x0b\x42\x91\x6d\xa6\x3d\xb2\x17\xe5\x04\xfc\x70\x12\x25\xcb\x85\x0c\x31\xc1\xe1\x88\x58\xf0\x3f\x20\xf1\x0a\x8a\x3f\x77\x0a\x00\xf2\xcc\x2b\xae\xaf\x26\xbe\xdf\x35\xda\x5f\xca\xc8\xd8\x7b\x7f\xb9\xcb\x82\x75\x2e\x9d\xf1\x22\xf6\xa5\x36\x36\xbb\x23\xef\xf6\xb5\xab\xd5\x3b\xc6\x61\x52\x5d\x2e\xd6\xa4\x55\xfa\xa2\x90\x16\x98\x89\x51\x9a\xf5\x53\x58\x8f\x31\xa4\xcc\x07\x40\xf0\xed\x27\xef\x9f\x36\x71\xd4\x3d\x3e\xde\xaa\xe8\x3c\xc7\x60\x7d\xc8\x43\x4d\xae\xdd\xe9\x2a\xf1\xe7\x3e\xb5\xfa\x93\xe0\x09\xa2\xaf\x37\x7b\xd6\x69\x73\x53\x29\x37\x94\x4d\x85\xb2\x98\x2d\x71\x33\x77\x59\x2e\xcc\x10\x03\x31\x31\x6d\x7f\x10\x41\xec\x7e\xf5\xfc\x75\xc9\xab\x1f\x7e\x7e\xd4\xb1\x75\xcf\xe1\xf6\x54\x84\xfb\xda\x7a\xf3\x4d\x1a\x28\x63\x6e\x0f\x67\x91\x37\xca\xd0\x68\x0f\x9c\xcb\x95\xb6\x5a\x6d\x69\xbb\x8e\x55\x29\x5f\x11\x16\xc1\x79\x3e\xce\x51\x23\xb5\x49\xc6\x4d\x20\x8c\xb4\x67\xfa\x8d\xee\xfc\x49\x00\xc0\x05\xa1\xbc\x8f\x21\xad\xa1\x53\x85\x15\xa7\xd6\xd0\xd2\x91\xce\x00\x90\xb4\xde\x36\x47\x11\x71\xcb\x49\x6d\x52\xf9\xef\x01\xa7\x24\x04\x20\x02"
+
+///|
+test "a br body decodes the same however the wire is chunked" {
+  let body = mixed_body()
+  assert_eq(decode_chunks([Brotli], [mixed_br]), Ok(body))
+  for seed in 0..<4 {
+    let rand = @random.Rand::chacha8(
+      seed=Bytes::make(32, (seed + 32).to_byte()),
+    )
+    for trial in 0..<10 {
+      // Up to two flate codings applied on top of br.
+      let codings = Array::makei(rand.int(limit=3), _ => rand.int(limit=3))
+      let undo = undo_of(codings)
+      undo.push(Brotli)
+      let wire = encode_codings(mixed_br, codings)
+      let label = "seed \{seed} trial \{trial} codings \{codings_label(codings)}"
+      for _ in 0..<4 {
+        assert_eq(
+          decode_chunks(undo, random_chunks(rand, wire)),
+          Ok(body),
+          msg=label,
+        )
+      }
+    }
+  }
+}
+
+///|
 test "a decompression bomb comes out one bounded slice per pull" {
   let zeros = Bytes::make(1024 * 1024, b'\x00')
+  let cases : Array[(String, Bytes, Array[Coding], Int32)] = [
+    ("br", zeros_2m_br, [Brotli], 2 * zeros.length()),
+    (
+      "br, gzip",
+      encode_codings(zeros_2m_br, [0]),
+      [Gzip, Brotli],
+      2 * zeros.length(),
+    ),
+  ]
   for codings in [[0], [1], [2], [0, 0], [2, 0, 1]] {
-    let wire = encode_codings(zeros, codings)
-    let undo = undo_of(codings)
+    cases.push(
+      (
+        codings_label(codings),
+        encode_codings(zeros, codings),
+        undo_of(codings),
+        zeros.length(),
+      ),
+    )
+  }
+  for case in cases {
+    let (label, wire, undo, size) = case
     let decoder = ContentDecoder::new(undo)
     let mut fed = false
     let mut decoded = 0
@@ -258,11 +392,8 @@ test "a decompression bomb comes out one bounded slice per pull" {
         Done => break
       }
     }
-    assert_eq(decoded, zeros.length(), msg=codings_label(codings))
-    assert_true(
-      slices >= zeros.length() / decoded_slice_bytes,
-      msg=codings_label(codings),
-    )
+    assert_eq(decoded, size, msg=label)
+    assert_true(slices >= size / decoded_slice_bytes, msg=label)
   }
 }
 
@@ -293,6 +424,40 @@ async test "read_bounded refuses a decoded bomb without reading it all" {
 }
 
 ///|
+async test "read_bounded refuses a br bomb one slice past the limit" {
+  // 14 bytes for 2 MiB: all of the wire arrives before the limit, so count
+  // what is decoded instead of what is read.
+  let chunks = zeros_2m_br
+    .iter()
+    .map(byte => Bytes::from_array([byte]))
+    .collect()
+  let mut reads = 0
+  let read : async () -> Bytes? = () => {
+    reads += 1
+    chunks.get(reads - 1)
+  }
+  let decoder = Some(ContentDecoder::new([Brotli]))
+  let mut decoded = 0
+  let outcome = try
+    read_bounded(
+      () => {
+        let slice = read_decoded(read, decoder)
+        decoded += slice.map_or(0, Bytes::length)
+        slice
+      },
+      256 * 1024,
+    )
+  catch {
+    @http.HttpError::Protocol(message) => message
+    error => "unexpected \{Repr(error)}"
+  } noraise {
+    body => "\{body.length()} bytes"
+  }
+  assert_eq(outcome, "response body larger than 262144 bytes")
+  assert_eq(decoded, 256 * 1024 + decoded_slice_bytes)
+}
+
+///|
 async test "read_decoded passes reads through without a decoder" {
   let chunks = [b"ab", b"", b"c"]
   let mut reads = 0
@@ -310,10 +475,25 @@ async test "read_decoded passes reads through without a decoder" {
 ///|
 test "a pull never asks for input while decoded output is pending" {
   // 512 KiB that packs into far less than one 64 KiB slice of input.
-  let body = Bytes::makei(512 * 1024, i => (i / 4096 % 7).to_byte())
+  let steps = Bytes::makei(512 * 1024, i => (i / 4096 % 7).to_byte())
+  let a_512k = Bytes::make(512 * 1024, b'a')
+  let cases : Array[(String, Bytes, Bytes, Array[Coding])] = [
+    ("br", a_512k, a_512k_br, [Brotli]),
+    ("br, gzip", a_512k, encode_codings(a_512k_br, [0]), [Gzip, Brotli]),
+  ]
   for codings in [[0], [1], [2], [0, 0], [2, 0, 1], [1, 2]] {
-    let wire = encode_codings(body, codings)
-    let decoder = ContentDecoder::new(undo_of(codings))
+    cases.push(
+      (
+        codings_label(codings),
+        steps,
+        encode_codings(steps, codings),
+        undo_of(codings),
+      ),
+    )
+  }
+  for case in cases {
+    let (label, body, wire, undo) = case
+    let decoder = ContentDecoder::new(undo)
     let mut fed = false
     let mut decoded = 0
     for ;; {
@@ -325,31 +505,40 @@ test "a pull never asks for input while decoded output is pending" {
         }
         NeedInput => {
           // Asked again: everything the wire held must be out by now.
-          assert_eq(decoded, body.length(), msg=codings_label(codings))
+          assert_eq(decoded, body.length(), msg=label)
           decoder.end()
         }
         Done => break
       }
     }
-    assert_eq(decoded, body.length(), msg=codings_label(codings))
+    assert_eq(decoded, body.length(), msg=label)
   }
 }
 
 ///|
 async test "read_decoded drains a chunk without reading again" {
   let body = Bytes::make(512 * 1024, b'a')
+  let cases : Array[(String, Bytes, Array[Coding])] = [
+    ("br", a_512k_br, [Brotli]),
+    ("br, deflate", encode_codings(a_512k_br, [1]), [Deflate, Brotli]),
+  ]
   for codings in [[0], [1], [2], [0, 1]] {
-    let wire = encode_codings(body, codings)
+    cases.push(
+      (codings_label(codings), encode_codings(body, codings), undo_of(codings)),
+    )
+  }
+  for case in cases {
+    let (label, wire, undo) = case
     let mut reads = 0
     // A server that flushed the chunk and is now silent.
     let read : async () -> Bytes? = () => {
       reads += 1
       if reads > 1 {
-        fail("read again after \{codings_label(codings)}")
+        fail("read again after \{label}")
       }
       Some(wire)
     }
-    let decoder = Some(ContentDecoder::new(undo_of(codings)))
+    let decoder = Some(ContentDecoder::new(undo))
     let mut decoded = 0
     while decoded < body.length() {
       guard read_decoded(read, decoder) is Some(slice) else {

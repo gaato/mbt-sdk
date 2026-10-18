@@ -24,4 +24,5 @@ import {
   "gaato/http@0.2.1",
   "moonbitlang/async@0.22.5",
   "moonbit-community/flate@0.9.0",
+  "gaato/brotli@0.1.0",
 }

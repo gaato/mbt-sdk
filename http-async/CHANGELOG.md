@@ -40,9 +40,15 @@ note.
   `max_body_bytes`, so a decompression bomb stops there. `deflate` is read
   as zlib or, when its first two bytes are not a zlib header, raw DEFLATE,
   as browsers do. Up to five chained codings are undone, last applied
-  first; more fail with `Protocol`. Brotli (`br`) is not offered: no
-  streaming, bounded MoonBit decoder exists yet. JS is unchanged, since
-  fetch decodes.
+  first; more fail with `Protocol`. JS is unchanged, since fetch decodes.
+- **Native and Wasm responses in Brotli (`br`) are decoded.** The transport
+  sends `Accept-Encoding: gzip, deflate, br`, as browsers do, and undoes
+  `br` with `gaato/brotli`, a streaming RFC 7932 decoder in MoonBit, under
+  the same rules as `gzip` and `deflate`: 64 KiB reads, decoded bytes
+  against `max_body_bytes`, chains of up to five codings, and malformed,
+  truncated or trailing data failing with `Protocol`. Any window RFC 7932
+  allows is accepted, as browsers accept it; a `br` body holds at most
+  16 MiB of it, and no more than it has decoded.
 
 ### Changed
 

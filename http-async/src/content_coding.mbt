@@ -3,11 +3,12 @@
 priv enum Coding {
   Gzip
   Deflate
+  Brotli
 }
 
 ///|
 /// Every coding the transport undoes, in the order `Accept-Encoding` lists them.
-let decodable_codings : Array[Coding] = [Gzip, Deflate]
+let decodable_codings : Array[Coding] = [Gzip, Deflate, Brotli]
 
 ///|
 /// The most codings one `Content-Encoding` may list, as urllib3 and httpx2
@@ -19,6 +20,7 @@ fn Coding::name(self : Coding) -> String {
   match self {
     Gzip => "gzip"
     Deflate => "deflate"
+    Brotli => "br"
   }
 }
 
@@ -36,6 +38,7 @@ fn coding_of(token : String) -> Coding? {
   match token {
     "gzip" | "x-gzip" => Some(Gzip)
     "deflate" => Some(Deflate)
+    "br" => Some(Brotli)
     _ => None
   }
 }

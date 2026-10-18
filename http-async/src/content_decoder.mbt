@@ -4,11 +4,19 @@
 let decoded_slice_bytes : Int32 = 64 * 1024
 
 ///|
+/// The largest `br` window accepted, as a power of two: RFC 7932's largest,
+/// 16 MiB, as browsers accept, since a smaller cap refuses valid streams.
+/// The decoder grows the window only as output needs it, so a stream that
+/// declares 16 MiB and decodes to little holds little.
+let brotli_window_bits : Int32 = 24
+
+///|
 /// The decompressor of one stage.
-priv enum Inflate {
+priv enum Decompressor {
   Gzip(@gzip.Decoder)
   Zlib(@zlib.Decoder)
   Raw(@flate.Inflater)
+  Brotli(@brotli.Decoder)
 }
 
 ///|
@@ -18,7 +26,7 @@ priv struct Stage {
   coding : Coding
   /// `None` for a `deflate` body until its first two bytes, which tell zlib
   /// from raw DEFLATE, have arrived.
-  mut inflate : Inflate?
+  mut decompressor : Decompressor?
   /// The at most one byte of a `deflate` body seen before that.
   mut sniffed : Bytes
   /// Input accepted from upstream and not yet consumed.
@@ -29,8 +37,8 @@ priv struct Stage {
   mut started : Bool
   /// The coded stream reached its end.
   mut finished : Bool
-  /// The last step stopped for output room: gzip and zlib may have taken
-  /// all the input and still hold decoded bytes, so step again before
+  /// The last step stopped for output room: gzip, zlib and Brotli may have
+  /// taken all the input and still hold decoded bytes, so step again before
   /// asking upstream for more.
   mut output_pending : Bool
   output : FixedArray[Byte]
@@ -39,9 +47,12 @@ priv struct Stage {
 ///|
 /// Undoes a chain of content codings incrementally. The caller pulls decoded
 /// slices; when `pull` answers `NeedInput` it feeds the next wire chunk, or
-/// ends the input. Memory is bounded whatever the body: per stage, a 32 KiB
-/// window, a `decoded_slice_bytes` output buffer, and flate's bounded pending
-/// input; each slice is a fresh `Bytes` of at most `decoded_slice_bytes`.
+/// ends the input. Memory is bounded whatever the body: per stage, a
+/// `decoded_slice_bytes` output buffer and the decompressor's state, which
+/// for gzip and `deflate` is a 32 KiB window and flate's bounded pending
+/// input, and for `br` a window of at most `1 << brotli_window_bits` bytes,
+/// never more than the stage's output so far, and at most 1.3 MiB of tables.
+/// Each slice is a fresh `Bytes` of at most `decoded_slice_bytes`.
 priv struct ContentDecoder {
   /// The first stage reads the wire; each later one reads the stage before.
   stages : Array[Stage]
@@ -63,9 +74,11 @@ priv enum Pulled {
 fn ContentDecoder::new(undo : Array[Coding]) -> ContentDecoder {
   let stages = undo.map(coding => {
     coding,
-    inflate: match coding {
+    decompressor: match coding {
       Gzip => Some(Gzip(@gzip.Decoder()))
       Deflate => None
+      Brotli =>
+        Some(Brotli(@brotli.Decoder(max_window_bits=brotli_window_bits)))
     },
     sniffed: b"",
     input: b""[:],
@@ -133,8 +146,8 @@ fn ContentDecoder::pull_stage(
       }
       stage.started = true
     }
-    let inflate = match stage.inflate {
-      Some(inflate) => inflate
+    let decompressor = match stage.decompressor {
+      Some(decompressor) => decompressor
       None => {
         let joined = stage.sniffed + stage.input.to_owned()
         if joined.length() < 2 {
@@ -145,17 +158,17 @@ fn ContentDecoder::pull_stage(
           stage.input = b""[:]
           continue
         }
-        let inflate = if zlib_header(joined[0], joined[1]) {
+        let decompressor = if zlib_header(joined[0], joined[1]) {
           Zlib(@zlib.Decoder())
         } else {
           Raw(@flate.Inflater())
         }
-        stage.inflate = Some(inflate)
+        stage.decompressor = Some(decompressor)
         stage.input = joined[:]
-        inflate
+        decompressor
       }
     }
-    let (status, consumed, produced) = inflate.step(
+    let (status, consumed, produced) = decompressor.step(
       stage.input,
       stage.output,
       end=stage.input_ended,
@@ -166,10 +179,11 @@ fn ContentDecoder::pull_stage(
     if status is @flate.Done {
       stage.finished = true
       // Bytes read ahead past the end, which gzip and zlib keep aside.
-      let unused = match inflate {
+      // Brotli raises on them itself.
+      let unused = match decompressor {
         Gzip(decoder) => decoder.unused_input().length()
         Zlib(decoder) => decoder.unused_input().length()
-        Raw(_) => 0
+        Raw(_) | Brotli(_) => 0
       }
       guard unused == 0 else {
         raise malformed(stage.coding, "data after the end of the stream")
@@ -179,8 +193,8 @@ fn ContentDecoder::pull_stage(
       return Slice(Bytes::from_array(stage.output[:produced]))
     }
     // Without output, a step must have consumed input, finished, or be
-    // waiting for input upstream can still give. flate always progresses
-    // with free output; never spin if it did not.
+    // waiting for input upstream can still give. flate and Brotli always
+    // progress with free output; never spin if they did not.
     guard consumed > 0 ||
       status is @flate.Done ||
       (
@@ -195,9 +209,10 @@ fn ContentDecoder::pull_stage(
 
 ///|
 /// One decompression step from `input` into `output`: the status and the
-/// bytes consumed and produced.
-fn Inflate::step(
-  self : Inflate,
+/// bytes consumed and produced. Brotli's `Status` has the same three cases
+/// as flate's, which the stages share.
+fn Decompressor::step(
+  self : Decompressor,
   input : BytesView,
   output : FixedArray[Byte],
   end~ : Bool,
@@ -221,6 +236,17 @@ fn Inflate::step(
         @flate.InflateError(_, message) => raise malformed(coding, message)
       }
       (status, inflater.last_consumed(), inflater.last_produced())
+    }
+    Brotli(decoder) => {
+      let status = decoder.step_into(input, output, end~) catch {
+        @brotli.BrotliError(_, message) => raise malformed(coding, message)
+      }
+      let status : @flate.Status = match status {
+        Done => Done
+        NeedMoreInput => NeedMoreInput
+        NeedMoreOutput => NeedMoreOutput
+      }
+      (status, decoder.last_consumed(), decoder.last_produced())
     }
   }
 }

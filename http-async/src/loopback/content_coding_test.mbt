@@ -3,6 +3,19 @@
 let hello_gzip : Bytes = b"\x1f\x8b\x08\x00\x00\x00\x00\x00\x02\xff\xcb\x48\xcd\xc9\xc9\xd7\x51\xc8\x40\xa2\x00\x9f\xa1\xca\x09\x13\x00\x00\x00"
 
 ///|
+/// `brotli.compress(b"hello, hello, hello")` from Python's brotli 1.2.0.
+let hello_br : Bytes = b"\x1b\x12\x00\xf8\x8d\x94\x6e\xde\x44\x09\x52\x86\x96\x6c\x2c\x6f\x11\x4f\x24\xd0\x71\x00"
+
+///|
+/// `brotli.compress(b"a" * 512 * 1024)`: 14 bytes that decode to 512 KiB.
+let a_512k_br : Bytes = b"\x5b\xff\xff\x87\x5f\x22\x2c\x1e\x0b\x04\x72\xef\x0f\x00"
+
+///|
+/// `brotli.compress(bytes(2 * 1024 * 1024), lgwin=24)`: 14 bytes that decode
+/// to 2 MiB of zeros, declaring a 16 MiB window.
+let zeros_2m_br : Bytes = b"\x9f\xff\xff\x1f\xf8\x27\x00\xe2\xb1\x40\x20\xf7\xfe\x03"
+
+///|
 /// Serves `wire` under `Content-Encoding: encoding` (if not empty) with its
 /// `Content-Length`, recording the request's `Accept-Encoding`.
 async fn serve_coded(
@@ -44,7 +57,7 @@ async fn coded_outcome(
 }
 
 ///|
-async test "the transport offers gzip and deflate and undoes what it knows" {
+async test "the transport offers gzip, deflate and br and undoes what it knows" {
   let hello = b"hello, hello, hello"
   let rows : Array[(String, Bytes, Result[(String?, String?, Bytes), String])] = [
     ("", hello, Ok((None, Some("19"), hello))),
@@ -64,9 +77,20 @@ async test "the transport offers gzip and deflate and undoes what it knows" {
       b"\x1f\x8b\x08\x00\x00\x00\x00\x00\x02\xff\xab\x98\x73\xda\xe3\xec\xc9\x93\xd7\x03\x4f\x38\x2c\x62\x70\xd1\x60\xbb\x0a\x00\x4f\x91\x4a\xd0\x11\x00\x00\x00",
       Ok((None, None, hello)),
     ),
-    ("br, gzip", hello_gzip, Ok((Some("br"), None, hello))),
+    ("br", hello_br, Ok((None, None, hello))),
+    ("br, gzip", @gzip.compress(hello_br), Ok((None, None, hello))),
+    ("zstd, gzip", hello_gzip, Ok((Some("zstd"), None, hello))),
     // Before, the transport failed on any coding but gzip.
-    ("br", b"\x0b\x02\x80", Ok((Some("br"), Some("3"), b"\x0b\x02\x80"))),
+    (
+      "zstd",
+      b"\x28\xb5\x2f\xfd",
+      Ok((Some("zstd"), Some("4"), b"\x28\xb5\x2f\xfd")),
+    ),
+    (
+      "br",
+      hello_br[:hello_br.length() - 1].to_owned(),
+      Err("malformed br response body: the stream ends early"),
+    ),
     (
       "gzip",
       hello_gzip[:20].to_owned(),
@@ -108,7 +132,7 @@ async test "the transport offers gzip and deflate and undoes what it knows" {
         transport.close()
       },
     )
-    assert_eq(accepted, [Some("gzip, deflate"), Some("gzip, deflate")])
+    assert_eq(accepted, [Some("gzip, deflate, br"), Some("gzip, deflate, br")])
   }
 }
 
@@ -166,14 +190,57 @@ async test "a decoded bomb stops at max_body_bytes and streams in 64 KiB reads" 
 }
 
 ///|
+async test "a br bomb stops at max_body_bytes and streams in 64 KiB reads" {
+  let accepted = []
+  with_keepalive_server(
+    (request, conn) => serve_coded(request, conn, "br", zeros_2m_br, accepted),
+    (url, _) => {
+      let transport = @adapter.AsyncTransport::new(max_body_bytes=256 * 1024)
+      let outcome = coded_outcome(() => transport.send(@http.Request::get(url)))
+      assert_eq(outcome, Err("response body larger than 262144 bytes"))
+      let (_, stream) = transport.send_stream(@http.Request::get(url))
+      defer stream.close()
+      let mut total = 0
+      let mut largest = 0
+      while stream.read_some() is Some(chunk) {
+        total += chunk.length()
+        largest = largest.max(chunk.length())
+      }
+      assert_eq(total, 2 * 1024 * 1024)
+      assert_true(largest <= 64 * 1024, msg="largest read: \{largest}")
+    },
+  )
+  assert_eq(accepted.length(), 2)
+}
+
+///|
 async test "a flushed coded chunk decodes in full before the server writes again" {
   let size = 512 * 1024
-  let wire = @gzip.compress(Bytes::make(size, b'e'))
+  for
+    coded in [
+      ("gzip", @gzip.compress(Bytes::make(size, b'a'))),
+      ("br", a_512k_br),
+    ] {
+    flushed_chunk_decodes(coded.0, coded.1, size)
+  }
+}
+
+///|
+/// Serves `wire` under `Content-Encoding: encoding` in one flushed chunk,
+/// then stays silent until the client has read the `size` bytes it decodes
+/// to.
+async fn flushed_chunk_decodes(
+  encoding : String,
+  wire : Bytes,
+  size : Int32,
+) -> Unit {
   let release = @async.Queue(kind=Unbounded)
   with_server(
     conn => {
       ignore(conn.read_request())
-      conn.send_response(200, "OK", extra_headers={ "Content-Encoding": "gzip" })
+      conn.send_response(200, "OK", extra_headers={
+        "Content-Encoding": encoding,
+      })
       conn.write(wire)
       conn.flush()
       // Silent until the client has read everything the chunk decodes to.
@@ -186,7 +253,9 @@ async test "a flushed coded chunk decodes in full before the server writes again
       defer stream.close()
       let mut total = 0
       while total < size {
-        guard stream.read_some() is Some(chunk) else { fail("ended early") }
+        guard stream.read_some() is Some(chunk) else {
+          fail("\{encoding} ended early")
+        }
         total += chunk.length()
       }
       release.put(true)
