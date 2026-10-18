@@ -234,6 +234,7 @@ fn CookieJar::cookie_domain(
   for c in domain {
     guard c.to_int() < 0x80 else { return None }
   }
+  let domain = canonical_ip_literal(domain)
   if is_single_label(domain) ||
     (self.is_public_suffix)(domain) ||
     is_ip_host(host) {

@@ -219,6 +219,42 @@ test "the storage model and the cookie header follow RFC 6265 scenarios" {
       Some("a=1"),
     ),
     (
+      "IPv6 Domain in another spelling",
+      [("http://[0:0::1]/", "a=1; Domain=[0:0:0:0:0:0:0:1]")],
+      "http://[::1]:9090/",
+      Some("a=1"),
+    ),
+    (
+      "IPv6 Domain of another address",
+      [("http://[::1]/", "a=1; Domain=[::2]")],
+      "http://[::1]/",
+      None,
+    ),
+    (
+      "IPv6 host-only cookie stays on its address",
+      [("http://[2001:db8::1]/", "a=1")],
+      "http://[2001:DB8:0::2]/",
+      None,
+    ),
+    (
+      "uppercase request host",
+      [("http://example.com/", "a=1")],
+      "http://EXAMPLE.COM/",
+      Some("a=1"),
+    ),
+    (
+      "uppercase setting host with Domain",
+      [("http://WWW.Example.COM/", "a=1; Domain=example.com")],
+      "http://api.example.com/",
+      Some("a=1"),
+    ),
+    (
+      "path read after dot-segment removal",
+      [("http://a.com/x/../y/page", "a=1")],
+      "http://a.com/y/z",
+      Some("a=1"),
+    ),
+    (
       "port does not matter",
       [("http://example.com:8080/", "a=1")],
       "http://example.com:9090/",

@@ -34,6 +34,7 @@ test "a URL without a host stores and sends nothing" {
   let jar = @cookie.CookieJar::new(@mock.FakeClock::new())
   jar.store(set_cookies(["a=1"]), "not a url")
   jar.store(set_cookies(["a=1"]), "file:///etc/hosts")
+  jar.store(set_cookies(["a=1"]), "http://b\u{fc}cher.example/")
   assert_eq(jar.length(), 0)
   jar.store(set_cookies(["a=1"]), "http://a.com/")
   assert_eq(jar.header_for("/relative"), None)

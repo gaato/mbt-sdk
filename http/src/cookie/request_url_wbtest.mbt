@@ -13,7 +13,21 @@ test "parse_request_url keeps the scheme, host and path a jar reads" {
     ("http://host?q=/a", Some(("http", "host", "/"))),
     ("http://host#/a", Some(("http", "host", "/"))),
     ("wss://[::1]:443/ws", Some(("wss", "[::1]", "/ws"))),
+    // Hosts and paths come out as @http.Url normalises them.
+    ("http://[0:0:0:0:0:0:0:1]:8080/", Some(("http", "[::1]", "/"))),
+    ("http://[2001:DB8:0::0:1]", Some(("http", "[2001:db8::1]", "/"))),
+    (
+      "HTTP://WWW.EXAMPLE.COM:80/Dir/../X",
+      Some(("http", "www.example.com", "/X")),
+    ),
+    ("https://a.example/a b/./c", Some(("https", "a.example", "/a%20b/c"))),
+    ("http://b\u{fc}cher.example/", None),
+    ("http://%41.example/", None),
+    ("http://ex ample.com/", None),
     ("http://[::1", None),
+    ("http://[v1.x]/", None),
+    ("/relative/path", None),
+    ("file:///etc/hosts", None),
     ("http:///path", None),
     ("http://:80/", None),
     ("example.com/path", None),
@@ -37,4 +51,13 @@ test "https and wss are the secure schemes" {
   for case in cases {
     assert_eq(parse_request_url(case.0).unwrap().is_secure(), case.1)
   }
+}
+
+///|
+test "IPv6 Domain values are compared in canonical form" {
+  assert_eq(canonical_ip_literal("[0:0::1]"), "[::1]")
+  assert_eq(canonical_ip_literal("[2001:DB8::0:1]"), "[2001:db8::1]")
+  assert_eq(canonical_ip_literal("[::1]:80"), "[::1]:80")
+  assert_eq(canonical_ip_literal("[bogus]"), "[bogus]")
+  assert_eq(canonical_ip_literal("example.com"), "example.com")
 }
