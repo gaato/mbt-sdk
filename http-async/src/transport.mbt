@@ -84,6 +84,10 @@ pub struct AsyncTransport {
 /// uses the platform's proxy settings, if any, and the environment is not
 /// read: a request on a transport given `proxy` fails with `Protocol`.
 ///
+/// `clock` measures every limit above and the idle time of parked
+/// connections; a test passes a virtual clock to expire them without
+/// waiting.
+///
 /// ```mbt check
 /// test {
 ///   let _ = @adapter.AsyncTransport::new(timeout_ms=1000)
@@ -111,6 +115,7 @@ pub fn AsyncTransport::new(
   max_body_bytes? : Int32,
   proxy? : String,
   trust_env~ : Bool = true,
+  clock~ : &@clock.Clock = AsyncClock::new(),
 ) -> AsyncTransport {
   {
     limits: {
@@ -120,7 +125,7 @@ pub fn AsyncTransport::new(
       write: write_timeout_ms.unwrap_or(timeout_ms),
       read: read_timeout_ms.unwrap_or(timeout_ms),
     },
-    clock: AsyncClock::new(),
+    clock,
     max_body_bytes,
     pool: IdlePool::new(max_per_origin=max_idle_per_origin, idle_max_ms~),
     slots: Slots::new(

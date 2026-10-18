@@ -274,6 +274,46 @@ async test "response head timeout for buffered and streaming sends" {
 }
 
 ///|
+async test "a transport given a clock times its phases on it" {
+  let clock = @simclock.VirtualClock()
+  let answer : @async.Queue[Unit] = @async.Queue(kind=Unbounded)
+  let received : @async.Queue[Unit] = @async.Queue(kind=Unbounded)
+  with_server(
+    conn => {
+      ignore(conn.read_request())
+      received.put(())
+      answer.get()
+    },
+    url => {
+      let transport = @adapter.AsyncTransport::new(timeout_ms=30000, clock~)
+      let outcome : Ref[String?] = Ref(None)
+      @async.with_task_group(group => {
+        group.spawn_bg(() => {
+          outcome.val = Some(
+            try transport.send(@http.Request::get(url)) catch {
+              @http.HttpError::Timeout(phase~, ms~) =>
+                "Timeout \{@debug.to_string(phase)} \{ms}"
+              error => "unexpected \{@debug.to_string(error)}"
+            } noraise {
+              _ => "answered"
+            },
+          )
+        })
+        // Wait until the server has the request, so the head is what the
+        // transport waits for; only the virtual clock moves after that.
+        received.get()
+        clock.settle()
+        clock.advance(29_999)
+        assert_eq(outcome.val, None)
+        clock.advance(1)
+        assert_eq(outcome.val, Some("Timeout Head 30000"))
+      })
+      answer.put(())
+    },
+  )
+}
+
+///|
 async test "whole body timeout and streaming idle timeout close the connection" {
   for streaming in [false, true] {
     let closed = @async.Queue(kind=Unbounded)

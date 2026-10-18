@@ -1,5 +1,6 @@
 import {
   "gaato/http-async" @adapter,
+  "gaato/http-async/mock" @simclock,
   "gaato/http",
   "gaato/http/cookie",
   "gaato/http/mock",
