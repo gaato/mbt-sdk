@@ -524,7 +524,7 @@ test "generated requests carry the method and the path of the operation" {
   let repo = @gen.repos_get_request("gaato", "mbt-sdk")
   assert_eq(repo.http_method, "GET")
   assert_eq(repo.url, "/repos/gaato/mbt-sdk")
-  assert_eq(repo.body, b"")
+  assert_eq(repo.body, Bytes(b""))
   // No generated operation sets headers: the client's defaults supply them.
   assert_eq(repo.headers.length(), 0)
   let listed = @gen.repos_list_for_user_request("gaato", per_page=100)

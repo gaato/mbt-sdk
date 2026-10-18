@@ -10,12 +10,28 @@ note.
 
 ### Added
 
+- **Stream request bodies are sent as they are read.** A large upload no
+  longer has to sit in memory: `Request::body_stream` bodies are written
+  chunk by chunk on native and Wasm, with `Content-Length` when the stream
+  was declared with a length and `Transfer-Encoding: chunked` otherwise.
+  Every body, in memory or streamed, is written in slices of at most
+  64 KiB, each one a `Write` phase: `write_timeout_ms` bounds each slice
+  and each read from the stream, as httpx's write timeout bounds a chunk,
+  and `timeout_ms` the whole upload. The stream is closed when the request
+  is sent or fails. A stale-connection replay never resends a stream it
+  already read. On JS, moonbitlang/async's client buffers the body and
+  hands it to fetch whole, so a stream body is read into memory first, up
+  to 16 MiB; past that the request fails with `Protocol` before anything is
+  sent. Streaming it to fetch would need a `ReadableStream` body with
+  `duplex: "half"`, which Node supports but Firefox and Safari do not, and
+  Chromium only over HTTP/2.
 - **Per-phase timeouts: `connect_timeout_ms`, `write_timeout_ms`,
   `read_timeout_ms` and `pool_timeout_ms`.** One `timeout_ms` could not
   give a slow streaming response a long wait for its head while failing
   fast on an unreachable host. Each new limit bounds one phase (dialing
-  with DNS, TCP and TLS; sending the request; the head and each body read
-  separately; waiting for a connection slot), always within the
+  with DNS, TCP and TLS; sending the request head and each write of at
+  most 64 KiB of its body; the head and each body read separately; waiting
+  for a connection slot), always within the
   exchange's `timeout_ms`, and the `Timeout` it raises names the phase and
   the limit that ran out. Each defaults to `timeout_ms`, so existing
   callers keep one limit per exchange and per stream read. A stream's
@@ -52,6 +68,14 @@ note.
 
 ### Changed
 
+- **Request bodies are sent with `Content-Length`.** moonbitlang/async
+  sends a body without a declared length chunked, and the transport used
+  to drop the caller's `Content-Length`, so every non-empty body went out
+  chunked, which some servers and signed upload URLs refuse. A body in
+  memory now declares its length, as fetch, httpx and browsers do; an empty
+  one declares `Content-Length: 0` for POST, PUT and PATCH (RFC 9110 §8.6)
+  and nothing otherwise. A `Content-Length` header the caller sets is still
+  replaced by the body's own. JS is unchanged, since fetch frames the body.
 - **Failures and timeouts name the phase they happened in.** Requires
   `gaato/http`'s new `HttpError`. The transport dials, writes the request,
   waits for the head and reads the body as separate phases, so a timeout is

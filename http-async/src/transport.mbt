@@ -11,8 +11,17 @@
 /// have expired, so a transport left unused holds them until its next request
 /// or `close()`. When a reused connection fails
 /// before a response head, the request is sent once more on a fresh connection
-/// if it is idempotent or carries an `Idempotency-Key`; other requests surface
-/// the failure.
+/// if it is idempotent or carries an `Idempotency-Key` and its body is not a
+/// stream already read; other requests surface the failure.
+///
+/// A body in memory is sent with `Content-Length`; so is a stream body
+/// declared with a length (`Request::body_stream`), while one without is sent
+/// `Transfer-Encoding: chunked`. A body is written in slices of at most
+/// 64 KiB, each as it is read from a stream, which is taken once and closed
+/// when the request is sent or fails. On JS, moonbitlang/async hands fetch
+/// the body whole, so a stream body is read into memory first and one over
+/// 16 MiB fails with `Protocol` before anything is sent; send larger bodies
+/// as bytes there.
 ///
 /// On native and Wasm, a request without `Accept-Encoding` is sent with
 /// `Accept-Encoding: gzip, deflate, br` and its response body is decoded: the
@@ -35,7 +44,9 @@ pub struct AsyncTransport {
 ///   buffered one to the end of its body, a streaming one to its head. Every
 ///   phase ends at that deadline at the latest, reporting `ms=timeout_ms`.
 /// - `connect_timeout_ms` bounds dialing a new connection: DNS, TCP and TLS.
-/// - `write_timeout_ms` bounds sending the request.
+/// - `write_timeout_ms` bounds sending the request head, and each write of
+///   at most 64 KiB of the body on its own; for a stream body, each read from
+///   the stream as well.
 /// - `read_timeout_ms` bounds waiting for the head, and each body read on its
 ///   own. It alone bounds a stream's reads.
 /// - `pool_timeout_ms` bounds the wait for a slot under a connection cap.
@@ -297,13 +308,14 @@ fn AsyncTransport::discard(
 
 ///|
 /// The request headers as sent, with `User-Agent` pulled out because
-/// connections are dialed and reused per user agent. `Content-Length` is
-/// dropped since async frames the body itself; repeated names are comma-joined.
+/// connections are dialed and reused per user agent. `Content-Length` and
+/// `Transfer-Encoding` are dropped since the transport frames the body
+/// itself; repeated names are comma-joined.
 fn wire_headers(headers : @http.Headers) -> (@ahttp.Headers, String?) {
   let wire : @ahttp.Headers = Map([])
   let mut user_agent : String? = None
   for (name, value) in headers.iter() {
-    if name == "content-length" {
+    if name == "content-length" || name == "transfer-encoding" {
       continue
     }
     if name == "user-agent" {
@@ -340,6 +352,11 @@ async fn AsyncTransport::open_request(
   if negotiated {
     headers[@ahttp.CaseInsensitiveString("Accept-Encoding")] = accept_encoding()
   }
+  if declares_content_length &&
+    content_length(request.http_method, request.body) is Some(length) {
+    headers[@ahttp.CaseInsensitiveString("Content-Length")] = length.to_string()
+  }
+  refuse_unbufferable(request.body, buffered_stream_limit)
   if self.pool.closed {
     raise @http.HttpError::Connect("transport closed")
   }
@@ -376,25 +393,61 @@ async fn AsyncTransport::open_request(
 }
 
 ///|
-/// Writes one request as the `Write` phase of `timer` and reads its response
-/// head as the `Head` phase. Writes are buffered, so the request is flushed
-/// before the head is awaited; the few bytes that end a chunked body go out
-/// with the head's phase. The connection is closed on any failure, including
-/// cancellation, which bypasses `catch`.
+/// Writes one request as `Write` phases of `timer` (the head, then the body
+/// slice by slice, see `send_body`) and reads its response head as the `Head`
+/// phase. Each slice is flushed within its phase, the head with the first
+/// slice or alone when there is no body; the few bytes that end a
+/// chunked body go out with the head's phase. The connection is closed on any
+/// failure, including cancellation, which bypasses `catch`.
 async fn exchange(
   client : @ahttp.Client,
   meth : @ahttp.RequestMethod,
   path : String,
   headers : @ahttp.Headers,
-  body : Bytes,
+  body : @http.Body,
   timer : PhaseTimer,
 ) -> @ahttp.Response raise @http.HttpError {
   errdefer client.close()
+  // A stream is taken before the head goes out, so one that was already sent
+  // fails without a byte of this request reaching the server.
+  let outgoing = open_body(body)
+  defer outgoing.close()
+  let empty = body.length() is Some(0L)
+  if empty {
+    // A head declaring no body goes out whole before any body is read, so an
+    // empty stream proves it is empty first, and is not read again.
+    confirm_empty(outgoing, timer)
+  }
+  // A stream's first read happens before the head is serialized, since the
+  // client may flush a large head on its own: whatever a stream checks when
+  // first read (a multipart body takes every part) fails before any byte.
+  let first = if !empty && outgoing is Reader(reader) {
+    Some(timer.run(Write, () => reader.read_some()))
+  } else {
+    None
+  }
   timer.run(Write, () => {
     client.request(meth, path, extra_headers=headers)
-    client.write(body)
-    client.flush()
+    // With a body, the head goes out with its first slice.
+    if empty {
+      client.flush()
+    }
   })
+  if !empty {
+    send_outgoing(
+      outgoing,
+      slice => {
+        client.write(slice)
+        client.flush()
+      },
+      timer,
+      buffer_limit=buffered_stream_limit,
+      first?,
+    )
+    // A stream of unknown length that ended at once wrote no slice, so its
+    // head is still unsent: it goes out in the Write phase, not the Head one.
+    timer.run(Write, () => client.flush())
+  }
   timer.run(Head, () => client.end_request())
 }
 

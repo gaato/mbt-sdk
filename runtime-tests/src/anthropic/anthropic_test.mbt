@@ -9,7 +9,7 @@ fn json_response(
 
 ///|
 fn sent_json(request : @http.Request) -> Json raise {
-  @json.parse(@utf8.decode(request.body))
+  @json.parse(@utf8.decode(request.body.as_bytes().unwrap()))
 }
 
 ///|

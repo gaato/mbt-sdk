@@ -165,6 +165,39 @@ async test "a dropped parked connection is replayed for GET but surfaces for POS
 }
 
 ///|
+async test "a dropped parked connection is not replayed with a stream body it sent" {
+  // As above: the server closes every connection after one response.
+  with_keepalive_server(
+    (_, conn) => {
+      pong(conn)
+      conn.close()
+    },
+    (url, connections) => {
+      let transport = @adapter.AsyncTransport::new()
+      ignore(transport.send(@http.Request::get(url)))
+      assert_eq(transport.idle_connections(), 1)
+      // PUT is idempotent, but the stream was read on the stale connection.
+      let request = @http.Request::put(url).body_stream(generated(10L))
+      try transport.send(request) catch {
+        @http.HttpError::Network(..) => ()
+        error => fail("expected Network, got \{@debug.to_string(error)}")
+      } noraise {
+        _ => fail("expected the dropped connection to surface")
+      }
+      assert_eq(connections(), 1)
+      assert_false(request.body.is_replayable())
+      // The same request with its body in memory is replayed.
+      ignore(transport.send(@http.Request::get(url)))
+      let replayed = transport.send(
+        @http.Request::put(url).body_bytes(b"0123456789"),
+      )
+      assert_eq(replayed.status, 200)
+      assert_eq(connections(), 3)
+    },
+  )
+}
+
+///|
 async test "a replay that fails as well surfaces after one fresh connection" {
   // The first connection answers once and closes without saying so; every
   // later one closes on its first request without answering.

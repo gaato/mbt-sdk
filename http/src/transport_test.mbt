@@ -6,7 +6,11 @@ struct TestTransport {
 ///|
 impl @http.Transport for TestTransport with fn send(self, request) {
   self.calls.push("send:" + request.url)
-  { status: 503, headers: request.headers, body: request.body, }
+  {
+    status: 503,
+    headers: request.headers,
+    body: request.body.as_bytes().unwrap(),
+  }
 }
 
 ///|

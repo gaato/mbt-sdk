@@ -56,7 +56,7 @@ test "embedding request input variants round-trip and unknown request enums surv
     }
     let request = @gen.create_embedding_request(original)
     let decoded : @gen.CreateEmbeddingRequest = @json.from_json(
-      @json.parse(@utf8.decode(request.body)),
+      @json.parse(@utf8.decode(request.body.as_bytes().unwrap())),
     )
     match (input, decoded.input) {
       (@gen.Text(expected), @gen.Text(actual)) => assert_eq(actual, expected)

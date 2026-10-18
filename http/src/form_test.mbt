@@ -69,7 +69,10 @@ test "form_body sets the body and a default content type" {
     ("grant_type", "client_credentials"),
     ("scope", "read write"),
   ])
-  assert_eq(request.body, b"grant_type=client_credentials&scope=read+write")
+  assert_eq(
+    request.body,
+    Bytes(b"grant_type=client_credentials&scope=read+write"),
+  )
   assert_eq(
     request.headers.get("content-type"),
     Some("application/x-www-form-urlencoded"),

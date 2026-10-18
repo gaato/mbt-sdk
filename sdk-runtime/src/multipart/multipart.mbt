@@ -1,10 +1,12 @@
 ///|
-/// A single multipart/form-data field with an optional filename and media type.
+/// A single multipart/form-data field with an optional filename and media
+/// type. Its body is bytes, or a stream read as the request is sent
+/// (`Part::file_stream`).
 pub(all) struct Part {
   name : String
   filename : String?
   content_type : String?
-  body : Bytes
+  body : @http.Body
 } derive(Eq, Debug)
 
 ///|
@@ -20,11 +22,16 @@ pub extend Part with @debug.Debug::{to_repr}
 ///
 /// ```mbt check
 /// test {
-///   assert_eq(@multipart.Part::text("message", "hello").body, b"hello")
+///   assert_eq(@multipart.Part::text("message", "hello").body, Bytes(b"hello"))
 /// }
 /// ```
 pub fn Part::text(name : String, value : String) -> Part {
-  { name, filename: None, content_type: None, body: @http.encode_utf8(value), }
+  {
+    name,
+    filename: None,
+    content_type: None,
+    body: Bytes(@http.encode_utf8(value)),
+  }
 }
 
 ///|
@@ -36,7 +43,7 @@ pub fn Part::text(name : String, value : String) -> Part {
 ///     "upload", "data.bin", "application/octet-stream", b"\x00\xFF",
 ///   )
 ///   assert_eq(part.filename, Some("data.bin"))
-///   assert_eq(part.body, b"\x00\xFF")
+///   assert_eq(part.body, Bytes(b"\x00\xFF"))
 /// }
 /// ```
 pub fn Part::file(
@@ -45,7 +52,33 @@ pub fn Part::file(
   content_type : String,
   body : Bytes,
 ) -> Part {
-  { name, filename: Some(filename), content_type: Some(content_type), body, }
+  {
+    name,
+    filename: Some(filename),
+    content_type: Some(content_type),
+    body: Bytes(body),
+  }
+}
+
+///|
+/// Creates a file field whose body is read from `stream` as the request is
+/// sent, so the file need not be held in memory. With `length`, the stream
+/// must produce exactly that many bytes; when every part's length is known,
+/// the multipart body is sent with `Content-Length`, otherwise chunked. The
+/// part can be sent once, like any stream body (`@http.StreamBody`).
+pub fn Part::file_stream(
+  name : String,
+  filename : String,
+  content_type : String,
+  stream : &@http.BodyStream,
+  length? : Int64,
+) -> Part {
+  {
+    name,
+    filename: Some(filename),
+    content_type: Some(content_type),
+    body: Stream(@http.StreamBody::new(stream, length?)),
+  }
 }
 
 ///|
@@ -55,7 +88,7 @@ pub fn Part::file(
 /// test {
 ///   let part = @multipart.Part::json("metadata", { "ok": true })
 ///   assert_eq(part.content_type, Some("application/json"))
-///   assert_eq(part.body, b"{\"ok\":true}")
+///   assert_eq(part.body, Bytes(b"{\"ok\":true}"))
 /// }
 /// ```
 pub fn Part::json(name : String, value : Json) -> Part {
@@ -63,7 +96,7 @@ pub fn Part::json(name : String, value : Json) -> Part {
     name,
     filename: None,
     content_type: Some("application/json"),
-    body: @http.encode_utf8(value.stringify()),
+    body: Bytes(@http.encode_utf8(value.stringify())),
   }
 }
 
@@ -73,6 +106,9 @@ pub(all) suberror MultipartError {
   InvalidBoundary(String)
   BoundaryCollision
   InvalidHeaderValue(String)
+  /// The named part is a stream, which `encode` and `encode_segments` cannot
+  /// hold: use `encode_body` or `apply`.
+  StreamPart(String)
 } derive(Debug)
 
 ///|
@@ -152,7 +188,7 @@ fn body_collides(body : Bytes, delimiter : Bytes, embedded : Bytes) -> Bool {
 
 ///|
 /// Encodes fields as multipart/form-data and returns its Content-Type value and
-/// byte-exact body.
+/// byte-exact body. A stream part raises `StreamPart`: see `encode_body`.
 ///
 /// ```mbt check
 /// test {
@@ -181,7 +217,7 @@ pub fn encode(
 /// instead of one buffer: the framing between parts, and each part's body
 /// exactly as supplied, not copied. The segments concatenated are the body
 /// `encode` returns, so a host can stream a large upload without building it
-/// in memory first.
+/// in memory first. A stream part raises `StreamPart`.
 ///
 /// ```mbt check
 /// test {
@@ -198,6 +234,60 @@ pub fn encode_segments(
   parts : Array[Part],
   boundary : String,
 ) -> (String, Array[Bytes]) raise MultipartError {
+  let (content_type, pieces) = layout(parts, boundary)
+  let segments = pieces.map(piece => {
+    match piece {
+      Fixed(bytes) => bytes
+      Streamed(name, _) => raise StreamPart(name)
+    }
+  })
+  (content_type, segments)
+}
+
+///|
+/// Encodes fields as a request body: the bytes `encode` returns when every
+/// part is in memory, and otherwise a stream that reads each stream part as
+/// it is sent. The stream has a known length, so a transport sends
+/// `Content-Length`, only when every stream part was given one.
+///
+/// A stream part cannot be checked for the boundary before it is sent, so
+/// each is scanned as it streams: one that contains the delimiter fails the
+/// request with `HttpError::Protocol` before the colliding bytes go out.
+/// With `make_boundary`'s 165 random bits a collision is not expected; the
+/// scan makes it an error instead of a corrupt body.
+///
+/// ```mbt check
+/// test {
+///   let (_, body) = @multipart.encode_body(
+///     [@multipart.Part::text("message", "hello")],
+///     "B",
+///   )
+///   assert_eq(body.length(), Some(69L))
+/// }
+/// ```
+pub fn encode_body(
+  parts : Array[Part],
+  boundary : String,
+) -> (String, @http.Body) raise MultipartError {
+  let (content_type, pieces) = layout(parts, boundary)
+  (content_type, pieces_body(pieces, boundary))
+}
+
+///|
+/// One stretch of an encoded body: framing and in-memory part bodies, or a
+/// stream part's body with its part's name.
+priv enum Piece {
+  Fixed(Bytes)
+  Streamed(String, @http.StreamBody)
+}
+
+///|
+/// Validates `parts` and `boundary` and lays the body out as pieces. Bytes
+/// parts are checked for the boundary here; stream parts as they stream.
+fn layout(
+  parts : Array[Part],
+  boundary : String,
+) -> (String, Array[Piece]) raise MultipartError {
   validate_boundary(boundary)
   let delimiter = @http.encode_utf8("--" + boundary)
   let embedded = @http.encode_utf8("\r\n--" + boundary)
@@ -206,11 +296,11 @@ pub fn encode_segments(
       (content_type.contains("\r") || content_type.contains("\n")) {
       raise InvalidHeaderValue(content_type)
     }
-    if body_collides(part.body, delimiter, embedded) {
+    if part.body is Bytes(body) && body_collides(body, delimiter, embedded) {
       raise BoundaryCollision
     }
   }
-  let segments : Array[Bytes] = []
+  let pieces : Array[Piece] = []
   let framing : Array[Byte] = []
   for part in parts {
     append_text(framing, "--" + boundary + "\r\n")
@@ -227,21 +317,29 @@ pub fn encode_segments(
       append_text(framing, "Content-Type: " + content_type + "\r\n")
     }
     append_text(framing, "\r\n")
-    if !part.body.is_empty() {
-      segments.push(Bytes::from_array(framing))
-      framing.clear()
-      segments.push(part.body)
+    match part.body {
+      Bytes(body) if body.is_empty() => ()
+      Bytes(body) => {
+        pieces.push(Fixed(Bytes::from_array(framing)))
+        framing.clear()
+        pieces.push(Fixed(body))
+      }
+      Stream(stream) => {
+        pieces.push(Fixed(Bytes::from_array(framing)))
+        framing.clear()
+        pieces.push(Streamed(part.name, stream))
+      }
     }
     append_text(framing, "\r\n")
   }
   append_text(framing, "--" + boundary + "--\r\n")
-  segments.push(Bytes::from_array(framing))
+  pieces.push(Fixed(Bytes::from_array(framing)))
   let parameter = if boundary_needs_quotes(boundary) {
     "\"" + boundary + "\""
   } else {
     boundary
   }
-  ("multipart/form-data; boundary=" + parameter, segments)
+  ("multipart/form-data; boundary=" + parameter, pieces)
 }
 
 ///|
@@ -275,8 +373,8 @@ pub fn make_boundary(random : () -> Double) -> String {
 }
 
 ///|
-/// Returns an independent request with an encoded multipart body and replaces
-/// every existing Content-Type value.
+/// Returns an independent request with an encoded multipart body
+/// (`encode_body`) and replaces every existing Content-Type value.
 ///
 /// ```mbt check
 /// test {
@@ -298,10 +396,10 @@ pub fn apply(
   parts : Array[Part],
   boundary : String,
 ) -> @http.Request raise MultipartError {
-  let (content_type, body) = encode(parts, boundary)
-  let result = request.body_bytes(body)
-  result.headers.set("content-type", content_type)
-  result
+  let (content_type, body) = encode_body(parts, boundary)
+  let headers = @http.Headers::from_array(request.headers.iter().to_array())
+  headers.set("content-type", content_type)
+  { ..request, headers, body, }
 }
 
 ///|

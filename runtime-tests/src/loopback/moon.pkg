@@ -1,0 +1,13 @@
+// Native only: the server side of these uploads is moonbitlang/async's HTTP
+// server, which has no JS implementation.
+import {
+  "gaato/http",
+  "gaato/http-async" @adapter,
+  "gaato/sdk-runtime/multipart",
+  "moonbitlang/async",
+  "moonbitlang/async/http" @ahttp,
+  "moonbitlang/async/socket",
+  "moonbitlang/core/encoding/utf8",
+} for "test"
+
+supported_targets = "native"

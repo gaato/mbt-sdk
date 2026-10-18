@@ -46,6 +46,15 @@ pub fn is_idempotent(request : @http.Request) -> Bool {
 }
 
 ///|
+/// Whether `Client` may send `request` again at all, before any
+/// `RetryDecider` is asked: when each attempt builds its own body
+/// (`rebuilt`), or the body can be sent again (`Body::is_replayable`: bytes,
+/// or a stream no transport has read yet).
+fn can_resend(request : @http.Request, rebuilt~ : Bool) -> Bool {
+  rebuilt || request.body.is_replayable()
+}
+
+///|
 /// Decides, after a failed attempt, whether the client sends the request
 /// again and how long it waits first.
 ///

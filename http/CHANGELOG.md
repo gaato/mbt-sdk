@@ -9,6 +9,31 @@ never does. Every breaking change is listed with a migration note.
 
 ### Changed
 
+- **`Request.body` is a `Body`: bytes in memory, or a stream sent as it is
+  read.** A large upload, a multipart file or a body piped from another
+  stream no longer has to be held in memory whole. `Body` is
+  `Bytes(Bytes)` or `Stream(StreamBody)`; `Body::length` gives the known
+  length, `Body::as_bytes` the bytes of an in-memory body (as reqwest's
+  `Body::as_bytes`), and `Body::is_replayable` whether a sender may send it
+  again. Equality compares bytes, and a stream only with itself; `Debug`
+  shows a stream's declared length, not its contents. Migration: compare
+  `request.body` with `Bytes(b"...")`, read the bytes of a request you built
+  with `request.body.as_bytes()` (or match `Bytes(bytes)`), write
+  `body: Bytes(...)` in a `Request` literal, and copy a request with
+  `{ ..request, headers: ... }` instead of `request.body_bytes(request.body)`.
+  The builders (`body_bytes`, `body_text`, `json_body`, `form_body`) are
+  unchanged.
+- **Redirects refuse to resend a stream body that was already sent.** A
+  301, 302, 307 or 308 that keeps the method keeps the body, and a stream
+  read by the first request cannot be sent again: `follow_redirects` and
+  `follow_redirects_stream` raise the new
+  `RedirectError::UnreplayableBody(location~)`, and the `redirects` step
+  `HttpError::Protocol`, without sending the next request. Fetch refuses
+  the same redirects; httpx raises `StreamConsumed`. A redirect that turns
+  the request into GET (303, or 301/302 from POST) drops the body and is
+  followed. Migration: add an arm for `UnreplayableBody(..)` where you match
+  `RedirectError` exhaustively.
+
 - **`HttpError` says which phase of an exchange failed.** A retry policy, or
   a client that raises httpx's `ConnectTimeout`, `ReadTimeout` or
   `WriteError`, needs to know whether the request can have reached the
@@ -28,6 +53,18 @@ never does. Every breaking change is listed with a migration note.
 
 ### Added
 
+- **`Request::body_stream(stream, length?)` and `StreamBody` send a body
+  read from a `BodyStream`.** The same trait a response body implements,
+  so a response stream can be piped into a request. With `length`, a
+  transport sends `Content-Length` and the stream must produce exactly
+  that many bytes (more, or an early end, raises `Protocol`); without it,
+  HTTP/1.1 transports send it chunked. The transport that sends the body
+  takes it with `StreamBody::take`, once: a second sender gets `Protocol`
+  instead of a partial body, and closes it when done. A stream nobody has
+  taken yet, as after a failure `HttpError::is_unsent` vouches for, can
+  still be sent. `FakeTransport` reads a stream body to its end, as a
+  transport would, and records the bytes, except for a scripted failure
+  that proves nothing was sent.
 - **`Url`: RFC 3986 URI references with parsing, normalisation and
   resolution.** `Url::parse` splits a reference into scheme, userinfo, host
   (IPv6 literals included), port, path, query and fragment, lower-cases the

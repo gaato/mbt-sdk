@@ -11,6 +11,8 @@ pub fn apply(@http.Request, Array[Part], String) -> @http.Request raise Multipar
 
 pub fn encode(Array[Part], String) -> (String, Bytes) raise MultipartError
 
+pub fn encode_body(Array[Part], String) -> (String, @http.Body) raise MultipartError
+
 pub fn encode_segments(Array[Part], String) -> (String, Array[Bytes]) raise MultipartError
 
 pub fn encode_segments_fresh(Array[Part], random? : () -> Double, attempts? : Int) -> (String, Array[Bytes]) raise MultipartError
@@ -24,6 +26,7 @@ pub(all) suberror MultipartError {
   InvalidBoundary(String)
   BoundaryCollision
   InvalidHeaderValue(String)
+  StreamPart(String)
 } derive(@debug.Debug)
 pub fn MultipartError::to_repr(Self) -> @debug.Repr
 
@@ -32,10 +35,11 @@ pub(all) struct Part {
   name : String
   filename : String?
   content_type : String?
-  body : Bytes
+  body : @http.Body
 } derive(Eq, @debug.Debug)
 pub fn Part::equal(Self, Self) -> Bool
 pub fn Part::file(String, String, String, Bytes) -> Self
+pub fn Part::file_stream(String, String, String, &@http.BodyStream, length? : Int64) -> Self
 pub fn Part::json(String, Json) -> Self
 pub fn Part::not_equal(Self, Self) -> Bool
 pub fn Part::text(String, String) -> Self

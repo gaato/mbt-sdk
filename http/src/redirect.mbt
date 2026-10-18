@@ -17,6 +17,9 @@ pub(all) suberror RedirectError {
   /// The `Location` did not resolve to an absolute `http` or `https` URL
   /// with a host.
   BadLocation(location~ : String, reason~ : String)
+  /// The redirect keeps the method and body, and the body is a stream that
+  /// was already sent (`Body::is_replayable` is false), as Fetch refuses.
+  UnreplayableBody(location~ : String)
 } derive(Debug)
 
 ///|
@@ -42,7 +45,10 @@ pub extend RedirectHop with @debug.Debug::{to_repr}
 ///
 /// The `Location` is resolved against the request URL (RFC 3986 §5.2) and
 /// its fragment is not sent. 303 turns any method but HEAD into GET, 301 and
-/// 302 turn POST into GET; 307 and 308 keep the method and body. A request
+/// 302 turn POST into GET; 307 and 308 keep the method and body. A redirect
+/// that would send a stream body again raises `UnreplayableBody`, since the
+/// stream was read by the first request; a request turned into GET does not
+/// need it. A request
 /// turned into GET loses its body and the headers describing it
 /// (`Content-Length`, `Content-Type`, `Transfer-Encoding`, and Fetch's
 /// `Content-Encoding`, `Content-Language`, `Content-Location`). When the
@@ -185,6 +191,12 @@ fn redirect_failure(error : RedirectError) -> HttpError {
     Downgrade(location~) => Protocol("refused redirect to http: " + location)
     BadLocation(location~, reason~) =>
       Protocol("bad redirect Location " + location.escape() + ": " + reason)
+    UnreplayableBody(location~) =>
+      Protocol(
+        "refused redirect to " +
+        location +
+        ": the stream request body was already sent",
+      )
   }
 }
 
@@ -214,6 +226,9 @@ fn plan_redirect(
   }
   let http_method = redirect_method(response.status, request.http_method)
   let drop_body = http_method != request.http_method
+  if !drop_body && !request.body.is_replayable() {
+    raise UnreplayableBody(location=to.to_string())
+  }
   let headers = redirect_headers(
     request.headers,
     from~,
@@ -226,7 +241,7 @@ fn plan_redirect(
     url: to.without_fragment().to_string(),
     headers,
     body: if drop_body {
-      b""
+      Bytes(b"")
     } else {
       request.body
     },

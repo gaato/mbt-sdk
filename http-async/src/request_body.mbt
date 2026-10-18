@@ -1,0 +1,154 @@
+// Sending a request body. Bytes and streams go out the same way: in writes of
+// at most `max_write_bytes`, each its own `Write` phase, so `write_timeout_ms`
+// bounds the time one slice takes to leave, as httpx's write timeout does, and
+// the exchange deadline bounds the whole upload.
+
+///|
+/// The most bytes one write puts on a connection. A chunk from the caller's
+/// stream, or a body held in memory, is cut to this size, so one `Write`
+/// phase sends at most 64 KiB however large the chunks the stream returns.
+let max_write_bytes : Int32 = 64 * 1024
+
+///|
+/// The `Content-Length` to declare for `body`, or `None` to leave the framing
+/// to the client: chunked once bytes are written, nothing for an empty body.
+/// A known length is declared; an empty one only for a method that expects
+/// content (RFC 9110 §8.6: a user agent should not send `Content-Length` when
+/// there is no content and the method does not anticipate any).
+fn content_length(http_method : String, body : @http.Body) -> Int64? {
+  match body.length() {
+    Some(0L) =>
+      if http_method.to_upper() is ("POST" | "PUT" | "PATCH") {
+        Some(0L)
+      } else {
+        None
+      }
+    length => length
+  }
+}
+
+///|
+/// The `Protocol` message for a stream body of `bytes` bytes on a platform
+/// that buffers stream bodies up to `limit` bytes, or `None` when it fits.
+fn buffer_overflow(limit : Int64?, bytes : Int64) -> String? {
+  guard limit is Some(limit) && bytes > limit else { return None }
+  Some(
+    "a stream request body is buffered in memory on this platform, and this one exceeds \{limit} bytes; send it as bytes instead",
+  )
+}
+
+///|
+/// Raises `Protocol`, before anything is sent, for a stream body declared
+/// longer than a buffering platform's `limit`.
+fn refuse_unbufferable(
+  body : @http.Body,
+  limit : Int64?,
+) -> Unit raise @http.HttpError {
+  guard body is Stream(stream) else { return }
+  if buffer_overflow(limit, stream.length().unwrap_or(0L)) is Some(message) {
+    raise @http.HttpError::Protocol(message)
+  }
+}
+
+///|
+/// A request body ready to send: bytes, or a stream already taken.
+priv enum Outgoing {
+  Buffered(Bytes)
+  Reader(&@http.BodyStream)
+}
+
+///|
+/// Takes `body`'s stream, if it has one, so a body that cannot be sent fails
+/// before any byte of the request goes out.
+fn open_body(body : @http.Body) -> Outgoing raise @http.HttpError {
+  match body {
+    Bytes(bytes) => Buffered(bytes)
+    Stream(stream) => Reader(stream.take())
+  }
+}
+
+///|
+/// Closes a taken stream; nothing to do for bytes.
+fn Outgoing::close(self : Outgoing) -> Unit {
+  if self is Reader(reader) {
+    reader.close()
+  }
+}
+
+///|
+/// Reads a stream declared empty to its end, as `Write` phases of `timer`.
+/// The taken stream raises `Protocol` if it produces any byte.
+async fn confirm_empty(
+  outgoing : Outgoing,
+  timer : PhaseTimer,
+) -> Unit raise @http.HttpError {
+  if outgoing is Reader(reader) {
+    while timer.run(Write, () => reader.read_some()) is Some(_) {
+
+    }
+  }
+}
+
+///|
+/// Sends `outgoing` through `write` as `Write` phases of `timer`: each slice
+/// of at most `max_write_bytes`, and for a stream each read from it, is one
+/// phase. A stream's chunk is written once the next read has returned. A stream that grows past `buffer_limit` raises `Protocol`. The
+/// caller closes `outgoing`.
+async fn send_outgoing(
+  outgoing : Outgoing,
+  write : async (BytesView) -> Unit,
+  timer : PhaseTimer,
+  buffer_limit~ : Int64?,
+  first? : Bytes?,
+) -> Unit raise @http.HttpError {
+  match outgoing {
+    Buffered(bytes) => write_slices(bytes, write, timer)
+    Reader(reader) => {
+      // One chunk is held back until the next read succeeds, so the bytes
+      // that complete a body go out only once the stream has ended cleanly:
+      // a stream that fails at its end fails before the request is whole.
+      // `first` is a first read already made, used before reading on.
+      let mut sent = 0L
+      let mut held : Bytes? = None
+      let mut pending = first
+      for ;; {
+        let next = match pending {
+          Some(read) => {
+            pending = None
+            read
+          }
+          None => timer.run(Write, () => reader.read_some())
+        }
+        guard next is Some(chunk) else { break }
+        sent += chunk.length().to_int64()
+        if buffer_overflow(buffer_limit, sent) is Some(message) {
+          raise @http.HttpError::Protocol(message)
+        }
+        if chunk.is_empty() {
+          continue
+        }
+        if held is Some(previous) {
+          write_slices(previous, write, timer)
+        }
+        held = Some(chunk)
+      }
+      if held is Some(last) {
+        write_slices(last, write, timer)
+      }
+    }
+  }
+}
+
+///|
+/// Writes `bytes` in slices of at most `max_write_bytes`, each one `Write`
+/// phase of `timer`.
+async fn write_slices(
+  bytes : Bytes,
+  write : async (BytesView) -> Unit,
+  timer : PhaseTimer,
+) -> Unit raise @http.HttpError {
+  for start = 0; start < bytes.length(); start = start + max_write_bytes {
+    let slice = bytes[start:(start + max_write_bytes).min(bytes.length())]
+    timer.run(Write, () => write(slice))
+  }
+}

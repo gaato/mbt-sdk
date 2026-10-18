@@ -40,6 +40,7 @@ pub(all) suberror RedirectError {
   TooManyRedirects(max~ : Int, location~ : String)
   Downgrade(location~ : String)
   BadLocation(location~ : String, reason~ : String)
+  UnreplayableBody(location~ : String)
 } derive(@debug.Debug)
 pub fn RedirectError::to_repr(Self) -> @debug.Repr
 
@@ -51,6 +52,17 @@ pub fn UrlError::not_equal(Self, Self) -> Bool
 pub fn UrlError::to_repr(Self) -> @debug.Repr
 
 // Types and methods
+pub(all) enum Body {
+  Bytes(Bytes)
+  Stream(StreamBody)
+} derive(Eq, @debug.Debug)
+pub fn Body::as_bytes(Self) -> Bytes?
+pub fn Body::equal(Self, Self) -> Bool
+pub fn Body::is_replayable(Self) -> Bool
+pub fn Body::length(Self) -> Int64?
+pub fn Body::not_equal(Self, Self) -> Bool
+pub fn Body::to_repr(Self) -> @debug.Repr
+
 pub struct Headers {
   // private fields
 } derive(Eq, @debug.Debug)
@@ -92,9 +104,10 @@ pub(all) struct Request {
   http_method : String
   url : String
   headers : Headers
-  body : Bytes
+  body : Body
 } derive(Eq, @debug.Debug)
 pub fn Request::body_bytes(Self, Bytes) -> Self
+pub fn Request::body_stream(Self, &BodyStream, length? : Int64) -> Self
 pub fn Request::body_text(Self, String) -> Self
 pub fn Request::delete(String) -> Self
 pub fn Request::equal(Self, Self) -> Bool
@@ -128,6 +141,18 @@ pub(all) struct ResponseHead {
 pub fn ResponseHead::equal(Self, Self) -> Bool
 pub fn ResponseHead::not_equal(Self, Self) -> Bool
 pub fn ResponseHead::to_repr(Self) -> @debug.Repr
+
+pub struct StreamBody {
+  // private fields
+}
+pub fn StreamBody::equal(Self, Self) -> Bool
+pub fn StreamBody::length(Self) -> Int64?
+pub fn StreamBody::new(&BodyStream, length? : Int64) -> Self
+pub fn StreamBody::not_equal(Self, Self) -> Bool
+pub fn StreamBody::take(Self) -> &BodyStream raise HttpError
+pub fn StreamBody::to_repr(Self) -> @debug.Repr
+pub impl Eq for StreamBody
+pub impl @debug.Debug for StreamBody
 
 pub struct StreamRedirectHop {
   request : Request

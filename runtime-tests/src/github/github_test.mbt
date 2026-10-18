@@ -83,7 +83,7 @@ fn sent_variables(request : @http.Request) -> Json? {
 ///|
 /// The body a request carried, as text.
 fn sent_text(request : @http.Request) -> String {
-  @utf8.decode(request.body) catch {
+  @utf8.decode(request.body.as_bytes().unwrap()) catch {
     _ => ""
   }
 }
@@ -156,7 +156,7 @@ async test "GitHub sends the documented defaults and omits auth without a token"
     assert_eq(sent.length(), 2)
     assert_eq(sent[0].http_method, "GET")
     assert_eq(sent[0].url, "https://api.github.com/repos/octocat/Hello-World")
-    assert_eq(sent[0].body, b"")
+    assert_eq(sent[0].body, Bytes(b""))
     assert_eq(sent[0].headers.get("authorization"), Some("Bearer ghp_test"))
     assert_eq(
       sent[0].headers.get("accept"),

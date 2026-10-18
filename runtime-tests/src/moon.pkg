@@ -3,7 +3,11 @@ import {
   "gaato/http/mock",
   "gaato/http-async" @adapter,
   "gaato/sdk-runtime" @runtime,
+  "gaato/sdk-runtime/multipart",
   "moonbitlang/async",
+  "moonbitlang/core/debug",
+  "moonbitlang/core/encoding/utf8",
+  "moonbitlang/core/random",
 } for "test"
 
 supported_targets = "js + native"

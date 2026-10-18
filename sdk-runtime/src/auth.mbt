@@ -41,7 +41,7 @@ pub fn Auth::apply(self : Auth, request : @http.Request) -> @http.Request {
       if request.headers.contains("authorization") {
         request
       } else {
-        let result = request.body_bytes(request.body)
+        let result = { ..request, headers: copy_headers(request.headers), }
         result.headers.set("authorization", "Bearer " + token)
         result
       }
@@ -49,7 +49,7 @@ pub fn Auth::apply(self : Auth, request : @http.Request) -> @http.Request {
       if request.headers.contains(name) {
         request
       } else {
-        let result = request.body_bytes(request.body)
+        let result = { ..request, headers: copy_headers(request.headers), }
         result.headers.set(name, value)
         result
       }

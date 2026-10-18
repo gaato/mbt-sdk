@@ -125,9 +125,14 @@ async test "POST Japanese JSON bytes content-type and joined request headers" {
       assert_eq(request.path, "/?query=1")
       assert_eq(request.headers.get("content-type"), Some("application/json"))
       assert_eq(request.headers.get("x-repeat"), Some("one, two"))
-      assert_eq(request.headers.get("content-length"), None)
+      // The caller's Content-Length is replaced by the body's own.
+      assert_eq(
+        request.headers.get("content-length"),
+        template.body.length().map(length => length.to_string()),
+      )
+      assert_eq(request.headers.get("transfer-encoding"), None)
       let body = conn.read_all().binary()
-      assert_eq(body, template.body)
+      assert_eq(@http.Body::Bytes(body), template.body)
       reply(conn, 200, body)
     },
     url => {
@@ -137,7 +142,7 @@ async test "POST Japanese JSON bytes content-type and joined request headers" {
         .header("X-Repeat", "one")
         .header("x-repeat", "two")
       assert_eq(
-        @adapter.AsyncTransport::new().send(request).body,
+        @http.Body::Bytes(@adapter.AsyncTransport::new().send(request).body),
         template.body,
       )
     },
@@ -319,15 +324,16 @@ async test "stream timeout is per read rather than total lifetime" {
     conn => {
       ignore(conn.read_request())
       conn.send_response(200, "OK")
-      for _ in 0..<4 {
+      // Each gap is well under the per-read limit, their sum well over it.
+      for _ in 0..<5 {
         conn.write(b"x")
         conn.flush()
-        @async.sleep(100)
+        @async.sleep(300)
       }
       conn.end_response()
     },
     url => {
-      let (_, stream) = @adapter.AsyncTransport::new(timeout_ms=250).send_stream(
+      let (_, stream) = @adapter.AsyncTransport::new(timeout_ms=1000).send_stream(
         @http.Request::get(url),
       )
       defer stream.close()
@@ -335,7 +341,7 @@ async test "stream timeout is per read rather than total lifetime" {
       while stream.read_some() is Some(chunk) {
         chunks.push(chunk)
       }
-      assert_eq(chunks, [b"x", b"x", b"x", b"x"])
+      assert_eq(chunks, [b"x", b"x", b"x", b"x", b"x"])
     },
   )
 }

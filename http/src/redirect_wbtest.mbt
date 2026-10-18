@@ -194,11 +194,16 @@ fn plan(
       "too many: " + max.to_string() + " " + location
     Downgrade(location~) => "downgrade: " + location
     BadLocation(location~, reason~) => "bad: " + location + " " + reason
+    UnreplayableBody(location~) => "unreplayable: " + location
     Transport(_) => "transport"
   } noraise {
     None => "stop"
     Some(next) => {
-      let body = @utf8.decode_lossy(next.body)
+      let body = match next.body {
+        Bytes(bytes) => @utf8.decode_lossy(bytes)
+        Stream(_) if physical_equal(next.body, request.body) => "<same stream>"
+        Stream(_) => "<other stream>"
+      }
       let headers = next.headers.iter().map(pair => pair.0).to_array()
       "\{next.http_method} \{next.url} \{body} [\{headers.join(", ")}]"
     }
@@ -260,6 +265,56 @@ test "plan_redirect decides each hop" {
 }
 
 ///|
+/// A stream that is never read: `plan_redirect` only asks whether it was taken.
+priv struct Unread {}
+
+///|
+impl BodyStream for Unread with fn read_some(_) {
+  None
+}
+
+///|
+impl BodyStream for Unread with fn close(_) {
+  ()
+}
+
+///|
+test "plan_redirect refuses to resend a stream body that was sent" {
+  let fresh = (http_method : String) => {
+    Request::new(http_method, "https://h/a").body_stream(Unread::{ }, length=0)
+  }
+  let sent = (http_method : String) => {
+    let request = fresh(http_method)
+    guard! request.body is Stream(stream)
+    ignore(stream.take())
+    request
+  }
+  let cases = [
+    // A redirect that keeps the method keeps the body: a sent stream is gone.
+    (plan(sent("POST"), 307, location="/b"), "unreplayable: https://h/b"),
+    (plan(sent("PUT"), 308, location="/b"), "unreplayable: https://h/b"),
+    (plan(sent("PUT"), 301, location="/b"), "unreplayable: https://h/b"),
+    (plan(sent("PUT"), 302, location="/b"), "unreplayable: https://h/b"),
+    // One that turns the request into GET drops the body, so it is followed.
+    (plan(sent("POST"), 301, location="/b"), "GET https://h/b  []"),
+    (plan(sent("POST"), 302, location="/b"), "GET https://h/b  []"),
+    (plan(sent("PUT"), 303, location="/b"), "GET https://h/b  []"),
+    // A stream nobody has taken yet goes along unread.
+    (plan(fresh("PUT"), 307, location="/b"), "PUT https://h/b <same stream> []"),
+    // Refusals the caller must fix first still win.
+    (plan(sent("POST"), 307, location="http://h/b"), "downgrade: http://h/b"),
+    (
+      plan(sent("POST"), 307, location="/b", max_redirects=0),
+      "too many: 0 https://h/b",
+    ),
+    (plan(sent("POST"), 200, location="/b"), "stop"),
+  ]
+  for case in cases {
+    assert_eq(case.0, case.1)
+  }
+}
+
+///|
 test "redirect_failure maps refusals to protocol errors" {
   let cases : Array[(RedirectError, String)] = [
     (Transport(Timeout(phase=Head, ms=5)), "Timeout(phase=Head, ms=5)"),
@@ -275,6 +330,10 @@ test "redirect_failure maps refusals to protocol errors" {
     (
       BadLocation(location="ftp://h", reason="not an http or https URL"),
       "Protocol(\"bad redirect Location \\\"ftp://h\\\": not an http or https URL\")",
+    ),
+    (
+      UnreplayableBody(location="https://h/x"),
+      "Protocol(\"refused redirect to https://h/x: the stream request body was already sent\")",
     ),
   ]
   for case in cases {

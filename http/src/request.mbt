@@ -1,19 +1,19 @@
 ///|
-/// An HTTP request with a byte body. Builders copy headers before returning.
+/// An HTTP request. Builders copy headers before returning.
 ///
 /// ```mbt check
 /// test {
 ///   let request = @http.Request::post("/items")
 ///     .header("Accept", "application/json")
 ///     .body_text("hello")
-///   assert_eq(request.body, b"hello")
+///   assert_eq(request.body, Bytes(b"hello"))
 /// }
 /// ```
 pub(all) struct Request {
   http_method : String
   url : String
   headers : Headers
-  body : Bytes
+  body : Body
 } derive(Eq, Debug)
 
 ///|
@@ -27,7 +27,7 @@ pub extend Request with @debug.Debug::{to_repr}
 ///|
 /// Creates a request with the supplied method, empty headers and an empty body.
 pub fn Request::new(http_method : String, url : String) -> Request {
-  { http_method, url, headers: Headers::new(), body: b"", }
+  { http_method, url, headers: Headers::new(), body: Bytes(b""), }
 }
 
 ///|
@@ -75,7 +75,24 @@ pub fn Request::header(
 ///|
 /// Returns a new request with the supplied bytes and independent headers.
 pub fn Request::body_bytes(self : Request, body : Bytes) -> Request {
-  { ..self, headers: self.headers.copy(), body, }
+  { ..self, headers: self.headers.copy(), body: Bytes(body), }
+}
+
+///|
+/// Returns a new request whose body is read from `stream` as it is sent, and
+/// independent headers. With `length`, the stream must produce exactly that
+/// many bytes, sent as `Content-Length`; without it, a transport sends the
+/// body chunked. The body can be sent once: see `StreamBody`.
+pub fn Request::body_stream(
+  self : Request,
+  stream : &BodyStream,
+  length? : Int64,
+) -> Request {
+  {
+    ..self,
+    headers: self.headers.copy(),
+    body: Stream(StreamBody::new(stream, length?)),
+  }
 }
 
 ///|
