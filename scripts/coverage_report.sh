@@ -53,11 +53,13 @@ else
   cd "$repo_root"
   json_file="$repo_root/_build/coverage_report.json"
   # Test drivers: every package of the measured modules, and every
-  # runtime-tests package except the live API tests (they need credentials
-  # and would make the numbers depend on the network).
+  # runtime-tests package except the live API tests (they need credentials)
+  # and badhttp (it calls badhttp.dev); both would make the numbers depend on
+  # the network.
   mapfile -t drivers < <(
     for m in "${MODULES[@]}"; do find "$m/src" -name moon.pkg -printf '%h\n'; done
-    find runtime-tests/src -name moon.pkg -printf '%h\n' | grep -v '^runtime-tests/src/live$'
+    find runtime-tests/src -name moon.pkg -printf '%h\n' \
+      | grep -v -e '^runtime-tests/src/live$' -e '^runtime-tests/src/badhttp$'
   )
   find _build -name 'moonbit_coverage_*' -delete 2>/dev/null || true
   rm -rf _build/native/debug/test
