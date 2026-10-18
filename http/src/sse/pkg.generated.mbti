@@ -7,7 +7,7 @@ import {
 }
 
 // Values
-pub async fn[E : Error] each_event(&@http.BodyStream, async (SseEvent) -> Unit raise E) -> Unit
+pub async fn[E : Error] each_event(&@http.BodyStream, async (SseEvent) -> Unit raise E, max_event_bytes? : Int) -> Unit
 
 // Errors
 
@@ -25,9 +25,9 @@ pub fn SseEvent::to_repr(Self) -> @debug.Repr
 pub struct SseParser {
   // private fields
 }
-pub fn SseParser::feed(Self, Bytes) -> Array[SseEvent]
+pub fn SseParser::feed(Self, Bytes) -> Array[SseEvent] raise @http.HttpError
 pub fn SseParser::finish(Self) -> Array[SseEvent]
-pub fn SseParser::new() -> Self
+pub fn SseParser::new(max_event_bytes? : Int) -> Self
 
 // Type aliases
 

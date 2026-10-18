@@ -54,10 +54,10 @@ pub type Middleware = async (Request, async (Request) -> Response raise HttpErro
 ```moonbit
 pub(all) struct SseEvent { event : String; data : String; id : String?; retry : Int? }
 pub struct SseParser
-pub fn SseParser::new() -> SseParser
-pub fn SseParser::feed(Self, Bytes) -> Array[SseEvent]   // チャンク境界は任意
+pub fn SseParser::new(max_event_bytes? : Int) -> SseParser   // 既定 16 MiB
+pub fn SseParser::feed(Self, Bytes) -> Array[SseEvent] raise HttpError   // チャンク境界は任意。上限超過は Protocol
 pub fn SseParser::finish(Self) -> Array[SseEvent]        // 仕様どおり、未ディスパッチの末尾は捨てる
-pub async fn each_event(&BodyStream, async (SseEvent) -> Unit raise E) -> Unit raise E  // 便利関数
+pub async fn each_event(&BodyStream, async (SseEvent) -> Unit raise E, max_event_bytes? : Int) -> Unit raise E  // 便利関数
 ```
 WHATWG「Server-sent events」の解釈規則に準拠: `\n` / `\r\n` / `\r`、先頭 BOM、コメント行、複数 `data:` の改行連結、`id` に NUL を含む場合は無視、`retry` は数字のみ、UTF-8 の多バイト文字がチャンク境界で割れても壊れない(バイトで溜めて行単位でデコード)。`[DONE]` の扱いは API 固有なので入れない。
 
@@ -66,6 +66,7 @@ SSE の判断:
 - `SseEvent.retry` は前回のイベント送出以降に受理した最後の値。データのない空行では保持し、次のイベントに載せてから `None` に戻す。last-event-id のようには永続化しない。
 - 未設定の id は `None`、明示的な空 id は `Some("")`。`data:` が一行ある空文字イベントは送出するが、data 行のないブロックは送出しない。
 - `finish()` は未完イベントを捨てて終端状態にする。繰り返し呼び出しと、その後の `feed()` は `[]` を返す。
+- 1 イベントの大きさを `max_event_bytes` で抑える。数えるのはそのイベントの `data` 行の生バイトと読みかけの行(行末は数えない)で、改行の来ない行も空行の来ない data 行の列も同じ上限に当たる。超えるバイトで `feed` が `HttpError::Protocol` を送出し、同じチャンクで先に完成したイベントごと捨てて終端状態にする。`LineFramer` と同じ形。既定は 16 MiB で、上限なしにしないのは OpenAI / Anthropic の facade が `each_event` を既定値で呼び、利用者が上限を渡す口がないため。16 MiB は base64 画像を含む `response.completed` でも余裕があり、それでいてメモリを使い切らせない。
 - `each_event` の実装は callback の型を `raise E` に保ち、関数の戻り側は `raise` (`Error`) とする。`BodyStream::read_some()` が任意の `Error` を送出するため、`raise E` だけには限定できない。読み取り・callback のエラーはそのまま伝播し、`defer` で必ず close する。
 
 `gaato/http/mock`: `FakeTransport::new()`、`.expect(method, url_suffix, Response)`、`.expect_stream(..., chunks : Array[Bytes])`、`.sent() -> Array[Request]`、`.assert_complete()`。不一致はその場で raise し、かつラッチして `assert_complete` でも落とす。

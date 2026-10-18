@@ -9,7 +9,7 @@ fn event(
 }
 
 ///|
-fn parse(text : String) -> Array[@sse.SseEvent] {
+fn parse(text : String) -> Array[@sse.SseEvent] raise {
   let parser = @sse.SseParser::new()
   let result = parser.feed(@utf8.encode(text))
   result.append(parser.finish())
@@ -294,7 +294,7 @@ fn generate_stream(rand : @random.Rand) -> (Bytes, Array[@sse.SseEvent]) {
 }
 
 ///|
-fn events_of_chunks(chunks : Array[Bytes]) -> Array[@sse.SseEvent] {
+fn events_of_chunks(chunks : Array[Bytes]) -> Array[@sse.SseEvent] raise {
   let parser = @sse.SseParser::new()
   let events = []
   for chunk in chunks {
@@ -394,4 +394,163 @@ test "random bytes parse the same under any chunking" {
       }
     }
   }
+}
+
+///|
+/// The data of each event fed through a bounded parser, and the refusal
+/// message if the parser refused the stream.
+fn bounded_outcome(
+  limit : Int32,
+  chunks : Array[String],
+) -> (Array[String], String?) {
+  let parser = @sse.SseParser::new(max_event_bytes=limit)
+  let data = []
+  try {
+    for chunk in chunks {
+      for event in parser.feed(@utf8.encode(chunk)) {
+        data.push(event.data)
+      }
+    }
+    ignore(parser.finish())
+    (data, None)
+  } catch {
+    @http.HttpError::Protocol(message) => (data, Some(message))
+    _ => (data, Some("unexpected error"))
+  }
+}
+
+///|
+test "one event is bounded by its data lines plus the line being read" {
+  let refused = Some("SSE event larger than 12 bytes")
+  let x = (n : Int32) => "x".repeat(n)
+  let rows : Array[(String, Int32, Array[String], (Array[String], String?))] = [
+    ("line at limit", 12, ["data:" + x(7) + "\n\n"], ([x(7)], None)),
+    ("line at limit + 1", 12, ["data:" + x(8) + "\n\n"], ([], refused)),
+    ("endless line at limit", 12, [x(12)], ([], None)),
+    ("endless line at limit + 1", 12, [x(13)], ([], refused)),
+    (
+      "endless line at limit + 1 over chunks",
+      12,
+      [x(5), x(7), "x"],
+      ([], refused),
+    ),
+    ("data lines at limit", 12, ["data:a\ndata:a\n\n"], (["a\na"], None)),
+    ("data lines at limit + 1", 12, ["data:a\ndata:ab\n\n"], ([], refused)),
+    (
+      "endless data lines at limit + 1",
+      12,
+      ["data:a\n", "data:a\n", "d"],
+      ([], refused),
+    ),
+    (
+      "terminators are not counted",
+      12,
+      ["data:" + x(7) + "\r\n\r\n"],
+      ([x(7)], None),
+    ),
+    (
+      "other lines do not accumulate",
+      12,
+      [
+        ": comment!!\nevent: abcde\nid: abcdefgh\nretry: 1000\ndata:" +
+        x(7) +
+        "\n\n",
+      ],
+      ([x(7)], None),
+    ),
+    (
+      "a blank line resets the count",
+      12,
+      ["data:" + x(7) + "\n\ndata:" + x(7) + "\n\n"],
+      ([x(7), x(7)], None),
+    ),
+    ("bytes, not characters", 12, ["data:日日a\n\n"], (["日日a"], None)),
+    ("bytes, not characters + 1", 12, ["data:日日é\n\n"], ([], refused)),
+    (
+      "events in earlier chunks survive",
+      12,
+      ["data: a\n\n", x(13)],
+      (["a"], refused),
+    ),
+    (
+      "events earlier in the refused chunk are discarded",
+      12,
+      ["data: a\n\n" + x(13)],
+      ([], refused),
+    ),
+    ("zero allows blank lines", 0, ["\n\r\n\r"], ([], None)),
+    (
+      "zero refuses any field",
+      0,
+      ["d"],
+      ([], Some("SSE event larger than 0 bytes")),
+    ),
+  ]
+  for row in rows {
+    let (label, limit, chunks, expected) = row
+    assert_eq(bounded_outcome(limit, chunks), expected, msg=label)
+  }
+}
+
+///|
+test "a refused stream stays finished" {
+  let parser = @sse.SseParser::new(max_event_bytes=4)
+  try parser.feed(b"data: a") catch {
+    _ => ()
+  } noraise {
+    _ => fail("expected the event to be refused")
+  }
+  assert_eq(parser.feed(b"\n\ndata: b\n\n"), [])
+}
+
+///|
+test "the bound refuses generated streams the same way under any chunking" {
+  for seed in 8..<12 {
+    let rand = seeded(seed)
+    for case in 0..<100 {
+      let (bytes, unbounded) = generate_stream(rand)
+      let limit = rand.int(limit=40)
+      let label = "seed \{seed} case \{case} limit \{limit}"
+      // Byte by byte, every event completed before the overflow is returned.
+      let (before, refused) = bounded_events(
+        limit,
+        bytes.iter().map(byte => Bytes::make(1, byte)).collect(),
+      )
+      assert_true(is_prefix(before, unbounded), msg="\{label} reference prefix")
+      assert_true(refused || before == unbounded, msg="\{label} reference all")
+      for chunks in [[bytes], hostile_chunks(bytes), random_chunks(rand, bytes)] {
+        let (events, chunked_refused) = bounded_events(limit, chunks)
+        assert_eq(chunked_refused, refused, msg="\{label} refused")
+        assert_true(is_prefix(events, before), msg="\{label} prefix")
+        assert_true(refused || events == before, msg="\{label} events")
+      }
+    }
+  }
+}
+
+///|
+fn bounded_events(
+  limit : Int32,
+  chunks : Array[Bytes],
+) -> (Array[@sse.SseEvent], Bool) {
+  let parser = @sse.SseParser::new(max_event_bytes=limit)
+  let events = []
+  try {
+    for chunk in chunks {
+      events.append(parser.feed(chunk))
+    }
+    events.append(parser.finish())
+    (events, false)
+  } catch {
+    _ => (events, true)
+  }
+}
+
+///|
+fn is_prefix(
+  prefix : Array[@sse.SseEvent],
+  whole : Array[@sse.SseEvent],
+) -> Bool {
+  prefix.length() <= whole.length() &&
+  prefix == whole[:prefix.length()].to_owned()
 }
