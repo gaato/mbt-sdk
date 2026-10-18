@@ -3,18 +3,18 @@
 ///
 /// A connection returns to the pool only after its response body has been
 /// consumed in full and the server did not answer `Connection: close`. At most
-/// `max_idle_per_origin` connections are parked per origin, each for at most
-/// `idle_max_ms`; concurrent requests beyond that dial new connections and are
-/// never queued. When a reused connection fails before a response head, the
-/// request is sent once more on a fresh connection if it is idempotent or
-/// carries an `Idempotency-Key`; other requests surface the failure.
+/// `max_idle_per_origin` connections are parked per origin, each reusable for
+/// at most `idle_max_ms`; concurrent requests beyond that dial new connections
+/// and are never queued. No timer runs: every request, to any origin, closes
+/// the parked connections that have expired, so a transport left unused holds
+/// them until its next request or `close()`. When a reused connection fails
+/// before a response head, the request is sent once more on a fresh connection
+/// if it is idempotent or carries an `Idempotency-Key`; other requests surface
+/// the failure.
 pub struct AsyncTransport {
   priv timeout_ms : Int32
   priv max_body_bytes : Int32?
-  priv max_idle_per_origin : Int32
-  priv idle_max_ms : Int32
-  priv idle : Map[String, Array[IdleConn]]
-  priv mut closed : Bool
+  priv pool : IdlePool[@ahttp.Client]
 }
 
 ///|
@@ -40,10 +40,7 @@ pub fn AsyncTransport::new(
   {
     timeout_ms,
     max_body_bytes,
-    max_idle_per_origin,
-    idle_max_ms,
-    idle: {},
-    closed: false,
+    pool: IdlePool::new(max_per_origin=max_idle_per_origin, idle_max_ms~),
   }
 }
 

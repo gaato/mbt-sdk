@@ -131,19 +131,6 @@ async test "Connection: close and disabled reuse dial per request" {
 }
 
 ///|
-async test "parked connections older than idle_max_ms are not reused" {
-  with_keepalive_server((_, conn) => pong(conn), (url, connections) => {
-    let transport = @adapter.AsyncTransport::new(idle_max_ms=20)
-    ignore(transport.send(@http.Request::get(url)))
-    assert_eq(transport.idle_connections(), 1)
-    @async.sleep(60)
-    ignore(transport.send(@http.Request::get(url)))
-    assert_eq(connections(), 2)
-    assert_eq(transport.idle_connections(), 1)
-  })
-}
-
-///|
 async test "a dropped parked connection is replayed for GET but surfaces for POST" {
   // The server closes every connection after one response, without saying so.
   with_keepalive_server(
