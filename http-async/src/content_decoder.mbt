@@ -29,6 +29,10 @@ priv struct Stage {
   mut started : Bool
   /// The coded stream reached its end.
   mut finished : Bool
+  /// The last step stopped for output room: gzip and zlib may have taken
+  /// all the input and still hold decoded bytes, so step again before
+  /// asking upstream for more.
+  mut output_pending : Bool
   output : FixedArray[Byte]
 }
 
@@ -68,6 +72,7 @@ fn ContentDecoder::new(undo : Array[Coding]) -> ContentDecoder {
     input_ended: false,
     started: false,
     finished: false,
+    output_pending: false,
     output: FixedArray::make(decoded_slice_bytes, b'\x00'),
   })
   { stages, }
@@ -100,7 +105,7 @@ fn ContentDecoder::pull_stage(
 ) -> Pulled raise @http.HttpError {
   let stage = self.stages[index]
   for ;; {
-    if stage.input.length() == 0 && !stage.input_ended {
+    if stage.input.length() == 0 && !stage.input_ended && !stage.output_pending {
       if index == 0 {
         return NeedInput
       }
@@ -157,6 +162,7 @@ fn ContentDecoder::pull_stage(
       coding=stage.coding,
     )
     stage.input = stage.input[consumed:]
+    stage.output_pending = status is @flate.NeedMoreOutput
     if status is @flate.Done {
       stage.finished = true
       // Bytes read ahead past the end, which gzip and zlib keep aside.
@@ -172,8 +178,16 @@ fn ContentDecoder::pull_stage(
     if produced > 0 {
       return Slice(Bytes::from_array(stage.output[:produced]))
     }
-    guard consumed > 0 || status is @flate.Done || stage.input.length() == 0 else {
-      // flate always progresses with free output; never spin if it did not.
+    // Without output, a step must have consumed input, finished, or be
+    // waiting for input upstream can still give. flate always progresses
+    // with free output; never spin if it did not.
+    guard consumed > 0 ||
+      status is @flate.Done ||
+      (
+        status is @flate.NeedMoreInput &&
+        stage.input.length() == 0 &&
+        !stage.input_ended
+      ) else {
       raise malformed(stage.coding, "the decoder made no progress")
     }
   }

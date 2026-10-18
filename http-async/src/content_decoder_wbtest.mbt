@@ -306,3 +306,58 @@ async test "read_decoded passes reads through without a decoder" {
   }
   assert_eq(seen, chunks)
 }
+
+///|
+test "a pull never asks for input while decoded output is pending" {
+  // 512 KiB that packs into far less than one 64 KiB slice of input.
+  let body = Bytes::makei(512 * 1024, i => (i / 4096 % 7).to_byte())
+  for codings in [[0], [1], [2], [0, 0], [2, 0, 1], [1, 2]] {
+    let wire = encode_codings(body, codings)
+    let decoder = ContentDecoder::new(undo_of(codings))
+    let mut fed = false
+    let mut decoded = 0
+    for ;; {
+      match decoder.pull() {
+        Slice(slice) => decoded += slice.length()
+        NeedInput if !fed => {
+          decoder.feed(wire)
+          fed = true
+        }
+        NeedInput => {
+          // Asked again: everything the wire held must be out by now.
+          assert_eq(decoded, body.length(), msg=codings_label(codings))
+          decoder.end()
+        }
+        Done => break
+      }
+    }
+    assert_eq(decoded, body.length(), msg=codings_label(codings))
+  }
+}
+
+///|
+async test "read_decoded drains a chunk without reading again" {
+  let body = Bytes::make(512 * 1024, b'a')
+  for codings in [[0], [1], [2], [0, 1]] {
+    let wire = encode_codings(body, codings)
+    let mut reads = 0
+    // A server that flushed the chunk and is now silent.
+    let read : async () -> Bytes? = () => {
+      reads += 1
+      if reads > 1 {
+        fail("read again after \{codings_label(codings)}")
+      }
+      Some(wire)
+    }
+    let decoder = Some(ContentDecoder::new(undo_of(codings)))
+    let mut decoded = 0
+    while decoded < body.length() {
+      guard read_decoded(read, decoder) is Some(slice) else {
+        fail("ended early")
+      }
+      decoded += slice.length()
+    }
+    assert_eq(decoded, body.length())
+    assert_eq(reads, 1)
+  }
+}

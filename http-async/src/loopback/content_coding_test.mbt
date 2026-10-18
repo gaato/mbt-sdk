@@ -164,3 +164,34 @@ async test "a decoded bomb stops at max_body_bytes and streams in 64 KiB reads" 
     },
   )
 }
+
+///|
+async test "a flushed coded chunk decodes in full before the server writes again" {
+  let size = 512 * 1024
+  let wire = @gzip.compress(Bytes::make(size, b'e'))
+  let release = @async.Queue(kind=Unbounded)
+  with_server(
+    conn => {
+      ignore(conn.read_request())
+      conn.send_response(200, "OK", extra_headers={ "Content-Encoding": "gzip" })
+      conn.write(wire)
+      conn.flush()
+      // Silent until the client has read everything the chunk decodes to.
+      let _ : Bool = release.get()
+      conn.end_response()
+    },
+    url => {
+      let transport = @adapter.AsyncTransport::new(timeout_ms=1000)
+      let (_, stream) = transport.send_stream(@http.Request::get(url))
+      defer stream.close()
+      let mut total = 0
+      while total < size {
+        guard stream.read_some() is Some(chunk) else { fail("ended early") }
+        total += chunk.length()
+      }
+      release.put(true)
+      assert_eq(stream.read_some(), None)
+      assert_eq(total, size)
+    },
+  )
+}
