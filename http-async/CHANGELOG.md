@@ -17,6 +17,10 @@ note.
 
 ### Fixed
 
+- **`Connection: close` is matched as a token.** A response whose
+  `Connection` header merely contained the letters `close` (such as
+  `closed-ish` or `keep-alive, x-close`) was treated as closing, so its
+  connection was never reused.
 - **Expired keep-alive connections are closed for every origin.** A parked
   connection that outlived `idle_max_ms` was closed only when the same
   origin was requested again, so an origin never requested again kept its
