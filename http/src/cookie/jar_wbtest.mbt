@@ -421,6 +421,18 @@ test "the storage model and the cookie header follow RFC 6265 scenarios" {
       None,
     ),
     (
+      "__Host- with an invalid Path",
+      [("https://a.com/", "__Host-id=1; Secure; Path=invalid")],
+      "https://a.com/",
+      None,
+    ),
+    (
+      "__Host- with an empty Path",
+      [("https://a.com/", "__Host-id=1; Secure; Path")],
+      "https://a.com/",
+      None,
+    ),
+    (
       "__Host- with Domain",
       [("https://a.com/", "__Host-a=1; Secure; Path=/; Domain=a.com")],
       "https://a.com/",
@@ -546,6 +558,72 @@ test "the storage model and the cookie header follow RFC 6265 scenarios" {
       set_at(jar, step.0, step.1, T0 + i.to_int64())
     }
     assert_eq(get_at(jar, request, T0 + 1000L), expected, msg=label)
+  }
+}
+
+///|
+/// Steps of `(time offset in ms, request URL, Set-Cookie)`, then a request
+/// at the last step's time plus one: an expired cookie no longer blocks,
+/// shadows or lends its creation time to a new one.
+test "expired cookies take no part in storing new ones" {
+  let cases : Array[(String, Array[(Int64, String, String)], String, String?)] = [
+    (
+      "an expired Secure cookie does not block an insecure one",
+      [
+        (0L, "https://a.com/", "a=1; Secure; Max-Age=1"),
+        (1000L, "http://a.com/", "a=2"),
+      ],
+      "http://a.com/",
+      Some("a=2"),
+    ),
+    (
+      "an expired Secure cookie on a parent domain does not shadow",
+      [
+        (0L, "https://a.com/", "a=1; Secure; Domain=a.com; Max-Age=1"),
+        (1000L, "http://www.a.com/", "a=2; Path=/x"),
+      ],
+      "http://www.a.com/x",
+      Some("a=2"),
+    ),
+    (
+      "a live Secure cookie still blocks",
+      [
+        (0L, "https://a.com/", "a=1; Secure; Max-Age=2"),
+        (1000L, "http://a.com/", "a=2"),
+      ],
+      "https://a.com/",
+      Some("a=1"),
+    ),
+    (
+      "replacing an expired cookie starts a new creation time",
+      [
+        (0L, "http://a.com/", "a=1; Max-Age=1"),
+        (500L, "http://a.com/", "b=1"),
+        (2000L, "http://a.com/", "a=2"),
+      ],
+      "http://a.com/",
+      Some("b=1; a=2"),
+    ),
+    (
+      "replacing a live cookie keeps its creation time",
+      [
+        (0L, "http://a.com/", "a=1; Max-Age=5"),
+        (500L, "http://a.com/", "b=1"),
+        (2000L, "http://a.com/", "a=2"),
+      ],
+      "http://a.com/",
+      Some("a=2; b=1"),
+    ),
+  ]
+  for case in cases {
+    let (label, steps, request, expected) = case
+    let jar = test_jar()
+    let mut last = T0
+    for step in steps {
+      last = T0 + step.0
+      set_at(jar, step.1, step.2, last)
+    }
+    assert_eq(get_at(jar, request, last + 1L), expected, msg=label)
   }
 }
 
