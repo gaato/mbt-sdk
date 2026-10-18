@@ -10,6 +10,7 @@
 /// carries an `Idempotency-Key`; other requests surface the failure.
 pub struct AsyncTransport {
   priv timeout_ms : Int32
+  priv max_body_bytes : Int32?
   priv max_idle_per_origin : Int32
   priv idle_max_ms : Int32
   priv idle : Map[String, Array[IdleConn]]
@@ -19,19 +20,31 @@ pub struct AsyncTransport {
 ///|
 /// Creates a transport. Streaming reads each receive a fresh idle timeout.
 /// `max_idle_per_origin = 0` or `idle_max_ms = 0` disables connection reuse.
+/// `max_body_bytes` bounds a buffered response body: a longer one closes the
+/// connection and fails with `Protocol`. Without it the body is unbounded.
+/// Streams are never bounded, since their reader decides what to keep.
 ///
 /// ```mbt check
 /// test {
 ///   let _ = @adapter.AsyncTransport::new(timeout_ms=1000)
 ///   let _ = @adapter.AsyncTransport::new(max_idle_per_origin=0)
+///   let _ = @adapter.AsyncTransport::new(max_body_bytes=1_048_576)
 /// }
 /// ```
 pub fn AsyncTransport::new(
   timeout_ms~ : Int32 = 30000,
   max_idle_per_origin~ : Int32 = 4,
   idle_max_ms~ : Int32 = 10000,
+  max_body_bytes? : Int32,
 ) -> AsyncTransport {
-  { timeout_ms, max_idle_per_origin, idle_max_ms, idle: {}, closed: false, }
+  {
+    timeout_ms,
+    max_body_bytes,
+    max_idle_per_origin,
+    idle_max_ms,
+    idle: {},
+    closed: false,
+  }
 }
 
 ///|
@@ -44,9 +57,7 @@ pub impl @http.Transport for AsyncTransport with fn send(self, request) {
   bounded(self.timeout_ms, () => {
     let opened = self.open_request(request)
     errdefer opened.client.close()
-    let body = opened.client.read_all().binary() catch {
-        error => raise @http.HttpError::Protocol(error.to_string())
-      }
+    let body = read_body(opened.client, self.max_body_bytes)
     self.release(opened)
     @http.Response::{
       status: opened.head.status,
@@ -77,6 +88,40 @@ pub impl @http.Transport for AsyncTransport with fn send_stream(self, request) {
     }
     (exchange.head, stream)
   })
+}
+
+///|
+/// The rest of a response body, refused once it exceeds `max_bytes`.
+async fn read_body(
+  client : @ahttp.Client,
+  max_bytes : Int32?,
+) -> Bytes raise @http.HttpError {
+  try {
+    match max_bytes {
+      None => client.read_all().binary()
+      Some(max_bytes) => read_bounded(() => client.read_some(), max_bytes)
+    }
+  } catch {
+    @http.HttpError::Protocol(message) =>
+      raise @http.HttpError::Protocol(message)
+    error => raise @http.HttpError::Protocol(error.to_string())
+  }
+}
+
+///|
+/// Chunks from `read` until it returns `None`. The chunk that would take the
+/// total past `max_bytes` raises `Protocol` without reading further.
+async fn read_bounded(read : async () -> Bytes?, max_bytes : Int32) -> Bytes {
+  let body = Buffer()
+  while read() is Some(chunk) {
+    if chunk.length() > max_bytes - body.length() {
+      raise @http.HttpError::Protocol(
+        "response body larger than \{max_bytes} bytes",
+      )
+    }
+    body.write_bytes(chunk)
+  }
+  body.to_bytes()
 }
 
 ///|
