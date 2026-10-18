@@ -341,6 +341,31 @@ async test "stream timeout is per read rather than total lifetime" {
 }
 
 ///|
+async test "a stream read returns at most 64 KiB however much has arrived" {
+  let body = Bytes::make(1_000_000, b'x')
+  with_server(
+    conn => {
+      ignore(conn.read_request())
+      reply(conn, 200, body)
+    },
+    url => {
+      let (_, stream) = @adapter.AsyncTransport::new().send_stream(
+        @http.Request::get(url),
+      )
+      defer stream.close()
+      let mut total = 0
+      let mut largest = 0
+      while stream.read_some() is Some(chunk) {
+        total += chunk.length()
+        largest = largest.max(chunk.length())
+      }
+      assert_eq(total, body.length())
+      assert_true(largest <= 64 * 1024, msg="largest read: \{largest}")
+    },
+  )
+}
+
+///|
 async test "closed loopback port is Connect" {
   @async.with_timeout(5000, () => {
     let server = @ahttp.Server(@socket.Addr::parse("127.0.0.1:0"))
