@@ -57,7 +57,9 @@ records="$(awk '
   }
 ' "$ledger")"
 
-header="$(printf '%s\n' "$records" | awk -F '\t' '$1 == "HEADER" { print $2; exit }')"
+# awk reads all of its input: exiting at the first match would make printf
+# die of SIGPIPE once the records outgrow the pipe's buffer.
+header="$(printf '%s\n' "$records" | awk -F '\t' '$1 == "HEADER" && !seen { print $2; seen = 1 }')"
 if [[ "$header" != "Tests" ]]; then
   echo "bounds_check.sh: no \"Enforced limits\" table whose last column is Tests in $ledger" >&2
   exit 2
