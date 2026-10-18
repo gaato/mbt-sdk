@@ -112,6 +112,7 @@ Unreachable or platform-only:
 | File | Budget | Reason |
 | --- | --- | --- |
 | http/src/mock/transport.mbt | 2 | The kind-mismatch arms of `send` and `send_stream`: `take` already rejects a script entry whose kind does not match the call. |
+| http-async/src/content_decoder.mbt | 1 | The no-progress guard of `ContentDecoder::pull_stage`: flate consumes or produces on every step that has input and free output, so it never fires; it keeps a broken step from spinning the event loop. |
 
 Testable, not yet tested (next candidates):
 

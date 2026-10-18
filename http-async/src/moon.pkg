@@ -5,6 +5,9 @@ import {
   "moonbitlang/async/semaphore",
   "moonbitlang/async",
   "moonbitlang/async/http" @ahttp,
+  "moonbit-community/flate",
+  "moonbit-community/flate/gzip",
+  "moonbit-community/flate/zlib",
 }
 
 import {
@@ -28,5 +31,7 @@ options(
   targets: {
     "head_error.native.mbt": [ "native", "wasm" ],
     "head_error.js.mbt": [ "js" ],
+    "negotiation.native.mbt": [ "native", "wasm" ],
+    "negotiation.js.mbt": [ "js" ],
   },
 )

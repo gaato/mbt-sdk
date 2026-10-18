@@ -11,6 +11,12 @@
 /// before a response head, the request is sent once more on a fresh connection
 /// if it is idempotent or carries an `Idempotency-Key`; other requests surface
 /// the failure.
+///
+/// On native and Wasm, a request without `Accept-Encoding` is sent with
+/// `Accept-Encoding: gzip, deflate` and its response body is decoded: the
+/// codings undone leave `Content-Encoding`, `Content-Length` is dropped, and an
+/// unknown coding stays on the body untouched. A request that sets
+/// `Accept-Encoding` itself gets the body as sent. On JS, fetch does both.
 pub struct AsyncTransport {
   priv timeout_ms : Int32
   priv max_body_bytes : Int32?
@@ -20,9 +26,10 @@ pub struct AsyncTransport {
 ///|
 /// Creates a transport. Streaming reads each receive a fresh idle timeout.
 /// `max_idle_per_origin = 0` or `idle_max_ms = 0` disables connection reuse.
-/// `max_body_bytes` bounds a buffered response body: a longer one closes the
-/// connection and fails with `Protocol`. Without it the body is unbounded.
-/// Streams are never bounded, since their reader decides what to keep.
+/// `max_body_bytes` bounds a buffered response body, counted after decoding:
+/// a longer one closes the connection and fails with `Protocol`. Without it
+/// the body is unbounded. Streams are never bounded, since their reader
+/// decides what to keep.
 ///
 /// ```mbt check
 /// test {
@@ -54,7 +61,7 @@ pub impl @http.Transport for AsyncTransport with fn send(self, request) {
   bounded(self.timeout_ms, () => {
     let opened = self.open_request(request)
     errdefer opened.client.close()
-    let body = read_body(opened.client, self.max_body_bytes)
+    let body = read_body(opened.client, opened.decoder, self.max_body_bytes)
     self.release(opened)
     @http.Response::{
       status: opened.head.status,
@@ -78,6 +85,7 @@ pub impl @http.Transport for AsyncTransport with fn send_stream(self, request) {
       origin: exchange.origin,
       user_agent: exchange.user_agent,
       client: exchange.client,
+      decoder: exchange.decoder,
       keep_alive: exchange.keep_alive,
       timeout_ms: self.timeout_ms,
       finished: false,
@@ -91,22 +99,41 @@ pub impl @http.Transport for AsyncTransport with fn send_stream(self, request) {
 /// The most bytes one read takes from a connection. Without `max_len`, a read
 /// returns whatever the connection has buffered, so a stream's chunk, and the
 /// overshoot past `max_body_bytes` before it is refused, would be bounded only
-/// by that buffer.
+/// by that buffer. A decoded read is cut to the same size.
 let max_read_bytes : Int32 = 64 * 1024
 
 ///|
-/// The rest of a response body, refused once it exceeds `max_bytes`.
+/// The next chunk of a body: the next `read`, or with a `decoder`, the next
+/// decoded slice, reading only as much as that slice needs.
+async fn read_decoded(
+  read : async () -> Bytes?,
+  decoder : ContentDecoder?,
+) -> Bytes? {
+  guard decoder is Some(decoder) else { return read() }
+  for ;; {
+    match decoder.pull() {
+      Slice(slice) => return Some(slice)
+      Done => return None
+      NeedInput =>
+        match read() {
+          Some(chunk) => decoder.feed(chunk)
+          None => decoder.end()
+        }
+    }
+  }
+}
+
+///|
+/// The rest of a response body, decoded, refused once it exceeds `max_bytes`.
 async fn read_body(
   client : @ahttp.Client,
+  decoder : ContentDecoder?,
   max_bytes : Int32?,
 ) -> Bytes raise @http.HttpError {
-  try {
-    match max_bytes {
-      None => client.read_all().binary()
-      Some(max_bytes) =>
-        read_bounded(() => client.read_some(max_len=max_read_bytes), max_bytes)
-    }
-  } catch {
+  read_bounded(
+    () => read_decoded(() => client.read_some(max_len=max_read_bytes), decoder),
+    max_bytes.unwrap_or(2147483647), // no limit short of `Int32`
+  ) catch {
     @http.HttpError::Protocol(message) =>
       raise @http.HttpError::Protocol(message)
     error => raise @http.HttpError::Protocol(error.to_string())
@@ -155,6 +182,7 @@ priv struct ClientStream {
   origin : String
   user_agent : String?
   client : @ahttp.Client
+  decoder : ContentDecoder?
   keep_alive : Bool
   timeout_ms : Int32
   mut finished : Bool
@@ -182,7 +210,10 @@ impl @http.BodyStream for ClientStream with fn read_some(self) {
   }
   errdefer @http.BodyStream::close(self)
   let chunk = bounded(self.timeout_ms, () => {
-    self.client.read_some(max_len=max_read_bytes) catch {
+    let read = () => self.client.read_some(max_len=max_read_bytes)
+    read_decoded(read, self.decoder) catch {
+      @http.HttpError::Protocol(message) =>
+        raise @http.HttpError::Protocol(message)
       error => raise @http.HttpError::Protocol(error.to_string())
     }
   })
@@ -198,6 +229,7 @@ impl @http.BodyStream for ClientStream with fn read_some(self) {
 priv struct Opened {
   head : @http.ResponseHead
   client : @ahttp.Client
+  decoder : ContentDecoder?
   origin : String
   user_agent : String?
   keep_alive : Bool
@@ -250,6 +282,11 @@ async fn AsyncTransport::open_request(
   let meth = request_method(request.http_method)
   let (origin, path) = split_url(request.url)
   let (headers, user_agent) = wire_headers(request.headers)
+  let negotiated = negotiates_content_coding &&
+    !request.headers.contains("accept-encoding")
+  if negotiated {
+    headers[@ahttp.CaseInsensitiveString("Accept-Encoding")] = accept_encoding()
+  }
   let mut fresh = false
   for ;; {
     let (client, reused) = self.checkout(origin, user_agent, fresh~)
@@ -264,9 +301,17 @@ async fn AsyncTransport::open_request(
         raise head_error(error)
       }
     }
+    let head = response_head(response)
+    let decoder = if negotiated {
+      errdefer client.close()
+      decode_head(head)
+    } else {
+      None
+    }
     return {
-      head: response_head(response),
+      head,
       client,
+      decoder,
       origin,
       user_agent,
       keep_alive: !connection_close(response),

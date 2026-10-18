@@ -8,6 +8,7 @@ import {
   "moonbitlang/async/http" @ahttp,
   "moonbitlang/async/socket",
   "moonbitlang/async/io",
+  "moonbit-community/flate/gzip",
 } for "test"
 
 supported_targets = "native + wasm"
@@ -16,6 +17,7 @@ options(
   targets: {
     "loopback_test.mbt": [ "native", "wasm" ],
     "pool_test.mbt": [ "native", "wasm" ],
+    "content_coding_test.mbt": [ "native", "wasm" ],
     "cookie_roundtrip_test.mbt": [ "native", "wasm" ],
   },
 )
