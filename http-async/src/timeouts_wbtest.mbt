@@ -24,9 +24,29 @@ test "Timeouts gives the head and body the read limit" {
   let limits = { total: 1, pool: 2, connect: 3, write: 4, read: 5, }
   let phases : Array[@http.Phase] = [Pool, Dial, Write, Head, Body, Unknown]
   assert_eq(phases.map(phase => limits.of(phase)), [2, 3, 4, 5, 5, 5])
-  let uniform = Timeouts::uniform(7)
-  assert_eq(phases.map(phase => uniform.of(phase)), [7, 7, 7, 7, 7, 7])
-  assert_eq(uniform.total, 7)
+}
+
+///|
+/// Every limit set to `ms`, as `AsyncTransport::new(timeout_ms=ms)` makes them.
+fn uniform(ms : Int32) -> Timeouts {
+  AsyncTransport::new(timeout_ms=ms).limits
+}
+
+///|
+test "phase limits default to timeout_ms" {
+  let phases : Array[@http.Phase] = [Pool, Dial, Write, Head, Body, Unknown]
+  let limits = uniform(7)
+  assert_eq(phases.map(phase => limits.of(phase)), [7, 7, 7, 7, 7, 7])
+  assert_eq(limits.total, 7)
+  let custom = AsyncTransport::new(
+      timeout_ms=10,
+      connect_timeout_ms=1,
+      write_timeout_ms=2,
+      read_timeout_ms=3,
+      pool_timeout_ms=4,
+    ).limits
+  assert_eq(phases.map(phase => custom.of(phase)), [4, 1, 2, 3, 3, 3])
+  assert_eq(custom.total, 10)
 }
 
 ///|
@@ -128,7 +148,7 @@ async test "the exchange deadline cuts the phase in progress short" {
 async test "a spent limit raises without starting the phase" {
   for total in [0, -1] {
     let clock = @simclock.VirtualClock(start_ms=0)
-    let timer = PhaseTimer::exchange(clock, Timeouts::uniform(total))
+    let timer = PhaseTimer::exchange(clock, uniform(total))
     let mut started = false
     let outcome = try timer.run(Dial, () => started = true) catch {
       error => @debug.to_string(error)
@@ -143,7 +163,7 @@ async test "a spent limit raises without starting the phase" {
 ///|
 async test "a phase's failure becomes an HttpError of that phase" {
   let clock = @simclock.VirtualClock(start_ms=0)
-  let timer = PhaseTimer::exchange(clock, Timeouts::uniform(1000))
+  let timer = PhaseTimer::exchange(clock, uniform(1000))
   let rows : Array[(@http.Phase, String)] = [
     (Dial, "Connect(\"down\")"),
     (Write, "Network(phase=Write, message=\"down\")"),

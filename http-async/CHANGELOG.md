@@ -10,6 +10,28 @@ note.
 
 ### Added
 
+- **Per-phase timeouts: `connect_timeout_ms`, `write_timeout_ms`,
+  `read_timeout_ms` and `pool_timeout_ms`.** One `timeout_ms` could not
+  give a slow streaming response a long wait for its head while failing
+  fast on an unreachable host. Each new limit bounds one phase (dialing
+  with DNS, TCP and TLS; sending the request; the head and each body read
+  separately; waiting for a connection slot), always within the
+  exchange's `timeout_ms`, and the `Timeout` it raises names the phase and
+  the limit that ran out. Each defaults to `timeout_ms`, so existing
+  callers keep one limit per exchange and per stream read. A stream's
+  reads are bounded by `read_timeout_ms` alone, as before by `timeout_ms`.
+  Like httpx's `Timeout(connect=, read=, write=, pool=)`, plus the overall
+  deadline httpx lacks. All timing goes through the transport's clock.
+- **`max_connections` and `max_connections_per_origin` cap the connections
+  in use.** A connection is in use from its request's slot until its body
+  is read or abandoned; parked ones do not count. A request over a cap
+  waits in arrival order (a freed slot goes to the earliest waiter it
+  fits, so one origin at its cap does not hold up another) until
+  `pool_timeout_ms`, then fails with `Timeout(phase=Pool)`; a waiter that
+  gives up or is cancelled leaves the queue and releases only a slot it was
+  granted, and `close()` refuses the waiters with `Connect`. Unset, the
+  default, requests never wait, as before.
+
 - **Native and Wasm responses in `deflate`, and in chains of codings, are
   decoded.** moonbitlang/async undoes only a single `gzip`, and failed the
   request on any other `Content-Encoding`. The transport now sends

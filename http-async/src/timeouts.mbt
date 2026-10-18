@@ -11,12 +11,6 @@ priv struct Timeouts {
 }
 
 ///|
-/// Every limit set to `ms`.
-fn Timeouts::uniform(ms : Int32) -> Timeouts {
-  { total: ms, pool: ms, connect: ms, write: ms, read: ms, }
-}
-
-///|
 /// The limit of one phase.
 fn Timeouts::of(self : Timeouts, phase : @http.Phase) -> Int32 {
   match phase {

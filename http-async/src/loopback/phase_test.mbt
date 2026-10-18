@@ -139,3 +139,103 @@ async test "a malformed head is Protocol" {
     },
   )
 }
+
+///|
+async test "each phase limit bounds only its phase" {
+  // Dialing: a TLS handshake that never completes.
+  with_raw_server(_ => @async.sleep(3000), port => {
+    let transport = @adapter.AsyncTransport::new(connect_timeout_ms=200)
+    let outcome = phase_outcome(
+      transport,
+      @http.Request::get("https://127.0.0.1:\{port}/"),
+    )
+    assert_eq(outcome, "Timeout(phase=Dial, ms=200)")
+  })
+  // Writing: a server that never reads.
+  with_raw_server(_ => @async.sleep(3000), port => {
+    let transport = @adapter.AsyncTransport::new(write_timeout_ms=200)
+    let request = @http.Request::post("http://127.0.0.1:\{port}/").body_bytes(
+      large_body,
+    )
+    assert_eq(phase_outcome(transport, request), "Timeout(phase=Write, ms=200)")
+  })
+  // Reading the head: a server that never answers.
+  for streaming in [false, true] {
+    with_raw_server(
+      conn => {
+        ignore(conn.read_until("\r\n\r\n"))
+        @async.sleep(3000)
+      },
+      port => {
+        let transport = @adapter.AsyncTransport::new(read_timeout_ms=200)
+        let outcome = phase_outcome(
+          transport,
+          @http.Request::get("http://127.0.0.1:\{port}/"),
+          streaming~,
+        )
+        assert_eq(outcome, "Timeout(phase=Head, ms=200)")
+      },
+    )
+  }
+  // Reading the body: a server that stops after the first bytes.
+  for streaming in [false, true] {
+    with_raw_server(
+      conn => {
+        ignore(conn.read_until("\r\n\r\n"))
+        conn.write(b"HTTP/1.1 200 OK\r\nContent-Length: 100\r\n\r\nfirst")
+        @async.sleep(3000)
+      },
+      port => {
+        let transport = @adapter.AsyncTransport::new(read_timeout_ms=200)
+        let outcome = phase_outcome(
+          transport,
+          @http.Request::get("http://127.0.0.1:\{port}/"),
+          streaming~,
+        )
+        assert_eq(outcome, "Timeout(phase=Body, ms=200)")
+      },
+    )
+  }
+}
+
+///|
+async test "the exchange timeout ends a buffered body that keeps trickling" {
+  // Every byte arrives well within the read limit, so only the exchange's
+  // deadline stops the buffered read; a stream's reads have no such deadline.
+  let trickle = async fn(conn : @socket.Tcp) {
+    ignore(conn.read_until("\r\n\r\n"))
+    conn.write(b"HTTP/1.1 200 OK\r\nContent-Length: 1000\r\n\r\n")
+    for _ in 0..<1000 {
+      conn.write(b"x")
+      @async.sleep(50)
+    }
+  }
+  with_raw_server(trickle, port => {
+    let transport = @adapter.AsyncTransport::new(
+      timeout_ms=400,
+      read_timeout_ms=200,
+    )
+    let outcome = phase_outcome(
+      transport,
+      @http.Request::get("http://127.0.0.1:\{port}/"),
+    )
+    assert_eq(outcome, "Timeout(phase=Body, ms=400)")
+  })
+  with_raw_server(trickle, port => {
+    let transport = @adapter.AsyncTransport::new(
+      timeout_ms=400,
+      read_timeout_ms=200,
+    )
+    let (_, stream) = transport.send_stream(
+      @http.Request::get("http://127.0.0.1:\{port}/"),
+    )
+    defer stream.close()
+    let started = @async.now()
+    let mut length = 0
+    while @async.now() - started < 600L {
+      guard stream.read_some() is Some(chunk) else { fail("stream ended") }
+      length += chunk.length()
+    }
+    assert_true(length >= 5, msg="read \{length} bytes")
+  })
+}

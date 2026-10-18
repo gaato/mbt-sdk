@@ -178,9 +178,10 @@ fn AsyncTransport::checkin(
 }
 
 ///|
-/// Closes every idle connection and refuses further requests with
-/// `Connect("transport closed")`. In-flight requests finish and their
-/// connections are closed instead of parked.
+/// Closes every idle connection and refuses further requests, and those
+/// waiting for a connection slot, with `Connect("transport closed")`.
+/// In-flight requests finish and their connections are closed instead of
+/// parked.
 ///
 /// ```mbt check
 /// test {
@@ -193,6 +194,7 @@ pub fn AsyncTransport::close(self : AsyncTransport) -> Unit {
   for client in self.pool.drain() {
     client.close()
   }
+  self.slots.refuse_waiting()
 }
 
 ///|

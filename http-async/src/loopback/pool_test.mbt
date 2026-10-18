@@ -257,3 +257,108 @@ async test "max_idle_per_origin bounds parked connections, not concurrency" {
     },
   )
 }
+
+///|
+/// Answers `/hold` with a head and a first chunk, then keeps the body open
+/// for 3 s; answers anything else with `pong`.
+async fn hold_or_pong(
+  request : @ahttp.Request,
+  conn : @ahttp.ServerConnection,
+) -> Unit {
+  if request.path == "/hold" {
+    conn.send_response(200, "OK")
+    conn.write(b"x")
+    conn.flush()
+    @async.sleep(3000)
+    conn.end_response()
+  } else {
+    pong(conn)
+  }
+}
+
+///|
+async test "a request over the connection cap waits for a slot until pool_timeout_ms" {
+  with_keepalive_server(hold_or_pong, (url, connections) => {
+    let transport = @adapter.AsyncTransport::new(
+      max_connections_per_origin=1,
+      pool_timeout_ms=200,
+    )
+    let (_, held) = transport.send_stream(@http.Request::get(url + "/hold"))
+    try transport.send(@http.Request::get(url + "/ping")) catch {
+      @http.HttpError::Timeout(phase=Pool, ms~) => assert_eq(ms, 200)
+      error => fail("expected a Pool timeout, got \{@debug.to_string(error)}")
+    } noraise {
+      _ => fail("the cap was not applied")
+    }
+    assert_eq(connections(), 1)
+    // Abandoning the stream closes its connection and frees the slot.
+    held.close()
+    assert_eq(transport.send(@http.Request::get(url + "/ping")).body, b"pong")
+    assert_eq(connections(), 2)
+  })
+}
+
+///|
+async test "a queued request takes the connection its predecessor parks" {
+  with_keepalive_server((_, conn) => pong(conn), (url, connections) => {
+    let transport = @adapter.AsyncTransport::new(max_connections=1)
+    let order : Array[Int32] = []
+    @async.with_task_group(group => {
+      for i in 0..<4 {
+        group.spawn_bg(() => {
+          ignore(transport.send(@http.Request::get(url + "/ping")))
+          order.push(i)
+        })
+      }
+    })
+    assert_eq(order, [0, 1, 2, 3])
+    assert_eq(connections(), 1)
+    assert_eq(transport.idle_connections(), 1)
+  })
+}
+
+///|
+async test "closing the transport refuses the requests waiting for a slot" {
+  with_keepalive_server(hold_or_pong, (url, _) => {
+    let transport = @adapter.AsyncTransport::new(max_connections=1)
+    let (_, held) = transport.send_stream(@http.Request::get(url + "/hold"))
+    defer held.close()
+    let outcome = Ref("pending")
+    @async.with_task_group(group => {
+      group.spawn_bg(() => {
+        outcome.val = try
+          transport.send(@http.Request::get(url + "/ping"))
+        catch {
+          error => @debug.to_string(error)
+        } noraise {
+          _ => "sent"
+        }
+      })
+      @async.sleep(50)
+      transport.close()
+    })
+    assert_eq(outcome.val, "Connect(\"transport closed\")")
+  })
+  // A waiter handed a slot just before the close is refused as it resumes.
+  with_keepalive_server(hold_or_pong, (url, connections) => {
+    let transport = @adapter.AsyncTransport::new(max_connections=1)
+    let (_, held) = transport.send_stream(@http.Request::get(url + "/hold"))
+    let outcome = Ref("pending")
+    @async.with_task_group(group => {
+      group.spawn_bg(() => {
+        outcome.val = try
+          transport.send(@http.Request::get(url + "/ping"))
+        catch {
+          error => @debug.to_string(error)
+        } noraise {
+          _ => "sent"
+        }
+      })
+      @async.sleep(50)
+      held.close()
+      transport.close()
+    })
+    assert_eq(outcome.val, "Connect(\"transport closed\")")
+    assert_eq(connections(), 1)
+  })
+}

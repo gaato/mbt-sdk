@@ -3,6 +3,7 @@ import {
   "gaato/http/clock",
   "gaato/http/sync",
   "moonbitlang/async/semaphore",
+  "moonbitlang/async/cond_var",
   "moonbitlang/async",
   "moonbitlang/async/http" @ahttp,
   "moonbit-community/flate",

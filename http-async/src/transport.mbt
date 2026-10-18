@@ -4,10 +4,12 @@
 /// A connection returns to the pool only after its response body has been
 /// consumed in full and the server did not answer `Connection: close`. At most
 /// `max_idle_per_origin` connections are parked per origin, each reusable for
-/// at most `idle_max_ms`; concurrent requests beyond that dial new connections
-/// and are never queued. No timer runs: every request, to any origin, closes
-/// the parked connections that have expired, so a transport left unused holds
-/// them until its next request or `close()`. When a reused connection fails
+/// at most `idle_max_ms`; concurrent requests beyond that dial new connections.
+/// They queue only under `max_connections` or `max_connections_per_origin`,
+/// which cap the connections in use (parked ones do not count). No timer
+/// runs: every request, to any origin, closes the parked connections that
+/// have expired, so a transport left unused holds them until its next request
+/// or `close()`. When a reused connection fails
 /// before a response head, the request is sent once more on a fresh connection
 /// if it is idempotent or carries an `Idempotency-Key`; other requests surface
 /// the failure.
@@ -22,40 +24,80 @@ pub struct AsyncTransport {
   priv clock : &@clock.Clock
   priv max_body_bytes : Int32?
   priv pool : IdlePool[@ahttp.Client]
+  priv slots : Slots
 }
 
 ///|
-/// Creates a transport. `timeout_ms` bounds a buffered exchange from start to
-/// the end of its body, a streaming exchange up to its head, and each read of
-/// a stream; a nonpositive value fails every request at once.
+/// Creates a transport.
+///
+/// Time limits, in milliseconds; a nonpositive one fails at once:
+/// - `timeout_ms` bounds an exchange from the call, slot wait included: a
+///   buffered one to the end of its body, a streaming one to its head. Every
+///   phase ends at that deadline at the latest, reporting `ms=timeout_ms`.
+/// - `connect_timeout_ms` bounds dialing a new connection: DNS, TCP and TLS.
+/// - `write_timeout_ms` bounds sending the request.
+/// - `read_timeout_ms` bounds waiting for the head, and each body read on its
+///   own. It alone bounds a stream's reads.
+/// - `pool_timeout_ms` bounds the wait for a slot under a connection cap.
+///
+/// Each phase limit defaults to `timeout_ms`, which keeps one limit for the
+/// exchange and one per stream read. A timeout names its phase: `Pool`,
+/// `Dial`, `Write`, `Head` or `Body`. On JS, fetch connects, sends and waits
+/// for the head in one call, under `read_timeout_ms` and as phase `Unknown`;
+/// the connect and write limits do not apply there.
+///
+/// `max_connections` caps the connections in use across origins, and
+/// `max_connections_per_origin` those to one origin: a connection is in use
+/// from its request's slot until its body is read or abandoned. A request
+/// over a cap waits for a slot, first come first served among the waiters a
+/// freed slot fits, until `pool_timeout_ms`; caps below 1 count as 1. Unset,
+/// requests never wait.
+///
 /// `max_idle_per_origin = 0` or `idle_max_ms = 0` disables connection reuse.
 /// `max_body_bytes` bounds a buffered response body, counted after decoding:
 /// a longer one closes the connection and fails with `Protocol`. Without it
 /// the body is unbounded. Streams are never bounded, since their reader
 /// decides what to keep.
 ///
-/// A timeout names the phase it interrupted, as do failures after the
-/// connection is made (`Network`). On JS, fetch connects, sends and waits for
-/// the head in one call, so failures and timeouts there carry `Unknown`.
-///
 /// ```mbt check
 /// test {
 ///   let _ = @adapter.AsyncTransport::new(timeout_ms=1000)
+///   let _ = @adapter.AsyncTransport::new(
+///     connect_timeout_ms=5000,
+///     read_timeout_ms=60000,
+///   )
+///   let _ = @adapter.AsyncTransport::new(max_connections_per_origin=8)
 ///   let _ = @adapter.AsyncTransport::new(max_idle_per_origin=0)
 ///   let _ = @adapter.AsyncTransport::new(max_body_bytes=1_048_576)
 /// }
 /// ```
 pub fn AsyncTransport::new(
   timeout_ms~ : Int32 = 30000,
+  connect_timeout_ms? : Int32,
+  write_timeout_ms? : Int32,
+  read_timeout_ms? : Int32,
+  pool_timeout_ms? : Int32,
+  max_connections? : Int32,
+  max_connections_per_origin? : Int32,
   max_idle_per_origin~ : Int32 = 4,
   idle_max_ms~ : Int32 = 10000,
   max_body_bytes? : Int32,
 ) -> AsyncTransport {
   {
-    limits: Timeouts::uniform(timeout_ms),
+    limits: {
+      total: timeout_ms,
+      pool: pool_timeout_ms.unwrap_or(timeout_ms),
+      connect: connect_timeout_ms.unwrap_or(timeout_ms),
+      write: write_timeout_ms.unwrap_or(timeout_ms),
+      read: read_timeout_ms.unwrap_or(timeout_ms),
+    },
     clock: AsyncClock::new(),
     max_body_bytes,
     pool: IdlePool::new(max_per_origin=max_idle_per_origin, idle_max_ms~),
+    slots: Slots::new(
+      max_total?=max_connections,
+      max_per_origin?=max_connections_per_origin,
+    ),
   }
 }
 
@@ -68,7 +110,7 @@ pub extend AsyncTransport with @http.Transport::{send, send_stream}
 pub impl @http.Transport for AsyncTransport with fn send(self, request) {
   let timer = PhaseTimer::exchange(self.clock, self.limits)
   let opened = self.open_request(request, timer)
-  errdefer opened.client.close()
+  errdefer self.discard(opened.origin, opened.client)
   let body = read_body(
     opened.client,
     opened.decoder,
@@ -198,8 +240,9 @@ impl @http.BodyStream for ClientStream with fn close(self) {
     self.closed = true
     if self.finished && self.keep_alive {
       self.transport.checkin(self.origin, self.user_agent, self.client)
+      self.transport.slots.release(self.origin)
     } else {
-      self.client.close()
+      self.transport.discard(self.origin, self.client)
     }
   }
 }
@@ -230,13 +273,26 @@ priv struct Opened {
 }
 
 ///|
-/// Parks or closes the connection of a fully consumed exchange.
+/// Parks or closes the connection of a fully consumed exchange and frees its
+/// slot.
 fn AsyncTransport::release(self : AsyncTransport, opened : Opened) -> Unit {
   if opened.keep_alive {
     self.checkin(opened.origin, opened.user_agent, opened.client)
+    self.slots.release(opened.origin)
   } else {
-    opened.client.close()
+    self.discard(opened.origin, opened.client)
   }
+}
+
+///|
+/// Closes the connection of an exchange that ends early and frees its slot.
+fn AsyncTransport::discard(
+  self : AsyncTransport,
+  origin : String,
+  client : @ahttp.Client,
+) -> Unit {
+  client.close()
+  self.slots.release(origin)
 }
 
 ///|
@@ -269,7 +325,8 @@ fn wire_headers(headers : @http.Headers) -> (@ahttp.Headers, String?) {
 }
 
 ///|
-/// Sends `request` and reads its response head, each phase under `timer`.
+/// Takes a connection slot, sends `request` and reads its response head, each
+/// phase under `timer`. The slot passes to the returned exchange.
 async fn AsyncTransport::open_request(
   self : AsyncTransport,
   request : @http.Request,
@@ -283,6 +340,11 @@ async fn AsyncTransport::open_request(
   if negotiated {
     headers[@ahttp.CaseInsensitiveString("Accept-Encoding")] = accept_encoding()
   }
+  if self.pool.closed {
+    raise @http.HttpError::Connect("transport closed")
+  }
+  self.slots.acquire(origin, timer)
+  errdefer self.slots.release(origin)
   let mut fresh = false
   for ;; {
     let (client, reused) = self.checkout(origin, user_agent, fresh~, timer)
