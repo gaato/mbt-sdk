@@ -4,6 +4,7 @@ pub struct LineFramer {
   priv line : Array[Byte]
   priv max_line : Int32?
   priv mut finished : Bool
+  priv mut overflow : Int32?
 }
 
 ///|
@@ -16,16 +17,26 @@ pub struct LineFramer {
 /// }
 /// ```
 pub fn LineFramer::new(max_line? : Int32) -> LineFramer {
-  { line: [], max_line, finished: false, }
+  { line: [], max_line, finished: false, overflow: None, }
 }
 
 ///|
 /// Feeds an arbitrary byte chunk and returns complete nonblank lines in order.
 /// A trailing carriage return is removed from each complete line.
+///
+/// `max_line` bounds a line's content: the carriage return of a CRLF
+/// terminator is exempt, while any other carriage return counts. A line over
+/// it raises `LineTooLong` and ends the stream. When the same chunk completed
+/// lines before it, those are returned first and the next `feed` or `finish`
+/// raises, so feed an empty chunk to observe it without waiting for more input.
 pub fn LineFramer::feed(
   self : LineFramer,
   bytes : Bytes,
 ) -> Array[Bytes] raise DecodeError {
+  if self.overflow is Some(limit) {
+    self.overflow = None
+    raise LineTooLong(limit)
+  }
   let lines = []
   if self.finished {
     return lines
@@ -38,10 +49,14 @@ pub fn LineFramer::feed(
       }
     } else {
       self.line.push(byte)
-      if self.max_line is Some(limit) && self.line.length() > limit {
+      if self.max_line is Some(limit) && overlong(self.line, limit) {
         self.finished = true
         self.line.clear()
-        raise LineTooLong(limit)
+        if lines.is_empty() {
+          raise LineTooLong(limit)
+        }
+        self.overflow = Some(limit)
+        return lines
       }
     }
   }
@@ -50,18 +65,36 @@ pub fn LineFramer::feed(
 
 ///|
 /// Finishes the stream and returns a final nonblank unterminated line once.
-pub fn LineFramer::finish(self : LineFramer) -> Bytes? {
+/// Raises `LineTooLong` for an overflow `feed` deferred, or for a final line
+/// over `max_line`: a carriage return that no newline followed is content.
+pub fn LineFramer::finish(self : LineFramer) -> Bytes? raise DecodeError {
+  if self.overflow is Some(limit) {
+    self.overflow = None
+    raise LineTooLong(limit)
+  }
   if self.finished {
     return None
   }
   self.finished = true
   let line = Bytes::from_array(self.line.copy())
   self.line.clear()
-  if blank(line) {
-    None
-  } else {
-    Some(line)
+  // Length first: a blank tail over the limit is still an overflow.
+  if self.max_line is Some(limit) && line.length() > limit {
+    raise LineTooLong(limit)
   }
+  if blank(line) {
+    return None
+  }
+  Some(line)
+}
+
+///|
+/// Reports whether a partial line holds more than `limit` content bytes. A
+/// final carriage return gets one byte of slack: it may yet be the start of a
+/// CRLF terminator, which `take_line` strips.
+fn overlong(line : Array[Byte], limit : Int32) -> Bool {
+  let length = line.length()
+  length > limit && !(length - 1 == limit && line[length - 1] == b'\r')
 }
 
 ///|

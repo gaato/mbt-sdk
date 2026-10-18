@@ -1,4 +1,34 @@
 ///|
+/// Returns the `id: null` reply to a line that failed to decode, or `None`
+/// when the failure is fatal: an overlong line means the stream is broken.
+fn decode_failure_reply(error : @jsonrpc.DecodeError) -> @jsonrpc.Message? {
+  let reply = match error {
+    InvalidJson(_) => @jsonrpc.RpcError::parse_error()
+    InvalidMessage(_) => @jsonrpc.RpcError::invalid_request()
+    LineTooLong(_) => return None
+  }
+  Some(Failure(id=Null, error=reply))
+}
+
+///|
+/// Builds the reply to request `id` from its handler outcome. A raising handler
+/// is answered with an internal error before the raise fails the group.
+fn request_reply(
+  id : @jsonrpc.RequestId,
+  outcome : Result[Result[Json, @jsonrpc.RpcError], Error],
+) -> @jsonrpc.Message {
+  match outcome {
+    Ok(Ok(result)) => Response(id~, result~)
+    Ok(Err(error)) => Failure(id~, error~)
+    Err(error) =>
+      Failure(
+        id~,
+        error=@jsonrpc.RpcError::internal_error(message=error.to_string()),
+      )
+  }
+}
+
+///|
 fn[X] Connection::dispatch(
   self : Connection,
   group : @async.TaskGroup[X],
@@ -8,13 +38,8 @@ fn[X] Connection::dispatch(
   let message = @jsonrpc.decode_line(line, envelope=self.envelope) catch {
     error => {
       self.errors += 1
-      let reply = match error {
-        @jsonrpc.DecodeError::InvalidJson(_) => @jsonrpc.RpcError::parse_error()
-        @jsonrpc.DecodeError::InvalidMessage(_) =>
-          @jsonrpc.RpcError::invalid_request()
-        @jsonrpc.DecodeError::LineTooLong(_) => raise error
-      }
-      group.spawn_bg(() => self.send(Failure(id=Null, error=reply), reply=true))
+      guard decode_failure_reply(error) is Some(reply) else { raise error }
+      group.spawn_bg(() => self.send(reply, reply=true))
       return
     }
   }
@@ -32,27 +57,14 @@ fn[X] Connection::dispatch(
     Request(id~, name~, params~) =>
       group.spawn_bg(() => {
         let outcome = Ok(on_request(name, params)) catch { error => Err(error) }
-        let result = match outcome {
-          Ok(result) => result
-          Err(error) => {
-            self.send(
-              Failure(
-                id~,
-                error=@jsonrpc.RpcError::internal_error(
-                  message=error.to_string(),
-                ),
-              ),
-              reply=true,
-            ) catch {
-              _ => ()
-            }
-            raise error
+        let reply = request_reply(id, outcome)
+        if outcome is Err(error) {
+          self.send(reply, reply=true) catch {
+            _ => ()
           }
+          raise error
         }
-        match result {
-          Ok(result) => self.send(Response(id~, result~), reply=true)
-          Err(error) => self.send(Failure(id~, error~), reply=true)
-        }
+        self.send(reply, reply=true)
       })
     Notification(name~, params~) =>
       ignore(self.notifications.try_put((name, params)))
