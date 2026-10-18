@@ -9,6 +9,7 @@ fn expect_error(
     @multipart.BoundaryCollision => assert_eq(expected, "BoundaryCollision")
     @multipart.InvalidHeaderValue(value) =>
       assert_eq(expected, "InvalidHeaderValue:" + value)
+    @multipart.StreamPart(name) => assert_eq(expected, "StreamPart:" + name)
   } noraise {
     _ => fail("expected multipart error")
   }
@@ -303,5 +304,119 @@ test "lone surrogates in names, filenames and text encode as U+FFFD" {
   )
   assert_eq(
     body, b"--b\r\nContent-Disposition: form-data; name=\"\xEF\xBF\xBDn\"\r\n\r\nv\xEF\xBF\xBD\r\n--b\r\nContent-Disposition: form-data; name=\"f\"; filename=\"\xEF\xBF\xBDx\xEF\xBF\xBD\"\r\nContent-Type: text/plain\r\n\r\n\r\n--b--\r\n",
+  )
+}
+
+///|
+/// A part stream that is never read: these tests only lay bodies out.
+priv struct Unread {}
+
+///|
+impl @http.BodyStream for Unread with fn read_some(_) {
+  None
+}
+
+///|
+impl @http.BodyStream for Unread with fn close(_) {
+  ()
+}
+
+///|
+test "encode_body leaves bytes-only bodies exactly as encode makes them" {
+  let cases : Array[Array[@multipart.Part]] = [
+    [],
+    [@multipart.Part::text("message", "hello")],
+    [@multipart.Part::text("empty", "")],
+    [
+      @multipart.Part::json("payload_json", { "content": "hi" }),
+      @multipart.Part::text("empty", ""),
+      @multipart.Part::file(
+        "files[0]", "a.bin", "application/octet-stream", b"\x00\x01",
+      ),
+    ],
+    [@multipart.Part::file("a\"\r\nb", "日本\"\r\n.txt", "text/plain", b"ok")],
+  ]
+  for parts in cases {
+    let (content_type, encoded) = @multipart.encode(parts, "B")
+    assert_eq(
+      @multipart.encode_body(parts, "B"),
+      (content_type, Bytes(encoded)),
+    )
+    let applied = @multipart.apply(@http.Request::post("/u"), parts, "B")
+    assert_eq(applied.body, Bytes(encoded))
+  }
+}
+
+///|
+test "encode_body declares a length only when every stream part has one" {
+  let file = (length : Int64?) => {
+    @multipart.Part::file_stream("f", "f.bin", "x/y", Unread::{ }, length?)
+  }
+  let framing = (parts : Array[@multipart.Part]) => {
+    // The same layout with every stream part empty: framing only.
+    let empty = parts.map(part => {
+      match part.body {
+        Stream(_) => { ..part, body: Bytes(b""), }
+        Bytes(_) => part
+      }
+    })
+    @multipart.encode(empty, "B").1.length().to_int64()
+  }
+  let rows : Array[(Array[@multipart.Part], Int64?)] = [
+    ([file(Some(10L))], Some(10L)),
+    ([file(Some(0L))], Some(0L)),
+    (
+      [file(Some(10L)), @multipart.Part::text("t", "abc"), file(Some(5L))],
+      Some(15L),
+    ),
+    ([file(None)], None),
+    ([file(Some(10L)), file(None)], None),
+    ([@multipart.Part::text("t", "abc"), file(None)], None),
+  ]
+  for row in rows {
+    let (parts, streamed) = row
+    let (_, body) = @multipart.encode_body(parts, "B")
+    assert_true(body is Stream(_))
+    let expected = streamed.map(bytes => bytes + framing(parts))
+    assert_eq(body.length(), expected, msg=@debug.to_string(parts.length()))
+  }
+}
+
+///|
+test "encode and encode_segments refuse stream parts" {
+  let parts = [
+    @multipart.Part::text("t", "x"),
+    @multipart.Part::file_stream("upload", "a.bin", "x/y", Unread::{ }),
+  ]
+  expect_error(() => ignore(@multipart.encode(parts, "B")), "StreamPart:upload")
+  expect_error(
+    () => ignore(@multipart.encode_segments(parts, "B")),
+    "StreamPart:upload",
+  )
+  // Validation still runs on every part before a stream is considered.
+  expect_error(
+    () => {
+      ignore(
+        @multipart.encode_body(
+          [
+            @multipart.Part::file_stream("f", "a", "x/y", Unread::{ }),
+            @multipart.Part::text("t", "--B"),
+          ],
+          "B",
+        ),
+      )
+    },
+    "BoundaryCollision",
+  )
+  expect_error(
+    () => {
+      ignore(
+        @multipart.encode_body(
+          [@multipart.Part::file_stream("f", "a", "x/\ny", Unread::{ })],
+          "B",
+        ),
+      )
+    },
+    "InvalidHeaderValue:x/\ny",
   )
 }

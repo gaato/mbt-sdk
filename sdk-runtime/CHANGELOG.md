@@ -10,6 +10,22 @@ note.
 
 ### Changed
 
+- **Multipart file parts can stream: `Part.body` is an `@http.Body`.** An
+  upload no longer has to hold its files in memory. `Part::file_stream(name,
+  filename, content_type, stream, length?)` makes a part read from a
+  `BodyStream` as the request is sent; `encode_body` and `apply` produce a
+  stream body when any part streams, with `Content-Length` only when every
+  stream part has a length and chunked otherwise. A body of bytes parts is
+  unchanged, byte for byte. Bytes parts are still checked for the boundary
+  before anything is sent; a stream part cannot be, so it is scanned as it
+  streams and one that contains the delimiter fails the request with
+  `HttpError::Protocol` before the colliding bytes go out (with
+  `make_boundary`'s 165 random bits this is not expected to happen).
+  `encode` and `encode_segments`, which return bytes, raise the new
+  `MultipartError::StreamPart(name)` for a stream part. Migration: compare
+  `part.body` with `Bytes(b"...")` or read it with `part.body.as_bytes()`,
+  write `body: Bytes(...)` in a `Part` literal, and add an arm for
+  `StreamPart(_)` where you match `MultipartError` exhaustively.
 - **`Client` never resends a stream request body a transport has read.**
   Requires `gaato/http`'s new `Body`. A request built with
   `Request::body_stream` is sent once: after a failure, the client raises
