@@ -211,12 +211,12 @@ fn replayable(request : @http.Request) -> Bool {
 }
 
 ///|
-/// Whether the server asked to close the connection after this response.
+/// Whether the server asked to close the connection after this response:
+/// `Connection` is a comma-separated token list, so `close` must be a whole token.
 fn connection_close(response : @ahttp.Response) -> Bool {
-  for name, value in response.headers {
-    if name.0.to_lower() == "connection" && value.to_lower().contains("close") {
-      return true
-    }
+  guard response.headers.get(@ahttp.CaseInsensitiveString("connection"))
+    is Some(value) else {
+    return false
   }
-  false
+  value.split(",").any(token => token.trim().to_owned().to_lower() == "close")
 }

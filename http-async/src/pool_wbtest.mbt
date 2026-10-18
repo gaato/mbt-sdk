@@ -219,3 +219,73 @@ test "drain hands back every parked connection and closes the pool" {
   assert_eq(pool.count(), 0)
   assert_eq(pool.put("a", None, 4, now=1000), [4])
 }
+
+///|
+test "replayable allows idempotent methods or an idempotency key" {
+  let rows : Array[(String, Array[(String, String)], Bool)] = [
+    ("GET", [], true),
+    ("get", [], true),
+    ("HEAD", [], true),
+    ("PUT", [], true),
+    ("Delete", [], true),
+    ("OPTIONS", [], true),
+    ("TRACE", [], true),
+    ("POST", [], false),
+    ("PATCH", [], false),
+    ("CONNECT", [], false),
+    ("PURGE", [], false),
+    ("POST", [("Idempotency-Key", "k")], true),
+    ("PATCH", [("idempotency-key", "")], true),
+    ("POST", [("x-idempotency-key", "k")], false),
+  ]
+  for row in rows {
+    let (http_method, headers, expected) = row
+    let request : @http.Request = {
+      http_method,
+      url: "http://example.com/",
+      headers: @http.Headers::from_array(headers),
+      body: b"",
+    }
+    assert_eq(
+      replayable(request),
+      expected,
+      msg="\{http_method} [\{pairs_label(headers.iter())}]",
+    )
+  }
+}
+
+///|
+test "connection_close looks for the close token" {
+  let rows : Array[(Array[(String, String)], Bool)] = [
+    ([], false),
+    ([("Connection", "keep-alive")], false),
+    ([("Connection", "close")], true),
+    ([("connection", "Close")], true),
+    ([("CONNECTION", "CLOSE")], true),
+    ([("Connection", " close ")], true),
+    ([("Connection", "keep-alive, close")], true),
+    ([("Connection", "close,upgrade")], true),
+    ([("Connection", "Upgrade")], false),
+    ([("Connection", "closed-ish")], false),
+    ([("Connection", "keep-alive, x-close")], false),
+    ([("Connection", "")], false),
+    ([("X-Connection", "close")], false),
+    ([("X-Status", "close")], false),
+  ]
+  for row in rows {
+    let (headers, expected) = row
+    let response : @ahttp.Response = {
+      code: 200,
+      reason: "OK",
+      headers: Map(
+        headers.map(pair => (@ahttp.CaseInsensitiveString(pair.0), pair.1)),
+      ),
+      cookies: [],
+    }
+    assert_eq(
+      connection_close(response),
+      expected,
+      msg=pairs_label(headers.iter()),
+    )
+  }
+}
