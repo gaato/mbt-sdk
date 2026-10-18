@@ -244,7 +244,7 @@ test "replayable allows idempotent methods or an idempotency key" {
       http_method,
       url: "http://example.com/",
       headers: @http.Headers::from_array(headers),
-      body: b"",
+      body: Bytes(b""),
     }
     assert_eq(
       replayable(request),

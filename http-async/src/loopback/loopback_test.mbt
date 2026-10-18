@@ -127,7 +127,7 @@ async test "POST Japanese JSON bytes content-type and joined request headers" {
       assert_eq(request.headers.get("x-repeat"), Some("one, two"))
       assert_eq(request.headers.get("content-length"), None)
       let body = conn.read_all().binary()
-      assert_eq(body, template.body)
+      assert_eq(@http.Body::Bytes(body), template.body)
       reply(conn, 200, body)
     },
     url => {
@@ -137,7 +137,7 @@ async test "POST Japanese JSON bytes content-type and joined request headers" {
         .header("X-Repeat", "one")
         .header("x-repeat", "two")
       assert_eq(
-        @adapter.AsyncTransport::new().send(request).body,
+        @http.Body::Bytes(@adapter.AsyncTransport::new().send(request).body),
         template.body,
       )
     },

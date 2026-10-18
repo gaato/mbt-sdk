@@ -12,7 +12,7 @@ test "all method constructors start empty and preserve URL and custom method" {
     assert_eq(request.http_method, http_method)
     assert_eq(request.url, "/path")
     assert_eq(request.headers.length(), 0)
-    assert_eq(request.body, b"")
+    assert_eq(request.body, Bytes(b""))
   }
 }
 
@@ -34,9 +34,9 @@ test "builders copy headers and preserve source requests" {
   for derived in [bytes, text, json] {
     assert_eq(derived.headers.get_all("X-A"), ["one"])
   }
-  assert_eq(original.body, b"")
-  assert_eq(bytes.body, b"\xff\x00")
-  assert_eq(text.body, @utf8.encode("日本語🌙"))
+  assert_eq(original.body, Bytes(b""))
+  assert_eq(bytes.body, Bytes(b"\xff\x00"))
+  assert_eq(text.body, Bytes(@utf8.encode("日本語🌙")))
 }
 
 ///|
@@ -49,7 +49,7 @@ test "json body sets a default content type and preserves existing values" {
   let response : @http.Response = {
     status: 200,
     headers: request.headers,
-    body: request.body,
+    body: request.body.as_bytes().unwrap(),
   }
   assert_eq(response.json(), value)
   let custom = original

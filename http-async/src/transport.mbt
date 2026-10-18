@@ -340,6 +340,11 @@ async fn AsyncTransport::open_request(
   if negotiated {
     headers[@ahttp.CaseInsensitiveString("Accept-Encoding")] = accept_encoding()
   }
+  guard request.body is Bytes(body) else {
+    raise @http.HttpError::Protocol(
+      "AsyncTransport cannot send a stream body yet",
+    )
+  }
   if self.pool.closed {
     raise @http.HttpError::Connect("transport closed")
   }
@@ -348,7 +353,7 @@ async fn AsyncTransport::open_request(
   let mut fresh = false
   for ;; {
     let (client, reused) = self.checkout(origin, user_agent, fresh~, timer)
-    let response = exchange(client, meth, path, headers, request.body, timer) catch {
+    let response = exchange(client, meth, path, headers, body, timer) catch {
       @http.HttpError::Network(..) if reused && replayable(request) => {
         // A parked connection the server had already dropped: replay once
         // on a fresh one. `reused` is false on that second attempt.

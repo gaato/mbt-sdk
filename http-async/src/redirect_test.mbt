@@ -25,7 +25,7 @@ fn send_via(
 ///|
 fn summary(request : @http.Request) -> String {
   let headers = request.headers.iter().map(pair => pair.0).to_array()
-  "\{request.http_method} \{request.url} \{@utf8.decode_lossy(request.body)} [\{headers.join(", ")}]"
+  "\{request.http_method} \{request.url} \{@utf8.decode_lossy(request.body.as_bytes().unwrap())} [\{headers.join(", ")}]"
 }
 
 ///|
@@ -392,6 +392,7 @@ async test "follow_redirects_stream closes the 3xx it refuses" {
       TooManyRedirects(max~, location~) => "too many: \{max} \{location}"
       Downgrade(location~) => "downgrade: " + location
       BadLocation(reason~, ..) => "bad: " + reason
+      UnreplayableBody(location~) => "unreplayable: " + location
       Transport(_) => "transport"
     } noraise {
       _ => "followed"

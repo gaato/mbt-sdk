@@ -615,7 +615,7 @@ async test "Client builds a deferred body only after each admission" {
       [b"ok"],
     )
     let log : Array[String] = []
-    let observed : Array[Bytes] = []
+    let observed : Array[@http.Body] = []
     let client = @runtime.Client::new(
       transport,
       @mock.FakeClock::new(),
@@ -636,10 +636,11 @@ async test "Client builds a deferred body only after each admission" {
     let (_, stream) = client.send_stream(@http.Request::post("/upload"), body~)
     stream.close()
     assert_eq(log, ["acquire", "build", "release 200"])
+    let encoded : @http.Body = Bytes(b"encoded")
     assert_eq(transport.sent().map(request => request.body), [
-      b"encoded", b"encoded", b"encoded",
+      encoded, encoded, encoded,
     ])
-    assert_eq(observed, [b"encoded", b"encoded", b"encoded"])
+    assert_eq(observed, [encoded, encoded, encoded])
     transport.assert_complete()
   })
 }

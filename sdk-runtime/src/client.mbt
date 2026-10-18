@@ -226,7 +226,7 @@ fn attempt_request(
 ) -> @http.Request {
   match body {
     Some(build) => request.body_bytes(build())
-    None => request.body_bytes(request.body)
+    None => { ..request, headers: copy_headers(request.headers), }
   }
 }
 
@@ -386,7 +386,8 @@ async fn read_error_body(stream : &@http.BodyStream) -> Bytes raise SdkError {
 fn Client::prepare(self : Client, request : @http.Request) -> @http.Request {
   let original_headers = request.headers
   let prepared = {
-    ..request.body_bytes(request.body),
+    ..request,
+    headers: copy_headers(request.headers),
     url: resolve_url(self.base_url, request.url),
   }
   for pair in self.default_headers.iter() {

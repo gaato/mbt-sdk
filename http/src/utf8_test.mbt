@@ -11,15 +11,19 @@ test "caller strings with lone surrogates encode with U+FFFD" {
   let text = lone_surrogates("a")
   let request = @http.Request::post("/")
   let rows : Array[(String, Bytes, Bytes)] = [
-    ("body_text", request.body_text(text).body, b"\xEF\xBF\xBDa\xEF\xBF\xBD"),
+    (
+      "body_text",
+      request.body_text(text).body.as_bytes().unwrap(),
+      b"\xEF\xBF\xBDa\xEF\xBF\xBD",
+    ),
     (
       "json_body",
-      request.json_body(Json::string(text)).body,
+      request.json_body(Json::string(text)).body.as_bytes().unwrap(),
       b"\"\xEF\xBF\xBDa\xEF\xBF\xBD\"",
     ),
     (
       "form_body",
-      request.form_body([("k", text)]).body,
+      request.form_body([("k", text)]).body.as_bytes().unwrap(),
       b"k=%EF%BF%BDa%EF%BF%BD",
     ),
   ]

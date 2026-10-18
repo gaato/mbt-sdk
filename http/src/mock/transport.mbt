@@ -85,8 +85,9 @@ pub fn FakeTransport::expect_stream(
 
 ///|
 /// Returns independent request snapshots, including unsuccessful attempts.
+/// A stream body appears as the bytes the fake read from it.
 pub fn FakeTransport::sent(self : FakeTransport) -> Array[@http.Request] {
-  self.requests.map(request => request.body_bytes(request.body))
+  self.requests.map(snapshot)
 }
 
 ///|
@@ -119,6 +120,28 @@ fn copy_headers(headers : @http.Headers) -> @http.Headers {
 }
 
 ///|
+fn snapshot(request : @http.Request) -> @http.Request {
+  { ..request, headers: copy_headers(request.headers), }
+}
+
+///|
+/// `request` with a stream body read to its end, as a transport sends it:
+/// a stream already taken, or one that breaks its declared length, raises
+/// `Protocol` as `StreamBody::take` and its reader do.
+async fn drained(
+  request : @http.Request,
+) -> @http.Request raise @http.HttpError {
+  guard request.body is Stream(stream) else { return request }
+  let reader = stream.take()
+  defer reader.close()
+  let body = Buffer()
+  while reader.read_some() is Some(chunk) {
+    body.write_bytes(chunk)
+  }
+  { ..request, body: Bytes(body.to_bytes()), }
+}
+
+///|
 fn[T] FakeTransport::reject(
   self : FakeTransport,
   message : String,
@@ -130,13 +153,22 @@ fn[T] FakeTransport::reject(
 }
 
 ///|
-fn FakeTransport::take(
+/// Records `request` and consumes the next expectation. A stream body is read
+/// first, unless the scripted reply is a failure that proves nothing was sent
+/// (`HttpError::is_unsent`); a body that cannot be read raises before
+/// anything is recorded or consumed.
+async fn FakeTransport::take(
   self : FakeTransport,
   request : @http.Request,
   streaming : Bool,
 ) -> Reply raise @http.HttpError {
-  self.requests.push(request.body_bytes(request.body))
-  guard self.expectations.get(self.cursor) is Some(expected) else {
+  let next = self.expectations.get(self.cursor)
+  let request = match next {
+    Some({ reply: Failure(error), .. }) if error.is_unsent() => request
+    _ => drained(request)
+  }
+  self.requests.push(snapshot(request))
+  guard next is Some(expected) else {
     return self.reject(
       "unexpected request: " + request.http_method + " " + request.url,
     )

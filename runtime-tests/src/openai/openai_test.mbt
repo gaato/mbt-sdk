@@ -142,18 +142,18 @@ async test "OpenAI operations send exact requests and decode spec examples" {
     }
     assert_eq(sent[0].http_method, "GET")
     assert_eq(sent[0].url, "https://api.openai.com/v1/models")
-    assert_eq(sent[0].body, b"")
+    assert_eq(sent[0].body, Bytes(b""))
     assert_eq(sent[0].headers.get("content-type"), None)
     assert_eq(sent[1].http_method, "GET")
     assert_eq(sent[1].url, "https://api.openai.com/v1/models/gpt-4o-mini")
-    assert_eq(@json.parse(@utf8.decode(sent[2].body)), {
+    assert_eq(@json.parse(@utf8.decode(sent[2].body.as_bytes().unwrap())), {
       "input": ["The food was delicious"],
       "model": "text-embedding-ada-002",
       "dimensions": 2,
       "user": "user-1234",
     })
     assert_eq(sent[2].headers.get("content-type"), Some("application/json"))
-    assert_eq(@json.parse(@utf8.decode(sent[3].body)), {
+    assert_eq(@json.parse(@utf8.decode(sent[3].body.as_bytes().unwrap())), {
       "temperature": 0.5,
       "previous_response_id": "resp_previous",
       "model": "gpt-4.1",
@@ -257,7 +257,7 @@ async test "chat completions send exact JSON and retain nullable and unknown res
     )
     assert_eq(unknown.finish_reason, Some(@openai_sdk.Unknown("future_reason")))
     let sent = transport.sent()
-    assert_eq(@json.parse(@utf8.decode(sent[0].body)), {
+    assert_eq(@json.parse(@utf8.decode(sent[0].body.as_bytes().unwrap())), {
       "model": "gpt-chat",
       "messages": [
         { "role": "system", "content": "Be concise." },
@@ -320,7 +320,7 @@ async test "chat completion streaming handles split reasoning usage and DONE" {
     let sent = transport.sent()
     assert_eq(sent.length(), 1)
     assert_eq(sent[0].headers.get("accept"), Some("text/event-stream"))
-    assert_eq(@json.parse(@utf8.decode(sent[0].body)), {
+    assert_eq(@json.parse(@utf8.decode(sent[0].body.as_bytes().unwrap())), {
       "model": "gpt-chat",
       "messages": [{ "role": "user", "content": "Hello" }],
       "stream": true,
@@ -444,7 +444,7 @@ async test "tool calls decode from OpenAI and Ollama fixtures and stream in wire
       },
     ])
     let sent = transport.sent()
-    assert_eq(@json.parse(@utf8.decode(sent[0].body)), {
+    assert_eq(@json.parse(@utf8.decode(sent[0].body.as_bytes().unwrap())), {
       "model": "gpt-chat",
       "messages": [{ "role": "user", "content": "weather" }],
       "tools": [
@@ -766,7 +766,7 @@ async test "streaming decodes spec events across chunks and stops at DONE" {
     assert_auth_header(sent[0])
     assert_eq(sent[0].headers.get("accept"), Some("text/event-stream"))
     assert_eq(sent[0].headers.get("content-type"), Some("application/json"))
-    assert_eq(@json.parse(@utf8.decode(sent[0].body)), {
+    assert_eq(@json.parse(@utf8.decode(sent[0].body.as_bytes().unwrap())), {
       "model": "gpt-4o",
       "input": "story",
       "stream": true,

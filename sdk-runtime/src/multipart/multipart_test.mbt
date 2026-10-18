@@ -180,7 +180,7 @@ test "apply replaces content type preserves headers and input" {
   assert_eq(result.headers.get("x-keep"), Some("yes"))
   assert_eq(original.headers.get_all("content-type"), ["old/one", "old/two"])
   assert_eq(original.headers.get("x-keep"), Some("yes"))
-  assert_eq(original.body, b"old body")
+  assert_eq(original.body, Bytes(b"old body"))
   assert_true(result.body != original.body)
 }
 
