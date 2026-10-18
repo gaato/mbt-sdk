@@ -656,3 +656,30 @@ fn is_prefix(
   prefix.length() <= whole.length() &&
   prefix == whole[:prefix.length()].to_owned()
 }
+
+///|
+test "the default bound is 16 MiB" {
+  let limit = 16 * 1024 * 1024
+  let rows : Array[(String, Array[Bytes], String?)] = [
+    ("an endless line at the default", [Bytes::make(limit, b'x')], None),
+    (
+      "an endless line at the default + 1",
+      [Bytes::make(limit, b'x'), b"x"],
+      Some("SSE event larger than 16777216 bytes"),
+    ),
+  ]
+  for row in rows {
+    let (label, chunks, expected) = row
+    let parser = @sse.SseParser::new()
+    let refusal = try {
+      for chunk in chunks {
+        ignore(parser.feed(chunk))
+      }
+      None
+    } catch {
+      @http.HttpError::Protocol(message) => Some(message)
+      _ => Some("unexpected error")
+    }
+    assert_eq(refusal, expected, msg=label)
+  }
+}

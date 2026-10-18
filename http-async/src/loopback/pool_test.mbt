@@ -165,6 +165,35 @@ async test "a dropped parked connection is replayed for GET but surfaces for POS
 }
 
 ///|
+async test "a replay that fails as well surfaces after one fresh connection" {
+  // The first connection answers once and closes without saying so; every
+  // later one closes on its first request without answering.
+  let answered = Ref(false)
+  with_keepalive_server(
+    (_, conn) => {
+      if !answered.val {
+        answered.val = true
+        pong(conn)
+      }
+      conn.close()
+    },
+    (url, connections) => {
+      let transport = @adapter.AsyncTransport::new()
+      ignore(transport.send(@http.Request::get(url)))
+      assert_eq(transport.idle_connections(), 1)
+      try transport.send(@http.Request::get(url)) catch {
+        _ => ()
+      } noraise {
+        _ => fail("expected the failed replay to surface")
+      }
+      // The stale connection and one fresh one: the replay was not replayed.
+      assert_eq(connections(), 2)
+      assert_eq(transport.idle_connections(), 0)
+    },
+  )
+}
+
+///|
 async test "closed transport refuses requests" {
   with_keepalive_server((_, conn) => pong(conn), (url, _) => {
     let transport = @adapter.AsyncTransport::new()
