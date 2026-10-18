@@ -8,6 +8,8 @@ note.
 
 ## [Unreleased]
 
+## [0.3.1] - 2026-10-18
+
 ### Added
 
 - **`AsyncTransport::new(clock~)`.** The phase limits and the idle time of parked connections were measured on the wall clock, so a caller that times everything else on an injected clock (a test on a virtual clock, an SDK forwarding its own) could not expire them; the transport already ran on a clock inside, and now takes one, defaulting to `AsyncClock`.
