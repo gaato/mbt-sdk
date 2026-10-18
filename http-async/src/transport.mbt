@@ -302,7 +302,7 @@ async fn AsyncTransport::open_request(
       }
     }
     let head = response_head(response)
-    let decoder = if negotiated {
+    let decoder = if negotiated && has_body(request.http_method, head.status) {
       errdefer client.close()
       decode_head(head)
     } else {

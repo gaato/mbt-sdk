@@ -146,3 +146,27 @@ test "Accept-Encoding offers exactly the codings the decoder undoes" {
     assert_true(plan.remaining is None, msg=coding.name())
   }
 }
+
+///|
+test "only responses that can carry a body are decoded" {
+  let cases : Array[(String, Int32, Bool)] = [
+    ("GET", 200, true),
+    ("get", 206, true),
+    ("POST", 500, true),
+    ("HEAD", 200, false),
+    ("head", 404, false),
+    ("GET", 100, false),
+    ("GET", 199, false),
+    ("GET", 204, false),
+    ("GET", 304, false),
+    ("GET", 205, true),
+  ]
+  for case in cases {
+    let (http_method, status, expected) = case
+    assert_eq(
+      has_body(http_method, status),
+      expected,
+      msg="\{http_method} \{status}",
+    )
+  }
+}

@@ -88,6 +88,17 @@ fn coding_plan(values : Array[String]) -> CodingPlan raise @http.HttpError {
 }
 
 ///|
+/// Whether a response to `http_method` with `status` can carry a body (RFC 9110
+/// §6.4.1). Without one, `Content-Encoding` and `Content-Length` describe
+/// the selected representation, so they are kept as sent.
+fn has_body(http_method : String, status : Int32) -> Bool {
+  http_method.to_upper() != "HEAD" &&
+  !(status >= 100 && status < 200) &&
+  status != 204 &&
+  status != 304
+}
+
+///|
 /// The decoder for a body whose head is `head`, or `None` when there is
 /// nothing to undo. With a decoder, `head` is edited in place to describe the
 /// decoded body: `Content-Length`, which counted the coded bytes, is dropped,
