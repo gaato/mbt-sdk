@@ -20,3 +20,26 @@ test "sends are refused once the writer closes, and only replies outlive close" 
     )
   }
 }
+
+///|
+test "a read failure reaches pending calls as Transport with a readable message" {
+  let rows : Array[(String, Error, String)] = [
+    (
+      "a transport failure keeps its message",
+      RpcFailure::Transport("JSON-RPC line exceeds 4 bytes"),
+      "JSON-RPC line exceeds 4 bytes",
+    ),
+    (
+      "any other error carries its text",
+      Failure("boom"),
+      Failure("boom").to_string(),
+    ),
+  ]
+  for row in rows {
+    let (label, error, expected) = row
+    guard read_failure(error) is Transport(message) else {
+      fail("\{label}: not Transport")
+    }
+    assert_eq(message, expected, msg=label)
+  }
+}

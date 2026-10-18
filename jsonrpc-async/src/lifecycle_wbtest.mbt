@@ -179,3 +179,172 @@ async test "a response in the same chunk as an overlong line is dispatched first
     assert_eq(queue.try_get(), Some(Json::boolean(true)))
   })
 }
+
+///|
+async test "a notification backlog over max_notifications fails the connection" {
+  @async.with_timeout(5000, () => {
+    let mut connection : Connection? = None
+    let mut message = ""
+    try
+      @async.with_task_group(group => {
+        let (read, peer_write) = @io.pipe()
+        let (peer_read, write) = @io.pipe()
+        group.add_defer(() => {
+          read.close()
+          peer_write.close()
+          peer_read.close()
+          write.close()
+        })
+        let started : @aqueue.Queue[Unit] = @aqueue.Queue(kind=Unbounded)
+        let release : @aqueue.Queue[Unit] = @aqueue.Queue(kind=Unbounded)
+        let rpc = Connection::start(group, read, write, max_notifications=2, on_notification=(
+          _,
+          _,
+        ) => {
+          started.put(())
+          release.get()
+        })
+        connection = Some(rpc)
+        rpc.pending[Number(1L)] = @aqueue.Queue(kind=Unbounded)
+        let tick = @jsonrpc.Message::Notification(name="tick", params=None).encode(
+          envelope=Strict,
+        )
+        peer_write.write(tick)
+        // The handler now holds the first; two more fill the backlog exactly.
+        started.get()
+        peer_write.write(tick)
+        peer_write.write(tick)
+        assert_false(rpc.is_closed())
+        peer_write.write(tick)
+        // Nothing is ever put: only the failing group ends this wait.
+        let never : @aqueue.Queue[Unit] = @aqueue.Queue(kind=Unbounded)
+        never.get()
+      })
+    catch {
+      RpcFailure::Transport(text) => message = text
+      error => raise error
+    } noraise {
+      _ => fail("expected failed group")
+    }
+    assert_eq(message, "JSON-RPC notification backlog exceeds 2 notifications")
+    assert_true(connection.unwrap().is_closed())
+    assert_eq(connection.unwrap().pending.length(), 0)
+  })
+}
+
+///|
+async fn read_message(reader : @io.PipeRead) -> @jsonrpc.Message {
+  @jsonrpc.decode_line(
+    @utf8.encode(reader.read_until("\n").unwrap()),
+    envelope=Strict,
+  )
+}
+
+///|
+async test "a request past max_inbound is refused while handlers' own calls still complete" {
+  @async.with_timeout(5000, () => {
+    @async.with_task_group(group => {
+      let (read, peer_write) = @io.pipe()
+      let (peer_read, write) = @io.pipe()
+      group.add_defer(() => {
+        read.close()
+        write.close()
+        peer_read.close()
+        peer_write.close()
+      })
+      let rpc : Ref[Connection?] = Ref(None)
+      let mut handled = 0
+      rpc.val = Some(
+        Connection::start(group, read, write, max_inbound=1, on_request=(_, _) => {
+          handled += 1
+          Ok(rpc.val.unwrap().call("question"))
+        }),
+      )
+      let ask = (id : Int64) => {
+        @jsonrpc.Message::Request(id=Number(id), name="ask", params=None).encode(
+          envelope=Strict,
+        )
+      }
+      let answer = (id : Int64, result : Json) => {
+        @jsonrpc.Message::Response(id=Number(id), result~).encode(
+          envelope=Strict,
+        )
+      }
+      peer_write.write(ask(1))
+      // The handler now holds the only slot, waiting for our answer.
+      assert_eq(
+        read_message(peer_read),
+        Request(id=Number(1L), name="question", params=None),
+      )
+      // A blocking limit would stop reading here, and the answer below would
+      // never reach the handler.
+      peer_write.write(ask(2))
+      assert_eq(
+        read_message(peer_read),
+        Failure(
+          id=Number(2L),
+          error=@jsonrpc.RpcError::new(
+            code=-32001,
+            message="Server overloaded; retry later.",
+          ),
+        ),
+      )
+      peer_write.write(answer(1, "first"))
+      assert_eq(
+        read_message(peer_read),
+        Response(id=Number(1L), result="first"),
+      )
+      // The slot is free again.
+      peer_write.write(ask(3))
+      assert_eq(
+        read_message(peer_read),
+        Request(id=Number(2L), name="question", params=None),
+      )
+      peer_write.write(answer(2, "third"))
+      assert_eq(
+        read_message(peer_read),
+        Response(id=Number(3L), result="third"),
+      )
+      assert_eq(handled, 2)
+    })
+  })
+}
+
+///|
+async test "unread error replies hold the read loop at max_inbound until the peer reads" {
+  @async.with_timeout(5000, () => {
+    @async.with_task_group(group => {
+      let (read, peer_write) = @io.pipe()
+      let (peer_read, write) = @io.pipe()
+      group.add_defer(() => {
+        read.close()
+        write.close()
+        peer_read.close()
+        peer_write.close()
+      })
+      let seen : @aqueue.Queue[Unit] = @aqueue.Queue(kind=Unbounded)
+      let rpc = Connection::start(group, read, write, max_inbound=1, on_notification=(
+        _,
+        _,
+      ) => seen.put(()))
+      // Once the notification is handled, the read loop waits on the pipe, so
+      // the next write is dispatched before the writer resumes.
+      peer_write.write(
+        @jsonrpc.Message::Notification(name="ready", params=None).encode(
+          envelope=Strict,
+        ),
+      )
+      seen.get()
+      peer_write.write(b"x\nx\nx\nx\nx\n")
+      // One reply is being written and the read loop waits with the second.
+      assert_eq(rpc.decode_errors(), 2)
+      for _ in 0..<5 {
+        assert_eq(
+          read_message(peer_read),
+          Failure(id=Null, error=@jsonrpc.RpcError::parse_error()),
+        )
+      }
+      assert_eq(rpc.decode_errors(), 5)
+    })
+  })
+}
