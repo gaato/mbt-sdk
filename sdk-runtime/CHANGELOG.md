@@ -8,6 +8,16 @@ note.
 
 ## [Unreleased]
 
+### Fixed
+
+- **An error keeps at most 1 MiB of the response body.** `classify`, and so
+  `Client::send`, put the whole buffered body into `Status` and
+  `RateLimited`, so an error held anywhere kept a body as large as the
+  transport allowed alive with it. They now keep its first 1 MiB, the same
+  bound `send_stream` already read an error body to; a shorter body is kept
+  as it is, without a copy. `Decode` still carries the successful body it
+  failed to decode.
+
 ## [0.3.0] - 2026-10-18
 
 ### Fixed

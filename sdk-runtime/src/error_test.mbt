@@ -86,3 +86,34 @@ test "classification forwards date clock and millisecond precedence" {
     }
   }
 }
+
+///|
+test "classified error bodies keep at most their first MiB" {
+  let mib = 1048576
+  for status in [404, 429, 500] {
+    for
+      (length, kept) in [
+        (0, 0),
+        (1, 1),
+        (mib - 1, mib - 1),
+        (mib, mib),
+        (mib + 1, mib),
+        (3 * mib, mib),
+      ] {
+      let body = Bytes::makei(length, i => (i % 251).to_byte())
+      let response : @http.Response = {
+        status,
+        headers: @http.Headers::new(),
+        body,
+      }
+      let actual = try @runtime.classify(response) catch {
+        @runtime.Status(body~, ..) | @runtime.RateLimited(body~, ..) => body
+        _ => fail("unexpected classification")
+      } noraise {
+        _ => fail("\{status} must raise")
+      }
+      assert_eq(actual.length(), kept)
+      assert_true(actual == body[:kept].to_owned())
+    }
+  }
+}
