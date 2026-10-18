@@ -7,6 +7,27 @@ never does. Every breaking change is listed with a migration note.
 
 ## [Unreleased]
 
+## [0.3.1] - 2026-10-19
+
+### Added
+
+- **Multipart writer: `gaato/http/multipart`.** `Part` (text, file, JSON
+  and streamed file parts), `encode`, `encode_body`, `encode_segments`,
+  `encode_segments_fresh`, `join_segments`, `make_boundary`, `apply` and
+  `MultipartError`, moved unchanged from `gaato/sdk-runtime/multipart`.
+- **Host randomness: `gaato/http/random`.** `default_random()` returns a
+  value in [0, 1) from host randomness, or a deterministic xorshift64 when
+  the host has none; it is meant for jitter and boundaries, not security.
+  It sits in its own package, beside `clock`, so the root stays free of
+  host state; callers pass it, or any `() -> Double`, where randomness is
+  wanted.
+- **Header helpers: `parse_retry_after`, `retry_after_ms`,
+  `parse_link_next` and `is_idempotent`.** Retry-After as seconds or an
+  IMF-fixdate (RFC 9110), with `retry-after-ms` preferred as the OpenAI
+  SDKs do; the `next` target of a Link header (RFC 8288); and whether a
+  request's method is idempotent or it carries an `Idempotency-Key`. Moved
+  unchanged from `gaato/sdk-runtime`.
+
 ## [0.3.0] - 2026-10-18
 
 ### Changed

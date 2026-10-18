@@ -407,7 +407,7 @@ pub fn apply(
 /// `attempts` draws. Nonpositive attempts raise BoundaryCollision without drawing.
 pub fn encode_segments_fresh(
   parts : Array[Part],
-  random~ : () -> Double = @runtime.default_random,
+  random~ : () -> Double = @random.default_random,
   attempts~ : Int32 = 16,
 ) -> (String, Array[Bytes]) raise MultipartError {
   for _ in 0..<attempts {

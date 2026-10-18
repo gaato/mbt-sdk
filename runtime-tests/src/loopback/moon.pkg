@@ -3,7 +3,7 @@
 import {
   "gaato/http",
   "gaato/http-async" @adapter,
-  "gaato/sdk-runtime/multipart",
+  "gaato/http/multipart",
   "moonbitlang/async",
   "moonbitlang/async/http" @ahttp,
   "moonbitlang/async/socket",

@@ -1,7 +1,7 @@
 ///|
 /// Returns the target of the first RFC 8288 Link value whose relation includes
 /// `next`, across repeated headers and comma-separated link values.
-pub fn parse_link_next(headers : @http.Headers) -> String? {
+pub fn parse_link_next(headers : Headers) -> String? {
   for value in headers.get_all("link") {
     for link in split_link_values(value) {
       if parse_next_link(link) is Some(url) {

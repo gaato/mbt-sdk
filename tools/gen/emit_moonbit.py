@@ -1010,7 +1010,7 @@ fn json_array_matches(
     if "@sdkjson." in body:
         imports.append('  "gaato/sdk-runtime/json" @sdkjson,')
     if "@multipart." in body:
-        imports.append('  "gaato/sdk-runtime/multipart" @multipart,')
+        imports.append('  "gaato/http/multipart" @multipart,')
     if "@debug." in body:
         imports.append('  "moonbitlang/core/debug",')
     if "@utf8." in body:

@@ -28,21 +28,6 @@ test "Auth redacts every secret and preserves explicit request headers" {
 }
 
 ///|
-test "idempotency covers methods and idempotency key" {
-  for verb in ["GET", "head", "Put", "DELETE", "OPTIONS", "trace"] {
-    assert_true(@runtime.is_idempotent(@http.Request::new(verb, "/")))
-  }
-  for verb in ["POST", "PATCH", "CONNECT", "unknown"] {
-    assert_false(@runtime.is_idempotent(@http.Request::new(verb, "/")))
-  }
-  assert_true(
-    @runtime.is_idempotent(
-      @http.Request::post("/").header("Idempotency-Key", "request-1"),
-    ),
-  )
-}
-
-///|
 test "RetryPolicy defaults and none" {
   let expected : @runtime.RetryPolicy = {
     max_retries: 2,

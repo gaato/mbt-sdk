@@ -111,17 +111,18 @@ Unreachable or platform-only:
 | File | Budget | Reason |
 | --- | --- | --- |
 | http/src/mock/transport.mbt | 2 | The kind-mismatch arms of `send` and `send_stream`: `take` already rejects a script entry whose kind does not match the call. |
+| http/src/random/random.mbt | 2 | The xorshift fallback of `default_random` runs only when `@env.rand` is unavailable, which native never is. |
 | http-async/src/content_decoder.mbt | 1 | The no-progress guard of `ContentDecoder::pull_stage`: flate consumes or produces on every step that has input and free output, so it never fires; it keeps a broken step from spinning the event loop. |
 
 Testable, not yet tested (next candidates):
 
 | File | Budget | Reason |
 | --- | --- | --- |
-| sdk-runtime/src/client.mbt | 8 | not yet tested: the retry-then-sleep path of `send_stream` (2); a limiter whose `acquire` raises (1) or whose `release` raises after a transport failure (1) or after a buffered response (the no-op discard, 1); `resolve_url` with no slash on either side (1). Platform-only: the xorshift fallback of `default_random` (2) runs only when `@env.rand` is unavailable, which native never is. |
+| sdk-runtime/src/client.mbt | 6 | not yet tested: the retry-then-sleep path of `send_stream` (2); a limiter whose `acquire` raises (1) or whose `release` raises after a transport failure (1) or after a buffered response (the no-op discard, 1); `resolve_url` with no slash on either side (1). |
 | codex-app-server/src/child.mbt | 6 | not yet tested: `spawn` and `Session::shutdown` need an app-server process; testable with a stub `program~` speaking NDJSON. The JSON-RPC child plumbing itself is tested in jsonrpc-async. |
 | codex-app-server/src/handlers.mbt | 4 | not yet tested: `dispatch` routes for file-change, permissions and user-input requests (3) and a handler returning `Err` (1); command approval and decode failures are tested. |
 | jsonrpc-async/src/child.mbt | 5 | not yet tested: `shutdown` with `timeout_ms <= 0` (2). Needs a spawn or wait failure: the `errdefer`s that close the pipes when `@process.spawn` raises (2; a nonexistent program may reach them, unverified), and the re-raise of a `wait` failure other than the timeout (1). |
 | http-async/src/mock/virtual_clock.mbt | 3 | not yet tested: `VirtualClock::next_deadline` (no caller in the workspace). |
 | jsonrpc/src/types.mbt | 2 | not yet tested: `RpcError` decoding of a non-object value and of a non-numeric or out-of-range `code`. |
-| sdk-runtime/src/link.mbt | 2 | not yet tested: a backslash escape inside a quoted Link parameter value. |
+| http/src/link.mbt | 2 | not yet tested: a backslash escape inside a quoted Link parameter value. |
 | sdk-runtime/src/auth.mbt | 1 | not yet tested: the `Debug` representation of `NoAuth`. |

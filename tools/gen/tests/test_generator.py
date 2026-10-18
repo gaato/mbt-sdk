@@ -911,7 +911,7 @@ class IRTests(unittest.TestCase):
         self.assertIn("@multipart.Part::text(\"title\", parameter_value(title))", source)
         self.assertIn("@multipart.Part::json(\"metadata\", Json(value))", source)
         self.assertIn("@multipart.apply(request, parts, boundary)", source)
-        self.assertIn('"gaato/sdk-runtime/multipart" @multipart', generated["moon.pkg"])
+        self.assertIn('"gaato/http/multipart" @multipart', generated["moon.pkg"])
 
     def test_json_body_wins_when_form_is_an_alternative(self):
         content = {

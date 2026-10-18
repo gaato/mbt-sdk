@@ -30,7 +30,7 @@ pub impl @runtime.RetryDecider for GitHubRetry with fn next_delay_ms(
       headers
     _ => return None
   }
-  let delay = match @runtime.retry_after_ms(headers) {
+  let delay = match @http.retry_after_ms(headers) {
     Some(ms) => ms
     None => {
       let mut ms = 60000

@@ -353,7 +353,7 @@ pub impl RateLimiter for WindowLimiter with fn release(
     parsed=(self.parse)(headers, now_unix_ms).map(state => {
       clamp_server_reset(state, now_unix_ms)
     }),
-    delay_ms=match retry_after_ms(headers, now_unix_ms~) {
+    delay_ms=match @http.retry_after_ms(headers, now_unix_ms~) {
       Some(ms) => Some(ms.min(max_server_wait_ms))
       None => self.default_retry_after_ms
     },

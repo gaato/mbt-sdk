@@ -34,18 +34,6 @@ pub fn RetryPolicy::none() -> RetryPolicy {
 }
 
 ///|
-/// Reports whether the method is idempotent or an idempotency key is present.
-pub fn is_idempotent(request : @http.Request) -> Bool {
-  if request.headers.contains("idempotency-key") {
-    return true
-  }
-  match request.http_method.to_lower() {
-    "get" | "head" | "put" | "delete" | "options" | "trace" => true
-    _ => false
-  }
-}
-
-///|
 /// Whether `Client` may send `request` again at all, before any
 /// `RetryDecider` is asked: when each attempt builds its own body
 /// (`rebuilt`), or the body can be sent again (`Body::is_replayable`: bytes,
@@ -90,14 +78,14 @@ pub impl RetryDecider for RetryPolicy with fn next_delay_ms(
     Transport(failure) => failure.is_unsent()
     _ => false
   }
-  if !is_idempotent(request) &&
+  if !@http.is_idempotent(request) &&
     !self.retry_non_idempotent &&
     !processed_is_known_false {
     return None
   }
   let server_delay = match error {
     RateLimited(retry_after_ms=Some(ms), ..) => Some(ms)
-    Status(headers~, ..) => retry_after_ms(headers)
+    Status(headers~, ..) => @http.retry_after_ms(headers)
     _ => None
   }
   match server_delay {

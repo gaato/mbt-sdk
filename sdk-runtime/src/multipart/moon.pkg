@@ -1,14 +1,3 @@
 import {
-  "gaato/sdk-runtime" @runtime,
-  "gaato/http",
-  "moonbitlang/core/debug",
+  "gaato/http/multipart" @http_multipart,
 }
-
-import {
-  "gaato/sdk-runtime/multipart",
-  "moonbitlang/core/encoding/utf8",
-} for "test"
-
-import {
-  "moonbitlang/core/random",
-} for "wbtest"

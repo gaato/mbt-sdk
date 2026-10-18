@@ -3,7 +3,7 @@ import {
   "gaato/http/mock",
   "gaato/http-async" @adapter,
   "gaato/sdk-runtime" @runtime,
-  "gaato/sdk-runtime/multipart",
+  "gaato/http/multipart",
   "moonbitlang/async",
   "moonbitlang/core/debug",
   "moonbitlang/core/encoding/utf8",

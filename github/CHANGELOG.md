@@ -14,6 +14,13 @@ are optional unless the field is required, and keep a wildcard arm.
 
 ## [Unreleased]
 
+## [0.14.1] - 2026-10-19
+
+### Changed
+
+- **Built on `gaato/sdk-runtime` 0.5.0 and `gaato/http` 0.3.1.** Retry-After
+  and Link parsing now come from `gaato/http`. The public API is unchanged.
+
 ## [0.14.0] - 2026-10-18
 
 ### Changed

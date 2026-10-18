@@ -11,16 +11,21 @@ import {
 // Values
 pub fn classify(@http.Response, now_unix_ms? : Int64) -> @http.Response raise SdkError
 
+#deprecated
 pub fn default_random() -> Double
 
+#deprecated
 pub fn is_idempotent(@http.Request) -> Bool
 
+#deprecated
 pub fn parse_link_next(@http.Headers) -> String?
 
+#deprecated
 pub fn parse_retry_after(String, now_unix_ms? : Int64) -> Int?
 
 pub fn rate_limit_headers(remaining~ : String, reset_after_seconds? : String, reset_unix_seconds? : String) -> (@http.Headers, Int64) -> RateLimitState?
 
+#deprecated
 pub fn retry_after_ms(@http.Headers, now_unix_ms? : Int64) -> Int?
 
 // Errors

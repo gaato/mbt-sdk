@@ -17,11 +17,19 @@ pub async fn follow_redirects_stream(Request, async (Request) -> (ResponseHead, 
 
 pub fn form_urlencode(ArrayView[(String, String)]) -> String
 
+pub fn is_idempotent(Request) -> Bool
+
+pub fn parse_link_next(Headers) -> String?
+
+pub fn parse_retry_after(String, now_unix_ms? : Int64) -> Int?
+
 pub fn percent_encode(String) -> String
 
 pub fn percent_encode_path(String) -> String
 
 pub fn redirects(max_redirects? : Int, allow_downgrade? : Bool, credential_headers? : Array[String], on_redirect? : (RedirectHop) -> Unit) -> async (Request, async (Request) -> Response raise HttpError) -> Response raise HttpError
+
+pub fn retry_after_ms(Headers, now_unix_ms? : Int64) -> Int?
 
 pub async fn send_with(&Transport, Array[async (Request, async (Request) -> Response raise HttpError) -> Response raise HttpError], Request) -> Response raise HttpError
 

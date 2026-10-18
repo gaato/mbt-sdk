@@ -8,6 +8,23 @@ note.
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-10-19
+
+### Changed
+
+- **The HTTP-generic parts moved down to `gaato/http`, leaving this module
+  to what SDKs share.** `parse_retry_after`, `retry_after_ms`,
+  `parse_link_next` and `is_idempotent` are in `gaato/http`,
+  `default_random` in `gaato/http/random`, and the multipart writer in
+  `gaato/http/multipart`. The old names stay for this release as deprecated
+  aliases of the new ones, so `Part` and `MultipartError` are the same
+  types either way, and go in the next minor. Error constructors cannot be
+  aliased, so a pattern such as `@multipart.BoundaryCollision` written
+  against `gaato/sdk-runtime/multipart` no longer resolves. Migration:
+  import `gaato/http/multipart` instead of `gaato/sdk-runtime/multipart`
+  and `gaato/http/random` for `default_random`, and call the header
+  helpers as `@http.<name>`.
+
 ## [0.4.0] - 2026-10-18
 
 ### Changed

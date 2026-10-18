@@ -4,7 +4,7 @@
 ///
 /// ```mbt check
 /// test {
-///   assert_eq(@runtime.parse_retry_after("1.2349"), Some(1234))
+///   assert_eq(@http.parse_retry_after("1.2349"), Some(1234))
 /// }
 /// ```
 pub fn parse_retry_after(value : String, now_unix_ms? : Int64) -> Int32? {
@@ -28,7 +28,7 @@ pub fn parse_retry_after(value : String, now_unix_ms? : Int64) -> Int32? {
 ///|
 /// Prefers the first retry-after-ms value; falls back to retry-after when that
 /// header is absent or unparseable, as the official OpenAI SDKs do.
-pub fn retry_after_ms(headers : @http.Headers, now_unix_ms? : Int64) -> Int32? {
+pub fn retry_after_ms(headers : Headers, now_unix_ms? : Int64) -> Int32? {
   if headers.get("retry-after-ms") is Some(value) &&
     decimal_ms(value.trim().to_owned(), 1) is Some(ms) {
     return Some(ms)

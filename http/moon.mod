@@ -5,7 +5,7 @@
 
 name = "gaato/http"
 
-version = "0.3.0"
+version = "0.3.1"
 
 license = "Apache-2.0"
 
@@ -15,7 +15,7 @@ repository = "https://github.com/gaato/mbt-sdk"
 
 keywords = [ "http", "sans-io", "transport", "sse", "cookie", "client" ]
 
-description = "Sans-IO HTTP vocabulary for MoonBit SDKs: request/response types, a Transport trait, an incremental SSE parser, an RFC 6265 cookie jar and a scripted fake transport. No dependencies; runs on every backend."
+description = "Sans-IO HTTP vocabulary for MoonBit SDKs: request/response types, a Transport trait, Retry-After and Link parsing, a multipart writer, an incremental SSE parser, an RFC 6265 cookie jar and a scripted fake transport. No dependencies; runs on every backend."
 
 source = "src"
 

@@ -55,7 +55,7 @@ pub fn classify(
     response
   } else if response.status == 429 {
     raise RateLimited(
-      retry_after_ms=retry_after_ms(response.headers, now_unix_ms?),
+      retry_after_ms=@http.retry_after_ms(response.headers, now_unix_ms?),
       headers=response.headers,
       body=error_body(response.body),
     )

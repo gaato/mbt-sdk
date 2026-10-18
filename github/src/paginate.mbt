@@ -33,7 +33,7 @@ pub fn[T] GitHub::paginator(
     let response = self.send(request)
     @runtime.Page::{
       items: decode(response),
-      next: @runtime.parse_link_next(response.headers),
+      next: @http.parse_link_next(response.headers),
     }
   })
 }

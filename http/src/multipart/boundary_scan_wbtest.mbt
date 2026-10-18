@@ -33,7 +33,7 @@ test "BoundaryScan finds the delimiter as body_collides does" {
 
 ///|
 /// Cuts `body` at random points, sometimes leaving empty chunks between.
-fn random_chunks(rand : @random.Rand, body : Bytes) -> Array[Bytes] {
+fn random_chunks(rand : @core_random.Rand, body : Bytes) -> Array[Bytes] {
   let chunks = []
   let mut start = 0
   while start < body.length() {
@@ -52,7 +52,7 @@ test "BoundaryScan agrees with body_collides however the body is chunked" {
   // Bytes the delimiter is made of, so near misses are common.
   let alphabet = b"\r\n-ab"
   for seed in 0..<4 {
-    let rand = @random.Rand::chacha8(seed=Bytes::make(32, seed.to_byte()))
+    let rand = @core_random.Rand::chacha8(seed=Bytes::make(32, seed.to_byte()))
     for trial in 0..<500 {
       let body = Bytes::makei(rand.int(limit=24), _ => {
         alphabet[rand.int(limit=alphabet.length())]
