@@ -150,7 +150,7 @@ fn split_url_label(url : String) -> String {
     @http.HttpError::Protocol(message) => "error: \{message}"
     error => "unexpected \{Repr(error)}"
   } noraise {
-    (origin, path) => "\{origin} \{path}"
+    (origin, path) => "\{origin.text} \{path}"
   }
 }
 

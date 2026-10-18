@@ -10,6 +10,9 @@ import {
   "moonbit-community/flate/gzip",
   "moonbit-community/flate/zlib",
   "gaato/brotli",
+  "moonbitlang/core/encoding/base64",
+  "moonbitlang/core/encoding/percent",
+  "moonbitlang/core/env",
 }
 
 import {
@@ -26,11 +29,17 @@ import {
 import {
   "gaato/http-async/mock" @simclock,
   "moonbitlang/async/io",
+  "moonbitlang/async/socket",
   "moonbitlang/core/debug",
   "moonbitlang/core/random",
 } for "wbtest"
 
 supported_targets = "js + native + wasm"
+
+// The wbtest socket import is used only by native and Wasm files. Moon does
+// not yet support conditional imports; on JS it is intentionally unused.
+
+warnings = "-unused_package"
 
 options(
   targets: {
@@ -40,6 +49,10 @@ options(
     "failure_js_wbtest.mbt": [ "js" ],
     "negotiation.native.mbt": [ "native", "wasm" ],
     "negotiation.js.mbt": [ "js" ],
+    "proxy.native.mbt": [ "native", "wasm" ],
+    "proxy.js.mbt": [ "js" ],
+    "proxy_js_wbtest.mbt": [ "js" ],
+    "proxy_env_wbtest.mbt": [ "native", "wasm" ],
     "request_body.native.mbt": [ "native", "wasm" ],
     "request_body.js.mbt": [ "js" ],
     "upload_js_test.mbt": [ "js" ],

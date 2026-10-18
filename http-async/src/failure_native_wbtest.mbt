@@ -39,6 +39,11 @@ test "failure maps each phase's errors on native" {
       @http.HttpError::Network(phase=Body, message="x"),
       "Network(phase=Body, message=\"x\")",
     ),
+    (
+      Body,
+      @http.HttpError::Proxy(status=502, message="x"),
+      "Proxy(status=502, message=\"x\")",
+    ),
   ]
   for row in rows {
     let (phase, error, expected) = row

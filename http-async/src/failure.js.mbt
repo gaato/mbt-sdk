@@ -17,3 +17,9 @@ fn reported_phase(phase : @http.Phase) -> @http.Phase {
 fn is_malformed(_error : Error) -> Bool {
   false
 }
+
+///|
+// Fetch opens no tunnel of ours.
+fn proxy_refusal(_error : Error) -> @http.HttpError? {
+  None
+}

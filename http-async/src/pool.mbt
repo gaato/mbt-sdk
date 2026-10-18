@@ -121,13 +121,16 @@ fn[C] IdlePool::count(self : IdlePool[C]) -> Int32 {
 }
 
 ///|
-/// Takes a young idle connection to `origin`, or dials a new one, as the
-/// `Dial` phase of `timer`, when there is none or `fresh` is set. Idle
-/// connections of any origin that outlived `idle_max_ms` are closed on the
-/// way. The flag says whether the connection was reused.
+/// Takes a young idle connection parked under `key`, or dials one to
+/// `origin` on `route`, as the `Dial` phase of `timer`, when there is none or
+/// `fresh` is set. Idle connections under any key that outlived
+/// `idle_max_ms` are closed on the way. The flag says whether the connection
+/// was reused.
 async fn AsyncTransport::checkout(
   self : AsyncTransport,
+  key : String,
   origin : String,
+  route : Route,
   user_agent : String?,
   fresh~ : Bool,
   timer : PhaseTimer,
@@ -137,7 +140,7 @@ async fn AsyncTransport::checkout(
   }
   if !fresh {
     let (reused, expired) = self.pool.take(
-      origin,
+      key,
       user_agent,
       now=self.clock.now_unix_ms(),
     )
@@ -148,11 +151,7 @@ async fn AsyncTransport::checkout(
       return (client, true)
     }
   }
-  let dial_headers : @ahttp.Headers = Map([])
-  if user_agent is Some(value) {
-    dial_headers["User-Agent"] = value
-  }
-  let client = timer.run(Dial, () => @ahttp.Client(origin, headers=dial_headers))
+  let client = timer.run(Dial, () => dial(origin, route, user_agent))
   (client, false)
 }
 
@@ -162,13 +161,13 @@ async fn AsyncTransport::checkout(
 /// connections of any origin that outlived `idle_max_ms` are closed first.
 fn AsyncTransport::checkin(
   self : AsyncTransport,
-  origin : String,
+  key : String,
   user_agent : String?,
   client : @ahttp.Client,
 ) -> Unit {
   for
     rejected in self.pool.put(
-      origin,
+      key,
       user_agent,
       client,
       now=self.clock.now_unix_ms(),

@@ -23,5 +23,6 @@ options(
     "cookie_roundtrip_test.mbt": [ "native", "wasm" ],
     "phase_test.mbt": [ "native", "wasm" ],
     "upload_test.mbt": [ "native", "wasm" ],
+    "proxy_test.mbt": [ "native", "wasm" ],
   },
 )

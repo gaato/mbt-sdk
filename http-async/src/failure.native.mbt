@@ -16,3 +16,16 @@ fn is_malformed(error : Error) -> Bool {
   | @ahttp.HttpProtocolError::HttpVersionNotSupported(_)
   | @ahttp.HttpProtocolError::NotImplemented)
 }
+
+///|
+// moonbitlang/async refuses a non-2xx answer to the tunnel's `CONNECT` with
+// `ProxyError`, before the origin is reached.
+fn proxy_refusal(error : Error) -> @http.HttpError? {
+  guard error is @ahttp.ProxyError::ProxyError(response) else { return None }
+  Some(
+    Proxy(
+      status=response.code,
+      message="the proxy refused the tunnel: \{response.code} \{response.reason}",
+    ),
+  )
+}
