@@ -305,3 +305,115 @@ test "responses without rate-limit headers still sweep expired states" {
   })
   assert_eq(limiter.states.length(), 0)
 }
+
+///|
+test "a response cannot push a bucket's reset or the global block past an hour" {
+  let hour = 3_600_000L
+  let rows : Array[(String, Int32, Array[(String, String)], Int64)] = [
+    (
+      "relative reset ahead",
+      200,
+      [("remaining", "0"), ("reset-after", "60")],
+      61_000L,
+    ),
+    (
+      "relative reset at the cap",
+      200,
+      [("remaining", "0"), ("reset-after", "3600")],
+      1000L + hour,
+    ),
+    (
+      "relative reset past the cap",
+      200,
+      [("remaining", "0"), ("reset-after", "3600.001")],
+      1000L + hour,
+    ),
+    (
+      "relative reset that saturates",
+      200,
+      [("remaining", "0"), ("reset-after", "99999999999999999999999")],
+      1000L + hour,
+    ),
+    (
+      "absolute reset in a thousand years",
+      200,
+      [("remaining", "0"), ("reset", "33000000000")],
+      1000L + hour,
+    ),
+    (
+      "absolute reset behind the clock",
+      200,
+      [("remaining", "0"), ("reset", "0.5")],
+      500L,
+    ),
+    ("retry-after within the cap", 429, [("retry-after", "30")], 31_000L),
+    ("retry-after past the cap", 429, [("retry-after", "86400")], 1000L + hour),
+    (
+      "retry-after-ms that saturates",
+      429,
+      [("retry-after-ms", "99999999999")],
+      1000L + hour,
+    ),
+  ]
+  for row in rows {
+    let (label, status, pairs, expected) = row
+    let clock = @mock.FakeClock::new(start_unix_ms=1000L)
+    let limiter = WindowLimiter::new(
+      clock,
+      rate_limit_headers(
+        remaining="remaining",
+        reset_after_seconds="reset-after",
+        reset_unix_seconds="reset",
+      ),
+    )
+    run_now(() => {
+      limiter.release("a", status~, headers=@http.Headers::from_array(pairs))
+    })
+    assert_eq(
+      limiter.state("a").map(state => state.reset_at_unix_ms),
+      Some(expected),
+      msg=label,
+    )
+    // The next acquisition waits out at most the cap.
+    run_now(() => limiter.acquire("a", global_exempt=true))
+    let waited = clock.slept().fold(init=0L, (sum, ms) => sum + ms.to_int64())
+    assert_true(waited <= hour, msg="\{label}: waited \{waited}")
+  }
+}
+
+///|
+test "an account-wide 429 cannot block past an hour" {
+  let clock = @mock.FakeClock::new(start_unix_ms=1000L)
+  let limiter = WindowLimiter::new(clock, (_, _) => None, global_block=_ => true)
+  run_now(() => {
+    limiter.release(
+      "a",
+      status=429,
+      headers=@http.Headers::from_array([("retry-after", "2000000")]),
+    )
+  })
+  assert_eq(limiter.global_blocked_until, Some(1000L + 3_600_000L))
+}
+
+///|
+test "clamp_server_reset keeps resets within an hour and pulls later ones back" {
+  let max_ms = 9223372036854775807L
+  let rows : Array[(String, Int64, Int64, Int64)] = [
+    ("reset behind the clock", 1000L, 0L, 0L),
+    ("reset just ahead", 1000L, 1001L, 1001L),
+    ("reset at the horizon", 1000L, 3_601_000L, 3_601_000L),
+    ("reset one past the horizon", 1000L, 3_601_001L, 3_601_000L),
+    ("saturated reset", 1000L, max_ms, 3_601_000L),
+    ("negative clock", -5000L, max_ms, 3_595_000L),
+    ("horizon that saturates", max_ms - 10L, max_ms, max_ms),
+  ]
+  for row in rows {
+    let (label, now, reset, expected) = row
+    let state = clamp_server_reset(
+      { remaining: 3, reset_at_unix_ms: reset, },
+      now,
+    )
+    assert_eq(state.remaining, 3, msg="\{label}: remaining")
+    assert_eq(state.reset_at_unix_ms, expected, msg=label)
+  }
+}
