@@ -97,24 +97,31 @@ async fn read_body(
   max_bytes : Int32?,
 ) -> Bytes raise @http.HttpError {
   try {
-    guard max_bytes is Some(max_bytes) else {
-      return client.read_all().binary()
+    match max_bytes {
+      None => client.read_all().binary()
+      Some(max_bytes) => read_bounded(() => client.read_some(), max_bytes)
     }
-    let body = Buffer()
-    while client.read_some() is Some(chunk) {
-      if chunk.length() > max_bytes - body.length() {
-        raise @http.HttpError::Protocol(
-          "response body larger than \{max_bytes} bytes",
-        )
-      }
-      body.write_bytes(chunk)
-    }
-    body.to_bytes()
   } catch {
     @http.HttpError::Protocol(message) =>
       raise @http.HttpError::Protocol(message)
     error => raise @http.HttpError::Protocol(error.to_string())
   }
+}
+
+///|
+/// Chunks from `read` until it returns `None`. The chunk that would take the
+/// total past `max_bytes` raises `Protocol` without reading further.
+async fn read_bounded(read : async () -> Bytes?, max_bytes : Int32) -> Bytes {
+  let body = Buffer()
+  while read() is Some(chunk) {
+    if chunk.length() > max_bytes - body.length() {
+      raise @http.HttpError::Protocol(
+        "response body larger than \{max_bytes} bytes",
+      )
+    }
+    body.write_bytes(chunk)
+  }
+  body.to_bytes()
 }
 
 ///|
