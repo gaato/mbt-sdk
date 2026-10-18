@@ -444,9 +444,10 @@ fn split_url(url : String) -> (String, String) raise @http.HttpError {
 }
 
 ///|
-/// `scheme://authority` in one spelling per server, so the idle pool and the
-/// connection caps key every spelling of an origin alike: lower-case scheme
-/// and host, canonical IPv6, no default port.
+/// The origin of `scheme://authority` in one spelling per server, so the idle
+/// pool and the connection caps key every spelling alike: lower-case scheme
+/// and host, canonical IPv6, no default port. Userinfo is dropped: it is not
+/// part of an origin, and the transport never sends it.
 fn canonical_origin(
   scheme : String,
   authority : String,
@@ -458,10 +459,6 @@ fn canonical_origin(
   let builder = StringBuilder()
   builder.write_string(scheme)
   builder.write_string("://")
-  if url.userinfo is Some(userinfo) {
-    builder.write_string(userinfo)
-    builder.write_char('@')
-  }
   let host = url.host.unwrap_or("")
   if host.contains(":") {
     // An IPv6 literal: `Url` keeps the host without its brackets.
