@@ -10,10 +10,7 @@
 /// carries an `Idempotency-Key`; other requests surface the failure.
 pub struct AsyncTransport {
   priv timeout_ms : Int32
-  priv max_idle_per_origin : Int32
-  priv idle_max_ms : Int32
-  priv idle : Map[String, Array[IdleConn]]
-  priv mut closed : Bool
+  priv pool : IdlePool[@ahttp.Client]
 }
 
 ///|
@@ -31,7 +28,10 @@ pub fn AsyncTransport::new(
   max_idle_per_origin~ : Int32 = 4,
   idle_max_ms~ : Int32 = 10000,
 ) -> AsyncTransport {
-  { timeout_ms, max_idle_per_origin, idle_max_ms, idle: {}, closed: false, }
+  {
+    timeout_ms,
+    pool: IdlePool::new(max_per_origin=max_idle_per_origin, idle_max_ms~),
+  }
 }
 
 ///|

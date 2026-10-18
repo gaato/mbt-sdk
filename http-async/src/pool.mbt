@@ -1,9 +1,97 @@
 ///|
 /// A keep-alive connection parked between requests to one origin.
-priv struct IdleConn {
-  client : @ahttp.Client
+priv struct IdleConn[C] {
+  conn : C
   user_agent : String?
   parked_at_ms : Int64
+}
+
+///|
+/// Parked keep-alive connections per origin. Generic over the connection so
+/// the bookkeeping runs without sockets in tests; methods hand back the
+/// connections the caller must close.
+priv struct IdlePool[C] {
+  max_per_origin : Int32
+  idle_max_ms : Int32
+  parked : Map[String, Array[IdleConn[C]]]
+  mut closed : Bool
+}
+
+///|
+fn[C] IdlePool::new(
+  max_per_origin~ : Int32,
+  idle_max_ms~ : Int32,
+) -> IdlePool[C] {
+  { max_per_origin, idle_max_ms, parked: {}, closed: false, }
+}
+
+///|
+/// Takes the newest young connection to `origin` parked with `user_agent`.
+/// Connections met on the way that outlived `idle_max_ms` are handed back.
+fn[C] IdlePool::take(
+  self : IdlePool[C],
+  origin : String,
+  user_agent : String?,
+  now~ : Int64,
+) -> (C?, Array[C]) {
+  let expired = []
+  if self.parked.get(origin) is Some(parked) {
+    for i = parked.length() - 1; i >= 0; i = i - 1 {
+      let idle = parked[i]
+      if now - idle.parked_at_ms >= self.idle_max_ms.to_int64() {
+        ignore(parked.remove(i))
+        expired.push(idle.conn)
+      } else if idle.user_agent == user_agent {
+        ignore(parked.remove(i))
+        return (Some(idle.conn), expired)
+      }
+    }
+  }
+  (None, expired)
+}
+
+///|
+/// Parks `conn`, or hands it back when the pool is closed, reuse is disabled,
+/// or `origin` already holds `max_per_origin` connections.
+fn[C] IdlePool::put(
+  self : IdlePool[C],
+  origin : String,
+  user_agent : String?,
+  conn : C,
+  now~ : Int64,
+) -> Array[C] {
+  if self.closed || self.max_per_origin <= 0 || self.idle_max_ms <= 0 {
+    return [conn]
+  }
+  let parked = self.parked.get_or_init(origin, () => [])
+  if parked.length() >= self.max_per_origin {
+    return [conn]
+  }
+  parked.push({ conn, user_agent, parked_at_ms: now, })
+  []
+}
+
+///|
+/// Closes the pool and hands back every parked connection.
+fn[C] IdlePool::drain(self : IdlePool[C]) -> Array[C] {
+  self.closed = true
+  let conns = []
+  for _, parked in self.parked {
+    for idle in parked {
+      conns.push(idle.conn)
+    }
+  }
+  self.parked.clear()
+  conns
+}
+
+///|
+fn[C] IdlePool::count(self : IdlePool[C]) -> Int32 {
+  let mut total = 0
+  for _, parked in self.parked {
+    total += parked.length()
+  }
+  total
 }
 
 ///|
@@ -16,20 +104,16 @@ async fn AsyncTransport::checkout(
   user_agent : String?,
   fresh~ : Bool,
 ) -> (@ahttp.Client, Bool) raise @http.HttpError {
-  if self.closed {
+  if self.pool.closed {
     raise @http.HttpError::Connect("transport closed")
   }
-  if !fresh && self.idle.get(origin) is Some(parked) {
-    let now = @async.now()
-    for i = parked.length() - 1; i >= 0; i = i - 1 {
-      let conn = parked[i]
-      if now - conn.parked_at_ms >= self.idle_max_ms.to_int64() {
-        ignore(parked.remove(i))
-        conn.client.close()
-      } else if conn.user_agent == user_agent {
-        ignore(parked.remove(i))
-        return (conn.client, true)
-      }
+  if !fresh {
+    let (reused, expired) = self.pool.take(origin, user_agent, now=@async.now())
+    for client in expired {
+      client.close()
+    }
+    if reused is Some(client) {
+      return (client, true)
     }
   }
   let dial_headers : @ahttp.Headers = Map([])
@@ -55,16 +139,9 @@ fn AsyncTransport::checkin(
   user_agent : String?,
   client : @ahttp.Client,
 ) -> Unit {
-  if self.closed || self.max_idle_per_origin <= 0 || self.idle_max_ms <= 0 {
-    client.close()
-    return
+  for rejected in self.pool.put(origin, user_agent, client, now=@async.now()) {
+    rejected.close()
   }
-  let parked = self.idle.get_or_init(origin, () => [])
-  if parked.length() >= self.max_idle_per_origin {
-    client.close()
-    return
-  }
-  parked.push({ client, user_agent, parked_at_ms: @async.now(), })
 }
 
 ///|
@@ -80,23 +157,15 @@ fn AsyncTransport::checkin(
 /// }
 /// ```
 pub fn AsyncTransport::close(self : AsyncTransport) -> Unit {
-  self.closed = true
-  for _, parked in self.idle {
-    for conn in parked {
-      conn.client.close()
-    }
+  for client in self.pool.drain() {
+    client.close()
   }
-  self.idle.clear()
 }
 
 ///|
 /// The number of parked keep-alive connections across all origins.
 pub fn AsyncTransport::idle_connections(self : AsyncTransport) -> Int32 {
-  let mut total = 0
-  for _, parked in self.idle {
-    total += parked.length()
-  }
-  total
+  self.pool.count()
 }
 
 ///|
