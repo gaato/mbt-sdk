@@ -150,17 +150,24 @@ pub fn Connection::decode_errors(self : Connection) -> Int32 {
 }
 
 ///|
+/// Reports whether a send must be refused. After the connection closes, only
+/// replies to requests already received may still go out, until the writer closes.
+fn send_refused(writer_closed~ : Bool, closed~ : Bool, reply~ : Bool) -> Bool {
+  writer_closed || (closed && !reply)
+}
+
+///|
 async fn Connection::send(
   self : Connection,
   message : @jsonrpc.Message,
   reply~ : Bool = false,
 ) -> Unit raise RpcFailure {
-  if self.writer_closed || (self.closed && !reply) {
+  if send_refused(writer_closed=self.writer_closed, closed=self.closed, reply~) {
     raise Closed
   }
   self.mutex.acquire()
   defer self.mutex.release()
-  if self.writer_closed || (self.closed && !reply) {
+  if send_refused(writer_closed=self.writer_closed, closed=self.closed, reply~) {
     raise Closed
   }
   let mut complete = false
