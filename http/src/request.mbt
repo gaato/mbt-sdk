@@ -79,9 +79,10 @@ pub fn Request::body_bytes(self : Request, body : Bytes) -> Request {
 }
 
 ///|
-/// Returns a new request whose body is the UTF-8 encoding of the text.
+/// Returns a new request whose body is the UTF-8 encoding of the text, with
+/// any lone surrogate written as U+FFFD (see `encode_utf8`).
 pub fn Request::body_text(self : Request, body : String) -> Request {
-  self.body_bytes(@utf8.encode(body))
+  self.body_bytes(encode_utf8(body))
 }
 
 ///|

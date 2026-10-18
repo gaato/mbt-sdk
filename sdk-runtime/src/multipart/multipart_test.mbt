@@ -289,3 +289,19 @@ test "fresh encoding redraws collisions and joins exactly" {
   assert_eq(draws, 96)
   ignore(@multipart.encode_segments_fresh([]))
 }
+
+///|
+test "lone surrogates in names, filenames and text encode as U+FFFD" {
+  let high = String::from_array([(0xD800).unsafe_to_char()])
+  let low = String::from_array([(0xDC00).unsafe_to_char()])
+  let (_, body) = @multipart.encode(
+    [
+      @multipart.Part::text(high + "n", "v" + low),
+      @multipart.Part::file("f", low + "x" + high, "text/plain", b""),
+    ],
+    "b",
+  )
+  assert_eq(
+    body, b"--b\r\nContent-Disposition: form-data; name=\"\xEF\xBF\xBDn\"\r\n\r\nv\xEF\xBF\xBD\r\n--b\r\nContent-Disposition: form-data; name=\"f\"; filename=\"\xEF\xBF\xBDx\xEF\xBF\xBD\"\r\nContent-Type: text/plain\r\n\r\n\r\n--b--\r\n",
+  )
+}

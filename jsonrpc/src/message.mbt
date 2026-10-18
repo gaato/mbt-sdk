@@ -111,7 +111,7 @@ fn decode_response(fields : Map[String, Json]) -> Message raise DecodeError {
 ///|
 /// Encodes a message as one compact newline-terminated NDJSON record.
 pub fn Message::encode(self : Message, envelope~ : Envelope) -> Bytes {
-  @utf8.encode(self.to_json(envelope~).stringify() + "\n")
+  encode_utf8(self.to_json(envelope~).stringify() + "\n")
 }
 
 ///|

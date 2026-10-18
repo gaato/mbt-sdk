@@ -1,7 +1,6 @@
 import {
   "gaato/sdk-runtime" @runtime,
   "gaato/http",
-  "moonbitlang/core/encoding/utf8",
   "moonbitlang/core/debug",
 }
 

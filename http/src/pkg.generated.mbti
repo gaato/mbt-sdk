@@ -9,6 +9,8 @@ import {
 // Values
 pub fn append_query(String, String, String) -> String
 
+pub fn encode_utf8(String) -> Bytes
+
 pub async fn follow_redirects(Request, async (Request) -> Response raise HttpError, max_redirects? : Int, allow_downgrade? : Bool, credential_headers? : Array[String], on_redirect? : (RedirectHop) -> Unit) -> Response raise RedirectError
 
 pub async fn follow_redirects_stream(Request, async (Request) -> (ResponseHead, &BodyStream) raise HttpError, max_redirects? : Int, allow_downgrade? : Bool, credential_headers? : Array[String], on_redirect? : (StreamRedirectHop) -> Unit) -> (ResponseHead, &BodyStream) raise RedirectError

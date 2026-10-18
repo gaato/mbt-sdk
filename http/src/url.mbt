@@ -595,7 +595,7 @@ fn url_encode(chars : ArrayView[Char], keep : (Int32) -> Bool) -> String {
     if code < 0x80 && keep(code) {
       builder.write_char(c)
     } else {
-      for byte in @utf8.encode(c.to_string()) {
+      for byte in encode_utf8(c.to_string()) {
         let b = byte.to_int()
         builder.write_char('%')
         builder.write_char(hex_digit(b >> 4))

@@ -65,6 +65,18 @@ never does. Every breaking change is listed with a migration note.
   `*` is not, the reverse of `percent_encode`'s RFC 3986 set for paths and
   queries. A lone surrogate is encoded as U+FFFD. `form_body` sets the
   content type only when the request has none.
+- **`encode_utf8` encodes a string as UTF-8 without aborting.** It writes
+  a lone surrogate as U+FFFD, as the WHATWG UTF-8 encoder and
+  `TextEncoder` do, where `@utf8.encode` aborts the process. Use it for
+  any string that came from outside.
+
+### Fixed
+
+- **`Request::body_text`, `json_body` and `Url::parse` no longer abort on
+  a lone surrogate.** They encoded with `@utf8.encode`, which aborts the
+  whole process on an unpaired UTF-16 surrogate, so a caller's string, or
+  a JSON value holding one, could crash it. A lone surrogate is now
+  written as U+FFFD (`%EF%BF%BD` in a URL).
 
 ## [0.2.1] - 2026-10-18
 

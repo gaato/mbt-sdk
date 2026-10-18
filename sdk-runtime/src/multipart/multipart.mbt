@@ -24,7 +24,7 @@ pub extend Part with @debug.Debug::{to_repr}
 /// }
 /// ```
 pub fn Part::text(name : String, value : String) -> Part {
-  { name, filename: None, content_type: None, body: @utf8.encode(value), }
+  { name, filename: None, content_type: None, body: @http.encode_utf8(value), }
 }
 
 ///|
@@ -63,7 +63,7 @@ pub fn Part::json(name : String, value : Json) -> Part {
     name,
     filename: None,
     content_type: Some("application/json"),
-    body: @utf8.encode(value.stringify()),
+    body: @http.encode_utf8(value.stringify()),
   }
 }
 
@@ -130,12 +130,12 @@ fn append_bytes(output : Array[Byte], bytes : Bytes) -> Unit {
 
 ///|
 fn append_text(output : Array[Byte], text : String) -> Unit {
-  append_bytes(output, @utf8.encode(text))
+  append_bytes(output, @http.encode_utf8(text))
 }
 
 ///|
 fn append_escaped_parameter(output : Array[Byte], value : String) -> Unit {
-  for byte in @utf8.encode(value) {
+  for byte in @http.encode_utf8(value) {
     match byte.to_int() {
       34 => append_bytes(output, b"%22")
       13 => append_bytes(output, b"%0D")
@@ -199,8 +199,8 @@ pub fn encode_segments(
   boundary : String,
 ) -> (String, Array[Bytes]) raise MultipartError {
   validate_boundary(boundary)
-  let delimiter = @utf8.encode("--" + boundary)
-  let embedded = @utf8.encode("\r\n--" + boundary)
+  let delimiter = @http.encode_utf8("--" + boundary)
+  let embedded = @http.encode_utf8("\r\n--" + boundary)
   for part in parts {
     if part.content_type is Some(content_type) &&
       (content_type.contains("\r") || content_type.contains("\n")) {

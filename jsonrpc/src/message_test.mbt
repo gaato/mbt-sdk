@@ -186,3 +186,21 @@ test "invalid UTF-8 is InvalidJson" {
     _ => fail("expected InvalidJson")
   }
 }
+
+///|
+test "lone surrogates in a message encode as U+FFFD" {
+  let high = String::from_array([(0xD800).unsafe_to_char()])
+  let low = String::from_array([(0xDC00).unsafe_to_char()])
+  let message = @jsonrpc.Message::Notification(
+    name="log",
+    params=Some(Json::string(high + "a" + low)),
+  )
+  let bytes = message.encode(envelope=Strict)
+  assert_eq(
+    @jsonrpc.decode_line(bytes, envelope=Strict),
+    @jsonrpc.Message::Notification(
+      name="log",
+      params=Some(Json::string("\u{FFFD}a\u{FFFD}")),
+    ),
+  )
+}

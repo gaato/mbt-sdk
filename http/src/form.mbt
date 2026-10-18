@@ -44,39 +44,10 @@ pub fn Request::form_body(
 }
 
 ///|
-/// Appends one name or value under the urlencoded serializer's rules. The
-/// UTF-8 encoding is done here because `@utf8.encode` aborts on a lone
-/// surrogate, which the serializer's USVString input has as U+FFFD.
+/// Appends one name or value under the urlencoded serializer's rules.
 fn form_write(builder : StringBuilder, text : String) -> Unit {
-  let units = text.length()
-  for i = 0; i < units; {
-    let unit = text.code_unit_at(i).to_int()
-    let (code_point, width) = if unit >= 0xD800 &&
-      unit < 0xDC00 &&
-      i + 1 < units &&
-      text.code_unit_at(i + 1).to_int() is (0xDC00..<0xE000 as low) {
-      (0x10000 + ((unit - 0xD800) << 10) + (low - 0xDC00), 2)
-    } else if unit >= 0xD800 && unit < 0xE000 {
-      (0xFFFD, 1)
-    } else {
-      (unit, 1)
-    }
-    if code_point < 0x80 {
-      form_byte(builder, code_point)
-    } else if code_point < 0x800 {
-      form_byte(builder, 0xC0 | (code_point >> 6))
-      form_byte(builder, 0x80 | (code_point & 0x3F))
-    } else if code_point < 0x10000 {
-      form_byte(builder, 0xE0 | (code_point >> 12))
-      form_byte(builder, 0x80 | ((code_point >> 6) & 0x3F))
-      form_byte(builder, 0x80 | (code_point & 0x3F))
-    } else {
-      form_byte(builder, 0xF0 | (code_point >> 18))
-      form_byte(builder, 0x80 | ((code_point >> 12) & 0x3F))
-      form_byte(builder, 0x80 | ((code_point >> 6) & 0x3F))
-      form_byte(builder, 0x80 | (code_point & 0x3F))
-    }
-    continue i + width
+  for byte in encode_utf8(text) {
+    form_byte(builder, byte.to_int())
   }
 }
 

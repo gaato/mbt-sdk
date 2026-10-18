@@ -16,6 +16,11 @@ note.
   now goes out as it is, as lower-case ones did. Paths are still joined onto
   the base URL, not resolved by RFC 3986, which would drop a base path such
   as OpenAI's `/v1`. Requires `gaato/http`'s new `Url`.
+- **Multipart text fields, names and filenames no longer abort on a lone
+  surrogate.** `Part::text`, `Part::json` and the `Content-Disposition`
+  parameters encoded with `@utf8.encode`, which aborts the process on an
+  unpaired UTF-16 surrogate; it is now written as U+FFFD. Requires
+  `gaato/http`'s new `encode_utf8`.
 
 ## [0.3.1] - 2026-10-18
 
