@@ -308,14 +308,14 @@ fn AsyncTransport::discard(
 
 ///|
 /// The request headers as sent, with `User-Agent` pulled out because
-/// connections are dialed and reused per user agent. `Content-Length` is
-/// dropped since the transport declares it from the body; repeated names are
-/// comma-joined.
+/// connections are dialed and reused per user agent. `Content-Length` and
+/// `Transfer-Encoding` are dropped since the transport frames the body
+/// itself; repeated names are comma-joined.
 fn wire_headers(headers : @http.Headers) -> (@ahttp.Headers, String?) {
   let wire : @ahttp.Headers = Map([])
   let mut user_agent : String? = None
   for (name, value) in headers.iter() {
-    if name == "content-length" {
+    if name == "content-length" || name == "transfer-encoding" {
       continue
     }
     if name == "user-agent" {
@@ -412,6 +412,11 @@ async fn exchange(
   // fails without a byte of this request reaching the server.
   let outgoing = open_body(body)
   defer outgoing.close()
+  if body.length() is Some(0L) {
+    // A head declaring no body goes out whole before any body is read, so an
+    // empty stream proves it is empty first.
+    confirm_empty(outgoing, timer)
+  }
   timer.run(Write, () => {
     client.request(meth, path, extra_headers=headers)
     // With a body, the head goes out with its first slice.

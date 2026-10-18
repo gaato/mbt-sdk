@@ -191,3 +191,31 @@ async test "a stream sent once is refused before its request reaches the server"
     },
   )
 }
+
+///|
+async test "a stream declared empty that is not fails before its head goes out" {
+  let heads = Ref(0)
+  let finished : @async.Queue[Unit] = @async.Queue(kind=Unbounded)
+  with_raw_server(
+    conn => {
+      while conn.read_until("\r\n\r\n") is Some(_) {
+        heads.val += 1
+      }
+      finished.put(())
+    },
+    port => {
+      let source = generated(5L)
+      let request = @http.Request::post("http://127.0.0.1:\{port}/").body_stream(
+        source,
+        length=0,
+      )
+      assert_eq(
+        phase_outcome(@adapter.AsyncTransport::new(), request),
+        "Protocol",
+      )
+      assert_true(source.closed)
+      finished.get()
+      assert_eq(heads.val, 0)
+    },
+  )
+}

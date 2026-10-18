@@ -76,6 +76,20 @@ fn Outgoing::close(self : Outgoing) -> Unit {
 }
 
 ///|
+/// Reads a stream declared empty to its end, as `Write` phases of `timer`.
+/// The taken stream raises `Protocol` if it produces any byte.
+async fn confirm_empty(
+  outgoing : Outgoing,
+  timer : PhaseTimer,
+) -> Unit raise @http.HttpError {
+  if outgoing is Reader(reader) {
+    while timer.run(Write, () => reader.read_some()) is Some(_) {
+
+    }
+  }
+}
+
+///|
 /// Sends `outgoing` through `write` as `Write` phases of `timer`: each slice
 /// of at most `max_write_bytes`, and for a stream each read from it, is one
 /// phase. A stream that grows past `buffer_limit` raises `Protocol`. The
