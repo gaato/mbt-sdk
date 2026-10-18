@@ -54,16 +54,9 @@ test "take reuses the newest young connection with the same User-Agent" {
       None,
       None,
       [1],
-      "a[]",
+      "",
     ),
-    (
-      "age idle_max - 1 is reused",
-      [("a", 1, None, 901)],
-      None,
-      Some(1),
-      [],
-      "a[]",
-    ),
+    ("age idle_max - 1 is reused", [("a", 1, None, 901)], None, Some(1), [], ""),
     (
       "User-Agent mismatch is skipped",
       [("a", 1, Some("x"), 950)],
@@ -97,12 +90,12 @@ test "take reuses the newest young connection with the same User-Agent" {
       "a[1]",
     ),
     (
-      "scan stops at the first match",
+      "expired entries older than the match are closed too",
       [("a", 1, None, 800), ("a", 2, None, 950)],
       None,
       Some(2),
-      [],
-      "a[1]",
+      [1],
+      "",
     ),
     (
       "expired entries before a mismatch are closed",
@@ -113,12 +106,20 @@ test "take reuses the newest young connection with the same User-Agent" {
       "a[1]",
     ),
     (
-      "other origins are left alone",
+      "expired entries of other origins are closed",
       [("b", 1, None, 800), ("a", 2, None, 950)],
       None,
       Some(2),
+      [1],
+      "",
+    ),
+    (
+      "young entries of other origins stay",
+      [("b", 1, None, 950), ("a", 2, None, 950)],
+      None,
+      Some(2),
       [],
-      "b[1] a[]",
+      "b[1]",
     ),
     ("unknown origin", [("b", 1, None, 950)], None, None, [], "b[1]"),
   ]
@@ -169,6 +170,24 @@ test "put parks below the cap and hands back what it cannot keep" {
     ("max_idle = 0 disables reuse", 0, 100, false, [], [99], ""),
     ("idle_max = 0 disables reuse", 4, 0, false, [], [99], ""),
     ("closed pool parks nothing", 4, 100, true, [], [99], ""),
+    (
+      "expired entries do not count toward the cap",
+      1,
+      100,
+      false,
+      [("a", 1, None, 800)],
+      [1],
+      "a[99]",
+    ),
+    (
+      "expired entries of other origins are closed",
+      4,
+      100,
+      false,
+      [("b", 1, None, 800)],
+      [1],
+      "a[99]",
+    ),
   ]
   for row in rows {
     let (
