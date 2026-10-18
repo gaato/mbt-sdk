@@ -102,3 +102,42 @@ async fn each_event_scenarios() -> Unit {
 async test "each_event scenarios execute" {
   each_event_scenarios()
 }
+
+///|
+/// `text` in a buffer the test can still change after handing it out as
+/// `Bytes`, so a callback can tell which bytes had been parsed before it ran.
+fn mutable_bytes(text : Bytes) -> (FixedArray[Byte], Bytes) {
+  let backing = FixedArray::make(text.length(), b'\x00')
+  for i, byte in text {
+    backing[i] = byte
+  }
+  (backing, backing.unsafe_reinterpret_as_bytes())
+}
+
+///|
+async test "each_event dispatches a read's first events before parsing the rest" {
+  // One read far larger than a slice: an event, a comment line past the
+  // slice boundary, then an event whose data the first callback rewrites.
+  let padding = Bytes::make(100_000, b'x')
+  let text = Buffer()
+  text.write_bytes(b"data: a\n\n:")
+  text.write_bytes(padding)
+  text.write_bytes(b"\ndata: orig\n\n")
+  let (backing, chunk) = mutable_bytes(text.to_bytes())
+  let stream = TestStream::{
+    chunks: [chunk],
+    cursor: 0,
+    closes: 0,
+    fail_read: false,
+  }
+  let seen = []
+  @sse.each_event(stream, event => {
+    if event.data == "a" {
+      for i, byte in b"edit" {
+        backing[chunk.length() - 6 + i] = byte
+      }
+    }
+    seen.push(event.data)
+  })
+  assert_eq(seen, ["a", "edit"])
+}

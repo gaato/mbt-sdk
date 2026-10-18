@@ -112,7 +112,7 @@ test "retry is pending until dispatch then resets and ignores invalid values" {
   ])
   for
     invalid in [
-      "", "-1", "+1", "1.0", "1x", " 1", "1 ", "１２", "2147483648", "999999999999999999999999999999999",
+      "", "-1", "+1", "1.0", "1x", " 1", "1 ", "１２", "99999999999999999999x",
     ] {
     assert_eq(
       parse("retry: 7\nretry: " + invalid + "\ndata: x\n\ndata: y\n\n"),
@@ -122,10 +122,10 @@ test "retry is pending until dispatch then resets and ignores invalid values" {
   }
   assert_eq(
     parse(
-      "retry: 2147483647\ndata: max\n\nretry: 0000000000000000000000000000\ndata: zero\n\nretry: 1\nretry: 2\ndata: last\n\n",
+      "retry: 3600000\ndata: max\n\nretry: 0000000000000000000000000000\ndata: zero\n\nretry: 1\nretry: 2\ndata: last\n\n",
     ),
     [
-      event("max", retry=2147483647),
+      event("max", retry=3600000),
       event("zero", retry=0),
       event("last", retry=2),
     ],
@@ -211,6 +211,27 @@ fn field_line(rand : @random.Rand, name : String, value : String) -> String {
 }
 
 ///|
+test "a retry hint past an hour reads as an hour" {
+  let rows : Array[(String, Int32)] = [
+    ("3599999", 3599999),
+    ("3600000", 3600000),
+    ("3600001", 3600000),
+    ("2147483647", 3600000),
+    ("2147483648", 3600000),
+    ("999999999999999999999999999999999", 3600000),
+    ("000000000000000000000003600001", 3600000),
+  ]
+  for row in rows {
+    let (value, expected) = row
+    assert_eq(
+      parse("retry: " + value + "\ndata: x\n\n"),
+      [event("x", retry=expected)],
+      msg=value,
+    )
+  }
+}
+
+///|
 /// A random stream and the events it means, tracked while writing it.
 fn generate_stream(rand : @random.Rand) -> (Bytes, Array[@sse.SseEvent]) {
   let text = StringBuilder()
@@ -266,7 +287,7 @@ fn generate_stream(rand : @random.Rand) -> (Bytes, Array[@sse.SseEvent]) {
           (if rand.boolean() { "00" } else { "" }) +
           value.to_string()
         } else {
-          let invalid = ["", "1x", "-1", " 1", "2147483648"]
+          let invalid = ["", "1x", "-1", " 1", "99999999999x"]
           "retry: " + invalid[rand.int(limit=invalid.length())]
         }
       8 => ":" + random_value(rand)

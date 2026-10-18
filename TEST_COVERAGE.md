@@ -104,7 +104,7 @@ Pending refactor (in flight; re-measure after the parallel changes merge):
 | http-async/src/pool.mbt | 3 | Closing the real connections `IdlePool` hands back as expired needs real elapsed time; the `IdlePool` tables cover which ones expire. The `invalid URL` and `unsupported protocol` mapping of `@ahttp.Client` construction errors: `split_url` rejects both before a client is built. |
 | http-async/src/transport.mbt | 4 | The `send_stream` errdefer that closes a client opened before the head timed out, the non-`HttpError` arm of `bounded` (callers narrow every error first), and the mapping of a socket error while reading a body, buffered (`read_body`) or streamed (`ClientStream::read_some`): only the network-dependent badhttp tests reach them. |
 | sdk-runtime/src/rate_limit.mbt | 7 | Header-window parsing: a remaining count without either reset header (3), an all-whitespace count (1), and the Int64 saturation arms of `decimal_seconds_ms` (3). |
-| jsonrpc-async/src/connection.mbt | 6 | pending refactor (in flight): `send` after the writer closed (both checks), a non-positive `timeout_ms`, the catch-all of `call`, a reader failure other than an over-long line, and a notification-queue error other than closure. |
+| jsonrpc-async/src/connection.mbt | 5 | pending refactor (in flight): `send` after the writer closed (both checks), a non-positive `timeout_ms`, the catch-all of `call`, and a notification-queue error other than closure. |
 | jsonrpc-async/src/dispatch.mbt | 1 | The swallowed failure of sending an internal-error reply after a handler raised: the writer must fail between the handler and the reply. |
 
 Unreachable or platform-only:

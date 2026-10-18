@@ -88,6 +88,13 @@ pub impl @http.Transport for AsyncTransport with fn send_stream(self, request) {
 }
 
 ///|
+/// The most bytes one read takes from a connection. Without `max_len`, a read
+/// returns whatever the connection has buffered, so a stream's chunk, and the
+/// overshoot past `max_body_bytes` before it is refused, would be bounded only
+/// by that buffer.
+let max_read_bytes : Int32 = 64 * 1024
+
+///|
 /// The rest of a response body, refused once it exceeds `max_bytes`.
 async fn read_body(
   client : @ahttp.Client,
@@ -96,7 +103,8 @@ async fn read_body(
   try {
     match max_bytes {
       None => client.read_all().binary()
-      Some(max_bytes) => read_bounded(() => client.read_some(), max_bytes)
+      Some(max_bytes) =>
+        read_bounded(() => client.read_some(max_len=max_read_bytes), max_bytes)
     }
   } catch {
     @http.HttpError::Protocol(message) =>
@@ -174,7 +182,7 @@ impl @http.BodyStream for ClientStream with fn read_some(self) {
   }
   errdefer @http.BodyStream::close(self)
   let chunk = bounded(self.timeout_ms, () => {
-    self.client.read_some() catch {
+    self.client.read_some(max_len=max_read_bytes) catch {
       error => raise @http.HttpError::Protocol(error.to_string())
     }
   })

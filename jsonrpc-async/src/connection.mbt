@@ -62,6 +62,23 @@ let default_max_notifications : Int32 = 32_768
 let default_max_inbound : Int32 = 64
 
 ///|
+/// The most bytes read, and fed to the framer, at once. Each slice's lines are
+/// dispatched before the next slice is framed, so the lines held at once are
+/// bounded by one slice, not by one read, whose size the reader decides.
+let slice_bytes : Int32 = 64 * 1024
+
+///|
+/// The slice of `chunk` that starts at `start`, without a copy when the
+/// whole chunk fits in one.
+fn slice_at(chunk : Bytes, start : Int32) -> Bytes {
+  if start == 0 && chunk.length() <= slice_bytes {
+    chunk
+  } else {
+    chunk[start:(start + slice_bytes).min(chunk.length())].to_owned()
+  }
+}
+
+///|
 /// The failure pending calls get when reading ends with `error`: a transport
 /// failure keeps its message, and anything else becomes one carrying its text.
 fn read_failure(error : Error) -> RpcFailure {
@@ -133,14 +150,16 @@ pub fn[X] Connection::start(
     let framer = @jsonrpc.LineFramer::new(max_line~)
     let failure : Error? = try {
       for ;; {
-        match reader.read_some() {
-          Some(bytes) => {
-            for line in framer.feed(bytes) {
-              self.dispatch(group, line, on_request)
+        match reader.read_some(max_len=slice_bytes) {
+          Some(bytes) =>
+            // A reader may return more than `max_len`, so slice here too.
+            for start = 0; start < bytes.length(); start = start + slice_bytes {
+              for line in framer.feed(slice_at(bytes, start)) {
+                self.dispatch(group, line, on_request)
+              }
+              // Raises an overflow that followed those lines in the same slice.
+              ignore(framer.feed(b""))
             }
-            // Raises an overflow that followed those lines in the same chunk.
-            ignore(framer.feed(b""))
-          }
           None => {
             if framer.finish() is Some(line) {
               self.dispatch(group, line, on_request)
