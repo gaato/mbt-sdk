@@ -4,3 +4,7 @@ import {
   "moonbitlang/core/encoding/percent",
   "moonbitlang/core/encoding/utf8",
 }
+
+import {
+  "moonbitlang/core/random",
+} for "test"

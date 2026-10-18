@@ -23,6 +23,13 @@ pub(all) suberror HttpError {
 } derive(@debug.Debug)
 pub fn HttpError::to_repr(Self) -> @debug.Repr
 
+pub(all) suberror UrlError {
+  Invalid(String)
+} derive(Eq, @debug.Debug)
+pub fn UrlError::equal(Self, Self) -> Bool
+pub fn UrlError::not_equal(Self, Self) -> Bool
+pub fn UrlError::to_repr(Self) -> @debug.Repr
+
 // Types and methods
 pub struct Headers {
   // private fields
@@ -81,6 +88,31 @@ pub(all) struct ResponseHead {
 pub fn ResponseHead::equal(Self, Self) -> Bool
 pub fn ResponseHead::not_equal(Self, Self) -> Bool
 pub fn ResponseHead::to_repr(Self) -> @debug.Repr
+
+pub struct Url {
+  scheme : String?
+  userinfo : String?
+  host : String?
+  port : Int?
+  path : String
+  query : String?
+  fragment : String?
+} derive(Eq, @debug.Debug)
+pub fn Url::append_query_params(Self, Array[(String, String)]) -> Self
+pub fn Url::equal(Self, Self) -> Bool
+pub fn Url::is_absolute(Self) -> Bool
+pub fn Url::merge_query_params(Self, Array[(String, String)]) -> Self
+pub fn Url::not_equal(Self, Self) -> Bool
+pub fn Url::output(Self, &Logger) -> Unit
+pub fn Url::parse(String) -> Self raise UrlError
+pub fn Url::port_or_default(Self) -> Int?
+pub fn Url::query_params(Self) -> Array[(String, String)]
+pub fn Url::resolve(Self, Self) -> Self
+pub fn Url::same_origin(Self, Self) -> Bool
+pub fn Url::to_repr(Self) -> @debug.Repr
+pub fn Url::to_string(Self) -> String
+pub fn Url::without_fragment(Self) -> Self
+pub impl Show for Url
 
 // Type aliases
 pub type Middleware = async (Request, async (Request) -> Response raise HttpError) -> Response raise HttpError

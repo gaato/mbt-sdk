@@ -7,6 +7,19 @@ never does. Every breaking change is listed with a migration note.
 
 ## [Unreleased]
 
+### Added
+
+- **`Url`: RFC 3986 URI references with parsing, normalisation and
+  resolution.** `Url::parse` splits a reference into scheme, userinfo, host
+  (IPv6 literals included), port, path, query and fragment, lower-cases the
+  scheme and host, drops default ports and percent-encodes by the WHATWG
+  URL Standard's sets; `Url::resolve` implements RFC 3986 §5.2 and passes all
+  42 examples of §5.4. `same_origin`, `port_or_default`, `query_params`,
+  `append_query_params` and `merge_query_params` cover what HTTP clients
+  need. Non-ASCII hosts are refused: IDNA is out of scope, so pass the
+  `xn--` form. The algorithm is ported from moonbitstack/moonhttp's `url`
+  package (Apache-2.0).
+
 ## [0.2.1] - 2026-10-18
 
 ### Fixed
