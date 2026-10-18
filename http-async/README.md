@@ -25,3 +25,5 @@ On native and Wasm, `AsyncTransport::new(proxy="http://user:pass@proxy:3128")` s
 In 0.1.2, a request's `User-Agent` is set when its connection is opened. Connections are reused only for requests with the same `User-Agent`; requests without one retain moonbitlang/async's default.
 
 Unofficial and experimental. Source, issues and design notes: https://github.com/gaato/mbt-sdk
+
+Known limitation: moonbitlang/async 0.22.5 cannot dial an IPv6 literal host (`http://[::1]:8080/`, as an origin or a proxy): it passes the bracketed address to name resolution, which fails with `Connect`. Use a host name until that is fixed upstream.

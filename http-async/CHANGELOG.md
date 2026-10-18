@@ -132,6 +132,13 @@ note.
   kept `Content-Encoding: gzip` after decoding. A request that sets
   `Accept-Encoding` itself still gets the body as the server sent it.
 
+### Fixed
+
+- **A connection is not reused after `101 Switching Protocols` or a caller's
+  `CONNECT`.** Either turns it into something other than an HTTP connection
+  (through a forwarding proxy, a tunnel to the origin), so parking it let
+  the next request, and any proxy credentials on it, reach the wrong peer.
+
 ## [0.2.1] - 2026-10-18
 
 ### Fixed

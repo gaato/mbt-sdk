@@ -221,6 +221,18 @@ fn replayable(request : @http.Request) -> Bool {
 }
 
 ///|
+/// Whether the connection can carry another request after this exchange: not
+/// when the server asked to close it, not after `101 Switching Protocols`
+/// (the connection speaks another protocol now, and through a forwarding
+/// proxy it may be a tunnel to the origin), and not after a caller's
+/// `CONNECT`, which turns it into a tunnel.
+fn reusable(http_method : String, response : @ahttp.Response) -> Bool {
+  !connection_close(response) &&
+  response.code != 101 &&
+  http_method.to_upper() != "CONNECT"
+}
+
+///|
 /// Whether the server asked to close the connection after this response:
 /// `Connection` is a comma-separated token list, so `close` must be a whole token.
 fn connection_close(response : @ahttp.Response) -> Bool {

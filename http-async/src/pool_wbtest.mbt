@@ -328,3 +328,30 @@ test "connection_close looks for the close token" {
     )
   }
 }
+
+///|
+test "a connection is reused only while it still speaks HTTP" {
+  let rows : Array[(String, Int32, String, Bool)] = [
+    ("GET", 200, "", true),
+    ("POST", 204, "keep-alive", true),
+    ("GET", 200, "close", false),
+    ("GET", 101, "Upgrade", false),
+    ("get", 101, "", false),
+    ("CONNECT", 200, "", false),
+    ("connect", 200, "keep-alive", false),
+    ("OPTIONS", 200, "", true),
+  ]
+  for row in rows {
+    let (http_method, code, connection, expected) = row
+    let headers : @ahttp.Headers = Map([])
+    if connection != "" {
+      headers[@ahttp.CaseInsensitiveString("Connection")] = connection
+    }
+    let response : @ahttp.Response = { code, reason: "", headers, cookies: [], }
+    assert_eq(
+      reusable(http_method, response),
+      expected,
+      msg="\{http_method} \{code} \{connection}",
+    )
+  }
+}

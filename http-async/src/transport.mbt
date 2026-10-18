@@ -424,7 +424,7 @@ async fn AsyncTransport::open_request(
       decoder,
       key,
       user_agent,
-      keep_alive: !connection_close(response),
+      keep_alive: reusable(request.http_method, response),
     }
   }
 }
