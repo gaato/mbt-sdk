@@ -117,3 +117,16 @@ test "stream bodies are equal only to themselves" {
     "Stream(StreamBody(length=Some(1), taken=true))",
   )
 }
+
+///|
+test "a stream body with a negative declared length is refused before it is read" {
+  let stream = StreamBody::new(Silent::{ }, length=-1)
+  let outcome = try stream.take() catch {
+    error => @debug.to_string(error)
+  } noraise {
+    _ => "taken"
+  }
+  assert_eq(
+    outcome, "Protocol(\"a stream request body cannot declare a negative length\")",
+  )
+}

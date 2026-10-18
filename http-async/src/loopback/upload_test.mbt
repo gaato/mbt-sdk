@@ -163,3 +163,31 @@ async test "a stream shorter than its declared length fails without a response" 
     assert_true(source.closed)
   })
 }
+
+///|
+async test "a stream sent once is refused before its request reaches the server" {
+  let heads = Ref(0)
+  let finished : @async.Queue[Unit] = @async.Queue(kind=Unbounded)
+  with_raw_server(
+    conn => {
+      while conn.read_until("\r\n\r\n") is Some(_) {
+        heads.val += 1
+        conn.write(b"HTTP/1.1 200 OK\r\nContent-Length: 0\r\n\r\n")
+      }
+      finished.put(())
+    },
+    port => {
+      let url = "http://127.0.0.1:\{port}/"
+      let transport = @adapter.AsyncTransport::new()
+      let request = @http.Request::post(url).body_stream(
+        generated(0L),
+        length=0,
+      )
+      ignore(transport.send(request))
+      // The refused send closes the reused connection without writing to it.
+      assert_eq(phase_outcome(transport, request), "Protocol")
+      finished.get()
+      assert_eq(heads.val, 1)
+    },
+  )
+}

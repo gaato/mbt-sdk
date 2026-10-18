@@ -408,6 +408,10 @@ async fn exchange(
   timer : PhaseTimer,
 ) -> @ahttp.Response raise @http.HttpError {
   errdefer client.close()
+  // A stream is taken before the head goes out, so one that was already sent
+  // fails without a byte of this request reaching the server.
+  let outgoing = open_body(body)
+  defer outgoing.close()
   timer.run(Write, () => {
     client.request(meth, path, extra_headers=headers)
     // With a body, the head goes out with its first slice.
@@ -415,8 +419,8 @@ async fn exchange(
       client.flush()
     }
   })
-  send_body(
-    body,
+  send_outgoing(
+    outgoing,
     slice => {
       client.write(slice)
       client.flush()

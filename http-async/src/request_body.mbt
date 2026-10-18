@@ -51,21 +51,44 @@ fn refuse_unbufferable(
 }
 
 ///|
-/// Sends `body` through `write` as `Write` phases of `timer`: each slice of
-/// at most `max_write_bytes`, and for a stream each read from it, is one
-/// phase. A stream is taken here and closed when sending ends, however it
-/// ends; one that grows past `buffer_limit` raises `Protocol`.
-async fn send_body(
-  body : @http.Body,
+/// A request body ready to send: bytes, or a stream already taken.
+priv enum Outgoing {
+  Buffered(Bytes)
+  Reader(&@http.BodyStream)
+}
+
+///|
+/// Takes `body`'s stream, if it has one, so a body that cannot be sent fails
+/// before any byte of the request goes out.
+fn open_body(body : @http.Body) -> Outgoing raise @http.HttpError {
+  match body {
+    Bytes(bytes) => Buffered(bytes)
+    Stream(stream) => Reader(stream.take())
+  }
+}
+
+///|
+/// Closes a taken stream; nothing to do for bytes.
+fn Outgoing::close(self : Outgoing) -> Unit {
+  if self is Reader(reader) {
+    reader.close()
+  }
+}
+
+///|
+/// Sends `outgoing` through `write` as `Write` phases of `timer`: each slice
+/// of at most `max_write_bytes`, and for a stream each read from it, is one
+/// phase. A stream that grows past `buffer_limit` raises `Protocol`. The
+/// caller closes `outgoing`.
+async fn send_outgoing(
+  outgoing : Outgoing,
   write : async (BytesView) -> Unit,
   timer : PhaseTimer,
   buffer_limit~ : Int64?,
 ) -> Unit raise @http.HttpError {
-  match body {
-    Bytes(bytes) => write_slices(bytes, write, timer)
-    Stream(stream) => {
-      let reader = stream.take()
-      defer reader.close()
+  match outgoing {
+    Buffered(bytes) => write_slices(bytes, write, timer)
+    Reader(reader) => {
       let mut sent = 0L
       while timer.run(Write, () => reader.read_some()) is Some(chunk) {
         sent += chunk.length().to_int64()

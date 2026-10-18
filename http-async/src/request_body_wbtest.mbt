@@ -1,4 +1,18 @@
 ///|
+/// `exchange`'s body sending without a client: takes `body`, sends it through
+/// `write`, and closes a taken stream however sending ends.
+async fn send_body(
+  body : @http.Body,
+  write : async (BytesView) -> Unit,
+  timer : PhaseTimer,
+  buffer_limit~ : Int64?,
+) -> Unit raise @http.HttpError {
+  let outgoing = open_body(body)
+  defer outgoing.close()
+  send_outgoing(outgoing, write, timer, buffer_limit~)
+}
+
+///|
 test "content_length declares known lengths, and zero only where content is expected" {
   let stream = (length : Int64?) => {
     @http.Body::Stream(@http.StreamBody::new(Paced::new([]), length?))
