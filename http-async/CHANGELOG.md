@@ -24,6 +24,29 @@ note.
 
 ### Changed
 
+- **Failures and timeouts name the phase they happened in.** Requires
+  `gaato/http`'s new `HttpError`. The transport dials, writes the request,
+  waits for the head and reads the body as separate phases, so a timeout is
+  `Timeout(phase=Dial | Write | Head | Body, ms=timeout_ms)` for the phase
+  the deadline interrupted, and the deadline is still one per buffered
+  exchange (up to the head for a stream) and one per stream read. On
+  native and Wasm, a reset or an end of stream after connecting is now
+  `Network` in its phase instead of `Protocol`; only a message the parser
+  refuses stays `Protocol`. A body cut short of its `Content-Length` is
+  therefore `Network(phase=Body)`, where httpx says `RemoteProtocolError`:
+  the connection ended, which is what a retry policy needs to know. On JS,
+  fetch connects, sends and waits for the head in one call and rejects
+  every failure alike with a `TypeError`, so those failures are
+  `Network(phase=Unknown)` instead of `Connect`, and a timeout there is
+  `Timeout(phase=Unknown)`; `Connect` would claim the request was never
+  sent, which fetch cannot know. `DeadlineTransport` cannot see the inner
+  transport's phase and reports `Timeout(phase=Unknown, ms)`. A stale
+  parked connection is replayed only when it fails with `Network`, which
+  is how a dropped connection shows; before, any failure before the head
+  was replayed. The request is flushed before the head is awaited, so a
+  bodiless request now leaves in two writes. Migration: see `gaato/http`'s
+  `HttpError` note; code that matched `Protocol` to catch dropped
+  connections should match `Network(..)`.
 - **A decoded response's headers describe the decoded body, and an unknown
   coding passes through.** The undone codings leave `Content-Encoding` and
   `Content-Length` is dropped; a coding the transport does not know, and any

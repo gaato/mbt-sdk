@@ -353,12 +353,7 @@ async fn send_buffered(
   request : @http.Request,
 ) -> @http.Response raise SdkError {
   @http.send_with(transport, middleware, request) catch {
-    @http.HttpError::Connect(message) =>
-      raise Transport(@http.HttpError::Connect(message))
-    @http.HttpError::Timeout(milliseconds) =>
-      raise Transport(@http.HttpError::Timeout(milliseconds))
-    @http.HttpError::Protocol(message) =>
-      raise Transport(@http.HttpError::Protocol(message))
+    error => raise Transport(error)
   }
 }
 
@@ -368,12 +363,7 @@ async fn send_streaming(
   request : @http.Request,
 ) -> (@http.ResponseHead, &@http.BodyStream) raise SdkError {
   transport.send_stream(request) catch {
-    @http.HttpError::Connect(message) =>
-      raise Transport(@http.HttpError::Connect(message))
-    @http.HttpError::Timeout(milliseconds) =>
-      raise Transport(@http.HttpError::Timeout(milliseconds))
-    @http.HttpError::Protocol(message) =>
-      raise Transport(@http.HttpError::Protocol(message))
+    error => raise Transport(error)
   }
 }
 
@@ -382,14 +372,7 @@ async fn read_error_body(stream : &@http.BodyStream) -> Bytes raise SdkError {
   defer stream.close()
   let bytes : Array[Byte] = []
   for ; bytes.length() < max_error_body_bytes; {
-    let chunk = stream.read_some() catch {
-      @http.HttpError::Connect(message) =>
-        raise Transport(@http.HttpError::Connect(message))
-      @http.HttpError::Timeout(milliseconds) =>
-        raise Transport(@http.HttpError::Timeout(milliseconds))
-      @http.HttpError::Protocol(message) =>
-        raise Transport(@http.HttpError::Protocol(message))
-    }
+    let chunk = stream.read_some() catch { error => raise Transport(error) }
     guard chunk is Some(chunk) else { break }
     let take = chunk.length().min(max_error_body_bytes - bytes.length())
     for byte in chunk[:take] {

@@ -77,7 +77,8 @@ pub impl RetryDecider for RetryPolicy with fn next_delay_ms(
     return None
   }
   let processed_is_known_false = match error {
-    RateLimited(..) | Transport(Connect(_)) => true
+    RateLimited(..) => true
+    Transport(failure) => failure.is_unsent()
     _ => false
   }
   if !is_idempotent(request) &&

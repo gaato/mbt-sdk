@@ -101,8 +101,7 @@ Pending refactor (in flight; re-measure after the parallel changes merge):
 
 | File | Budget | Reason |
 | --- | --- | --- |
-| http-async/src/pool.mbt | 3 | Closing the real connections `IdlePool` hands back as expired needs real elapsed time; the `IdlePool` tables cover which ones expire. The `invalid URL` and `unsupported protocol` mapping of `@ahttp.Client` construction errors: `split_url` rejects both before a client is built. |
-| http-async/src/transport.mbt | 4 | The `send_stream` errdefer that closes a client opened before the head timed out, the non-`HttpError` arm of `bounded` (callers narrow every error first), and the mapping of a socket error while reading a body, buffered (`read_body`) or streamed (`ClientStream::read_some`): only the network-dependent badhttp tests reach them. |
+| http-async/src/pool.mbt | 1 | Closing the real connections `IdlePool` hands back as expired needs real elapsed time; the `IdlePool` tables cover which ones expire. |
 | sdk-runtime/src/rate_limit.mbt | 7 | Header-window parsing: a remaining count without either reset header (3), an all-whitespace count (1), and the Int64 saturation arms of `decimal_seconds_ms` (3). |
 | jsonrpc-async/src/connection.mbt | 5 | pending refactor (in flight): `send` after the writer closed (both checks), a non-positive `timeout_ms`, the catch-all of `call`, and a notification-queue error other than closure. |
 | jsonrpc-async/src/dispatch.mbt | 1 | The swallowed failure of sending an internal-error reply after a handler raised: the writer must fail between the handler and the reply. |
@@ -118,7 +117,7 @@ Testable, not yet tested (next candidates):
 
 | File | Budget | Reason |
 | --- | --- | --- |
-| sdk-runtime/src/client.mbt | 15 | not yet tested: the retry-then-sleep path of `send_stream` (2); the Timeout/Protocol arms of the transport-error mapping in `send_buffered`, `send_streaming` and `read_error_body` (7, Connect is tested); a limiter whose `acquire` raises (1) or whose `release` raises after a transport failure (1) or after a buffered response (the no-op discard, 1); `resolve_url` with no slash on either side (1). Platform-only: the xorshift fallback of `default_random` (2) runs only when `@env.rand` is unavailable, which native never is. |
+| sdk-runtime/src/client.mbt | 8 | not yet tested: the retry-then-sleep path of `send_stream` (2); a limiter whose `acquire` raises (1) or whose `release` raises after a transport failure (1) or after a buffered response (the no-op discard, 1); `resolve_url` with no slash on either side (1). Platform-only: the xorshift fallback of `default_random` (2) runs only when `@env.rand` is unavailable, which native never is. |
 | codex-app-server/src/child.mbt | 6 | not yet tested: `spawn` and `Session::shutdown` need an app-server process; testable with a stub `program~` speaking NDJSON. The JSON-RPC child plumbing itself is tested in jsonrpc-async. |
 | codex-app-server/src/handlers.mbt | 4 | not yet tested: `dispatch` routes for file-change, permissions and user-input requests (3) and a handler returning `Err` (1); command approval and decode failures are tested. |
 | jsonrpc-async/src/child.mbt | 5 | not yet tested: `shutdown` with `timeout_ms <= 0` (2). Needs a spawn or wait failure: the `errdefer`s that close the pipes when `@process.spawn` raises (2; a nonexistent program may reach them, unverified), and the re-raise of a `wait` failure other than the timeout (1). |

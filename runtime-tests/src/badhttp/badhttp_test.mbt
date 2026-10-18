@@ -112,8 +112,8 @@ async test "sse stall trips the idle timeout as Timeout" {
     assert_eq(head.status, 200)
     let mut seen = 0
     try @sse.each_event(stream, _ => seen += 1) catch {
-      @http.HttpError::Timeout(1500) => ()
-      error => fail("expected Timeout(1500), got \{@debug.to_string(error)}")
+      @http.HttpError::Timeout(phase=Body, ms=1500) => ()
+      error => fail("expected a Body timeout, got \{@debug.to_string(error)}")
     } noraise {
       _ => fail("expected the stall to time out")
     }
@@ -122,15 +122,15 @@ async test "sse stall trips the idle timeout as Timeout" {
 }
 
 ///|
-async test "truncate: a short body under a longer Content-Length is Protocol" {
+async test "truncate: a short body under a longer Content-Length is a Body network failure" {
   bounded(() => {
     try
       transport().send(
         @http.Request::get("\{BASE}/truncate?length=1000&send=500"),
       )
     catch {
-      @http.HttpError::Protocol(_) => ()
-      error => fail("expected Protocol, got \{@debug.to_string(error)}")
+      @http.HttpError::Network(phase=Body, ..) => ()
+      error => fail("expected Network(Body), got \{@debug.to_string(error)}")
     } noraise {
       response => fail("expected an error, got status \{response.status}")
     }
@@ -142,8 +142,8 @@ async test "delay beyond the timeout is Timeout" {
   bounded(() => {
     let t = @adapter.AsyncTransport::new(timeout_ms=1000)
     try t.send(@http.Request::get("\{BASE}/delay/3")) catch {
-      @http.HttpError::Timeout(1000) => ()
-      error => fail("expected Timeout(1000), got \{@debug.to_string(error)}")
+      @http.HttpError::Timeout(phase=Head, ms=1000) => ()
+      error => fail("expected a Head timeout, got \{@debug.to_string(error)}")
     } noraise {
       response => fail("expected an error, got status \{response.status}")
     }

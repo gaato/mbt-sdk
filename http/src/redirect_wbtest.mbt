@@ -262,7 +262,7 @@ test "plan_redirect decides each hop" {
 ///|
 test "redirect_failure maps refusals to protocol errors" {
   let cases : Array[(RedirectError, String)] = [
-    (Transport(Timeout(5)), "Timeout(5)"),
+    (Transport(Timeout(phase=Head, ms=5)), "Timeout(phase=Head, ms=5)"),
     (Transport(Connect("no route")), "Connect(\"no route\")"),
     (
       TooManyRedirects(max=3, location="https://h/x"),

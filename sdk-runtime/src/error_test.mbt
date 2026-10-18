@@ -49,7 +49,19 @@ test "non status errors and explicitly constructed statuses" {
     (error, expected) in (
       [
         (@runtime.Transport(@http.Connect("offline")), true),
-        (@runtime.Transport(@http.Timeout(12)), true),
+        (@runtime.Transport(@http.Timeout(phase=Pool, ms=12)), true),
+        (@runtime.Transport(@http.Timeout(phase=Dial, ms=12)), true),
+        (@runtime.Transport(@http.Timeout(phase=Write, ms=12)), true),
+        (@runtime.Transport(@http.Timeout(phase=Head, ms=12)), true),
+        (@runtime.Transport(@http.Timeout(phase=Body, ms=12)), true),
+        (@runtime.Transport(@http.Timeout(phase=Unknown, ms=12)), true),
+        (@runtime.Transport(@http.Network(phase=Write, message="reset")), true),
+        (@runtime.Transport(@http.Network(phase=Head, message="reset")), true),
+        (@runtime.Transport(@http.Network(phase=Body, message="reset")), true),
+        (
+          @runtime.Transport(@http.Network(phase=Unknown, message="failed")),
+          true,
+        ),
         (@runtime.Transport(@http.Protocol("bad frame")), false),
         (@runtime.Decode(message="invalid JSON", body=b"x"), false),
         (@runtime.Config("invalid config"), false),

@@ -18,18 +18,25 @@
 /// unknown coding stays on the body untouched. A request that sets
 /// `Accept-Encoding` itself gets the body as sent. On JS, fetch does both.
 pub struct AsyncTransport {
-  priv timeout_ms : Int32
+  priv limits : Timeouts
+  priv clock : &@clock.Clock
   priv max_body_bytes : Int32?
   priv pool : IdlePool[@ahttp.Client]
 }
 
 ///|
-/// Creates a transport. Streaming reads each receive a fresh idle timeout.
+/// Creates a transport. `timeout_ms` bounds a buffered exchange from start to
+/// the end of its body, a streaming exchange up to its head, and each read of
+/// a stream; a nonpositive value fails every request at once.
 /// `max_idle_per_origin = 0` or `idle_max_ms = 0` disables connection reuse.
 /// `max_body_bytes` bounds a buffered response body, counted after decoding:
 /// a longer one closes the connection and fails with `Protocol`. Without it
 /// the body is unbounded. Streams are never bounded, since their reader
 /// decides what to keep.
+///
+/// A timeout names the phase it interrupted, as do failures after the
+/// connection is made (`Network`). On JS, fetch connects, sends and waits for
+/// the head in one call, so failures and timeouts there carry `Unknown`.
 ///
 /// ```mbt check
 /// test {
@@ -45,7 +52,8 @@ pub fn AsyncTransport::new(
   max_body_bytes? : Int32,
 ) -> AsyncTransport {
   {
-    timeout_ms,
+    limits: Timeouts::uniform(timeout_ms),
+    clock: AsyncClock::new(),
     max_body_bytes,
     pool: IdlePool::new(max_per_origin=max_idle_per_origin, idle_max_ms~),
   }
@@ -56,43 +64,45 @@ pub fn AsyncTransport::new(
 pub extend AsyncTransport with @http.Transport::{send, send_stream}
 
 ///|
-/// Reads the entire response within one timeout, regardless of status.
+/// Reads the entire response within the exchange timeout, regardless of status.
 pub impl @http.Transport for AsyncTransport with fn send(self, request) {
-  bounded(self.timeout_ms, () => {
-    let opened = self.open_request(request)
-    errdefer opened.client.close()
-    let body = read_body(opened.client, opened.decoder, self.max_body_bytes)
-    self.release(opened)
-    @http.Response::{
-      status: opened.head.status,
-      headers: opened.head.headers,
-      body,
-    }
-  })
+  let timer = PhaseTimer::exchange(self.clock, self.limits)
+  let opened = self.open_request(request, timer)
+  errdefer opened.client.close()
+  let body = read_body(
+    opened.client,
+    opened.decoder,
+    self.max_body_bytes,
+    timer,
+  )
+  self.release(opened)
+  @http.Response::{
+    status: opened.head.status,
+    headers: opened.head.headers,
+    body,
+  }
 }
 
 ///|
-/// Reads the response head within one timeout and transfers ownership to a stream.
+/// Reads the response head within the exchange timeout and transfers
+/// ownership of the connection to a stream.
 pub impl @http.Transport for AsyncTransport with fn send_stream(self, request) {
-  // Retain ownership until the timeout scope has actually returned to the caller.
-  let mut opened : @ahttp.Client? = None
-  errdefer (if opened is Some(client) { client.close() })
-  bounded(self.timeout_ms, () => {
-    let exchange = self.open_request(request)
-    opened = Some(exchange.client)
-    let stream : &@http.BodyStream = ClientStream::{
-      transport: self,
-      origin: exchange.origin,
-      user_agent: exchange.user_agent,
-      client: exchange.client,
-      decoder: exchange.decoder,
-      keep_alive: exchange.keep_alive,
-      timeout_ms: self.timeout_ms,
-      finished: false,
-      closed: false,
-    }
-    (exchange.head, stream)
-  })
+  let exchange = self.open_request(
+    request,
+    PhaseTimer::exchange(self.clock, self.limits),
+  )
+  let stream : &@http.BodyStream = ClientStream::{
+    transport: self,
+    origin: exchange.origin,
+    user_agent: exchange.user_agent,
+    client: exchange.client,
+    decoder: exchange.decoder,
+    keep_alive: exchange.keep_alive,
+    timer: PhaseTimer::stream(self.clock, self.limits),
+    finished: false,
+    closed: false,
+  }
+  (exchange.head, stream)
 }
 
 ///|
@@ -124,19 +134,30 @@ async fn read_decoded(
 }
 
 ///|
+/// The next chunk of a response body as one `Body` phase of `timer`.
+async fn read_chunk(
+  client : @ahttp.Client,
+  decoder : ContentDecoder?,
+  timer : PhaseTimer,
+) -> Bytes? raise @http.HttpError {
+  timer.run(Body, () => {
+    read_decoded(() => client.read_some(max_len=max_read_bytes), decoder)
+  })
+}
+
+///|
 /// The rest of a response body, decoded, refused once it exceeds `max_bytes`.
 async fn read_body(
   client : @ahttp.Client,
   decoder : ContentDecoder?,
   max_bytes : Int32?,
+  timer : PhaseTimer,
 ) -> Bytes raise @http.HttpError {
   read_bounded(
-    () => read_decoded(() => client.read_some(max_len=max_read_bytes), decoder),
+    () => read_chunk(client, decoder, timer),
     max_bytes.unwrap_or(2147483647), // no limit short of `Int32`
   ) catch {
-    @http.HttpError::Protocol(message) =>
-      raise @http.HttpError::Protocol(message)
-    error => raise @http.HttpError::Protocol(error.to_string())
+    error => raise failure(Body, error)
   }
 }
 
@@ -157,26 +178,6 @@ async fn read_bounded(read : async () -> Bytes?, max_bytes : Int32) -> Bytes {
 }
 
 ///|
-/// Runs `f` under one deadline. Expiry surfaces as `Timeout(ms)`; every other
-/// failure is narrowed to `HttpError`. Cancellation is not an `Error` in
-/// moonbitlang/async, so `catch` never sees it and it propagates untouched.
-async fn[X] bounded(
-  ms : Int32,
-  f : async () -> X raise @http.HttpError,
-) -> X raise @http.HttpError {
-  if ms <= 0 {
-    raise @http.HttpError::Timeout(ms)
-  }
-  @async.with_timeout(ms, () => f(), error=@http.HttpError::Timeout(ms)) catch {
-    @http.HttpError::Connect(message) => raise @http.HttpError::Connect(message)
-    @http.HttpError::Protocol(message) =>
-      raise @http.HttpError::Protocol(message)
-    @http.HttpError::Timeout(timeout) => raise @http.HttpError::Timeout(timeout)
-    other => raise @http.HttpError::Protocol(other.to_string())
-  }
-}
-
-///|
 priv struct ClientStream {
   transport : AsyncTransport
   origin : String
@@ -184,7 +185,7 @@ priv struct ClientStream {
   client : @ahttp.Client
   decoder : ContentDecoder?
   keep_alive : Bool
-  timeout_ms : Int32
+  timer : PhaseTimer
   mut finished : Bool
   mut closed : Bool
 }
@@ -209,14 +210,7 @@ impl @http.BodyStream for ClientStream with fn read_some(self) {
     return None
   }
   errdefer @http.BodyStream::close(self)
-  let chunk = bounded(self.timeout_ms, () => {
-    let read = () => self.client.read_some(max_len=max_read_bytes)
-    read_decoded(read, self.decoder) catch {
-      @http.HttpError::Protocol(message) =>
-        raise @http.HttpError::Protocol(message)
-      error => raise @http.HttpError::Protocol(error.to_string())
-    }
-  })
+  let chunk = read_chunk(self.client, self.decoder, self.timer)
   if chunk is None {
     self.finished = true
     @http.BodyStream::close(self)
@@ -275,9 +269,11 @@ fn wire_headers(headers : @http.Headers) -> (@ahttp.Headers, String?) {
 }
 
 ///|
+/// Sends `request` and reads its response head, each phase under `timer`.
 async fn AsyncTransport::open_request(
   self : AsyncTransport,
   request : @http.Request,
+  timer : PhaseTimer,
 ) -> Opened raise @http.HttpError {
   let meth = request_method(request.http_method)
   let (origin, path) = split_url(request.url)
@@ -289,17 +285,15 @@ async fn AsyncTransport::open_request(
   }
   let mut fresh = false
   for ;; {
-    let (client, reused) = self.checkout(origin, user_agent, fresh~)
-    let response = exchange(client, meth, path, headers, request.body) catch {
-      error => {
-        if reused && replayable(request) {
-          // A parked connection the server had already dropped: replay once
-          // on a fresh one. `reused` is false on that second attempt.
-          fresh = true
-          continue
-        }
-        raise head_error(error)
+    let (client, reused) = self.checkout(origin, user_agent, fresh~, timer)
+    let response = exchange(client, meth, path, headers, request.body, timer) catch {
+      @http.HttpError::Network(..) if reused && replayable(request) => {
+        // A parked connection the server had already dropped: replay once
+        // on a fresh one. `reused` is false on that second attempt.
+        fresh = true
+        continue
       }
+      error => raise error
     }
     let head = response_head(response)
     let decoder = if negotiated && has_body(request.http_method, head.status) {
@@ -320,19 +314,26 @@ async fn AsyncTransport::open_request(
 }
 
 ///|
-/// Writes one request and reads its response head. The connection is closed
-/// on any failure, including cancellation, which bypasses `catch`.
+/// Writes one request as the `Write` phase of `timer` and reads its response
+/// head as the `Head` phase. Writes are buffered, so the request is flushed
+/// before the head is awaited; the few bytes that end a chunked body go out
+/// with the head's phase. The connection is closed on any failure, including
+/// cancellation, which bypasses `catch`.
 async fn exchange(
   client : @ahttp.Client,
   meth : @ahttp.RequestMethod,
   path : String,
   headers : @ahttp.Headers,
   body : Bytes,
-) -> @ahttp.Response {
+  timer : PhaseTimer,
+) -> @ahttp.Response raise @http.HttpError {
   errdefer client.close()
-  client.request(meth, path, extra_headers=headers)
-  client.write(body)
-  client.end_request()
+  timer.run(Write, () => {
+    client.request(meth, path, extra_headers=headers)
+    client.write(body)
+    client.flush()
+  })
+  timer.run(Head, () => client.end_request())
 }
 
 ///|

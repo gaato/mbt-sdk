@@ -277,5 +277,5 @@ test "response_head keeps headers and serializes each cookie" {
 ///|
 test "the exchange timeout defaults to 30 s" {
   // The loopback tests check what the timeout bounds; this pins its default.
-  assert_eq(AsyncTransport::new().timeout_ms, 30000)
+  assert_eq(AsyncTransport::new().limits.total, 30000)
 }

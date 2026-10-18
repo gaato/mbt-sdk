@@ -195,7 +195,7 @@ async test "redirects as middleware maps refusals to Protocol and passes transpo
   fake.expect("GET", "/a", redirect_to(302, "/b"))
   fake.expect("GET", "/b", final_ok())
   fake.expect("GET", "/c", redirect_to(302, "/d"))
-  fake.expect_error("GET", "/d", @http.HttpError::Timeout(7))
+  fake.expect_error("GET", "/d", @http.HttpError::Timeout(phase=Write, ms=7))
   fake.expect("GET", "/e", redirect_to(302, "ftp://h/f"))
   fake.expect("GET", "/g", redirect_to(302, "/h"))
   let hops = []
@@ -218,7 +218,7 @@ async test "redirects as middleware maps refusals to Protocol and passes transpo
       _ => "no error"
     }
   }
-  assert_eq(failure(follow, "http://h/c"), "Timeout(7)")
+  assert_eq(failure(follow, "http://h/c"), "Timeout(phase=Write, ms=7)")
   assert_eq(
     failure(follow, "http://h/e"),
     "Protocol(\"bad redirect Location \\\"ftp://h/f\\\": not an http or https URL\")",

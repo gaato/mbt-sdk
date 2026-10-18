@@ -27,7 +27,7 @@ async test "deadline bounds buffered exchange and streaming head" {
         ignore(transport.send(@http.Request::get("/")))
       }
     } catch {
-      @http.HttpError::Timeout(ms) => assert_eq(ms, 5)
+      @http.HttpError::Timeout(phase=Unknown, ms~) => assert_eq(ms, 5)
       _ => fail("expected deadline timeout")
     } noraise {
       _ => fail("expected timeout")
@@ -50,7 +50,8 @@ async test "deadline passes responses and original errors through" {
       error in [
         @http.HttpError::Connect("offline"),
         @http.HttpError::Protocol("bad"),
-        @http.HttpError::Timeout(42),
+        @http.HttpError::Timeout(phase=Head, ms=42),
+        @http.HttpError::Network(phase=Body, message="reset"),
       ] {
       fake.expect_error("GET", "/", error)
       try {
@@ -60,16 +61,7 @@ async test "deadline passes responses and original errors through" {
           ignore(transport.send(@http.Request::get("/")))
         }
       } catch {
-        actual =>
-          match (actual, error) {
-            (@http.HttpError::Connect(a), @http.HttpError::Connect(b)) =>
-              assert_eq(a, b)
-            (@http.HttpError::Protocol(a), @http.HttpError::Protocol(b)) =>
-              assert_eq(a, b)
-            (@http.HttpError::Timeout(a), @http.HttpError::Timeout(b)) =>
-              assert_eq(a, b)
-            _ => fail("inner error changed")
-          }
+        actual => assert_eq(@debug.to_string(actual), @debug.to_string(error))
       } noraise {
         _ => fail("expected inner error")
       }
@@ -96,7 +88,8 @@ async test "nonpositive deadlines expire before invoking inner transport" {
   for ms in [0, -1] {
     let transport = @adapter.DeadlineTransport::new(fake, timeout_ms=ms)
     try transport.send(@http.Request::get("/")) catch {
-      @http.HttpError::Timeout(actual) => assert_eq(actual, ms)
+      @http.HttpError::Timeout(phase=Unknown, ms=actual) =>
+        assert_eq(actual, ms)
       _ => fail("expected immediate timeout")
     } noraise {
       _ => fail("expected timeout")

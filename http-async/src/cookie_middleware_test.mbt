@@ -72,7 +72,11 @@ async test "cookies leaves an explicit Cookie header alone but still stores" {
 async test "cookies stores nothing when the request fails" {
   let jar = @cookie.CookieJar::new(@mock.FakeClock::new())
   let fake = @mock.FakeTransport::new()
-  fake.expect_error("GET", "https://a.example/", @http.HttpError::Timeout(5))
+  fake.expect_error(
+    "GET",
+    "https://a.example/",
+    @http.HttpError::Timeout(phase=Head, ms=5),
+  )
   let failed = try
     @http.send_with(
       fake,
@@ -80,7 +84,7 @@ async test "cookies stores nothing when the request fails" {
       @http.Request::get("https://a.example/"),
     )
   catch {
-    Timeout(5) => true
+    Timeout(phase=Head, ms=5) => true
     _ => false
   } noraise {
     _ => false

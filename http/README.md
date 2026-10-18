@@ -8,6 +8,8 @@ The SSE parser bounds one event at `max_event_bytes` (16 MiB by default): the ra
 
 `CookieJar` stores the `Set-Cookie` headers of responses and builds the `Cookie` header of later requests, reading the time from a `Clock`. It keeps at most 50 cookies per domain and 3000 in all (both adjustable), evicting expired cookies first and then the least recently used, and ignores a `Set-Cookie` over 4096 bytes. It has no Public Suffix List: it refuses a single-label `Domain` such as `com`, and `CookieJar::new(clock, is_public_suffix=...)` takes a lookup to refuse more. `HttpOnly` cookies are sent and `SameSite` is recorded but not enforced, as in other HTTP clients. `@cookie.cookies(jar)` is the middleware step: put it after `redirects` in the `send_with` array so that every redirect hop stores and sends its own cookies.
 
+`HttpError` separates a failed connection (`Connect`: nothing was sent) from a `Timeout` or `Network` failure in a later `Phase` (`Pool`, `Dial`, `Write`, `Head`, `Body`, or `Unknown`) and a malformed message (`Protocol`); `HttpError::is_unsent` says whether a non-idempotent request may safely be sent again.
+
 An SDK built on this module never imports an async runtime: the caller passes a `Transport` and a `Clock`, for example from `gaato/http-async`.
 
 Unofficial and experimental. Source, issues and design notes: https://github.com/gaato/mbt-sdk

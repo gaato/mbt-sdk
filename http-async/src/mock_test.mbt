@@ -206,7 +206,7 @@ async test "mock violations execute" {
 async test "scripted errors preserve FIFO matching and record both send kinds" {
   let fake = @mock.FakeTransport::new()
   fake.expect_error("gEt", "/one", @http.HttpError::Connect("offline"))
-  fake.expect_error("POST", "/two", @http.HttpError::Timeout(42))
+  fake.expect_error("POST", "/two", @http.HttpError::Timeout(phase=Body, ms=42))
   fake.expect("GET", "/three", response())
   try fake.send(@http.Request::get("https://example.invalid/one")) catch {
     @http.HttpError::Connect(message) => assert_eq(message, "offline")
@@ -215,7 +215,7 @@ async test "scripted errors preserve FIFO matching and record both send kinds" {
     _ => fail("expected scripted error")
   }
   try fake.send_stream(@http.Request::post("/two")) catch {
-    @http.HttpError::Timeout(ms) => assert_eq(ms, 42)
+    @http.HttpError::Timeout(phase=Body, ms~) => assert_eq(ms, 42)
     _ => fail("expected Timeout")
   } noraise {
     _ => fail("expected scripted error")
