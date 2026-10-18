@@ -9,8 +9,10 @@ import {
 
 import {
   "gaato/http-async" @adapter,
+  "gaato/http-async/mock" @simclock,
   "gaato/http/mock",
   "gaato/http/sse",
+  "moonbitlang/async/aqueue",
 } for "test"
 
 supported_targets = "js + native + wasm"

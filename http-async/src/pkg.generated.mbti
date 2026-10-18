@@ -8,6 +8,7 @@ import {
 }
 
 // Values
+pub async fn[X] with_timeout_opt(&@clock.Clock, Int, async () -> X) -> X?
 
 // Errors
 
