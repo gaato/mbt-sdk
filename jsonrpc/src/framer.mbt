@@ -4,6 +4,7 @@ pub struct LineFramer {
   priv line : Array[Byte]
   priv max_line : Int32?
   priv mut finished : Bool
+  priv mut overflow : Int32?
 }
 
 ///|
@@ -16,7 +17,7 @@ pub struct LineFramer {
 /// }
 /// ```
 pub fn LineFramer::new(max_line? : Int32) -> LineFramer {
-  { line: [], max_line, finished: false, }
+  { line: [], max_line, finished: false, overflow: None, }
 }
 
 ///|
@@ -24,11 +25,18 @@ pub fn LineFramer::new(max_line? : Int32) -> LineFramer {
 /// A trailing carriage return is removed from each complete line.
 ///
 /// `max_line` bounds a line's content: the carriage return of a CRLF
-/// terminator is exempt, while any other carriage return counts.
+/// terminator is exempt, while any other carriage return counts. A line over
+/// it raises `LineTooLong` and ends the stream. When the same chunk completed
+/// lines before it, those are returned first and the next `feed` raises, so
+/// feed an empty chunk to observe it without waiting for more input.
 pub fn LineFramer::feed(
   self : LineFramer,
   bytes : Bytes,
 ) -> Array[Bytes] raise DecodeError {
+  if self.overflow is Some(limit) {
+    self.overflow = None
+    raise LineTooLong(limit)
+  }
   let lines = []
   if self.finished {
     return lines
@@ -44,7 +52,11 @@ pub fn LineFramer::feed(
       if self.max_line is Some(limit) && overlong(self.line, limit) {
         self.finished = true
         self.line.clear()
-        raise LineTooLong(limit)
+        if lines.is_empty() {
+          raise LineTooLong(limit)
+        }
+        self.overflow = Some(limit)
+        return lines
       }
     }
   }

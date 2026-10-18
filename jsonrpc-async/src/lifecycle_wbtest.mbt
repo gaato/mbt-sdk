@@ -146,3 +146,36 @@ async test "LineTooLong fails pending requests with Transport and exits the grou
     assert_eq(connection.unwrap().pending.length(), 0)
   })
 }
+
+///|
+async test "a response in the same chunk as an overlong line is dispatched first" {
+  @async.with_timeout(5000, () => {
+    let queue : @aqueue.Queue[Json] = @aqueue.Queue(kind=Unbounded)
+    try
+      @async.with_task_group(group => {
+        let (read, peer_write) = @io.pipe()
+        let (peer_read, write) = @io.pipe()
+        group.add_defer(() => {
+          read.close()
+          peer_write.close()
+          peer_read.close()
+          write.close()
+        })
+        let rpc = Connection::start(group, read, write, max_line=64)
+        // Registered directly, not through `call`, so the result stays
+        // observable after the failure cancels the group.
+        rpc.pending[Number(1L)] = queue
+        let response = @jsonrpc.Message::Response(id=Number(1L), result=true)
+        let chunk = response.encode(envelope=Strict).to_array()
+        chunk.append(Array::make(65, b'x'))
+        peer_write.write(Bytes::from_array(chunk))
+      })
+    catch {
+      RpcFailure::Transport(_) => ()
+      error => raise error
+    } noraise {
+      _ => fail("expected failed group")
+    }
+    assert_eq(queue.try_get(), Some(Json::boolean(true)))
+  })
+}

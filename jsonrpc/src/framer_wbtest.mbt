@@ -78,3 +78,37 @@ test "max_line bounds line content, not the CRLF terminator" {
     assert_eq(limited_transcript(max_line, chunks), expected, msg=label)
   }
 }
+
+///|
+test "an overflow delivers the lines completed before it, then raises once" {
+  let rows : Array[(String, Int32, Array[Bytes], Array[String])] = [
+    (
+      "overflow with no earlier line raises at once",
+      3,
+      [b"abcd\nef\n", b"gh\n"],
+      ["raise LineTooLong(3)", "[]", "finish None"],
+    ),
+    (
+      "earlier lines first, the raise on the next feed",
+      3,
+      [b"ab\n\ncd\nefgh\nij\n", b"", b"kl\n"],
+      ["[\"ab\", \"cd\"]", "raise LineTooLong(3)", "[]", "finish None"],
+    ),
+    (
+      "the next feed raises whatever it carries",
+      3,
+      [b"ab\nefgh", b"ij\n"],
+      ["[\"ab\"]", "raise LineTooLong(3)", "finish None"],
+    ),
+    (
+      "a CRLF line before the overflow",
+      3,
+      [b"abc\r\nabcd", b""],
+      ["[\"abc\"]", "raise LineTooLong(3)", "finish None"],
+    ),
+  ]
+  for row in rows {
+    let (label, max_line, chunks, expected) = row
+    assert_eq(limited_transcript(max_line, chunks), expected, msg=label)
+  }
+}

@@ -85,10 +85,13 @@ pub fn[X] Connection::start(
     let failure : Error? = try {
       for ;; {
         match reader.read_some() {
-          Some(bytes) =>
+          Some(bytes) => {
             for line in framer.feed(bytes) {
               self.dispatch(group, line, on_request)
             }
+            // Raises an overflow that followed those lines in the same chunk.
+            ignore(framer.feed(b""))
+          }
           None => {
             if framer.finish() is Some(line) {
               self.dispatch(group, line, on_request)
