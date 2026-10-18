@@ -8,6 +8,15 @@ note.
 
 ## [Unreleased]
 
+### Fixed
+
+- **`Client` keeps an absolute URL whatever the case of its scheme.** A
+  request URL starting `HTTPS://` or `Http://` was taken for a path and
+  joined onto the base URL; any absolute `http` or `https` URL with a host
+  now goes out as it is, as lower-case ones did. Paths are still joined onto
+  the base URL, not resolved by RFC 3986, which would drop a base path such
+  as OpenAI's `/v1`. Requires `gaato/http`'s new `Url`.
+
 ## [0.3.1] - 2026-10-18
 
 ### Fixed

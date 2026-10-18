@@ -415,8 +415,11 @@ fn Client::prepare(self : Client, request : @http.Request) -> @http.Request {
 }
 
 ///|
+/// Joins a request path onto the base URL, or keeps an absolute `http(s)` URL
+/// such as a pagination link. A join, not RFC 3986 resolution: `/chat` on
+/// `https://api.openai.com/v1` must keep the base's `/v1`.
 fn resolve_url(base_url : String, url : String) -> String {
-  if url.has_prefix("http://") || url.has_prefix("https://") {
+  if absolute_http_url(url) {
     return url
   }
   if base_url.has_suffix("/") && url.has_prefix("/") {
@@ -425,6 +428,20 @@ fn resolve_url(base_url : String, url : String) -> String {
     base_url + url
   } else {
     base_url + "/" + url
+  }
+}
+
+///|
+/// Whether `url` is an absolute `http` or `https` URL with a host, in any
+/// letter case.
+fn absolute_http_url(url : String) -> Bool {
+  if url.has_prefix("http://") || url.has_prefix("https://") {
+    return true
+  }
+  try @http.Url::parse(url) catch {
+    _ => false
+  } noraise {
+    parsed => parsed.scheme is Some("http" | "https") && parsed.host is Some(_)
   }
 }
 
