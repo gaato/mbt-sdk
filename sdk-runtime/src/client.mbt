@@ -74,6 +74,8 @@ pub fn Client::new(
 
 ///|
 /// Sends a buffered request, retrying only as directed by the retry decider.
+/// A request whose stream body (`Request::body_stream`) a transport has read
+/// is never sent again, whatever the decider says: the failure is raised.
 ///
 /// `bucket` names the rate-limit bucket the request is admitted through and
 /// `global_exempt` keeps it out of an account-wide limit; both are passed to
@@ -102,8 +104,7 @@ pub async fn Client::send(
     match outcome {
       Ok(response) => return response
       Err(error) =>
-        match
-          self.retry.next_delay_ms(error, request, attempt, (self.random)()) {
+        match self.retry_delay(error, request, body is Some(_), attempt) {
           Some(delay) => self.clock.sleep(delay)
           None => raise error
         }
@@ -133,7 +134,7 @@ pub async fn Client::send_json(
 ///|
 /// Sends a streaming request. A successful body is returned to the caller;
 /// an unsuccessful body is read up to 1 MiB, closed, classified, and retried.
-/// `body` is as for `send`.
+/// `body`, and a stream request body, are as for `send`.
 pub async fn Client::send_stream(
   self : Client,
   request : @http.Request,
@@ -152,13 +153,27 @@ pub async fn Client::send_stream(
     match outcome {
       Ok(response) => return response
       Err(error) =>
-        match
-          self.retry.next_delay_ms(error, request, attempt, (self.random)()) {
+        match self.retry_delay(error, request, body is Some(_), attempt) {
           Some(delay) => self.clock.sleep(delay)
           None => raise error
         }
     }
   }
+}
+
+///|
+/// The wait before sending `request` again after `error`, or `None` to
+/// raise it: never when its stream body was read (`can_resend`), otherwise
+/// as the retry decider says.
+fn Client::retry_delay(
+  self : Client,
+  error : SdkError,
+  request : @http.Request,
+  rebuilt : Bool,
+  attempt : Int32,
+) -> Int32? {
+  guard can_resend(request, rebuilt~) else { return None }
+  self.retry.next_delay_ms(error, request, attempt, (self.random)())
 }
 
 ///|

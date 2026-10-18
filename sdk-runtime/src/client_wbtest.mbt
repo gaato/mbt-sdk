@@ -74,3 +74,43 @@ test "resolve_url keeps an absolute http(s) URL in any letter case" {
     assert_eq((case.0, case.1, resolve_url(case.0, case.1)), case)
   }
 }
+
+///|
+priv struct Unread {}
+
+///|
+impl @http.BodyStream for Unread with fn read_some(_) {
+  None
+}
+
+///|
+impl @http.BodyStream for Unread with fn close(_) {
+  ()
+}
+
+///|
+test "can_resend refuses only a stream body a transport has read" {
+  let stream = (taken : Bool) => {
+    let body = @http.StreamBody::new(Unread::{ })
+    if taken {
+      ignore(body.take())
+    }
+    { ..@http.Request::put("/upload"), body: Stream(body), }
+  }
+  let rows : Array[(@http.Request, Bool, Bool)] = [
+    (@http.Request::post("/upload").body_bytes(b"x"), false, true),
+    (@http.Request::get("/"), false, true),
+    (stream(false), false, true),
+    (stream(true), false, false),
+    // A body rebuilt for each attempt replaces the one that was read.
+    (stream(true), true, true),
+  ]
+  for row in rows {
+    let (request, rebuilt, expected) = row
+    assert_eq(
+      can_resend(request, rebuilt~),
+      expected,
+      msg=@debug.to_string(row),
+    )
+  }
+}

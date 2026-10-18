@@ -10,6 +10,16 @@ note.
 
 ### Changed
 
+- **`Client` never resends a stream request body a transport has read.**
+  Requires `gaato/http`'s new `Body`. A request built with
+  `Request::body_stream` is sent once: after a failure, the client raises
+  it instead of asking the retry decider, unless the transport failed
+  before reading the stream (as with `Connect`) or `body` rebuilds the body
+  for each attempt. A custom `RetryDecider` cannot override this, since a
+  resent stream would go out empty or cut short. Migration: the requests
+  `Client` hands to the observer, the retry decider and middleware carry a
+  `Body`; read `attempt.request.body.as_bytes()` instead of
+  `attempt.request.body`.
 - **Retries use the phase a transport failure happened in.** Requires
   `gaato/http`'s new `HttpError`. `SdkError::is_retryable` is true for
   `Network` failures, which transports used to report as the

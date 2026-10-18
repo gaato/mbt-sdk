@@ -721,3 +721,89 @@ async test "Client asks the supplied retry decider" {
     transport.assert_complete()
   })
 }
+
+///|
+priv struct AlwaysRetry {}
+
+///|
+impl @runtime.RetryDecider for AlwaysRetry with fn next_delay_ms(
+  _self,
+  _error,
+  _request,
+  _attempt,
+  _random,
+) {
+  Some(1)
+}
+
+///|
+/// A request body stream over fixed chunks.
+priv struct Upload {
+  chunks : Array[Bytes]
+}
+
+///|
+impl @http.BodyStream for Upload with fn read_some(self) {
+  if self.chunks.is_empty() {
+    None
+  } else {
+    Some(self.chunks.remove(0))
+  }
+}
+
+///|
+impl @http.BodyStream for Upload with fn close(self) {
+  self.chunks.clear()
+}
+
+///|
+async test "Client never resends a stream body a transport has read" {
+  bounded(() => {
+    let deciders : Array[&@runtime.RetryDecider] = [
+      @runtime.RetryPolicy::default(),
+      AlwaysRetry::{ },
+    ]
+    for decider in deciders {
+      // PUT is idempotent and 503 retryable, but the stream was sent.
+      let transport = @mock.FakeTransport::new()
+      transport.expect("PUT", "/upload", buffered_response(503))
+      let clock = @mock.FakeClock::new()
+      let client = @runtime.Client::new(
+        transport,
+        clock,
+        base_url="https://api.test",
+        retry=decider,
+        random=() => 0.5,
+      )
+      let request = @http.Request::put("/upload").body_stream(Upload::{
+        chunks: [b"ab", b"c"],
+      })
+      try client.send(request) catch {
+        @runtime.Status(status=503, ..) => ()
+        error => fail("expected the 503, got \{@debug.to_string(error)}")
+      } noraise {
+        _ => fail("expected a failure")
+      }
+      assert_eq(clock.slept(), [])
+      assert_eq(transport.sent().map(request => request.body), [Bytes(b"abc")])
+      transport.assert_complete()
+    }
+    // A failure that proves nothing was sent leaves the stream unread, so the
+    // request is sent again and the stream goes out then.
+    let transport = @mock.FakeTransport::new()
+    transport.expect_error("PUT", "/upload", Connect("refused"))
+    transport.expect("PUT", "/upload", buffered_response(200))
+    let client = @runtime.Client::new(
+      transport,
+      @mock.FakeClock::new(),
+      base_url="https://api.test",
+      random=() => 0.5,
+    )
+    let request = @http.Request::put("/upload").body_stream(Upload::{
+      chunks: [b"ab", b"c"],
+    })
+    assert_eq(client.send(request).status, 200)
+    assert_eq(transport.sent()[1].body, Bytes(b"abc"))
+    transport.assert_complete()
+  })
+}

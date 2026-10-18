@@ -4,6 +4,7 @@ import {
   "gaato/http-async" @adapter,
   "gaato/sdk-runtime" @runtime,
   "moonbitlang/async",
+  "moonbitlang/core/debug",
 } for "test"
 
 supported_targets = "js + native"
