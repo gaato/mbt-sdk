@@ -1,6 +1,8 @@
 import {
   "gaato/http-async" @adapter,
   "gaato/http",
+  "gaato/http/cookie",
+  "gaato/http/mock",
   "gaato/http/sse",
   "moonbitlang/async",
   "moonbitlang/async/http" @ahttp,
@@ -14,5 +16,6 @@ options(
   targets: {
     "loopback_test.mbt": [ "native", "wasm" ],
     "pool_test.mbt": [ "native", "wasm" ],
+    "cookie_roundtrip_test.mbt": [ "native", "wasm" ],
   },
 )
