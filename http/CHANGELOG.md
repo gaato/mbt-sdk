@@ -50,6 +50,15 @@ never does. Every breaking change is listed with a migration note.
   as `Timeout(phase=Unknown, ms=...)` when the phase is not known, and add
   an arm for `Network(..)`, which transports raise for failures they used
   to report as `Protocol` (native) or `Connect` (JS).
+- **`HttpError::Proxy(status~, message~)` is a proxy's refusal to open a
+  tunnel.** A transport that reaches an `https://` origin through a proxy
+  first asks it for a tunnel with `CONNECT`; a non-2xx answer (407 for
+  credentials, 403 for a refused destination, 502 or 504 for an unreachable
+  one) used to have no variant that kept its status, and neither `Connect`
+  nor `Protocol` says what to fix. Nothing reached the origin, so
+  `is_unsent` is true, as for httpx's `ProxyError` and Mint's
+  `{:proxy, {:unexpected_status, status}}`. Migration: add an arm for
+  `Proxy(..)` where you match `HttpError` exhaustively.
 
 ### Added
 

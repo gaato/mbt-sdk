@@ -80,10 +80,12 @@ pub fn SdkError::status(self : SdkError) -> Int32? {
 
 ///|
 /// Reports transient failures; request idempotency remains the caller's
-/// concern. Every transport failure but `Protocol` is transient.
+/// concern. Every transport failure but `Protocol` is transient, and a
+/// proxy's refusal to open a tunnel only when its status is 502, 503 or 504.
 pub fn SdkError::is_retryable(self : SdkError) -> Bool {
   match self {
     Transport(Connect(_) | Timeout(..) | Network(..)) | RateLimited(..) => true
+    Transport(Proxy(status=502 | 503 | 504, ..)) => true
     Status(status=408 | 409 | 500 | 502 | 503 | 504, ..) => true
     _ => false
   }

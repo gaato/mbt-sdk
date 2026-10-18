@@ -10,6 +10,31 @@ note.
 
 ### Added
 
+- **HTTP proxies: `AsyncTransport::new(proxy=..., trust_env=...)`.** A
+  client behind a corporate or CI proxy could not reach anything. On native
+  and Wasm, `proxy` (`http://` or `https://`, with optional
+  `user:password@`) carries every request: an `http://` request is
+  forwarded to it in absolute form, an `https://` one goes through a
+  `CONNECT` tunnel with TLS end to end, as curl, httpx and Mint do. The
+  credentials go to the proxy alone, as `Basic` `Proxy-Authorization`; a
+  `Proxy-Authorization` header set on a request is dropped, so it can never
+  reach an origin through a tunnel or a redirect.
+  Without `proxy`, the transport reads `HTTP_PROXY`, `HTTPS_PROXY`,
+  `ALL_PROXY` and `NO_PROXY` (lower case first; upper-case `HTTP_PROXY` is
+  ignored under CGI, as Go and Python ignore it) once, when it is made,
+  unless `trust_env=false`; an explicit `proxy` ignores the environment, as
+  httpx's does. `NO_PROXY` takes curl's forms: `*`, a domain with or
+  without a leading dot for itself and its subdomains, IPv4 and IPv6
+  addresses and `/prefix` networks, and `:port` to restrict an entry. Each
+  request is routed by its own URL, so a redirect to another origin is
+  routed afresh, and connections are parked and capped per origin and
+  proxy. A proxy that cannot be reached fails with `Connect`, a refused
+  tunnel with the new `HttpError::Proxy(status~, ..)`, and an unusable proxy
+  URL with `Protocol`; none sends the request direct. On JS, fetch uses the
+  platform's proxy settings, if any; the environment is not read, and a
+  request on a transport given `proxy` fails with `Protocol`. Behaviour
+  change: a transport now honours proxy environment variables that were
+  ignored before; pass `trust_env=false` to keep connecting directly.
 - **Stream request bodies are sent as they are read.** A large upload no
   longer has to sit in memory: `Request::body_stream` bodies are written
   chunk by chunk on native and Wasm, with `Content-Length` when the stream
@@ -106,6 +131,13 @@ note.
   Go, where moonbitlang/async raised `NotImplemented`. Before, a gzip body
   kept `Content-Encoding: gzip` after decoding. A request that sets
   `Accept-Encoding` itself still gets the body as the server sent it.
+
+### Fixed
+
+- **A connection is not reused after `101 Switching Protocols` or a caller's
+  `CONNECT`.** Either turns it into something other than an HTTP connection
+  (through a forwarding proxy, a tunnel to the origin), so parking it let
+  the next request, and any proxy credentials on it, reach the wrong peer.
 
 ## [0.2.1] - 2026-10-18
 

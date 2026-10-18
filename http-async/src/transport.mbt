@@ -34,6 +34,7 @@ pub struct AsyncTransport {
   priv max_body_bytes : Int32?
   priv pool : IdlePool[@ahttp.Client]
   priv slots : Slots
+  priv proxies : Proxies
 }
 
 ///|
@@ -70,6 +71,19 @@ pub struct AsyncTransport {
 /// the body is unbounded. Streams are never bounded, since their reader
 /// decides what to keep.
 ///
+/// `proxy`, an `http://` or `https://` URL with an optional
+/// `user:password@`, carries every request: an `http://` one is forwarded
+/// to it, an `https://` one goes through a `CONNECT` tunnel, and the
+/// credentials go to the proxy alone, as `Basic` `Proxy-Authorization`.
+/// Without it, and unless `trust_env` is false, the transport takes its
+/// proxies from `HTTP_PROXY`, `HTTPS_PROXY`, `ALL_PROXY` and `NO_PROXY`
+/// (lower case first) as curl and httpx read them, once, here. Each request
+/// is routed by its own URL. A proxy it cannot reach fails the request with
+/// `Connect`, a refused tunnel with `HttpError::Proxy`, and an unusable
+/// proxy URL with `Protocol`; none of them sends it direct. On JS, fetch
+/// uses the platform's proxy settings, if any, and the environment is not
+/// read: a request on a transport given `proxy` fails with `Protocol`.
+///
 /// ```mbt check
 /// test {
 ///   let _ = @adapter.AsyncTransport::new(timeout_ms=1000)
@@ -80,6 +94,8 @@ pub struct AsyncTransport {
 ///   let _ = @adapter.AsyncTransport::new(max_connections_per_origin=8)
 ///   let _ = @adapter.AsyncTransport::new(max_idle_per_origin=0)
 ///   let _ = @adapter.AsyncTransport::new(max_body_bytes=1_048_576)
+///   let _ = @adapter.AsyncTransport::new(proxy="http://user:pass@proxy:3128")
+///   let _ = @adapter.AsyncTransport::new(trust_env=false)
 /// }
 /// ```
 pub fn AsyncTransport::new(
@@ -93,6 +109,8 @@ pub fn AsyncTransport::new(
   max_idle_per_origin~ : Int32 = 4,
   idle_max_ms~ : Int32 = 10000,
   max_body_bytes? : Int32,
+  proxy? : String,
+  trust_env~ : Bool = true,
 ) -> AsyncTransport {
   {
     limits: {
@@ -109,6 +127,7 @@ pub fn AsyncTransport::new(
       max_total?=max_connections,
       max_per_origin?=max_connections_per_origin,
     ),
+    proxies: platform_proxies(proxy, trust_env~, @env.get_env_var),
   }
 }
 
@@ -121,7 +140,7 @@ pub extend AsyncTransport with @http.Transport::{send, send_stream}
 pub impl @http.Transport for AsyncTransport with fn send(self, request) {
   let timer = PhaseTimer::exchange(self.clock, self.limits)
   let opened = self.open_request(request, timer)
-  errdefer self.discard(opened.origin, opened.client)
+  errdefer self.discard(opened.key, opened.client)
   let body = read_body(
     opened.client,
     opened.decoder,
@@ -146,7 +165,7 @@ pub impl @http.Transport for AsyncTransport with fn send_stream(self, request) {
   )
   let stream : &@http.BodyStream = ClientStream::{
     transport: self,
-    origin: exchange.origin,
+    key: exchange.key,
     user_agent: exchange.user_agent,
     client: exchange.client,
     decoder: exchange.decoder,
@@ -233,7 +252,7 @@ async fn read_bounded(read : async () -> Bytes?, max_bytes : Int32) -> Bytes {
 ///|
 priv struct ClientStream {
   transport : AsyncTransport
-  origin : String
+  key : String
   user_agent : String?
   client : @ahttp.Client
   decoder : ContentDecoder?
@@ -250,10 +269,10 @@ impl @http.BodyStream for ClientStream with fn close(self) {
   if !self.closed {
     self.closed = true
     if self.finished && self.keep_alive {
-      self.transport.checkin(self.origin, self.user_agent, self.client)
-      self.transport.slots.release(self.origin)
+      self.transport.checkin(self.key, self.user_agent, self.client)
+      self.transport.slots.release(self.key)
     } else {
-      self.transport.discard(self.origin, self.client)
+      self.transport.discard(self.key, self.client)
     }
   }
 }
@@ -273,12 +292,13 @@ impl @http.BodyStream for ClientStream with fn read_some(self) {
 }
 
 ///|
-/// One exchange whose response head has arrived; the body is still on `client`.
+/// One exchange whose response head has arrived; the body is still on
+/// `client`, a connection parked and counted under `key` (`Route::key`).
 priv struct Opened {
   head : @http.ResponseHead
   client : @ahttp.Client
   decoder : ContentDecoder?
-  origin : String
+  key : String
   user_agent : String?
   keep_alive : Bool
 }
@@ -288,10 +308,10 @@ priv struct Opened {
 /// slot.
 fn AsyncTransport::release(self : AsyncTransport, opened : Opened) -> Unit {
   if opened.keep_alive {
-    self.checkin(opened.origin, opened.user_agent, opened.client)
-    self.slots.release(opened.origin)
+    self.checkin(opened.key, opened.user_agent, opened.client)
+    self.slots.release(opened.key)
   } else {
-    self.discard(opened.origin, opened.client)
+    self.discard(opened.key, opened.client)
   }
 }
 
@@ -299,23 +319,29 @@ fn AsyncTransport::release(self : AsyncTransport, opened : Opened) -> Unit {
 /// Closes the connection of an exchange that ends early and frees its slot.
 fn AsyncTransport::discard(
   self : AsyncTransport,
-  origin : String,
+  key : String,
   client : @ahttp.Client,
 ) -> Unit {
   client.close()
-  self.slots.release(origin)
+  self.slots.release(key)
 }
 
 ///|
 /// The request headers as sent, with `User-Agent` pulled out because
 /// connections are dialed and reused per user agent. `Content-Length` and
 /// `Transfer-Encoding` are dropped since the transport frames the body
-/// itself; repeated names are comma-joined.
+/// itself, and `Proxy-Authorization` since proxy credentials come from the
+/// proxy URL; repeated names are comma-joined.
 fn wire_headers(headers : @http.Headers) -> (@ahttp.Headers, String?) {
   let wire : @ahttp.Headers = Map([])
   let mut user_agent : String? = None
   for (name, value) in headers.iter() {
-    if name == "content-length" || name == "transfer-encoding" {
+    // The transport frames the body itself, and proxy credentials come from
+    // the proxy URL alone: a caller's `Proxy-Authorization` would otherwise
+    // reach the origin through a tunnel, or after a redirect.
+    if name == "content-length" ||
+      name == "transfer-encoding" ||
+      name == "proxy-authorization" {
       continue
     }
     if name == "user-agent" {
@@ -337,8 +363,9 @@ fn wire_headers(headers : @http.Headers) -> (@ahttp.Headers, String?) {
 }
 
 ///|
-/// Takes a connection slot, sends `request` and reads its response head, each
-/// phase under `timer`. The slot passes to the returned exchange.
+/// Takes a connection slot, sends `request` on the route its URL picks and
+/// reads its response head, each phase under `timer`. The slot passes to the
+/// returned exchange.
 async fn AsyncTransport::open_request(
   self : AsyncTransport,
   request : @http.Request,
@@ -356,16 +383,26 @@ async fn AsyncTransport::open_request(
     content_length(request.http_method, request.body) is Some(length) {
     headers[@ahttp.CaseInsensitiveString("Content-Length")] = length.to_string()
   }
+  let route = self.proxies.route(origin)
   refuse_unbufferable(request.body, buffered_stream_limit)
   if self.pool.closed {
     raise @http.HttpError::Connect("transport closed")
   }
-  self.slots.acquire(origin, timer)
-  errdefer self.slots.release(origin)
+  let key = route.key(origin.text)
+  let target = route.target(origin.text, path)
+  self.slots.acquire(key, timer)
+  errdefer self.slots.release(key)
   let mut fresh = false
   for ;; {
-    let (client, reused) = self.checkout(origin, user_agent, fresh~, timer)
-    let response = exchange(client, meth, path, headers, request.body, timer) catch {
+    let (client, reused) = self.checkout(
+      key,
+      origin.text,
+      route,
+      user_agent,
+      fresh~,
+      timer,
+    )
+    let response = exchange(client, meth, target, headers, request.body, timer) catch {
       @http.HttpError::Network(..) if reused && replayable(request) => {
         // A parked connection the server had already dropped: replay once
         // on a fresh one. `reused` is false on that second attempt.
@@ -385,9 +422,9 @@ async fn AsyncTransport::open_request(
       head,
       client,
       decoder,
-      origin,
+      key,
       user_agent,
-      keep_alive: !connection_close(response),
+      keep_alive: reusable(request.http_method, response),
     }
   }
 }
@@ -402,7 +439,7 @@ async fn AsyncTransport::open_request(
 async fn exchange(
   client : @ahttp.Client,
   meth : @ahttp.RequestMethod,
-  path : String,
+  target : String,
   headers : @ahttp.Headers,
   body : @http.Body,
   timer : PhaseTimer,
@@ -427,7 +464,7 @@ async fn exchange(
     None
   }
   timer.run(Write, () => {
-    client.request(meth, path, extra_headers=headers)
+    client.request(meth, target, extra_headers=headers)
     // With a body, the head goes out with its first slice.
     if empty {
       client.flush()
@@ -468,7 +505,9 @@ fn request_method(meth : String) -> @ahttp.RequestMethod raise @http.HttpError {
 }
 
 ///|
-fn split_url(url : String) -> (String, String) raise @http.HttpError {
+/// The origin of an absolute `http://` or `https://` URL, and its request
+/// target: the path and query, without the fragment.
+fn split_url(url : String) -> (Origin, String) raise @http.HttpError {
   guard url.find("://") is Some(scheme_end) else {
     raise @http.HttpError::Protocol("expected an absolute HTTP URL")
   }
@@ -497,14 +536,26 @@ fn split_url(url : String) -> (String, String) raise @http.HttpError {
 }
 
 ///|
-/// The origin of `scheme://authority` in one spelling per server, so the idle
-/// pool and the connection caps key every spelling alike: lower-case scheme
-/// and host, canonical IPv6, no default port. Userinfo is dropped: it is not
-/// part of an origin, and the transport never sends it.
+/// A request's origin, and the host and port it names, which pick its route.
+priv struct Origin {
+  /// `scheme://host[:port]` in one spelling per server, so the idle pool and
+  /// the connection caps key every spelling alike: lower-case scheme and
+  /// host, canonical IPv6 in brackets, no default port.
+  text : String
+  https : Bool
+  /// The host as `@http.Url` keeps it: an IPv6 literal without brackets.
+  host : String
+  /// The port, the scheme's default when the URL names none.
+  port : Int32
+}
+
+///|
+/// The origin of `scheme://authority`. Userinfo is dropped: it is not part of
+/// an origin, and the transport never sends it.
 fn canonical_origin(
   scheme : String,
   authority : String,
-) -> String raise @http.HttpError {
+) -> Origin raise @http.HttpError {
   let url = @http.Url::parse(scheme + "://" + authority + "/") catch {
     @http.UrlError::Invalid(reason) =>
       raise @http.HttpError::Protocol("invalid URL authority: " + reason)
@@ -525,7 +576,13 @@ fn canonical_origin(
     builder.write_char(':')
     builder.write_string(port.to_string())
   }
-  builder.to_string()
+  let https = scheme == "https"
+  {
+    text: builder.to_string(),
+    https,
+    host,
+    port: url.port.unwrap_or(if https { 443 } else { 80 }),
+  }
 }
 
 ///|

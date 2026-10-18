@@ -128,6 +128,10 @@ test "wire_headers joins duplicates and pulls out the user agent" {
     ),
     ([("content-length", "3"), ("x", "y")], "[x: y] no user agent"),
     ([("transfer-encoding", "chunked"), ("x", "y")], "[x: y] no user agent"),
+    (
+      [("proxy-authorization", "Basic eDp5"), ("x", "y")],
+      "[x: y] no user agent",
+    ),
     ([("Content-Length", "3")], "[] no user agent"),
     (
       [("accept", "a"), ("x", "y"), ("accept", "b")],
@@ -150,7 +154,7 @@ fn split_url_label(url : String) -> String {
     @http.HttpError::Protocol(message) => "error: \{message}"
     error => "unexpected \{Repr(error)}"
   } noraise {
-    (origin, path) => "\{origin} \{path}"
+    (origin, path) => "\{origin.text} \{path}"
   }
 }
 

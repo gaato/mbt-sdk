@@ -4,16 +4,19 @@
 /// failure before the connection is made is `Connect`, since nothing was
 /// sent, and one after it is `Network` in the phase the platform can see
 /// (`reported_phase`), unless the platform recognises a malformed message
-/// (`is_malformed`), which is `Protocol`.
+/// (`is_malformed`), which is `Protocol`, or a proxy's refusal to open a
+/// tunnel (`proxy_refusal`).
 fn failure(phase : @http.Phase, error : Error) -> @http.HttpError {
   match error {
     @http.HttpError::Connect(message) => Connect(message)
     @http.HttpError::Timeout(phase~, ms~) => Timeout(phase~, ms~)
     @http.HttpError::Network(phase~, message~) => Network(phase~, message~)
     @http.HttpError::Protocol(message) => Protocol(message)
+    @http.HttpError::Proxy(status~, message~) => Proxy(status~, message~)
     @ahttp.URIParseError::InvalidFormat => Protocol("invalid URL")
     @ahttp.URIParseError::UnsupportedProtocol(protocol) =>
       Protocol("unsupported protocol: " + protocol)
+    _ if proxy_refusal(error) is Some(refusal) => refusal
     _ if is_malformed(error) => Protocol(error.to_string())
     _ =>
       match phase {

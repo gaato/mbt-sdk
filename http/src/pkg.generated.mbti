@@ -31,6 +31,7 @@ pub(all) suberror HttpError {
   Timeout(phase~ : Phase, ms~ : Int)
   Network(phase~ : Phase, message~ : String)
   Protocol(String)
+  Proxy(status~ : Int, message~ : String)
 } derive(@debug.Debug)
 pub fn HttpError::is_unsent(Self) -> Bool
 pub fn HttpError::to_repr(Self) -> @debug.Repr

@@ -63,6 +63,11 @@ test "non status errors and explicitly constructed statuses" {
           true,
         ),
         (@runtime.Transport(@http.Protocol("bad frame")), false),
+        (@runtime.Transport(@http.Proxy(status=502, message="refused")), true),
+        (@runtime.Transport(@http.Proxy(status=503, message="refused")), true),
+        (@runtime.Transport(@http.Proxy(status=504, message="refused")), true),
+        (@runtime.Transport(@http.Proxy(status=407, message="refused")), false),
+        (@runtime.Transport(@http.Proxy(status=403, message="refused")), false),
         (@runtime.Decode(message="invalid JSON", body=b"x"), false),
         (@runtime.Config("invalid config"), false),
       ] : Array[(@runtime.SdkError, Bool)]) {
