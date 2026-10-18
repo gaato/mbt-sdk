@@ -18,8 +18,9 @@ scripts/coverage_report.sh                    # measure, print tables, check the
 scripts/coverage_report.sh --from-json _build/coverage_report.json   # recheck only
 ```
 
-Run it by hand before a release (see [docs/release.md](docs/release.md)); it is
-not part of `scripts/gates.sh` or CI. A run takes about 13 s on a warm or cold
+CI runs it after the gates on every push and pull request, so a change that
+leaves a line unexplained or over budget fails there; it is not part of
+`scripts/gates.sh`. A run takes about 13 s on a warm or cold
 `_build` (the instrumented test build is from scratch either way) and three
 consecutive runs produced identical per-line results, but it opens loopback
 sockets and spawns child processes, so it shares the native tests' sandbox
@@ -63,10 +64,9 @@ rerun the tests.
 - moon's bundled tcc cannot link on some hosts (openSUSE); the script sets
   `MOON_CC=cc` unless it is already set.
 
-Snapshot at the last full measurement (2026-10-18, main at `eb0faad0`, before
-the in-flight http-async / sdk-runtime / jsonrpc refactors land): **93.2 %**
-across the measured modules (1095/1175 lines; http 98.6 %, jsonrpc 98.2 %,
-sdk-runtime 95.2 %, jsonrpc-async 87.1 %, http-async 87.0 %,
+Snapshot at the last full measurement (2026-10-18, main at `1468aead`):
+**95.1 %** across the measured modules (1172/1232 lines; http 98.7 %,
+jsonrpc 98.3 %, http-async 95.8 %, sdk-runtime 95.8 %, jsonrpc-async 88.6 %,
 codex-app-server 75.0 %).
 
 ## Policy
@@ -100,11 +100,11 @@ Pending refactor (in flight; re-measure after the parallel changes merge):
 
 | File | Budget | Reason |
 | --- | --- | --- |
-| http-async/src/pool.mbt | 2 | pending refactor (in flight): `invalid URL` and `unsupported protocol` mapping of `@ahttp.Client` construction errors. |
-| http-async/src/transport.mbt | 20 | pending refactor (in flight): Set-Cookie reconstruction in `response_head` (10 lines; no loopback test sends a cookie), the HEAD/PUT/DELETE/CONNECT/OPTIONS/TRACE/PATCH arms of `request_method` (7), the non-`HttpError` arm of `bounded`, the `read_some` error mapping, and the `send_stream` errdefer that closes a client opened before the head timed out. |
-| sdk-runtime/src/rate_limit.mbt | 10 | pending refactor (in flight): Int64/Int32 saturation in `sleep_until`, `decimal_seconds_ms` and `saturating_add_i64` (6), missing reset headers in the header-window parser (3), and an all-whitespace remaining count (1). |
+| http-async/src/pool.mbt | 3 | Closing the real connections `IdlePool` hands back as expired needs real elapsed time; the `IdlePool` tables cover which ones expire. The `invalid URL` and `unsupported protocol` mapping of `@ahttp.Client` construction errors: `split_url` rejects both before a client is built. |
+| http-async/src/transport.mbt | 3 | The `send_stream` errdefer that closes a client opened before the head timed out, the non-`HttpError` arm of `bounded` (callers narrow every error first), and the error mapping of a failing `read_some` on an open stream. |
+| sdk-runtime/src/rate_limit.mbt | 7 | Header-window parsing: a remaining count without either reset header (3), an all-whitespace count (1), and the Int64 saturation arms of `decimal_seconds_ms` (3). |
 | jsonrpc-async/src/connection.mbt | 6 | pending refactor (in flight): `send` after the writer closed (both checks), a non-positive `timeout_ms`, the catch-all of `call`, a reader failure other than an over-long line, and a notification-queue error other than closure. |
-| jsonrpc-async/src/dispatch.mbt | 2 | pending refactor (in flight): the `LineTooLong` re-raise (lines reach `decode_line` already framed) and the swallowed failure of an internal-error reply. |
+| jsonrpc-async/src/dispatch.mbt | 1 | The swallowed failure of sending an internal-error reply after a handler raised: the writer must fail between the handler and the reply. |
 
 Unreachable or platform-only:
 
