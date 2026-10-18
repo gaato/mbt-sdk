@@ -29,8 +29,11 @@ pub struct SseParser {
   priv max_event_bytes : Int32
   priv line : Array[Byte]
   priv data : Array[String]
-  // Raw bytes of the `data` lines in `data`, counted against the bound.
+  // Raw bytes of the lines behind `data`, `event_type` and `last_id`,
+  // counted against the bound with the line being read.
   priv mut data_bytes : Int32
+  priv mut event_bytes : Int32
+  priv mut id_bytes : Int32
   priv mut first_line : Bool
   priv mut skip_lf : Bool
   priv mut event_type : String
@@ -44,8 +47,11 @@ pub struct SseParser {
 
 ///|
 /// Creates an empty parser. `max_event_bytes` bounds one event: the raw bytes
-/// of its `data` lines plus the line being read, line terminators excluded.
-/// It defaults to 16 MiB.
+/// of its `data` lines, of the `event` and `id` lines in effect, and of the
+/// line being read, line terminators excluded. It defaults to 16 MiB. An
+/// `event` or `id` line that replaces an earlier one replaces its count too,
+/// and the `id` persists into later events, as the spec says, so it counts
+/// against each of them until replaced.
 ///
 /// ```mbt check
 /// test {
@@ -63,6 +69,8 @@ pub fn SseParser::new(
     line: [],
     data: [],
     data_bytes: 0,
+    event_bytes: 0,
+    id_bytes: 0,
     first_line: true,
     skip_lf: false,
     event_type: "",
@@ -101,7 +109,7 @@ pub fn SseParser::feed(
     if byte == b'\r' || byte == b'\n' {
       self.process_line(events)
       self.skip_lf = byte == b'\r'
-    } else if self.line.length() + self.data_bytes < self.max_event_bytes {
+    } else if self.line.length() + self.kept_bytes() < self.max_event_bytes {
       self.line.push(byte)
     } else {
       self.end()
@@ -139,12 +147,21 @@ fn SseParser::raise_overflow(self : SseParser) -> Unit raise @http.HttpError {
 }
 
 ///|
+/// Every kept line value counts, so an event cannot hold several bounds' worth
+/// spread over its fields. A completed line never raises the count by more
+/// than its own length, so checking bytes as they arrive is enough.
+fn SseParser::kept_bytes(self : SseParser) -> Int32 {
+  self.data_bytes + self.event_bytes + self.id_bytes
+}
+
+///|
 fn SseParser::end(self : SseParser) -> Unit {
   self.finished = true
   self.line.clear()
   self.data.clear()
   self.data_bytes = 0
   self.event_type = ""
+  self.event_bytes = 0
   self.retry = None
 }
 
@@ -174,6 +191,7 @@ fn SseParser::process_line(self : SseParser, events : Array[SseEvent]) -> Unit {
     self.data.clear()
     self.data_bytes = 0
     self.event_type = ""
+    self.event_bytes = 0
     return
   }
   if line.has_prefix(":") {
@@ -189,8 +207,15 @@ fn SseParser::process_line(self : SseParser, events : Array[SseEvent]) -> Unit {
       self.data.push(value)
       self.data_bytes += line_bytes
     }
-    "event" => self.event_type = value
-    "id" => if !value.contains("\u{0000}") { self.last_id = Some(value) }
+    "event" => {
+      self.event_type = value
+      self.event_bytes = line_bytes
+    }
+    "id" =>
+      if !value.contains("\u{0000}") {
+        self.last_id = Some(value)
+        self.id_bytes = line_bytes
+      }
     "retry" => if parse_retry(value) is Some(value) { self.retry = Some(value) }
     _ => ()
   }
