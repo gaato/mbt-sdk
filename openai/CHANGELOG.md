@@ -11,10 +11,15 @@ change itself is the diff of `src/gen/pkg.generated.mbti`.
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-10-18
+
 ### Changed
 
-- Depends on `gaato/sdk-runtime` 0.2.3, which forgets idle rate-limit
-  buckets.
+- **Depends on `gaato/http` 0.2.0 and `gaato/sdk-runtime` 0.3.0.** A
+  streamed event larger than 16 MiB now fails the stream with
+  `HttpError::Protocol` instead of being buffered without limit. Migration:
+  update the `gaato/http` and `gaato/sdk-runtime` imports alongside this
+  one.
 
 ## [0.2.1] - 2026-10-15
 

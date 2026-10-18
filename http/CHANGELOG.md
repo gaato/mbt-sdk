@@ -7,6 +7,8 @@ never does. Every breaking change is listed with a migration note.
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-10-18
+
 ### Changed
 
 - **An SSE event is bounded, 16 MiB by default.** A server that never sent

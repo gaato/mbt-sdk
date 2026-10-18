@@ -8,6 +8,8 @@ note.
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-10-18
+
 ### Fixed
 
 - **A bucket wait no longer spins when the reset is far away.** The wait
@@ -18,6 +20,12 @@ note.
   made every acquisition sleep forever, and a non-positive `window_ms`
   reset the window on every admission. `WindowLimiter::new` now drops such
   a window, so it imposes no global limit, as documented on the type.
+
+### Changed
+
+- **Depends on `gaato/http` 0.2.0.** Types from `gaato/http` appear in this
+  module's API, so a project using it moves to `gaato/http` 0.2.0 too.
+  Migration: update the `gaato/http` import alongside this one.
 
 ## [0.2.3] - 2026-10-17
 

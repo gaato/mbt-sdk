@@ -8,6 +8,8 @@ note.
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-10-18
+
 ### Added
 
 - **`with_timeout_opt(clock, milliseconds, f)` runs `f` under a deadline on
@@ -29,6 +31,12 @@ note.
   ones stayed parked. Every request now closes the expired connections of
   all origins first. No timer runs, so an idle transport still holds them
   until its next request or `close()`.
+
+### Changed
+
+- **Depends on `gaato/http` 0.2.0.** Types from `gaato/http` appear in this
+  module's API, so a project using it moves to `gaato/http` 0.2.0 too.
+  Migration: update the `gaato/http` import alongside this one.
 
 ## [0.1.6] - 2026-10-18
 
