@@ -105,6 +105,7 @@ jobs:
       # Only src ships. A spec change that leaves src alone releases nothing; a
       # src change with the same public API (.mbti) is a patch. Generated types
       # are pub(all), so any public API change is breaking: minor while 0.x.
+      # The changelog entry goes under [Unreleased], which the bump then dates.
       - name: Bump the module version
         if: steps.fetch.outputs.changed == 'true'
         id: bump
@@ -122,6 +123,15 @@ jobs:
             kind="public API unchanged"
             next="$major.$minor.$((patch + 1))"
           fi
+          fetched="$(sed -nE 's/^- Fetched: (.*)$/\1/p' "$PROVIDER/spec/SOURCE.md")"
+          sha="$(sed -nE 's/^- sha256: (.*)$/\1/p' "$PROVIDER/spec/SOURCE.md")"
+          if [ "$kind" = "public API changed" ]; then
+            api="The public API changed; see the \`pkg.generated.mbti\` diff."
+          else
+            api="The public API is unchanged."
+          fi
+          scripts/release.sh note "$PROVIDER" Changed \
+            "**Regenerated from the upstream spec fetched $fetched** (sha256 \`${sha:0:12}\`). $api"
           scripts/release.sh bump "$PROVIDER" "$next"
           echo "version=$next" >> "$GITHUB_OUTPUT"
           echo "summary=$current → $next ($kind)" >> "$GITHUB_OUTPUT"

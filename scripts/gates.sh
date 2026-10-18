@@ -18,6 +18,8 @@ io_targets=(native); [ "$js" = 1 ] && io_targets+=(js)
 
 run() { echo "+ $*"; "$@"; }
 
+# Every published module's CHANGELOG has [Unreleased] and a heading for its version.
+run scripts/release.sh check
 run moon update
 for m in http jsonrpc sdk-runtime openai anthropic codex-protocol github; do
   for t in "${all_targets[@]}"; do run moon -C "$m" check --deny-warn --target "$t"; done
