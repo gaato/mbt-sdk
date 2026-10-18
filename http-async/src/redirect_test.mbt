@@ -246,3 +246,278 @@ async test "a transport failure mid-chain is RedirectError::Transport" {
   assert_eq(error, "Connect(\"refused\")")
   fake.assert_complete()
 }
+
+///|
+/// Wraps a stream to count its reads and every `close` call, repeats included.
+struct CountedStream {
+  inner : &@http.BodyStream
+  url : String
+  log : Array[String]
+}
+
+///|
+impl @http.BodyStream for CountedStream with fn read_some(self) {
+  self.log.push("read " + self.url)
+  self.inner.read_some()
+}
+
+///|
+impl @http.BodyStream for CountedStream with fn close(self) {
+  self.log.push("close " + self.url)
+  self.inner.close()
+}
+
+///|
+fn stream_via(
+  fake : @mock.FakeTransport,
+  log : Array[String],
+) -> async (@http.Request) -> (@http.ResponseHead, &@http.BodyStream) raise @http.HttpError {
+  request => {
+    let (head, stream) = fake.send_stream(request)
+    (head, CountedStream::{ inner: stream, url: request.url, log, })
+  }
+}
+
+///|
+fn moved(status : Int32, location : String) -> @http.ResponseHead {
+  { status, headers: @http.Headers::from_array([("Location", location)]), }
+}
+
+///|
+async fn read_all(stream : &@http.BodyStream) -> Bytes raise @http.HttpError {
+  let buffer = Buffer()
+  while stream.read_some() is Some(chunk) {
+    buffer.write_bytes(chunk)
+  }
+  buffer.to_bytes()
+}
+
+///|
+async test "follow_redirects_stream closes each 3xx unread and returns the final stream" {
+  let fake = @mock.FakeTransport::new()
+  let log = []
+  fake.expect_stream("POST", "https://api.example/a", moved(302, "/b"), [
+    b"moved",
+  ])
+  fake.expect_stream(
+    "GET",
+    "https://api.example/b",
+    moved(307, "https://objects.example/f?sig=1"),
+    [b"moved"],
+  )
+  fake.expect_stream(
+    "GET",
+    "https://objects.example/f?sig=1",
+    { status: 200, headers: @http.Headers::new(), },
+    [b"he", b"llo"],
+  )
+  let request = @http.Request::post("https://api.example/a")
+    .header("Authorization", "Bearer t")
+    .header("Content-Type", "text/plain")
+    .header("Accept", "*/*")
+    .body_text("x")
+  let hops = []
+  let (head, stream) = @http.follow_redirects_stream(
+    request,
+    stream_via(fake, log),
+    on_redirect=hop => {
+      log.push("hop \{hop.head.status} \{hop.next.url}")
+      hops.push(hop)
+    },
+  )
+  assert_eq(head.status, 200)
+  // Each intermediate stream is closed once, before its hop is reported and
+  // the next request sent; none is read.
+  assert_eq(log, [
+    "close https://api.example/a", "hop 302 https://api.example/b", "close https://api.example/b",
+    "hop 307 https://objects.example/f?sig=1",
+  ])
+  assert_eq(read_all(stream), b"hello")
+  stream.close()
+  assert_eq(fake.streams_closed(), 3)
+  assert_eq(fake.sent().map(summary), [
+    "POST https://api.example/a x [authorization, content-type, accept]", "GET https://api.example/b  [authorization, accept]",
+    "GET https://objects.example/f?sig=1  [accept]",
+  ])
+  assert_eq(hops.map(hop => hop.request.url), [
+    "https://api.example/a", "https://api.example/b",
+  ])
+  fake.assert_complete()
+}
+
+///|
+async test "follow_redirects_stream closes the 3xx it refuses" {
+  // (max_redirects, allow_downgrade, script, expected outcome)
+  let cases : Array[(Int32?, Bool, Array[(String, @http.ResponseHead)], String)] = [
+    (
+      Some(1),
+      false,
+      [("https://h/0", moved(301, "/1")), ("https://h/1", moved(301, "/2"))],
+      "too many: 1 https://h/2",
+    ),
+    (
+      None,
+      false,
+      [("https://h/0", moved(308, "http://h/1"))],
+      "downgrade: http://h/1",
+    ),
+    (
+      None,
+      false,
+      [("https://h/0", moved(302, "mailto:x@y"))],
+      "bad: not an http or https URL",
+    ),
+    (
+      Some(0),
+      false,
+      [("https://h/0", moved(303, "/1"))],
+      "too many: 0 https://h/1",
+    ),
+  ]
+  for case in cases {
+    let (max, allow_downgrade, script, expected) = case
+    let fake = @mock.FakeTransport::new()
+    let log = []
+    for step in script {
+      fake.expect_stream("GET", step.0, step.1, [b"moved"])
+    }
+    let outcome = try
+      @http.follow_redirects_stream(
+        @http.Request::get("https://h/0"),
+        stream_via(fake, log),
+        max_redirects?=max,
+        allow_downgrade~,
+      )
+    catch {
+      TooManyRedirects(max~, location~) => "too many: \{max} \{location}"
+      Downgrade(location~) => "downgrade: " + location
+      BadLocation(reason~, ..) => "bad: " + reason
+      Transport(_) => "transport"
+    } noraise {
+      _ => "followed"
+    }
+    assert_eq(outcome, expected)
+    assert_eq(log, script.map(step => "close " + step.0))
+    fake.assert_complete()
+  }
+}
+
+///|
+async test "follow_redirects_stream stops at 10 redirects by default" {
+  let fake = @mock.FakeTransport::new()
+  let log = []
+  for i in 0..<=10 {
+    fake.expect_stream("GET", "/r\{i}", moved(302, "/r\{i + 1}"), [])
+  }
+  let outcome = try
+    @http.follow_redirects_stream(
+      @http.Request::get("https://h/r0"),
+      stream_via(fake, log),
+    )
+  catch {
+    TooManyRedirects(max~, ..) => max
+    _ => -1
+  } noraise {
+    _ => -2
+  }
+  assert_eq(outcome, 10)
+  assert_eq(log.length(), 11)
+  assert_eq(log.filter(line => line.has_prefix("close")).length(), 11)
+  fake.assert_complete()
+}
+
+///|
+async test "follow_redirects_stream downgrades on request, without credentials" {
+  let fake = @mock.FakeTransport::new()
+  let log = []
+  fake.expect_stream("GET", "https://h/a", moved(301, "http://h/b"), [])
+  fake.expect_stream(
+    "GET",
+    "http://h/b",
+    { status: 404, headers: @http.Headers::new(), },
+    [b"gone"],
+  )
+  let request = @http.Request::get("https://h/a")
+    .header("Authorization", "Bearer t")
+    .header("X-Api-Key", "k")
+  let (head, stream) = @http.follow_redirects_stream(
+    request,
+    stream_via(fake, log),
+    allow_downgrade=true,
+    credential_headers=["X-Api-Key"],
+  )
+  // A non-redirect status is a final response like any other.
+  assert_eq(head.status, 404)
+  assert_eq(read_all(stream), b"gone")
+  stream.close()
+  assert_eq(fake.sent().map(summary), [
+    "GET https://h/a  [authorization, x-api-key]", "GET http://h/b  []",
+  ])
+  assert_eq(log, [
+    "close https://h/a", "read http://h/b", "read http://h/b", "close http://h/b",
+  ])
+  fake.assert_complete()
+}
+
+///|
+async test "follow_redirects_stream leaves no stream open on a later failure or cancellation" {
+  // A transport failure on the second hop.
+  let fake = @mock.FakeTransport::new()
+  let log = []
+  fake.expect_stream("GET", "/a", moved(302, "/b"), [])
+  fake.expect_error("GET", "/b", @http.HttpError::Connect("refused"))
+  let outcome = try
+    @http.follow_redirects_stream(
+      @http.Request::get("http://h/a"),
+      stream_via(fake, log),
+    )
+  catch {
+    Transport(error) => @debug.to_string(error)
+    _ => "unexpected error"
+  } noraise {
+    _ => "no error"
+  }
+  assert_eq(outcome, "Connect(\"refused\")")
+  assert_eq(log, ["close http://h/a"])
+  fake.assert_complete()
+  // Cancelled while the second request waits.
+  let fake = @mock.FakeTransport::new()
+  let log = []
+  fake.expect_stream("GET", "/a", moved(302, "/b"), [])
+  let send = stream_via(fake, log)
+  let stalled : async (@http.Request) -> (@http.ResponseHead, &@http.BodyStream) raise @http.HttpError = request => {
+    if request.url.has_suffix("/b") {
+      @async.sleep(60_000)
+    }
+    send(request)
+  }
+  let result = @async.with_timeout_opt(20, () => {
+    @http.follow_redirects_stream(@http.Request::get("http://h/a"), stalled)
+  })
+  assert_true(result is None)
+  assert_eq(log, ["close http://h/a"])
+  assert_eq(fake.streams_closed(), 1)
+  fake.assert_complete()
+}
+
+///|
+async test "follow_redirects_stream returns a 3xx without Location open" {
+  let fake = @mock.FakeTransport::new()
+  let log = []
+  fake.expect_stream(
+    "GET",
+    "/a",
+    { status: 302, headers: @http.Headers::new(), },
+    [b"body"],
+  )
+  let (head, stream) = @http.follow_redirects_stream(
+    @http.Request::get("http://h/a"),
+    stream_via(fake, log),
+  )
+  assert_eq(head.status, 302)
+  assert_eq(log, [])
+  assert_eq(read_all(stream), b"body")
+  stream.close()
+  assert_eq(fake.streams_closed(), 1)
+  fake.assert_complete()
+}

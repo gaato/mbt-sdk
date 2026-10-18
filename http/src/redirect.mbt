@@ -70,7 +70,7 @@ pub async fn follow_redirects(
     let response = send(request) catch { error => raise Transport(error) }
     guard plan_redirect(
         request,
-        response,
+        { status: response.status, headers: response.headers, },
         followed~,
         max_redirects~,
         allow_downgrade~,
@@ -81,6 +81,63 @@ pub async fn follow_redirects(
     }
     if on_redirect is Some(callback) {
       callback({ request, response, next, })
+    }
+    request = next
+  }
+}
+
+///|
+/// One redirect followed by `follow_redirects_stream`: the request, the head
+/// of the 3xx response it got (its body was closed unread), and the request
+/// sent next.
+pub struct StreamRedirectHop {
+  request : Request
+  head : ResponseHead
+  next : Request
+} derive(Debug)
+
+///|
+/// Debug representation of a hop.
+pub extend StreamRedirectHop with @debug.Debug::{to_repr}
+
+///|
+/// `follow_redirects` for streamed responses, with the same rules and limit:
+/// sends through `send_stream` and returns the head and body of the first
+/// response that is not a redirect to follow, unread.
+///
+/// Each 3xx body is closed unread before the next request goes out, and on
+/// every error after its head arrived, so only the returned stream stays
+/// open. A closed, undrained stream is not reused by a pooling transport,
+/// which costs a connection per hop but never reads a redirect body of
+/// unknown size.
+pub async fn follow_redirects_stream(
+  request : Request,
+  send_stream : async (Request) -> (ResponseHead, &BodyStream) raise HttpError,
+  max_redirects~ : Int32 = 10,
+  allow_downgrade~ : Bool = false,
+  credential_headers~ : Array[String] = [],
+  on_redirect? : (StreamRedirectHop) -> Unit,
+) -> (ResponseHead, &BodyStream) raise RedirectError {
+  let mut request = request
+  for followed = 0; ; followed = followed + 1 {
+    let (head, stream) = send_stream(request) catch {
+      error => raise Transport(error)
+    }
+    let planned = {
+      errdefer stream.close()
+      plan_redirect(
+        request,
+        head,
+        followed~,
+        max_redirects~,
+        allow_downgrade~,
+        credential_headers~,
+      )
+    }
+    guard planned is Some(next) else { return (head, stream) }
+    stream.close()
+    if on_redirect is Some(callback) {
+      callback({ request, head, next, })
     }
     request = next
   }
@@ -132,11 +189,11 @@ fn redirect_failure(error : RedirectError) -> HttpError {
 }
 
 ///|
-/// The request to send after `response`, or None when it is not a redirect to
-/// follow.
+/// The request to send after a response with this head, or None when it is
+/// not a redirect to follow.
 fn plan_redirect(
   request : Request,
-  response : Response,
+  response : ResponseHead,
   followed~ : Int32,
   max_redirects~ : Int32,
   allow_downgrade~ : Bool,

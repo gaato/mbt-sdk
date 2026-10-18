@@ -183,7 +183,7 @@ fn plan(
   try
     plan_redirect(
       request,
-      { status, headers, body: b"redirect body", },
+      { status, headers, },
       followed~,
       max_redirects~,
       allow_downgrade~,

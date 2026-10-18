@@ -32,6 +32,12 @@ never does. Every breaking change is listed with a migration note.
   `HttpError::Protocol`, so `HttpError` keeps its variants. `on_redirect`
   sees each hop for callers that keep a history. Nothing follows redirects
   unless a caller adds the step.
+- **`follow_redirects_stream` follows redirects for `send_stream`.** Same
+  rules and limit as `follow_redirects`; each 3xx body is closed unread
+  before the next request, and on every error or cancellation after its
+  head arrived, so only the final stream is left open for the caller.
+  `on_redirect` receives a `StreamRedirectHop` (request, 3xx head, next
+  request).
 
 ## [0.2.1] - 2026-10-18
 
