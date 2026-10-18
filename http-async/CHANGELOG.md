@@ -16,7 +16,9 @@ note.
   `user:password@`) carries every request: an `http://` request is
   forwarded to it in absolute form, an `https://` one goes through a
   `CONNECT` tunnel with TLS end to end, as curl, httpx and Mint do. The
-  credentials go to the proxy alone, as `Basic` `Proxy-Authorization`.
+  credentials go to the proxy alone, as `Basic` `Proxy-Authorization`; a
+  `Proxy-Authorization` header set on a request is dropped, so it can never
+  reach an origin through a tunnel or a redirect.
   Without `proxy`, the transport reads `HTTP_PROXY`, `HTTPS_PROXY`,
   `ALL_PROXY` and `NO_PROXY` (lower case first; upper-case `HTTP_PROXY` is
   ignored under CGI, as Go and Python ignore it) once, when it is made,

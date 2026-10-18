@@ -330,12 +330,18 @@ fn AsyncTransport::discard(
 /// The request headers as sent, with `User-Agent` pulled out because
 /// connections are dialed and reused per user agent. `Content-Length` and
 /// `Transfer-Encoding` are dropped since the transport frames the body
-/// itself; repeated names are comma-joined.
+/// itself, and `Proxy-Authorization` since proxy credentials come from the
+/// proxy URL; repeated names are comma-joined.
 fn wire_headers(headers : @http.Headers) -> (@ahttp.Headers, String?) {
   let wire : @ahttp.Headers = Map([])
   let mut user_agent : String? = None
   for (name, value) in headers.iter() {
-    if name == "content-length" || name == "transfer-encoding" {
+    // The transport frames the body itself, and proxy credentials come from
+    // the proxy URL alone: a caller's `Proxy-Authorization` would otherwise
+    // reach the origin through a tunnel, or after a redirect.
+    if name == "content-length" ||
+      name == "transfer-encoding" ||
+      name == "proxy-authorization" {
       continue
     }
     if name == "user-agent" {
