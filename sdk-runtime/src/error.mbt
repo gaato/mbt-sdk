@@ -13,7 +13,26 @@ pub(all) suberror SdkError {
 pub extend SdkError with @debug.Debug::{to_repr}
 
 ///|
+/// The most bytes of a response body an `SdkError` built here keeps: an
+/// error body is for diagnosis, so a longer one is cut to its first 1 MiB
+/// rather than held whole for as long as the error lives.
+let max_error_body_bytes : Int32 = 1048576
+
+///|
+/// `body` itself when it fits in `max_error_body_bytes`, otherwise a copy of
+/// its first `max_error_body_bytes` bytes.
+fn error_body(body : Bytes) -> Bytes {
+  if body.length() <= max_error_body_bytes {
+    body
+  } else {
+    body[:max_error_body_bytes].to_owned()
+  }
+}
+
+///|
 /// Returns successful responses unchanged and classifies all other statuses.
+/// The error keeps at most the first 1 MiB of the body, as a streaming
+/// error body is read; the status and headers are kept whole.
 ///
 /// ```mbt check
 /// test {
@@ -38,13 +57,13 @@ pub fn classify(
     raise RateLimited(
       retry_after_ms=retry_after_ms(response.headers, now_unix_ms?),
       headers=response.headers,
-      body=response.body,
+      body=error_body(response.body),
     )
   } else {
     raise Status(
       status=response.status,
       headers=response.headers,
-      body=response.body,
+      body=error_body(response.body),
     )
   }
 }

@@ -381,7 +381,7 @@ async fn send_streaming(
 async fn read_error_body(stream : &@http.BodyStream) -> Bytes raise SdkError {
   defer stream.close()
   let bytes : Array[Byte] = []
-  for ; bytes.length() < 1048576; {
+  for ; bytes.length() < max_error_body_bytes; {
     let chunk = stream.read_some() catch {
       @http.HttpError::Connect(message) =>
         raise Transport(@http.HttpError::Connect(message))
@@ -391,7 +391,7 @@ async fn read_error_body(stream : &@http.BodyStream) -> Bytes raise SdkError {
         raise Transport(@http.HttpError::Protocol(message))
     }
     guard chunk is Some(chunk) else { break }
-    let take = chunk.length().min(1048576 - bytes.length())
+    let take = chunk.length().min(max_error_body_bytes - bytes.length())
     for byte in chunk[:take] {
       bytes.push(byte)
     }

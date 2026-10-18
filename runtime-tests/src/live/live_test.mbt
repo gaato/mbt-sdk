@@ -15,6 +15,16 @@ async fn bounded(f : async () -> Unit) -> Unit {
 }
 
 ///|
+/// The transport every live test uses, configured as the READMEs recommend:
+/// a buffered body is bounded, since the transport reads one whole otherwise.
+fn live_transport() -> @adapter.AsyncTransport {
+  @adapter.AsyncTransport::new(
+    timeout_ms=45000,
+    max_body_bytes=64 * 1024 * 1024,
+  )
+}
+
+///|
 fn credential(name : String, provider : String) -> String? {
   match @env.get_env_var(name) {
     Some(value) if !value.trim().is_empty() => Some(value)
@@ -36,7 +46,7 @@ fn optional_setting(name : String) -> String? {
 ///|
 fn runtime_client(api_key : String, base_url : String) -> @runtime.Client {
   @runtime.Client::new(
-    @adapter.AsyncTransport::new(timeout_ms=45000),
+    live_transport(),
     @adapter.AsyncClock::new(),
     base_url~,
     auth=@runtime.Bearer(api_key),
@@ -317,7 +327,7 @@ async test "live OpenRouter Anthropic-compatible Messages API" {
     }
     let client = @anthropic_sdk.Anthropic::new(
       api_key=key,
-      @adapter.AsyncTransport::new(timeout_ms=45000),
+      live_transport(),
       @adapter.AsyncClock::new(),
       base_url="https://openrouter.ai/api",
       auth_header=@anthropic_sdk.Bearer,
@@ -416,7 +426,7 @@ async test "live local OpenAI-compatible Chat Completions API" {
     }
     let client = @openai_sdk.OpenAI::from_client(
       @runtime.Client::new(
-        @adapter.AsyncTransport::new(timeout_ms=45000),
+        live_transport(),
         @adapter.AsyncClock::new(),
         base_url~,
         auth~,
@@ -516,7 +526,7 @@ async test "live local Anthropic-compatible Messages API" {
       )
       return
     }
-    let transport = @adapter.AsyncTransport::new(timeout_ms=45000)
+    let transport = live_transport()
     let clock = @adapter.AsyncClock::new()
     let client = match optional_setting("ANTHROPIC_COMPAT_API_KEY") {
       Some(key) =>
@@ -607,7 +617,7 @@ async test "live OpenAI official minimal operations" {
     guard credential("OPENAI_API_KEY", "OpenAI") is Some(key) else { return }
     let client = @openai_sdk.OpenAI::new(
       api_key=key,
-      @adapter.AsyncTransport::new(timeout_ms=45000),
+      live_transport(),
       @adapter.AsyncClock::new(),
     )
     let models = one_call("OpenAI", "<list>", () => client.list_models())
@@ -694,7 +704,7 @@ async test "live Anthropic official tools and thinking" {
     }
     let client = @anthropic_sdk.Anthropic::new(
       api_key=key,
-      @adapter.AsyncTransport::new(timeout_ms=45000),
+      live_transport(),
       @adapter.AsyncClock::new(),
       retry=live_retry(),
     )
@@ -828,7 +838,7 @@ async test "live Anthropic official minimal operations" {
     }
     let client = @anthropic_sdk.Anthropic::new(
       api_key=key,
-      @adapter.AsyncTransport::new(timeout_ms=45000),
+      live_transport(),
       @adapter.AsyncClock::new(),
     )
     let models = one_anthropic_call("Anthropic", "<list>", () => {
@@ -949,7 +959,7 @@ async test "live GitHub REST read paths, Link pagination, and rate limits" {
     //    metered at 60 requests an hour, so it spends exactly one.
     let public_repo = one_github_call("repos/get (unauthenticated)", () => {
       @github_sdk.GitHub::new(
-        @adapter.AsyncTransport::new(timeout_ms=45000),
+        live_transport(),
         @adapter.AsyncClock::new(),
         retry=live_retry(),
       ).call(
@@ -976,7 +986,7 @@ async test "live GitHub REST read paths, Link pagination, and rate limits" {
       ),
     )
     let gh = @github_sdk.GitHub::new(
-      @adapter.AsyncTransport::new(timeout_ms=45000),
+      live_transport(),
       clock,
       token~,
       retry=live_retry(),
@@ -1098,7 +1108,7 @@ async test "live GitHub GraphQL passthrough, error envelope, and point budget" {
       ),
     )
     let gh = @github_sdk.GitHub::new(
-      @adapter.AsyncTransport::new(timeout_ms=45000),
+      live_transport(),
       clock,
       token~,
       retry=live_retry(),
