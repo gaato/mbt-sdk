@@ -324,15 +324,16 @@ async test "stream timeout is per read rather than total lifetime" {
     conn => {
       ignore(conn.read_request())
       conn.send_response(200, "OK")
-      for _ in 0..<4 {
+      // Each gap is well under the per-read limit, their sum well over it.
+      for _ in 0..<5 {
         conn.write(b"x")
         conn.flush()
-        @async.sleep(100)
+        @async.sleep(300)
       }
       conn.end_response()
     },
     url => {
-      let (_, stream) = @adapter.AsyncTransport::new(timeout_ms=250).send_stream(
+      let (_, stream) = @adapter.AsyncTransport::new(timeout_ms=1000).send_stream(
         @http.Request::get(url),
       )
       defer stream.close()
@@ -340,7 +341,7 @@ async test "stream timeout is per read rather than total lifetime" {
       while stream.read_some() is Some(chunk) {
         chunks.push(chunk)
       }
-      assert_eq(chunks, [b"x", b"x", b"x", b"x"])
+      assert_eq(chunks, [b"x", b"x", b"x", b"x", b"x"])
     },
   )
 }
