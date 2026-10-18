@@ -91,13 +91,17 @@ pub fn StreamBody::length(self : StreamBody) -> Int64? {
 /// raises `Protocol` when the source produces more bytes than the declared
 /// length, or ends before it; its `close` closes the source.
 ///
-/// A second call raises `Protocol`, since the bytes already read are gone, and
-/// so does a negative declared length, before anything is read.
+/// A second call raises `Protocol`, since the bytes already read are gone. A
+/// negative declared length raises `Protocol` before anything is read, and
+/// closes the source, which no sender will take.
 pub fn StreamBody::take(self : StreamBody) -> &BodyStream raise HttpError {
   if self.taken {
     raise Protocol(already_taken)
   }
   if self.length is Some(length) && length < 0L {
+    // Refused for good: the source is closed here, as no sender will.
+    self.taken = true
+    self.source.close()
     raise Protocol("a stream request body cannot declare a negative length")
   }
   self.taken = true

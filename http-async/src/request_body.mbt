@@ -92,24 +92,48 @@ async fn confirm_empty(
 ///|
 /// Sends `outgoing` through `write` as `Write` phases of `timer`: each slice
 /// of at most `max_write_bytes`, and for a stream each read from it, is one
-/// phase. A stream that grows past `buffer_limit` raises `Protocol`. The
+/// phase. A stream's chunk is written once the next read has returned. A stream that grows past `buffer_limit` raises `Protocol`. The
 /// caller closes `outgoing`.
 async fn send_outgoing(
   outgoing : Outgoing,
   write : async (BytesView) -> Unit,
   timer : PhaseTimer,
   buffer_limit~ : Int64?,
+  first? : Bytes?,
 ) -> Unit raise @http.HttpError {
   match outgoing {
     Buffered(bytes) => write_slices(bytes, write, timer)
     Reader(reader) => {
+      // One chunk is held back until the next read succeeds, so the bytes
+      // that complete a body go out only once the stream has ended cleanly:
+      // a stream that fails at its end fails before the request is whole.
+      // `first` is a first read already made, used before reading on.
       let mut sent = 0L
-      while timer.run(Write, () => reader.read_some()) is Some(chunk) {
+      let mut held : Bytes? = None
+      let mut pending = first
+      for ;; {
+        let next = match pending {
+          Some(read) => {
+            pending = None
+            read
+          }
+          None => timer.run(Write, () => reader.read_some())
+        }
+        guard next is Some(chunk) else { break }
         sent += chunk.length().to_int64()
         if buffer_overflow(buffer_limit, sent) is Some(message) {
           raise @http.HttpError::Protocol(message)
         }
-        write_slices(chunk, write, timer)
+        if chunk.is_empty() {
+          continue
+        }
+        if held is Some(previous) {
+          write_slices(previous, write, timer)
+        }
+        held = Some(chunk)
+      }
+      if held is Some(last) {
+        write_slices(last, write, timer)
       }
     }
   }

@@ -17,8 +17,10 @@ fn pieces_body(pieces : Array[Piece], boundary : String) -> @http.Body {
         stream.length()
       }
     }
+    // A negative part length is refused when the parts are taken; it must
+    // not shrink the total into a plausible Content-Length meanwhile.
     length = match (length, size) {
-      (Some(total), Some(size)) => Some(total + size)
+      (Some(total), Some(size)) if size >= 0L => Some(total + size)
       _ => None
     }
   }
@@ -26,6 +28,8 @@ fn pieces_body(pieces : Array[Piece], boundary : String) -> @http.Body {
   let stream = MultipartStream::{
     pieces,
     delimiter: @http.encode_utf8("\r\n--" + boundary),
+    readers: None,
+    next_reader: 0,
     next: 0,
     current: None,
     closed: false,
@@ -43,11 +47,15 @@ priv struct Reading {
 
 ///|
 /// A multipart body read piece by piece: framing as it is, and each stream
-/// part from its own stream, taken when reached and scanned for the
-/// delimiter. Holds nothing but the pieces and the part being read.
+/// part from its own stream, scanned for the delimiter. Every part stream is
+/// taken at the first read, before any framing is returned, so a part that
+/// cannot be sent fails before a byte of the request goes out. Holds nothing
+/// but the pieces, their readers and the part being read.
 priv struct MultipartStream {
   pieces : Array[Piece]
   delimiter : Bytes
+  mut readers : Array[&@http.BodyStream]?
+  mut next_reader : Int32
   mut next : Int32
   mut current : Reading?
   mut closed : Bool
@@ -55,6 +63,9 @@ priv struct MultipartStream {
 
 ///|
 impl @http.BodyStream for MultipartStream with fn read_some(self) {
+  if self.readers is None && !self.closed {
+    self.readers = Some(self.take_parts())
+  }
   for ;; {
     if self.closed {
       return None
@@ -82,12 +93,57 @@ impl @http.BodyStream for MultipartStream with fn read_some(self) {
     self.next += 1
     match piece {
       Fixed(bytes) => return Some(bytes)
-      Streamed(name, stream) =>
+      Streamed(name, _) => {
+        let readers = self.readers.unwrap_or([])
+        let reader = readers[self.next_reader]
+        self.next_reader += 1
         self.current = Some({
-          reader: stream.take(),
+          reader,
           name,
           scan: BoundaryScan::new(self.delimiter),
         })
+      }
+    }
+  }
+}
+
+///|
+/// Takes every part stream, in order. If one cannot be taken, the ones taken
+/// so far are closed, the body is closed and the error is raised.
+fn MultipartStream::take_parts(
+  self : MultipartStream,
+) -> Array[&@http.BodyStream] raise @http.HttpError {
+  let readers : Array[&@http.BodyStream] = []
+  let mut index = 0
+  errdefer {
+    for reader in readers {
+      reader.close()
+    }
+    // The parts after the one that failed are still this body's to close.
+    for piece in self.pieces[index + 1:] {
+      close_unclaimed(piece)
+    }
+    self.readers = Some([])
+    self.closed = true
+  }
+  for i, piece in self.pieces {
+    index = i
+    if piece is Streamed(_, stream) {
+      readers.push(stream.take())
+    }
+  }
+  readers
+}
+
+///|
+/// Closes a stream part no sender has taken; one another sender took is left
+/// to it.
+fn close_unclaimed(piece : Piece) -> Unit {
+  if piece is Streamed(_, stream) {
+    try stream.take() catch {
+      _ => ()
+    } noraise {
+      reader => reader.close()
     }
   }
 }
@@ -102,14 +158,13 @@ impl @http.BodyStream for MultipartStream with fn close(self) {
   if self.current is Some(part) {
     part.reader.close()
   }
-  for piece in self.pieces[self.next:] {
-    if piece is Streamed(_, stream) {
-      // A stream another sender took is that sender's to close.
-      try stream.take() catch {
-        _ => ()
-      } noraise {
-        reader => reader.close()
-      }
+  if self.readers is Some(readers) {
+    for reader in readers[self.next_reader:] {
+      reader.close()
     }
+    return
+  }
+  for piece in self.pieces[self.next:] {
+    close_unclaimed(piece)
   }
 }

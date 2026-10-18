@@ -105,3 +105,61 @@ async test "a 32 MiB streamed file part uploads intact through AsyncTransport" {
     })
   }
 }
+
+///|
+/// A part stream that is already taken, or empty.
+struct Empty {}
+
+///|
+impl @http.BodyStream for Empty with fn read_some(_) {
+  None
+}
+
+///|
+impl @http.BodyStream for Empty with fn close(_) {
+  ()
+}
+
+///|
+async test "a multipart part that cannot be sent fails before a large head goes out" {
+  let received = Ref(0)
+  let finished : @async.Queue[Unit] = @async.Queue(kind=Unbounded)
+  @async.with_timeout(5000, () => {
+    let server = @socket.TcpServer(@socket.Addr::parse("127.0.0.1:0"))
+    defer server.close()
+    @async.with_task_group(group => {
+      group.spawn_bg(no_wait=true, () => {
+        let (conn, _) = server.accept()
+        defer conn.close()
+        let buffer = FixedArray::make(65536, b'\x00')
+        while (conn.read(buffer) catch { _ => 0 }) is n && n > 0 {
+          received.val += n
+        }
+        finished.put(())
+      })
+      let part = @multipart.Part::file_stream("b", "b", "x/y", Empty::{ })
+      guard part.body is Stream(stream) else { fail("expected a stream part") }
+      ignore(stream.take())
+      let (content_type, body) = @multipart.encode_body([part], "B")
+      // Far more than any send buffer, so the client would flush part of the
+      // head on its own if it serialized it before taking the parts.
+      let request = @http.Request::post(
+        "http://127.0.0.1:\{server.addr.port()}/",
+      )
+      request.headers.set("content-type", content_type)
+      request.headers.set("x-large", String::make(2 * 1024 * 1024, 'a'))
+      let outcome = try
+        @adapter.AsyncTransport::new().send({ ..request, body, }) |> ignore
+      catch {
+        @http.HttpError::Protocol(_) => "Protocol"
+        error => "unexpected \{Repr(error)}"
+      } noraise {
+        _ => "sent"
+      }
+      assert_eq(outcome, "Protocol")
+      // The refused send closed its connection; the server has read it all.
+      finished.get()
+    })
+  })
+  assert_eq(received.val, 0)
+}

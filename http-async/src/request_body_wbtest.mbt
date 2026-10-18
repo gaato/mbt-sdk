@@ -241,13 +241,14 @@ async test "each slice and each stream read is its own Write phase" {
     run_send(clock, limits(write=300), body, write_ms=301),
     "Timeout(phase=Write, ms=300) at 300 after []",
   )
-  // So does a stream that takes longer than the limit to produce a chunk,
-  // after the chunks it produced in time went out; the stream is closed.
+  // So does a stream that takes longer than the limit to produce a chunk;
+  // the chunk before it is still held back, so only the first went out, and
+  // the stream is closed.
   let clock = @simclock.VirtualClock(start_ms=0)
   let source = Paced::new([(250, chunk), (250, chunk), (301, chunk)], clock~)
   assert_eq(
     run_send(clock, limits(write=300), Stream(@http.StreamBody::new(source))),
-    "Timeout(phase=Write, ms=300) at 800 after [65536, 65536]",
+    "Timeout(phase=Write, ms=300) at 800 after [65536]",
   )
   assert_true(source.closed)
   // The exchange deadline cuts the upload short, reporting the total.
@@ -268,11 +269,12 @@ async test "each slice and each stream read is its own Write phase" {
 
 ///|
 async test "send_body closes the stream however sending ends" {
-  // A length broken mid-way, a buffer limit crossed, and a failed write.
+  // A length broken mid-way, a buffer limit crossed, and a failed write. The
+  // chunk read last is held back, so the first two fail before writing it.
   let short = Paced::new([(0, b"abc")])
   assert_eq(
     run_send(fresh(), limits(), Stream(@http.StreamBody::new(short, length=4))),
-    "Protocol(\"request body stream ended after 3 of its declared 4 bytes\") at 0 after [3]",
+    "Protocol(\"request body stream ended after 3 of its declared 4 bytes\") at 0 after []",
   )
   assert_true(short.closed)
   let large = Paced::new([(0, b"0123456789"), (0, b"a")])
@@ -283,7 +285,7 @@ async test "send_body closes the stream however sending ends" {
       Stream(@http.StreamBody::new(large)),
       buffer_limit=10,
     ),
-    "Protocol(\"a stream request body is buffered in memory on this platform, and this one exceeds 10 bytes; send it as bytes instead\") at 0 after [10]",
+    "Protocol(\"a stream request body is buffered in memory on this platform, and this one exceeds 10 bytes; send it as bytes instead\") at 0 after []",
   )
   assert_true(large.closed)
   let broken = Paced::new([(0, b"abc")])
@@ -307,4 +309,16 @@ async test "send_body closes the stream however sending ends" {
     run_send(fresh(), limits(), Stream(sent)),
     "Protocol(\"the stream request body was already sent; a stream can be sent only once\") at 0 after []",
   )
+}
+
+///|
+async test "the bytes that complete a stream body wait for its clean end" {
+  // A stream that delivers its declared length and then fails: nothing that
+  // completes the body is written before the failure.
+  let source = Paced::new([(0, b"abc"), (0, b"d")])
+  assert_eq(
+    run_send(fresh(), limits(), Stream(@http.StreamBody::new(source, length=3))),
+    "Protocol(\"request body stream is longer than its declared 3 bytes\") at 0 after []",
+  )
+  assert_true(source.closed)
 }

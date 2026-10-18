@@ -129,4 +129,27 @@ test "a stream body with a negative declared length is refused before it is read
   assert_eq(
     outcome, "Protocol(\"a stream request body cannot declare a negative length\")",
   )
+  // The refused source is closed, and the body counts as sent.
+  let closing = Closing::{ closed: false, }
+  let refused = StreamBody::new(closing, length=-1)
+  try refused.take() |> ignore catch {
+    _ => ()
+  }
+  assert_true(closing.closed)
+  assert_false(Stream(refused).is_replayable())
+}
+
+///|
+priv struct Closing {
+  mut closed : Bool
+}
+
+///|
+impl BodyStream for Closing with fn read_some(_) {
+  None
+}
+
+///|
+impl BodyStream for Closing with fn close(self) {
+  self.closed = true
 }

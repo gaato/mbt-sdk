@@ -418,6 +418,14 @@ async fn exchange(
     // empty stream proves it is empty first, and is not read again.
     confirm_empty(outgoing, timer)
   }
+  // A stream's first read happens before the head is serialized, since the
+  // client may flush a large head on its own: whatever a stream checks when
+  // first read (a multipart body takes every part) fails before any byte.
+  let first = if !empty && outgoing is Reader(reader) {
+    Some(timer.run(Write, () => reader.read_some()))
+  } else {
+    None
+  }
   timer.run(Write, () => {
     client.request(meth, path, extra_headers=headers)
     // With a body, the head goes out with its first slice.
@@ -434,6 +442,7 @@ async fn exchange(
       },
       timer,
       buffer_limit=buffered_stream_limit,
+      first?,
     )
     // A stream of unknown length that ended at once wrote no slice, so its
     // head is still unsent: it goes out in the Write phase, not the Head one.

@@ -165,15 +165,10 @@ async test "a multipart stream breaks on a part that breaks its length" {
 async test "closing a multipart stream closes the parts it did not reach, once" {
   let first = parts_of([b"one"])
   let unreached = parts_of([b"two"])
-  let elsewhere = parts_of([b"three"])
-  let taken = @multipart.Part::file_stream("c", "c", "x/y", elsewhere)
-  guard taken.body is Stream(stream) else { fail("expected a stream part") }
-  let other = stream.take()
   let (_, body) = @multipart.encode_body(
     [
       @multipart.Part::file_stream("a", "a", "x/y", first),
       @multipart.Part::file_stream("b", "b", "x/y", unreached),
-      taken,
     ],
     "B",
   )
@@ -186,10 +181,128 @@ async test "closing a multipart stream closes the parts it did not reach, once" 
   assert_true(first.closed)
   assert_true(unreached.closed)
   assert_eq(unreached.next, 0)
-  // A part another sender took is left to it.
-  assert_false(elsewhere.closed)
-  other.close()
   // Closed, it reads as ended, and closing again changes nothing.
   assert_eq(reader.read_some(), None)
   reader.close()
+}
+
+///|
+async test "a part another sender took fails the first read, before any framing" {
+  let first = parts_of([b"one"])
+  let elsewhere = parts_of([b"three"])
+  let taken = @multipart.Part::file_stream("c", "c", "x/y", elsewhere)
+  guard taken.body is Stream(stream) else { fail("expected a stream part") }
+  let other = stream.take()
+  let (_, body) = @multipart.encode_body(
+    [@multipart.Part::file_stream("a", "a", "x/y", first), taken],
+    "B",
+  )
+  guard body is Stream(multipart) else { fail("expected a stream body") }
+  let reader = multipart.take()
+  let outcome = try reader.read_some() catch {
+    @http.HttpError::Protocol(_) => "Protocol"
+    error => "unexpected \{Repr(error)}"
+  } noraise {
+    _ => "read"
+  }
+  assert_eq(outcome, "Protocol")
+  // The parts it took are closed; the one another sender took is left to it.
+  assert_true(first.closed)
+  assert_false(elsewhere.closed)
+  other.close()
+  assert_eq(reader.read_some(), None)
+}
+
+///|
+async test "a part with a negative length fails the first read and declares no length" {
+  let negative = parts_of([b""])
+  let after = parts_of([b"x"])
+  let (_, body) = @multipart.encode_body(
+    [
+      @multipart.Part::file_stream("a", "a", "x/y", negative, length=-1),
+      @multipart.Part::file_stream("b", "b", "x/y", after),
+    ],
+    "B",
+  )
+  guard body is Stream(multipart) else { fail("expected a stream body") }
+  assert_eq(multipart.length(), None)
+  let reader = multipart.take()
+  let outcome = try reader.read_some() catch {
+    @http.HttpError::Protocol(_) => "Protocol"
+    error => "unexpected \{Repr(error)}"
+  } noraise {
+    _ => "read"
+  }
+  assert_eq(outcome, "Protocol")
+  // Both sources are closed: the refused one and the one after it.
+  assert_true(negative.closed)
+  assert_true(after.closed)
+}
+
+///|
+async test "closing an unread multipart body closes a negative-length part" {
+  let negative = parts_of([b""])
+  let (_, body) = @multipart.encode_body(
+    [@multipart.Part::file_stream("a", "a", "x/y", negative, length=-1)],
+    "B",
+  )
+  guard body is Stream(multipart) else { fail("expected a stream body") }
+  multipart.take().close()
+  assert_true(negative.closed)
+}
+
+///|
+async test "closing a multipart stream before reading it closes every part" {
+  let first = parts_of([b"one"])
+  let second = parts_of([b"two"])
+  let elsewhere = parts_of([b"three"])
+  let taken = @multipart.Part::file_stream("c", "c", "x/y", elsewhere)
+  guard taken.body is Stream(stream) else { fail("expected a stream part") }
+  let other = stream.take()
+  let (_, body) = @multipart.encode_body(
+    [
+      @multipart.Part::file_stream("a", "a", "x/y", first),
+      @multipart.Part::file_stream("b", "b", "x/y", second),
+      taken,
+    ],
+    "B",
+  )
+  guard body is Stream(multipart) else { fail("expected a stream body") }
+  multipart.take().close()
+  assert_true(first.closed)
+  assert_true(second.closed)
+  // A part another sender took is left to it.
+  assert_false(elsewhere.closed)
+  other.close()
+}
+
+///|
+async test "a failed part take closes the parts after it too" {
+  let first = parts_of([b"one"])
+  let elsewhere = parts_of([b"two"])
+  let last = parts_of([b"three"])
+  let taken = @multipart.Part::file_stream("b", "b", "x/y", elsewhere)
+  guard taken.body is Stream(stream) else { fail("expected a stream part") }
+  let other = stream.take()
+  let (_, body) = @multipart.encode_body(
+    [
+      @multipart.Part::file_stream("a", "a", "x/y", first),
+      taken,
+      @multipart.Part::file_stream("c", "c", "x/y", last),
+    ],
+    "B",
+  )
+  guard body is Stream(multipart) else { fail("expected a stream body") }
+  let reader = multipart.take()
+  let failed = try reader.read_some() catch {
+    @http.HttpError::Protocol(_) => true
+    _ => false
+  } noraise {
+    _ => false
+  }
+  assert_true(failed)
+  assert_true(first.closed)
+  assert_true(last.closed)
+  assert_false(elsewhere.closed)
+  other.close()
 }
