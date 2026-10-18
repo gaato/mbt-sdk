@@ -56,6 +56,12 @@ pub(all) suberror HttpError {
   Network(phase~ : Phase, message~ : String)
   /// A malformed request or response, or one the transport refused.
   Protocol(String)
+  /// The proxy answered a tunnel request (`CONNECT`) with `status`, other
+  /// than 2xx, so nothing reached the origin: 407 when it wants credentials,
+  /// 403 when it refuses the destination, 502 or 504 when it could not reach
+  /// it. A proxy forwarding a plain `http://` request answers with an
+  /// ordinary response instead.
+  Proxy(status~ : Int32, message~ : String)
 } derive(Debug)
 
 ///|
@@ -64,21 +70,23 @@ pub extend HttpError with @debug.Debug::{to_repr}
 
 ///|
 /// Whether the failure proves that no byte of the request was sent, so the
-/// server cannot have acted on it: a `Connect` failure, or a timeout while
-/// waiting for a connection slot or connecting. Such a request may be sent
+/// server cannot have acted on it: a `Connect` failure, a proxy's refusal to
+/// open a tunnel, or a timeout while waiting for a connection slot or
+/// connecting. Such a request may be sent
 /// again even when it is not idempotent.
 ///
 /// ```mbt check
 /// test {
 ///   assert_true(@http.Connect("refused").is_unsent())
 ///   assert_true(@http.Timeout(phase=Dial, ms=1000).is_unsent())
+///   assert_true(@http.Proxy(status=407, message="auth").is_unsent())
 ///   assert_false(@http.Timeout(phase=Head, ms=1000).is_unsent())
 ///   assert_false(@http.Network(phase=Write, message="reset").is_unsent())
 /// }
 /// ```
 pub fn HttpError::is_unsent(self : HttpError) -> Bool {
   match self {
-    Connect(_) | Timeout(phase=Pool | Dial, ..) => true
+    Connect(_) | Proxy(..) | Timeout(phase=Pool | Dial, ..) => true
     Timeout(..) | Network(..) | Protocol(_) => false
   }
 }

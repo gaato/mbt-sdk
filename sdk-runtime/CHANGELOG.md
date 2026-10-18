@@ -10,6 +10,11 @@ note.
 
 ### Changed
 
+- **A proxy's refusal to open a tunnel is retried only for 502, 503 and
+  504.** `SdkError::is_retryable` treats `HttpError::Proxy(status~, ..)`
+  like a gateway status: a proxy that could not reach the origin may
+  succeed next time, while 407 (credentials) or 403 (refused destination)
+  will not.
 - **Multipart file parts can stream: `Part.body` is an `@http.Body`.** An
   upload no longer has to hold its files in memory. `Part::file_stream(name,
   filename, content_type, stream, length?)` makes a part read from a
