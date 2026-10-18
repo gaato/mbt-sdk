@@ -366,3 +366,40 @@ async test "invalid handshake closes output and malformed results identify metho
     })
   })
 }
+
+///|
+async test "max_line reaches the connection and an overlong reply fails the handshake" {
+  @async.with_timeout(5000, () => {
+    let mut message = ""
+    try
+      @async.with_task_group(group => {
+        let (client_read, client_write, server_read, server_write) = pipes(
+          group,
+        )
+        let _server = @rpc.Connection::start(
+          group,
+          server_read,
+          server_write,
+          envelope=Bare,
+          on_request=(_, _) => Ok(initialize_result()),
+        )
+        ignore(
+          @codex.connect(
+            group,
+            client_read,
+            client_write,
+            initialize(),
+            close_writer=() => client_write.close(),
+            max_line=64,
+          ),
+        )
+      })
+    catch {
+      @rpc.RpcFailure::Transport(text) => message = text
+      error => raise error
+    } noraise {
+      _ => fail("expected failed group")
+    }
+    assert_eq(message, "JSON-RPC line exceeds 64 bytes")
+  })
+}

@@ -77,6 +77,10 @@ moon run --target native codex-app-server/src/examples/initialize -- $codex_smok
 - Keep the task group alive for the connection/session lifetime. `connect`
   borrows the reader; its owner must close it after background tasks finish.
   `close_writer` must close output. Native `spawn` owns its pipes and process.
+- One received line is one message, limited to 64 MiB by default (the
+  `gaato/jsonrpc-async` default): a turn's diff or a thread's history arrives
+  in a single line. `spawn` and `connect` take `max_line` to change it. A longer
+  line fails the connection with `RpcFailure::Transport`.
 - Notifications run in wire order and requests dispatch concurrently. A handler
   can call back into the server. The inherited notification queue is unbounded;
   event consumers should hand off expensive work promptly.

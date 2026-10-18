@@ -44,15 +44,33 @@ pub struct Connection {
 }
 
 ///|
+/// The default `max_line`. Generous because one line is one message: a Codex
+/// notification can carry a whole turn's diff, and a response a thread's history.
+let default_max_line : Int32 = 64 * 1024 * 1024
+
+///|
+/// The failure pending calls get when reading ends with `error`: a transport
+/// failure keeps its message, and anything else becomes one carrying its text.
+fn read_failure(error : Error) -> RpcFailure {
+  match error {
+    RpcFailure::Transport(message) => Transport(message)
+    _ => Transport(error.to_string())
+  }
+}
+
+///|
 /// Starts reading and dispatching in `group`. The caller owns the reader.
 /// Supply `close_writer` to send EOF when closing; its default does nothing.
+///
+/// `max_line` bounds one received line in bytes, 64 MiB by default. A longer
+/// line fails the connection: pending calls and the group get `Transport`.
 pub fn[X] Connection::start(
   group : @async.TaskGroup[X],
   reader : &@io.Reader,
   writer : &@io.Writer,
   close_writer~ : () -> Unit = () => (),
   envelope~ : @jsonrpc.Envelope = Strict,
-  max_line? : Int32,
+  max_line~ : Int32 = default_max_line,
   on_request~ : RequestHandler = (name, _) => {
     Err(@jsonrpc.RpcError::method_not_found(name))
   },
@@ -81,7 +99,7 @@ pub fn[X] Connection::start(
   })
   group.spawn_bg(no_wait=true, () => {
     defer self.end_reading()
-    let framer = @jsonrpc.LineFramer::new(max_line?)
+    let framer = @jsonrpc.LineFramer::new(max_line~)
     let failure : Error? = try {
       for ;; {
         match reader.read_some() {
@@ -107,7 +125,7 @@ pub fn[X] Connection::start(
       error => Some(error)
     }
     if failure is Some(error) {
-      self.fail_pending(Transport(error.to_string()))
+      self.fail_pending(read_failure(error))
       raise error
     }
   })

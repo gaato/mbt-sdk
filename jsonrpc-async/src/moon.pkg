@@ -20,5 +20,9 @@ import {
 warnings = "-unused_package"
 
 options(
-  targets: { "child.mbt": [ "native" ], "child_test.mbt": [ "native" ] },
+  targets: {
+    "child.mbt": [ "native" ],
+    "child_test.mbt": [ "native" ],
+    "lifecycle_native_wbtest.mbt": [ "native" ],
+  },
 )

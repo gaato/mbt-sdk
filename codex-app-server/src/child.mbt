@@ -9,6 +9,7 @@ pub struct Session {
 /// Starts `codex app-server` over stdio. stderr is inherited, never protocol data.
 /// Pass extra_env (for example CODEX_HOME) to isolate configuration if needed.
 /// Child and pipe lifetime is bounded by the supplied task group.
+/// `max_line` is passed to the connection as in `connect`.
 pub async fn[X] spawn(
   group : @async.TaskGroup[X],
   initialize : @protocol.InitializeParams,
@@ -18,6 +19,7 @@ pub async fn[X] spawn(
   handlers~ : Handlers = Handlers::new(),
   on_event~ : EventHandler = _ => (),
   timeout_ms~ : Int32 = 10000,
+  max_line? : Int32,
 ) -> Session {
   let child = @rpc.spawn_child(
     group,
@@ -26,6 +28,7 @@ pub async fn[X] spawn(
     cwd?,
     extra_env?,
     envelope=Bare,
+    max_line?,
     on_request=(name, params) => handlers.dispatch(name, params),
     on_notification=(name, params) => {
       on_event(@protocol.Event::decode(name, params))

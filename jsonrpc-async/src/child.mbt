@@ -7,6 +7,7 @@ pub struct Child {
 
 ///|
 /// Starts a child with NDJSON on stdin/stdout. Stderr is inherited by default.
+/// `max_line` and the handlers are passed to `Connection::start`.
 pub async fn[X] spawn_child(
   group : @async.TaskGroup[X],
   program : String,
