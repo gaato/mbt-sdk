@@ -57,6 +57,14 @@ never does. Every breaking change is listed with a migration note.
   Placed inside `redirects`, it runs once per hop, so every hop stores its
   cookies and sends its own. `CookieJar::attach` does the sending half on
   its own, for `send_stream` callers, who store from the `ResponseHead`.
+- **`form_urlencode` and `Request::form_body` encode an
+  `application/x-www-form-urlencoded` body.** OAuth token endpoints and
+  other form APIs had no encoder in the stack. It follows the WHATWG
+  urlencoded serializer, as browsers and `URLSearchParams` do: a space is
+  `+`, only ASCII alphanumerics and `*-._` are kept, so `~` is encoded and
+  `*` is not, the reverse of `percent_encode`'s RFC 3986 set for paths and
+  queries. A lone surrogate is encoded as U+FFFD. `form_body` sets the
+  content type only when the request has none.
 
 ## [0.2.1] - 2026-10-18
 

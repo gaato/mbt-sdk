@@ -13,6 +13,8 @@ pub async fn follow_redirects(Request, async (Request) -> Response raise HttpErr
 
 pub async fn follow_redirects_stream(Request, async (Request) -> (ResponseHead, &BodyStream) raise HttpError, max_redirects? : Int, allow_downgrade? : Bool, credential_headers? : Array[String], on_redirect? : (StreamRedirectHop) -> Unit) -> (ResponseHead, &BodyStream) raise RedirectError
 
+pub fn form_urlencode(ArrayView[(String, String)]) -> String
+
 pub fn percent_encode(String) -> String
 
 pub fn percent_encode_path(String) -> String
@@ -80,6 +82,7 @@ pub fn Request::body_bytes(Self, Bytes) -> Self
 pub fn Request::body_text(Self, String) -> Self
 pub fn Request::delete(String) -> Self
 pub fn Request::equal(Self, Self) -> Bool
+pub fn Request::form_body(Self, ArrayView[(String, String)]) -> Self
 pub fn Request::get(String) -> Self
 pub fn Request::header(Self, String, String) -> Self
 pub fn Request::json_body(Self, Json) -> Self
