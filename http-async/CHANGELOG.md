@@ -8,6 +8,8 @@ note.
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-10-19
+
 ### Added
 
 - **The `zstd` content coding.** On native and Wasm the transport now undoes
