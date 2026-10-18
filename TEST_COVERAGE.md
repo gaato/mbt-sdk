@@ -74,8 +74,8 @@ codex-app-server 75.0 %).
 
 Must be covered by tests:
 
-- pure logic: header/URL/body assembly, the SSE parser, JSON-RPC framing and
-  codecs, multipart, retry and rate-limit arithmetic;
+- pure logic: header/URL/body assembly, the SSE parser, the cookie jar,
+  JSON-RPC framing and codecs, multipart, retry and rate-limit arithmetic;
 - every `raise` arm reachable through the public API, including the
   transport-error mapping arms (a scripted `@mock.FakeTransport` failure
   reaches each one);

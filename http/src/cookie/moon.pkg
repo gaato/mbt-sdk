@@ -1,0 +1,15 @@
+import {
+  "gaato/http",
+  "gaato/http/clock",
+  "moonbitlang/core/debug",
+  "moonbitlang/core/int64",
+}
+
+import {
+  "gaato/http/mock",
+} for "test"
+
+import {
+  "gaato/http/mock",
+  "moonbitlang/core/random",
+} for "wbtest"

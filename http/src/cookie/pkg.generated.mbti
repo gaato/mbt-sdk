@@ -1,0 +1,57 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "gaato/http/cookie"
+
+import {
+  "gaato/http",
+  "gaato/http/clock",
+  "moonbitlang/core/debug",
+}
+
+// Values
+
+// Errors
+
+// Types and methods
+pub struct Cookie {
+  name : String
+  value : String
+  domain : String
+  host_only : Bool
+  path : String
+  expires_ms : Int64?
+  secure : Bool
+  http_only : Bool
+  same_site : SameSite?
+  creation_ms : Int64
+  last_access_ms : Int64
+} derive(Eq, @debug.Debug)
+pub fn Cookie::equal(Self, Self) -> Bool
+pub fn Cookie::is_expired(Self, Int64) -> Bool
+pub fn Cookie::not_equal(Self, Self) -> Bool
+pub fn Cookie::to_repr(Self) -> @debug.Repr
+
+pub struct CookieJar {
+  // private fields
+}
+pub fn CookieJar::clear(Self) -> Unit
+pub fn CookieJar::clear_domain(Self, String) -> Unit
+pub fn CookieJar::clear_session(Self) -> Unit
+pub fn CookieJar::header_for(Self, String) -> String?
+pub fn CookieJar::iter(Self) -> Iter[Cookie]
+pub fn CookieJar::length(Self) -> Int
+pub fn CookieJar::new(&@clock.Clock, max_per_domain? : Int, max_total? : Int, is_public_suffix? : (String) -> Bool) -> Self
+pub fn CookieJar::remove_expired(Self) -> Unit
+pub fn CookieJar::store(Self, @http.Headers, String) -> Unit
+
+pub(all) enum SameSite {
+  Strict
+  Lax
+  NoRestriction
+} derive(Eq, @debug.Debug)
+pub fn SameSite::equal(Self, Self) -> Bool
+pub fn SameSite::not_equal(Self, Self) -> Bool
+pub fn SameSite::to_repr(Self) -> @debug.Repr
+
+// Type aliases
+
+// Traits

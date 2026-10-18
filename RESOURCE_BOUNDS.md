@@ -23,12 +23,13 @@ fails when a row names no test or a named test is not declared in the named
 file. Whether a named test really reaches the bound is checked in review. The
 other tables describe where no limit is enforced, so they stay prose.
 
-Scope: the hand-written modules `http` (with `http/sse`), `http-async`,
-`sdk-runtime`, `jsonrpc`, `jsonrpc-async` and `codex-app-server`. The
-generated SDKs (`openai`, `anthropic`, `github`) appear only where they buffer
-responses or streams; they do so through `sdk-runtime`, the transport the
-caller passes, and `@sse.each_event`. Test helpers (`http/mock`,
-`http-async/mock`) record what a test feeds them and are not listed.
+Scope: the hand-written modules `http` (with `http/sse` and `http/cookie`),
+`http-async`, `sdk-runtime`, `jsonrpc`, `jsonrpc-async` and
+`codex-app-server`. The generated SDKs (`openai`, `anthropic`, `github`)
+appear only where they buffer responses or streams; they do so through
+`sdk-runtime`, the transport the caller passes, and `@sse.each_event`. Test
+helpers (`http/mock`, `http-async/mock`) record what a test feeds them and are
+not listed.
 
 ## Enforced limits
 
@@ -45,6 +46,10 @@ caller passes, and `@sse.each_event`. Test helpers (`http/mock`,
 | Retries of one call (`sdk-runtime/src/retry.mbt`, `RetryPolicy::next_delay_ms`; `sdk-runtime/src/backoff.mbt`, `Backoff::delay_ms`) | `max_retries`, default 2; backoff capped at `max_ms` (30 s); a server delay over `max_retry_after_ms` (60 s) is not waited for. A custom `RetryDecider` sets its own bound | The last error is raised | `runtime-tests/src/client_test.mbt`: "Client stops at max retries and raises the final error", "Retry-After above the policy cap is not retried"; `sdk-runtime/src/auth_retry_test.mbt`: "RetryPolicy defaults and none", "next_delay honors Retry-After sources and upper bound"; `sdk-runtime/src/backoff_test.mbt`: "backoff defaults exponential growth cap and negative attempt" |
 | Redirect hops of one call (`http/src/redirect.mbt`, `follow_redirects`, `redirects`, `follow_redirects_stream`) | `max_redirects` followed, default 10, chosen by the caller. The step keeps only the current request: each 3xx response is handed to `on_redirect`, if given, and dropped, so a caller building a history holds at most `max_redirects` hops. The streaming variant closes each 3xx stream unread before the next request, so at most one stream is open at a time | `RedirectError::TooManyRedirects` (`HttpError::Protocol` from the middleware step) on the redirect past the limit, without sending it | `http-async/src/redirect_test.mbt`: "redirects stop at max_redirects, 10 by default", "follow_redirects_stream stops at 10 redirects by default", "follow_redirects_stream closes the 3xx it refuses"; `http/src/redirect_wbtest.mbt`: "plan_redirect decides each hop" |
 | `Paginator::collect` result (`sdk-runtime/src/paginator.mbt`) | `max` items, chosen by the caller; the unused rest of the last page is kept in `pending`, at most one page | Collection stops | `runtime-tests/src/paginator_test.mbt`: "Paginator each visits every item and collect keeps the unused rest"; `runtime-tests/src/github/github_test.mbt`: "collect stops at max without fetching the page it does not need" |
+| Cookies per domain (`http/src/cookie/jar.mbt`, `CookieJar::store`, `enforce_limits`) | `max_per_domain`, default 50 (the RFC 6265 §6.1 minimum), counted by the cookie's domain field, so a domain's host-only and `Domain` cookies share it. A host can only set cookies for itself and its parent domains | The domain's expired cookies are evicted, then its least recently accessed (earliest created among ties) until it fits (RFC 6265 §5.3). The new cookie is the most recently accessed, so it stays | `http/src/cookie/jar_wbtest.mbt`: "the per-domain cap evicts the least recently accessed cookie", "the per-domain cap evicts expired cookies before live ones", "the per-domain cap counts host-only and domain cookies of one domain", "the default caps are 50 cookies per domain and 3000 in all", "zero or negative caps keep nothing" |
+| Cookies in a jar (`http/src/cookie/jar.mbt`, `CookieJar::store`, `enforce_limits`) | `max_total`, default 3000 (the RFC 6265 §6.1 minimum) | Every expired cookie is evicted, then the least recently accessed across domains until it fits | `http/src/cookie/jar_wbtest.mbt`: "the total cap evicts expired cookies, then the least recently accessed", "the default caps are 50 cookies per domain and 3000 in all", "zero or negative caps keep nothing", "header_for sends exactly the live matching cookies, longest path first" |
+| One cookie (`http/src/cookie/set_cookie.mbt`, `parse_set_cookie`) | 4096 UTF-8 bytes for the whole `Set-Cookie` value: name, value and attributes (RFC 6265 §6.1); 1024 bytes for one attribute value (RFC 6265bis) | A longer value is ignored whole; a longer attribute is skipped | `http/src/cookie/set_cookie_wbtest.mbt`: "a set-cookie value is ignored past 4096 bytes and an attribute past 1024" |
+| Cookie lifetime (`http/src/cookie/jar.mbt`, `expiry`) | 400 days from when the cookie is stored (RFC 6265bis, as browsers do). A session cookie has no expiry: it stays until `clear_session`, `clear` or eviction | A later `Expires` or larger `Max-Age` is cut to 400 days | `http/src/cookie/jar_wbtest.mbt`: "lifetimes are cut to 400 days" |
 
 ## Bounded by rate and lifetime
 
@@ -58,6 +63,7 @@ caller passes, and `@sse.each_event`. Test helpers (`http/mock`,
 | Response streams (`http-async/src/transport.mbt`, `ClientStream`) | Body bytes | The transport keeps nothing between reads; the reader decides what to keep. A stream may last indefinitely while each read arrives within `timeout_ms` |
 | `Paginator::each` and `next_page` (`sdk-runtime/src/paginator.mbt`) | Pages | One page at a time. A server that always names a next page keeps the walk fetching, in constant memory; the callback stops it by raising |
 | Codex child process (`codex-app-server/src/child.mbt`, `spawn`; `jsonrpc-async/src/child.mbt`, `spawn_child`, `Child::shutdown`) | stdout and stderr output | stdout is read continuously by the connection's read loop; stderr is inherited, never buffered here. The child and its pipes end with the caller's task group, and `shutdown` cancels the child after its timeout |
+| The `Cookie` header (`http/src/cookie/jar.mbt`, `CookieJar::header_for`) | Cookies matching one request | The host's and its parent domains' cookies, at most `max_per_domain` each and `max_total` in all, each under 4096 bytes. The header is built per call and not kept |
 
 ## Left to the caller
 

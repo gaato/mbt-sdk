@@ -13,9 +13,9 @@ readme = "README.md"
 
 repository = "https://github.com/gaato/mbt-sdk"
 
-keywords = [ "http", "sans-io", "transport", "sse", "client" ]
+keywords = [ "http", "sans-io", "transport", "sse", "cookie", "client" ]
 
-description = "Sans-IO HTTP vocabulary for MoonBit SDKs: request/response types, a Transport trait, an incremental SSE parser and a scripted fake transport. No dependencies; runs on every backend."
+description = "Sans-IO HTTP vocabulary for MoonBit SDKs: request/response types, a Transport trait, an incremental SSE parser, an RFC 6265 cookie jar and a scripted fake transport. No dependencies; runs on every backend."
 
 source = "src"
 

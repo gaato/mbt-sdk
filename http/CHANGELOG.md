@@ -38,6 +38,19 @@ never does. Every breaking change is listed with a migration note.
   head arrived, so only the final stream is left open for the caller.
   `on_redirect` receives a `StreamRedirectHop` (request, 3xx head, next
   request).
+- **`gaato/http/cookie`: an RFC 6265 cookie jar for HTTP clients.**
+  `CookieJar::store` takes a response's `Set-Cookie` headers and the request
+  URL; `CookieJar::header_for` builds the `Cookie` header of a request. It
+  parses `Set-Cookie` leniently as RFC 6265 §5.2 does (the §5.1.1 date
+  algorithm for `Expires`, `Max-Age`, `Domain`, `Path`, `Secure`, `HttpOnly`,
+  `SameSite`), applies the §5.3 storage model and sends cookies in §5.4
+  order, with the RFC 6265bis rules browsers follow: Secure cookies only from
+  https, the `__Secure-` and `__Host-` prefixes, no insecure overwrite of a
+  Secure cookie, control characters refused, lifetimes cut to 400 days. Time
+  comes from a `@clock.Clock`. The jar keeps at most 50 cookies per domain and
+  3000 in all by default, and ignores a `Set-Cookie` over 4096 bytes. There is
+  no Public Suffix List: a single-label `Domain` is refused and an IP host
+  only gets host-only cookies; pass `is_public_suffix` to refuse more.
 
 ## [0.2.1] - 2026-10-18
 
