@@ -38,6 +38,7 @@ pub fn ChatCompletion::equal(Self, Self) -> Bool
 pub fn ChatCompletion::not_equal(Self, Self) -> Bool
 pub fn ChatCompletion::to_repr(Self) -> @debug.Repr
 
+#non_exhaustive
 pub(all) enum ChatEvent {
   Delta(String)
   ReasoningDelta(String)
@@ -110,6 +111,7 @@ pub fn EmbeddingResponse::equal(Self, Self) -> Bool
 pub fn EmbeddingResponse::not_equal(Self, Self) -> Bool
 pub fn EmbeddingResponse::to_repr(Self) -> @debug.Repr
 
+#non_exhaustive
 pub(all) enum FinishReason {
   Stop
   Length
@@ -158,6 +160,7 @@ pub fn Response::equal(Self, Self) -> Bool
 pub fn Response::not_equal(Self, Self) -> Bool
 pub fn Response::to_repr(Self) -> @debug.Repr
 
+#non_exhaustive
 pub(all) enum ResponseEvent {
   Created(Response)
   InProgress(Response)
@@ -193,6 +196,7 @@ pub fn ResponseRequest::not_equal(Self, Self) -> Bool
 pub fn ResponseRequest::to_repr(Self) -> @debug.Repr
 pub fn ResponseRequest::with_tool_outputs(Self, Array[(String, String)]) -> Self
 
+#non_exhaustive
 pub(all) enum ResponseStatus {
   Completed
   Failed

@@ -7,6 +7,18 @@ never does. Every breaking change is listed with a migration note.
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-10-19
+
+### Changed
+
+- **`Phase` is `#non_exhaustive`.** A later phase of an exchange, such as a
+  TLS handshake or a proxy tunnel, can then be added without breaking
+  matches in your code. Migration: a `match` on `Phase` outside this module
+  ends with `@http.Phase::.. => …` after the existing constructors.
+  `gaato/http-async` 0.4.1 already does. `HttpError` and the other error
+  types stay exhaustive: MoonBit 0.10.15 ignores the attribute on a
+  `suberror`.
+
 ## [0.3.1] - 2026-10-19
 
 ### Added

@@ -146,6 +146,16 @@ class IRTests(unittest.TestCase):
         self.assertIsInstance(enum, StringEnum)
         self.assertEqual([variant.value for variant in enum.variants], ["left", "right"])
 
+    def test_generated_enums_and_unions_are_non_exhaustive(self):
+        # A value the spec adds later must not break matches in user code, so
+        # a regeneration stays a patch release.
+        enum_schema = {"type": "string", "enum": ["left", "right"]}
+        types = emit(IRBuilder(document(operation(request=enum_schema)), "example/gen").build())["types.mbt"]
+        self.assertIn("#non_exhaustive\npub(all) enum TestOperationRequest {", types)
+        union_schema = {"oneOf": [{"type": "string"}, {"type": "integer"}]}
+        types = emit(IRBuilder(document(operation(request=union_schema)), "example/gen").build())["types.mbt"]
+        self.assertIn("#non_exhaustive\npub(all) enum TestOperationRequest {", types)
+
     def test_enum_value_colliding_with_fallback_constructor_moves_the_fallback_aside(self):
         request_schema = {"type": "string", "enum": ["anthropic", "custom"]}
         ir = IRBuilder(document(operation(request=request_schema)), "example/gen").build()

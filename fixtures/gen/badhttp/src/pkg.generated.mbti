@@ -200,6 +200,7 @@ pub fn put_echo_request() -> @http.Request
 // Errors
 
 // Types and methods
+#non_exhaustive
 pub(all) enum Get402BrokenFlavorFlavor {
   NotBase64
   NotJson
@@ -221,6 +222,7 @@ pub fn Get402BrokenFlavorFlavor::to_repr(Self) -> @debug.Repr
 pub impl ToJson for Get402BrokenFlavorFlavor
 pub impl @json.FromJson for Get402BrokenFlavorFlavor
 
+#non_exhaustive
 pub(all) enum Get402BrokenFlavorNetwork {
   BaseSepolia
   Base
@@ -234,6 +236,7 @@ pub fn Get402BrokenFlavorNetwork::to_repr(Self) -> @debug.Repr
 pub impl ToJson for Get402BrokenFlavorNetwork
 pub impl @json.FromJson for Get402BrokenFlavorNetwork
 
+#non_exhaustive
 pub(all) enum Get402PayNetwork {
   BaseSepolia
   Base
@@ -247,6 +250,7 @@ pub fn Get402PayNetwork::to_repr(Self) -> @debug.Repr
 pub impl ToJson for Get402PayNetwork
 pub impl @json.FromJson for Get402PayNetwork
 
+#non_exhaustive
 pub(all) enum Get402ScenarioNetwork {
   BaseSepolia
   Base
@@ -260,6 +264,7 @@ pub fn Get402ScenarioNetwork::to_repr(Self) -> @debug.Repr
 pub impl ToJson for Get402ScenarioNetwork
 pub impl @json.FromJson for Get402ScenarioNetwork
 
+#non_exhaustive
 pub(all) enum Get402ScenarioScenario {
   Never
   Reject
@@ -278,6 +283,7 @@ pub fn Get402ScenarioScenario::to_repr(Self) -> @debug.Repr
 pub impl ToJson for Get402ScenarioScenario
 pub impl @json.FromJson for Get402ScenarioScenario
 
+#non_exhaustive
 pub(all) enum GetAuthFlavorFlavor {
   Basic
   Bearer
@@ -307,6 +313,7 @@ pub fn GetAuthFlavorFlavor::to_repr(Self) -> @debug.Repr
 pub impl ToJson for GetAuthFlavorFlavor
 pub impl @json.FromJson for GetAuthFlavorFlavor
 
+#non_exhaustive
 pub(all) enum GetBadjsonFlavorFlavor {
   Truncated
   TrailingComma
@@ -334,6 +341,7 @@ pub fn GetBadjsonFlavorFlavor::to_repr(Self) -> @debug.Repr
 pub impl ToJson for GetBadjsonFlavorFlavor
 pub impl @json.FromJson for GetBadjsonFlavorFlavor
 
+#non_exhaustive
 pub(all) enum GetCompressFlavorFlavor {
   Ok
   Br
@@ -366,6 +374,7 @@ pub fn GetCompressFlavorFlavor::to_repr(Self) -> @debug.Repr
 pub impl ToJson for GetCompressFlavorFlavor
 pub impl @json.FromJson for GetCompressFlavorFlavor
 
+#non_exhaustive
 pub(all) enum GetCookiesFlavorFlavor {
   Ok
   Echo
@@ -396,6 +405,7 @@ pub fn GetCookiesFlavorFlavor::to_repr(Self) -> @debug.Repr
 pub impl ToJson for GetCookiesFlavorFlavor
 pub impl @json.FromJson for GetCookiesFlavorFlavor
 
+#non_exhaustive
 pub(all) enum GetCrosshostFlavorFlavor {
   SameOrigin
   ToSubdomain
@@ -416,6 +426,7 @@ pub fn GetCrosshostFlavorFlavor::to_repr(Self) -> @debug.Repr
 pub impl ToJson for GetCrosshostFlavorFlavor
 pub impl @json.FromJson for GetCrosshostFlavorFlavor
 
+#non_exhaustive
 pub(all) enum GetEtagFlavorFlavor {
   Ok
   Weak
@@ -437,6 +448,7 @@ pub fn GetEtagFlavorFlavor::to_repr(Self) -> @debug.Repr
 pub impl ToJson for GetEtagFlavorFlavor
 pub impl @json.FromJson for GetEtagFlavorFlavor
 
+#non_exhaustive
 pub(all) enum GetRangeFlavorFlavor {
   Ok
   Ignore
@@ -462,6 +474,7 @@ pub fn GetRangeFlavorFlavor::to_repr(Self) -> @debug.Repr
 pub impl ToJson for GetRangeFlavorFlavor
 pub impl @json.FromJson for GetRangeFlavorFlavor
 
+#non_exhaustive
 pub(all) enum GetRedirectHopsHops {
   Int(Int)
   Text(String)
@@ -474,6 +487,7 @@ pub fn GetRedirectHopsHops::to_repr(Self) -> @debug.Repr
 pub impl ToJson for GetRedirectHopsHops
 pub impl @json.FromJson for GetRedirectHopsHops
 
+#non_exhaustive
 pub(all) enum GetSseFlavorFlavor {
   Ok
   Stall

@@ -110,6 +110,7 @@ pub impl @json.FromJson for APIError with fn from_json(value, path) {
 ///|
 ///
 /// Specifies who can invoke a tool. Values: direct: The model can call this tool directly. code_execution_20250825: The tool can be called from the code execution environment (v1). code_execution_20260120: The tool can be called from the code execution environment (v2 with persistence). code_execution_20260521: The tool can be called from the code execution environment (v2 with persistence).
+#non_exhaustive
 pub(all) enum AllowedCaller {
   Direct
   CodeExecution20250825
@@ -262,6 +263,7 @@ pub impl @json.FromJson for AvailableToolsLimitExceededErrorDetails with fn from
 ///|
 ///
 /// Generated string enum Base64ImageSourceMediaType.
+#non_exhaustive
 pub(all) enum Base64ImageSourceMediaType {
   ImageJpeg
   ImagePng
@@ -426,6 +428,7 @@ pub impl @json.FromJson for Base64PDFSource with fn from_json(value, path) {
 ///|
 ///
 /// Generated string enum BashCodeExecutionToolResultErrorCode.
+#non_exhaustive
 pub(all) enum BashCodeExecutionToolResultErrorCode {
   InvalidToolInput
   Unavailable
@@ -489,6 +492,7 @@ pub impl @json.FromJson for BashCodeExecutionToolResultErrorCode with fn from_js
 ///|
 ///
 /// The time-to-live for the cache control breakpoint. This may be one the following values: - `5m`: 5 minutes - `1h`: 1 hour Defaults to `5m`. See [prompt caching pricing](https://platform.claude.com/docs/en/build-with-claude/prompt-caching) for details.
+#non_exhaustive
 pub(all) enum CacheControlEphemeralTtl {
   Value5m
   Value1h
@@ -594,6 +598,7 @@ pub impl @json.FromJson for CacheControlEphemeral with fn from_json(value, path)
 ///|
 ///
 /// Create a cache control breakpoint at this content block.
+#non_exhaustive
 pub(all) enum BashTool20250124CacheControl {
   Ephemeral(CacheControlEphemeral)
   Unknown(String, Json)
@@ -2991,6 +2996,7 @@ pub impl @json.FromJson for BrowserToolsetConfigs with fn from_json(value, path)
 ///|
 ///
 /// Create a cache control breakpoint at this content block.
+#non_exhaustive
 pub(all) enum BrowserToolset20260801CacheControl {
   Ephemeral(CacheControlEphemeral)
   Unknown(String, Json)
@@ -3458,6 +3464,7 @@ pub impl @json.FromJson for CacheMissUnavailable with fn from_json(value, path) 
 ///|
 ///
 /// Generated tagged union CacheMissReason.
+#non_exhaustive
 pub(all) enum CacheMissReason {
   MessagesChanged(CacheMissMessagesChanged)
   ModelChanged(CacheMissModelChanged)
@@ -3964,6 +3971,7 @@ pub impl @json.FromJson for ResponseWebSearchResultLocationCitation with fn from
 ///|
 ///
 /// Generated tagged union CitationsDeltaCitation.
+#non_exhaustive
 pub(all) enum CitationsDeltaCitation {
   CharLocation(ResponseCharLocationCitation)
   ContentBlockLocation(ResponseContentBlockLocationCitation)
@@ -4230,6 +4238,7 @@ pub impl @json.FromJson for CmekKeyNetworkBlockedErrorDetails with fn from_json(
 ///|
 ///
 /// Generated string enum CodeExecutionToolResultErrorCode.
+#non_exhaustive
 pub(all) enum CodeExecutionToolResultErrorCode {
   InvalidToolInput
   Unavailable
@@ -4290,6 +4299,7 @@ pub impl @json.FromJson for CodeExecutionToolResultErrorCode with fn from_json(
 ///|
 ///
 /// Create a cache control breakpoint at this content block.
+#non_exhaustive
 pub(all) enum CodeExecutionTool20250522CacheControl {
   Ephemeral(CacheControlEphemeral)
   Unknown(String, Json)
@@ -4410,6 +4420,7 @@ pub impl @json.FromJson for CodeExecutionTool20250522 with fn from_json(
 ///|
 ///
 /// Create a cache control breakpoint at this content block.
+#non_exhaustive
 pub(all) enum CodeExecutionTool20250825CacheControl {
   Ephemeral(CacheControlEphemeral)
   Unknown(String, Json)
@@ -4530,6 +4541,7 @@ pub impl @json.FromJson for CodeExecutionTool20250825 with fn from_json(
 ///|
 ///
 /// Create a cache control breakpoint at this content block.
+#non_exhaustive
 pub(all) enum CodeExecutionTool20260120CacheControl {
   Ephemeral(CacheControlEphemeral)
   Unknown(String, Json)
@@ -4650,6 +4662,7 @@ pub impl @json.FromJson for CodeExecutionTool20260120 with fn from_json(
 ///|
 ///
 /// Create a cache control breakpoint at this content block.
+#non_exhaustive
 pub(all) enum CodeExecutionTool20260521CacheControl {
   Ephemeral(CacheControlEphemeral)
   Unknown(String, Json)
@@ -6223,6 +6236,7 @@ pub impl @json.FromJson for ComputerToolsetConfigs with fn from_json(
 ///|
 ///
 /// Create a cache control breakpoint at this content block.
+#non_exhaustive
 pub(all) enum ComputerToolset20260801CacheControl {
   Ephemeral(CacheControlEphemeral)
   Unknown(String, Json)
@@ -6330,6 +6344,7 @@ pub impl @json.FromJson for ComputerToolset20260801 with fn from_json(
 ///|
 ///
 /// Type of skill - either 'anthropic' (built-in) or 'custom' (user-defined)
+#non_exhaustive
 pub(all) enum ContainerSkillType {
   Anthropic
   Custom
@@ -6491,6 +6506,7 @@ pub impl @json.FromJson for Container with fn from_json(value, path) {
 ///|
 ///
 /// Type of skill - either 'anthropic' (built-in) or 'custom' (user-defined)
+#non_exhaustive
 pub(all) enum SkillParamsType {
   Anthropic
   CustomSkill
@@ -6864,6 +6880,7 @@ pub impl @json.FromJson for ThinkingContentBlockDelta with fn from_json(
 ///|
 ///
 /// Generated tagged union ContentBlockDeltaEventDelta.
+#non_exhaustive
 pub(all) enum ContentBlockDeltaEventDelta {
   CitationsDelta(CitationsDelta)
   InputJsonDelta(InputJsonContentBlockDelta)
@@ -6979,6 +6996,7 @@ pub impl @json.FromJson for ContentBlockDeltaEvent with fn from_json(
 ///|
 ///
 /// Create a cache control breakpoint at this content block.
+#non_exhaustive
 pub(all) enum RequestImageBlockCacheControl {
   Ephemeral(CacheControlEphemeral)
   Unknown(String, Json)
@@ -7123,6 +7141,7 @@ pub impl @json.FromJson for URLImageSource with fn from_json(value, path) {
 ///|
 ///
 /// Generated tagged union RequestImageBlockSource.
+#non_exhaustive
 pub(all) enum RequestImageBlockSource {
   Base64(Base64ImageSource)
   File(FileImageSource)
@@ -7174,6 +7193,7 @@ pub impl @json.FromJson for RequestImageBlockSource with fn from_json(
 ///|
 ///
 /// What the server does when this image exceeds the model's maximum image size. `"downsize"` (the default) scales the image down to fit, which changes the dimensions the model observes without telling you. `"error"` instead rejects the request with a 400 error naming the image's dimensions and the largest dimensions that fit, so you can scale the image deliberately — your image is never silently scaled down.
+#non_exhaustive
 pub(all) enum RequestImageTransformationsOversizedImage {
   Downsize
   Error
@@ -7346,6 +7366,7 @@ pub impl @json.FromJson for RequestImageBlock with fn from_json(value, path) {
 ///|
 ///
 /// Create a cache control breakpoint at this content block.
+#non_exhaustive
 pub(all) enum RequestTextBlockCacheControl {
   Ephemeral(CacheControlEphemeral)
   Unknown(String, Json)
@@ -7781,6 +7802,7 @@ pub impl @json.FromJson for RequestWebSearchResultLocationCitation with fn from_
 ///|
 ///
 /// Generated tagged union RequestTextBlockCitationsItem.
+#non_exhaustive
 pub(all) enum RequestTextBlockCitationsItem {
   CharLocation(RequestCharLocationCitation)
   ContentBlockLocation(RequestContentBlockLocationCitation)
@@ -7905,6 +7927,7 @@ pub impl @json.FromJson for RequestTextBlock with fn from_json(value, path) {
 ///|
 ///
 /// Generated tagged union ContentBlockSourceContentValueArrayItem.
+#non_exhaustive
 pub(all) enum ContentBlockSourceContentValueArrayItem {
   Image(RequestImageBlock)
   Text(RequestTextBlock)
@@ -7957,6 +7980,7 @@ pub impl @json.FromJson for ContentBlockSourceContentValueArrayItem with fn from
 ///|
 ///
 /// Generated untagged union ContentBlockSourceContent.
+#non_exhaustive
 pub(all) enum ContentBlockSourceContent {
   Text(String)
   ValueArray(Array[ContentBlockSourceContentValueArrayItem])
@@ -8234,6 +8258,7 @@ pub impl @json.FromJson for ResponseBashCodeExecutionResultBlock with fn from_js
 ///|
 ///
 /// Generated tagged union ResponseBashCodeExecutionToolResultBlockContent.
+#non_exhaustive
 pub(all) enum ResponseBashCodeExecutionToolResultBlockContent {
   BashCodeExecutionToolResultError(ResponseBashCodeExecutionToolResultError)
   BashCodeExecutionResult(ResponseBashCodeExecutionResultBlock)
@@ -8598,6 +8623,7 @@ pub impl @json.FromJson for ResponseEncryptedCodeExecutionResultBlock with fn fr
 ///|
 ///
 /// Generated tagged union ResponseCodeExecutionToolResultBlockContent.
+#non_exhaustive
 pub(all) enum ResponseCodeExecutionToolResultBlockContent {
   CodeExecutionToolResultError(ResponseCodeExecutionToolResultError)
   CodeExecutionResult(ResponseCodeExecutionResultBlock)
@@ -8973,6 +8999,7 @@ pub impl @json.FromJson for DirectCaller with fn from_json(value, path) {
 ///|
 ///
 /// Generated tagged union ResponseServerToolUseBlockCaller.
+#non_exhaustive
 pub(all) enum ResponseServerToolUseBlockCaller {
   CodeExecution20250825(ServerToolCaller)
   CodeExecution20260120(ServerToolCaller20260120)
@@ -9026,6 +9053,7 @@ pub impl @json.FromJson for ResponseServerToolUseBlockCaller with fn from_json(
 ///|
 ///
 /// Generated string enum ResponseServerToolUseBlockName.
+#non_exhaustive
 pub(all) enum ResponseServerToolUseBlockName {
   WebSearch
   WebFetch
@@ -9161,6 +9189,7 @@ pub impl @json.FromJson for ResponseServerToolUseBlock with fn from_json(
 ///|
 ///
 /// Generated tagged union ResponseTextBlockCitationsItem.
+#non_exhaustive
 pub(all) enum ResponseTextBlockCitationsItem {
   CharLocation(ResponseCharLocationCitation)
   ContentBlockLocation(ResponseContentBlockLocationCitation)
@@ -9276,6 +9305,7 @@ pub impl @json.FromJson for ResponseTextBlock with fn from_json(value, path) {
 ///|
 ///
 /// Generated string enum TextEditorCodeExecutionToolResultErrorCode.
+#non_exhaustive
 pub(all) enum TextEditorCodeExecutionToolResultErrorCode {
   InvalidToolInput
   Unavailable
@@ -9418,6 +9448,7 @@ pub impl @json.FromJson for ResponseTextEditorCodeExecutionToolResultError with 
 ///|
 ///
 /// Generated string enum ResponseTextEditorCodeExecutionViewResultBlockFileType.
+#non_exhaustive
 pub(all) enum ResponseTextEditorCodeExecutionViewResultBlockFileType {
   Text
   Image
@@ -9717,6 +9748,7 @@ pub impl @json.FromJson for ResponseTextEditorCodeExecutionStrReplaceResultBlock
 ///|
 ///
 /// Generated tagged union ResponseTextEditorCodeExecutionToolResultBlockContent.
+#non_exhaustive
 pub(all) enum ResponseTextEditorCodeExecutionToolResultBlockContent {
   TextEditorCodeExecutionToolResultError(
     ResponseTextEditorCodeExecutionToolResultError
@@ -9916,6 +9948,7 @@ pub impl @json.FromJson for ResponseThinkingBlock with fn from_json(value, path)
 ///|
 ///
 /// Generated string enum ToolSearchToolResultErrorCode.
+#non_exhaustive
 pub(all) enum ToolSearchToolResultErrorCode {
   InvalidToolInput
   Unavailable
@@ -10144,6 +10177,7 @@ pub impl @json.FromJson for ResponseToolSearchToolSearchResultBlock with fn from
 ///|
 ///
 /// Generated tagged union ResponseToolSearchToolResultBlockContent.
+#non_exhaustive
 pub(all) enum ResponseToolSearchToolResultBlockContent {
   ToolSearchToolResultError(ResponseToolSearchToolResultError)
   ToolSearchToolSearchResult(ResponseToolSearchToolSearchResultBlock)
@@ -10256,6 +10290,7 @@ pub impl @json.FromJson for ResponseToolSearchToolResultBlock with fn from_json(
 ///|
 ///
 /// Generated tagged union ResponseToolUseBlockCaller.
+#non_exhaustive
 pub(all) enum ResponseToolUseBlockCaller {
   CodeExecution20250825(ServerToolCaller)
   CodeExecution20260120(ServerToolCaller20260120)
@@ -10383,6 +10418,7 @@ pub impl @json.FromJson for ResponseToolUseBlock with fn from_json(value, path) 
 ///|
 ///
 /// Generated tagged union ResponseWebFetchToolResultBlockCaller.
+#non_exhaustive
 pub(all) enum ResponseWebFetchToolResultBlockCaller {
   CodeExecution20250825(ServerToolCaller)
   CodeExecution20260120(ServerToolCaller20260120)
@@ -10438,6 +10474,7 @@ pub impl @json.FromJson for ResponseWebFetchToolResultBlockCaller with fn from_j
 ///|
 ///
 /// Generated string enum WebFetchToolResultErrorCode.
+#non_exhaustive
 pub(all) enum WebFetchToolResultErrorCode {
   InvalidToolInput
   UrlTooLong
@@ -10663,6 +10700,7 @@ pub impl @json.FromJson for PlainTextSource with fn from_json(value, path) {
 ///|
 ///
 /// Generated tagged union ResponseDocumentBlockSource.
+#non_exhaustive
 pub(all) enum ResponseDocumentBlockSource {
   Base64(Base64PDFSource)
   Text(PlainTextSource)
@@ -10832,6 +10870,7 @@ pub impl @json.FromJson for ResponseWebFetchResultBlock with fn from_json(
 ///|
 ///
 /// Generated tagged union ResponseWebFetchToolResultBlockContent.
+#non_exhaustive
 pub(all) enum ResponseWebFetchToolResultBlockContent {
   WebFetchToolResultError(ResponseWebFetchToolResultError)
   WebFetchResult(ResponseWebFetchResultBlock)
@@ -10945,6 +10984,7 @@ pub impl @json.FromJson for ResponseWebFetchToolResultBlock with fn from_json(
 ///|
 ///
 /// Generated tagged union ResponseWebSearchToolResultBlockCaller.
+#non_exhaustive
 pub(all) enum ResponseWebSearchToolResultBlockCaller {
   CodeExecution20250825(ServerToolCaller)
   CodeExecution20260120(ServerToolCaller20260120)
@@ -11000,6 +11040,7 @@ pub impl @json.FromJson for ResponseWebSearchToolResultBlockCaller with fn from_
 ///|
 ///
 /// Generated string enum WebSearchToolResultErrorCode.
+#non_exhaustive
 pub(all) enum WebSearchToolResultErrorCode {
   InvalidToolInput
   Unavailable
@@ -11178,6 +11219,7 @@ pub impl @json.FromJson for ResponseWebSearchResultBlock with fn from_json(
 ///|
 ///
 /// Generated untagged union ResponseWebSearchToolResultBlockContent.
+#non_exhaustive
 pub(all) enum ResponseWebSearchToolResultBlockContent {
   ResponseWebSearchToolResultError(ResponseWebSearchToolResultError)
   ResponseWebSearchResultBlockArray(Array[ResponseWebSearchResultBlock])
@@ -11302,6 +11344,7 @@ pub impl @json.FromJson for ResponseWebSearchToolResultBlock with fn from_json(
 ///|
 ///
 /// Generated tagged union ContentBlockStartEventContentBlock.
+#non_exhaustive
 pub(all) enum ContentBlockStartEventContentBlock {
   BashCodeExecutionToolResult(ResponseBashCodeExecutionToolResultBlock)
   CodeExecutionToolResult(ResponseCodeExecutionToolResultBlock)
@@ -11576,6 +11619,7 @@ pub impl @json.FromJson for ContextManagementCapability with fn from_json(
 ///|
 ///
 /// Top-level cache control automatically applies a cache_control marker to the last cacheable block in the request.
+#non_exhaustive
 pub(all) enum CountMessageTokensParamsCacheControl {
   Ephemeral(CacheControlEphemeral)
   Unknown(String, Json)
@@ -11621,6 +11665,7 @@ pub impl @json.FromJson for CountMessageTokensParamsCacheControl with fn from_js
 ///|
 ///
 /// Create a cache control breakpoint at this content block.
+#non_exhaustive
 pub(all) enum RequestBashCodeExecutionToolResultBlockCacheControl {
   Ephemeral(CacheControlEphemeral)
   Unknown(String, Json)
@@ -11850,6 +11895,7 @@ pub impl @json.FromJson for RequestBashCodeExecutionResultBlock with fn from_jso
 ///|
 ///
 /// Generated tagged union RequestBashCodeExecutionToolResultBlockContent.
+#non_exhaustive
 pub(all) enum RequestBashCodeExecutionToolResultBlockContent {
   BashCodeExecutionToolResultError(RequestBashCodeExecutionToolResultError)
   BashCodeExecutionResult(RequestBashCodeExecutionResultBlock)
@@ -11982,6 +12028,7 @@ pub impl @json.FromJson for RequestBashCodeExecutionToolResultBlock with fn from
 ///|
 ///
 /// Create a cache control breakpoint at this content block.
+#non_exhaustive
 pub(all) enum RequestCodeExecutionToolResultBlockCacheControl {
   Ephemeral(CacheControlEphemeral)
   Unknown(String, Json)
@@ -12277,6 +12324,7 @@ pub impl @json.FromJson for RequestEncryptedCodeExecutionResultBlock with fn fro
 ///|
 ///
 /// Generated tagged union RequestCodeExecutionToolResultBlockContent.
+#non_exhaustive
 pub(all) enum RequestCodeExecutionToolResultBlockContent {
   CodeExecutionToolResultError(RequestCodeExecutionToolResultError)
   CodeExecutionResult(RequestCodeExecutionResultBlock)
@@ -12409,6 +12457,7 @@ pub impl @json.FromJson for RequestCodeExecutionToolResultBlock with fn from_jso
 ///|
 ///
 /// Create a cache control breakpoint at this content block.
+#non_exhaustive
 pub(all) enum RequestContainerUploadBlockCacheControl {
   Ephemeral(CacheControlEphemeral)
   Unknown(String, Json)
@@ -12520,6 +12569,7 @@ pub impl @json.FromJson for RequestContainerUploadBlock with fn from_json(
 ///|
 ///
 /// Create a cache control breakpoint at this content block.
+#non_exhaustive
 pub(all) enum RequestDocumentBlockCacheControl {
   Ephemeral(CacheControlEphemeral)
   Unknown(String, Json)
@@ -12708,6 +12758,7 @@ pub impl @json.FromJson for URLPDFSource with fn from_json(value, path) {
 ///|
 ///
 /// Generated tagged union RequestDocumentBlockSource.
+#non_exhaustive
 pub(all) enum RequestDocumentBlockSource {
   Base64(Base64PDFSource)
   Content(ContentBlockSource)
@@ -12893,6 +12944,7 @@ pub impl @json.FromJson for RequestRedactedThinkingBlock with fn from_json(
 ///|
 ///
 /// Create a cache control breakpoint at this content block.
+#non_exhaustive
 pub(all) enum RequestSearchResultBlockCacheControl {
   Ephemeral(CacheControlEphemeral)
   Unknown(String, Json)
@@ -13015,6 +13067,7 @@ pub impl @json.FromJson for RequestSearchResultBlock with fn from_json(
 ///|
 ///
 /// Create a cache control breakpoint at this content block.
+#non_exhaustive
 pub(all) enum RequestServerToolUseBlockCacheControl {
   Ephemeral(CacheControlEphemeral)
   Unknown(String, Json)
@@ -13062,6 +13115,7 @@ pub impl @json.FromJson for RequestServerToolUseBlockCacheControl with fn from_j
 ///|
 ///
 /// Generated tagged union RequestServerToolUseBlockCaller.
+#non_exhaustive
 pub(all) enum RequestServerToolUseBlockCaller {
   CodeExecution20250825(ServerToolCaller)
   CodeExecution20260120(ServerToolCaller20260120)
@@ -13115,6 +13169,7 @@ pub impl @json.FromJson for RequestServerToolUseBlockCaller with fn from_json(
 ///|
 ///
 /// Generated string enum RequestServerToolUseBlockName.
+#non_exhaustive
 pub(all) enum RequestServerToolUseBlockName {
   WebSearch
   WebFetch
@@ -13261,6 +13316,7 @@ pub impl @json.FromJson for RequestServerToolUseBlock with fn from_json(
 ///|
 ///
 /// Create a cache control breakpoint at this content block.
+#non_exhaustive
 pub(all) enum RequestTextEditorCodeExecutionToolResultBlockCacheControl {
   Ephemeral(CacheControlEphemeral)
   Unknown(String, Json)
@@ -13388,6 +13444,7 @@ pub impl @json.FromJson for RequestTextEditorCodeExecutionToolResultError with f
 ///|
 ///
 /// Generated string enum RequestTextEditorCodeExecutionViewResultBlockFileType.
+#non_exhaustive
 pub(all) enum RequestTextEditorCodeExecutionViewResultBlockFileType {
   Text
   Image
@@ -13695,6 +13752,7 @@ pub impl @json.FromJson for RequestTextEditorCodeExecutionStrReplaceResultBlock 
 ///|
 ///
 /// Generated tagged union RequestTextEditorCodeExecutionToolResultBlockContent.
+#non_exhaustive
 pub(all) enum RequestTextEditorCodeExecutionToolResultBlockContent {
   TextEditorCodeExecutionToolResultError(
     RequestTextEditorCodeExecutionToolResultError
@@ -13905,6 +13963,7 @@ pub impl @json.FromJson for RequestThinkingBlock with fn from_json(value, path) 
 ///|
 ///
 /// Create a cache control breakpoint at this content block.
+#non_exhaustive
 pub(all) enum RequestToolResultBlockCacheControl {
   Ephemeral(CacheControlEphemeral)
   Unknown(String, Json)
@@ -13950,6 +14009,7 @@ pub impl @json.FromJson for RequestToolResultBlockCacheControl with fn from_json
 ///|
 ///
 /// Create a cache control breakpoint at this content block.
+#non_exhaustive
 pub(all) enum RequestBrowserStateBlockCacheControl {
   Ephemeral(CacheControlEphemeral)
   Unknown(String, Json)
@@ -13995,6 +14055,7 @@ pub impl @json.FromJson for RequestBrowserStateBlockCacheControl with fn from_js
 ///|
 ///
 /// Generated tagged union RequestBrowserStateBlockStateChangesItem.
+#non_exhaustive
 pub(all) enum RequestBrowserStateBlockStateChangesItem {
   DownloadCompleted(BrowserStateChangeDownloadCompleted)
   DownloadFailed(BrowserStateChangeDownloadFailed)
@@ -14122,6 +14183,7 @@ pub impl @json.FromJson for RequestBrowserStateBlock with fn from_json(
 ///|
 ///
 /// Create a cache control breakpoint at this content block.
+#non_exhaustive
 pub(all) enum RequestToolReferenceBlockCacheControl {
   Ephemeral(CacheControlEphemeral)
   Unknown(String, Json)
@@ -14231,6 +14293,7 @@ pub impl @json.FromJson for RequestToolReferenceBlock with fn from_json(
 ///|
 ///
 /// Generated tagged union RequestToolResultBlockContentValueArrayItem.
+#non_exhaustive
 pub(all) enum RequestToolResultBlockContentValueArrayItem {
   BrowserState(RequestBrowserStateBlock)
   Document(RequestDocumentBlock)
@@ -14300,6 +14363,7 @@ pub impl @json.FromJson for RequestToolResultBlockContentValueArrayItem with fn 
 ///|
 ///
 /// Generated untagged union RequestToolResultBlockContent.
+#non_exhaustive
 pub(all) enum RequestToolResultBlockContent {
   Text(String)
   ValueArray(Array[RequestToolResultBlockContentValueArrayItem])
@@ -14432,6 +14496,7 @@ pub impl @json.FromJson for RequestToolResultBlock with fn from_json(
 ///|
 ///
 /// Create a cache control breakpoint at this content block.
+#non_exhaustive
 pub(all) enum RequestToolSearchToolResultBlockCacheControl {
   Ephemeral(CacheControlEphemeral)
   Unknown(String, Json)
@@ -14604,6 +14669,7 @@ pub impl @json.FromJson for RequestToolSearchToolSearchResultBlock with fn from_
 ///|
 ///
 /// Generated tagged union RequestToolSearchToolResultBlockContent.
+#non_exhaustive
 pub(all) enum RequestToolSearchToolResultBlockContent {
   ToolSearchToolResultError(RequestToolSearchToolResultError)
   ToolSearchToolSearchResult(RequestToolSearchToolSearchResultBlock)
@@ -14727,6 +14793,7 @@ pub impl @json.FromJson for RequestToolSearchToolResultBlock with fn from_json(
 ///|
 ///
 /// Create a cache control breakpoint at this content block.
+#non_exhaustive
 pub(all) enum RequestToolUseBlockCacheControl {
   Ephemeral(CacheControlEphemeral)
   Unknown(String, Json)
@@ -14772,6 +14839,7 @@ pub impl @json.FromJson for RequestToolUseBlockCacheControl with fn from_json(
 ///|
 ///
 /// Generated tagged union RequestToolUseBlockCaller.
+#non_exhaustive
 pub(all) enum RequestToolUseBlockCaller {
   CodeExecution20250825(ServerToolCaller)
   CodeExecution20260120(ServerToolCaller20260120)
@@ -14904,6 +14972,7 @@ pub impl @json.FromJson for RequestToolUseBlock with fn from_json(value, path) {
 ///|
 ///
 /// Create a cache control breakpoint at this content block.
+#non_exhaustive
 pub(all) enum RequestWebFetchToolResultBlockCacheControl {
   Ephemeral(CacheControlEphemeral)
   Unknown(String, Json)
@@ -14958,6 +15027,7 @@ pub impl @json.FromJson for RequestWebFetchToolResultBlockCacheControl with fn f
 ///|
 ///
 /// Generated tagged union RequestWebFetchToolResultBlockCaller.
+#non_exhaustive
 pub(all) enum RequestWebFetchToolResultBlockCaller {
   CodeExecution20250825(ServerToolCaller)
   CodeExecution20260120(ServerToolCaller20260120)
@@ -15132,6 +15202,7 @@ pub impl @json.FromJson for RequestWebFetchResultBlock with fn from_json(
 ///|
 ///
 /// Generated tagged union RequestWebFetchToolResultBlockContent.
+#non_exhaustive
 pub(all) enum RequestWebFetchToolResultBlockContent {
   WebFetchToolResultError(RequestWebFetchToolResultError)
   WebFetchResult(RequestWebFetchResultBlock)
@@ -15255,6 +15326,7 @@ pub impl @json.FromJson for RequestWebFetchToolResultBlock with fn from_json(
 ///|
 ///
 /// Create a cache control breakpoint at this content block.
+#non_exhaustive
 pub(all) enum RequestWebSearchToolResultBlockCacheControl {
   Ephemeral(CacheControlEphemeral)
   Unknown(String, Json)
@@ -15309,6 +15381,7 @@ pub impl @json.FromJson for RequestWebSearchToolResultBlockCacheControl with fn 
 ///|
 ///
 /// Generated tagged union RequestWebSearchToolResultBlockCaller.
+#non_exhaustive
 pub(all) enum RequestWebSearchToolResultBlockCaller {
   CodeExecution20250825(ServerToolCaller)
   CodeExecution20260120(ServerToolCaller20260120)
@@ -15481,6 +15554,7 @@ pub impl @json.FromJson for RequestWebSearchToolResultError with fn from_json(
 ///|
 ///
 /// Generated untagged union RequestWebSearchToolResultBlockContent.
+#non_exhaustive
 pub(all) enum RequestWebSearchToolResultBlockContent {
   RequestWebSearchResultBlockArray(Array[RequestWebSearchResultBlock])
   RequestWebSearchToolResultError(RequestWebSearchToolResultError)
@@ -15613,6 +15687,7 @@ pub impl @json.FromJson for RequestWebSearchToolResultBlock with fn from_json(
 ///|
 ///
 /// Generated tagged union InputContentBlock.
+#non_exhaustive
 pub(all) enum InputContentBlock {
   BashCodeExecutionToolResult(RequestBashCodeExecutionToolResultBlock)
   CodeExecutionToolResult(RequestCodeExecutionToolResultBlock)
@@ -15707,6 +15782,7 @@ pub impl @json.FromJson for InputContentBlock with fn from_json(value, path) {
 ///|
 ///
 /// Generated untagged union InputMessageContent.
+#non_exhaustive
 pub(all) enum InputMessageContent {
   Text(String)
   InputContentBlockArray(Array[InputContentBlock])
@@ -15754,6 +15830,7 @@ pub impl @json.FromJson for InputMessageContent with fn from_json(value, path) {
 ///|
 ///
 /// Generated string enum InputMessageRole.
+#non_exhaustive
 pub(all) enum InputMessageRole {
   User
   Assistant
@@ -15859,6 +15936,7 @@ pub impl @json.FromJson for InputMessage with fn from_json(value, path) {
 ///|
 ///
 /// All possible effort levels.
+#non_exhaustive
 pub(all) enum EffortLevel {
   Low
   Medium
@@ -16017,6 +16095,7 @@ pub impl @json.FromJson for OutputConfig with fn from_json(value, path) {
 ///|
 ///
 /// Generated string enum Speed.
+#non_exhaustive
 pub(all) enum Speed {
   Standard
   Fast
@@ -16068,6 +16147,7 @@ pub impl @json.FromJson for Speed with fn from_json(value, path) {
 ///|
 ///
 /// System prompt. A system prompt is a way of providing context and instructions to Claude, such as specifying a particular goal or role. See our [guide to system prompts](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices#give-claude-a-role).
+#non_exhaustive
 pub(all) enum CountMessageTokensParamsSystem {
   Text(String)
   RequestTextBlockArray(Array[RequestTextBlock])
@@ -16120,6 +16200,7 @@ pub impl @json.FromJson for CountMessageTokensParamsSystem with fn from_json(
 ///|
 ///
 /// Generated string enum ThinkingDisplayMode.
+#non_exhaustive
 pub(all) enum ThinkingDisplayMode {
   Summarized
   Omitted
@@ -16370,6 +16451,7 @@ pub impl @json.FromJson for ThinkingConfigEnabled with fn from_json(value, path)
 ///|
 ///
 /// Configuration for Claude's thinking. With `{"type": "adaptive"}`, Claude decides when and how much to think. With `{"type": "enabled"}` (manual extended thinking), you set a `budget_tokens` of at least 1,024. Thinking tokens count toward your `max_tokens` limit. Which `type` values are accepted, and what happens when you omit `thinking`, depend on the model. See [thinking](https://platform.claude.com/docs/en/build-with-claude/thinking#configuring-thinking) for each model's behavior.
+#non_exhaustive
 pub(all) enum ThinkingConfigParam {
   Adaptive(ThinkingConfigAdaptive)
   BetweenTools(ThinkingConfigBetweenTools)
@@ -16625,6 +16707,7 @@ pub impl @json.FromJson for ToolChoiceTool with fn from_json(value, path) {
 ///|
 ///
 /// How the model should use the provided tools. The model can use a specific tool, any available tool, decide by itself, or not use tools at all.
+#non_exhaustive
 pub(all) enum ToolChoice {
   Any(ToolChoiceAny)
   Auto(ToolChoiceAuto)
@@ -16676,6 +16759,7 @@ pub impl @json.FromJson for ToolChoice with fn from_json(value, path) {
 ///|
 ///
 /// Create a cache control breakpoint at this content block.
+#non_exhaustive
 pub(all) enum ToolCacheControl {
   Ephemeral(CacheControlEphemeral)
   Unknown(String, Json)
@@ -16814,6 +16898,7 @@ pub impl @json.FromJson for Tool with fn from_json(value, path) {
 ///|
 ///
 /// Create a cache control breakpoint at this content block.
+#non_exhaustive
 pub(all) enum MemoryTool20250818CacheControl {
   Ephemeral(CacheControlEphemeral)
   Unknown(String, Json)
@@ -16934,6 +17019,7 @@ pub impl @json.FromJson for MemoryTool20250818 with fn from_json(value, path) {
 ///|
 ///
 /// Create a cache control breakpoint at this content block.
+#non_exhaustive
 pub(all) enum TextEditor20250124CacheControl {
   Ephemeral(CacheControlEphemeral)
   Unknown(String, Json)
@@ -17054,6 +17140,7 @@ pub impl @json.FromJson for TextEditor20250124 with fn from_json(value, path) {
 ///|
 ///
 /// Create a cache control breakpoint at this content block.
+#non_exhaustive
 pub(all) enum TextEditor20250429CacheControl {
   Ephemeral(CacheControlEphemeral)
   Unknown(String, Json)
@@ -17174,6 +17261,7 @@ pub impl @json.FromJson for TextEditor20250429 with fn from_json(value, path) {
 ///|
 ///
 /// Create a cache control breakpoint at this content block.
+#non_exhaustive
 pub(all) enum TextEditor20250728CacheControl {
   Ephemeral(CacheControlEphemeral)
   Unknown(String, Json)
@@ -17299,6 +17387,7 @@ pub impl @json.FromJson for TextEditor20250728 with fn from_json(value, path) {
 ///|
 ///
 /// Create a cache control breakpoint at this content block.
+#non_exhaustive
 pub(all) enum WebSearchTool20250305CacheControl {
   Ephemeral(CacheControlEphemeral)
   Unknown(String, Json)
@@ -17499,6 +17588,7 @@ pub impl @json.FromJson for WebSearchTool20250305 with fn from_json(value, path)
 ///|
 ///
 /// Create a cache control breakpoint at this content block.
+#non_exhaustive
 pub(all) enum WebFetchTool20250910CacheControl {
   Ephemeral(CacheControlEphemeral)
   Unknown(String, Json)
@@ -17780,6 +17870,7 @@ pub impl @json.FromJson for WebFetchUrlSourceOnly with fn from_json(value, path)
 ///|
 ///
 /// Which client tools' results contribute fetchable URLs: "all", "none", or an only or except list of client tool names from tools[].
+#non_exhaustive
 pub(all) enum WebFetchUrlSourcesClientToolResults {
   All(WebFetchUrlSourceAll)
   Except(WebFetchUrlSourceExcept)
@@ -17834,6 +17925,7 @@ pub impl @json.FromJson for WebFetchUrlSourcesClientToolResults with fn from_jso
 ///|
 ///
 /// Which server tools' results contribute fetchable URLs: "all", "none", or an only or except list of server tool names from tools[]; only web_search and web_fetch results ever contribute.
+#non_exhaustive
 pub(all) enum WebFetchUrlSourcesServerToolResults {
   All(WebFetchUrlSourceAll)
   Except(WebFetchUrlSourceExcept)
@@ -17888,6 +17980,7 @@ pub impl @json.FromJson for WebFetchUrlSourcesServerToolResults with fn from_jso
 ///|
 ///
 /// Whether URLs in user messages are fetchable: "all" or "none".
+#non_exhaustive
 pub(all) enum WebFetchUrlSourcesUserInput {
   All(WebFetchUrlSourceAll)
   None(WebFetchUrlSourceNone)
@@ -18091,6 +18184,7 @@ pub impl @json.FromJson for WebFetchTool20250910 with fn from_json(value, path) 
 ///|
 ///
 /// Create a cache control breakpoint at this content block.
+#non_exhaustive
 pub(all) enum WebSearchTool20260209CacheControl {
   Ephemeral(CacheControlEphemeral)
   Unknown(String, Json)
@@ -18226,6 +18320,7 @@ pub impl @json.FromJson for WebSearchTool20260209 with fn from_json(value, path)
 ///|
 ///
 /// Create a cache control breakpoint at this content block.
+#non_exhaustive
 pub(all) enum WebFetchTool20260209CacheControl {
   Ephemeral(CacheControlEphemeral)
   Unknown(String, Json)
@@ -18371,6 +18466,7 @@ pub impl @json.FromJson for WebFetchTool20260209 with fn from_json(value, path) 
 ///|
 ///
 /// Create a cache control breakpoint at this content block.
+#non_exhaustive
 pub(all) enum WebFetchTool20260309CacheControl {
   Ephemeral(CacheControlEphemeral)
   Unknown(String, Json)
@@ -18521,6 +18617,7 @@ pub impl @json.FromJson for WebFetchTool20260309 with fn from_json(value, path) 
 ///|
 ///
 /// Create a cache control breakpoint at this content block.
+#non_exhaustive
 pub(all) enum WebSearchTool20260318CacheControl {
   Ephemeral(CacheControlEphemeral)
   Unknown(String, Json)
@@ -18566,6 +18663,7 @@ pub impl @json.FromJson for WebSearchTool20260318CacheControl with fn from_json(
 ///|
 ///
 /// How this tool's result blocks appear in the API response when the result was consumed by a completed code_execution call in the same turn. 'full' returns the complete content (default). 'excluded' drops the nested server_tool_use and result block pair entirely. Results from direct calls, or from code_execution calls that paused before completing, are always returned in full so they can be sent back on the next turn.
+#non_exhaustive
 pub(all) enum WebSearchTool20260318ResponseInclusion {
   Full
   Excluded
@@ -18717,6 +18815,7 @@ pub impl @json.FromJson for WebSearchTool20260318 with fn from_json(value, path)
 ///|
 ///
 /// Create a cache control breakpoint at this content block.
+#non_exhaustive
 pub(all) enum WebFetchTool20260318CacheControl {
   Ephemeral(CacheControlEphemeral)
   Unknown(String, Json)
@@ -18762,6 +18861,7 @@ pub impl @json.FromJson for WebFetchTool20260318CacheControl with fn from_json(
 ///|
 ///
 /// How this tool's result blocks appear in the API response when the result was consumed by a completed code_execution call in the same turn. 'full' returns the complete content (default). 'excluded' drops the nested server_tool_use and result block pair entirely. Results from direct calls, or from code_execution calls that paused before completing, are always returned in full so they can be sent back on the next turn.
+#non_exhaustive
 pub(all) enum WebFetchTool20260318ResponseInclusion {
   Full
   Excluded
@@ -18928,6 +19028,7 @@ pub impl @json.FromJson for WebFetchTool20260318 with fn from_json(value, path) 
 ///|
 ///
 /// Create a cache control breakpoint at this content block.
+#non_exhaustive
 pub(all) enum ToolSearchToolBM2520251119CacheControl {
   Ephemeral(CacheControlEphemeral)
   Unknown(String, Json)
@@ -18975,6 +19076,7 @@ pub impl @json.FromJson for ToolSearchToolBM2520251119CacheControl with fn from_
 ///|
 ///
 /// Generated string enum ToolSearchToolBM2520251119Type.
+#non_exhaustive
 pub(all) enum ToolSearchToolBM2520251119Type {
   ToolSearchToolBm2520251119
   ToolSearchToolBm25
@@ -19102,6 +19204,7 @@ pub impl @json.FromJson for ToolSearchToolBM2520251119 with fn from_json(
 ///|
 ///
 /// Create a cache control breakpoint at this content block.
+#non_exhaustive
 pub(all) enum ToolSearchToolRegex20251119CacheControl {
   Ephemeral(CacheControlEphemeral)
   Unknown(String, Json)
@@ -19151,6 +19254,7 @@ pub impl @json.FromJson for ToolSearchToolRegex20251119CacheControl with fn from
 ///|
 ///
 /// Generated string enum ToolSearchToolRegex20251119Type.
+#non_exhaustive
 pub(all) enum ToolSearchToolRegex20251119Type {
   ToolSearchToolRegex20251119
   ToolSearchToolRegex
@@ -19278,6 +19382,7 @@ pub impl @json.FromJson for ToolSearchToolRegex20251119 with fn from_json(
 ///|
 ///
 /// Generated tagged union CountMessageTokensParamsToolsItem.
+#non_exhaustive
 pub(all) enum CountMessageTokensParamsToolsItem {
   Tool(Tool)
   BashTool20250124(BashTool20250124)
@@ -19540,6 +19645,7 @@ pub impl @json.FromJson for CountMessageTokensResponse with fn from_json(
 ///|
 ///
 /// Top-level cache control automatically applies a cache_control marker to the last cacheable block in the request.
+#non_exhaustive
 pub(all) enum CreateMessageParamsCacheControl {
   Ephemeral(CacheControlEphemeral)
   Unknown(String, Json)
@@ -19585,6 +19691,7 @@ pub impl @json.FromJson for CreateMessageParamsCacheControl with fn from_json(
 ///|
 ///
 /// Container identifier for reuse across requests.
+#non_exhaustive
 pub(all) enum CreateMessageParamsContainer {
   ContainerParams(ContainerParams)
   Text(String)
@@ -19723,6 +19830,7 @@ pub impl @json.FromJson for Metadata with fn from_json(value, path) {
 ///|
 ///
 /// Determines whether to use priority capacity (if available) or standard capacity for this request. Anthropic offers different levels of service for your API requests. See [service-tiers](https://platform.claude.com/docs/en/api/service-tiers) for details.
+#non_exhaustive
 pub(all) enum CreateMessageParamsServiceTier {
   Auto
   StandardOnly
@@ -19777,6 +19885,7 @@ pub impl @json.FromJson for CreateMessageParamsServiceTier with fn from_json(
 ///|
 ///
 /// System prompt. A system prompt is a way of providing context and instructions to Claude, such as specifying a particular goal or role. See our [guide to system prompts](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices#give-claude-a-role).
+#non_exhaustive
 pub(all) enum CreateMessageParamsSystem {
   Text(String)
   RequestTextBlockArray(Array[RequestTextBlock])
@@ -19827,6 +19936,7 @@ pub impl @json.FromJson for CreateMessageParamsSystem with fn from_json(
 ///|
 ///
 /// Generated tagged union CreateMessageParamsToolsItem.
+#non_exhaustive
 pub(all) enum CreateMessageParamsToolsItem {
   Tool(Tool)
   BashTool20250124(BashTool20250124)
@@ -20550,6 +20660,7 @@ pub impl @json.FromJson for GatewayTimeoutError with fn from_json(value, path) {
 ///|
 ///
 /// Generated tagged union ErrorResponseError.
+#non_exhaustive
 pub(all) enum ErrorResponseError {
   ApiError(APIError)
   AuthenticationError(AuthenticationError)
@@ -20931,6 +21042,7 @@ pub impl @json.FromJson for ModelCapabilities with fn from_json(value, path) {
 ///|
 ///
 /// The model's current lifecycle stage. - `active`: The model is available for use, open to new adopters, and not scheduled for retirement. - `deprecated`: The model remains callable for organizations with existing access, but is headed for retirement and closed to new adopters. - `retired`: The model is no longer available for use; inference requests naming it fail. It remains in the catalogue as the historical record of its retirement.
+#non_exhaustive
 pub(all) enum ModelInfoLifecycle {
   Active
   Deprecated
@@ -20985,6 +21097,7 @@ pub impl @json.FromJson for ModelInfoLifecycle with fn from_json(value, path) {
 ///|
 ///
 /// A Claude model line, such as `opus` or `sonnet`. More lines may be added as new values.
+#non_exhaustive
 pub(all) enum ModelLine {
   Haiku
   Sonnet
@@ -21214,6 +21327,7 @@ pub impl @json.FromJson for ListResponseModelInfo with fn from_json(value, path)
 ///|
 ///
 /// Generated tagged union ContentBlock.
+#non_exhaustive
 pub(all) enum ContentBlock {
   BashCodeExecutionToolResult(ResponseBashCodeExecutionToolResultBlock)
   CodeExecutionToolResult(ResponseCodeExecutionToolResultBlock)
@@ -21296,6 +21410,7 @@ pub impl @json.FromJson for ContentBlock with fn from_json(value, path) {
 ///|
 ///
 /// Generated string enum StopReason.
+#non_exhaustive
 pub(all) enum StopReason {
   EndTurn
   MaxTokens
@@ -21362,6 +21477,7 @@ pub impl @json.FromJson for StopReason with fn from_json(value, path) {
 ///|
 ///
 /// The policy category that triggered a refusal.
+#non_exhaustive
 pub(all) enum RefusalCategory {
   Cyber
   Bio
@@ -21573,6 +21689,7 @@ pub impl @json.FromJson for ServerToolUsage with fn from_json(value, path) {
 ///|
 ///
 /// If the request used the priority, standard, or batch tier.
+#non_exhaustive
 pub(all) enum UsageServiceTier {
   Standard
   Priority
@@ -22123,6 +22240,7 @@ pub impl @json.FromJson for MessageStopEvent with fn from_json(value, path) {
 ///|
 ///
 /// Generated tagged union MessageStreamEvent.
+#non_exhaustive
 pub(all) enum MessageStreamEvent {
   ContentBlockDelta(ContentBlockDeltaEvent)
   ContentBlockStart(ContentBlockStartEvent)
@@ -22489,6 +22607,7 @@ pub impl @json.FromJson for ToolReferenceUnresolvedErrorDetails with fn from_jso
 ///|
 ///
 /// Generated string enum ModelsListLifecycleItem.
+#non_exhaustive
 pub(all) enum ModelsListLifecycleItem {
   Active
   Deprecated

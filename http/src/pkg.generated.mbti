@@ -90,6 +90,7 @@ pub fn Headers::remove(Self, String) -> Unit
 pub fn Headers::set(Self, String, String) -> Unit
 pub fn Headers::to_repr(Self) -> @debug.Repr
 
+#non_exhaustive
 pub(all) enum Phase {
   Pool
   Dial

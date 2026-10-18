@@ -11,15 +11,7 @@ fn content_block_from_generated(block : @gen.ContentBlock) -> ContentBlock {
     @gen.ContentBlock::Unknown(kind, value) => Other(kind, value)
     other => {
       let value = other.to_json()
-      let kind = match value {
-        Object(fields) =>
-          match fields.get("type") {
-            Some(String(kind)) => kind
-            _ => ""
-          }
-        _ => ""
-      }
-      Other(kind, value)
+      Other(string_field(value, "type"), value)
     }
   }
 }
@@ -70,16 +62,15 @@ fn api_error_from_generated(error : @gen.ErrorResponseError) -> ApiErrorBody {
       { type_: body.type_, message: body.message, }
     @gen.ErrorResponseError::TimeoutError(body) =>
       { type_: body.type_, message: body.message, }
-    @gen.ErrorResponseError::Unknown(kind, value) => {
-      let message = match value {
-        Object(fields) =>
-          match fields.get("message") {
-            Some(String(message)) => message
-            _ => ""
-          }
-        _ => ""
+    @gen.ErrorResponseError::Unknown(kind, value) =>
+      { type_: kind, message: string_field(value, "message"), }
+    // An error type added to the spec after this layer was written.
+    @gen.ErrorResponseError::.. as other => {
+      let value = other.to_json()
+      {
+        type_: string_field(value, "type"),
+        message: string_field(value, "message"),
       }
-      { type_: kind, message, }
     }
   }
 }
@@ -107,6 +98,14 @@ fn decode_error_envelope(
 ) -> ApiErrorBody raise @json.JsonDecodeError {
   let envelope : ApiErrorEnvelopeJson = @json.from_json(value)
   envelope.0
+}
+
+///|
+fn string_field(value : Json, key : String) -> String {
+  match json_field(value, key) {
+    Some(String(text)) => text
+    _ => ""
+  }
 }
 
 ///|
@@ -149,7 +148,8 @@ fn message_event_from_generated(
         @gen.ContentBlockDeltaEventDelta::InputJsonDelta(json) =>
           InputJsonDelta(index=delta.index, partial_json=json.partial_json)
         @gen.ContentBlockDeltaEventDelta::CitationsDelta(_)
-        | @gen.ContentBlockDeltaEventDelta::Unknown(_, _) =>
+        | @gen.ContentBlockDeltaEventDelta::Unknown(_, _)
+        | @gen.ContentBlockDeltaEventDelta::.. =>
           Other("content_block_delta", raw)
       }
     @gen.MessageStreamEvent::ContentBlockStop(stop) =>
@@ -161,6 +161,9 @@ fn message_event_from_generated(
     @gen.MessageStreamEvent::Unknown("error", _) =>
       Error(decode_error_envelope(raw))
     @gen.MessageStreamEvent::Unknown(kind, _) => Other(kind, raw)
+    // An event added to the spec after this layer was written stays `Other`,
+    // as it was before regeneration.
+    @gen.MessageStreamEvent::.. => Other(string_field(raw, "type"), raw)
   }
 }
 

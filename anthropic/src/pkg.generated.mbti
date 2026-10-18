@@ -48,6 +48,7 @@ pub fn ApiErrorBody::equal(Self, Self) -> Bool
 pub fn ApiErrorBody::not_equal(Self, Self) -> Bool
 pub fn ApiErrorBody::to_repr(Self) -> @debug.Repr
 
+#non_exhaustive
 pub(all) enum AuthHeader {
   XApiKey
   Bearer
@@ -56,6 +57,7 @@ pub fn AuthHeader::equal(Self, Self) -> Bool
 pub fn AuthHeader::not_equal(Self, Self) -> Bool
 pub fn AuthHeader::to_repr(Self) -> @debug.Repr
 
+#non_exhaustive
 pub(all) enum ContentBlock {
   Text(String)
   Thinking(thinking~ : String, signature~ : String)
@@ -67,6 +69,7 @@ pub fn ContentBlock::equal(Self, Self) -> Bool
 pub fn ContentBlock::not_equal(Self, Self) -> Bool
 pub fn ContentBlock::to_repr(Self) -> @debug.Repr
 
+#non_exhaustive
 pub(all) enum InputContent {
   Text(String)
   Blocks(Array[@gen.InputContentBlock])
@@ -89,6 +92,7 @@ pub fn Message::tool_result(tool_use_id~ : String, content~ : String, is_error? 
 pub fn Message::user(String) -> Self
 pub fn Message::user_blocks(Array[@gen.InputContentBlock]) -> Self
 
+#non_exhaustive
 pub(all) enum MessageEvent {
   MessageStart(MessageResponse)
   ContentBlockStart(index~ : Int, block~ : ContentBlock)
@@ -144,6 +148,7 @@ pub fn MessageResponse::text(Self) -> String
 pub fn MessageResponse::to_repr(Self) -> @debug.Repr
 pub fn MessageResponse::tool_uses(Self) -> Array[(String, String, Json)]
 
+#non_exhaustive
 pub(all) enum Role {
   User
   Assistant

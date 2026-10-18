@@ -434,6 +434,7 @@ pub impl @json.FromJson for Root with fn from_json(value, path) {
 ///|
 ///
 /// The package's language or package management ecosystem.
+#non_exhaustive
 pub(all) enum SecurityAdvisoryEcosystems {
   Rubygems
   Npm
@@ -1021,6 +1022,7 @@ pub impl @json.FromJson for SimpleUser with fn from_json(value, path) {
 ///|
 ///
 /// The type of credit the user is receiving.
+#non_exhaustive
 pub(all) enum SecurityAdvisoryCreditTypes {
   Analyst
   Finder
@@ -1099,6 +1101,7 @@ pub impl @json.FromJson for SecurityAdvisoryCreditTypes with fn from_json(
 ///|
 ///
 /// The type of advisory.
+#non_exhaustive
 pub(all) enum GlobalAdvisoryType {
   Reviewed
   Unreviewed
@@ -1153,6 +1156,7 @@ pub impl @json.FromJson for GlobalAdvisoryType with fn from_json(value, path) {
 ///|
 ///
 /// The severity of the advisory.
+#non_exhaustive
 pub(all) enum GlobalAdvisorySeverity {
   Critical
   High
@@ -1216,6 +1220,7 @@ pub impl @json.FromJson for GlobalAdvisorySeverity with fn from_json(
 ///|
 ///
 /// The type of identifier.
+#non_exhaustive
 pub(all) enum GlobalAdvisoryIdentifiersItemType {
   CVE
   GHSA
@@ -1910,6 +1915,7 @@ pub impl @json.FromJson for Integration with fn from_json(value, path) {
 ///|
 ///
 /// Generated untagged union WebhookConfigInsecureSsl.
+#non_exhaustive
 pub(all) enum WebhookConfigInsecureSsl {
   Text(String)
   Number(Double)
@@ -2211,6 +2217,7 @@ pub impl @json.FromJson for ScimError with fn from_json(value, path) {
 ///|
 ///
 /// Generated untagged union ValidationErrorErrorsItemValue.
+#non_exhaustive
 pub(all) enum ValidationErrorErrorsItemValue {
   Text(String)
   Int(Int32)
@@ -2687,6 +2694,7 @@ pub impl @json.FromJson for IntegrationInstallationRequest with fn from_json(
 ///|
 ///
 /// The level of permission to grant the access token for GitHub Actions workflows, workflow runs, and artifacts.
+#non_exhaustive
 pub(all) enum AppPermissionsActions {
   Read
   Write
@@ -2738,6 +2746,7 @@ pub impl @json.FromJson for AppPermissionsActions with fn from_json(value, path)
 ///|
 ///
 /// The level of permission to grant the access token for repository creation, deletion, settings, teams, and collaborators creation.
+#non_exhaustive
 pub(all) enum AppPermissionsAdministration {
   Read
   Write
@@ -2792,6 +2801,7 @@ pub impl @json.FromJson for AppPermissionsAdministration with fn from_json(
 ///|
 ///
 /// The level of permission to grant the access token to create and retrieve build artifact metadata records.
+#non_exhaustive
 pub(all) enum AppPermissionsArtifactMetadata {
   Read
   Write
@@ -2846,6 +2856,7 @@ pub impl @json.FromJson for AppPermissionsArtifactMetadata with fn from_json(
 ///|
 ///
 /// The level of permission to create and retrieve the access token for repository attestations.
+#non_exhaustive
 pub(all) enum AppPermissionsAttestations {
   Read
   Write
@@ -2900,6 +2911,7 @@ pub impl @json.FromJson for AppPermissionsAttestations with fn from_json(
 ///|
 ///
 /// The level of permission to grant the access token for checks on code.
+#non_exhaustive
 pub(all) enum AppPermissionsChecks {
   Read
   Write
@@ -2951,6 +2963,7 @@ pub impl @json.FromJson for AppPermissionsChecks with fn from_json(value, path) 
 ///|
 ///
 /// The level of permission to grant the access token to view and manage code quality data.
+#non_exhaustive
 pub(all) enum AppPermissionsCodeQuality {
   Read
   Write
@@ -3005,6 +3018,7 @@ pub impl @json.FromJson for AppPermissionsCodeQuality with fn from_json(
 ///|
 ///
 /// The level of permission to grant the access token to create, edit, delete, and list Codespaces.
+#non_exhaustive
 pub(all) enum AppPermissionsCodespaces {
   Read
   Write
@@ -3059,6 +3073,7 @@ pub impl @json.FromJson for AppPermissionsCodespaces with fn from_json(
 ///|
 ///
 /// The level of permission to grant the access token for repository contents, commits, branches, downloads, releases, and merges.
+#non_exhaustive
 pub(all) enum AppPermissionsContents {
   Read
   Write
@@ -3113,6 +3128,7 @@ pub impl @json.FromJson for AppPermissionsContents with fn from_json(
 ///|
 ///
 /// The level of permission to grant the access token to manage Dependabot secrets.
+#non_exhaustive
 pub(all) enum AppPermissionsDependabotSecrets {
   Read
   Write
@@ -3167,6 +3183,7 @@ pub impl @json.FromJson for AppPermissionsDependabotSecrets with fn from_json(
 ///|
 ///
 /// The level of permission to grant the access token for deployments and deployment statuses.
+#non_exhaustive
 pub(all) enum AppPermissionsDeployments {
   Read
   Write
@@ -3221,6 +3238,7 @@ pub impl @json.FromJson for AppPermissionsDeployments with fn from_json(
 ///|
 ///
 /// The level of permission to grant the access token for discussions and related comments and labels.
+#non_exhaustive
 pub(all) enum AppPermissionsDiscussions {
   Read
   Write
@@ -3275,6 +3293,7 @@ pub impl @json.FromJson for AppPermissionsDiscussions with fn from_json(
 ///|
 ///
 /// The level of permission to grant the access token for managing repository environments.
+#non_exhaustive
 pub(all) enum AppPermissionsEnvironments {
   Read
   Write
@@ -3329,6 +3348,7 @@ pub impl @json.FromJson for AppPermissionsEnvironments with fn from_json(
 ///|
 ///
 /// The level of permission to grant the access token for issues and related comments, assignees, labels, and milestones.
+#non_exhaustive
 pub(all) enum AppPermissionsIssues {
   Read
   Write
@@ -3380,6 +3400,7 @@ pub impl @json.FromJson for AppPermissionsIssues with fn from_json(value, path) 
 ///|
 ///
 /// The level of permission to grant the access token to manage the merge queues for a repository.
+#non_exhaustive
 pub(all) enum AppPermissionsMergeQueues {
   Read
   Write
@@ -3434,6 +3455,7 @@ pub impl @json.FromJson for AppPermissionsMergeQueues with fn from_json(
 ///|
 ///
 /// The level of permission to grant the access token to search repositories, list collaborators, and access repository metadata.
+#non_exhaustive
 pub(all) enum AppPermissionsMetadata {
   Read
   Write
@@ -3488,6 +3510,7 @@ pub impl @json.FromJson for AppPermissionsMetadata with fn from_json(
 ///|
 ///
 /// The level of permission to grant the access token for packages published to GitHub Packages.
+#non_exhaustive
 pub(all) enum AppPermissionsPackages {
   Read
   Write
@@ -3542,6 +3565,7 @@ pub impl @json.FromJson for AppPermissionsPackages with fn from_json(
 ///|
 ///
 /// The level of permission to grant the access token to retrieve Pages statuses, configuration, and builds, as well as create new builds.
+#non_exhaustive
 pub(all) enum AppPermissionsPages {
   Read
   Write
@@ -3593,6 +3617,7 @@ pub impl @json.FromJson for AppPermissionsPages with fn from_json(value, path) {
 ///|
 ///
 /// The level of permission to grant the access token for pull requests and related comments, assignees, labels, milestones, and merges.
+#non_exhaustive
 pub(all) enum AppPermissionsPullRequests {
   Read
   Write
@@ -3647,6 +3672,7 @@ pub impl @json.FromJson for AppPermissionsPullRequests with fn from_json(
 ///|
 ///
 /// The level of permission to grant the access token to view and edit custom properties for a repository, when allowed by the property.
+#non_exhaustive
 pub(all) enum AppPermissionsRepositoryCustomProperties {
   Read
   Write
@@ -3705,6 +3731,7 @@ pub impl @json.FromJson for AppPermissionsRepositoryCustomProperties with fn fro
 ///|
 ///
 /// The level of permission to grant the access token to manage the post-receive hooks for a repository.
+#non_exhaustive
 pub(all) enum AppPermissionsRepositoryHooks {
   Read
   Write
@@ -3759,6 +3786,7 @@ pub impl @json.FromJson for AppPermissionsRepositoryHooks with fn from_json(
 ///|
 ///
 /// The level of permission to grant the access token to manage repository projects, columns, and cards.
+#non_exhaustive
 pub(all) enum AppPermissionsRepositoryProjects {
   Read
   Write
@@ -3816,6 +3844,7 @@ pub impl @json.FromJson for AppPermissionsRepositoryProjects with fn from_json(
 ///|
 ///
 /// The level of permission to grant the access token to view and manage secret scanning alerts.
+#non_exhaustive
 pub(all) enum AppPermissionsSecretScanningAlerts {
   Read
   Write
@@ -3870,6 +3899,7 @@ pub impl @json.FromJson for AppPermissionsSecretScanningAlerts with fn from_json
 ///|
 ///
 /// The level of permission to grant the access token to manage repository secrets.
+#non_exhaustive
 pub(all) enum AppPermissionsSecrets {
   Read
   Write
@@ -3921,6 +3951,7 @@ pub impl @json.FromJson for AppPermissionsSecrets with fn from_json(value, path)
 ///|
 ///
 /// The level of permission to grant the access token to view and manage security events like code scanning alerts.
+#non_exhaustive
 pub(all) enum AppPermissionsSecurityEvents {
   Read
   Write
@@ -3975,6 +4006,7 @@ pub impl @json.FromJson for AppPermissionsSecurityEvents with fn from_json(
 ///|
 ///
 /// The level of permission to grant the access token to manage just a single file.
+#non_exhaustive
 pub(all) enum AppPermissionsSingleFile {
   Read
   Write
@@ -4029,6 +4061,7 @@ pub impl @json.FromJson for AppPermissionsSingleFile with fn from_json(
 ///|
 ///
 /// The level of permission to grant the access token for commit statuses.
+#non_exhaustive
 pub(all) enum AppPermissionsStatuses {
   Read
   Write
@@ -4083,6 +4116,7 @@ pub impl @json.FromJson for AppPermissionsStatuses with fn from_json(
 ///|
 ///
 /// The level of permission to grant the access token to manage Dependabot alerts.
+#non_exhaustive
 pub(all) enum AppPermissionsVulnerabilityAlerts {
   Read
   Write
@@ -4137,6 +4171,7 @@ pub impl @json.FromJson for AppPermissionsVulnerabilityAlerts with fn from_json(
 ///|
 ///
 /// The level of permission to grant the access token to view and edit custom properties for an organization, when allowed by the property.
+#non_exhaustive
 pub(all) enum AppPermissionsCustomPropertiesForOrganizations {
   Read
   Write
@@ -4200,6 +4235,7 @@ pub impl @json.FromJson for AppPermissionsCustomPropertiesForOrganizations with 
 ///|
 ///
 /// The level of permission to grant the access token for organization teams and members.
+#non_exhaustive
 pub(all) enum AppPermissionsMembers {
   Read
   Write
@@ -4251,6 +4287,7 @@ pub impl @json.FromJson for AppPermissionsMembers with fn from_json(value, path)
 ///|
 ///
 /// The level of permission to grant the access token to manage access to an organization.
+#non_exhaustive
 pub(all) enum AppPermissionsOrganizationAdministration {
   Read
   Write
@@ -4309,6 +4346,7 @@ pub impl @json.FromJson for AppPermissionsOrganizationAdministration with fn fro
 ///|
 ///
 /// The level of permission to grant the access token for custom repository roles management.
+#non_exhaustive
 pub(all) enum AppPermissionsOrganizationCustomRoles {
   Read
   Write
@@ -4365,6 +4403,7 @@ pub impl @json.FromJson for AppPermissionsOrganizationCustomRoles with fn from_j
 ///|
 ///
 /// The level of permission to grant the access token for custom organization roles management.
+#non_exhaustive
 pub(all) enum AppPermissionsOrganizationCustomOrgRoles {
   Read
   Write
@@ -4423,6 +4462,7 @@ pub impl @json.FromJson for AppPermissionsOrganizationCustomOrgRoles with fn fro
 ///|
 ///
 /// The level of permission to grant the access token for repository custom properties management at the organization level.
+#non_exhaustive
 pub(all) enum AppPermissionsOrganizationCustomProperties {
   Read
   Write
@@ -4489,6 +4529,7 @@ pub impl @json.FromJson for AppPermissionsOrganizationCustomProperties with fn f
 ///|
 ///
 /// The level of permission to grant the access token for managing access to GitHub Copilot for members of an organization with a Copilot Business subscription. This property is in public preview and is subject to change.
+#non_exhaustive
 pub(all) enum AppPermissionsOrganizationCopilotSeatManagement {
   Read
   Write
@@ -4554,6 +4595,7 @@ pub impl @json.FromJson for AppPermissionsOrganizationCopilotSeatManagement with
 ///|
 ///
 /// The level of permission to grant the access token to view and manage Copilot cloud agent settings for an organization.
+#non_exhaustive
 pub(all) enum AppPermissionsOrganizationCopilotAgentSettings {
   Read
   Write
@@ -4617,6 +4659,7 @@ pub impl @json.FromJson for AppPermissionsOrganizationCopilotAgentSettings with 
 ///|
 ///
 /// The level of permission to grant the access token for managing external custom properties for repositories in an organization.
+#non_exhaustive
 pub(all) enum AppPermissionsOrganizationExternalPropertiesForRepos {
   Read
   Write
@@ -4685,6 +4728,7 @@ pub impl @json.FromJson for AppPermissionsOrganizationExternalPropertiesForRepos
 ///|
 ///
 /// The level of permission to grant the access token to view and manage announcement banners for an organization.
+#non_exhaustive
 pub(all) enum AppPermissionsOrganizationAnnouncementBanners {
   Read
   Write
@@ -4748,6 +4792,7 @@ pub impl @json.FromJson for AppPermissionsOrganizationAnnouncementBanners with f
 ///|
 ///
 /// The level of permission to grant the access token to manage the post-receive hooks for an organization.
+#non_exhaustive
 pub(all) enum AppPermissionsOrganizationHooks {
   Read
   Write
@@ -4802,6 +4847,7 @@ pub impl @json.FromJson for AppPermissionsOrganizationHooks with fn from_json(
 ///|
 ///
 /// The level of permission to grant the access token for viewing and managing fine-grained personal access token requests to an organization.
+#non_exhaustive
 pub(all) enum AppPermissionsOrganizationPersonalAccessTokens {
   Read
   Write
@@ -4865,6 +4911,7 @@ pub impl @json.FromJson for AppPermissionsOrganizationPersonalAccessTokens with 
 ///|
 ///
 /// The level of permission to grant the access token for viewing and managing fine-grained personal access tokens that have been approved by an organization.
+#non_exhaustive
 pub(all) enum AppPermissionsOrganizationPersonalAccessTokenRequests {
   Read
   Write
@@ -4930,6 +4977,7 @@ pub impl @json.FromJson for AppPermissionsOrganizationPersonalAccessTokenRequest
 ///|
 ///
 /// The level of permission to grant the access token to manage organization projects and projects public preview (where available).
+#non_exhaustive
 pub(all) enum AppPermissionsOrganizationProjects {
   Read
   Write
@@ -4987,6 +5035,7 @@ pub impl @json.FromJson for AppPermissionsOrganizationProjects with fn from_json
 ///|
 ///
 /// The level of permission to grant the access token for organization packages published to GitHub Packages.
+#non_exhaustive
 pub(all) enum AppPermissionsOrganizationPackages {
   Read
   Write
@@ -5041,6 +5090,7 @@ pub impl @json.FromJson for AppPermissionsOrganizationPackages with fn from_json
 ///|
 ///
 /// The level of permission to grant the access token to manage organization secrets.
+#non_exhaustive
 pub(all) enum AppPermissionsOrganizationSecrets {
   Read
   Write
@@ -5095,6 +5145,7 @@ pub impl @json.FromJson for AppPermissionsOrganizationSecrets with fn from_json(
 ///|
 ///
 /// The level of permission to grant the access token to view and manage GitHub Actions self-hosted runners available to an organization.
+#non_exhaustive
 pub(all) enum AppPermissionsOrganizationSelfHostedRunners {
   Read
   Write
@@ -5158,6 +5209,7 @@ pub impl @json.FromJson for AppPermissionsOrganizationSelfHostedRunners with fn 
 ///|
 ///
 /// The level of permission to grant the access token to view and manage users blocked by the organization.
+#non_exhaustive
 pub(all) enum AppPermissionsOrganizationUserBlocking {
   Read
   Write
@@ -5214,6 +5266,7 @@ pub impl @json.FromJson for AppPermissionsOrganizationUserBlocking with fn from_
 ///|
 ///
 /// The level of permission to grant the access token to manage the email addresses belonging to a user.
+#non_exhaustive
 pub(all) enum AppPermissionsEmailAddresses {
   Read
   Write
@@ -5268,6 +5321,7 @@ pub impl @json.FromJson for AppPermissionsEmailAddresses with fn from_json(
 ///|
 ///
 /// The level of permission to grant the access token to manage the followers belonging to a user.
+#non_exhaustive
 pub(all) enum AppPermissionsFollowers {
   Read
   Write
@@ -5322,6 +5376,7 @@ pub impl @json.FromJson for AppPermissionsFollowers with fn from_json(
 ///|
 ///
 /// The level of permission to grant the access token to manage git SSH keys.
+#non_exhaustive
 pub(all) enum AppPermissionsGitSshKeys {
   Read
   Write
@@ -5376,6 +5431,7 @@ pub impl @json.FromJson for AppPermissionsGitSshKeys with fn from_json(
 ///|
 ///
 /// The level of permission to grant the access token to view and manage GPG keys belonging to a user.
+#non_exhaustive
 pub(all) enum AppPermissionsGpgKeys {
   Read
   Write
@@ -5427,6 +5483,7 @@ pub impl @json.FromJson for AppPermissionsGpgKeys with fn from_json(value, path)
 ///|
 ///
 /// The level of permission to grant the access token to view and manage interaction limits on a repository.
+#non_exhaustive
 pub(all) enum AppPermissionsInteractionLimits {
   Read
   Write
@@ -5481,6 +5538,7 @@ pub impl @json.FromJson for AppPermissionsInteractionLimits with fn from_json(
 ///|
 ///
 /// The level of permission to grant the access token to list and manage repositories a user is starring.
+#non_exhaustive
 pub(all) enum AppPermissionsStarring {
   Read
   Write
@@ -5535,6 +5593,7 @@ pub impl @json.FromJson for AppPermissionsStarring with fn from_json(
 ///|
 ///
 /// The level of permission to grant the access token for organization custom properties management at the enterprise level.
+#non_exhaustive
 pub(all) enum AppPermissionsEnterpriseCustomPropertiesForOrganizations {
   Read
   Write
@@ -6132,6 +6191,7 @@ pub impl @json.FromJson for NullableSimpleUser with fn from_json(value, path) {
 ///|
 ///
 /// Describe whether all repositories have been selected or there's a selection involved
+#non_exhaustive
 pub(all) enum InstallationRepositorySelection {
   All
   Selected
@@ -6476,6 +6536,7 @@ pub impl @json.FromJson for RepositoryPermissions with fn from_json(value, path)
 ///|
 ///
 /// The policy controlling who can create pull requests: all or collaborators_only.
+#non_exhaustive
 pub(all) enum RepositoryPullRequestCreationPolicy {
   All
   CollaboratorsOnly
@@ -6530,6 +6591,7 @@ pub impl @json.FromJson for RepositoryPullRequestCreationPolicy with fn from_jso
 ///|
 ///
 /// The default value for a squash merge commit title: - `PR_TITLE` - default to the pull request's title. - `COMMIT_OR_PR_TITLE` - default to the commit's title (if only one commit) or the pull request's title (when more than one commit).
+#non_exhaustive
 pub(all) enum RepositorySquashMergeCommitTitle {
   PRTITLE
   COMMITORPRTITLE
@@ -6584,6 +6646,7 @@ pub impl @json.FromJson for RepositorySquashMergeCommitTitle with fn from_json(
 ///|
 ///
 /// The default value for a squash merge commit message: - `PR_BODY` - default to the pull request's body. - `COMMIT_MESSAGES` - default to the branch's commit messages. - `BLANK` - default to a blank commit message.
+#non_exhaustive
 pub(all) enum RepositorySquashMergeCommitMessage {
   PRBODY
   COMMITMESSAGES
@@ -6641,6 +6704,7 @@ pub impl @json.FromJson for RepositorySquashMergeCommitMessage with fn from_json
 ///|
 ///
 /// The default value for a merge commit title. - `PR_TITLE` - default to the pull request's title. - `MERGE_MESSAGE` - default to the classic title for a merge message (e.g., Merge pull request #123 from branch-name).
+#non_exhaustive
 pub(all) enum RepositoryMergeCommitTitle {
   PRTITLE
   MERGEMESSAGE
@@ -6695,6 +6759,7 @@ pub impl @json.FromJson for RepositoryMergeCommitTitle with fn from_json(
 ///|
 ///
 /// The default value for a merge commit message. - `PR_TITLE` - default to the pull request's title. - `PR_BODY` - default to the pull request's body. - `BLANK` - default to a blank commit message.
+#non_exhaustive
 pub(all) enum RepositoryMergeCommitMessage {
   PRBODY
   PRTITLE
@@ -7368,6 +7433,7 @@ pub impl @json.FromJson for Repository with fn from_json(value, path) {
 ///|
 ///
 /// Generated string enum InstallationTokenRepositorySelection.
+#non_exhaustive
 pub(all) enum InstallationTokenRepositorySelection {
   All
   Selected
@@ -7508,6 +7574,7 @@ pub impl @json.FromJson for InstallationToken with fn from_json(value, path) {
 ///|
 ///
 /// Describe whether all repositories have been selected or there's a selection involved
+#non_exhaustive
 pub(all) enum NullableScopedInstallationRepositorySelection {
   All
   Selected
@@ -8013,6 +8080,7 @@ pub impl @json.FromJson for ActionsCacheStorageLimitForEnterprise with fn from_j
 ///|
 ///
 /// Whether the inclusion was defined at the organization or enterprise level
+#non_exhaustive
 pub(all) enum OidcCustomPropertyInclusionInclusionSource {
   Organization
   Enterprise
@@ -8178,6 +8246,7 @@ pub impl @json.FromJson for OidcCustomPropertyInclusionInput with fn from_json(
 ///|
 ///
 /// The type of the code security configuration.
+#non_exhaustive
 pub(all) enum CodeSecurityConfigurationTargetType {
   Global
   Organization
@@ -8235,6 +8304,7 @@ pub impl @json.FromJson for CodeSecurityConfigurationTargetType with fn from_jso
 ///|
 ///
 /// The enablement status of GitHub Advanced Security
+#non_exhaustive
 pub(all) enum CodeSecurityConfigurationAdvancedSecurity {
   Enabled
   Disabled
@@ -8301,6 +8371,7 @@ pub impl @json.FromJson for CodeSecurityConfigurationAdvancedSecurity with fn fr
 ///|
 ///
 /// The enablement status of Dependency Graph
+#non_exhaustive
 pub(all) enum CodeSecurityConfigurationDependencyGraph {
   Enabled
   Disabled
@@ -8362,6 +8433,7 @@ pub impl @json.FromJson for CodeSecurityConfigurationDependencyGraph with fn fro
 ///|
 ///
 /// The enablement status of Automatic dependency submission
+#non_exhaustive
 pub(all) enum CodeSecurityConfigurationDependencyGraphAutosubmitAction {
   Enabled
   Disabled
@@ -8489,6 +8561,7 @@ pub impl @json.FromJson for CodeSecurityConfigurationDependencyGraphAutosubmitAc
 ///|
 ///
 /// The enablement status of Dependabot alerts
+#non_exhaustive
 pub(all) enum CodeSecurityConfigurationDependabotAlerts {
   Enabled
   Disabled
@@ -8552,6 +8625,7 @@ pub impl @json.FromJson for CodeSecurityConfigurationDependabotAlerts with fn fr
 ///|
 ///
 /// The enablement status of Dependabot security updates
+#non_exhaustive
 pub(all) enum CodeSecurityConfigurationDependabotSecurityUpdates {
   Enabled
   Disabled
@@ -8620,6 +8694,7 @@ pub impl @json.FromJson for CodeSecurityConfigurationDependabotSecurityUpdates w
 ///|
 ///
 /// The enablement status of Dependabot delegated alert dismissal
+#non_exhaustive
 pub(all) enum CodeSecurityConfigurationDependabotDelegatedAlertDismissal {
   Enabled
   Disabled
@@ -8745,6 +8820,7 @@ pub impl @json.FromJson for CodeSecurityConfigurationCodeScanningOptions with fn
 ///|
 ///
 /// The enablement status of code scanning default setup
+#non_exhaustive
 pub(all) enum CodeSecurityConfigurationCodeScanningDefaultSetup {
   Enabled
   Disabled
@@ -8813,6 +8889,7 @@ pub impl @json.FromJson for CodeSecurityConfigurationCodeScanningDefaultSetup wi
 ///|
 ///
 /// Whether to use labeled runners or standard GitHub runners.
+#non_exhaustive
 pub(all) enum CodeSecurityConfigurationCodeScanningDefaultSetupOptionsRunnerType {
   Standard
   Labeled
@@ -8951,6 +9028,7 @@ pub impl @json.FromJson for CodeSecurityConfigurationCodeScanningDefaultSetupOpt
 ///|
 ///
 /// The enablement status of code scanning delegated alert dismissal
+#non_exhaustive
 pub(all) enum CodeSecurityConfigurationCodeScanningDelegatedAlertDismissal {
   Enabled
   Disabled
@@ -9019,6 +9097,7 @@ pub impl @json.FromJson for CodeSecurityConfigurationCodeScanningDelegatedAlertD
 ///|
 ///
 /// The enablement status of secret scanning
+#non_exhaustive
 pub(all) enum CodeSecurityConfigurationSecretScanning {
   Enabled
   Disabled
@@ -9080,6 +9159,7 @@ pub impl @json.FromJson for CodeSecurityConfigurationSecretScanning with fn from
 ///|
 ///
 /// The enablement status of secret scanning push protection
+#non_exhaustive
 pub(all) enum CodeSecurityConfigurationSecretScanningPushProtection {
   Enabled
   Disabled
@@ -9148,6 +9228,7 @@ pub impl @json.FromJson for CodeSecurityConfigurationSecretScanningPushProtectio
 ///|
 ///
 /// The enablement status of secret scanning delegated bypass
+#non_exhaustive
 pub(all) enum CodeSecurityConfigurationSecretScanningDelegatedBypass {
   Enabled
   Disabled
@@ -9216,6 +9297,7 @@ pub impl @json.FromJson for CodeSecurityConfigurationSecretScanningDelegatedBypa
 ///|
 ///
 /// The type of the bypass reviewer
+#non_exhaustive
 pub(all) enum CodeSecurityConfigurationSecretScanningDelegatedBypassOptionsReviewersItemReviewerType {
   TEAM
   ROLE
@@ -9281,6 +9363,7 @@ pub impl @json.FromJson for CodeSecurityConfigurationSecretScanningDelegatedBypa
 ///|
 ///
 /// The bypass mode for the reviewer
+#non_exhaustive
 pub(all) enum CodeSecurityConfigurationSecretScanningDelegatedBypassOptionsReviewersItemMode {
   ALWAYS
   EXEMPT
@@ -9482,6 +9565,7 @@ pub impl @json.FromJson for CodeSecurityConfigurationSecretScanningDelegatedBypa
 ///|
 ///
 /// The enablement status of secret scanning validity checks
+#non_exhaustive
 pub(all) enum CodeSecurityConfigurationSecretScanningValidityChecks {
   Enabled
   Disabled
@@ -9550,6 +9634,7 @@ pub impl @json.FromJson for CodeSecurityConfigurationSecretScanningValidityCheck
 ///|
 ///
 /// The enablement status of secret scanning non-provider patterns
+#non_exhaustive
 pub(all) enum CodeSecurityConfigurationSecretScanningNonProviderPatterns {
   Enabled
   Disabled
@@ -9618,6 +9703,7 @@ pub impl @json.FromJson for CodeSecurityConfigurationSecretScanningNonProviderPa
 ///|
 ///
 /// The enablement status of Copilot secret scanning
+#non_exhaustive
 pub(all) enum CodeSecurityConfigurationSecretScanningGenericSecrets {
   Enabled
   Disabled
@@ -9686,6 +9772,7 @@ pub impl @json.FromJson for CodeSecurityConfigurationSecretScanningGenericSecret
 ///|
 ///
 /// The enablement status of secret scanning delegated alert dismissal
+#non_exhaustive
 pub(all) enum CodeSecurityConfigurationSecretScanningDelegatedAlertDismissal {
   Enabled
   Disabled
@@ -9754,6 +9841,7 @@ pub impl @json.FromJson for CodeSecurityConfigurationSecretScanningDelegatedAler
 ///|
 ///
 /// The enablement status of secret scanning extended metadata
+#non_exhaustive
 pub(all) enum CodeSecurityConfigurationSecretScanningExtendedMetadata {
   Enabled
   Disabled
@@ -9822,6 +9910,7 @@ pub impl @json.FromJson for CodeSecurityConfigurationSecretScanningExtendedMetad
 ///|
 ///
 /// The enablement status of private vulnerability reporting
+#non_exhaustive
 pub(all) enum CodeSecurityConfigurationPrivateVulnerabilityReporting {
   Enabled
   Disabled
@@ -9890,6 +9979,7 @@ pub impl @json.FromJson for CodeSecurityConfigurationPrivateVulnerabilityReporti
 ///|
 ///
 /// The enforcement status for a security configuration
+#non_exhaustive
 pub(all) enum CodeSecurityConfigurationEnforcement {
   Enforced
   Unenforced
@@ -10261,6 +10351,7 @@ pub impl @json.FromJson for CodeScanningOptions with fn from_json(value, path) {
 ///|
 ///
 /// Whether to use labeled runners or standard GitHub runners.
+#non_exhaustive
 pub(all) enum CodeScanningDefaultSetupOptionsRunnerType {
   Standard
   Labeled
@@ -10378,6 +10469,7 @@ pub impl @json.FromJson for CodeScanningDefaultSetupOptions with fn from_json(
 ///|
 ///
 /// The visibility of newly created repositories for which the code security configuration will be applied to by default
+#non_exhaustive
 pub(all) enum CodeSecurityDefaultConfigurationsItemDefaultForNewRepos {
   Public
   PrivateAndInternal
@@ -10781,6 +10873,7 @@ pub impl @json.FromJson for SimpleRepository with fn from_json(value, path) {
 ///|
 ///
 /// The attachment status of the code security configuration on the repository.
+#non_exhaustive
 pub(all) enum CodeSecurityConfigurationRepositoriesStatus {
   Attached
   Attaching
@@ -11087,6 +11180,7 @@ pub impl @json.FromJson for DependabotAlertPackage with fn from_json(
 ///|
 ///
 /// The severity of the vulnerability.
+#non_exhaustive
 pub(all) enum DependabotAlertSecurityVulnerabilitySeverity {
   Low
   Medium
@@ -11282,6 +11376,7 @@ pub impl @json.FromJson for DependabotAlertSecurityVulnerability with fn from_js
 ///|
 ///
 /// The severity of the advisory.
+#non_exhaustive
 pub(all) enum DependabotAlertSecurityAdvisorySeverity {
   Low
   Medium
@@ -11346,6 +11441,7 @@ pub impl @json.FromJson for DependabotAlertSecurityAdvisorySeverity with fn from
 ///|
 ///
 /// The classification of the advisory.
+#non_exhaustive
 pub(all) enum DependabotAlertSecurityAdvisoryClassification {
   General
   Malware
@@ -11524,6 +11620,7 @@ pub impl @json.FromJson for DependabotAlertSecurityAdvisoryCwesItem with fn from
 ///|
 ///
 /// The type of advisory identifier.
+#non_exhaustive
 pub(all) enum DependabotAlertSecurityAdvisoryIdentifiersItemType {
   CVE
   GHSA
@@ -11837,6 +11934,7 @@ pub impl @json.FromJson for DependabotAlertSecurityAdvisory with fn from_json(
 ///|
 ///
 /// The current status of the dismissal request.
+#non_exhaustive
 pub(all) enum DependabotAlertDismissalRequestSimpleStatus {
   Pending
   Approved
@@ -12034,6 +12132,7 @@ pub impl @json.FromJson for DependabotAlertDismissalRequestSimple with fn from_j
 ///|
 ///
 /// The state of the Dependabot alert.
+#non_exhaustive
 pub(all) enum DependabotAlertWithRepositoryState {
   AutoDismissed
   Dismissed
@@ -12094,6 +12193,7 @@ pub impl @json.FromJson for DependabotAlertWithRepositoryState with fn from_json
 ///|
 ///
 /// The execution scope of the vulnerable dependency.
+#non_exhaustive
 pub(all) enum DependabotAlertWithRepositoryDependencyScope {
   Development
   Runtime
@@ -12157,6 +12257,7 @@ pub impl @json.FromJson for DependabotAlertWithRepositoryDependencyScope with fn
 ///|
 ///
 /// The vulnerable dependency's relationship to your project. > [!NOTE] > We are rolling out support for dependency relationship across ecosystems. This value will be "unknown" for all dependencies in unsupported ecosystems.
+#non_exhaustive
 pub(all) enum DependabotAlertWithRepositoryDependencyRelationship {
   Unknown
   Direct
@@ -12308,6 +12409,7 @@ pub impl @json.FromJson for DependabotAlertWithRepositoryDependency with fn from
 ///|
 ///
 /// The reason that the alert was dismissed.
+#non_exhaustive
 pub(all) enum DependabotAlertWithRepositoryDismissedReason {
   FixStarted
   Inaccurate
@@ -12809,6 +12911,7 @@ pub impl @json.FromJson for NullableSimpleRepository with fn from_json(
 ///|
 ///
 /// The default repository access level for Dependabot updates.
+#non_exhaustive
 pub(all) enum DependabotRepositoryAccessDetailsDefaultLevel {
   Public
   Internal
@@ -13101,6 +13204,7 @@ pub impl @json.FromJson for Label with fn from_json(value, path) {
 ///|
 ///
 /// The state of the milestone.
+#non_exhaustive
 pub(all) enum NullableMilestoneState {
   Open
   Closed
@@ -13282,6 +13386,7 @@ pub impl @json.FromJson for NullableMilestone with fn from_json(value, path) {
 ///|
 ///
 /// The color of the issue type.
+#non_exhaustive
 pub(all) enum IssueTypeColor {
   Gray
   Blue
@@ -13558,6 +13663,7 @@ pub impl @json.FromJson for NullableIntegration with fn from_json(value, path) {
 ///|
 ///
 /// How the author is associated with the repository.
+#non_exhaustive
 pub(all) enum AuthorAssociation {
   COLLABORATOR
   CONTRIBUTOR
@@ -14068,6 +14174,7 @@ pub impl @json.FromJson for IssueDependenciesSummary with fn from_json(
 ///|
 ///
 /// The data type of the issue field
+#non_exhaustive
 pub(all) enum IssueFieldValueDataType {
   Text
   SingleSelect
@@ -14131,6 +14238,7 @@ pub impl @json.FromJson for IssueFieldValueDataType with fn from_json(
 ///|
 ///
 /// The value of the issue field
+#non_exhaustive
 pub(all) enum IssueFieldValueValue {
   Text(String)
   Number(Double)
@@ -14384,6 +14492,7 @@ pub impl @json.FromJson for IssueFieldValue with fn from_json(value, path) {
 ///|
 ///
 /// The reason for the current state
+#non_exhaustive
 pub(all) enum IssueStateReason {
   Completed
   Reopened
@@ -14525,6 +14634,7 @@ pub impl @json.FromJson for IssueLabelsItemObject with fn from_json(value, path)
 ///|
 ///
 /// Generated untagged union IssueLabelsItem.
+#non_exhaustive
 pub(all) enum IssueLabelsItem {
   Text(String)
   Object(IssueLabelsItemObject)
@@ -15314,6 +15424,7 @@ pub impl @json.FromJson for PullRequestMinimal with fn from_json(value, path) {
 ///|
 ///
 /// State of the release asset.
+#non_exhaustive
 pub(all) enum ReleaseAssetState {
   Uploaded
   Open
@@ -17639,6 +17750,7 @@ pub impl @json.FromJson for License with fn from_json(value, path) {
 ///|
 ///
 /// Generated string enum MarketplaceListingPlanPriceModel.
+#non_exhaustive
 pub(all) enum MarketplaceListingPlanPriceModel {
   FREE
   FLATRATE
@@ -18469,6 +18581,7 @@ pub impl @json.FromJson for ApiOverview with fn from_json(value, path) {
 ///|
 ///
 /// Generated string enum SecurityAndAnalysisAdvancedSecurityStatus.
+#non_exhaustive
 pub(all) enum SecurityAndAnalysisAdvancedSecurityStatus {
   Enabled
   Disabled
@@ -18575,6 +18688,7 @@ pub impl @json.FromJson for SecurityAndAnalysisAdvancedSecurity with fn from_jso
 ///|
 ///
 /// Generated string enum SecurityAndAnalysisCodeSecurityStatus.
+#non_exhaustive
 pub(all) enum SecurityAndAnalysisCodeSecurityStatus {
   Enabled
   Disabled
@@ -18677,6 +18791,7 @@ pub impl @json.FromJson for SecurityAndAnalysisCodeSecurity with fn from_json(
 ///|
 ///
 /// The enablement status of Dependabot security updates for the repository.
+#non_exhaustive
 pub(all) enum SecurityAndAnalysisDependabotSecurityUpdatesStatus {
   Enabled
   Disabled
@@ -18797,6 +18912,7 @@ pub impl @json.FromJson for SecurityAndAnalysisDependabotSecurityUpdates with fn
 ///|
 ///
 /// Generated string enum SecurityAndAnalysisSecretScanningStatus.
+#non_exhaustive
 pub(all) enum SecurityAndAnalysisSecretScanningStatus {
   Enabled
   Disabled
@@ -18901,6 +19017,7 @@ pub impl @json.FromJson for SecurityAndAnalysisSecretScanning with fn from_json(
 ///|
 ///
 /// Generated string enum SecurityAndAnalysisSecretScanningPushProtectionStatus.
+#non_exhaustive
 pub(all) enum SecurityAndAnalysisSecretScanningPushProtectionStatus {
   Enabled
   Disabled
@@ -19023,6 +19140,7 @@ pub impl @json.FromJson for SecurityAndAnalysisSecretScanningPushProtection with
 ///|
 ///
 /// Generated string enum SecurityAndAnalysisSecretScanningNonProviderPatternsStatus.
+#non_exhaustive
 pub(all) enum SecurityAndAnalysisSecretScanningNonProviderPatternsStatus {
   Enabled
   Disabled
@@ -19145,6 +19263,7 @@ pub impl @json.FromJson for SecurityAndAnalysisSecretScanningNonProviderPatterns
 ///|
 ///
 /// Generated string enum SecurityAndAnalysisSecretScanningAiDetectionStatus.
+#non_exhaustive
 pub(all) enum SecurityAndAnalysisSecretScanningAiDetectionStatus {
   Enabled
   Disabled
@@ -19265,6 +19384,7 @@ pub impl @json.FromJson for SecurityAndAnalysisSecretScanningAiDetection with fn
 ///|
 ///
 /// Generated string enum SecurityAndAnalysisSecretScanningDelegatedAlertDismissalStatus.
+#non_exhaustive
 pub(all) enum SecurityAndAnalysisSecretScanningDelegatedAlertDismissalStatus {
   Enabled
   Disabled
@@ -19387,6 +19507,7 @@ pub impl @json.FromJson for SecurityAndAnalysisSecretScanningDelegatedAlertDismi
 ///|
 ///
 /// Generated string enum SecurityAndAnalysisSecretScanningDelegatedBypassStatus.
+#non_exhaustive
 pub(all) enum SecurityAndAnalysisSecretScanningDelegatedBypassStatus {
   Enabled
   Disabled
@@ -19509,6 +19630,7 @@ pub impl @json.FromJson for SecurityAndAnalysisSecretScanningDelegatedBypass wit
 ///|
 ///
 /// The type of the bypass reviewer
+#non_exhaustive
 pub(all) enum SecurityAndAnalysisSecretScanningDelegatedBypassOptionsReviewersItemReviewerType {
   TEAM
   ROLE
@@ -19574,6 +19696,7 @@ pub impl @json.FromJson for SecurityAndAnalysisSecretScanningDelegatedBypassOpti
 ///|
 ///
 /// The bypass mode for the reviewer
+#non_exhaustive
 pub(all) enum SecurityAndAnalysisSecretScanningDelegatedBypassOptionsReviewersItemMode {
   ALWAYS
   EXEMPT
@@ -19889,6 +20012,7 @@ pub impl @json.FromJson for SecurityAndAnalysis with fn from_json(value, path) {
 ///|
 ///
 /// The policy controlling who can create pull requests: all or collaborators_only.
+#non_exhaustive
 pub(all) enum MinimalRepositoryPullRequestCreationPolicy {
   All
   CollaboratorsOnly
@@ -21031,6 +21155,7 @@ pub impl @json.FromJson for ActionsCacheStorageLimitForOrganization with fn from
 ///|
 ///
 /// The type of scope for the budget
+#non_exhaustive
 pub(all) enum CreateBudgetBudgetBudgetScope {
   Enterprise
   Organization
@@ -21100,6 +21225,7 @@ pub impl @json.FromJson for CreateBudgetBudgetBudgetScope with fn from_json(
 ///|
 ///
 /// The type of pricing for the budget
+#non_exhaustive
 pub(all) enum CreateBudgetBudgetBudgetType {
   ProductPricing
   SkuPricing
@@ -21350,6 +21476,7 @@ pub impl @json.FromJson for CreateBudget with fn from_json(value, path) {
 ///|
 ///
 /// The type of scope for the budget
+#non_exhaustive
 pub(all) enum UpdateBudgetBudgetBudgetScope {
   Enterprise
   Organization
@@ -21419,6 +21546,7 @@ pub impl @json.FromJson for UpdateBudgetBudgetBudgetScope with fn from_json(
 ///|
 ///
 /// The type of pricing for the budget
+#non_exhaustive
 pub(all) enum UpdateBudgetBudgetBudgetType {
   ProductPricing
   SkuPricing
@@ -22387,6 +22515,7 @@ pub impl @json.FromJson for ActionsCacheUsageByRepository with fn from_json(
 ///|
 ///
 /// The image provider.
+#non_exhaustive
 pub(all) enum NullableActionsHostedRunnerPoolImageSource {
   Github
   Partner
@@ -22636,6 +22765,7 @@ pub impl @json.FromJson for PublicIp with fn from_json(value, path) {
 ///|
 ///
 /// The status of the runner.
+#non_exhaustive
 pub(all) enum ActionsHostedRunnerStatus {
   Ready
   Provisioning
@@ -22961,6 +23091,7 @@ pub impl @json.FromJson for ActionsHostedRunnerCustomImageVersion with fn from_j
 ///|
 ///
 /// The image provider.
+#non_exhaustive
 pub(all) enum ActionsHostedRunnerCuratedImageSource {
   Github
   Partner
@@ -23271,6 +23402,7 @@ pub impl @json.FromJson for EmptyObject with fn from_json(value, path) {
 ///|
 ///
 /// The policy that controls the repositories in the organization that are allowed to run GitHub Actions.
+#non_exhaustive
 pub(all) enum EnabledRepositories {
   All
   None
@@ -23325,6 +23457,7 @@ pub impl @json.FromJson for EnabledRepositories with fn from_json(value, path) {
 ///|
 ///
 /// The permissions policy that controls the actions and reusable workflows that are allowed to run.
+#non_exhaustive
 pub(all) enum AllowedActions {
   All
   LocalOnly
@@ -23555,6 +23688,7 @@ pub impl @json.FromJson for ActionsArtifactAndLogRetention with fn from_json(
 ///|
 ///
 /// The policy that controls when fork PR workflows require approval from a maintainer.
+#non_exhaustive
 pub(all) enum ActionsForkPrContributorApprovalApprovalPolicy {
   FirstTimeContributorsNewToGithub
   FirstTimeContributors
@@ -23893,6 +24027,7 @@ pub impl @json.FromJson for SelectedActions with fn from_json(value, path) {
 ///|
 ///
 /// The policy that controls whether self-hosted runners can be used by repositories in the organization
+#non_exhaustive
 pub(all) enum SelfHostedRunnersSettingsEnabledRepositories {
   All
   Selected
@@ -24015,6 +24150,7 @@ pub impl @json.FromJson for SelfHostedRunnersSettings with fn from_json(
 ///|
 ///
 /// The default workflow permissions granted to the GITHUB_TOKEN when running workflows.
+#non_exhaustive
 pub(all) enum ActionsDefaultWorkflowPermissions {
   Read
   Write
@@ -24191,6 +24327,7 @@ pub impl @json.FromJson for ActionsSetDefaultWorkflowPermissions with fn from_js
 ///|
 ///
 /// The enforcement level of the ruleset. `evaluate` allows admins to test rules before enforcing them. Admins can view insights on the Rule Insights page (`evaluate` is only available with GitHub Enterprise).
+#non_exhaustive
 pub(all) enum RepositoryRuleEnforcement {
   Disabled
   Active
@@ -24248,6 +24385,7 @@ pub impl @json.FromJson for RepositoryRuleEnforcement with fn from_json(
 ///|
 ///
 /// The type of the actor
+#non_exhaustive
 pub(all) enum ActionsRuleParamsActorType {
   User
   Bot
@@ -24485,6 +24623,7 @@ pub impl @json.FromJson for ActionsRuleRestrictActionsActors with fn from_json(
 ///|
 ///
 /// Generated string enum ActionsRuleRestrictActionEventsParametersAllowedEventsItem.
+#non_exhaustive
 pub(all) enum ActionsRuleRestrictActionEventsParametersAllowedEventsItem {
   BranchProtectionRule
   CheckRun
@@ -24764,6 +24903,7 @@ pub impl @json.FromJson for ActionsRuleRestrictActionEvents with fn from_json(
 ///|
 ///
 /// An actions rule.
+#non_exhaustive
 pub(all) enum ActionsRule {
   RestrictActionsActors(ActionsRuleRestrictActionsActors)
   RestrictActionEvents(ActionsRuleRestrictActionEvents)
@@ -24811,6 +24951,7 @@ pub impl @json.FromJson for ActionsRule with fn from_json(value, path) {
 ///|
 ///
 /// The type of the source of the policy
+#non_exhaustive
 pub(all) enum ActionsPolicySourceType {
   Repository
   Organization
@@ -25236,6 +25377,7 @@ pub impl @json.FromJson for RunnerGroupsOrg with fn from_json(value, path) {
 ///|
 ///
 /// The type of label. Read-only labels are applied automatically when the runner is configured.
+#non_exhaustive
 pub(all) enum RunnerLabelType {
   ReadOnly
   Custom
@@ -25505,6 +25647,7 @@ pub impl @json.FromJson for RunnerApplication with fn from_json(value, path) {
 ///|
 ///
 /// Describe whether all repositories have been selected or there's a selection involved
+#non_exhaustive
 pub(all) enum AuthenticationTokenRepositorySelection {
   All
   Selected
@@ -25635,6 +25778,7 @@ pub impl @json.FromJson for AuthenticationToken with fn from_json(value, path) {
 ///|
 ///
 /// Visibility of a secret
+#non_exhaustive
 pub(all) enum OrganizationActionsSecretVisibility {
   All
   Private
@@ -25827,6 +25971,7 @@ pub impl @json.FromJson for ActionsPublicKey with fn from_json(value, path) {
 ///|
 ///
 /// Visibility of a variable
+#non_exhaustive
 pub(all) enum OrganizationActionsVariableVisibility {
   All
   Private
@@ -25965,6 +26110,7 @@ pub impl @json.FromJson for OrganizationActionsVariable with fn from_json(
 ///|
 ///
 /// Generated string enum ArtifactDeploymentRecordRuntimeRisksItem.
+#non_exhaustive
 pub(all) enum ArtifactDeploymentRecordRuntimeRisksItem {
   CriticalResource
   InternetExposed
@@ -26131,6 +26277,7 @@ pub impl @json.FromJson for ArtifactDeploymentRecord with fn from_json(
 ///|
 ///
 /// Indicates whether a campaign is open or closed
+#non_exhaustive
 pub(all) enum CampaignState {
   Open
   Closed
@@ -26182,6 +26329,7 @@ pub impl @json.FromJson for CampaignState with fn from_json(value, path) {
 ///|
 ///
 /// The ownership type of the team
+#non_exhaustive
 pub(all) enum NullableTeamSimpleType {
   Enterprise
   Organization
@@ -26426,6 +26574,7 @@ pub impl @json.FromJson for TeamPermissions with fn from_json(value, path) {
 ///|
 ///
 /// The ownership type of the team
+#non_exhaustive
 pub(all) enum TeamType {
   Enterprise
   Organization
@@ -26477,6 +26626,7 @@ pub impl @json.FromJson for TeamType with fn from_json(value, path) {
 ///|
 ///
 /// How the team's access to the repository was granted. This property is only present when the team is returned in a repository context, such as `GET /repos/{owner}/{repo}/teams`.
+#non_exhaustive
 pub(all) enum TeamAccessSource {
   Direct
   Organization
@@ -26838,6 +26988,7 @@ pub impl @json.FromJson for CampaignSummary with fn from_json(value, path) {
 ///|
 ///
 /// Whether AI Scan on pull requests is enabled for the organization. The organization setting respects enterprise policy, and repositories inherit it: when disabled, repositories cannot enable AI Scan; when enabled, repositories can still opt out.
+#non_exhaustive
 pub(all) enum CodeScanningAiScanOrgSettingsPrScan {
   Enabled
   Disabled
@@ -26938,6 +27089,7 @@ pub impl @json.FromJson for CodeScanningAiScanOrgSettings with fn from_json(
 ///|
 ///
 /// Whether AI Scan is enabled for the organization. Organization respects enterprise policy. Disabled organizations prevent repositories from enabling AI Scan. Enabled organizations enable AI Scan for their repositories, but individual repositories can opt out.
+#non_exhaustive
 pub(all) enum CodeScanningAiScanOrgEnablementUpdatePrScan {
   Enabled
   Disabled
@@ -27049,6 +27201,7 @@ pub impl @json.FromJson for CodeScanningAiScanOrgEnablementUpdate with fn from_j
 ///|
 ///
 /// State of a code scanning alert.
+#non_exhaustive
 pub(all) enum CodeScanningAlertStateQuery {
   Open
   Closed
@@ -27109,6 +27262,7 @@ pub impl @json.FromJson for CodeScanningAlertStateQuery with fn from_json(
 ///|
 ///
 /// Severity of a code scanning alert.
+#non_exhaustive
 pub(all) enum CodeScanningAlertSeverity {
   Critical
   High
@@ -27178,6 +27332,7 @@ pub impl @json.FromJson for CodeScanningAlertSeverity with fn from_json(
 ///|
 ///
 /// State of a code scanning alert.
+#non_exhaustive
 pub(all) enum CodeScanningAlertState {
   Open
   Dismissed
@@ -27235,6 +27390,7 @@ pub impl @json.FromJson for CodeScanningAlertState with fn from_json(
 ///|
 ///
 /// **Required when the state is dismissed.** The reason for dismissing or closing the alert.
+#non_exhaustive
 pub(all) enum CodeScanningAlertDismissedReason {
   FalsePositive
   WonTFix
@@ -27295,6 +27451,7 @@ pub impl @json.FromJson for CodeScanningAlertDismissedReason with fn from_json(
 ///|
 ///
 /// The severity of the alert.
+#non_exhaustive
 pub(all) enum CodeScanningAlertRuleSummarySeverity {
   None
   Note
@@ -27355,6 +27512,7 @@ pub impl @json.FromJson for CodeScanningAlertRuleSummarySeverity with fn from_js
 ///|
 ///
 /// The security severity of the alert.
+#non_exhaustive
 pub(all) enum CodeScanningAlertRuleSummarySecuritySeverityLevel {
   Low
   Medium
@@ -27652,6 +27810,7 @@ pub impl @json.FromJson for CodeScanningAlertLocation with fn from_json(
 ///|
 ///
 /// A classification of the file. For example to identify it as generated.
+#non_exhaustive
 pub(all) enum CodeScanningAlertClassification {
   Source
   Generated
@@ -28011,6 +28170,7 @@ pub impl @json.FromJson for CodeScanningOrganizationAlertItems with fn from_json
 ///|
 ///
 /// Whether a prebuild is currently available when creating a codespace for this machine and repository. If a branch was not specified as a ref, the default branch will be assumed. Value will be "null" if prebuilds are not supported or prebuild availability could not be determined. Value will be "none" if no prebuild is available. Latest values "ready" and "in_progress" indicate the prebuild availability status.
+#non_exhaustive
 pub(all) enum NullableCodespaceMachinePrebuildAvailability {
   None
   Ready
@@ -28164,6 +28324,7 @@ pub impl @json.FromJson for NullableCodespaceMachine with fn from_json(
 ///|
 ///
 /// State of this codespace.
+#non_exhaustive
 pub(all) enum CodespaceState {
   Unknown
   Created
@@ -28325,6 +28486,7 @@ pub impl @json.FromJson for CodespaceGitStatus with fn from_json(value, path) {
 ///|
 ///
 /// The initally assigned location of a new codespace.
+#non_exhaustive
 pub(all) enum CodespaceLocation {
   EastUs
   SouthEastAsia
@@ -28669,6 +28831,7 @@ pub impl @json.FromJson for Codespace with fn from_json(value, path) {
 ///|
 ///
 /// The type of repositories in the organization that the secret is visible to
+#non_exhaustive
 pub(all) enum CodespacesOrgSecretVisibility {
   All
   Private
@@ -28858,6 +29021,7 @@ pub impl @json.FromJson for CodespacesPublicKey with fn from_json(value, path) {
 ///|
 ///
 /// The base role that determines default permissions. - `no_access`: No default access - `reader`: Default read permissions - `writer`: Default write permissions (organization spaces only) - `admin`: Default admin permissions (organization spaces only)
+#non_exhaustive
 pub(all) enum CopilotSpaceBaseRole {
   Reader
   Writer
@@ -28915,6 +29079,7 @@ pub impl @json.FromJson for CopilotSpaceBaseRole with fn from_json(value, path) 
 ///|
 ///
 /// The type of resource.
+#non_exhaustive
 pub(all) enum CopilotSpaceResourcesAttributesItemResourceType {
   Repository
   GithubFile
@@ -29298,6 +29463,7 @@ pub impl @json.FromJson for CopilotSpace with fn from_json(value, path) {
 ///|
 ///
 /// The role granted to the collaborator
+#non_exhaustive
 pub(all) enum CopilotSpaceCollaboratorUserRole {
   Reader
   Writer
@@ -29525,6 +29691,7 @@ pub impl @json.FromJson for CopilotSpaceCollaboratorUser with fn from_json(
 ///|
 ///
 /// The role granted to the collaborator
+#non_exhaustive
 pub(all) enum CopilotSpaceCollaboratorTeamRole {
   Reader
   Writer
@@ -29705,6 +29872,7 @@ pub impl @json.FromJson for CopilotSpaceCollaboratorTeam with fn from_json(
 ///|
 ///
 /// A collaborator (user or team) of a Copilot Space
+#non_exhaustive
 pub(all) enum CopilotSpaceCollaborator {
   User(CopilotSpaceCollaboratorUser)
   Team(CopilotSpaceCollaboratorTeam)
@@ -29753,6 +29921,7 @@ pub impl @json.FromJson for CopilotSpaceCollaborator with fn from_json(
 ///|
 ///
 /// The type of the resource.
+#non_exhaustive
 pub(all) enum CopilotSpaceResourceResourceType {
   Repository
   GithubFile
@@ -30087,6 +30256,7 @@ pub impl @json.FromJson for NullableOrganizationSimple with fn from_json(
 ///|
 ///
 /// The Copilot plan of the organization, or the parent enterprise, when applicable.
+#non_exhaustive
 pub(all) enum CopilotSeatDetailsPlanType {
   Business
   Enterprise
@@ -30246,6 +30416,7 @@ pub impl @json.FromJson for CopilotSeatDetails with fn from_json(value, path) {
 ///|
 ///
 /// Visibility of a secret
+#non_exhaustive
 pub(all) enum OrganizationDependabotSecretVisibility {
   All
   Private
@@ -30424,6 +30595,7 @@ pub impl @json.FromJson for DependabotPublicKey with fn from_json(value, path) {
 ///|
 ///
 /// The policy controlling who can create pull requests: all or collaborators_only.
+#non_exhaustive
 pub(all) enum NullableMinimalRepositoryPullRequestCreationPolicy {
   All
   CollaboratorsOnly
@@ -31129,6 +31301,7 @@ pub impl @json.FromJson for NullableMinimalRepository with fn from_json(
 ///|
 ///
 /// Generated string enum PackagePackageType.
+#non_exhaustive
 pub(all) enum PackagePackageType {
   Npm
   Maven
@@ -31192,6 +31365,7 @@ pub impl @json.FromJson for PackagePackageType with fn from_json(value, path) {
 ///|
 ///
 /// Generated string enum PackageVisibility.
+#non_exhaustive
 pub(all) enum PackageVisibility {
   Private
   Public
@@ -32024,6 +32198,7 @@ pub impl @json.FromJson for ApiInsightsUserStatsItem with fn from_json(
 ///|
 ///
 /// The type of GitHub user that can comment, open issues, or create pull requests while the interaction limit is in effect.
+#non_exhaustive
 pub(all) enum InteractionGroup {
   ExistingUsers
   ContributorsOnly
@@ -32136,6 +32311,7 @@ pub impl @json.FromJson for InteractionLimitResponse with fn from_json(
 ///|
 ///
 /// The duration of the interaction restriction. Default: `one_day`.
+#non_exhaustive
 pub(all) enum InteractionExpiry {
   OneDay
   ThreeDays
@@ -32247,6 +32423,7 @@ pub impl @json.FromJson for InteractionLimit with fn from_json(value, path) {
 ///|
 ///
 /// The data type of the issue field.
+#non_exhaustive
 pub(all) enum IssueFieldDataType {
   Text
   Date
@@ -32307,6 +32484,7 @@ pub impl @json.FromJson for IssueFieldDataType with fn from_json(value, path) {
 ///|
 ///
 /// The visibility of the issue field. Can be `organization_members_only` (visible only within the organization) or `all` (visible to all users who can see issues).
+#non_exhaustive
 pub(all) enum IssueFieldVisibility {
   OrganizationMembersOnly
   All
@@ -32358,6 +32536,7 @@ pub impl @json.FromJson for IssueFieldVisibility with fn from_json(value, path) 
 ///|
 ///
 /// The color of the option.
+#non_exhaustive
 pub(all) enum IssueFieldOptionsItemColor {
   Gray
   Blue
@@ -32598,6 +32777,7 @@ pub impl @json.FromJson for IssueField with fn from_json(value, path) {
 ///|
 ///
 /// The data type of the issue field.
+#non_exhaustive
 pub(all) enum OrganizationCreateIssueFieldDataType {
   Text
   Date
@@ -32661,6 +32841,7 @@ pub impl @json.FromJson for OrganizationCreateIssueFieldDataType with fn from_js
 ///|
 ///
 /// The visibility of the issue field. Can be `organization_members_only` (visible only within the organization) or `all` (visible to all users who can see issues). Only used when the visibility settings feature is enabled. Defaults to `organization_members_only`.
+#non_exhaustive
 pub(all) enum OrganizationCreateIssueFieldVisibility {
   OrganizationMembersOnly
   All
@@ -32717,6 +32898,7 @@ pub impl @json.FromJson for OrganizationCreateIssueFieldVisibility with fn from_
 ///|
 ///
 /// Color for the option.
+#non_exhaustive
 pub(all) enum OrganizationCreateIssueFieldOptionsItemColor {
   Gray
   Blue
@@ -32941,6 +33123,7 @@ pub impl @json.FromJson for OrganizationCreateIssueField with fn from_json(
 ///|
 ///
 /// The visibility of the issue field. Can be `organization_members_only` (visible only within the organization) or `all` (visible to all users who can see issues). Only used when the visibility settings feature is enabled.
+#non_exhaustive
 pub(all) enum OrganizationUpdateIssueFieldVisibility {
   OrganizationMembersOnly
   All
@@ -32997,6 +33180,7 @@ pub impl @json.FromJson for OrganizationUpdateIssueFieldVisibility with fn from_
 ///|
 ///
 /// Color for the option.
+#non_exhaustive
 pub(all) enum OrganizationUpdateIssueFieldOptionsItemColor {
   Gray
   Blue
@@ -33221,6 +33405,7 @@ pub impl @json.FromJson for OrganizationUpdateIssueField with fn from_json(
 ///|
 ///
 /// Color for the issue type.
+#non_exhaustive
 pub(all) enum OrganizationCreateIssueTypeColor {
   Gray
   Blue
@@ -33360,6 +33545,7 @@ pub impl @json.FromJson for OrganizationCreateIssueType with fn from_json(
 ///|
 ///
 /// Color for the issue type.
+#non_exhaustive
 pub(all) enum OrganizationUpdateIssueTypeColor {
   Gray
   Blue
@@ -33499,6 +33685,7 @@ pub impl @json.FromJson for OrganizationUpdateIssueType with fn from_json(
 ///|
 ///
 /// The state of the member in the organization. The `pending` state indicates the user has not yet accepted an invitation.
+#non_exhaustive
 pub(all) enum OrgMembershipState {
   Active
   Pending
@@ -33550,6 +33737,7 @@ pub impl @json.FromJson for OrgMembershipState with fn from_json(value, path) {
 ///|
 ///
 /// The user's membership type in the organization.
+#non_exhaustive
 pub(all) enum OrgMembershipRole {
   Admin
   Member
@@ -33880,6 +34068,7 @@ pub impl @json.FromJson for Migration with fn from_json(value, path) {
 ///|
 ///
 /// The system role from which this role inherits permissions.
+#non_exhaustive
 pub(all) enum OrganizationRoleBaseRole {
   Read
   Triage
@@ -33943,6 +34132,7 @@ pub impl @json.FromJson for OrganizationRoleBaseRole with fn from_json(
 ///|
 ///
 /// Source answers the question, "where did this role come from?"
+#non_exhaustive
 pub(all) enum OrganizationRoleSource {
   Organization
   Enterprise
@@ -34092,6 +34282,7 @@ pub impl @json.FromJson for OrganizationRole with fn from_json(value, path) {
 ///|
 ///
 /// Determines if the team has a direct, indirect, or mixed relationship to a role
+#non_exhaustive
 pub(all) enum TeamRoleAssignmentAssignment {
   Direct
   Indirect
@@ -34215,6 +34406,7 @@ pub impl @json.FromJson for TeamRoleAssignmentPermissions with fn from_json(
 ///|
 ///
 /// The ownership type of the team
+#non_exhaustive
 pub(all) enum TeamRoleAssignmentType {
   Enterprise
   Organization
@@ -34406,6 +34598,7 @@ pub impl @json.FromJson for TeamRoleAssignment with fn from_json(value, path) {
 ///|
 ///
 /// The ownership type of the team
+#non_exhaustive
 pub(all) enum TeamSimpleType {
   Enterprise
   Organization
@@ -34584,6 +34777,7 @@ pub impl @json.FromJson for TeamSimple with fn from_json(value, path) {
 ///|
 ///
 /// Determines if the user has a direct, indirect, or mixed relationship to a role
+#non_exhaustive
 pub(all) enum UserRoleAssignmentAssignment {
   Direct
   Indirect
@@ -34808,6 +35002,7 @@ pub impl @json.FromJson for UserRoleAssignment with fn from_json(value, path) {
 ///|
 ///
 /// Generated string enum PackageVersionMetadataPackageType.
+#non_exhaustive
 pub(all) enum PackageVersionMetadataPackageType {
   Npm
   Maven
@@ -35123,6 +35318,7 @@ pub impl @json.FromJson for PackageVersion with fn from_json(value, path) {
 ///|
 ///
 /// Type of repository selection requested.
+#non_exhaustive
 pub(all) enum OrganizationProgrammaticAccessGrantRequestRepositorySelection {
   None
   All
@@ -35382,6 +35578,7 @@ pub impl @json.FromJson for OrganizationProgrammaticAccessGrantRequest with fn f
 ///|
 ///
 /// Type of repository selection requested.
+#non_exhaustive
 pub(all) enum OrganizationProgrammaticAccessGrantRepositorySelection {
   None
   All
@@ -35625,6 +35822,7 @@ pub impl @json.FromJson for OrganizationProgrammaticAccessGrant with fn from_jso
 ///|
 ///
 /// The registry type.
+#non_exhaustive
 pub(all) enum OrgPrivateRegistryConfigurationRegistryType {
   MavenRepository
   NugetFeed
@@ -35727,6 +35925,7 @@ pub impl @json.FromJson for OrgPrivateRegistryConfigurationRegistryType with fn 
 ///|
 ///
 /// The authentication type for the private registry.
+#non_exhaustive
 pub(all) enum OrgPrivateRegistryConfigurationAuthType {
   Token
   UsernamePassword
@@ -35803,6 +36002,7 @@ pub impl @json.FromJson for OrgPrivateRegistryConfigurationAuthType with fn from
 ///|
 ///
 /// Which type of organization repositories have access to the private registry.
+#non_exhaustive
 pub(all) enum OrgPrivateRegistryConfigurationVisibility {
   All
   Private
@@ -36039,6 +36239,7 @@ pub impl @json.FromJson for OrgPrivateRegistryConfiguration with fn from_json(
 ///|
 ///
 /// The registry type.
+#non_exhaustive
 pub(all) enum OrgPrivateRegistryConfigurationWithSelectedRepositoriesRegistryType {
   MavenRepository
   NugetFeed
@@ -36143,6 +36344,7 @@ pub impl @json.FromJson for OrgPrivateRegistryConfigurationWithSelectedRepositor
 ///|
 ///
 /// The authentication type for the private registry.
+#non_exhaustive
 pub(all) enum OrgPrivateRegistryConfigurationWithSelectedRepositoriesAuthType {
   Token
   UsernamePassword
@@ -36226,6 +36428,7 @@ pub impl @json.FromJson for OrgPrivateRegistryConfigurationWithSelectedRepositor
 ///|
 ///
 /// Which type of organization repositories have access to the private registry. `selected` means only the repositories specified by `selected_repository_ids` can access the private registry.
+#non_exhaustive
 pub(all) enum OrgPrivateRegistryConfigurationWithSelectedRepositoriesVisibility {
   All
   Private
@@ -36485,6 +36688,7 @@ pub impl @json.FromJson for OrgPrivateRegistryConfigurationWithSelectedRepositor
 ///|
 ///
 /// The current status.
+#non_exhaustive
 pub(all) enum NullableProjectsV2StatusUpdateStatus {
   INACTIVE
   ONTRACK
@@ -36645,6 +36849,7 @@ pub impl @json.FromJson for NullableProjectsV2StatusUpdate with fn from_json(
 ///|
 ///
 /// The current state of the project.
+#non_exhaustive
 pub(all) enum ProjectsV2State {
   Open
   Closed
@@ -36880,6 +37085,7 @@ pub impl @json.FromJson for Link with fn from_json(value, path) {
 ///|
 ///
 /// The merge method to use.
+#non_exhaustive
 pub(all) enum AutoMergeMergeMethod {
   Merge
   Squash
@@ -37636,6 +37842,7 @@ pub impl @json.FromJson for PullRequestSimple with fn from_json(value, path) {
 ///|
 ///
 /// The type of content tracked in a project item
+#non_exhaustive
 pub(all) enum ProjectsV2ItemContentType {
   Issue
   PullRequest
@@ -38084,6 +38291,7 @@ pub impl @json.FromJson for ProjectsV2IterationSettings with fn from_json(
 ///|
 ///
 /// The field's data type.
+#non_exhaustive
 pub(all) enum ProjectsV2FieldDataType {
   Assignees
   LinkedPullRequests
@@ -38329,6 +38537,7 @@ pub impl @json.FromJson for ProjectsV2Field with fn from_json(value, path) {
 ///|
 ///
 /// The color associated with the option.
+#non_exhaustive
 pub(all) enum ProjectsV2FieldSingleSelectOptionColor {
   BLUE
   GRAY
@@ -38695,6 +38904,7 @@ pub impl @json.FromJson for ProjectsV2ItemWithContent with fn from_json(
 ///|
 ///
 /// The layout of the view.
+#non_exhaustive
 pub(all) enum ProjectsV2ViewLayout {
   Table
   Board
@@ -38749,6 +38959,7 @@ pub impl @json.FromJson for ProjectsV2ViewLayout with fn from_json(value, path) 
 ///|
 ///
 /// Generated untagged union ProjectsV2ViewSortByItemItem.
+#non_exhaustive
 pub(all) enum ProjectsV2ViewSortByItemItem {
   Int(Int32)
   Text(String)
@@ -39074,6 +39285,7 @@ pub impl @json.FromJson for ExternalProperty with fn from_json(value, path) {
 ///|
 ///
 /// The value assigned to the property
+#non_exhaustive
 pub(all) enum CustomPropertyValueValue {
   Text(String)
   TextArray(Array[String])
@@ -39229,6 +39441,7 @@ pub impl @json.FromJson for RepositoryExternalPropertyPayload with fn from_json(
 ///|
 ///
 /// The source type of the property
+#non_exhaustive
 pub(all) enum CustomPropertySourceType {
   Organization
   Enterprise
@@ -39283,6 +39496,7 @@ pub impl @json.FromJson for CustomPropertySourceType with fn from_json(
 ///|
 ///
 /// The type of the value for the property
+#non_exhaustive
 pub(all) enum CustomPropertyValueType {
   String
   SingleSelect
@@ -39346,6 +39560,7 @@ pub impl @json.FromJson for CustomPropertyValueType with fn from_json(
 ///|
 ///
 /// Default value of the property
+#non_exhaustive
 pub(all) enum CustomPropertyDefaultValue {
   Text(String)
   TextArray(Array[String])
@@ -39396,6 +39611,7 @@ pub impl @json.FromJson for CustomPropertyDefaultValue with fn from_json(
 ///|
 ///
 /// Who can edit the values of the property
+#non_exhaustive
 pub(all) enum CustomPropertyValuesEditableBy {
   OrgActors
   OrgAndRepoActors
@@ -39546,6 +39762,7 @@ pub impl @json.FromJson for CustomProperty with fn from_json(value, path) {
 ///|
 ///
 /// The type of the value for the property
+#non_exhaustive
 pub(all) enum CustomPropertySetPayloadValueType {
   String
   SingleSelect
@@ -39609,6 +39826,7 @@ pub impl @json.FromJson for CustomPropertySetPayloadValueType with fn from_json(
 ///|
 ///
 /// Default value of the property
+#non_exhaustive
 pub(all) enum CustomPropertySetPayloadDefaultValue {
   Text(String)
   TextArray(Array[String])
@@ -39661,6 +39879,7 @@ pub impl @json.FromJson for CustomPropertySetPayloadDefaultValue with fn from_js
 ///|
 ///
 /// Who can edit the values of the property
+#non_exhaustive
 pub(all) enum CustomPropertySetPayloadValuesEditableBy {
   OrgActors
   OrgAndRepoActors
@@ -39933,6 +40152,7 @@ pub impl @json.FromJson for NullableRepositoryPermissions with fn from_json(
 ///|
 ///
 /// The policy controlling who can create pull requests: all or collaborators_only.
+#non_exhaustive
 pub(all) enum NullableRepositoryPullRequestCreationPolicy {
   All
   CollaboratorsOnly
@@ -39996,6 +40216,7 @@ pub impl @json.FromJson for NullableRepositoryPullRequestCreationPolicy with fn 
 ///|
 ///
 /// The default value for a squash merge commit title: - `PR_TITLE` - default to the pull request's title. - `COMMIT_OR_PR_TITLE` - default to the commit's title (if only one commit) or the pull request's title (when more than one commit).
+#non_exhaustive
 pub(all) enum NullableRepositorySquashMergeCommitTitle {
   PRTITLE
   COMMITORPRTITLE
@@ -40054,6 +40275,7 @@ pub impl @json.FromJson for NullableRepositorySquashMergeCommitTitle with fn fro
 ///|
 ///
 /// The default value for a squash merge commit message: - `PR_BODY` - default to the pull request's body. - `COMMIT_MESSAGES` - default to the branch's commit messages. - `BLANK` - default to a blank commit message.
+#non_exhaustive
 pub(all) enum NullableRepositorySquashMergeCommitMessage {
   PRBODY
   COMMITMESSAGES
@@ -40120,6 +40342,7 @@ pub impl @json.FromJson for NullableRepositorySquashMergeCommitMessage with fn f
 ///|
 ///
 /// The default value for a merge commit title. - `PR_TITLE` - default to the pull request's title. - `MERGE_MESSAGE` - default to the classic title for a merge message (e.g., Merge pull request #123 from branch-name).
+#non_exhaustive
 pub(all) enum NullableRepositoryMergeCommitTitle {
   PRTITLE
   MERGEMESSAGE
@@ -40174,6 +40397,7 @@ pub impl @json.FromJson for NullableRepositoryMergeCommitTitle with fn from_json
 ///|
 ///
 /// The default value for a merge commit message. - `PR_TITLE` - default to the pull request's title. - `PR_BODY` - default to the pull request's body. - `BLANK` - default to a blank commit message.
+#non_exhaustive
 pub(all) enum NullableRepositoryMergeCommitMessage {
   PRBODY
   PRTITLE
@@ -40910,6 +41134,7 @@ pub impl @json.FromJson for CodeOfConductSimple with fn from_json(value, path) {
 ///|
 ///
 /// The policy controlling who can create pull requests: all or collaborators_only.
+#non_exhaustive
 pub(all) enum FullRepositoryPullRequestCreationPolicy {
   All
   CollaboratorsOnly
@@ -41034,6 +41259,7 @@ pub impl @json.FromJson for FullRepositoryPermissions with fn from_json(
 ///|
 ///
 /// The default value for a squash merge commit title: - `PR_TITLE` - default to the pull request's title. - `COMMIT_OR_PR_TITLE` - default to the commit's title (if only one commit) or the pull request's title (when more than one commit).
+#non_exhaustive
 pub(all) enum FullRepositorySquashMergeCommitTitle {
   PRTITLE
   COMMITORPRTITLE
@@ -41088,6 +41314,7 @@ pub impl @json.FromJson for FullRepositorySquashMergeCommitTitle with fn from_js
 ///|
 ///
 /// The default value for a squash merge commit message: - `PR_BODY` - default to the pull request's body. - `COMMIT_MESSAGES` - default to the branch's commit messages. - `BLANK` - default to a blank commit message.
+#non_exhaustive
 pub(all) enum FullRepositorySquashMergeCommitMessage {
   PRBODY
   COMMITMESSAGES
@@ -41147,6 +41374,7 @@ pub impl @json.FromJson for FullRepositorySquashMergeCommitMessage with fn from_
 ///|
 ///
 /// The default value for a merge commit title. - `PR_TITLE` - default to the pull request's title. - `MERGE_MESSAGE` - default to the classic title for a merge message (e.g., Merge pull request #123 from branch-name).
+#non_exhaustive
 pub(all) enum FullRepositoryMergeCommitTitle {
   PRTITLE
   MERGEMESSAGE
@@ -41201,6 +41429,7 @@ pub impl @json.FromJson for FullRepositoryMergeCommitTitle with fn from_json(
 ///|
 ///
 /// The default value for a merge commit message. - `PR_TITLE` - default to the pull request's title. - `PR_BODY` - default to the pull request's body. - `BLANK` - default to a blank commit message.
+#non_exhaustive
 pub(all) enum FullRepositoryMergeCommitMessage {
   PRBODY
   PRTITLE
@@ -41851,6 +42080,7 @@ pub impl @json.FromJson for FullRepository with fn from_json(value, path) {
 ///|
 ///
 /// The type of actor that can bypass a ruleset.
+#non_exhaustive
 pub(all) enum RepositoryRulesetBypassActorActorType {
   Integration
   OrganizationAdmin
@@ -41919,6 +42149,7 @@ pub impl @json.FromJson for RepositoryRulesetBypassActorActorType with fn from_j
 ///|
 ///
 /// When the specified actor can bypass the ruleset. `pull_request` means that an actor can only bypass rules on pull requests. `pull_request` is not applicable for the `DeployKey` actor type. Also, `pull_request` is only applicable to branch rulesets. When `bypass_mode` is `exempt`, rules will not be run for that actor and a bypass audit entry will not be created.
+#non_exhaustive
 pub(all) enum RepositoryRulesetBypassActorBypassMode {
   Always
   PullRequest
@@ -42377,6 +42608,7 @@ pub impl @json.FromJson for RepositoryRuleRequiredLinearHistory with fn from_jso
 ///|
 ///
 /// When set to ALLGREEN, the merge commit created by merge queue for each PR in the group must pass all required checks to merge. When set to HEADGREEN, only the commit at the head of the merge group, i.e. the commit containing changes from all of the PRs in the group, must pass its required checks to merge.
+#non_exhaustive
 pub(all) enum RepositoryRuleMergeQueueParametersGroupingStrategy {
   ALLGREEN
   HEADGREEN
@@ -42442,6 +42674,7 @@ pub impl @json.FromJson for RepositoryRuleMergeQueueParametersGroupingStrategy w
 ///|
 ///
 /// Method to use when merging changes from queued pull requests.
+#non_exhaustive
 pub(all) enum RepositoryRuleMergeQueueParametersMergeMethod {
   MERGE
   SQUASH
@@ -42815,6 +43048,7 @@ pub impl @json.FromJson for RepositoryRuleRequiredSignatures with fn from_json(
 ///|
 ///
 /// The type of the actor
+#non_exhaustive
 pub(all) enum RepositoryRuleParamsActorType {
   User
   Team
@@ -43102,6 +43336,7 @@ pub impl @json.FromJson for RepositoryRuleParamsRequiredReviewerConfiguration wi
 ///|
 ///
 /// Generated string enum RepositoryRulePullRequestParametersAllowedMergeMethodsItem.
+#non_exhaustive
 pub(all) enum RepositoryRulePullRequestParametersAllowedMergeMethodsItem {
   Merge
   Squash
@@ -43576,6 +43811,7 @@ pub impl @json.FromJson for RepositoryRuleNonFastForward with fn from_json(
 ///|
 ///
 /// The operator to use for matching.
+#non_exhaustive
 pub(all) enum RepositoryRuleCommitMessagePatternParametersOperator {
   StartsWith
   EndsWith
@@ -43772,6 +44008,7 @@ pub impl @json.FromJson for RepositoryRuleCommitMessagePattern with fn from_json
 ///|
 ///
 /// The operator to use for matching.
+#non_exhaustive
 pub(all) enum RepositoryRuleCommitAuthorEmailPatternParametersOperator {
   StartsWith
   EndsWith
@@ -43972,6 +44209,7 @@ pub impl @json.FromJson for RepositoryRuleCommitAuthorEmailPattern with fn from_
 ///|
 ///
 /// The operator to use for matching.
+#non_exhaustive
 pub(all) enum RepositoryRuleCommitterEmailPatternParametersOperator {
   StartsWith
   EndsWith
@@ -44168,6 +44406,7 @@ pub impl @json.FromJson for RepositoryRuleCommitterEmailPattern with fn from_jso
 ///|
 ///
 /// The operator to use for matching.
+#non_exhaustive
 pub(all) enum RepositoryRuleBranchNamePatternParametersOperator {
   StartsWith
   EndsWith
@@ -44361,6 +44600,7 @@ pub impl @json.FromJson for RepositoryRuleBranchNamePattern with fn from_json(
 ///|
 ///
 /// The operator to use for matching.
+#non_exhaustive
 pub(all) enum RepositoryRuleTagNamePatternParametersOperator {
   StartsWith
   EndsWith
@@ -44726,6 +44966,7 @@ pub impl @json.FromJson for RepositoryRuleWorkflows with fn from_json(
 ///|
 ///
 /// The severity level at which code scanning results that raise alerts block a reference update. For more information on alert severity levels, see "[About code scanning alerts](https://docs.github.com/code-security/code-scanning/managing-code-scanning-alerts/about-code-scanning-alerts#about-alert-severity-and-security-severity-levels)."
+#non_exhaustive
 pub(all) enum RepositoryRuleParamsCodeScanningToolAlertsThreshold {
   None
   Errors
@@ -44797,6 +45038,7 @@ pub impl @json.FromJson for RepositoryRuleParamsCodeScanningToolAlertsThreshold 
 ///|
 ///
 /// The severity level at which code scanning results that raise security alerts block a reference update. For more information on security severity levels, see "[About code scanning alerts](https://docs.github.com/code-security/code-scanning/managing-code-scanning-alerts/about-code-scanning-alerts#about-alert-severity-and-security-severity-levels)."
+#non_exhaustive
 pub(all) enum RepositoryRuleParamsCodeScanningToolSecurityAlertsThreshold {
   None
   Critical
@@ -45033,6 +45275,7 @@ pub impl @json.FromJson for RepositoryRuleCodeScanning with fn from_json(
 ///|
 ///
 /// The lowest severity level at which code quality reviews need to be resolved before commits can be merged.
+#non_exhaustive
 pub(all) enum RepositoryRuleCodeQualityParametersSeverity {
   Errors
   Warnings
@@ -45914,6 +46157,7 @@ pub impl @json.FromJson for RepositoryRuleMaxFileSize with fn from_json(
 ///|
 ///
 /// A repository rule.
+#non_exhaustive
 pub(all) enum RepositoryRule {
   Creation(RepositoryRuleCreation)
   Update(RepositoryRuleUpdate)
@@ -46036,6 +46280,7 @@ pub impl @json.FromJson for RepositoryRule with fn from_json(value, path) {
 ///|
 ///
 /// The target of the ruleset
+#non_exhaustive
 pub(all) enum RepositoryRulesetTarget {
   Branch
   Tag
@@ -46096,6 +46341,7 @@ pub impl @json.FromJson for RepositoryRulesetTarget with fn from_json(
 ///|
 ///
 /// The type of the source of the ruleset
+#non_exhaustive
 pub(all) enum RepositoryRulesetSourceType {
   Repository
   Organization
@@ -46153,6 +46399,7 @@ pub impl @json.FromJson for RepositoryRulesetSourceType with fn from_json(
 ///|
 ///
 /// The bypass type of the user making the API request for this ruleset. This field is only returned when querying the repository-level endpoint.
+#non_exhaustive
 pub(all) enum RepositoryRulesetCurrentUserCanBypass {
   Always
   PullRequestsOnly
@@ -46477,6 +46724,7 @@ pub impl @json.FromJson for RepositoryRuleset with fn from_json(value, path) {
 ///|
 ///
 /// A repository rule.
+#non_exhaustive
 pub(all) enum OrgRules {
   Creation(RepositoryRuleCreation)
   Update(RepositoryRuleUpdate)
@@ -46586,6 +46834,7 @@ pub impl @json.FromJson for OrgRules with fn from_json(value, path) {
 ///|
 ///
 /// The result of the rule evaluations for rules with the `active` enforcement status.
+#non_exhaustive
 pub(all) enum RuleSuitesItemResult {
   Pass
   Fail
@@ -46640,6 +46889,7 @@ pub impl @json.FromJson for RuleSuitesItemResult with fn from_json(value, path) 
 ///|
 ///
 /// The result of the rule evaluations for rules with the `active` and `evaluate` enforcement statuses, demonstrating whether rules would pass or fail if all rules in the rule suite were `active`.
+#non_exhaustive
 pub(all) enum RuleSuitesItemEvaluationResult {
   Pass
   Fail
@@ -46796,6 +47046,7 @@ pub impl @json.FromJson for RuleSuitesItem with fn from_json(value, path) {
 ///|
 ///
 /// The result of the rule evaluations for rules with the `active` enforcement status.
+#non_exhaustive
 pub(all) enum RuleSuiteResult {
   Pass
   Fail
@@ -46850,6 +47101,7 @@ pub impl @json.FromJson for RuleSuiteResult with fn from_json(value, path) {
 ///|
 ///
 /// The result of the rule evaluations for rules with the `active` and `evaluate` enforcement statuses, demonstrating whether rules would pass or fail if all rules in the rule suite were `active`. Null if no rules with `evaluate` enforcement status were run.
+#non_exhaustive
 pub(all) enum RuleSuiteEvaluationResult {
   Pass
   Fail
@@ -46971,6 +47223,7 @@ pub impl @json.FromJson for RuleSuiteRuleEvaluationsItemRuleSource with fn from_
 ///|
 ///
 /// The enforcement level of this rule source.
+#non_exhaustive
 pub(all) enum RuleSuiteRuleEvaluationsItemEnforcement {
   Active
   Evaluate
@@ -47032,6 +47285,7 @@ pub impl @json.FromJson for RuleSuiteRuleEvaluationsItemEnforcement with fn from
 ///|
 ///
 /// The result of the evaluation of the individual rule.
+#non_exhaustive
 pub(all) enum RuleSuiteRuleEvaluationsItemResult {
   Pass
   Fail
@@ -47483,6 +47737,7 @@ pub impl @json.FromJson for RulesetVersionWithState with fn from_json(
 ///|
 ///
 /// Sets the state of the secret scanning alert. You must provide `resolution` when you set the state to `resolved`.
+#non_exhaustive
 pub(all) enum SecretScanningAlertState {
   Open
   Resolved
@@ -47537,6 +47792,7 @@ pub impl @json.FromJson for SecretScanningAlertState with fn from_json(
 ///|
 ///
 /// **Required when the `state` is `resolved`.** The reason for resolving the alert.
+#non_exhaustive
 pub(all) enum SecretScanningAlertResolution {
   FalsePositive
   WontFix
@@ -47597,6 +47853,7 @@ pub impl @json.FromJson for SecretScanningAlertResolution with fn from_json(
 ///|
 ///
 /// The token status as of the latest validity check.
+#non_exhaustive
 pub(all) enum OrganizationSecretScanningAlertValidity {
   Active
   Inactive
@@ -47938,6 +48195,7 @@ pub impl @json.FromJson for OrganizationSecretScanningAlert with fn from_json(
 ///|
 ///
 /// The state of the custom pattern.
+#non_exhaustive
 pub(all) enum SecretScanningCustomPatternState {
   Published
   Unpublished
@@ -48180,6 +48438,7 @@ pub impl @json.FromJson for SecretScanningCustomPatternToCreate with fn from_jso
 ///|
 ///
 /// A machine-readable code describing the error.
+#non_exhaustive
 pub(all) enum SecretScanningCustomPatternValidationErrorCode {
   Invalid
   Unprocessable
@@ -48467,6 +48726,7 @@ pub impl @json.FromJson for SecretScanningCustomPatternToUpdate with fn from_jso
 ///|
 ///
 /// The default push protection setting for this pattern.
+#non_exhaustive
 pub(all) enum SecretScanningPatternOverrideDefaultSetting {
   Disabled
   Enabled
@@ -48530,6 +48790,7 @@ pub impl @json.FromJson for SecretScanningPatternOverrideDefaultSetting with fn 
 ///|
 ///
 /// The push protection setting for this pattern set at the enterprise level. Only present for partner patterns when the organization has a parent enterprise.
+#non_exhaustive
 pub(all) enum SecretScanningPatternOverrideEnterpriseSetting {
   NotSet
   Disabled
@@ -48596,6 +48857,7 @@ pub impl @json.FromJson for SecretScanningPatternOverrideEnterpriseSetting with 
 ///|
 ///
 /// The current push protection setting for this pattern. If this is `not-set`, then it inherits either the enterprise setting if it exists or the default setting.
+#non_exhaustive
 pub(all) enum SecretScanningPatternOverrideSetting {
   NotSet
   Disabled
@@ -48974,6 +49236,7 @@ pub impl @json.FromJson for RepositoryAdvisoryVulnerability with fn from_json(
 ///|
 ///
 /// The state of the user's acceptance of the credit.
+#non_exhaustive
 pub(all) enum RepositoryAdvisoryCreditState {
   Accepted
   Declined
@@ -49089,6 +49352,7 @@ pub impl @json.FromJson for RepositoryAdvisoryCredit with fn from_json(
 ///|
 ///
 /// The severity of the advisory.
+#non_exhaustive
 pub(all) enum RepositoryAdvisorySeverity {
   Critical
   High
@@ -49469,6 +49733,7 @@ pub impl @json.FromJson for RepositoryAdvisoryPublisher with fn from_json(
 ///|
 ///
 /// The type of identifier.
+#non_exhaustive
 pub(all) enum RepositoryAdvisoryIdentifiersItemType {
   CVE
   GHSA
@@ -49579,6 +49844,7 @@ pub impl @json.FromJson for RepositoryAdvisoryIdentifiersItem with fn from_json(
 ///|
 ///
 /// The state of the advisory.
+#non_exhaustive
 pub(all) enum RepositoryAdvisoryState {
   Published
   Closed
@@ -50345,6 +50611,7 @@ pub impl @json.FromJson for RepositoryAdvisory with fn from_json(value, path) {
 ///|
 ///
 /// The policy that controls how immutable releases are enforced in the organization.
+#non_exhaustive
 pub(all) enum ImmutableReleasesOrganizationSettingsEnforcedRepositories {
   All
   None
@@ -50471,6 +50738,7 @@ pub impl @json.FromJson for ImmutableReleasesOrganizationSettings with fn from_j
 ///|
 ///
 /// The hosted compute service the network configuration supports.
+#non_exhaustive
 pub(all) enum NetworkConfigurationComputeService {
   None
   Actions
@@ -51097,6 +51365,7 @@ pub impl @json.FromJson for TeamOrganization with fn from_json(value, path) {
 ///|
 ///
 /// The level of privacy this team should have
+#non_exhaustive
 pub(all) enum TeamFullPrivacy {
   Closed
   Secret
@@ -51148,6 +51417,7 @@ pub impl @json.FromJson for TeamFullPrivacy with fn from_json(value, path) {
 ///|
 ///
 /// The notification setting the team has set
+#non_exhaustive
 pub(all) enum TeamFullNotificationSetting {
   NotificationsEnabled
   NotificationsDisabled
@@ -51202,6 +51472,7 @@ pub impl @json.FromJson for TeamFullNotificationSetting with fn from_json(
 ///|
 ///
 /// The ownership type of the team
+#non_exhaustive
 pub(all) enum TeamFullType {
   Enterprise
   Organization
@@ -51410,6 +51681,7 @@ pub impl @json.FromJson for TeamFull with fn from_json(value, path) {
 ///|
 ///
 /// The member's role on the team. Only present on the `List team members` endpoint, and only when the feature is enabled for the organization.
+#non_exhaustive
 pub(all) enum TeamMemberRole {
   Member
   Maintainer
@@ -51628,6 +51900,7 @@ pub impl @json.FromJson for TeamMember with fn from_json(value, path) {
 ///|
 ///
 /// The role of the user in the team.
+#non_exhaustive
 pub(all) enum TeamMembershipRole {
   Member
   Maintainer
@@ -51679,6 +51952,7 @@ pub impl @json.FromJson for TeamMembershipRole with fn from_json(value, path) {
 ///|
 ///
 /// The state of the user's membership in the team.
+#non_exhaustive
 pub(all) enum TeamMembershipState {
   Active
   Pending
@@ -53104,6 +53378,7 @@ pub impl @json.FromJson for ConcurrencyGroupList with fn from_json(value, path) 
 ///|
 ///
 /// Generated string enum ConcurrencyGroupGroupMembersItemStatus.
+#non_exhaustive
 pub(all) enum ConcurrencyGroupGroupMembersItemStatus {
   InProgress
   Pending
@@ -53314,6 +53589,7 @@ pub impl @json.FromJson for ConcurrencyGroup with fn from_json(value, path) {
 ///|
 ///
 /// The phase of the lifecycle that the job is currently in.
+#non_exhaustive
 pub(all) enum JobStatus {
   Queued
   InProgress
@@ -53377,6 +53653,7 @@ pub impl @json.FromJson for JobStatus with fn from_json(value, path) {
 ///|
 ///
 /// The outcome of the job.
+#non_exhaustive
 pub(all) enum JobConclusion {
   Success
   Failure
@@ -53443,6 +53720,7 @@ pub impl @json.FromJson for JobConclusion with fn from_json(value, path) {
 ///|
 ///
 /// The phase of the lifecycle that the job is currently in.
+#non_exhaustive
 pub(all) enum JobStepsItemStatus {
   Queued
   InProgress
@@ -53994,6 +54272,7 @@ pub impl @json.FromJson for ActionsRepositoryPermissions with fn from_json(
 ///|
 ///
 /// Defines the level of access that workflows outside of the repository have to actions and reusable workflows within the repository. `none` means the access is only possible from workflows in this repository. `user` level access allows sharing across user owned private repositories only. `organization` level access allows sharing across the organization.
+#non_exhaustive
 pub(all) enum ActionsWorkflowAccessToRepositoryAccessLevel {
   None
   User
@@ -54653,6 +54932,7 @@ pub impl @json.FromJson for EnvironmentApprovalsEnvironmentsItem with fn from_js
 ///|
 ///
 /// Whether deployment to the environment(s) was approved or rejected or pending (with comments)
+#non_exhaustive
 pub(all) enum EnvironmentApprovalsState {
   Approved
   Rejected
@@ -54769,6 +55049,7 @@ pub impl @json.FromJson for EnvironmentApprovals with fn from_json(value, path) 
 ///|
 ///
 /// Generated string enum ConcurrencyGroupRunListConcurrencyGroupsItemGroupMembersItemStatus.
+#non_exhaustive
 pub(all) enum ConcurrencyGroupRunListConcurrencyGroupsItemGroupMembersItemStatus {
   InProgress
   Pending
@@ -55075,6 +55356,7 @@ pub impl @json.FromJson for ConcurrencyGroupRunList with fn from_json(
 ///|
 ///
 /// The type of reviewer.
+#non_exhaustive
 pub(all) enum DeploymentReviewerType {
   User
   Team
@@ -55325,6 +55607,7 @@ pub impl @json.FromJson for PendingDeployment with fn from_json(value, path) {
 ///|
 ///
 /// Generated untagged union DeploymentPayload.
+#non_exhaustive
 pub(all) enum DeploymentPayload {
   Object(Json)
   Text(String)
@@ -55981,6 +56264,7 @@ pub impl @json.FromJson for WorkflowRunUsage with fn from_json(value, path) {
 ///|
 ///
 /// Generated string enum WorkflowState.
+#non_exhaustive
 pub(all) enum WorkflowState {
   Active
   Deleted
@@ -56435,6 +56719,7 @@ pub impl @json.FromJson for WorkflowUsage with fn from_json(value, path) {
 ///|
 ///
 /// The type of the activity that was performed.
+#non_exhaustive
 pub(all) enum ActivityActivityType {
   Push
   ForcePush
@@ -58448,6 +58733,7 @@ pub impl @json.FromJson for Verification with fn from_json(value, path) {
 ///|
 ///
 /// Generated string enum DiffEntryStatus.
+#non_exhaustive
 pub(all) enum DiffEntryStatus {
   Added
   Removed
@@ -60132,6 +60418,7 @@ pub impl @json.FromJson for DeploymentSimple with fn from_json(value, path) {
 ///|
 ///
 /// The phase of the lifecycle that the check is currently in. Statuses of waiting, requested, and pending are reserved for GitHub Actions check runs.
+#non_exhaustive
 pub(all) enum CheckRunStatus {
   Queued
   InProgress
@@ -60195,6 +60482,7 @@ pub impl @json.FromJson for CheckRunStatus with fn from_json(value, path) {
 ///|
 ///
 /// Generated string enum CheckRunConclusion.
+#non_exhaustive
 pub(all) enum CheckRunConclusion {
   Success
   Failure
@@ -60787,6 +61075,7 @@ pub impl @json.FromJson for SimpleCommit with fn from_json(value, path) {
 ///|
 ///
 /// The phase of the lifecycle that the check suite is currently in. Statuses of waiting, requested, and pending are reserved for GitHub Actions check suites.
+#non_exhaustive
 pub(all) enum CheckSuiteStatus {
   Queued
   InProgress
@@ -60850,6 +61139,7 @@ pub impl @json.FromJson for CheckSuiteStatus with fn from_json(value, path) {
 ///|
 ///
 /// Generated string enum CheckSuiteConclusion.
+#non_exhaustive
 pub(all) enum CheckSuiteConclusion {
   Success
   Failure
@@ -61246,6 +61536,7 @@ pub impl @json.FromJson for CheckSuitePreference with fn from_json(value, path) 
 ///|
 ///
 /// The severity of the rule used to detect the finding.
+#non_exhaustive
 pub(all) enum CodeQualityFindingRuleSeverity {
   Error
   Warning
@@ -61306,6 +61597,7 @@ pub impl @json.FromJson for CodeQualityFindingRuleSeverity with fn from_json(
 ///|
 ///
 /// The category of the rule used to detect the finding.
+#non_exhaustive
 pub(all) enum CodeQualityFindingRuleCategory {
   None
   Maintainability
@@ -61553,6 +61845,7 @@ pub impl @json.FromJson for CodeQualityFindingMessage with fn from_json(
 ///|
 ///
 /// State of the code quality finding.
+#non_exhaustive
 pub(all) enum CodeQualityFindingState {
   Open
   Dismissed
@@ -61678,6 +61971,7 @@ pub impl @json.FromJson for CodeQualityFinding with fn from_json(value, path) {
 ///|
 ///
 /// Code quality setup has been configured or not.
+#non_exhaustive
 pub(all) enum CodeQualitySetupState {
   Configured
   NotConfigured
@@ -61729,6 +62023,7 @@ pub impl @json.FromJson for CodeQualitySetupState with fn from_json(value, path)
 ///|
 ///
 /// Generated string enum CodeQualitySetupLanguagesItem.
+#non_exhaustive
 pub(all) enum CodeQualitySetupLanguagesItem {
   Csharp
   Go
@@ -61798,6 +62093,7 @@ pub impl @json.FromJson for CodeQualitySetupLanguagesItem with fn from_json(
 ///|
 ///
 /// Runner type to be used.
+#non_exhaustive
 pub(all) enum CodeQualitySetupRunnerType {
   Standard
   Labeled
@@ -61852,6 +62148,7 @@ pub impl @json.FromJson for CodeQualitySetupRunnerType with fn from_json(
 ///|
 ///
 /// The AI findings configuration for the repository.
+#non_exhaustive
 pub(all) enum CodeQualitySetupAiFindingsOption {
   Disabled
   OnPush
@@ -61981,6 +62278,7 @@ pub impl @json.FromJson for CodeQualitySetup with fn from_json(value, path) {
 ///|
 ///
 /// The desired state of code quality setup.
+#non_exhaustive
 pub(all) enum CodeQualitySetupUpdateState {
   Configured
   NotConfigured
@@ -62035,6 +62333,7 @@ pub impl @json.FromJson for CodeQualitySetupUpdateState with fn from_json(
 ///|
 ///
 /// Runner type to be used.
+#non_exhaustive
 pub(all) enum CodeQualitySetupUpdateRunnerType {
   Standard
   Labeled
@@ -62089,6 +62388,7 @@ pub impl @json.FromJson for CodeQualitySetupUpdateRunnerType with fn from_json(
 ///|
 ///
 /// Generated string enum CodeQualitySetupUpdateLanguagesItem.
+#non_exhaustive
 pub(all) enum CodeQualitySetupUpdateLanguagesItem {
   Csharp
   Go
@@ -62155,6 +62455,7 @@ pub impl @json.FromJson for CodeQualitySetupUpdateLanguagesItem with fn from_jso
 ///|
 ///
 /// Whether AI findings run for Code Quality on this repository.
+#non_exhaustive
 pub(all) enum CodeQualitySetupUpdateAiFindingsOption {
   Disabled
   OnPush
@@ -62337,6 +62638,7 @@ pub impl @json.FromJson for CodeQualitySetupUpdateResponse with fn from_json(
 ///|
 ///
 /// Whether AI Scan is enabled for the repository.
+#non_exhaustive
 pub(all) enum CodeScanningAiScanEnablementPrScan {
   Enabled
   Disabled
@@ -62437,6 +62739,7 @@ pub impl @json.FromJson for CodeScanningAiScanEnablement with fn from_json(
 ///|
 ///
 /// Whether to enable or disable AI Scan for the repository.
+#non_exhaustive
 pub(all) enum CodeScanningAiScanEnablementUpdatePrScan {
   Enabled
   Disabled
@@ -62684,6 +62987,7 @@ pub impl @json.FromJson for CodeScanningAlertItems with fn from_json(
 ///|
 ///
 /// The severity of the alert.
+#non_exhaustive
 pub(all) enum CodeScanningAlertRuleSeverity {
   None
   Note
@@ -62744,6 +63048,7 @@ pub impl @json.FromJson for CodeScanningAlertRuleSeverity with fn from_json(
 ///|
 ///
 /// The security severity of the alert.
+#non_exhaustive
 pub(all) enum CodeScanningAlertRuleSecuritySeverityLevel {
   Low
   Medium
@@ -63053,6 +63358,7 @@ pub impl @json.FromJson for CodeScanningAlert with fn from_json(value, path) {
 ///|
 ///
 /// Sets the state of the code scanning alert. You must provide `dismissed_reason` when you set the state to `dismissed`.
+#non_exhaustive
 pub(all) enum CodeScanningAlertSetState {
   Open
   Dismissed
@@ -63107,6 +63413,7 @@ pub impl @json.FromJson for CodeScanningAlertSetState with fn from_json(
 ///|
 ///
 /// The status of an autofix.
+#non_exhaustive
 pub(all) enum CodeScanningAutofixStatus {
   Pending
   Error
@@ -63333,6 +63640,7 @@ pub impl @json.FromJson for CodeScanningAutofixCommitsResponse with fn from_json
 ///|
 ///
 /// State of a code scanning alert instance.
+#non_exhaustive
 pub(all) enum CodeScanningAlertInstanceState {
   Open
   Fixed
@@ -63806,6 +64114,7 @@ pub impl @json.FromJson for CodeScanningCodeqlDatabase with fn from_json(
 ///|
 ///
 /// The language targeted by the CodeQL query
+#non_exhaustive
 pub(all) enum CodeScanningVariantAnalysisLanguage {
   Actions
   Cpp
@@ -63959,6 +64268,7 @@ pub impl @json.FromJson for CodeScanningVariantAnalysisRepository with fn from_j
 ///|
 ///
 /// The new status of the CodeQL variant analysis repository task.
+#non_exhaustive
 pub(all) enum CodeScanningVariantAnalysisStatus {
   Pending
   InProgress
@@ -64088,6 +64398,7 @@ pub impl @json.FromJson for CodeScanningVariantAnalysisSkippedRepoGroup with fn 
 ///|
 ///
 /// The reason for a failure of the variant analysis. This is only available if the variant analysis has failed.
+#non_exhaustive
 pub(all) enum CodeScanningVariantAnalysisFailureReason {
   NoReposQueried
   ActionsWorkflowRunFailed
@@ -64584,6 +64895,7 @@ pub impl @json.FromJson for CodeScanningVariantAnalysisRepoTask with fn from_jso
 ///|
 ///
 /// Code scanning default setup has been configured or not.
+#non_exhaustive
 pub(all) enum CodeScanningDefaultSetupState {
   Configured
   NotConfigured
@@ -64638,6 +64950,7 @@ pub impl @json.FromJson for CodeScanningDefaultSetupState with fn from_json(
 ///|
 ///
 /// Generated string enum CodeScanningDefaultSetupLanguagesItem.
+#non_exhaustive
 pub(all) enum CodeScanningDefaultSetupLanguagesItem {
   Actions
   CCpp
@@ -64721,6 +65034,7 @@ pub impl @json.FromJson for CodeScanningDefaultSetupLanguagesItem with fn from_j
 ///|
 ///
 /// Runner type to be used.
+#non_exhaustive
 pub(all) enum CodeScanningDefaultSetupRunnerType {
   Standard
   Labeled
@@ -64775,6 +65089,7 @@ pub impl @json.FromJson for CodeScanningDefaultSetupRunnerType with fn from_json
 ///|
 ///
 /// CodeQL query suite to be used.
+#non_exhaustive
 pub(all) enum CodeScanningDefaultSetupQuerySuite {
   Default
   Extended
@@ -64829,6 +65144,7 @@ pub impl @json.FromJson for CodeScanningDefaultSetupQuerySuite with fn from_json
 ///|
 ///
 /// Threat model to be used for code scanning analysis. Use `remote` to analyze only network sources and `remote_and_local` to include local sources like filesystem access, command-line arguments, database reads, environment variable and standard input.
+#non_exhaustive
 pub(all) enum CodeScanningDefaultSetupThreatModel {
   Remote
   RemoteAndLocal
@@ -64966,6 +65282,7 @@ pub impl @json.FromJson for CodeScanningDefaultSetup with fn from_json(
 ///|
 ///
 /// The desired state of code scanning default setup.
+#non_exhaustive
 pub(all) enum CodeScanningDefaultSetupUpdateState {
   Configured
   NotConfigured
@@ -65020,6 +65337,7 @@ pub impl @json.FromJson for CodeScanningDefaultSetupUpdateState with fn from_jso
 ///|
 ///
 /// Runner type to be used.
+#non_exhaustive
 pub(all) enum CodeScanningDefaultSetupUpdateRunnerType {
   Standard
   Labeled
@@ -65078,6 +65396,7 @@ pub impl @json.FromJson for CodeScanningDefaultSetupUpdateRunnerType with fn fro
 ///|
 ///
 /// CodeQL query suite to be used.
+#non_exhaustive
 pub(all) enum CodeScanningDefaultSetupUpdateQuerySuite {
   Default
   Extended
@@ -65136,6 +65455,7 @@ pub impl @json.FromJson for CodeScanningDefaultSetupUpdateQuerySuite with fn fro
 ///|
 ///
 /// Threat model to be used for code scanning analysis. Use `remote` to analyze only network sources and `remote_and_local` to include local sources like filesystem access, command-line arguments, database reads, environment variable and standard input.
+#non_exhaustive
 pub(all) enum CodeScanningDefaultSetupUpdateThreatModel {
   Remote
   RemoteAndLocal
@@ -65196,6 +65516,7 @@ pub impl @json.FromJson for CodeScanningDefaultSetupUpdateThreatModel with fn fr
 ///|
 ///
 /// Generated string enum CodeScanningDefaultSetupUpdateLanguagesItem.
+#non_exhaustive
 pub(all) enum CodeScanningDefaultSetupUpdateLanguagesItem {
   Actions
   CCpp
@@ -65464,6 +65785,7 @@ pub impl @json.FromJson for CodeScanningSarifsReceipt with fn from_json(
 ///|
 ///
 /// `pending` files have not yet been processed, while `complete` means results from the SARIF have been stored. `failed` files have either not been processed at all, or could only be partially processed.
+#non_exhaustive
 pub(all) enum CodeScanningSarifsStatusProcessingStatus {
   Pending
   Complete
@@ -65587,6 +65909,7 @@ pub impl @json.FromJson for CodeScanningSarifsStatus with fn from_json(
 ///|
 ///
 /// The attachment status of the code security configuration on the repository.
+#non_exhaustive
 pub(all) enum CodeSecurityConfigurationForRepositoryStatus {
   Attached
   Attaching
@@ -65852,6 +66175,7 @@ pub impl @json.FromJson for CodeownersErrors with fn from_json(value, path) {
 ///|
 ///
 /// Whether a prebuild is currently available when creating a codespace for this machine and repository. If a branch was not specified as a ref, the default branch will be assumed. Value will be "null" if prebuilds are not supported or prebuild availability could not be determined. Value will be "none" if no prebuild is available. Latest values "ready" and "in_progress" indicate the prebuild availability status.
+#non_exhaustive
 pub(all) enum CodespaceMachinePrebuildAvailability {
   None
   Ready
@@ -66328,6 +66652,7 @@ pub impl @json.FromJson for Collaborator with fn from_json(value, path) {
 ///|
 ///
 /// The permission associated with the invitation.
+#non_exhaustive
 pub(all) enum RepositoryInvitationPermissions {
   Read
   Write
@@ -66888,6 +67213,7 @@ pub impl @json.FromJson for CommitComment with fn from_json(value, path) {
 ///|
 ///
 /// The reaction to use
+#non_exhaustive
 pub(all) enum ReactionContent {
   Plus1
   Minus1
@@ -67712,6 +68038,7 @@ pub impl @json.FromJson for CommunityProfile with fn from_json(value, path) {
 ///|
 ///
 /// Generated string enum CommitComparisonStatus.
+#non_exhaustive
 pub(all) enum CommitComparisonStatus {
   Diverged
   Ahead
@@ -68195,6 +68522,7 @@ pub impl @json.FromJson for ContentTree with fn from_json(value, path) {
 ///|
 ///
 /// Generated string enum ContentDirectoryItemType.
+#non_exhaustive
 pub(all) enum ContentDirectoryItemType {
   Dir
   File
@@ -69861,6 +70189,7 @@ pub impl @json.FromJson for Contributor with fn from_json(value, path) {
 ///|
 ///
 /// The state of the Dependabot alert.
+#non_exhaustive
 pub(all) enum DependabotAlertState {
   AutoDismissed
   Dismissed
@@ -69918,6 +70247,7 @@ pub impl @json.FromJson for DependabotAlertState with fn from_json(value, path) 
 ///|
 ///
 /// The execution scope of the vulnerable dependency.
+#non_exhaustive
 pub(all) enum DependabotAlertDependencyScope {
   Development
   Runtime
@@ -69972,6 +70302,7 @@ pub impl @json.FromJson for DependabotAlertDependencyScope with fn from_json(
 ///|
 ///
 /// The vulnerable dependency's relationship to your project. > [!NOTE] > We are rolling out support for dependency relationship across ecosystems. This value will be "unknown" for all dependencies in unsupported ecosystems.
+#non_exhaustive
 pub(all) enum DependabotAlertDependencyRelationship {
   Unknown
   Direct
@@ -70108,6 +70439,7 @@ pub impl @json.FromJson for DependabotAlertDependency with fn from_json(
 ///|
 ///
 /// The reason that the alert was dismissed.
+#non_exhaustive
 pub(all) enum DependabotAlertDismissedReason {
   FixStarted
   Inaccurate
@@ -70367,6 +70699,7 @@ pub impl @json.FromJson for DependabotSecret with fn from_json(value, path) {
 ///|
 ///
 /// Generated string enum DependencyGraphDiffItemChangeType.
+#non_exhaustive
 pub(all) enum DependencyGraphDiffItemChangeType {
   Added
   Removed
@@ -70492,6 +70825,7 @@ pub impl @json.FromJson for DependencyGraphDiffItemVulnerabilitiesItem with fn f
 ///|
 ///
 /// Where the dependency is utilized. `development` means that the dependency is only utilized in the development environment. `runtime` means that the dependency is utilized at runtime and in the development environment.
+#non_exhaustive
 pub(all) enum DependencyGraphDiffItemScope {
   Unknown
   Runtime
@@ -71089,6 +71423,7 @@ pub impl @json.FromJson for DependencyGraphSpdxSbom with fn from_json(
 ///|
 ///
 /// Generated untagged union MetadataValue.
+#non_exhaustive
 pub(all) enum MetadataValue {
   Text(String)
   Number(Double)
@@ -71142,6 +71477,7 @@ pub impl @json.FromJson for MetadataValue with fn from_json(value, path) {
 ///|
 ///
 /// A notation of whether a dependency is requested directly by this manifest or is a dependency of another dependency.
+#non_exhaustive
 pub(all) enum DependencyRelationship {
   Direct
   Indirect
@@ -71196,6 +71532,7 @@ pub impl @json.FromJson for DependencyRelationship with fn from_json(
 ///|
 ///
 /// A notation of whether the dependency is required for the primary build artifact (runtime) or is only used for development. Future versions of this specification may allow for more granular scopes.
+#non_exhaustive
 pub(all) enum DependencyScope {
   Runtime
   Development
@@ -71597,6 +71934,7 @@ pub impl @json.FromJson for Snapshot with fn from_json(value, path) {
 ///|
 ///
 /// The state of the status.
+#non_exhaustive
 pub(all) enum DeploymentStatusState {
   Error
   Failure
@@ -72119,6 +72457,7 @@ pub impl @json.FromJson for EnvironmentProtectionRulesItemBranchPolicy with fn f
 ///|
 ///
 /// Generated tagged union EnvironmentProtectionRulesItem.
+#non_exhaustive
 pub(all) enum EnvironmentProtectionRulesItem {
   WaitTimer(EnvironmentProtectionRulesItemWaitTimer)
   RequiredReviewers(EnvironmentProtectionRulesItemRequiredReviewers)
@@ -72263,6 +72602,7 @@ pub impl @json.FromJson for Environment with fn from_json(value, path) {
 ///|
 ///
 /// Whether this rule targets a branch or tag.
+#non_exhaustive
 pub(all) enum DeploymentBranchPolicyType {
   Branch
   Tag
@@ -72379,6 +72719,7 @@ pub impl @json.FromJson for DeploymentBranchPolicy with fn from_json(
 ///|
 ///
 /// Whether this rule targets a branch or tag
+#non_exhaustive
 pub(all) enum DeploymentBranchPolicyNamePatternWithTypeType {
   Branch
   Tag
@@ -73589,6 +73930,7 @@ pub impl @json.FromJson for GitTree with fn from_json(value, path) {
 ///|
 ///
 /// The Git hash algorithm used by this repository.
+#non_exhaustive
 pub(all) enum RepositoryHashAlgorithmHashAlgorithm {
   Sha1
   Sha256
@@ -73909,6 +74251,7 @@ pub impl @json.FromJson for CheckImmutableReleases with fn from_json(
 ///|
 ///
 /// Generated string enum ImportStatus.
+#non_exhaustive
 pub(all) enum ImportStatus {
   Auth
   Error
@@ -74397,6 +74740,7 @@ pub impl @json.FromJson for InteractionLimitPullRequestBypassList with fn from_j
 ///|
 ///
 /// The reason for the current state
+#non_exhaustive
 pub(all) enum NullableIssueStateReason {
   Completed
   Reopened
@@ -74544,6 +74888,7 @@ pub impl @json.FromJson for NullableIssueLabelsItemObject with fn from_json(
 ///|
 ///
 /// Generated untagged union NullableIssueLabelsItem.
+#non_exhaustive
 pub(all) enum NullableIssueLabelsItem {
   Text(String)
   Object(NullableIssueLabelsItemObject)
@@ -75192,6 +75537,7 @@ pub impl @json.FromJson for IssueEventRename with fn from_json(value, path) {
 ///|
 ///
 /// The color of the issue type.
+#non_exhaustive
 pub(all) enum IssueTypeWebhookColor {
   Gray
   Blue
@@ -75458,6 +75804,7 @@ pub impl @json.FromJson for NullableIssueReference with fn from_json(
 ///|
 ///
 /// The confidence level the agent had when performing this action.
+#non_exhaustive
 pub(all) enum NullableIssueEventIntentConfidence {
   LOW
   MEDIUM
@@ -75768,6 +76115,7 @@ pub impl @json.FromJson for IssueEvent with fn from_json(value, path) {
 ///|
 ///
 /// The kind of change proposed.
+#non_exhaustive
 pub(all) enum IssueSuggestionAction {
   SetType
   AddLabel
@@ -75828,6 +76176,7 @@ pub impl @json.FromJson for IssueSuggestionAction with fn from_json(value, path)
 ///|
 ///
 /// The suggestion's lifecycle state.
+#non_exhaustive
 pub(all) enum IssueSuggestionState {
   Pending
   Applied
@@ -75891,6 +76240,7 @@ pub impl @json.FromJson for IssueSuggestionState with fn from_json(value, path) 
 ///|
 ///
 /// The proposed value, when applicable. An array for multi-select field suggestions.
+#non_exhaustive
 pub(all) enum IssueSuggestionTargetValue {
   Text(String)
   Number(Double)
@@ -75953,6 +76303,7 @@ pub impl @json.FromJson for IssueSuggestionTargetValue with fn from_json(
 ///|
 ///
 /// The actor's confidence level in the suggestion.
+#non_exhaustive
 pub(all) enum IssueSuggestionConfidence {
   LOW
   MEDIUM
@@ -76331,6 +76682,7 @@ pub impl @json.FromJson for PullRequestReviewCommentLinks with fn from_json(
 ///|
 ///
 /// The side of the first line of the range for a multi-line comment.
+#non_exhaustive
 pub(all) enum PullRequestReviewCommentStartSide {
   LEFT
   RIGHT
@@ -76385,6 +76737,7 @@ pub impl @json.FromJson for PullRequestReviewCommentStartSide with fn from_json(
 ///|
 ///
 /// The side of the diff to which the comment applies. The side of the last line of the range for a multi-line comment
+#non_exhaustive
 pub(all) enum PullRequestReviewCommentSide {
   LEFT
   RIGHT
@@ -76439,6 +76792,7 @@ pub impl @json.FromJson for PullRequestReviewCommentSide with fn from_json(
 ///|
 ///
 /// The level at which the comment is targeted, can be a diff line or a file.
+#non_exhaustive
 pub(all) enum PullRequestReviewCommentSubjectType {
   Line
   File
@@ -76955,6 +77309,7 @@ pub impl @json.FromJson for LicenseContent with fn from_json(value, path) {
 ///|
 ///
 /// Generated string enum MergedUpstreamMergeType.
+#non_exhaustive
 pub(all) enum MergedUpstreamMergeType {
   Merge
   FastForward
@@ -77067,6 +77422,7 @@ pub impl @json.FromJson for MergedUpstream with fn from_json(value, path) {
 ///|
 ///
 /// The state of the milestone.
+#non_exhaustive
 pub(all) enum MilestoneState {
   Open
   Closed
@@ -77296,6 +77652,7 @@ pub impl @json.FromJson for PagesSourceHash with fn from_json(value, path) {
 ///|
 ///
 /// Generated string enum PagesHttpsCertificateState.
+#non_exhaustive
 pub(all) enum PagesHttpsCertificateState {
   New
   AuthorizationCreated
@@ -77439,6 +77796,7 @@ pub impl @json.FromJson for PagesHttpsCertificate with fn from_json(value, path)
 ///|
 ///
 /// The status of the most recent build of the Page.
+#non_exhaustive
 pub(all) enum PageStatus {
   Built
   Building
@@ -77493,6 +77851,7 @@ pub impl @json.FromJson for PageStatus with fn from_json(value, path) {
 ///|
 ///
 /// The state if the domain is verified
+#non_exhaustive
 pub(all) enum PageProtectedDomainState {
   Pending
   Verified
@@ -77550,6 +77909,7 @@ pub impl @json.FromJson for PageProtectedDomainState with fn from_json(
 ///|
 ///
 /// The process in which the Page will be built.
+#non_exhaustive
 pub(all) enum PageBuildType {
   Legacy
   Workflow
@@ -77879,6 +78239,7 @@ pub impl @json.FromJson for PageBuildStatus with fn from_json(value, path) {
 ///|
 ///
 /// The ID of the GitHub Pages deployment. This is the Git SHA of the deployed commit.
+#non_exhaustive
 pub(all) enum PageDeploymentId {
   Int(Int32)
   Text(String)
@@ -77985,6 +78346,7 @@ pub impl @json.FromJson for PageDeployment with fn from_json(value, path) {
 ///|
 ///
 /// The current status of the deployment.
+#non_exhaustive
 pub(all) enum PagesDeploymentStatusStatus {
   DeploymentInProgress
   SyncingFiles
@@ -78592,6 +78954,7 @@ pub impl @json.FromJson for PagesHealthCheck with fn from_json(value, path) {
 ///|
 ///
 /// State of this Pull Request. Either `open` or `closed`.
+#non_exhaustive
 pub(all) enum PullRequestState {
   Open
   Closed
@@ -79287,6 +79650,7 @@ pub impl @json.FromJson for PullRequestMergeResult with fn from_json(
 ///|
 ///
 /// Generated string enum PullRequestMergeAsyncResultStatus.
+#non_exhaustive
 pub(all) enum PullRequestMergeAsyncResultStatus {
   Pending
   Merged
@@ -79765,6 +80129,7 @@ pub impl @json.FromJson for ReviewCommentLinks with fn from_json(value, path) {
 ///|
 ///
 /// The side of the first line of the range for a multi-line comment.
+#non_exhaustive
 pub(all) enum ReviewCommentSide {
   LEFT
   RIGHT
@@ -79816,6 +80181,7 @@ pub impl @json.FromJson for ReviewCommentSide with fn from_json(value, path) {
 ///|
 ///
 /// The side of the first line of the range for a multi-line comment.
+#non_exhaustive
 pub(all) enum ReviewCommentStartSide {
   LEFT
   RIGHT
@@ -79870,6 +80236,7 @@ pub impl @json.FromJson for ReviewCommentStartSide with fn from_json(
 ///|
 ///
 /// The level at which the comment is targeted, can be a diff line or a file.
+#non_exhaustive
 pub(all) enum ReviewCommentSubjectType {
   Line
   File
@@ -80173,6 +80540,7 @@ pub impl @json.FromJson for ReleaseNotesContent with fn from_json(value, path) {
 ///|
 ///
 /// The type of source for the ruleset that includes this rule.
+#non_exhaustive
 pub(all) enum RepositoryRuleRulesetInfoRulesetSourceType {
   Repository
   Organization
@@ -80294,6 +80662,7 @@ pub impl @json.FromJson for RepositoryRuleRulesetInfo with fn from_json(
 ///|
 ///
 /// The type of source for the ruleset that includes this rule.
+#non_exhaustive
 pub(all) enum RepositoryRuleDetailedCreationRulesetSourceType {
   Repository
   Organization
@@ -80475,6 +80844,7 @@ pub impl @json.FromJson for RepositoryRuleDetailedUpdateParameters with fn from_
 ///|
 ///
 /// The type of source for the ruleset that includes this rule.
+#non_exhaustive
 pub(all) enum RepositoryRuleDetailedUpdateRulesetSourceType {
   Repository
   Organization
@@ -80604,6 +80974,7 @@ pub impl @json.FromJson for RepositoryRuleDetailedUpdate with fn from_json(
 ///|
 ///
 /// The type of source for the ruleset that includes this rule.
+#non_exhaustive
 pub(all) enum RepositoryRuleDetailedDeletionRulesetSourceType {
   Repository
   Organization
@@ -80731,6 +81102,7 @@ pub impl @json.FromJson for RepositoryRuleDetailedDeletion with fn from_json(
 ///|
 ///
 /// The type of source for the ruleset that includes this rule.
+#non_exhaustive
 pub(all) enum RepositoryRuleDetailedRequiredLinearHistoryRulesetSourceType {
   Repository
   Organization
@@ -80867,6 +81239,7 @@ pub impl @json.FromJson for RepositoryRuleDetailedRequiredLinearHistory with fn 
 ///|
 ///
 /// When set to ALLGREEN, the merge commit created by merge queue for each PR in the group must pass all required checks to merge. When set to HEADGREEN, only the commit at the head of the merge group, i.e. the commit containing changes from all of the PRs in the group, must pass its required checks to merge.
+#non_exhaustive
 pub(all) enum RepositoryRuleDetailedMergeQueueParametersGroupingStrategy {
   ALLGREEN
   HEADGREEN
@@ -80932,6 +81305,7 @@ pub impl @json.FromJson for RepositoryRuleDetailedMergeQueueParametersGroupingSt
 ///|
 ///
 /// Method to use when merging changes from queued pull requests.
+#non_exhaustive
 pub(all) enum RepositoryRuleDetailedMergeQueueParametersMergeMethod {
   MERGE
   SQUASH
@@ -81098,6 +81472,7 @@ pub impl @json.FromJson for RepositoryRuleDetailedMergeQueueParameters with fn f
 ///|
 ///
 /// The type of source for the ruleset that includes this rule.
+#non_exhaustive
 pub(all) enum RepositoryRuleDetailedMergeQueueRulesetSourceType {
   Repository
   Organization
@@ -81295,6 +81670,7 @@ pub impl @json.FromJson for RepositoryRuleDetailedRequiredDeploymentsParameters 
 ///|
 ///
 /// The type of source for the ruleset that includes this rule.
+#non_exhaustive
 pub(all) enum RepositoryRuleDetailedRequiredDeploymentsRulesetSourceType {
   Repository
   Organization
@@ -81432,6 +81808,7 @@ pub impl @json.FromJson for RepositoryRuleDetailedRequiredDeployments with fn fr
 ///|
 ///
 /// The type of source for the ruleset that includes this rule.
+#non_exhaustive
 pub(all) enum RepositoryRuleDetailedRequiredSignaturesRulesetSourceType {
   Repository
   Organization
@@ -81563,6 +81940,7 @@ pub impl @json.FromJson for RepositoryRuleDetailedRequiredSignatures with fn fro
 ///|
 ///
 /// Generated string enum RepositoryRuleDetailedPullRequestParametersAllowedMergeMethodsItem.
+#non_exhaustive
 pub(all) enum RepositoryRuleDetailedPullRequestParametersAllowedMergeMethodsItem {
   Merge
   Squash
@@ -81751,6 +82129,7 @@ pub impl @json.FromJson for RepositoryRuleDetailedPullRequestParameters with fn 
 ///|
 ///
 /// The type of source for the ruleset that includes this rule.
+#non_exhaustive
 pub(all) enum RepositoryRuleDetailedPullRequestRulesetSourceType {
   Repository
   Organization
@@ -81962,6 +82341,7 @@ pub impl @json.FromJson for RepositoryRuleDetailedRequiredStatusChecksParameters
 ///|
 ///
 /// The type of source for the ruleset that includes this rule.
+#non_exhaustive
 pub(all) enum RepositoryRuleDetailedRequiredStatusChecksRulesetSourceType {
   Repository
   Organization
@@ -82102,6 +82482,7 @@ pub impl @json.FromJson for RepositoryRuleDetailedRequiredStatusChecks with fn f
 ///|
 ///
 /// The type of source for the ruleset that includes this rule.
+#non_exhaustive
 pub(all) enum RepositoryRuleDetailedNonFastForwardRulesetSourceType {
   Repository
   Organization
@@ -82229,6 +82610,7 @@ pub impl @json.FromJson for RepositoryRuleDetailedNonFastForward with fn from_js
 ///|
 ///
 /// The operator to use for matching.
+#non_exhaustive
 pub(all) enum RepositoryRuleDetailedCommitMessagePatternParametersOperator {
   StartsWith
   EndsWith
@@ -82373,6 +82755,7 @@ pub impl @json.FromJson for RepositoryRuleDetailedCommitMessagePatternParameters
 ///|
 ///
 /// The type of source for the ruleset that includes this rule.
+#non_exhaustive
 pub(all) enum RepositoryRuleDetailedCommitMessagePatternRulesetSourceType {
   Repository
   Organization
@@ -82513,6 +82896,7 @@ pub impl @json.FromJson for RepositoryRuleDetailedCommitMessagePattern with fn f
 ///|
 ///
 /// The operator to use for matching.
+#non_exhaustive
 pub(all) enum RepositoryRuleDetailedCommitAuthorEmailPatternParametersOperator {
   StartsWith
   EndsWith
@@ -82657,6 +83041,7 @@ pub impl @json.FromJson for RepositoryRuleDetailedCommitAuthorEmailPatternParame
 ///|
 ///
 /// The type of source for the ruleset that includes this rule.
+#non_exhaustive
 pub(all) enum RepositoryRuleDetailedCommitAuthorEmailPatternRulesetSourceType {
   Repository
   Organization
@@ -82797,6 +83182,7 @@ pub impl @json.FromJson for RepositoryRuleDetailedCommitAuthorEmailPattern with 
 ///|
 ///
 /// The operator to use for matching.
+#non_exhaustive
 pub(all) enum RepositoryRuleDetailedCommitterEmailPatternParametersOperator {
   StartsWith
   EndsWith
@@ -82941,6 +83327,7 @@ pub impl @json.FromJson for RepositoryRuleDetailedCommitterEmailPatternParameter
 ///|
 ///
 /// The type of source for the ruleset that includes this rule.
+#non_exhaustive
 pub(all) enum RepositoryRuleDetailedCommitterEmailPatternRulesetSourceType {
   Repository
   Organization
@@ -83081,6 +83468,7 @@ pub impl @json.FromJson for RepositoryRuleDetailedCommitterEmailPattern with fn 
 ///|
 ///
 /// The operator to use for matching.
+#non_exhaustive
 pub(all) enum RepositoryRuleDetailedBranchNamePatternParametersOperator {
   StartsWith
   EndsWith
@@ -83225,6 +83613,7 @@ pub impl @json.FromJson for RepositoryRuleDetailedBranchNamePatternParameters wi
 ///|
 ///
 /// The type of source for the ruleset that includes this rule.
+#non_exhaustive
 pub(all) enum RepositoryRuleDetailedBranchNamePatternRulesetSourceType {
   Repository
   Organization
@@ -83360,6 +83749,7 @@ pub impl @json.FromJson for RepositoryRuleDetailedBranchNamePattern with fn from
 ///|
 ///
 /// The operator to use for matching.
+#non_exhaustive
 pub(all) enum RepositoryRuleDetailedTagNamePatternParametersOperator {
   StartsWith
   EndsWith
@@ -83502,6 +83892,7 @@ pub impl @json.FromJson for RepositoryRuleDetailedTagNamePatternParameters with 
 ///|
 ///
 /// The type of source for the ruleset that includes this rule.
+#non_exhaustive
 pub(all) enum RepositoryRuleDetailedTagNamePatternRulesetSourceType {
   Repository
   Organization
@@ -83695,6 +84086,7 @@ pub impl @json.FromJson for RepositoryRuleDetailedWorkflowsParameters with fn fr
 ///|
 ///
 /// The type of source for the ruleset that includes this rule.
+#non_exhaustive
 pub(all) enum RepositoryRuleDetailedWorkflowsRulesetSourceType {
   Repository
   Organization
@@ -83883,6 +84275,7 @@ pub impl @json.FromJson for RepositoryRuleDetailedCodeScanningParameters with fn
 ///|
 ///
 /// The type of source for the ruleset that includes this rule.
+#non_exhaustive
 pub(all) enum RepositoryRuleDetailedCodeScanningRulesetSourceType {
   Repository
   Organization
@@ -84014,6 +84407,7 @@ pub impl @json.FromJson for RepositoryRuleDetailedCodeScanning with fn from_json
 ///|
 ///
 /// The lowest severity level at which code quality reviews need to be resolved before commits can be merged.
+#non_exhaustive
 pub(all) enum RepositoryRuleDetailedCodeQualityParametersSeverity {
   Errors
   Warnings
@@ -84140,6 +84534,7 @@ pub impl @json.FromJson for RepositoryRuleDetailedCodeQualityParameters with fn 
 ///|
 ///
 /// The type of source for the ruleset that includes this rule.
+#non_exhaustive
 pub(all) enum RepositoryRuleDetailedCodeQualityRulesetSourceType {
   Repository
   Organization
@@ -84334,6 +84729,7 @@ pub impl @json.FromJson for RepositoryRuleDetailedCodeCoverageParameters with fn
 ///|
 ///
 /// The type of source for the ruleset that includes this rule.
+#non_exhaustive
 pub(all) enum RepositoryRuleDetailedCodeCoverageRulesetSourceType {
   Repository
   Organization
@@ -84532,6 +84928,7 @@ pub impl @json.FromJson for RepositoryRuleDetailedCopilotCodeReviewParameters wi
 ///|
 ///
 /// The type of source for the ruleset that includes this rule.
+#non_exhaustive
 pub(all) enum RepositoryRuleDetailedCopilotCodeReviewRulesetSourceType {
   Repository
   Organization
@@ -84667,6 +85064,7 @@ pub impl @json.FromJson for RepositoryRuleDetailedCopilotCodeReview with fn from
 ///|
 ///
 /// The type of source for the ruleset that includes this rule.
+#non_exhaustive
 pub(all) enum RepositoryRuleDetailedLicenseComplianceScanningRulesetSourceType {
   Repository
   Organization
@@ -84864,6 +85262,7 @@ pub impl @json.FromJson for RepositoryRuleDetailedFilePathRestrictionParameters 
 ///|
 ///
 /// The type of source for the ruleset that includes this rule.
+#non_exhaustive
 pub(all) enum RepositoryRuleDetailedFilePathRestrictionRulesetSourceType {
   Repository
   Organization
@@ -85060,6 +85459,7 @@ pub impl @json.FromJson for RepositoryRuleDetailedMaxFilePathLengthParameters wi
 ///|
 ///
 /// The type of source for the ruleset that includes this rule.
+#non_exhaustive
 pub(all) enum RepositoryRuleDetailedMaxFilePathLengthRulesetSourceType {
   Repository
   Organization
@@ -85258,6 +85658,7 @@ pub impl @json.FromJson for RepositoryRuleDetailedFileExtensionRestrictionParame
 ///|
 ///
 /// The type of source for the ruleset that includes this rule.
+#non_exhaustive
 pub(all) enum RepositoryRuleDetailedFileExtensionRestrictionRulesetSourceType {
   Repository
   Organization
@@ -85453,6 +85854,7 @@ pub impl @json.FromJson for RepositoryRuleDetailedMaxFileSizeParameters with fn 
 ///|
 ///
 /// The type of source for the ruleset that includes this rule.
+#non_exhaustive
 pub(all) enum RepositoryRuleDetailedMaxFileSizeRulesetSourceType {
   Repository
   Organization
@@ -85584,6 +85986,7 @@ pub impl @json.FromJson for RepositoryRuleDetailedMaxFileSize with fn from_json(
 ///|
 ///
 /// A repository rule with ruleset details.
+#non_exhaustive
 pub(all) enum RepositoryRuleDetailed {
   Creation(RepositoryRuleDetailedCreation)
   Update(RepositoryRuleDetailedUpdate)
@@ -85709,6 +86112,7 @@ pub impl @json.FromJson for RepositoryRuleDetailed with fn from_json(
 ///|
 ///
 /// The token status as of the latest validity check.
+#non_exhaustive
 pub(all) enum SecretScanningAlertValidity {
   Active
   Inactive
@@ -86092,6 +86496,7 @@ pub impl @json.FromJson for SecretScanningAlertMetadataItem with fn from_json(
 ///|
 ///
 /// The token status as of the latest validity check.
+#non_exhaustive
 pub(all) enum SecretScanningAlertWithMetadataValidity {
   Active
   Inactive
@@ -86433,6 +86838,7 @@ pub impl @json.FromJson for SecretScanningAlertWithMetadata with fn from_json(
 ///|
 ///
 /// The location type. Because secrets may be found in different types of resources (ie. code, comments, issues, pull requests, discussions), this field identifies the type of resource where the secret was found.
+#non_exhaustive
 pub(all) enum SecretScanningLocationType {
   Commit
   WikiCommit
@@ -86574,6 +86980,7 @@ pub impl @json.FromJson for SecretScanningLocation with fn from_json(
 ///|
 ///
 /// The reason for bypassing push protection.
+#non_exhaustive
 pub(all) enum SecretScanningPushProtectionBypassReason {
   FalsePositive
   UsedInTests
@@ -87126,6 +87533,7 @@ pub impl @json.FromJson for RepositoryAdvisoryCreateCreditsItem with fn from_jso
 ///|
 ///
 /// The severity of the advisory. You must choose between setting this field or `cvss_vector_string`.
+#non_exhaustive
 pub(all) enum RepositoryAdvisoryCreateSeverity {
   Critical
   High
@@ -87278,6 +87686,7 @@ pub impl @json.FromJson for RepositoryAdvisoryCreate with fn from_json(
 ///|
 ///
 /// Generated untagged union RepositoryAdvisoryDescriptionValidationErrorErrorsItemValue.
+#non_exhaustive
 pub(all) enum RepositoryAdvisoryDescriptionValidationErrorErrorsItemValue {
   Text(String)
   Int(Int32)
@@ -87652,6 +88061,7 @@ pub impl @json.FromJson for PrivateVulnerabilityReportCreateVulnerabilitiesItem 
 ///|
 ///
 /// The severity of the advisory. You must choose between setting this field or `cvss_vector_string`.
+#non_exhaustive
 pub(all) enum PrivateVulnerabilityReportCreateSeverity {
   Critical
   High
@@ -88001,6 +88411,7 @@ pub impl @json.FromJson for RepositoryAdvisoryUpdateCreditsItem with fn from_jso
 ///|
 ///
 /// The severity of the advisory. You must choose between setting this field or `cvss_vector_string`.
+#non_exhaustive
 pub(all) enum RepositoryAdvisoryUpdateSeverity {
   Critical
   High
@@ -88061,6 +88472,7 @@ pub impl @json.FromJson for RepositoryAdvisoryUpdateSeverity with fn from_json(
 ///|
 ///
 /// The state of the advisory.
+#non_exhaustive
 pub(all) enum RepositoryAdvisoryUpdateState {
   Published
   Closed
@@ -88270,6 +88682,7 @@ pub impl @json.FromJson for PullRequestStackMinimalBase with fn from_json(
 ///|
 ///
 /// Generated string enum PullRequestStackMinimalPullRequestsItemState.
+#non_exhaustive
 pub(all) enum PullRequestStackMinimalPullRequestsItemState {
   Open
   Closed
@@ -88776,6 +89189,7 @@ pub impl @json.FromJson for PullRequestStackPullRequestBase with fn from_json(
 ///|
 ///
 /// Generated string enum PullRequestStackPullRequestState.
+#non_exhaustive
 pub(all) enum PullRequestStackPullRequestState {
   Open
   Closed
@@ -90826,6 +91240,7 @@ pub impl @json.FromJson for LabelSearchResultItem with fn from_json(value, path)
 ///|
 ///
 /// The policy controlling who can create pull requests: all or collaborators_only.
+#non_exhaustive
 pub(all) enum RepoSearchResultItemPullRequestCreationPolicy {
   All
   CollaboratorsOnly
@@ -92377,6 +92792,7 @@ pub impl @json.FromJson for PrivateUser with fn from_json(value, path) {
 ///|
 ///
 /// The type of repositories in the organization that the secret is visible to
+#non_exhaustive
 pub(all) enum CodespacesSecretVisibility {
   All
   Private
@@ -92635,6 +93051,7 @@ pub impl @json.FromJson for CodespaceExportDetails with fn from_json(
 ///|
 ///
 /// State of this codespace.
+#non_exhaustive
 pub(all) enum CodespaceWithFullRepositoryState {
   Unknown
   Created
@@ -92802,6 +93219,7 @@ pub impl @json.FromJson for CodespaceWithFullRepositoryGitStatus with fn from_js
 ///|
 ///
 /// The initally assigned location of a new codespace.
+#non_exhaustive
 pub(all) enum CodespaceWithFullRepositoryLocation {
   EastUs
   SouthEastAsia
@@ -94133,6 +94551,7 @@ pub impl @json.FromJson for KeySimple with fn from_json(value, path) {
 ///|
 ///
 /// Generated string enum SecurityAdvisoriesListGlobalAdvisoriesType.
+#non_exhaustive
 pub(all) enum SecurityAdvisoriesListGlobalAdvisoriesType {
   Reviewed
   Malware
@@ -94199,6 +94618,7 @@ pub impl @json.FromJson for SecurityAdvisoriesListGlobalAdvisoriesType with fn f
 ///|
 ///
 /// Generated string enum SecurityAdvisoriesListGlobalAdvisoriesSeverity.
+#non_exhaustive
 pub(all) enum SecurityAdvisoriesListGlobalAdvisoriesSeverity {
   Unknown
   Low
@@ -94271,6 +94691,7 @@ pub impl @json.FromJson for SecurityAdvisoriesListGlobalAdvisoriesSeverity with 
 ///|
 ///
 /// Generated untagged union SecurityAdvisoriesListGlobalAdvisoriesCwes.
+#non_exhaustive
 pub(all) enum SecurityAdvisoriesListGlobalAdvisoriesCwes {
   Text(String)
   TextArray(Array[String])
@@ -94332,6 +94753,7 @@ pub impl @json.FromJson for SecurityAdvisoriesListGlobalAdvisoriesCwes with fn f
 ///|
 ///
 /// Generated untagged union SecurityAdvisoriesListGlobalAdvisoriesAffects.
+#non_exhaustive
 pub(all) enum SecurityAdvisoriesListGlobalAdvisoriesAffects {
   Text(String)
   TextArray(Array[String])
@@ -94393,6 +94815,7 @@ pub impl @json.FromJson for SecurityAdvisoriesListGlobalAdvisoriesAffects with f
 ///|
 ///
 /// Generated string enum SecurityAdvisoriesListGlobalAdvisoriesDirection.
+#non_exhaustive
 pub(all) enum SecurityAdvisoriesListGlobalAdvisoriesDirection {
   Asc
   Desc
@@ -94458,6 +94881,7 @@ pub impl @json.FromJson for SecurityAdvisoriesListGlobalAdvisoriesDirection with
 ///|
 ///
 /// Generated string enum SecurityAdvisoriesListGlobalAdvisoriesSort.
+#non_exhaustive
 pub(all) enum SecurityAdvisoriesListGlobalAdvisoriesSort {
   Updated
   Published
@@ -94527,6 +94951,7 @@ pub impl @json.FromJson for SecurityAdvisoriesListGlobalAdvisoriesSort with fn f
 ///|
 ///
 /// Generated string enum AgentAutomationsListAutomationsOwnerType.
+#non_exhaustive
 pub(all) enum AgentAutomationsListAutomationsOwnerType {
   User
   Repository
@@ -94654,6 +95079,7 @@ pub impl @json.FromJson for AgentAutomationsListAutomationsResponseItemRepositor
 ///|
 ///
 /// Who owns the automation. `user` keeps it private to its creator and its runs act as that user. `repository` makes it belong to the repository, visible to anyone with read access to the repository, and its runs act as the Copilot app rather than as a person.
+#non_exhaustive
 pub(all) enum AgentAutomationsListAutomationsResponseItemOwnerType {
   User
   Repository
@@ -94719,6 +95145,7 @@ pub impl @json.FromJson for AgentAutomationsListAutomationsResponseItemOwnerType
 ///|
 ///
 /// Controls which repository resources a run may modify. `trigger` limits writes to the resource that started the run, when one exists, and resources created during the run; `repository` allows writes to any resource in the repository. Supported values: `trigger`, `repository`.
+#non_exhaustive
 pub(all) enum AgentAutomationsListAutomationsResponseItemWriteScope {
   Trigger
   Repository
@@ -94784,6 +95211,7 @@ pub impl @json.FromJson for AgentAutomationsListAutomationsResponseItemWriteScop
 ///|
 ///
 /// Generated string enum AgentAutomationsListAutomationsResponseItemTriggersIntervalCadenceItem.
+#non_exhaustive
 pub(all) enum AgentAutomationsListAutomationsResponseItemTriggersIntervalCadenceItem {
   Hourly
   Daily
@@ -94852,6 +95280,7 @@ pub impl @json.FromJson for AgentAutomationsListAutomationsResponseItemTriggersI
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsListAutomationsResponseItemTriggersIntervalWriteScope {
   Trigger
   Repository
@@ -94998,6 +95427,7 @@ pub impl @json.FromJson for AgentAutomationsListAutomationsResponseItemTriggersI
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsListAutomationsResponseItemTriggersIssueOpenedWriteScope {
   Trigger
   Repository
@@ -95128,6 +95558,7 @@ pub impl @json.FromJson for AgentAutomationsListAutomationsResponseItemTriggersI
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsListAutomationsResponseItemTriggersIssueLabeledWriteScope {
   Trigger
   Repository
@@ -95262,6 +95693,7 @@ pub impl @json.FromJson for AgentAutomationsListAutomationsResponseItemTriggersI
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsListAutomationsResponseItemTriggersWorkflowRunWriteScope {
   Trigger
   Repository
@@ -95400,6 +95832,7 @@ pub impl @json.FromJson for AgentAutomationsListAutomationsResponseItemTriggersW
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsListAutomationsResponseItemTriggersPullRequestOpenedWriteScope {
   Trigger
   Repository
@@ -95534,6 +95967,7 @@ pub impl @json.FromJson for AgentAutomationsListAutomationsResponseItemTriggersP
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsListAutomationsResponseItemTriggersPullRequestSynchronizeWriteScope {
   Trigger
   Repository
@@ -95668,6 +96102,7 @@ pub impl @json.FromJson for AgentAutomationsListAutomationsResponseItemTriggersP
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsListAutomationsResponseItemTriggersPullRequestMergedWriteScope {
   Trigger
   Repository
@@ -95802,6 +96237,7 @@ pub impl @json.FromJson for AgentAutomationsListAutomationsResponseItemTriggersP
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsListAutomationsResponseItemTriggersIssueCommentWriteScope {
   Trigger
   Repository
@@ -95932,6 +96368,7 @@ pub impl @json.FromJson for AgentAutomationsListAutomationsResponseItemTriggersI
 ///|
 ///
 /// Generated string enum AgentAutomationsListAutomationsResponseItemTriggersPullRequestCommentCommentTypesItem.
+#non_exhaustive
 pub(all) enum AgentAutomationsListAutomationsResponseItemTriggersPullRequestCommentCommentTypesItem {
   TimelineComment
   ReviewComment
@@ -95997,6 +96434,7 @@ pub impl @json.FromJson for AgentAutomationsListAutomationsResponseItemTriggersP
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsListAutomationsResponseItemTriggersPullRequestCommentWriteScope {
   Trigger
   Repository
@@ -96135,6 +96573,7 @@ pub impl @json.FromJson for AgentAutomationsListAutomationsResponseItemTriggersP
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsListAutomationsResponseItemTriggersDiscussionOpenedWriteScope {
   Trigger
   Repository
@@ -96269,6 +96708,7 @@ pub impl @json.FromJson for AgentAutomationsListAutomationsResponseItemTriggersD
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsListAutomationsResponseItemTriggersDiscussionUpdatedWriteScope {
   Trigger
   Repository
@@ -96403,6 +96843,7 @@ pub impl @json.FromJson for AgentAutomationsListAutomationsResponseItemTriggersD
 ///|
 ///
 /// Generated string enum AgentAutomationsListAutomationsResponseItemTriggersDiscussionCommentCommentTypesItem.
+#non_exhaustive
 pub(all) enum AgentAutomationsListAutomationsResponseItemTriggersDiscussionCommentCommentTypesItem {
   Comment
   Reply
@@ -96468,6 +96909,7 @@ pub impl @json.FromJson for AgentAutomationsListAutomationsResponseItemTriggersD
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsListAutomationsResponseItemTriggersDiscussionCommentWriteScope {
   Trigger
   Repository
@@ -96610,6 +97052,7 @@ pub impl @json.FromJson for AgentAutomationsListAutomationsResponseItemTriggersD
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsListAutomationsResponseItemTriggersIssueAssignedWriteScope {
   Trigger
   Repository
@@ -96744,6 +97187,7 @@ pub impl @json.FromJson for AgentAutomationsListAutomationsResponseItemTriggersI
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsListAutomationsResponseItemTriggersPullRequestAssignedWriteScope {
   Trigger
   Repository
@@ -96882,6 +97326,7 @@ pub impl @json.FromJson for AgentAutomationsListAutomationsResponseItemTriggersP
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsListAutomationsResponseItemTriggersSubIssueAddedWriteScope {
   Trigger
   Repository
@@ -97012,6 +97457,7 @@ pub impl @json.FromJson for AgentAutomationsListAutomationsResponseItemTriggersS
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsListAutomationsResponseItemTriggersPullRequestReadyForReviewWriteScope {
   Trigger
   Repository
@@ -97146,6 +97592,7 @@ pub impl @json.FromJson for AgentAutomationsListAutomationsResponseItemTriggersP
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsListAutomationsResponseItemTriggersPullRequestLabeledWriteScope {
   Trigger
   Repository
@@ -97284,6 +97731,7 @@ pub impl @json.FromJson for AgentAutomationsListAutomationsResponseItemTriggersP
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsListAutomationsResponseItemTriggersPullRequestMergeConflictWriteScope {
   Trigger
   Repository
@@ -97418,6 +97866,7 @@ pub impl @json.FromJson for AgentAutomationsListAutomationsResponseItemTriggersP
 ///|
 ///
 /// Generated string enum AgentAutomationsListAutomationsResponseItemTriggersPullRequestReviewSubmittedStatesItem.
+#non_exhaustive
 pub(all) enum AgentAutomationsListAutomationsResponseItemTriggersPullRequestReviewSubmittedStatesItem {
   Approved
   ChangesRequested
@@ -97486,6 +97935,7 @@ pub impl @json.FromJson for AgentAutomationsListAutomationsResponseItemTriggersP
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsListAutomationsResponseItemTriggersPullRequestReviewSubmittedWriteScope {
   Trigger
   Repository
@@ -97628,6 +98078,7 @@ pub impl @json.FromJson for AgentAutomationsListAutomationsResponseItemTriggersP
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsListAutomationsResponseItemTriggersPullRequestReviewRequestedWriteScope {
   Trigger
   Repository
@@ -97762,6 +98213,7 @@ pub impl @json.FromJson for AgentAutomationsListAutomationsResponseItemTriggersP
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsListAutomationsResponseItemTriggersAutomationCompletedWriteScope {
   Trigger
   Repository
@@ -98249,6 +98701,7 @@ pub impl @json.FromJson for AgentAutomationsListAutomationsResponseItem with fn 
 ///|
 ///
 /// The tool's behavior level. `read` tools only retrieve data. `write` tools can change data. This describes tool behavior, not a specific GitHub token permission.
+#non_exhaustive
 pub(all) enum AgentAutomationsListAvailableAutomationToolsResponseItemToolsItemScope {
   Read
   Write
@@ -98745,6 +99198,7 @@ pub impl @json.FromJson for AgentAutomationsListAvailableAutomationTriggersRespo
 ///|
 ///
 /// A restricted JSON Schema fragment describing the field value accepted by Automation create and update requests.
+#non_exhaustive
 pub(all) enum AgentAutomationsListAvailableAutomationTriggersResponseItemFieldsItemSchema {
   String(
     AgentAutomationsListAvailableAutomationTriggersResponseItemFieldsItemSchemaString
@@ -99040,6 +99494,7 @@ pub impl @json.FromJson for AgentAutomationsGetAutomationResponseRepository with
 ///|
 ///
 /// Who owns the automation. `user` keeps it private to its creator and its runs act as that user. `repository` makes it belong to the repository, visible to anyone with read access to the repository, and its runs act as the Copilot app rather than as a person.
+#non_exhaustive
 pub(all) enum AgentAutomationsGetAutomationResponseOwnerType {
   User
   Repository
@@ -99103,6 +99558,7 @@ pub impl @json.FromJson for AgentAutomationsGetAutomationResponseOwnerType with 
 ///|
 ///
 /// Controls which repository resources a run may modify. `trigger` limits writes to the resource that started the run, when one exists, and resources created during the run; `repository` allows writes to any resource in the repository. Supported values: `trigger`, `repository`.
+#non_exhaustive
 pub(all) enum AgentAutomationsGetAutomationResponseWriteScope {
   Trigger
   Repository
@@ -99168,6 +99624,7 @@ pub impl @json.FromJson for AgentAutomationsGetAutomationResponseWriteScope with
 ///|
 ///
 /// Generated string enum AgentAutomationsGetAutomationResponseTriggersIntervalCadenceItem.
+#non_exhaustive
 pub(all) enum AgentAutomationsGetAutomationResponseTriggersIntervalCadenceItem {
   Hourly
   Daily
@@ -99236,6 +99693,7 @@ pub impl @json.FromJson for AgentAutomationsGetAutomationResponseTriggersInterva
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsGetAutomationResponseTriggersIntervalWriteScope {
   Trigger
   Repository
@@ -99382,6 +99840,7 @@ pub impl @json.FromJson for AgentAutomationsGetAutomationResponseTriggersInterva
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsGetAutomationResponseTriggersIssueOpenedWriteScope {
   Trigger
   Repository
@@ -99512,6 +99971,7 @@ pub impl @json.FromJson for AgentAutomationsGetAutomationResponseTriggersIssueOp
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsGetAutomationResponseTriggersIssueLabeledWriteScope {
   Trigger
   Repository
@@ -99646,6 +100106,7 @@ pub impl @json.FromJson for AgentAutomationsGetAutomationResponseTriggersIssueLa
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsGetAutomationResponseTriggersWorkflowRunWriteScope {
   Trigger
   Repository
@@ -99784,6 +100245,7 @@ pub impl @json.FromJson for AgentAutomationsGetAutomationResponseTriggersWorkflo
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsGetAutomationResponseTriggersPullRequestOpenedWriteScope {
   Trigger
   Repository
@@ -99918,6 +100380,7 @@ pub impl @json.FromJson for AgentAutomationsGetAutomationResponseTriggersPullReq
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsGetAutomationResponseTriggersPullRequestSynchronizeWriteScope {
   Trigger
   Repository
@@ -100052,6 +100515,7 @@ pub impl @json.FromJson for AgentAutomationsGetAutomationResponseTriggersPullReq
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsGetAutomationResponseTriggersPullRequestMergedWriteScope {
   Trigger
   Repository
@@ -100186,6 +100650,7 @@ pub impl @json.FromJson for AgentAutomationsGetAutomationResponseTriggersPullReq
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsGetAutomationResponseTriggersIssueCommentWriteScope {
   Trigger
   Repository
@@ -100316,6 +100781,7 @@ pub impl @json.FromJson for AgentAutomationsGetAutomationResponseTriggersIssueCo
 ///|
 ///
 /// Generated string enum AgentAutomationsGetAutomationResponseTriggersPullRequestCommentCommentTypesItem.
+#non_exhaustive
 pub(all) enum AgentAutomationsGetAutomationResponseTriggersPullRequestCommentCommentTypesItem {
   TimelineComment
   ReviewComment
@@ -100381,6 +100847,7 @@ pub impl @json.FromJson for AgentAutomationsGetAutomationResponseTriggersPullReq
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsGetAutomationResponseTriggersPullRequestCommentWriteScope {
   Trigger
   Repository
@@ -100519,6 +100986,7 @@ pub impl @json.FromJson for AgentAutomationsGetAutomationResponseTriggersPullReq
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsGetAutomationResponseTriggersDiscussionOpenedWriteScope {
   Trigger
   Repository
@@ -100653,6 +101121,7 @@ pub impl @json.FromJson for AgentAutomationsGetAutomationResponseTriggersDiscuss
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsGetAutomationResponseTriggersDiscussionUpdatedWriteScope {
   Trigger
   Repository
@@ -100787,6 +101256,7 @@ pub impl @json.FromJson for AgentAutomationsGetAutomationResponseTriggersDiscuss
 ///|
 ///
 /// Generated string enum AgentAutomationsGetAutomationResponseTriggersDiscussionCommentCommentTypesItem.
+#non_exhaustive
 pub(all) enum AgentAutomationsGetAutomationResponseTriggersDiscussionCommentCommentTypesItem {
   Comment
   Reply
@@ -100852,6 +101322,7 @@ pub impl @json.FromJson for AgentAutomationsGetAutomationResponseTriggersDiscuss
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsGetAutomationResponseTriggersDiscussionCommentWriteScope {
   Trigger
   Repository
@@ -100994,6 +101465,7 @@ pub impl @json.FromJson for AgentAutomationsGetAutomationResponseTriggersDiscuss
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsGetAutomationResponseTriggersIssueAssignedWriteScope {
   Trigger
   Repository
@@ -101128,6 +101600,7 @@ pub impl @json.FromJson for AgentAutomationsGetAutomationResponseTriggersIssueAs
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsGetAutomationResponseTriggersPullRequestAssignedWriteScope {
   Trigger
   Repository
@@ -101266,6 +101739,7 @@ pub impl @json.FromJson for AgentAutomationsGetAutomationResponseTriggersPullReq
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsGetAutomationResponseTriggersSubIssueAddedWriteScope {
   Trigger
   Repository
@@ -101396,6 +101870,7 @@ pub impl @json.FromJson for AgentAutomationsGetAutomationResponseTriggersSubIssu
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsGetAutomationResponseTriggersPullRequestReadyForReviewWriteScope {
   Trigger
   Repository
@@ -101530,6 +102005,7 @@ pub impl @json.FromJson for AgentAutomationsGetAutomationResponseTriggersPullReq
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsGetAutomationResponseTriggersPullRequestLabeledWriteScope {
   Trigger
   Repository
@@ -101668,6 +102144,7 @@ pub impl @json.FromJson for AgentAutomationsGetAutomationResponseTriggersPullReq
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsGetAutomationResponseTriggersPullRequestMergeConflictWriteScope {
   Trigger
   Repository
@@ -101802,6 +102279,7 @@ pub impl @json.FromJson for AgentAutomationsGetAutomationResponseTriggersPullReq
 ///|
 ///
 /// Generated string enum AgentAutomationsGetAutomationResponseTriggersPullRequestReviewSubmittedStatesItem.
+#non_exhaustive
 pub(all) enum AgentAutomationsGetAutomationResponseTriggersPullRequestReviewSubmittedStatesItem {
   Approved
   ChangesRequested
@@ -101870,6 +102348,7 @@ pub impl @json.FromJson for AgentAutomationsGetAutomationResponseTriggersPullReq
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsGetAutomationResponseTriggersPullRequestReviewSubmittedWriteScope {
   Trigger
   Repository
@@ -102012,6 +102491,7 @@ pub impl @json.FromJson for AgentAutomationsGetAutomationResponseTriggersPullReq
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsGetAutomationResponseTriggersPullRequestReviewRequestedWriteScope {
   Trigger
   Repository
@@ -102146,6 +102626,7 @@ pub impl @json.FromJson for AgentAutomationsGetAutomationResponseTriggersPullReq
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsGetAutomationResponseTriggersAutomationCompletedWriteScope {
   Trigger
   Repository
@@ -102639,6 +103120,7 @@ pub impl @json.FromJson for AgentAutomationsGetAutomationResponse with fn from_j
 ///|
 ///
 /// Generated string enum AgentAutomationsListAutomationTasksSort.
+#non_exhaustive
 pub(all) enum AgentAutomationsListAutomationTasksSort {
   UpdatedAt
   CreatedAt
@@ -102697,6 +103179,7 @@ pub impl @json.FromJson for AgentAutomationsListAutomationTasksSort with fn from
 ///|
 ///
 /// Generated string enum AgentAutomationsListAutomationTasksDirection.
+#non_exhaustive
 pub(all) enum AgentAutomationsListAutomationTasksDirection {
   Asc
   Desc
@@ -102760,6 +103243,7 @@ pub impl @json.FromJson for AgentAutomationsListAutomationTasksDirection with fn
 ///|
 ///
 /// Type of the task creator
+#non_exhaustive
 pub(all) enum AgentAutomationsListAutomationTasksResponseTasksItemCreatorType {
   User
   Organization
@@ -103002,6 +103486,7 @@ pub impl @json.FromJson for AgentAutomationsListAutomationTasksResponseTasksItem
 ///|
 ///
 /// Current state of the task, derived from its most recent session
+#non_exhaustive
 pub(all) enum AgentAutomationsListAutomationTasksResponseTasksItemState {
   Queued
   InProgress
@@ -103085,6 +103570,7 @@ pub impl @json.FromJson for AgentAutomationsListAutomationTasksResponseTasksItem
 ///|
 ///
 /// Type of artifact. Available Values: `pull`, `branch`.
+#non_exhaustive
 pub(all) enum AgentAutomationsListAutomationTasksResponseTasksItemArtifactsItemType {
   Pull
   Branch
@@ -103474,6 +103960,7 @@ pub impl @json.FromJson for AgentAutomationsListAutomationTasksResponse with fn 
 ///|
 ///
 /// Generated string enum AgentAutomationsListRepoAutomationsOwnerType.
+#non_exhaustive
 pub(all) enum AgentAutomationsListRepoAutomationsOwnerType {
   User
   Repository
@@ -103537,6 +104024,7 @@ pub impl @json.FromJson for AgentAutomationsListRepoAutomationsOwnerType with fn
 ///|
 ///
 /// Who owns the automation. `user` keeps it private to its creator and its runs act as that user. `repository` makes it belong to the repository, visible to anyone with read access to the repository, and its runs act as the Copilot app rather than as a person.
+#non_exhaustive
 pub(all) enum AgentAutomationsListRepoAutomationsResponseAutomationsItemOwnerType {
   User
   Repository
@@ -103602,6 +104090,7 @@ pub impl @json.FromJson for AgentAutomationsListRepoAutomationsResponseAutomatio
 ///|
 ///
 /// Controls which repository resources a run may modify. `trigger` limits writes to the resource that started the run, when one exists, and resources created during the run; `repository` allows writes to any resource in the repository. Supported values: `trigger`, `repository`.
+#non_exhaustive
 pub(all) enum AgentAutomationsListRepoAutomationsResponseAutomationsItemWriteScope {
   Trigger
   Repository
@@ -103667,6 +104156,7 @@ pub impl @json.FromJson for AgentAutomationsListRepoAutomationsResponseAutomatio
 ///|
 ///
 /// Generated string enum AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersIntervalCadenceItem.
+#non_exhaustive
 pub(all) enum AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersIntervalCadenceItem {
   Hourly
   Daily
@@ -103735,6 +104225,7 @@ pub impl @json.FromJson for AgentAutomationsListRepoAutomationsResponseAutomatio
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersIntervalWriteScope {
   Trigger
   Repository
@@ -103881,6 +104372,7 @@ pub impl @json.FromJson for AgentAutomationsListRepoAutomationsResponseAutomatio
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersIssueOpenedWriteScope {
   Trigger
   Repository
@@ -104011,6 +104503,7 @@ pub impl @json.FromJson for AgentAutomationsListRepoAutomationsResponseAutomatio
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersIssueLabeledWriteScope {
   Trigger
   Repository
@@ -104145,6 +104638,7 @@ pub impl @json.FromJson for AgentAutomationsListRepoAutomationsResponseAutomatio
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersWorkflowRunWriteScope {
   Trigger
   Repository
@@ -104283,6 +104777,7 @@ pub impl @json.FromJson for AgentAutomationsListRepoAutomationsResponseAutomatio
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestOpenedWriteScope {
   Trigger
   Repository
@@ -104417,6 +104912,7 @@ pub impl @json.FromJson for AgentAutomationsListRepoAutomationsResponseAutomatio
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestSynchronizeWriteScope {
   Trigger
   Repository
@@ -104551,6 +105047,7 @@ pub impl @json.FromJson for AgentAutomationsListRepoAutomationsResponseAutomatio
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestMergedWriteScope {
   Trigger
   Repository
@@ -104685,6 +105182,7 @@ pub impl @json.FromJson for AgentAutomationsListRepoAutomationsResponseAutomatio
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersIssueCommentWriteScope {
   Trigger
   Repository
@@ -104815,6 +105313,7 @@ pub impl @json.FromJson for AgentAutomationsListRepoAutomationsResponseAutomatio
 ///|
 ///
 /// Generated string enum AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestCommentCommentTypesItem.
+#non_exhaustive
 pub(all) enum AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestCommentCommentTypesItem {
   TimelineComment
   ReviewComment
@@ -104880,6 +105379,7 @@ pub impl @json.FromJson for AgentAutomationsListRepoAutomationsResponseAutomatio
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestCommentWriteScope {
   Trigger
   Repository
@@ -105018,6 +105518,7 @@ pub impl @json.FromJson for AgentAutomationsListRepoAutomationsResponseAutomatio
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersDiscussionOpenedWriteScope {
   Trigger
   Repository
@@ -105152,6 +105653,7 @@ pub impl @json.FromJson for AgentAutomationsListRepoAutomationsResponseAutomatio
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersDiscussionUpdatedWriteScope {
   Trigger
   Repository
@@ -105286,6 +105788,7 @@ pub impl @json.FromJson for AgentAutomationsListRepoAutomationsResponseAutomatio
 ///|
 ///
 /// Generated string enum AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersDiscussionCommentCommentTypesItem.
+#non_exhaustive
 pub(all) enum AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersDiscussionCommentCommentTypesItem {
   Comment
   Reply
@@ -105351,6 +105854,7 @@ pub impl @json.FromJson for AgentAutomationsListRepoAutomationsResponseAutomatio
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersDiscussionCommentWriteScope {
   Trigger
   Repository
@@ -105493,6 +105997,7 @@ pub impl @json.FromJson for AgentAutomationsListRepoAutomationsResponseAutomatio
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersIssueAssignedWriteScope {
   Trigger
   Repository
@@ -105627,6 +106132,7 @@ pub impl @json.FromJson for AgentAutomationsListRepoAutomationsResponseAutomatio
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestAssignedWriteScope {
   Trigger
   Repository
@@ -105765,6 +106271,7 @@ pub impl @json.FromJson for AgentAutomationsListRepoAutomationsResponseAutomatio
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersSubIssueAddedWriteScope {
   Trigger
   Repository
@@ -105895,6 +106402,7 @@ pub impl @json.FromJson for AgentAutomationsListRepoAutomationsResponseAutomatio
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestReadyForReviewWriteScope {
   Trigger
   Repository
@@ -106029,6 +106537,7 @@ pub impl @json.FromJson for AgentAutomationsListRepoAutomationsResponseAutomatio
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestLabeledWriteScope {
   Trigger
   Repository
@@ -106167,6 +106676,7 @@ pub impl @json.FromJson for AgentAutomationsListRepoAutomationsResponseAutomatio
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestMergeConflictWriteScope {
   Trigger
   Repository
@@ -106301,6 +106811,7 @@ pub impl @json.FromJson for AgentAutomationsListRepoAutomationsResponseAutomatio
 ///|
 ///
 /// Generated string enum AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestReviewSubmittedStatesItem.
+#non_exhaustive
 pub(all) enum AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestReviewSubmittedStatesItem {
   Approved
   ChangesRequested
@@ -106369,6 +106880,7 @@ pub impl @json.FromJson for AgentAutomationsListRepoAutomationsResponseAutomatio
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestReviewSubmittedWriteScope {
   Trigger
   Repository
@@ -106511,6 +107023,7 @@ pub impl @json.FromJson for AgentAutomationsListRepoAutomationsResponseAutomatio
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersPullRequestReviewRequestedWriteScope {
   Trigger
   Repository
@@ -106645,6 +107158,7 @@ pub impl @json.FromJson for AgentAutomationsListRepoAutomationsResponseAutomatio
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsListRepoAutomationsResponseAutomationsItemTriggersAutomationCompletedWriteScope {
   Trigger
   Repository
@@ -107196,6 +107710,7 @@ pub impl @json.FromJson for AgentAutomationsListRepoAutomationsResponse with fn 
 ///|
 ///
 /// Generated string enum AgentAutomationsCreateRepoAutomationRequestTriggersIntervalCadenceItem.
+#non_exhaustive
 pub(all) enum AgentAutomationsCreateRepoAutomationRequestTriggersIntervalCadenceItem {
   Hourly
   Daily
@@ -107264,6 +107779,7 @@ pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationRequestTriggersI
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsCreateRepoAutomationRequestTriggersIntervalWriteScope {
   Trigger
   Repository
@@ -107410,6 +107926,7 @@ pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationRequestTriggersI
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsCreateRepoAutomationRequestTriggersIssueOpenedWriteScope {
   Trigger
   Repository
@@ -107540,6 +108057,7 @@ pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationRequestTriggersI
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsCreateRepoAutomationRequestTriggersIssueLabeledWriteScope {
   Trigger
   Repository
@@ -107674,6 +108192,7 @@ pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationRequestTriggersI
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsCreateRepoAutomationRequestTriggersWorkflowRunWriteScope {
   Trigger
   Repository
@@ -107812,6 +108331,7 @@ pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationRequestTriggersW
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestOpenedWriteScope {
   Trigger
   Repository
@@ -107946,6 +108466,7 @@ pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationRequestTriggersP
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestSynchronizeWriteScope {
   Trigger
   Repository
@@ -108080,6 +108601,7 @@ pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationRequestTriggersP
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestMergedWriteScope {
   Trigger
   Repository
@@ -108214,6 +108736,7 @@ pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationRequestTriggersP
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsCreateRepoAutomationRequestTriggersIssueCommentWriteScope {
   Trigger
   Repository
@@ -108344,6 +108867,7 @@ pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationRequestTriggersI
 ///|
 ///
 /// Generated string enum AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestCommentCommentTypesItem.
+#non_exhaustive
 pub(all) enum AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestCommentCommentTypesItem {
   TimelineComment
   ReviewComment
@@ -108409,6 +108933,7 @@ pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationRequestTriggersP
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestCommentWriteScope {
   Trigger
   Repository
@@ -108547,6 +109072,7 @@ pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationRequestTriggersP
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsCreateRepoAutomationRequestTriggersDiscussionOpenedWriteScope {
   Trigger
   Repository
@@ -108681,6 +109207,7 @@ pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationRequestTriggersD
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsCreateRepoAutomationRequestTriggersDiscussionUpdatedWriteScope {
   Trigger
   Repository
@@ -108815,6 +109342,7 @@ pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationRequestTriggersD
 ///|
 ///
 /// Generated string enum AgentAutomationsCreateRepoAutomationRequestTriggersDiscussionCommentCommentTypesItem.
+#non_exhaustive
 pub(all) enum AgentAutomationsCreateRepoAutomationRequestTriggersDiscussionCommentCommentTypesItem {
   Comment
   Reply
@@ -108880,6 +109408,7 @@ pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationRequestTriggersD
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsCreateRepoAutomationRequestTriggersDiscussionCommentWriteScope {
   Trigger
   Repository
@@ -109022,6 +109551,7 @@ pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationRequestTriggersD
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsCreateRepoAutomationRequestTriggersIssueAssignedWriteScope {
   Trigger
   Repository
@@ -109156,6 +109686,7 @@ pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationRequestTriggersI
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestAssignedWriteScope {
   Trigger
   Repository
@@ -109294,6 +109825,7 @@ pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationRequestTriggersP
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsCreateRepoAutomationRequestTriggersSubIssueAddedWriteScope {
   Trigger
   Repository
@@ -109424,6 +109956,7 @@ pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationRequestTriggersS
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestReadyForReviewWriteScope {
   Trigger
   Repository
@@ -109558,6 +110091,7 @@ pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationRequestTriggersP
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestLabeledWriteScope {
   Trigger
   Repository
@@ -109696,6 +110230,7 @@ pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationRequestTriggersP
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestMergeConflictWriteScope {
   Trigger
   Repository
@@ -109830,6 +110365,7 @@ pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationRequestTriggersP
 ///|
 ///
 /// Generated string enum AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestReviewSubmittedStatesItem.
+#non_exhaustive
 pub(all) enum AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestReviewSubmittedStatesItem {
   Approved
   ChangesRequested
@@ -109898,6 +110434,7 @@ pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationRequestTriggersP
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestReviewSubmittedWriteScope {
   Trigger
   Repository
@@ -110040,6 +110577,7 @@ pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationRequestTriggersP
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsCreateRepoAutomationRequestTriggersPullRequestReviewRequestedWriteScope {
   Trigger
   Repository
@@ -110174,6 +110712,7 @@ pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationRequestTriggersP
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsCreateRepoAutomationRequestTriggersAutomationCompletedWriteScope {
   Trigger
   Repository
@@ -110479,6 +111018,7 @@ pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationRequestTriggers 
 ///|
 ///
 /// Who owns the automation, fixed at creation. `user` keeps it private to its creator and its runs act as that user. `repository` makes it belong to the repository, visible to anyone with read access to the repository and maintainable by anyone with write access to the repository, and its runs act as the Copilot app rather than as a person. `repository` is rejected when repository ownership is not available for the repository. Supported values: `user`, `repository`. Defaults to `user`.
+#non_exhaustive
 pub(all) enum AgentAutomationsCreateRepoAutomationRequestOwnerType {
   User
   Repository
@@ -110544,6 +111084,7 @@ pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationRequestOwnerType
 ///|
 ///
 /// Controls which repository resources a run may modify. `trigger` limits writes to the resource that started the run, when one exists, and resources created during the run; `repository` allows writes to any resource in the repository. Supported values: `trigger`, `repository`.
+#non_exhaustive
 pub(all) enum AgentAutomationsCreateRepoAutomationRequestWriteScope {
   Trigger
   Repository
@@ -110724,6 +111265,7 @@ pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationRequest with fn 
 ///|
 ///
 /// Who owns the automation. `user` keeps it private to its creator and its runs act as that user. `repository` makes it belong to the repository, visible to anyone with read access to the repository, and its runs act as the Copilot app rather than as a person.
+#non_exhaustive
 pub(all) enum AgentAutomationsCreateRepoAutomationResponseOwnerType {
   User
   Repository
@@ -110789,6 +111331,7 @@ pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationResponseOwnerTyp
 ///|
 ///
 /// Controls which repository resources a run may modify. `trigger` limits writes to the resource that started the run, when one exists, and resources created during the run; `repository` allows writes to any resource in the repository. Supported values: `trigger`, `repository`.
+#non_exhaustive
 pub(all) enum AgentAutomationsCreateRepoAutomationResponseWriteScope {
   Trigger
   Repository
@@ -110854,6 +111397,7 @@ pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationResponseWriteSco
 ///|
 ///
 /// Generated string enum AgentAutomationsCreateRepoAutomationResponseTriggersIntervalCadenceItem.
+#non_exhaustive
 pub(all) enum AgentAutomationsCreateRepoAutomationResponseTriggersIntervalCadenceItem {
   Hourly
   Daily
@@ -110922,6 +111466,7 @@ pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationResponseTriggers
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsCreateRepoAutomationResponseTriggersIntervalWriteScope {
   Trigger
   Repository
@@ -111068,6 +111613,7 @@ pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationResponseTriggers
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsCreateRepoAutomationResponseTriggersIssueOpenedWriteScope {
   Trigger
   Repository
@@ -111198,6 +111744,7 @@ pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationResponseTriggers
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsCreateRepoAutomationResponseTriggersIssueLabeledWriteScope {
   Trigger
   Repository
@@ -111332,6 +111879,7 @@ pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationResponseTriggers
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsCreateRepoAutomationResponseTriggersWorkflowRunWriteScope {
   Trigger
   Repository
@@ -111470,6 +112018,7 @@ pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationResponseTriggers
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestOpenedWriteScope {
   Trigger
   Repository
@@ -111604,6 +112153,7 @@ pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationResponseTriggers
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestSynchronizeWriteScope {
   Trigger
   Repository
@@ -111738,6 +112288,7 @@ pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationResponseTriggers
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestMergedWriteScope {
   Trigger
   Repository
@@ -111872,6 +112423,7 @@ pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationResponseTriggers
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsCreateRepoAutomationResponseTriggersIssueCommentWriteScope {
   Trigger
   Repository
@@ -112002,6 +112554,7 @@ pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationResponseTriggers
 ///|
 ///
 /// Generated string enum AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestCommentCommentTypesItem.
+#non_exhaustive
 pub(all) enum AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestCommentCommentTypesItem {
   TimelineComment
   ReviewComment
@@ -112067,6 +112620,7 @@ pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationResponseTriggers
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestCommentWriteScope {
   Trigger
   Repository
@@ -112205,6 +112759,7 @@ pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationResponseTriggers
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsCreateRepoAutomationResponseTriggersDiscussionOpenedWriteScope {
   Trigger
   Repository
@@ -112339,6 +112894,7 @@ pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationResponseTriggers
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsCreateRepoAutomationResponseTriggersDiscussionUpdatedWriteScope {
   Trigger
   Repository
@@ -112473,6 +113029,7 @@ pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationResponseTriggers
 ///|
 ///
 /// Generated string enum AgentAutomationsCreateRepoAutomationResponseTriggersDiscussionCommentCommentTypesItem.
+#non_exhaustive
 pub(all) enum AgentAutomationsCreateRepoAutomationResponseTriggersDiscussionCommentCommentTypesItem {
   Comment
   Reply
@@ -112538,6 +113095,7 @@ pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationResponseTriggers
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsCreateRepoAutomationResponseTriggersDiscussionCommentWriteScope {
   Trigger
   Repository
@@ -112680,6 +113238,7 @@ pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationResponseTriggers
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsCreateRepoAutomationResponseTriggersIssueAssignedWriteScope {
   Trigger
   Repository
@@ -112814,6 +113373,7 @@ pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationResponseTriggers
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestAssignedWriteScope {
   Trigger
   Repository
@@ -112952,6 +113512,7 @@ pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationResponseTriggers
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsCreateRepoAutomationResponseTriggersSubIssueAddedWriteScope {
   Trigger
   Repository
@@ -113082,6 +113643,7 @@ pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationResponseTriggers
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestReadyForReviewWriteScope {
   Trigger
   Repository
@@ -113216,6 +113778,7 @@ pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationResponseTriggers
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestLabeledWriteScope {
   Trigger
   Repository
@@ -113354,6 +113917,7 @@ pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationResponseTriggers
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestMergeConflictWriteScope {
   Trigger
   Repository
@@ -113488,6 +114052,7 @@ pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationResponseTriggers
 ///|
 ///
 /// Generated string enum AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestReviewSubmittedStatesItem.
+#non_exhaustive
 pub(all) enum AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestReviewSubmittedStatesItem {
   Approved
   ChangesRequested
@@ -113556,6 +114121,7 @@ pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationResponseTriggers
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestReviewSubmittedWriteScope {
   Trigger
   Repository
@@ -113698,6 +114264,7 @@ pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationResponseTriggers
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsCreateRepoAutomationResponseTriggersPullRequestReviewRequestedWriteScope {
   Trigger
   Repository
@@ -113832,6 +114399,7 @@ pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationResponseTriggers
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsCreateRepoAutomationResponseTriggersAutomationCompletedWriteScope {
   Trigger
   Repository
@@ -114331,6 +114899,7 @@ pub impl @json.FromJson for AgentAutomationsCreateRepoAutomationResponse with fn
 ///|
 ///
 /// Who owns the automation. `user` keeps it private to its creator and its runs act as that user. `repository` makes it belong to the repository, visible to anyone with read access to the repository, and its runs act as the Copilot app rather than as a person.
+#non_exhaustive
 pub(all) enum AgentAutomationsGetRepoAutomationResponseOwnerType {
   User
   Repository
@@ -114396,6 +114965,7 @@ pub impl @json.FromJson for AgentAutomationsGetRepoAutomationResponseOwnerType w
 ///|
 ///
 /// Controls which repository resources a run may modify. `trigger` limits writes to the resource that started the run, when one exists, and resources created during the run; `repository` allows writes to any resource in the repository. Supported values: `trigger`, `repository`.
+#non_exhaustive
 pub(all) enum AgentAutomationsGetRepoAutomationResponseWriteScope {
   Trigger
   Repository
@@ -114461,6 +115031,7 @@ pub impl @json.FromJson for AgentAutomationsGetRepoAutomationResponseWriteScope 
 ///|
 ///
 /// Generated string enum AgentAutomationsGetRepoAutomationResponseTriggersIntervalCadenceItem.
+#non_exhaustive
 pub(all) enum AgentAutomationsGetRepoAutomationResponseTriggersIntervalCadenceItem {
   Hourly
   Daily
@@ -114529,6 +115100,7 @@ pub impl @json.FromJson for AgentAutomationsGetRepoAutomationResponseTriggersInt
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsGetRepoAutomationResponseTriggersIntervalWriteScope {
   Trigger
   Repository
@@ -114675,6 +115247,7 @@ pub impl @json.FromJson for AgentAutomationsGetRepoAutomationResponseTriggersInt
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsGetRepoAutomationResponseTriggersIssueOpenedWriteScope {
   Trigger
   Repository
@@ -114805,6 +115378,7 @@ pub impl @json.FromJson for AgentAutomationsGetRepoAutomationResponseTriggersIss
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsGetRepoAutomationResponseTriggersIssueLabeledWriteScope {
   Trigger
   Repository
@@ -114939,6 +115513,7 @@ pub impl @json.FromJson for AgentAutomationsGetRepoAutomationResponseTriggersIss
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsGetRepoAutomationResponseTriggersWorkflowRunWriteScope {
   Trigger
   Repository
@@ -115077,6 +115652,7 @@ pub impl @json.FromJson for AgentAutomationsGetRepoAutomationResponseTriggersWor
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsGetRepoAutomationResponseTriggersPullRequestOpenedWriteScope {
   Trigger
   Repository
@@ -115211,6 +115787,7 @@ pub impl @json.FromJson for AgentAutomationsGetRepoAutomationResponseTriggersPul
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsGetRepoAutomationResponseTriggersPullRequestSynchronizeWriteScope {
   Trigger
   Repository
@@ -115345,6 +115922,7 @@ pub impl @json.FromJson for AgentAutomationsGetRepoAutomationResponseTriggersPul
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsGetRepoAutomationResponseTriggersPullRequestMergedWriteScope {
   Trigger
   Repository
@@ -115479,6 +116057,7 @@ pub impl @json.FromJson for AgentAutomationsGetRepoAutomationResponseTriggersPul
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsGetRepoAutomationResponseTriggersIssueCommentWriteScope {
   Trigger
   Repository
@@ -115609,6 +116188,7 @@ pub impl @json.FromJson for AgentAutomationsGetRepoAutomationResponseTriggersIss
 ///|
 ///
 /// Generated string enum AgentAutomationsGetRepoAutomationResponseTriggersPullRequestCommentCommentTypesItem.
+#non_exhaustive
 pub(all) enum AgentAutomationsGetRepoAutomationResponseTriggersPullRequestCommentCommentTypesItem {
   TimelineComment
   ReviewComment
@@ -115674,6 +116254,7 @@ pub impl @json.FromJson for AgentAutomationsGetRepoAutomationResponseTriggersPul
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsGetRepoAutomationResponseTriggersPullRequestCommentWriteScope {
   Trigger
   Repository
@@ -115812,6 +116393,7 @@ pub impl @json.FromJson for AgentAutomationsGetRepoAutomationResponseTriggersPul
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsGetRepoAutomationResponseTriggersDiscussionOpenedWriteScope {
   Trigger
   Repository
@@ -115946,6 +116528,7 @@ pub impl @json.FromJson for AgentAutomationsGetRepoAutomationResponseTriggersDis
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsGetRepoAutomationResponseTriggersDiscussionUpdatedWriteScope {
   Trigger
   Repository
@@ -116080,6 +116663,7 @@ pub impl @json.FromJson for AgentAutomationsGetRepoAutomationResponseTriggersDis
 ///|
 ///
 /// Generated string enum AgentAutomationsGetRepoAutomationResponseTriggersDiscussionCommentCommentTypesItem.
+#non_exhaustive
 pub(all) enum AgentAutomationsGetRepoAutomationResponseTriggersDiscussionCommentCommentTypesItem {
   Comment
   Reply
@@ -116145,6 +116729,7 @@ pub impl @json.FromJson for AgentAutomationsGetRepoAutomationResponseTriggersDis
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsGetRepoAutomationResponseTriggersDiscussionCommentWriteScope {
   Trigger
   Repository
@@ -116287,6 +116872,7 @@ pub impl @json.FromJson for AgentAutomationsGetRepoAutomationResponseTriggersDis
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsGetRepoAutomationResponseTriggersIssueAssignedWriteScope {
   Trigger
   Repository
@@ -116421,6 +117007,7 @@ pub impl @json.FromJson for AgentAutomationsGetRepoAutomationResponseTriggersIss
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsGetRepoAutomationResponseTriggersPullRequestAssignedWriteScope {
   Trigger
   Repository
@@ -116559,6 +117146,7 @@ pub impl @json.FromJson for AgentAutomationsGetRepoAutomationResponseTriggersPul
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsGetRepoAutomationResponseTriggersSubIssueAddedWriteScope {
   Trigger
   Repository
@@ -116689,6 +117277,7 @@ pub impl @json.FromJson for AgentAutomationsGetRepoAutomationResponseTriggersSub
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsGetRepoAutomationResponseTriggersPullRequestReadyForReviewWriteScope {
   Trigger
   Repository
@@ -116823,6 +117412,7 @@ pub impl @json.FromJson for AgentAutomationsGetRepoAutomationResponseTriggersPul
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsGetRepoAutomationResponseTriggersPullRequestLabeledWriteScope {
   Trigger
   Repository
@@ -116961,6 +117551,7 @@ pub impl @json.FromJson for AgentAutomationsGetRepoAutomationResponseTriggersPul
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsGetRepoAutomationResponseTriggersPullRequestMergeConflictWriteScope {
   Trigger
   Repository
@@ -117095,6 +117686,7 @@ pub impl @json.FromJson for AgentAutomationsGetRepoAutomationResponseTriggersPul
 ///|
 ///
 /// Generated string enum AgentAutomationsGetRepoAutomationResponseTriggersPullRequestReviewSubmittedStatesItem.
+#non_exhaustive
 pub(all) enum AgentAutomationsGetRepoAutomationResponseTriggersPullRequestReviewSubmittedStatesItem {
   Approved
   ChangesRequested
@@ -117163,6 +117755,7 @@ pub impl @json.FromJson for AgentAutomationsGetRepoAutomationResponseTriggersPul
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsGetRepoAutomationResponseTriggersPullRequestReviewSubmittedWriteScope {
   Trigger
   Repository
@@ -117305,6 +117898,7 @@ pub impl @json.FromJson for AgentAutomationsGetRepoAutomationResponseTriggersPul
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsGetRepoAutomationResponseTriggersPullRequestReviewRequestedWriteScope {
   Trigger
   Repository
@@ -117439,6 +118033,7 @@ pub impl @json.FromJson for AgentAutomationsGetRepoAutomationResponseTriggersPul
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsGetRepoAutomationResponseTriggersAutomationCompletedWriteScope {
   Trigger
   Repository
@@ -117935,6 +118530,7 @@ pub impl @json.FromJson for AgentAutomationsGetRepoAutomationResponse with fn fr
 ///|
 ///
 /// Controls which repository resources a run may modify. `trigger` limits writes to the resource that started the run, when one exists, and resources created during the run; `repository` allows writes to any resource in the repository. Supported values: `trigger`, `repository`. Omit to leave unchanged.
+#non_exhaustive
 pub(all) enum AgentAutomationsEditRepoAutomationRequestWriteScope {
   Trigger
   Repository
@@ -118000,6 +118596,7 @@ pub impl @json.FromJson for AgentAutomationsEditRepoAutomationRequestWriteScope 
 ///|
 ///
 /// Generated string enum AgentAutomationsEditRepoAutomationRequestTriggersIntervalCadenceItem.
+#non_exhaustive
 pub(all) enum AgentAutomationsEditRepoAutomationRequestTriggersIntervalCadenceItem {
   Hourly
   Daily
@@ -118068,6 +118665,7 @@ pub impl @json.FromJson for AgentAutomationsEditRepoAutomationRequestTriggersInt
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsEditRepoAutomationRequestTriggersIntervalWriteScope {
   Trigger
   Repository
@@ -118214,6 +118812,7 @@ pub impl @json.FromJson for AgentAutomationsEditRepoAutomationRequestTriggersInt
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsEditRepoAutomationRequestTriggersIssueOpenedWriteScope {
   Trigger
   Repository
@@ -118344,6 +118943,7 @@ pub impl @json.FromJson for AgentAutomationsEditRepoAutomationRequestTriggersIss
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsEditRepoAutomationRequestTriggersIssueLabeledWriteScope {
   Trigger
   Repository
@@ -118478,6 +119078,7 @@ pub impl @json.FromJson for AgentAutomationsEditRepoAutomationRequestTriggersIss
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsEditRepoAutomationRequestTriggersWorkflowRunWriteScope {
   Trigger
   Repository
@@ -118616,6 +119217,7 @@ pub impl @json.FromJson for AgentAutomationsEditRepoAutomationRequestTriggersWor
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsEditRepoAutomationRequestTriggersPullRequestOpenedWriteScope {
   Trigger
   Repository
@@ -118750,6 +119352,7 @@ pub impl @json.FromJson for AgentAutomationsEditRepoAutomationRequestTriggersPul
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsEditRepoAutomationRequestTriggersPullRequestSynchronizeWriteScope {
   Trigger
   Repository
@@ -118884,6 +119487,7 @@ pub impl @json.FromJson for AgentAutomationsEditRepoAutomationRequestTriggersPul
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsEditRepoAutomationRequestTriggersPullRequestMergedWriteScope {
   Trigger
   Repository
@@ -119018,6 +119622,7 @@ pub impl @json.FromJson for AgentAutomationsEditRepoAutomationRequestTriggersPul
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsEditRepoAutomationRequestTriggersIssueCommentWriteScope {
   Trigger
   Repository
@@ -119148,6 +119753,7 @@ pub impl @json.FromJson for AgentAutomationsEditRepoAutomationRequestTriggersIss
 ///|
 ///
 /// Generated string enum AgentAutomationsEditRepoAutomationRequestTriggersPullRequestCommentCommentTypesItem.
+#non_exhaustive
 pub(all) enum AgentAutomationsEditRepoAutomationRequestTriggersPullRequestCommentCommentTypesItem {
   TimelineComment
   ReviewComment
@@ -119213,6 +119819,7 @@ pub impl @json.FromJson for AgentAutomationsEditRepoAutomationRequestTriggersPul
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsEditRepoAutomationRequestTriggersPullRequestCommentWriteScope {
   Trigger
   Repository
@@ -119351,6 +119958,7 @@ pub impl @json.FromJson for AgentAutomationsEditRepoAutomationRequestTriggersPul
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsEditRepoAutomationRequestTriggersDiscussionOpenedWriteScope {
   Trigger
   Repository
@@ -119485,6 +120093,7 @@ pub impl @json.FromJson for AgentAutomationsEditRepoAutomationRequestTriggersDis
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsEditRepoAutomationRequestTriggersDiscussionUpdatedWriteScope {
   Trigger
   Repository
@@ -119619,6 +120228,7 @@ pub impl @json.FromJson for AgentAutomationsEditRepoAutomationRequestTriggersDis
 ///|
 ///
 /// Generated string enum AgentAutomationsEditRepoAutomationRequestTriggersDiscussionCommentCommentTypesItem.
+#non_exhaustive
 pub(all) enum AgentAutomationsEditRepoAutomationRequestTriggersDiscussionCommentCommentTypesItem {
   Comment
   Reply
@@ -119684,6 +120294,7 @@ pub impl @json.FromJson for AgentAutomationsEditRepoAutomationRequestTriggersDis
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsEditRepoAutomationRequestTriggersDiscussionCommentWriteScope {
   Trigger
   Repository
@@ -119826,6 +120437,7 @@ pub impl @json.FromJson for AgentAutomationsEditRepoAutomationRequestTriggersDis
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsEditRepoAutomationRequestTriggersIssueAssignedWriteScope {
   Trigger
   Repository
@@ -119960,6 +120572,7 @@ pub impl @json.FromJson for AgentAutomationsEditRepoAutomationRequestTriggersIss
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsEditRepoAutomationRequestTriggersPullRequestAssignedWriteScope {
   Trigger
   Repository
@@ -120098,6 +120711,7 @@ pub impl @json.FromJson for AgentAutomationsEditRepoAutomationRequestTriggersPul
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsEditRepoAutomationRequestTriggersSubIssueAddedWriteScope {
   Trigger
   Repository
@@ -120228,6 +120842,7 @@ pub impl @json.FromJson for AgentAutomationsEditRepoAutomationRequestTriggersSub
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsEditRepoAutomationRequestTriggersPullRequestReadyForReviewWriteScope {
   Trigger
   Repository
@@ -120362,6 +120977,7 @@ pub impl @json.FromJson for AgentAutomationsEditRepoAutomationRequestTriggersPul
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsEditRepoAutomationRequestTriggersPullRequestLabeledWriteScope {
   Trigger
   Repository
@@ -120500,6 +121116,7 @@ pub impl @json.FromJson for AgentAutomationsEditRepoAutomationRequestTriggersPul
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsEditRepoAutomationRequestTriggersPullRequestMergeConflictWriteScope {
   Trigger
   Repository
@@ -120634,6 +121251,7 @@ pub impl @json.FromJson for AgentAutomationsEditRepoAutomationRequestTriggersPul
 ///|
 ///
 /// Generated string enum AgentAutomationsEditRepoAutomationRequestTriggersPullRequestReviewSubmittedStatesItem.
+#non_exhaustive
 pub(all) enum AgentAutomationsEditRepoAutomationRequestTriggersPullRequestReviewSubmittedStatesItem {
   Approved
   ChangesRequested
@@ -120702,6 +121320,7 @@ pub impl @json.FromJson for AgentAutomationsEditRepoAutomationRequestTriggersPul
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsEditRepoAutomationRequestTriggersPullRequestReviewSubmittedWriteScope {
   Trigger
   Repository
@@ -120844,6 +121463,7 @@ pub impl @json.FromJson for AgentAutomationsEditRepoAutomationRequestTriggersPul
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsEditRepoAutomationRequestTriggersPullRequestReviewRequestedWriteScope {
   Trigger
   Repository
@@ -120978,6 +121598,7 @@ pub impl @json.FromJson for AgentAutomationsEditRepoAutomationRequestTriggersPul
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsEditRepoAutomationRequestTriggersAutomationCompletedWriteScope {
   Trigger
   Repository
@@ -121390,6 +122011,7 @@ pub impl @json.FromJson for AgentAutomationsEditRepoAutomationRequest with fn fr
 ///|
 ///
 /// Who owns the automation. `user` keeps it private to its creator and its runs act as that user. `repository` makes it belong to the repository, visible to anyone with read access to the repository, and its runs act as the Copilot app rather than as a person.
+#non_exhaustive
 pub(all) enum AgentAutomationsEditRepoAutomationResponseOwnerType {
   User
   Repository
@@ -121455,6 +122077,7 @@ pub impl @json.FromJson for AgentAutomationsEditRepoAutomationResponseOwnerType 
 ///|
 ///
 /// Controls which repository resources a run may modify. `trigger` limits writes to the resource that started the run, when one exists, and resources created during the run; `repository` allows writes to any resource in the repository. Supported values: `trigger`, `repository`.
+#non_exhaustive
 pub(all) enum AgentAutomationsEditRepoAutomationResponseWriteScope {
   Trigger
   Repository
@@ -121520,6 +122143,7 @@ pub impl @json.FromJson for AgentAutomationsEditRepoAutomationResponseWriteScope
 ///|
 ///
 /// Generated string enum AgentAutomationsEditRepoAutomationResponseTriggersIntervalCadenceItem.
+#non_exhaustive
 pub(all) enum AgentAutomationsEditRepoAutomationResponseTriggersIntervalCadenceItem {
   Hourly
   Daily
@@ -121588,6 +122212,7 @@ pub impl @json.FromJson for AgentAutomationsEditRepoAutomationResponseTriggersIn
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsEditRepoAutomationResponseTriggersIntervalWriteScope {
   Trigger
   Repository
@@ -121734,6 +122359,7 @@ pub impl @json.FromJson for AgentAutomationsEditRepoAutomationResponseTriggersIn
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsEditRepoAutomationResponseTriggersIssueOpenedWriteScope {
   Trigger
   Repository
@@ -121864,6 +122490,7 @@ pub impl @json.FromJson for AgentAutomationsEditRepoAutomationResponseTriggersIs
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsEditRepoAutomationResponseTriggersIssueLabeledWriteScope {
   Trigger
   Repository
@@ -121998,6 +122625,7 @@ pub impl @json.FromJson for AgentAutomationsEditRepoAutomationResponseTriggersIs
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsEditRepoAutomationResponseTriggersWorkflowRunWriteScope {
   Trigger
   Repository
@@ -122136,6 +122764,7 @@ pub impl @json.FromJson for AgentAutomationsEditRepoAutomationResponseTriggersWo
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsEditRepoAutomationResponseTriggersPullRequestOpenedWriteScope {
   Trigger
   Repository
@@ -122270,6 +122899,7 @@ pub impl @json.FromJson for AgentAutomationsEditRepoAutomationResponseTriggersPu
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsEditRepoAutomationResponseTriggersPullRequestSynchronizeWriteScope {
   Trigger
   Repository
@@ -122404,6 +123034,7 @@ pub impl @json.FromJson for AgentAutomationsEditRepoAutomationResponseTriggersPu
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsEditRepoAutomationResponseTriggersPullRequestMergedWriteScope {
   Trigger
   Repository
@@ -122538,6 +123169,7 @@ pub impl @json.FromJson for AgentAutomationsEditRepoAutomationResponseTriggersPu
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsEditRepoAutomationResponseTriggersIssueCommentWriteScope {
   Trigger
   Repository
@@ -122668,6 +123300,7 @@ pub impl @json.FromJson for AgentAutomationsEditRepoAutomationResponseTriggersIs
 ///|
 ///
 /// Generated string enum AgentAutomationsEditRepoAutomationResponseTriggersPullRequestCommentCommentTypesItem.
+#non_exhaustive
 pub(all) enum AgentAutomationsEditRepoAutomationResponseTriggersPullRequestCommentCommentTypesItem {
   TimelineComment
   ReviewComment
@@ -122733,6 +123366,7 @@ pub impl @json.FromJson for AgentAutomationsEditRepoAutomationResponseTriggersPu
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsEditRepoAutomationResponseTriggersPullRequestCommentWriteScope {
   Trigger
   Repository
@@ -122871,6 +123505,7 @@ pub impl @json.FromJson for AgentAutomationsEditRepoAutomationResponseTriggersPu
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsEditRepoAutomationResponseTriggersDiscussionOpenedWriteScope {
   Trigger
   Repository
@@ -123005,6 +123640,7 @@ pub impl @json.FromJson for AgentAutomationsEditRepoAutomationResponseTriggersDi
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsEditRepoAutomationResponseTriggersDiscussionUpdatedWriteScope {
   Trigger
   Repository
@@ -123139,6 +123775,7 @@ pub impl @json.FromJson for AgentAutomationsEditRepoAutomationResponseTriggersDi
 ///|
 ///
 /// Generated string enum AgentAutomationsEditRepoAutomationResponseTriggersDiscussionCommentCommentTypesItem.
+#non_exhaustive
 pub(all) enum AgentAutomationsEditRepoAutomationResponseTriggersDiscussionCommentCommentTypesItem {
   Comment
   Reply
@@ -123204,6 +123841,7 @@ pub impl @json.FromJson for AgentAutomationsEditRepoAutomationResponseTriggersDi
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsEditRepoAutomationResponseTriggersDiscussionCommentWriteScope {
   Trigger
   Repository
@@ -123346,6 +123984,7 @@ pub impl @json.FromJson for AgentAutomationsEditRepoAutomationResponseTriggersDi
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsEditRepoAutomationResponseTriggersIssueAssignedWriteScope {
   Trigger
   Repository
@@ -123480,6 +124119,7 @@ pub impl @json.FromJson for AgentAutomationsEditRepoAutomationResponseTriggersIs
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsEditRepoAutomationResponseTriggersPullRequestAssignedWriteScope {
   Trigger
   Repository
@@ -123618,6 +124258,7 @@ pub impl @json.FromJson for AgentAutomationsEditRepoAutomationResponseTriggersPu
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsEditRepoAutomationResponseTriggersSubIssueAddedWriteScope {
   Trigger
   Repository
@@ -123748,6 +124389,7 @@ pub impl @json.FromJson for AgentAutomationsEditRepoAutomationResponseTriggersSu
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsEditRepoAutomationResponseTriggersPullRequestReadyForReviewWriteScope {
   Trigger
   Repository
@@ -123882,6 +124524,7 @@ pub impl @json.FromJson for AgentAutomationsEditRepoAutomationResponseTriggersPu
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsEditRepoAutomationResponseTriggersPullRequestLabeledWriteScope {
   Trigger
   Repository
@@ -124020,6 +124663,7 @@ pub impl @json.FromJson for AgentAutomationsEditRepoAutomationResponseTriggersPu
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsEditRepoAutomationResponseTriggersPullRequestMergeConflictWriteScope {
   Trigger
   Repository
@@ -124154,6 +124798,7 @@ pub impl @json.FromJson for AgentAutomationsEditRepoAutomationResponseTriggersPu
 ///|
 ///
 /// Generated string enum AgentAutomationsEditRepoAutomationResponseTriggersPullRequestReviewSubmittedStatesItem.
+#non_exhaustive
 pub(all) enum AgentAutomationsEditRepoAutomationResponseTriggersPullRequestReviewSubmittedStatesItem {
   Approved
   ChangesRequested
@@ -124222,6 +124867,7 @@ pub impl @json.FromJson for AgentAutomationsEditRepoAutomationResponseTriggersPu
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsEditRepoAutomationResponseTriggersPullRequestReviewSubmittedWriteScope {
   Trigger
   Repository
@@ -124364,6 +125010,7 @@ pub impl @json.FromJson for AgentAutomationsEditRepoAutomationResponseTriggersPu
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsEditRepoAutomationResponseTriggersPullRequestReviewRequestedWriteScope {
   Trigger
   Repository
@@ -124498,6 +125145,7 @@ pub impl @json.FromJson for AgentAutomationsEditRepoAutomationResponseTriggersPu
 ///|
 ///
 /// Override the Automation `write_scope` for runs started by this trigger. If omitted, the automation's `write_scope` is used. Organization or repository policy may restrict the effective scope to `trigger`.
+#non_exhaustive
 pub(all) enum AgentAutomationsEditRepoAutomationResponseTriggersAutomationCompletedWriteScope {
   Trigger
   Repository
@@ -124997,6 +125645,7 @@ pub impl @json.FromJson for AgentAutomationsEditRepoAutomationResponse with fn f
 ///|
 ///
 /// Generated string enum AgentTasksListTasksForRepoSort.
+#non_exhaustive
 pub(all) enum AgentTasksListTasksForRepoSort {
   UpdatedAt
   CreatedAt
@@ -125051,6 +125700,7 @@ pub impl @json.FromJson for AgentTasksListTasksForRepoSort with fn from_json(
 ///|
 ///
 /// Generated string enum AgentTasksListTasksForRepoDirection.
+#non_exhaustive
 pub(all) enum AgentTasksListTasksForRepoDirection {
   Asc
   Desc
@@ -125105,6 +125755,7 @@ pub impl @json.FromJson for AgentTasksListTasksForRepoDirection with fn from_jso
 ///|
 ///
 /// Type of the task creator
+#non_exhaustive
 pub(all) enum AgentTasksListTasksForRepoResponseTasksItemCreatorType {
   User
   Organization
@@ -125347,6 +125998,7 @@ pub impl @json.FromJson for AgentTasksListTasksForRepoResponseTasksItemRepositor
 ///|
 ///
 /// Current state of the task, derived from its most recent session
+#non_exhaustive
 pub(all) enum AgentTasksListTasksForRepoResponseTasksItemState {
   Queued
   InProgress
@@ -125430,6 +126082,7 @@ pub impl @json.FromJson for AgentTasksListTasksForRepoResponseTasksItemState wit
 ///|
 ///
 /// Type of artifact. Available Values: `pull`, `branch`.
+#non_exhaustive
 pub(all) enum AgentTasksListTasksForRepoResponseTasksItemArtifactsItemType {
   Pull
   Branch
@@ -125886,6 +126539,7 @@ pub impl @json.FromJson for AgentTasksCreateTaskInRepoRequest with fn from_json(
 ///|
 ///
 /// Type of the task creator
+#non_exhaustive
 pub(all) enum AgentTasksCreateTaskInRepoResponseCreatorType {
   User
   Organization
@@ -126117,6 +126771,7 @@ pub impl @json.FromJson for AgentTasksCreateTaskInRepoResponseRepository with fn
 ///|
 ///
 /// Current state of the task, derived from its most recent session
+#non_exhaustive
 pub(all) enum AgentTasksCreateTaskInRepoResponseState {
   Queued
   InProgress
@@ -126193,6 +126848,7 @@ pub impl @json.FromJson for AgentTasksCreateTaskInRepoResponseState with fn from
 ///|
 ///
 /// Type of artifact. Available Values: `pull`, `branch`.
+#non_exhaustive
 pub(all) enum AgentTasksCreateTaskInRepoResponseArtifactsItemType {
   Pull
   Branch
@@ -126510,6 +127166,7 @@ pub impl @json.FromJson for AgentTasksCreateTaskInRepoResponse with fn from_json
 ///|
 ///
 /// Type of the task creator
+#non_exhaustive
 pub(all) enum AgentTasksGetTaskByRepoAndIdResponseCreatorType {
   User
   Organization
@@ -126745,6 +127402,7 @@ pub impl @json.FromJson for AgentTasksGetTaskByRepoAndIdResponseRepository with 
 ///|
 ///
 /// Current state of the task, derived from its most recent session
+#non_exhaustive
 pub(all) enum AgentTasksGetTaskByRepoAndIdResponseState {
   Queued
   InProgress
@@ -126823,6 +127481,7 @@ pub impl @json.FromJson for AgentTasksGetTaskByRepoAndIdResponseState with fn fr
 ///|
 ///
 /// Type of artifact. Available Values: `pull`, `branch`.
+#non_exhaustive
 pub(all) enum AgentTasksGetTaskByRepoAndIdResponseArtifactsItemType {
   Pull
   Branch
@@ -127188,6 +127847,7 @@ pub impl @json.FromJson for AgentTasksGetTaskByRepoAndIdResponseSessionsItemRepo
 ///|
 ///
 /// Current state of a session
+#non_exhaustive
 pub(all) enum AgentTasksGetTaskByRepoAndIdResponseSessionsItemState {
   Queued
   InProgress
@@ -127271,6 +127931,7 @@ pub impl @json.FromJson for AgentTasksGetTaskByRepoAndIdResponseSessionsItemStat
 ///|
 ///
 /// Billing unit used for this session. New sessions since June 1, 2026 use `ai_credits`, but older sessions use `premium_requests`.
+#non_exhaustive
 pub(all) enum AgentTasksGetTaskByRepoAndIdResponseSessionsItemUsageType {
   AiCredits
   PremiumRequests
@@ -127732,6 +128393,7 @@ pub impl @json.FromJson for AgentTasksGetTaskByRepoAndIdResponse with fn from_js
 ///|
 ///
 /// Generated string enum AgentTasksListTasksSort.
+#non_exhaustive
 pub(all) enum AgentTasksListTasksSort {
   UpdatedAt
   CreatedAt
@@ -127786,6 +128448,7 @@ pub impl @json.FromJson for AgentTasksListTasksSort with fn from_json(
 ///|
 ///
 /// Generated string enum AgentTasksListTasksDirection.
+#non_exhaustive
 pub(all) enum AgentTasksListTasksDirection {
   Asc
   Desc
@@ -127840,6 +128503,7 @@ pub impl @json.FromJson for AgentTasksListTasksDirection with fn from_json(
 ///|
 ///
 /// Type of the task creator
+#non_exhaustive
 pub(all) enum AgentTasksListTasksResponseTasksItemCreatorType {
   User
   Organization
@@ -128075,6 +128739,7 @@ pub impl @json.FromJson for AgentTasksListTasksResponseTasksItemRepository with 
 ///|
 ///
 /// Current state of the task, derived from its most recent session
+#non_exhaustive
 pub(all) enum AgentTasksListTasksResponseTasksItemState {
   Queued
   InProgress
@@ -128153,6 +128818,7 @@ pub impl @json.FromJson for AgentTasksListTasksResponseTasksItemState with fn fr
 ///|
 ///
 /// Type of artifact. Available Values: `pull`, `branch`.
+#non_exhaustive
 pub(all) enum AgentTasksListTasksResponseTasksItemArtifactsItemType {
   Pull
   Branch
@@ -128530,6 +129196,7 @@ pub impl @json.FromJson for AgentTasksListTasksResponse with fn from_json(
 ///|
 ///
 /// Type of the task creator
+#non_exhaustive
 pub(all) enum AgentTasksGetTaskByIdResponseCreatorType {
   User
   Organization
@@ -128747,6 +129414,7 @@ pub impl @json.FromJson for AgentTasksGetTaskByIdResponseRepository with fn from
 ///|
 ///
 /// Current state of the task, derived from its most recent session
+#non_exhaustive
 pub(all) enum AgentTasksGetTaskByIdResponseState {
   Queued
   InProgress
@@ -128819,6 +129487,7 @@ pub impl @json.FromJson for AgentTasksGetTaskByIdResponseState with fn from_json
 ///|
 ///
 /// Type of artifact. Available Values: `pull`, `branch`.
+#non_exhaustive
 pub(all) enum AgentTasksGetTaskByIdResponseArtifactsItemType {
   Pull
   Branch
@@ -129169,6 +129838,7 @@ pub impl @json.FromJson for AgentTasksGetTaskByIdResponseSessionsItemRepository 
 ///|
 ///
 /// Current state of a session
+#non_exhaustive
 pub(all) enum AgentTasksGetTaskByIdResponseSessionsItemState {
   Queued
   InProgress
@@ -129250,6 +129920,7 @@ pub impl @json.FromJson for AgentTasksGetTaskByIdResponseSessionsItemState with 
 ///|
 ///
 /// Billing unit used for this session. New sessions since June 1, 2026 use `ai_credits`, but older sessions use `premium_requests`.
+#non_exhaustive
 pub(all) enum AgentTasksGetTaskByIdResponseSessionsItemUsageType {
   AiCredits
   PremiumRequests
@@ -129762,6 +130433,7 @@ pub impl @json.FromJson for AppsUpdateWebhookConfigForAppRequest with fn from_js
 ///|
 ///
 /// Generated string enum AppsListWebhookDeliveriesStatus.
+#non_exhaustive
 pub(all) enum AppsListWebhookDeliveriesStatus {
   Success
   Failure
@@ -130176,6 +130848,7 @@ pub impl @json.FromJson for CredentialsRevokeRequest with fn from_json(
 ///|
 ///
 /// The enablement status of GitHub Advanced Security features. `enabled` will enable both Code Security and Secret Protection features. > [!WARNING] > `code_security` and `secret_protection` are deprecated values for this field. Prefer the individual `code_security` and `secret_protection` fields to set the status of these features.
+#non_exhaustive
 pub(all) enum CodeSecurityCreateConfigurationForEnterpriseRequestAdvancedSecurity {
   Enabled
   Disabled
@@ -130247,6 +130920,7 @@ pub impl @json.FromJson for CodeSecurityCreateConfigurationForEnterpriseRequestA
 ///|
 ///
 /// The enablement status of GitHub Code Security features.
+#non_exhaustive
 pub(all) enum CodeSecurityCreateConfigurationForEnterpriseRequestCodeSecurity {
   Enabled
   Disabled
@@ -130315,6 +130989,7 @@ pub impl @json.FromJson for CodeSecurityCreateConfigurationForEnterpriseRequestC
 ///|
 ///
 /// The enablement status of Dependency Graph
+#non_exhaustive
 pub(all) enum CodeSecurityCreateConfigurationForEnterpriseRequestDependencyGraph {
   Enabled
   Disabled
@@ -130383,6 +131058,7 @@ pub impl @json.FromJson for CodeSecurityCreateConfigurationForEnterpriseRequestD
 ///|
 ///
 /// The enablement status of Automatic dependency submission
+#non_exhaustive
 pub(all) enum CodeSecurityCreateConfigurationForEnterpriseRequestDependencyGraphAutosubmitAction {
   Enabled
   Disabled
@@ -130510,6 +131186,7 @@ pub impl @json.FromJson for CodeSecurityCreateConfigurationForEnterpriseRequestD
 ///|
 ///
 /// The enablement status of Dependabot alerts
+#non_exhaustive
 pub(all) enum CodeSecurityCreateConfigurationForEnterpriseRequestDependabotAlerts {
   Enabled
   Disabled
@@ -130578,6 +131255,7 @@ pub impl @json.FromJson for CodeSecurityCreateConfigurationForEnterpriseRequestD
 ///|
 ///
 /// The enablement status of Dependabot security updates
+#non_exhaustive
 pub(all) enum CodeSecurityCreateConfigurationForEnterpriseRequestDependabotSecurityUpdates {
   Enabled
   Disabled
@@ -130646,6 +131324,7 @@ pub impl @json.FromJson for CodeSecurityCreateConfigurationForEnterpriseRequestD
 ///|
 ///
 /// The enablement status of code scanning default setup
+#non_exhaustive
 pub(all) enum CodeSecurityCreateConfigurationForEnterpriseRequestCodeScanningDefaultSetup {
   Enabled
   Disabled
@@ -130714,6 +131393,7 @@ pub impl @json.FromJson for CodeSecurityCreateConfigurationForEnterpriseRequestC
 ///|
 ///
 /// The enablement status of code scanning delegated alert dismissal
+#non_exhaustive
 pub(all) enum CodeSecurityCreateConfigurationForEnterpriseRequestCodeScanningDelegatedAlertDismissal {
   Enabled
   Disabled
@@ -130782,6 +131462,7 @@ pub impl @json.FromJson for CodeSecurityCreateConfigurationForEnterpriseRequestC
 ///|
 ///
 /// The enablement status of GitHub Secret Protection features.
+#non_exhaustive
 pub(all) enum CodeSecurityCreateConfigurationForEnterpriseRequestSecretProtection {
   Enabled
   Disabled
@@ -130850,6 +131531,7 @@ pub impl @json.FromJson for CodeSecurityCreateConfigurationForEnterpriseRequestS
 ///|
 ///
 /// The enablement status of secret scanning
+#non_exhaustive
 pub(all) enum CodeSecurityCreateConfigurationForEnterpriseRequestSecretScanning {
   Enabled
   Disabled
@@ -130918,6 +131600,7 @@ pub impl @json.FromJson for CodeSecurityCreateConfigurationForEnterpriseRequestS
 ///|
 ///
 /// The enablement status of secret scanning push protection
+#non_exhaustive
 pub(all) enum CodeSecurityCreateConfigurationForEnterpriseRequestSecretScanningPushProtection {
   Enabled
   Disabled
@@ -130986,6 +131669,7 @@ pub impl @json.FromJson for CodeSecurityCreateConfigurationForEnterpriseRequestS
 ///|
 ///
 /// The enablement status of secret scanning validity checks
+#non_exhaustive
 pub(all) enum CodeSecurityCreateConfigurationForEnterpriseRequestSecretScanningValidityChecks {
   Enabled
   Disabled
@@ -131054,6 +131738,7 @@ pub impl @json.FromJson for CodeSecurityCreateConfigurationForEnterpriseRequestS
 ///|
 ///
 /// The enablement status of secret scanning non provider patterns
+#non_exhaustive
 pub(all) enum CodeSecurityCreateConfigurationForEnterpriseRequestSecretScanningNonProviderPatterns {
   Enabled
   Disabled
@@ -131122,6 +131807,7 @@ pub impl @json.FromJson for CodeSecurityCreateConfigurationForEnterpriseRequestS
 ///|
 ///
 /// The enablement status of Copilot secret scanning
+#non_exhaustive
 pub(all) enum CodeSecurityCreateConfigurationForEnterpriseRequestSecretScanningGenericSecrets {
   Enabled
   Disabled
@@ -131190,6 +131876,7 @@ pub impl @json.FromJson for CodeSecurityCreateConfigurationForEnterpriseRequestS
 ///|
 ///
 /// The enablement status of secret scanning delegated alert dismissal
+#non_exhaustive
 pub(all) enum CodeSecurityCreateConfigurationForEnterpriseRequestSecretScanningDelegatedAlertDismissal {
   Enabled
   Disabled
@@ -131258,6 +131945,7 @@ pub impl @json.FromJson for CodeSecurityCreateConfigurationForEnterpriseRequestS
 ///|
 ///
 /// The enablement status of secret scanning extended metadata
+#non_exhaustive
 pub(all) enum CodeSecurityCreateConfigurationForEnterpriseRequestSecretScanningExtendedMetadata {
   Enabled
   Disabled
@@ -131326,6 +132014,7 @@ pub impl @json.FromJson for CodeSecurityCreateConfigurationForEnterpriseRequestS
 ///|
 ///
 /// The enablement status of private vulnerability reporting
+#non_exhaustive
 pub(all) enum CodeSecurityCreateConfigurationForEnterpriseRequestPrivateVulnerabilityReporting {
   Enabled
   Disabled
@@ -131394,6 +132083,7 @@ pub impl @json.FromJson for CodeSecurityCreateConfigurationForEnterpriseRequestP
 ///|
 ///
 /// The enforcement status for a security configuration
+#non_exhaustive
 pub(all) enum CodeSecurityCreateConfigurationForEnterpriseRequestEnforcement {
   Enforced
   Unenforced
@@ -131688,6 +132378,7 @@ pub impl @json.FromJson for CodeSecurityCreateConfigurationForEnterpriseRequest 
 ///|
 ///
 /// The enablement status of GitHub Advanced Security features. `enabled` will enable both Code Security and Secret Protection features. > [!WARNING] > `code_security` and `secret_protection` are deprecated values for this field. Prefer the individual `code_security` and `secret_protection` fields to set the status of these features.
+#non_exhaustive
 pub(all) enum CodeSecurityUpdateEnterpriseConfigurationRequestAdvancedSecurity {
   Enabled
   Disabled
@@ -131759,6 +132450,7 @@ pub impl @json.FromJson for CodeSecurityUpdateEnterpriseConfigurationRequestAdva
 ///|
 ///
 /// The enablement status of GitHub Code Security features.
+#non_exhaustive
 pub(all) enum CodeSecurityUpdateEnterpriseConfigurationRequestCodeSecurity {
   Enabled
   Disabled
@@ -131827,6 +132519,7 @@ pub impl @json.FromJson for CodeSecurityUpdateEnterpriseConfigurationRequestCode
 ///|
 ///
 /// The enablement status of Dependency Graph
+#non_exhaustive
 pub(all) enum CodeSecurityUpdateEnterpriseConfigurationRequestDependencyGraph {
   Enabled
   Disabled
@@ -131895,6 +132588,7 @@ pub impl @json.FromJson for CodeSecurityUpdateEnterpriseConfigurationRequestDepe
 ///|
 ///
 /// The enablement status of Automatic dependency submission
+#non_exhaustive
 pub(all) enum CodeSecurityUpdateEnterpriseConfigurationRequestDependencyGraphAutosubmitAction {
   Enabled
   Disabled
@@ -132022,6 +132716,7 @@ pub impl @json.FromJson for CodeSecurityUpdateEnterpriseConfigurationRequestDepe
 ///|
 ///
 /// The enablement status of Dependabot alerts
+#non_exhaustive
 pub(all) enum CodeSecurityUpdateEnterpriseConfigurationRequestDependabotAlerts {
   Enabled
   Disabled
@@ -132090,6 +132785,7 @@ pub impl @json.FromJson for CodeSecurityUpdateEnterpriseConfigurationRequestDepe
 ///|
 ///
 /// The enablement status of Dependabot security updates
+#non_exhaustive
 pub(all) enum CodeSecurityUpdateEnterpriseConfigurationRequestDependabotSecurityUpdates {
   Enabled
   Disabled
@@ -132158,6 +132854,7 @@ pub impl @json.FromJson for CodeSecurityUpdateEnterpriseConfigurationRequestDepe
 ///|
 ///
 /// The enablement status of code scanning default setup
+#non_exhaustive
 pub(all) enum CodeSecurityUpdateEnterpriseConfigurationRequestCodeScanningDefaultSetup {
   Enabled
   Disabled
@@ -132226,6 +132923,7 @@ pub impl @json.FromJson for CodeSecurityUpdateEnterpriseConfigurationRequestCode
 ///|
 ///
 /// The enablement status of code scanning delegated alert dismissal
+#non_exhaustive
 pub(all) enum CodeSecurityUpdateEnterpriseConfigurationRequestCodeScanningDelegatedAlertDismissal {
   Enabled
   Disabled
@@ -132294,6 +132992,7 @@ pub impl @json.FromJson for CodeSecurityUpdateEnterpriseConfigurationRequestCode
 ///|
 ///
 /// The enablement status of GitHub Secret Protection features.
+#non_exhaustive
 pub(all) enum CodeSecurityUpdateEnterpriseConfigurationRequestSecretProtection {
   Enabled
   Disabled
@@ -132362,6 +133061,7 @@ pub impl @json.FromJson for CodeSecurityUpdateEnterpriseConfigurationRequestSecr
 ///|
 ///
 /// The enablement status of secret scanning
+#non_exhaustive
 pub(all) enum CodeSecurityUpdateEnterpriseConfigurationRequestSecretScanning {
   Enabled
   Disabled
@@ -132430,6 +133130,7 @@ pub impl @json.FromJson for CodeSecurityUpdateEnterpriseConfigurationRequestSecr
 ///|
 ///
 /// The enablement status of secret scanning push protection
+#non_exhaustive
 pub(all) enum CodeSecurityUpdateEnterpriseConfigurationRequestSecretScanningPushProtection {
   Enabled
   Disabled
@@ -132498,6 +133199,7 @@ pub impl @json.FromJson for CodeSecurityUpdateEnterpriseConfigurationRequestSecr
 ///|
 ///
 /// The enablement status of secret scanning validity checks
+#non_exhaustive
 pub(all) enum CodeSecurityUpdateEnterpriseConfigurationRequestSecretScanningValidityChecks {
   Enabled
   Disabled
@@ -132566,6 +133268,7 @@ pub impl @json.FromJson for CodeSecurityUpdateEnterpriseConfigurationRequestSecr
 ///|
 ///
 /// The enablement status of secret scanning non-provider patterns
+#non_exhaustive
 pub(all) enum CodeSecurityUpdateEnterpriseConfigurationRequestSecretScanningNonProviderPatterns {
   Enabled
   Disabled
@@ -132634,6 +133337,7 @@ pub impl @json.FromJson for CodeSecurityUpdateEnterpriseConfigurationRequestSecr
 ///|
 ///
 /// The enablement status of Copilot secret scanning
+#non_exhaustive
 pub(all) enum CodeSecurityUpdateEnterpriseConfigurationRequestSecretScanningGenericSecrets {
   Enabled
   Disabled
@@ -132702,6 +133406,7 @@ pub impl @json.FromJson for CodeSecurityUpdateEnterpriseConfigurationRequestSecr
 ///|
 ///
 /// The enablement status of secret scanning delegated alert dismissal
+#non_exhaustive
 pub(all) enum CodeSecurityUpdateEnterpriseConfigurationRequestSecretScanningDelegatedAlertDismissal {
   Enabled
   Disabled
@@ -132770,6 +133475,7 @@ pub impl @json.FromJson for CodeSecurityUpdateEnterpriseConfigurationRequestSecr
 ///|
 ///
 /// The enablement status of secret scanning extended metadata
+#non_exhaustive
 pub(all) enum CodeSecurityUpdateEnterpriseConfigurationRequestSecretScanningExtendedMetadata {
   Enabled
   Disabled
@@ -132838,6 +133544,7 @@ pub impl @json.FromJson for CodeSecurityUpdateEnterpriseConfigurationRequestSecr
 ///|
 ///
 /// The enablement status of private vulnerability reporting
+#non_exhaustive
 pub(all) enum CodeSecurityUpdateEnterpriseConfigurationRequestPrivateVulnerabilityReporting {
   Enabled
   Disabled
@@ -132906,6 +133613,7 @@ pub impl @json.FromJson for CodeSecurityUpdateEnterpriseConfigurationRequestPriv
 ///|
 ///
 /// The enforcement status for a security configuration
+#non_exhaustive
 pub(all) enum CodeSecurityUpdateEnterpriseConfigurationRequestEnforcement {
   Enforced
   Unenforced
@@ -133200,6 +133908,7 @@ pub impl @json.FromJson for CodeSecurityUpdateEnterpriseConfigurationRequest wit
 ///|
 ///
 /// The type of repositories to attach the configuration to.
+#non_exhaustive
 pub(all) enum CodeSecurityAttachEnterpriseConfigurationRequestScope {
   All
   AllWithoutConfigurations
@@ -133322,6 +134031,7 @@ pub impl @json.FromJson for CodeSecurityAttachEnterpriseConfigurationRequest wit
 ///|
 ///
 /// Specify which types of repository this security configuration should be applied to by default.
+#non_exhaustive
 pub(all) enum CodeSecuritySetConfigurationAsDefaultForEnterpriseRequestDefaultForNewRepos {
   All
   None
@@ -133456,6 +134166,7 @@ pub impl @json.FromJson for CodeSecuritySetConfigurationAsDefaultForEnterpriseRe
 ///|
 ///
 /// Specifies which types of repository this security configuration is applied to by default.
+#non_exhaustive
 pub(all) enum CodeSecuritySetConfigurationAsDefaultForEnterpriseResponseDefaultForNewRepos {
   All
   None
@@ -133594,6 +134305,7 @@ pub impl @json.FromJson for CodeSecuritySetConfigurationAsDefaultForEnterpriseRe
 ///|
 ///
 /// The policy state for Copilot cloud agent in the enterprise. Can be one of `enabled_for_all_orgs`, `disabled_for_all_orgs`, `enabled_for_selected_orgs`, or `configured_by_org_admins`.
+#non_exhaustive
 pub(all) enum CopilotSetEnterpriseCodingAgentPolicyRequestPolicyState {
   EnabledForAllOrgs
   DisabledForAllOrgs
@@ -133988,6 +134700,7 @@ pub impl @json.FromJson for CopilotRemoveOrganizationsFromEnterpriseCodingAgentP
 ///|
 ///
 /// Generated untagged union DependabotListAlertsForEnterpriseHas.
+#non_exhaustive
 pub(all) enum DependabotListAlertsForEnterpriseHas {
   Text(String)
   TextArray(Array[String])
@@ -134040,6 +134753,7 @@ pub impl @json.FromJson for DependabotListAlertsForEnterpriseHas with fn from_js
 ///|
 ///
 /// Generated string enum DependabotListAlertsForEnterpriseScope.
+#non_exhaustive
 pub(all) enum DependabotListAlertsForEnterpriseScope {
   Development
   Runtime
@@ -134096,6 +134810,7 @@ pub impl @json.FromJson for DependabotListAlertsForEnterpriseScope with fn from_
 ///|
 ///
 /// Generated string enum DependabotListAlertsForEnterpriseSort.
+#non_exhaustive
 pub(all) enum DependabotListAlertsForEnterpriseSort {
   Created
   Updated
@@ -134155,6 +134870,7 @@ pub impl @json.FromJson for DependabotListAlertsForEnterpriseSort with fn from_j
 ///|
 ///
 /// Generated string enum DependabotListAlertsForEnterpriseDirection.
+#non_exhaustive
 pub(all) enum DependabotListAlertsForEnterpriseDirection {
   Asc
   Desc
@@ -134287,6 +135003,7 @@ pub impl @json.FromJson for DependabotUpdateRepositoryAccessForEnterpriseRequest
 ///|
 ///
 /// The default repository access level for Dependabot updates.
+#non_exhaustive
 pub(all) enum DependabotSetRepositoryAccessDefaultLevelForEnterpriseRequestDefaultLevel {
   Public
   Internal
@@ -134455,6 +135172,7 @@ pub impl @json.FromJson for GistsCreateRequestFilesValue with fn from_json(
 ///|
 ///
 /// Generated string enum GistsCreateRequestPublicText.
+#non_exhaustive
 pub(all) enum GistsCreateRequestPublicText {
   True
   False
@@ -134509,6 +135227,7 @@ pub impl @json.FromJson for GistsCreateRequestPublicText with fn from_json(
 ///|
 ///
 /// Generated untagged union GistsCreateRequestPublic.
+#non_exhaustive
 pub(all) enum GistsCreateRequestPublic {
   Bool(Bool)
   Text(GistsCreateRequestPublicText)
@@ -134891,6 +135610,7 @@ pub impl @json.FromJson for AppsListReposAccessibleToInstallationResponseReposit
 ///|
 ///
 /// The policy controlling who can create pull requests: all or collaborators_only.
+#non_exhaustive
 pub(all) enum AppsListReposAccessibleToInstallationResponseRepositoriesItemPullRequestCreationPolicy {
   All
   CollaboratorsOnly
@@ -134956,6 +135676,7 @@ pub impl @json.FromJson for AppsListReposAccessibleToInstallationResponseReposit
 ///|
 ///
 /// The default value for a squash merge commit title: - `PR_TITLE` - default to the pull request's title. - `COMMIT_OR_PR_TITLE` - default to the commit's title (if only one commit) or the pull request's title (when more than one commit).
+#non_exhaustive
 pub(all) enum AppsListReposAccessibleToInstallationResponseRepositoriesItemSquashMergeCommitTitle {
   PRTITLE
   COMMITORPRTITLE
@@ -135021,6 +135742,7 @@ pub impl @json.FromJson for AppsListReposAccessibleToInstallationResponseReposit
 ///|
 ///
 /// The default value for a squash merge commit message: - `PR_BODY` - default to the pull request's body. - `COMMIT_MESSAGES` - default to the branch's commit messages. - `BLANK` - default to a blank commit message.
+#non_exhaustive
 pub(all) enum AppsListReposAccessibleToInstallationResponseRepositoriesItemSquashMergeCommitMessage {
   PRBODY
   COMMITMESSAGES
@@ -135089,6 +135811,7 @@ pub impl @json.FromJson for AppsListReposAccessibleToInstallationResponseReposit
 ///|
 ///
 /// The default value for a merge commit title. - `PR_TITLE` - default to the pull request's title. - `MERGE_MESSAGE` - default to the classic title for a merge message (e.g., Merge pull request #123 from branch-name).
+#non_exhaustive
 pub(all) enum AppsListReposAccessibleToInstallationResponseRepositoriesItemMergeCommitTitle {
   PRTITLE
   MERGEMESSAGE
@@ -135154,6 +135877,7 @@ pub impl @json.FromJson for AppsListReposAccessibleToInstallationResponseReposit
 ///|
 ///
 /// The default value for a merge commit message. - `PR_TITLE` - default to the pull request's title. - `PR_BODY` - default to the pull request's body. - `BLANK` - default to a blank commit message.
+#non_exhaustive
 pub(all) enum AppsListReposAccessibleToInstallationResponseRepositoriesItemMergeCommitMessage {
   PRBODY
   PRTITLE
@@ -135939,6 +136663,7 @@ pub impl @json.FromJson for AppsListReposAccessibleToInstallationResponse with f
 ///|
 ///
 /// Generated string enum IssuesListFilter.
+#non_exhaustive
 pub(all) enum IssuesListFilter {
   Assigned
   Created
@@ -136002,6 +136727,7 @@ pub impl @json.FromJson for IssuesListFilter with fn from_json(value, path) {
 ///|
 ///
 /// Generated string enum IssuesListState.
+#non_exhaustive
 pub(all) enum IssuesListState {
   Open
   Closed
@@ -136056,6 +136782,7 @@ pub impl @json.FromJson for IssuesListState with fn from_json(value, path) {
 ///|
 ///
 /// Generated string enum IssuesListSort.
+#non_exhaustive
 pub(all) enum IssuesListSort {
   Created
   Updated
@@ -136110,6 +136837,7 @@ pub impl @json.FromJson for IssuesListSort with fn from_json(value, path) {
 ///|
 ///
 /// Generated string enum IssuesListDirection.
+#non_exhaustive
 pub(all) enum IssuesListDirection {
   Asc
   Desc
@@ -136161,6 +136889,7 @@ pub impl @json.FromJson for IssuesListDirection with fn from_json(value, path) {
 ///|
 ///
 /// The rendering mode.
+#non_exhaustive
 pub(all) enum MarkdownRenderRequestMode {
   Markdown
   Gfm
@@ -136270,6 +136999,7 @@ pub impl @json.FromJson for MarkdownRenderRequest with fn from_json(value, path)
 ///|
 ///
 /// Generated string enum AppsListAccountsForPlanSort.
+#non_exhaustive
 pub(all) enum AppsListAccountsForPlanSort {
   Created
   Updated
@@ -136324,6 +137054,7 @@ pub impl @json.FromJson for AppsListAccountsForPlanSort with fn from_json(
 ///|
 ///
 /// Generated string enum AppsListAccountsForPlanDirection.
+#non_exhaustive
 pub(all) enum AppsListAccountsForPlanDirection {
   Asc
   Desc
@@ -136378,6 +137109,7 @@ pub impl @json.FromJson for AppsListAccountsForPlanDirection with fn from_json(
 ///|
 ///
 /// Generated string enum AppsListAccountsForPlanStubbedSort.
+#non_exhaustive
 pub(all) enum AppsListAccountsForPlanStubbedSort {
   Created
   Updated
@@ -136432,6 +137164,7 @@ pub impl @json.FromJson for AppsListAccountsForPlanStubbedSort with fn from_json
 ///|
 ///
 /// Generated string enum AppsListAccountsForPlanStubbedDirection.
+#non_exhaustive
 pub(all) enum AppsListAccountsForPlanStubbedDirection {
   Asc
   Desc
@@ -136642,6 +137375,7 @@ pub impl @json.FromJson for ActivitySetThreadSubscriptionRequest with fn from_js
 ///|
 ///
 /// Generated string enum BillingGetAllBudgetsOrgScope.
+#non_exhaustive
 pub(all) enum BillingGetAllBudgetsOrgScope {
   Enterprise
   Organization
@@ -136773,6 +137507,7 @@ pub impl @json.FromJson for BillingCreateOrganizationBudgetRequestBudgetAlerting
 ///|
 ///
 /// The scope of the budget for this organization. - `organization`: Apply the budget to the organization. - `repository`: Apply the budget to a specific repository in the organization. - `multi_user_customer`: Apply a universal budget to all users in the organization. - `user`: Apply the budget to a single user in the organization. `user` and `multi_user_customer` scopes are only supported when `budget_product_sku` is `ai_credits` or `premium_requests`.
+#non_exhaustive
 pub(all) enum BillingCreateOrganizationBudgetRequestBudgetScope {
   Organization
   Repository
@@ -136844,6 +137579,7 @@ pub impl @json.FromJson for BillingCreateOrganizationBudgetRequestBudgetScope wi
 ///|
 ///
 /// The type of pricing model used by the budget. Determines how `budget_product_sku` is interpreted. - `BundlePricing`: Covers all AI credit SKUs. Set `budget_product_sku` to `ai_credits`. - `ProductPricing`: Covers all SKUs that belong to a product. Set `budget_product_sku` to a product such as `actions` or `packages`. - `SkuPricing`: Covers a single, specific SKU. Set `budget_product_sku` to a SKU such as `actions_linux`.
+#non_exhaustive
 pub(all) enum BillingCreateOrganizationBudgetRequestBudgetType {
   BundlePricing
   ProductPricing
@@ -137071,6 +137807,7 @@ pub impl @json.FromJson for BillingUpdateBudgetOrgRequestBudgetAlerting with fn 
 ///|
 ///
 /// The date the budget will expire in `YYYY-MM-DD` format. Only dates in the future are accepted. If not set, the budget will not expire. Setting to `null` or `0` will remove the expiration date from a budget if set. Only supported for existing user-scoped budgets.
+#non_exhaustive
 pub(all) enum BillingUpdateBudgetOrgRequestExpiresAt {
   Text(String)
   Int(Int32)
@@ -137189,6 +137926,7 @@ pub impl @json.FromJson for BillingUpdateBudgetOrgRequest with fn from_json(
 ///|
 ///
 /// Default permission level members have for organization repositories.
+#non_exhaustive
 pub(all) enum OrgsUpdateRequestDefaultRepositoryPermission {
   Read
   Write
@@ -137258,6 +137996,7 @@ pub impl @json.FromJson for OrgsUpdateRequestDefaultRepositoryPermission with fn
 ///|
 ///
 /// Specifies which types of repositories non-admin organization members can create. `private` is only available to repositories that are part of an organization on GitHub Enterprise Cloud. **Note:** This parameter is closing down and will be removed in the future. Its return value ignores internal repositories. Using this parameter overrides values set in `members_can_create_repositories`. See the parameter deprecation notice in the operation description for details.
+#non_exhaustive
 pub(all) enum OrgsUpdateRequestMembersAllowedRepositoryCreationType {
   All
   Private
@@ -137732,6 +138471,7 @@ pub impl @json.FromJson for ActionsListHostedRunnersForOrgResponse with fn from_
 ///|
 ///
 /// The source of the runner image.
+#non_exhaustive
 pub(all) enum ActionsCreateHostedRunnerForOrgRequestImageSource {
   Github
   Partner
@@ -138328,6 +139068,7 @@ pub impl @json.FromJson for ActionsGetHostedRunnersPlatformsForOrgResponse with 
 ///|
 ///
 /// The source type of the runner image to use. Must match the source of the image specified by `image_id`. Can be one of `github`, `partner`, or `custom`.
+#non_exhaustive
 pub(all) enum ActionsUpdateHostedRunnerForOrgRequestImageSource {
   Github
   Partner
@@ -138752,6 +139493,7 @@ pub impl @json.FromJson for ActionsSetSelectedRepositoriesEnabledGithubActionsOr
 ///|
 ///
 /// The policy that controls whether self-hosted runners can be used in the organization
+#non_exhaustive
 pub(all) enum ActionsSetSelfHostedRunnersPermissionsOrganizationRequestEnabledRepositories {
   All
   Selected
@@ -139250,6 +139992,7 @@ pub impl @json.FromJson for ActionsListSelfHostedRunnerGroupsForOrgResponse with
 ///|
 ///
 /// Visibility of a runner group. You can select all repositories, select individual repositories, or limit access to private repositories.
+#non_exhaustive
 pub(all) enum ActionsCreateSelfHostedRunnerGroupForOrgRequestVisibility {
   Selected
   All
@@ -139424,6 +140167,7 @@ pub impl @json.FromJson for ActionsCreateSelfHostedRunnerGroupForOrgRequest with
 ///|
 ///
 /// Visibility of a runner group. You can select all repositories, select individual repositories, or all private repositories.
+#non_exhaustive
 pub(all) enum ActionsUpdateSelfHostedRunnerGroupForOrgRequestVisibility {
   Selected
   All
@@ -140284,6 +141028,7 @@ pub impl @json.FromJson for ActionsListOrgSecretsResponse with fn from_json(
 ///|
 ///
 /// Which type of organization repositories have access to the organization secret. `selected` means only the repositories specified by `selected_repository_ids` can access the secret.
+#non_exhaustive
 pub(all) enum ActionsCreateOrUpdateOrgSecretRequestVisibility {
   All
   Private
@@ -140596,6 +141341,7 @@ pub impl @json.FromJson for ActionsListOrgVariablesResponse with fn from_json(
 ///|
 ///
 /// The type of repositories in the organization that can access the variable. `selected` means only the repositories specified by `selected_repository_ids` can access the variable.
+#non_exhaustive
 pub(all) enum ActionsCreateOrgVariableRequestVisibility {
   All
   Private
@@ -140723,6 +141469,7 @@ pub impl @json.FromJson for ActionsCreateOrgVariableRequest with fn from_json(
 ///|
 ///
 /// The type of repositories in the organization that can access the variable. `selected` means only the repositories specified by `selected_repository_ids` can access the variable.
+#non_exhaustive
 pub(all) enum ActionsUpdateOrgVariableRequestVisibility {
   All
   Private
@@ -141028,6 +141775,7 @@ pub impl @json.FromJson for AgentsListOrgSecretsResponse with fn from_json(
 ///|
 ///
 /// Which type of organization repositories have access to the organization secret. `selected` means only the repositories specified by `selected_repository_ids` can access the secret.
+#non_exhaustive
 pub(all) enum AgentsCreateOrUpdateOrgSecretRequestVisibility {
   All
   Private
@@ -141333,6 +142081,7 @@ pub impl @json.FromJson for AgentsListOrgVariablesResponse with fn from_json(
 ///|
 ///
 /// The type of repositories in the organization that can access the variable. `selected` means only the repositories specified by `selected_repository_ids` can access the variable.
+#non_exhaustive
 pub(all) enum AgentsCreateOrgVariableRequestVisibility {
   All
   Private
@@ -141458,6 +142207,7 @@ pub impl @json.FromJson for AgentsCreateOrgVariableRequest with fn from_json(
 ///|
 ///
 /// The type of repositories in the organization that can access the variable. `selected` means only the repositories specified by `selected_repository_ids` can access the variable.
+#non_exhaustive
 pub(all) enum AgentsUpdateOrgVariableRequestVisibility {
   All
   Private
@@ -141707,6 +142457,7 @@ pub impl @json.FromJson for AgentsSetSelectedReposForOrgVariableRequest with fn 
 ///|
 ///
 /// The status of the artifact. Can be either deployed or decommissioned.
+#non_exhaustive
 pub(all) enum OrgsCreateArtifactDeploymentRecordRequestStatus {
   Deployed
   Decommissioned
@@ -141772,6 +142523,7 @@ pub impl @json.FromJson for OrgsCreateArtifactDeploymentRecordRequestStatus with
 ///|
 ///
 /// Generated string enum OrgsCreateArtifactDeploymentRecordRequestRuntimeRisksItem.
+#non_exhaustive
 pub(all) enum OrgsCreateArtifactDeploymentRecordRequestRuntimeRisksItem {
   CriticalResource
   InternetExposed
@@ -142023,6 +142775,7 @@ pub impl @json.FromJson for OrgsCreateArtifactDeploymentRecordResponse with fn f
 ///|
 ///
 /// The deployment status of the artifact.
+#non_exhaustive
 pub(all) enum OrgsSetClusterDeploymentRecordsRequestDeploymentsItemStatus {
   Deployed
   Decommissioned
@@ -142088,6 +142841,7 @@ pub impl @json.FromJson for OrgsSetClusterDeploymentRecordsRequestDeploymentsIte
 ///|
 ///
 /// Generated string enum OrgsSetClusterDeploymentRecordsRequestDeploymentsItemRuntimeRisksItem.
+#non_exhaustive
 pub(all) enum OrgsSetClusterDeploymentRecordsRequestDeploymentsItemRuntimeRisksItem {
   CriticalResource
   InternetExposed
@@ -142393,6 +143147,7 @@ pub impl @json.FromJson for OrgsSetClusterDeploymentRecordsResponse with fn from
 ///|
 ///
 /// The deployment status of the artifact.
+#non_exhaustive
 pub(all) enum OrgsCreateClusterDeploymentRecordsJobRequestDeploymentsItemStatus {
   Deployed
   Decommissioned
@@ -142458,6 +143213,7 @@ pub impl @json.FromJson for OrgsCreateClusterDeploymentRecordsJobRequestDeployme
 ///|
 ///
 /// Generated string enum OrgsCreateClusterDeploymentRecordsJobRequestDeploymentsItemRuntimeRisksItem.
+#non_exhaustive
 pub(all) enum OrgsCreateClusterDeploymentRecordsJobRequestDeploymentsItemRuntimeRisksItem {
   CriticalResource
   InternetExposed
@@ -142765,6 +143521,7 @@ pub impl @json.FromJson for OrgsCreateClusterDeploymentRecordsJobResponse with f
 ///|
 ///
 /// The current status of the job.
+#non_exhaustive
 pub(all) enum OrgsGetClusterDeploymentRecordsJobResponseStatus {
   Pending
   Processing
@@ -142911,6 +143668,7 @@ pub impl @json.FromJson for OrgsGetClusterDeploymentRecordsJobResponse with fn f
 ///|
 ///
 /// The status of the artifact (e.g., active, inactive).
+#non_exhaustive
 pub(all) enum OrgsCreateArtifactStorageRecordRequestStatus {
   Active
   Eol
@@ -144038,6 +144796,7 @@ pub impl @json.FromJson for OrgsListAttestationsResponse with fn from_json(
 ///|
 ///
 /// Generated string enum CampaignsListOrgCampaignsDirection.
+#non_exhaustive
 pub(all) enum CampaignsListOrgCampaignsDirection {
   Asc
   Desc
@@ -144092,6 +144851,7 @@ pub impl @json.FromJson for CampaignsListOrgCampaignsDirection with fn from_json
 ///|
 ///
 /// Generated string enum CampaignsListOrgCampaignsSort.
+#non_exhaustive
 pub(all) enum CampaignsListOrgCampaignsSort {
   Created
   Updated
@@ -144392,6 +145152,7 @@ pub impl @json.FromJson for CampaignsUpdateCampaignRequest with fn from_json(
 ///|
 ///
 /// Generated string enum CodeScanningListAlertsForOrgDirection.
+#non_exhaustive
 pub(all) enum CodeScanningListAlertsForOrgDirection {
   Asc
   Desc
@@ -144448,6 +145209,7 @@ pub impl @json.FromJson for CodeScanningListAlertsForOrgDirection with fn from_j
 ///|
 ///
 /// Generated string enum CodeScanningListAlertsForOrgSort.
+#non_exhaustive
 pub(all) enum CodeScanningListAlertsForOrgSort {
   Created
   Updated
@@ -144502,6 +145264,7 @@ pub impl @json.FromJson for CodeScanningListAlertsForOrgSort with fn from_json(
 ///|
 ///
 /// Generated string enum CodeSecurityGetConfigurationsForOrgTargetType.
+#non_exhaustive
 pub(all) enum CodeSecurityGetConfigurationsForOrgTargetType {
   Global
   All
@@ -144565,6 +145328,7 @@ pub impl @json.FromJson for CodeSecurityGetConfigurationsForOrgTargetType with f
 ///|
 ///
 /// The enablement status of GitHub Advanced Security features. `enabled` will enable both Code Security and Secret Protection features. > [!WARNING] > `code_security` and `secret_protection` are deprecated values for this field. Prefer the individual `code_security` and `secret_protection` fields to set the status of these features.
+#non_exhaustive
 pub(all) enum CodeSecurityCreateConfigurationRequestAdvancedSecurity {
   Enabled
   Disabled
@@ -144636,6 +145400,7 @@ pub impl @json.FromJson for CodeSecurityCreateConfigurationRequestAdvancedSecuri
 ///|
 ///
 /// The enablement status of GitHub Code Security features.
+#non_exhaustive
 pub(all) enum CodeSecurityCreateConfigurationRequestCodeSecurity {
   Enabled
   Disabled
@@ -144704,6 +145469,7 @@ pub impl @json.FromJson for CodeSecurityCreateConfigurationRequestCodeSecurity w
 ///|
 ///
 /// The enablement status of Dependency Graph
+#non_exhaustive
 pub(all) enum CodeSecurityCreateConfigurationRequestDependencyGraph {
   Enabled
   Disabled
@@ -144772,6 +145538,7 @@ pub impl @json.FromJson for CodeSecurityCreateConfigurationRequestDependencyGrap
 ///|
 ///
 /// The enablement status of Automatic dependency submission
+#non_exhaustive
 pub(all) enum CodeSecurityCreateConfigurationRequestDependencyGraphAutosubmitAction {
   Enabled
   Disabled
@@ -144899,6 +145666,7 @@ pub impl @json.FromJson for CodeSecurityCreateConfigurationRequestDependencyGrap
 ///|
 ///
 /// The enablement status of Dependabot alerts
+#non_exhaustive
 pub(all) enum CodeSecurityCreateConfigurationRequestDependabotAlerts {
   Enabled
   Disabled
@@ -144967,6 +145735,7 @@ pub impl @json.FromJson for CodeSecurityCreateConfigurationRequestDependabotAler
 ///|
 ///
 /// The enablement status of Dependabot security updates
+#non_exhaustive
 pub(all) enum CodeSecurityCreateConfigurationRequestDependabotSecurityUpdates {
   Enabled
   Disabled
@@ -145035,6 +145804,7 @@ pub impl @json.FromJson for CodeSecurityCreateConfigurationRequestDependabotSecu
 ///|
 ///
 /// The enablement status of Dependabot delegated alert dismissal. Requires Dependabot alerts to be enabled.
+#non_exhaustive
 pub(all) enum CodeSecurityCreateConfigurationRequestDependabotDelegatedAlertDismissal {
   Enabled
   Disabled
@@ -145103,6 +145873,7 @@ pub impl @json.FromJson for CodeSecurityCreateConfigurationRequestDependabotDele
 ///|
 ///
 /// The enablement status of code scanning default setup
+#non_exhaustive
 pub(all) enum CodeSecurityCreateConfigurationRequestCodeScanningDefaultSetup {
   Enabled
   Disabled
@@ -145171,6 +145942,7 @@ pub impl @json.FromJson for CodeSecurityCreateConfigurationRequestCodeScanningDe
 ///|
 ///
 /// The enablement status of code scanning delegated alert dismissal
+#non_exhaustive
 pub(all) enum CodeSecurityCreateConfigurationRequestCodeScanningDelegatedAlertDismissal {
   Enabled
   Disabled
@@ -145239,6 +146011,7 @@ pub impl @json.FromJson for CodeSecurityCreateConfigurationRequestCodeScanningDe
 ///|
 ///
 /// The enablement status of GitHub Secret Protection features.
+#non_exhaustive
 pub(all) enum CodeSecurityCreateConfigurationRequestSecretProtection {
   Enabled
   Disabled
@@ -145307,6 +146080,7 @@ pub impl @json.FromJson for CodeSecurityCreateConfigurationRequestSecretProtecti
 ///|
 ///
 /// The enablement status of secret scanning
+#non_exhaustive
 pub(all) enum CodeSecurityCreateConfigurationRequestSecretScanning {
   Enabled
   Disabled
@@ -145375,6 +146149,7 @@ pub impl @json.FromJson for CodeSecurityCreateConfigurationRequestSecretScanning
 ///|
 ///
 /// The enablement status of secret scanning push protection
+#non_exhaustive
 pub(all) enum CodeSecurityCreateConfigurationRequestSecretScanningPushProtection {
   Enabled
   Disabled
@@ -145443,6 +146218,7 @@ pub impl @json.FromJson for CodeSecurityCreateConfigurationRequestSecretScanning
 ///|
 ///
 /// The enablement status of secret scanning delegated bypass
+#non_exhaustive
 pub(all) enum CodeSecurityCreateConfigurationRequestSecretScanningDelegatedBypass {
   Enabled
   Disabled
@@ -145511,6 +146287,7 @@ pub impl @json.FromJson for CodeSecurityCreateConfigurationRequestSecretScanning
 ///|
 ///
 /// The type of the bypass reviewer
+#non_exhaustive
 pub(all) enum CodeSecurityCreateConfigurationRequestSecretScanningDelegatedBypassOptionsReviewersItemReviewerType {
   TEAM
   ROLE
@@ -145576,6 +146353,7 @@ pub impl @json.FromJson for CodeSecurityCreateConfigurationRequestSecretScanning
 ///|
 ///
 /// The bypass mode for the reviewer
+#non_exhaustive
 pub(all) enum CodeSecurityCreateConfigurationRequestSecretScanningDelegatedBypassOptionsReviewersItemMode {
   ALWAYS
   EXEMPT
@@ -145771,6 +146549,7 @@ pub impl @json.FromJson for CodeSecurityCreateConfigurationRequestSecretScanning
 ///|
 ///
 /// The enablement status of secret scanning validity checks
+#non_exhaustive
 pub(all) enum CodeSecurityCreateConfigurationRequestSecretScanningValidityChecks {
   Enabled
   Disabled
@@ -145839,6 +146618,7 @@ pub impl @json.FromJson for CodeSecurityCreateConfigurationRequestSecretScanning
 ///|
 ///
 /// The enablement status of secret scanning non provider patterns
+#non_exhaustive
 pub(all) enum CodeSecurityCreateConfigurationRequestSecretScanningNonProviderPatterns {
   Enabled
   Disabled
@@ -145907,6 +146687,7 @@ pub impl @json.FromJson for CodeSecurityCreateConfigurationRequestSecretScanning
 ///|
 ///
 /// The enablement status of Copilot secret scanning
+#non_exhaustive
 pub(all) enum CodeSecurityCreateConfigurationRequestSecretScanningGenericSecrets {
   Enabled
   Disabled
@@ -145975,6 +146756,7 @@ pub impl @json.FromJson for CodeSecurityCreateConfigurationRequestSecretScanning
 ///|
 ///
 /// The enablement status of secret scanning delegated alert dismissal
+#non_exhaustive
 pub(all) enum CodeSecurityCreateConfigurationRequestSecretScanningDelegatedAlertDismissal {
   Enabled
   Disabled
@@ -146043,6 +146825,7 @@ pub impl @json.FromJson for CodeSecurityCreateConfigurationRequestSecretScanning
 ///|
 ///
 /// The enablement status of secret scanning extended metadata
+#non_exhaustive
 pub(all) enum CodeSecurityCreateConfigurationRequestSecretScanningExtendedMetadata {
   Enabled
   Disabled
@@ -146111,6 +146894,7 @@ pub impl @json.FromJson for CodeSecurityCreateConfigurationRequestSecretScanning
 ///|
 ///
 /// The enablement status of private vulnerability reporting
+#non_exhaustive
 pub(all) enum CodeSecurityCreateConfigurationRequestPrivateVulnerabilityReporting {
   Enabled
   Disabled
@@ -146179,6 +146963,7 @@ pub impl @json.FromJson for CodeSecurityCreateConfigurationRequestPrivateVulnera
 ///|
 ///
 /// The enforcement status for a security configuration
+#non_exhaustive
 pub(all) enum CodeSecurityCreateConfigurationRequestEnforcement {
   Enforced
   Unenforced
@@ -146545,6 +147330,7 @@ pub impl @json.FromJson for CodeSecurityDetachConfigurationRequest with fn from_
 ///|
 ///
 /// The enablement status of GitHub Advanced Security features. `enabled` will enable both Code Security and Secret Protection features. > [!WARNING] > `code_security` and `secret_protection` are deprecated values for this field. Prefer the individual `code_security` and `secret_protection` fields to set the status of these features.
+#non_exhaustive
 pub(all) enum CodeSecurityUpdateConfigurationRequestAdvancedSecurity {
   Enabled
   Disabled
@@ -146616,6 +147402,7 @@ pub impl @json.FromJson for CodeSecurityUpdateConfigurationRequestAdvancedSecuri
 ///|
 ///
 /// The enablement status of GitHub Code Security features.
+#non_exhaustive
 pub(all) enum CodeSecurityUpdateConfigurationRequestCodeSecurity {
   Enabled
   Disabled
@@ -146684,6 +147471,7 @@ pub impl @json.FromJson for CodeSecurityUpdateConfigurationRequestCodeSecurity w
 ///|
 ///
 /// The enablement status of Dependency Graph
+#non_exhaustive
 pub(all) enum CodeSecurityUpdateConfigurationRequestDependencyGraph {
   Enabled
   Disabled
@@ -146752,6 +147540,7 @@ pub impl @json.FromJson for CodeSecurityUpdateConfigurationRequestDependencyGrap
 ///|
 ///
 /// The enablement status of Automatic dependency submission
+#non_exhaustive
 pub(all) enum CodeSecurityUpdateConfigurationRequestDependencyGraphAutosubmitAction {
   Enabled
   Disabled
@@ -146879,6 +147668,7 @@ pub impl @json.FromJson for CodeSecurityUpdateConfigurationRequestDependencyGrap
 ///|
 ///
 /// The enablement status of Dependabot alerts
+#non_exhaustive
 pub(all) enum CodeSecurityUpdateConfigurationRequestDependabotAlerts {
   Enabled
   Disabled
@@ -146947,6 +147737,7 @@ pub impl @json.FromJson for CodeSecurityUpdateConfigurationRequestDependabotAler
 ///|
 ///
 /// The enablement status of Dependabot security updates
+#non_exhaustive
 pub(all) enum CodeSecurityUpdateConfigurationRequestDependabotSecurityUpdates {
   Enabled
   Disabled
@@ -147015,6 +147806,7 @@ pub impl @json.FromJson for CodeSecurityUpdateConfigurationRequestDependabotSecu
 ///|
 ///
 /// The enablement status of Dependabot delegated alert dismissal. Requires Dependabot alerts to be enabled.
+#non_exhaustive
 pub(all) enum CodeSecurityUpdateConfigurationRequestDependabotDelegatedAlertDismissal {
   Enabled
   Disabled
@@ -147083,6 +147875,7 @@ pub impl @json.FromJson for CodeSecurityUpdateConfigurationRequestDependabotDele
 ///|
 ///
 /// The enablement status of code scanning default setup
+#non_exhaustive
 pub(all) enum CodeSecurityUpdateConfigurationRequestCodeScanningDefaultSetup {
   Enabled
   Disabled
@@ -147151,6 +147944,7 @@ pub impl @json.FromJson for CodeSecurityUpdateConfigurationRequestCodeScanningDe
 ///|
 ///
 /// The enablement status of code scanning delegated alert dismissal
+#non_exhaustive
 pub(all) enum CodeSecurityUpdateConfigurationRequestCodeScanningDelegatedAlertDismissal {
   Enabled
   Disabled
@@ -147219,6 +148013,7 @@ pub impl @json.FromJson for CodeSecurityUpdateConfigurationRequestCodeScanningDe
 ///|
 ///
 /// The enablement status of GitHub Secret Protection features.
+#non_exhaustive
 pub(all) enum CodeSecurityUpdateConfigurationRequestSecretProtection {
   Enabled
   Disabled
@@ -147287,6 +148082,7 @@ pub impl @json.FromJson for CodeSecurityUpdateConfigurationRequestSecretProtecti
 ///|
 ///
 /// The enablement status of secret scanning
+#non_exhaustive
 pub(all) enum CodeSecurityUpdateConfigurationRequestSecretScanning {
   Enabled
   Disabled
@@ -147355,6 +148151,7 @@ pub impl @json.FromJson for CodeSecurityUpdateConfigurationRequestSecretScanning
 ///|
 ///
 /// The enablement status of secret scanning push protection
+#non_exhaustive
 pub(all) enum CodeSecurityUpdateConfigurationRequestSecretScanningPushProtection {
   Enabled
   Disabled
@@ -147423,6 +148220,7 @@ pub impl @json.FromJson for CodeSecurityUpdateConfigurationRequestSecretScanning
 ///|
 ///
 /// The enablement status of secret scanning delegated bypass
+#non_exhaustive
 pub(all) enum CodeSecurityUpdateConfigurationRequestSecretScanningDelegatedBypass {
   Enabled
   Disabled
@@ -147491,6 +148289,7 @@ pub impl @json.FromJson for CodeSecurityUpdateConfigurationRequestSecretScanning
 ///|
 ///
 /// The type of the bypass reviewer
+#non_exhaustive
 pub(all) enum CodeSecurityUpdateConfigurationRequestSecretScanningDelegatedBypassOptionsReviewersItemReviewerType {
   TEAM
   ROLE
@@ -147556,6 +148355,7 @@ pub impl @json.FromJson for CodeSecurityUpdateConfigurationRequestSecretScanning
 ///|
 ///
 /// The bypass mode for the reviewer
+#non_exhaustive
 pub(all) enum CodeSecurityUpdateConfigurationRequestSecretScanningDelegatedBypassOptionsReviewersItemMode {
   ALWAYS
   EXEMPT
@@ -147751,6 +148551,7 @@ pub impl @json.FromJson for CodeSecurityUpdateConfigurationRequestSecretScanning
 ///|
 ///
 /// The enablement status of secret scanning validity checks
+#non_exhaustive
 pub(all) enum CodeSecurityUpdateConfigurationRequestSecretScanningValidityChecks {
   Enabled
   Disabled
@@ -147819,6 +148620,7 @@ pub impl @json.FromJson for CodeSecurityUpdateConfigurationRequestSecretScanning
 ///|
 ///
 /// The enablement status of secret scanning non-provider patterns
+#non_exhaustive
 pub(all) enum CodeSecurityUpdateConfigurationRequestSecretScanningNonProviderPatterns {
   Enabled
   Disabled
@@ -147887,6 +148689,7 @@ pub impl @json.FromJson for CodeSecurityUpdateConfigurationRequestSecretScanning
 ///|
 ///
 /// The enablement status of Copilot secret scanning
+#non_exhaustive
 pub(all) enum CodeSecurityUpdateConfigurationRequestSecretScanningGenericSecrets {
   Enabled
   Disabled
@@ -147955,6 +148758,7 @@ pub impl @json.FromJson for CodeSecurityUpdateConfigurationRequestSecretScanning
 ///|
 ///
 /// The enablement status of secret scanning delegated alert dismissal
+#non_exhaustive
 pub(all) enum CodeSecurityUpdateConfigurationRequestSecretScanningDelegatedAlertDismissal {
   Enabled
   Disabled
@@ -148023,6 +148827,7 @@ pub impl @json.FromJson for CodeSecurityUpdateConfigurationRequestSecretScanning
 ///|
 ///
 /// The enablement status of secret scanning extended metadata
+#non_exhaustive
 pub(all) enum CodeSecurityUpdateConfigurationRequestSecretScanningExtendedMetadata {
   Enabled
   Disabled
@@ -148091,6 +148896,7 @@ pub impl @json.FromJson for CodeSecurityUpdateConfigurationRequestSecretScanning
 ///|
 ///
 /// The enablement status of private vulnerability reporting
+#non_exhaustive
 pub(all) enum CodeSecurityUpdateConfigurationRequestPrivateVulnerabilityReporting {
   Enabled
   Disabled
@@ -148159,6 +148965,7 @@ pub impl @json.FromJson for CodeSecurityUpdateConfigurationRequestPrivateVulnera
 ///|
 ///
 /// The enforcement status for a security configuration
+#non_exhaustive
 pub(all) enum CodeSecurityUpdateConfigurationRequestEnforcement {
   Enforced
   Unenforced
@@ -148471,6 +149278,7 @@ pub impl @json.FromJson for CodeSecurityUpdateConfigurationRequest with fn from_
 ///|
 ///
 /// The type of repositories to attach the configuration to. `selected` means the configuration will be attached to only the repositories specified by `selected_repository_ids`
+#non_exhaustive
 pub(all) enum CodeSecurityAttachConfigurationRequestScope {
   All
   AllWithoutConfigurations
@@ -148601,6 +149409,7 @@ pub impl @json.FromJson for CodeSecurityAttachConfigurationRequest with fn from_
 ///|
 ///
 /// Specify which types of repository this security configuration should be applied to by default.
+#non_exhaustive
 pub(all) enum CodeSecuritySetConfigurationAsDefaultRequestDefaultForNewRepos {
   All
   None
@@ -148733,6 +149542,7 @@ pub impl @json.FromJson for CodeSecuritySetConfigurationAsDefaultRequest with fn
 ///|
 ///
 /// Specifies which types of repository this security configuration is applied to by default.
+#non_exhaustive
 pub(all) enum CodeSecuritySetConfigurationAsDefaultResponseDefaultForNewRepos {
   All
   None
@@ -148923,6 +149733,7 @@ pub impl @json.FromJson for CodespacesListInOrganizationResponse with fn from_js
 ///|
 ///
 /// Which users can access codespaces in the organization. `disabled` means that no users can access codespaces in the organization.
+#non_exhaustive
 pub(all) enum CodespacesSetCodespacesAccessRequestVisibility {
   Disabled
   SelectedMembers
@@ -149212,6 +150023,7 @@ pub impl @json.FromJson for CodespacesListOrgSecretsResponse with fn from_json(
 ///|
 ///
 /// Which type of organization repositories have access to the organization secret. `selected` means only the repositories specified by `selected_repository_ids` can access the secret.
+#non_exhaustive
 pub(all) enum CodespacesCreateOrUpdateOrgSecretRequestVisibility {
   All
   Private
@@ -149520,6 +150332,7 @@ pub impl @json.FromJson for CopilotSpacesListForOrgResponse with fn from_json(
 ///|
 ///
 /// The base role that determines default permissions for organization members. - `no_access`: No default access (default) - `reader`: Organization members can read the space - `writer`: Organization members can read and edit the space - `admin`: Organization members have full admin access to the space
+#non_exhaustive
 pub(all) enum CopilotSpacesCreateForOrgRequestBaseRole {
   Reader
   Writer
@@ -149584,6 +150397,7 @@ pub impl @json.FromJson for CopilotSpacesCreateForOrgRequestBaseRole with fn fro
 ///|
 ///
 /// The type of resource.
+#non_exhaustive
 pub(all) enum CopilotSpacesCreateForOrgRequestResourcesAttributesItemResourceType {
   Repository
   GithubFile
@@ -149876,6 +150690,7 @@ pub impl @json.FromJson for CopilotSpacesCreateForOrgRequest with fn from_json(
 ///|
 ///
 /// The base role that determines default permissions for organization members. Changing this field requires admin permissions. - `no_access`: No default access (default) - `reader`: Organization members can read the space - `writer`: Organization members can read and edit the space - `admin`: Organization members have full admin access to the space
+#non_exhaustive
 pub(all) enum CopilotSpacesUpdateForOrgRequestBaseRole {
   Reader
   Writer
@@ -149940,6 +150755,7 @@ pub impl @json.FromJson for CopilotSpacesUpdateForOrgRequestBaseRole with fn fro
 ///|
 ///
 /// The type of resource.
+#non_exhaustive
 pub(all) enum CopilotSpacesUpdateForOrgRequestResourcesAttributesItemResourceType {
   Repository
   GithubFile
@@ -150287,6 +151103,7 @@ pub impl @json.FromJson for CopilotSpacesListCollaboratorsForOrgResponse with fn
 ///|
 ///
 /// The type of actor (user or team).
+#non_exhaustive
 pub(all) enum CopilotSpacesAddCollaboratorForOrgRequestActorType {
   User
   Team
@@ -150352,6 +151169,7 @@ pub impl @json.FromJson for CopilotSpacesAddCollaboratorForOrgRequestActorType w
 ///|
 ///
 /// The role to grant to the collaborator.
+#non_exhaustive
 pub(all) enum CopilotSpacesAddCollaboratorForOrgRequestRole {
   Reader
   Writer
@@ -150482,6 +151300,7 @@ pub impl @json.FromJson for CopilotSpacesAddCollaboratorForOrgRequest with fn fr
 ///|
 ///
 /// Generated string enum CopilotSpacesUpdateCollaboratorForOrgActorType.
+#non_exhaustive
 pub(all) enum CopilotSpacesUpdateCollaboratorForOrgActorType {
   User
   Team
@@ -150545,6 +151364,7 @@ pub impl @json.FromJson for CopilotSpacesUpdateCollaboratorForOrgActorType with 
 ///|
 ///
 /// The new role to grant to the collaborator. Use `no_access` to remove the collaborator.
+#non_exhaustive
 pub(all) enum CopilotSpacesUpdateCollaboratorForOrgRequestRole {
   Reader
   Writer
@@ -150671,6 +151491,7 @@ pub impl @json.FromJson for CopilotSpacesUpdateCollaboratorForOrgRequest with fn
 ///|
 ///
 /// Generated string enum CopilotSpacesRemoveCollaboratorForOrgActorType.
+#non_exhaustive
 pub(all) enum CopilotSpacesRemoveCollaboratorForOrgActorType {
   User
   Team
@@ -150784,6 +151605,7 @@ pub impl @json.FromJson for CopilotSpacesListResourcesForOrgResponse with fn fro
 ///|
 ///
 /// The type of resource to create.
+#non_exhaustive
 pub(all) enum CopilotSpacesCreateResourceForOrgRequestResourceType {
   Repository
   GithubFile
@@ -151452,6 +152274,7 @@ pub impl @json.FromJson for CopilotCancelCopilotSeatAssignmentForUsersResponse w
 ///|
 ///
 /// The policy for which repositories can use Copilot cloud agent. Can be one of `all`, `selected`, or `none`.
+#non_exhaustive
 pub(all) enum CopilotGetCopilotCodingAgentPermissionsOrganizationResponseEnabledRepositories {
   All
   Selected
@@ -151587,6 +152410,7 @@ pub impl @json.FromJson for CopilotGetCopilotCodingAgentPermissionsOrganizationR
 ///|
 ///
 /// The policy for which repositories can use Copilot cloud agent. Can be one of `all`, `selected`, or `none`.
+#non_exhaustive
 pub(all) enum CopilotSetCopilotCodingAgentPermissionsOrganizationRequestEnabledRepositories {
   All
   Selected
@@ -151899,6 +152723,7 @@ pub impl @json.FromJson for CopilotSetCopilotContentExclusionForOrganizationResp
 ///|
 ///
 /// Generated string enum DependabotListAlertsForOrgHasTextArrayItem.
+#non_exhaustive
 pub(all) enum DependabotListAlertsForOrgHasTextArrayItem {
   Patch
   Deployment
@@ -151962,6 +152787,7 @@ pub impl @json.FromJson for DependabotListAlertsForOrgHasTextArrayItem with fn f
 ///|
 ///
 /// Generated untagged union DependabotListAlertsForOrgHas.
+#non_exhaustive
 pub(all) enum DependabotListAlertsForOrgHas {
   Text(String)
   TextArray(Array[DependabotListAlertsForOrgHasTextArrayItem])
@@ -152017,6 +152843,7 @@ pub impl @json.FromJson for DependabotListAlertsForOrgHas with fn from_json(
 ///|
 ///
 /// Generated string enum DependabotListAlertsForOrgScope.
+#non_exhaustive
 pub(all) enum DependabotListAlertsForOrgScope {
   Development
   Runtime
@@ -152071,6 +152898,7 @@ pub impl @json.FromJson for DependabotListAlertsForOrgScope with fn from_json(
 ///|
 ///
 /// Generated string enum DependabotListAlertsForOrgSort.
+#non_exhaustive
 pub(all) enum DependabotListAlertsForOrgSort {
   Created
   Updated
@@ -152128,6 +152956,7 @@ pub impl @json.FromJson for DependabotListAlertsForOrgSort with fn from_json(
 ///|
 ///
 /// Generated string enum DependabotListAlertsForOrgDirection.
+#non_exhaustive
 pub(all) enum DependabotListAlertsForOrgDirection {
   Asc
   Desc
@@ -152249,6 +153078,7 @@ pub impl @json.FromJson for DependabotUpdateRepositoryAccessForOrgRequest with f
 ///|
 ///
 /// The default repository access level for Dependabot updates.
+#non_exhaustive
 pub(all) enum DependabotSetRepositoryAccessDefaultLevelRequestDefaultLevel {
   Public
   Internal
@@ -152425,6 +153255,7 @@ pub impl @json.FromJson for DependabotListOrgSecretsResponse with fn from_json(
 ///|
 ///
 /// Which type of organization repositories have access to the organization secret. `selected` means only the repositories specified by `selected_repository_ids` can access the secret.
+#non_exhaustive
 pub(all) enum DependabotCreateOrUpdateOrgSecretRequestVisibility {
   All
   Private
@@ -152493,6 +153324,7 @@ pub impl @json.FromJson for DependabotCreateOrUpdateOrgSecretRequestVisibility w
 ///|
 ///
 /// Generated untagged union DependabotCreateOrUpdateOrgSecretRequestSelectedRepositoryIdsItem.
+#non_exhaustive
 pub(all) enum DependabotCreateOrUpdateOrgSecretRequestSelectedRepositoryIdsItem {
   Int(Int32)
   Text(String)
@@ -153072,6 +153904,7 @@ pub impl @json.FromJson for OrgsUpdateWebhookConfigForOrgRequest with fn from_js
 ///|
 ///
 /// Generated string enum OrgsListWebhookDeliveriesStatus.
+#non_exhaustive
 pub(all) enum OrgsListWebhookDeliveriesStatus {
   Success
   Failure
@@ -153126,6 +153959,7 @@ pub impl @json.FromJson for OrgsListWebhookDeliveriesStatus with fn from_json(
 ///|
 ///
 /// Generated string enum ApiInsightsGetRouteStatsByActorActorType.
+#non_exhaustive
 pub(all) enum ApiInsightsGetRouteStatsByActorActorType {
   Installation
   ClassicPat
@@ -153193,6 +154027,7 @@ pub impl @json.FromJson for ApiInsightsGetRouteStatsByActorActorType with fn fro
 ///|
 ///
 /// Generated string enum ApiInsightsGetRouteStatsByActorDirection.
+#non_exhaustive
 pub(all) enum ApiInsightsGetRouteStatsByActorDirection {
   Asc
   Desc
@@ -153251,6 +154086,7 @@ pub impl @json.FromJson for ApiInsightsGetRouteStatsByActorDirection with fn fro
 ///|
 ///
 /// Generated string enum ApiInsightsGetRouteStatsByActorSortItem.
+#non_exhaustive
 pub(all) enum ApiInsightsGetRouteStatsByActorSortItem {
   LastRateLimitedTimestamp
   LastRequestTimestamp
@@ -153321,6 +154157,7 @@ pub impl @json.FromJson for ApiInsightsGetRouteStatsByActorSortItem with fn from
 ///|
 ///
 /// Generated string enum ApiInsightsGetSubjectStatsDirection.
+#non_exhaustive
 pub(all) enum ApiInsightsGetSubjectStatsDirection {
   Asc
   Desc
@@ -153375,6 +154212,7 @@ pub impl @json.FromJson for ApiInsightsGetSubjectStatsDirection with fn from_jso
 ///|
 ///
 /// Generated string enum ApiInsightsGetSubjectStatsSortItem.
+#non_exhaustive
 pub(all) enum ApiInsightsGetSubjectStatsSortItem {
   LastRateLimitedTimestamp
   LastRequestTimestamp
@@ -153438,6 +154276,7 @@ pub impl @json.FromJson for ApiInsightsGetSubjectStatsSortItem with fn from_json
 ///|
 ///
 /// Generated string enum ApiInsightsGetSummaryStatsByActorActorType.
+#non_exhaustive
 pub(all) enum ApiInsightsGetSummaryStatsByActorActorType {
   Installation
   ClassicPat
@@ -153510,6 +154349,7 @@ pub impl @json.FromJson for ApiInsightsGetSummaryStatsByActorActorType with fn f
 ///|
 ///
 /// Generated string enum ApiInsightsGetTimeStatsByActorActorType.
+#non_exhaustive
 pub(all) enum ApiInsightsGetTimeStatsByActorActorType {
   Installation
   ClassicPat
@@ -153577,6 +154417,7 @@ pub impl @json.FromJson for ApiInsightsGetTimeStatsByActorActorType with fn from
 ///|
 ///
 /// Generated string enum ApiInsightsGetUserStatsDirection.
+#non_exhaustive
 pub(all) enum ApiInsightsGetUserStatsDirection {
   Asc
   Desc
@@ -153631,6 +154472,7 @@ pub impl @json.FromJson for ApiInsightsGetUserStatsDirection with fn from_json(
 ///|
 ///
 /// Generated string enum ApiInsightsGetUserStatsSortItem.
+#non_exhaustive
 pub(all) enum ApiInsightsGetUserStatsSortItem {
   LastRateLimitedTimestamp
   LastRequestTimestamp
@@ -153957,6 +154799,7 @@ pub impl @json.FromJson for InteractionsUpdatePullRequestCreationCapForOrgRespon
 ///|
 ///
 /// Generated string enum OrgsListPendingInvitationsRole.
+#non_exhaustive
 pub(all) enum OrgsListPendingInvitationsRole {
   All
   Admin
@@ -154020,6 +154863,7 @@ pub impl @json.FromJson for OrgsListPendingInvitationsRole with fn from_json(
 ///|
 ///
 /// Generated string enum OrgsListPendingInvitationsInvitationSource.
+#non_exhaustive
 pub(all) enum OrgsListPendingInvitationsInvitationSource {
   All
   Member
@@ -154086,6 +154930,7 @@ pub impl @json.FromJson for OrgsListPendingInvitationsInvitationSource with fn f
 ///|
 ///
 /// The role for the new member. * `admin` - Organization owners with full administrative rights to the organization and complete access to all repositories and teams. * `direct_member` - Non-owner organization members with ability to see other members and join teams by invitation. * `billing_manager` - Non-owner organization members with ability to manage the billing settings of your organization. * `reinstate` - The previous role assigned to the invitee before they were removed from your organization. Can be one of the roles listed above. Only works if the invitee was previously part of your organization.
+#non_exhaustive
 pub(all) enum OrgsCreateInvitationRequestRole {
   Admin
   DirectMember
@@ -154208,6 +155053,7 @@ pub impl @json.FromJson for OrgsCreateInvitationRequest with fn from_json(
 ///|
 ///
 /// Generated string enum IssuesListForOrgFilter.
+#non_exhaustive
 pub(all) enum IssuesListForOrgFilter {
   Assigned
   Created
@@ -154274,6 +155120,7 @@ pub impl @json.FromJson for IssuesListForOrgFilter with fn from_json(
 ///|
 ///
 /// Generated string enum IssuesListForOrgState.
+#non_exhaustive
 pub(all) enum IssuesListForOrgState {
   Open
   Closed
@@ -154328,6 +155175,7 @@ pub impl @json.FromJson for IssuesListForOrgState with fn from_json(value, path)
 ///|
 ///
 /// Generated string enum IssuesListForOrgSort.
+#non_exhaustive
 pub(all) enum IssuesListForOrgSort {
   Created
   Updated
@@ -154382,6 +155230,7 @@ pub impl @json.FromJson for IssuesListForOrgSort with fn from_json(value, path) 
 ///|
 ///
 /// Generated string enum IssuesListForOrgDirection.
+#non_exhaustive
 pub(all) enum IssuesListForOrgDirection {
   Asc
   Desc
@@ -154436,6 +155285,7 @@ pub impl @json.FromJson for IssuesListForOrgDirection with fn from_json(
 ///|
 ///
 /// Generated string enum OrgsListMembersFilter.
+#non_exhaustive
 pub(all) enum OrgsListMembersFilter {
   Value2faDisabled
   Value2faInsecure
@@ -154490,6 +155340,7 @@ pub impl @json.FromJson for OrgsListMembersFilter with fn from_json(value, path)
 ///|
 ///
 /// Generated string enum OrgsListMembersRole.
+#non_exhaustive
 pub(all) enum OrgsListMembersRole {
   All
   Admin
@@ -154607,6 +155458,7 @@ pub impl @json.FromJson for CodespacesGetCodespacesForUserInOrgResponse with fn 
 ///|
 ///
 /// The role to give the user in the organization. Can be one of: * `admin` - The user will become an owner of the organization. * `member` - The user will become a non-owner member of the organization.
+#non_exhaustive
 pub(all) enum OrgsSetMembershipForUserRequestRole {
   Admin
   Member
@@ -154855,6 +155707,7 @@ pub impl @json.FromJson for OrgsListOrgRolesResponse with fn from_json(
 ///|
 ///
 /// Generated string enum OrgsListOutsideCollaboratorsFilter.
+#non_exhaustive
 pub(all) enum OrgsListOutsideCollaboratorsFilter {
   Value2faDisabled
   Value2faInsecure
@@ -155014,6 +155867,7 @@ pub impl @json.FromJson for OrgsConvertMemberToOutsideCollaboratorResponse with 
 ///|
 ///
 /// Generated string enum PackagesListPackagesForOrganizationPackageType.
+#non_exhaustive
 pub(all) enum PackagesListPackagesForOrganizationPackageType {
   Npm
   Maven
@@ -155089,6 +155943,7 @@ pub impl @json.FromJson for PackagesListPackagesForOrganizationPackageType with 
 ///|
 ///
 /// Generated string enum PackagesListPackagesForOrganizationVisibility.
+#non_exhaustive
 pub(all) enum PackagesListPackagesForOrganizationVisibility {
   Public
   Private
@@ -155155,6 +156010,7 @@ pub impl @json.FromJson for PackagesListPackagesForOrganizationVisibility with f
 ///|
 ///
 /// Generated string enum PackagesGetPackageForOrganizationPackageType.
+#non_exhaustive
 pub(all) enum PackagesGetPackageForOrganizationPackageType {
   Npm
   Maven
@@ -155230,6 +156086,7 @@ pub impl @json.FromJson for PackagesGetPackageForOrganizationPackageType with fn
 ///|
 ///
 /// Generated string enum PackagesDeletePackageForOrgPackageType.
+#non_exhaustive
 pub(all) enum PackagesDeletePackageForOrgPackageType {
   Npm
   Maven
@@ -155298,6 +156155,7 @@ pub impl @json.FromJson for PackagesDeletePackageForOrgPackageType with fn from_
 ///|
 ///
 /// Generated string enum PackagesRestorePackageForOrgPackageType.
+#non_exhaustive
 pub(all) enum PackagesRestorePackageForOrgPackageType {
   Npm
   Maven
@@ -155368,6 +156226,7 @@ pub impl @json.FromJson for PackagesRestorePackageForOrgPackageType with fn from
 ///|
 ///
 /// Generated string enum PackagesGetAllPackageVersionsForPackageOwnedByOrgPackageType.
+#non_exhaustive
 pub(all) enum PackagesGetAllPackageVersionsForPackageOwnedByOrgPackageType {
   Npm
   Maven
@@ -155445,6 +156304,7 @@ pub impl @json.FromJson for PackagesGetAllPackageVersionsForPackageOwnedByOrgPac
 ///|
 ///
 /// Generated string enum PackagesGetAllPackageVersionsForPackageOwnedByOrgState.
+#non_exhaustive
 pub(all) enum PackagesGetAllPackageVersionsForPackageOwnedByOrgState {
   Active
   Deleted
@@ -155510,6 +156370,7 @@ pub impl @json.FromJson for PackagesGetAllPackageVersionsForPackageOwnedByOrgSta
 ///|
 ///
 /// Generated string enum PackagesGetPackageVersionForOrganizationPackageType.
+#non_exhaustive
 pub(all) enum PackagesGetPackageVersionForOrganizationPackageType {
   Npm
   Maven
@@ -155587,6 +156448,7 @@ pub impl @json.FromJson for PackagesGetPackageVersionForOrganizationPackageType 
 ///|
 ///
 /// Generated string enum PackagesDeletePackageVersionForOrgPackageType.
+#non_exhaustive
 pub(all) enum PackagesDeletePackageVersionForOrgPackageType {
   Npm
   Maven
@@ -155662,6 +156524,7 @@ pub impl @json.FromJson for PackagesDeletePackageVersionForOrgPackageType with f
 ///|
 ///
 /// Generated string enum PackagesRestorePackageVersionForOrgPackageType.
+#non_exhaustive
 pub(all) enum PackagesRestorePackageVersionForOrgPackageType {
   Npm
   Maven
@@ -155737,6 +156600,7 @@ pub impl @json.FromJson for PackagesRestorePackageVersionForOrgPackageType with 
 ///|
 ///
 /// Generated string enum OrgsListPatGrantRequestsDirection.
+#non_exhaustive
 pub(all) enum OrgsListPatGrantRequestsDirection {
   Asc
   Desc
@@ -155791,6 +156655,7 @@ pub impl @json.FromJson for OrgsListPatGrantRequestsDirection with fn from_json(
 ///|
 ///
 /// Action to apply to the requests.
+#non_exhaustive
 pub(all) enum OrgsReviewPatGrantRequestsInBulkRequestAction {
   Approve
   Deny
@@ -155916,6 +156781,7 @@ pub impl @json.FromJson for OrgsReviewPatGrantRequestsInBulkRequest with fn from
 ///|
 ///
 /// Action to apply to the request.
+#non_exhaustive
 pub(all) enum OrgsReviewPatGrantRequestRequestAction {
   Approve
   Deny
@@ -156026,6 +156892,7 @@ pub impl @json.FromJson for OrgsReviewPatGrantRequestRequest with fn from_json(
 ///|
 ///
 /// Generated string enum OrgsListPatGrantsDirection.
+#non_exhaustive
 pub(all) enum OrgsListPatGrantsDirection {
   Asc
   Desc
@@ -156229,6 +157096,7 @@ pub impl @json.FromJson for PrivateRegistriesListOrgPrivateRegistriesResponse wi
 ///|
 ///
 /// The registry type.
+#non_exhaustive
 pub(all) enum PrivateRegistriesCreateOrgPrivateRegistryRequestRegistryType {
   MavenRepository
   NugetFeed
@@ -156333,6 +157201,7 @@ pub impl @json.FromJson for PrivateRegistriesCreateOrgPrivateRegistryRequestRegi
 ///|
 ///
 /// Which type of organization repositories have access to the private registry. `selected` means only the repositories specified by `selected_repository_ids` can access the private registry.
+#non_exhaustive
 pub(all) enum PrivateRegistriesCreateOrgPrivateRegistryRequestVisibility {
   All
   Private
@@ -156401,6 +157270,7 @@ pub impl @json.FromJson for PrivateRegistriesCreateOrgPrivateRegistryRequestVisi
 ///|
 ///
 /// The authentication type for the private registry. Defaults to `token` if not specified. Use `oidc_azure`, `oidc_aws`, `oidc_jfrog`, `oidc_cloudsmith`, or `oidc_gcp` for OIDC authentication. Use `anonymous` for registries that do not require authentication; `username`, `encrypted_value`, and `key_id` must be omitted.
+#non_exhaustive
 pub(all) enum PrivateRegistriesCreateOrgPrivateRegistryRequestAuthType {
   Token
   UsernamePassword
@@ -156728,6 +157598,7 @@ pub impl @json.FromJson for PrivateRegistriesGetOrgPublicKeyResponse with fn fro
 ///|
 ///
 /// The registry type.
+#non_exhaustive
 pub(all) enum PrivateRegistriesUpdateOrgPrivateRegistryRequestRegistryType {
   MavenRepository
   NugetFeed
@@ -156832,6 +157703,7 @@ pub impl @json.FromJson for PrivateRegistriesUpdateOrgPrivateRegistryRequestRegi
 ///|
 ///
 /// Which type of organization repositories have access to the private registry. `selected` means only the repositories specified by `selected_repository_ids` can access the private registry.
+#non_exhaustive
 pub(all) enum PrivateRegistriesUpdateOrgPrivateRegistryRequestVisibility {
   All
   Private
@@ -156900,6 +157772,7 @@ pub impl @json.FromJson for PrivateRegistriesUpdateOrgPrivateRegistryRequestVisi
 ///|
 ///
 /// The authentication type for the private registry. This field cannot be changed after creation. If provided, it must match the existing `auth_type` of the configuration. To change the authentication type, delete and recreate the configuration.
+#non_exhaustive
 pub(all) enum PrivateRegistriesUpdateOrgPrivateRegistryRequestAuthType {
   Token
   UsernamePassword
@@ -157223,6 +158096,7 @@ pub impl @json.FromJson for ProjectsCreateDraftItemForOrgRequest with fn from_js
 ///|
 ///
 /// Generated untagged union ProjectsListItemsForOrgFields.
+#non_exhaustive
 pub(all) enum ProjectsListItemsForOrgFields {
   Text(String)
   TextArray(Array[String])
@@ -157275,6 +158149,7 @@ pub impl @json.FromJson for ProjectsListItemsForOrgFields with fn from_json(
 ///|
 ///
 /// The type of item to add to the project. Must be either Issue or PullRequest.
+#non_exhaustive
 pub(all) enum ProjectsAddItemForOrgRequestType {
   Issue
   PullRequest
@@ -157395,6 +158270,7 @@ pub impl @json.FromJson for ProjectsAddItemForOrgRequest with fn from_json(
 ///|
 ///
 /// Generated untagged union ProjectsGetOrgItemFields.
+#non_exhaustive
 pub(all) enum ProjectsGetOrgItemFields {
   Text(String)
   TextArray(Array[String])
@@ -157445,6 +158321,7 @@ pub impl @json.FromJson for ProjectsGetOrgItemFields with fn from_json(
 ///|
 ///
 /// The new value for the field: - For text, number, and date fields, provide the new value directly. - For single select and iteration fields, provide the ID of the option or iteration. - To clear the field, set this to null.
+#non_exhaustive
 pub(all) enum ProjectsUpdateItemForOrgRequestFieldsItemValue {
   Text(String)
   Number(Double)
@@ -157612,6 +158489,7 @@ pub impl @json.FromJson for ProjectsUpdateItemForOrgRequest with fn from_json(
 ///|
 ///
 /// The layout of the view.
+#non_exhaustive
 pub(all) enum ProjectsCreateViewForOrgRequestLayout {
   Table
   Board
@@ -157671,6 +158549,7 @@ pub impl @json.FromJson for ProjectsCreateViewForOrgRequestLayout with fn from_j
 ///|
 ///
 /// Generated untagged union ProjectsCreateViewForOrgRequestSortByItemItem.
+#non_exhaustive
 pub(all) enum ProjectsCreateViewForOrgRequestSortByItemItem {
   Int(Int32)
   Text(String)
@@ -157814,6 +158693,7 @@ pub impl @json.FromJson for ProjectsCreateViewForOrgRequest with fn from_json(
 ///|
 ///
 /// Generated untagged union ProjectsListViewItemsForOrgFields.
+#non_exhaustive
 pub(all) enum ProjectsListViewItemsForOrgFields {
   Text(String)
   TextArray(Array[String])
@@ -158177,6 +159057,7 @@ pub impl @json.FromJson for OrgsCustomPropertiesForReposCreateOrUpdateOrganizati
 ///|
 ///
 /// Generated string enum ReposListForOrgType.
+#non_exhaustive
 pub(all) enum ReposListForOrgType {
   All
   Public
@@ -158240,6 +159121,7 @@ pub impl @json.FromJson for ReposListForOrgType with fn from_json(value, path) {
 ///|
 ///
 /// Generated string enum ReposListForOrgSort.
+#non_exhaustive
 pub(all) enum ReposListForOrgSort {
   Created
   Updated
@@ -158297,6 +159179,7 @@ pub impl @json.FromJson for ReposListForOrgSort with fn from_json(value, path) {
 ///|
 ///
 /// Generated string enum ReposListForOrgDirection.
+#non_exhaustive
 pub(all) enum ReposListForOrgDirection {
   Asc
   Desc
@@ -158351,6 +159234,7 @@ pub impl @json.FromJson for ReposListForOrgDirection with fn from_json(
 ///|
 ///
 /// The visibility of the repository.
+#non_exhaustive
 pub(all) enum ReposCreateInOrgRequestVisibility {
   Public
   Private
@@ -158405,6 +159289,7 @@ pub impl @json.FromJson for ReposCreateInOrgRequestVisibility with fn from_json(
 ///|
 ///
 /// Required when using `squash_merge_commit_message`. The default value for a squash merge commit title: - `PR_TITLE` - default to the pull request's title. - `COMMIT_OR_PR_TITLE` - default to the commit's title (if only one commit) or the pull request's title (when more than one commit).
+#non_exhaustive
 pub(all) enum ReposCreateInOrgRequestSquashMergeCommitTitle {
   PRTITLE
   COMMITORPRTITLE
@@ -158468,6 +159353,7 @@ pub impl @json.FromJson for ReposCreateInOrgRequestSquashMergeCommitTitle with f
 ///|
 ///
 /// The default value for a squash merge commit message: - `PR_BODY` - default to the pull request's body. - `COMMIT_MESSAGES` - default to the branch's commit messages. - `BLANK` - default to a blank commit message.
+#non_exhaustive
 pub(all) enum ReposCreateInOrgRequestSquashMergeCommitMessage {
   PRBODY
   COMMITMESSAGES
@@ -158536,6 +159422,7 @@ pub impl @json.FromJson for ReposCreateInOrgRequestSquashMergeCommitMessage with
 ///|
 ///
 /// Required when using `merge_commit_message`. The default value for a merge commit title. - `PR_TITLE` - default to the pull request's title. - `MERGE_MESSAGE` - default to the classic title for a merge message (e.g., Merge pull request #123 from branch-name).
+#non_exhaustive
 pub(all) enum ReposCreateInOrgRequestMergeCommitTitle {
   PRTITLE
   MERGEMESSAGE
@@ -158594,6 +159481,7 @@ pub impl @json.FromJson for ReposCreateInOrgRequestMergeCommitTitle with fn from
 ///|
 ///
 /// The default value for a merge commit message. - `PR_TITLE` - default to the pull request's title. - `PR_BODY` - default to the pull request's body. - `BLANK` - default to a blank commit message.
+#non_exhaustive
 pub(all) enum ReposCreateInOrgRequestMergeCommitMessage {
   PRBODY
   PRTITLE
@@ -158837,6 +159725,7 @@ pub impl @json.FromJson for ReposCreateInOrgRequest with fn from_json(
 ///|
 ///
 /// The target of the ruleset
+#non_exhaustive
 pub(all) enum ReposCreateOrgRulesetRequestTarget {
   Branch
   Tag
@@ -158967,6 +159856,7 @@ pub impl @json.FromJson for ReposCreateOrgRulesetRequest with fn from_json(
 ///|
 ///
 /// Generated string enum ReposGetOrgRuleSuitesTimePeriod.
+#non_exhaustive
 pub(all) enum ReposGetOrgRuleSuitesTimePeriod {
   Hour
   Day
@@ -159027,6 +159917,7 @@ pub impl @json.FromJson for ReposGetOrgRuleSuitesTimePeriod with fn from_json(
 ///|
 ///
 /// Generated string enum ReposGetOrgRuleSuitesRuleSuiteResult.
+#non_exhaustive
 pub(all) enum ReposGetOrgRuleSuitesRuleSuiteResult {
   Pass
   Fail
@@ -159087,6 +159978,7 @@ pub impl @json.FromJson for ReposGetOrgRuleSuitesRuleSuiteResult with fn from_js
 ///|
 ///
 /// Generated string enum ReposGetOrgRuleSuitesEvaluateStatus.
+#non_exhaustive
 pub(all) enum ReposGetOrgRuleSuitesEvaluateStatus {
   All
   Active
@@ -159144,6 +160036,7 @@ pub impl @json.FromJson for ReposGetOrgRuleSuitesEvaluateStatus with fn from_jso
 ///|
 ///
 /// The target of the ruleset
+#non_exhaustive
 pub(all) enum ReposUpdateOrgRulesetRequestTarget {
   Branch
   Tag
@@ -159274,6 +160167,7 @@ pub impl @json.FromJson for ReposUpdateOrgRulesetRequest with fn from_json(
 ///|
 ///
 /// Generated string enum SecretScanningListAlertsForOrgState.
+#non_exhaustive
 pub(all) enum SecretScanningListAlertsForOrgState {
   Open
   Resolved
@@ -159328,6 +160222,7 @@ pub impl @json.FromJson for SecretScanningListAlertsForOrgState with fn from_jso
 ///|
 ///
 /// Generated string enum SecretScanningListAlertsForOrgSort.
+#non_exhaustive
 pub(all) enum SecretScanningListAlertsForOrgSort {
   Created
   Updated
@@ -159382,6 +160277,7 @@ pub impl @json.FromJson for SecretScanningListAlertsForOrgSort with fn from_json
 ///|
 ///
 /// Generated string enum SecretScanningListAlertsForOrgDirection.
+#non_exhaustive
 pub(all) enum SecretScanningListAlertsForOrgDirection {
   Asc
   Desc
@@ -159440,6 +160336,7 @@ pub impl @json.FromJson for SecretScanningListAlertsForOrgDirection with fn from
 ///|
 ///
 /// Generated string enum SecretScanningListOrgCustomPatternsState.
+#non_exhaustive
 pub(all) enum SecretScanningListOrgCustomPatternsState {
   Published
   Unpublished
@@ -159498,6 +160395,7 @@ pub impl @json.FromJson for SecretScanningListOrgCustomPatternsState with fn fro
 ///|
 ///
 /// Generated string enum SecretScanningListOrgCustomPatternsPushProtection.
+#non_exhaustive
 pub(all) enum SecretScanningListOrgCustomPatternsPushProtection {
   Enabled
   Disabled
@@ -159563,6 +160461,7 @@ pub impl @json.FromJson for SecretScanningListOrgCustomPatternsPushProtection wi
 ///|
 ///
 /// Generated string enum SecretScanningListOrgCustomPatternsSort.
+#non_exhaustive
 pub(all) enum SecretScanningListOrgCustomPatternsSort {
   Created
   Updated
@@ -159624,6 +160523,7 @@ pub impl @json.FromJson for SecretScanningListOrgCustomPatternsSort with fn from
 ///|
 ///
 /// Generated string enum SecretScanningListOrgCustomPatternsDirection.
+#non_exhaustive
 pub(all) enum SecretScanningListOrgCustomPatternsDirection {
   Asc
   Desc
@@ -159803,6 +160703,7 @@ pub impl @json.FromJson for SecretScanningBulkCreateOrgCustomPatternsResponse wi
 ///|
 ///
 /// What to do with alerts associated with the deleted patterns. `delete_alerts` permanently removes the alerts. `resolve_alerts` resolves the alerts as "pattern deleted". Defaults to `delete_alerts` when not specified.
+#non_exhaustive
 pub(all) enum SecretScanningBulkDeleteOrgCustomPatternsRequestPostDeleteAction {
   DeleteAlerts
   ResolveAlerts
@@ -159933,6 +160834,7 @@ pub impl @json.FromJson for SecretScanningBulkDeleteOrgCustomPatternsRequest wit
 ///|
 ///
 /// Push protection setting to set for the pattern.
+#non_exhaustive
 pub(all) enum SecretScanningUpdateOrgPatternConfigsRequestProviderPatternSettingsItemPushProtectionSetting {
   NotSet
   Disabled
@@ -160068,6 +160970,7 @@ pub impl @json.FromJson for SecretScanningUpdateOrgPatternConfigsRequestProvider
 ///|
 ///
 /// Push protection setting to set for the pattern.
+#non_exhaustive
 pub(all) enum SecretScanningUpdateOrgPatternConfigsRequestCustomPatternSettingsItemPushProtectionSetting {
   Disabled
   Enabled
@@ -160360,6 +161263,7 @@ pub impl @json.FromJson for SecretScanningUpdateOrgPatternConfigsResponse with f
 ///|
 ///
 /// Generated string enum SecurityAdvisoriesListOrgRepositoryAdvisoriesDirection.
+#non_exhaustive
 pub(all) enum SecurityAdvisoriesListOrgRepositoryAdvisoriesDirection {
   Asc
   Desc
@@ -160425,6 +161329,7 @@ pub impl @json.FromJson for SecurityAdvisoriesListOrgRepositoryAdvisoriesDirecti
 ///|
 ///
 /// Generated string enum SecurityAdvisoriesListOrgRepositoryAdvisoriesSort.
+#non_exhaustive
 pub(all) enum SecurityAdvisoriesListOrgRepositoryAdvisoriesSort {
   Created
   Updated
@@ -160493,6 +161398,7 @@ pub impl @json.FromJson for SecurityAdvisoriesListOrgRepositoryAdvisoriesSort wi
 ///|
 ///
 /// Generated string enum SecurityAdvisoriesListOrgRepositoryAdvisoriesState.
+#non_exhaustive
 pub(all) enum SecurityAdvisoriesListOrgRepositoryAdvisoriesState {
   Triage
   Draft
@@ -160564,6 +161470,7 @@ pub impl @json.FromJson for SecurityAdvisoriesListOrgRepositoryAdvisoriesState w
 ///|
 ///
 /// The policy that controls how immutable releases are enforced in the organization.
+#non_exhaustive
 pub(all) enum OrgsSetImmutableReleasesSettingsRequestEnforcedRepositories {
   All
   None
@@ -160885,6 +161792,7 @@ pub impl @json.FromJson for HostedComputeListNetworkConfigurationsForOrgResponse
 ///|
 ///
 /// The hosted compute service to use for the network configuration.
+#non_exhaustive
 pub(all) enum HostedComputeCreateNetworkConfigurationForOrgRequestComputeService {
   None
   Actions
@@ -161037,6 +161945,7 @@ pub impl @json.FromJson for HostedComputeCreateNetworkConfigurationForOrgRequest
 ///|
 ///
 /// The hosted compute service to use for the network configuration.
+#non_exhaustive
 pub(all) enum HostedComputeUpdateNetworkConfigurationForOrgRequestComputeService {
   None
   Actions
@@ -161189,6 +162098,7 @@ pub impl @json.FromJson for HostedComputeUpdateNetworkConfigurationForOrgRequest
 ///|
 ///
 /// Generated string enum TeamsListTeamType.
+#non_exhaustive
 pub(all) enum TeamsListTeamType {
   All
   Enterprise
@@ -161243,6 +162153,7 @@ pub impl @json.FromJson for TeamsListTeamType with fn from_json(value, path) {
 ///|
 ///
 /// The level of privacy this team should have. The options are: **For a non-nested team:** * `secret` - only visible to organization owners and members of this team. * `closed` - visible to all members of this organization. Default: `secret` **For a parent or child team:** * `closed` - visible to all members of this organization. Default for child team: `closed`
+#non_exhaustive
 pub(all) enum TeamsCreateRequestPrivacy {
   Secret
   Closed
@@ -161297,6 +162208,7 @@ pub impl @json.FromJson for TeamsCreateRequestPrivacy with fn from_json(
 ///|
 ///
 /// The notification setting the team has chosen. The options are: * `notifications_enabled` - team members receive notifications when the team is @mentioned. * `notifications_disabled` - no one receives notifications. Default: `notifications_enabled`
+#non_exhaustive
 pub(all) enum TeamsCreateRequestNotificationSetting {
   NotificationsEnabled
   NotificationsDisabled
@@ -161353,6 +162265,7 @@ pub impl @json.FromJson for TeamsCreateRequestNotificationSetting with fn from_j
 ///|
 ///
 /// **Closing down notice**. The permission that new repositories will be added to the team with when none is specified.
+#non_exhaustive
 pub(all) enum TeamsCreateRequestPermission {
   Pull
   Push
@@ -161496,6 +162409,7 @@ pub impl @json.FromJson for TeamsCreateRequest with fn from_json(value, path) {
 ///|
 ///
 /// The level of privacy this team should have. Editing teams without specifying this parameter leaves `privacy` intact. When a team is nested, the `privacy` for parent teams cannot be `secret`. The options are: **For a non-nested team:** * `secret` - only visible to organization owners and members of this team. * `closed` - visible to all members of this organization. **For a parent or child team:** * `closed` - visible to all members of this organization.
+#non_exhaustive
 pub(all) enum TeamsUpdateInOrgRequestPrivacy {
   Secret
   Closed
@@ -161550,6 +162464,7 @@ pub impl @json.FromJson for TeamsUpdateInOrgRequestPrivacy with fn from_json(
 ///|
 ///
 /// The notification setting the team has chosen. Editing teams without specifying this parameter leaves `notification_setting` intact. The options are: * `notifications_enabled` - team members receive notifications when the team is @mentioned. * `notifications_disabled` - no one receives notifications.
+#non_exhaustive
 pub(all) enum TeamsUpdateInOrgRequestNotificationSetting {
   NotificationsEnabled
   NotificationsDisabled
@@ -161613,6 +162528,7 @@ pub impl @json.FromJson for TeamsUpdateInOrgRequestNotificationSetting with fn f
 ///|
 ///
 /// **Closing down notice**. The permission that new repositories will be added to the team with when none is specified.
+#non_exhaustive
 pub(all) enum TeamsUpdateInOrgRequestPermission {
   Pull
   Push
@@ -161752,6 +162668,7 @@ pub impl @json.FromJson for TeamsUpdateInOrgRequest with fn from_json(
 ///|
 ///
 /// Generated string enum TeamsListMembersInOrgRole.
+#non_exhaustive
 pub(all) enum TeamsListMembersInOrgRole {
   Member
   Maintainer
@@ -161809,6 +162726,7 @@ pub impl @json.FromJson for TeamsListMembersInOrgRole with fn from_json(
 ///|
 ///
 /// The role that this user should have in the team.
+#non_exhaustive
 pub(all) enum TeamsAddOrUpdateMembershipForUserInOrgRequestRole {
   Member
   Maintainer
@@ -161984,6 +162902,7 @@ pub impl @json.FromJson for TeamsAddOrUpdateRepoPermissionsInOrgRequest with fn 
 ///|
 ///
 /// Generated string enum OrgsEnableOrDisableSecurityProductOnAllOrgReposSecurityProduct.
+#non_exhaustive
 pub(all) enum OrgsEnableOrDisableSecurityProductOnAllOrgReposSecurityProduct {
   DependencyGraph
   DependabotAlerts
@@ -162064,6 +162983,7 @@ pub impl @json.FromJson for OrgsEnableOrDisableSecurityProductOnAllOrgReposSecur
 ///|
 ///
 /// Generated string enum OrgsEnableOrDisableSecurityProductOnAllOrgReposEnablement.
+#non_exhaustive
 pub(all) enum OrgsEnableOrDisableSecurityProductOnAllOrgReposEnablement {
   EnableAll
   DisableAll
@@ -162129,6 +163049,7 @@ pub impl @json.FromJson for OrgsEnableOrDisableSecurityProductOnAllOrgReposEnabl
 ///|
 ///
 /// CodeQL query suite to be used. If you specify the `query_suite` parameter, the default setup will be configured with this query suite only on all repositories that didn't have default setup already configured. It will not change the query suite on repositories that already have default setup configured. If you don't specify any `query_suite` in your request, the preferred query suite of the organization will be applied.
+#non_exhaustive
 pub(all) enum OrgsEnableOrDisableSecurityProductOnAllOrgReposRequestQuerySuite {
   Default
   Extended
@@ -162251,6 +163172,7 @@ pub impl @json.FromJson for OrgsEnableOrDisableSecurityProductOnAllOrgReposReque
 ///|
 ///
 /// The visibility of the repository.
+#non_exhaustive
 pub(all) enum ReposUpdateRequestVisibility {
   Public
   Private
@@ -162761,6 +163683,7 @@ pub impl @json.FromJson for ReposUpdateRequestSecurityAndAnalysisSecretScanningD
 ///|
 ///
 /// The type of the bypass reviewer
+#non_exhaustive
 pub(all) enum ReposUpdateRequestSecurityAndAnalysisSecretScanningDelegatedBypassOptionsReviewersItemReviewerType {
   TEAM
   ROLE
@@ -162826,6 +163749,7 @@ pub impl @json.FromJson for ReposUpdateRequestSecurityAndAnalysisSecretScanningD
 ///|
 ///
 /// The bypass mode for the reviewer
+#non_exhaustive
 pub(all) enum ReposUpdateRequestSecurityAndAnalysisSecretScanningDelegatedBypassOptionsReviewersItemMode {
   ALWAYS
   EXEMPT
@@ -163139,6 +164063,7 @@ pub impl @json.FromJson for ReposUpdateRequestSecurityAndAnalysis with fn from_j
 ///|
 ///
 /// The policy that controls who can create pull requests for this repository: `all` or `collaborators_only`.
+#non_exhaustive
 pub(all) enum ReposUpdateRequestPullRequestCreationPolicy {
   All
   CollaboratorsOnly
@@ -163202,6 +164127,7 @@ pub impl @json.FromJson for ReposUpdateRequestPullRequestCreationPolicy with fn 
 ///|
 ///
 /// Required when using `squash_merge_commit_message`. The default value for a squash merge commit title: - `PR_TITLE` - default to the pull request's title. - `COMMIT_OR_PR_TITLE` - default to the commit's title (if only one commit) or the pull request's title (when more than one commit).
+#non_exhaustive
 pub(all) enum ReposUpdateRequestSquashMergeCommitTitle {
   PRTITLE
   COMMITORPRTITLE
@@ -163260,6 +164186,7 @@ pub impl @json.FromJson for ReposUpdateRequestSquashMergeCommitTitle with fn fro
 ///|
 ///
 /// The default value for a squash merge commit message: - `PR_BODY` - default to the pull request's body. - `COMMIT_MESSAGES` - default to the branch's commit messages. - `BLANK` - default to a blank commit message.
+#non_exhaustive
 pub(all) enum ReposUpdateRequestSquashMergeCommitMessage {
   PRBODY
   COMMITMESSAGES
@@ -163326,6 +164253,7 @@ pub impl @json.FromJson for ReposUpdateRequestSquashMergeCommitMessage with fn f
 ///|
 ///
 /// Required when using `merge_commit_message`. The default value for a merge commit title. - `PR_TITLE` - default to the pull request's title. - `MERGE_MESSAGE` - default to the classic title for a merge message (e.g., Merge pull request #123 from branch-name).
+#non_exhaustive
 pub(all) enum ReposUpdateRequestMergeCommitTitle {
   PRTITLE
   MERGEMESSAGE
@@ -163380,6 +164308,7 @@ pub impl @json.FromJson for ReposUpdateRequestMergeCommitTitle with fn from_json
 ///|
 ///
 /// The default value for a merge commit message. - `PR_TITLE` - default to the pull request's title. - `PR_BODY` - default to the pull request's body. - `BLANK` - default to a blank commit message.
+#non_exhaustive
 pub(all) enum ReposUpdateRequestMergeCommitMessage {
   PRBODY
   PRTITLE
@@ -163686,6 +164615,7 @@ pub impl @json.FromJson for ActionsListArtifactsForRepoResponse with fn from_jso
 ///|
 ///
 /// Generated string enum ActionsGetActionsCacheListSort.
+#non_exhaustive
 pub(all) enum ActionsGetActionsCacheListSort {
   CreatedAt
   LastAccessedAt
@@ -163743,6 +164673,7 @@ pub impl @json.FromJson for ActionsGetActionsCacheListSort with fn from_json(
 ///|
 ///
 /// Generated string enum ActionsGetActionsCacheListDirection.
+#non_exhaustive
 pub(all) enum ActionsGetActionsCacheListDirection {
   Asc
   Desc
@@ -164626,6 +165557,7 @@ pub impl @json.FromJson for ActionsSetCustomLabelsForSelfHostedRunnerForRepoRequ
 ///|
 ///
 /// Generated string enum ActionsListWorkflowRunsForRepoStatus.
+#non_exhaustive
 pub(all) enum ActionsListWorkflowRunsForRepoStatus {
   Completed
   ActionRequired
@@ -164772,6 +165704,7 @@ pub impl @json.FromJson for ActionsListWorkflowRunsForRepoResponse with fn from_
 ///|
 ///
 /// Generated string enum ActionsListWorkflowRunArtifactsDirection.
+#non_exhaustive
 pub(all) enum ActionsListWorkflowRunArtifactsDirection {
   Asc
   Desc
@@ -164951,6 +165884,7 @@ pub impl @json.FromJson for ActionsListJobsForWorkflowRunAttemptResponse with fn
 ///|
 ///
 /// Generated string enum ActionsListJobsForWorkflowRunFilter.
+#non_exhaustive
 pub(all) enum ActionsListJobsForWorkflowRunFilter {
   Latest
   All
@@ -165061,6 +165995,7 @@ pub impl @json.FromJson for ActionsListJobsForWorkflowRunResponse with fn from_j
 ///|
 ///
 /// Whether to approve or reject deployment to the specified environments.
+#non_exhaustive
 pub(all) enum ActionsReviewPendingDeploymentsForRunRequestState {
   Approved
   Rejected
@@ -165621,6 +166556,7 @@ pub impl @json.FromJson for ActionsListRepoWorkflowsResponse with fn from_json(
 ///|
 ///
 /// Generated untagged union ActionsGetWorkflowWorkflowId.
+#non_exhaustive
 pub(all) enum ActionsGetWorkflowWorkflowId {
   Int(Int32)
   Text(String)
@@ -165671,6 +166607,7 @@ pub impl @json.FromJson for ActionsGetWorkflowWorkflowId with fn from_json(
 ///|
 ///
 /// Generated untagged union ActionsDisableWorkflowWorkflowId.
+#non_exhaustive
 pub(all) enum ActionsDisableWorkflowWorkflowId {
   Int(Int32)
   Text(String)
@@ -165723,6 +166660,7 @@ pub impl @json.FromJson for ActionsDisableWorkflowWorkflowId with fn from_json(
 ///|
 ///
 /// Generated untagged union ActionsCreateWorkflowDispatchWorkflowId.
+#non_exhaustive
 pub(all) enum ActionsCreateWorkflowDispatchWorkflowId {
   Int(Int32)
   Text(String)
@@ -165837,6 +166775,7 @@ pub impl @json.FromJson for ActionsCreateWorkflowDispatchRequest with fn from_js
 ///|
 ///
 /// Generated untagged union ActionsEnableWorkflowWorkflowId.
+#non_exhaustive
 pub(all) enum ActionsEnableWorkflowWorkflowId {
   Int(Int32)
   Text(String)
@@ -165889,6 +166828,7 @@ pub impl @json.FromJson for ActionsEnableWorkflowWorkflowId with fn from_json(
 ///|
 ///
 /// Generated untagged union ActionsListWorkflowRunsWorkflowId.
+#non_exhaustive
 pub(all) enum ActionsListWorkflowRunsWorkflowId {
   Int(Int32)
   Text(String)
@@ -165941,6 +166881,7 @@ pub impl @json.FromJson for ActionsListWorkflowRunsWorkflowId with fn from_json(
 ///|
 ///
 /// Generated string enum ActionsListWorkflowRunsStatus.
+#non_exhaustive
 pub(all) enum ActionsListWorkflowRunsStatus {
   Completed
   ActionRequired
@@ -166085,6 +167026,7 @@ pub impl @json.FromJson for ActionsListWorkflowRunsResponse with fn from_json(
 ///|
 ///
 /// Generated untagged union ActionsGetWorkflowUsageWorkflowId.
+#non_exhaustive
 pub(all) enum ActionsGetWorkflowUsageWorkflowId {
   Int(Int32)
   Text(String)
@@ -166137,6 +167079,7 @@ pub impl @json.FromJson for ActionsGetWorkflowUsageWorkflowId with fn from_json(
 ///|
 ///
 /// Generated string enum ReposListActivitiesDirection.
+#non_exhaustive
 pub(all) enum ReposListActivitiesDirection {
   Asc
   Desc
@@ -166191,6 +167134,7 @@ pub impl @json.FromJson for ReposListActivitiesDirection with fn from_json(
 ///|
 ///
 /// Generated string enum ReposListActivitiesTimePeriod.
+#non_exhaustive
 pub(all) enum ReposListActivitiesTimePeriod {
   Day
   Week
@@ -166254,6 +167198,7 @@ pub impl @json.FromJson for ReposListActivitiesTimePeriod with fn from_json(
 ///|
 ///
 /// Generated string enum ReposListActivitiesActivityType.
+#non_exhaustive
 pub(all) enum ReposListActivitiesActivityType {
   Push
   ForcePush
@@ -168090,6 +169035,7 @@ pub impl @json.FromJson for ReposAddStatusCheckContextsRequestObject with fn fro
 ///|
 ///
 /// Generated untagged union ReposAddStatusCheckContextsRequest.
+#non_exhaustive
 pub(all) enum ReposAddStatusCheckContextsRequest {
   Object(ReposAddStatusCheckContextsRequestObject)
   TextArray(Array[String])
@@ -168195,6 +169141,7 @@ pub impl @json.FromJson for ReposSetStatusCheckContextsRequestObject with fn fro
 ///|
 ///
 /// Generated untagged union ReposSetStatusCheckContextsRequest.
+#non_exhaustive
 pub(all) enum ReposSetStatusCheckContextsRequest {
   Object(ReposSetStatusCheckContextsRequestObject)
   TextArray(Array[String])
@@ -168305,6 +169252,7 @@ pub impl @json.FromJson for ReposRemoveStatusCheckContextsRequestObject with fn 
 ///|
 ///
 /// Generated untagged union ReposRemoveStatusCheckContextsRequest.
+#non_exhaustive
 pub(all) enum ReposRemoveStatusCheckContextsRequest {
   Object(ReposRemoveStatusCheckContextsRequestObject)
   TextArray(Array[String])
@@ -168559,6 +169507,7 @@ pub impl @json.FromJson for ReposAddTeamAccessRestrictionsRequestObject with fn 
 ///|
 ///
 /// Generated untagged union ReposAddTeamAccessRestrictionsRequest.
+#non_exhaustive
 pub(all) enum ReposAddTeamAccessRestrictionsRequest {
   Object(ReposAddTeamAccessRestrictionsRequestObject)
   TextArray(Array[String])
@@ -168671,6 +169620,7 @@ pub impl @json.FromJson for ReposSetTeamAccessRestrictionsRequestObject with fn 
 ///|
 ///
 /// Generated untagged union ReposSetTeamAccessRestrictionsRequest.
+#non_exhaustive
 pub(all) enum ReposSetTeamAccessRestrictionsRequest {
   Object(ReposSetTeamAccessRestrictionsRequestObject)
   TextArray(Array[String])
@@ -168783,6 +169733,7 @@ pub impl @json.FromJson for ReposRemoveTeamAccessRestrictionsRequestObject with 
 ///|
 ///
 /// Generated untagged union ReposRemoveTeamAccessRestrictionsRequest.
+#non_exhaustive
 pub(all) enum ReposRemoveTeamAccessRestrictionsRequest {
   Object(ReposRemoveTeamAccessRestrictionsRequestObject)
   TextArray(Array[String])
@@ -169034,6 +169985,7 @@ pub impl @json.FromJson for ReposRenameBranchRequest with fn from_json(
 ///|
 ///
 /// The current status of the check run. Only GitHub Actions can set a status of `waiting`, `pending`, or `requested`.
+#non_exhaustive
 pub(all) enum ChecksCreateRequestStatus {
   Queued
   InProgress
@@ -169100,6 +170052,7 @@ pub impl @json.FromJson for ChecksCreateRequestStatus with fn from_json(
 ///|
 ///
 /// **Required if you provide `completed_at` or a `status` of `completed`**. The final conclusion of the check. **Note:** Providing `conclusion` will automatically set the `status` parameter to `completed`. You cannot change a check run conclusion to `stale`, only GitHub can set this.
+#non_exhaustive
 pub(all) enum ChecksCreateRequestConclusion {
   ActionRequired
   Cancelled
@@ -169172,6 +170125,7 @@ pub impl @json.FromJson for ChecksCreateRequestConclusion with fn from_json(
 ///|
 ///
 /// The level of the annotation.
+#non_exhaustive
 pub(all) enum ChecksCreateRequestOutputAnnotationsItemAnnotationLevel {
   Notice
   Warning
@@ -169612,6 +170566,7 @@ pub impl @json.FromJson for ChecksCreateRequest with fn from_json(value, path) {
 ///|
 ///
 /// The current status of the check run. Only GitHub Actions can set a status of `waiting`, `pending`, or `requested`.
+#non_exhaustive
 pub(all) enum ChecksUpdateRequestStatus {
   Queued
   InProgress
@@ -169678,6 +170633,7 @@ pub impl @json.FromJson for ChecksUpdateRequestStatus with fn from_json(
 ///|
 ///
 /// **Required if you provide `completed_at` or a `status` of `completed`**. The final conclusion of the check. **Note:** Providing `conclusion` will automatically set the `status` parameter to `completed`. You cannot change a check run conclusion to `stale`, only GitHub can set this.
+#non_exhaustive
 pub(all) enum ChecksUpdateRequestConclusion {
   ActionRequired
   Cancelled
@@ -169750,6 +170706,7 @@ pub impl @json.FromJson for ChecksUpdateRequestConclusion with fn from_json(
 ///|
 ///
 /// The level of the annotation.
+#non_exhaustive
 pub(all) enum ChecksUpdateRequestOutputAnnotationsItemAnnotationLevel {
   Notice
   Warning
@@ -170348,6 +171305,7 @@ pub impl @json.FromJson for ChecksSetSuitesPreferencesRequest with fn from_json(
 ///|
 ///
 /// Generated string enum ChecksListForSuiteStatus.
+#non_exhaustive
 pub(all) enum ChecksListForSuiteStatus {
   Queued
   InProgress
@@ -170405,6 +171363,7 @@ pub impl @json.FromJson for ChecksListForSuiteStatus with fn from_json(
 ///|
 ///
 /// Generated string enum ChecksListForSuiteFilter.
+#non_exhaustive
 pub(all) enum ChecksListForSuiteFilter {
   Latest
   All
@@ -170513,6 +171472,7 @@ pub impl @json.FromJson for ChecksListForSuiteResponse with fn from_json(
 ///|
 ///
 /// Generated string enum CodeQualityListFindingsForRepoDirection.
+#non_exhaustive
 pub(all) enum CodeQualityListFindingsForRepoDirection {
   Asc
   Desc
@@ -170571,6 +171531,7 @@ pub impl @json.FromJson for CodeQualityListFindingsForRepoDirection with fn from
 ///|
 ///
 /// Generated string enum CodeQualityListFindingsForRepoState.
+#non_exhaustive
 pub(all) enum CodeQualityListFindingsForRepoState {
   Open
   Dismissed
@@ -170625,6 +171586,7 @@ pub impl @json.FromJson for CodeQualityListFindingsForRepoState with fn from_jso
 ///|
 ///
 /// Generated string enum CodeScanningListAlertsForRepoDirection.
+#non_exhaustive
 pub(all) enum CodeScanningListAlertsForRepoDirection {
   Asc
   Desc
@@ -170681,6 +171643,7 @@ pub impl @json.FromJson for CodeScanningListAlertsForRepoDirection with fn from_
 ///|
 ///
 /// Generated string enum CodeScanningListAlertsForRepoSort.
+#non_exhaustive
 pub(all) enum CodeScanningListAlertsForRepoSort {
   Created
   Updated
@@ -170807,6 +171770,7 @@ pub impl @json.FromJson for CodeScanningUpdateAlertRequest with fn from_json(
 ///|
 ///
 /// Generated string enum CodeScanningListRecentAnalysesDirection.
+#non_exhaustive
 pub(all) enum CodeScanningListRecentAnalysesDirection {
   Asc
   Desc
@@ -171074,6 +172038,7 @@ pub impl @json.FromJson for CodespacesListInRepositoryForAuthenticatedUserRespon
 ///|
 ///
 /// The geographic area for this codespace. If not specified, the value is assigned by IP. This property replaces `location`, which is closing down.
+#non_exhaustive
 pub(all) enum CodespacesCreateWithRepoForAuthenticatedUserRequestGeo {
   EuropeWest
   SoutheastAsia
@@ -171712,6 +172677,7 @@ pub impl @json.FromJson for CodespacesCreateOrUpdateRepoSecretRequest with fn fr
 ///|
 ///
 /// Generated string enum ReposListCollaboratorsAffiliation.
+#non_exhaustive
 pub(all) enum ReposListCollaboratorsAffiliation {
   Outside
   Direct
@@ -171769,6 +172735,7 @@ pub impl @json.FromJson for ReposListCollaboratorsAffiliation with fn from_json(
 ///|
 ///
 /// Generated string enum ReposListCollaboratorsPermission.
+#non_exhaustive
 pub(all) enum ReposListCollaboratorsPermission {
   Pull
   Triage
@@ -171927,6 +172894,7 @@ pub impl @json.FromJson for ReposUpdateCommitCommentRequest with fn from_json(
 ///|
 ///
 /// Generated string enum ReactionsListForCommitCommentContent.
+#non_exhaustive
 pub(all) enum ReactionsListForCommitCommentContent {
   Plus1
   Minus1
@@ -171999,6 +172967,7 @@ pub impl @json.FromJson for ReactionsListForCommitCommentContent with fn from_js
 ///|
 ///
 /// The [reaction type](https://docs.github.com/rest/reactions/reactions#about-reactions) to add to the commit comment.
+#non_exhaustive
 pub(all) enum ReactionsCreateForCommitCommentRequestContent {
   Plus1
   Minus1
@@ -172190,6 +173159,7 @@ pub impl @json.FromJson for ReposCreateCommitCommentRequest with fn from_json(
 ///|
 ///
 /// Generated string enum ChecksListForRefStatus.
+#non_exhaustive
 pub(all) enum ChecksListForRefStatus {
   Queued
   InProgress
@@ -172247,6 +173217,7 @@ pub impl @json.FromJson for ChecksListForRefStatus with fn from_json(
 ///|
 ///
 /// Generated string enum ChecksListForRefFilter.
+#non_exhaustive
 pub(all) enum ChecksListForRefFilter {
   Latest
   All
@@ -172409,6 +173380,7 @@ pub impl @json.FromJson for ChecksListSuitesForRefResponse with fn from_json(
 ///|
 ///
 /// Generated tagged union ReposGetContentResponseObject.
+#non_exhaustive
 pub(all) enum ReposGetContentResponseObject {
   File(ContentFile)
   Symlink(ContentSymlink)
@@ -172460,6 +173432,7 @@ pub impl @json.FromJson for ReposGetContentResponseObject with fn from_json(
 ///|
 ///
 /// Generated untagged union ReposGetContentResponse.
+#non_exhaustive
 pub(all) enum ReposGetContentResponse {
   ContentDirectory(Array[ContentDirectoryItem])
   Object(ReposGetContentResponseObject)
@@ -173091,6 +174064,7 @@ pub impl @json.FromJson for CopilotGetCopilotCloudAgentConfigurationResponse wit
 ///|
 ///
 /// Generated untagged union DependabotListAlertsForRepoHas.
+#non_exhaustive
 pub(all) enum DependabotListAlertsForRepoHas {
   Text(String)
   TextArray(Array[String])
@@ -173143,6 +174117,7 @@ pub impl @json.FromJson for DependabotListAlertsForRepoHas with fn from_json(
 ///|
 ///
 /// Generated string enum DependabotListAlertsForRepoScope.
+#non_exhaustive
 pub(all) enum DependabotListAlertsForRepoScope {
   Development
   Runtime
@@ -173197,6 +174172,7 @@ pub impl @json.FromJson for DependabotListAlertsForRepoScope with fn from_json(
 ///|
 ///
 /// Generated string enum DependabotListAlertsForRepoSort.
+#non_exhaustive
 pub(all) enum DependabotListAlertsForRepoSort {
   Created
   Updated
@@ -173254,6 +174230,7 @@ pub impl @json.FromJson for DependabotListAlertsForRepoSort with fn from_json(
 ///|
 ///
 /// Generated string enum DependabotListAlertsForRepoDirection.
+#non_exhaustive
 pub(all) enum DependabotListAlertsForRepoDirection {
   Asc
   Desc
@@ -173308,6 +174285,7 @@ pub impl @json.FromJson for DependabotListAlertsForRepoDirection with fn from_js
 ///|
 ///
 /// The state of the Dependabot alert. A `dismissed_reason` must be provided when setting the state to `dismissed`.
+#non_exhaustive
 pub(all) enum DependabotUpdateAlertRequestState {
   Dismissed
   Open
@@ -173362,6 +174340,7 @@ pub impl @json.FromJson for DependabotUpdateAlertRequestState with fn from_json(
 ///|
 ///
 /// **Required when `state` is `dismissed`.** A reason for dismissing the alert.
+#non_exhaustive
 pub(all) enum DependabotUpdateAlertRequestDismissedReason {
   FixStarted
   Inaccurate
@@ -173806,6 +174785,7 @@ pub impl @json.FromJson for DependencyGraphCreateRepositorySnapshotResponse with
 ///|
 ///
 /// Generated untagged union ReposCreateDeploymentRequestPayload.
+#non_exhaustive
 pub(all) enum ReposCreateDeploymentRequestPayload {
   Object(Json)
   Text(String)
@@ -173954,6 +174934,7 @@ pub impl @json.FromJson for ReposCreateDeploymentRequest with fn from_json(
 ///|
 ///
 /// The state of the status. When you set a transient deployment to `inactive`, the deployment will be shown as `destroyed` in GitHub.
+#non_exhaustive
 pub(all) enum ReposCreateDeploymentStatusRequestState {
   Error
   Failure
@@ -174904,6 +175885,7 @@ pub impl @json.FromJson for ActionsUpdateEnvironmentVariableRequest with fn from
 ///|
 ///
 /// Generated string enum ReposListForksSort.
+#non_exhaustive
 pub(all) enum ReposListForksSort {
   Newest
   Oldest
@@ -175358,6 +176340,7 @@ pub impl @json.FromJson for GitUpdateRefRequest with fn from_json(value, path) {
 ///|
 ///
 /// The type of the object we're tagging. Normally this is a `commit` but it can also be a `tree` or a `blob`.
+#non_exhaustive
 pub(all) enum GitCreateTagRequestType {
   Commit
   Tree
@@ -175536,6 +176519,7 @@ pub impl @json.FromJson for GitCreateTagRequest with fn from_json(value, path) {
 ///|
 ///
 /// The file mode; one of `100644` for file (blob), `100755` for executable (blob), `040000` for subdirectory (tree), `160000` for submodule (commit), or `120000` for a blob that specifies the path of a symlink.
+#non_exhaustive
 pub(all) enum GitCreateTreeRequestTreeItemMode {
   Value100644
   Value100755
@@ -175599,6 +176583,7 @@ pub impl @json.FromJson for GitCreateTreeRequestTreeItemMode with fn from_json(
 ///|
 ///
 /// Either `blob`, `tree`, or `commit`.
+#non_exhaustive
 pub(all) enum GitCreateTreeRequestTreeItemType {
   Blob
   Tree
@@ -176027,6 +177012,7 @@ pub impl @json.FromJson for ReposUpdateWebhookConfigForRepoRequest with fn from_
 ///|
 ///
 /// Generated string enum ReposListWebhookDeliveriesStatus.
+#non_exhaustive
 pub(all) enum ReposListWebhookDeliveriesStatus {
   Success
   Failure
@@ -176081,6 +177067,7 @@ pub impl @json.FromJson for ReposListWebhookDeliveriesStatus with fn from_json(
 ///|
 ///
 /// The originating VCS type. Without this parameter, the import job will take additional time to detect the VCS type before beginning the import. This detection step will be reflected in the response.
+#non_exhaustive
 pub(all) enum MigrationsStartImportRequestVcs {
   Subversion
   Git
@@ -176207,6 +177194,7 @@ pub impl @json.FromJson for MigrationsStartImportRequest with fn from_json(
 ///|
 ///
 /// The type of version control system you are migrating from.
+#non_exhaustive
 pub(all) enum MigrationsUpdateImportRequestVcs {
   Subversion
   Tfvc
@@ -176383,6 +177371,7 @@ pub impl @json.FromJson for MigrationsMapCommitAuthorRequest with fn from_json(
 ///|
 ///
 /// Whether to store large files during the import. `opt_in` means large files will be stored using Git LFS. `opt_out` means large files will be removed during the import.
+#non_exhaustive
 pub(all) enum MigrationsSetLfsPreferenceRequestUseLfs {
   OptIn
   OptOut
@@ -176696,6 +177685,7 @@ pub impl @json.FromJson for InteractionsUpdatePullRequestCreationCapForRepoRespo
 ///|
 ///
 /// The permissions that the associated user will have on the repository. Valid values are `read`, `write`, `maintain`, `triage`, and `admin`.
+#non_exhaustive
 pub(all) enum ReposUpdateInvitationRequestPermissions {
   Read
   Write
@@ -176809,6 +177799,7 @@ pub impl @json.FromJson for ReposUpdateInvitationRequest with fn from_json(
 ///|
 ///
 /// Generated string enum IssuesListForRepoState.
+#non_exhaustive
 pub(all) enum IssuesListForRepoState {
   Open
   Closed
@@ -176866,6 +177857,7 @@ pub impl @json.FromJson for IssuesListForRepoState with fn from_json(
 ///|
 ///
 /// Generated string enum IssuesListForRepoSort.
+#non_exhaustive
 pub(all) enum IssuesListForRepoSort {
   Created
   Updated
@@ -176920,6 +177912,7 @@ pub impl @json.FromJson for IssuesListForRepoSort with fn from_json(value, path)
 ///|
 ///
 /// Generated string enum IssuesListForRepoDirection.
+#non_exhaustive
 pub(all) enum IssuesListForRepoDirection {
   Asc
   Desc
@@ -176974,6 +177967,7 @@ pub impl @json.FromJson for IssuesListForRepoDirection with fn from_json(
 ///|
 ///
 /// The title of the issue.
+#non_exhaustive
 pub(all) enum IssuesCreateRequestTitle {
   Text(String)
   Int(Int32)
@@ -177024,6 +178018,7 @@ pub impl @json.FromJson for IssuesCreateRequestTitle with fn from_json(
 ///|
 ///
 /// Generated untagged union IssuesCreateRequestMilestone.
+#non_exhaustive
 pub(all) enum IssuesCreateRequestMilestone {
   Text(String)
   Int(Int32)
@@ -177141,6 +178136,7 @@ pub impl @json.FromJson for IssuesCreateRequestLabelsItemObject with fn from_jso
 ///|
 ///
 /// Generated untagged union IssuesCreateRequestLabelsItem.
+#non_exhaustive
 pub(all) enum IssuesCreateRequestLabelsItem {
   Text(String)
   Object(IssuesCreateRequestLabelsItemObject)
@@ -177196,6 +178192,7 @@ pub impl @json.FromJson for IssuesCreateRequestLabelsItem with fn from_json(
 ///|
 ///
 /// The value to set for the field. For multi-select fields, provide an array of option names.
+#non_exhaustive
 pub(all) enum IssuesCreateRequestIssueFieldValuesItemValue {
   Text(String)
   Number(Double)
@@ -177410,6 +178407,7 @@ pub impl @json.FromJson for IssuesCreateRequest with fn from_json(value, path) {
 ///|
 ///
 /// Generated string enum IssuesListCommentsForRepoSort.
+#non_exhaustive
 pub(all) enum IssuesListCommentsForRepoSort {
   Created
   Updated
@@ -177464,6 +178462,7 @@ pub impl @json.FromJson for IssuesListCommentsForRepoSort with fn from_json(
 ///|
 ///
 /// Generated string enum IssuesListCommentsForRepoDirection.
+#non_exhaustive
 pub(all) enum IssuesListCommentsForRepoDirection {
   Asc
   Desc
@@ -177564,6 +178563,7 @@ pub impl @json.FromJson for IssuesUpdateCommentRequest with fn from_json(
 ///|
 ///
 /// Generated string enum ReactionsListForIssueCommentContent.
+#non_exhaustive
 pub(all) enum ReactionsListForIssueCommentContent {
   Plus1
   Minus1
@@ -177636,6 +178636,7 @@ pub impl @json.FromJson for ReactionsListForIssueCommentContent with fn from_jso
 ///|
 ///
 /// The [reaction type](https://docs.github.com/rest/reactions/reactions#about-reactions) to add to the issue comment.
+#non_exhaustive
 pub(all) enum ReactionsCreateForIssueCommentRequestContent {
   Plus1
   Minus1
@@ -177765,6 +178766,7 @@ pub impl @json.FromJson for ReactionsCreateForIssueCommentRequest with fn from_j
 ///|
 ///
 /// The title of the issue.
+#non_exhaustive
 pub(all) enum IssuesUpdateRequestTitle {
   Text(String)
   Int(Int32)
@@ -177815,6 +178817,7 @@ pub impl @json.FromJson for IssuesUpdateRequestTitle with fn from_json(
 ///|
 ///
 /// The open or closed state of the issue.
+#non_exhaustive
 pub(all) enum IssuesUpdateRequestState {
   Open
   Closed
@@ -177869,6 +178872,7 @@ pub impl @json.FromJson for IssuesUpdateRequestState with fn from_json(
 ///|
 ///
 /// The reason for the state change. Ignored unless `state` is changed.
+#non_exhaustive
 pub(all) enum IssuesUpdateRequestStateReason {
   Completed
   NotPlanned
@@ -177929,6 +178933,7 @@ pub impl @json.FromJson for IssuesUpdateRequestStateReason with fn from_json(
 ///|
 ///
 /// Generated untagged union IssuesUpdateRequestMilestone.
+#non_exhaustive
 pub(all) enum IssuesUpdateRequestMilestone {
   Text(String)
   Int(Int32)
@@ -177979,6 +178984,7 @@ pub impl @json.FromJson for IssuesUpdateRequestMilestone with fn from_json(
 ///|
 ///
 /// The confidence level for this label choice.
+#non_exhaustive
 pub(all) enum IssuesUpdateRequestLabelsItemObjectConfidence {
   Low
   Medium
@@ -178127,6 +179133,7 @@ pub impl @json.FromJson for IssuesUpdateRequestLabelsItemObject with fn from_jso
 ///|
 ///
 /// Generated untagged union IssuesUpdateRequestLabelsItem.
+#non_exhaustive
 pub(all) enum IssuesUpdateRequestLabelsItem {
   Text(String)
   Object(IssuesUpdateRequestLabelsItemObject)
@@ -178182,6 +179189,7 @@ pub impl @json.FromJson for IssuesUpdateRequestLabelsItem with fn from_json(
 ///|
 ///
 /// The confidence level for this assignee choice.
+#non_exhaustive
 pub(all) enum IssuesUpdateRequestAssigneesItemObjectConfidence {
   Low
   Medium
@@ -178314,6 +179322,7 @@ pub impl @json.FromJson for IssuesUpdateRequestAssigneesItemObject with fn from_
 ///|
 ///
 /// Generated untagged union IssuesUpdateRequestAssigneesItem.
+#non_exhaustive
 pub(all) enum IssuesUpdateRequestAssigneesItem {
   Text(String)
   Object(IssuesUpdateRequestAssigneesItemObject)
@@ -178369,6 +179378,7 @@ pub impl @json.FromJson for IssuesUpdateRequestAssigneesItem with fn from_json(
 ///|
 ///
 /// The value to set for the field. For multi-select fields, provide an array of option names.
+#non_exhaustive
 pub(all) enum IssuesUpdateRequestIssueFieldValuesItemValue {
   Text(String)
   Number(Double)
@@ -178436,6 +179446,7 @@ pub impl @json.FromJson for IssuesUpdateRequestIssueFieldValuesItemValue with fn
 ///|
 ///
 /// The confidence level for this field value choice.
+#non_exhaustive
 pub(all) enum IssuesUpdateRequestIssueFieldValuesItemConfidence {
   Low
   Medium
@@ -178574,6 +179585,7 @@ pub impl @json.FromJson for IssuesUpdateRequestIssueFieldValuesItem with fn from
 ///|
 ///
 /// The confidence level for this type choice.
+#non_exhaustive
 pub(all) enum IssuesUpdateRequestTypeObjectConfidence {
   Low
   Medium
@@ -178702,6 +179714,7 @@ pub impl @json.FromJson for IssuesUpdateRequestTypeObject with fn from_json(
 ///|
 ///
 /// The issue type to associate with this issue. Only users with push access can set the type for issues. Without push access to the repository, type changes are silently dropped.
+#non_exhaustive
 pub(all) enum IssuesUpdateRequestType {
   Text(String)
   Object(IssuesUpdateRequestTypeObject)
@@ -178851,6 +179864,7 @@ pub impl @json.FromJson for IssuesUpdateRequest with fn from_json(value, path) {
 ///|
 ///
 /// The reason for the current state
+#non_exhaustive
 pub(all) enum IssuesUpdateResponseStateReason {
   Completed
   Reopened
@@ -179169,6 +180183,7 @@ pub impl @json.FromJson for IssuesUpdateResponseLabelsItemObject with fn from_js
 ///|
 ///
 /// Generated untagged union IssuesUpdateResponseLabelsItem.
+#non_exhaustive
 pub(all) enum IssuesUpdateResponseLabelsItem {
   Text(String)
   Object(IssuesUpdateResponseLabelsItemObject)
@@ -179296,6 +180311,7 @@ pub impl @json.FromJson for IssuesUpdateResponsePullRequest with fn from_json(
 ///|
 ///
 /// Generated string enum IssuesUpdateResponseSuggestionsTypeItemConfidence.
+#non_exhaustive
 pub(all) enum IssuesUpdateResponseSuggestionsTypeItemConfidence {
   Low
   Medium
@@ -179364,6 +180380,7 @@ pub impl @json.FromJson for IssuesUpdateResponseSuggestionsTypeItemConfidence wi
 ///|
 ///
 /// Generated string enum IssuesUpdateResponseSuggestionsTypeItemIgnoredReason.
+#non_exhaustive
 pub(all) enum IssuesUpdateResponseSuggestionsTypeItemIgnoredReason {
   AlreadyApplied
   IssueAlreadyClosed
@@ -179503,6 +180520,7 @@ pub impl @json.FromJson for IssuesUpdateResponseSuggestionsTypeItem with fn from
 ///|
 ///
 /// Generated untagged union IssuesUpdateResponseSuggestionsIssueFieldValuesItemValue.
+#non_exhaustive
 pub(all) enum IssuesUpdateResponseSuggestionsIssueFieldValuesItemValue {
   Text(String)
   Number(Double)
@@ -179572,6 +180590,7 @@ pub impl @json.FromJson for IssuesUpdateResponseSuggestionsIssueFieldValuesItemV
 ///|
 ///
 /// Generated string enum IssuesUpdateResponseSuggestionsIssueFieldValuesItemConfidence.
+#non_exhaustive
 pub(all) enum IssuesUpdateResponseSuggestionsIssueFieldValuesItemConfidence {
   Low
   Medium
@@ -179640,6 +180659,7 @@ pub impl @json.FromJson for IssuesUpdateResponseSuggestionsIssueFieldValuesItemC
 ///|
 ///
 /// Generated string enum IssuesUpdateResponseSuggestionsIssueFieldValuesItemIgnoredReason.
+#non_exhaustive
 pub(all) enum IssuesUpdateResponseSuggestionsIssueFieldValuesItemIgnoredReason {
   AlreadyApplied
   IssueAlreadyClosed
@@ -179790,6 +180810,7 @@ pub impl @json.FromJson for IssuesUpdateResponseSuggestionsIssueFieldValuesItem 
 ///|
 ///
 /// Generated string enum IssuesUpdateResponseSuggestionsLabelsItemConfidence.
+#non_exhaustive
 pub(all) enum IssuesUpdateResponseSuggestionsLabelsItemConfidence {
   Low
   Medium
@@ -179858,6 +180879,7 @@ pub impl @json.FromJson for IssuesUpdateResponseSuggestionsLabelsItemConfidence 
 ///|
 ///
 /// Generated string enum IssuesUpdateResponseSuggestionsLabelsItemIgnoredReason.
+#non_exhaustive
 pub(all) enum IssuesUpdateResponseSuggestionsLabelsItemIgnoredReason {
   AlreadyApplied
   IssueAlreadyClosed
@@ -179999,6 +181021,7 @@ pub impl @json.FromJson for IssuesUpdateResponseSuggestionsLabelsItem with fn fr
 ///|
 ///
 /// Generated string enum IssuesUpdateResponseSuggestionsAssigneesItemConfidence.
+#non_exhaustive
 pub(all) enum IssuesUpdateResponseSuggestionsAssigneesItemConfidence {
   Low
   Medium
@@ -180067,6 +181090,7 @@ pub impl @json.FromJson for IssuesUpdateResponseSuggestionsAssigneesItemConfiden
 ///|
 ///
 /// Generated string enum IssuesUpdateResponseSuggestionsAssigneesItemIgnoredReason.
+#non_exhaustive
 pub(all) enum IssuesUpdateResponseSuggestionsAssigneesItemIgnoredReason {
   AlreadyApplied
   IssueAlreadyClosed
@@ -180211,6 +181235,7 @@ pub impl @json.FromJson for IssuesUpdateResponseSuggestionsAssigneesItem with fn
 ///|
 ///
 /// Generated string enum IssuesUpdateResponseSuggestionsStateItemConfidence.
+#non_exhaustive
 pub(all) enum IssuesUpdateResponseSuggestionsStateItemConfidence {
   Low
   Medium
@@ -180279,6 +181304,7 @@ pub impl @json.FromJson for IssuesUpdateResponseSuggestionsStateItemConfidence w
 ///|
 ///
 /// Generated string enum IssuesUpdateResponseSuggestionsStateItemIgnoredReason.
+#non_exhaustive
 pub(all) enum IssuesUpdateResponseSuggestionsStateItemIgnoredReason {
   AlreadyApplied
   IssueAlreadyClosed
@@ -180760,6 +181786,7 @@ pub impl @json.FromJson for IssuesUpdateResponse with fn from_json(value, path) 
 ///|
 ///
 /// The confidence level for this assignee choice.
+#non_exhaustive
 pub(all) enum IssuesAddAssigneesRequestAssigneesItemObjectConfidence {
   Low
   Medium
@@ -180899,6 +181926,7 @@ pub impl @json.FromJson for IssuesAddAssigneesRequestAssigneesItemObject with fn
 ///|
 ///
 /// Generated untagged union IssuesAddAssigneesRequestAssigneesItem.
+#non_exhaustive
 pub(all) enum IssuesAddAssigneesRequestAssigneesItem {
   Text(String)
   Object(IssuesAddAssigneesRequestAssigneesItemObject)
@@ -181140,6 +182168,7 @@ pub impl @json.FromJson for IssuesAddBlockedByDependencyRequest with fn from_jso
 ///|
 ///
 /// The value to set for the field. The type depends on the field's data type: - For text fields: provide a string value - For single_select fields: provide the option name as a string (must match an existing option) - For number fields: provide a numeric value - For multi_select fields: provide an array of option names (must match existing options) - For date fields: provide an ISO 8601 date string
+#non_exhaustive
 pub(all) enum IssuesAddIssueFieldValuesRequestIssueFieldValuesItemValue {
   Text(String)
   Number(Double)
@@ -181326,6 +182355,7 @@ pub impl @json.FromJson for IssuesAddIssueFieldValuesRequest with fn from_json(
 ///|
 ///
 /// The value to set for the field. The type depends on the field's data type: - For text fields: provide a string value - For single_select fields: provide the option name as a string (must match an existing option) - For number fields: provide a numeric value - For date fields: provide an ISO 8601 date string
+#non_exhaustive
 pub(all) enum IssuesSetIssueFieldValuesRequestIssueFieldValuesItemValue {
   Text(String)
   Number(Double)
@@ -181506,6 +182536,7 @@ pub impl @json.FromJson for IssuesSetIssueFieldValuesRequest with fn from_json(
 ///|
 ///
 /// The confidence level for this label choice.
+#non_exhaustive
 pub(all) enum IssuesAddLabelsRequestObjectLabelsItemObjectConfidence {
   Low
   Medium
@@ -181645,6 +182676,7 @@ pub impl @json.FromJson for IssuesAddLabelsRequestObjectLabelsItemObject with fn
 ///|
 ///
 /// Generated untagged union IssuesAddLabelsRequestObjectLabelsItem.
+#non_exhaustive
 pub(all) enum IssuesAddLabelsRequestObjectLabelsItem {
   Text(String)
   Object(IssuesAddLabelsRequestObjectLabelsItemObject)
@@ -181748,6 +182780,7 @@ pub impl @json.FromJson for IssuesAddLabelsRequestObject with fn from_json(
 ///|
 ///
 /// The confidence level for this label choice.
+#non_exhaustive
 pub(all) enum IssuesAddLabelsRequestObjectArrayItemConfidence {
   Low
   Medium
@@ -181880,6 +182913,7 @@ pub impl @json.FromJson for IssuesAddLabelsRequestObjectArrayItem with fn from_j
 ///|
 ///
 /// Generated untagged union IssuesAddLabelsRequest.
+#non_exhaustive
 pub(all) enum IssuesAddLabelsRequest {
   Object(IssuesAddLabelsRequestObject)
   TextArray(Array[String])
@@ -181939,6 +182973,7 @@ pub impl @json.FromJson for IssuesAddLabelsRequest with fn from_json(
 ///|
 ///
 /// The reason for locking the issue or pull request conversation. Lock will fail if you don't use one of these reasons: * `off-topic` * `too heated` * `resolved` * `spam`
+#non_exhaustive
 pub(all) enum IssuesLockRequestLockReason {
   OffTopic
   TooHeated
@@ -182042,6 +183077,7 @@ pub impl @json.FromJson for IssuesLockRequest with fn from_json(value, path) {
 ///|
 ///
 /// Generated string enum ReactionsListForIssueContent.
+#non_exhaustive
 pub(all) enum ReactionsListForIssueContent {
   Plus1
   Minus1
@@ -182114,6 +183150,7 @@ pub impl @json.FromJson for ReactionsListForIssueContent with fn from_json(
 ///|
 ///
 /// The [reaction type](https://docs.github.com/rest/reactions/reactions#about-reactions) to add to the issue.
+#non_exhaustive
 pub(all) enum ReactionsCreateForIssueRequestContent {
   Plus1
   Minus1
@@ -182438,6 +183475,7 @@ pub impl @json.FromJson for IssuesReprioritizeSubIssueRequest with fn from_json(
 ///|
 ///
 /// Generated string enum IssuesListSuggestionsState.
+#non_exhaustive
 pub(all) enum IssuesListSuggestionsState {
   Pending
   Applied
@@ -182507,6 +183545,7 @@ pub impl @json.FromJson for IssuesListSuggestionsState with fn from_json(
 ///|
 ///
 /// Generated string enum IssuesListSuggestionsAction.
+#non_exhaustive
 pub(all) enum IssuesListSuggestionsAction {
   SetType
   AddLabel
@@ -182849,6 +183888,7 @@ pub impl @json.FromJson for ReposMergeRequest with fn from_json(value, path) {
 ///|
 ///
 /// Generated string enum IssuesListMilestonesState.
+#non_exhaustive
 pub(all) enum IssuesListMilestonesState {
   Open
   Closed
@@ -182906,6 +183946,7 @@ pub impl @json.FromJson for IssuesListMilestonesState with fn from_json(
 ///|
 ///
 /// Generated string enum IssuesListMilestonesSort.
+#non_exhaustive
 pub(all) enum IssuesListMilestonesSort {
   DueOn
   Completeness
@@ -182960,6 +184001,7 @@ pub impl @json.FromJson for IssuesListMilestonesSort with fn from_json(
 ///|
 ///
 /// Generated string enum IssuesListMilestonesDirection.
+#non_exhaustive
 pub(all) enum IssuesListMilestonesDirection {
   Asc
   Desc
@@ -183014,6 +184056,7 @@ pub impl @json.FromJson for IssuesListMilestonesDirection with fn from_json(
 ///|
 ///
 /// The state of the milestone. Either `open` or `closed`.
+#non_exhaustive
 pub(all) enum IssuesCreateMilestoneRequestState {
   Open
   Closed
@@ -183130,6 +184173,7 @@ pub impl @json.FromJson for IssuesCreateMilestoneRequest with fn from_json(
 ///|
 ///
 /// The state of the milestone. Either `open` or `closed`.
+#non_exhaustive
 pub(all) enum IssuesUpdateMilestoneRequestState {
   Open
   Closed
@@ -183364,6 +184408,7 @@ pub impl @json.FromJson for ActivityMarkRepoNotificationsAsReadResponse with fn 
 ///|
 ///
 /// The process in which the Page will be built. Possible values are `"legacy"` and `"workflow"`.
+#non_exhaustive
 pub(all) enum ReposCreatePagesSiteRequestBuildType {
   Legacy
   Workflow
@@ -183418,6 +184463,7 @@ pub impl @json.FromJson for ReposCreatePagesSiteRequestBuildType with fn from_js
 ///|
 ///
 /// The repository directory that includes the source files for the Pages site. Allowed paths are `/` or `/docs`. Default: `/`
+#non_exhaustive
 pub(all) enum ReposCreatePagesSiteRequestSourcePath {
   Value
   Docs
@@ -183582,6 +184628,7 @@ pub impl @json.FromJson for ReposCreatePagesSiteRequest with fn from_json(
 ///|
 ///
 /// The process by which the GitHub Pages site will be built. `workflow` means that the site is built by a custom GitHub Actions workflow. `legacy` means that the site is built by GitHub when changes are pushed to a specific branch.
+#non_exhaustive
 pub(all) enum ReposUpdateInformationAboutPagesSiteRequestBuildType {
   Legacy
   Workflow
@@ -183647,6 +184694,7 @@ pub impl @json.FromJson for ReposUpdateInformationAboutPagesSiteRequestBuildType
 ///|
 ///
 /// Update the source for the repository. Must include the branch name, and may optionally specify the subdirectory `/docs`. Possible values are `"gh-pages"`, `"master"`, and `"master /docs"`.
+#non_exhaustive
 pub(all) enum ReposUpdateInformationAboutPagesSiteRequestSourceText {
   GhPages
   Master
@@ -183715,6 +184763,7 @@ pub impl @json.FromJson for ReposUpdateInformationAboutPagesSiteRequestSourceTex
 ///|
 ///
 /// The repository directory that includes the source files for the Pages site. Allowed paths are `/` or `/docs`.
+#non_exhaustive
 pub(all) enum ReposUpdateInformationAboutPagesSiteRequestSourceObjectPath {
   Value
   Docs
@@ -183845,6 +184894,7 @@ pub impl @json.FromJson for ReposUpdateInformationAboutPagesSiteRequestSourceObj
 ///|
 ///
 /// Generated untagged union ReposUpdateInformationAboutPagesSiteRequestSource.
+#non_exhaustive
 pub(all) enum ReposUpdateInformationAboutPagesSiteRequestSource {
   Text(ReposUpdateInformationAboutPagesSiteRequestSourceText)
   Object(ReposUpdateInformationAboutPagesSiteRequestSourceObject)
@@ -184056,6 +185106,7 @@ pub impl @json.FromJson for ReposCreatePagesDeploymentRequest with fn from_json(
 ///|
 ///
 /// Generated untagged union ReposGetPagesDeploymentPagesDeploymentId.
+#non_exhaustive
 pub(all) enum ReposGetPagesDeploymentPagesDeploymentId {
   Int(Int32)
   Text(String)
@@ -184112,6 +185163,7 @@ pub impl @json.FromJson for ReposGetPagesDeploymentPagesDeploymentId with fn fro
 ///|
 ///
 /// Generated untagged union ReposCancelPagesDeploymentPagesDeploymentId.
+#non_exhaustive
 pub(all) enum ReposCancelPagesDeploymentPagesDeploymentId {
   Int(Int32)
   Text(String)
@@ -184287,6 +185339,7 @@ pub impl @json.FromJson for ReposCustomPropertiesForReposCreateOrUpdateRepositor
 ///|
 ///
 /// Generated string enum PullsListState.
+#non_exhaustive
 pub(all) enum PullsListState {
   Open
   Closed
@@ -184341,6 +185394,7 @@ pub impl @json.FromJson for PullsListState with fn from_json(value, path) {
 ///|
 ///
 /// Generated string enum PullsListSort.
+#non_exhaustive
 pub(all) enum PullsListSort {
   Created
   Updated
@@ -184398,6 +185452,7 @@ pub impl @json.FromJson for PullsListSort with fn from_json(value, path) {
 ///|
 ///
 /// Generated string enum PullsListDirection.
+#non_exhaustive
 pub(all) enum PullsListDirection {
   Asc
   Desc
@@ -184526,6 +185581,7 @@ pub impl @json.FromJson for PullsCreateRequest with fn from_json(value, path) {
 ///|
 ///
 /// Generated string enum PullsListReviewCommentsForRepoSort.
+#non_exhaustive
 pub(all) enum PullsListReviewCommentsForRepoSort {
   Created
   Updated
@@ -184583,6 +185639,7 @@ pub impl @json.FromJson for PullsListReviewCommentsForRepoSort with fn from_json
 ///|
 ///
 /// Generated string enum PullsListReviewCommentsForRepoDirection.
+#non_exhaustive
 pub(all) enum PullsListReviewCommentsForRepoDirection {
   Asc
   Desc
@@ -184687,6 +185744,7 @@ pub impl @json.FromJson for PullsUpdateReviewCommentRequest with fn from_json(
 ///|
 ///
 /// Generated string enum ReactionsListForPullRequestReviewCommentContent.
+#non_exhaustive
 pub(all) enum ReactionsListForPullRequestReviewCommentContent {
   Plus1
   Minus1
@@ -184770,6 +185828,7 @@ pub impl @json.FromJson for ReactionsListForPullRequestReviewCommentContent with
 ///|
 ///
 /// The [reaction type](https://docs.github.com/rest/reactions/reactions#about-reactions) to add to the pull request review comment.
+#non_exhaustive
 pub(all) enum ReactionsCreateForPullRequestReviewCommentRequestContent {
   Plus1
   Minus1
@@ -184910,6 +185969,7 @@ pub impl @json.FromJson for ReactionsCreateForPullRequestReviewCommentRequest wi
 ///|
 ///
 /// State of this Pull Request. Either `open` or `closed`.
+#non_exhaustive
 pub(all) enum PullsUpdateRequestState {
   Open
   Closed
@@ -185029,6 +186089,7 @@ pub impl @json.FromJson for PullsUpdateRequest with fn from_json(value, path) {
 ///|
 ///
 /// The geographic area for this codespace. If not specified, the value is assigned by IP. This property replaces `location`, which is closing down.
+#non_exhaustive
 pub(all) enum CodespacesCreateWithPrForAuthenticatedUserRequestGeo {
   EuropeWest
   SoutheastAsia
@@ -185212,6 +186273,7 @@ pub impl @json.FromJson for CodespacesCreateWithPrForAuthenticatedUserRequest wi
 ///|
 ///
 /// Generated string enum PullsListReviewCommentsSort.
+#non_exhaustive
 pub(all) enum PullsListReviewCommentsSort {
   Created
   Updated
@@ -185266,6 +186328,7 @@ pub impl @json.FromJson for PullsListReviewCommentsSort with fn from_json(
 ///|
 ///
 /// Generated string enum PullsListReviewCommentsDirection.
+#non_exhaustive
 pub(all) enum PullsListReviewCommentsDirection {
   Asc
   Desc
@@ -185320,6 +186383,7 @@ pub impl @json.FromJson for PullsListReviewCommentsDirection with fn from_json(
 ///|
 ///
 /// In a split diff view, the side of the diff that the pull request's changes appear on. Can be `LEFT` or `RIGHT`. Use `LEFT` for deletions that appear in red. Use `RIGHT` for additions that appear in green or unchanged lines that appear in white and are shown for context. For a multi-line comment, side represents whether the last line of the comment range is a deletion or addition. For more information, see "[Diff view options](https://docs.github.com/articles/about-comparing-branches-in-pull-requests#diff-view-options)" in the GitHub Help documentation.
+#non_exhaustive
 pub(all) enum PullsCreateReviewCommentRequestSide {
   LEFT
   RIGHT
@@ -185374,6 +186438,7 @@ pub impl @json.FromJson for PullsCreateReviewCommentRequestSide with fn from_jso
 ///|
 ///
 /// **Required when using multi-line comments unless using `in_reply_to`**. The `start_side` is the starting side of the diff that the comment applies to. Can be `LEFT` or `RIGHT`. To learn more about multi-line comments, see "[Commenting on a pull request](https://docs.github.com/articles/commenting-on-a-pull-request#adding-line-comments-to-a-pull-request)" in the GitHub Help documentation. See `side` in this table for additional context.
+#non_exhaustive
 pub(all) enum PullsCreateReviewCommentRequestStartSide {
   LEFT
   RIGHT
@@ -185435,6 +186500,7 @@ pub impl @json.FromJson for PullsCreateReviewCommentRequestStartSide with fn fro
 ///|
 ///
 /// The level at which the comment is targeted.
+#non_exhaustive
 pub(all) enum PullsCreateReviewCommentRequestSubjectType {
   Line
   File
@@ -185645,6 +186711,7 @@ pub impl @json.FromJson for PullsCreateReplyForReviewCommentRequest with fn from
 ///|
 ///
 /// The merge method to use.
+#non_exhaustive
 pub(all) enum PullsMergeRequestMergeMethod {
   Merge
   Squash
@@ -185761,6 +186828,7 @@ pub impl @json.FromJson for PullsMergeRequest with fn from_json(value, path) {
 ///|
 ///
 /// The merge method to use for a direct merge. Only supported for direct merges.
+#non_exhaustive
 pub(all) enum PullsMergeAsyncRequestMergeMethod {
   Merge
   Squash
@@ -185818,6 +186886,7 @@ pub impl @json.FromJson for PullsMergeAsyncRequestMergeMethod with fn from_json(
 ///|
 ///
 /// The action that will be taken to merge the pull request. `direct_merge` merges the pull request directly without using a merge queue; `merge_queue` adds the pull request to a merge queue; `default` uses a merge queue if one is configured for the target branch, or merges directly otherwise. If omitted, defaults to `default`.
+#non_exhaustive
 pub(all) enum PullsMergeAsyncRequestMergeAction {
   Default
   DirectMerge
@@ -186114,6 +187183,7 @@ pub impl @json.FromJson for PullsRerequestReviewersRequest with fn from_json(
 ///|
 ///
 /// The review action you want to perform. The review actions include: `APPROVE`, `REQUEST_CHANGES`, or `COMMENT`. By leaving this blank, you set the review action state to `PENDING`, which means you will need to [submit the pull request review](https://docs.github.com/rest/pulls/reviews#submit-a-review-for-a-pull-request) when you are ready.
+#non_exhaustive
 pub(all) enum PullsCreateReviewRequestEvent {
   APPROVE
   REQUESTCHANGES
@@ -186402,6 +187472,7 @@ pub impl @json.FromJson for PullsDismissReviewRequest with fn from_json(
 ///|
 ///
 /// The review action you want to perform. The review actions include: `APPROVE`, `REQUEST_CHANGES`, or `COMMENT`. When you leave this blank, the API returns _HTTP 422 (Unrecognizable entity)_ and sets the review action state to `PENDING`, which means you will need to re-submit the pull request review using a review action.
+#non_exhaustive
 pub(all) enum PullsSubmitReviewRequestEvent {
   APPROVE
   REQUESTCHANGES
@@ -186615,6 +187686,7 @@ pub impl @json.FromJson for PullsUpdateBranchResponse with fn from_json(
 ///|
 ///
 /// Specifies whether this release should be set as the latest release for the repository. Drafts and prereleases cannot be set as latest. Defaults to `true` for newly published releases. `legacy` specifies that the latest release should be determined based on the release creation date and higher semantic version.
+#non_exhaustive
 pub(all) enum ReposCreateReleaseRequestMakeLatest {
   True
   False
@@ -186890,6 +187962,7 @@ pub impl @json.FromJson for ReposGenerateReleaseNotesRequest with fn from_json(
 ///|
 ///
 /// Specifies whether this release should be set as the latest release for the repository. Drafts and prereleases cannot be set as latest. Defaults to `true` for newly published releases. `legacy` specifies that the latest release should be determined based on the release creation date and higher semantic version.
+#non_exhaustive
 pub(all) enum ReposUpdateReleaseRequestMakeLatest {
   True
   False
@@ -187036,6 +188109,7 @@ pub impl @json.FromJson for ReposUpdateReleaseRequest with fn from_json(
 ///|
 ///
 /// Generated string enum ReactionsListForReleaseContent.
+#non_exhaustive
 pub(all) enum ReactionsListForReleaseContent {
   Plus1
   Laugh
@@ -187102,6 +188176,7 @@ pub impl @json.FromJson for ReactionsListForReleaseContent with fn from_json(
 ///|
 ///
 /// The [reaction type](https://docs.github.com/rest/reactions/reactions#about-reactions) to add to the release.
+#non_exhaustive
 pub(all) enum ReactionsCreateForReleaseRequestContent {
   Plus1
   Laugh
@@ -187218,6 +188293,7 @@ pub impl @json.FromJson for ReactionsCreateForReleaseRequest with fn from_json(
 ///|
 ///
 /// The target of the ruleset
+#non_exhaustive
 pub(all) enum ReposCreateRepoRulesetRequestTarget {
   Branch
   Tag
@@ -187345,6 +188421,7 @@ pub impl @json.FromJson for ReposCreateRepoRulesetRequest with fn from_json(
 ///|
 ///
 /// Generated string enum ReposGetRepoRuleSuitesTimePeriod.
+#non_exhaustive
 pub(all) enum ReposGetRepoRuleSuitesTimePeriod {
   Hour
   Day
@@ -187405,6 +188482,7 @@ pub impl @json.FromJson for ReposGetRepoRuleSuitesTimePeriod with fn from_json(
 ///|
 ///
 /// Generated string enum ReposGetRepoRuleSuitesRuleSuiteResult.
+#non_exhaustive
 pub(all) enum ReposGetRepoRuleSuitesRuleSuiteResult {
   Pass
   Fail
@@ -187467,6 +188545,7 @@ pub impl @json.FromJson for ReposGetRepoRuleSuitesRuleSuiteResult with fn from_j
 ///|
 ///
 /// Generated string enum ReposGetRepoRuleSuitesEvaluateStatus.
+#non_exhaustive
 pub(all) enum ReposGetRepoRuleSuitesEvaluateStatus {
   All
   Active
@@ -187524,6 +188603,7 @@ pub impl @json.FromJson for ReposGetRepoRuleSuitesEvaluateStatus with fn from_js
 ///|
 ///
 /// The target of the ruleset
+#non_exhaustive
 pub(all) enum ReposUpdateRepoRulesetRequestTarget {
   Branch
   Tag
@@ -187651,6 +188731,7 @@ pub impl @json.FromJson for ReposUpdateRepoRulesetRequest with fn from_json(
 ///|
 ///
 /// Generated string enum SecretScanningListAlertsForRepoState.
+#non_exhaustive
 pub(all) enum SecretScanningListAlertsForRepoState {
   Open
   Resolved
@@ -187705,6 +188786,7 @@ pub impl @json.FromJson for SecretScanningListAlertsForRepoState with fn from_js
 ///|
 ///
 /// Generated string enum SecretScanningListAlertsForRepoSort.
+#non_exhaustive
 pub(all) enum SecretScanningListAlertsForRepoSort {
   Created
   Updated
@@ -187759,6 +188841,7 @@ pub impl @json.FromJson for SecretScanningListAlertsForRepoSort with fn from_jso
 ///|
 ///
 /// Generated string enum SecretScanningListAlertsForRepoDirection.
+#non_exhaustive
 pub(all) enum SecretScanningListAlertsForRepoDirection {
   Asc
   Desc
@@ -187817,6 +188900,7 @@ pub impl @json.FromJson for SecretScanningListAlertsForRepoDirection with fn fro
 ///|
 ///
 /// Sets the validity of the secret scanning alert. Can be `active`, `inactive`, or `null` to clear the override.
+#non_exhaustive
 pub(all) enum SecretScanningUpdateAlertRequestValidity {
   Active
   Inactive
@@ -187947,6 +189031,7 @@ pub impl @json.FromJson for SecretScanningUpdateAlertRequest with fn from_json(
 ///|
 ///
 /// Generated string enum SecretScanningListRepoCustomPatternsState.
+#non_exhaustive
 pub(all) enum SecretScanningListRepoCustomPatternsState {
   Published
   Unpublished
@@ -188007,6 +189092,7 @@ pub impl @json.FromJson for SecretScanningListRepoCustomPatternsState with fn fr
 ///|
 ///
 /// Generated string enum SecretScanningListRepoCustomPatternsPushProtection.
+#non_exhaustive
 pub(all) enum SecretScanningListRepoCustomPatternsPushProtection {
   Enabled
   Disabled
@@ -188072,6 +189158,7 @@ pub impl @json.FromJson for SecretScanningListRepoCustomPatternsPushProtection w
 ///|
 ///
 /// Generated string enum SecretScanningListRepoCustomPatternsSort.
+#non_exhaustive
 pub(all) enum SecretScanningListRepoCustomPatternsSort {
   Created
   Updated
@@ -188133,6 +189220,7 @@ pub impl @json.FromJson for SecretScanningListRepoCustomPatternsSort with fn fro
 ///|
 ///
 /// Generated string enum SecretScanningListRepoCustomPatternsDirection.
+#non_exhaustive
 pub(all) enum SecretScanningListRepoCustomPatternsDirection {
   Asc
   Desc
@@ -188312,6 +189400,7 @@ pub impl @json.FromJson for SecretScanningBulkCreateRepoCustomPatternsResponse w
 ///|
 ///
 /// What to do with alerts associated with the deleted patterns. `delete_alerts` permanently removes the alerts. `resolve_alerts` resolves the alerts as "pattern deleted". Defaults to `delete_alerts` when not specified.
+#non_exhaustive
 pub(all) enum SecretScanningBulkDeleteRepoCustomPatternsRequestPostDeleteAction {
   DeleteAlerts
   ResolveAlerts
@@ -188507,6 +189596,7 @@ pub impl @json.FromJson for SecretScanningCreatePushProtectionBypassRequest with
 ///|
 ///
 /// Generated string enum SecurityAdvisoriesListRepositoryAdvisoriesDirection.
+#non_exhaustive
 pub(all) enum SecurityAdvisoriesListRepositoryAdvisoriesDirection {
   Asc
   Desc
@@ -188572,6 +189662,7 @@ pub impl @json.FromJson for SecurityAdvisoriesListRepositoryAdvisoriesDirection 
 ///|
 ///
 /// Generated string enum SecurityAdvisoriesListRepositoryAdvisoriesSort.
+#non_exhaustive
 pub(all) enum SecurityAdvisoriesListRepositoryAdvisoriesSort {
   Created
   Updated
@@ -188638,6 +189729,7 @@ pub impl @json.FromJson for SecurityAdvisoriesListRepositoryAdvisoriesSort with 
 ///|
 ///
 /// Generated string enum SecurityAdvisoriesListRepositoryAdvisoriesState.
+#non_exhaustive
 pub(all) enum SecurityAdvisoriesListRepositoryAdvisoriesState {
   Triage
   Draft
@@ -189347,6 +190439,7 @@ pub impl @json.FromJson for ActivityGetStargazerCountForRepoResponse with fn fro
 ///|
 ///
 /// The state of the status.
+#non_exhaustive
 pub(all) enum ReposCreateCommitStatusRequestState {
   Error
   Failure
@@ -189574,6 +190667,7 @@ pub impl @json.FromJson for ReposReplaceAllTopicsRequest with fn from_json(
 ///|
 ///
 /// Generated string enum ReposGetClonesPer.
+#non_exhaustive
 pub(all) enum ReposGetClonesPer {
   Day
   Week
@@ -189625,6 +190719,7 @@ pub impl @json.FromJson for ReposGetClonesPer with fn from_json(value, path) {
 ///|
 ///
 /// Generated string enum ReposGetViewsPer.
+#non_exhaustive
 pub(all) enum ReposGetViewsPer {
   Day
   Week
@@ -189797,6 +190892,7 @@ pub impl @json.FromJson for ReposCreateUsingTemplateRequest with fn from_json(
 ///|
 ///
 /// Generated string enum SearchCodeOrder.
+#non_exhaustive
 pub(all) enum SearchCodeOrder {
   Desc
   Asc
@@ -189903,6 +190999,7 @@ pub impl @json.FromJson for SearchCodeResponse with fn from_json(value, path) {
 ///|
 ///
 /// Generated string enum SearchCommitsSort.
+#non_exhaustive
 pub(all) enum SearchCommitsSort {
   AuthorDate
   CommitterDate
@@ -189954,6 +191051,7 @@ pub impl @json.FromJson for SearchCommitsSort with fn from_json(value, path) {
 ///|
 ///
 /// Generated string enum SearchCommitsOrder.
+#non_exhaustive
 pub(all) enum SearchCommitsOrder {
   Desc
   Asc
@@ -190060,6 +191158,7 @@ pub impl @json.FromJson for SearchCommitsResponse with fn from_json(value, path)
 ///|
 ///
 /// Generated string enum SearchIssuesAndPullRequestsSort.
+#non_exhaustive
 pub(all) enum SearchIssuesAndPullRequestsSort {
   Comments
   Reactions
@@ -190141,6 +191240,7 @@ pub impl @json.FromJson for SearchIssuesAndPullRequestsSort with fn from_json(
 ///|
 ///
 /// Generated string enum SearchIssuesAndPullRequestsOrder.
+#non_exhaustive
 pub(all) enum SearchIssuesAndPullRequestsOrder {
   Desc
   Asc
@@ -190195,6 +191295,7 @@ pub impl @json.FromJson for SearchIssuesAndPullRequestsOrder with fn from_json(
 ///|
 ///
 /// Generated string enum SearchIssuesAndPullRequestsSearchType.
+#non_exhaustive
 pub(all) enum SearchIssuesAndPullRequestsSearchType {
   Semantic
   Hybrid
@@ -190251,6 +191352,7 @@ pub impl @json.FromJson for SearchIssuesAndPullRequestsSearchType with fn from_j
 ///|
 ///
 /// The type of search that was performed. Possible values are `lexical`, `semantic`, or `hybrid`.
+#non_exhaustive
 pub(all) enum SearchIssuesAndPullRequestsResponseSearchType {
   Lexical
   Semantic
@@ -190317,6 +191419,7 @@ pub impl @json.FromJson for SearchIssuesAndPullRequestsResponseSearchType with f
 ///|
 ///
 /// Generated string enum SearchIssuesAndPullRequestsResponseLexicalFallbackReasonItem.
+#non_exhaustive
 pub(all) enum SearchIssuesAndPullRequestsResponseLexicalFallbackReasonItem {
   NoTextTerms
   QuotedText
@@ -190479,6 +191582,7 @@ pub impl @json.FromJson for SearchIssuesAndPullRequestsResponse with fn from_jso
 ///|
 ///
 /// Generated string enum SearchLabelsSort.
+#non_exhaustive
 pub(all) enum SearchLabelsSort {
   Created
   Updated
@@ -190530,6 +191634,7 @@ pub impl @json.FromJson for SearchLabelsSort with fn from_json(value, path) {
 ///|
 ///
 /// Generated string enum SearchLabelsOrder.
+#non_exhaustive
 pub(all) enum SearchLabelsOrder {
   Desc
   Asc
@@ -190636,6 +191741,7 @@ pub impl @json.FromJson for SearchLabelsResponse with fn from_json(value, path) 
 ///|
 ///
 /// Generated string enum SearchReposSort.
+#non_exhaustive
 pub(all) enum SearchReposSort {
   Stars
   Forks
@@ -190693,6 +191799,7 @@ pub impl @json.FromJson for SearchReposSort with fn from_json(value, path) {
 ///|
 ///
 /// Generated string enum SearchReposOrder.
+#non_exhaustive
 pub(all) enum SearchReposOrder {
   Desc
   Asc
@@ -190854,6 +191961,7 @@ pub impl @json.FromJson for SearchTopicsResponse with fn from_json(value, path) 
 ///|
 ///
 /// Generated string enum SearchUsersSort.
+#non_exhaustive
 pub(all) enum SearchUsersSort {
   Followers
   Repositories
@@ -190908,6 +192016,7 @@ pub impl @json.FromJson for SearchUsersSort with fn from_json(value, path) {
 ///|
 ///
 /// Generated string enum SearchUsersOrder.
+#non_exhaustive
 pub(all) enum SearchUsersOrder {
   Desc
   Asc
@@ -191014,6 +192123,7 @@ pub impl @json.FromJson for SearchUsersResponse with fn from_json(value, path) {
 ///|
 ///
 /// The level of privacy this team should have. Editing teams without specifying this parameter leaves `privacy` intact. The options are: **For a non-nested team:** * `secret` - only visible to organization owners and members of this team. * `closed` - visible to all members of this organization. **For a parent or child team:** * `closed` - visible to all members of this organization.
+#non_exhaustive
 pub(all) enum TeamsUpdateLegacyRequestPrivacy {
   Secret
   Closed
@@ -191068,6 +192178,7 @@ pub impl @json.FromJson for TeamsUpdateLegacyRequestPrivacy with fn from_json(
 ///|
 ///
 /// The notification setting the team has chosen. Editing teams without specifying this parameter leaves `notification_setting` intact. The options are: * `notifications_enabled` - team members receive notifications when the team is @mentioned. * `notifications_disabled` - no one receives notifications.
+#non_exhaustive
 pub(all) enum TeamsUpdateLegacyRequestNotificationSetting {
   NotificationsEnabled
   NotificationsDisabled
@@ -191131,6 +192242,7 @@ pub impl @json.FromJson for TeamsUpdateLegacyRequestNotificationSetting with fn 
 ///|
 ///
 /// **Closing down notice**. The permission that new repositories will be added to the team with when none is specified.
+#non_exhaustive
 pub(all) enum TeamsUpdateLegacyRequestPermission {
   Pull
   Push
@@ -191270,6 +192382,7 @@ pub impl @json.FromJson for TeamsUpdateLegacyRequest with fn from_json(
 ///|
 ///
 /// Generated string enum TeamsListMembersLegacyRole.
+#non_exhaustive
 pub(all) enum TeamsListMembersLegacyRole {
   Member
   Maintainer
@@ -191327,6 +192440,7 @@ pub impl @json.FromJson for TeamsListMembersLegacyRole with fn from_json(
 ///|
 ///
 /// The role that this user should have in the team.
+#non_exhaustive
 pub(all) enum TeamsAddOrUpdateMembershipForUserLegacyRequestRole {
   Member
   Maintainer
@@ -191447,6 +192561,7 @@ pub impl @json.FromJson for TeamsAddOrUpdateMembershipForUserLegacyRequest with 
 ///|
 ///
 /// The permission to grant the team on this repository. If no permission is specified, the team's `permission` attribute will be used to determine what permission to grant the team on this repository.
+#non_exhaustive
 pub(all) enum TeamsAddOrUpdateRepoPermissionsLegacyRequestPermission {
   Pull
   Push
@@ -191570,6 +192685,7 @@ pub impl @json.FromJson for TeamsAddOrUpdateRepoPermissionsLegacyRequest with fn
 ///|
 ///
 /// Generated tagged union UsersGetAuthenticatedResponse.
+#non_exhaustive
 pub(all) enum UsersGetAuthenticatedResponse {
   Public(PublicUser)
   Private(PrivateUser)
@@ -191833,6 +192949,7 @@ pub impl @json.FromJson for CodespacesListSecretsForAuthenticatedUserResponse wi
 ///|
 ///
 /// Generated untagged union CodespacesCreateOrUpdateSecretForAuthenticatedUserRequestSelectedRepositoryIdsItem.
+#non_exhaustive
 pub(all) enum CodespacesCreateOrUpdateSecretForAuthenticatedUserRequestSelectedRepositoryIdsItem {
   Int(Int32)
   Text(String)
@@ -192294,6 +193411,7 @@ pub impl @json.FromJson for CodespacesPublishForAuthenticatedUserRequest with fn
 ///|
 ///
 /// Denotes whether an email is publicly visible.
+#non_exhaustive
 pub(all) enum UsersSetPrimaryEmailVisibilityForAuthenticatedUserRequestVisibility {
   Public
   Private
@@ -192471,6 +193589,7 @@ pub impl @json.FromJson for UsersAddEmailForAuthenticatedUserRequestObject with 
 ///|
 ///
 /// Generated untagged union UsersAddEmailForAuthenticatedUserRequest.
+#non_exhaustive
 pub(all) enum UsersAddEmailForAuthenticatedUserRequest {
   Object(UsersAddEmailForAuthenticatedUserRequestObject)
   TextArray(Array[String])
@@ -192593,6 +193712,7 @@ pub impl @json.FromJson for UsersDeleteEmailForAuthenticatedUserRequestObject wi
 ///|
 ///
 /// Generated untagged union UsersDeleteEmailForAuthenticatedUserRequest.
+#non_exhaustive
 pub(all) enum UsersDeleteEmailForAuthenticatedUserRequest {
   Object(UsersDeleteEmailForAuthenticatedUserRequestObject)
   TextArray(Array[String])
@@ -192868,6 +193988,7 @@ pub impl @json.FromJson for AppsListInstallationReposForAuthenticatedUserRespons
 ///|
 ///
 /// The policy controlling who can create pull requests: all or collaborators_only.
+#non_exhaustive
 pub(all) enum AppsListInstallationReposForAuthenticatedUserResponseRepositoriesItemPullRequestCreationPolicy {
   All
   CollaboratorsOnly
@@ -192933,6 +194054,7 @@ pub impl @json.FromJson for AppsListInstallationReposForAuthenticatedUserRespons
 ///|
 ///
 /// The default value for a squash merge commit title: - `PR_TITLE` - default to the pull request's title. - `COMMIT_OR_PR_TITLE` - default to the commit's title (if only one commit) or the pull request's title (when more than one commit).
+#non_exhaustive
 pub(all) enum AppsListInstallationReposForAuthenticatedUserResponseRepositoriesItemSquashMergeCommitTitle {
   PRTITLE
   COMMITORPRTITLE
@@ -192998,6 +194120,7 @@ pub impl @json.FromJson for AppsListInstallationReposForAuthenticatedUserRespons
 ///|
 ///
 /// The default value for a squash merge commit message: - `PR_BODY` - default to the pull request's body. - `COMMIT_MESSAGES` - default to the branch's commit messages. - `BLANK` - default to a blank commit message.
+#non_exhaustive
 pub(all) enum AppsListInstallationReposForAuthenticatedUserResponseRepositoriesItemSquashMergeCommitMessage {
   PRBODY
   COMMITMESSAGES
@@ -193066,6 +194189,7 @@ pub impl @json.FromJson for AppsListInstallationReposForAuthenticatedUserRespons
 ///|
 ///
 /// The default value for a merge commit title. - `PR_TITLE` - default to the pull request's title. - `MERGE_MESSAGE` - default to the classic title for a merge message (e.g., Merge pull request #123 from branch-name).
+#non_exhaustive
 pub(all) enum AppsListInstallationReposForAuthenticatedUserResponseRepositoriesItemMergeCommitTitle {
   PRTITLE
   MERGEMESSAGE
@@ -193131,6 +194255,7 @@ pub impl @json.FromJson for AppsListInstallationReposForAuthenticatedUserRespons
 ///|
 ///
 /// The default value for a merge commit message. - `PR_TITLE` - default to the pull request's title. - `PR_BODY` - default to the pull request's body. - `BLANK` - default to a blank commit message.
+#non_exhaustive
 pub(all) enum AppsListInstallationReposForAuthenticatedUserResponseRepositoriesItemMergeCommitMessage {
   PRBODY
   PRTITLE
@@ -193918,6 +195043,7 @@ pub impl @json.FromJson for AppsListInstallationReposForAuthenticatedUserRespons
 ///|
 ///
 /// Generated string enum IssuesListForAuthenticatedUserFilter.
+#non_exhaustive
 pub(all) enum IssuesListForAuthenticatedUserFilter {
   Assigned
   Created
@@ -193984,6 +195110,7 @@ pub impl @json.FromJson for IssuesListForAuthenticatedUserFilter with fn from_js
 ///|
 ///
 /// Generated string enum IssuesListForAuthenticatedUserState.
+#non_exhaustive
 pub(all) enum IssuesListForAuthenticatedUserState {
   Open
   Closed
@@ -194041,6 +195168,7 @@ pub impl @json.FromJson for IssuesListForAuthenticatedUserState with fn from_jso
 ///|
 ///
 /// Generated string enum IssuesListForAuthenticatedUserSort.
+#non_exhaustive
 pub(all) enum IssuesListForAuthenticatedUserSort {
   Created
   Updated
@@ -194098,6 +195226,7 @@ pub impl @json.FromJson for IssuesListForAuthenticatedUserSort with fn from_json
 ///|
 ///
 /// Generated string enum IssuesListForAuthenticatedUserDirection.
+#non_exhaustive
 pub(all) enum IssuesListForAuthenticatedUserDirection {
   Asc
   Desc
@@ -194221,6 +195350,7 @@ pub impl @json.FromJson for UsersCreatePublicSshKeyForAuthenticatedUserRequest w
 ///|
 ///
 /// Generated string enum OrgsListMembershipsForAuthenticatedUserState.
+#non_exhaustive
 pub(all) enum OrgsListMembershipsForAuthenticatedUserState {
   Active
   Pending
@@ -194436,6 +195566,7 @@ pub impl @json.FromJson for MigrationsStartForAuthenticatedUserRequest with fn f
 ///|
 ///
 /// Generated string enum PackagesListPackagesForAuthenticatedUserPackageType.
+#non_exhaustive
 pub(all) enum PackagesListPackagesForAuthenticatedUserPackageType {
   Npm
   Maven
@@ -194513,6 +195644,7 @@ pub impl @json.FromJson for PackagesListPackagesForAuthenticatedUserPackageType 
 ///|
 ///
 /// Generated string enum PackagesListPackagesForAuthenticatedUserVisibility.
+#non_exhaustive
 pub(all) enum PackagesListPackagesForAuthenticatedUserVisibility {
   Public
   Private
@@ -194581,6 +195713,7 @@ pub impl @json.FromJson for PackagesListPackagesForAuthenticatedUserVisibility w
 ///|
 ///
 /// Generated string enum PackagesGetPackageForAuthenticatedUserPackageType.
+#non_exhaustive
 pub(all) enum PackagesGetPackageForAuthenticatedUserPackageType {
   Npm
   Maven
@@ -194658,6 +195791,7 @@ pub impl @json.FromJson for PackagesGetPackageForAuthenticatedUserPackageType wi
 ///|
 ///
 /// Generated string enum PackagesDeletePackageForAuthenticatedUserPackageType.
+#non_exhaustive
 pub(all) enum PackagesDeletePackageForAuthenticatedUserPackageType {
   Npm
   Maven
@@ -194735,6 +195869,7 @@ pub impl @json.FromJson for PackagesDeletePackageForAuthenticatedUserPackageType
 ///|
 ///
 /// Generated string enum PackagesRestorePackageForAuthenticatedUserPackageType.
+#non_exhaustive
 pub(all) enum PackagesRestorePackageForAuthenticatedUserPackageType {
   Npm
   Maven
@@ -194812,6 +195947,7 @@ pub impl @json.FromJson for PackagesRestorePackageForAuthenticatedUserPackageTyp
 ///|
 ///
 /// Generated string enum PackagesGetAllPackageVersionsForPackageOwnedByAuthenticatedUserPackageType.
+#non_exhaustive
 pub(all) enum PackagesGetAllPackageVersionsForPackageOwnedByAuthenticatedUserPackageType {
   Npm
   Maven
@@ -194889,6 +196025,7 @@ pub impl @json.FromJson for PackagesGetAllPackageVersionsForPackageOwnedByAuthen
 ///|
 ///
 /// Generated string enum PackagesGetAllPackageVersionsForPackageOwnedByAuthenticatedUserState.
+#non_exhaustive
 pub(all) enum PackagesGetAllPackageVersionsForPackageOwnedByAuthenticatedUserState {
   Active
   Deleted
@@ -194954,6 +196091,7 @@ pub impl @json.FromJson for PackagesGetAllPackageVersionsForPackageOwnedByAuthen
 ///|
 ///
 /// Generated string enum PackagesGetPackageVersionForAuthenticatedUserPackageType.
+#non_exhaustive
 pub(all) enum PackagesGetPackageVersionForAuthenticatedUserPackageType {
   Npm
   Maven
@@ -195031,6 +196169,7 @@ pub impl @json.FromJson for PackagesGetPackageVersionForAuthenticatedUserPackage
 ///|
 ///
 /// Generated string enum PackagesDeletePackageVersionForAuthenticatedUserPackageType.
+#non_exhaustive
 pub(all) enum PackagesDeletePackageVersionForAuthenticatedUserPackageType {
   Npm
   Maven
@@ -195108,6 +196247,7 @@ pub impl @json.FromJson for PackagesDeletePackageVersionForAuthenticatedUserPack
 ///|
 ///
 /// Generated string enum PackagesRestorePackageVersionForAuthenticatedUserPackageType.
+#non_exhaustive
 pub(all) enum PackagesRestorePackageVersionForAuthenticatedUserPackageType {
   Npm
   Maven
@@ -195185,6 +196325,7 @@ pub impl @json.FromJson for PackagesRestorePackageVersionForAuthenticatedUserPac
 ///|
 ///
 /// Generated string enum ReposListForAuthenticatedUserVisibility.
+#non_exhaustive
 pub(all) enum ReposListForAuthenticatedUserVisibility {
   All
   Public
@@ -195246,6 +196387,7 @@ pub impl @json.FromJson for ReposListForAuthenticatedUserVisibility with fn from
 ///|
 ///
 /// Generated string enum ReposListForAuthenticatedUserType.
+#non_exhaustive
 pub(all) enum ReposListForAuthenticatedUserType {
   All
   Owner
@@ -195309,6 +196451,7 @@ pub impl @json.FromJson for ReposListForAuthenticatedUserType with fn from_json(
 ///|
 ///
 /// Generated string enum ReposListForAuthenticatedUserSort.
+#non_exhaustive
 pub(all) enum ReposListForAuthenticatedUserSort {
   Created
   Updated
@@ -195369,6 +196512,7 @@ pub impl @json.FromJson for ReposListForAuthenticatedUserSort with fn from_json(
 ///|
 ///
 /// Generated string enum ReposListForAuthenticatedUserDirection.
+#non_exhaustive
 pub(all) enum ReposListForAuthenticatedUserDirection {
   Asc
   Desc
@@ -195425,6 +196569,7 @@ pub impl @json.FromJson for ReposListForAuthenticatedUserDirection with fn from_
 ///|
 ///
 /// Required when using `squash_merge_commit_message`. The default value for a squash merge commit title: - `PR_TITLE` - default to the pull request's title. - `COMMIT_OR_PR_TITLE` - default to the commit's title (if only one commit) or the pull request's title (when more than one commit).
+#non_exhaustive
 pub(all) enum ReposCreateForAuthenticatedUserRequestSquashMergeCommitTitle {
   PRTITLE
   COMMITORPRTITLE
@@ -195490,6 +196635,7 @@ pub impl @json.FromJson for ReposCreateForAuthenticatedUserRequestSquashMergeCom
 ///|
 ///
 /// The default value for a squash merge commit message: - `PR_BODY` - default to the pull request's body. - `COMMIT_MESSAGES` - default to the branch's commit messages. - `BLANK` - default to a blank commit message.
+#non_exhaustive
 pub(all) enum ReposCreateForAuthenticatedUserRequestSquashMergeCommitMessage {
   PRBODY
   COMMITMESSAGES
@@ -195558,6 +196704,7 @@ pub impl @json.FromJson for ReposCreateForAuthenticatedUserRequestSquashMergeCom
 ///|
 ///
 /// Required when using `merge_commit_message`. The default value for a merge commit title. - `PR_TITLE` - default to the pull request's title. - `MERGE_MESSAGE` - default to the classic title for a merge message (e.g., Merge pull request #123 from branch-name).
+#non_exhaustive
 pub(all) enum ReposCreateForAuthenticatedUserRequestMergeCommitTitle {
   PRTITLE
   MERGEMESSAGE
@@ -195623,6 +196770,7 @@ pub impl @json.FromJson for ReposCreateForAuthenticatedUserRequestMergeCommitTit
 ///|
 ///
 /// The default value for a merge commit message. - `PR_TITLE` - default to the pull request's title. - `PR_BODY` - default to the pull request's body. - `BLANK` - default to a blank commit message.
+#non_exhaustive
 pub(all) enum ReposCreateForAuthenticatedUserRequestMergeCommitMessage {
   PRBODY
   PRTITLE
@@ -196040,6 +197188,7 @@ pub impl @json.FromJson for UsersCreateSshSigningKeyForAuthenticatedUserRequest 
 ///|
 ///
 /// Generated string enum ActivityListReposStarredByAuthenticatedUserSort.
+#non_exhaustive
 pub(all) enum ActivityListReposStarredByAuthenticatedUserSort {
   Created
   Updated
@@ -196105,6 +197254,7 @@ pub impl @json.FromJson for ActivityListReposStarredByAuthenticatedUserSort with
 ///|
 ///
 /// Generated string enum ActivityListReposStarredByAuthenticatedUserDirection.
+#non_exhaustive
 pub(all) enum ActivityListReposStarredByAuthenticatedUserDirection {
   Asc
   Desc
@@ -196170,6 +197320,7 @@ pub impl @json.FromJson for ActivityListReposStarredByAuthenticatedUserDirection
 ///|
 ///
 /// Generated tagged union UsersGetByIdResponse.
+#non_exhaustive
 pub(all) enum UsersGetByIdResponse {
   Public(PublicUser)
   Private(PrivateUser)
@@ -196280,6 +197431,7 @@ pub impl @json.FromJson for ProjectsCreateDraftItemForAuthenticatedUserRequest w
 ///|
 ///
 /// The layout of the view.
+#non_exhaustive
 pub(all) enum ProjectsCreateViewForUserRequestLayout {
   Table
   Board
@@ -196339,6 +197491,7 @@ pub impl @json.FromJson for ProjectsCreateViewForUserRequestLayout with fn from_
 ///|
 ///
 /// Generated untagged union ProjectsCreateViewForUserRequestSortByItemItem.
+#non_exhaustive
 pub(all) enum ProjectsCreateViewForUserRequestSortByItemItem {
   Int(Int32)
   Text(String)
@@ -196482,6 +197635,7 @@ pub impl @json.FromJson for ProjectsCreateViewForUserRequest with fn from_json(
 ///|
 ///
 /// Generated tagged union UsersGetByUsernameResponse.
+#non_exhaustive
 pub(all) enum UsersGetByUsernameResponse {
   Public(PublicUser)
   Private(PrivateUser)
@@ -197087,6 +198241,7 @@ pub impl @json.FromJson for CopilotSpacesListForUserResponse with fn from_json(
 ///|
 ///
 /// The base role that determines default permissions for the space. - `no_access`: No default access (default) - `reader`: Makes the space publicly readable Note: User spaces do not support writer or admin base roles.
+#non_exhaustive
 pub(all) enum CopilotSpacesCreateForUserRequestBaseRole {
   Reader
   NoAccess
@@ -197147,6 +198302,7 @@ pub impl @json.FromJson for CopilotSpacesCreateForUserRequestBaseRole with fn fr
 ///|
 ///
 /// The type of resource.
+#non_exhaustive
 pub(all) enum CopilotSpacesCreateForUserRequestResourcesAttributesItemResourceType {
   Repository
   GithubFile
@@ -197439,6 +198595,7 @@ pub impl @json.FromJson for CopilotSpacesCreateForUserRequest with fn from_json(
 ///|
 ///
 /// The base role that determines default permissions for the space. Changing this field requires admin permissions. - `no_access`: No default access (default) - `reader`: Makes the space publicly readable Note: User spaces do not support writer or admin base roles.
+#non_exhaustive
 pub(all) enum CopilotSpacesUpdateForUserRequestBaseRole {
   Reader
   NoAccess
@@ -197499,6 +198656,7 @@ pub impl @json.FromJson for CopilotSpacesUpdateForUserRequestBaseRole with fn fr
 ///|
 ///
 /// The type of resource.
+#non_exhaustive
 pub(all) enum CopilotSpacesUpdateForUserRequestResourcesAttributesItemResourceType {
   Repository
   GithubFile
@@ -197846,6 +199004,7 @@ pub impl @json.FromJson for CopilotSpacesListCollaboratorsForUserResponse with f
 ///|
 ///
 /// The type of actor (must be `User` for user-owned spaces; `Team` will be rejected).
+#non_exhaustive
 pub(all) enum CopilotSpacesAddCollaboratorForUserRequestActorType {
   User
   Team
@@ -197911,6 +199070,7 @@ pub impl @json.FromJson for CopilotSpacesAddCollaboratorForUserRequestActorType 
 ///|
 ///
 /// The role to grant to the collaborator.
+#non_exhaustive
 pub(all) enum CopilotSpacesAddCollaboratorForUserRequestRole {
   Reader
   Writer
@@ -198044,6 +199204,7 @@ pub impl @json.FromJson for CopilotSpacesAddCollaboratorForUserRequest with fn f
 ///|
 ///
 /// Generated string enum CopilotSpacesUpdateCollaboratorForUserActorType.
+#non_exhaustive
 pub(all) enum CopilotSpacesUpdateCollaboratorForUserActorType {
   User
   Team
@@ -198109,6 +199270,7 @@ pub impl @json.FromJson for CopilotSpacesUpdateCollaboratorForUserActorType with
 ///|
 ///
 /// The new role to grant to the collaborator. Use `no_access` to remove the collaborator.
+#non_exhaustive
 pub(all) enum CopilotSpacesUpdateCollaboratorForUserRequestRole {
   Reader
   Writer
@@ -198235,6 +199397,7 @@ pub impl @json.FromJson for CopilotSpacesUpdateCollaboratorForUserRequest with f
 ///|
 ///
 /// Generated string enum CopilotSpacesRemoveCollaboratorForUserActorType.
+#non_exhaustive
 pub(all) enum CopilotSpacesRemoveCollaboratorForUserActorType {
   User
   Team
@@ -198352,6 +199515,7 @@ pub impl @json.FromJson for CopilotSpacesListResourcesForUserResponse with fn fr
 ///|
 ///
 /// The type of resource to create.
+#non_exhaustive
 pub(all) enum CopilotSpacesCreateResourceForUserRequestResourceType {
   Repository
   GithubFile
@@ -198538,6 +199702,7 @@ pub impl @json.FromJson for CopilotSpacesUpdateResourceForUserRequest with fn fr
 ///|
 ///
 /// Generated string enum UsersGetContextForUserSubjectType.
+#non_exhaustive
 pub(all) enum UsersGetContextForUserSubjectType {
   Organization
   Repository
@@ -198598,6 +199763,7 @@ pub impl @json.FromJson for UsersGetContextForUserSubjectType with fn from_json(
 ///|
 ///
 /// Generated string enum PackagesListPackagesForUserPackageType.
+#non_exhaustive
 pub(all) enum PackagesListPackagesForUserPackageType {
   Npm
   Maven
@@ -198666,6 +199832,7 @@ pub impl @json.FromJson for PackagesListPackagesForUserPackageType with fn from_
 ///|
 ///
 /// Generated string enum PackagesListPackagesForUserVisibility.
+#non_exhaustive
 pub(all) enum PackagesListPackagesForUserVisibility {
   Public
   Private
@@ -198725,6 +199892,7 @@ pub impl @json.FromJson for PackagesListPackagesForUserVisibility with fn from_j
 ///|
 ///
 /// Generated string enum PackagesGetPackageForUserPackageType.
+#non_exhaustive
 pub(all) enum PackagesGetPackageForUserPackageType {
   Npm
   Maven
@@ -198791,6 +199959,7 @@ pub impl @json.FromJson for PackagesGetPackageForUserPackageType with fn from_js
 ///|
 ///
 /// Generated string enum PackagesDeletePackageForUserPackageType.
+#non_exhaustive
 pub(all) enum PackagesDeletePackageForUserPackageType {
   Npm
   Maven
@@ -198861,6 +200030,7 @@ pub impl @json.FromJson for PackagesDeletePackageForUserPackageType with fn from
 ///|
 ///
 /// Generated string enum PackagesRestorePackageForUserPackageType.
+#non_exhaustive
 pub(all) enum PackagesRestorePackageForUserPackageType {
   Npm
   Maven
@@ -198931,6 +200101,7 @@ pub impl @json.FromJson for PackagesRestorePackageForUserPackageType with fn fro
 ///|
 ///
 /// Generated string enum PackagesGetAllPackageVersionsForPackageOwnedByUserPackageType.
+#non_exhaustive
 pub(all) enum PackagesGetAllPackageVersionsForPackageOwnedByUserPackageType {
   Npm
   Maven
@@ -199008,6 +200179,7 @@ pub impl @json.FromJson for PackagesGetAllPackageVersionsForPackageOwnedByUserPa
 ///|
 ///
 /// Generated string enum PackagesGetPackageVersionForUserPackageType.
+#non_exhaustive
 pub(all) enum PackagesGetPackageVersionForUserPackageType {
   Npm
   Maven
@@ -199083,6 +200255,7 @@ pub impl @json.FromJson for PackagesGetPackageVersionForUserPackageType with fn 
 ///|
 ///
 /// Generated string enum PackagesDeletePackageVersionForUserPackageType.
+#non_exhaustive
 pub(all) enum PackagesDeletePackageVersionForUserPackageType {
   Npm
   Maven
@@ -199158,6 +200331,7 @@ pub impl @json.FromJson for PackagesDeletePackageVersionForUserPackageType with 
 ///|
 ///
 /// Generated string enum PackagesRestorePackageVersionForUserPackageType.
+#non_exhaustive
 pub(all) enum PackagesRestorePackageVersionForUserPackageType {
   Npm
   Maven
@@ -199235,6 +200409,7 @@ pub impl @json.FromJson for PackagesRestorePackageVersionForUserPackageType with
 ///|
 ///
 /// The field's data type.
+#non_exhaustive
 pub(all) enum ProjectsAddFieldForUserRequestValue0DataType {
   Text
   Number
@@ -199473,6 +200648,7 @@ pub impl @json.FromJson for ProjectsAddFieldForUserRequestValue2 with fn from_js
 ///|
 ///
 /// Generated tagged union ProjectsAddFieldForUserRequest.
+#non_exhaustive
 pub(all) enum ProjectsAddFieldForUserRequest {
   Value0(ProjectsAddFieldForUserRequestValue0)
   Value1(ProjectsAddFieldForUserRequestValue1)
@@ -199526,6 +200702,7 @@ pub impl @json.FromJson for ProjectsAddFieldForUserRequest with fn from_json(
 ///|
 ///
 /// Generated untagged union ProjectsListItemsForUserFields.
+#non_exhaustive
 pub(all) enum ProjectsListItemsForUserFields {
   Text(String)
   TextArray(Array[String])
@@ -199578,6 +200755,7 @@ pub impl @json.FromJson for ProjectsListItemsForUserFields with fn from_json(
 ///|
 ///
 /// The type of item to add to the project. Must be either Issue or PullRequest.
+#non_exhaustive
 pub(all) enum ProjectsAddItemForUserRequestType {
   Issue
   PullRequest
@@ -199698,6 +200876,7 @@ pub impl @json.FromJson for ProjectsAddItemForUserRequest with fn from_json(
 ///|
 ///
 /// Generated untagged union ProjectsGetUserItemFields.
+#non_exhaustive
 pub(all) enum ProjectsGetUserItemFields {
   Text(String)
   TextArray(Array[String])
@@ -199748,6 +200927,7 @@ pub impl @json.FromJson for ProjectsGetUserItemFields with fn from_json(
 ///|
 ///
 /// The new value for the field: - For text, number, and date fields, provide the new value directly. - For single select and iteration fields, provide the ID of the option or iteration. - To clear the field, set this to null.
+#non_exhaustive
 pub(all) enum ProjectsUpdateItemForUserRequestFieldsItemValue {
   Text(String)
   Number(Double)
@@ -199920,6 +201100,7 @@ pub impl @json.FromJson for ProjectsUpdateItemForUserRequest with fn from_json(
 ///|
 ///
 /// Generated untagged union ProjectsListViewItemsForUserFields.
+#non_exhaustive
 pub(all) enum ProjectsListViewItemsForUserFields {
   Text(String)
   TextArray(Array[String])
@@ -199972,6 +201153,7 @@ pub impl @json.FromJson for ProjectsListViewItemsForUserFields with fn from_json
 ///|
 ///
 /// Generated string enum ReposListForUserType.
+#non_exhaustive
 pub(all) enum ReposListForUserType {
   All
   Owner
@@ -200026,6 +201208,7 @@ pub impl @json.FromJson for ReposListForUserType with fn from_json(value, path) 
 ///|
 ///
 /// Generated string enum ReposListForUserSort.
+#non_exhaustive
 pub(all) enum ReposListForUserSort {
   Created
   Updated
@@ -200083,6 +201266,7 @@ pub impl @json.FromJson for ReposListForUserSort with fn from_json(value, path) 
 ///|
 ///
 /// Generated string enum ReposListForUserDirection.
+#non_exhaustive
 pub(all) enum ReposListForUserDirection {
   Asc
   Desc
@@ -200137,6 +201321,7 @@ pub impl @json.FromJson for ReposListForUserDirection with fn from_json(
 ///|
 ///
 /// Generated string enum ActivityListReposStarredByUserSort.
+#non_exhaustive
 pub(all) enum ActivityListReposStarredByUserSort {
   Created
   Updated
@@ -200191,6 +201376,7 @@ pub impl @json.FromJson for ActivityListReposStarredByUserSort with fn from_json
 ///|
 ///
 /// Generated string enum ActivityListReposStarredByUserDirection.
+#non_exhaustive
 pub(all) enum ActivityListReposStarredByUserDirection {
   Asc
   Desc

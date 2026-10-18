@@ -21,7 +21,9 @@ fn response_status_from_generated(
     Some(@gen.InProgress) => InProgress
     Some(@gen.Incomplete) => Incomplete
     Some(@gen.Unknown(value)) => Unknown(value)
-    None => Unknown(raw)
+    // A status added to the spec after this layer was written keeps its
+    // wire value, as it did before regeneration.
+    Some(@gen.ResponseStatus::..) | None => Unknown(raw)
   }
 }
 
@@ -42,6 +44,16 @@ fn tool_call_from_generated(
 }
 
 ///|
+/// The wire value of a generated string enum, for a value added to the spec
+/// after this layer was written.
+fn wire_string(json : Json) -> String {
+  match json {
+    String(value) => value
+    _ => json.stringify()
+  }
+}
+
+///|
 fn chat_finish_reason(
   reason : @gen.CreateChatCompletionResponseChoicesItemFinishReason,
 ) -> FinishReason {
@@ -52,6 +64,8 @@ fn chat_finish_reason(
     @gen.ContentFilter => ContentFilter
     @gen.FunctionCall => Unknown("function_call")
     @gen.Unknown(value) => Unknown(value)
+    @gen.CreateChatCompletionResponseChoicesItemFinishReason::.. as other =>
+      Unknown(wire_string(other.to_json()))
   }
 }
 
@@ -66,6 +80,8 @@ fn chat_stream_finish_reason(
     @gen.ContentFilter => ContentFilter
     @gen.FunctionCall => Unknown("function_call")
     @gen.Unknown(value) => Unknown(value)
+    @gen.CreateChatCompletionStreamResponseChoicesItemFinishReason::.. as other =>
+      Unknown(wire_string(other.to_json()))
   }
 }
 

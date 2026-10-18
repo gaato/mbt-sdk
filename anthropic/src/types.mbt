@@ -21,6 +21,7 @@ pub using @gen {
 
 ///|
 /// Selects the credential header used by the API.
+#non_exhaustive
 pub(all) enum AuthHeader {
   XApiKey
   Bearer
@@ -61,6 +62,7 @@ pub extend ApiErrorBody with @debug.Debug::{to_repr}
 
 ///|
 /// A participant in a Messages API conversation.
+#non_exhaustive
 pub(all) enum Role {
   User
   Assistant
@@ -77,6 +79,7 @@ pub extend Role with @debug.Debug::{to_repr}
 ///|
 /// Input content as plain text or typed content blocks. A block the generated
 /// vocabulary does not know is carried losslessly as `@gen.InputContentBlock::Unknown`.
+#non_exhaustive
 pub(all) enum InputContent {
   Text(String)
   Blocks(Array[InputContentBlock])
@@ -327,6 +330,7 @@ fn copy_message(message : Message) -> Message {
 ///|
 /// One output content block. Blocks beyond text, thinking and tool use keep
 /// their JSON; the typed form is on `MessageResponse::message`.
+#non_exhaustive
 pub(all) enum ContentBlock {
   Text(String)
   Thinking(thinking~ : String, signature~ : String)
@@ -394,6 +398,7 @@ pub fn MessageResponse::tool_uses(
 ///|
 /// One event from a streaming message. Event and delta kinds outside the
 /// generated vocabulary retain their raw JSON.
+#non_exhaustive
 pub(all) enum MessageEvent {
   MessageStart(MessageResponse)
   ContentBlockStart(index~ : Int32, block~ : ContentBlock)

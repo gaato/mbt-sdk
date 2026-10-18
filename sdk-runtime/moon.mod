@@ -4,7 +4,7 @@
 
 name = "gaato/sdk-runtime"
 
-version = "0.5.0"
+version = "0.6.0"
 
 license = "Apache-2.0"
 

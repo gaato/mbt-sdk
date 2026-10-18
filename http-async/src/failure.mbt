@@ -21,7 +21,7 @@ fn failure(phase : @http.Phase, error : Error) -> @http.HttpError {
     _ =>
       match phase {
         Pool | Dial => Connect(error.to_string())
-        Write | Head | Body | Unknown =>
+        Write | Head | Body | Unknown | @http.Phase::.. =>
           Network(phase=reported_phase(phase), message=error.to_string())
       }
   }

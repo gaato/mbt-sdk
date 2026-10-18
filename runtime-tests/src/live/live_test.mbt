@@ -503,6 +503,7 @@ async test "live local OpenAI-compatible Chat Completions API" {
               finished_was_last_non_usage = true
             }
             @openai_sdk.Usage(_) => ()
+            @openai_sdk.ChatEvent::.. => finished_was_last_non_usage = false
           }
         },
       )

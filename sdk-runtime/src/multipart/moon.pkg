@@ -1,3 +1,0 @@
-import {
-  "gaato/http/multipart" @http_multipart,
-}

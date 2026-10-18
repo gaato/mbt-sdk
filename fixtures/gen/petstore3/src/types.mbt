@@ -138,6 +138,7 @@ fn decode_optional_int64(
 ///|
 ///
 /// Order Status
+#non_exhaustive
 pub(all) enum OrderStatus {
   Placed
   Approved
@@ -430,6 +431,7 @@ pub impl @json.FromJson for Tag with fn from_json(value, path) {
 ///|
 ///
 /// pet status in the store
+#non_exhaustive
 pub(all) enum PetStatus {
   Available
   Pending
@@ -606,6 +608,7 @@ pub impl @json.FromJson for ApiResponse with fn from_json(value, path) {
 ///|
 ///
 /// Generated string enum FindPetsByStatusStatus.
+#non_exhaustive
 pub(all) enum FindPetsByStatusStatus {
   Available
   Pending

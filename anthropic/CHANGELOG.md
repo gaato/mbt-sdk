@@ -15,6 +15,18 @@ are optional unless the field is required, and keep a wildcard arm.
 
 ## [Unreleased]
 
+## [0.10.0] - 2026-10-19
+
+### Changed
+
+- **`AuthHeader`, `Role`, `InputContent`, `ContentBlock`, `MessageEvent` and
+  every enum in `gaato/anthropic/gen` are `#non_exhaustive`.** A value the
+  API adds can then become a constructor in a patch release, including the
+  regenerations made when the vendored spec changes. Until this module
+  maps such a value, it still arrives as `Other(..)` with its wire value,
+  as it did before. Migration: a `match` on one of these types ends with
+  `TypeName::.. => …` after the existing constructors.
+
 ## [0.9.0] - 2026-10-18
 
 ### Changed

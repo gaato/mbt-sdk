@@ -509,6 +509,7 @@ pub impl @json.FromJson for AskForApprovalGranular with fn from_json(
 ///|
 ///
 /// Generated externally tagged union AskForApproval.
+#non_exhaustive
 pub(all) enum AskForApproval {
   Untrusted
   OnRequest
@@ -571,6 +572,7 @@ pub impl @json.FromJson for AskForApproval with fn from_json(value, path) {
 ///|
 ///
 /// Configures who approval requests are routed to for review. Examples include sandbox escapes, blocked network access, MCP approval prompts, and ARC escalations. Defaults to `user`. `auto_review` uses a carefully prompted subagent to gather relevant context and apply a risk-based decision framework before approving or denying the request. The legacy value `guardian_subagent` is accepted for compatibility.
+#non_exhaustive
 pub(all) enum ApprovalsReviewer {
   User
   AutoReview
@@ -625,6 +627,7 @@ pub impl @json.FromJson for ApprovalsReviewer with fn from_json(value, path) {
 ///|
 ///
 /// Generated string enum Personality.
+#non_exhaustive
 pub(all) enum Personality {
   None
   Friendly
@@ -679,6 +682,7 @@ pub impl @json.FromJson for Personality with fn from_json(value, path) {
 ///|
 ///
 /// Generated string enum SandboxMode.
+#non_exhaustive
 pub(all) enum SandboxMode {
   ReadOnly
   WorkspaceWrite
@@ -733,6 +737,7 @@ pub impl @json.FromJson for SandboxMode with fn from_json(value, path) {
 ///|
 ///
 /// Generated string enum ThreadStartSource.
+#non_exhaustive
 pub(all) enum ThreadStartSource {
   Startup
   Clear
@@ -1006,6 +1011,7 @@ pub impl @json.FromJson for SandboxPolicyReadOnly with fn from_json(value, path)
 ///|
 ///
 /// Generated string enum NetworkAccess.
+#non_exhaustive
 pub(all) enum NetworkAccess {
   Restricted
   Enabled
@@ -1183,6 +1189,7 @@ pub impl @json.FromJson for SandboxPolicyWorkspaceWrite with fn from_json(
 ///|
 ///
 /// Generated tagged union SandboxPolicy.
+#non_exhaustive
 pub(all) enum SandboxPolicy {
   DangerFullAccess(SandboxPolicyDangerFullAccess)
   ReadOnly(SandboxPolicyReadOnly)
@@ -1293,6 +1300,7 @@ pub impl @json.FromJson for GitInfo with fn from_json(value, path) {
 ///|
 ///
 /// Generated string enum ThreadHistoryMode.
+#non_exhaustive
 pub(all) enum ThreadHistoryMode {
   Legacy
   Paginated
@@ -1528,6 +1536,7 @@ pub impl @json.FromJson for SubAgentSourceThreadSpawn with fn from_json(
 ///|
 ///
 /// Generated externally tagged union SubAgentSource.
+#non_exhaustive
 pub(all) enum SubAgentSource {
   Review
   Compact
@@ -1597,6 +1606,7 @@ pub impl @json.FromJson for SubAgentSource with fn from_json(value, path) {
 ///|
 ///
 /// Generated externally tagged union SessionSource.
+#non_exhaustive
 pub(all) enum SessionSource {
   Cli
   Vscode
@@ -1796,6 +1806,7 @@ pub impl @json.FromJson for ThreadStatusSystemError with fn from_json(
 ///|
 ///
 /// Generated string enum ThreadActiveFlag.
+#non_exhaustive
 pub(all) enum ThreadActiveFlag {
   WaitingOnApproval
   WaitingOnUserInput
@@ -1898,6 +1909,7 @@ pub impl @json.FromJson for ThreadStatusActive with fn from_json(value, path) {
 ///|
 ///
 /// Generated tagged union ThreadStatus.
+#non_exhaustive
 pub(all) enum ThreadStatus {
   NotLoaded(ThreadStatusNotLoaded)
   Idle(ThreadStatusIdle)
@@ -2163,6 +2175,7 @@ pub impl @json.FromJson for CodexErrorInfoResponseTooManyFailedAttempts with fn 
 ///|
 ///
 /// Generated string enum NonSteerableTurnKind.
+#non_exhaustive
 pub(all) enum NonSteerableTurnKind {
   Review
   Compact
@@ -2260,6 +2273,7 @@ pub impl @json.FromJson for CodexErrorInfoActiveTurnNotSteerable with fn from_js
 ///|
 ///
 /// This translation layer make sure that we expose codex error code in camel case. When an upstream HTTP status is available (for example, from the Responses API or a provider), it is forwarded in `httpStatusCode` on the relevant `codexErrorInfo` variant.
+#non_exhaustive
 pub(all) enum CodexErrorInfo {
   ContextWindowExceeded
   SessionBudgetExceeded
@@ -2724,6 +2738,7 @@ pub impl @json.FromJson for UserInputText with fn from_json(value, path) {
 ///|
 ///
 /// Generated string enum ImageDetail.
+#non_exhaustive
 pub(all) enum ImageDetail {
   Auto
   Low
@@ -3100,6 +3115,7 @@ pub impl @json.FromJson for UserInputMention with fn from_json(value, path) {
 ///|
 ///
 /// Generated tagged union UserInput.
+#non_exhaustive
 pub(all) enum UserInput {
   Text(UserInputText)
   Image(UserInputImage)
@@ -3435,6 +3451,7 @@ pub impl @json.FromJson for MemoryCitation with fn from_json(value, path) {
 ///|
 ///
 /// Classifies an assistant message as interim commentary or final answer text. Providers do not emit this consistently, so callers must treat `None` as "phase unknown" and keep compatibility behavior for legacy models.
+#non_exhaustive
 pub(all) enum MessagePhase {
   Commentary
   FinalAnswer
@@ -3861,6 +3878,7 @@ pub impl @json.FromJson for FunctionCallOutputContentItemEncryptedContent with f
 ///|
 ///
 /// Responses API compatible content items that can be returned by a tool call. This is a subset of ContentItem with the types we support as function call outputs.
+#non_exhaustive
 pub(all) enum FunctionCallOutputContentItem {
   InputText(FunctionCallOutputContentItemInputText)
   InputImage(FunctionCallOutputContentItemInputImage)
@@ -3915,6 +3933,7 @@ pub impl @json.FromJson for FunctionCallOutputContentItem with fn from_json(
 ///|
 ///
 /// Generated untagged union FunctionCallOutputBody.
+#non_exhaustive
 pub(all) enum FunctionCallOutputBody {
   Text(String)
   FunctionCallOutputContentItemArray(Array[FunctionCallOutputContentItem])
@@ -4389,6 +4408,7 @@ pub impl @json.FromJson for CommandActionKnownUnknown with fn from_json(
 ///|
 ///
 /// Generated tagged union CommandAction.
+#non_exhaustive
 pub(all) enum CommandAction {
   Read(CommandActionRead)
   ListFiles(CommandActionListFiles)
@@ -4440,6 +4460,7 @@ pub impl @json.FromJson for CommandAction with fn from_json(value, path) {
 ///|
 ///
 /// Generated string enum CommandExecutionSource.
+#non_exhaustive
 pub(all) enum CommandExecutionSource {
   Agent
   UserShell
@@ -4500,6 +4521,7 @@ pub impl @json.FromJson for CommandExecutionSource with fn from_json(
 ///|
 ///
 /// Generated string enum CommandExecutionStatus.
+#non_exhaustive
 pub(all) enum CommandExecutionStatus {
   InProgress
   Completed
@@ -4808,6 +4830,7 @@ pub impl @json.FromJson for PatchChangeKindUpdate with fn from_json(value, path)
 ///|
 ///
 /// Generated tagged union PatchChangeKind.
+#non_exhaustive
 pub(all) enum PatchChangeKind {
   Add(PatchChangeKindAdd)
   Delete(PatchChangeKindDelete)
@@ -4911,6 +4934,7 @@ pub impl @json.FromJson for FileUpdateChange with fn from_json(value, path) {
 ///|
 ///
 /// Generated string enum PatchApplyStatus.
+#non_exhaustive
 pub(all) enum PatchApplyStatus {
   InProgress
   Completed
@@ -5196,6 +5220,7 @@ pub impl @json.FromJson for McpToolCallResult with fn from_json(value, path) {
 ///|
 ///
 /// Generated string enum McpToolCallStatus.
+#non_exhaustive
 pub(all) enum McpToolCallStatus {
   InProgress
   Completed
@@ -5550,6 +5575,7 @@ pub impl @json.FromJson for DynamicToolCallOutputContentItemInputAudio with fn f
 ///|
 ///
 /// Generated tagged union DynamicToolCallOutputContentItem.
+#non_exhaustive
 pub(all) enum DynamicToolCallOutputContentItem {
   InputText(DynamicToolCallOutputContentItemInputText)
   InputImage(DynamicToolCallOutputContentItemInputImage)
@@ -5601,6 +5627,7 @@ pub impl @json.FromJson for DynamicToolCallOutputContentItem with fn from_json(
 ///|
 ///
 /// Generated string enum DynamicToolCallStatus.
+#non_exhaustive
 pub(all) enum DynamicToolCallStatus {
   InProgress
   Completed
@@ -5750,6 +5777,7 @@ pub impl @json.FromJson for ThreadItemDynamicToolCall with fn from_json(
 ///|
 ///
 /// Generated string enum CollabAgentStatus.
+#non_exhaustive
 pub(all) enum CollabAgentStatus {
   PendingInit
   Running
@@ -5867,6 +5895,7 @@ pub impl @json.FromJson for CollabAgentState with fn from_json(value, path) {
 ///|
 ///
 /// Generated string enum CollabAgentToolCallStatus.
+#non_exhaustive
 pub(all) enum CollabAgentToolCallStatus {
   InProgress
   Completed
@@ -5927,6 +5956,7 @@ pub impl @json.FromJson for CollabAgentToolCallStatus with fn from_json(
 ///|
 ///
 /// Generated string enum CollabAgentTool.
+#non_exhaustive
 pub(all) enum CollabAgentTool {
   SpawnAgent
   SendInput
@@ -6099,6 +6129,7 @@ pub impl @json.FromJson for ThreadItemCollabAgentToolCall with fn from_json(
 ///|
 ///
 /// Generated string enum SubAgentActivityKind.
+#non_exhaustive
 pub(all) enum SubAgentActivityKind {
   Started
   Interacted
@@ -6438,6 +6469,7 @@ pub impl @json.FromJson for WebSearchActionOther with fn from_json(value, path) 
 ///|
 ///
 /// Generated tagged union WebSearchAction.
+#non_exhaustive
 pub(all) enum WebSearchAction {
   Search(WebSearchActionSearch)
   OpenPage(WebSearchActionOpenPage)
@@ -6730,6 +6762,7 @@ pub impl @json.FromJson for ImageGenerationFailureUsageLimitExceeded with fn fro
 ///|
 ///
 /// Generated tagged union ImageGenerationFailure.
+#non_exhaustive
 pub(all) enum ImageGenerationFailure {
   UsageLimitExceeded(ImageGenerationFailureUsageLimitExceeded)
   Unknown(String, Json)
@@ -7036,6 +7069,7 @@ pub impl @json.FromJson for ThreadItemContextCompaction with fn from_json(
 ///|
 ///
 /// Generated tagged union ThreadItem.
+#non_exhaustive
 pub(all) enum ThreadItem {
   UserMessage(ThreadItemUserMessage)
   HookPrompt(ThreadItemHookPrompt)
@@ -7132,6 +7166,7 @@ pub impl @json.FromJson for ThreadItem with fn from_json(value, path) {
 ///|
 ///
 /// Generated string enum TurnItemsView.
+#non_exhaustive
 pub(all) enum TurnItemsView {
   NotLoaded
   Summary
@@ -7186,6 +7221,7 @@ pub impl @json.FromJson for TurnItemsView with fn from_json(value, path) {
 ///|
 ///
 /// Generated string enum TurnStatus.
+#non_exhaustive
 pub(all) enum TurnStatus {
   Completed
   Interrupted
@@ -7851,6 +7887,7 @@ pub impl @json.FromJson for ThreadResumeResponse with fn from_json(value, path) 
 ///|
 ///
 /// A summary of the reasoning performed by the model. This can be useful for debugging and understanding the model's reasoning process. See https://platform.openai.com/docs/guides/reasoning?api-mode=responses#reasoning-summaries
+#non_exhaustive
 pub(all) enum ReasoningSummary {
   Auto
   Concise
@@ -8185,6 +8222,7 @@ pub impl @json.FromJson for TurnInterruptParams with fn from_json(value, path) {
 ///|
 ///
 /// Distinguishes a command approval from input sent to an existing terminal.
+#non_exhaustive
 pub(all) enum CommandExecutionApprovalKind {
   Command
   WriteStdin
@@ -8239,6 +8277,7 @@ pub impl @json.FromJson for CommandExecutionApprovalKind with fn from_json(
 ///|
 ///
 /// Generated string enum NetworkApprovalProtocol.
+#non_exhaustive
 pub(all) enum NetworkApprovalProtocol {
   Http
   Https
@@ -8353,6 +8392,7 @@ pub impl @json.FromJson for NetworkApprovalContext with fn from_json(
 ///|
 ///
 /// Generated string enum NetworkPolicyRuleAction.
+#non_exhaustive
 pub(all) enum NetworkPolicyRuleAction {
   Allow
   Deny
@@ -8722,6 +8762,7 @@ pub impl @json.FromJson for CommandExecutionApprovalDecisionApplyNetworkPolicyAm
 ///|
 ///
 /// Generated externally tagged union CommandExecutionApprovalDecision.
+#non_exhaustive
 pub(all) enum CommandExecutionApprovalDecision {
   Accept
   AcceptForSession
@@ -8944,6 +8985,7 @@ pub impl @json.FromJson for FileChangeRequestApprovalParams with fn from_json(
 ///|
 ///
 /// Generated string enum FileChangeApprovalDecision.
+#non_exhaustive
 pub(all) enum FileChangeApprovalDecision {
   Accept
   AcceptForSession
@@ -9050,6 +9092,7 @@ pub impl @json.FromJson for FileChangeRequestApprovalResponse with fn from_json(
 ///|
 ///
 /// Generated string enum FileSystemAccessMode.
+#non_exhaustive
 pub(all) enum FileSystemAccessMode {
   Read
   Write
@@ -9505,6 +9548,7 @@ pub impl @json.FromJson for FileSystemSpecialPathKnownUnknown with fn from_json(
 ///|
 ///
 /// Generated tagged union FileSystemSpecialPath.
+#non_exhaustive
 pub(all) enum FileSystemSpecialPath {
   Root(FileSystemSpecialPathRoot)
   Minimal(FileSystemSpecialPathMinimal)
@@ -9613,6 +9657,7 @@ pub impl @json.FromJson for FileSystemPathSpecial with fn from_json(value, path)
 ///|
 ///
 /// Generated tagged union FileSystemPath.
+#non_exhaustive
 pub(all) enum FileSystemPath {
   Path(FileSystemPathPath)
   GlobPattern(FileSystemPathGlobPattern)
@@ -10032,6 +10077,7 @@ pub impl @json.FromJson for GrantedPermissionProfile with fn from_json(
 ///|
 ///
 /// Generated string enum PermissionGrantScope.
+#non_exhaustive
 pub(all) enum PermissionGrantScope {
   Turn
   Session

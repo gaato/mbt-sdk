@@ -61,6 +61,7 @@ pub fn AgentMessageDeltaNotification::to_repr(Self) -> @debug.Repr
 pub impl ToJson for AgentMessageDeltaNotification
 pub impl @moonbitlang/core/json.FromJson for AgentMessageDeltaNotification
 
+#non_exhaustive
 pub(all) enum ApprovalsReviewer {
   User
   AutoReview
@@ -75,6 +76,7 @@ pub fn ApprovalsReviewer::to_repr(Self) -> @debug.Repr
 pub impl ToJson for ApprovalsReviewer
 pub impl @moonbitlang/core/json.FromJson for ApprovalsReviewer
 
+#non_exhaustive
 pub(all) enum AskForApproval {
   Untrusted
   OnRequest
@@ -152,6 +154,7 @@ pub fn ClientInfo::to_repr(Self) -> @debug.Repr
 pub impl ToJson for ClientInfo
 pub impl @moonbitlang/core/json.FromJson for ClientInfo
 
+#non_exhaustive
 pub(all) enum CodexErrorInfo {
   ContextWindowExceeded
   SessionBudgetExceeded
@@ -254,6 +257,7 @@ pub fn CollabAgentState::to_repr(Self) -> @debug.Repr
 pub impl ToJson for CollabAgentState
 pub impl @moonbitlang/core/json.FromJson for CollabAgentState
 
+#non_exhaustive
 pub(all) enum CollabAgentStatus {
   PendingInit
   Running
@@ -272,6 +276,7 @@ pub fn CollabAgentStatus::to_repr(Self) -> @debug.Repr
 pub impl ToJson for CollabAgentStatus
 pub impl @moonbitlang/core/json.FromJson for CollabAgentStatus
 
+#non_exhaustive
 pub(all) enum CollabAgentTool {
   SpawnAgent
   SendInput
@@ -292,6 +297,7 @@ pub fn CollabAgentTool::to_repr(Self) -> @debug.Repr
 pub impl ToJson for CollabAgentTool
 pub impl @moonbitlang/core/json.FromJson for CollabAgentTool
 
+#non_exhaustive
 pub(all) enum CollabAgentToolCallStatus {
   InProgress
   Completed
@@ -307,6 +313,7 @@ pub fn CollabAgentToolCallStatus::to_repr(Self) -> @debug.Repr
 pub impl ToJson for CollabAgentToolCallStatus
 pub impl @moonbitlang/core/json.FromJson for CollabAgentToolCallStatus
 
+#non_exhaustive
 pub(all) enum CommandAction {
   Read(CommandActionRead)
   ListFiles(CommandActionListFiles)
@@ -379,6 +386,7 @@ pub fn CommandActionSearch::to_repr(Self) -> @debug.Repr
 pub impl ToJson for CommandActionSearch
 pub impl @moonbitlang/core/json.FromJson for CommandActionSearch
 
+#non_exhaustive
 pub(all) enum CommandExecutionApprovalDecision {
   Accept
   AcceptForSession
@@ -420,6 +428,7 @@ pub fn CommandExecutionApprovalDecisionApplyNetworkPolicyAmendment::to_repr(Self
 pub impl ToJson for CommandExecutionApprovalDecisionApplyNetworkPolicyAmendment
 pub impl @moonbitlang/core/json.FromJson for CommandExecutionApprovalDecisionApplyNetworkPolicyAmendment
 
+#non_exhaustive
 pub(all) enum CommandExecutionApprovalKind {
   Command
   WriteStdin
@@ -470,6 +479,7 @@ pub fn CommandExecutionRequestApprovalResponse::to_repr(Self) -> @debug.Repr
 pub impl ToJson for CommandExecutionRequestApprovalResponse
 pub impl @moonbitlang/core/json.FromJson for CommandExecutionRequestApprovalResponse
 
+#non_exhaustive
 pub(all) enum CommandExecutionSource {
   Agent
   UserShell
@@ -485,6 +495,7 @@ pub fn CommandExecutionSource::to_repr(Self) -> @debug.Repr
 pub impl ToJson for CommandExecutionSource
 pub impl @moonbitlang/core/json.FromJson for CommandExecutionSource
 
+#non_exhaustive
 pub(all) enum CommandExecutionStatus {
   InProgress
   Completed
@@ -500,6 +511,7 @@ pub fn CommandExecutionStatus::to_repr(Self) -> @debug.Repr
 pub impl ToJson for CommandExecutionStatus
 pub impl @moonbitlang/core/json.FromJson for CommandExecutionStatus
 
+#non_exhaustive
 pub(all) enum DynamicToolCallOutputContentItem {
   InputText(DynamicToolCallOutputContentItemInputText)
   InputImage(DynamicToolCallOutputContentItemInputImage)
@@ -553,6 +565,7 @@ pub fn DynamicToolCallOutputContentItemInputText::to_repr(Self) -> @debug.Repr
 pub impl ToJson for DynamicToolCallOutputContentItemInputText
 pub impl @moonbitlang/core/json.FromJson for DynamicToolCallOutputContentItemInputText
 
+#non_exhaustive
 pub(all) enum DynamicToolCallStatus {
   InProgress
   Completed
@@ -582,6 +595,7 @@ pub fn ErrorNotification::to_repr(Self) -> @debug.Repr
 pub impl ToJson for ErrorNotification
 pub impl @moonbitlang/core/json.FromJson for ErrorNotification
 
+#non_exhaustive
 pub(all) enum Event {
   Error(ErrorNotification)
   ThreadStarted(ThreadStartedNotification)
@@ -594,6 +608,7 @@ pub(all) enum Event {
 }
 pub fn Event::decode(String, Json?) -> Self raise @moonbitlang/core/json.JsonDecodeError
 
+#non_exhaustive
 pub(all) enum FileChangeApprovalDecision {
   Accept
   AcceptForSession
@@ -638,6 +653,7 @@ pub fn FileChangeRequestApprovalResponse::to_repr(Self) -> @debug.Repr
 pub impl ToJson for FileChangeRequestApprovalResponse
 pub impl @moonbitlang/core/json.FromJson for FileChangeRequestApprovalResponse
 
+#non_exhaustive
 pub(all) enum FileSystemAccessMode {
   Read
   Write
@@ -652,6 +668,7 @@ pub fn FileSystemAccessMode::to_repr(Self) -> @debug.Repr
 pub impl ToJson for FileSystemAccessMode
 pub impl @moonbitlang/core/json.FromJson for FileSystemAccessMode
 
+#non_exhaustive
 pub(all) enum FileSystemPath {
   Path(FileSystemPathPath)
   GlobPattern(FileSystemPathGlobPattern)
@@ -718,6 +735,7 @@ pub fn FileSystemSandboxEntry::to_repr(Self) -> @debug.Repr
 pub impl ToJson for FileSystemSandboxEntry
 pub impl @moonbitlang/core/json.FromJson for FileSystemSandboxEntry
 
+#non_exhaustive
 pub(all) enum FileSystemSpecialPath {
   Root(FileSystemSpecialPathRoot)
   Minimal(FileSystemSpecialPathMinimal)
@@ -824,6 +842,7 @@ pub fn FileUpdateChange::to_repr(Self) -> @debug.Repr
 pub impl ToJson for FileUpdateChange
 pub impl @moonbitlang/core/json.FromJson for FileUpdateChange
 
+#non_exhaustive
 pub(all) enum FunctionCallOutputBody {
   Text(String)
   FunctionCallOutputContentItemArray(Array[FunctionCallOutputContentItem])
@@ -836,6 +855,7 @@ pub fn FunctionCallOutputBody::to_repr(Self) -> @debug.Repr
 pub impl ToJson for FunctionCallOutputBody
 pub impl @moonbitlang/core/json.FromJson for FunctionCallOutputBody
 
+#non_exhaustive
 pub(all) enum FunctionCallOutputContentItem {
   InputText(FunctionCallOutputContentItemInputText)
   InputImage(FunctionCallOutputContentItemInputImage)
@@ -944,6 +964,7 @@ pub fn HookPromptFragment::to_repr(Self) -> @debug.Repr
 pub impl ToJson for HookPromptFragment
 pub impl @moonbitlang/core/json.FromJson for HookPromptFragment
 
+#non_exhaustive
 pub(all) enum ImageDetail {
   Auto
   Low
@@ -959,6 +980,7 @@ pub fn ImageDetail::to_repr(Self) -> @debug.Repr
 pub impl ToJson for ImageDetail
 pub impl @moonbitlang/core/json.FromJson for ImageDetail
 
+#non_exhaustive
 pub(all) enum ImageGenerationFailure {
   UsageLimitExceeded(ImageGenerationFailureUsageLimitExceeded)
   Unknown(String, Json)
@@ -1101,6 +1123,7 @@ pub fn McpToolCallResult::to_repr(Self) -> @debug.Repr
 pub impl ToJson for McpToolCallResult
 pub impl @moonbitlang/core/json.FromJson for McpToolCallResult
 
+#non_exhaustive
 pub(all) enum McpToolCallStatus {
   InProgress
   Completed
@@ -1143,6 +1166,7 @@ pub fn MemoryCitationEntry::to_repr(Self) -> @debug.Repr
 pub impl ToJson for MemoryCitationEntry
 pub impl @moonbitlang/core/json.FromJson for MemoryCitationEntry
 
+#non_exhaustive
 pub(all) enum MessagePhase {
   Commentary
   FinalAnswer
@@ -1182,6 +1206,7 @@ pub fn MisalignmentSteer::to_repr(Self) -> @debug.Repr
 pub impl ToJson for MisalignmentSteer
 pub impl @moonbitlang/core/json.FromJson for MisalignmentSteer
 
+#non_exhaustive
 pub(all) enum NetworkAccess {
   Restricted
   Enabled
@@ -1208,6 +1233,7 @@ pub fn NetworkApprovalContext::to_repr(Self) -> @debug.Repr
 pub impl ToJson for NetworkApprovalContext
 pub impl @moonbitlang/core/json.FromJson for NetworkApprovalContext
 
+#non_exhaustive
 pub(all) enum NetworkApprovalProtocol {
   Http
   Https
@@ -1236,6 +1262,7 @@ pub fn NetworkPolicyAmendment::to_repr(Self) -> @debug.Repr
 pub impl ToJson for NetworkPolicyAmendment
 pub impl @moonbitlang/core/json.FromJson for NetworkPolicyAmendment
 
+#non_exhaustive
 pub(all) enum NetworkPolicyRuleAction {
   Allow
   Deny
@@ -1249,6 +1276,7 @@ pub fn NetworkPolicyRuleAction::to_repr(Self) -> @debug.Repr
 pub impl ToJson for NetworkPolicyRuleAction
 pub impl @moonbitlang/core/json.FromJson for NetworkPolicyRuleAction
 
+#non_exhaustive
 pub(all) enum NonSteerableTurnKind {
   Review
   Compact
@@ -1262,6 +1290,7 @@ pub fn NonSteerableTurnKind::to_repr(Self) -> @debug.Repr
 pub impl ToJson for NonSteerableTurnKind
 pub impl @moonbitlang/core/json.FromJson for NonSteerableTurnKind
 
+#non_exhaustive
 pub(all) enum PatchApplyStatus {
   InProgress
   Completed
@@ -1277,6 +1306,7 @@ pub fn PatchApplyStatus::to_repr(Self) -> @debug.Repr
 pub impl ToJson for PatchApplyStatus
 pub impl @moonbitlang/core/json.FromJson for PatchApplyStatus
 
+#non_exhaustive
 pub(all) enum PatchChangeKind {
   Add(PatchChangeKindAdd)
   Delete(PatchChangeKindDelete)
@@ -1328,6 +1358,7 @@ pub fn PatchChangeKindUpdate::to_repr(Self) -> @debug.Repr
 pub impl ToJson for PatchChangeKindUpdate
 pub impl @moonbitlang/core/json.FromJson for PatchChangeKindUpdate
 
+#non_exhaustive
 pub(all) enum PermissionGrantScope {
   Turn
   Session
@@ -1374,6 +1405,7 @@ pub fn PermissionsRequestApprovalResponse::to_repr(Self) -> @debug.Repr
 pub impl ToJson for PermissionsRequestApprovalResponse
 pub impl @moonbitlang/core/json.FromJson for PermissionsRequestApprovalResponse
 
+#non_exhaustive
 pub(all) enum Personality {
   None
   Friendly
@@ -1388,6 +1420,7 @@ pub fn Personality::to_repr(Self) -> @debug.Repr
 pub impl ToJson for Personality
 pub impl @moonbitlang/core/json.FromJson for Personality
 
+#non_exhaustive
 pub(all) enum ReasoningSummary {
   Auto
   Concise
@@ -1416,6 +1449,7 @@ pub fn RequestPermissionProfile::to_repr(Self) -> @debug.Repr
 pub impl ToJson for RequestPermissionProfile
 pub impl @moonbitlang/core/json.FromJson for RequestPermissionProfile
 
+#non_exhaustive
 pub(all) enum SandboxMode {
   ReadOnly
   WorkspaceWrite
@@ -1430,6 +1464,7 @@ pub fn SandboxMode::to_repr(Self) -> @debug.Repr
 pub impl ToJson for SandboxMode
 pub impl @moonbitlang/core/json.FromJson for SandboxMode
 
+#non_exhaustive
 pub(all) enum SandboxPolicy {
   DangerFullAccess(SandboxPolicyDangerFullAccess)
   ReadOnly(SandboxPolicyReadOnly)
@@ -1499,6 +1534,7 @@ pub fn SandboxPolicyWorkspaceWrite::to_repr(Self) -> @debug.Repr
 pub impl ToJson for SandboxPolicyWorkspaceWrite
 pub impl @moonbitlang/core/json.FromJson for SandboxPolicyWorkspaceWrite
 
+#non_exhaustive
 pub(all) enum SessionSource {
   Cli
   Vscode
@@ -1517,6 +1553,7 @@ pub fn SessionSource::to_repr(Self) -> @debug.Repr
 pub impl ToJson for SessionSource
 pub impl @moonbitlang/core/json.FromJson for SessionSource
 
+#non_exhaustive
 pub(all) enum SubAgentActivityKind {
   Started
   Interacted
@@ -1532,6 +1569,7 @@ pub fn SubAgentActivityKind::to_repr(Self) -> @debug.Repr
 pub impl ToJson for SubAgentActivityKind
 pub impl @moonbitlang/core/json.FromJson for SubAgentActivityKind
 
+#non_exhaustive
 pub(all) enum SubAgentSource {
   Review
   Compact
@@ -1616,6 +1654,7 @@ pub fn Thread::to_repr(Self) -> @debug.Repr
 pub impl ToJson for Thread
 pub impl @moonbitlang/core/json.FromJson for Thread
 
+#non_exhaustive
 pub(all) enum ThreadActiveFlag {
   WaitingOnApproval
   WaitingOnUserInput
@@ -1629,6 +1668,7 @@ pub fn ThreadActiveFlag::to_repr(Self) -> @debug.Repr
 pub impl ToJson for ThreadActiveFlag
 pub impl @moonbitlang/core/json.FromJson for ThreadActiveFlag
 
+#non_exhaustive
 pub(all) enum ThreadHistoryMode {
   Legacy
   Paginated
@@ -1642,6 +1682,7 @@ pub fn ThreadHistoryMode::to_repr(Self) -> @debug.Repr
 pub impl ToJson for ThreadHistoryMode
 pub impl @moonbitlang/core/json.FromJson for ThreadHistoryMode
 
+#non_exhaustive
 pub(all) enum ThreadItem {
   UserMessage(ThreadItemUserMessage)
   HookPrompt(ThreadItemHookPrompt)
@@ -2109,6 +2150,7 @@ pub fn ThreadStartResponse::to_repr(Self) -> @debug.Repr
 pub impl ToJson for ThreadStartResponse
 pub impl @moonbitlang/core/json.FromJson for ThreadStartResponse
 
+#non_exhaustive
 pub(all) enum ThreadStartSource {
   Startup
   Clear
@@ -2134,6 +2176,7 @@ pub fn ThreadStartedNotification::to_repr(Self) -> @debug.Repr
 pub impl ToJson for ThreadStartedNotification
 pub impl @moonbitlang/core/json.FromJson for ThreadStartedNotification
 
+#non_exhaustive
 pub(all) enum ThreadStatus {
   NotLoaded(ThreadStatusNotLoaded)
   Idle(ThreadStatusIdle)
@@ -2329,6 +2372,7 @@ pub fn TurnInterruptParams::to_repr(Self) -> @debug.Repr
 pub impl ToJson for TurnInterruptParams
 pub impl @moonbitlang/core/json.FromJson for TurnInterruptParams
 
+#non_exhaustive
 pub(all) enum TurnItemsView {
   NotLoaded
   Summary
@@ -2395,6 +2439,7 @@ pub fn TurnStartedNotification::to_repr(Self) -> @debug.Repr
 pub impl ToJson for TurnStartedNotification
 pub impl @moonbitlang/core/json.FromJson for TurnStartedNotification
 
+#non_exhaustive
 pub(all) enum TurnStatus {
   Completed
   Interrupted
@@ -2435,6 +2480,7 @@ pub fn UInt64Number::to_repr(Self) -> @debug.Repr
 pub impl ToJson for UInt64Number
 pub impl @moonbitlang/core/json.FromJson for UInt64Number
 
+#non_exhaustive
 pub(all) enum UserInput {
   Text(UserInputText)
   Image(UserInputImage)
@@ -2549,6 +2595,7 @@ pub fn UserInputText::to_repr(Self) -> @debug.Repr
 pub impl ToJson for UserInputText
 pub impl @moonbitlang/core/json.FromJson for UserInputText
 
+#non_exhaustive
 pub(all) enum WebSearchAction {
   Search(WebSearchActionSearch)
   OpenPage(WebSearchActionOpenPage)

@@ -18,6 +18,7 @@ pub(open) trait Transport {
 
 ///|
 /// The step of an exchange a transport failure happened in.
+#non_exhaustive
 pub(all) enum Phase {
   /// Waiting for a connection slot, when the transport caps connections.
   Pool

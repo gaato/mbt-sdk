@@ -8,6 +8,14 @@ note.
 
 ## [Unreleased]
 
+## [0.4.1] - 2026-10-19
+
+### Changed
+
+- **Builds against `gaato/http` 0.4.0, whose `Phase` is `#non_exhaustive`.**
+  A phase added to `gaato/http` later is reported as a network failure and
+  timed with the read limit, as `Unknown` is.
+
 ## [0.4.0] - 2026-10-19
 
 ### Added

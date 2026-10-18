@@ -762,6 +762,7 @@ pub impl @json.FromJson for ChatCompletionRequestMessageContentPartRefusal with 
 ///|
 ///
 /// Generated tagged union ChatCompletionRequestAssistantMessageContentPart.
+#non_exhaustive
 pub(all) enum ChatCompletionRequestAssistantMessageContentPart {
   Text(ChatCompletionRequestMessageContentPartText)
   Refusal(ChatCompletionRequestMessageContentPartRefusal)
@@ -821,6 +822,7 @@ pub impl @json.FromJson for ChatCompletionRequestAssistantMessageContentPart wit
 ///|
 ///
 /// The contents of the assistant message. Required unless `tool_calls` or `function_call` is specified.
+#non_exhaustive
 pub(all) enum ChatCompletionRequestAssistantMessageContent {
   Text(String)
   ChatCompletionRequestAssistantMessageContentPartArray(
@@ -1093,6 +1095,7 @@ pub impl @json.FromJson for ChatCompletionRequestAssistantMessage with fn from_j
 ///|
 ///
 /// The contents of the developer message.
+#non_exhaustive
 pub(all) enum ChatCompletionRequestDeveloperMessageContent {
   Text(String)
   ChatCompletionRequestMessageContentPartTextArray(
@@ -1277,6 +1280,7 @@ pub impl @json.FromJson for ChatCompletionRequestFunctionMessage with fn from_js
 ///|
 ///
 /// Generated tagged union ChatCompletionRequestSystemMessageContentPart.
+#non_exhaustive
 pub(all) enum ChatCompletionRequestSystemMessageContentPart {
   Text(ChatCompletionRequestMessageContentPartText)
   Unknown(String, Json)
@@ -1331,6 +1335,7 @@ pub impl @json.FromJson for ChatCompletionRequestSystemMessageContentPart with f
 ///|
 ///
 /// The contents of the system message.
+#non_exhaustive
 pub(all) enum ChatCompletionRequestSystemMessageContent {
   Text(String)
   ChatCompletionRequestSystemMessageContentPartArray(
@@ -1452,6 +1457,7 @@ pub impl @json.FromJson for ChatCompletionRequestSystemMessage with fn from_json
 ///|
 ///
 /// Specifies the detail level of the image. Learn more in the [Vision guide](/docs/guides/vision#low-or-high-fidelity-image-understanding).
+#non_exhaustive
 pub(all) enum ChatCompletionRequestMessageContentPartImageImageUrlDetail {
   Auto
   Low
@@ -1648,6 +1654,7 @@ pub impl @json.FromJson for ChatCompletionRequestMessageContentPartImage with fn
 ///|
 ///
 /// The format of the encoded audio data. Currently supports "wav" and "mp3".
+#non_exhaustive
 pub(all) enum ChatCompletionRequestMessageContentPartAudioInputAudioFormat {
   Wav
   Mp3
@@ -1973,6 +1980,7 @@ pub impl @json.FromJson for ChatCompletionRequestMessageContentPartFile with fn 
 ///|
 ///
 /// Generated tagged union ChatCompletionRequestUserMessageContentPart.
+#non_exhaustive
 pub(all) enum ChatCompletionRequestUserMessageContentPart {
   Text(ChatCompletionRequestMessageContentPartText)
   ImageUrl(ChatCompletionRequestMessageContentPartImage)
@@ -2036,6 +2044,7 @@ pub impl @json.FromJson for ChatCompletionRequestUserMessageContentPart with fn 
 ///|
 ///
 /// The contents of the user message.
+#non_exhaustive
 pub(all) enum ChatCompletionRequestUserMessageContent {
   Text(String)
   ChatCompletionRequestUserMessageContentPartArray(
@@ -2155,6 +2164,7 @@ pub impl @json.FromJson for ChatCompletionRequestUserMessage with fn from_json(
 ///|
 ///
 /// Generated tagged union ChatCompletionRequestToolMessageContentPart.
+#non_exhaustive
 pub(all) enum ChatCompletionRequestToolMessageContentPart {
   Text(ChatCompletionRequestMessageContentPartText)
   Unknown(String, Json)
@@ -2209,6 +2219,7 @@ pub impl @json.FromJson for ChatCompletionRequestToolMessageContentPart with fn 
 ///|
 ///
 /// The contents of the tool message.
+#non_exhaustive
 pub(all) enum ChatCompletionRequestToolMessageContent {
   Text(String)
   ChatCompletionRequestToolMessageContentPartArray(
@@ -2328,6 +2339,7 @@ pub impl @json.FromJson for ChatCompletionRequestToolMessage with fn from_json(
 ///|
 ///
 /// Generated tagged union ChatCompletionRequestMessage.
+#non_exhaustive
 pub(all) enum ChatCompletionRequestMessage {
   Developer(ChatCompletionRequestDeveloperMessage)
   System(ChatCompletionRequestSystemMessage)
@@ -2828,6 +2840,7 @@ pub impl @json.FromJson for ChatCompletionStreamResponseDeltaFunctionCall with f
 ///|
 ///
 /// The role of the author of this message.
+#non_exhaustive
 pub(all) enum ChatCompletionStreamResponseDeltaRole {
   Developer
   System
@@ -3201,6 +3214,7 @@ pub impl @json.FromJson for ChatCompletionTool with fn from_json(value, path) {
 ///|
 ///
 /// `none` means the model will not call any tool and instead generates a message. `auto` means the model can pick between generating a message or calling one or more tools. `required` means the model must call one or more tools.
+#non_exhaustive
 pub(all) enum ChatCompletionToolChoiceOptionText {
   None
   Auto
@@ -3258,6 +3272,7 @@ pub impl @json.FromJson for ChatCompletionToolChoiceOptionText with fn from_json
 ///|
 ///
 /// Controls which (if any) tool is called by the model. `none` means the model will not call any tool and instead generates a message. `auto` means the model can pick between generating a message or calling one or more tools. `required` means the model must call one or more tools. Specifying a particular tool via `{"type": "function", "function": {"name": "my_function"}}` forces the model to call that tool. `none` is the default when no tools are present. `auto` is the default if tools are present.
+#non_exhaustive
 pub(all) enum ChatCompletionToolChoiceOption {
   Text(ChatCompletionToolChoiceOptionText)
   ChatCompletionNamedToolChoice(ChatCompletionNamedToolChoice)
@@ -3313,6 +3328,7 @@ pub impl @json.FromJson for ChatCompletionToolChoiceOption with fn from_json(
 ///|
 ///
 /// Indicates which mouse button was pressed during the click. One of `left`, `right`, `wheel`, `back`, or `forward`.
+#non_exhaustive
 pub(all) enum ClickButton {
   Left
   Right
@@ -3594,6 +3610,7 @@ pub impl @json.FromJson for CodeInterpreterTextOutput with fn from_json(
 ///|
 ///
 /// The status of the code interpreter tool call.
+#non_exhaustive
 pub(all) enum CodeInterpreterToolCallStatus {
   InProgress
   Interpreting
@@ -3651,6 +3668,7 @@ pub impl @json.FromJson for CodeInterpreterToolCallStatus with fn from_json(
 ///|
 ///
 /// Generated tagged union CodeInterpreterToolOutput.
+#non_exhaustive
 pub(all) enum CodeInterpreterToolOutput {
   Logs(CodeInterpreterTextOutput)
   Files(CodeInterpreterFileOutput)
@@ -4395,6 +4413,7 @@ pub impl @json.FromJson for Wait with fn from_json(value, path) {
 ///|
 ///
 /// Generated tagged union ComputerAction.
+#non_exhaustive
 pub(all) enum ComputerAction {
   Click(Click)
   DoubleClick(DoubleClick)
@@ -4574,6 +4593,7 @@ pub impl @json.FromJson for ComputerToolCallSafetyCheck with fn from_json(
 ///|
 ///
 /// The status of the item. One of `in_progress`, `completed`, or `incomplete`. Populated when items are returned via API.
+#non_exhaustive
 pub(all) enum ComputerToolCallStatus {
   InProgress
   Completed
@@ -4698,6 +4718,7 @@ pub impl @json.FromJson for ComputerToolCall with fn from_json(value, path) {
 ///|
 ///
 /// Specifies the latency tier to use for processing the request. This parameter is relevant for customers subscribed to the scale tier service: - If set to 'auto', and the Project is Scale tier enabled, the system will utilize scale tier credits until they are exhausted. - If set to 'auto', and the Project is not Scale tier enabled, the request will be processed using the default service tier with a lower uptime SLA and no latency guarentee. - If set to 'default', the request will be processed using the default service tier with a lower uptime SLA and no latency guarentee. - If set to 'flex', the request will be processed with the Flex Processing service tier. [Learn more](/docs/guides/flex-processing). - When not set, the default behavior is 'auto'. When this parameter is set, the response body will include the `service_tier` utilized.
+#non_exhaustive
 pub(all) enum ServiceTier {
   Auto
   Default
@@ -4752,6 +4773,7 @@ pub impl @json.FromJson for ServiceTier with fn from_json(value, path) {
 ///|
 ///
 /// Generated string enum ResponseModalitiesItem.
+#non_exhaustive
 pub(all) enum ResponseModalitiesItem {
   Text
   Audio
@@ -4806,6 +4828,7 @@ pub impl @json.FromJson for ResponseModalitiesItem with fn from_json(
 ///|
 ///
 /// **o-series models only** Constrains effort on reasoning for [reasoning models](https://platform.openai.com/docs/guides/reasoning). Currently supported values are `low`, `medium`, and `high`. Reducing reasoning effort can result in faster responses and fewer tokens used on reasoning in a response.
+#non_exhaustive
 pub(all) enum ReasoningEffort {
   Low
   Medium
@@ -4979,6 +5002,7 @@ pub impl @json.FromJson for CreateChatCompletionRequestWebSearchOptionsUserLocat
 ///|
 ///
 /// High level guidance for the amount of context window space to use for the search. One of `low`, `medium`, or `high`. `medium` is the default.
+#non_exhaustive
 pub(all) enum WebSearchContextSize {
   Low
   Medium
@@ -5304,6 +5328,7 @@ pub impl @json.FromJson for ResponseFormatJsonObject with fn from_json(
 ///|
 ///
 /// An object specifying the format that the model must output. Setting to `{ "type": "json_schema", "json_schema": {...} }` enables Structured Outputs which ensures the model will match your supplied JSON schema. Learn more in the [Structured Outputs guide](/docs/guides/structured-outputs). Setting to `{ "type": "json_object" }` enables the older JSON mode, which ensures the message the model generates is valid JSON. Using `json_schema` is preferred for models that support it.
+#non_exhaustive
 pub(all) enum CreateChatCompletionRequestResponseFormat {
   Text(ResponseFormatText)
   JsonSchema(ResponseFormatJsonSchema)
@@ -5361,6 +5386,7 @@ pub impl @json.FromJson for CreateChatCompletionRequestResponseFormat with fn fr
 ///|
 ///
 /// Specifies the output audio format. Must be one of `wav`, `mp3`, `flac`, `opus`, or `pcm16`.
+#non_exhaustive
 pub(all) enum CreateChatCompletionRequestAudioFormat {
   Wav
   Aac
@@ -5483,6 +5509,7 @@ pub impl @json.FromJson for CreateChatCompletionRequestAudio with fn from_json(
 ///|
 ///
 /// Not supported with latest reasoning models `o3` and `o4-mini`. Up to 4 sequences where the API will stop generating further tokens. The returned text will not contain the stop sequence.
+#non_exhaustive
 pub(all) enum StopConfiguration {
   Text(String)
   TextArray(Array[String])
@@ -5530,6 +5557,7 @@ pub impl @json.FromJson for StopConfiguration with fn from_json(value, path) {
 ///|
 ///
 /// The content that should be matched when generating a model response. If generated tokens would match this content, the entire model response can be returned much more quickly.
+#non_exhaustive
 pub(all) enum PredictionContentContent {
   Text(String)
   ChatCompletionRequestMessageContentPartTextArray(
@@ -5636,6 +5664,7 @@ pub impl @json.FromJson for PredictionContent with fn from_json(value, path) {
 ///|
 ///
 /// Configuration for a [Predicted Output](/docs/guides/predicted-outputs), which can greatly improve response times when large parts of the model response are known ahead of time. This is most common when you are regenerating a file with only minor changes to most of the content.
+#non_exhaustive
 pub(all) enum CreateChatCompletionRequestPrediction {
   Content(PredictionContent)
   Unknown(String, Json)
@@ -5683,6 +5712,7 @@ pub impl @json.FromJson for CreateChatCompletionRequestPrediction with fn from_j
 ///|
 ///
 /// `none` means the model will not call a function and instead generates a message. `auto` means the model can pick between generating a message or calling a function.
+#non_exhaustive
 pub(all) enum CreateChatCompletionRequestFunctionCallText {
   None
   Auto
@@ -5746,6 +5776,7 @@ pub impl @json.FromJson for CreateChatCompletionRequestFunctionCallText with fn 
 ///|
 ///
 /// Deprecated in favor of `tool_choice`. Controls which (if any) function is called by the model. `none` means the model will not call a function and instead generates a message. `auto` means the model can pick between generating a message or calling a function. Specifying a particular function via `{"name": "my_function"}` forces the model to call that function. `none` is the default when no functions are present. `auto` is the default if functions are present.
+#non_exhaustive
 pub(all) enum CreateChatCompletionRequestFunctionCall {
   Text(CreateChatCompletionRequestFunctionCallText)
   ChatCompletionFunctionCallOption(ChatCompletionFunctionCallOption)
@@ -6012,6 +6043,7 @@ pub impl @json.FromJson for CreateChatCompletionRequest with fn from_json(
 ///|
 ///
 /// The reason the model stopped generating tokens. This will be `stop` if the model hit a natural stop point or a provided stop sequence, `length` if the maximum number of tokens specified in the request was reached, `content_filter` if content was omitted due to a flag from our content filters, `tool_calls` if the model called a tool, or `function_call` (deprecated) if the model called a function.
+#non_exhaustive
 pub(all) enum CreateChatCompletionResponseChoicesItemFinishReason {
   Stop
   Length
@@ -6370,6 +6402,7 @@ pub impl @json.FromJson for CreateChatCompletionStreamResponseChoicesItemLogprob
 ///|
 ///
 /// The reason the model stopped generating tokens. This will be `stop` if the model hit a natural stop point or a provided stop sequence, `length` if the maximum number of tokens specified in the request was reached, `content_filter` if content was omitted due to a flag from our content filters, `tool_calls` if the model called a tool, or `function_call` (deprecated) if the model called a function.
+#non_exhaustive
 pub(all) enum CreateChatCompletionStreamResponseChoicesItemFinishReason {
   Stop
   Length
@@ -6608,6 +6641,7 @@ pub impl @json.FromJson for CreateChatCompletionStreamResponse with fn from_json
 ///|
 ///
 /// Input text to embed, encoded as a string or array of tokens. To embed multiple inputs in a single request, pass an array of strings or array of token arrays. The input must not exceed the max input tokens for the model (8192 tokens for `text-embedding-ada-002`), cannot be an empty string, and any array must be 2048 dimensions or less. [Example Python code](https://cookbook.openai.com/examples/how_to_count_tokens_with_tiktoken) for counting tokens. Some models may also impose a limit on total number of tokens summed across inputs.
+#non_exhaustive
 pub(all) enum CreateEmbeddingRequestInput {
   Text(String)
   TextArray(Array[String])
@@ -6672,6 +6706,7 @@ pub impl @json.FromJson for CreateEmbeddingRequestInput with fn from_json(
 ///|
 ///
 /// The format to return the embeddings in. Can be either `float` or [`base64`](https://pypi.org/project/pybase64/).
+#non_exhaustive
 pub(all) enum CreateEmbeddingRequestEncodingFormat {
   Float
   Base64
@@ -7026,6 +7061,7 @@ pub impl @json.FromJson for ModelResponseProperties with fn from_json(
 ///|
 ///
 /// A summary of the reasoning performed by the model. This can be useful for debugging and understanding the model's reasoning process. One of `auto`, `concise`, or `detailed`.
+#non_exhaustive
 pub(all) enum ReasoningSummary {
   Auto
   Concise
@@ -7080,6 +7116,7 @@ pub impl @json.FromJson for ReasoningSummary with fn from_json(value, path) {
 ///|
 ///
 /// **Deprecated:** use `summary` instead. A summary of the reasoning performed by the model. This can be useful for debugging and understanding the model's reasoning process. One of `auto`, `concise`, or `detailed`.
+#non_exhaustive
 pub(all) enum ReasoningGenerateSummary {
   Auto
   Concise
@@ -7268,6 +7305,7 @@ pub impl @json.FromJson for TextResponseFormatJsonSchema with fn from_json(
 ///|
 ///
 /// An object specifying the format that the model must output. Configuring `{ "type": "json_schema" }` enables Structured Outputs, which ensures the model will match your supplied JSON schema. Learn more in the [Structured Outputs guide](/docs/guides/structured-outputs). The default format is `{ "type": "text" }` with no additional options. **Not recommended for gpt-4o and newer models:** Setting to `{ "type": "json_object" }` enables the older JSON mode, which ensures the message the model generates is valid JSON. Using `json_schema` is preferred for models that support it.
+#non_exhaustive
 pub(all) enum TextResponseFormatConfiguration {
   Text(ResponseFormatText)
   JsonSchema(TextResponseFormatJsonSchema)
@@ -7362,6 +7400,7 @@ pub impl @json.FromJson for CreateResponseText with fn from_json(value, path) {
 ///|
 ///
 /// The ranker to use for the file search.
+#non_exhaustive
 pub(all) enum RankingOptionsRanker {
   Auto
   Default20241115
@@ -7670,6 +7709,7 @@ pub impl @json.FromJson for ApproximateLocation with fn from_json(value, path) {
 ///|
 ///
 /// High level guidance for the amount of context window space to use for the search. One of `low`, `medium`, or `high`. `medium` is the default.
+#non_exhaustive
 pub(all) enum WebSearchPreviewToolSearchContextSize {
   Low
   Medium
@@ -7788,6 +7828,7 @@ pub impl @json.FromJson for WebSearchPreviewTool with fn from_json(value, path) 
 ///|
 ///
 /// The type of computer environment to control.
+#non_exhaustive
 pub(all) enum ComputerUsePreviewToolEnvironment {
   Windows
   Mac
@@ -7913,6 +7954,7 @@ pub impl @json.FromJson for ComputerUsePreviewTool with fn from_json(
 ///|
 ///
 /// Generated tagged union Tool.
+#non_exhaustive
 pub(all) enum Tool {
   FileSearch(FileSearchTool)
   Function(FunctionTool)
@@ -7964,6 +8006,7 @@ pub impl @json.FromJson for Tool with fn from_json(value, path) {
 ///|
 ///
 /// The truncation strategy to use for the model response. - `auto`: If the context of this response and previous ones exceeds the model's context window size, the model will truncate the response to fit the context window by dropping input items in the middle of the conversation. - `disabled` (default): If a model response will exceed the context window size for a model, the request will fail with a 400 error.
+#non_exhaustive
 pub(all) enum CreateResponseTruncation {
   Auto
   Disabled
@@ -8191,6 +8234,7 @@ pub impl @json.FromJson for FilePath with fn from_json(value, path) {
 ///|
 ///
 /// Generated tagged union Annotation.
+#non_exhaustive
 pub(all) enum Annotation {
   FileCitation(FileCitationBody)
   UrlCitation(UrlCitationBody)
@@ -8345,6 +8389,7 @@ pub impl @json.FromJson for RefusalContent with fn from_json(value, path) {
 ///|
 ///
 /// Generated tagged union OutputContent.
+#non_exhaustive
 pub(all) enum OutputContent {
   OutputText(OutputTextContent)
   Refusal(RefusalContent)
@@ -8390,6 +8435,7 @@ pub impl @json.FromJson for OutputContent with fn from_json(value, path) {
 ///|
 ///
 /// The status of the message input. One of `in_progress`, `completed`, or `incomplete`. Populated when input items are returned via API.
+#non_exhaustive
 pub(all) enum OutputMessageStatus {
   InProgress
   Completed
@@ -8504,6 +8550,7 @@ pub impl @json.FromJson for OutputMessage with fn from_json(value, path) {
 ///|
 ///
 /// The role of the message input. One of `user`, `assistant`, `system`, or `developer`.
+#non_exhaustive
 pub(all) enum EasyInputMessageRole {
   User
   Assistant
@@ -8612,6 +8659,7 @@ pub impl @json.FromJson for InputTextContent with fn from_json(value, path) {
 ///|
 ///
 /// The detail level of the image to be sent to the model. One of `high`, `low`, or `auto`. Defaults to `auto`.
+#non_exhaustive
 pub(all) enum InputImageContentDetail {
   Low
   High
@@ -8797,6 +8845,7 @@ pub impl @json.FromJson for InputFileContent with fn from_json(value, path) {
 ///|
 ///
 /// Generated tagged union InputContent.
+#non_exhaustive
 pub(all) enum InputContent {
   InputText(InputTextContent)
   InputImage(InputImageContent)
@@ -8845,6 +8894,7 @@ pub impl @json.FromJson for InputContent with fn from_json(value, path) {
 ///|
 ///
 /// Text, image, or audio input to the model, used to generate a response. Can also contain previous assistant responses.
+#non_exhaustive
 pub(all) enum EasyInputMessageContent {
   Text(String)
   InputMessageContentList(Array[InputContent])
@@ -8950,6 +9000,7 @@ pub impl @json.FromJson for EasyInputMessage with fn from_json(value, path) {
 ///|
 ///
 /// The role of the message input. One of `user`, `system`, or `developer`.
+#non_exhaustive
 pub(all) enum InputMessageRole {
   User
   System
@@ -9004,6 +9055,7 @@ pub impl @json.FromJson for InputMessageRole with fn from_json(value, path) {
 ///|
 ///
 /// The status of item. One of `in_progress`, `completed`, or `incomplete`. Populated when items are returned via API.
+#non_exhaustive
 pub(all) enum InputMessageStatus {
   InProgress
   Completed
@@ -9117,6 +9169,7 @@ pub impl @json.FromJson for InputMessage with fn from_json(value, path) {
 ///|
 ///
 /// The status of the file search tool call. One of `in_progress`, `searching`, `incomplete` or `failed`,
+#non_exhaustive
 pub(all) enum FileSearchToolCallStatus {
   InProgress
   Searching
@@ -9180,6 +9233,7 @@ pub impl @json.FromJson for FileSearchToolCallStatus with fn from_json(
 ///|
 ///
 /// Generated untagged union VectorStoreFileAttributesValue.
+#non_exhaustive
 pub(all) enum VectorStoreFileAttributesValue {
   Text(String)
   Number(Double)
@@ -9441,6 +9495,7 @@ pub impl @json.FromJson for ComputerCallSafetyCheckParam with fn from_json(
 ///|
 ///
 /// The status of the message input. One of `in_progress`, `completed`, or `incomplete`. Populated when input items are returned via API.
+#non_exhaustive
 pub(all) enum ComputerCallOutputItemParamStatus {
   InProgress
   Completed
@@ -9581,6 +9636,7 @@ pub impl @json.FromJson for ComputerCallOutputItemParam with fn from_json(
 ///|
 ///
 /// The status of the web search tool call.
+#non_exhaustive
 pub(all) enum WebSearchToolCallStatus {
   InProgress
   Searching
@@ -9696,6 +9752,7 @@ pub impl @json.FromJson for WebSearchToolCall with fn from_json(value, path) {
 ///|
 ///
 /// The status of the item. One of `in_progress`, `completed`, or `incomplete`. Populated when items are returned via API.
+#non_exhaustive
 pub(all) enum FunctionToolCallStatus {
   InProgress
   Completed
@@ -9820,6 +9877,7 @@ pub impl @json.FromJson for FunctionToolCall with fn from_json(value, path) {
 ///|
 ///
 /// The status of the item. One of `in_progress`, `completed`, or `incomplete`. Populated when items are returned via API.
+#non_exhaustive
 pub(all) enum FunctionCallOutputItemParamStatus {
   InProgress
   Completed
@@ -9998,6 +10056,7 @@ pub impl @json.FromJson for ReasoningItemSummaryItem with fn from_json(
 ///|
 ///
 /// The status of the item. One of `in_progress`, `completed`, or `incomplete`. Populated when items are returned via API.
+#non_exhaustive
 pub(all) enum ReasoningItemStatus {
   InProgress
   Completed
@@ -10215,6 +10274,7 @@ pub impl @json.FromJson for ItemReferenceParam with fn from_json(value, path) {
 ///|
 ///
 /// Generated tagged union InputItem.
+#non_exhaustive
 pub(all) enum InputItem {
   OutputMessage(OutputMessage)
   EasyInputMessage(EasyInputMessage)
@@ -10298,6 +10358,7 @@ pub impl @json.FromJson for InputItem with fn from_json(value, path) {
 ///|
 ///
 /// Text, image, or file inputs to the model, used to generate a response. Learn more: - [Text inputs and outputs](/docs/guides/text) - [Image inputs](/docs/guides/images) - [File inputs](/docs/guides/pdf-files) - [Conversation state](/docs/guides/conversation-state) - [Function calling](/docs/guides/function-calling)
+#non_exhaustive
 pub(all) enum CreateResponseInput {
   Text(String)
   InputItemArray(Array[InputItem])
@@ -10345,6 +10406,7 @@ pub impl @json.FromJson for CreateResponseInput with fn from_json(value, path) {
 ///|
 ///
 /// Specify additional output data to include in the model response. Currently supported values are: - `file_search_call.results`: Include the search results of the file search tool call. - `message.input_image.image_url`: Include image urls from the input message. - `computer_call_output.output.image_url`: Include image urls from the computer call output.
+#non_exhaustive
 pub(all) enum Includable {
   FileSearchCallResults
   MessageInputImageImageUrl
@@ -10543,6 +10605,7 @@ pub impl @json.FromJson for CreateResponse with fn from_json(value, path) {
 ///|
 ///
 /// Content item used to generate a response.
+#non_exhaustive
 pub(all) enum Item {
   OutputMessage(OutputMessage)
   InputMessage(InputMessage)
@@ -10722,6 +10785,7 @@ pub impl @json.FromJson for ListModelsResponse with fn from_json(value, path) {
 ///|
 ///
 /// Generated tagged union OutputItem.
+#non_exhaustive
 pub(all) enum OutputItem {
   Message(OutputMessage)
   FileSearchCall(FileSearchToolCall)
@@ -10822,6 +10886,7 @@ pub impl @json.FromJson for ResponseText with fn from_json(value, path) {
 ///|
 ///
 /// The truncation strategy to use for the model response. - `auto`: If the context of this response and previous ones exceeds the model's context window size, the model will truncate the response to fit the context window by dropping input items in the middle of the conversation. - `disabled` (default): If a model response will exceed the context window size for a model, the request will fail with a 400 error.
+#non_exhaustive
 pub(all) enum ResponseTruncation {
   Auto
   Disabled
@@ -10873,6 +10938,7 @@ pub impl @json.FromJson for ResponseTruncation with fn from_json(value, path) {
 ///|
 ///
 /// The status of the response generation. One of `completed`, `failed`, `in_progress`, or `incomplete`.
+#non_exhaustive
 pub(all) enum ResponseStatus {
   Completed
   Failed
@@ -10930,6 +10996,7 @@ pub impl @json.FromJson for ResponseStatus with fn from_json(value, path) {
 ///|
 ///
 /// The error code for the response.
+#non_exhaustive
 pub(all) enum ResponseErrorCode {
   ServerError
   RateLimitExceeded
@@ -11080,6 +11147,7 @@ pub impl @json.FromJson for ResponseError with fn from_json(value, path) {
 ///|
 ///
 /// The reason why the response is incomplete.
+#non_exhaustive
 pub(all) enum ResponseIncompleteDetailsReason {
   MaxOutputTokens
   ContentFilter
@@ -12962,6 +13030,7 @@ pub impl @json.FromJson for ResponsePropertiesText with fn from_json(
 ///|
 ///
 /// The truncation strategy to use for the model response. - `auto`: If the context of this response and previous ones exceeds the model's context window size, the model will truncate the response to fit the context window by dropping input items in the middle of the conversation. - `disabled` (default): If a model response will exceed the context window size for a model, the request will fail with a 400 error.
+#non_exhaustive
 pub(all) enum ResponsePropertiesTruncation {
   Auto
   Disabled
@@ -13997,6 +14066,7 @@ pub impl @json.FromJson for ResponseWebSearchCallSearchingEvent with fn from_jso
 ///|
 ///
 /// Generated tagged union ResponseStreamEvent.
+#non_exhaustive
 pub(all) enum ResponseStreamEvent {
   ResponseAudioDelta(ResponseAudioDeltaEvent)
   ResponseAudioDone(ResponseAudioDoneEvent)

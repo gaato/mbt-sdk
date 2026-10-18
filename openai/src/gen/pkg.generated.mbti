@@ -41,6 +41,7 @@ pub fn retrieve_model_request(String) -> @http.Request
 // Errors
 
 // Types and methods
+#non_exhaustive
 pub(all) enum Annotation {
   FileCitation(FileCitationBody)
   UrlCitation(UrlCitationBody)
@@ -203,6 +204,7 @@ pub fn ChatCompletionRequestAssistantMessageAudio::to_repr(Self) -> @debug.Repr
 pub impl ToJson for ChatCompletionRequestAssistantMessageAudio
 pub impl @moonbitlang/core/json.FromJson for ChatCompletionRequestAssistantMessageAudio
 
+#non_exhaustive
 pub(all) enum ChatCompletionRequestAssistantMessageContent {
   Text(String)
   ChatCompletionRequestAssistantMessageContentPartArray(Array[ChatCompletionRequestAssistantMessageContentPart])
@@ -215,6 +217,7 @@ pub fn ChatCompletionRequestAssistantMessageContent::to_repr(Self) -> @debug.Rep
 pub impl ToJson for ChatCompletionRequestAssistantMessageContent
 pub impl @moonbitlang/core/json.FromJson for ChatCompletionRequestAssistantMessageContent
 
+#non_exhaustive
 pub(all) enum ChatCompletionRequestAssistantMessageContentPart {
   Text(ChatCompletionRequestMessageContentPartText)
   Refusal(ChatCompletionRequestMessageContentPartRefusal)
@@ -255,6 +258,7 @@ pub fn ChatCompletionRequestDeveloperMessage::to_repr(Self) -> @debug.Repr
 pub impl ToJson for ChatCompletionRequestDeveloperMessage
 pub impl @moonbitlang/core/json.FromJson for ChatCompletionRequestDeveloperMessage
 
+#non_exhaustive
 pub(all) enum ChatCompletionRequestDeveloperMessageContent {
   Text(String)
   ChatCompletionRequestMessageContentPartTextArray(Array[ChatCompletionRequestMessageContentPartText])
@@ -281,6 +285,7 @@ pub fn ChatCompletionRequestFunctionMessage::to_repr(Self) -> @debug.Repr
 pub impl ToJson for ChatCompletionRequestFunctionMessage
 pub impl @moonbitlang/core/json.FromJson for ChatCompletionRequestFunctionMessage
 
+#non_exhaustive
 pub(all) enum ChatCompletionRequestMessage {
   Developer(ChatCompletionRequestDeveloperMessage)
   System(ChatCompletionRequestSystemMessage)
@@ -324,6 +329,7 @@ pub fn ChatCompletionRequestMessageContentPartAudioInputAudio::to_repr(Self) -> 
 pub impl ToJson for ChatCompletionRequestMessageContentPartAudioInputAudio
 pub impl @moonbitlang/core/json.FromJson for ChatCompletionRequestMessageContentPartAudioInputAudio
 
+#non_exhaustive
 pub(all) enum ChatCompletionRequestMessageContentPartAudioInputAudioFormat {
   Wav
   Mp3
@@ -390,6 +396,7 @@ pub fn ChatCompletionRequestMessageContentPartImageImageUrl::to_repr(Self) -> @d
 pub impl ToJson for ChatCompletionRequestMessageContentPartImageImageUrl
 pub impl @moonbitlang/core/json.FromJson for ChatCompletionRequestMessageContentPartImageImageUrl
 
+#non_exhaustive
 pub(all) enum ChatCompletionRequestMessageContentPartImageImageUrlDetail {
   Auto
   Low
@@ -444,6 +451,7 @@ pub fn ChatCompletionRequestSystemMessage::to_repr(Self) -> @debug.Repr
 pub impl ToJson for ChatCompletionRequestSystemMessage
 pub impl @moonbitlang/core/json.FromJson for ChatCompletionRequestSystemMessage
 
+#non_exhaustive
 pub(all) enum ChatCompletionRequestSystemMessageContent {
   Text(String)
   ChatCompletionRequestSystemMessageContentPartArray(Array[ChatCompletionRequestSystemMessageContentPart])
@@ -456,6 +464,7 @@ pub fn ChatCompletionRequestSystemMessageContent::to_repr(Self) -> @debug.Repr
 pub impl ToJson for ChatCompletionRequestSystemMessageContent
 pub impl @moonbitlang/core/json.FromJson for ChatCompletionRequestSystemMessageContent
 
+#non_exhaustive
 pub(all) enum ChatCompletionRequestSystemMessageContentPart {
   Text(ChatCompletionRequestMessageContentPartText)
   Unknown(String, Json)
@@ -482,6 +491,7 @@ pub fn ChatCompletionRequestToolMessage::to_repr(Self) -> @debug.Repr
 pub impl ToJson for ChatCompletionRequestToolMessage
 pub impl @moonbitlang/core/json.FromJson for ChatCompletionRequestToolMessage
 
+#non_exhaustive
 pub(all) enum ChatCompletionRequestToolMessageContent {
   Text(String)
   ChatCompletionRequestToolMessageContentPartArray(Array[ChatCompletionRequestToolMessageContentPart])
@@ -494,6 +504,7 @@ pub fn ChatCompletionRequestToolMessageContent::to_repr(Self) -> @debug.Repr
 pub impl ToJson for ChatCompletionRequestToolMessageContent
 pub impl @moonbitlang/core/json.FromJson for ChatCompletionRequestToolMessageContent
 
+#non_exhaustive
 pub(all) enum ChatCompletionRequestToolMessageContentPart {
   Text(ChatCompletionRequestMessageContentPartText)
   Unknown(String, Json)
@@ -520,6 +531,7 @@ pub fn ChatCompletionRequestUserMessage::to_repr(Self) -> @debug.Repr
 pub impl ToJson for ChatCompletionRequestUserMessage
 pub impl @moonbitlang/core/json.FromJson for ChatCompletionRequestUserMessage
 
+#non_exhaustive
 pub(all) enum ChatCompletionRequestUserMessageContent {
   Text(String)
   ChatCompletionRequestUserMessageContentPartArray(Array[ChatCompletionRequestUserMessageContentPart])
@@ -532,6 +544,7 @@ pub fn ChatCompletionRequestUserMessageContent::to_repr(Self) -> @debug.Repr
 pub impl ToJson for ChatCompletionRequestUserMessageContent
 pub impl @moonbitlang/core/json.FromJson for ChatCompletionRequestUserMessageContent
 
+#non_exhaustive
 pub(all) enum ChatCompletionRequestUserMessageContentPart {
   Text(ChatCompletionRequestMessageContentPartText)
   ImageUrl(ChatCompletionRequestMessageContentPartImage)
@@ -660,6 +673,7 @@ pub fn ChatCompletionStreamResponseDeltaFunctionCall::to_repr(Self) -> @debug.Re
 pub impl ToJson for ChatCompletionStreamResponseDeltaFunctionCall
 pub impl @moonbitlang/core/json.FromJson for ChatCompletionStreamResponseDeltaFunctionCall
 
+#non_exhaustive
 pub(all) enum ChatCompletionStreamResponseDeltaRole {
   Developer
   System
@@ -717,6 +731,7 @@ pub fn ChatCompletionTool::to_repr(Self) -> @debug.Repr
 pub impl ToJson for ChatCompletionTool
 pub impl @moonbitlang/core/json.FromJson for ChatCompletionTool
 
+#non_exhaustive
 pub(all) enum ChatCompletionToolChoiceOption {
   Text(ChatCompletionToolChoiceOptionText)
   ChatCompletionNamedToolChoice(ChatCompletionNamedToolChoice)
@@ -729,6 +744,7 @@ pub fn ChatCompletionToolChoiceOption::to_repr(Self) -> @debug.Repr
 pub impl ToJson for ChatCompletionToolChoiceOption
 pub impl @moonbitlang/core/json.FromJson for ChatCompletionToolChoiceOption
 
+#non_exhaustive
 pub(all) enum ChatCompletionToolChoiceOptionText {
   None
   Auto
@@ -758,6 +774,7 @@ pub fn Click::to_repr(Self) -> @debug.Repr
 pub impl ToJson for Click
 pub impl @moonbitlang/core/json.FromJson for Click
 
+#non_exhaustive
 pub(all) enum ClickButton {
   Left
   Right
@@ -828,6 +845,7 @@ pub fn CodeInterpreterToolCall::to_repr(Self) -> @debug.Repr
 pub impl ToJson for CodeInterpreterToolCall
 pub impl @moonbitlang/core/json.FromJson for CodeInterpreterToolCall
 
+#non_exhaustive
 pub(all) enum CodeInterpreterToolCallStatus {
   InProgress
   Interpreting
@@ -842,6 +860,7 @@ pub fn CodeInterpreterToolCallStatus::to_repr(Self) -> @debug.Repr
 pub impl ToJson for CodeInterpreterToolCallStatus
 pub impl @moonbitlang/core/json.FromJson for CodeInterpreterToolCallStatus
 
+#non_exhaustive
 pub(all) enum CodeInterpreterToolOutput {
   Logs(CodeInterpreterTextOutput)
   Files(CodeInterpreterFileOutput)
@@ -899,6 +918,7 @@ pub fn CompletionUsagePromptTokensDetails::to_repr(Self) -> @debug.Repr
 pub impl ToJson for CompletionUsagePromptTokensDetails
 pub impl @moonbitlang/core/json.FromJson for CompletionUsagePromptTokensDetails
 
+#non_exhaustive
 pub(all) enum ComputerAction {
   Click(Click)
   DoubleClick(DoubleClick)
@@ -936,6 +956,7 @@ pub fn ComputerCallOutputItemParam::to_repr(Self) -> @debug.Repr
 pub impl ToJson for ComputerCallOutputItemParam
 pub impl @moonbitlang/core/json.FromJson for ComputerCallOutputItemParam
 
+#non_exhaustive
 pub(all) enum ComputerCallOutputItemParamStatus {
   InProgress
   Completed
@@ -1008,6 +1029,7 @@ pub fn ComputerToolCallSafetyCheck::to_repr(Self) -> @debug.Repr
 pub impl ToJson for ComputerToolCallSafetyCheck
 pub impl @moonbitlang/core/json.FromJson for ComputerToolCallSafetyCheck
 
+#non_exhaustive
 pub(all) enum ComputerToolCallStatus {
   InProgress
   Completed
@@ -1037,6 +1059,7 @@ pub fn ComputerUsePreviewTool::to_repr(Self) -> @debug.Repr
 pub impl ToJson for ComputerUsePreviewTool
 pub impl @moonbitlang/core/json.FromJson for ComputerUsePreviewTool
 
+#non_exhaustive
 pub(all) enum ComputerUsePreviewToolEnvironment {
   Windows
   Mac
@@ -1121,6 +1144,7 @@ pub fn CreateChatCompletionRequestAudio::to_repr(Self) -> @debug.Repr
 pub impl ToJson for CreateChatCompletionRequestAudio
 pub impl @moonbitlang/core/json.FromJson for CreateChatCompletionRequestAudio
 
+#non_exhaustive
 pub(all) enum CreateChatCompletionRequestAudioFormat {
   Wav
   Aac
@@ -1138,6 +1162,7 @@ pub fn CreateChatCompletionRequestAudioFormat::to_repr(Self) -> @debug.Repr
 pub impl ToJson for CreateChatCompletionRequestAudioFormat
 pub impl @moonbitlang/core/json.FromJson for CreateChatCompletionRequestAudioFormat
 
+#non_exhaustive
 pub(all) enum CreateChatCompletionRequestFunctionCall {
   Text(CreateChatCompletionRequestFunctionCallText)
   ChatCompletionFunctionCallOption(ChatCompletionFunctionCallOption)
@@ -1150,6 +1175,7 @@ pub fn CreateChatCompletionRequestFunctionCall::to_repr(Self) -> @debug.Repr
 pub impl ToJson for CreateChatCompletionRequestFunctionCall
 pub impl @moonbitlang/core/json.FromJson for CreateChatCompletionRequestFunctionCall
 
+#non_exhaustive
 pub(all) enum CreateChatCompletionRequestFunctionCallText {
   None
   Auto
@@ -1163,6 +1189,7 @@ pub fn CreateChatCompletionRequestFunctionCallText::to_repr(Self) -> @debug.Repr
 pub impl ToJson for CreateChatCompletionRequestFunctionCallText
 pub impl @moonbitlang/core/json.FromJson for CreateChatCompletionRequestFunctionCallText
 
+#non_exhaustive
 pub(all) enum CreateChatCompletionRequestPrediction {
   Content(PredictionContent)
   Unknown(String, Json)
@@ -1175,6 +1202,7 @@ pub fn CreateChatCompletionRequestPrediction::to_repr(Self) -> @debug.Repr
 pub impl ToJson for CreateChatCompletionRequestPrediction
 pub impl @moonbitlang/core/json.FromJson for CreateChatCompletionRequestPrediction
 
+#non_exhaustive
 pub(all) enum CreateChatCompletionRequestResponseFormat {
   Text(ResponseFormatText)
   JsonSchema(ResponseFormatJsonSchema)
@@ -1247,6 +1275,7 @@ pub fn CreateChatCompletionResponseChoicesItem::to_repr(Self) -> @debug.Repr
 pub impl ToJson for CreateChatCompletionResponseChoicesItem
 pub impl @moonbitlang/core/json.FromJson for CreateChatCompletionResponseChoicesItem
 
+#non_exhaustive
 pub(all) enum CreateChatCompletionResponseChoicesItemFinishReason {
   Stop
   Length
@@ -1309,6 +1338,7 @@ pub fn CreateChatCompletionStreamResponseChoicesItem::to_repr(Self) -> @debug.Re
 pub impl ToJson for CreateChatCompletionStreamResponseChoicesItem
 pub impl @moonbitlang/core/json.FromJson for CreateChatCompletionStreamResponseChoicesItem
 
+#non_exhaustive
 pub(all) enum CreateChatCompletionStreamResponseChoicesItemFinishReason {
   Stop
   Length
@@ -1354,6 +1384,7 @@ pub fn CreateEmbeddingRequest::to_repr(Self) -> @debug.Repr
 pub impl ToJson for CreateEmbeddingRequest
 pub impl @moonbitlang/core/json.FromJson for CreateEmbeddingRequest
 
+#non_exhaustive
 pub(all) enum CreateEmbeddingRequestEncodingFormat {
   Float
   Base64
@@ -1367,6 +1398,7 @@ pub fn CreateEmbeddingRequestEncodingFormat::to_repr(Self) -> @debug.Repr
 pub impl ToJson for CreateEmbeddingRequestEncodingFormat
 pub impl @moonbitlang/core/json.FromJson for CreateEmbeddingRequestEncodingFormat
 
+#non_exhaustive
 pub(all) enum CreateEmbeddingRequestInput {
   Text(String)
   TextArray(Array[String])
@@ -1438,6 +1470,7 @@ pub fn CreateResponse::to_repr(Self) -> @debug.Repr
 pub impl ToJson for CreateResponse
 pub impl @moonbitlang/core/json.FromJson for CreateResponse
 
+#non_exhaustive
 pub(all) enum CreateResponseInput {
   Text(String)
   InputItemArray(Array[InputItem])
@@ -1462,6 +1495,7 @@ pub fn CreateResponseText::to_repr(Self) -> @debug.Repr
 pub impl ToJson for CreateResponseText
 pub impl @moonbitlang/core/json.FromJson for CreateResponseText
 
+#non_exhaustive
 pub(all) enum CreateResponseTruncation {
   Auto
   Disabled
@@ -1516,6 +1550,7 @@ pub fn EasyInputMessage::to_repr(Self) -> @debug.Repr
 pub impl ToJson for EasyInputMessage
 pub impl @moonbitlang/core/json.FromJson for EasyInputMessage
 
+#non_exhaustive
 pub(all) enum EasyInputMessageContent {
   Text(String)
   InputMessageContentList(Array[InputContent])
@@ -1528,6 +1563,7 @@ pub fn EasyInputMessageContent::to_repr(Self) -> @debug.Repr
 pub impl ToJson for EasyInputMessageContent
 pub impl @moonbitlang/core/json.FromJson for EasyInputMessageContent
 
+#non_exhaustive
 pub(all) enum EasyInputMessageRole {
   User
   Assistant
@@ -1632,6 +1668,7 @@ pub fn FileSearchToolCallResultsItem::to_repr(Self) -> @debug.Repr
 pub impl ToJson for FileSearchToolCallResultsItem
 pub impl @moonbitlang/core/json.FromJson for FileSearchToolCallResultsItem
 
+#non_exhaustive
 pub(all) enum FileSearchToolCallStatus {
   InProgress
   Searching
@@ -1664,6 +1701,7 @@ pub fn FunctionCallOutputItemParam::to_repr(Self) -> @debug.Repr
 pub impl ToJson for FunctionCallOutputItemParam
 pub impl @moonbitlang/core/json.FromJson for FunctionCallOutputItemParam
 
+#non_exhaustive
 pub(all) enum FunctionCallOutputItemParamStatus {
   InProgress
   Completed
@@ -1726,6 +1764,7 @@ pub fn FunctionToolCall::to_repr(Self) -> @debug.Repr
 pub impl ToJson for FunctionToolCall
 pub impl @moonbitlang/core/json.FromJson for FunctionToolCall
 
+#non_exhaustive
 pub(all) enum FunctionToolCallStatus {
   InProgress
   Completed
@@ -1740,6 +1779,7 @@ pub fn FunctionToolCallStatus::to_repr(Self) -> @debug.Repr
 pub impl ToJson for FunctionToolCallStatus
 pub impl @moonbitlang/core/json.FromJson for FunctionToolCallStatus
 
+#non_exhaustive
 pub(all) enum Includable {
   FileSearchCallResults
   MessageInputImageImageUrl
@@ -1754,6 +1794,7 @@ pub fn Includable::to_repr(Self) -> @debug.Repr
 pub impl ToJson for Includable
 pub impl @moonbitlang/core/json.FromJson for Includable
 
+#non_exhaustive
 pub(all) enum InputContent {
   InputText(InputTextContent)
   InputImage(InputImageContent)
@@ -1798,6 +1839,7 @@ pub fn InputImageContent::to_repr(Self) -> @debug.Repr
 pub impl ToJson for InputImageContent
 pub impl @moonbitlang/core/json.FromJson for InputImageContent
 
+#non_exhaustive
 pub(all) enum InputImageContentDetail {
   Low
   High
@@ -1812,6 +1854,7 @@ pub fn InputImageContentDetail::to_repr(Self) -> @debug.Repr
 pub impl ToJson for InputImageContentDetail
 pub impl @moonbitlang/core/json.FromJson for InputImageContentDetail
 
+#non_exhaustive
 pub(all) enum InputItem {
   OutputMessage(OutputMessage)
   EasyInputMessage(EasyInputMessage)
@@ -1849,6 +1892,7 @@ pub fn InputMessage::to_repr(Self) -> @debug.Repr
 pub impl ToJson for InputMessage
 pub impl @moonbitlang/core/json.FromJson for InputMessage
 
+#non_exhaustive
 pub(all) enum InputMessageRole {
   User
   System
@@ -1863,6 +1907,7 @@ pub fn InputMessageRole::to_repr(Self) -> @debug.Repr
 pub impl ToJson for InputMessageRole
 pub impl @moonbitlang/core/json.FromJson for InputMessageRole
 
+#non_exhaustive
 pub(all) enum InputMessageStatus {
   InProgress
   Completed
@@ -1890,6 +1935,7 @@ pub fn InputTextContent::to_repr(Self) -> @debug.Repr
 pub impl ToJson for InputTextContent
 pub impl @moonbitlang/core/json.FromJson for InputTextContent
 
+#non_exhaustive
 pub(all) enum Item {
   OutputMessage(OutputMessage)
   InputMessage(InputMessage)
@@ -1992,6 +2038,7 @@ pub fn Move::to_repr(Self) -> @debug.Repr
 pub impl ToJson for Move
 pub impl @moonbitlang/core/json.FromJson for Move
 
+#non_exhaustive
 pub(all) enum OutputContent {
   OutputText(OutputTextContent)
   Refusal(RefusalContent)
@@ -2005,6 +2052,7 @@ pub fn OutputContent::to_repr(Self) -> @debug.Repr
 pub impl ToJson for OutputContent
 pub impl @moonbitlang/core/json.FromJson for OutputContent
 
+#non_exhaustive
 pub(all) enum OutputItem {
   Message(OutputMessage)
   FileSearchCall(FileSearchToolCall)
@@ -2037,6 +2085,7 @@ pub fn OutputMessage::to_repr(Self) -> @debug.Repr
 pub impl ToJson for OutputMessage
 pub impl @moonbitlang/core/json.FromJson for OutputMessage
 
+#non_exhaustive
 pub(all) enum OutputMessageStatus {
   InProgress
   Completed
@@ -2078,6 +2127,7 @@ pub fn PredictionContent::to_repr(Self) -> @debug.Repr
 pub impl ToJson for PredictionContent
 pub impl @moonbitlang/core/json.FromJson for PredictionContent
 
+#non_exhaustive
 pub(all) enum PredictionContentContent {
   Text(String)
   ChatCompletionRequestMessageContentPartTextArray(Array[ChatCompletionRequestMessageContentPartText])
@@ -2103,6 +2153,7 @@ pub fn RankingOptions::to_repr(Self) -> @debug.Repr
 pub impl ToJson for RankingOptions
 pub impl @moonbitlang/core/json.FromJson for RankingOptions
 
+#non_exhaustive
 pub(all) enum RankingOptionsRanker {
   Auto
   Default20241115
@@ -2130,6 +2181,7 @@ pub fn Reasoning::to_repr(Self) -> @debug.Repr
 pub impl ToJson for Reasoning
 pub impl @moonbitlang/core/json.FromJson for Reasoning
 
+#non_exhaustive
 pub(all) enum ReasoningEffort {
   Low
   Medium
@@ -2144,6 +2196,7 @@ pub fn ReasoningEffort::to_repr(Self) -> @debug.Repr
 pub impl ToJson for ReasoningEffort
 pub impl @moonbitlang/core/json.FromJson for ReasoningEffort
 
+#non_exhaustive
 pub(all) enum ReasoningGenerateSummary {
   Auto
   Concise
@@ -2186,6 +2239,7 @@ pub fn ReasoningItemContentItem::to_repr(Self) -> @debug.Repr
 pub impl ToJson for ReasoningItemContentItem
 pub impl @moonbitlang/core/json.FromJson for ReasoningItemContentItem
 
+#non_exhaustive
 pub(all) enum ReasoningItemStatus {
   InProgress
   Completed
@@ -2212,6 +2266,7 @@ pub fn ReasoningItemSummaryItem::to_repr(Self) -> @debug.Repr
 pub impl ToJson for ReasoningItemSummaryItem
 pub impl @moonbitlang/core/json.FromJson for ReasoningItemSummaryItem
 
+#non_exhaustive
 pub(all) enum ReasoningSummary {
   Auto
   Concise
@@ -2464,6 +2519,7 @@ pub fn ResponseError::to_repr(Self) -> @debug.Repr
 pub impl ToJson for ResponseError
 pub impl @moonbitlang/core/json.FromJson for ResponseError
 
+#non_exhaustive
 pub(all) enum ResponseErrorCode {
   ServerError
   RateLimitExceeded
@@ -2670,6 +2726,7 @@ pub fn ResponseIncompleteDetails::to_repr(Self) -> @debug.Repr
 pub impl ToJson for ResponseIncompleteDetails
 pub impl @moonbitlang/core/json.FromJson for ResponseIncompleteDetails
 
+#non_exhaustive
 pub(all) enum ResponseIncompleteDetailsReason {
   MaxOutputTokens
   ContentFilter
@@ -2696,6 +2753,7 @@ pub fn ResponseIncompleteEvent::to_repr(Self) -> @debug.Repr
 pub impl ToJson for ResponseIncompleteEvent
 pub impl @moonbitlang/core/json.FromJson for ResponseIncompleteEvent
 
+#non_exhaustive
 pub(all) enum ResponseModalitiesItem {
   Text
   Audio
@@ -2769,6 +2827,7 @@ pub fn ResponsePropertiesText::to_repr(Self) -> @debug.Repr
 pub impl ToJson for ResponsePropertiesText
 pub impl @moonbitlang/core/json.FromJson for ResponsePropertiesText
 
+#non_exhaustive
 pub(all) enum ResponsePropertiesTruncation {
   Auto
   Disabled
@@ -2902,6 +2961,7 @@ pub fn ResponseRefusalDoneEvent::to_repr(Self) -> @debug.Repr
 pub impl ToJson for ResponseRefusalDoneEvent
 pub impl @moonbitlang/core/json.FromJson for ResponseRefusalDoneEvent
 
+#non_exhaustive
 pub(all) enum ResponseStatus {
   Completed
   Failed
@@ -2917,6 +2977,7 @@ pub fn ResponseStatus::to_repr(Self) -> @debug.Repr
 pub impl ToJson for ResponseStatus
 pub impl @moonbitlang/core/json.FromJson for ResponseStatus
 
+#non_exhaustive
 pub(all) enum ResponseStreamEvent {
   ResponseAudioDelta(ResponseAudioDeltaEvent)
   ResponseAudioDone(ResponseAudioDoneEvent)
@@ -3025,6 +3086,7 @@ pub fn ResponseTextDoneEvent::to_repr(Self) -> @debug.Repr
 pub impl ToJson for ResponseTextDoneEvent
 pub impl @moonbitlang/core/json.FromJson for ResponseTextDoneEvent
 
+#non_exhaustive
 pub(all) enum ResponseTruncation {
   Auto
   Disabled
@@ -3148,6 +3210,7 @@ pub fn Scroll::to_repr(Self) -> @debug.Repr
 pub impl ToJson for Scroll
 pub impl @moonbitlang/core/json.FromJson for Scroll
 
+#non_exhaustive
 pub(all) enum ServiceTier {
   Auto
   Default
@@ -3162,6 +3225,7 @@ pub fn ServiceTier::to_repr(Self) -> @debug.Repr
 pub impl ToJson for ServiceTier
 pub impl @moonbitlang/core/json.FromJson for ServiceTier
 
+#non_exhaustive
 pub(all) enum StopConfiguration {
   Text(String)
   TextArray(Array[String])
@@ -3174,6 +3238,7 @@ pub fn StopConfiguration::to_repr(Self) -> @debug.Repr
 pub impl ToJson for StopConfiguration
 pub impl @moonbitlang/core/json.FromJson for StopConfiguration
 
+#non_exhaustive
 pub(all) enum TextResponseFormatConfiguration {
   Text(ResponseFormatText)
   JsonSchema(TextResponseFormatJsonSchema)
@@ -3204,6 +3269,7 @@ pub fn TextResponseFormatJsonSchema::to_repr(Self) -> @debug.Repr
 pub impl ToJson for TextResponseFormatJsonSchema
 pub impl @moonbitlang/core/json.FromJson for TextResponseFormatJsonSchema
 
+#non_exhaustive
 pub(all) enum Tool {
   FileSearch(FileSearchTool)
   Function(FunctionTool)
@@ -3248,6 +3314,7 @@ pub fn UrlCitationBody::to_repr(Self) -> @debug.Repr
 pub impl ToJson for UrlCitationBody
 pub impl @moonbitlang/core/json.FromJson for UrlCitationBody
 
+#non_exhaustive
 pub(all) enum VectorStoreFileAttributesValue {
   Text(String)
   Number(Double)
@@ -3273,6 +3340,7 @@ pub fn Wait::to_repr(Self) -> @debug.Repr
 pub impl ToJson for Wait
 pub impl @moonbitlang/core/json.FromJson for Wait
 
+#non_exhaustive
 pub(all) enum WebSearchContextSize {
   Low
   Medium
@@ -3316,6 +3384,7 @@ pub fn WebSearchPreviewTool::to_repr(Self) -> @debug.Repr
 pub impl ToJson for WebSearchPreviewTool
 pub impl @moonbitlang/core/json.FromJson for WebSearchPreviewTool
 
+#non_exhaustive
 pub(all) enum WebSearchPreviewToolSearchContextSize {
   Low
   Medium
@@ -3344,6 +3413,7 @@ pub fn WebSearchToolCall::to_repr(Self) -> @debug.Repr
 pub impl ToJson for WebSearchToolCall
 pub impl @moonbitlang/core/json.FromJson for WebSearchToolCall
 
+#non_exhaustive
 pub(all) enum WebSearchToolCallStatus {
   InProgress
   Searching

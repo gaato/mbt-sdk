@@ -133,6 +133,7 @@ pub fn Category::to_repr(Self) -> @debug.Repr
 pub impl ToJson for Category
 pub impl @json.FromJson for Category
 
+#non_exhaustive
 pub(all) enum FindPetsByStatusStatus {
   Available
   Pending
@@ -164,6 +165,7 @@ pub fn Order::to_repr(Self) -> @debug.Repr
 pub impl ToJson for Order
 pub impl @json.FromJson for Order
 
+#non_exhaustive
 pub(all) enum OrderStatus {
   Placed
   Approved
@@ -195,6 +197,7 @@ pub fn Pet::to_repr(Self) -> @debug.Repr
 pub impl ToJson for Pet
 pub impl @json.FromJson for Pet
 
+#non_exhaustive
 pub(all) enum PetStatus {
   Available
   Pending

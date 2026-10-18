@@ -48,6 +48,7 @@ pub fn APIError::to_repr(Self) -> @debug.Repr
 pub impl ToJson for APIError
 pub impl @moonbitlang/core/json.FromJson for APIError
 
+#non_exhaustive
 pub(all) enum AllowedCaller {
   Direct
   CodeExecution20250825
@@ -100,6 +101,7 @@ pub fn Base64ImageSource::to_repr(Self) -> @debug.Repr
 pub impl ToJson for Base64ImageSource
 pub impl @moonbitlang/core/json.FromJson for Base64ImageSource
 
+#non_exhaustive
 pub(all) enum Base64ImageSourceMediaType {
   ImageJpeg
   ImagePng
@@ -128,6 +130,7 @@ pub fn Base64PDFSource::to_repr(Self) -> @debug.Repr
 pub impl ToJson for Base64PDFSource
 pub impl @moonbitlang/core/json.FromJson for Base64PDFSource
 
+#non_exhaustive
 pub(all) enum BashCodeExecutionToolResultErrorCode {
   InvalidToolInput
   Unavailable
@@ -161,6 +164,7 @@ pub fn BashTool20250124::to_repr(Self) -> @debug.Repr
 pub impl ToJson for BashTool20250124
 pub impl @moonbitlang/core/json.FromJson for BashTool20250124
 
+#non_exhaustive
 pub(all) enum BashTool20250124CacheControl {
   Ephemeral(CacheControlEphemeral)
   Unknown(String, Json)
@@ -624,6 +628,7 @@ pub fn BrowserToolset20260801::to_repr(Self) -> @debug.Repr
 pub impl ToJson for BrowserToolset20260801
 pub impl @moonbitlang/core/json.FromJson for BrowserToolset20260801
 
+#non_exhaustive
 pub(all) enum BrowserToolset20260801CacheControl {
   Ephemeral(CacheControlEphemeral)
   Unknown(String, Json)
@@ -743,6 +748,7 @@ pub fn CacheControlEphemeral::to_repr(Self) -> @debug.Repr
 pub impl ToJson for CacheControlEphemeral
 pub impl @moonbitlang/core/json.FromJson for CacheControlEphemeral
 
+#non_exhaustive
 pub(all) enum CacheControlEphemeralTtl {
   Value5m
   Value1h
@@ -807,6 +813,7 @@ pub fn CacheMissPreviousMessageNotFound::to_repr(Self) -> @debug.Repr
 pub impl ToJson for CacheMissPreviousMessageNotFound
 pub impl @moonbitlang/core/json.FromJson for CacheMissPreviousMessageNotFound
 
+#non_exhaustive
 pub(all) enum CacheMissReason {
   MessagesChanged(CacheMissMessagesChanged)
   ModelChanged(CacheMissModelChanged)
@@ -887,6 +894,7 @@ pub fn CitationsDelta::to_repr(Self) -> @debug.Repr
 pub impl ToJson for CitationsDelta
 pub impl @moonbitlang/core/json.FromJson for CitationsDelta
 
+#non_exhaustive
 pub(all) enum CitationsDeltaCitation {
   CharLocation(ResponseCharLocationCitation)
   ContentBlockLocation(ResponseContentBlockLocationCitation)
@@ -959,6 +967,7 @@ pub fn CodeExecutionTool20250522::to_repr(Self) -> @debug.Repr
 pub impl ToJson for CodeExecutionTool20250522
 pub impl @moonbitlang/core/json.FromJson for CodeExecutionTool20250522
 
+#non_exhaustive
 pub(all) enum CodeExecutionTool20250522CacheControl {
   Ephemeral(CacheControlEphemeral)
   Unknown(String, Json)
@@ -987,6 +996,7 @@ pub fn CodeExecutionTool20250825::to_repr(Self) -> @debug.Repr
 pub impl ToJson for CodeExecutionTool20250825
 pub impl @moonbitlang/core/json.FromJson for CodeExecutionTool20250825
 
+#non_exhaustive
 pub(all) enum CodeExecutionTool20250825CacheControl {
   Ephemeral(CacheControlEphemeral)
   Unknown(String, Json)
@@ -1015,6 +1025,7 @@ pub fn CodeExecutionTool20260120::to_repr(Self) -> @debug.Repr
 pub impl ToJson for CodeExecutionTool20260120
 pub impl @moonbitlang/core/json.FromJson for CodeExecutionTool20260120
 
+#non_exhaustive
 pub(all) enum CodeExecutionTool20260120CacheControl {
   Ephemeral(CacheControlEphemeral)
   Unknown(String, Json)
@@ -1043,6 +1054,7 @@ pub fn CodeExecutionTool20260521::to_repr(Self) -> @debug.Repr
 pub impl ToJson for CodeExecutionTool20260521
 pub impl @moonbitlang/core/json.FromJson for CodeExecutionTool20260521
 
+#non_exhaustive
 pub(all) enum CodeExecutionTool20260521CacheControl {
   Ephemeral(CacheControlEphemeral)
   Unknown(String, Json)
@@ -1055,6 +1067,7 @@ pub fn CodeExecutionTool20260521CacheControl::to_repr(Self) -> @debug.Repr
 pub impl ToJson for CodeExecutionTool20260521CacheControl
 pub impl @moonbitlang/core/json.FromJson for CodeExecutionTool20260521CacheControl
 
+#non_exhaustive
 pub(all) enum CodeExecutionToolResultErrorCode {
   InvalidToolInput
   Unavailable
@@ -1343,6 +1356,7 @@ pub fn ComputerToolset20260801::to_repr(Self) -> @debug.Repr
 pub impl ToJson for ComputerToolset20260801
 pub impl @moonbitlang/core/json.FromJson for ComputerToolset20260801
 
+#non_exhaustive
 pub(all) enum ComputerToolset20260801CacheControl {
   Ephemeral(CacheControlEphemeral)
   Unknown(String, Json)
@@ -1476,6 +1490,7 @@ pub fn ContainerSkill::to_repr(Self) -> @debug.Repr
 pub impl ToJson for ContainerSkill
 pub impl @moonbitlang/core/json.FromJson for ContainerSkill
 
+#non_exhaustive
 pub(all) enum ContainerSkillType {
   Anthropic
   Custom
@@ -1489,6 +1504,7 @@ pub fn ContainerSkillType::to_repr(Self) -> @debug.Repr
 pub impl ToJson for ContainerSkillType
 pub impl @moonbitlang/core/json.FromJson for ContainerSkillType
 
+#non_exhaustive
 pub(all) enum ContentBlock {
   BashCodeExecutionToolResult(ResponseBashCodeExecutionToolResultBlock)
   CodeExecutionToolResult(ResponseCodeExecutionToolResultBlock)
@@ -1526,6 +1542,7 @@ pub fn ContentBlockDeltaEvent::to_repr(Self) -> @debug.Repr
 pub impl ToJson for ContentBlockDeltaEvent
 pub impl @moonbitlang/core/json.FromJson for ContentBlockDeltaEvent
 
+#non_exhaustive
 pub(all) enum ContentBlockDeltaEventDelta {
   CitationsDelta(CitationsDelta)
   InputJsonDelta(InputJsonContentBlockDelta)
@@ -1555,6 +1572,7 @@ pub fn ContentBlockSource::to_repr(Self) -> @debug.Repr
 pub impl ToJson for ContentBlockSource
 pub impl @moonbitlang/core/json.FromJson for ContentBlockSource
 
+#non_exhaustive
 pub(all) enum ContentBlockSourceContent {
   Text(String)
   ValueArray(Array[ContentBlockSourceContentValueArrayItem])
@@ -1567,6 +1585,7 @@ pub fn ContentBlockSourceContent::to_repr(Self) -> @debug.Repr
 pub impl ToJson for ContentBlockSourceContent
 pub impl @moonbitlang/core/json.FromJson for ContentBlockSourceContent
 
+#non_exhaustive
 pub(all) enum ContentBlockSourceContentValueArrayItem {
   Image(RequestImageBlock)
   Text(RequestTextBlock)
@@ -1594,6 +1613,7 @@ pub fn ContentBlockStartEvent::to_repr(Self) -> @debug.Repr
 pub impl ToJson for ContentBlockStartEvent
 pub impl @moonbitlang/core/json.FromJson for ContentBlockStartEvent
 
+#non_exhaustive
 pub(all) enum ContentBlockStartEventContentBlock {
   BashCodeExecutionToolResult(ResponseBashCodeExecutionToolResultBlock)
   CodeExecutionToolResult(ResponseCodeExecutionToolResultBlock)
@@ -1665,6 +1685,7 @@ pub fn CountMessageTokensParams::to_repr(Self) -> @debug.Repr
 pub impl ToJson for CountMessageTokensParams
 pub impl @moonbitlang/core/json.FromJson for CountMessageTokensParams
 
+#non_exhaustive
 pub(all) enum CountMessageTokensParamsCacheControl {
   Ephemeral(CacheControlEphemeral)
   Unknown(String, Json)
@@ -1677,6 +1698,7 @@ pub fn CountMessageTokensParamsCacheControl::to_repr(Self) -> @debug.Repr
 pub impl ToJson for CountMessageTokensParamsCacheControl
 pub impl @moonbitlang/core/json.FromJson for CountMessageTokensParamsCacheControl
 
+#non_exhaustive
 pub(all) enum CountMessageTokensParamsSystem {
   Text(String)
   RequestTextBlockArray(Array[RequestTextBlock])
@@ -1689,6 +1711,7 @@ pub fn CountMessageTokensParamsSystem::to_repr(Self) -> @debug.Repr
 pub impl ToJson for CountMessageTokensParamsSystem
 pub impl @moonbitlang/core/json.FromJson for CountMessageTokensParamsSystem
 
+#non_exhaustive
 pub(all) enum CountMessageTokensParamsToolsItem {
   Tool(Tool)
   BashTool20250124(BashTool20250124)
@@ -1764,6 +1787,7 @@ pub fn CreateMessageParams::to_repr(Self) -> @debug.Repr
 pub impl ToJson for CreateMessageParams
 pub impl @moonbitlang/core/json.FromJson for CreateMessageParams
 
+#non_exhaustive
 pub(all) enum CreateMessageParamsCacheControl {
   Ephemeral(CacheControlEphemeral)
   Unknown(String, Json)
@@ -1776,6 +1800,7 @@ pub fn CreateMessageParamsCacheControl::to_repr(Self) -> @debug.Repr
 pub impl ToJson for CreateMessageParamsCacheControl
 pub impl @moonbitlang/core/json.FromJson for CreateMessageParamsCacheControl
 
+#non_exhaustive
 pub(all) enum CreateMessageParamsContainer {
   ContainerParams(ContainerParams)
   Text(String)
@@ -1788,6 +1813,7 @@ pub fn CreateMessageParamsContainer::to_repr(Self) -> @debug.Repr
 pub impl ToJson for CreateMessageParamsContainer
 pub impl @moonbitlang/core/json.FromJson for CreateMessageParamsContainer
 
+#non_exhaustive
 pub(all) enum CreateMessageParamsServiceTier {
   Auto
   StandardOnly
@@ -1801,6 +1827,7 @@ pub fn CreateMessageParamsServiceTier::to_repr(Self) -> @debug.Repr
 pub impl ToJson for CreateMessageParamsServiceTier
 pub impl @moonbitlang/core/json.FromJson for CreateMessageParamsServiceTier
 
+#non_exhaustive
 pub(all) enum CreateMessageParamsSystem {
   Text(String)
   RequestTextBlockArray(Array[RequestTextBlock])
@@ -1813,6 +1840,7 @@ pub fn CreateMessageParamsSystem::to_repr(Self) -> @debug.Repr
 pub impl ToJson for CreateMessageParamsSystem
 pub impl @moonbitlang/core/json.FromJson for CreateMessageParamsSystem
 
+#non_exhaustive
 pub(all) enum CreateMessageParamsToolsItem {
   Tool(Tool)
   BashTool20250124(BashTool20250124)
@@ -1898,6 +1926,7 @@ pub fn EffortCapability::to_repr(Self) -> @debug.Repr
 pub impl ToJson for EffortCapability
 pub impl @moonbitlang/core/json.FromJson for EffortCapability
 
+#non_exhaustive
 pub(all) enum EffortLevel {
   Low
   Medium
@@ -1937,6 +1966,7 @@ pub fn ErrorResponse::to_repr(Self) -> @debug.Repr
 pub impl ToJson for ErrorResponse
 pub impl @moonbitlang/core/json.FromJson for ErrorResponse
 
+#non_exhaustive
 pub(all) enum ErrorResponseError {
   ApiError(APIError)
   AuthenticationError(AuthenticationError)
@@ -1996,6 +2026,7 @@ pub fn GatewayTimeoutError::to_repr(Self) -> @debug.Repr
 pub impl ToJson for GatewayTimeoutError
 pub impl @moonbitlang/core/json.FromJson for GatewayTimeoutError
 
+#non_exhaustive
 pub(all) enum InputContentBlock {
   BashCodeExecutionToolResult(RequestBashCodeExecutionToolResultBlock)
   CodeExecutionToolResult(RequestCodeExecutionToolResultBlock)
@@ -2049,6 +2080,7 @@ pub fn InputMessage::to_repr(Self) -> @debug.Repr
 pub impl ToJson for InputMessage
 pub impl @moonbitlang/core/json.FromJson for InputMessage
 
+#non_exhaustive
 pub(all) enum InputMessageContent {
   Text(String)
   InputContentBlockArray(Array[InputContentBlock])
@@ -2061,6 +2093,7 @@ pub fn InputMessageContent::to_repr(Self) -> @debug.Repr
 pub impl ToJson for InputMessageContent
 pub impl @moonbitlang/core/json.FromJson for InputMessageContent
 
+#non_exhaustive
 pub(all) enum InputMessageRole {
   User
   Assistant
@@ -2132,6 +2165,7 @@ pub fn MemoryTool20250818::to_repr(Self) -> @debug.Repr
 pub impl ToJson for MemoryTool20250818
 pub impl @moonbitlang/core/json.FromJson for MemoryTool20250818
 
+#non_exhaustive
 pub(all) enum MemoryTool20250818CacheControl {
   Ephemeral(CacheControlEphemeral)
   Unknown(String, Json)
@@ -2235,6 +2269,7 @@ pub fn MessageStopEvent::to_repr(Self) -> @debug.Repr
 pub impl ToJson for MessageStopEvent
 pub impl @moonbitlang/core/json.FromJson for MessageStopEvent
 
+#non_exhaustive
 pub(all) enum MessageStreamEvent {
   ContentBlockDelta(ContentBlockDeltaEvent)
   ContentBlockStart(ContentBlockStartEvent)
@@ -2306,6 +2341,7 @@ pub fn ModelInfo::to_repr(Self) -> @debug.Repr
 pub impl ToJson for ModelInfo
 pub impl @moonbitlang/core/json.FromJson for ModelInfo
 
+#non_exhaustive
 pub(all) enum ModelInfoLifecycle {
   Active
   Deprecated
@@ -2320,6 +2356,7 @@ pub fn ModelInfoLifecycle::to_repr(Self) -> @debug.Repr
 pub impl ToJson for ModelInfoLifecycle
 pub impl @moonbitlang/core/json.FromJson for ModelInfoLifecycle
 
+#non_exhaustive
 pub(all) enum ModelLine {
   Haiku
   Sonnet
@@ -2336,6 +2373,7 @@ pub fn ModelLine::to_repr(Self) -> @debug.Repr
 pub impl ToJson for ModelLine
 pub impl @moonbitlang/core/json.FromJson for ModelLine
 
+#non_exhaustive
 pub(all) enum ModelsListLifecycleItem {
   Active
   Deprecated
@@ -2452,6 +2490,7 @@ pub fn RateLimitError::to_repr(Self) -> @debug.Repr
 pub impl ToJson for RateLimitError
 pub impl @moonbitlang/core/json.FromJson for RateLimitError
 
+#non_exhaustive
 pub(all) enum RefusalCategory {
   Cyber
   Bio
@@ -2524,6 +2563,7 @@ pub fn RequestBashCodeExecutionToolResultBlock::to_repr(Self) -> @debug.Repr
 pub impl ToJson for RequestBashCodeExecutionToolResultBlock
 pub impl @moonbitlang/core/json.FromJson for RequestBashCodeExecutionToolResultBlock
 
+#non_exhaustive
 pub(all) enum RequestBashCodeExecutionToolResultBlockCacheControl {
   Ephemeral(CacheControlEphemeral)
   Unknown(String, Json)
@@ -2536,6 +2576,7 @@ pub fn RequestBashCodeExecutionToolResultBlockCacheControl::to_repr(Self) -> @de
 pub impl ToJson for RequestBashCodeExecutionToolResultBlockCacheControl
 pub impl @moonbitlang/core/json.FromJson for RequestBashCodeExecutionToolResultBlockCacheControl
 
+#non_exhaustive
 pub(all) enum RequestBashCodeExecutionToolResultBlockContent {
   BashCodeExecutionToolResultError(RequestBashCodeExecutionToolResultError)
   BashCodeExecutionResult(RequestBashCodeExecutionResultBlock)
@@ -2607,6 +2648,7 @@ pub fn RequestBrowserStateBlock::to_repr(Self) -> @debug.Repr
 pub impl ToJson for RequestBrowserStateBlock
 pub impl @moonbitlang/core/json.FromJson for RequestBrowserStateBlock
 
+#non_exhaustive
 pub(all) enum RequestBrowserStateBlockCacheControl {
   Ephemeral(CacheControlEphemeral)
   Unknown(String, Json)
@@ -2619,6 +2661,7 @@ pub fn RequestBrowserStateBlockCacheControl::to_repr(Self) -> @debug.Repr
 pub impl ToJson for RequestBrowserStateBlockCacheControl
 pub impl @moonbitlang/core/json.FromJson for RequestBrowserStateBlockCacheControl
 
+#non_exhaustive
 pub(all) enum RequestBrowserStateBlockStateChangesItem {
   DownloadCompleted(BrowserStateChangeDownloadCompleted)
   DownloadFailed(BrowserStateChangeDownloadFailed)
@@ -2706,6 +2749,7 @@ pub fn RequestCodeExecutionToolResultBlock::to_repr(Self) -> @debug.Repr
 pub impl ToJson for RequestCodeExecutionToolResultBlock
 pub impl @moonbitlang/core/json.FromJson for RequestCodeExecutionToolResultBlock
 
+#non_exhaustive
 pub(all) enum RequestCodeExecutionToolResultBlockCacheControl {
   Ephemeral(CacheControlEphemeral)
   Unknown(String, Json)
@@ -2718,6 +2762,7 @@ pub fn RequestCodeExecutionToolResultBlockCacheControl::to_repr(Self) -> @debug.
 pub impl ToJson for RequestCodeExecutionToolResultBlockCacheControl
 pub impl @moonbitlang/core/json.FromJson for RequestCodeExecutionToolResultBlockCacheControl
 
+#non_exhaustive
 pub(all) enum RequestCodeExecutionToolResultBlockContent {
   CodeExecutionToolResultError(RequestCodeExecutionToolResultError)
   CodeExecutionResult(RequestCodeExecutionResultBlock)
@@ -2759,6 +2804,7 @@ pub fn RequestContainerUploadBlock::to_repr(Self) -> @debug.Repr
 pub impl ToJson for RequestContainerUploadBlock
 pub impl @moonbitlang/core/json.FromJson for RequestContainerUploadBlock
 
+#non_exhaustive
 pub(all) enum RequestContainerUploadBlockCacheControl {
   Ephemeral(CacheControlEphemeral)
   Unknown(String, Json)
@@ -2805,6 +2851,7 @@ pub fn RequestDocumentBlock::to_repr(Self) -> @debug.Repr
 pub impl ToJson for RequestDocumentBlock
 pub impl @moonbitlang/core/json.FromJson for RequestDocumentBlock
 
+#non_exhaustive
 pub(all) enum RequestDocumentBlockCacheControl {
   Ephemeral(CacheControlEphemeral)
   Unknown(String, Json)
@@ -2817,6 +2864,7 @@ pub fn RequestDocumentBlockCacheControl::to_repr(Self) -> @debug.Repr
 pub impl ToJson for RequestDocumentBlockCacheControl
 pub impl @moonbitlang/core/json.FromJson for RequestDocumentBlockCacheControl
 
+#non_exhaustive
 pub(all) enum RequestDocumentBlockSource {
   Base64(Base64PDFSource)
   Content(ContentBlockSource)
@@ -2864,6 +2912,7 @@ pub fn RequestImageBlock::to_repr(Self) -> @debug.Repr
 pub impl ToJson for RequestImageBlock
 pub impl @moonbitlang/core/json.FromJson for RequestImageBlock
 
+#non_exhaustive
 pub(all) enum RequestImageBlockCacheControl {
   Ephemeral(CacheControlEphemeral)
   Unknown(String, Json)
@@ -2876,6 +2925,7 @@ pub fn RequestImageBlockCacheControl::to_repr(Self) -> @debug.Repr
 pub impl ToJson for RequestImageBlockCacheControl
 pub impl @moonbitlang/core/json.FromJson for RequestImageBlockCacheControl
 
+#non_exhaustive
 pub(all) enum RequestImageBlockSource {
   Base64(Base64ImageSource)
   File(FileImageSource)
@@ -2902,6 +2952,7 @@ pub fn RequestImageTransformations::to_repr(Self) -> @debug.Repr
 pub impl ToJson for RequestImageTransformations
 pub impl @moonbitlang/core/json.FromJson for RequestImageTransformations
 
+#non_exhaustive
 pub(all) enum RequestImageTransformationsOversizedImage {
   Downsize
   Error
@@ -2962,6 +3013,7 @@ pub fn RequestSearchResultBlock::to_repr(Self) -> @debug.Repr
 pub impl ToJson for RequestSearchResultBlock
 pub impl @moonbitlang/core/json.FromJson for RequestSearchResultBlock
 
+#non_exhaustive
 pub(all) enum RequestSearchResultBlockCacheControl {
   Ephemeral(CacheControlEphemeral)
   Unknown(String, Json)
@@ -3009,6 +3061,7 @@ pub fn RequestServerToolUseBlock::to_repr(Self) -> @debug.Repr
 pub impl ToJson for RequestServerToolUseBlock
 pub impl @moonbitlang/core/json.FromJson for RequestServerToolUseBlock
 
+#non_exhaustive
 pub(all) enum RequestServerToolUseBlockCacheControl {
   Ephemeral(CacheControlEphemeral)
   Unknown(String, Json)
@@ -3021,6 +3074,7 @@ pub fn RequestServerToolUseBlockCacheControl::to_repr(Self) -> @debug.Repr
 pub impl ToJson for RequestServerToolUseBlockCacheControl
 pub impl @moonbitlang/core/json.FromJson for RequestServerToolUseBlockCacheControl
 
+#non_exhaustive
 pub(all) enum RequestServerToolUseBlockCaller {
   CodeExecution20250825(ServerToolCaller)
   CodeExecution20260120(ServerToolCaller20260120)
@@ -3035,6 +3089,7 @@ pub fn RequestServerToolUseBlockCaller::to_repr(Self) -> @debug.Repr
 pub impl ToJson for RequestServerToolUseBlockCaller
 pub impl @moonbitlang/core/json.FromJson for RequestServerToolUseBlockCaller
 
+#non_exhaustive
 pub(all) enum RequestServerToolUseBlockName {
   WebSearch
   WebFetch
@@ -3068,6 +3123,7 @@ pub fn RequestTextBlock::to_repr(Self) -> @debug.Repr
 pub impl ToJson for RequestTextBlock
 pub impl @moonbitlang/core/json.FromJson for RequestTextBlock
 
+#non_exhaustive
 pub(all) enum RequestTextBlockCacheControl {
   Ephemeral(CacheControlEphemeral)
   Unknown(String, Json)
@@ -3080,6 +3136,7 @@ pub fn RequestTextBlockCacheControl::to_repr(Self) -> @debug.Repr
 pub impl ToJson for RequestTextBlockCacheControl
 pub impl @moonbitlang/core/json.FromJson for RequestTextBlockCacheControl
 
+#non_exhaustive
 pub(all) enum RequestTextBlockCitationsItem {
   CharLocation(RequestCharLocationCitation)
   ContentBlockLocation(RequestContentBlockLocationCitation)
@@ -3141,6 +3198,7 @@ pub fn RequestTextEditorCodeExecutionToolResultBlock::to_repr(Self) -> @debug.Re
 pub impl ToJson for RequestTextEditorCodeExecutionToolResultBlock
 pub impl @moonbitlang/core/json.FromJson for RequestTextEditorCodeExecutionToolResultBlock
 
+#non_exhaustive
 pub(all) enum RequestTextEditorCodeExecutionToolResultBlockCacheControl {
   Ephemeral(CacheControlEphemeral)
   Unknown(String, Json)
@@ -3153,6 +3211,7 @@ pub fn RequestTextEditorCodeExecutionToolResultBlockCacheControl::to_repr(Self) 
 pub impl ToJson for RequestTextEditorCodeExecutionToolResultBlockCacheControl
 pub impl @moonbitlang/core/json.FromJson for RequestTextEditorCodeExecutionToolResultBlockCacheControl
 
+#non_exhaustive
 pub(all) enum RequestTextEditorCodeExecutionToolResultBlockContent {
   TextEditorCodeExecutionToolResultError(RequestTextEditorCodeExecutionToolResultError)
   TextEditorCodeExecutionViewResult(RequestTextEditorCodeExecutionViewResultBlock)
@@ -3199,6 +3258,7 @@ pub fn RequestTextEditorCodeExecutionViewResultBlock::to_repr(Self) -> @debug.Re
 pub impl ToJson for RequestTextEditorCodeExecutionViewResultBlock
 pub impl @moonbitlang/core/json.FromJson for RequestTextEditorCodeExecutionViewResultBlock
 
+#non_exhaustive
 pub(all) enum RequestTextEditorCodeExecutionViewResultBlockFileType {
   Text
   Image
@@ -3241,6 +3301,7 @@ pub fn RequestToolReferenceBlock::to_repr(Self) -> @debug.Repr
 pub impl ToJson for RequestToolReferenceBlock
 pub impl @moonbitlang/core/json.FromJson for RequestToolReferenceBlock
 
+#non_exhaustive
 pub(all) enum RequestToolReferenceBlockCacheControl {
   Ephemeral(CacheControlEphemeral)
   Unknown(String, Json)
@@ -3270,6 +3331,7 @@ pub fn RequestToolResultBlock::to_repr(Self) -> @debug.Repr
 pub impl ToJson for RequestToolResultBlock
 pub impl @moonbitlang/core/json.FromJson for RequestToolResultBlock
 
+#non_exhaustive
 pub(all) enum RequestToolResultBlockCacheControl {
   Ephemeral(CacheControlEphemeral)
   Unknown(String, Json)
@@ -3282,6 +3344,7 @@ pub fn RequestToolResultBlockCacheControl::to_repr(Self) -> @debug.Repr
 pub impl ToJson for RequestToolResultBlockCacheControl
 pub impl @moonbitlang/core/json.FromJson for RequestToolResultBlockCacheControl
 
+#non_exhaustive
 pub(all) enum RequestToolResultBlockContent {
   Text(String)
   ValueArray(Array[RequestToolResultBlockContentValueArrayItem])
@@ -3294,6 +3357,7 @@ pub fn RequestToolResultBlockContent::to_repr(Self) -> @debug.Repr
 pub impl ToJson for RequestToolResultBlockContent
 pub impl @moonbitlang/core/json.FromJson for RequestToolResultBlockContent
 
+#non_exhaustive
 pub(all) enum RequestToolResultBlockContentValueArrayItem {
   BrowserState(RequestBrowserStateBlock)
   Document(RequestDocumentBlock)
@@ -3326,6 +3390,7 @@ pub fn RequestToolSearchToolResultBlock::to_repr(Self) -> @debug.Repr
 pub impl ToJson for RequestToolSearchToolResultBlock
 pub impl @moonbitlang/core/json.FromJson for RequestToolSearchToolResultBlock
 
+#non_exhaustive
 pub(all) enum RequestToolSearchToolResultBlockCacheControl {
   Ephemeral(CacheControlEphemeral)
   Unknown(String, Json)
@@ -3338,6 +3403,7 @@ pub fn RequestToolSearchToolResultBlockCacheControl::to_repr(Self) -> @debug.Rep
 pub impl ToJson for RequestToolSearchToolResultBlockCacheControl
 pub impl @moonbitlang/core/json.FromJson for RequestToolSearchToolResultBlockCacheControl
 
+#non_exhaustive
 pub(all) enum RequestToolSearchToolResultBlockContent {
   ToolSearchToolResultError(RequestToolSearchToolResultError)
   ToolSearchToolSearchResult(RequestToolSearchToolSearchResultBlock)
@@ -3396,6 +3462,7 @@ pub fn RequestToolUseBlock::to_repr(Self) -> @debug.Repr
 pub impl ToJson for RequestToolUseBlock
 pub impl @moonbitlang/core/json.FromJson for RequestToolUseBlock
 
+#non_exhaustive
 pub(all) enum RequestToolUseBlockCacheControl {
   Ephemeral(CacheControlEphemeral)
   Unknown(String, Json)
@@ -3408,6 +3475,7 @@ pub fn RequestToolUseBlockCacheControl::to_repr(Self) -> @debug.Repr
 pub impl ToJson for RequestToolUseBlockCacheControl
 pub impl @moonbitlang/core/json.FromJson for RequestToolUseBlockCacheControl
 
+#non_exhaustive
 pub(all) enum RequestToolUseBlockCaller {
   CodeExecution20250825(ServerToolCaller)
   CodeExecution20260120(ServerToolCaller20260120)
@@ -3453,6 +3521,7 @@ pub fn RequestWebFetchToolResultBlock::to_repr(Self) -> @debug.Repr
 pub impl ToJson for RequestWebFetchToolResultBlock
 pub impl @moonbitlang/core/json.FromJson for RequestWebFetchToolResultBlock
 
+#non_exhaustive
 pub(all) enum RequestWebFetchToolResultBlockCacheControl {
   Ephemeral(CacheControlEphemeral)
   Unknown(String, Json)
@@ -3465,6 +3534,7 @@ pub fn RequestWebFetchToolResultBlockCacheControl::to_repr(Self) -> @debug.Repr
 pub impl ToJson for RequestWebFetchToolResultBlockCacheControl
 pub impl @moonbitlang/core/json.FromJson for RequestWebFetchToolResultBlockCacheControl
 
+#non_exhaustive
 pub(all) enum RequestWebFetchToolResultBlockCaller {
   CodeExecution20250825(ServerToolCaller)
   CodeExecution20260120(ServerToolCaller20260120)
@@ -3479,6 +3549,7 @@ pub fn RequestWebFetchToolResultBlockCaller::to_repr(Self) -> @debug.Repr
 pub impl ToJson for RequestWebFetchToolResultBlockCaller
 pub impl @moonbitlang/core/json.FromJson for RequestWebFetchToolResultBlockCaller
 
+#non_exhaustive
 pub(all) enum RequestWebFetchToolResultBlockContent {
   WebFetchToolResultError(RequestWebFetchToolResultError)
   WebFetchResult(RequestWebFetchResultBlock)
@@ -3552,6 +3623,7 @@ pub fn RequestWebSearchToolResultBlock::to_repr(Self) -> @debug.Repr
 pub impl ToJson for RequestWebSearchToolResultBlock
 pub impl @moonbitlang/core/json.FromJson for RequestWebSearchToolResultBlock
 
+#non_exhaustive
 pub(all) enum RequestWebSearchToolResultBlockCacheControl {
   Ephemeral(CacheControlEphemeral)
   Unknown(String, Json)
@@ -3564,6 +3636,7 @@ pub fn RequestWebSearchToolResultBlockCacheControl::to_repr(Self) -> @debug.Repr
 pub impl ToJson for RequestWebSearchToolResultBlockCacheControl
 pub impl @moonbitlang/core/json.FromJson for RequestWebSearchToolResultBlockCacheControl
 
+#non_exhaustive
 pub(all) enum RequestWebSearchToolResultBlockCaller {
   CodeExecution20250825(ServerToolCaller)
   CodeExecution20260120(ServerToolCaller20260120)
@@ -3578,6 +3651,7 @@ pub fn RequestWebSearchToolResultBlockCaller::to_repr(Self) -> @debug.Repr
 pub impl ToJson for RequestWebSearchToolResultBlockCaller
 pub impl @moonbitlang/core/json.FromJson for RequestWebSearchToolResultBlockCaller
 
+#non_exhaustive
 pub(all) enum RequestWebSearchToolResultBlockContent {
   RequestWebSearchResultBlockArray(Array[RequestWebSearchResultBlock])
   RequestWebSearchToolResultError(RequestWebSearchToolResultError)
@@ -3644,6 +3718,7 @@ pub fn ResponseBashCodeExecutionToolResultBlock::to_repr(Self) -> @debug.Repr
 pub impl ToJson for ResponseBashCodeExecutionToolResultBlock
 pub impl @moonbitlang/core/json.FromJson for ResponseBashCodeExecutionToolResultBlock
 
+#non_exhaustive
 pub(all) enum ResponseBashCodeExecutionToolResultBlockContent {
   BashCodeExecutionToolResultError(ResponseBashCodeExecutionToolResultError)
   BashCodeExecutionResult(ResponseBashCodeExecutionResultBlock)
@@ -3742,6 +3817,7 @@ pub fn ResponseCodeExecutionToolResultBlock::to_repr(Self) -> @debug.Repr
 pub impl ToJson for ResponseCodeExecutionToolResultBlock
 pub impl @moonbitlang/core/json.FromJson for ResponseCodeExecutionToolResultBlock
 
+#non_exhaustive
 pub(all) enum ResponseCodeExecutionToolResultBlockContent {
   CodeExecutionToolResultError(ResponseCodeExecutionToolResultError)
   CodeExecutionResult(ResponseCodeExecutionResultBlock)
@@ -3814,6 +3890,7 @@ pub fn ResponseDocumentBlock::to_repr(Self) -> @debug.Repr
 pub impl ToJson for ResponseDocumentBlock
 pub impl @moonbitlang/core/json.FromJson for ResponseDocumentBlock
 
+#non_exhaustive
 pub(all) enum ResponseDocumentBlockSource {
   Base64(Base64PDFSource)
   Text(PlainTextSource)
@@ -3908,6 +3985,7 @@ pub fn ResponseServerToolUseBlock::to_repr(Self) -> @debug.Repr
 pub impl ToJson for ResponseServerToolUseBlock
 pub impl @moonbitlang/core/json.FromJson for ResponseServerToolUseBlock
 
+#non_exhaustive
 pub(all) enum ResponseServerToolUseBlockCaller {
   CodeExecution20250825(ServerToolCaller)
   CodeExecution20260120(ServerToolCaller20260120)
@@ -3922,6 +4000,7 @@ pub fn ResponseServerToolUseBlockCaller::to_repr(Self) -> @debug.Repr
 pub impl ToJson for ResponseServerToolUseBlockCaller
 pub impl @moonbitlang/core/json.FromJson for ResponseServerToolUseBlockCaller
 
+#non_exhaustive
 pub(all) enum ResponseServerToolUseBlockName {
   WebSearch
   WebFetch
@@ -3954,6 +4033,7 @@ pub fn ResponseTextBlock::to_repr(Self) -> @debug.Repr
 pub impl ToJson for ResponseTextBlock
 pub impl @moonbitlang/core/json.FromJson for ResponseTextBlock
 
+#non_exhaustive
 pub(all) enum ResponseTextBlockCitationsItem {
   CharLocation(ResponseCharLocationCitation)
   ContentBlockLocation(ResponseContentBlockLocationCitation)
@@ -4014,6 +4094,7 @@ pub fn ResponseTextEditorCodeExecutionToolResultBlock::to_repr(Self) -> @debug.R
 pub impl ToJson for ResponseTextEditorCodeExecutionToolResultBlock
 pub impl @moonbitlang/core/json.FromJson for ResponseTextEditorCodeExecutionToolResultBlock
 
+#non_exhaustive
 pub(all) enum ResponseTextEditorCodeExecutionToolResultBlockContent {
   TextEditorCodeExecutionToolResultError(ResponseTextEditorCodeExecutionToolResultError)
   TextEditorCodeExecutionViewResult(ResponseTextEditorCodeExecutionViewResultBlock)
@@ -4060,6 +4141,7 @@ pub fn ResponseTextEditorCodeExecutionViewResultBlock::to_repr(Self) -> @debug.R
 pub impl ToJson for ResponseTextEditorCodeExecutionViewResultBlock
 pub impl @moonbitlang/core/json.FromJson for ResponseTextEditorCodeExecutionViewResultBlock
 
+#non_exhaustive
 pub(all) enum ResponseTextEditorCodeExecutionViewResultBlockFileType {
   Text
   Image
@@ -4114,6 +4196,7 @@ pub fn ResponseToolSearchToolResultBlock::to_repr(Self) -> @debug.Repr
 pub impl ToJson for ResponseToolSearchToolResultBlock
 pub impl @moonbitlang/core/json.FromJson for ResponseToolSearchToolResultBlock
 
+#non_exhaustive
 pub(all) enum ResponseToolSearchToolResultBlockContent {
   ToolSearchToolResultError(ResponseToolSearchToolResultError)
   ToolSearchToolSearchResult(ResponseToolSearchToolSearchResultBlock)
@@ -4171,6 +4254,7 @@ pub fn ResponseToolUseBlock::to_repr(Self) -> @debug.Repr
 pub impl ToJson for ResponseToolUseBlock
 pub impl @moonbitlang/core/json.FromJson for ResponseToolUseBlock
 
+#non_exhaustive
 pub(all) enum ResponseToolUseBlockCaller {
   CodeExecution20250825(ServerToolCaller)
   CodeExecution20260120(ServerToolCaller20260120)
@@ -4215,6 +4299,7 @@ pub fn ResponseWebFetchToolResultBlock::to_repr(Self) -> @debug.Repr
 pub impl ToJson for ResponseWebFetchToolResultBlock
 pub impl @moonbitlang/core/json.FromJson for ResponseWebFetchToolResultBlock
 
+#non_exhaustive
 pub(all) enum ResponseWebFetchToolResultBlockCaller {
   CodeExecution20250825(ServerToolCaller)
   CodeExecution20260120(ServerToolCaller20260120)
@@ -4229,6 +4314,7 @@ pub fn ResponseWebFetchToolResultBlockCaller::to_repr(Self) -> @debug.Repr
 pub impl ToJson for ResponseWebFetchToolResultBlockCaller
 pub impl @moonbitlang/core/json.FromJson for ResponseWebFetchToolResultBlockCaller
 
+#non_exhaustive
 pub(all) enum ResponseWebFetchToolResultBlockContent {
   WebFetchToolResultError(ResponseWebFetchToolResultError)
   WebFetchResult(ResponseWebFetchResultBlock)
@@ -4301,6 +4387,7 @@ pub fn ResponseWebSearchToolResultBlock::to_repr(Self) -> @debug.Repr
 pub impl ToJson for ResponseWebSearchToolResultBlock
 pub impl @moonbitlang/core/json.FromJson for ResponseWebSearchToolResultBlock
 
+#non_exhaustive
 pub(all) enum ResponseWebSearchToolResultBlockCaller {
   CodeExecution20250825(ServerToolCaller)
   CodeExecution20260120(ServerToolCaller20260120)
@@ -4315,6 +4402,7 @@ pub fn ResponseWebSearchToolResultBlockCaller::to_repr(Self) -> @debug.Repr
 pub impl ToJson for ResponseWebSearchToolResultBlockCaller
 pub impl @moonbitlang/core/json.FromJson for ResponseWebSearchToolResultBlockCaller
 
+#non_exhaustive
 pub(all) enum ResponseWebSearchToolResultBlockContent {
   ResponseWebSearchToolResultError(ResponseWebSearchToolResultError)
   ResponseWebSearchResultBlockArray(Array[ResponseWebSearchResultBlock])
@@ -4419,6 +4507,7 @@ pub fn SkillParams::to_repr(Self) -> @debug.Repr
 pub impl ToJson for SkillParams
 pub impl @moonbitlang/core/json.FromJson for SkillParams
 
+#non_exhaustive
 pub(all) enum SkillParamsType {
   Anthropic
   CustomSkill
@@ -4442,6 +4531,7 @@ pub fn SkillReadBlockedUndecryptableErrorDetails::to_repr(Self) -> @debug.Repr
 pub impl ToJson for SkillReadBlockedUndecryptableErrorDetails
 pub impl @moonbitlang/core/json.FromJson for SkillReadBlockedUndecryptableErrorDetails
 
+#non_exhaustive
 pub(all) enum Speed {
   Standard
   Fast
@@ -4455,6 +4545,7 @@ pub fn Speed::to_repr(Self) -> @debug.Repr
 pub impl ToJson for Speed
 pub impl @moonbitlang/core/json.FromJson for Speed
 
+#non_exhaustive
 pub(all) enum StopReason {
   EndTurn
   MaxTokens
@@ -4503,6 +4594,7 @@ pub fn TextEditor20250124::to_repr(Self) -> @debug.Repr
 pub impl ToJson for TextEditor20250124
 pub impl @moonbitlang/core/json.FromJson for TextEditor20250124
 
+#non_exhaustive
 pub(all) enum TextEditor20250124CacheControl {
   Ephemeral(CacheControlEphemeral)
   Unknown(String, Json)
@@ -4532,6 +4624,7 @@ pub fn TextEditor20250429::to_repr(Self) -> @debug.Repr
 pub impl ToJson for TextEditor20250429
 pub impl @moonbitlang/core/json.FromJson for TextEditor20250429
 
+#non_exhaustive
 pub(all) enum TextEditor20250429CacheControl {
   Ephemeral(CacheControlEphemeral)
   Unknown(String, Json)
@@ -4562,6 +4655,7 @@ pub fn TextEditor20250728::to_repr(Self) -> @debug.Repr
 pub impl ToJson for TextEditor20250728
 pub impl @moonbitlang/core/json.FromJson for TextEditor20250728
 
+#non_exhaustive
 pub(all) enum TextEditor20250728CacheControl {
   Ephemeral(CacheControlEphemeral)
   Unknown(String, Json)
@@ -4574,6 +4668,7 @@ pub fn TextEditor20250728CacheControl::to_repr(Self) -> @debug.Repr
 pub impl ToJson for TextEditor20250728CacheControl
 pub impl @moonbitlang/core/json.FromJson for TextEditor20250728CacheControl
 
+#non_exhaustive
 pub(all) enum TextEditorCodeExecutionToolResultErrorCode {
   InvalidToolInput
   Unavailable
@@ -4654,6 +4749,7 @@ pub fn ThinkingConfigEnabled::to_repr(Self) -> @debug.Repr
 pub impl ToJson for ThinkingConfigEnabled
 pub impl @moonbitlang/core/json.FromJson for ThinkingConfigEnabled
 
+#non_exhaustive
 pub(all) enum ThinkingConfigParam {
   Adaptive(ThinkingConfigAdaptive)
   BetweenTools(ThinkingConfigBetweenTools)
@@ -4682,6 +4778,7 @@ pub fn ThinkingContentBlockDelta::to_repr(Self) -> @debug.Repr
 pub impl ToJson for ThinkingContentBlockDelta
 pub impl @moonbitlang/core/json.FromJson for ThinkingContentBlockDelta
 
+#non_exhaustive
 pub(all) enum ThinkingDisplayMode {
   Summarized
   Omitted
@@ -4731,6 +4828,7 @@ pub fn Tool::to_repr(Self) -> @debug.Repr
 pub impl ToJson for Tool
 pub impl @moonbitlang/core/json.FromJson for Tool
 
+#non_exhaustive
 pub(all) enum ToolCacheControl {
   Ephemeral(CacheControlEphemeral)
   Unknown(String, Json)
@@ -4743,6 +4841,7 @@ pub fn ToolCacheControl::to_repr(Self) -> @debug.Repr
 pub impl ToJson for ToolCacheControl
 pub impl @moonbitlang/core/json.FromJson for ToolCacheControl
 
+#non_exhaustive
 pub(all) enum ToolChoice {
   Any(ToolChoiceAny)
   Auto(ToolChoiceAuto)
@@ -4846,6 +4945,7 @@ pub fn ToolSearchToolBM2520251119::to_repr(Self) -> @debug.Repr
 pub impl ToJson for ToolSearchToolBM2520251119
 pub impl @moonbitlang/core/json.FromJson for ToolSearchToolBM2520251119
 
+#non_exhaustive
 pub(all) enum ToolSearchToolBM2520251119CacheControl {
   Ephemeral(CacheControlEphemeral)
   Unknown(String, Json)
@@ -4858,6 +4958,7 @@ pub fn ToolSearchToolBM2520251119CacheControl::to_repr(Self) -> @debug.Repr
 pub impl ToJson for ToolSearchToolBM2520251119CacheControl
 pub impl @moonbitlang/core/json.FromJson for ToolSearchToolBM2520251119CacheControl
 
+#non_exhaustive
 pub(all) enum ToolSearchToolBM2520251119Type {
   ToolSearchToolBm2520251119
   ToolSearchToolBm25
@@ -4887,6 +4988,7 @@ pub fn ToolSearchToolRegex20251119::to_repr(Self) -> @debug.Repr
 pub impl ToJson for ToolSearchToolRegex20251119
 pub impl @moonbitlang/core/json.FromJson for ToolSearchToolRegex20251119
 
+#non_exhaustive
 pub(all) enum ToolSearchToolRegex20251119CacheControl {
   Ephemeral(CacheControlEphemeral)
   Unknown(String, Json)
@@ -4899,6 +5001,7 @@ pub fn ToolSearchToolRegex20251119CacheControl::to_repr(Self) -> @debug.Repr
 pub impl ToJson for ToolSearchToolRegex20251119CacheControl
 pub impl @moonbitlang/core/json.FromJson for ToolSearchToolRegex20251119CacheControl
 
+#non_exhaustive
 pub(all) enum ToolSearchToolRegex20251119Type {
   ToolSearchToolRegex20251119
   ToolSearchToolRegex
@@ -4912,6 +5015,7 @@ pub fn ToolSearchToolRegex20251119Type::to_repr(Self) -> @debug.Repr
 pub impl ToJson for ToolSearchToolRegex20251119Type
 pub impl @moonbitlang/core/json.FromJson for ToolSearchToolRegex20251119Type
 
+#non_exhaustive
 pub(all) enum ToolSearchToolResultErrorCode {
   InvalidToolInput
   Unavailable
@@ -4974,6 +5078,7 @@ pub fn Usage::to_repr(Self) -> @debug.Repr
 pub impl ToJson for Usage
 pub impl @moonbitlang/core/json.FromJson for Usage
 
+#non_exhaustive
 pub(all) enum UsageServiceTier {
   Standard
   Priority
@@ -5025,6 +5130,7 @@ pub fn WebFetchTool20250910::to_repr(Self) -> @debug.Repr
 pub impl ToJson for WebFetchTool20250910
 pub impl @moonbitlang/core/json.FromJson for WebFetchTool20250910
 
+#non_exhaustive
 pub(all) enum WebFetchTool20250910CacheControl {
   Ephemeral(CacheControlEphemeral)
   Unknown(String, Json)
@@ -5059,6 +5165,7 @@ pub fn WebFetchTool20260209::to_repr(Self) -> @debug.Repr
 pub impl ToJson for WebFetchTool20260209
 pub impl @moonbitlang/core/json.FromJson for WebFetchTool20260209
 
+#non_exhaustive
 pub(all) enum WebFetchTool20260209CacheControl {
   Ephemeral(CacheControlEphemeral)
   Unknown(String, Json)
@@ -5094,6 +5201,7 @@ pub fn WebFetchTool20260309::to_repr(Self) -> @debug.Repr
 pub impl ToJson for WebFetchTool20260309
 pub impl @moonbitlang/core/json.FromJson for WebFetchTool20260309
 
+#non_exhaustive
 pub(all) enum WebFetchTool20260309CacheControl {
   Ephemeral(CacheControlEphemeral)
   Unknown(String, Json)
@@ -5130,6 +5238,7 @@ pub fn WebFetchTool20260318::to_repr(Self) -> @debug.Repr
 pub impl ToJson for WebFetchTool20260318
 pub impl @moonbitlang/core/json.FromJson for WebFetchTool20260318
 
+#non_exhaustive
 pub(all) enum WebFetchTool20260318CacheControl {
   Ephemeral(CacheControlEphemeral)
   Unknown(String, Json)
@@ -5142,6 +5251,7 @@ pub fn WebFetchTool20260318CacheControl::to_repr(Self) -> @debug.Repr
 pub impl ToJson for WebFetchTool20260318CacheControl
 pub impl @moonbitlang/core/json.FromJson for WebFetchTool20260318CacheControl
 
+#non_exhaustive
 pub(all) enum WebFetchTool20260318ResponseInclusion {
   Full
   Excluded
@@ -5155,6 +5265,7 @@ pub fn WebFetchTool20260318ResponseInclusion::to_repr(Self) -> @debug.Repr
 pub impl ToJson for WebFetchTool20260318ResponseInclusion
 pub impl @moonbitlang/core/json.FromJson for WebFetchTool20260318ResponseInclusion
 
+#non_exhaustive
 pub(all) enum WebFetchToolResultErrorCode {
   InvalidToolInput
   UrlTooLong
@@ -5252,6 +5363,7 @@ pub fn WebFetchUrlSources::to_repr(Self) -> @debug.Repr
 pub impl ToJson for WebFetchUrlSources
 pub impl @moonbitlang/core/json.FromJson for WebFetchUrlSources
 
+#non_exhaustive
 pub(all) enum WebFetchUrlSourcesClientToolResults {
   All(WebFetchUrlSourceAll)
   Except(WebFetchUrlSourceExcept)
@@ -5267,6 +5379,7 @@ pub fn WebFetchUrlSourcesClientToolResults::to_repr(Self) -> @debug.Repr
 pub impl ToJson for WebFetchUrlSourcesClientToolResults
 pub impl @moonbitlang/core/json.FromJson for WebFetchUrlSourcesClientToolResults
 
+#non_exhaustive
 pub(all) enum WebFetchUrlSourcesServerToolResults {
   All(WebFetchUrlSourceAll)
   Except(WebFetchUrlSourceExcept)
@@ -5282,6 +5395,7 @@ pub fn WebFetchUrlSourcesServerToolResults::to_repr(Self) -> @debug.Repr
 pub impl ToJson for WebFetchUrlSourcesServerToolResults
 pub impl @moonbitlang/core/json.FromJson for WebFetchUrlSourcesServerToolResults
 
+#non_exhaustive
 pub(all) enum WebFetchUrlSourcesUserInput {
   All(WebFetchUrlSourceAll)
   None(WebFetchUrlSourceNone)
@@ -5315,6 +5429,7 @@ pub fn WebSearchTool20250305::to_repr(Self) -> @debug.Repr
 pub impl ToJson for WebSearchTool20250305
 pub impl @moonbitlang/core/json.FromJson for WebSearchTool20250305
 
+#non_exhaustive
 pub(all) enum WebSearchTool20250305CacheControl {
   Ephemeral(CacheControlEphemeral)
   Unknown(String, Json)
@@ -5347,6 +5462,7 @@ pub fn WebSearchTool20260209::to_repr(Self) -> @debug.Repr
 pub impl ToJson for WebSearchTool20260209
 pub impl @moonbitlang/core/json.FromJson for WebSearchTool20260209
 
+#non_exhaustive
 pub(all) enum WebSearchTool20260209CacheControl {
   Ephemeral(CacheControlEphemeral)
   Unknown(String, Json)
@@ -5380,6 +5496,7 @@ pub fn WebSearchTool20260318::to_repr(Self) -> @debug.Repr
 pub impl ToJson for WebSearchTool20260318
 pub impl @moonbitlang/core/json.FromJson for WebSearchTool20260318
 
+#non_exhaustive
 pub(all) enum WebSearchTool20260318CacheControl {
   Ephemeral(CacheControlEphemeral)
   Unknown(String, Json)
@@ -5392,6 +5509,7 @@ pub fn WebSearchTool20260318CacheControl::to_repr(Self) -> @debug.Repr
 pub impl ToJson for WebSearchTool20260318CacheControl
 pub impl @moonbitlang/core/json.FromJson for WebSearchTool20260318CacheControl
 
+#non_exhaustive
 pub(all) enum WebSearchTool20260318ResponseInclusion {
   Full
   Excluded
@@ -5405,6 +5523,7 @@ pub fn WebSearchTool20260318ResponseInclusion::to_repr(Self) -> @debug.Repr
 pub impl ToJson for WebSearchTool20260318ResponseInclusion
 pub impl @moonbitlang/core/json.FromJson for WebSearchTool20260318ResponseInclusion
 
+#non_exhaustive
 pub(all) enum WebSearchToolResultErrorCode {
   InvalidToolInput
   Unavailable

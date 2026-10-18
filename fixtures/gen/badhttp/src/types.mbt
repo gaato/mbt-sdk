@@ -3,6 +3,7 @@
 ///|
 ///
 /// Generated string enum GetBadjsonFlavorFlavor.
+#non_exhaustive
 pub(all) enum GetBadjsonFlavorFlavor {
   Truncated
   TrailingComma
@@ -99,6 +100,7 @@ pub impl @json.FromJson for GetBadjsonFlavorFlavor with fn from_json(
 ///|
 ///
 /// Generated string enum GetSseFlavorFlavor.
+#non_exhaustive
 pub(all) enum GetSseFlavorFlavor {
   Ok
   Stall
@@ -186,6 +188,7 @@ pub impl @json.FromJson for GetSseFlavorFlavor with fn from_json(value, path) {
 ///|
 ///
 /// Generated string enum GetRangeFlavorFlavor.
+#non_exhaustive
 pub(all) enum GetRangeFlavorFlavor {
   Ok
   Ignore
@@ -273,6 +276,7 @@ pub impl @json.FromJson for GetRangeFlavorFlavor with fn from_json(value, path) 
 ///|
 ///
 /// Generated string enum GetEtagFlavorFlavor.
+#non_exhaustive
 pub(all) enum GetEtagFlavorFlavor {
   Ok
   Weak
@@ -348,6 +352,7 @@ pub impl @json.FromJson for GetEtagFlavorFlavor with fn from_json(value, path) {
 ///|
 ///
 /// Generated string enum GetCookiesFlavorFlavor.
+#non_exhaustive
 pub(all) enum GetCookiesFlavorFlavor {
   Ok
   Echo
@@ -453,6 +458,7 @@ pub impl @json.FromJson for GetCookiesFlavorFlavor with fn from_json(
 ///|
 ///
 /// Generated string enum GetAuthFlavorFlavor.
+#non_exhaustive
 pub(all) enum GetAuthFlavorFlavor {
   Basic
   Bearer
@@ -552,6 +558,7 @@ pub impl @json.FromJson for GetAuthFlavorFlavor with fn from_json(value, path) {
 ///|
 ///
 /// Generated string enum GetCrosshostFlavorFlavor.
+#non_exhaustive
 pub(all) enum GetCrosshostFlavorFlavor {
   SameOrigin
   ToSubdomain
@@ -627,6 +634,7 @@ pub impl @json.FromJson for GetCrosshostFlavorFlavor with fn from_json(
 ///|
 ///
 /// Generated string enum GetCompressFlavorFlavor.
+#non_exhaustive
 pub(all) enum GetCompressFlavorFlavor {
   Ok
   Br
@@ -738,6 +746,7 @@ pub impl @json.FromJson for GetCompressFlavorFlavor with fn from_json(
 ///|
 ///
 /// Generated untagged union GetRedirectHopsHops.
+#non_exhaustive
 pub(all) enum GetRedirectHopsHops {
   Int(Int32)
   Text(String)
@@ -785,6 +794,7 @@ pub impl @json.FromJson for GetRedirectHopsHops with fn from_json(value, path) {
 ///|
 ///
 /// Generated string enum Get402PayNetwork.
+#non_exhaustive
 pub(all) enum Get402PayNetwork {
   BaseSepolia
   Base
@@ -836,6 +846,7 @@ pub impl @json.FromJson for Get402PayNetwork with fn from_json(value, path) {
 ///|
 ///
 /// Generated string enum Get402ScenarioScenario.
+#non_exhaustive
 pub(all) enum Get402ScenarioScenario {
   Never
   Reject
@@ -905,6 +916,7 @@ pub impl @json.FromJson for Get402ScenarioScenario with fn from_json(
 ///|
 ///
 /// Generated string enum Get402ScenarioNetwork.
+#non_exhaustive
 pub(all) enum Get402ScenarioNetwork {
   BaseSepolia
   Base
@@ -956,6 +968,7 @@ pub impl @json.FromJson for Get402ScenarioNetwork with fn from_json(value, path)
 ///|
 ///
 /// Generated string enum Get402BrokenFlavorFlavor.
+#non_exhaustive
 pub(all) enum Get402BrokenFlavorFlavor {
   NotBase64
   NotJson
@@ -1034,6 +1047,7 @@ pub impl @json.FromJson for Get402BrokenFlavorFlavor with fn from_json(
 ///|
 ///
 /// Generated string enum Get402BrokenFlavorNetwork.
+#non_exhaustive
 pub(all) enum Get402BrokenFlavorNetwork {
   BaseSepolia
   Base

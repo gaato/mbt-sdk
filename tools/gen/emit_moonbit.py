@@ -211,7 +211,7 @@ def _struct(declaration: Struct) -> str:
 
 def _string_enum(declaration: StringEnum) -> str:
     lines = _doc(declaration.description, f"Generated string enum {declaration.name}.")
-    lines.append(f"pub(all) enum {declaration.name} {{")
+    lines.extend(["#non_exhaustive", f"pub(all) enum {declaration.name} {{"])
     lines.extend(f"  {variant.name}" for variant in declaration.variants)
     lines.append(f"  {declaration.fallback}(String)")
     lines.append("}" + DERIVE)
@@ -253,7 +253,7 @@ def _shape_guard(shape: str, value: str) -> str:
 
 def _union(declaration: UntaggedUnion) -> str:
     lines = _doc(declaration.description, f"Generated untagged union {declaration.name}.")
-    lines.append(f"pub(all) enum {declaration.name} {{")
+    lines.extend(["#non_exhaustive", f"pub(all) enum {declaration.name} {{"])
     lines.extend(f"  {variant.name}({variant.type.moon_type()})" for variant in declaration.variants)
     lines.append("}" + DERIVE)
     lines.extend(_derive_extends(declaration.name))
@@ -273,7 +273,7 @@ def _union(declaration: UntaggedUnion) -> str:
 
 def _external_union(declaration: ExternalUnion) -> str:
     lines = _doc(declaration.description, f"Generated externally tagged union {declaration.name}.")
-    lines.append(f"pub(all) enum {declaration.name} {{")
+    lines.extend(["#non_exhaustive", f"pub(all) enum {declaration.name} {{"])
     for variant in declaration.variants:
         payload = f"({variant.type.moon_type()})" if variant.type else ""
         lines.append(f"  {variant.name}{payload}")
@@ -307,7 +307,7 @@ def _external_union(declaration: ExternalUnion) -> str:
 
 def _tagged_union(declaration: TaggedUnion) -> str:
     lines = _doc(declaration.description, f"Generated tagged union {declaration.name}.")
-    lines.append(f"pub(all) enum {declaration.name} {{")
+    lines.extend(["#non_exhaustive", f"pub(all) enum {declaration.name} {{"])
     lines.extend(f"  {variant.name}({variant.type.moon_type()})" for variant in declaration.variants)
     lines.append(f"  {declaration.fallback}(String, Json)")
     lines.append("}" + DERIVE)

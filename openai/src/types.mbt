@@ -305,6 +305,7 @@ fn copy_chat_message(message : ChatMessage) -> ChatMessage {
 
 ///|
 /// Why a chat completion stopped. Unknown values are retained.
+#non_exhaustive
 pub(all) enum FinishReason {
   Stop
   Length
@@ -343,6 +344,7 @@ pub extend ChatCompletion with @debug.Debug::{to_repr}
 
 ///|
 /// One event from a streaming chat completion. Unknown chunks retain raw JSON.
+#non_exhaustive
 pub(all) enum ChatEvent {
   Delta(String)
   ReasoningDelta(String)
@@ -506,6 +508,7 @@ pub extend EmbeddingResponse with @debug.Debug::{to_repr}
 
 ///|
 /// A response lifecycle status. Unknown values are retained for forward compatibility.
+#non_exhaustive
 pub(all) enum ResponseStatus {
   Completed
   Failed
@@ -622,6 +625,7 @@ pub extend Response with @debug.Debug::{to_repr}
 
 ///|
 /// One event from a streaming response. Unknown event types retain their raw JSON.
+#non_exhaustive
 pub(all) enum ResponseEvent {
   Created(Response)
   InProgress(Response)

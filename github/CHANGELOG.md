@@ -14,6 +14,15 @@ are optional unless the field is required, and keep a wildcard arm.
 
 ## [Unreleased]
 
+## [0.16.0] - 2026-10-19
+
+### Changed
+
+- **Every enum in `gaato/github/gen` is `#non_exhaustive`.** A value the
+  API adds can then become a constructor in the patch releases made when
+  the vendored spec changes. Migration: a `match` on one of these types
+  ends with `TypeName::.. => …` after the existing constructors.
+
 ## [0.15.0] - 2026-10-18
 
 ### Changed

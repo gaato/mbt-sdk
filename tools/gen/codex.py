@@ -234,7 +234,7 @@ pub fn {snake_case(method)}(params : {builder.type_of(params)}) -> Call[{builder
   {{ name: {json.dumps(method)}, params: Json(params), decode: decode_result }}
 }}
 ''')
-    lines.append('///|\n/// Typed progress events; unselected or newer events retain their JSON.\npub(all) enum Event {')
+    lines.append('///|\n/// Typed progress events; unselected or newer events retain their JSON.\n#non_exhaustive\npub(all) enum Event {')
     for method, params in builder.notifications:
         lines.append(f'  {pascal_case(method)}({builder.type_of(params)})')
     lines.append('  Unknown(String, Json?)\n}\n')

@@ -1,5 +1,6 @@
 ///|
 /// Request authentication. Debug output always redacts credential values.
+#non_exhaustive
 pub(all) enum Auth {
   NoAuth
   Bearer(String)

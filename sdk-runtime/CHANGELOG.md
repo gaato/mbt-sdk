@@ -8,6 +8,24 @@ note.
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-10-19
+
+### Changed
+
+- **`Auth` is `#non_exhaustive`.** Another credential scheme can then be
+  added without breaking matches in your code. Migration: a `match` on
+  `Auth` outside this module ends with `@runtime.Auth::.. => …` after the
+  existing constructors.
+
+### Removed
+
+- **The deprecated aliases of the parts that moved to `gaato/http` in
+  0.5.0.** `parse_retry_after`, `retry_after_ms`, `parse_link_next`,
+  `is_idempotent` and `default_random` are gone from this module, and so is
+  the `gaato/sdk-runtime/multipart` package. Migration: import
+  `gaato/http/multipart` and `gaato/http/random`, and call the header
+  helpers as `@http.<name>`.
+
 ## [0.5.0] - 2026-10-19
 
 ### Changed

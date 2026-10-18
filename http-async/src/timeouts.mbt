@@ -17,7 +17,7 @@ fn Timeouts::of(self : Timeouts, phase : @http.Phase) -> Int32 {
     Pool => self.pool
     Dial => self.connect
     Write => self.write
-    Head | Body | Unknown => self.read
+    Head | Body | Unknown | @http.Phase::.. => self.read
   }
 }
 

@@ -90,6 +90,7 @@ pub fn turn_interrupt(params : TurnInterruptParams) -> Call[Json] {
 
 ///|
 /// Typed progress events; unselected or newer events retain their JSON.
+#non_exhaustive
 pub(all) enum Event {
   Error(ErrorNotification)
   ThreadStarted(ThreadStartedNotification)
