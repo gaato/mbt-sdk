@@ -348,3 +348,104 @@ async test "unread error replies hold the read loop at max_inbound until the pee
     })
   })
 }
+
+///|
+/// A reader that returns each chunk whole, whatever `max_len` asks for, as a
+/// reader may, and records the `max_len` of every read. Its other methods go
+/// to an idle pipe, since `read_some` is the only one `Connection` calls.
+struct ChunkReader {
+  idle : @io.PipeRead
+  chunks : Array[Bytes]
+  max_lens : Array[Int32?]
+}
+
+///|
+impl @io.Reader for ChunkReader with fn _get_internal_buffer(self) {
+  @io.Reader::_get_internal_buffer(self.idle)
+}
+
+///|
+impl @io.Reader for ChunkReader with fn _direct_read(
+  self,
+  dst,
+  offset~,
+  max_len~,
+) {
+  @io.Reader::_direct_read(self.idle, dst, offset~, max_len~)
+}
+
+///|
+impl @io.Reader for ChunkReader with fn read_some(self, max_len?) {
+  self.max_lens.push(max_len)
+  if self.chunks.is_empty() {
+    None
+  } else {
+    Some(self.chunks.remove(0))
+  }
+}
+
+///|
+async test "a read's first lines are dispatched before the rest is parsed" {
+  @async.with_timeout(5000, () => {
+    @async.with_task_group(group => {
+      let (idle, idle_write) = @io.pipe()
+      let (peer_read, write) = @io.pipe()
+      group.add_defer(() => {
+        idle.close()
+        idle_write.close()
+        write.close()
+        peer_read.close()
+      })
+      // One read far larger than a slice: a request, two malformed lines that
+      // hold the read loop at max_inbound, a blank line past the slice
+      // boundary, then a notification whose params the request rewrites.
+      let text = Buffer()
+      text.write_bytes(
+        @jsonrpc.Message::Request(id=Number(1L), name="edit", params=None).encode(
+          envelope=Strict,
+        ),
+      )
+      text.write_bytes(b"x\nx\n")
+      text.write_bytes(Bytes::make(100_000, b' '))
+      text.write_bytes(
+        b"\n{\"jsonrpc\":\"2.0\",\"method\":\"note\",\"params\":{\"v\":\"orig\"}}\n",
+      )
+      let source = text.to_bytes()
+      let backing = FixedArray::make(source.length(), b'\x00')
+      for i, byte in source {
+        backing[i] = byte
+      }
+      let reader = ChunkReader::{
+        idle,
+        chunks: [backing.unsafe_reinterpret_as_bytes()],
+        max_lens: [],
+      }
+      let edited : @aqueue.Queue[Unit] = @aqueue.Queue(kind=Unbounded)
+      let notes : @aqueue.Queue[Json?] = @aqueue.Queue(kind=Unbounded)
+      ignore(
+        Connection::start(
+          group,
+          reader,
+          write,
+          max_inbound=1,
+          on_request=(_, _) => {
+            for i, byte in b"edit" {
+              backing[backing.length() - 8 + i] = byte
+            }
+            edited.put(())
+            Ok(Json::null())
+          },
+          on_notification=(_, params) => notes.put(params),
+        ),
+      )
+      // The read loop waits on the second malformed line's reply until the
+      // peer reads, so the rewrite lands before it can go on.
+      edited.get()
+      for _ in 0..<3 {
+        ignore(read_message(peer_read))
+      }
+      assert_eq(notes.get(), Some({ "v": "edit" }))
+      assert_eq(reader.max_lens, [Some(slice_bytes), Some(slice_bytes)])
+    })
+  })
+}

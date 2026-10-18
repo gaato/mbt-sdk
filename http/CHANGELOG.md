@@ -15,6 +15,11 @@ never does. Every breaking change is listed with a migration note.
   `id` persists into later events, as the spec says, so it counts against
   each of them until replaced. Events completed earlier in the same chunk
   are still delivered before the error.
+- **`each_event` feeds the parser at most 64 KiB at a time.** It passed
+  each read to `SseParser::feed` whole and dispatched the events only after
+  parsing it, so the events held at once were bounded only by the size of
+  one read, which the transport decides. Each slice's events are now
+  dispatched before the next slice is parsed.
 
 ## [0.2.0] - 2026-10-18
 
