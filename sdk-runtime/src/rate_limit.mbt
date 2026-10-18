@@ -143,6 +143,8 @@ pub struct WindowLimiter {
 /// `global_block` identifies account-wide 429 responses.
 /// `default_retry_after_ms` supplies a delay when a 429 has no Retry-After.
 /// Negative fallback delays are treated as zero.
+/// A response's parsed reset and Retry-After count only up to one hour ahead,
+/// so no server can hold a bucket, or every request, longer than that.
 pub fn WindowLimiter::new(
   clock : &@clock.Clock,
   parse : (@http.Headers, Int64) -> RateLimitState?,
@@ -311,8 +313,29 @@ pub impl RateLimiter for WindowLimiter with fn acquire(
 }
 
 ///|
+/// The furthest ahead a response may move a bucket's reset or the account-wide
+/// block: one hour, the longest window among the APIs served here (GitHub's
+/// hourly quota; Discord resets in seconds, OpenAI per minute). Without it a
+/// reset or Retry-After far in the future would keep a state, and make every
+/// acquisition wait, for as long as the server said.
+let max_server_wait_ms : Int32 = 3_600_000
+
+///|
+/// Pulls a parsed reset back to at most `max_server_wait_ms` after `now`.
+fn clamp_server_reset(state : RateLimitState, now : Int64) -> RateLimitState {
+  let horizon = saturating_add_ms(now, max_server_wait_ms)
+  if state.reset_at_unix_ms > horizon {
+    { ..state, reset_at_unix_ms: horizon, }
+  } else {
+    state
+  }
+}
+
+///|
 /// Replaces parsed state; a 429 Retry-After takes precedence over that parser.
 /// An attempt without a response (status `0`) leaves the window unchanged.
+/// Both the parsed reset and the Retry-After delay are clamped to one hour
+/// ahead, however far the server puts them.
 pub impl RateLimiter for WindowLimiter with fn release(
   self,
   bucket,
@@ -327,9 +350,11 @@ pub impl RateLimiter for WindowLimiter with fn release(
   }
   let effect = release_effect(
     status,
-    parsed=(self.parse)(headers, now_unix_ms),
+    parsed=(self.parse)(headers, now_unix_ms).map(state => {
+      clamp_server_reset(state, now_unix_ms)
+    }),
     delay_ms=match retry_after_ms(headers, now_unix_ms~) {
-      Some(ms) => Some(ms)
+      Some(ms) => Some(ms.min(max_server_wait_ms))
       None => self.default_retry_after_ms
     },
     global=status == 429 &&

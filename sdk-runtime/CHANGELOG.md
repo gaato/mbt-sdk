@@ -17,6 +17,15 @@ note.
   bound `send_stream` already read an error body to; a shorter body is kept
   as it is, without a copy. `Decode` still carries the successful body it
   failed to decode.
+- **A response can hold a `WindowLimiter` bucket for at most an hour.** A
+  reset parsed from headers (`rate_limit_headers` reads `x-ratelimit-reset`
+  as an absolute instant) was kept as the server sent it, so a reset far in
+  the future kept the bucket's state, and made its acquisitions wait,
+  practically forever; a 429's `Retry-After` could block a bucket or every
+  request for up to 24 days. `release` now pulls both back to one hour after
+  the response, the longest window among the APIs served (GitHub's hourly
+  quota). `rate_limit_headers` and `retry_after_ms` still return what the
+  server sent.
 
 ## [0.3.0] - 2026-10-18
 
