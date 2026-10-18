@@ -12231,6 +12231,7 @@ pub impl @json.FromJson for DependabotAlertWithRepositoryDependencyRelationship 
 pub(all) struct DependabotAlertWithRepositoryDependency {
   package_ : DependabotAlertPackage?
   manifest_path : String?
+  version_requirement : @sdkjson.Presence[String]
   scope : @sdkjson.Presence[DependabotAlertWithRepositoryDependencyScope]
   relationship : @sdkjson.Presence[
     DependabotAlertWithRepositoryDependencyRelationship,
@@ -12249,12 +12250,14 @@ pub extend DependabotAlertWithRepositoryDependency with @debug.Debug::{to_repr}
 pub fn DependabotAlertWithRepositoryDependency::new(
   package_? : DependabotAlertPackage,
   manifest_path? : String,
+  version_requirement? : String,
   scope? : DependabotAlertWithRepositoryDependencyScope,
   relationship? : DependabotAlertWithRepositoryDependencyRelationship,
 ) -> DependabotAlertWithRepositoryDependency {
   {
     package_,
     manifest_path,
+    version_requirement: @sdkjson.Presence::from_option(version_requirement),
     scope: @sdkjson.Presence::from_option(scope),
     relationship: @sdkjson.Presence::from_option(relationship),
   }
@@ -12272,6 +12275,7 @@ pub impl ToJson for DependabotAlertWithRepositoryDependency with fn to_json(
   @sdkjson.ObjBuilder::new()
   .opt("package", self.package_)
   .opt("manifest_path", self.manifest_path)
+  .presence("version_requirement", self.version_requirement)
   .presence("scope", self.scope)
   .presence("relationship", self.relationship)
   .build()
@@ -12293,6 +12297,9 @@ pub impl @json.FromJson for DependabotAlertWithRepositoryDependency with fn from
   {
     package_: @sdkjson.opt_field(obj, "package", path),
     manifest_path: @sdkjson.opt_field(obj, "manifest_path", path),
+    version_requirement: @sdkjson.presence_field(
+      obj, "version_requirement", path,
+    ),
     scope: @sdkjson.presence_field(obj, "scope", path),
     relationship: @sdkjson.presence_field(obj, "relationship", path),
   }
@@ -70030,6 +70037,7 @@ pub impl @json.FromJson for DependabotAlertDependencyRelationship with fn from_j
 pub(all) struct DependabotAlertDependency {
   package_ : DependabotAlertPackage?
   manifest_path : String?
+  version_requirement : @sdkjson.Presence[String]
   scope : @sdkjson.Presence[DependabotAlertDependencyScope]
   relationship : @sdkjson.Presence[DependabotAlertDependencyRelationship]
 } derive(Eq, @debug.Debug)
@@ -70046,12 +70054,14 @@ pub extend DependabotAlertDependency with @debug.Debug::{to_repr}
 pub fn DependabotAlertDependency::new(
   package_? : DependabotAlertPackage,
   manifest_path? : String,
+  version_requirement? : String,
   scope? : DependabotAlertDependencyScope,
   relationship? : DependabotAlertDependencyRelationship,
 ) -> DependabotAlertDependency {
   {
     package_,
     manifest_path,
+    version_requirement: @sdkjson.Presence::from_option(version_requirement),
     scope: @sdkjson.Presence::from_option(scope),
     relationship: @sdkjson.Presence::from_option(relationship),
   }
@@ -70067,6 +70077,7 @@ pub impl ToJson for DependabotAlertDependency with fn to_json(self) {
   @sdkjson.ObjBuilder::new()
   .opt("package", self.package_)
   .opt("manifest_path", self.manifest_path)
+  .presence("version_requirement", self.version_requirement)
   .presence("scope", self.scope)
   .presence("relationship", self.relationship)
   .build()
@@ -70086,6 +70097,9 @@ pub impl @json.FromJson for DependabotAlertDependency with fn from_json(
   {
     package_: @sdkjson.opt_field(obj, "package", path),
     manifest_path: @sdkjson.opt_field(obj, "manifest_path", path),
+    version_requirement: @sdkjson.presence_field(
+      obj, "version_requirement", path,
+    ),
     scope: @sdkjson.presence_field(obj, "scope", path),
     relationship: @sdkjson.presence_field(obj, "relationship", path),
   }

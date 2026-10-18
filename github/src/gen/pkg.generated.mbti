@@ -25660,12 +25660,13 @@ pub impl @moonbitlang/core/json.FromJson for DependabotAlert
 pub(all) struct DependabotAlertDependency {
   package_ : DependabotAlertPackage?
   manifest_path : String?
+  version_requirement : @gaato/sdk-runtime/json.Presence[String]
   scope : @gaato/sdk-runtime/json.Presence[DependabotAlertDependencyScope]
   relationship : @gaato/sdk-runtime/json.Presence[DependabotAlertDependencyRelationship]
 } derive(Eq, @debug.Debug)
 pub fn DependabotAlertDependency::equal(Self, Self) -> Bool
 pub fn DependabotAlertDependency::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
-pub fn DependabotAlertDependency::new(package_? : DependabotAlertPackage, manifest_path? : String, scope? : DependabotAlertDependencyScope, relationship? : DependabotAlertDependencyRelationship) -> Self
+pub fn DependabotAlertDependency::new(package_? : DependabotAlertPackage, manifest_path? : String, version_requirement? : String, scope? : DependabotAlertDependencyScope, relationship? : DependabotAlertDependencyRelationship) -> Self
 pub fn DependabotAlertDependency::not_equal(Self, Self) -> Bool
 pub fn DependabotAlertDependency::to_json(Self) -> Json
 pub fn DependabotAlertDependency::to_repr(Self) -> @debug.Repr
@@ -25981,12 +25982,13 @@ pub impl @moonbitlang/core/json.FromJson for DependabotAlertWithRepository
 pub(all) struct DependabotAlertWithRepositoryDependency {
   package_ : DependabotAlertPackage?
   manifest_path : String?
+  version_requirement : @gaato/sdk-runtime/json.Presence[String]
   scope : @gaato/sdk-runtime/json.Presence[DependabotAlertWithRepositoryDependencyScope]
   relationship : @gaato/sdk-runtime/json.Presence[DependabotAlertWithRepositoryDependencyRelationship]
 } derive(Eq, @debug.Debug)
 pub fn DependabotAlertWithRepositoryDependency::equal(Self, Self) -> Bool
 pub fn DependabotAlertWithRepositoryDependency::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
-pub fn DependabotAlertWithRepositoryDependency::new(package_? : DependabotAlertPackage, manifest_path? : String, scope? : DependabotAlertWithRepositoryDependencyScope, relationship? : DependabotAlertWithRepositoryDependencyRelationship) -> Self
+pub fn DependabotAlertWithRepositoryDependency::new(package_? : DependabotAlertPackage, manifest_path? : String, version_requirement? : String, scope? : DependabotAlertWithRepositoryDependencyScope, relationship? : DependabotAlertWithRepositoryDependencyRelationship) -> Self
 pub fn DependabotAlertWithRepositoryDependency::not_equal(Self, Self) -> Bool
 pub fn DependabotAlertWithRepositoryDependency::to_json(Self) -> Json
 pub fn DependabotAlertWithRepositoryDependency::to_repr(Self) -> @debug.Repr
