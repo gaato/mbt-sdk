@@ -8,6 +8,7 @@ import {
 }
 
 // Values
+pub fn cookies(CookieJar) -> async (@http.Request, async (@http.Request) -> @http.Response raise @http.HttpError) -> @http.Response raise @http.HttpError
 
 // Errors
 
@@ -33,6 +34,7 @@ pub fn Cookie::to_repr(Self) -> @debug.Repr
 pub struct CookieJar {
   // private fields
 }
+pub fn CookieJar::attach(Self, @http.Request) -> @http.Request
 pub fn CookieJar::clear(Self) -> Unit
 pub fn CookieJar::clear_domain(Self, String) -> Unit
 pub fn CookieJar::clear_session(Self) -> Unit

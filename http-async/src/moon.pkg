@@ -10,6 +10,7 @@ import {
 import {
   "gaato/http-async" @adapter,
   "gaato/http-async/mock" @simclock,
+  "gaato/http/cookie",
   "gaato/http/mock",
   "gaato/http/sse",
   "moonbitlang/async/aqueue",

@@ -51,6 +51,12 @@ never does. Every breaking change is listed with a migration note.
   3000 in all by default, and ignores a `Set-Cookie` over 4096 bytes. There is
   no Public Suffix List: a single-label `Domain` is refused and an IP host
   only gets host-only cookies; pass `is_public_suffix` to refuse more.
+- **`@cookie.cookies(jar)`, a middleware step that sends and stores a jar's
+  cookies.** Each request gets the jar's `Cookie` header for its URL unless
+  it already has one, and each response's `Set-Cookie` headers are stored.
+  Placed inside `redirects`, it runs once per hop, so every hop stores its
+  cookies and sends its own. `CookieJar::attach` does the sending half on
+  its own, for `send_stream` callers, who store from the `ResponseHead`.
 
 ## [0.2.1] - 2026-10-18
 
