@@ -1,6 +1,13 @@
 # gaato/anthropic
 
-Unofficial Anthropic Messages API client for MoonBit: buffered and streaming messages, open content blocks and stream events, tool use, on `gaato/http` and `gaato/sdk-runtime`. Works against Anthropic-compatible servers through `base_url`. The caller supplies a `Transport` and a `Clock`, for example `gaato/http-async`.
+Unofficial Anthropic Messages API client for MoonBit: buffered and streaming messages, open content blocks and stream events, tool use, on `gaato/http` and `gaato/sdk-runtime`. Works against Anthropic-compatible servers through `base_url`. The caller supplies a `Transport` and a `Clock`, for example `gaato/http-async`:
+
+```moonbit
+let transport = @http_async.AsyncTransport::new(max_body_bytes=64 * 1024 * 1024)
+let client = @anthropic.Anthropic::new(api_key~, transport, @http_async.AsyncClock::new())
+```
+
+Set `max_body_bytes`: the transport reads a buffered body whole unless told otherwise, and this client cannot set it because the transport is yours. 64 MiB is ample for API JSON; a longer reply fails with `@runtime.Transport(Protocol(..))` rather than growing memory. Streaming calls are not affected.
 
 Unofficial and experimental. Source, issues and design notes: https://github.com/gaato/mbt-sdk
 

@@ -17,6 +17,7 @@ Write the entry in the PR that makes the change, under `## [Unreleased]` of ever
 ```fish
 scripts/release.sh bump http 0.2.0       # sets http/moon.mod and every "gaato/http@…" import, dates the CHANGELOG
 scripts/gates.sh                         # green, including native loopback tests
+scripts/coverage_report.sh               # ledger OK (CI runs it too; see TEST_COVERAGE.md)
 scripts/release.sh publish --dry-run     # what the job will do
 ```
 

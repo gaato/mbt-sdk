@@ -9,6 +9,7 @@ All 1,221 operations of the vendored first-party OpenAPI document are generated 
 Unlike `gaato/openai` and `gaato/anthropic`, this module does not restate the generated types behind a hand-written vocabulary — at this surface area that would be a second API to keep in step with the first. The generated package *is* the public type vocabulary, and the facade only sends, follows, and reads:
 
 ```moonbit
+let transport = @http_async.AsyncTransport::new(max_body_bytes=64 * 1024 * 1024)
 let gh = @github.GitHub::new(transport, clock, token="ghp_...")
 let repo = gh.call(@gen.repos_get_request("gaato", "mbt-sdk"), @gen.repos_get_decode)
 let diff = gh.send(
@@ -18,6 +19,8 @@ let diff = gh.send(
 ```
 
 `call` decodes; `send` returns the response for operations with no body to decode (`204`, `304`) or a non-JSON representation such as `application/vnd.github.diff`. An operation that sets its own `accept` wins over the client default, as do all request headers.
+
+Both read the whole body into memory, so give the transport a `max_body_bytes`; this client cannot set it because the transport is yours. 64 MiB is ample for API JSON, and a longer reply fails with `@runtime.Transport(Protocol(..))` rather than growing memory. Files are another matter. The archive, artifact, log and migration downloads (`repos_download_tarball_archive`, `repos_download_zipball_archive`, `actions_download_artifact`, the `actions_download_*_logs` operations, `migrations_download_archive_for_org`, `migrations_get_archive_for_authenticated_user`) answer `302` with a short-lived `location`, as do `repos_get_release_asset` with `accept: application/octet-stream` and `code_scanning_get_codeql_database` with `accept: application/zip` some of the time. The native and Wasm transports do not follow redirects, so `send` raises that `302` as `@runtime.Status`; read `location` from its headers and fetch it with `transport.send_stream`, without the token, writing chunks out as they arrive. On JS, `fetch` follows the redirect and the file arrives as a buffered body, as do raw content (`repos_get_content` with `accept: application/vnd.github.raw`, up to 100 MB) and large diffs on every target; send those through a second `GitHub` client whose transport has a limit sized for the largest file you accept.
 
 GitHub paginates with RFC 8288 `Link` headers, so `paginator` follows the `rel="next"` URL the server wrote. It is an `@runtime.Paginator`, with `each`, `next_page` and `collect`:
 

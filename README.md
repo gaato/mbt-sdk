@@ -18,7 +18,7 @@ Status: experimental. The HTTP, runtime and API modules are published on [moonca
 | `gaato/http` | [![mooncakes](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fmooncakes.io%2Fapi%2Fv0%2Fmodules%2Fgaato%2Fhttp&query=%24.version&label=mooncakes&prefix=v)](https://mooncakes.io/docs/gaato/http) | Sans-IO HTTP vocabulary: `Request`, `Response`, `Headers`, the `Transport` and `BodyStream` traits, middleware, a `Clock` trait, an incremental WHATWG-conformant SSE parser, and a scripted `FakeTransport` / `FakeClock` for tests | nothing (runs on wasm-gc, wasm, js, native) |
 | `gaato/http-async` | [![mooncakes](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fmooncakes.io%2Fapi%2Fv0%2Fmodules%2Fgaato%2Fhttp-async&query=%24.version&label=mooncakes&prefix=v)](https://mooncakes.io/docs/gaato/http-async) | `AsyncTransport` (with a small keep-alive pool per origin) and `AsyncClock` over `moonbitlang/async` (native and js) | `gaato/http`, `moonbitlang/async` |
 | `gaato/jsonrpc` | unpublished | Sans-IO JSON-RPC 2.0 vocabulary: `Message`, `RequestId`, `RpcError`, strict (`"jsonrpc":"2.0"`) and bare (codex app-server) envelopes, NDJSON encoding, an incremental `LineFramer` | nothing (runs on wasm-gc, wasm, js, native) |
-| `gaato/jsonrpc-async` | unpublished | Bidirectional `Connection` over any `moonbitlang/async` reader/writer pair, plus `spawn_child` for JSON-RPC over a child process's stdio (native); the base for ACP and codex app-server clients | `gaato/jsonrpc`, `moonbitlang/async` |
+| `gaato/jsonrpc-async` | unpublished | Bidirectional `Connection` over any `moonbitlang/async` reader/writer pair, plus `spawn_child` for JSON-RPC over a child process's stdio (native), with default limits on line size, queued notifications and concurrent inbound requests (`Connection::start` documents them); the base for ACP and codex app-server clients | `gaato/jsonrpc`, `moonbitlang/async` |
 | `gaato/codex-protocol` | unpublished | Codex app-server v2 types, typed calls and events generated from a pinned CLI JSON Schema | `gaato/sdk-runtime` (JSON helpers only) |
 | `gaato/codex-app-server` | unpublished | Initialized Codex connections, native stdio sessions, progress events and explicit approval/user-input handlers; [usage and scope](codex-app-server/README.md) | `gaato/codex-protocol`, `gaato/jsonrpc-async`, `moonbitlang/async` |
 | `gaato/sdk-runtime` | [![mooncakes](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fmooncakes.io%2Fapi%2Fv0%2Fmodules%2Fgaato%2Fsdk-runtime&query=%24.version&label=mooncakes&prefix=v)](https://mooncakes.io/docs/gaato/sdk-runtime) | API-agnostic client runtime: error taxonomy, `Retry-After` / `retry-after-ms`, backoff, a pluggable retry decision with `RetryPolicy` as the default, paired `acquire`/`release` rate limiting, a per-attempt observer, pagination with the SDK's own error type, auth, tri-state JSON fields, open enums, multipart writer | `gaato/http` |
@@ -30,13 +30,15 @@ Status: experimental. The HTTP, runtime and API modules are published on [moonca
 HTTP SDK modules never import an async runtime: the caller passes a `Transport` and a `Clock`. That keeps them portable and makes retry, rate-limit and streaming logic testable with fakes and a fake clock. The Codex SDK keeps generated protocol types portable and puts connection/process ownership in a separate async module.
 
 ```moonbit
-let transport = @http_async.AsyncTransport::new()
+let transport = @http_async.AsyncTransport::new(max_body_bytes=64 * 1024 * 1024)
 let clock = @http_async.AsyncClock::new()
 let openai = @openai.OpenAI::new(api_key~, transport, clock)
 openai.stream_response(@openai.ResponseRequest::new(model="gpt-5.6-sol", input="Hello"), event => {
   if event is OutputTextDelta(text) { print(text) }
 })
 ```
+
+Set `max_body_bytes` on the transport: without it a buffered response is read whole however large it is, and an SDK cannot set it for you because the transport is yours. 64 MiB is ample for API JSON; a longer reply fails with `Transport(Protocol(..))` instead of growing memory, and streaming calls are not affected. Error bodies kept in an `SdkError` are cut to their first 1 MiB either way.
 
 For OpenAI-compatible servers that implement Chat Completions, use `ChatRequest` with `chat_completion` or `stream_chat_completion`. The opt-in live suite also accepts `OPENAI_COMPAT_BASE_URL` and `OPENAI_COMPAT_MODEL`; `OPENAI_COMPAT_API_KEY` is optional for local servers.
 

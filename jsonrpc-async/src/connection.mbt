@@ -37,6 +37,9 @@ pub struct Connection {
   priv mutex : @async.Mutex
   priv pending : Map[@jsonrpc.RequestId, @aqueue.Queue[Json]]
   priv notifications : @aqueue.Queue[(String, Json?)]
+  priv max_notifications : Int32
+  priv handlers : @async.Semaphore
+  priv replies : @async.Semaphore
   priv mut next_id : Int64
   priv mut closed : Bool
   priv mut writer_closed : Bool
@@ -44,15 +47,58 @@ pub struct Connection {
 }
 
 ///|
+/// The default `max_line`. Generous because one line is one message: a Codex
+/// notification can carry a whole turn's diff, and a response a thread's history.
+let default_max_line : Int32 = 64 * 1024 * 1024
+
+///|
+/// The default `max_notifications`. Codex emits up to 10,000 output deltas for
+/// one command, and its own TUI buffers 32,768 events per thread.
+let default_max_notifications : Int32 = 32_768
+
+///|
+/// The default `max_inbound`. Peers such as Codex request at most one approval
+/// or input per tool call in flight, far fewer than this.
+let default_max_inbound : Int32 = 64
+
+///|
+/// The failure pending calls get when reading ends with `error`: a transport
+/// failure keeps its message, and anything else becomes one carrying its text.
+fn read_failure(error : Error) -> RpcFailure {
+  match error {
+    RpcFailure::Transport(message) => Transport(message)
+    _ => Transport(error.to_string())
+  }
+}
+
+///|
 /// Starts reading and dispatching in `group`. The caller owns the reader.
 /// Supply `close_writer` to send EOF when closing; its default does nothing.
+///
+/// `max_line` bounds one received line in bytes, 64 MiB by default. A longer
+/// line fails the connection: pending calls and the group get `Transport`.
+///
+/// `max_notifications` bounds the notifications received but not yet passed
+/// to `on_notification`, 32,768 by default. A notification past it fails the
+/// connection the same way. Reading never waits for the handler instead: a
+/// handler awaiting a call's response needs the reader to deliver it.
+///
+/// `max_inbound` bounds the received requests handled at once, 64 by default.
+/// A request past it is answered with error -32001, "Server overloaded; retry
+/// later.", without calling `on_request`; reading does not wait for a handler,
+/// for the same reason. The same number bounds the replies that need no
+/// handler, those refusals and the errors for malformed lines, waiting to be
+/// written. Past that, reading waits until the peer reads them.
+/// `max_notifications` and `max_inbound` must be positive.
 pub fn[X] Connection::start(
   group : @async.TaskGroup[X],
   reader : &@io.Reader,
   writer : &@io.Writer,
   close_writer~ : () -> Unit = () => (),
   envelope~ : @jsonrpc.Envelope = Strict,
-  max_line? : Int32,
+  max_line~ : Int32 = default_max_line,
+  max_notifications~ : Int32 = default_max_notifications,
+  max_inbound~ : Int32 = default_max_inbound,
   on_request~ : RequestHandler = (name, _) => {
     Err(@jsonrpc.RpcError::method_not_found(name))
   },
@@ -64,7 +110,10 @@ pub fn[X] Connection::start(
     envelope,
     mutex: @async.Mutex(),
     pending: {},
-    notifications: @aqueue.Queue(kind=Unbounded),
+    notifications: @aqueue.Queue(kind=Blocking(max_notifications)),
+    max_notifications,
+    handlers: @async.Semaphore(max_inbound),
+    replies: @async.Semaphore(max_inbound),
     next_id: 1L,
     closed: false,
     writer_closed: false,
@@ -81,7 +130,7 @@ pub fn[X] Connection::start(
   })
   group.spawn_bg(no_wait=true, () => {
     defer self.end_reading()
-    let framer = @jsonrpc.LineFramer::new(max_line?)
+    let framer = @jsonrpc.LineFramer::new(max_line~)
     let failure : Error? = try {
       for ;; {
         match reader.read_some() {
@@ -107,7 +156,7 @@ pub fn[X] Connection::start(
       error => Some(error)
     }
     if failure is Some(error) {
-      self.fail_pending(Transport(error.to_string()))
+      self.fail_pending(read_failure(error))
       raise error
     }
   })

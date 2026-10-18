@@ -77,9 +77,18 @@ moon run --target native codex-app-server/src/examples/initialize -- $codex_smok
 - Keep the task group alive for the connection/session lifetime. `connect`
   borrows the reader; its owner must close it after background tasks finish.
   `close_writer` must close output. Native `spawn` owns its pipes and process.
+- One received line is one message, limited to 64 MiB by default (the
+  `gaato/jsonrpc-async` default): a turn's diff or a thread's history arrives
+  in a single line. `spawn` and `connect` take `max_line` to change it. A longer
+  line fails the connection with `RpcFailure::Transport`.
 - Notifications run in wire order and requests dispatch concurrently. A handler
-  can call back into the server. The inherited notification queue is unbounded;
-  event consumers should hand off expensive work promptly.
+  can call back into the server. At most 32,768 events wait for `on_event` by
+  default (`max_notifications` on `spawn` and `connect`); one more fails the
+  connection with `RpcFailure::Transport`, because reading cannot pause for a
+  handler that may itself await a reply. Hand off expensive work promptly.
+- At most 64 server requests run their handlers at once by default
+  (`max_inbound`). The server gets error -32001, "Server overloaded; retry
+  later.", for one past that, the error it uses itself when saturated.
 - `Client::call` raises `RpcFailure` for remote errors, transport closure, or
   timeout. Bad response JSON raises `ClientError::InvalidResult` with the method
   name. Reinitialization raises `AlreadyInitialized` locally.

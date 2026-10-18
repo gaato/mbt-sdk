@@ -29,17 +29,49 @@ fn request_reply(
 }
 
 ///|
-fn[X] Connection::dispatch(
+/// The reply to a request refused because `max_inbound` are being handled:
+/// the error Codex's app-server gives when its own request ingress is full.
+fn overloaded_reply(id : @jsonrpc.RequestId) -> @jsonrpc.Message {
+  Failure(
+    id~,
+    error=@jsonrpc.RpcError::new(
+      code=-32001,
+      message="Server overloaded; retry later.",
+    ),
+  )
+}
+
+///|
+/// Sends a reply that needs no handler from a task of its own. At most
+/// `max_inbound` wait to be written; past that the read loop waits for one to
+/// finish, which depends on the peer reading and never on a handler.
+async fn[X] Connection::reply_later(
+  self : Connection,
+  group : @async.TaskGroup[X],
+  reply : @jsonrpc.Message,
+) -> Unit {
+  self.replies.acquire()
+  group.spawn_bg(() => {
+    defer self.replies.release()
+    self.send(reply, reply=true)
+  })
+}
+
+///|
+/// Routes one received line. It waits only in `reply_later`: a handler that
+/// awaits a call's response needs this loop to keep reading, so a request past
+/// `max_inbound` is refused rather than waited for.
+async fn[X] Connection::dispatch(
   self : Connection,
   group : @async.TaskGroup[X],
   line : Bytes,
   on_request : RequestHandler,
-) -> Unit raise {
+) -> Unit {
   let message = @jsonrpc.decode_line(line, envelope=self.envelope) catch {
     error => {
       self.errors += 1
       guard decode_failure_reply(error) is Some(reply) else { raise error }
-      group.spawn_bg(() => self.send(reply, reply=true))
+      self.reply_later(group, reply)
       return
     }
   }
@@ -55,18 +87,29 @@ fn[X] Connection::dispatch(
         queue.close(error=RpcFailure::Remote(error))
       }
     Request(id~, name~, params~) =>
-      group.spawn_bg(() => {
-        let outcome = Ok(on_request(name, params)) catch { error => Err(error) }
-        let reply = request_reply(id, outcome)
-        if outcome is Err(error) {
-          self.send(reply, reply=true) catch {
-            _ => ()
+      if self.handlers.try_acquire() {
+        group.spawn_bg(() => {
+          defer self.handlers.release()
+          let outcome = Ok(on_request(name, params)) catch {
+            error => Err(error)
           }
-          raise error
-        }
-        self.send(reply, reply=true)
-      })
+          let reply = request_reply(id, outcome)
+          if outcome is Err(error) {
+            self.send(reply, reply=true) catch {
+              _ => ()
+            }
+            raise error
+          }
+          self.send(reply, reply=true)
+        })
+      } else {
+        self.reply_later(group, overloaded_reply(id))
+      }
     Notification(name~, params~) =>
-      ignore(self.notifications.try_put((name, params)))
+      if !self.notifications.try_put((name, params)) {
+        raise RpcFailure::Transport(
+          "JSON-RPC notification backlog exceeds \{self.max_notifications} notifications",
+        )
+      }
   }
 }

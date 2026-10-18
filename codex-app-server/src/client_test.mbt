@@ -366,3 +366,144 @@ async test "invalid handshake closes output and malformed results identify metho
     })
   })
 }
+
+///|
+async test "max_line reaches the connection and an overlong reply fails the handshake" {
+  @async.with_timeout(5000, () => {
+    let mut message = ""
+    try
+      @async.with_task_group(group => {
+        let (client_read, client_write, server_read, server_write) = pipes(
+          group,
+        )
+        let _server = @rpc.Connection::start(
+          group,
+          server_read,
+          server_write,
+          envelope=Bare,
+          on_request=(_, _) => Ok(initialize_result()),
+        )
+        ignore(
+          @codex.connect(
+            group,
+            client_read,
+            client_write,
+            initialize(),
+            close_writer=() => client_write.close(),
+            max_line=64,
+          ),
+        )
+      })
+    catch {
+      @rpc.RpcFailure::Transport(text) => message = text
+      error => raise error
+    } noraise {
+      _ => fail("expected failed group")
+    }
+    assert_eq(message, "JSON-RPC line exceeds 64 bytes")
+  })
+}
+
+///|
+async test "max_notifications reaches the connection and a stalled event handler fails it" {
+  @async.with_timeout(5000, () => {
+    let mut message = ""
+    try
+      @async.with_task_group(group => {
+        let (client_read, client_write, server_read, server_write) = pipes(
+          group,
+        )
+        let server = @rpc.Connection::start(
+          group,
+          server_read,
+          server_write,
+          envelope=Bare,
+          on_request=(_, _) => Ok(initialize_result()),
+        )
+        let started : @aqueue.Queue[Unit] = @aqueue.Queue(kind=Unbounded)
+        let release : @aqueue.Queue[Unit] = @aqueue.Queue(kind=Unbounded)
+        ignore(
+          @codex.connect(
+            group,
+            client_read,
+            client_write,
+            initialize(),
+            close_writer=() => client_write.close(),
+            on_event=_ => {
+              started.put(())
+              release.get()
+            },
+            max_notifications=1,
+          ),
+        )
+        server.notify("future/event")
+        started.get()
+        server.notify("future/event")
+        server.notify("future/event")
+        // Nothing is ever put: only the failing group ends this wait.
+        release.get()
+      })
+    catch {
+      @rpc.RpcFailure::Transport(text) => message = text
+      error => raise error
+    } noraise {
+      _ => fail("expected failed group")
+    }
+    assert_eq(message, "JSON-RPC notification backlog exceeds 1 notifications")
+  })
+}
+
+///|
+async test "max_inbound reaches the connection and refuses a request past it" {
+  @async.with_timeout(5000, () => {
+    @async.with_task_group(group => {
+      let (client_read, client_write, server_read, server_write) = pipes(group)
+      let server = @rpc.Connection::start(
+        group,
+        server_read,
+        server_write,
+        envelope=Bare,
+        on_request=(_, _) => Ok(initialize_result()),
+      )
+      let started : @aqueue.Queue[Unit] = @aqueue.Queue(kind=Unbounded)
+      let release : @aqueue.Queue[Unit] = @aqueue.Queue(kind=Unbounded)
+      let _client = @codex.connect(
+        group,
+        client_read,
+        client_write,
+        initialize(),
+        close_writer=() => client_write.close(),
+        handlers=@codex.Handlers::new(command=_ => {
+          started.put(())
+          release.get()
+          Ok(
+            @protocol.CommandExecutionRequestApprovalResponse::new(
+              decision=Decline,
+            ),
+          )
+        }),
+        max_inbound=1,
+      )
+      let approval : Json = {
+        "threadId": "thread-1",
+        "turnId": "turn-1",
+        "itemId": "item-1",
+        "startedAtMs": 1,
+      }
+      let first = group.spawn(() => {
+        server.call("item/commandExecution/requestApproval", params=approval)
+      })
+      started.get()
+      try
+        server.call("item/commandExecution/requestApproval", params=approval)
+      catch {
+        @rpc.RpcFailure::Remote(error) => assert_eq(error.code, -32001)
+        error => raise error
+      } noraise {
+        _ => fail("expected an overloaded refusal")
+      }
+      release.put(())
+      assert_eq(first.wait(), { "decision": "decline" })
+    })
+  })
+}
