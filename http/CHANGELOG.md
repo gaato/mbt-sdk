@@ -7,6 +7,19 @@ never does. Every breaking change is listed with a migration note.
 
 ## [Unreleased]
 
+### Changed
+
+- **An SSE event is bounded, 16 MiB by default.** A server that never sent
+  a newline or a blank line made `SseParser` buffer without limit, and the
+  OpenAI and Anthropic streams go through it. `SseParser::new` and
+  `each_event` take `max_event_bytes?` (the raw bytes of one event's `data`
+  lines plus the line being read); past it the stream is refused with
+  `HttpError::Protocol`. Events completed earlier in the same chunk are
+  still delivered and the error comes on the next `feed` or `finish`;
+  `each_event` raises it at once. Migration: `SseParser::feed` and
+  `SseParser::finish` now raise `@http.HttpError`, so call them from a
+  raising context; callers of `each_event` need no change.
+
 ## [0.1.2] - 2026-10-16
 
 ### Changed

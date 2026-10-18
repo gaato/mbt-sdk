@@ -74,6 +74,28 @@ async fn each_event_scenarios() -> Unit {
   assert_eq(seen, ["a"])
   assert_eq(callback.cursor, 1)
   assert_eq(callback.closes, 1)
+  let oversized = TestStream::{
+    chunks: [b"data: a\n\ndata: bb", b"data: never read\n\n"],
+    cursor: 0,
+    closes: 0,
+    fail_read: false,
+  }
+  let delivered = []
+  try
+    @sse.each_event(
+      oversized,
+      event => delivered.push(event.data),
+      max_event_bytes=7,
+    )
+  catch {
+    @http.HttpError::Protocol("SSE event larger than 7 bytes") => ()
+    _ => fail("an oversized event must fail with Protocol")
+  } noraise {
+    _ => fail("expected the oversized event to be refused")
+  }
+  assert_eq(delivered, ["a"])
+  assert_eq(oversized.cursor, 1)
+  assert_eq(oversized.closes, 1)
 }
 
 ///|

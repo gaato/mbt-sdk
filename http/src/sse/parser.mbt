@@ -17,45 +17,76 @@ pub extend SseEvent with Eq::{equal, not_equal}
 pub extend SseEvent with @debug.Debug::{to_repr}
 
 ///|
+/// The default bound on one event: 16 MiB, far above any realistic event,
+/// including a final `response.completed` that repeats a whole response
+/// with base64 images, yet small enough that a stream which never ends a
+/// line or an event cannot exhaust memory.
+let default_max_event_bytes : Int32 = 16 * 1024 * 1024
+
+///|
 /// An incremental UTF-8 event-stream parser. Create one parser per stream.
 pub struct SseParser {
+  priv max_event_bytes : Int32
   priv line : Array[Byte]
   priv data : Array[String]
+  // Raw bytes of the `data` lines in `data`, counted against the bound.
+  priv mut data_bytes : Int32
   priv mut first_line : Bool
   priv mut skip_lf : Bool
   priv mut event_type : String
   priv mut last_id : String?
   priv mut retry : Int32?
   priv mut finished : Bool
+  // An overflow found after events completed in the same chunk, raised by
+  // the next `feed` or `finish` so those events are returned first.
+  priv mut overflow : Bool
 }
 
 ///|
-/// Creates an empty parser.
+/// Creates an empty parser. `max_event_bytes` bounds one event: the raw bytes
+/// of its `data` lines plus the line being read, line terminators excluded.
+/// It defaults to 16 MiB.
 ///
 /// ```mbt check
 /// test {
 ///   let parser = @sse.SseParser::new()
 ///   assert_eq(parser.feed(b"data: hello\n\n")[0].data, "hello")
 ///   assert_eq(parser.finish(), [])
+///   let _ = @sse.SseParser::new(max_event_bytes=1_048_576)
 /// }
 /// ```
-pub fn SseParser::new() -> SseParser {
+pub fn SseParser::new(
+  max_event_bytes~ : Int32 = default_max_event_bytes,
+) -> SseParser {
   {
+    max_event_bytes,
     line: [],
     data: [],
+    data_bytes: 0,
     first_line: true,
     skip_lf: false,
     event_type: "",
     last_id: None,
     retry: None,
     finished: false,
+    overflow: false,
   }
 }
 
 ///|
 /// Feeds any byte chunk and returns complete events in order.
 /// Malformed UTF-8 is replaced with U+FFFD. Feeding after finish is a no-op.
-pub fn SseParser::feed(self : SseParser, bytes : Bytes) -> Array[SseEvent] {
+///
+/// An event over `max_event_bytes` raises `Protocol` and ends the stream,
+/// which is refused rather than read without bound. When the same chunk
+/// completed events before it, those are returned first and the next `feed`
+/// or `finish` raises, so feed an empty chunk to observe it without waiting
+/// for more input.
+pub fn SseParser::feed(
+  self : SseParser,
+  bytes : Bytes,
+) -> Array[SseEvent] raise @http.HttpError {
+  self.raise_overflow()
   let events = []
   if self.finished {
     return events
@@ -70,8 +101,15 @@ pub fn SseParser::feed(self : SseParser, bytes : Bytes) -> Array[SseEvent] {
     if byte == b'\r' || byte == b'\n' {
       self.process_line(events)
       self.skip_lf = byte == b'\r'
-    } else {
+    } else if self.line.length() + self.data_bytes < self.max_event_bytes {
       self.line.push(byte)
+    } else {
+      self.end()
+      self.overflow = true
+      if events.is_empty() {
+        self.raise_overflow()
+      }
+      return events
     }
   }
   events
@@ -79,14 +117,35 @@ pub fn SseParser::feed(self : SseParser, bytes : Bytes) -> Array[SseEvent] {
 
 ///|
 /// Ends the stream, discarding any incomplete event; always returns [].
-/// Repeated calls are harmless.
-pub fn SseParser::finish(self : SseParser) -> Array[SseEvent] {
+/// Repeated calls are harmless. Raises `Protocol` if `feed` left an
+/// overflow unreported, so an oversized event at the end is never lost.
+pub fn SseParser::finish(
+  self : SseParser,
+) -> Array[SseEvent] raise @http.HttpError {
+  self.end()
+  self.raise_overflow()
+  []
+}
+
+///|
+/// Raises a pending overflow once.
+fn SseParser::raise_overflow(self : SseParser) -> Unit raise @http.HttpError {
+  if self.overflow {
+    self.overflow = false
+    raise @http.HttpError::Protocol(
+      "SSE event larger than \{self.max_event_bytes} bytes",
+    )
+  }
+}
+
+///|
+fn SseParser::end(self : SseParser) -> Unit {
   self.finished = true
   self.line.clear()
   self.data.clear()
+  self.data_bytes = 0
   self.event_type = ""
   self.retry = None
-  []
 }
 
 ///|
@@ -96,6 +155,7 @@ fn SseParser::process_line(self : SseParser, events : Array[SseEvent]) -> Unit {
     ignore_bom=self.first_line,
   )
   self.first_line = false
+  let line_bytes = self.line.length()
   self.line.clear()
   if line == "" {
     if !self.data.is_empty() {
@@ -112,6 +172,7 @@ fn SseParser::process_line(self : SseParser, events : Array[SseEvent]) -> Unit {
       self.retry = None
     }
     self.data.clear()
+    self.data_bytes = 0
     self.event_type = ""
     return
   }
@@ -124,7 +185,10 @@ fn SseParser::process_line(self : SseParser, events : Array[SseEvent]) -> Unit {
     None => (line, "")
   }
   match field {
-    "data" => self.data.push(value)
+    "data" => {
+      self.data.push(value)
+      self.data_bytes += line_bytes
+    }
     "event" => self.event_type = value
     "id" => if !value.contains("\u{0000}") { self.last_id = Some(value) }
     "retry" => if parse_retry(value) is Some(value) { self.retry = Some(value) }
