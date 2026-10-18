@@ -370,3 +370,29 @@ test "release_effect records parsed state and applies 429 delays" {
     assert_eq(effect.blocked_until, blocked, msg="\{label}: block")
   }
 }
+
+///|
+test "a global window with a non-positive limit or length imposes no limit" {
+  let rows : Array[(GlobalWindow, GlobalWindow?)] = [
+    ({ limit: 2, window_ms: 1000, }, Some({ limit: 2, window_ms: 1000, })),
+    ({ limit: 1, window_ms: 1, }, Some({ limit: 1, window_ms: 1, })),
+    // A zero limit would wait forever; a zero window would reset every time.
+    ({ limit: 0, window_ms: 1000, }, None),
+    ({ limit: -1, window_ms: 1000, }, None),
+    ({ limit: 2, window_ms: 0, }, None),
+    ({ limit: 2, window_ms: -5, }, None),
+  ]
+  for row in rows {
+    let (window, expected) = row
+    let limiter = WindowLimiter::new(
+      @mock.FakeClock::new(),
+      (_, _) => None,
+      global=window,
+    )
+    assert_eq(
+      limiter.global,
+      expected,
+      msg="limit=\{window.limit} window_ms=\{window.window_ms}",
+    )
+  }
+}

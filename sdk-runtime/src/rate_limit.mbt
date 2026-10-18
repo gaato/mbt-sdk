@@ -78,7 +78,10 @@ pub impl RateLimiter for NoLimiter with fn release(
 }
 
 ///|
-/// An account-wide admission window counted across buckets.
+/// An account-wide admission window counted across buckets: at most `limit`
+/// admissions in each `window_ms`. Both must be positive; a window with a
+/// non-positive limit or length imposes no limit, since it would otherwise
+/// block forever or reset on every admission.
 pub(all) struct GlobalWindow {
   limit : Int32
   window_ms : Int32
@@ -135,7 +138,8 @@ pub struct WindowLimiter {
 /// `gate` creates a bucket's gate, held from `acquire` until the paired
 /// release; a bucket nobody holds or waits on forgets its gate and gets a new
 /// one on its next acquire.
-/// `global` limits non-exempt admissions across buckets (positive values).
+/// `global` limits non-exempt admissions across buckets; one with a
+/// non-positive limit or length is ignored.
 /// `global_block` identifies account-wide 429 responses.
 /// `default_retry_after_ms` supplies a delay when a 429 has no Retry-After.
 /// Negative fallback delays are treated as zero.
@@ -155,7 +159,10 @@ pub fn WindowLimiter::new(
     states_swept_at_ms: clock.now_unix_ms(),
     gate,
     gates: Map([]),
-    global,
+    global: match global {
+      Some(window) if window.limit > 0 && window.window_ms > 0 => Some(window)
+      _ => None
+    },
     global_block,
     default_retry_after_ms,
     global_window_start: None,
