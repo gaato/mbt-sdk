@@ -1,6 +1,7 @@
 ///|
 /// A dispatched event, with resolved type and the current last-event-id.
-/// Retry is the last valid retry seen since the previous dispatched event.
+/// Retry is the last valid retry seen since the previous dispatched event, in
+/// milliseconds, capped at one hour.
 pub(all) struct SseEvent {
   event : String
   data : String
@@ -222,6 +223,14 @@ fn SseParser::process_line(self : SseParser, events : Array[SseEvent]) -> Unit {
 }
 
 ///|
+/// The longest reconnection delay a stream may ask for: one hour. The server
+/// picks `retry:`, and a caller that sleeps for it before reconnecting would
+/// otherwise wait as long as the server said, up to weeks.
+let max_retry_ms : Int32 = 3_600_000
+
+///|
+/// Any run of ASCII digits is a valid hint, as the spec says; one past
+/// `max_retry_ms` saturates there.
 fn parse_retry(value : String) -> Int32? {
   if value.is_empty() {
     return None
@@ -231,11 +240,7 @@ fn parse_retry(value : String) -> Int32? {
     if digit < '0' || digit > '9' {
       return None
     }
-    let digit = digit.to_int() - 48
-    if result > (2147483647 - digit) / 10 {
-      return None
-    }
-    result = result * 10 + digit
+    result = (result * 10 + (digit.to_int() - 48)).min(max_retry_ms)
   }
   Some(result)
 }
