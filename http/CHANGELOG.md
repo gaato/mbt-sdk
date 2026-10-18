@@ -7,6 +7,8 @@ never does. Every breaking change is listed with a migration note.
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-10-18
+
 ### Changed
 
 - **`Request.body` is a `Body`: bytes in memory, or a stream sent as it is

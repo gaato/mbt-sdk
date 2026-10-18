@@ -4,7 +4,7 @@
 
 name = "gaato/sdk-runtime"
 
-version = "0.3.1"
+version = "0.4.0"
 
 license = "Apache-2.0"
 
@@ -21,5 +21,5 @@ source = "src"
 preferred_target = "wasm-gc"
 
 import {
-  "gaato/http@0.2.1",
+  "gaato/http@0.3.0",
 }

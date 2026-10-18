@@ -15,12 +15,12 @@ source = "src"
 preferred_target = "native"
 
 import {
-  "gaato/http@0.2.1",
-  "gaato/http-async@0.2.1",
-  "gaato/sdk-runtime@0.3.1",
-  "gaato/openai@0.3.1",
-  "gaato/anthropic@0.8.1",
-  "gaato/github@0.13.1",
+  "gaato/http@0.3.0",
+  "gaato/http-async@0.3.0",
+  "gaato/sdk-runtime@0.4.0",
+  "gaato/openai@0.4.0",
+  "gaato/anthropic@0.9.0",
+  "gaato/github@0.14.0",
   "gaato/fixture-badhttp@0.0.0",
   "moonbitlang/async@0.22.5",
 }

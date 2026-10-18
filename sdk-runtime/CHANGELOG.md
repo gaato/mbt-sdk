@@ -8,6 +8,8 @@ note.
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-10-18
+
 ### Changed
 
 - **A proxy's refusal to open a tunnel is retried only for 502, 503 and

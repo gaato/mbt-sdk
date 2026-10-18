@@ -4,7 +4,7 @@
 
 name = "gaato/http-async"
 
-version = "0.2.1"
+version = "0.3.0"
 
 license = "Apache-2.0"
 
@@ -21,7 +21,7 @@ source = "src"
 preferred_target = "native"
 
 import {
-  "gaato/http@0.2.1",
+  "gaato/http@0.3.0",
   "moonbitlang/async@0.22.5",
   "moonbit-community/flate@0.9.0",
   "gaato/brotli@0.1.0",

@@ -11,6 +11,12 @@ change itself is the diff of `src/gen/pkg.generated.mbti`.
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-10-18
+
+### Changed
+
+- **Depends on `gaato/http` 0.3.0 and `gaato/sdk-runtime` 0.4.0.** `HttpError` now says which phase of an exchange failed (`Timeout(phase~, ms~)`, `Network(phase~, ..)`, `Proxy(status~, ..)`), `Request.body` is a `Body` that may stream, and `Client` never resends a stream body a transport has read. Migration: update the `gaato/http` and `gaato/sdk-runtime` imports alongside this module, and follow their changelogs where you match `HttpError` or read `Request.body`.
+
 ## [0.3.1] - 2026-10-18
 
 ### Changed

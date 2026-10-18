@@ -8,6 +8,8 @@ note.
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-10-18
+
 ### Added
 
 - **HTTP proxies: `AsyncTransport::new(proxy=..., trust_env=...)`.** A
