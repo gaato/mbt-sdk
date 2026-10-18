@@ -31,6 +31,10 @@
 # - moon's bundled tcc cannot link on some hosts (openSUSE); use the system cc.
 
 set -euo pipefail
+# The tables use gawk's asorti; Debian's default awk (mawk) lacks it.
+for tool in jq gawk; do
+  command -v "$tool" >/dev/null || { echo "coverage_report.sh needs $tool" >&2; exit 2; }
+done
 
 # Measured modules (workspace member directories).
 MODULES=(http http-async sdk-runtime jsonrpc jsonrpc-async codex-app-server)
@@ -90,7 +94,7 @@ jq -r --arg lib "$LIBRARY" --arg ex "$EXCLUDE" '
       ([.coverage[] | select(. != null and . > 0)] | length),
       ([.coverage[] | select(. != null)] | length) ]
   | @tsv
-' "$json_file" | sort | awk -F '\t' -v ledger="$ledger" -v lib="$LIBRARY" '
+' "$json_file" | sort | gawk -F '\t' -v ledger="$ledger" -v lib="$LIBRARY" '
   # ---- ledger: rows like "| http/src/foo.mbt | 12 | reason |" -------------
   BEGIN {
     while ((getline line < ledger) > 0) {
