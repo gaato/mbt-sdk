@@ -266,6 +266,9 @@ test "connection_close looks for the close token" {
     ([("Connection", "keep-alive, close")], true),
     ([("Connection", "close,upgrade")], true),
     ([("Connection", "Upgrade")], false),
+    ([("Connection", "closed-ish")], false),
+    ([("Connection", "keep-alive, x-close")], false),
+    ([("Connection", "")], false),
     ([("X-Connection", "close")], false),
     ([("X-Status", "close")], false),
   ]
