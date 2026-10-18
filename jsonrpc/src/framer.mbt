@@ -78,11 +78,12 @@ pub fn LineFramer::finish(self : LineFramer) -> Bytes? raise DecodeError {
   self.finished = true
   let line = Bytes::from_array(self.line.copy())
   self.line.clear()
-  if blank(line) {
-    return None
-  }
+  // Length first: a blank tail over the limit is still an overflow.
   if self.max_line is Some(limit) && line.length() > limit {
     raise LineTooLong(limit)
+  }
+  if blank(line) {
+    return None
   }
   Some(line)
 }

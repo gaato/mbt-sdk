@@ -74,6 +74,12 @@ test "max_line bounds line content, not the CRLF terminator" {
       ["[]", "finish Some(\"abc\")"],
     ),
     (
+      "a blank unterminated tail whose CR goes over the limit",
+      3,
+      [b"  \t\r"],
+      ["[]", "finish raise LineTooLong(3)"],
+    ),
+    (
       "an unterminated tail whose CR goes over the limit",
       3,
       [b"abc\r"],
