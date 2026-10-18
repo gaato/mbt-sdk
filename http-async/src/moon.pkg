@@ -15,6 +15,10 @@ import {
   "moonbitlang/async/aqueue",
 } for "test"
 
+import {
+  "moonbitlang/core/random",
+} for "wbtest"
+
 supported_targets = "js + native + wasm"
 
 options(

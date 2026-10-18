@@ -33,6 +33,73 @@ async test "read_bounded stops at the chunk that crosses the limit" {
 }
 
 ///|
+/// What `read_bounded` makes of `chunks`: the body, or the `Protocol` message.
+async fn bounded_outcome(
+  chunks : Array[Bytes],
+  max_bytes : Int32,
+) -> Result[Bytes, String] {
+  let mut next = 0
+  let read : async () -> Bytes? = () => {
+    next += 1
+    chunks.get(next - 1)
+  }
+  try read_bounded(read, max_bytes) catch {
+    @http.HttpError::Protocol(message) => Err(message)
+    error => Err("unexpected \{Repr(error)}")
+  } noraise {
+    body => Ok(body)
+  }
+}
+
+///|
+/// Cuts `body` at random points, sometimes leaving empty chunks in between.
+fn random_chunks(rand : @random.Rand, body : Bytes) -> Array[Bytes] {
+  let chunks = []
+  let mut start = 0
+  while start < body.length() {
+    let end = start + rand.int(limit=body.length() - start + 1)
+    chunks.push(body[start:end].to_owned())
+    start = end
+  }
+  if rand.int(limit=4) == 0 {
+    chunks.push(b"")
+  }
+  chunks
+}
+
+///|
+async test "read_bounded does not depend on how the body is chunked" {
+  for seed in 0..<4 {
+    let rand = @random.Rand::chacha8(seed=Bytes::make(32, seed.to_byte()))
+    for trial in 0..<50 {
+      let body = Bytes::from_array(
+        Array::makei(rand.int(limit=40), _ => rand.int(limit=256).to_byte()),
+      )
+      let len = body.length()
+      for max_bytes in [0, len - 1, len, len + 1] {
+        guard max_bytes >= 0 else { continue }
+        let whole = bounded_outcome([body], max_bytes)
+        let oracle : Result[Bytes, String] = if len <= max_bytes {
+          Ok(body)
+        } else {
+          Err("response body larger than \{max_bytes} bytes")
+        }
+        assert_eq(whole, oracle, msg="seed \{seed} trial \{trial}")
+        for _ in 0..<8 {
+          let chunks = random_chunks(rand, body)
+          let lengths = chunks.map(chunk => chunk.length().to_string())
+          assert_eq(
+            bounded_outcome(chunks, max_bytes),
+            whole,
+            msg="seed \{seed} trial \{trial} limit \{max_bytes} chunks [\{lengths.join(",")}]",
+          )
+        }
+      }
+    }
+  }
+}
+
+///|
 /// `name: value` pairs in iteration order, joined by `"; "`.
 fn pairs_label(pairs : Iter[(String, String)]) -> String {
   pairs.map(pair => "\{pair.0}: \{pair.1}").collect().join("; ")
