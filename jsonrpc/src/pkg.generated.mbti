@@ -32,7 +32,7 @@ pub struct LineFramer {
   // private fields
 }
 pub fn LineFramer::feed(Self, Bytes) -> Array[Bytes] raise DecodeError
-pub fn LineFramer::finish(Self) -> Bytes?
+pub fn LineFramer::finish(Self) -> Bytes? raise DecodeError
 pub fn LineFramer::new(max_line? : Int) -> Self
 
 pub(all) enum Message {

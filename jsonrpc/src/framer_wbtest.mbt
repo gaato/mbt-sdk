@@ -1,4 +1,13 @@
 ///|
+fn finish_label(framer : LineFramer) -> String {
+  try framer.finish() catch {
+    error => "finish raise \{Repr(error)}"
+  } noraise {
+    line => "finish \{Repr(line.map(line => @utf8.decode_lossy(line)))}"
+  }
+}
+
+///|
 /// Feeds `chunks` to a framer limited to `max_line`, then finishes it, and
 /// renders each step's outcome.
 fn limited_transcript(max_line : Int32, chunks : Array[Bytes]) -> Array[String] {
@@ -13,9 +22,7 @@ fn limited_transcript(max_line : Int32, chunks : Array[Bytes]) -> Array[String] 
       },
     )
   }
-  steps.push(
-    "finish \{Repr(framer.finish().map(line => @utf8.decode_lossy(line)))}",
-  )
+  steps.push(finish_label(framer))
   steps
 }
 
@@ -70,7 +77,7 @@ test "max_line bounds line content, not the CRLF terminator" {
       "an unterminated tail whose CR goes over the limit",
       3,
       [b"abc\r"],
-      ["[]", "finish None"],
+      ["[]", "finish raise LineTooLong(3)"],
     ),
   ]
   for row in rows {
@@ -99,6 +106,12 @@ test "an overflow delivers the lines completed before it, then raises once" {
       3,
       [b"ab\nefgh", b"ij\n"],
       ["[\"ab\"]", "raise LineTooLong(3)", "finish None"],
+    ),
+    (
+      "a deferred overflow at the end of the stream",
+      3,
+      [b"ab\nefgh"],
+      ["[\"ab\"]", "finish raise LineTooLong(3)"],
     ),
     (
       "a CRLF line before the overflow",
@@ -152,9 +165,7 @@ fn stream_events(max_line : Int32, chunks : Array[Bytes]) -> Array[String] {
       events.push("\{Repr(@utf8.decode_lossy(line))}")
     }
   }
-  events.push(
-    "finish \{Repr(framer.finish().map(line => @utf8.decode_lossy(line)))}",
-  )
+  events.push(finish_label(framer))
   events
 }
 
