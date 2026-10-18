@@ -14,6 +14,10 @@ import {
   "gaato/jsonrpc-async" @jsonrpc_async,
 } for "test"
 
+import {
+  "moonbitlang/core/encoding/utf8",
+} for "wbtest"
+
 // The process import is used only by native files. Moon does not yet support
 // conditional imports; on JS it is intentionally unused. Keep other warnings on.
 

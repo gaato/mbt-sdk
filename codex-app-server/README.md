@@ -86,6 +86,9 @@ moon run --target native codex-app-server/src/examples/initialize -- $codex_smok
   default (`max_notifications` on `spawn` and `connect`); one more fails the
   connection with `RpcFailure::Transport`, because reading cannot pause for a
   handler that may itself await a reply. Hand off expensive work promptly.
+- At most 64 server requests run their handlers at once by default
+  (`max_inbound`). The server gets error -32001, "Server overloaded; retry
+  later.", for one past that, the error it uses itself when saturated.
 - `Client::call` raises `RpcFailure` for remote errors, transport closure, or
   timeout. Bad response JSON raises `ClientError::InvalidResult` with the method
   name. Reinitialization raises `AlreadyInitialized` locally.

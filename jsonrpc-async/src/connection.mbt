@@ -38,6 +38,8 @@ pub struct Connection {
   priv pending : Map[@jsonrpc.RequestId, @aqueue.Queue[Json]]
   priv notifications : @aqueue.Queue[(String, Json?)]
   priv max_notifications : Int32
+  priv handlers : @async.Semaphore
+  priv replies : @async.Semaphore
   priv mut next_id : Int64
   priv mut closed : Bool
   priv mut writer_closed : Bool
@@ -53,6 +55,11 @@ let default_max_line : Int32 = 64 * 1024 * 1024
 /// The default `max_notifications`. Codex emits up to 10,000 output deltas for
 /// one command, and its own TUI buffers 32,768 events per thread.
 let default_max_notifications : Int32 = 32_768
+
+///|
+/// The default `max_inbound`. Peers such as Codex request at most one approval
+/// or input per tool call in flight, far fewer than this.
+let default_max_inbound : Int32 = 64
 
 ///|
 /// The failure pending calls get when reading ends with `error`: a transport
@@ -75,6 +82,14 @@ fn read_failure(error : Error) -> RpcFailure {
 /// to `on_notification`, 32,768 by default. A notification past it fails the
 /// connection the same way. Reading never waits for the handler instead: a
 /// handler awaiting a call's response needs the reader to deliver it.
+///
+/// `max_inbound` bounds the received requests handled at once, 64 by default.
+/// A request past it is answered with error -32001, "Server overloaded; retry
+/// later.", without calling `on_request`; reading does not wait for a handler,
+/// for the same reason. The same number bounds the replies that need no
+/// handler, those refusals and the errors for malformed lines, waiting to be
+/// written. Past that, reading waits until the peer reads them.
+/// `max_notifications` and `max_inbound` must be positive.
 pub fn[X] Connection::start(
   group : @async.TaskGroup[X],
   reader : &@io.Reader,
@@ -83,6 +98,7 @@ pub fn[X] Connection::start(
   envelope~ : @jsonrpc.Envelope = Strict,
   max_line~ : Int32 = default_max_line,
   max_notifications~ : Int32 = default_max_notifications,
+  max_inbound~ : Int32 = default_max_inbound,
   on_request~ : RequestHandler = (name, _) => {
     Err(@jsonrpc.RpcError::method_not_found(name))
   },
@@ -96,6 +112,8 @@ pub fn[X] Connection::start(
     pending: {},
     notifications: @aqueue.Queue(kind=Blocking(max_notifications)),
     max_notifications,
+    handlers: @async.Semaphore(max_inbound),
+    replies: @async.Semaphore(max_inbound),
     next_id: 1L,
     closed: false,
     writer_closed: false,
