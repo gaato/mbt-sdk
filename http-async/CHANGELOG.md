@@ -8,6 +8,24 @@ note.
 
 ## [Unreleased]
 
+### Added
+
+- **The `zstd` content coding.** On native and Wasm the transport now undoes
+  `Content-Encoding: zstd` (RFC 8878) as it undoes `gzip`, `deflate` and
+  `br`, with `gaato/zstd`: in bounded slices, with the window capped at
+  8 MiB, the limit RFC 9659 sets for the coding (`zstd_window_bits`). A frame
+  that needs a larger window, a dictionary, or fails its checksum raises
+  `Protocol`, as a malformed body of any coding does.
+
+### Changed
+
+- **`Accept-Encoding` offers `zstd`.** A request without its own
+  `Accept-Encoding` is sent with `gzip, deflate, br, zstd`, so servers that
+  prefer zstd (several CDNs do) now answer with it. Responses decode the same
+  either way; set `Accept-Encoding` on the request to choose the codings
+  yourself.
+- `gaato/brotli` 0.2.0 (was 0.1.0); the decoder is unchanged.
+
 ## [0.3.1] - 2026-10-18
 
 ### Added

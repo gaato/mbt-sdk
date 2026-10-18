@@ -11,12 +11,19 @@ let decoded_slice_bytes : Int32 = 64 * 1024
 let brotli_window_bits : Int32 = 24
 
 ///|
+/// The largest `zstd` window accepted, as a power of two: 8 MiB, which RFC
+/// 9659 requires HTTP recipients to accept and encoders not to exceed for
+/// the `zstd` coding. As for `br`, the window grows only as output needs it.
+let zstd_window_bits : Int32 = 23
+
+///|
 /// The decompressor of one stage.
 priv enum Decompressor {
   Gzip(@gzip.Decoder)
   Zlib(@zlib.Decoder)
   Raw(@flate.Inflater)
   Brotli(@brotli.Decoder)
+  Zstd(@zstd.Decoder)
 }
 
 ///|
@@ -37,7 +44,7 @@ priv struct Stage {
   mut started : Bool
   /// The coded stream reached its end.
   mut finished : Bool
-  /// The last step stopped for output room: gzip, zlib and Brotli may have
+  /// The last step stopped for output room: gzip, zlib, Brotli and zstd may have
   /// taken all the input and still hold decoded bytes, so step again before
   /// asking upstream for more.
   mut output_pending : Bool
@@ -50,8 +57,11 @@ priv struct Stage {
 /// ends the input. Memory is bounded whatever the body: per stage, a
 /// `decoded_slice_bytes` output buffer and the decompressor's state, which
 /// for gzip and `deflate` is a 32 KiB window and flate's bounded pending
-/// input, and for `br` a window of at most `1 << brotli_window_bits` bytes,
-/// never more than the stage's output so far, and at most 1.3 MiB of tables.
+/// input, for `br` a window of at most `1 << brotli_window_bits` bytes,
+/// never more than the stage's output so far, and at most 1.3 MiB of tables,
+/// and for `zstd` a window of at most `1 << zstd_window_bits` bytes, likewise
+/// no more than the output so far, one block of at most 128 KiB and its
+/// literals, and about 11 KiB of tables.
 /// Each slice is a fresh `Bytes` of at most `decoded_slice_bytes`.
 priv struct ContentDecoder {
   /// The first stage reads the wire; each later one reads the stage before.
@@ -79,6 +89,7 @@ fn ContentDecoder::new(undo : Array[Coding]) -> ContentDecoder {
       Deflate => None
       Brotli =>
         Some(Brotli(@brotli.Decoder(max_window_bits=brotli_window_bits)))
+      Zstd => Some(Zstd(@zstd.Decoder(max_window_bits=zstd_window_bits)))
     },
     sniffed: b"",
     input: b""[:],
@@ -179,11 +190,11 @@ fn ContentDecoder::pull_stage(
     if status is @flate.Done {
       stage.finished = true
       // Bytes read ahead past the end, which gzip and zlib keep aside.
-      // Brotli raises on them itself.
+      // Brotli and zstd raise on them themselves.
       let unused = match decompressor {
         Gzip(decoder) => decoder.unused_input().length()
         Zlib(decoder) => decoder.unused_input().length()
-        Raw(_) | Brotli(_) => 0
+        Raw(_) | Brotli(_) | Zstd(_) => 0
       }
       guard unused == 0 else {
         raise malformed(stage.coding, "data after the end of the stream")
@@ -193,7 +204,7 @@ fn ContentDecoder::pull_stage(
       return Slice(Bytes::from_array(stage.output[:produced]))
     }
     // Without output, a step must have consumed input, finished, or be
-    // waiting for input upstream can still give. flate and Brotli always
+    // waiting for input upstream can still give. flate, Brotli and zstd always
     // progress with free output; never spin if they did not.
     guard consumed > 0 ||
       status is @flate.Done ||
@@ -209,7 +220,7 @@ fn ContentDecoder::pull_stage(
 
 ///|
 /// One decompression step from `input` into `output`: the status and the
-/// bytes consumed and produced. Brotli's `Status` has the same three cases
+/// bytes consumed and produced. Brotli's and zstd's `Status` have the same three cases
 /// as flate's, which the stages share.
 fn Decompressor::step(
   self : Decompressor,
@@ -240,6 +251,17 @@ fn Decompressor::step(
     Brotli(decoder) => {
       let status = decoder.step_into(input, output, end~) catch {
         @brotli.BrotliError(_, message) => raise malformed(coding, message)
+      }
+      let status : @flate.Status = match status {
+        Done => Done
+        NeedMoreInput => NeedMoreInput
+        NeedMoreOutput => NeedMoreOutput
+      }
+      (status, decoder.last_consumed(), decoder.last_produced())
+    }
+    Zstd(decoder) => {
+      let status = decoder.step_into(input, output, end~) catch {
+        @zstd.ZstdError(_, message) => raise malformed(coding, message)
       }
       let status : @flate.Status = match status {
         Done => Done

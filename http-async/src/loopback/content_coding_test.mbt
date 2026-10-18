@@ -16,6 +16,22 @@ let a_512k_br : Bytes = b"\x5b\xff\xff\x87\x5f\x22\x2c\x1e\x0b\x04\x72\xef\x0f\x
 let zeros_2m_br : Bytes = b"\x9f\xff\xff\x1f\xf8\x27\x00\xe2\xb1\x40\x20\xf7\xfe\x03"
 
 ///|
+/// `zstandard.ZstdCompressor(level=3).compress(b"hello, hello, hello")` from
+/// Python's zstandard 0.25.0.
+let hello_zstd : Bytes = b"\x28\xb5\x2f\xfd\x20\x13\x6d\x00\x00\x38\x68\x65\x6c\x6c\x6f\x2c\x20\x01\x00\xe2\x8a\x11"
+
+///|
+/// `ZstdCompressor(level=19).compress(b"a" * 512 * 1024)`: 33 bytes that
+/// decode to 512 KiB.
+let a_512k_zstd : Bytes = b"\x28\xb5\x2f\xfd\xa0\x00\x00\x08\x00\x4c\x00\x00\x08\x61\x01\x00\xfc\xff\x39\x10\x02\x02\x00\x10\x61\x02\x00\x10\x61\x03\x00\x10\x61"
+
+///|
+/// `ZstdCompressor(level=19, write_checksum=True)` through `compressobj` of
+/// `bytes(2 * 1024 * 1024)`: 85 bytes that decode to 2 MiB of zeros,
+/// declaring an 8 MiB window.
+let zeros_2m_zstd : Bytes = b"\x28\xb5\x2f\xfd\x04\x68\x4c\x00\x00\x08\x00\x01\x00\xfc\xff\x39\x10\x02\x02\x00\x10\x00\x02\x00\x10\x00\x02\x00\x10\x00\x02\x00\x10\x00\x02\x00\x10\x00\x02\x00\x10\x00\x02\x00\x10\x00\x02\x00\x10\x00\x02\x00\x10\x00\x02\x00\x10\x00\x02\x00\x10\x00\x02\x00\x10\x00\x02\x00\x10\x00\x02\x00\x10\x00\x02\x00\x10\x00\x01\x00\x00\xdb\x23\x8e\xf8"
+
+///|
 /// Serves `wire` under `Content-Encoding: encoding` (if not empty) with its
 /// `Content-Length`, recording the request's `Accept-Encoding`.
 async fn serve_coded(
@@ -57,7 +73,7 @@ async fn coded_outcome(
 }
 
 ///|
-async test "the transport offers gzip, deflate and br and undoes what it knows" {
+async test "the transport offers gzip, deflate, br and zstd and undoes what it knows" {
   let hello = b"hello, hello, hello"
   let rows : Array[(String, Bytes, Result[(String?, String?, Bytes), String])] = [
     ("", hello, Ok((None, Some("19"), hello))),
@@ -79,12 +95,19 @@ async test "the transport offers gzip, deflate and br and undoes what it knows" 
     ),
     ("br", hello_br, Ok((None, None, hello))),
     ("br, gzip", @gzip.compress(hello_br), Ok((None, None, hello))),
-    ("zstd, gzip", hello_gzip, Ok((Some("zstd"), None, hello))),
+    ("zstd", hello_zstd, Ok((None, None, hello))),
+    ("zstd, gzip", @gzip.compress(hello_zstd), Ok((None, None, hello))),
+    ("compress, gzip", hello_gzip, Ok((Some("compress"), None, hello))),
     // Before, the transport failed on any coding but gzip.
     (
+      "compress",
+      b"\x1f\x9d\x90",
+      Ok((Some("compress"), Some("3"), b"\x1f\x9d\x90")),
+    ),
+    (
       "zstd",
-      b"\x28\xb5\x2f\xfd",
-      Ok((Some("zstd"), Some("4"), b"\x28\xb5\x2f\xfd")),
+      hello_zstd[:hello_zstd.length() - 1].to_owned(),
+      Err("malformed zstd response body: the stream ends inside a frame"),
     ),
     (
       "br",
@@ -132,7 +155,10 @@ async test "the transport offers gzip, deflate and br and undoes what it knows" 
         transport.close()
       },
     )
-    assert_eq(accepted, [Some("gzip, deflate, br"), Some("gzip, deflate, br")])
+    assert_eq(accepted, [
+      Some("gzip, deflate, br, zstd"),
+      Some("gzip, deflate, br, zstd"),
+    ])
   }
 }
 
@@ -190,10 +216,19 @@ async test "a decoded bomb stops at max_body_bytes and streams in 64 KiB reads" 
 }
 
 ///|
-async test "a br bomb stops at max_body_bytes and streams in 64 KiB reads" {
+async test "a br or zstd bomb stops at max_body_bytes and streams in 64 KiB reads" {
+  for coded in [("br", zeros_2m_br), ("zstd", zeros_2m_zstd)] {
+    small_bomb_stops(coded.0, coded.1)
+  }
+}
+
+///|
+/// Serves `wire`, a few dozen bytes that decode to 2 MiB under
+/// `Content-Encoding: encoding`, to a transport with a 256 KiB limit.
+async fn small_bomb_stops(encoding : String, wire : Bytes) -> Unit {
   let accepted = []
   with_keepalive_server(
-    (request, conn) => serve_coded(request, conn, "br", zeros_2m_br, accepted),
+    (request, conn) => serve_coded(request, conn, encoding, wire, accepted),
     (url, _) => {
       let transport = @adapter.AsyncTransport::new(max_body_bytes=256 * 1024)
       let outcome = coded_outcome(() => transport.send(@http.Request::get(url)))
@@ -220,6 +255,7 @@ async test "a flushed coded chunk decodes in full before the server writes again
     coded in [
       ("gzip", @gzip.compress(Bytes::make(size, b'a'))),
       ("br", a_512k_br),
+      ("zstd", a_512k_zstd),
     ] {
     flushed_chunk_decodes(coded.0, coded.1, size)
   }

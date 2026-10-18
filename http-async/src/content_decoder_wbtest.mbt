@@ -73,6 +73,41 @@ let a_512k_br : Bytes = b"\x5b\xff\xff\x87\x5f\x22\x2c\x1e\x0b\x04\x72\xef\x0f\x
 let zeros_2m_br : Bytes = b"\x9f\xff\xff\x1f\xf8\x27\x00\xe2\xb1\x40\x20\xf7\xfe\x03"
 
 ///|
+/// `zstandard.ZstdCompressor(level=3).compress(b"hello, hello, hello")` from
+/// Python's zstandard 0.25.0: one frame with its content size.
+let hello_zstd : Bytes = b"\x28\xb5\x2f\xfd\x20\x13\x6d\x00\x00\x38\x68\x65\x6c\x6c\x6f\x2c\x20\x01\x00\xe2\x8a\x11"
+
+///|
+/// The same through `compressobj` with `write_checksum=True`, as a server
+/// streaming its response writes it: no content size, a 2 MiB window and
+/// a checksum.
+let hello_zstd_stream : Bytes = b"\x28\xb5\x2f\xfd\x04\x58\x6d\x00\x00\x38\x68\x65\x6c\x6c\x6f\x2c\x20\x01\x00\xe2\x8a\x11\x75\xf3\x98\x8e"
+
+///|
+/// The same with `window_log=23`: RFC 9659's largest window, 8 MiB.
+let hello_zstd_8m : Bytes = b"\x28\xb5\x2f\xfd\x00\x68\x6d\x00\x00\x38\x68\x65\x6c\x6c\x6f\x2c\x20\x01\x00\xe2\x8a\x11"
+
+///|
+/// The same with `window_log=24`, over RFC 9659's limit.
+let hello_zstd_16m : Bytes = b"\x28\xb5\x2f\xfd\x00\x70\x6d\x00\x00\x38\x68\x65\x6c\x6c\x6f\x2c\x20\x01\x00\xe2\x8a\x11"
+
+///|
+/// `ZstdCompressor(level=3).compress(gzip.compress(b"hello, hello, hello",
+/// mtime=0))`: the body of `Content-Encoding: gzip, zstd`.
+let hello_gzip_zstd : Bytes = b"\x28\xb5\x2f\xfd\x20\x1d\xe9\x00\x00\x1f\x8b\x08\x00\x00\x00\x00\x00\x02\xff\xcb\x48\xcd\xc9\xc9\xd7\x51\xc8\x40\xa2\x00\x9f\xa1\xca\x09\x13\x00\x00\x00"
+
+///|
+/// `ZstdCompressor(level=19).compress(b"a" * 512 * 1024)`: 33 bytes that
+/// decode to 512 KiB.
+let a_512k_zstd : Bytes = b"\x28\xb5\x2f\xfd\xa0\x00\x00\x08\x00\x4c\x00\x00\x08\x61\x01\x00\xfc\xff\x39\x10\x02\x02\x00\x10\x61\x02\x00\x10\x61\x03\x00\x10\x61"
+
+///|
+/// `ZstdCompressor(level=19, write_checksum=True)` through `compressobj` of
+/// `bytes(2 * 1024 * 1024)`: 85 bytes that decode to 2 MiB of zeros,
+/// declaring an 8 MiB window.
+let zeros_2m_zstd : Bytes = b"\x28\xb5\x2f\xfd\x04\x68\x4c\x00\x00\x08\x00\x01\x00\xfc\xff\x39\x10\x02\x02\x00\x10\x00\x02\x00\x10\x00\x02\x00\x10\x00\x02\x00\x10\x00\x02\x00\x10\x00\x02\x00\x10\x00\x02\x00\x10\x00\x02\x00\x10\x00\x02\x00\x10\x00\x02\x00\x10\x00\x02\x00\x10\x00\x02\x00\x10\x00\x02\x00\x10\x00\x02\x00\x10\x00\x02\x00\x10\x00\x01\x00\x00\xdb\x23\x8e\xf8"
+
+///|
 test "ContentDecoder undoes each coding and chain" {
   let hello : Result[Bytes, String] = Ok(b"hello, hello, hello")
   let empty : Result[Bytes, String] = Ok(b"")
@@ -107,6 +142,24 @@ test "ContentDecoder undoes each coding and chain" {
     ),
     ("an empty br body", [Brotli], b"", empty),
     ("br of nothing", [Brotli], b"\x3b", empty),
+    ("zstd", [Zstd], hello_zstd, hello),
+    ("zstd streamed, with a checksum", [Zstd], hello_zstd_stream, hello),
+    ("zstd declaring an 8 MiB window", [Zstd], hello_zstd_8m, hello),
+    (
+      "zstd frames in a row",
+      [Zstd],
+      hello_zstd + hello_zstd_stream,
+      Ok(b"hello, hello, hellohello, hello, hello"),
+    ),
+    ("gzip, zstd: zstd undone first", [Zstd, Gzip], hello_gzip_zstd, hello),
+    (
+      "zstd, br: br undone first",
+      [Brotli, Zstd],
+      b"\x8b\x0a\x80" + hello_zstd + b"\x03",
+      hello,
+    ),
+    ("an empty zstd body", [Zstd], b"", empty),
+    ("zstd of nothing", [Zstd], b"\x28\xb5\x2f\xfd\x20\x00\x01\x00\x00", empty),
     (
       "gzip of nothing",
       [Gzip],
@@ -198,6 +251,50 @@ test "ContentDecoder undoes each coding and chain" {
       [Gzip, Brotli],
       @gzip.compress(hello_br + b"x"),
       Err("malformed br response body: data after the end of the stream"),
+    ),
+    (
+      "a truncated zstd body",
+      [Zstd],
+      hello_zstd[:hello_zstd.length() - 1].to_owned(),
+      Err("malformed zstd response body: the stream ends inside a frame"),
+    ),
+    (
+      "data after a zstd body",
+      [Zstd],
+      hello_zstd + b"junk",
+      Err(
+        "malformed zstd response body: data after the last frame that starts no frame",
+      ),
+    ),
+    (
+      "a zstd checksum mismatch",
+      [Zstd],
+      hello_zstd_stream[:hello_zstd_stream.length() - 1].to_owned() + b"\x00",
+      Err(
+        "malformed zstd response body: the frame's content checksum does not match",
+      ),
+    ),
+    (
+      "a zstd window over 8 MiB",
+      [Zstd],
+      hello_zstd_16m,
+      Err(
+        "malformed zstd response body: the frame needs a 16777216-byte window, over the 8388608-byte limit",
+      ),
+    ),
+    (
+      "not zstd at all",
+      [Zstd],
+      b"hello, world",
+      Err("malformed zstd response body: not a zstd stream"),
+    ),
+    (
+      "an inner zstd stream with data after it",
+      [Gzip, Zstd],
+      @gzip.compress(hello_zstd + b"junk"),
+      Err(
+        "malformed zstd response body: data after the last frame that starts no frame",
+      ),
     ),
     (
       "not gzip at all",
@@ -347,10 +444,42 @@ test "a br body decodes the same however the wire is chunked" {
 }
 
 ///|
+/// `ZstdCompressor(level=19, write_checksum=True).compress(mixed_body())`
+/// from Python's zstandard 0.25.0.
+let mixed_zstd : Bytes = b"\x28\xb5\x2f\xfd\xa4\xcc\x9a\x02\x00\x74\x0a\x00\x84\x12\x54\x68\x65\x20\x71\x75\x69\x63\x6b\x20\x62\x72\x6f\x77\x6e\x20\x66\x6f\x78\x20\x6a\x75\x6d\x70\x73\x20\x6f\x76\x65\x72\x20\x74\x6c\x61\x7a\x79\x20\x64\x6f\x67\x2e\x20\x00\x1f\x3e\x5d\x7c\x9b\xba\xd9\xf8\x1c\x3b\x5a\x79\x98\xb7\xd6\xf5\x19\x38\x57\x76\x95\xb4\xd3\xf2\x16\x35\x54\x73\x92\xb1\xd0\xef\x13\x32\x51\x70\x8f\xae\xcd\xec\x10\x2f\x4e\x6d\x8c\xab\xca\xe9\x0d\x2c\x4b\x6a\x89\xa8\xc7\xe6\x0a\x29\x48\x67\x86\xa5\xc4\xe3\x07\x26\x45\x64\x83\xa2\xc1\xe0\x04\x23\x42\x61\x80\x9f\xbe\xdd\x01\x20\x3f\x5e\x7d\x9c\xbb\xda\xf9\x1d\x3c\x5b\x7a\x99\xb8\xd7\xf6\x1a\x39\x58\x77\x96\xb5\xd4\xf3\x17\x36\x55\x74\x93\xb2\xd1\xf0\x14\x33\x52\x71\x90\xaf\xce\xed\x11\x30\x4f\x6e\x8d\xac\xcb\xea\x0e\x2d\x4c\x6b\x8a\xa9\xc8\xe7\x0b\x2a\x49\x68\x87\xa6\xc5\xe4\x08\x27\x46\x65\x84\xa3\xc2\xe1\x05\x24\x43\x62\x81\xa0\xbf\xde\x02\x21\x40\x5f\x7e\x9d\xbc\xdb\xfa\x1e\x3d\x5c\x7b\x9a\xb9\xd8\xf7\x1b\x3a\x59\x78\x97\xb6\xd5\xf4\x18\x37\x56\x75\x94\xb3\xd2\xf1\x15\x34\x53\x72\x91\xb0\xcf\xee\x12\x31\x50\x6f\x8e\xad\xcc\xeb\x0f\x2e\x4d\x6c\x8b\xaa\xc9\xe8\x0c\x2b\x4a\x69\x88\xa7\xc6\xe5\x09\x28\x47\x66\x85\xa4\xc3\xe2\x06\x25\x44\x63\x82\xa1\xc0\xdf\x03\x22\x41\x60\x7f\x9e\xbd\xdc\x00\x01\x02\x08\x00\xa0\xb6\xbb\x4b\xda\x47\xde\xf1\x03\xb5\xd5\xd5\x2f\xed\xd7\xd1\xf8\x83\x87\x83\xeb\x77\xaf\xce\x6f\x2a\x49\x15\xaa\x0a\x41\x00\xea\x09\x63\xd6\x04\x02\x31\x36\xb9\xad"
+
+///|
+test "a zstd body decodes the same however the wire is chunked" {
+  let body = mixed_body()
+  assert_eq(decode_chunks([Zstd], [mixed_zstd]), Ok(body))
+  for seed in 0..<4 {
+    let rand = @random.Rand::chacha8(
+      seed=Bytes::make(32, (seed + 48).to_byte()),
+    )
+    for trial in 0..<10 {
+      // Up to two flate codings applied on top of zstd.
+      let codings = Array::makei(rand.int(limit=3), _ => rand.int(limit=3))
+      let undo = undo_of(codings)
+      undo.push(Zstd)
+      let wire = encode_codings(mixed_zstd, codings)
+      let label = "seed \{seed} trial \{trial} codings \{codings_label(codings)}"
+      for _ in 0..<4 {
+        assert_eq(
+          decode_chunks(undo, random_chunks(rand, wire)),
+          Ok(body),
+          msg=label,
+        )
+      }
+    }
+  }
+}
+
+///|
 test "a decompression bomb comes out one bounded slice per pull" {
   let zeros = Bytes::make(1024 * 1024, b'\x00')
   let cases : Array[(String, Bytes, Array[Coding], Int32)] = [
     ("br", zeros_2m_br, [Brotli], 2 * zeros.length()),
+    ("zstd", zeros_2m_zstd, [Zstd], 2 * zeros.length()),
     (
       "br, gzip",
       encode_codings(zeros_2m_br, [0]),
@@ -424,19 +553,23 @@ async test "read_bounded refuses a decoded bomb without reading it all" {
 }
 
 ///|
-async test "read_bounded refuses a br bomb one slice past the limit" {
-  // 14 bytes for 2 MiB: all of the wire arrives before the limit, so count
-  // what is decoded instead of what is read.
-  let chunks = zeros_2m_br
-    .iter()
-    .map(byte => Bytes::from_array([byte]))
-    .collect()
+async test "read_bounded refuses a br or zstd bomb one slice past the limit" {
+  for coded in [(zeros_2m_br, Coding::Brotli), (zeros_2m_zstd, Zstd)] {
+    refuses_bomb_one_slice_past(coded.0, coded.1)
+  }
+}
+
+///|
+/// `wire` packs 2 MiB in a few dozen bytes: all of it arrives before the
+/// limit, so count what is decoded instead of what is read.
+async fn refuses_bomb_one_slice_past(wire : Bytes, coding : Coding) -> Unit {
+  let chunks = wire.iter().map(byte => Bytes::from_array([byte])).collect()
   let mut reads = 0
   let read : async () -> Bytes? = () => {
     reads += 1
     chunks.get(reads - 1)
   }
-  let decoder = Some(ContentDecoder::new([Brotli]))
+  let decoder = Some(ContentDecoder::new([coding]))
   let mut decoded = 0
   let outcome = try
     read_bounded(
@@ -479,6 +612,7 @@ test "a pull never asks for input while decoded output is pending" {
   let a_512k = Bytes::make(512 * 1024, b'a')
   let cases : Array[(String, Bytes, Bytes, Array[Coding])] = [
     ("br", a_512k, a_512k_br, [Brotli]),
+    ("zstd", a_512k, a_512k_zstd, [Zstd]),
     ("br, gzip", a_512k, encode_codings(a_512k_br, [0]), [Gzip, Brotli]),
   ]
   for codings in [[0], [1], [2], [0, 0], [2, 0, 1], [1, 2]] {
@@ -520,6 +654,7 @@ async test "read_decoded drains a chunk without reading again" {
   let body = Bytes::make(512 * 1024, b'a')
   let cases : Array[(String, Bytes, Array[Coding])] = [
     ("br", a_512k_br, [Brotli]),
+    ("zstd", a_512k_zstd, [Zstd]),
     ("br, deflate", encode_codings(a_512k_br, [1]), [Deflate, Brotli]),
   ]
   for codings in [[0], [1], [2], [0, 1]] {

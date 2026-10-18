@@ -21,6 +21,7 @@ test "coding_plan undoes known codings from the last applied" {
     ("x-gzip is gzip", ["x-gzip"], "undo [gzip] keep -"),
     ("deflate", ["deflate"], "undo [deflate] keep -"),
     ("br", ["br"], "undo [br] keep -"),
+    ("zstd", ["zstd"], "undo [zstd] keep -"),
     ("tokens are case-insensitive", ["GZip"], "undo [gzip] keep -"),
     ("br is case-insensitive too", ["BR"], "undo [br] keep -"),
     (
@@ -29,9 +30,9 @@ test "coding_plan undoes known codings from the last applied" {
       "undo [gzip deflate] keep -",
     ),
     (
-      "br chained with the others",
-      ["br, deflate, gzip, br"],
-      "undo [br gzip deflate br] keep -",
+      "br and zstd chained with the others",
+      ["br, deflate, zstd, gzip, br"],
+      "undo [br gzip zstd deflate br] keep -",
     ),
     (
       "repeated field lines join as one list",
@@ -44,11 +45,11 @@ test "coding_plan undoes known codings from the last applied" {
       "undo [gzip] keep -",
     ),
     ("only identity", ["identity"], "undo [] keep -"),
-    ("unknown coding stays", ["zstd"], "undo [] keep zstd"),
+    ("unknown coding stays", ["compress"], "undo [] keep compress"),
     (
       "an unknown last coding hides the ones under it",
-      ["gzip, br, zstd"],
-      "undo [] keep gzip, br, zstd",
+      ["gzip, br, compress"],
+      "undo [] keep gzip, br, compress",
     ),
     (
       "an unknown first coding stays with its spelling",
@@ -57,8 +58,8 @@ test "coding_plan undoes known codings from the last applied" {
     ),
     (
       "codings before an unknown one stay",
-      ["gzip, zstd, gzip"],
-      "undo [gzip] keep gzip, zstd",
+      ["gzip, compress, gzip"],
+      "undo [gzip] keep gzip, compress",
     ),
     (
       "five codings are allowed",
@@ -106,13 +107,13 @@ test "decode_head rewrites only a head it decodes" {
     ),
     (
       "a partly decoded body keeps the codings left",
-      [("content-encoding", "zstd, br"), ("content-length", "29")],
-      "decoder content-encoding: zstd",
+      [("content-encoding", "compress, br"), ("content-length", "29")],
+      "decoder content-encoding: compress",
     ),
     (
       "an unknown coding leaves the head as it came",
-      [("content-encoding", "zstd"), ("content-length", "29")],
-      "none content-encoding: zstd; content-length: 29",
+      [("content-encoding", "compress"), ("content-length", "29")],
+      "none content-encoding: compress; content-length: 29",
     ),
     (
       "a plain body leaves the head as it came",
@@ -151,7 +152,7 @@ test "decode_head rewrites only a head it decodes" {
 
 ///|
 test "Accept-Encoding offers exactly the codings the decoder undoes" {
-  assert_eq(accept_encoding(), "gzip, deflate, br")
+  assert_eq(accept_encoding(), "gzip, deflate, br, zstd")
   for coding in decodable_codings {
     let plan = coding_plan([coding.name()]) catch { _ => panic() }
     assert_eq(plan.undo.length(), 1, msg=coding.name())

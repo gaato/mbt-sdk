@@ -24,7 +24,7 @@
 /// as bytes there.
 ///
 /// On native and Wasm, a request without `Accept-Encoding` is sent with
-/// `Accept-Encoding: gzip, deflate, br` and its response body is decoded: the
+/// `Accept-Encoding: gzip, deflate, br, zstd` and its response body is decoded: the
 /// codings undone leave `Content-Encoding`, `Content-Length` is dropped, and an
 /// unknown coding stays on the body untouched. A request that sets
 /// `Accept-Encoding` itself gets the body as sent. On JS, fetch does both.
