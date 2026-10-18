@@ -26,7 +26,7 @@ pub struct SseParser {
   // private fields
 }
 pub fn SseParser::feed(Self, Bytes) -> Array[SseEvent] raise @http.HttpError
-pub fn SseParser::finish(Self) -> Array[SseEvent]
+pub fn SseParser::finish(Self) -> Array[SseEvent] raise @http.HttpError
 pub fn SseParser::new(max_event_bytes? : Int) -> Self
 
 // Type aliases

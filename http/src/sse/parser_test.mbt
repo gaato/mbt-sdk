@@ -473,10 +473,10 @@ test "one event is bounded by its data lines plus the line being read" {
       (["a"], refused),
     ),
     (
-      "events earlier in the refused chunk are discarded",
+      "events earlier in the refused chunk are delivered, then the raise",
       12,
       ["data: a\n\n" + x(13)],
-      ([], refused),
+      (["a"], refused),
     ),
     ("zero allows blank lines", 0, ["\n\r\n\r"], ([], None)),
     (
@@ -504,6 +504,29 @@ test "a refused stream stays finished" {
 }
 
 ///|
+test "an overflow after events in the same chunk raises on the next call" {
+  let next_feed = @sse.SseParser::new(max_event_bytes=4)
+  assert_eq(next_feed.feed(b"data\n\ndata: a"), [event("")])
+  try next_feed.feed(b"") catch {
+    @http.HttpError::Protocol(_) => ()
+    _ => fail("expected Protocol")
+  } noraise {
+    _ => fail("the next feed must raise")
+  }
+  assert_eq(next_feed.feed(b"data\n\n"), [])
+  assert_eq(next_feed.finish(), [])
+  let at_finish = @sse.SseParser::new(max_event_bytes=4)
+  assert_eq(at_finish.feed(b"data\n\ndata: a"), [event("")])
+  try at_finish.finish() catch {
+    @http.HttpError::Protocol(_) => ()
+    _ => fail("expected Protocol")
+  } noraise {
+    _ => fail("finish must raise an overflow at the end of the stream")
+  }
+  assert_eq(at_finish.finish(), [])
+}
+
+///|
 test "the bound refuses generated streams the same way under any chunking" {
   for seed in 8..<12 {
     let rand = seeded(seed)
@@ -521,8 +544,7 @@ test "the bound refuses generated streams the same way under any chunking" {
       for chunks in [[bytes], hostile_chunks(bytes), random_chunks(rand, bytes)] {
         let (events, chunked_refused) = bounded_events(limit, chunks)
         assert_eq(chunked_refused, refused, msg="\{label} refused")
-        assert_true(is_prefix(events, before), msg="\{label} prefix")
-        assert_true(refused || events == before, msg="\{label} events")
+        assert_eq(events, before, msg="\{label} events")
       }
     }
   }

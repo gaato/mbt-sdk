@@ -75,7 +75,7 @@ async fn each_event_scenarios() -> Unit {
   assert_eq(callback.cursor, 1)
   assert_eq(callback.closes, 1)
   let oversized = TestStream::{
-    chunks: [b"data: a\n\n", b"data: bb", b"data: never read\n\n"],
+    chunks: [b"data: a\n\ndata: bb", b"data: never read\n\n"],
     cursor: 0,
     closes: 0,
     fail_read: false,
@@ -94,7 +94,7 @@ async fn each_event_scenarios() -> Unit {
     _ => fail("expected the oversized event to be refused")
   }
   assert_eq(delivered, ["a"])
-  assert_eq(oversized.cursor, 2)
+  assert_eq(oversized.cursor, 1)
   assert_eq(oversized.closes, 1)
 }
 

@@ -37,6 +37,9 @@ pub struct SseParser {
   priv mut last_id : String?
   priv mut retry : Int32?
   priv mut finished : Bool
+  // An overflow found after events completed in the same chunk, raised by
+  // the next `feed` or `finish` so those events are returned first.
+  priv mut overflow : Bool
 }
 
 ///|
@@ -66,6 +69,7 @@ pub fn SseParser::new(
     last_id: None,
     retry: None,
     finished: false,
+    overflow: false,
   }
 }
 
@@ -73,13 +77,16 @@ pub fn SseParser::new(
 /// Feeds any byte chunk and returns complete events in order.
 /// Malformed UTF-8 is replaced with U+FFFD. Feeding after finish is a no-op.
 ///
-/// Raises `Protocol` at the byte that takes an event past `max_event_bytes`,
-/// discarding the events completed earlier in the same chunk, and finishes
-/// the parser: the stream is refused rather than read without bound.
+/// An event over `max_event_bytes` raises `Protocol` and ends the stream,
+/// which is refused rather than read without bound. When the same chunk
+/// completed events before it, those are returned first and the next `feed`
+/// or `finish` raises, so feed an empty chunk to observe it without waiting
+/// for more input.
 pub fn SseParser::feed(
   self : SseParser,
   bytes : Bytes,
 ) -> Array[SseEvent] raise @http.HttpError {
+  self.raise_overflow()
   let events = []
   if self.finished {
     return events
@@ -97,10 +104,12 @@ pub fn SseParser::feed(
     } else if self.line.length() + self.data_bytes < self.max_event_bytes {
       self.line.push(byte)
     } else {
-      ignore(self.finish())
-      raise @http.HttpError::Protocol(
-        "SSE event larger than \{self.max_event_bytes} bytes",
-      )
+      self.end()
+      self.overflow = true
+      if events.is_empty() {
+        self.raise_overflow()
+      }
+      return events
     }
   }
   events
@@ -108,15 +117,35 @@ pub fn SseParser::feed(
 
 ///|
 /// Ends the stream, discarding any incomplete event; always returns [].
-/// Repeated calls are harmless.
-pub fn SseParser::finish(self : SseParser) -> Array[SseEvent] {
+/// Repeated calls are harmless. Raises `Protocol` if `feed` left an
+/// overflow unreported, so an oversized event at the end is never lost.
+pub fn SseParser::finish(
+  self : SseParser,
+) -> Array[SseEvent] raise @http.HttpError {
+  self.end()
+  self.raise_overflow()
+  []
+}
+
+///|
+/// Raises a pending overflow once.
+fn SseParser::raise_overflow(self : SseParser) -> Unit raise @http.HttpError {
+  if self.overflow {
+    self.overflow = false
+    raise @http.HttpError::Protocol(
+      "SSE event larger than \{self.max_event_bytes} bytes",
+    )
+  }
+}
+
+///|
+fn SseParser::end(self : SseParser) -> Unit {
   self.finished = true
   self.line.clear()
   self.data.clear()
   self.data_bytes = 0
   self.event_type = ""
   self.retry = None
-  []
 }
 
 ///|
