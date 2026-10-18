@@ -62,8 +62,7 @@ fn bucket_step(state : RateLimitState?, now : Int64) -> BucketStep {
   if state.remaining > 0 {
     return Consume({ ..state, remaining: state.remaining - 1, })
   }
-  let delta = state.reset_at_unix_ms - now
-  Wait(if delta > 2147483647L { 2147483647 } else { delta.to_int() })
+  Wait(delay_until(state.reset_at_unix_ms, now))
 }
 
 ///|

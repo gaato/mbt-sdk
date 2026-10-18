@@ -158,6 +158,14 @@ test "bucket_step admits, consumes, expires and waits" {
       0L,
       "wait 2147483647",
     ),
+    (
+      // The span overflows Int64; wrapped and truncated it is a zero sleep,
+      // so the wait would spin.
+      "negative clock with a saturated reset",
+      Some({ remaining: 0, reset_at_unix_ms: max_ms, }),
+      -1L,
+      "wait 2147483647",
+    ),
   ]
   for row in rows {
     let (label, state, now, expected) = row
