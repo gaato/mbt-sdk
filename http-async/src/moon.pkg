@@ -40,5 +40,8 @@ options(
     "failure_js_wbtest.mbt": [ "js" ],
     "negotiation.native.mbt": [ "native", "wasm" ],
     "negotiation.js.mbt": [ "js" ],
+    "request_body.native.mbt": [ "native", "wasm" ],
+    "request_body.js.mbt": [ "js" ],
+    "upload_js_test.mbt": [ "js" ],
   },
 )

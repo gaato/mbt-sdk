@@ -125,7 +125,12 @@ async test "POST Japanese JSON bytes content-type and joined request headers" {
       assert_eq(request.path, "/?query=1")
       assert_eq(request.headers.get("content-type"), Some("application/json"))
       assert_eq(request.headers.get("x-repeat"), Some("one, two"))
-      assert_eq(request.headers.get("content-length"), None)
+      // The caller's Content-Length is replaced by the body's own.
+      assert_eq(
+        request.headers.get("content-length"),
+        template.body.length().map(length => length.to_string()),
+      )
+      assert_eq(request.headers.get("transfer-encoding"), None)
       let body = conn.read_all().binary()
       assert_eq(@http.Body::Bytes(body), template.body)
       reply(conn, 200, body)

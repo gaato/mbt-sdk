@@ -255,6 +255,45 @@ test "replayable allows idempotent methods or an idempotency key" {
 }
 
 ///|
+test "replayable never resends a stream body once it was taken" {
+  let stream_request = (http_method : String, taken : Bool) => {
+    let stream = @http.StreamBody::new(Paced::new([]), length=0)
+    if taken {
+      ignore(stream.take())
+    }
+    {
+      ..@http.Request::new(http_method, "http://example.com/"),
+      body: Stream(stream),
+    }
+  }
+  let rows : Array[(@http.Request, Bool)] = [
+    (stream_request("PUT", false), true),
+    (stream_request("PUT", true), false),
+    (stream_request("GET", true), false),
+    (stream_request("POST", false), false),
+    (
+      {
+        ..stream_request("POST", true),
+        headers: @http.Headers::from_array([("Idempotency-Key", "k")]),
+      },
+      false,
+    ),
+    (
+      {
+        ..stream_request("POST", false),
+        headers: @http.Headers::from_array([("Idempotency-Key", "k")]),
+      },
+      true,
+    ),
+    (@http.Request::put("http://example.com/").body_bytes(b"x"), true),
+  ]
+  for row in rows {
+    let (request, expected) = row
+    assert_eq(replayable(request), expected, msg=@debug.to_string(request))
+  }
+}
+
+///|
 test "connection_close looks for the close token" {
   let rows : Array[(Array[(String, String)], Bool)] = [
     ([], false),

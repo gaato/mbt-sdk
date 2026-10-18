@@ -10,6 +10,7 @@ import {
   "moonbitlang/async/io",
   "moonbit-community/flate/gzip",
   "moonbitlang/core/debug",
+  "moonbitlang/core/encoding/utf8",
 } for "test"
 
 supported_targets = "native + wasm"
@@ -21,5 +22,6 @@ options(
     "content_coding_test.mbt": [ "native", "wasm" ],
     "cookie_roundtrip_test.mbt": [ "native", "wasm" ],
     "phase_test.mbt": [ "native", "wasm" ],
+    "upload_test.mbt": [ "native", "wasm" ],
   },
 )

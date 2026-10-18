@@ -206,8 +206,12 @@ pub fn AsyncTransport::idle_connections(self : AsyncTransport) -> Int32 {
 ///|
 /// Whether a request may be sent again on a fresh connection after a reused
 /// one failed before producing a response head: idempotent methods, or any
-/// request carrying an `Idempotency-Key`.
+/// request carrying an `Idempotency-Key`, and only while its body can be sent
+/// again (`Body::is_replayable`: bytes, or a stream not yet taken).
 fn replayable(request : @http.Request) -> Bool {
+  if !request.body.is_replayable() {
+    return false
+  }
   if request.headers.contains("idempotency-key") {
     return true
   }
