@@ -440,7 +440,42 @@ fn split_url(url : String) -> (String, String) raise @http.HttpError {
   } else {
     "/" + tail.to_owned()
   }
-  (scheme + "://" + authority.to_owned(), path)
+  (canonical_origin(scheme, authority.to_owned()), path)
+}
+
+///|
+/// `scheme://authority` in one spelling per server, so the idle pool and the
+/// connection caps key every spelling of an origin alike: lower-case scheme
+/// and host, canonical IPv6, no default port.
+fn canonical_origin(
+  scheme : String,
+  authority : String,
+) -> String raise @http.HttpError {
+  let url = @http.Url::parse(scheme + "://" + authority + "/") catch {
+    @http.UrlError::Invalid(reason) =>
+      raise @http.HttpError::Protocol("invalid URL authority: " + reason)
+  }
+  let builder = StringBuilder()
+  builder.write_string(scheme)
+  builder.write_string("://")
+  if url.userinfo is Some(userinfo) {
+    builder.write_string(userinfo)
+    builder.write_char('@')
+  }
+  let host = url.host.unwrap_or("")
+  if host.contains(":") {
+    // An IPv6 literal: `Url` keeps the host without its brackets.
+    builder.write_char('[')
+    builder.write_string(host)
+    builder.write_char(']')
+  } else {
+    builder.write_string(host)
+  }
+  if url.port is Some(port) {
+    builder.write_char(':')
+    builder.write_string(port.to_string())
+  }
+  builder.to_string()
 }
 
 ///|
