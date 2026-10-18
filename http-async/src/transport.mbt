@@ -412,27 +412,33 @@ async fn exchange(
   // fails without a byte of this request reaching the server.
   let outgoing = open_body(body)
   defer outgoing.close()
-  if body.length() is Some(0L) {
+  let empty = body.length() is Some(0L)
+  if empty {
     // A head declaring no body goes out whole before any body is read, so an
-    // empty stream proves it is empty first.
+    // empty stream proves it is empty first, and is not read again.
     confirm_empty(outgoing, timer)
   }
   timer.run(Write, () => {
     client.request(meth, path, extra_headers=headers)
     // With a body, the head goes out with its first slice.
-    if body.length() is Some(0L) {
+    if empty {
       client.flush()
     }
   })
-  send_outgoing(
-    outgoing,
-    slice => {
-      client.write(slice)
-      client.flush()
-    },
-    timer,
-    buffer_limit=buffered_stream_limit,
-  )
+  if !empty {
+    send_outgoing(
+      outgoing,
+      slice => {
+        client.write(slice)
+        client.flush()
+      },
+      timer,
+      buffer_limit=buffered_stream_limit,
+    )
+    // A stream of unknown length that ended at once wrote no slice, so its
+    // head is still unsent: it goes out in the Write phase, not the Head one.
+    timer.run(Write, () => client.flush())
+  }
   timer.run(Head, () => client.end_request())
 }
 

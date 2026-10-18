@@ -219,3 +219,39 @@ async test "a stream declared empty that is not fails before its head goes out" 
     },
   )
 }
+
+///|
+/// A stream that ends at once and refuses any read after its end, as the
+/// `BodyStream` contract allows.
+struct EndsOnce {
+  mut ended : Bool
+}
+
+///|
+impl @http.BodyStream for EndsOnce with fn read_some(self) {
+  if self.ended {
+    raise @http.HttpError::Protocol("read after the end")
+  }
+  self.ended = true
+  None
+}
+
+///|
+impl @http.BodyStream for EndsOnce with fn close(_) {
+  ()
+}
+
+///|
+async test "an empty stream is read to its end once, with or without a length" {
+  for length in [Some(0L), None] {
+    with_server(count_upload, url => {
+      let request = @http.Request::post(url + "/").body_stream(
+        EndsOnce::{ ended: false, },
+        length?,
+      )
+      let response = @adapter.AsyncTransport::new().send(request)
+      let text = @utf8.decode(response.body)
+      assert_true(text.contains("received=0"), msg=text)
+    })
+  }
+}
