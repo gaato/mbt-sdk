@@ -348,3 +348,59 @@ async test "unread error replies hold the read loop at max_inbound until the pee
     })
   })
 }
+
+///|
+async test "a request past the default max_inbound of 64 is refused" {
+  @async.with_timeout(5000, () => {
+    @async.with_task_group(group => {
+      let (read, peer_write) = @io.pipe()
+      let (peer_read, write) = @io.pipe()
+      group.add_defer(() => {
+        read.close()
+        write.close()
+        peer_read.close()
+        peer_write.close()
+      })
+      let release : @aqueue.Queue[Unit] = @aqueue.Queue(kind=Unbounded)
+      let mut handled = 0
+      let _rpc = Connection::start(group, read, write, on_request=(_, _) => {
+        handled += 1
+        release.get()
+        Ok(Json::null())
+      })
+      let limit = 64
+      let requests : Array[Byte] = []
+      for id in 1..<=(limit + 1) {
+        requests.append(
+          @jsonrpc.Message::Request(
+            id=Number(id.to_int64()),
+            name="ask",
+            params=None,
+          )
+          .encode(envelope=Strict)
+          .to_array(),
+        )
+      }
+      peer_write.write(Bytes::from_array(requests))
+      assert_eq(
+        read_message(peer_read),
+        Failure(
+          id=Number((limit + 1).to_int64()),
+          error=@jsonrpc.RpcError::new(
+            code=-32001,
+            message="Server overloaded; retry later.",
+          ),
+        ),
+      )
+      for _ in 0..<limit {
+        release.put(())
+      }
+      for _ in 0..<limit {
+        guard read_message(peer_read) is Response(result=Null, ..) else {
+          fail("expected a handler's reply")
+        }
+      }
+      assert_eq(handled, limit)
+    })
+  })
+}

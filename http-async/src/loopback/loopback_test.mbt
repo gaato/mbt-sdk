@@ -469,3 +469,50 @@ async test "max_body_bytes bounds buffered bodies but not streams" {
     },
   )
 }
+
+///|
+async test "max_body_bytes counts the decoded bytes of a gzip body" {
+  // `gzip -n -9` of 1000 and 1001 bytes of 'a': 29 bytes each on the wire.
+  let rows : Array[(String, Bytes, Result[Int32, String])] = [
+    (
+      "1000 decoded bytes at a limit of 1000",
+      b"\x1f\x8b\x08\x00\x00\x00\x00\x00\x02\x03\x4b\x4c\x1c\x05\xa3\x60\x14\x0c\x77\x00\x00\x03\xda\x38\x9a\xe8\x03\x00\x00",
+      Ok(1000),
+    ),
+    (
+      "1001 decoded bytes at a limit of 1000",
+      b"\x1f\x8b\x08\x00\x00\x00\x00\x00\x02\x03\x4b\x4c\x1c\x05\xa3\x60\x14\x0c\x7b\x00\x00\x23\xd7\x24\x71\xe9\x03\x00\x00",
+      Err("response body larger than 1000 bytes"),
+    ),
+  ]
+  for row in rows {
+    let (label, gzipped, expected) = row
+    with_server(
+      conn => {
+        ignore(conn.read_request())
+        // The client may close before the response is written in full.
+        try {
+          conn.send_response(200, "OK", extra_headers={
+            "Content-Encoding": "gzip",
+          })
+          conn.write(gzipped)
+          conn.end_response()
+        } catch {
+          _ => ()
+        }
+      },
+      url => {
+        let transport = @adapter.AsyncTransport::new(max_body_bytes=1000)
+        let outcome : Result[Int32, String] = try
+          transport.send(@http.Request::get(url))
+        catch {
+          @http.HttpError::Protocol(message) => Err(message)
+          error => Err("unexpected \{Repr(error)}")
+        } noraise {
+          response => Ok(response.body.length())
+        }
+        assert_eq(outcome, expected, msg=label)
+      },
+    )
+  }
+}
