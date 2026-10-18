@@ -20,6 +20,8 @@ scripts/gates.sh                         # green, including native loopback test
 scripts/release.sh publish --dry-run     # what the job will do
 ```
 
+A structure that grows with network or peer input needs a row in [RESOURCE_BOUNDS.md](../RESOURCE_BOUNDS.md) before it ships; check that the ledger still matches the code being released.
+
 Commit, push `main`, and watch the `Release` run. Public API changes show up as diffs in `pkg.generated.mbti`; use them to decide the bump. While versions are `0.x`, a breaking change bumps the minor version.
 
 ## Automated releases from spec-watch
