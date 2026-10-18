@@ -19,6 +19,17 @@ never does. Every breaking change is listed with a migration note.
   need. Non-ASCII hosts are refused: IDNA is out of scope, so pass the
   `xn--` form. The algorithm is ported from moonbitstack/moonhttp's `url`
   package (Apache-2.0).
+- **`follow_redirects` and the `redirects` middleware step.** They follow
+  301, 302, 303, 307 and 308 up to `max_redirects` (10 by default), rewrite
+  the method as browsers and httpx do, drop the body and its headers when
+  the request becomes a GET, strip `Authorization`, `Cookie`,
+  `Proxy-Authorization` and caller-named credential headers when the origin
+  changes (except a same-host upgrade to `https`), and refuse an `https` to
+  `http` downgrade unless `allow_downgrade` is set. `follow_redirects`
+  raises the new `RedirectError`; `redirects` reports refusals as
+  `HttpError::Protocol`, so `HttpError` keeps its variants. `on_redirect`
+  sees each hop for callers that keep a history. Nothing follows redirects
+  unless a caller adds the step.
 
 ## [0.2.1] - 2026-10-18
 

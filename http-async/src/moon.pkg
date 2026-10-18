@@ -13,6 +13,8 @@ import {
   "gaato/http/mock",
   "gaato/http/sse",
   "moonbitlang/async/aqueue",
+  "moonbitlang/core/debug",
+  "moonbitlang/core/encoding/utf8",
 } for "test"
 
 import {

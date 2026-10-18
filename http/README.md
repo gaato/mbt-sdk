@@ -4,7 +4,7 @@ Sans-IO HTTP vocabulary for MoonBit SDKs: `Request`, `Response`, `Headers`, the 
 
 The SSE parser bounds one event at `max_event_bytes` (16 MiB by default): the raw bytes of its `data` lines, of the `event` and `id` lines in effect (the `id` persists into later events, so it counts against each of them until replaced), and of the line being read. A stream that never ends a line, or never sends the blank line that ends an event, fails with `HttpError::Protocol` instead of growing memory without bound. Events completed before the oversized one are still delivered: when they arrive in the same chunk, `SseParser::feed` returns them and the next `feed` (an empty chunk is enough) or `finish` raises; `each_event` dispatches them and then raises without reading further. Pass `max_event_bytes` to `SseParser::new` or `each_event` to change it.
 
-`Url` parses, normalises and resolves URI references by RFC 3986 (non-ASCII hosts are refused; pass the IDNA `xn--` form).
+`Url` parses, normalises and resolves URI references by RFC 3986 (non-ASCII hosts are refused; pass the IDNA `xn--` form). `follow_redirects`, or the `redirects` middleware step, follows 301/302/303/307/308 up to `max_redirects` (10 by default), rewriting POST to GET where browsers do, stripping credentials when the origin changes and refusing `https` to `http` unless `allow_downgrade` is set. Nothing follows redirects unless you add the step.
 
 An SDK built on this module never imports an async runtime: the caller passes a `Transport` and a `Clock`, for example from `gaato/http-async`.
 

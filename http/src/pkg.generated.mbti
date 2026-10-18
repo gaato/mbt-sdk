@@ -9,9 +9,13 @@ import {
 // Values
 pub fn append_query(String, String, String) -> String
 
+pub async fn follow_redirects(Request, async (Request) -> Response raise HttpError, max_redirects? : Int, allow_downgrade? : Bool, credential_headers? : Array[String], on_redirect? : (RedirectHop) -> Unit) -> Response raise RedirectError
+
 pub fn percent_encode(String) -> String
 
 pub fn percent_encode_path(String) -> String
+
+pub fn redirects(max_redirects? : Int, allow_downgrade? : Bool, credential_headers? : Array[String], on_redirect? : (RedirectHop) -> Unit) -> async (Request, async (Request) -> Response raise HttpError) -> Response raise HttpError
 
 pub async fn send_with(&Transport, Array[async (Request, async (Request) -> Response raise HttpError) -> Response raise HttpError], Request) -> Response raise HttpError
 
@@ -22,6 +26,14 @@ pub(all) suberror HttpError {
   Protocol(String)
 } derive(@debug.Debug)
 pub fn HttpError::to_repr(Self) -> @debug.Repr
+
+pub(all) suberror RedirectError {
+  Transport(HttpError)
+  TooManyRedirects(max~ : Int, location~ : String)
+  Downgrade(location~ : String)
+  BadLocation(location~ : String, reason~ : String)
+} derive(@debug.Debug)
+pub fn RedirectError::to_repr(Self) -> @debug.Repr
 
 pub(all) suberror UrlError {
   Invalid(String)
@@ -48,6 +60,13 @@ pub fn Headers::not_equal(Self, Self) -> Bool
 pub fn Headers::remove(Self, String) -> Unit
 pub fn Headers::set(Self, String, String) -> Unit
 pub fn Headers::to_repr(Self) -> @debug.Repr
+
+pub struct RedirectHop {
+  request : Request
+  response : Response
+  next : Request
+} derive(@debug.Debug)
+pub fn RedirectHop::to_repr(Self) -> @debug.Repr
 
 pub(all) struct Request {
   http_method : String
