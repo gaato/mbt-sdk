@@ -21,6 +21,11 @@ never does. Every breaking change is listed with a migration note.
   reconnecting. A larger value now reads as 3,600,000. A run of digits too
   long for `Int32` also reads as that cap instead of being ignored, since
   the spec accepts any run of ASCII digits.
+- **`each_event` feeds the parser at most 64 KiB at a time.** It passed
+  each read to `SseParser::feed` whole and dispatched the events only after
+  parsing it, so the events held at once were bounded only by the size of
+  one read, which the transport decides. Each slice's events are now
+  dispatched before the next slice is parsed.
 
 ## [0.2.0] - 2026-10-18
 

@@ -8,6 +8,14 @@ note.
 
 ## [Unreleased]
 
+### Fixed
+
+- **A read takes at most 64 KiB from the connection.** Stream reads and
+  the reads of a body bounded by `max_body_bytes` asked for whatever the
+  connection had buffered, so a stream chunk, and the bytes read past
+  `max_body_bytes` before the body was refused, were bounded only by that
+  buffer.
+
 ## [0.2.0] - 2026-10-18
 
 ### Added
