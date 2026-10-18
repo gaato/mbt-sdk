@@ -7,6 +7,15 @@ never does. Every breaking change is listed with a migration note.
 
 ## [Unreleased]
 
+### Fixed
+
+- **`max_event_bytes` now counts an SSE event's `event` and `id` lines, not
+  only its `data` lines.** Each of the three could reach the bound on its
+  own, so one event could keep about three times `max_event_bytes`. The
+  `id` persists into later events, as the spec says, so it counts against
+  each of them until replaced. Events completed earlier in the same chunk
+  are still delivered before the error.
+
 ## [0.2.0] - 2026-10-18
 
 ### Changed

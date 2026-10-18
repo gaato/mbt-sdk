@@ -420,7 +420,7 @@ fn bounded_outcome(
 }
 
 ///|
-test "one event is bounded by its data lines plus the line being read" {
+test "one event is bounded by the lines it keeps plus the line being read" {
   let refused = Some("SSE event larger than 12 bytes")
   let x = (n : Int32) => "x".repeat(n)
   let rows : Array[(String, Int32, Array[String], (Array[String], String?))] = [
@@ -449,14 +449,73 @@ test "one event is bounded by its data lines plus the line being read" {
       ([x(7)], None),
     ),
     (
-      "other lines do not accumulate",
+      "comments, retry and unknown fields are not kept",
       12,
-      [
-        ": comment!!\nevent: abcde\nid: abcdefgh\nretry: 1000\ndata:" +
-        x(7) +
-        "\n\n",
-      ],
+      [": comment!!\nretry: 1000\nunknown: abc\ndata:" + x(7) + "\n\n"],
       ([x(7)], None),
+    ),
+    ("event line at limit", 12, ["event:" + x(6) + "\n\n"], ([], None)),
+    ("event line at limit + 1", 12, ["event:" + x(7) + "\n\n"], ([], refused)),
+    ("event and data at limit", 12, ["event:ab\ndata\n\n"], ([""], None)),
+    ("event and data at limit + 1", 12, ["event:abc\ndata\n\n"], ([], refused)),
+    (
+      "a kept event leaves the rest for the line being read",
+      12,
+      ["event:abcde\n", "d"],
+      ([], None),
+    ),
+    (
+      "a kept event leaves the rest for the line being read + 1",
+      12,
+      ["event:abcde\n", "da"],
+      ([], refused),
+    ),
+    ("id line at limit", 12, ["id:" + x(9) + "\n\n"], ([], None)),
+    ("id line at limit + 1", 12, ["id:" + x(10) + "\n\n"], ([], refused)),
+    ("id and data at limit", 12, ["id:abcde\ndata\n\n"], ([""], None)),
+    ("id and data at limit + 1", 12, ["id:abcdef\ndata\n\n"], ([], refused)),
+    ("event, id and data at limit", 12, ["event\nid:\ndata\n\n"], ([""], None)),
+    (
+      "event, id and data at limit + 1",
+      12,
+      ["event:\nid:\ndata\n\n"],
+      ([], refused),
+    ),
+    (
+      "a replaced event counts only its last value",
+      16,
+      ["event:a\nevent:b\ndata\n\n"],
+      ([""], None),
+    ),
+    (
+      "a replaced id counts only its last value",
+      16,
+      ["id:abcd\nid:abcd\ndata:a\n\n"],
+      (["a"], None),
+    ),
+    (
+      "the event type resets with the event",
+      12,
+      ["event:ab\ndata\n\ndata:" + x(7) + "\n\n"],
+      (["", x(7)], None),
+    ),
+    (
+      "the id persists into later events",
+      12,
+      ["id:abcde\ndata\n\ndata\n\n"],
+      (["", ""], None),
+    ),
+    (
+      "the id persists into later events + 1",
+      12,
+      ["id:abcde\ndata\n\ndata:a\n\n"],
+      ([""], refused),
+    ),
+    (
+      "a new id replaces the persisting one",
+      12,
+      ["id:abcde\ndata\n\nid\ndata:abcde\n\n"],
+      (["", "abcde"], None),
     ),
     (
       "a blank line resets the count",
