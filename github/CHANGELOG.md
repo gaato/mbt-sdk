@@ -14,6 +14,16 @@ are optional unless the field is required, and keep a wildcard arm.
 
 ## [Unreleased]
 
+## [0.13.1] - 2026-10-18
+
+### Changed
+
+- **Depends on `gaato/http` 0.2.1 and `gaato/sdk-runtime` 0.3.1.** An error
+  keeps at most 1 MiB of its body, and a server-sent `x-ratelimit-reset` or
+  `Retry-After` can hold a rate-limit bucket for at most an hour. The README
+  now sets up the transport with a 64 MiB `max_body_bytes` and explains how
+  to fetch large downloads.
+
 ## [0.13.0] - 2026-10-18
 
 ### Changed

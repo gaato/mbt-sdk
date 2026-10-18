@@ -7,6 +7,8 @@ never does. Every breaking change is listed with a migration note.
 
 ## [Unreleased]
 
+## [0.2.1] - 2026-10-18
+
 ### Fixed
 
 - **`max_event_bytes` now counts an SSE event's `event` and `id` lines, not

@@ -8,6 +8,8 @@ note.
 
 ## [Unreleased]
 
+## [0.3.1] - 2026-10-18
+
 ### Fixed
 
 - **An error keeps at most 1 MiB of the response body.** `classify`, and so

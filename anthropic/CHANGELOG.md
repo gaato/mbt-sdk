@@ -15,6 +15,15 @@ are optional unless the field is required, and keep a wildcard arm.
 
 ## [Unreleased]
 
+## [0.8.1] - 2026-10-18
+
+### Changed
+
+- **Depends on `gaato/http` 0.2.1 and `gaato/sdk-runtime` 0.3.1.** Streams
+  now count an event's `event` and `id` lines toward its 16 MiB bound and
+  are parsed 64 KiB at a time, an error keeps at most 1 MiB of its body, and
+  a server cannot hold a rate-limit bucket for more than an hour.
+
 ## [0.8.0] - 2026-10-18
 
 ### Changed
