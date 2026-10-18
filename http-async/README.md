@@ -4,6 +4,8 @@
 
 `gaato/http-async/mock` has `VirtualClock`, a `Clock` for async tests whose time moves only when the test advances it: sleeps fire in deadline order, and `settle` lets the tasks under test run until they go idle between timers, so timing-dependent code runs the same way on every run and target.
 
+`with_timeout_opt(clock, milliseconds, f)` is `@async.with_timeout_opt` with the deadline taken from a `Clock`, so code that accepts a clock can have its timeouts driven by `VirtualClock` too.
+
 The Wasm backend uses MoonBit host APIs for sockets and TLS; it is not a
 browser or generic WASI transport. When using a `moonrun --policy` file, allow
 the destination host and port in `net.connect`. Loopback tests also need local
