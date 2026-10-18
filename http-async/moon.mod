@@ -4,7 +4,7 @@
 
 name = "gaato/http-async"
 
-version = "0.1.5"
+version = "0.1.6"
 
 license = "Apache-2.0"
 
