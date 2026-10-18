@@ -117,6 +117,15 @@ test "IPv6 literals are validated, lower-cased and bracketed again" {
   assert_eq(url.host, Some("2001:db8::1"))
   assert_eq(url.port, Some(8080))
   assert_eq(url.to_string(), "http://[2001:db8::1]:8080/p")
+  // RFC 5952's canonical form, so equal addresses serialise and compare alike.
+  let long = @http.Url::parse("http://[2001:0DB8:0:0:0:0:0:0001]:80/p")
+  assert_eq(long.to_string(), "http://[2001:db8::1]/p")
+  assert_true(long.same_origin(@http.Url::parse("http://[2001:db8::1]/")))
+  assert_false(long.same_origin(@http.Url::parse("http://[2001:db8::2]/")))
+  assert_eq(
+    @http.Url::parse("http://[0:0:0:0:0:ffff:192.0.2.1]/").host,
+    Some("::ffff:192.0.2.1"),
+  )
   for
     literal in [
       "::", "::1", "1:2:3:4:5:6:7:8", "1::8", "::ffff:192.0.2.1", "1:2:3:4:5:6:1.2.3.4",
@@ -339,7 +348,10 @@ fn random_reference(rand : @random.Rand) -> String {
   let scheme = pick(rand, ["http:", "HTTPS:", "ws:", "foo:", "g:"])
   let authority = "//" +
     pick(rand, ["", "u@", "u:p@", "a b@"]) +
-    pick(rand, ["a", "Example.COM", "[::1]", "[2001:DB8::A]", "127.0.0.1", ""]) +
+    pick(rand, [
+      "a", "Example.COM", "[::1]", "[2001:DB8::A]", "[2001:0db8:0:0:1:0:0:1]", "[0:0:0:0:0:FFFF:1.2.3.4]",
+      "127.0.0.1", "",
+    ]) +
     pick(rand, ["", ":", ":80", ":443", ":8080"])
   let suffix = pick(rand, ["", "?", "?y", "?a=1&b=x y", "?./..", "?'"]) +
     pick(rand, ["", "#", "#s", "#s/../x", "#é"])

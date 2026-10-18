@@ -12,7 +12,9 @@ never does. Every breaking change is listed with a migration note.
 - **`Url`: RFC 3986 URI references with parsing, normalisation and
   resolution.** `Url::parse` splits a reference into scheme, userinfo, host
   (IPv6 literals included), port, path, query and fragment, lower-cases the
-  scheme and host, drops default ports and percent-encodes by the WHATWG
+  scheme and host, writes IPv6 addresses in RFC 5952's canonical form (so
+  equal addresses serialise alike and `same_origin` matches them), drops
+  default ports and percent-encodes by the WHATWG
   URL Standard's sets; `Url::resolve` implements RFC 3986 §5.2 and passes all
   42 examples of §5.4. `same_origin`, `port_or_default`, `query_params`,
   `append_query_params` and `merge_query_params` cover what HTTP clients

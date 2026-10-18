@@ -32,7 +32,8 @@ pub fn append_query(url : String, name : String, value : String) -> String {
 ///|
 /// A URI reference (RFC 3986 §4.1), held normalised and percent-encoded.
 ///
-/// `Url::parse` lower-cases the scheme and host, drops a scheme's default
+/// `Url::parse` lower-cases the scheme and host, writes an IPv6 address in
+/// RFC 5952's canonical form, drops a scheme's default
 /// port (`http` 80, `https` 443, `ws` 80, `wss` 443, `ftp` 21), percent-encodes
 /// what the WHATWG URL Standard's sets encode (non-ASCII as UTF-8), and removes
 /// dot segments from the path of a reference with a scheme. Existing escapes
@@ -541,62 +542,13 @@ fn reg_name(chars : ArrayView[Char]) -> String raise UrlError {
 }
 
 ///|
-/// An IPv6 address between brackets, lower-cased (RFC 3986 §3.2.2). Zone
-/// identifiers and IPvFuture are refused, as browsers refuse them.
+/// An IPv6 address between brackets, in RFC 5952's canonical text form.
+/// Zone identifiers and IPvFuture are refused, as browsers refuse them.
 fn ip_literal(chars : ArrayView[Char]) -> String raise UrlError {
-  let text = String::from_array(chars).to_lower()
-  guard ipv6_address(text) else { raise Invalid("IP literal is not IPv6") }
+  guard ipv6_canonical(String::from_array(chars)) is Some(text) else {
+    raise Invalid("IP literal is not IPv6")
+  }
   text
-}
-
-///|
-/// Whether `text` matches RFC 3986's `IPv6address`.
-fn ipv6_address(text : String) -> Bool {
-  let halves = text.split("::").map(half => half.to_owned()).to_array()
-  guard halves.length() <= 2 else { return false }
-  let mut groups = 0
-  for h, half in halves {
-    if half == "" {
-      continue
-    }
-    let parts = half.split(":").to_array()
-    for p, part in parts {
-      let last = h == halves.length() - 1 && p == parts.length() - 1
-      if last && part.contains(".") {
-        guard ipv4_address(part) else { return false }
-        groups += 2
-      } else {
-        guard part.length() >= 1 &&
-          part.length() <= 4 &&
-          part.iter().all(c => c.is_ascii_hexdigit()) else {
-          return false
-        }
-        groups += 1
-      }
-    }
-  }
-  if halves.length() == 2 {
-    groups <= 7
-  } else {
-    groups == 8
-  }
-}
-
-///|
-/// Whether `text` is four decimal octets without leading zeros.
-fn ipv4_address(text : StringView) -> Bool {
-  let octets = text.split(".").to_array()
-  octets.length() == 4 &&
-  octets
-  .iter()
-  .all(octet => {
-    octet.length() >= 1 &&
-    octet.length() <= 3 &&
-    octet.iter().all(c => c.is_ascii_digit()) &&
-    !(octet.length() > 1 && octet.has_prefix("0")) &&
-    octet.iter().fold(init=0, (value, c) => value * 10 + c.to_int() - '0') <=
-    255
-  })
 }
 
 ///|
