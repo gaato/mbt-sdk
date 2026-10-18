@@ -8,6 +8,17 @@ note.
 
 ## [Unreleased]
 
+### Fixed
+
+- **A bucket wait no longer spins when the reset is far away.** The wait
+  until a bucket reset subtracted the clock from the reset time without an
+  overflow guard, so a saturated reset with a negative clock wrapped to a
+  zero-length sleep and busy-looped.
+- **A `GlobalWindow` that cannot limit is ignored.** A non-positive `limit`
+  made every acquisition sleep forever, and a non-positive `window_ms`
+  reset the window on every admission. `WindowLimiter::new` now drops such
+  a window, so it imposes no global limit, as documented on the type.
+
 ## [0.2.3] - 2026-10-17
 
 ### Fixed

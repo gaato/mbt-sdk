@@ -8,6 +8,24 @@ note.
 
 ## [Unreleased]
 
+### Added
+
+- **`with_timeout_opt(clock, milliseconds, f)` runs `f` under a deadline on
+  any `Clock`.** It is `@async.with_timeout_opt` with the clock as an
+  argument, so code that takes a clock can be driven by `VirtualClock` in
+  tests.
+
+### Fixed
+
+- **Expired keep-alive connections are closed for every origin.** A parked
+  connection that outlived `idle_max_ms` was closed only when the same
+  origin was requested again, so an origin never requested again kept its
+  socket until `close()`; expired connections also counted toward
+  `max_idle_per_origin`, which could close a fresh connection while stale
+  ones stayed parked. Every request now closes the expired connections of
+  all origins first. No timer runs, so an idle transport still holds them
+  until its next request or `close()`.
+
 ## [0.1.6] - 2026-10-18
 
 ### Added
