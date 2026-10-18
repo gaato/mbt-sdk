@@ -206,15 +206,13 @@ fn AsyncTransport::release(self : AsyncTransport, opened : Opened) -> Unit {
 }
 
 ///|
-async fn AsyncTransport::open_request(
-  self : AsyncTransport,
-  request : @http.Request,
-) -> Opened raise @http.HttpError {
-  let meth = request_method(request.http_method)
-  let (origin, path) = split_url(request.url)
-  let headers : @ahttp.Headers = Map([])
+/// The request headers as sent, with `User-Agent` pulled out because
+/// connections are dialed and reused per user agent. `Content-Length` is
+/// dropped since async frames the body itself; repeated names are comma-joined.
+fn wire_headers(headers : @http.Headers) -> (@ahttp.Headers, String?) {
+  let wire : @ahttp.Headers = Map([])
   let mut user_agent : String? = None
-  for (name, value) in request.headers.iter() {
+  for (name, value) in headers.iter() {
     if name == "content-length" {
       continue
     }
@@ -228,11 +226,22 @@ async fn AsyncTransport::open_request(
       continue
     }
     let key = @ahttp.CaseInsensitiveString(name)
-    headers[key] = match headers.get(key) {
+    wire[key] = match wire.get(key) {
       None => value
       Some(previous) => previous + ", " + value
     }
   }
+  (wire, user_agent)
+}
+
+///|
+async fn AsyncTransport::open_request(
+  self : AsyncTransport,
+  request : @http.Request,
+) -> Opened raise @http.HttpError {
+  let meth = request_method(request.http_method)
+  let (origin, path) = split_url(request.url)
+  let (headers, user_agent) = wire_headers(request.headers)
   let mut fresh = false
   for ;; {
     let (client, reused) = self.checkout(origin, user_agent, fresh~)

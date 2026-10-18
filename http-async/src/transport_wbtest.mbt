@@ -31,3 +31,178 @@ async test "read_bounded stops at the chunk that crosses the limit" {
     assert_eq(bounded_label(chunks, max_bytes), expected)
   }
 }
+
+///|
+/// `name: value` pairs in iteration order, joined by `"; "`.
+fn pairs_label(pairs : Iter[(String, String)]) -> String {
+  pairs.map(pair => "\{pair.0}: \{pair.1}").collect().join("; ")
+}
+
+///|
+fn wire_label(headers : Array[(String, String)]) -> String {
+  let (wire, user_agent) = wire_headers(@http.Headers::from_array(headers))
+  let sent = pairs_label(wire.iter().map(pair => (pair.0.0, pair.1)))
+  let user_agent = match user_agent {
+    None => "no user agent"
+    Some(value) => "user agent \{value}"
+  }
+  "[\{sent}] \{user_agent}"
+}
+
+///|
+test "wire_headers joins duplicates and pulls out the user agent" {
+  let rows : Array[(Array[(String, String)], String)] = [
+    ([], "[] no user agent"),
+    ([("accept", "*/*")], "[accept: */*] no user agent"),
+    ([("user-agent", "a/1")], "[] user agent a/1"),
+    (
+      [("user-agent", "a/1"), ("accept", "*/*"), ("User-Agent", "b/2")],
+      "[accept: */*] user agent a/1, b/2",
+    ),
+    ([("content-length", "3"), ("x", "y")], "[x: y] no user agent"),
+    ([("Content-Length", "3")], "[] no user agent"),
+    (
+      [("accept", "a"), ("x", "y"), ("accept", "b")],
+      "[accept: a, b; x: y] no user agent",
+    ),
+    (
+      [("X-Trace", "1"), ("x-trace", "2"), ("X-TRACE", "3")],
+      "[x-trace: 1, 2, 3] no user agent",
+    ),
+  ]
+  for row in rows {
+    let (headers, expected) = row
+    assert_eq(wire_label(headers), expected, msg=pairs_label(headers.iter()))
+  }
+}
+
+///|
+fn split_url_label(url : String) -> String {
+  try split_url(url) catch {
+    @http.HttpError::Protocol(message) => "error: \{message}"
+    error => "unexpected \{Repr(error)}"
+  } noraise {
+    (origin, path) => "\{origin} \{path}"
+  }
+}
+
+///|
+test "split_url separates the origin from the request target" {
+  let rows : Array[(String, String)] = [
+    ("http://example.com", "http://example.com /"),
+    ("https://example.com/", "https://example.com /"),
+    ("HTTPS://Example.com/a", "https://Example.com /a"),
+    ("http://example.com:8080/a/b", "http://example.com:8080 /a/b"),
+    ("http://example.com?q=1", "http://example.com /?q=1"),
+    ("http://example.com/a?q=/b", "http://example.com /a?q=/b"),
+    ("http://example.com/a#frag", "http://example.com /a"),
+    ("http://example.com/a?q=1#f?g", "http://example.com /a?q=1"),
+    ("http://example.com#/a", "http://example.com /"),
+    ("http://user@example.com/", "http://user@example.com /"),
+    ("example.com/a", "error: expected an absolute HTTP URL"),
+    ("ftp://example.com/", "error: unsupported URL scheme: ftp"),
+    ("ws://example.com/", "error: unsupported URL scheme: ws"),
+    ("://example.com/", "error: unsupported URL scheme: "),
+    ("http:///a", "error: empty URL authority"),
+    ("http://?q=1", "error: empty URL authority"),
+    ("http://#a", "error: empty URL authority"),
+  ]
+  for row in rows {
+    let (url, expected) = row
+    assert_eq(split_url_label(url), expected, msg=url)
+  }
+}
+
+///|
+test "request_method accepts the standard methods in any case" {
+  let rows : Array[(String, @ahttp.RequestMethod?)] = [
+    ("GET", Some(Get)),
+    ("get", Some(Get)),
+    ("Head", Some(Head)),
+    ("POST", Some(Post)),
+    ("put", Some(Put)),
+    ("DELETE", Some(Delete)),
+    ("CONNECT", Some(Connect)),
+    ("options", Some(Options)),
+    ("TRACE", Some(Trace)),
+    ("PATCH", Some(Patch)),
+    ("", None),
+    ("PURGE", None),
+    (" GET", None),
+  ]
+  for row in rows {
+    let (meth, expected) = row
+    let actual = try request_method(meth) catch {
+      @http.HttpError::Protocol(message) => {
+        assert_eq(message, "unknown HTTP method: " + meth, msg=meth)
+        None
+      }
+      error => fail("unexpected \{Repr(error)}")
+    } noraise {
+      meth => Some(meth)
+    }
+    assert_eq(actual, expected, msg=meth)
+  }
+}
+
+///|
+fn response_head_label(
+  code : Int32,
+  headers : Array[(String, String)],
+  cookies : Array[@ahttp.Cookie],
+) -> String {
+  let head = response_head({
+    code,
+    reason: "",
+    headers: Map(
+      headers.map(pair => (@ahttp.CaseInsensitiveString(pair.0), pair.1)),
+    ),
+    cookies,
+  })
+  "\{head.status} [\{pairs_label(head.headers.iter())}]"
+}
+
+///|
+test "response_head keeps headers and serializes each cookie" {
+  let rows : Array[
+    (Int32, Array[(String, String)], Array[@ahttp.Cookie], String),
+  ] = [
+    (204, [], [], "204 []"),
+    (
+      200,
+      [("Content-Type", "text/plain"), ("X-A", "1")],
+      [],
+      "200 [content-type: text/plain; x-a: 1]",
+    ),
+    (200, [], [@ahttp.Cookie("a", "1")], "200 [set-cookie: a=1]"),
+    (200, [], [@ahttp.Cookie("a", "")], "200 [set-cookie: a=]"),
+    (
+      302,
+      [("Location", "/")],
+      [
+        @ahttp.Cookie(
+          "s",
+          "v",
+          path="/",
+          expires_raw="Wed, 21 Oct 2026 07:28:00 GMT",
+          max_age=60,
+          domain="example.com",
+          secure=true,
+          http_only=true,
+          extensions=["SameSite=Lax", "Partitioned"],
+        ),
+      ],
+      "302 [location: /; set-cookie: s=v; Path=/; Expires=Wed, 21 Oct 2026 07:28:00 GMT; Max-Age=60; Domain=example.com; Secure; HttpOnly; SameSite=Lax; Partitioned]",
+    ),
+    (
+      200,
+      [],
+      [@ahttp.Cookie("a", "1", secure=true), @ahttp.Cookie("b", "2", max_age=0)],
+      "200 [set-cookie: a=1; Secure; set-cookie: b=2; Max-Age=0]",
+    ),
+  ]
+  for row in rows {
+    let (code, headers, cookies, expected) = row
+    assert_eq(response_head_label(code, headers, cookies), expected)
+  }
+}
