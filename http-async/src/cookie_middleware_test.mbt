@@ -27,25 +27,6 @@ fn sent_cookies(fake : @mock.FakeTransport) -> Array[String] {
 }
 
 ///|
-/// A stand-in for `@http.redirects`: it follows absolute `Location`s and
-/// sends each hop through the inner steps with the caller's headers, as the
-/// redirect step does for same-origin hops.
-fn follow_hops() -> @http.Middleware {
-  (request, next) => {
-    let mut request = request
-    for hops = 0; hops < 5; hops = hops + 1 {
-      let response = next(request)
-      guard response.status / 100 == 3 &&
-        response.headers.get("location") is Some(location) else {
-        return response
-      }
-      request = { ..request, url: location, }
-    }
-    raise @http.HttpError::Protocol("too many hops")
-  }
-}
-
-///|
 async test "cookies sends the jar's cookies and stores what responses set" {
   let jar = @cookie.CookieJar::new(@mock.FakeClock::new())
   let fake = @mock.FakeTransport::new()
@@ -130,7 +111,7 @@ async test "inside a redirect step every hop stores and sends its own cookies" {
   fake.expect("GET", "https://a.example/final", with_cookies(None, []))
   let response = @http.send_with(
     fake,
-    [follow_hops(), @cookie.cookies(jar)],
+    [@http.redirects(), @cookie.cookies(jar)],
     @http.Request::get("https://a.example/start"),
   )
   assert_eq(response.status, 200)
@@ -154,7 +135,7 @@ async test "outside a redirect step intermediate cookies are lost" {
   fake.expect("GET", "https://a.example/next", with_cookies(None, []))
   let _ = @http.send_with(
     fake,
-    [@cookie.cookies(jar), follow_hops()],
+    [@cookie.cookies(jar), @http.redirects()],
     @http.Request::get("https://a.example/start"),
   )
   assert_eq(sent_cookies(fake), [
@@ -186,4 +167,37 @@ async test "a streaming caller attaches before send_stream and stores the head" 
   body.close()
   assert_eq(sent_cookies(fake), ["https://a.example/events [sid=1]"])
   assert_eq(jar.header_for("https://a.example/"), Some("sid=1; seen=1"))
+}
+
+///|
+async test "a caller's Cookie header stops at an origin change and the jar takes over" {
+  let jar = @cookie.CookieJar::new(@mock.FakeClock::new())
+  jar.store(
+    @http.Headers::from_array([("Set-Cookie", "bb=1")]),
+    "https://b.example/",
+  )
+  let fake = @mock.FakeTransport::new()
+  fake.expect(
+    "GET",
+    "https://a.example/",
+    with_cookies(Some("https://a.example/same"), []),
+  )
+  fake.expect(
+    "GET",
+    "https://a.example/same",
+    with_cookies(Some("https://b.example/"), []),
+  )
+  fake.expect("GET", "https://b.example/", with_cookies(None, []))
+  let request = @http.Request::get("https://a.example/").header(
+    "Cookie", "mine=9",
+  )
+  let _ = @http.send_with(
+    fake,
+    [@http.redirects(), @cookie.cookies(jar)],
+    request,
+  )
+  assert_eq(sent_cookies(fake), [
+    "https://a.example/ [mine=9]", "https://a.example/same [mine=9]", "https://b.example/ [bb=1]",
+  ])
+  fake.assert_complete()
 }
