@@ -22,6 +22,9 @@ pub fn LineFramer::new(max_line? : Int32) -> LineFramer {
 ///|
 /// Feeds an arbitrary byte chunk and returns complete nonblank lines in order.
 /// A trailing carriage return is removed from each complete line.
+///
+/// `max_line` bounds a line's content: the carriage return of a CRLF
+/// terminator is exempt, while any other carriage return counts.
 pub fn LineFramer::feed(
   self : LineFramer,
   bytes : Bytes,
@@ -38,7 +41,7 @@ pub fn LineFramer::feed(
       }
     } else {
       self.line.push(byte)
-      if self.max_line is Some(limit) && self.line.length() > limit {
+      if self.max_line is Some(limit) && overlong(self.line, limit) {
         self.finished = true
         self.line.clear()
         raise LineTooLong(limit)
@@ -50,6 +53,8 @@ pub fn LineFramer::feed(
 
 ///|
 /// Finishes the stream and returns a final nonblank unterminated line once.
+/// A final line over `max_line` is dropped, because this cannot raise; that
+/// happens only when its last byte is a carriage return no newline followed.
 pub fn LineFramer::finish(self : LineFramer) -> Bytes? {
   if self.finished {
     return None
@@ -57,11 +62,20 @@ pub fn LineFramer::finish(self : LineFramer) -> Bytes? {
   self.finished = true
   let line = Bytes::from_array(self.line.copy())
   self.line.clear()
-  if blank(line) {
+  if blank(line) || (self.max_line is Some(limit) && line.length() > limit) {
     None
   } else {
     Some(line)
   }
+}
+
+///|
+/// Reports whether a partial line holds more than `limit` content bytes. A
+/// final carriage return gets one byte of slack: it may yet be the start of a
+/// CRLF terminator, which `take_line` strips.
+fn overlong(line : Array[Byte], limit : Int32) -> Bool {
+  let length = line.length()
+  length > limit && !(length - 1 == limit && line[length - 1] == b'\r')
 }
 
 ///|
