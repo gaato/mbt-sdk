@@ -78,7 +78,10 @@ pub impl RateLimiter for NoLimiter with fn release(
 }
 
 ///|
-/// An account-wide admission window counted across buckets.
+/// An account-wide admission window counted across buckets: at most `limit`
+/// admissions in each `window_ms`. Both must be positive; a window with a
+/// non-positive limit or length imposes no limit, since it would otherwise
+/// block forever or reset on every admission.
 pub(all) struct GlobalWindow {
   limit : Int32
   window_ms : Int32
@@ -135,7 +138,8 @@ pub struct WindowLimiter {
 /// `gate` creates a bucket's gate, held from `acquire` until the paired
 /// release; a bucket nobody holds or waits on forgets its gate and gets a new
 /// one on its next acquire.
-/// `global` limits non-exempt admissions across buckets (positive values).
+/// `global` limits non-exempt admissions across buckets; one with a
+/// non-positive limit or length is ignored.
 /// `global_block` identifies account-wide 429 responses.
 /// `default_retry_after_ms` supplies a delay when a 429 has no Retry-After.
 /// Negative fallback delays are treated as zero.
@@ -155,7 +159,10 @@ pub fn WindowLimiter::new(
     states_swept_at_ms: clock.now_unix_ms(),
     gate,
     gates: Map([]),
-    global,
+    global: match global {
+      Some(window) if window.limit > 0 && window.window_ms > 0 => Some(window)
+      _ => None
+    },
     global_block,
     default_retry_after_ms,
     global_window_start: None,
@@ -167,47 +174,23 @@ pub fn WindowLimiter::new(
 ///|
 async fn WindowLimiter::wait_for_global(self : WindowLimiter) -> Unit {
   for ;; {
-    let now = self.clock.now_unix_ms()
-    if self.global_blocked_until is Some(until) && now < until {
-      self.sleep_until(until, now)
-      continue
+    let step = global_step(
+      self.clock.now_unix_ms(),
+      blocked_until=self.global_blocked_until,
+      window=self.global,
+      start=self.global_window_start,
+      count=self.global_count,
+    )
+    match step {
+      Pass => return
+      Admit(start~, count~) => {
+        self.global_window_start = Some(start)
+        self.global_count = count
+        return
+      }
+      Wait(delay) => self.clock.sleep(delay)
     }
-    guard self.global is Some(window) else { return }
-    let start = match self.global_window_start {
-      Some(start) => start
-      None => now
-    }
-    let end = saturating_add_ms(start, window.window_ms)
-    if self.global_window_start is None || now >= end {
-      self.global_window_start = Some(now)
-      self.global_count = 0
-    }
-    if self.global_count < window.limit {
-      self.global_count += 1
-      return
-    }
-    self.sleep_until(end, now)
   }
-}
-
-///|
-async fn WindowLimiter::sleep_until(
-  self : WindowLimiter,
-  until : Int64,
-  now : Int64,
-) -> Unit {
-  let delta = if now < 0L && until > 9223372036854775807L + now {
-    9223372036854775807L
-  } else {
-    until - now
-  }
-  self.clock.sleep(
-    if delta > 2147483647L {
-      2147483647
-    } else {
-      delta.to_int()
-    },
-  )
 }
 
 ///|
@@ -312,19 +295,18 @@ pub impl RateLimiter for WindowLimiter with fn acquire(
     holding = true
   }
   for ;; {
-    guard self.states.get(bucket) is Some(state) else { return }
-    let now = self.clock.now_unix_ms()
-    if now >= state.reset_at_unix_ms {
-      self.states.remove(bucket)
-      return
+    match bucket_step(self.states.get(bucket), self.clock.now_unix_ms()) {
+      Admit => return
+      Expired => {
+        self.states.remove(bucket)
+        return
+      }
+      Consume(state) => {
+        self.states[bucket] = state
+        return
+      }
+      Wait(delay) => self.clock.sleep(delay)
     }
-    if state.remaining > 0 {
-      self.states[bucket] = { ..state, remaining: state.remaining - 1, }
-      return
-    }
-    let delta = state.reset_at_unix_ms - now
-    let delay = if delta > 2147483647L { 2147483647 } else { delta.to_int() }
-    self.clock.sleep(delay)
   }
 }
 
@@ -343,26 +325,23 @@ pub impl RateLimiter for WindowLimiter with fn release(
   if status == 0 {
     return
   }
-  if (self.parse)(headers, now_unix_ms) is Some(state) {
+  let effect = release_effect(
+    status,
+    parsed=(self.parse)(headers, now_unix_ms),
+    delay_ms=match retry_after_ms(headers, now_unix_ms~) {
+      Some(ms) => Some(ms)
+      None => self.default_retry_after_ms
+    },
+    global=status == 429 &&
+      self.global_block is Some(is_global) &&
+      is_global(headers),
+    blocked_until=self.global_blocked_until,
+    now=now_unix_ms,
+  )
+  if effect.record is Some(state) {
     self.states[bucket] = state
   }
-  let delay = match retry_after_ms(headers, now_unix_ms~) {
-    Some(ms) => Some(ms)
-    None => self.default_retry_after_ms
-  }
-  if status == 429 && delay is Some(ms) {
-    let until = saturating_add_ms(now_unix_ms, ms.max(0))
-    if self.global_block is Some(is_global) && is_global(headers) {
-      self.global_blocked_until = Some(
-        match self.global_blocked_until {
-          Some(previous) => previous.max(until)
-          None => until
-        },
-      )
-    } else {
-      self.states[bucket] = { remaining: 0, reset_at_unix_ms: until, }
-    }
-  }
+  self.global_blocked_until = effect.blocked_until
 }
 
 ///|
