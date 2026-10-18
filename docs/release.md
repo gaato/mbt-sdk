@@ -21,7 +21,7 @@ scripts/coverage_report.sh               # ledger OK (CI runs it too; see TEST_C
 scripts/release.sh publish --dry-run     # what the job will do
 ```
 
-A structure that grows with network or peer input needs a row in [RESOURCE_BOUNDS.md](../RESOURCE_BOUNDS.md) before it ships; check that the ledger still matches the code being released.
+A structure that grows with network or peer input needs a row in [RESOURCE_BOUNDS.md](../RESOURCE_BOUNDS.md) before it ships; check that the ledger still matches the code being released. An enforced limit's row names the tests that check its bound, and `scripts/bounds_check.sh` (run by `gates.sh`) fails when a row names none or names a test that does not exist.
 
 Commit, push `main`, and watch the `Release` run. Public API changes show up as diffs in `pkg.generated.mbti`; use them to decide the bump. While versions are `0.x`, a breaking change bumps the minor version.
 
