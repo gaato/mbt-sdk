@@ -102,7 +102,7 @@ Pending refactor (in flight; re-measure after the parallel changes merge):
 | File | Budget | Reason |
 | --- | --- | --- |
 | http-async/src/pool.mbt | 1 | Closing the real connections `IdlePool` hands back as expired needs real elapsed time; the `IdlePool` tables cover which ones expire. |
-| sdk-runtime/src/rate_limit.mbt | 7 | Header-window parsing: a remaining count without either reset header (3), an all-whitespace count (1), and the Int64 saturation arms of `decimal_seconds_ms` (3). |
+| sdk-runtime/src/rate_limit.mbt | 4 | Header-window parsing: a remaining count without either reset header (2), an all-whitespace count (1), and a reset value that is not a decimal number (1). |
 | jsonrpc-async/src/connection.mbt | 5 | pending refactor (in flight): `send` after the writer closed (both checks), a non-positive `timeout_ms`, the catch-all of `call`, and a notification-queue error other than closure. |
 | jsonrpc-async/src/dispatch.mbt | 1 | The swallowed failure of sending an internal-error reply after a handler raised: the writer must fail between the handler and the reply. |
 
