@@ -67,6 +67,10 @@ fn[X] Connection::dispatch(
         self.send(reply, reply=true)
       })
     Notification(name~, params~) =>
-      ignore(self.notifications.try_put((name, params)))
+      if !self.notifications.try_put((name, params)) {
+        raise RpcFailure::Transport(
+          "JSON-RPC notification backlog exceeds \{self.max_notifications} notifications",
+        )
+      }
   }
 }

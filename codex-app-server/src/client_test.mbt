@@ -403,3 +403,52 @@ async test "max_line reaches the connection and an overlong reply fails the hand
     assert_eq(message, "JSON-RPC line exceeds 64 bytes")
   })
 }
+
+///|
+async test "max_notifications reaches the connection and a stalled event handler fails it" {
+  @async.with_timeout(5000, () => {
+    let mut message = ""
+    try
+      @async.with_task_group(group => {
+        let (client_read, client_write, server_read, server_write) = pipes(
+          group,
+        )
+        let server = @rpc.Connection::start(
+          group,
+          server_read,
+          server_write,
+          envelope=Bare,
+          on_request=(_, _) => Ok(initialize_result()),
+        )
+        let started : @aqueue.Queue[Unit] = @aqueue.Queue(kind=Unbounded)
+        let release : @aqueue.Queue[Unit] = @aqueue.Queue(kind=Unbounded)
+        ignore(
+          @codex.connect(
+            group,
+            client_read,
+            client_write,
+            initialize(),
+            close_writer=() => client_write.close(),
+            on_event=_ => {
+              started.put(())
+              release.get()
+            },
+            max_notifications=1,
+          ),
+        )
+        server.notify("future/event")
+        started.get()
+        server.notify("future/event")
+        server.notify("future/event")
+        // Nothing is ever put: only the failing group ends this wait.
+        release.get()
+      })
+    catch {
+      @rpc.RpcFailure::Transport(text) => message = text
+      error => raise error
+    } noraise {
+      _ => fail("expected failed group")
+    }
+    assert_eq(message, "JSON-RPC notification backlog exceeds 1 notifications")
+  })
+}

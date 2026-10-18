@@ -37,6 +37,7 @@ pub struct Connection {
   priv mutex : @async.Mutex
   priv pending : Map[@jsonrpc.RequestId, @aqueue.Queue[Json]]
   priv notifications : @aqueue.Queue[(String, Json?)]
+  priv max_notifications : Int32
   priv mut next_id : Int64
   priv mut closed : Bool
   priv mut writer_closed : Bool
@@ -47,6 +48,11 @@ pub struct Connection {
 /// The default `max_line`. Generous because one line is one message: a Codex
 /// notification can carry a whole turn's diff, and a response a thread's history.
 let default_max_line : Int32 = 64 * 1024 * 1024
+
+///|
+/// The default `max_notifications`. Codex emits up to 10,000 output deltas for
+/// one command, and its own TUI buffers 32,768 events per thread.
+let default_max_notifications : Int32 = 32_768
 
 ///|
 /// The failure pending calls get when reading ends with `error`: a transport
@@ -64,6 +70,11 @@ fn read_failure(error : Error) -> RpcFailure {
 ///
 /// `max_line` bounds one received line in bytes, 64 MiB by default. A longer
 /// line fails the connection: pending calls and the group get `Transport`.
+///
+/// `max_notifications` bounds the notifications received but not yet passed
+/// to `on_notification`, 32,768 by default. A notification past it fails the
+/// connection the same way. Reading never waits for the handler instead: a
+/// handler awaiting a call's response needs the reader to deliver it.
 pub fn[X] Connection::start(
   group : @async.TaskGroup[X],
   reader : &@io.Reader,
@@ -71,6 +82,7 @@ pub fn[X] Connection::start(
   close_writer~ : () -> Unit = () => (),
   envelope~ : @jsonrpc.Envelope = Strict,
   max_line~ : Int32 = default_max_line,
+  max_notifications~ : Int32 = default_max_notifications,
   on_request~ : RequestHandler = (name, _) => {
     Err(@jsonrpc.RpcError::method_not_found(name))
   },
@@ -82,7 +94,8 @@ pub fn[X] Connection::start(
     envelope,
     mutex: @async.Mutex(),
     pending: {},
-    notifications: @aqueue.Queue(kind=Unbounded),
+    notifications: @aqueue.Queue(kind=Blocking(max_notifications)),
+    max_notifications,
     next_id: 1L,
     closed: false,
     writer_closed: false,

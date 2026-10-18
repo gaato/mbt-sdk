@@ -20,8 +20,9 @@ pub type EventHandler = async (@protocol.Event) -> Unit
 /// Completes the initialize/initialized handshake before returning a client.
 /// The caller owns reader lifetime; close_writer must close the output stream.
 /// Handshake failure closes the connection, including on cancellation.
-/// `max_line` bounds one received line in bytes; omitted, the
-/// `gaato/jsonrpc-async` default (64 MiB) applies.
+/// `max_line` bounds one received line in bytes and `max_notifications` the
+/// events waiting for `on_event`; omitted, the `gaato/jsonrpc-async` defaults
+/// (64 MiB and 32,768) apply. Exceeding either fails the connection.
 pub async fn[X] connect(
   group : @async.TaskGroup[X],
   reader : &@io.Reader,
@@ -32,6 +33,7 @@ pub async fn[X] connect(
   on_event~ : EventHandler = _ => (),
   timeout_ms~ : Int32 = 10000,
   max_line? : Int32,
+  max_notifications? : Int32,
 ) -> Client {
   let connection = @rpc.Connection::start(
     group,
@@ -40,6 +42,7 @@ pub async fn[X] connect(
     close_writer~,
     envelope=Bare,
     max_line?,
+    max_notifications?,
     on_request=(name, params) => handlers.dispatch(name, params),
     on_notification=(name, params) => {
       on_event(@protocol.Event::decode(name, params))

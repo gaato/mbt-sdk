@@ -82,8 +82,10 @@ moon run --target native codex-app-server/src/examples/initialize -- $codex_smok
   in a single line. `spawn` and `connect` take `max_line` to change it. A longer
   line fails the connection with `RpcFailure::Transport`.
 - Notifications run in wire order and requests dispatch concurrently. A handler
-  can call back into the server. The inherited notification queue is unbounded;
-  event consumers should hand off expensive work promptly.
+  can call back into the server. At most 32,768 events wait for `on_event` by
+  default (`max_notifications` on `spawn` and `connect`); one more fails the
+  connection with `RpcFailure::Transport`, because reading cannot pause for a
+  handler that may itself await a reply. Hand off expensive work promptly.
 - `Client::call` raises `RpcFailure` for remote errors, transport closure, or
   timeout. Bad response JSON raises `ClientError::InvalidResult` with the method
   name. Reinitialization raises `AlreadyInitialized` locally.

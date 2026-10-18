@@ -179,3 +179,55 @@ async test "a response in the same chunk as an overlong line is dispatched first
     assert_eq(queue.try_get(), Some(Json::boolean(true)))
   })
 }
+
+///|
+async test "a notification backlog over max_notifications fails the connection" {
+  @async.with_timeout(5000, () => {
+    let mut connection : Connection? = None
+    let mut message = ""
+    try
+      @async.with_task_group(group => {
+        let (read, peer_write) = @io.pipe()
+        let (peer_read, write) = @io.pipe()
+        group.add_defer(() => {
+          read.close()
+          peer_write.close()
+          peer_read.close()
+          write.close()
+        })
+        let started : @aqueue.Queue[Unit] = @aqueue.Queue(kind=Unbounded)
+        let release : @aqueue.Queue[Unit] = @aqueue.Queue(kind=Unbounded)
+        let rpc = Connection::start(group, read, write, max_notifications=2, on_notification=(
+          _,
+          _,
+        ) => {
+          started.put(())
+          release.get()
+        })
+        connection = Some(rpc)
+        rpc.pending[Number(1L)] = @aqueue.Queue(kind=Unbounded)
+        let tick = @jsonrpc.Message::Notification(name="tick", params=None).encode(
+          envelope=Strict,
+        )
+        peer_write.write(tick)
+        // The handler now holds the first; two more fill the backlog exactly.
+        started.get()
+        peer_write.write(tick)
+        peer_write.write(tick)
+        assert_false(rpc.is_closed())
+        peer_write.write(tick)
+        // Nothing is ever put: only the failing group ends this wait.
+        let never : @aqueue.Queue[Unit] = @aqueue.Queue(kind=Unbounded)
+        never.get()
+      })
+    catch {
+      RpcFailure::Transport(text) => message = text
+      error => raise error
+    } noraise {
+      _ => fail("expected failed group")
+    }
+    assert_eq(message, "JSON-RPC notification backlog exceeds 2 notifications")
+    assert_true(connection.unwrap().is_closed())
+    assert_eq(connection.unwrap().pending.length(), 0)
+  })
+}

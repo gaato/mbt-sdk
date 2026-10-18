@@ -9,9 +9,9 @@ import {
 }
 
 // Values
-pub async fn[X] connect(@async.TaskGroup[X], &@io.Reader, &@io.Writer, @gen.InitializeParams, close_writer~ : () -> Unit, handlers? : Handlers, on_event? : async (@gen.Event) -> Unit, timeout_ms? : Int, max_line? : Int) -> Client
+pub async fn[X] connect(@async.TaskGroup[X], &@io.Reader, &@io.Writer, @gen.InitializeParams, close_writer~ : () -> Unit, handlers? : Handlers, on_event? : async (@gen.Event) -> Unit, timeout_ms? : Int, max_line? : Int, max_notifications? : Int) -> Client
 
-pub async fn[X] spawn(@async.TaskGroup[X], @gen.InitializeParams, program? : String, cwd? : String, extra_env? : Map[String, String], handlers? : Handlers, on_event? : async (@gen.Event) -> Unit, timeout_ms? : Int, max_line? : Int) -> Session
+pub async fn[X] spawn(@async.TaskGroup[X], @gen.InitializeParams, program? : String, cwd? : String, extra_env? : Map[String, String], handlers? : Handlers, on_event? : async (@gen.Event) -> Unit, timeout_ms? : Int, max_line? : Int, max_notifications? : Int) -> Session
 
 // Errors
 pub(all) suberror ClientError {
