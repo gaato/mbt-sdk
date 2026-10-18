@@ -121,21 +121,26 @@ fn[C] IdlePool::count(self : IdlePool[C]) -> Int32 {
 }
 
 ///|
-/// Takes a young idle connection to `origin`, or dials a new one when there is
-/// none or `fresh` is set. Idle connections of any origin that outlived
-/// `idle_max_ms` are closed on the way. The flag says whether the connection
-/// was reused.
+/// Takes a young idle connection to `origin`, or dials a new one, as the
+/// `Dial` phase of `timer`, when there is none or `fresh` is set. Idle
+/// connections of any origin that outlived `idle_max_ms` are closed on the
+/// way. The flag says whether the connection was reused.
 async fn AsyncTransport::checkout(
   self : AsyncTransport,
   origin : String,
   user_agent : String?,
   fresh~ : Bool,
+  timer : PhaseTimer,
 ) -> (@ahttp.Client, Bool) raise @http.HttpError {
   if self.pool.closed {
     raise @http.HttpError::Connect("transport closed")
   }
   if !fresh {
-    let (reused, expired) = self.pool.take(origin, user_agent, now=@async.now())
+    let (reused, expired) = self.pool.take(
+      origin,
+      user_agent,
+      now=self.clock.now_unix_ms(),
+    )
     for client in expired {
       client.close()
     }
@@ -147,13 +152,7 @@ async fn AsyncTransport::checkout(
   if user_agent is Some(value) {
     dial_headers["User-Agent"] = value
   }
-  let client = @ahttp.Client(origin, headers=dial_headers) catch {
-    @ahttp.URIParseError::InvalidFormat =>
-      raise @http.HttpError::Protocol("invalid URL")
-    @ahttp.URIParseError::UnsupportedProtocol(protocol) =>
-      raise @http.HttpError::Protocol("unsupported protocol: " + protocol)
-    error => raise @http.HttpError::Connect(error.to_string())
-  }
+  let client = timer.run(Dial, () => @ahttp.Client(origin, headers=dial_headers))
   (client, false)
 }
 
@@ -167,15 +166,22 @@ fn AsyncTransport::checkin(
   user_agent : String?,
   client : @ahttp.Client,
 ) -> Unit {
-  for rejected in self.pool.put(origin, user_agent, client, now=@async.now()) {
+  for
+    rejected in self.pool.put(
+      origin,
+      user_agent,
+      client,
+      now=self.clock.now_unix_ms(),
+    ) {
     rejected.close()
   }
 }
 
 ///|
-/// Closes every idle connection and refuses further requests with
-/// `Connect("transport closed")`. In-flight requests finish and their
-/// connections are closed instead of parked.
+/// Closes every idle connection and refuses further requests, and those
+/// waiting for a connection slot, with `Connect("transport closed")`.
+/// In-flight requests finish and their connections are closed instead of
+/// parked.
 ///
 /// ```mbt check
 /// test {
@@ -188,6 +194,7 @@ pub fn AsyncTransport::close(self : AsyncTransport) -> Unit {
   for client in self.pool.drain() {
     client.close()
   }
+  self.slots.refuse_waiting()
 }
 
 ///|

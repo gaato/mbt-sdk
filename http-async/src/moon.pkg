@@ -3,6 +3,7 @@ import {
   "gaato/http/clock",
   "gaato/http/sync",
   "moonbitlang/async/semaphore",
+  "moonbitlang/async/cond_var",
   "moonbitlang/async",
   "moonbitlang/async/http" @ahttp,
   "moonbit-community/flate",
@@ -22,6 +23,9 @@ import {
 } for "test"
 
 import {
+  "gaato/http-async/mock" @simclock,
+  "moonbitlang/async/io",
+  "moonbitlang/core/debug",
   "moonbitlang/core/random",
 } for "wbtest"
 
@@ -29,8 +33,10 @@ supported_targets = "js + native + wasm"
 
 options(
   targets: {
-    "head_error.native.mbt": [ "native", "wasm" ],
-    "head_error.js.mbt": [ "js" ],
+    "failure.native.mbt": [ "native", "wasm" ],
+    "failure.js.mbt": [ "js" ],
+    "failure_native_wbtest.mbt": [ "native", "wasm" ],
+    "failure_js_wbtest.mbt": [ "js" ],
     "negotiation.native.mbt": [ "native", "wasm" ],
     "negotiation.js.mbt": [ "js" ],
   },

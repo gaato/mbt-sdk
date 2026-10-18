@@ -9,6 +9,7 @@ import {
   "moonbitlang/async/socket",
   "moonbitlang/async/io",
   "moonbit-community/flate/gzip",
+  "moonbitlang/core/debug",
 } for "test"
 
 supported_targets = "native + wasm"
@@ -19,5 +20,6 @@ options(
     "pool_test.mbt": [ "native", "wasm" ],
     "content_coding_test.mbt": [ "native", "wasm" ],
     "cookie_roundtrip_test.mbt": [ "native", "wasm" ],
+    "phase_test.mbt": [ "native", "wasm" ],
   },
 )

@@ -258,7 +258,7 @@ async test "response head timeout for buffered and streaming sends" {
             ignore(transport.send(@http.Request::get(url)))
           }
         } catch {
-          @http.HttpError::Timeout(ms) => assert_eq(ms, 200)
+          @http.HttpError::Timeout(phase=Head, ms~) => assert_eq(ms, 200)
           _ => fail("expected transport timeout")
         } noraise {
           _ => fail("expected timeout")
@@ -292,7 +292,7 @@ async test "whole body timeout and streaming idle timeout close the connection" 
           let (_, stream) = transport.send_stream(request)
           assert_eq(stream.read_some(), Some(b"first"))
           try stream.read_some() catch {
-            @http.HttpError::Timeout(ms) => assert_eq(ms, 200)
+            @http.HttpError::Timeout(phase=Body, ms~) => assert_eq(ms, 200)
             _ => fail("expected idle timeout")
           } noraise {
             _ => fail("expected timeout")
@@ -301,7 +301,7 @@ async test "whole body timeout and streaming idle timeout close the connection" 
           stream.close()
         } else {
           try transport.send(request) catch {
-            @http.HttpError::Timeout(ms) => assert_eq(ms, 200)
+            @http.HttpError::Timeout(phase=Body, ms~) => assert_eq(ms, 200)
             _ => fail("expected whole body timeout")
           } noraise {
             _ => fail("expected timeout")

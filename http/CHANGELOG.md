@@ -7,6 +7,25 @@ never does. Every breaking change is listed with a migration note.
 
 ## [Unreleased]
 
+### Changed
+
+- **`HttpError` says which phase of an exchange failed.** A retry policy, or
+  a client that raises httpx's `ConnectTimeout`, `ReadTimeout` or
+  `WriteError`, needs to know whether the request can have reached the
+  server; `Timeout(Int)` and a `Protocol` that also stood for a reset
+  connection could not tell. The new `Phase` is `Pool` (waiting for a
+  connection slot), `Dial` (DNS, TCP and TLS), `Write`, `Head`, `Body`, or
+  `Unknown` when the reporting layer cannot see the step. `Timeout` now
+  carries `phase~` and `ms~`, and the new `Network(phase~, message~)` is a
+  send or receive failure after the connection was made, which `Protocol`
+  no longer covers. `Connect` keeps its meaning: nothing was sent.
+  `HttpError::is_unsent` answers the retry question for every variant: true
+  for `Connect` and for timeouts in `Pool` or `Dial`. Migration: match
+  `Timeout(phase~, ms~)` or `Timeout(..)` instead of `Timeout(ms)`, build it
+  as `Timeout(phase=Unknown, ms=...)` when the phase is not known, and add
+  an arm for `Network(..)`, which transports raise for failures they used
+  to report as `Protocol` (native) or `Connect` (JS).
+
 ### Added
 
 - **`Url`: RFC 3986 URI references with parsing, normalisation and

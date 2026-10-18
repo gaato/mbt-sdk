@@ -10,6 +10,28 @@ note.
 
 ### Added
 
+- **Per-phase timeouts: `connect_timeout_ms`, `write_timeout_ms`,
+  `read_timeout_ms` and `pool_timeout_ms`.** One `timeout_ms` could not
+  give a slow streaming response a long wait for its head while failing
+  fast on an unreachable host. Each new limit bounds one phase (dialing
+  with DNS, TCP and TLS; sending the request; the head and each body read
+  separately; waiting for a connection slot), always within the
+  exchange's `timeout_ms`, and the `Timeout` it raises names the phase and
+  the limit that ran out. Each defaults to `timeout_ms`, so existing
+  callers keep one limit per exchange and per stream read. A stream's
+  reads are bounded by `read_timeout_ms` alone, as before by `timeout_ms`.
+  Like httpx's `Timeout(connect=, read=, write=, pool=)`, plus the overall
+  deadline httpx lacks. All timing goes through the transport's clock.
+- **`max_connections` and `max_connections_per_origin` cap the connections
+  in use.** A connection is in use from its request's slot until its body
+  is read or abandoned; parked ones do not count. A request over a cap
+  waits in arrival order (a freed slot goes to the earliest waiter it
+  fits, so one origin at its cap does not hold up another) until
+  `pool_timeout_ms`, then fails with `Timeout(phase=Pool)`; a waiter that
+  gives up or is cancelled leaves the queue and releases only a slot it was
+  granted, and `close()` refuses the waiters with `Connect`. Unset, the
+  default, requests never wait, as before.
+
 - **Native and Wasm responses in `deflate`, and in chains of codings, are
   decoded.** moonbitlang/async undoes only a single `gzip`, and failed the
   request on any other `Content-Encoding`. The transport now sends
@@ -24,6 +46,29 @@ note.
 
 ### Changed
 
+- **Failures and timeouts name the phase they happened in.** Requires
+  `gaato/http`'s new `HttpError`. The transport dials, writes the request,
+  waits for the head and reads the body as separate phases, so a timeout is
+  `Timeout(phase=Dial | Write | Head | Body, ms=timeout_ms)` for the phase
+  the deadline interrupted, and the deadline is still one per buffered
+  exchange (up to the head for a stream) and one per stream read. On
+  native and Wasm, a reset or an end of stream after connecting is now
+  `Network` in its phase instead of `Protocol`; only a message the parser
+  refuses stays `Protocol`. A body cut short of its `Content-Length` is
+  therefore `Network(phase=Body)`, where httpx says `RemoteProtocolError`:
+  the connection ended, which is what a retry policy needs to know. On JS,
+  fetch connects, sends and waits for the head in one call and rejects
+  every failure alike with a `TypeError`, so those failures are
+  `Network(phase=Unknown)` instead of `Connect`, and a timeout there is
+  `Timeout(phase=Unknown)`; `Connect` would claim the request was never
+  sent, which fetch cannot know. `DeadlineTransport` cannot see the inner
+  transport's phase and reports `Timeout(phase=Unknown, ms)`. A stale
+  parked connection is replayed only when it fails with `Network`, which
+  is how a dropped connection shows; before, any failure before the head
+  was replayed. The request is flushed before the head is awaited, so a
+  bodiless request now leaves in two writes. Migration: see `gaato/http`'s
+  `HttpError` note; code that matched `Protocol` to catch dropped
+  connections should match `Network(..)`.
 - **A decoded response's headers describe the decoded body, and an unknown
   coding passes through.** The undone codings leave `Content-Encoding` and
   `Content-Length` is dropped; a coding the transport does not know, and any

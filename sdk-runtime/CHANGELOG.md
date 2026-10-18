@@ -8,6 +8,19 @@ note.
 
 ## [Unreleased]
 
+### Changed
+
+- **Retries use the phase a transport failure happened in.** Requires
+  `gaato/http`'s new `HttpError`. `SdkError::is_retryable` is true for
+  `Network` failures, which transports used to report as the
+  non-retryable `Protocol` on native; `Protocol` stays non-retryable.
+  `RetryPolicy` now retries a non-idempotent request after any failure
+  `HttpError::is_unsent` vouches for, which adds timeouts while waiting for
+  a connection slot or connecting to `Connect`; a JS fetch failure is no
+  longer `Connect`, so a POST is not resent after one that may have reached
+  the server. Migration: match `Timeout(..)` instead of `Timeout(_)` in
+  `Transport` patterns, and handle `Transport(Network(..))`.
+
 ### Fixed
 
 - **`Client` keeps an absolute URL whatever the case of its scheme.** A

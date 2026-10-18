@@ -42,7 +42,7 @@ fn error_body(body : Bytes) -> Bytes {
 ///     body: b"",
 ///   }
 ///   assert_eq(@runtime.classify(response), response)
-///   let error = @runtime.Transport(@http.Timeout(500))
+///   let error = @runtime.Transport(@http.Timeout(phase=Head, ms=500))
 ///   assert_eq(error.status(), None)
 ///   assert_true(error.is_retryable())
 /// }
@@ -79,10 +79,11 @@ pub fn SdkError::status(self : SdkError) -> Int32? {
 }
 
 ///|
-/// Reports transient failures; request idempotency remains the caller's concern.
+/// Reports transient failures; request idempotency remains the caller's
+/// concern. Every transport failure but `Protocol` is transient.
 pub fn SdkError::is_retryable(self : SdkError) -> Bool {
   match self {
-    Transport(Connect(_) | Timeout(_)) | RateLimited(..) => true
+    Transport(Connect(_) | Timeout(..) | Network(..)) | RateLimited(..) => true
     Status(status=408 | 409 | 500 | 502 | 503 | 504, ..) => true
     _ => false
   }

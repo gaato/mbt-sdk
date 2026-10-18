@@ -62,8 +62,18 @@ test "next_delay retryability idempotency attempts and special failures table" {
   let keyed_post = post.header("idempotency-key", "key")
   let empty = @http.Headers::new()
   let cases : Array[(@runtime.SdkError, Bool, Bool)] = [
+    // Only a failure that proves nothing was sent lets a POST be retried.
     (@runtime.Transport(@http.Connect("offline")), true, true),
-    (@runtime.Transport(@http.Timeout(1)), true, false),
+    (@runtime.Transport(@http.Timeout(phase=Pool, ms=1)), true, true),
+    (@runtime.Transport(@http.Timeout(phase=Dial, ms=1)), true, true),
+    (@runtime.Transport(@http.Timeout(phase=Write, ms=1)), true, false),
+    (@runtime.Transport(@http.Timeout(phase=Head, ms=1)), true, false),
+    (@runtime.Transport(@http.Timeout(phase=Body, ms=1)), true, false),
+    (@runtime.Transport(@http.Timeout(phase=Unknown, ms=1)), true, false),
+    (@runtime.Transport(@http.Network(phase=Write, message="")), true, false),
+    (@runtime.Transport(@http.Network(phase=Head, message="")), true, false),
+    (@runtime.Transport(@http.Network(phase=Body, message="")), true, false),
+    (@runtime.Transport(@http.Network(phase=Unknown, message="")), true, false),
     (@runtime.Transport(@http.Protocol("bad")), false, false),
     (@runtime.Status(status=408, headers=empty, body=b""), true, false),
     (@runtime.Status(status=409, headers=empty, body=b""), true, false),
@@ -100,7 +110,12 @@ test "next_delay retryability idempotency attempts and special failures table" {
   }
   let permissive = { ..policy, retry_non_idempotent: true, }
   assert_eq(
-    permissive.next_delay_ms(@runtime.Transport(@http.Timeout(1)), post, 0, 0.0),
+    permissive.next_delay_ms(
+      @runtime.Transport(@http.Timeout(phase=Head, ms=1)),
+      post,
+      0,
+      0.0,
+    ),
     Some(400),
   )
 }

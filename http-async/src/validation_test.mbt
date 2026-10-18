@@ -42,7 +42,8 @@ async test "nonpositive timeouts expire immediately with their original value" {
           ignore(transport.send(request))
         }
       } catch {
-        @http.HttpError::Timeout(actual) => assert_eq(actual, ms)
+        // Nothing was dialed yet: the request fails as it starts connecting.
+        @http.HttpError::Timeout(phase=Dial, ms=actual) => assert_eq(actual, ms)
         _ => fail("expected immediate Timeout")
       } noraise {
         _ => fail("expected timeout")

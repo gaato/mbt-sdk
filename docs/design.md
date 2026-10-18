@@ -40,12 +40,13 @@ pub(open) trait Transport {
   async fn send(Self, Request) -> Response raise HttpError
   async fn send_stream(Self, Request) -> (ResponseHead, &BodyStream) raise HttpError
 }
-pub(all) suberror HttpError { Connect(String); Timeout(Int); Protocol(String) }
+pub(all) enum Phase { Pool; Dial; Write; Head; Body; Unknown }
+pub(all) suberror HttpError { Connect(String); Timeout(phase~ : Phase, ms~ : Int); Network(phase~ : Phase, message~ : String); Protocol(String) }
 pub type Middleware = async (Request, async (Request) -> Response raise HttpError) -> Response raise HttpError
 ```
 - `Request` / `Response` / `ResponseHead` は `Eq` と `Debug` を持つ(mock の照合とテストの失敗表示に使う)。
 - `gaato/http` は依存ゼロなので `async test` を実行できない。async な挙動(`send_with` の順序、`each_event`、`FakeTransport`)の実行テストは `http-async` 側のテストに置く。`http` 側は純粋関数のテストとコンパイル確認まで。
-- `BodyStream::read_some` が上げるのは `HttpError` だけ(2c で締めた)。ストリーム途中の切断は `Protocol`、タイムアウトは `Timeout`。
+- `BodyStream::read_some` が上げるのは `HttpError` だけ(2c で締めた)。ストリーム途中の切断は `Network(phase=Body)`、タイムアウトは `Timeout(phase=Body)`。2026-10-18 に `Timeout(Int)` から段階つきに変えた: 再試行の可否(要求が届いた可能性があるか)と httpx 流の `ConnectTimeout` / `ReadTimeout` / `WriteError` には段階が要る。`Connect` は「何も送っていない」の意味のまま残し、`HttpError::is_unsent` が `Connect` と `Pool` / `Dial` の `Timeout` を真とする。`Phase::Connect` にしなかったのは `@http.Connect(...)` が曖昧になるため。
 - キャンセルは `HttpError` にしない。`moonbitlang/async` のキャンセルは `Error` とは別のシグナルで `catch` では捕まらず、エラーに変換するとタスクグループが「失敗」として扱ってしまう。transport はシグナルをそのまま伝播させ、後始末は `defer` / `errdefer` で行う。`Cancelled` は 2c で契約から外した。
 - transport は status を解釈しない(4xx/5xx も `Response` で返す。分類は M2 の runtime の仕事)。
 - `Response::text()` / `json()`、`Request` の builder(`Request::get(url)`, `.header(k, v)`, `.json_body(j)`)を付ける。
@@ -71,12 +72,12 @@ SSE の判断:
 
 `gaato/http/mock`: `FakeTransport::new()`、`.expect(method, url_suffix, Response)`、`.expect_stream(..., chunks : Array[Bytes])`、`.sent() -> Array[Request]`、`.assert_complete()`。不一致はその場で raise し、かつラッチして `assert_complete` でも落とす。
 
-`gaato/http-async`: `AsyncTransport::new(timeout_ms? = 30000)`。`impl Transport`。`@http.Client` を直接使い、`content-length` は async 側に任せる、応答ヘッダ名を小文字化、`send_stream` は `read_some` をそのまま `BodyStream` にする、`@async.with_timeout` でタイムアウト、キャンセル時はシグナルを伝播させつつ `defer` で接続を close。接続プールは M1 では持たなかった(1 リクエスト 1 接続)。2026-09-22 に keep-alive プールを追加: `AsyncTransport::new(max_idle_per_origin? = 4, idle_max_ms? = 10000)`。本文を最後まで読み `Connection: close` でない接続だけ origin ごとに保管し、同時実行は制限しない(空きが無ければ dial する)。再利用した接続が応答ヘッダ前に失敗したら、冪等メソッドか `Idempotency-Key` 付きの要求だけ新規接続で 1 回再送し、それ以外は失敗を返す(Go の net/http と同じ規則)。`AsyncTransport::close()` で保管中の接続を閉じる。移植元は discord.mbt の `internal/pool`。
+`gaato/http-async`: `AsyncTransport::new(timeout_ms? = 30000)`。`impl Transport`。`@http.Client` を直接使い、`content-length` は async 側に任せる、応答ヘッダ名を小文字化、`send_stream` は `read_some` をそのまま `BodyStream` にする、`@async.with_timeout` でタイムアウト、キャンセル時はシグナルを伝播させつつ `defer` で接続を close。接続プールは M1 では持たなかった(1 リクエスト 1 接続)。2026-09-22 に keep-alive プールを追加: `AsyncTransport::new(max_idle_per_origin? = 4, idle_max_ms? = 10000)`。本文を最後まで読み `Connection: close` でない接続だけ origin ごとに保管し、同時実行は制限しない(空きが無ければ dial する)。再利用した接続が応答ヘッダ前に失敗したら、冪等メソッドか `Idempotency-Key` 付きの要求だけ新規接続で 1 回再送し、それ以外は失敗を返す(Go の net/http と同じ規則)。`AsyncTransport::close()` で保管中の接続を閉じる。移植元は discord.mbt の `internal/pool`。 2026-10-18 に同時接続の上限を追加: `max_connections` / `max_connections_per_origin`(既定は無制限)は使用中の接続(スロット取得から本文の読み切りか放棄まで、保管中は数えない)を数え、超えた要求は到着順に待つ(空いたスロットはそれが収まる最古の待ち手へ。上限に達した origin の待ち手が他の origin を塞がない)。待ちは `pool_timeout_ms` で `Timeout(phase=Pool)`、取消しや期限切れで抜けた待ち手は与えられたスロットだけ返す(`Slots::abandon`)。同時に段階ごとの上限 `connect_timeout_ms` / `write_timeout_ms` / `read_timeout_ms` / `pool_timeout_ms`(既定はどれも `timeout_ms`)を追加した。
 
 http-async の判断:
-- タイムアウトは `@async.with_timeout(ms, f, error=HttpError::Timeout(ms))` で掛ける。`timeout_ms <= 0` は接続せずに即 `Timeout`。`send` は接続から本文の読み切りまでを 1 つの期限で、`send_stream` は応答ヘッダまでを 1 つの期限で、その後は `read_some` 1 回ごとに新しい期限(アイドルタイムアウト)で縛る。
+- タイムアウトは段階ごとに `PhaseTimer::run` で掛ける(注入した `Clock` 上の `with_timeout_opt`)。各段階の予算は段階の上限と交換全体の残り時間の短い方で、切れたら進行中の段階と切れた上限を `Timeout(phase, ms)` で報告する。`timeout_ms <= 0` は接続せずに即 `Timeout(phase=Dial)`。`send` は接続から本文の読み切りまでを 1 つの期限で、`send_stream` は応答ヘッダまでを 1 つの期限で、その後は `read_some` 1 回ごとに新しい期限(アイドルタイムアウト)で縛る。
 - キャンセルには何もしない。`catch` に現れないのでそのまま伝播し、接続は `defer` / `errdefer` で閉じる。テストで、外側のキャンセルが `catch` を素通りすることと、サーバ側から接続の close が見えることを確認している。
-- エラーの写し方: URL の形式不正・未対応スキーム・未知のメソッドは接続前に `Protocol`。native は `Client` の生成時に DNS/TCP/TLS を済ませるので、生成時の失敗が `Connect`、それ以降の失敗が `Protocol`。js は fetch が遅延接続なので、応答ヘッダまでの失敗を `Connect` とする(fetch は接続失敗と不正応答を区別して返さない)。本文読み取り中の失敗は両ターゲットとも `Protocol`。
+- エラーの写し方(`failure.mbt`): URL の形式不正・未対応スキーム・未知のメソッドは接続前に `Protocol`。native は `Client` の生成時に DNS/TCP/TLS を済ませるので、生成時の失敗が `Connect`。それ以降は `request` / `write` / `flush` が `Write`、`end_request` が `Head`、本文の読み取りが `Body` で、パーサの拒否(`HttpProtocolError`)だけが `Protocol`、他(リセット・途中の EOF・TLS アラート)は `Network`。js は fetch が接続・送信・ヘッダ待ちを 1 回の呼び出しで行い、失敗をすべて同じ `TypeError` で返すので、ヘッダまでの失敗とタイムアウトは `Unknown` 段階(`Connect` にすると「送っていない」と偽ることになる)。本文読み取り中の失敗は `Network(phase=Body)`。
 - 送信ヘッダ: async の `Headers` は Map なので、同名の複数値は `", "` で連結する。呼び出し側の `content-length` は送らず async に計算させる。
 - 応答ヘッダ: 名前は小文字化。async は `Set-Cookie` を `cookies` に分離して持つので、属性から `set-cookie` 値を組み立て直して複数値として載せる(元の文字列とバイト単位で一致する保証はない)。それ以外の同名ヘッダは async が渡す形のまま。
 - リダイレクト: native は追従せず 3xx をそのまま返す(テストで確認)。js は fetch の既定動作(追従)になる。js での統一は M2 以降の課題。

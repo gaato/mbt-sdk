@@ -191,6 +191,59 @@ async test "POST retry exceptions are 429 Connect and idempotency key" {
 }
 
 ///|
+async test "a POST is retried after a failure that proves nothing was sent" {
+  bounded(() => {
+    let rows : Array[(@http.HttpError, Int32)] = [
+      (@http.HttpError::Timeout(phase=Pool, ms=10), 2),
+      (@http.HttpError::Timeout(phase=Dial, ms=10), 2),
+      (@http.HttpError::Timeout(phase=Write, ms=10), 1),
+      (@http.HttpError::Timeout(phase=Head, ms=10), 1),
+      (@http.HttpError::Network(phase=Write, message="reset"), 1),
+      (@http.HttpError::Network(phase=Unknown, message="fetch failed"), 1),
+    ]
+    for i, row in rows {
+      let (error, attempts) = row
+      let transport = @mock.FakeTransport::new()
+      transport.expect_error("POST", "/charge", error)
+      if attempts == 2 {
+        transport.expect("POST", "/charge", buffered_response(200))
+      }
+      let client = @runtime.Client::new(
+        transport,
+        @mock.FakeClock::new(),
+        base_url="https://api.test",
+        random=() => 0.5,
+      )
+      let retried = try client.send(@http.Request::post("/charge")) catch {
+        @runtime.Transport(_) => false
+        _ => fail("row \{i}: expected a transport error")
+      } noraise {
+        _ => true
+      }
+      assert_eq(retried, attempts == 2, msg="row \{i}")
+      assert_eq(transport.sent().length(), attempts)
+      transport.assert_complete()
+    }
+    // A GET is retried after any of them.
+    let transport = @mock.FakeTransport::new()
+    transport.expect_error(
+      "GET",
+      "/list",
+      @http.HttpError::Network(phase=Head, message="reset"),
+    )
+    transport.expect("GET", "/list", buffered_response(200))
+    let client = @runtime.Client::new(
+      transport,
+      @mock.FakeClock::new(),
+      base_url="https://api.test",
+      random=() => 0.5,
+    )
+    assert_eq(client.send(@http.Request::get("/list")).status, 200)
+    transport.assert_complete()
+  })
+}
+
+///|
 async test "Retry-After above the policy cap is not retried" {
   bounded(() => {
     let transport = @mock.FakeTransport::new()

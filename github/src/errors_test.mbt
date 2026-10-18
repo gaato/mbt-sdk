@@ -75,7 +75,9 @@ test "api_error returns None for bodies and failures that are not GitHub errors"
     #|{"error":"boom"}
   assert_eq(@github.api_error(status_error(500, body=body(unrelated))), None)
   assert_eq(
-    @github.api_error(@runtime.Transport(@http.HttpError::Timeout(1000))),
+    @github.api_error(
+      @runtime.Transport(@http.HttpError::Timeout(phase=Head, ms=1000)),
+    ),
     None,
   )
   assert_eq(@github.api_error(@runtime.Config("no base url")), None)
@@ -138,7 +140,7 @@ test "is_secondary_rate_limit separates the secondary limit from the hourly quot
   )
   assert_false(
     @github.is_secondary_rate_limit(
-      @runtime.Transport(@http.HttpError::Timeout(1000)),
+      @runtime.Transport(@http.HttpError::Timeout(phase=Head, ms=1000)),
     ),
   )
 }

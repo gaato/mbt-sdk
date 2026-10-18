@@ -158,18 +158,26 @@ test "split_url separates the origin from the request target" {
   let rows : Array[(String, String)] = [
     ("http://example.com", "http://example.com /"),
     ("https://example.com/", "https://example.com /"),
-    ("HTTPS://Example.com/a", "https://Example.com /a"),
+    ("HTTPS://Example.com/a", "https://example.com /a"),
+    ("http://EXAMPLE.com:80/a", "http://example.com /a"),
+    ("https://example.com:443", "https://example.com /"),
+    ("http://example.com:443/", "http://example.com:443 /"),
+    ("http://[2001:DB8:0:0:0:0:0:1]:8080/", "http://[2001:db8::1]:8080 /"),
     ("http://example.com:8080/a/b", "http://example.com:8080 /a/b"),
     ("http://example.com?q=1", "http://example.com /?q=1"),
     ("http://example.com/a?q=/b", "http://example.com /a?q=/b"),
     ("http://example.com/a#frag", "http://example.com /a"),
     ("http://example.com/a?q=1#f?g", "http://example.com /a?q=1"),
     ("http://example.com#/a", "http://example.com /"),
-    ("http://user@example.com/", "http://user@example.com /"),
+    ("http://user@example.com/", "http://example.com /"),
+    ("http://a:b@EXAMPLE.com:80/x", "http://example.com /x"),
     ("example.com/a", "error: expected an absolute HTTP URL"),
     ("ftp://example.com/", "error: unsupported URL scheme: ftp"),
     ("ws://example.com/", "error: unsupported URL scheme: ws"),
     ("://example.com/", "error: unsupported URL scheme: "),
+    (
+      "http://[::1/", "error: invalid URL authority: IP literal without a closing bracket",
+    ),
     ("http:///a", "error: empty URL authority"),
     ("http://?q=1", "error: empty URL authority"),
     ("http://#a", "error: empty URL authority"),
@@ -277,5 +285,5 @@ test "response_head keeps headers and serializes each cookie" {
 ///|
 test "the exchange timeout defaults to 30 s" {
   // The loopback tests check what the timeout bounds; this pins its default.
-  assert_eq(AsyncTransport::new().timeout_ms, 30000)
+  assert_eq(AsyncTransport::new().limits.total, 30000)
 }
