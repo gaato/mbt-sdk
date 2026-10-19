@@ -81,7 +81,7 @@ scripts/compat-servers.sh    # start Ollama (qwen2.5:0.5b, accepts tools) + a Li
 - `spec-watch.yml` — daily upstream spec check; on change it re-vendors, regenerates, runs the gates and opens a PR.
 - `live-compat.yml` — the live suite against local, key-free OpenAI- and Anthropic-compatible servers (Ollama + LiteLLM, always their latest release, so a change in either shows up here). Remote providers skip without keys.
 
-Design notes (Japanese): `docs/design.md` (M1), `docs/design-m2.md`, `docs/design-m3.md`, `docs/design-m4.md`, `docs/design-m5.md`, `docs/design-m6.md`, `docs/design-m7.md`, `docs/design-m8.md`. Release procedure: `docs/release.md`.
+Design notes (Japanese): `docs/design.md` (M1), `docs/design-m2.md`, `docs/design-m3.md`, `docs/design-m4.md`, `docs/design-m5.md`, `docs/design-m6.md`, `docs/design-m7.md`, `docs/design-m8.md`, `docs/design-m9.md`, `docs/design-m10.md`. Release procedure: `docs/release.md`. Adding an SDK: `docs/new-sdk.md`.
 
 ## License
 
