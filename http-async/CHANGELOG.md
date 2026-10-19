@@ -12,9 +12,10 @@ note.
 
 ### Changed
 
-- **Builds against `gaato/http` 0.4.0, whose `Phase` is `#non_exhaustive`.**
-  A phase added to `gaato/http` later is reported as a network failure and
-  timed with the read limit, as `Unknown` is.
+- **Requires `gaato/http` 0.4.0, whose `Phase` is `#non_exhaustive`.** A
+  phase added to `gaato/http` later is reported as a network failure and
+  timed with the read limit, as `Unknown` is. The `Phase::..` pattern that
+  does this does not compile against an older `gaato/http`.
 
 ## [0.4.0] - 2026-10-19
 

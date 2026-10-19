@@ -21,7 +21,7 @@ source = "src"
 preferred_target = "native"
 
 import {
-  "gaato/http@0.3.0",
+  "gaato/http@0.4.0",
   "moonbitlang/async@0.22.5",
   "moonbit-community/flate@0.9.0",
   "gaato/brotli@0.2.0",
