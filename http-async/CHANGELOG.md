@@ -8,6 +8,13 @@ note.
 
 ## [Unreleased]
 
+## [0.4.2] - 2026-10-19
+
+### Changed
+
+- **Depends on `gaato/http` 0.4.1**, for `@sync.Timer`. Migration: update
+  the `gaato/http` import alongside this module.
+
 ### Added
 
 - **`ClockTimer`, the `@sync.Timer` of this runtime.** `within(ms, f)` runs

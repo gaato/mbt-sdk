@@ -14,8 +14,15 @@ are optional unless the field is required, and keep a wildcard arm.
 
 ## [Unreleased]
 
+## [0.17.0] - 2026-10-19
+
 ### Changed
 
+- **Depends on `gaato/http` 0.4.1 and `gaato/sdk-runtime` 0.7.0.** Retries,
+  pacing and server keys come from them. Migration: update the `gaato/http`
+  and `gaato/sdk-runtime` imports alongside this module, and follow
+  `gaato/sdk-runtime`'s changelog where you build a `RetryPolicy` or a
+  `RetryDecider`.
 - **`GitHubRetry` implements `gaato/sdk-runtime` 0.7.0's `RetryDecider`.**
   Its method is `decide(error, context) -> Decision` instead of
   `next_delay_ms(error, request, attempt, random) -> Int?`. It no longer

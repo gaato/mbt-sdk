@@ -8,6 +8,8 @@ note.
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-10-19
+
 ### Added
 
 - **Retry presets: `RetryPolicy::conservative()`, `stainless(cap~)`,
@@ -58,6 +60,9 @@ note.
 
 ### Changed
 
+- **Depends on `gaato/http` 0.4.1**, for `gaato/http/retry` and
+  `@sync.Timer`. Migration: update the `gaato/http` import alongside this
+  module.
 - **Retry decisions are `gaato/http/retry` rules.** `RetryPolicy` is now
   `{ rule : RetryRule }`, and the rule types (`RetryRule`, `StatusRule`,
   `StatusMatch`, `Methods`, `RetryAfter`, `RetryAfterSource`,

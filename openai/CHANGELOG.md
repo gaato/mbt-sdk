@@ -11,8 +11,14 @@ change itself is the diff of `src/gen/pkg.generated.mbti`.
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-10-19
+
 ### Changed
 
+- **Depends on `gaato/http` 0.4.1 and `gaato/sdk-runtime` 0.7.0.** The
+  retry policy and the new timeouts come from them. Migration: update the
+  `gaato/http` and `gaato/sdk-runtime` imports alongside this module, and
+  follow `gaato/sdk-runtime`'s changelog where you build a `RetryPolicy`.
 - **Retries follow the official SDK (`openai-python`), POST included.**
   `OpenAI::new` now defaults to `RetryPolicy::stainless(cap=StopAbove(120000))`
   of `gaato/sdk-runtime`: two retries of 408, 409, 429 and every 5xx, and of

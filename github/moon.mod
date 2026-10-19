@@ -3,7 +3,7 @@
 
 name = "gaato/github"
 
-version = "0.16.0"
+version = "0.17.0"
 
 license = "Apache-2.0"
 
@@ -20,6 +20,6 @@ source = "src"
 preferred_target = "wasm-gc"
 
 import {
-  "gaato/http@0.3.1",
-  "gaato/sdk-runtime@0.5.0",
+  "gaato/http@0.4.1",
+  "gaato/sdk-runtime@0.7.0",
 }

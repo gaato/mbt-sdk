@@ -15,8 +15,14 @@ are optional unless the field is required, and keep a wildcard arm.
 
 ## [Unreleased]
 
+## [0.11.0] - 2026-10-19
+
 ### Changed
 
+- **Depends on `gaato/http` 0.4.1 and `gaato/sdk-runtime` 0.7.0.** The
+  retry policy and the new timeouts come from them. Migration: update the
+  `gaato/http` and `gaato/sdk-runtime` imports alongside this module, and
+  follow `gaato/sdk-runtime`'s changelog where you build a `RetryPolicy`.
 - **Retries follow the official SDK (`anthropic-sdk-python`), POST and 529
   included.** `Anthropic::new` now defaults to
   `RetryPolicy::stainless(cap=NoCap)` of `gaato/sdk-runtime`: two retries of

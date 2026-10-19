@@ -7,6 +7,8 @@ never does. Every breaking change is listed with a migration note.
 
 ## [Unreleased]
 
+## [0.4.1] - 2026-10-19
+
 ### Added
 
 - **Retry decisions as data: `gaato/http/retry`.** A `RetryRule` lists the
