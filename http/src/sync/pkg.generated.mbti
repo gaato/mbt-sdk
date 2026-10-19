@@ -14,3 +14,7 @@ pub(open) trait Gate {
   async fn acquire(Self) -> Unit noraise
   fn release(Self) -> Unit
 }
+
+pub(open) trait Timer {
+  async fn within(Self, Int, async () -> Unit noraise) -> Bool noraise
+}

@@ -41,7 +41,7 @@ Sources:
 | 2 | Statuses 501 and 505–599 are not retried | B | Retry 500–599 |
 | 3 | `x-should-retry` is ignored | B | Honour it as an override |
 | 4 | A timeout after the request was sent is not retried for POST | B | Retry sent failures for every method |
-| 5 | Retry-After cap: 60 s here vs 120 s | B | `Stop(120000)`: stop above 120 s, as the official SDK does |
+| 5 | Retry-After cap: 60 s here vs 120 s | B | `StopAbove(120000)`: stop above 120 s, as the official SDK does |
 | 6 | Backoff cap 30 s with ±20 % jitter vs 8 s with a 0.75–1.0 factor | B | 500 ms → 8 s, `Proportional(750, 1000)` |
 | 7 | No timeout vs 600 s total / 5 s connect | B | 600 s per call through `Timeouts`, when the caller supplies a timer; connect time stays a transport setting (README) |
 

@@ -1,0 +1,135 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "gaato/http/retry"
+
+import {
+  "gaato/http",
+  "moonbitlang/core/debug",
+}
+
+// Values
+
+// Errors
+
+// Types and methods
+pub(all) struct Backoff {
+  base_ms : Int
+  max_ms : Int
+  jitter : Jitter
+} derive(Eq, @debug.Debug)
+pub fn Backoff::delay_ms(Self, Int, Double) -> Int
+pub fn Backoff::equal(Self, Self) -> Bool
+pub fn Backoff::not_equal(Self, Self) -> Bool
+pub fn Backoff::to_repr(Self) -> @debug.Repr
+
+pub(all) enum Decision {
+  Wait(Int)
+  Stop(StopReason)
+} derive(Eq, @debug.Debug)
+pub fn Decision::equal(Self, Self) -> Bool
+pub fn Decision::not_equal(Self, Self) -> Bool
+pub fn Decision::to_repr(Self) -> @debug.Repr
+
+#non_exhaustive
+pub(all) enum Jitter {
+  NoJitter
+  Full
+  Proportional(lo~ : Int, hi~ : Int)
+} derive(Eq, @debug.Debug)
+pub fn Jitter::equal(Self, Self) -> Bool
+pub fn Jitter::not_equal(Self, Self) -> Bool
+pub fn Jitter::to_repr(Self) -> @debug.Repr
+
+#non_exhaustive
+pub(all) enum Methods {
+  Never
+  Idempotent
+  Listed(Array[String])
+  Any
+} derive(Eq, @debug.Debug)
+pub fn Methods::equal(Self, Self) -> Bool
+pub fn Methods::not_equal(Self, Self) -> Bool
+pub fn Methods::to_repr(Self) -> @debug.Repr
+
+pub(all) enum Outcome {
+  Response(status~ : Int, headers~ : @http.Headers)
+  Failure(@http.HttpError)
+} derive(@debug.Debug)
+pub fn Outcome::to_repr(Self) -> @debug.Repr
+
+pub(all) struct RetryAfter {
+  source : RetryAfterSource
+  cap : RetryAfterCap
+  zero_means_backoff : Bool
+} derive(Eq, @debug.Debug)
+pub fn RetryAfter::equal(Self, Self) -> Bool
+pub fn RetryAfter::not_equal(Self, Self) -> Bool
+pub fn RetryAfter::to_repr(Self) -> @debug.Repr
+
+#non_exhaustive
+pub(all) enum RetryAfterCap {
+  StopAbove(Int)
+  BackoffAbove(Int)
+  NoCap
+} derive(Eq, @debug.Debug)
+pub fn RetryAfterCap::equal(Self, Self) -> Bool
+pub fn RetryAfterCap::not_equal(Self, Self) -> Bool
+pub fn RetryAfterCap::to_repr(Self) -> @debug.Repr
+
+#non_exhaustive
+pub(all) enum RetryAfterSource {
+  Ignore
+  Header
+  MsThenHeader
+} derive(Eq, @debug.Debug)
+pub fn RetryAfterSource::equal(Self, Self) -> Bool
+pub fn RetryAfterSource::not_equal(Self, Self) -> Bool
+pub fn RetryAfterSource::to_repr(Self) -> @debug.Repr
+
+pub(all) struct RetryRule {
+  max_retries : Int
+  statuses : Array[StatusRule]
+  sent_failures : Methods
+  unsent_failures : Bool
+  override_header : String?
+  retry_after : RetryAfter
+  backoff : Backoff
+} derive(Eq, @debug.Debug)
+pub fn RetryRule::decide(Self, Outcome, @http.Request, attempt~ : Int, random~ : Double, now_unix_ms? : Int64, remaining_ms? : Int64, server_delay_ms? : Int, idempotent? : Bool, replayable? : Bool) -> Decision
+pub fn RetryRule::equal(Self, Self) -> Bool
+pub fn RetryRule::never() -> Self
+pub fn RetryRule::not_equal(Self, Self) -> Bool
+pub fn RetryRule::to_repr(Self) -> @debug.Repr
+
+pub(all) enum StatusMatch {
+  Code(Int)
+  Range(Int, Int)
+} derive(Eq, @debug.Debug)
+pub fn StatusMatch::equal(Self, Self) -> Bool
+pub fn StatusMatch::not_equal(Self, Self) -> Bool
+pub fn StatusMatch::to_repr(Self) -> @debug.Repr
+
+pub(all) struct StatusRule {
+  statuses : Array[StatusMatch]
+  methods : Methods
+} derive(Eq, @debug.Debug)
+pub fn StatusRule::equal(Self, Self) -> Bool
+pub fn StatusRule::not_equal(Self, Self) -> Bool
+pub fn StatusRule::to_repr(Self) -> @debug.Repr
+
+#non_exhaustive
+pub(all) enum StopReason {
+  Exhausted
+  NotRetryable
+  MethodNotAllowed
+  NotReplayable
+  ServerSaidNo
+  RetryAfterTooLong(Int)
+  Budget(Int)
+} derive(Eq, @debug.Debug)
+pub fn StopReason::equal(Self, Self) -> Bool
+pub fn StopReason::not_equal(Self, Self) -> Bool
+pub fn StopReason::to_repr(Self) -> @debug.Repr
+
+// Type aliases
+
+// Traits

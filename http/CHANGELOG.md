@@ -7,6 +7,25 @@ never does. Every breaking change is listed with a migration note.
 
 ## [Unreleased]
 
+### Added
+
+- **Retry decisions as data: `gaato/http/retry`.** A `RetryRule` lists the
+  retryable statuses and the methods each allows, which transport failures
+  are retried (a failure that sent nothing for any method, one after
+  sending through `sent_failures`), an override header such as
+  `x-should-retry`, how `Retry-After` / `retry-after-ms` is read and
+  capped, and an exponential `Backoff` with no, full or proportional
+  jitter. `RetryRule::decide` turns one failed attempt into `Wait(ms)` or
+  `Stop(reason)`, also stopping when the body cannot be sent again or the
+  wait would use up the remaining budget. It never sleeps or sends, and the
+  random number and clock reading are passed in, so API SDKs
+  (`gaato/sdk-runtime`) and general clients can share one tested core and
+  keep their own presets as values.
+- **`Timer` in `gaato/http/sync`.** `within(ms, f)` runs `f` for at most
+  `ms` milliseconds and reports whether it finished, so sans-IO code can
+  bound a wait without importing an async runtime. The runtime, such as
+  `gaato/http-async`, implements it, as it does `Gate`.
+
 ## [0.4.0] - 2026-10-19
 
 ### Changed

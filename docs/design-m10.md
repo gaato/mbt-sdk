@@ -50,30 +50,32 @@ pub(all) enum StatusMatch { Code(Int); Range(Int, Int) }
 pub(all) enum Methods { Never; Idempotent; Listed(Array[String]); Any }
 pub(all) struct StatusRule { statuses : Array[StatusMatch]; methods : Methods }
 pub(all) enum RetryAfterSource { Ignore; Header; MsThenHeader }
-pub(all) enum RetryAfterCap { Stop(Int); FallbackToBackoff(Int); NoCap }
+pub(all) enum RetryAfterCap { StopAbove(Int); BackoffAbove(Int); NoCap }
+pub(all) struct RetryAfter { source : RetryAfterSource; cap : RetryAfterCap; zero_means_backoff : Bool }
 pub(all) enum Jitter { NoJitter; Full; Proportional(lo~ : Int, hi~ : Int) } // 1000 分率
-pub(all) struct Backoff { base_ms : Int; max_ms : Int; jitter : Jitter }    // 2 倍ずつ、整数演算
+pub(all) struct Backoff { base_ms : Int; max_ms : Int; jitter : Jitter }    // 2 倍ずつ、整数演算、揺らぎの後も max_ms で切る
 pub(all) struct RetryRule {
   max_retries : Int
   statuses : Array[StatusRule]   // 最初に一致した規則を使う
   sent_failures : Methods        // 送った後の失敗: Timeout(Write|Head|Body|Unknown)・Network
   unsent_failures : Bool         // 送っていない失敗: Connect・Timeout(Pool|Dial)
   override_header : String?      // 例: "x-should-retry"
-  retry_after : RetryAfterSource
-  retry_after_cap : RetryAfterCap
+  retry_after : RetryAfter
   backoff : Backoff
 }
 pub(all) enum Outcome { Response(status~ : Int, headers~ : @http.Headers); Failure(@http.HttpError) }
 pub(all) enum Decision { Wait(Int); Stop(StopReason) }
-// StopReason: Exhausted / NotRetryable / MethodNotAllowed / ServerSaidNo / RetryAfterTooLong / Budget
+// StopReason: Exhausted / NotRetryable / MethodNotAllowed / NotReplayable / ServerSaidNo / RetryAfterTooLong / Budget
+// 値が増えうる enum(Methods・RetryAfterSource・RetryAfterCap・Jitter・StopReason)は #non_exhaustive
 ```
 
-`RetryRule::decide(outcome, request, attempt~, random~, now_unix_ms?, remaining_ms?, server_delay_ms?, idempotent?)` は次の順で判定する。
+`RetryRule::decide(outcome, request, attempt~, random~, now_unix_ms?, remaining_ms?, server_delay_ms?, idempotent?, replayable?)` は次の順で判定する。
 
 1. 回数の上限に達していれば止める。
+1. 本文を再送できなければ止める(`NotReplayable`。sdk-runtime の `body` closure のように作り直せる場合は `replayable` で上書きする)。
 2. 判定を上書きするヘッダーを見る。
 3. 状態コードまたは失敗の種類を分類し、メソッドの規則と照らす。
-4. サーバーが指定した待ち時間を読み、上限と比べる。
+4. サーバーが指定した待ち時間を読み、上限と比べる。Retry-After: 0 を「すぐ再送」とするか「指定なし」とするかは `zero_means_backoff` で選ぶ(requesto と今の sdk-runtime は前者、Stainless は後者)。上書きヘッダーが true でも、この上限判定は通る(openai と同じ順序)。
 5. 待ち時間の指定がなければ backoff で決める。
 6. 残り時間を超える待ちなら止める。
 
@@ -102,7 +104,7 @@ pub(open) trait Timer {
 
 - `RetryPolicy { rule }`。ひな形は次の 4 つ。
   - `conservative()`: 今の挙動。既定
-  - `stainless(retry_after_cap~)`
+  - `stainless(cap~)`
   - `none()`
   - `from_rule`
 - `Backoff` は `gaato/http/retry` に移し、sdk-runtime からは re-export する。
@@ -128,7 +130,7 @@ pub(open) trait Timer {
 
 | SDK | 再送 | 待ち時間 | 時間制限 | その他 |
 |---|---|---|---|---|
-| openai | `stainless(Stop(120000))`: 2 回。408/409/429/500–599 を全メソッドで再送。送った後の失敗も全メソッドで再送。`x-should-retry` に従う。`retry-after-ms`→`retry-after` の順に読む | 0.5 s→8 s、0.75〜1.0 倍。Retry-After が 120 s を超えたら再送しない | 600 s(timer を渡したときだけ) | — |
+| openai | `stainless(StopAbove(120000))`: 2 回。408/409/429/500–599 を全メソッドで再送。送った後の失敗も全メソッドで再送。`x-should-retry` に従う。`retry-after-ms`→`retry-after` の順に読む | 0.5 s→8 s、0.75〜1.0 倍。Retry-After が 120 s を超えたら再送しない | 600 s(timer を渡したときだけ) | — |
 | anthropic | `stainless(NoCap)`。中身は openai と同じ | Retry-After に上限なしで従う | 600 s | 529 も再送するようになる |
 | github | `conservative` で再送 3 回。5xx はべき等なものだけ | 二次制限は Retry-After、なければ `60 s << n`。一般の上限は無視し、残り時間と回数で抑える | — | GraphQL の 200 に乗る `RATE_LIMITED` と二次制限を `accept` で再送する。"Something went wrong" は mutation 以外だけ再送。バケットは core / core:write / graphql / search / core:notifications。`pace` は書き込みと graphql が 1 s、search が 2 s、notifications が 3 s。`alias` は `x-ratelimit-resource`。利用者が渡した `gate` で直列化する |
 | discord | 429 は全メソッドで再送(本文の `retry_after` + 1 ms)。502 は全メソッドで再送。500–599 と送った後の失敗はべき等なものだけ再送。`nonce` + `enforce_nonce` 付きのメッセージ作成はべき等として扱う | 本文の値を優先し、上限なし | `Timeouts` を使い、`AttemptDeadline` は削除 | JSON の本文も scope もない 429 は即座に失敗させる。401 で止める。`alias` は `x-ratelimit-bucket` と主要パラメーター。scope が shared の 429 では止めない。不正リクエスト(401/403/429)を observer で数える |
