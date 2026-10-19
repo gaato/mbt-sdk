@@ -51,6 +51,8 @@ Traps:
 
 Only to learn what users expect and to find traps the docs do not mention. Note where they contradict A.
 
+Trap: a community library's heuristic (for example "a 429 without a JSON body is the CDN's") can slip into our rules as if it were the API's contract. Before adopting one, restate it in A's terms (what the server documents about its own responses and limits) and name the rule after that; mention the infrastructure only as an example of where such a response comes from.
+
 ## 5. Choose the runtime configuration
 
 - Start from the sdk-runtime preset closest to B: the Stainless-style preset for Stainless SDKs (set its Retry-After cap to match the vendor), the conservative default when there is no B.
