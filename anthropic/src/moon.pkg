@@ -3,6 +3,7 @@ import {
   "gaato/http",
   "gaato/http/clock",
   "gaato/http/sse",
+  "gaato/http/sync",
   "gaato/sdk-runtime" @runtime,
   "gaato/sdk-runtime/json" @sdkjson,
   "moonbitlang/core/debug",

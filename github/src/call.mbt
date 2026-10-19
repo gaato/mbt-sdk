@@ -29,11 +29,14 @@ pub async fn GitHub::send(
   self : GitHub,
   request : @http.Request,
 ) -> @http.Response raise @runtime.SdkError {
-  self.client.send(request, bucket=rate_limit_bucket(request.url))
+  self.client.send(
+    request,
+    bucket=rate_limit_bucket(request.http_method, request.url),
+  )
 }
 
 ///|
-/// The rate limit bucket a request URL belongs to.
+/// The rate limit bucket a request belongs to, by method and URL.
 ///
 /// GitHub meters search separately from the rest of the REST API, and the two
 /// windows are far apart (30 requests per minute against 5,000 per hour), so
@@ -43,21 +46,108 @@ pub async fn GitHub::send(
 /// `/rate_limit`, and a GraphQL response names its own with
 /// `x-ratelimit-resource: graphql`.
 ///
+/// Writes get buckets of their own so they can be paced (`github_pace`):
+/// any method but `GET` and `HEAD` is `"core:write"`, or
+/// `"core:notifications"` on a path that sends notifications
+/// (`triggers_notification`). Their state is still the `core` window, because
+/// the limiter follows `x-ratelimit-resource`. `GitHub::graphql` names its
+/// own bucket (`"graphql"` or `"graphql:mutation"`); a request sent to the
+/// endpoint through `send` is `"graphql"`.
+///
 /// The URL is either the relative path a generated operation produced or the
 /// absolute `Link` target of a following page, so the scheme and authority are
 /// stripped first, along with the `/api/v3` mount a GitHub Enterprise Server
 /// deployment puts in front of every path. GraphQL is not under that mount —
 /// Enterprise Server serves it from `/api/graphql` — so both spellings appear
 /// here.
-fn rate_limit_bucket(url : String) -> String {
+fn rate_limit_bucket(http_method : String, url : String) -> String {
   let path = request_path(url)
+  let read = http_method.to_upper() is ("GET" | "HEAD")
   if path == "/graphql" || path == "/api/graphql" {
-    "graphql"
-  } else if path.has_prefix("/search/") {
-    "search"
+    graphql_bucket
+  } else if read {
+    if path.has_prefix("/search/") {
+      "search"
+    } else {
+      "core"
+    }
+  } else if triggers_notification(path) {
+    "core:notifications"
   } else {
-    "core"
+    "core:write"
   }
+}
+
+///|
+/// How far apart the requests of a bucket start, after octokit's
+/// `plugin-throttling` and docs.github.com's "wait at least one second between
+/// each request" for mutative requests: writes and every GraphQL request
+/// (which may mutate) at least 1 s apart, writes that send notifications 3 s,
+/// and searches 2 s. All writes and GraphQL share the `"write"` group, so a
+/// notification-sending write also holds the next plain write for 3 s, where
+/// octokit keeps a separate 3 s queue for them; the stricter spacing meets
+/// both of its limits. Reads are not paced.
+fn github_pace(bucket : String) -> @runtime.Pace {
+  match bucket {
+    "core:write" | "graphql" | "graphql:mutation" =>
+      { group: "write", min_interval_ms: 1000, }
+    "core:notifications" => { group: "write", min_interval_ms: 3000, }
+    "search" => { group: "search", min_interval_ms: 2000, }
+    _ => { group: bucket, min_interval_ms: 0, }
+  }
+}
+
+///|
+/// The REST paths whose writes send notifications, from octokit's
+/// `plugin-throttling` (`src/generated/triggers-notification-paths.ts` at
+/// eb4215edcd97f20ade800b18d964bf798e0d70b7), split into segments.
+let notification_paths : Array[Array[String]] = [
+  "/orgs/{org}/invitations", "/orgs/{org}/invitations/{invitation_id}", "/orgs/{org}/teams/{team_slug}/discussions",
+  "/orgs/{org}/teams/{team_slug}/discussions/{discussion_number}/comments", "/repos/{owner}/{repo}/collaborators/{username}",
+  "/repos/{owner}/{repo}/commits/{commit_sha}/comments", "/repos/{owner}/{repo}/issues",
+  "/repos/{owner}/{repo}/issues/{issue_number}/comments", "/repos/{owner}/{repo}/issues/{issue_number}/sub_issue",
+  "/repos/{owner}/{repo}/issues/{issue_number}/sub_issues/priority", "/repos/{owner}/{repo}/pulls",
+  "/repos/{owner}/{repo}/pulls/{pull_number}/comments", "/repos/{owner}/{repo}/pulls/{pull_number}/comments/{comment_id}/replies",
+  "/repos/{owner}/{repo}/pulls/{pull_number}/merge", "/repos/{owner}/{repo}/pulls/{pull_number}/requested_reviewers",
+  "/repos/{owner}/{repo}/pulls/{pull_number}/reviews", "/repos/{owner}/{repo}/releases",
+  "/teams/{team_id}/discussions", "/teams/{team_id}/discussions/{discussion_number}/comments",
+].map(path_segments)
+
+///|
+/// Whether a write to `path` sends notifications. A `{parameter}` matches one
+/// non-empty segment and a literal segment matches regardless of case.
+/// Octokit's own matcher is a looser regular expression (a parameter may span
+/// slashes, and anything without a slash may follow the last segment); since
+/// no owner, repository or number contains a slash, matching whole segments
+/// gives the same answer for every real path without its accidental matches.
+fn triggers_notification(path : String) -> Bool {
+  let segments = path_segments(path)
+  notification_paths
+  .iter()
+  .any(pattern => {
+    pattern.length() == segments.length() &&
+    pattern
+    .iter()
+    .zip(segments.iter())
+    .all(pair => {
+      let (expected, actual) = pair
+      if expected.has_prefix("{") {
+        !actual.is_empty()
+      } else {
+        expected.to_lower() == actual.to_lower()
+      }
+    })
+  })
+}
+
+///|
+/// The segments of a path, without the empty one before its leading slash.
+fn path_segments(path : String) -> Array[String] {
+  let segments = path.split("/").map(segment => segment.to_owned()).collect()
+  if segments.length() > 0 && segments[0].is_empty() {
+    segments.remove(0) |> ignore
+  }
+  segments
 }
 
 ///|

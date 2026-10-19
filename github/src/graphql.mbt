@@ -21,14 +21,31 @@
 /// array is present and non-empty, so an error cannot pass unnoticed; read the
 /// array back with `graphql_errors`. Use `graphql_response` instead when the
 /// partial `data` of such a reply is worth keeping.
+///
+/// Three kinds of error are recognised inside the retry loop, before the reply
+/// is returned (see `GitHubRetry`):
+///
+/// - a `RATE_LIMITED` error (the point budget is spent) is raised as
+///   `@runtime.RateLimited` with the reply's headers and body, and retried
+///   once, one second after `x-ratelimit-reset`;
+/// - an error naming the secondary rate limit is raised as
+///   `@runtime.RateLimited` as well, and retried after `retry-after` or at
+///   least a minute;
+/// - "Something went wrong while executing your query" is raised as
+///   `@runtime.Decode` and retried with the policy's backoff, but only when
+///   the document holds no mutation, since a mutation may have been applied.
+///
+/// Requests are metered and paced in the `"graphql"` bucket, or
+/// `"graphql:mutation"` for a document holding a mutation.
 pub async fn GitHub::graphql(
   self : GitHub,
   query~ : String,
   variables? : Json,
   operation_name? : String,
 ) -> Json raise @runtime.SdkError {
-  let response = self.graphql_exchange(query, variables, operation_name)
-  let envelope = graphql_envelope(response)
+  let (response, envelope) = self.graphql_exchange(
+    query, variables, operation_name,
+  )
   graphql_data(envelope, response)
 }
 
@@ -36,18 +53,20 @@ pub async fn GitHub::graphql(
 /// Sends a GraphQL query and returns the whole `{data, errors, extensions}`
 /// envelope.
 ///
-/// This raises only for the failures the HTTP status reports — an unauthorized
-/// request, a transport error, a body that is not JSON. A GraphQL reply that
-/// nulls one field and explains it in `errors` is returned intact, which is the
-/// point of this entry point: `graphql` would raise and discard the rest.
+/// This raises for the failures the HTTP status reports — an unauthorized
+/// request, a transport error, a body that is not JSON — and for the errors
+/// `graphql` retries once their retries run out: a rate limit, and a transient
+/// failure of a document without a mutation. Any other GraphQL reply, such as
+/// one that nulls one field and explains it in `errors`, is returned intact,
+/// which is the point of this entry point: `graphql` would raise and discard
+/// the rest.
 pub async fn GitHub::graphql_response(
   self : GitHub,
   query~ : String,
   variables? : Json,
   operation_name? : String,
 ) -> Json raise @runtime.SdkError {
-  let response = self.graphql_exchange(query, variables, operation_name)
-  graphql_envelope(response)
+  self.graphql_exchange(query, variables, operation_name).1
 }
 
 ///|
@@ -87,7 +106,8 @@ pub async fn GitHub::graphql_response(
 ///       )
 ///       .collect(max=500)
 ///
-/// Each page raises on a non-empty `errors` array exactly as `graphql` does.
+/// Each page raises on a non-empty `errors` array, and is retried, exactly as
+/// `graphql` does.
 pub fn[T] GitHub::graphql_paginator(
   self : GitHub,
   page : (Json) -> (Array[T], String?) raise @runtime.SdkError,
@@ -101,8 +121,9 @@ pub fn[T] GitHub::graphql_paginator(
       None => variables
       Some(cursor) => Some(with_cursor(variables, cursor_variable, cursor))
     }
-    let response = self.graphql_exchange(query, variables, operation_name)
-    let envelope = graphql_envelope(response)
+    let (response, envelope) = self.graphql_exchange(
+      query, variables, operation_name,
+    )
     let (items, next) = page(graphql_data(envelope, response))
     @runtime.Page::{ items, next, }
   })
@@ -152,7 +173,8 @@ pub extend GraphqlError with @debug.Debug::{to_repr}
 ///
 /// This is the counterpart of `api_error`. `graphql` reports a non-empty
 /// `errors` array as `@runtime.Decode` — the response decoded, it simply did not
-/// carry the value that was asked for — and attaches the body, which this reads
+/// carry the value that was asked for — or, for a rate limit, as
+/// `@runtime.RateLimited`, and attaches the body to either, which this reads
 /// back:
 ///
 ///     if @github.graphql_errors(error) is Some(errors) {
@@ -179,19 +201,36 @@ pub fn graphql_errors(error : @runtime.SdkError) -> Array[GraphqlError]? {
 }
 
 ///|
-/// Sends one GraphQL request.
+/// The bucket of a GraphQL document that holds no mutation.
+let graphql_bucket : String = "graphql"
+
+///|
+/// The bucket of a GraphQL document that holds a mutation: its own name, so
+/// `GitHubRetry` knows not to retry a transient failure of it, while
+/// `x-ratelimit-resource: graphql` lets it share the `"graphql"` window.
+let graphql_mutation_bucket : String = "graphql:mutation"
+
+///|
+/// Sends one GraphQL request and parses its reply.
 ///
 /// `accept` is set here because the client default is the REST media type,
 /// which this endpoint has no use for. The `x-github-api-version` default rides
 /// along; it selects a REST API version and GitHub ignores it for GraphQL,
 /// which has no versions.
+///
+/// The reply is parsed and checked inside the client's attempt loop (`accept`)
+/// so a rate limit or a transient failure reported in a `200` is retried like
+/// an error status; the envelope parsed there is handed back so it is not
+/// parsed twice.
 async fn GitHub::graphql_exchange(
   self : GitHub,
   query : String,
   variables : Json?,
   operation_name : String?,
-) -> @http.Response raise @runtime.SdkError {
-  self.send(
+) -> (@http.Response, Json) raise @runtime.SdkError {
+  let mutation = is_mutation_document(query)
+  let parsed : Ref[Json?] = { val: None, }
+  let response = self.client.send(
     @http.Request::post(self.graphql_url)
     .header("accept", "application/json")
     .json_body(
@@ -201,7 +240,190 @@ async fn GitHub::graphql_exchange(
       .opt("operationName", operation_name)
       .build(),
     ),
+    bucket=if mutation { graphql_mutation_bucket } else { graphql_bucket },
+    accept=response => {
+      parsed.val = None
+      let envelope = graphql_envelope(response)
+      check_graphql_reply(envelope, response, mutation~)
+      parsed.val = Some(envelope)
+    },
   )
+  match parsed.val {
+    Some(envelope) => (response, envelope)
+    None => (response, graphql_envelope(response))
+  }
+}
+
+///|
+/// Raises, for `GitHubRetry` to decide, the errors of a `200` reply that are
+/// worth another attempt: a spent point budget (`RATE_LIMITED`) or a secondary
+/// rate limit as `RateLimited` with the reply's headers and body, and a
+/// transient failure of a document without a mutation as `Decode`. Any other
+/// reply passes.
+fn check_graphql_reply(
+  envelope : Json,
+  response : @http.Response,
+  mutation~ : Bool,
+) -> Unit raise @runtime.SdkError {
+  guard envelope_errors(envelope) is Some(errors) && errors.length() > 0 else {
+    return
+  }
+  if has_condition(errors, GraphqlRateLimited) ||
+    has_condition(errors, GraphqlSecondary) {
+    raise @runtime.RateLimited(
+      retry_after_ms=@http.retry_after_ms(response.headers),
+      headers=response.headers,
+      body=response.body,
+    )
+  }
+  if !mutation && has_condition(errors, GraphqlTransient) {
+    raise @runtime.Decode(
+      message=graphql_error_message(errors),
+      body=response.body,
+    )
+  }
+}
+
+///|
+/// The GraphQL errors that the retry loop treats specially.
+priv enum GraphqlCondition {
+  /// `type: "RATE_LIMITED"`: the primary point budget is spent.
+  GraphqlRateLimited
+  /// A message naming the secondary rate limit.
+  GraphqlSecondary
+  /// "Something went wrong while executing your query", which octokit's
+  /// `plugin-retry` retries as if it were a `500`.
+  GraphqlTransient
+}
+
+///|
+/// Whether one GraphQL error is of this kind.
+fn GraphqlCondition::matches(
+  self : GraphqlCondition,
+  error : GraphqlError,
+) -> Bool {
+  match self {
+    GraphqlRateLimited => error.type_ is Some("RATE_LIMITED")
+    GraphqlSecondary => names_secondary_rate_limit(error.message)
+    GraphqlTransient =>
+      error.message.contains("Something went wrong while executing your query")
+  }
+}
+
+///|
+/// Whether a reply body is a GraphQL envelope with an error of this kind.
+fn graphql_reply_has(body : Bytes, condition : GraphqlCondition) -> Bool {
+  try decode_graphql_errors(body) catch {
+    _ => false
+  } noraise {
+    errors => has_condition(errors, condition)
+  }
+}
+
+///|
+/// Whether any of the errors is of this kind.
+fn has_condition(
+  errors : Array[GraphqlError],
+  condition : GraphqlCondition,
+) -> Bool {
+  errors.iter().any(error => condition.matches(error))
+}
+
+///|
+/// Whether a GraphQL document holds a mutation operation, so that a failure
+/// of it must not be retried.
+///
+/// The document is scanned for the keyword `mutation` outside every brace,
+/// parenthesis and bracket, skipping what GraphQL ignores (whitespace,
+/// commas, a byte order mark, `#` comments) and string values. That finds a
+/// mutation that is not the first definition — after a fragment, or beside a
+/// query in a document whose `operationName` picks it — which a look at the
+/// first keyword alone would miss. A query shorthand (`{ … }`), `query` and
+/// `subscription` are not mutations; keywords are case-sensitive, so a type
+/// condition `on Mutation` is not one either.
+fn is_mutation_document(document : String) -> Bool {
+  let chars = document.to_array()
+  let length = chars.length()
+  let mut depth = 0
+  let mut i = 0
+  while i < length {
+    let c = chars[i]
+    if c == '#' {
+      while i < length && chars[i] != '\n' && chars[i] != '\r' {
+        i += 1
+      }
+    } else if c == '"' {
+      i = skip_string(chars, i)
+    } else if c == '{' || c == '(' || c == '[' {
+      depth += 1
+      i += 1
+    } else if c == '}' || c == ')' || c == ']' {
+      depth = (depth - 1).max(0)
+      i += 1
+    } else if is_name_start(c) {
+      let start = i
+      while i < length &&
+            (is_name_start(chars[i]) || (chars[i] >= '0' && chars[i] <= '9')) {
+        i += 1
+      }
+      if depth == 0 &&
+        i - start == 8 &&
+        String::from_array(chars[start:i]) == "mutation" {
+        return true
+      }
+    } else {
+      i += 1
+    }
+  }
+  false
+}
+
+///|
+/// Whether a character can start a GraphQL name.
+fn is_name_start(c : Char) -> Bool {
+  (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '_'
+}
+
+///|
+/// The index just past the string value starting at `start`: a block string
+/// (`"""…"""`, where only `\"""` escapes), or a string that ends at an
+/// unescaped quote or at the end of its line. An unterminated string runs to
+/// the end of the document.
+fn skip_string(chars : Array[Char], start : Int32) -> Int32 {
+  let length = chars.length()
+  let block = start + 2 < length &&
+    chars[start + 1] == '"' &&
+    chars[start + 2] == '"'
+  if block {
+    let mut i = start + 3
+    while i < length {
+      if chars[i] == '\\' &&
+        i + 3 < length &&
+        chars[i + 1] == '"' &&
+        chars[i + 2] == '"' &&
+        chars[i + 3] == '"' {
+        i += 4
+      } else if chars[i] == '"' &&
+        i + 2 < length &&
+        chars[i + 1] == '"' &&
+        chars[i + 2] == '"' {
+        return i + 3
+      } else {
+        i += 1
+      }
+    }
+    return length
+  }
+  let mut i = start + 1
+  while i < length {
+    match chars[i] {
+      '\\' => i += 2
+      '"' => return i + 1
+      '\n' | '\r' => return i
+      _ => i += 1
+    }
+  }
+  length
 }
 
 ///|
@@ -218,11 +440,9 @@ fn graphql_envelope(response : @http.Response) -> Json raise @runtime.SdkError {
 ///
 /// The raise is `@runtime.Decode` rather than `@runtime.Status`: the request
 /// succeeded at the HTTP level, so reporting it as a status would put a `200` in
-/// `SdkError::status` and mislead anything that branches on one. `Decode` is
-/// also not retryable, which is right even for `RATE_LIMITED` — GraphQL's point
-/// budget refills on the hour and carries no `retry-after`, so an immediate
-/// retry only spends the policy's attempts. The response's `x-ratelimit-reset`
-/// has already reached the limiter, which paces the next request.
+/// `SdkError::status` and mislead anything that branches on one. The errors
+/// worth retrying never get here: `check_graphql_reply` raised them inside the
+/// retry loop.
 fn graphql_data(
   envelope : Json,
   response : @http.Response,

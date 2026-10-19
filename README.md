@@ -30,15 +30,21 @@ Status: experimental. The HTTP, runtime and API modules are published on [moonca
 HTTP SDK modules never import an async runtime: the caller passes a `Transport` and a `Clock`. That keeps them portable and makes retry, rate-limit and streaming logic testable with fakes and a fake clock. The Codex SDK keeps generated protocol types portable and puts connection/process ownership in a separate async module.
 
 ```moonbit
-let transport = @http_async.AsyncTransport::new(max_body_bytes=64 * 1024 * 1024)
+let transport = @http_async.AsyncTransport::new(
+  timeout_ms=600_000,
+  connect_timeout_ms=5_000,
+  max_body_bytes=64 * 1024 * 1024,
+)
 let clock = @http_async.AsyncClock::new()
-let openai = @openai.OpenAI::new(api_key~, transport, clock)
+let openai = @openai.OpenAI::new(api_key~, transport, clock, timer=@http_async.ClockTimer::new())
 openai.stream_response(@openai.ResponseRequest::new(model="gpt-5.6-sol", input="Hello"), event => {
   if event is OutputTextDelta(text) { print(text) }
 })
 ```
 
 Set `max_body_bytes` on the transport: without it a buffered response is read whole however large it is, and an SDK cannot set it for you because the transport is yours. 64 MiB is ample for API JSON; a longer reply fails with `Transport(Protocol(..))` instead of growing memory, and streaming calls are not affected. Error bodies kept in an `SdkError` are cut to their first 1 MiB either way.
+
+The OpenAI and Anthropic clients retry and time out as the official SDKs do (600 s per call, 5 s to connect). An SDK module cannot enforce a time limit without an async runtime, so the caller passes `ClockTimer` as `timer`, and gives the transport matching limits: `AsyncTransport`'s own exchange timeout defaults to 30 s, which would end a long generation first.
 
 For OpenAI-compatible servers that implement Chat Completions, use `ChatRequest` with `chat_completion` or `stream_chat_completion`. The opt-in live suite also accepts `OPENAI_COMPAT_BASE_URL` and `OPENAI_COMPAT_MODEL`; `OPENAI_COMPAT_API_KEY` is optional for local servers.
 

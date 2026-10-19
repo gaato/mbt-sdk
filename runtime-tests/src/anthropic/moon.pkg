@@ -1,6 +1,7 @@
 import {
   "gaato/http",
   "gaato/http/mock",
+  "gaato/http/sync",
   "gaato/sdk-runtime" @runtime,
   "gaato/anthropic" @anthropic_sdk,
   "gaato/anthropic/gen" @anthropic_gen,

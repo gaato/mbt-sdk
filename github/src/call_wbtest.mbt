@@ -1,34 +1,40 @@
 ///|
 test "rate limit bucket separates search from the rest of the API" {
   // Relative paths, as the generated operations build them.
-  assert_eq(rate_limit_bucket("/search/repositories?q=moonbit"), "search")
-  assert_eq(rate_limit_bucket("/search/code?q=addr%3Ain%3Afile"), "search")
-  assert_eq(rate_limit_bucket("/repos/gaato/mbt-sdk"), "core")
-  assert_eq(rate_limit_bucket("/rate_limit"), "core")
-  assert_eq(rate_limit_bucket("/"), "core")
-  // Absolute URLs, as a Link header hands them back for the following page.
   assert_eq(
-    rate_limit_bucket("https://api.github.com/search/issues?q=x&page=2"),
+    rate_limit_bucket("GET", "/search/repositories?q=moonbit"),
     "search",
   )
   assert_eq(
-    rate_limit_bucket("https://api.github.com/users/gaato/repos?page=3"),
+    rate_limit_bucket("GET", "/search/code?q=addr%3Ain%3Afile"),
+    "search",
+  )
+  assert_eq(rate_limit_bucket("GET", "/repos/gaato/mbt-sdk"), "core")
+  assert_eq(rate_limit_bucket("GET", "/rate_limit"), "core")
+  assert_eq(rate_limit_bucket("GET", "/"), "core")
+  // Absolute URLs, as a Link header hands them back for the following page.
+  assert_eq(
+    rate_limit_bucket("GET", "https://api.github.com/search/issues?q=x&page=2"),
+    "search",
+  )
+  assert_eq(
+    rate_limit_bucket("GET", "https://api.github.com/users/gaato/repos?page=3"),
     "core",
   )
   // A GitHub Enterprise Server mount keeps its bucket.
   assert_eq(
-    rate_limit_bucket("https://ghe.example.com/api/v3/search/users?q=x"),
+    rate_limit_bucket("GET", "https://ghe.example.com/api/v3/search/users?q=x"),
     "search",
   )
   assert_eq(
-    rate_limit_bucket("https://ghe.example.com/api/v3/repos/o/r"),
+    rate_limit_bucket("GET", "https://ghe.example.com/api/v3/repos/o/r"),
     "core",
   )
   // A repository named "search" is not the search API.
-  assert_eq(rate_limit_bucket("/repos/gaato/search/issues"), "core")
+  assert_eq(rate_limit_bucket("GET", "/repos/gaato/search/issues"), "core")
   // "/search" alone is not an endpoint, and neither is a prefix match on it.
-  assert_eq(rate_limit_bucket("/search"), "core")
-  assert_eq(rate_limit_bucket("/searching/x"), "core")
+  assert_eq(rate_limit_bucket("GET", "/search"), "core")
+  assert_eq(rate_limit_bucket("GET", "/searching/x"), "core")
 }
 
 ///|
@@ -81,4 +87,79 @@ test "a request that sets a default header keeps its own value" {
   }
   assert_eq(request.headers.get("accept"), Some("application/vnd.github.diff"))
   assert_eq(request.headers.get("user-agent"), Some("my-tool/2"))
+}
+
+///|
+test "writes get buckets of their own, notification-sending ones apart" {
+  assert_eq(rate_limit_bucket("HEAD", "/repos/o/r"), "core")
+  assert_eq(rate_limit_bucket("get", "/search/issues?q=x"), "search")
+  assert_eq(rate_limit_bucket("POST", "/repos/o/r/labels"), "core:write")
+  assert_eq(rate_limit_bucket("PATCH", "/repos/o/r"), "core:write")
+  assert_eq(
+    rate_limit_bucket("DELETE", "/repos/o/r/issues/1/lock"),
+    "core:write",
+  )
+  assert_eq(
+    rate_limit_bucket("POST", "/repos/o/r/issues"),
+    "core:notifications",
+  )
+  assert_eq(
+    rate_limit_bucket(
+      "POST", "https://api.github.com/repos/o/r/issues/7/comments",
+    ),
+    "core:notifications",
+  )
+  assert_eq(
+    rate_limit_bucket("PUT", "/repos/o/r/pulls/3/merge"),
+    "core:notifications",
+  )
+  assert_eq(
+    rate_limit_bucket(
+      "POST", "https://ghe.example.com/api/v3/repos/o/r/releases",
+    ),
+    "core:notifications",
+  )
+  // Reading a notification path is a read.
+  assert_eq(rate_limit_bucket("GET", "/repos/o/r/issues"), "core")
+  // A write to a search path is still a write, as octokit counts it.
+  assert_eq(rate_limit_bucket("POST", "/search/issues"), "core:write")
+  // GraphQL keeps its bucket whatever the method.
+  assert_eq(rate_limit_bucket("POST", "/graphql"), "graphql")
+}
+
+///|
+test "notification paths match whole segments" {
+  assert_true(triggers_notification("/repos/o/r/issues"))
+  assert_true(triggers_notification("/REPOS/o/r/Issues"))
+  assert_true(triggers_notification("/orgs/acme/invitations/12"))
+  assert_true(triggers_notification("/repos/o/r/issues/1/sub_issues/priority"))
+  assert_true(triggers_notification("/teams/9/discussions/2/comments"))
+  // A parameter is one non-empty segment.
+  assert_false(triggers_notification("/repos/o/x/r/issues"))
+  assert_false(triggers_notification("/repos//r/issues"))
+  // A longer, shorter or merely prefixed path does not match.
+  assert_false(triggers_notification("/repos/o/r/issues/1"))
+  assert_false(triggers_notification("/repos/o/r"))
+  assert_false(triggers_notification("/repos/o/r/issuesx"))
+  assert_false(triggers_notification("/repos/o/r/issues/"))
+  assert_eq(notification_paths.length(), 19)
+}
+
+///|
+test "pace spaces writes, graphql, notifications and search" {
+  assert_eq(github_pace("core:write"), {
+    group: "write",
+    min_interval_ms: 1000,
+  })
+  assert_eq(github_pace("graphql"), { group: "write", min_interval_ms: 1000, })
+  assert_eq(github_pace("graphql:mutation"), {
+    group: "write",
+    min_interval_ms: 1000,
+  })
+  assert_eq(github_pace("core:notifications"), {
+    group: "write",
+    min_interval_ms: 3000,
+  })
+  assert_eq(github_pace("search"), { group: "search", min_interval_ms: 2000, })
+  assert_eq(github_pace("core"), { group: "core", min_interval_ms: 0, })
 }

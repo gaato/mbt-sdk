@@ -18,14 +18,67 @@ are optional unless the field is required, and keep a wildcard arm.
 
 - **`GitHubRetry` implements `gaato/sdk-runtime` 0.7.0's `RetryDecider`.**
   Its method is `decide(error, context) -> Decision` instead of
-  `next_delay_ms(error, request, attempt, random) -> Int?`, and it reads the
-  delay cap from the policy's `rule.retry_after.cap` (`StopAbove` or
-  `BackoffAbove`; `NoCap` means none) instead of `max_retry_after_ms`. The
-  decisions are the same under the default policy. Migration: call
+  `next_delay_ms(error, request, attempt, random) -> Int?`. It no longer
+  holds a secondary-limit wait to the policy's Retry-After cap (below), and
+  hands every error it does not recognise to the policy, whose `StopAbove`
+  and `BackoffAbove` caps then apply as `gaato/http/retry` defines them.
+  Migration: call
   `retry.decide(error, @runtime.RetryContext::new(request, attempt~, random~))`
   and match `Wait(ms)` and `Stop(_)` instead of `Some(ms)` and `None`; build a
-  policy with `RetryPolicy::default().with_max_retries(n)` instead of a
+  policy with `RetryPolicy::conservative().with_max_retries(n)` instead of a
   struct update.
+- **Three retries by default, and still none for a `POST` on 5xx.**
+  `GitHub::new` defaults to `RetryPolicy::conservative().with_max_retries(3)`
+  (it was two retries), matching octokit's `plugin-retry`. Unlike octokit, a
+  5xx, 408, 409 or a timeout after sending is retried only for an idempotent
+  request: GitHub has no idempotency key, and a resent `POST` could open a
+  second issue or comment. Migration: pass `retry=` with
+  `.with_max_retries(2)` for the old count.
+- **A secondary rate limit is waited out with growing waits.** Without
+  `retry-after` (or with `retry-after: 0`) the waits are 60 s, 120 s, 240 s;
+  `retry-after` is read as seconds or an HTTP date. Neither is held to the
+  policy's Retry-After cap any more, so the second wait, which the 60 s cap
+  used to stop, now happens, as docs.github.com asks ("wait for at least one
+  minute", then "an exponentially increasing amount of time"). The retry
+  count and a total time limit still bound it. Detection matches "secondary
+  rate" in any case, as octokit does, also in a GraphQL reply.
+- **A primary rate limit is retried once, a second after the reset.** A `403`
+  or `429` with `x-ratelimit-remaining: 0` used to be raised at once; it is
+  now retried, for any method, one second after `x-ratelimit-reset`, and only
+  once per call, as octokit does (docs.github.com: do not retry before the
+  reset). That wait can be up to an hour. Migration: set a total time limit
+  through `timeouts`, or `retry=@runtime.RetryPolicy::none()` to raise at once.
+- **GraphQL rate limits and transient failures in a `200` are retried.**
+  `graphql`, `graphql_response` and `graphql_paginator` now check the reply
+  inside the retry loop. A `RATE_LIMITED` error is raised as
+  `@runtime.RateLimited` (it was `Decode`) and retried once after the reset; a
+  secondary limit is raised as `RateLimited` and waited out as above;
+  "Something went wrong while executing your query" is retried with the
+  policy's backoff when the document holds no mutation (a mutation may have
+  been applied, so it is raised as before). `graphql_response` raises these
+  once their retries run out instead of returning the envelope. Migration:
+  match `@runtime.RateLimited(..)` where you matched `Decode` for
+  `RATE_LIMITED`; `graphql_errors` reads either.
+- **Writes, GraphQL and searches are paced, so consecutive writes are
+  slower.** The default limiter spaces writes (any method but `GET` and
+  `HEAD`) and every GraphQL request at least 1 s apart, writes to the paths
+  that send notifications (from octokit's `plugin-throttling`) 3 s, and
+  searches 2 s, as octokit does and docs.github.com asks for mutative
+  requests. Writes use the `core:write` and `core:notifications` buckets, and
+  GraphQL `graphql` or `graphql:mutation`, but the limiter records state under
+  the response's `x-ratelimit-resource`, so they still spend and wait on the
+  `core` and `graphql` windows. Migration: pass
+  `limiter=@runtime.NoLimiter::new()`, or a `WindowLimiter` of your own, to
+  opt out.
+
+### Added
+
+- **`GitHub::new(gate?)` makes each paced group's requests serial.**
+  docs.github.com asks for requests "serially instead of concurrently"; this
+  module has no async runtime, so pass `gate=() => SemaphoreGate::new()` from
+  `gaato/http-async`. It is used by the default limiter only.
+- **`GitHub::new(timeouts?)` passes `@runtime.Timeouts` to the client,** for
+  per-attempt and per-call time limits.
 
 ## [0.16.0] - 2026-10-19
 

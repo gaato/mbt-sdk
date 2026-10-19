@@ -461,9 +461,10 @@ async test "search and core meter in separate buckets" {
     // Exhausting search does not hold up a core request.
     ignore(gh.send(@gen.repos_get_request("gaato", "mbt-sdk")))
     assert_eq(clock.slept(), [])
-    // The next search still pays for the exhausted search window.
+    // The next search still pays for the exhausted search window: first the
+    // 2 s spacing between searches, then the rest of the window.
     ignore(gh.send(search))
-    assert_eq(clock.slept(), [60000])
+    assert_eq(clock.slept(), [2000, 58000])
     transport.assert_complete()
   })
 }
@@ -886,11 +887,11 @@ async test "graphql_response keeps the partial data of a failed field" {
 }
 
 ///|
-async test "a graphql rate limit is not retried on the spot" {
+async test "a graphql rate limit is retried once, a second past the reset" {
   bounded(() => {
     // GitHub reports an exhausted point budget as an ordinary errors entry on a
-    // 200. It refills on the hour and carries no retry-after, so replaying it
-    // immediately would only spend the retry budget; the limiter has the reset.
+    // 200, with x-ratelimit-reset. It is raised as RateLimited inside the retry
+    // loop and waited out once, as octokit does; a second one is raised.
     let envelope =
       #|{"errors":[{"type":"RATE_LIMITED","message":"API rate limit exceeded for user ID 1."}]}
     let transport = @mock.FakeTransport::new()
@@ -899,22 +900,51 @@ async test "a graphql rate limit is not retried on the spot" {
       "https://api.github.com/graphql",
       json_response(envelope, headers=rate_limit_headers(0, 3600)),
     )
+    transport.expect(
+      "POST",
+      "https://api.github.com/graphql",
+      json_response(envelope, headers=rate_limit_headers(0, 7200)),
+    )
     let clock = @mock.FakeClock::new()
     let gh = @github_sdk.GitHub::new(transport, clock, token="ghp_test")
     try gh.graphql(query="{ viewer { login } }") catch {
-      error => {
-        assert_false(error.is_retryable())
+      @runtime.RateLimited(..) as error => {
         guard @github_sdk.graphql_errors(error) is Some(errors) else {
           fail("the raised error must carry the GraphQL errors array")
         }
         assert_eq(errors[0].type_, Some("RATE_LIMITED"))
       }
+      error => fail("expected RateLimited: " + @debug.to_string(error))
     } noraise {
-      _ => fail("RATE_LIMITED must fail")
+      _ => fail("a second RATE_LIMITED must fail")
     }
-    assert_eq(transport.sent().length(), 1)
-    assert_eq(clock.slept(), [])
+    // The reset is 3600 s after the epoch; the retry left at 3601 s, and the
+    // limiter, whose window had reset by then, did not wait again.
+    assert_eq(clock.slept(), [3601000])
+    assert_eq(transport.sent().length(), 2)
     transport.assert_complete()
+
+    let recovering = @mock.FakeTransport::new()
+    recovering.expect(
+      "POST",
+      "https://api.github.com/graphql",
+      json_response(envelope, headers=rate_limit_headers(0, 30)),
+    )
+    recovering.expect(
+      "POST",
+      "https://api.github.com/graphql",
+      json_response(
+        "{\"data\":{\"viewer\":{\"login\":\"gaato\"}}}",
+        headers=rate_limit_headers(4999, 3600),
+      ),
+    )
+    let clock = @mock.FakeClock::new()
+    let gh = @github_sdk.GitHub::new(recovering, clock, token="ghp_test")
+    assert_eq(gh.graphql(query="{ viewer { login } }"), {
+      "viewer": { "login": "gaato" },
+    })
+    assert_eq(clock.slept(), [31000])
+    recovering.assert_complete()
   })
 }
 

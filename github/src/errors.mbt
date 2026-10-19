@@ -65,16 +65,19 @@ pub fn is_not_modified(error : @runtime.SdkError) -> Bool {
 /// Reports a secondary rate limit, which is not the documented hourly quota.
 ///
 /// GitHub answers the hourly quota with `403` or `429` and
-/// `x-ratelimit-remaining: 0`; `WindowLimiter` already paces against those
-/// headers. A secondary rate limit — too many concurrent requests, too many
-/// points in a minute, too much content creation — is a separate mechanism,
-/// reported with `403` or `429` plus a `retry-after` header, or a body whose
-/// message names it. It leaves `x-ratelimit-remaining` untouched, so no limiter
+/// `x-ratelimit-remaining: 0`; `WindowLimiter` paces against those headers
+/// and `GitHubRetry` waits for the reset once. A secondary rate limit — too
+/// many concurrent requests, too many points in a minute, too much content
+/// creation — is a separate mechanism, reported with `403` or `429` plus a
+/// `retry-after` header, or a message naming it (matched as octokit does,
+/// "secondary rate" in any case), in a REST error body or in the `errors` of
+/// a GraphQL reply. It leaves `x-ratelimit-remaining` untouched, so no limiter
 /// can anticipate it: `GitHubRetry` waits and retries after it occurs.
 ///
 /// The runtime's taxonomy classifies only `429` as `RateLimited`, so a
-/// secondary limit delivered as `403` arrives as `Status`. This predicate spans
-/// both.
+/// secondary limit delivered as `403` arrives as `Status`; one delivered in a
+/// GraphQL `200` is raised by `graphql` as `RateLimited`. This predicate spans
+/// all three.
 pub fn is_secondary_rate_limit(error : @runtime.SdkError) -> Bool {
   let (status, headers, body) = match error {
     @runtime.Status(status~, headers~, body~) => (status, headers, body)
@@ -86,13 +89,22 @@ pub fn is_secondary_rate_limit(error : @runtime.SdkError) -> Bool {
 }
 
 ///|
-/// Reports whether an error body names the secondary rate limit.
+/// Reports whether a REST error body or a GraphQL reply names the secondary
+/// rate limit.
 fn mentions_secondary_rate_limit(body : Bytes) -> Bool {
-  try decode_api_error_body(body) catch {
+  let rest = try decode_api_error_body(body) catch {
     _ => false
   } noraise {
-    value => value.message.to_lower().contains("secondary rate limit")
+    value => names_secondary_rate_limit(value.message)
   }
+  rest || graphql_reply_has(body, GraphqlSecondary)
+}
+
+///|
+/// Whether a message names the secondary rate limit, as octokit's
+/// `/\bsecondary rate\b/i` does.
+fn names_secondary_rate_limit(message : String) -> Bool {
+  message.to_lower().contains("secondary rate")
 }
 
 ///|

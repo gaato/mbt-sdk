@@ -4,6 +4,7 @@ package "gaato/openai"
 import {
   "gaato/http",
   "gaato/http/clock",
+  "gaato/http/sync",
   "gaato/sdk-runtime",
   "moonbitlang/core/debug",
   "moonbitlang/core/json",
@@ -140,7 +141,7 @@ pub async fn OpenAI::create_embeddings(Self, EmbeddingRequest) -> EmbeddingRespo
 pub async fn OpenAI::create_response(Self, ResponseRequest) -> Response raise @sdk-runtime.SdkError
 pub fn OpenAI::from_client(@sdk-runtime.Client) -> Self
 pub async fn OpenAI::list_models(Self) -> Array[Model] raise @sdk-runtime.SdkError
-pub fn OpenAI::new(api_key~ : String, &@http.Transport, &@clock.Clock, base_url? : String, organization? : String, project? : String, retry? : @sdk-runtime.RetryPolicy) -> Self
+pub fn OpenAI::new(api_key~ : String, &@http.Transport, &@clock.Clock, base_url? : String, organization? : String, project? : String, retry? : @sdk-runtime.RetryPolicy, timer? : &@sync.Timer, timeout_ms? : Int, total_timeout_ms? : Int) -> Self
 pub async fn OpenAI::retrieve_model(Self, String) -> Model raise @sdk-runtime.SdkError
 pub async fn[E : Error] OpenAI::stream_chat_completion(Self, ChatRequest, async (ChatEvent) -> Unit raise E) -> Unit
 pub async fn[E : Error] OpenAI::stream_response(Self, ResponseRequest, async (ResponseEvent) -> Unit raise E) -> Unit

@@ -11,6 +11,37 @@ change itself is the diff of `src/gen/pkg.generated.mbti`.
 
 ## [Unreleased]
 
+### Changed
+
+- **Retries follow the official SDK (`openai-python`), POST included.**
+  `OpenAI::new` now defaults to `RetryPolicy::stainless(cap=StopAbove(120000))`
+  of `gaato/sdk-runtime`: two retries of 408, 409, 429 and every 5xx, and of
+  a timeout or network failure after the request was sent, for every method.
+  A `POST` such as a response or an embedding is therefore resent after a
+  5xx or a timeout, as the official SDK does, and the model may generate (and
+  bill) it twice. The server's `x-should-retry: true`/`false` overrides the
+  status rules; the backoff runs from 0.5 s to 8 s, shortened by up to a
+  quarter (it was 0.5 s to 30 s, ±20 %); a `Retry-After` over 120 s is raised
+  instead of waited for (the limit was 60 s), and one of 0 means the backoff.
+  Migration: pass `retry=@runtime.RetryPolicy::conservative()` to keep the
+  old behaviour, which retries a `POST` only on 429 and on failures that
+  prove nothing was sent. A policy built as `{ ..RetryPolicy::default(),
+  max_retries: n }` no longer compiles; write
+  `@runtime.RetryPolicy::stainless(cap=StopAbove(120000)).with_max_retries(n)`
+  (or `conservative().with_max_retries(n)`), and follow `gaato/sdk-runtime`'s
+  changelog for the rest of `RetryPolicy`.
+
+### Added
+
+- **`OpenAI::new(timer?, timeout_ms?, total_timeout_ms?)` limits calls in
+  time.** With a `@sync.Timer` such as `gaato/http-async`'s `ClockTimer`,
+  each attempt is limited to `timeout_ms` (600 s, the official default) and,
+  when given, the whole call, retries and waits included, to
+  `total_timeout_ms`. An attempt that runs out is retried like any timeout.
+  Without a timer nothing changes and only the transport's timeouts apply;
+  `AsyncTransport` defaults to 30 s, so raise its `timeout_ms` too (see the
+  README).
+
 ## [0.5.0] - 2026-10-19
 
 ### Changed

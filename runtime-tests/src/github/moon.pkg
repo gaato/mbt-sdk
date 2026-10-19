@@ -1,6 +1,7 @@
 import {
   "gaato/http",
   "gaato/http/mock",
+  "gaato/http/sync",
   "gaato/sdk-runtime" @runtime,
   "gaato/github" @github_sdk,
   "gaato/github/gen",
