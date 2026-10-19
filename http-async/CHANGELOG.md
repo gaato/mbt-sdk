@@ -8,6 +8,14 @@ note.
 
 ## [Unreleased]
 
+### Added
+
+- **`ClockTimer`, the `@sync.Timer` of this runtime.** `within(ms, f)` runs
+  `f` until it finishes or `ms` pass on the clock it was built with (the
+  wall clock by default, a `VirtualClock` in tests), and cancels `f` when
+  time runs out. `gaato/sdk-runtime` takes a `Timer` to bound each attempt
+  without importing an async runtime, as it takes a `Gate` for admission.
+
 ## [0.4.1] - 2026-10-19
 
 ### Changed

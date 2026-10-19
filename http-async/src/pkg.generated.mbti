@@ -30,6 +30,13 @@ pub async fn AsyncTransport::send(Self, @http.Request) -> @http.Response raise @
 pub async fn AsyncTransport::send_stream(Self, @http.Request) -> (@http.ResponseHead, &@http.BodyStream) raise @http.HttpError
 pub impl @http.Transport for AsyncTransport
 
+pub struct ClockTimer {
+  // private fields
+}
+pub fn ClockTimer::new(clock? : &@clock.Clock) -> Self
+pub async fn ClockTimer::within(Self, Int, async () -> Unit noraise) -> Bool noraise
+pub impl @sync.Timer for ClockTimer
+
 pub struct DeadlineTransport {
   // private fields
 }

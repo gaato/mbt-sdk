@@ -113,6 +113,7 @@ Unreachable or platform-only:
 | http/src/mock/transport.mbt | 2 | The kind-mismatch arms of `send` and `send_stream`: `take` already rejects a script entry whose kind does not match the call. |
 | http/src/random/random.mbt | 2 | The xorshift fallback of `default_random` runs only when `@env.rand` is unavailable, which native never is. |
 | http-async/src/content_decoder.mbt | 1 | The no-progress guard of `ContentDecoder::pull_stage`: flate consumes or produces on every step that has input and free output, so it never fires; it keeps a broken step from spinning the event loop. |
+| http-async/src/timer.mbt | 1 | The catch arm of `ClockTimer::within`: `with_timeout_opt` raises only what `f` raises, and a `Timer`'s `f` is `noraise`; the signature still requires the arm. |
 
 Testable, not yet tested (next candidates):
 
