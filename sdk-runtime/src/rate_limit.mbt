@@ -96,7 +96,52 @@ pub extend GlobalWindow with Eq::{equal, not_equal}
 pub extend GlobalWindow with @debug.Debug::{to_repr}
 
 ///|
-/// One bucket's gate and the tasks that hold it or wait on it. The limiter
+/// How far apart one group's admissions must be. `WindowLimiter::new(pace?)`
+/// maps each bucket to its group; admissions in a group start at least
+/// `min_interval_ms` apart, whatever the server's window says. A non-positive
+/// interval imposes no spacing.
+pub(all) struct Pace {
+  group : String
+  min_interval_ms : Int32
+} derive(Eq, Debug)
+
+///|
+/// Equality for paces.
+pub extend Pace with Eq::{equal, not_equal}
+
+///|
+/// Debug representation of paces.
+pub extend Pace with @debug.Debug::{to_repr}
+
+///|
+/// What a 429 response does to a `WindowLimiter`. Each case applies the
+/// Retry-After delay (or the configured default) differently.
+#non_exhaustive
+pub(all) enum LimitScope {
+  /// The request's bucket is empty until the delay ends; the account-wide
+  /// block is unchanged. The default.
+  Bucket
+  /// Every non-exempt request waits until the delay ends (extending, never
+  /// shortening, the account-wide block); the bucket keeps its parsed state.
+  Global
+  /// A limit shared with other clients ran out: the bucket keeps only the
+  /// state parsed from the headers, as for any other response, and is not
+  /// emptied.
+  Shared
+  /// The response changes nothing: no state is recorded and no block is set.
+  Ignore
+} derive(Eq, Debug)
+
+///|
+/// Equality for limit scopes.
+pub extend LimitScope with Eq::{equal, not_equal}
+
+///|
+/// Debug representation of limit scopes.
+pub extend LimitScope with @debug.Debug::{to_repr}
+
+///|
+/// One pace group's gate and the tasks that hold it or wait on it. The limiter
 /// drops the entry once both counts are zero, so a later caller makes a fresh
 /// gate only when no task can still touch this one.
 priv struct BucketGate {
@@ -125,8 +170,12 @@ pub struct WindowLimiter {
   priv mut states_swept_at_ms : Int64
   priv gate : (() -> &@sync.Gate)?
   priv gates : Map[String, BucketGate]
+  priv pace : (String) -> Pace
+  priv server_key : ((String, @http.Headers) -> String?)?
+  priv aliases : Map[String, String]
+  priv next_admit_at : Map[String, Int64]
+  priv scope : (Int32, @http.Headers) -> LimitScope
   priv global : GlobalWindow?
-  priv global_block : ((@http.Headers) -> Bool)?
   priv default_retry_after_ms : Int32?
   priv mut global_window_start : Int64?
   priv mut global_count : Int32
@@ -135,20 +184,38 @@ pub struct WindowLimiter {
 
 ///|
 /// Creates a limiter using an API-specific response-header parser.
-/// `gate` creates a bucket's gate, held from `acquire` until the paired
-/// release; a bucket nobody holds or waits on forgets its gate and gets a new
-/// one on its next acquire.
+///
+/// `pace` maps a bucket to its pace group, whose admissions start at least
+/// `min_interval_ms` apart; by default each bucket is its own group with no
+/// spacing. It must be pure: `acquire` and `release` each call it and must
+/// get the same group for the same bucket.
+/// `gate` creates a pace group's gate, held from `acquire` until the paired
+/// release, so the buckets of one group are serialised together; a group
+/// nobody holds or waits on forgets its gate and gets a new one on its next
+/// acquire.
+/// `server_key` reads, from a response's headers, the key under which the server
+/// counts the bucket (several buckets may share one server window). Once it
+/// names a key, the bucket's state is recorded and looked up under that key
+/// until a later response names another one or the key's state expires; the
+/// gate and the pace group stay the bucket's own.
+/// `scope` says what a 429 does (`LimitScope`); it is asked only about 429
+/// responses, with their status and headers. By default a 429 empties its
+/// bucket for its Retry-After, or blocks every bucket when `global_block`
+/// says the 429 is account-wide. `global_block` is kept for existing callers
+/// and is ignored when `scope` is given.
 /// `global` limits non-exempt admissions across buckets; one with a
 /// non-positive limit or length is ignored.
-/// `global_block` identifies account-wide 429 responses.
 /// `default_retry_after_ms` supplies a delay when a 429 has no Retry-After.
-/// Negative fallback delays are treated as zero.
+/// Negative fallback delays and pace intervals are treated as zero.
 /// A response's parsed reset and Retry-After count only up to one hour ahead,
 /// so no server can hold a bucket, or every request, longer than that.
 pub fn WindowLimiter::new(
   clock : &@clock.Clock,
   parse : (@http.Headers, Int64) -> RateLimitState?,
   gate? : () -> &@sync.Gate,
+  pace? : (String) -> Pace,
+  server_key? : (String, @http.Headers) -> String?,
+  scope? : (Int32, @http.Headers) -> LimitScope,
   global? : GlobalWindow,
   global_block? : (@http.Headers) -> Bool,
   default_retry_after_ms? : Int32,
@@ -161,11 +228,23 @@ pub fn WindowLimiter::new(
     states_swept_at_ms: clock.now_unix_ms(),
     gate,
     gates: Map([]),
+    pace: match pace {
+      Some(pace) => pace
+      None => bucket => { group: bucket, min_interval_ms: 0, }
+    },
+    server_key,
+    aliases: Map([]),
+    next_admit_at: Map([]),
+    scope: match (scope, global_block) {
+      (Some(scope), _) => scope
+      (None, Some(is_global)) =>
+        (_, headers) => if is_global(headers) { Global } else { Bucket }
+      (None, None) => (_, _) => Bucket
+    },
     global: match global {
       Some(window) if window.limit > 0 && window.window_ms > 0 => Some(window)
       _ => None
     },
-    global_block,
     default_retry_after_ms,
     global_window_start: None,
     global_count: 0,
@@ -196,19 +275,19 @@ async fn WindowLimiter::wait_for_global(self : WindowLimiter) -> Unit {
 }
 
 ///|
-/// Returns the bucket's gate, counting the caller as a waiter on it. The count
-/// is taken before any suspension, so the entry outlives every task that
+/// Returns the pace group's gate, counting the caller as a waiter on it. The
+/// count is taken before any suspension, so the entry outlives every task that
 /// might still acquire or release this gate.
 fn WindowLimiter::join_gate(
   self : WindowLimiter,
-  bucket : String,
+  group : String,
   make : () -> &@sync.Gate,
 ) -> BucketGate {
-  let entry = match self.gates.get(bucket) {
+  let entry = match self.gates.get(group) {
     Some(entry) => entry
     None => {
       let entry = { gate: make(), holders: 0, waiters: 0, }
-      self.gates[bucket] = entry
+      self.gates[group] = entry
       entry
     }
   }
@@ -217,14 +296,14 @@ fn WindowLimiter::join_gate(
 }
 
 ///|
-/// Stops counting the caller on the bucket's gate, returning its slot when
+/// Stops counting the caller on the pace group's gate, returning its slot when
 /// `holding`, and forgets the gate once nobody holds it or waits on it.
 fn WindowLimiter::leave_gate(
   self : WindowLimiter,
-  bucket : String,
+  group : String,
   holding~ : Bool,
 ) -> Unit {
-  guard self.gates.get(bucket) is Some(entry) else { return }
+  guard self.gates.get(group) is Some(entry) else { return }
   if holding {
     guard entry.holders > 0 else { return }
     entry.holders -= 1
@@ -234,19 +313,27 @@ fn WindowLimiter::leave_gate(
     entry.waiters -= 1
   }
   if entry.holders == 0 && entry.waiters == 0 {
-    self.gates.remove(bucket)
+    self.gates.remove(group)
   }
 }
 
 ///|
-/// Drop states whose reset has passed, each time the map has doubled since the
-/// last sweep (and holds at least `states_sweep_floor` entries), so buckets
-/// that are never seen again cost amortised constant work, and at least every
-/// `states_sweep_interval_ms`, so a burst's expired states do not stay once
-/// traffic returns to a few buckets. Every release checks, whether or not its
-/// response records a state.
+/// The number of entries a sweep can drop: states, aliases and pace deadlines.
+fn WindowLimiter::swept_entries(self : WindowLimiter) -> Int32 {
+  self.states.length() + self.aliases.length() + self.next_admit_at.length()
+}
+
+///|
+/// Drop states whose reset has passed, the aliases that point at a key with no
+/// state left, and pace deadlines already behind `now`, each time those maps
+/// together have doubled since the last sweep (and hold at least
+/// `states_sweep_floor` entries), so buckets that are never seen again cost
+/// amortised constant work, and at least every `states_sweep_interval_ms`, so
+/// a burst's expired entries do not stay once traffic returns to a few
+/// buckets. Every release checks, whether or not its response records a
+/// state.
 fn WindowLimiter::sweep_states(self : WindowLimiter, now : Int64) -> Unit {
-  guard self.states.length() >= self.states_sweep_at ||
+  guard self.swept_entries() >= self.states_sweep_at ||
     now - self.states_swept_at_ms >= states_sweep_interval_ms else {
     return
   }
@@ -259,8 +346,33 @@ fn WindowLimiter::sweep_states(self : WindowLimiter, now : Int64) -> Unit {
   for key in expired {
     self.states.remove(key)
   }
-  self.states_sweep_at = (self.states.length() * 2).max(states_sweep_floor)
+  let orphaned = []
+  for bucket, key in self.aliases {
+    if !self.states.contains(key) {
+      orphaned.push(bucket)
+    }
+  }
+  for bucket in orphaned {
+    self.aliases.remove(bucket)
+  }
+  let passed = []
+  for group, at in self.next_admit_at {
+    if at <= now {
+      passed.push(group)
+    }
+  }
+  for group in passed {
+    self.next_admit_at.remove(group)
+  }
+  self.states_sweep_at = (self.swept_entries() * 2).max(states_sweep_floor)
   self.states_swept_at_ms = now
+}
+
+///|
+/// The key a bucket's state is recorded under: the server key its last
+/// response named through `server_key`, or the bucket itself.
+fn WindowLimiter::resolve(self : WindowLimiter, bucket : String) -> String {
+  self.aliases.get(bucket).unwrap_or(bucket)
 }
 
 ///|
@@ -268,16 +380,21 @@ fn WindowLimiter::sweep_states(self : WindowLimiter, now : Int64) -> Unit {
 pub extend WindowLimiter with RateLimiter::{acquire, release}
 
 ///|
-/// Returns the currently recorded state for a bucket.
+/// Returns the currently recorded state for a bucket, looked up under the key
+/// its last response named through `server_key`, if any.
 pub fn WindowLimiter::state(
   self : WindowLimiter,
   bucket : String,
 ) -> RateLimitState? {
-  self.states.get(bucket)
+  self.states.get(self.resolve(bucket))
 }
 
 ///|
-/// Rechecks the bucket after every sleep because another task may update it.
+/// Waits for the account-wide window, then the pace group's gate, then the
+/// group's spacing and the bucket's window. Rechecks both after every sleep
+/// because another task may update them; the check that admits and the
+/// group's next admission time it records happen without suspending between
+/// them, so two tasks never both pass one deadline.
 pub impl RateLimiter for WindowLimiter with fn acquire(
   self,
   bucket,
@@ -286,9 +403,10 @@ pub impl RateLimiter for WindowLimiter with fn acquire(
   if !global_exempt {
     self.wait_for_global()
   }
-  let entry = self.gate.map(make => self.join_gate(bucket, make))
+  let { group, min_interval_ms, } = (self.pace)(bucket)
+  let entry = self.gate.map(make => self.join_gate(group, make))
   let mut holding = false
-  errdefer self.leave_gate(bucket, holding~)
+  errdefer self.leave_gate(group, holding~)
   if entry is Some(entry) {
     // A cancelled `acquire` unwinds without a slot; one that returns holds it.
     entry.gate.acquire()
@@ -297,18 +415,27 @@ pub impl RateLimiter for WindowLimiter with fn acquire(
     holding = true
   }
   for ;; {
-    match bucket_step(self.states.get(bucket), self.clock.now_unix_ms()) {
-      Admit => return
-      Expired => {
-        self.states.remove(bucket)
-        return
-      }
-      Consume(state) => {
-        self.states[bucket] = state
-        return
-      }
-      Wait(delay) => self.clock.sleep(delay)
+    let now = self.clock.now_unix_ms()
+    let paced = pace_step(self.next_admit_at.get(group), now)
+    if paced > 0 {
+      self.clock.sleep(paced)
+      continue
     }
+    // Resolved on every pass: a response may name the key while this waits.
+    let key = self.resolve(bucket)
+    match bucket_step(self.states.get(key), now) {
+      Admit => ()
+      Expired => self.states.remove(key)
+      Consume(state) => self.states[key] = state
+      Wait(delay) => {
+        self.clock.sleep(delay)
+        continue
+      }
+    }
+    if min_interval_ms > 0 {
+      self.next_admit_at[group] = saturating_add_ms(now, min_interval_ms)
+    }
+    return
   }
 }
 
@@ -332,7 +459,9 @@ fn clamp_server_reset(state : RateLimitState, now : Int64) -> RateLimitState {
 }
 
 ///|
-/// Replaces parsed state; a 429 Retry-After takes precedence over that parser.
+/// Replaces parsed state; a 429 Retry-After takes precedence over that parser
+/// as the limiter's `scope` says. A key named through `server_key` is remembered
+/// for the bucket and the state recorded under it.
 /// An attempt without a response (status `0`) leaves the window unchanged.
 /// Both the parsed reset and the Retry-After delay are clamped to one hour
 /// ahead, however far the server puts them.
@@ -342,11 +471,26 @@ pub impl RateLimiter for WindowLimiter with fn release(
   status~,
   headers~,
 ) {
-  defer self.leave_gate(bucket, holding=true)
+  defer self.leave_gate((self.pace)(bucket).group, holding=true)
   let now_unix_ms = self.clock.now_unix_ms()
   self.sweep_states(now_unix_ms)
   if status == 0 {
     return
+  }
+  let key = match self.server_key {
+    Some(server_key) =>
+      match server_key(bucket, headers) {
+        Some(key) if key == bucket => {
+          self.aliases.remove(bucket)
+          key
+        }
+        Some(key) => {
+          self.aliases[bucket] = key
+          key
+        }
+        None => self.resolve(bucket)
+      }
+    None => bucket
   }
   let effect = release_effect(
     status,
@@ -357,14 +501,12 @@ pub impl RateLimiter for WindowLimiter with fn release(
       Some(ms) => Some(ms.min(max_server_wait_ms))
       None => self.default_retry_after_ms
     },
-    global=status == 429 &&
-      self.global_block is Some(is_global) &&
-      is_global(headers),
+    scope=if status == 429 { (self.scope)(status, headers) } else { Bucket },
     blocked_until=self.global_blocked_until,
     now=now_unix_ms,
   )
   if effect.record is Some(state) {
-    self.states[bucket] = state
+    self.states[key] = state
   }
   self.global_blocked_until = effect.blocked_until
 }

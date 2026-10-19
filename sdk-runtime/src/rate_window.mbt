@@ -66,6 +66,16 @@ fn bucket_step(state : RateLimitState?, now : Int64) -> BucketStep {
 }
 
 ///|
+/// How long a pace group waits at `now` before its next admission, given the
+/// earliest instant that admission may start; zero when it may start now.
+fn pace_step(next_admit_at : Int64?, now : Int64) -> Int32 {
+  match next_admit_at {
+    Some(at) => delay_until(at, now)
+    None => 0
+  }
+}
+
+///|
 /// How long to sleep from `now` until `until`, saturating at the longest sleep
 /// a clock takes instead of wrapping when the span overflows.
 fn delay_until(until : Int64, now : Int64) -> Int32 {
@@ -96,22 +106,28 @@ priv struct ReleaseEffect {
 ///|
 /// Decides what a response with `status` does at `now`. `parsed` is the
 /// parser's state, `delay_ms` the Retry-After delay or the configured default,
-/// and `global` whether the response is an account-wide 429. A 429 with a delay
-/// empties the bucket until then, or, when global, extends the account-wide
-/// block (never shortening it) and leaves the parsed state as it is.
+/// and `scope` what a 429 affects; other statuses ignore it. A 429 with a delay
+/// empties the bucket until then (`Bucket`) or extends the account-wide block,
+/// never shortening it, and leaves the parsed state as it is (`Global`). A
+/// `Shared` 429 records only the parsed state, delay or not, and an `Ignore`d
+/// one records nothing.
 fn release_effect(
   status : Int32,
   parsed~ : RateLimitState?,
   delay_ms~ : Int32?,
-  global~ : Bool,
+  scope~ : LimitScope,
   blocked_until~ : Int64?,
   now~ : Int64,
 ) -> ReleaseEffect {
-  guard status == 429 && delay_ms is Some(ms) else {
-    return { record: parsed, blocked_until, }
+  guard status == 429 else { return { record: parsed, blocked_until, } }
+  match scope {
+    Ignore => return { record: None, blocked_until, }
+    Shared => return { record: parsed, blocked_until, }
+    _ => ()
   }
+  guard delay_ms is Some(ms) else { return { record: parsed, blocked_until, } }
   let until = saturating_add_ms(now, ms.max(0))
-  if global {
+  if scope is Global {
     let blocked_until = match blocked_until {
       Some(previous) => previous.max(until)
       None => until

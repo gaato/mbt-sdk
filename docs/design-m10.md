@@ -122,9 +122,9 @@ pub(open) trait Timer {
 **`WindowLimiter` に足す任意の引数**
 
 - `pace? : (String) -> Pace`: `Pace { group, min_interval_ms }`。純粋な関数で、gate のキーにも使う。
-- `alias? : (String, @http.Headers) -> String?`: 応答ヘッダーから、状態を記録するキーを読み替える。
+- `server_key? : (String, @http.Headers) -> String?`: 応答ヘッダーから、状態を記録するキーを読み替える。`alias` は MoonBit の予約語なので、この名前にした。
 - `scope? : (Int, @http.Headers) -> LimitScope`: `Bucket` / `Global` / `Shared` / `Ignore`。既存の `global_block` は、これの薄い包みとして残す。
-- alias と `next_admit_at` は `sweep_states` で掃除する。RESOURCE_BOUNDS.md に 2 行足す。
+- 別名(aliases)と `next_admit_at` は `sweep_states` で掃除する。RESOURCE_BOUNDS.md に 2 行足す。
 
 ## SDK ごとの目標(出典は behavior/ にある)
 
@@ -132,8 +132,8 @@ pub(open) trait Timer {
 |---|---|---|---|---|
 | openai | `stainless(StopAbove(120000))`: 2 回。408/409/429/500–599 を全メソッドで再送。送った後の失敗も全メソッドで再送。`x-should-retry` に従う。`retry-after-ms`→`retry-after` の順に読む | 0.5 s→8 s、0.75〜1.0 倍。Retry-After が 120 s を超えたら再送しない | 600 s(timer を渡したときだけ) | — |
 | anthropic | `stainless(NoCap)`。中身は openai と同じ | Retry-After に上限なしで従う | 600 s | 529 も再送するようになる |
-| github | `conservative` で再送 3 回。5xx はべき等なものだけ | 二次制限は Retry-After、なければ `60 s << n`。一般の上限は無視し、残り時間と回数で抑える | — | GraphQL の 200 に乗る `RATE_LIMITED` と二次制限を `accept` で再送する。"Something went wrong" は mutation 以外だけ再送。バケットは core / core:write / graphql / search / core:notifications。`pace` は書き込みと graphql が 1 s、search が 2 s、notifications が 3 s。`alias` は `x-ratelimit-resource`。利用者が渡した `gate` で直列化する |
-| discord | 429 は全メソッドで再送(本文の `retry_after` + 1 ms)。502 は全メソッドで再送。500–599 と送った後の失敗はべき等なものだけ再送。`nonce` + `enforce_nonce` 付きのメッセージ作成はべき等として扱う | 本文の値を優先し、上限なし | `Timeouts` を使い、`AttemptDeadline` は削除 | JSON の本文も scope もない 429 は即座に失敗させる。401 で止める。`alias` は `x-ratelimit-bucket` と主要パラメーター。scope が shared の 429 では止めない。不正リクエスト(401/403/429)を observer で数える |
+| github | `conservative` で再送 3 回。5xx はべき等なものだけ | 二次制限は Retry-After、なければ `60 s << n`。一般の上限は無視し、残り時間と回数で抑える | — | GraphQL の 200 に乗る `RATE_LIMITED` と二次制限を `accept` で再送する。"Something went wrong" は mutation 以外だけ再送。バケットは core / core:write / graphql / search / core:notifications。`pace` は書き込みと graphql が 1 s、search が 2 s、notifications が 3 s。`server_key` は `x-ratelimit-resource`。利用者が渡した `gate` で直列化する |
+| discord | 429 は全メソッドで再送(本文の `retry_after` + 1 ms)。502 は全メソッドで再送。500–599 と送った後の失敗はべき等なものだけ再送。`nonce` + `enforce_nonce` 付きのメッセージ作成はべき等として扱う | 本文の値を優先し、上限なし | `Timeouts` を使い、`AttemptDeadline` は削除 | JSON の本文も scope もない 429 は即座に失敗させる。401 で止める。`server_key` は `x-ratelimit-bucket` と主要パラメーター。scope が shared の 429 では止めない。不正リクエスト(401/403/429)を observer で数える |
 | requesto | 公開 API は変えず、中身を `RetryRule` に載せ替える(Req 寄りの既定値はそのまま) | 今のまま | 今のまま | 既存のテストを、挙動が変わっていないことの確認に使う |
 
 一次情報の要点:
@@ -167,8 +167,8 @@ publish は取り消せないので、P1〜P4 の版上げの前にはそのつ�
 | S1 | 着手前に言語の制約を確かめる(trait のメソッドが型引数を取れるか、`pub using` で enum の構成子まで出せるか、noraise の async closure を引数に取れるか)。そのうえで `gaato/http/retry` と `sync.Timer` を作る | **P1: http 0.5.0** |
 | S2 | http-async を http 0.5.0 に追従させ、`ClockTimer` を足す | **P1: http-async 0.5.0** |
 | S3 | sdk-runtime: RetryPolicy、RetryContext、accept、Timeouts | — |
-| S4 | WindowLimiter: pace、alias、scope | — |
-| S5 | openai/anthropic を stainless と timer に移す。github の規則、pace、alias、accept、二次制限 | **P2: sdk-runtime 0.7.0 / openai 0.6.0 / anthropic 0.11.0 / github 0.17.0** |
+| S4 | WindowLimiter: pace、server_key、scope | — |
+| S5 | openai/anthropic を stainless と timer に移す。github の規則、pace、server_key、accept、二次制限 | **P2: sdk-runtime 0.7.0 / openai 0.6.0 / anthropic 0.11.0 / github 0.17.0** |
 | S6 | discord.mbt を新しい core と limiter に載せる。`AttemptDeadline` を削除。不正リクエストを数える | **P3: discord 0.12.0** |
 | S7 | requesto を core に載せる | **P4: requesto 0.2.1(mbti が変われば 0.3.0)** |
 | S8 | 下流の追従: nekosama、gaato、discord-cli、docs-bot、kbbi | 必要なものだけ |

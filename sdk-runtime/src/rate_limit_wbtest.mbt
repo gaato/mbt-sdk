@@ -417,3 +417,302 @@ test "clamp_server_reset keeps resets within an hour and pulls later ones back" 
     assert_eq(state.reset_at_unix_ms, expected, msg=label)
   }
 }
+
+///|
+/// A clock whose sleeps park the task until the test moves time past them.
+priv struct ParkingClock {
+  mut now : Int64
+  sleepers : Array[(Int64, () -> Unit)]
+}
+
+///|
+fn ParkingClock::new(now : Int64) -> ParkingClock {
+  { now, sleepers: [], }
+}
+
+///|
+impl @clock.Clock for ParkingClock with fn sleep(self, milliseconds) {
+  let until = self.now + milliseconds.to_int64()
+  suspend_coroutine(wake => self.sleepers.push((until, () => wake(()))))
+}
+
+///|
+impl @clock.Clock for ParkingClock with fn now_unix_ms(self) {
+  self.now
+}
+
+///|
+/// Moves time to `now` and resumes, oldest first, every sleep that has ended.
+fn ParkingClock::advance_to(self : ParkingClock, now : Int64) -> Unit {
+  self.now = now
+  let due = []
+  let rest = []
+  for sleeper in self.sleepers {
+    if sleeper.0 <= now {
+      due.push(sleeper.1)
+    } else {
+      rest.push(sleeper)
+    }
+  }
+  self.sleepers.clear()
+  self.sleepers.append(rest)
+  for wake in due {
+    wake()
+  }
+}
+
+///|
+/// Paces buckets named `write:*` as one group with a one-second interval;
+/// every other bucket is its own unpaced group.
+fn write_pace(bucket : String) -> Pace {
+  if bucket.has_prefix("write:") {
+    { group: "write", min_interval_ms: 1000, }
+  } else {
+    { group: bucket, min_interval_ms: 0, }
+  }
+}
+
+///|
+fn keyed_headers(
+  key : String,
+  remaining : String,
+  reset_after : String,
+) -> @http.Headers {
+  @http.Headers::from_array([
+    ("key", key),
+    ("remaining", remaining),
+    ("reset-after", reset_after),
+  ])
+}
+
+///|
+fn header_key(_bucket : String, headers : @http.Headers) -> String? {
+  headers.get("key")
+}
+
+///|
+test "two tasks woken at one pace deadline are admitted a full interval apart" {
+  let clock = ParkingClock::new(1000L)
+  let limiter = WindowLimiter::new(clock, (_, _) => None, pace=write_pace)
+  let admitted = []
+  fn admit(bucket : String) -> Task {
+    spawn(() => {
+      limiter.acquire(bucket, global_exempt=true)
+      admitted.push("\{bucket}@\{clock.now}")
+    })
+  }
+
+  assert_true(admit("write:a").is_done())
+  let second = admit("write:b")
+  let third = admit("write:a")
+  // Another group is not held back by the paced one.
+  assert_true(admit("read").is_done())
+  assert_true(admit("read").is_done())
+  assert_false(second.is_done())
+  assert_false(third.is_done())
+  assert_eq(limiter.next_admit_at.get("write"), Some(2000L))
+  // Both sleepers wake at 2000; the first takes the slot and the second,
+  // checking right after with no suspension in between, waits again.
+  clock.advance_to(2000L)
+  assert_true(second.is_done())
+  assert_false(third.is_done())
+  assert_eq(clock.sleepers.map(sleeper => sleeper.0), [3000L])
+  clock.advance_to(3000L)
+  assert_true(third.is_done())
+  assert_eq(admitted, [
+    "write:a@1000", "read@1000", "read@1000", "write:b@2000", "write:a@3000",
+  ])
+  assert_eq(limiter.next_admit_at.get("read"), None)
+}
+
+///|
+test "a gate is keyed by the pace group, so a learned key cannot leak it" {
+  let clock = @mock.FakeClock::new(start_unix_ms=1000L)
+  let made = []
+  let limiter = WindowLimiter::new(
+    clock,
+    rate_limit_headers(remaining="remaining", reset_after_seconds="reset-after"),
+    gate=() => {
+      let gate = TestGate::new()
+      made.push(gate)
+      gate
+    },
+    pace=write_pace,
+    server_key=header_key,
+  )
+  run_now(() => limiter.acquire("write:a", global_exempt=true))
+  // A second bucket of the same group queues on the same gate.
+  let other = spawn(() => limiter.acquire("write:b", global_exempt=true))
+  assert_false(other.is_done())
+  assert_eq(made.length(), 1)
+  assert_eq(counts(limiter, "write"), Some((1, 1)))
+  run_now(() => {
+    limiter.release(
+      "write:a",
+      status=200,
+      headers=keyed_headers("core", "5", "60"),
+    )
+  })
+  assert_eq(limiter.aliases.get("write:a"), Some("core"))
+  made[0].run_woken()
+  assert_true(other.is_done())
+  run_now(() => {
+    limiter.release(
+      "write:b",
+      status=200,
+      headers=keyed_headers("core", "4", "60"),
+    )
+  })
+  assert_eq(limiter.gates.length(), 0)
+  assert_true(made[0].free)
+  // The second bucket of the group waited out the pace after taking the gate.
+  assert_eq(clock.slept(), [1000])
+  assert_eq(limiter.states.length(), 1)
+  assert_eq(
+    limiter.state("write:a"),
+    Some({ remaining: 4, reset_at_unix_ms: 62000L, }),
+  )
+  assert_eq(limiter.state("write:b"), limiter.state("core"))
+}
+
+///|
+test "a bucket follows the key its latest response names" {
+  let clock = @mock.FakeClock::new(start_unix_ms=1000L)
+  let limiter = WindowLimiter::new(
+    clock,
+    rate_limit_headers(remaining="remaining", reset_after_seconds="reset-after"),
+    server_key=header_key,
+  )
+  run_now(() => {
+    limiter.release("a", status=200, headers=keyed_headers("k1", "5", "60"))
+  })
+  assert_eq(limiter.resolve("a"), "k1")
+  assert_eq(limiter.resolve("b"), "b")
+  // A response without the header keeps the learned key.
+  run_now(() => limiter.release("a", status=200, headers=headers("3", "60")))
+  assert_eq(limiter.resolve("a"), "k1")
+  assert_eq(
+    limiter.states.get("k1"),
+    Some({ remaining: 3, reset_at_unix_ms: 61000L, }),
+  )
+  run_now(() => {
+    limiter.release("a", status=200, headers=keyed_headers("k2", "7", "60"))
+  })
+  assert_eq(limiter.resolve("a"), "k2")
+  assert_eq(
+    limiter.state("a"),
+    Some({ remaining: 7, reset_at_unix_ms: 61000L, }),
+  )
+  // Naming the bucket itself forgets the alias.
+  run_now(() => {
+    limiter.release("a", status=200, headers=keyed_headers("a", "2", "60"))
+  })
+  assert_eq(limiter.aliases.get("a"), None)
+  assert_eq(
+    limiter.state("a"),
+    Some({ remaining: 2, reset_at_unix_ms: 61000L, }),
+  )
+  // A response with no status learns nothing.
+  run_now(() => {
+    limiter.release("a", status=0, headers=keyed_headers("k3", "1", "60"))
+  })
+  assert_eq(limiter.aliases.get("a"), None)
+}
+
+///|
+test "a sweep drops orphaned aliases and pace deadlines already passed" {
+  let clock = @mock.FakeClock::new(start_unix_ms=0L)
+  let limiter = WindowLimiter::new(
+    clock,
+    rate_limit_headers(remaining="remaining", reset_after_seconds="reset-after"),
+    pace=bucket => { group: bucket, min_interval_ms: 10, },
+    server_key=header_key,
+  )
+  run_now(() => {
+    limiter.acquire("paced-old", global_exempt=true)
+    limiter.release("paced-old", status=0, headers=@http.Headers::new())
+    limiter.release("a", status=200, headers=keyed_headers("k1", "1", "1"))
+    limiter.release("b", status=200, headers=keyed_headers("k2", "1", "120"))
+  })
+  assert_eq(limiter.next_admit_at.length(), 1)
+  assert_eq(limiter.aliases.length(), 2)
+  clock.advance(61_000)
+  run_now(() => {
+    limiter.acquire("paced-new", global_exempt=true)
+    limiter.release("paced-new", status=200, headers=@http.Headers::new())
+  })
+  assert_eq(limiter.states.length(), 1)
+  assert_true(limiter.states.get("k2") is Some(_))
+  assert_eq(limiter.aliases.length(), 1)
+  assert_eq(limiter.aliases.get("b"), Some("k2"))
+  assert_eq(limiter.next_admit_at.length(), 1)
+  assert_eq(limiter.next_admit_at.get("paced-new"), Some(61_010L))
+}
+
+///|
+test "one-off aliased and paced buckets keep the maps bounded" {
+  let clock = @mock.FakeClock::new(start_unix_ms=1000L)
+  let limiter = WindowLimiter::new(
+    clock,
+    rate_limit_headers(remaining="remaining", reset_after_seconds="reset-after"),
+    pace=bucket => { group: bucket, min_interval_ms: 1, },
+    server_key=header_key,
+  )
+  let mut largest = 0
+  for i in 0..<10000 {
+    let bucket = "token-\{i}"
+    run_now(() => {
+      limiter.acquire(bucket, global_exempt=true)
+      limiter.release(
+        bucket,
+        status=200,
+        headers=keyed_headers("key-\{i}", "4", "0.05"),
+      )
+    })
+    clock.advance(1)
+    largest = largest.max(limiter.swept_entries())
+  }
+  // About 50 states and their 50 aliases are live at once, and one pace
+  // deadline; sweeps at twice the live count keep the maps under 4 floors.
+  assert_true(largest <= 4 * states_sweep_floor)
+  assert_true(limiter.aliases.length() <= limiter.states.length())
+}
+
+///|
+test "scope supersedes global_block, which keeps its old meaning alone" {
+  let rows : Array[(String, WindowLimiter, LimitScope)] = [
+    (
+      "neither",
+      WindowLimiter::new(@mock.FakeClock::new(), (_, _) => None),
+      Bucket,
+    ),
+    (
+      "global_block alone",
+      WindowLimiter::new(@mock.FakeClock::new(), (_, _) => None, global_block=_ => {
+        true
+      }),
+      Global,
+    ),
+    (
+      "global_block that declines",
+      WindowLimiter::new(@mock.FakeClock::new(), (_, _) => None, global_block=_ => {
+        false
+      }),
+      Bucket,
+    ),
+    (
+      "scope wins",
+      WindowLimiter::new(
+        @mock.FakeClock::new(),
+        (_, _) => None,
+        scope=(_, _) => Shared,
+        global_block=_ => true,
+      ),
+      Shared,
+    ),
+  ]
+  for row in rows {
+    let (label, limiter, expected) = row
+    assert_eq((limiter.scope)(429, @http.Headers::new()), expected, msg=label)
+  }
+}

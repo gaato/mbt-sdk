@@ -56,7 +56,7 @@ Only to learn what users expect and to find traps the docs do not mention. Note 
 - Start from the sdk-runtime preset closest to B: the Stainless-style preset for Stainless SDKs (set its Retry-After cap to match the vendor), the conservative default when there is no B.
 - Adjust the `RetryRule` fields rather than writing code: statuses and the methods each applies to, whether sent failures are retried, the override header, the Retry-After source and cap, the backoff.
 - Write a `RetryDecider` only for what a rule cannot express: delays read from a body, special limit types detected from messages, waits that must exceed the general cap.
-- Rate limits: configure `WindowLimiter` with the API's headers (`rate_limit_headers`), and use `pace`, `alias` and `scope` for spacing, server-assigned bucket ids and limit scopes. Do not hard-code limits the server reports in headers.
+- Rate limits: configure `WindowLimiter` with the API's headers (`rate_limit_headers`), and use `pace`, `server_key` and `scope` for spacing, server-assigned bucket ids and limit scopes. Do not hard-code limits the server reports in headers.
 - Timeouts: expose the vendor's default per-call timeout through `Timeouts`, and document the connect timeout as a transport setting.
 - Where B is unsafe for us (for example it resends writes that have no idempotency key), keep the safer behaviour, and record the decision and the reason in the note.
 

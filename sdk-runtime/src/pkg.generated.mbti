@@ -65,12 +65,31 @@ pub fn GlobalWindow::equal(Self, Self) -> Bool
 pub fn GlobalWindow::not_equal(Self, Self) -> Bool
 pub fn GlobalWindow::to_repr(Self) -> @debug.Repr
 
+#non_exhaustive
+pub(all) enum LimitScope {
+  Bucket
+  Global
+  Shared
+  Ignore
+} derive(Eq, @debug.Debug)
+pub fn LimitScope::equal(Self, Self) -> Bool
+pub fn LimitScope::not_equal(Self, Self) -> Bool
+pub fn LimitScope::to_repr(Self) -> @debug.Repr
+
 pub struct NoLimiter {
 }
 pub async fn NoLimiter::acquire(Self, String, global_exempt~ : Bool) -> Unit
 pub fn NoLimiter::new() -> Self
 pub async fn NoLimiter::release(Self, String, status~ : Int, headers~ : @http.Headers) -> Unit
 pub impl RateLimiter for NoLimiter
+
+pub(all) struct Pace {
+  group : String
+  min_interval_ms : Int
+} derive(Eq, @debug.Debug)
+pub fn Pace::equal(Self, Self) -> Bool
+pub fn Pace::not_equal(Self, Self) -> Bool
+pub fn Pace::to_repr(Self) -> @debug.Repr
 
 pub(all) struct Page[T] {
   items : Array[T]
@@ -132,7 +151,7 @@ pub struct WindowLimiter {
   // private fields
 }
 pub async fn WindowLimiter::acquire(Self, String, global_exempt~ : Bool) -> Unit
-pub fn WindowLimiter::new(&@clock.Clock, (@http.Headers, Int64) -> RateLimitState?, gate? : () -> &@sync.Gate, global? : GlobalWindow, global_block? : (@http.Headers) -> Bool, default_retry_after_ms? : Int) -> Self
+pub fn WindowLimiter::new(&@clock.Clock, (@http.Headers, Int64) -> RateLimitState?, gate? : () -> &@sync.Gate, pace? : (String) -> Pace, server_key? : (String, @http.Headers) -> String?, scope? : (Int, @http.Headers) -> LimitScope, global? : GlobalWindow, global_block? : (@http.Headers) -> Bool, default_retry_after_ms? : Int) -> Self
 pub async fn WindowLimiter::release(Self, String, status~ : Int, headers~ : @http.Headers) -> Unit
 pub fn WindowLimiter::state(Self, String) -> RateLimitState?
 pub impl RateLimiter for WindowLimiter

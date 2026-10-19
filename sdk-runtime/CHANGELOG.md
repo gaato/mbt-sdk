@@ -33,6 +33,28 @@ note.
   response inside the attempt and may raise to reject it, which the retry
   decider then handles like an error status: for APIs that report rate
   limits in a successful body, such as GitHub GraphQL.
+- **`WindowLimiter::new(pace?)` spaces a group's admissions: `Pace { group,
+  min_interval_ms }`.** The function maps each bucket to a group whose
+  admissions start at least `min_interval_ms` apart, for APIs that ask for
+  spacing their headers do not report (GitHub: writes and GraphQL 1 s apart,
+  search 2 s, notifications 3 s). It must be pure. The `gate` is now one per
+  group, so the buckets of a group are serialised together; by default each
+  bucket is its own unpaced group, as before.
+- **`WindowLimiter::new(server_key?)` records a bucket's state under the key
+  its responses name.** Several buckets that the server counts as one window
+  (GitHub's `x-ratelimit-resource`, Discord's `X-RateLimit-Bucket`) then
+  share their remaining count and reset; `WindowLimiter::state` looks a
+  bucket up through its key. The gate and the pace group stay the bucket's
+  own, so a key learned mid-request cannot strand a gate slot. Learned keys
+  are swept with the states they point at.
+- **`WindowLimiter::new(scope?)` decides what a 429 affects:
+  `LimitScope::{Bucket, Global, Shared, Ignore}`.** `Bucket` empties the
+  bucket until the Retry-After, `Global` blocks every non-exempt request,
+  `Shared` keeps only the parsed header state (Discord's
+  `X-RateLimit-Scope: shared`), and `Ignore` records no state and sets no
+  block (a `server_key` in its headers is still learned). It supersedes
+  `global_block`, which stays for existing callers, means `Global` when it
+  returns true and `Bucket` otherwise, and is ignored when `scope` is given.
 
 ### Changed
 
