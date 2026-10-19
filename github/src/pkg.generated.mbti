@@ -4,6 +4,7 @@ package "gaato/github"
 import {
   "gaato/http",
   "gaato/http/clock",
+  "gaato/http/retry",
   "gaato/sdk-runtime",
   "moonbitlang/core/debug",
 }
@@ -47,7 +48,7 @@ pub impl @debug.Debug for GitHub
 pub(all) struct GitHubRetry {
   policy : @sdk-runtime.RetryPolicy
 }
-pub fn GitHubRetry::next_delay_ms(Self, @sdk-runtime.SdkError, @http.Request, Int, Double) -> Int?
+pub fn GitHubRetry::decide(Self, @sdk-runtime.SdkError, @sdk-runtime.RetryContext) -> @retry.Decision
 pub impl @sdk-runtime.RetryDecider for GitHubRetry
 
 pub(all) struct GraphqlError {

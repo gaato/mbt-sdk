@@ -4,6 +4,7 @@ package "gaato/sdk-runtime"
 import {
   "gaato/http",
   "gaato/http/clock",
+  "gaato/http/retry",
   "gaato/http/sync",
   "moonbitlang/core/debug",
 }
@@ -22,6 +23,7 @@ pub(all) suberror SdkError {
   Config(String)
 } derive(@debug.Debug)
 pub fn SdkError::is_retryable(Self) -> Bool
+pub fn SdkError::outcome(Self) -> @retry.Outcome?
 pub fn SdkError::status(Self) -> Int?
 pub fn SdkError::to_repr(Self) -> @debug.Repr
 
@@ -47,24 +49,12 @@ pub fn Auth::apply(Self, @http.Request) -> @http.Request
 pub fn Auth::to_repr(Self) -> @debug.Repr
 pub impl @debug.Debug for Auth
 
-pub(all) struct Backoff {
-  base_ms : Int
-  max_ms : Int
-  factor : Double
-  jitter : Double
-} derive(Eq, @debug.Debug)
-pub fn Backoff::default() -> Self
-pub fn Backoff::delay_ms(Self, Int, Double) -> Int
-pub fn Backoff::equal(Self, Self) -> Bool
-pub fn Backoff::not_equal(Self, Self) -> Bool
-pub fn Backoff::to_repr(Self) -> @debug.Repr
-
 pub struct Client {
   // private fields
 }
-pub fn Client::new(&@http.Transport, &@clock.Clock, base_url~ : String, default_headers? : @http.Headers, auth? : Auth, retry? : &RetryDecider, limiter? : &RateLimiter, middleware? : Array[async (@http.Request, async (@http.Request) -> @http.Response raise @http.HttpError) -> @http.Response raise @http.HttpError], observer? : (Attempt) -> Unit, random? : () -> Double) -> Self
-pub async fn Client::send(Self, @http.Request, bucket? : String, global_exempt? : Bool, body? : () -> Bytes) -> @http.Response raise SdkError
-pub async fn Client::send_json(Self, @http.Request, bucket? : String, global_exempt? : Bool, body? : () -> Bytes) -> Json raise SdkError
+pub fn Client::new(&@http.Transport, &@clock.Clock, base_url~ : String, default_headers? : @http.Headers, auth? : Auth, retry? : &RetryDecider, limiter? : &RateLimiter, middleware? : Array[async (@http.Request, async (@http.Request) -> @http.Response raise @http.HttpError) -> @http.Response raise @http.HttpError], observer? : (Attempt) -> Unit, random? : () -> Double, timeouts? : Timeouts) -> Self
+pub async fn Client::send(Self, @http.Request, bucket? : String, global_exempt? : Bool, body? : () -> Bytes, accept? : (@http.Response) -> Unit raise SdkError) -> @http.Response raise SdkError
+pub async fn Client::send_json(Self, @http.Request, bucket? : String, global_exempt? : Bool, body? : () -> Bytes, accept? : (@http.Response) -> Unit raise SdkError) -> Json raise SdkError
 pub async fn Client::send_stream(Self, @http.Request, bucket? : String, global_exempt? : Bool, body? : () -> Bytes) -> (@http.ResponseHead, &@http.BodyStream) raise SdkError
 
 pub(all) struct GlobalWindow {
@@ -104,19 +94,39 @@ pub fn RateLimitState::equal(Self, Self) -> Bool
 pub fn RateLimitState::not_equal(Self, Self) -> Bool
 pub fn RateLimitState::to_repr(Self) -> @debug.Repr
 
+pub struct RetryContext {
+  bucket : String
+  request : @http.Request
+  attempt : Int
+  random : Double
+  now_unix_ms : Int64
+  remaining_ms : Int64?
+  replayable : Bool
+}
+pub fn RetryContext::new(@http.Request, bucket? : String, attempt? : Int, random? : Double, now_unix_ms? : Int64, remaining_ms? : Int64, replayable? : Bool) -> Self
+
 pub(all) struct RetryPolicy {
-  max_retries : Int
-  backoff : Backoff
-  max_retry_after_ms : Int
-  retry_non_idempotent : Bool
+  rule : @retry.RetryRule
 } derive(Eq, @debug.Debug)
+pub fn RetryPolicy::allow_non_idempotent(Self) -> Self
+pub fn RetryPolicy::conservative() -> Self
+pub fn RetryPolicy::decide(Self, SdkError, RetryContext) -> @retry.Decision
 pub fn RetryPolicy::default() -> Self
 pub fn RetryPolicy::equal(Self, Self) -> Bool
-pub fn RetryPolicy::next_delay_ms(Self, SdkError, @http.Request, Int, Double) -> Int?
+pub fn RetryPolicy::from_rule(@retry.RetryRule) -> Self
 pub fn RetryPolicy::none() -> Self
 pub fn RetryPolicy::not_equal(Self, Self) -> Bool
+pub fn RetryPolicy::stainless(cap~ : @retry.RetryAfterCap) -> Self
 pub fn RetryPolicy::to_repr(Self) -> @debug.Repr
+pub fn RetryPolicy::with_max_retries(Self, Int) -> Self
 pub impl RetryDecider for RetryPolicy
+
+pub(all) struct Timeouts {
+  timer : &@sync.Timer
+  attempt_ms : Int?
+  total_ms : Int?
+}
+pub fn Timeouts::new(&@sync.Timer, attempt_ms? : Int, total_ms? : Int) -> Self
 
 pub struct WindowLimiter {
   // private fields
@@ -128,6 +138,29 @@ pub fn WindowLimiter::state(Self, String) -> RateLimitState?
 pub impl RateLimiter for WindowLimiter
 
 // Type aliases
+pub using @retry {type Backoff}
+
+pub using @retry {type Decision}
+
+pub using @retry {type Jitter}
+
+pub using @retry {type Methods}
+
+pub using @retry {type Outcome}
+
+pub using @retry {type RetryAfter}
+
+pub using @retry {type RetryAfterCap}
+
+pub using @retry {type RetryAfterSource}
+
+pub using @retry {type RetryRule}
+
+pub using @retry {type StatusMatch}
+
+pub using @retry {type StatusRule}
+
+pub using @retry {type StopReason}
 
 // Traits
 pub(open) trait RateLimiter {
@@ -136,5 +169,5 @@ pub(open) trait RateLimiter {
 }
 
 pub(open) trait RetryDecider {
-  fn next_delay_ms(Self, SdkError, @http.Request, Int, Double) -> Int?
+  fn decide(Self, SdkError, RetryContext) -> @retry.Decision
 }

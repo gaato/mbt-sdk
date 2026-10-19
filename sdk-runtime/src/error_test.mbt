@@ -66,6 +66,8 @@ test "non status errors and explicitly constructed statuses" {
         (@runtime.Transport(@http.Proxy(status=502, message="refused")), true),
         (@runtime.Transport(@http.Proxy(status=503, message="refused")), true),
         (@runtime.Transport(@http.Proxy(status=504, message="refused")), true),
+        (@runtime.Transport(@http.Proxy(status=500, message="refused")), true),
+        (@runtime.Transport(@http.Proxy(status=429, message="refused")), true),
         (@runtime.Transport(@http.Proxy(status=407, message="refused")), false),
         (@runtime.Transport(@http.Proxy(status=403, message="refused")), false),
         (@runtime.Decode(message="invalid JSON", body=b"x"), false),
@@ -80,7 +82,10 @@ test "non status errors and explicitly constructed statuses" {
     body=b"",
   )
   assert_eq(error.status(), Some(429))
-  assert_false(error.is_retryable())
+  assert_true(error.is_retryable())
+  assert_false(
+    @runtime.Status(status=501, headers=@http.Headers::new(), body=b"").is_retryable(),
+  )
 }
 
 ///|

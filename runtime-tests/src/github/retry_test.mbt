@@ -50,10 +50,12 @@ async test "plain forbidden, retry count, and fallback delay cap stop retries" {
         transport.expect("GET", "/test", json_response(body, status=403))
       }
       let clock = @mock.FakeClock::new()
-      let gh = @github_sdk.GitHub::new(transport, clock, limiter=no_limiter(), retry={
-        ..@runtime.RetryPolicy::default(),
-        max_retries: retries,
-      })
+      let gh = @github_sdk.GitHub::new(
+        transport,
+        clock,
+        limiter=no_limiter(),
+        retry=@runtime.RetryPolicy::default().with_max_retries(retries),
+      )
       try gh.send(@http.Request::get("/test")) catch {
         error => assert_eq(error.status(), Some(403))
       } noraise {

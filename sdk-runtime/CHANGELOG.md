@@ -8,6 +8,80 @@ note.
 
 ## [Unreleased]
 
+### Added
+
+- **Retry presets: `RetryPolicy::conservative()`, `stainless(cap~)`,
+  `none()` and `from_rule(rule)`.** `conservative()` is the default and
+  keeps this module's behaviour; `stainless` is the official OpenAI and
+  Anthropic SDKs' (`_base_client.py`): 408, 409, 429 and every 5xx for any
+  method, transport failures for any method, `x-should-retry`, a backoff of
+  500 ms to 8 s shortened by up to 25 %, with `cap` choosing what a long
+  Retry-After does (`StopAbove(120000)` as openai-python, `NoCap` as
+  anthropic-sdk-python). `with_max_retries(n)` and `allow_non_idempotent()`
+  adjust a policy; `SdkError::outcome()` turns an error into the `Outcome`
+  a rule reads.
+- **`Client::new(timeouts?)` limits each attempt and each call.**
+  `Timeouts { timer, attempt_ms, total_ms }` takes a `@sync.Timer` (such as
+  `gaato/http-async`'s `ClockTimer`), so this module still needs no async
+  runtime. An exchange that runs out fails with
+  `Transport(Timeout(phase=Unknown, ..))` and goes to the retry decider like
+  any transport failure; `total_ms` also stops a retry whose wait would not
+  fit (`StopReason::Budget`) and an attempt that would start too late. The
+  rate limiter's `acquire` and `release` are not interrupted, so a limiter
+  wait counts against the total but can overrun it.
+- **`send` and `send_json` take an `accept` hook.** It sees each 2xx
+  response inside the attempt and may raise to reject it, which the retry
+  decider then handles like an error status: for APIs that report rate
+  limits in a successful body, such as GitHub GraphQL.
+
+### Changed
+
+- **Retry decisions are `gaato/http/retry` rules.** `RetryPolicy` is now
+  `{ rule : RetryRule }`, and the rule types (`RetryRule`, `StatusRule`,
+  `StatusMatch`, `Methods`, `RetryAfter`, `RetryAfterSource`,
+  `RetryAfterCap`, `Backoff`, `Jitter`, `Outcome`, `Decision`, `StopReason`)
+  are re-exported here. Migration: replace `{ ..RetryPolicy::default(),
+  max_retries: n }` with `RetryPolicy::default().with_max_retries(n)`,
+  `retry_non_idempotent: true` with `.allow_non_idempotent()`, and
+  `max_retry_after_ms` and `backoff` with a struct update of `rule`
+  (`RetryPolicy::from_rule({ ..policy.rule, retry_after: { ..policy.rule.retry_after, cap: StopAbove(ms) } })`).
+  A constructor of a re-exported enum is written without the package, as
+  `StopAbove(ms)` where the type is known, not `@runtime.StopAbove(ms)`.
+- **`RetryDecider` returns a `Decision` from a `RetryContext`.** The trait
+  method is `decide(Self, SdkError, RetryContext) -> Decision` instead of
+  `next_delay_ms(Self, SdkError, Request, Int, Double) -> Int?`; the
+  context carries the bucket, request, attempt, random number, current time,
+  the time left under `Timeouts.total_ms` and whether the request can be
+  resent. Migration: rename the method, read the old arguments from
+  `context.request`, `context.attempt` and `context.random`, and return
+  `Wait(ms)` for `Some(ms)` and `Stop(reason)` for `None`;
+  `RetryContext::new(request, ..)` builds a context for tests or for asking
+  another decider.
+- **`Backoff` is `gaato/http/retry`'s: `{ base_ms, max_ms, jitter : Jitter }`.**
+  The factor is always 2 and the arithmetic is integer, so the top of the
+  default ±20 % range can be 1 ms lower than before (a `random` clamped to
+  just under 1 gives 599 ms for the first retry, where it gave 600); other
+  default delays are unchanged. `Backoff::default()` is gone. Migration: take the default
+  from `RetryPolicy::conservative().rule.backoff`, replace `factor` (only 2
+  remains) and write `jitter: Proportional(lo=800, hi=1200)` for
+  `jitter: 0.2`.
+- **`conservative()` retries a few more failures than the old default, and
+  `SdkError::is_retryable` agrees with it.** A proxy's refusal to open a
+  tunnel (`Proxy(status~)`) is retried when its status is 408, 409, 429 or
+  500, as well as 502, 503 and 504, for any method, because a rule applies
+  one status list to responses and proxies alike. A `Status(status=429)`
+  built by hand (rather than by `classify`, which makes it `RateLimited`)
+  is retried for any method, like `RateLimited`. Migration: none for
+  responses that come through `classify`; to keep the narrower proxy set,
+  write a rule without those statuses.
+
+### Fixed
+
+- **An HTTP-date `Retry-After` on an error status is honoured.** The retry
+  decision now gets the current time, so `Retry-After: <date>` on a 503 or
+  any other retryable status waits until then; it used to fall back to the
+  backoff. A 429's date was already read when the response was classified.
+
 ## [0.6.0] - 2026-10-19
 
 ### Changed

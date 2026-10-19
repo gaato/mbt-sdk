@@ -689,14 +689,12 @@ async test "Client releases every attempt and observes them before retrying" {
 priv struct NeverRetry {}
 
 ///|
-impl @runtime.RetryDecider for NeverRetry with fn next_delay_ms(
+impl @runtime.RetryDecider for NeverRetry with fn decide(
   _self,
   _error,
-  _request,
-  _attempt,
-  _random,
+  _context,
 ) {
-  None
+  Stop(NotRetryable)
 }
 
 ///|
@@ -726,14 +724,12 @@ async test "Client asks the supplied retry decider" {
 priv struct AlwaysRetry {}
 
 ///|
-impl @runtime.RetryDecider for AlwaysRetry with fn next_delay_ms(
+impl @runtime.RetryDecider for AlwaysRetry with fn decide(
   _self,
   _error,
-  _request,
-  _attempt,
-  _random,
+  _context,
 ) {
-  Some(1)
+  Wait(1)
 }
 
 ///|

@@ -1,6 +1,6 @@
 # gaato/sdk-runtime
 
-API-agnostic client runtime for MoonBit SDKs, built on `gaato/http`: an error taxonomy (`SdkError`), backoff and retry policy, a `Client` that resolves URLs, applies default headers and auth, runs a rate limiter and middleware, classifies responses and retries (never resending a stream body a transport has read); a window rate limiter, a paginator, tri-state JSON fields (`Presence`), and open enums (`gaato/sdk-runtime/json`). The HTTP-generic parts it builds on (Retry-After parsing, multipart, randomness) live in `gaato/http`. No async runtime dependency: time comes through the `Clock` trait.
+API-agnostic client runtime for MoonBit SDKs, built on `gaato/http`: an error taxonomy (`SdkError`), retry policies over `gaato/http/retry` rules (`RetryPolicy::conservative()`, the default, and `stainless()`, the official OpenAI and Anthropic SDKs' behaviour), a `Client` that resolves URLs, applies default headers and auth, runs a rate limiter and middleware, classifies responses and retries (never resending a stream body a transport has read), with optional per-attempt and per-call time limits (`Timeouts`, through an injected `@sync.Timer`); a window rate limiter, a paginator, tri-state JSON fields (`Presence`), and open enums (`gaato/sdk-runtime/json`). The HTTP-generic parts it builds on (retry rules, Retry-After parsing, multipart, randomness) live in `gaato/http`. No async runtime dependency: time comes through the `Clock` trait.
 
 Unofficial and experimental. Source, issues and design notes: https://github.com/gaato/mbt-sdk
 

@@ -1,9 +1,9 @@
 import {
   "gaato/http",
   "gaato/http/clock",
+  "gaato/http/retry",
   "gaato/http/sync",
   "gaato/http/random",
-  "moonbitlang/core/math",
   "moonbitlang/core/debug",
 }
 

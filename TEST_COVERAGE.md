@@ -119,7 +119,7 @@ Testable, not yet tested (next candidates):
 
 | File | Budget | Reason |
 | --- | --- | --- |
-| sdk-runtime/src/client.mbt | 6 | not yet tested: the retry-then-sleep path of `send_stream` (2); a limiter whose `acquire` raises (1) or whose `release` raises after a transport failure (1) or after a buffered response (the no-op discard, 1); `resolve_url` with no slash on either side (1). |
+| sdk-runtime/src/client.mbt | 4 | not yet tested: a limiter whose `acquire` raises (1) or whose `release` raises after a transport failure (1) or after a buffered response (the no-op discard, 1); `resolve_url` with no slash on either side (1). |
 | codex-app-server/src/child.mbt | 6 | not yet tested: `spawn` and `Session::shutdown` need an app-server process; testable with a stub `program~` speaking NDJSON. The JSON-RPC child plumbing itself is tested in jsonrpc-async. |
 | codex-app-server/src/handlers.mbt | 4 | not yet tested: `dispatch` routes for file-change, permissions and user-input requests (3) and a handler returning `Err` (1); command approval and decode failures are tested. |
 | jsonrpc-async/src/child.mbt | 5 | not yet tested: `shutdown` with `timeout_ms <= 0` (2). Needs a spawn or wait failure: the `errdefer`s that close the pipes when `@process.spawn` raises (2; a nonexistent program may reach them, unverified), and the re-raise of a `wait` failure other than the timeout (1). |

@@ -6,7 +6,7 @@ let openrouter_models : Array[String] = [
 ///|
 /// One retry only: a stalled :free model should fail over to the next candidate, not burn the budget.
 fn live_retry() -> @runtime.RetryPolicy {
-  { ..@runtime.RetryPolicy::default(), max_retries: 1, }
+  @runtime.RetryPolicy::default().with_max_retries(1)
 }
 
 ///|

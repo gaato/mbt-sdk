@@ -14,6 +14,19 @@ are optional unless the field is required, and keep a wildcard arm.
 
 ## [Unreleased]
 
+### Changed
+
+- **`GitHubRetry` implements `gaato/sdk-runtime` 0.7.0's `RetryDecider`.**
+  Its method is `decide(error, context) -> Decision` instead of
+  `next_delay_ms(error, request, attempt, random) -> Int?`, and it reads the
+  delay cap from the policy's `rule.retry_after.cap` (`StopAbove` or
+  `BackoffAbove`; `NoCap` means none) instead of `max_retry_after_ms`. The
+  decisions are the same under the default policy. Migration: call
+  `retry.decide(error, @runtime.RetryContext::new(request, attempt~, random~))`
+  and match `Wait(ms)` and `Stop(_)` instead of `Some(ms)` and `None`; build a
+  policy with `RetryPolicy::default().with_max_retries(n)` instead of a
+  struct update.
+
 ## [0.16.0] - 2026-10-19
 
 ### Changed

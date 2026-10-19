@@ -79,14 +79,43 @@ pub fn SdkError::status(self : SdkError) -> Int32? {
 }
 
 ///|
-/// Reports transient failures; request idempotency remains the caller's
-/// concern. Every transport failure but `Protocol` is transient, and a
-/// proxy's refusal to open a tunnel only when its status is 502, 503 or 504.
+/// Reports transient failures, as `RetryPolicy::conservative()` classifies
+/// them; whether the request's method may be retried is the policy's
+/// concern. Every transport failure but `Protocol` is transient, and a status
+/// (or a proxy's refusal to open a tunnel) of 408, 409, 429, 500, 502, 503
+/// or 504.
 pub fn SdkError::is_retryable(self : SdkError) -> Bool {
   match self {
     Transport(Connect(_) | Timeout(..) | Network(..)) | RateLimited(..) => true
-    Transport(Proxy(status=502 | 503 | 504, ..)) => true
-    Status(status=408 | 409 | 500 | 502 | 503 | 504, ..) => true
+    Transport(Proxy(status~, ..)) | Status(status~, ..) =>
+      status is (408 | 409 | 429 | 500 | 502 | 503 | 504)
     _ => false
+  }
+}
+
+///|
+/// The error as a `RetryRule` sees it: a response for `Status` and
+/// `RateLimited` (status 429), a failure for `Transport`, and `None` for
+/// `Decode` and `Config`, which no rule retries.
+///
+/// ```mbt check
+/// test {
+///   let error = @runtime.RateLimited(
+///     retry_after_ms=None,
+///     headers=@http.Headers::new(),
+///     body=b"",
+///   )
+///   guard error.outcome() is Some(Response(status=429, ..)) else {
+///     fail("expected a 429 response")
+///   }
+///   assert_true(@runtime.Config("bad").outcome() is None)
+/// }
+/// ```
+pub fn SdkError::outcome(self : SdkError) -> Outcome? {
+  match self {
+    Transport(error) => Some(Failure(error))
+    Status(status~, headers~, ..) => Some(Response(status~, headers~))
+    RateLimited(headers~, ..) => Some(Response(status=429, headers~))
+    Decode(..) | Config(_) => None
   }
 }
