@@ -3158,7 +3158,7 @@ pub impl @json.FromJson for CacheCreation with fn from_json(value, path) {
 
 ///|
 ///
-/// Generated representation of CacheMissMessagesChanged.
+/// A `cache_miss_reason` for a request whose `messages` differ from the previous request's in an earlier entry, instead of only having entries appended. The `model`, `system`, and `tools` match. See the [cache diagnostics guide](https://platform.claude.com/docs/en/build-with-claude/cache-diagnostics#cache-miss-reason-types) to learn what to change for each reason.
 pub(all) struct CacheMissMessagesChanged {
   cache_missed_input_tokens : Int32
   type_ : String
@@ -3214,7 +3214,7 @@ pub impl @json.FromJson for CacheMissMessagesChanged with fn from_json(
 
 ///|
 ///
-/// Generated representation of CacheMissModelChanged.
+/// A `cache_miss_reason` for a request whose `model` or `speed` differs from the previous request's. See the [cache diagnostics guide](https://platform.claude.com/docs/en/build-with-claude/cache-diagnostics#cache-miss-reason-types) to learn what to change for each reason.
 pub(all) struct CacheMissModelChanged {
   cache_missed_input_tokens : Int32
   type_ : String
@@ -3267,7 +3267,7 @@ pub impl @json.FromJson for CacheMissModelChanged with fn from_json(value, path)
 
 ///|
 ///
-/// Generated representation of CacheMissPreviousMessageNotFound.
+/// A `cache_miss_reason` for when the API doesn't have a stored record of the request that `diagnostics.previous_message_id` references. This doesn't mean that this request changed. See the [cache diagnostics guide](https://platform.claude.com/docs/en/build-with-claude/cache-diagnostics#cache-miss-reason-types) to learn what to change for each reason.
 pub(all) struct CacheMissPreviousMessageNotFound {
   type_ : String
 } derive(Eq, @debug.Debug)
@@ -3313,7 +3313,7 @@ pub impl @json.FromJson for CacheMissPreviousMessageNotFound with fn from_json(
 
 ///|
 ///
-/// Generated representation of CacheMissSystemChanged.
+/// A `cache_miss_reason` for a request whose `system` differs from the previous request's. See the [cache diagnostics guide](https://platform.claude.com/docs/en/build-with-claude/cache-diagnostics#cache-miss-reason-types) to learn what to change for each reason.
 pub(all) struct CacheMissSystemChanged {
   cache_missed_input_tokens : Int32
   type_ : String
@@ -3369,7 +3369,7 @@ pub impl @json.FromJson for CacheMissSystemChanged with fn from_json(
 
 ///|
 ///
-/// Generated representation of CacheMissToolsChanged.
+/// A `cache_miss_reason` for a request whose `tools` differ from the previous request's, for example because tools were added, removed, or reordered. See the [cache diagnostics guide](https://platform.claude.com/docs/en/build-with-claude/cache-diagnostics#cache-miss-reason-types) to learn what to change for each reason.
 pub(all) struct CacheMissToolsChanged {
   cache_missed_input_tokens : Int32
   type_ : String
@@ -3422,7 +3422,7 @@ pub impl @json.FromJson for CacheMissToolsChanged with fn from_json(value, path)
 
 ///|
 ///
-/// Generated representation of CacheMissUnavailable.
+/// A `cache_miss_reason` for when the API can't give a diagnosis. The request itself was processed normally. This includes a request whose `model`, `system`, and `tools` match the previous request's but whose other prompt-affecting parameters, such as `thinking` or `tool_choice`, differ. See the [cache diagnostics guide](https://platform.claude.com/docs/en/build-with-claude/cache-diagnostics#cache-miss-reason-types) to learn what to change for each reason.
 pub(all) struct CacheMissUnavailable {
   type_ : String
 } derive(Eq, @debug.Debug)
@@ -4233,6 +4233,41 @@ pub impl @json.FromJson for CmekKeyNetworkBlockedErrorDetails with fn from_json(
 ) {
   let _ = @sdkjson.expect_object(value, path)
   CmekKeyNetworkBlockedErrorDetails::{ }
+}
+
+///|
+///
+/// The workspace's customer-managed encryption key could not be reached. Retry the request; if this continues, check that the key is available in your key management service, or contact Anthropic support.
+pub(all) struct CmekKeyUnreachableErrorDetails {} derive(Eq, @debug.Debug)
+
+///|
+pub extend CmekKeyUnreachableErrorDetails with Eq::{equal, not_equal}
+
+///|
+pub extend CmekKeyUnreachableErrorDetails with @debug.Debug::{to_repr}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend CmekKeyUnreachableErrorDetails with ToJson::{to_json}
+
+///|
+pub impl ToJson for CmekKeyUnreachableErrorDetails with fn to_json(_self) {
+  @sdkjson.ObjBuilder::new().field("error_code", "cmek_key_unreachable").build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend CmekKeyUnreachableErrorDetails with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for CmekKeyUnreachableErrorDetails with fn from_json(
+  value,
+  path,
+) {
+  let _ = @sdkjson.expect_object(value, path)
+  CmekKeyUnreachableErrorDetails::{ }
 }
 
 ///|
@@ -20060,7 +20095,7 @@ pub impl @json.FromJson for CreateMessageParamsToolsItem with fn from_json(
 
 ///|
 ///
-/// Generated representation of CreateMessageParams.
+/// The parameters of a request for the next message in a conversation. See the [Messages API guide](https://platform.claude.com/docs/en/build-with-claude/working-with-messages#basic-request-and-response) to learn more about requests and responses.
 pub(all) struct CreateMessageParams {
   model : String
   messages : Array[InputMessage]
