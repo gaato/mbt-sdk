@@ -951,6 +951,16 @@ pub fn CmekKeyNetworkBlockedErrorDetails::to_repr(Self) -> @debug.Repr
 pub impl ToJson for CmekKeyNetworkBlockedErrorDetails
 pub impl @moonbitlang/core/json.FromJson for CmekKeyNetworkBlockedErrorDetails
 
+pub(all) struct CmekKeyUnreachableErrorDetails {
+} derive(Eq, @debug.Debug)
+pub fn CmekKeyUnreachableErrorDetails::equal(Self, Self) -> Bool
+pub fn CmekKeyUnreachableErrorDetails::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn CmekKeyUnreachableErrorDetails::not_equal(Self, Self) -> Bool
+pub fn CmekKeyUnreachableErrorDetails::to_json(Self) -> Json
+pub fn CmekKeyUnreachableErrorDetails::to_repr(Self) -> @debug.Repr
+pub impl ToJson for CmekKeyUnreachableErrorDetails
+pub impl @moonbitlang/core/json.FromJson for CmekKeyUnreachableErrorDetails
+
 pub(all) struct CodeExecutionTool20250522 {
   allowed_callers : Array[AllowedCaller]?
   cache_control : @gaato/sdk-runtime/json.Presence[CodeExecutionTool20250522CacheControl]
