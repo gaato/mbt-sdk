@@ -77,6 +77,7 @@ a document:
 | `retry-after-ms` | The OpenAI SDKs: milliseconds, preferred over `Retry-After` | `http/src/retry_after.mbt` (`retry_after_ms`) |
 | Decimal seconds in `Retry-After` | The OpenAI SDKs parse it as a float; RFC 9110's `delay-seconds` is `1*DIGIT` | `http/src/retry_after.mbt` (`parse_retry_after`) |
 | `x-should-retry` | The Stainless-generated SDKs | `sdk-runtime/src/retry.mbt` |
+| Method names in any case | RFC 9110 §9.1 makes method names case-sensitive, but `AsyncTransport` sends a standard method in any case as its canonical upper-case form (moonbitlang/async's `RequestMethod`), so the code that decides on the method follows what goes on the wire: `is_idempotent`, `redirect_method` and the transport's replay check ignore case | `http/src/idempotent.mbt`; `http/src/redirect.mbt`; `http-async/src/pool.mbt` (`replayable`), `transport.mbt` (`request_method`) |
 | `x-ratelimit-*` | Each API's documentation, configured per SDK | `sdk-runtime/src/rate_limit.mbt` (`rate_limit_headers`); `github/src/client.mbt` |
 | URLs | RFC 3986, not the WHATWG URL parser: no IDNA (non-ASCII hosts are refused), no IPv4 shorthand, a backslash is data, `%2e` is not a dot segment, an IPv6 dotted quad is kept, no `file:` or opaque-path rules | `http/src/url.mbt` |
 
@@ -87,7 +88,6 @@ be fixed; the fix removes its row.
 
 | Document | The code |
 |---|---|
-| RFC 9110 §9.1: method names are case-sensitive | `is_idempotent` lower-cases the method |
 | JSON-RPC 2.0 §4, §5: a request has `method`, a response `result` or `error`, never both | `Message::from_json` decodes an object with `method` and `result` as a request |
 | draft-ietf-httpbis-rfc6265bis-22 §5.6: a pair without `=` is a cookie with an empty name; the 4096-byte limit covers the name and value | `parse_set_cookie` ignores such a pair, as RFC 6265 §5.2 does, and applies the limit to the whole `Set-Cookie` value |
 | curl and Go: a `*.example.com` entry in `NO_PROXY` | `no_proxy.mbt` drops it, so the host goes through the proxy |
