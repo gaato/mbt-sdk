@@ -27,7 +27,7 @@ Status: experimental. The HTTP, runtime and API modules are published on [moonca
 | `gaato/github` | [![mooncakes](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fmooncakes.io%2Fapi%2Fv0%2Fmodules%2Fgaato%2Fgithub&query=%24.version&label=mooncakes&prefix=v)](https://mooncakes.io/docs/gaato/github) | The whole GitHub REST API: all 1,221 operations and their types generated from the first-party OpenAPI description, under a thin facade that sends, paginates and reads errors, plus an untyped GraphQL passthrough; [scope and usage](github/README.md) | `gaato/http`, `gaato/sdk-runtime` |
 | `runtime-tests/` | — | Unpublished. Executes the async behaviour of the modules above (a module without an async runtime cannot run `async test`) | everything |
 
-HTTP SDK modules never import an async runtime: the caller passes a `Transport` and a `Clock`. That keeps them portable and makes retry, rate-limit and streaming logic testable with fakes and a fake clock. The Codex SDK keeps generated protocol types portable and puts connection/process ownership in a separate async module.
+HTTP SDK modules never import an async runtime (see [ARCHITECTURE.md](ARCHITECTURE.md)): the caller passes a `Transport` and a `Clock`. That keeps them portable and makes retry, rate-limit and streaming logic testable with fakes and a fake clock. The Codex SDK keeps generated protocol types portable and puts connection/process ownership in a separate async module.
 
 ```moonbit
 let transport = @http_async.AsyncTransport::new(
@@ -87,7 +87,7 @@ scripts/compat-servers.sh    # start Ollama (qwen2.5:0.5b, accepts tools) + a Li
 - `spec-watch.yml` — daily upstream spec check; on change it re-vendors, regenerates, runs the gates and opens a PR.
 - `live-compat.yml` — the live suite against local, key-free OpenAI- and Anthropic-compatible servers (Ollama + LiteLLM, always their latest release, so a change in either shows up here). Remote providers skip without keys.
 
-Specifications followed, their errata and known deviations: [SPECIFICATIONS.md](SPECIFICATIONS.md).
+How the repository is laid out: [ARCHITECTURE.md](ARCHITECTURE.md). What transports, body streams and the incremental parsers guarantee: [CONTRACT.md](CONTRACT.md). Specifications followed, their errata and known deviations: [SPECIFICATIONS.md](SPECIFICATIONS.md).
 
 Design notes (Japanese): `docs/design.md` (M1), `docs/design-m2.md`, `docs/design-m3.md`, `docs/design-m4.md`, `docs/design-m5.md`, `docs/design-m6.md`, `docs/design-m7.md`, `docs/design-m8.md`, `docs/design-m9.md`, `docs/design-m10.md`. Release procedure: `docs/release.md`. Adding an SDK: `docs/new-sdk.md`.
 
