@@ -113,6 +113,11 @@ unpublished module where the async behaviour of the layers below is run.
   MoonBit test files when their pins move. Where this code deliberately
   differs from a suite, the rows it skips are named by category and
   counted, and the difference is listed in `SPECIFICATIONS.md`.
+- **Recorded responses.** badhttp.dev's content-coding, cookie, event
+  stream and cross-host redirect responses (CC0), recorded byte for byte by
+  `scripts/capture_badhttp.mbtx`, are played back by a loopback server in
+  `runtime-tests/src/badhttp_replay`, so the transport, decoders, jar,
+  parser and redirects meet them in every gates run without the network.
 - **Live and scheduled.** `scripts/live.sh` runs the SDKs against the real
   APIs and local compatible servers; `scripts/conformance.sh` runs the
   transport, SSE parser and runtime against https://badhttp.dev. The

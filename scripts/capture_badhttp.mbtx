@@ -1,0 +1,151 @@
+// Records badhttp.dev's responses for runtime-tests/src/badhttp_replay,
+// which replays them offline through a loopback server. badhttp.dev
+// releases everything it serves under CC0-1.0 (https://badhttp.dev/license).
+//
+// Usage, from the repository root (needs the network and curl):
+//   moon run scripts/capture_badhttp.mbtx
+//
+// Each response is kept byte for byte as curl --raw receives it over
+// HTTP/1.1, head and body, chunked framing included, and written as hex
+// into runtime-tests/src/badhttp_replay/captures_wbtest.mbt. A crosshost
+// redirect is followed hop by hop, and every hop is kept, keyed by its
+// URL. The service allows 100 requests in 10 s; this makes about 60, a
+// quarter of a second apart.
+//
+// This is not part of the gates: it runs when badhttp.dev's version moves.
+
+import {
+  "moonbitlang/async@0.22.5",
+  "moonbitlang/async@0.22.5/fs",
+  "moonbitlang/async@0.22.5/shell",
+  "moonbitlang/core/encoding/utf8",
+}
+
+///|
+let base : String = "https://badhttp.dev"
+
+///|
+/// `(key, URL, accept-encoding)` of every response recorded, but the
+/// crosshost hops after the first.
+let requests : Array[(String, String, String?)] = [
+  ("compress.identity", "/compress/ok", Some("identity")),
+  ("compress.ok", "/compress/ok", Some("gzip")),
+  ("compress.br", "/compress/br", Some("br")),
+  ("compress.zstd", "/compress/zstd", Some("zstd")),
+  ..[
+    "deflate", "not-compressed", "undeclared", "truncated", "corrupt", "bad-crc",
+    "trailing-garbage", "multi-member", "double", "double-hidden", "deflate-raw",
+    "unknown-coding", "uppercase", "x-gzip", "empty", "wrong-length", "gzip-file",
+    "bomb",
+  ].map(flavor => ("compress.\{flavor}", "/compress/\{flavor}", Some("gzip"))),
+  ..[
+    "ok", "folded", "many", "duplicate", "on-redirect", "conflicting-expiry", "bad-expires",
+    "far-future", "wrong-domain", "public-suffix", "domain", "path-prefix", "name-prefixes",
+    "quoted", "utf8", "nameless", "huge",
+  ].map(flavor => ("cookies.\{flavor}", "/cookies/\{flavor}", None)),
+  ..[
+    "ok", "cut", "drop", "crlf", "cr", "no-space", "multiline", "comments", "split-utf8",
+    "wrong-type", "error-event", "resume",
+  ].map(flavor => ("sse.\{flavor}", "/sse/\{flavor}", None)),
+]
+
+///|
+/// The first URL of each crosshost chain.
+let crosshost : Array[String] = [
+  "https://badhttp.dev/crosshost/same-origin", "https://badhttp.dev/crosshost/to-subdomain",
+  "https://alt.badhttp.dev/crosshost/from-subdomain", "https://badhttp.dev/crosshost/boomerang",
+  "http://badhttp.dev/crosshost/scheme-upgrade", "https://badhttp.dev/crosshost/scheme-downgrade",
+  "https://badhttp.dev/crosshost/port-change", "https://badhttp.dev/crosshost/relative-authority",
+  "https://badhttp.dev/crosshost/jar",
+]
+
+///|
+async fn fetch(url : String, accept_encoding : String?) -> Bytes {
+  @async.sleep(250)
+  let headers = match accept_encoding {
+    Some(coding) => ["-H", "accept-encoding: \{coding}"]
+    None => []
+  }
+  let output = @shell.Cmd("curl", [
+    "--http1.1", "--raw", "-sS", "--max-time", "30", "-D", "-", "--output", "-",
+    ..headers, url,
+  ]).output()
+  // A response that ends in a reset (sse/drop) makes curl exit non-zero
+  // after writing what arrived; keep that.
+  if output.stdout_bytes().length() == 0 {
+    fail("no response from \{url}: \{output.stderr()}")
+  }
+  output.stdout_bytes()
+}
+
+///|
+/// The Location of a 3xx response, resolved against `url` well enough for
+/// badhttp.dev's absolute, protocol-relative and path-absolute values.
+fn next_hop(url : String, response : Bytes) -> String? {
+  let text = @utf8.decode_lossy(response)
+  guard text.has_prefix("HTTP/1.1 3") else { return None }
+  for line in text.split("\r\n") {
+    let line = line.to_owned()
+    if line.to_lower().has_prefix("location:") {
+      let location = line[9:].trim(chars=" \t").to_owned()
+      return Some(
+        if location.has_prefix("//") {
+          url[:url.find(":").unwrap() + 1].to_owned() + location
+        } else if location.has_prefix("/") {
+          let origin_end = url[8:].find("/").map(i => i + 8).unwrap_or(url.length())
+          url[:origin_end].to_owned() + location
+        } else {
+          location
+        },
+      )
+    }
+    if line.is_empty() {
+      break
+    }
+  }
+  None
+}
+
+///|
+fn hex(bytes : Bytes) -> String {
+  let out = StringBuilder()
+  for byte in bytes {
+    out.write_string(byte.to_hex())
+  }
+  out.to_string()
+}
+
+///|
+async fn main {
+  let rows : Array[(String, Bytes)] = []
+  for request in requests {
+    let (key, path, coding) = request
+    rows.push((key, fetch(base + path, coding)))
+    println("captured \{key}")
+  }
+  for start in crosshost {
+    let mut url = start
+    for _ in 0..<4 {
+      let response = fetch(url, None)
+      rows.push((url, response))
+      println("captured \{url}")
+      match next_hop(url, response) {
+        Some(next) if !rows.iter().any(row => row.0 == next) => url = next
+        _ => break
+      }
+    }
+  }
+  let out = StringBuilder()
+  out.write_string(
+    "// GENERATED by scripts/capture_badhttp.mbtx from https://badhttp.dev (CC0-1.0) — DO NOT EDIT.\n\n///|\n/// Raw HTTP/1.1 responses as hex, keyed by corpus id or, for crosshost hops,\n/// by URL.\nlet captures : Map[String, String] = {\n",
+  )
+  for row in rows {
+    out.write_string("  \"\{row.0}\": \"\{hex(row.1)}\",\n")
+  }
+  out.write_string("}\n")
+  @fs.write_file(
+    "runtime-tests/src/badhttp_replay/captures_wbtest.mbt",
+    out.to_string(),
+  )
+  println("wrote \{rows.length()} responses")
+}

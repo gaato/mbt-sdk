@@ -1,0 +1,15 @@
+// Replays recorded badhttp.dev responses (see scripts/capture_badhttp.mbtx)
+// through a loopback server; runs offline, in the gates.
+import {
+  "gaato/http",
+  "gaato/http/cookie",
+  "gaato/http/mock",
+  "gaato/http/sse",
+  "gaato/http-async" @adapter,
+  "moonbitlang/async",
+  "moonbitlang/async/socket",
+  "moonbitlang/core/encoding/utf8",
+  "moonbitlang/core/string",
+} for "wbtest"
+
+supported_targets = "native"
