@@ -145,6 +145,19 @@ test "request id cases and response shape validation" {
 }
 
 ///|
+test "a message with method and result or error is neither a request nor a response" {
+  for envelope in [@jsonrpc.Envelope::Strict, Bare] {
+    for
+      members in [
+        "\"method\":\"m\",\"id\":1,\"result\":1", "\"method\":\"m\",\"result\":null",
+        "\"method\":\"m\",\"id\":1,\"error\":{\"code\":-32603,\"message\":\"x\"}",
+      ] {
+      assert_invalid_message("{\"jsonrpc\":\"2.0\"," + members + "}", envelope)
+    }
+  }
+}
+
+///|
 test "reserved errors and invalid error objects" {
   assert_eq(@jsonrpc.RpcError::parse_error().code, -32700)
   assert_eq(@jsonrpc.RpcError::invalid_request().message, "Invalid Request")

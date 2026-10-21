@@ -88,6 +88,5 @@ be fixed; the fix removes its row.
 
 | Document | The code |
 |---|---|
-| JSON-RPC 2.0 §4, §5: a request has `method`, a response `result` or `error`, never both | `Message::from_json` decodes an object with `method` and `result` as a request |
 | draft-ietf-httpbis-rfc6265bis-22 §5.6: a pair without `=` is a cookie with an empty name; the 4096-byte limit covers the name and value | `parse_set_cookie` ignores such a pair, as RFC 6265 §5.2 does, and applies the limit to the whole `Set-Cookie` value |
 | curl and Go: a `*.example.com` entry in `NO_PROXY` | `no_proxy.mbt` drops it, so the host goes through the proxy |

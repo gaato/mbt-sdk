@@ -55,6 +55,12 @@ pub fn Message::from_json(
   validate_envelope(fields, envelope)
   match fields.get("method") {
     Some(String(method_name)) => {
+      // A request (§4) has `method`, a response (§5) `result` or `error`.
+      guard !fields.contains("result") && !fields.contains("error") else {
+        raise InvalidMessage(
+          "a message cannot be both a request and a response",
+        )
+      }
       let params = fields.get("params")
       match fields.get("id") {
         Some(id) => Request(id=decode_id(id), name=method_name, params~)
