@@ -15,6 +15,12 @@ are optional unless the field is required, and keep a wildcard arm.
 
 ## [Unreleased]
 
+## [0.12.1] - 2026-10-21
+
+### Changed
+
+- **Regenerated from the upstream spec fetched 2026-10-21** (sha256 `354355c70e8f`). The public API is unchanged.
+
 ## [0.12.0] - 2026-10-20
 
 ### Changed
