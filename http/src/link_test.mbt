@@ -27,3 +27,16 @@ test "parse_link_next handles repeated values comma URLs and relation forms" {
     None,
   )
 }
+
+///|
+test "only the first rel parameter of a link value counts" {
+  // RFC 8288 §3.3: occurrences after the first MUST be ignored.
+  let later_next = @http.Headers::from_array([
+    ("link", "<skipped>; rel=prev; rel=next, <chosen>; rel=next"),
+  ])
+  assert_eq(@http.parse_link_next(later_next), Some("chosen"))
+  let first_next = @http.Headers::from_array([
+    ("link", "<chosen>; title=x; rel=next; rel=prev"),
+  ])
+  assert_eq(@http.parse_link_next(first_next), Some("chosen"))
+}

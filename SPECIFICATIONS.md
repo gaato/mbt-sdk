@@ -23,7 +23,7 @@ errata are tracked in
 | RFC 4291, IPv6 addressing | Draft Standard; updated by RFC 5952, 6052, 7136, 7346, 7371, 8064 | `http-async/src/no_proxy.mbt` | IPv6 addresses and prefixes in `NO_PROXY` |
 | draft-ietf-httpbis-rfc6265bis-22, Cookies | Internet-Draft, revision 22, in the RFC Editor queue; will obsolete RFC 6265 | `http/src/cookie/` | `SameSite`, cookie prefixes (§4.1.3), the 400-day lifetime cap (§5.5), the 1024-byte attribute limit and control characters (§5.6), not overwriting Secure cookies (§5.7 step 16). The rest still follows RFC 6265; see "Known deviations" |
 | RFC 6265, HTTP State Management | Proposed Standard; obsoletes RFC 2965 | `http/src/cookie/` (`parse_set_cookie`, `parse_cookie_date`, `domain_match`, `path_match`, `CookieJar`) | Date parsing (§5.1.1), domain- and path-match (§5.1.3, §5.1.4), `Set-Cookie` parsing (§5.2), the storage model (§5.3), the `Cookie` header (§5.4), the size limits (§6.1) |
-| RFC 8288, Web Linking | Proposed Standard; obsoletes RFC 5988 | `http/src/link.mbt` (`parse_link_next`) | Only the target of `rel="next"`, unresolved; target attributes (Appendix B.2 steps 15–16) are not parsed |
+| RFC 8288, Web Linking | Proposed Standard; obsoletes RFC 5988 | `http/src/link.mbt` (`parse_link_next`) | Only the target of `rel="next"`, unresolved, from the first `rel` parameter (§3.3); target attributes (Appendix B.2 steps 15–16) are not parsed |
 | RFC 7578, multipart/form-data | Proposed Standard; obsoletes RFC 2388 | `http/src/multipart/` | Part framing (§4.1), `Content-Disposition` with `name` and `filename` (§4.2) |
 | RFC 2046, MIME media types | Draft Standard; updated by RFC 2646, 3798, 5147, 6657, 8098 | `http/src/multipart/multipart.mbt` (`is_boundary_char`, `validate_boundary`) | Boundary characters and length (§5.1.1) |
 | RFC 7617, Basic authentication | Proposed Standard; obsoletes RFC 2617 | `http-async/src/proxy.mbt` (`basic_credentials`) | `Proxy-Authorization: Basic` from a proxy URL's userinfo |
@@ -88,7 +88,6 @@ be fixed; the fix removes its row.
 | Document | The code |
 |---|---|
 | RFC 9110 §9.1: method names are case-sensitive | `is_idempotent` lower-cases the method |
-| RFC 8288 §3.3: occurrences of `rel` after the first MUST be ignored | `parse_next_link` reads every `rel` |
 | JSON-RPC 2.0 §4, §5: a request has `method`, a response `result` or `error`, never both | `Message::from_json` decodes an object with `method` and `result` as a request |
 | draft-ietf-httpbis-rfc6265bis-22 §5.6: a pair without `=` is a cookie with an empty name; the 4096-byte limit covers the name and value | `parse_set_cookie` ignores such a pair, as RFC 6265 §5.2 does, and applies the limit to the whole `Set-Cookie` value |
 | curl and Go: a `*.example.com` entry in `NO_PROXY` | `no_proxy.mbt` drops it, so the host goes through the proxy |

@@ -16,6 +16,9 @@ never does. Every breaking change is listed with a migration note.
   A two-digit year that would put the date more than 50 years after the
   clock is taken from the century before, as §5.6.7 says. HTTP-date stays
   case-sensitive and the weekday is still checked.
+- **`parse_link_next` reads only the first `rel` of a link value.** RFC 8288
+  §3.3 says later occurrences MUST be ignored; a value such as
+  `<a>; rel=prev; rel=next` was taken as the next page.
 
 ## [0.4.1] - 2026-10-19
 

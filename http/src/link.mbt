@@ -1,6 +1,7 @@
 ///|
-/// Returns the target of the first RFC 8288 Link value whose relation includes
-/// `next`, across repeated headers and comma-separated link values.
+/// Returns the target of the first RFC 8288 Link value whose relation, given
+/// by its first `rel` parameter, includes `next`, across repeated headers and
+/// comma-separated link values.
 pub fn parse_link_next(headers : Headers) -> String? {
   for value in headers.get_all("link") {
     for link in split_link_values(value) {
@@ -58,6 +59,7 @@ fn parse_next_link(value : String) -> String? {
     if name.trim().to_owned().to_lower() != "rel" {
       continue
     }
+    // RFC 8288 §3.3: a later `rel` parameter MUST be ignored.
     let relation = unquote(raw.trim().to_owned())
     for word in relation.split(" ") {
       let word = word.trim().to_owned()
@@ -65,6 +67,7 @@ fn parse_next_link(value : String) -> String? {
         return Some(url)
       }
     }
+    return None
   }
   None
 }
