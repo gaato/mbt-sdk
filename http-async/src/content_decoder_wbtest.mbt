@@ -172,37 +172,43 @@ test "ContentDecoder undoes each coding and chain" {
       "a truncated gzip body",
       [Gzip],
       hello_gzip[:hello_gzip.length() - 4].to_owned(),
-      Err("malformed gzip response body: gzip: truncated"),
+      Err(
+        "malformed gzip response body: the stream ends inside a member's trailer",
+      ),
     ),
     (
       "a deflate body of one byte",
       [Deflate],
       b"\x78",
-      Err("malformed deflate response body: the stream ends after one byte"),
+      Err("malformed deflate response body: the DEFLATE data ends early"),
     ),
     (
       "a truncated zlib body",
       [Deflate],
       hello_zlib[:hello_zlib.length() - 1].to_owned(),
-      Err("malformed deflate response body: zlib: truncated trailer"),
+      Err(
+        "malformed deflate response body: the stream ends inside its header or trailer",
+      ),
     ),
     (
       "a truncated raw DEFLATE body",
       [Deflate],
       hello_raw[:hello_raw.length() - 1].to_owned(),
-      Err("malformed deflate response body: unexpected end of input"),
+      Err("malformed deflate response body: the DEFLATE data ends early"),
     ),
     (
       "data after a gzip body",
       [Gzip],
       hello_gzip + b"x",
-      Err("malformed gzip response body: data after the end of the stream"),
+      Err("malformed gzip response body: data after the last member"),
     ),
     (
       "a gzip member cut after its magic",
       [Gzip],
       hello_gzip + b"\x1f\x8b",
-      Err("malformed gzip response body: gzip: truncated"),
+      Err(
+        "malformed gzip response body: the stream ends inside a member's header",
+      ),
     ),
     (
       "data after a zlib body",
@@ -214,13 +220,15 @@ test "ContentDecoder undoes each coding and chain" {
       "data after a raw DEFLATE body",
       [Deflate],
       hello_raw + b"x",
-      Err("malformed deflate response body: data after the end of the stream"),
+      Err("malformed deflate response body: data after the final block"),
     ),
     (
       "a zlib checksum mismatch",
       [Deflate],
       hello_zlib[:hello_zlib.length() - 1].to_owned() + b"\x00",
-      Err("malformed deflate response body: zlib: Adler-32 mismatch"),
+      Err(
+        "malformed deflate response body: the Adler-32 of the data does not match the stream's",
+      ),
     ),
     (
       "a truncated br body",
@@ -300,7 +308,9 @@ test "ContentDecoder undoes each coding and chain" {
       "not gzip at all",
       [Gzip],
       b"hello, world",
-      Err("malformed gzip response body: gzip: bad magic"),
+      Err(
+        "malformed gzip response body: not a gzip stream (the magic number is not 1f 8b)",
+      ),
     ),
     (
       "an inner stream with data after it",
@@ -318,7 +328,79 @@ test "ContentDecoder undoes each coding and chain" {
 }
 
 ///|
-test "zlib_header tells zlib from raw DEFLATE" {
+/// What a reader of the stream gets from `wire` fed whole, under `undo`: the
+/// decoded slices, then the `Protocol` message, or `"done"`.
+fn pulls(undo : Array[Coding], wire : Bytes) -> (Array[Bytes], String) {
+  let decoder = ContentDecoder::new(undo)
+  let slices = []
+  let mut fed = false
+  for ;; {
+    let pulled = decoder.pull() catch {
+      @http.HttpError::Protocol(message) => return (slices, message)
+      error => return (slices, "unexpected \{Repr(error)}")
+    }
+    match pulled {
+      Slice(slice) => slices.push(slice)
+      NeedInput if !fed => {
+        decoder.feed(wire)
+        fed = true
+      }
+      NeedInput => decoder.end()
+      Done => return (slices, "done")
+    }
+  }
+}
+
+///|
+test "a stream's reader gets the output before an error, then the error" {
+  // The step that finds the bytes after the stream also wrote its output,
+  // which goes out first, as it would had the bytes come in a later chunk.
+  let rows : Array[(String, Array[Coding], Bytes, String)] = [
+    (
+      "gzip",
+      [Gzip],
+      hello_gzip + b"x",
+      "malformed gzip response body: data after the last member",
+    ),
+    (
+      "zlib",
+      [Deflate],
+      hello_zlib + b"x",
+      "malformed deflate response body: data after the end of the stream",
+    ),
+    (
+      "raw DEFLATE",
+      [Deflate],
+      hello_raw + b"x",
+      "malformed deflate response body: data after the final block",
+    ),
+    (
+      "br",
+      [Brotli],
+      hello_br + b"x",
+      "malformed br response body: data after the end of the stream",
+    ),
+    (
+      "zstd",
+      [Zstd],
+      hello_zstd + b"junk",
+      "malformed zstd response body: data after the last frame that starts no frame",
+    ),
+    (
+      "gzip around br",
+      [Gzip, Brotli],
+      @gzip.compress(hello_br + b"x"),
+      "malformed br response body: data after the end of the stream",
+    ),
+  ]
+  for row in rows {
+    let (label, undo, wire, error) = row
+    assert_eq(pulls(undo, wire), ([b"hello, hello, hello"], error), msg=label)
+  }
+}
+
+///|
+test "@zlib.is_header tells zlib from the raw DEFLATE a deflate body may be" {
   let rows : Array[(Byte, Byte, Bool)] = [
     (b'\x78', b'\x9c', true), // default compression
     (b'\x78', b'\x01', true), // no compression
@@ -332,7 +414,7 @@ test "zlib_header tells zlib from raw DEFLATE" {
   ]
   for row in rows {
     let (cmf, flg, expected) = row
-    assert_eq(zlib_header(cmf, flg), expected, msg="\{cmf} \{flg}")
+    assert_eq(@zlib.is_header(cmf, flg), expected, msg="\{cmf} \{flg}")
   }
 }
 
@@ -343,7 +425,7 @@ fn encode_codings(body : Bytes, codings : Array[Int32]) -> Bytes {
     match coding {
       0 => @gzip.compress(coded, level=1)
       1 => @zlib.compress(coded, level=1)
-      _ => @flate.deflate_all(coded, level=1)
+      _ => @deflate.compress(coded, level=1)
     }
   })
 }
@@ -684,4 +766,32 @@ async test "read_decoded drains a chunk without reading again" {
     assert_eq(decoded, body.length())
     assert_eq(reads, 1)
   }
+}
+
+///|
+test "a gzip header of any size is skipped, not held" {
+  let header : @gzip.Header = {
+    text: false,
+    mtime: 0,
+    xfl: b'\x00',
+    os: b'\x03',
+    extra: Some(Bytes::make(65535, b'e')),
+    name: Some(Bytes::make(1 << 20, b'n')),
+    comment: Some(Bytes::make(1 << 20, b'c')),
+  }
+  let wire = @gzip.compress(b"hello", header~)
+  let chunks = []
+  for at = 0; at < wire.length(); at = at + 4096 {
+    chunks.push(wire[at:(at + 4096).min(wire.length())].to_owned())
+  }
+  assert_eq(decode_chunks([Gzip], chunks).unwrap(), b"hello")
+  // The decoder holds its window and tables, none of the header.
+  let decoder = ContentDecoder::new([Gzip])
+  decoder.feed(wire)
+  guard decoder.pull() is Slice(slice) else { fail("no slice") }
+  assert_eq(slice, b"hello")
+  assert_eq(
+    decoder.stages[0].decoder.unwrap().memory_usage(),
+    @gzip.Decoder().memory_usage(),
+  )
 }

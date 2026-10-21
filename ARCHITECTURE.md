@@ -131,8 +131,9 @@ unpublished module where the async behaviour of the layers below is run.
   `gaato/http-async` builds requests and reads responses through its client.
   On native it speaks HTTP/1.1 only; on JS, fetch chooses the protocol.
 - **Compression formats** (gzip, deflate, Brotli, Zstandard) are decoder
-  modules of their own, from codecs.mbt and moonbit-community/flate;
-  `gaato/http-async` only reads `Content-Encoding` and chains them.
+  modules of their own, from codecs.mbt, behind `gaato/codec_bytes`'
+  `Decode`; `gaato/http-async` only reads `Content-Encoding` and chains
+  them.
 - **GraphQL** is reached through the GitHub client as a passthrough over
   `Json`: a GraphQL response's shape belongs to the query the caller wrote,
   so there is no operation-to-type table to generate.

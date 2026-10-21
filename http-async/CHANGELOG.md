@@ -15,6 +15,21 @@ note.
   was skipped, so those hosts went through the proxy; Go reads `*.` this
   way. NO_PROXY handling is now also checked against the NO_PROXY tables of
   Go's `httpproxy` and curl (see NOTICE).
+- **Content decoding goes through `gaato/codec_bytes`' `Decode`.** gzip and
+  `deflate` bodies are decoded by `gaato/deflate` 0.1.0 instead of
+  `moonbit-community/flate`, no longer a direct dependency, and `br` and
+  `zstd` bodies by `gaato/brotli` 0.4.1 and `gaato/zstd` 0.3.1. The
+  `Protocol` message of a malformed body ends with the decoder's own
+  message, which now reads differently for gzip and `deflate` bodies
+  (for example "data after the last member" for bytes after a gzip body);
+  a `deflate` body of one byte is refused as raw DEFLATE cut short. A gzip
+  body's header fields (extra field, name, comment) are skipped whatever
+  their size, not held, and its header CRC is checked.
+- **A stream's reader gets the output decoded before an error.** When the
+  bytes after a body, or a checksum, are found in the same step that
+  decoded its last output, `send_stream` hands on that output and raises on
+  the next read, as it did when those bytes came in a later chunk. A
+  buffered body still fails whole.
 
 ## [0.4.2] - 2026-10-19
 

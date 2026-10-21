@@ -9,7 +9,7 @@ import {
   "moonbitlang/async/http" @ahttp,
   "moonbitlang/async/socket",
   "moonbitlang/async/io",
-  "moonbit-community/flate/gzip",
+  "gaato/deflate/gzip",
   "moonbitlang/core/debug",
   "moonbitlang/core/encoding/utf8",
 } for "test"

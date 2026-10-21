@@ -117,7 +117,7 @@ async test "the transport offers gzip, deflate, br and zstd and undoes what it k
     (
       "gzip",
       hello_gzip[:20].to_owned(),
-      Err("malformed gzip response body: gzip: truncated"),
+      Err("malformed gzip response body: the DEFLATE data ends early"),
     ),
     (
       "gzip, gzip, gzip, gzip, gzip, gzip",
