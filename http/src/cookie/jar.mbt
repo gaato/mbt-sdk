@@ -9,7 +9,7 @@ let default_max_total : Int32 = 3000
 
 ///|
 /// The longest a cookie lives, 400 days: a later `Expires` or larger
-/// `Max-Age` is cut to it, as RFC 6265bis §5.5 and browsers do.
+/// `Max-Age` is cut to it, as RFC 6265bis-22 §5.5 and browsers do.
 let max_lifetime_ms : Int64 = 400L * 86_400_000L
 
 ///|
@@ -154,7 +154,7 @@ pub fn CookieJar::remove_expired(self : CookieJar) -> Unit {
 
 ///|
 /// The RFC 6265 §5.3 storage model for one `Set-Cookie` value received at
-/// `now_ms`, with the RFC 6265bis additions browsers apply: Secure cookies
+/// `now_ms`, with the RFC 6265bis-22 additions browsers apply: Secure cookies
 /// only from secure origins, the `__Secure-` and `__Host-` prefixes, and no
 /// insecure overwrite of a Secure cookie. Expired cookies are evicted first
 /// (§5.3 asks for that whenever one exists), so none of these rules, the
@@ -256,7 +256,7 @@ fn CookieJar::cookie_domain(
 }
 
 ///|
-/// RFC 6265bis §4.1.3: a `__Secure-` cookie must be Secure; a `__Host-`
+/// RFC 6265bis-22 §4.1.3: a `__Secure-` cookie must be Secure; a `__Host-`
 /// cookie must also be host-only with a `Path` attribute whose value is `/`
 /// (not one that falls back to a default path of `/`). Prefixes match
 /// ignoring ASCII case, as browsers do.
@@ -272,7 +272,7 @@ fn prefix_allows(parsed : SetCookie, host_only : Bool) -> Bool {
 }
 
 ///|
-/// RFC 6265bis §5.7 step 16: whether an insecure cookie would overwrite or
+/// RFC 6265bis-22 §5.7 step 16: whether an insecure cookie would overwrite or
 /// shadow a stored Secure cookie of the same name on a related domain and an
 /// enclosing path.
 fn CookieJar::shadows_secure(

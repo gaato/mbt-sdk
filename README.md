@@ -19,7 +19,7 @@ Status: experimental. The HTTP, runtime and API modules are published on [moonca
 | `gaato/http-async` | [![mooncakes](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fmooncakes.io%2Fapi%2Fv0%2Fmodules%2Fgaato%2Fhttp-async&query=%24.version&label=mooncakes&prefix=v)](https://mooncakes.io/docs/gaato/http-async) | `AsyncTransport` (with a small keep-alive pool per origin) and `AsyncClock` over `moonbitlang/async` (native and js) | `gaato/http`, `moonbitlang/async` |
 | `gaato/jsonrpc` | unpublished | Sans-IO JSON-RPC 2.0 vocabulary: `Message`, `RequestId`, `RpcError`, strict (`"jsonrpc":"2.0"`) and bare (codex app-server) envelopes, NDJSON encoding, an incremental `LineFramer` | nothing (runs on wasm-gc, wasm, js, native) |
 | `gaato/jsonrpc-async` | unpublished | Bidirectional `Connection` over any `moonbitlang/async` reader/writer pair, plus `spawn_child` for JSON-RPC over a child process's stdio (native), with default limits on line size, queued notifications and concurrent inbound requests (`Connection::start` documents them); the base for ACP and codex app-server clients | `gaato/jsonrpc`, `moonbitlang/async` |
-| `gaato/codex-protocol` | unpublished | Codex app-server v2 types, typed calls and events generated from a pinned CLI JSON Schema | `gaato/sdk-runtime` (JSON helpers only) |
+| `gaato/codex-protocol` | unpublished | Codex app-server v2 types, typed calls and events generated from a pinned CLI JSON Schema (draft-07) | `gaato/sdk-runtime` (JSON helpers only) |
 | `gaato/codex-app-server` | unpublished | Initialized Codex connections, native stdio sessions, progress events and explicit approval/user-input handlers; [usage and scope](codex-app-server/README.md) | `gaato/codex-protocol`, `gaato/jsonrpc-async`, `moonbitlang/async` |
 | `gaato/sdk-runtime` | [![mooncakes](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fmooncakes.io%2Fapi%2Fv0%2Fmodules%2Fgaato%2Fsdk-runtime&query=%24.version&label=mooncakes&prefix=v)](https://mooncakes.io/docs/gaato/sdk-runtime) | API-agnostic client runtime: error taxonomy, a pluggable retry decision with `RetryPolicy` presets over `gaato/http/retry` rules, per-attempt and per-call time limits, paired `acquire`/`release` rate limiting, a per-attempt observer, pagination with the SDK's own error type, auth, tri-state JSON fields, open enums | `gaato/http` |
 | `gaato/openai` | [![mooncakes](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fmooncakes.io%2Fapi%2Fv0%2Fmodules%2Fgaato%2Fopenai&query=%24.version&label=mooncakes&prefix=v)](https://mooncakes.io/docs/gaato/openai) | First consumer: a stable hand-written facade for models, embeddings, Responses, and Chat Completions (buffered and streaming), backed by types and operations generated from the vendored OpenAPI spec | `gaato/http`, `gaato/sdk-runtime` |
@@ -61,11 +61,11 @@ openai/spec/openai.yaml → overlays/fix.yaml → overlays/moonbit.yaml → norm
       (vendored)          (upstream errors)     (x-moonbit-* hints)       tools/gen (Python)
 ```
 
-- Overlays follow the [OpenAPI Overlay Specification](https://spec.openapis.org/overlay/latest.html). `tools/apply_overlay.py` fails on actions that match nothing or change nothing, so stale corrections surface instead of silently doing nothing.
+- Overlays follow the [OpenAPI Overlay Specification 1.0.0](https://spec.openapis.org/overlay/v1.0.0.html) (`update` and `remove` actions). `tools/apply_overlay.py` fails on actions that match nothing or change nothing, so stale corrections surface instead of silently doing nothing.
 - The generator supports JSON and multipart request bodies, form and deep-object query parameters, and tagged unions including disjoint tag-value sets. It refuses unsupported shapes (with a JSON pointer and an overlay annotation) instead of silently degrading to `Json`.
 - Generated code is committed; users do not need Python.
 - GitHub runs the same two stages over `github/spec/api.github.com.2022-11-28.yaml` with `--include-all`, so every operation in the document is generated; `github/overlays/fix.yaml` carries the upstream corrections and `github/overlays/moonbit.yaml` the MoonBit decisions. `docs/census.md` lists which responses stayed raw `Json` and why.
-- Codex uses `codex-protocol/spec/schema.json` → selected JSON Schema reference closure → shared IR/emitter → `codex-protocol/src/gen`. The schema is pinned to CLI 0.155.1; regeneration is offline and is covered by the same `--check` gate.
+- Codex uses `codex-protocol/spec/schema.json` → selected JSON Schema (draft-07) reference closure → shared IR/emitter → `codex-protocol/src/gen`. The schema is pinned to CLI 0.155.1; regeneration is offline and is covered by the same `--check` gate.
 
 ```fish
 scripts/generate.sh          # apply overlays and regenerate
@@ -86,6 +86,8 @@ scripts/compat-servers.sh    # start Ollama (qwen2.5:0.5b, accepts tools) + a Li
 - `canary.yml` — the same gates daily on `:latest`; red here with green CI means the language moved.
 - `spec-watch.yml` — daily upstream spec check; on change it re-vendors, regenerates, runs the gates and opens a PR.
 - `live-compat.yml` — the live suite against local, key-free OpenAI- and Anthropic-compatible servers (Ollama + LiteLLM, always their latest release, so a change in either shows up here). Remote providers skip without keys.
+
+Specifications followed, their errata and known deviations: [SPECIFICATIONS.md](SPECIFICATIONS.md).
 
 Design notes (Japanese): `docs/design.md` (M1), `docs/design-m2.md`, `docs/design-m3.md`, `docs/design-m4.md`, `docs/design-m5.md`, `docs/design-m6.md`, `docs/design-m7.md`, `docs/design-m8.md`, `docs/design-m9.md`, `docs/design-m10.md`. Release procedure: `docs/release.md`. Adding an SDK: `docs/new-sdk.md`.
 

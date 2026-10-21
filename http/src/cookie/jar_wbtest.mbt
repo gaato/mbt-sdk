@@ -383,7 +383,7 @@ test "the storage model and the cookie header follow RFC 6265 scenarios" {
       "http://a.com/",
       Some("a=2"),
     ),
-    // Cookie prefixes (RFC 6265bis §4.1.3).
+    // Cookie prefixes (RFC 6265bis-22 §4.1.3).
     (
       "__Secure- needs Secure",
       [("https://a.com/", "__Secure-a=1")],

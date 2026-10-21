@@ -2,7 +2,7 @@
 # requires-python = ">=3.11"
 # dependencies = ["jsonpath-rfc9535>=0.1", "pyyaml>=6"]
 # ///
-"""Apply OpenAPI Overlay 1.x documents in order. Fails on zero-match and no-op actions."""
+"""Apply OpenAPI Overlay 1.0.0 documents (update and remove actions) in order. Fails on zero-match and no-op actions."""
 import copy, json, sys
 import yaml
 from jsonpath_rfc9535 import JSONPathEnvironment

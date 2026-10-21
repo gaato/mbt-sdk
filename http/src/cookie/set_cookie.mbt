@@ -5,7 +5,7 @@
 let max_cookie_bytes : Int32 = 4096
 
 ///|
-/// The most one attribute value may take, in UTF-8 bytes (RFC 6265bis
+/// The most one attribute value may take, in UTF-8 bytes (RFC 6265bis-22
 /// §5.6); a longer attribute is ignored.
 let max_attribute_bytes : Int32 = 1024
 
@@ -31,7 +31,7 @@ priv struct SetCookie {
 ///|
 /// Parses a `Set-Cookie` value, or returns `None` when RFC 6265 §5.2 ignores
 /// it: no `=` in the name-value pair, an empty name, a control character
-/// other than HTAB anywhere (RFC 6265bis), or more than `max_cookie_bytes`.
+/// other than HTAB anywhere (RFC 6265bis-22 §5.6), or more than `max_cookie_bytes`.
 /// Unknown and malformed attributes are skipped.
 fn parse_set_cookie(text : String) -> SetCookie? {
   guard utf8_length(text) <= max_cookie_bytes && !has_control(text) else {

@@ -1,7 +1,8 @@
 ///|
 test "cookie dates in the formats servers send parse to Unix milliseconds" {
   let cases : Array[(String, Int64?)] = [
-    // RFC 1123, RFC 850 and asctime, the three formats of RFC 7231.
+    // IMF-fixdate and the two obsolete forms, rfc850-date and asctime-date,
+    // of RFC 9110 §5.6.7.
     ("Sun, 06 Nov 1994 08:49:37 GMT", Some(784111777000L)),
     ("Sunday, 06-Nov-94 08:49:37 GMT", Some(784111777000L)),
     ("Sun Nov  6 08:49:37 1994", Some(784111777000L)),

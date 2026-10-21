@@ -116,6 +116,8 @@ pub(all) suberror MultipartError {
 pub extend MultipartError with @debug.Debug::{to_repr}
 
 ///|
+/// A character RFC 2046 §5.1.1 allows in a boundary (`bchars`), which RFC 7578
+/// §4.1 uses for multipart/form-data.
 fn is_boundary_char(c : Char) -> Bool {
   c.is_ascii_alphabetic() ||
   c.is_ascii_digit() ||
@@ -170,6 +172,9 @@ fn append_text(output : Array[Byte], text : String) -> Unit {
 }
 
 ///|
+/// Writes a `name` or `filename` parameter value as the WHATWG HTML
+/// multipart/form-data encoding algorithm does: `"`, CR and LF become `%22`,
+/// `%0D` and `%0A`, which RFC 7578 §4.2 leaves to the sender.
 fn append_escaped_parameter(output : Array[Byte], value : String) -> Unit {
   for byte in @http.encode_utf8(value) {
     match byte.to_int() {

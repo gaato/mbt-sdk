@@ -1,7 +1,8 @@
 ///|
 /// Parses a cookie-date with the RFC 6265 §5.1.1 algorithm, which accepts the
-/// formats servers actually send (RFC 1123, RFC 850, asctime, and their
-/// variants). Returns Unix milliseconds, or `None` when the algorithm fails.
+/// formats servers actually send (RFC 9110 §5.6.7's IMF-fixdate, rfc850-date
+/// and asctime-date, and their variants). Returns Unix milliseconds, or `None`
+/// when the algorithm fails.
 fn parse_cookie_date(text : String) -> Int64? {
   let mut time : (Int32, Int32, Int32)? = None
   let mut day : Int32? = None

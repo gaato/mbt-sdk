@@ -1,5 +1,5 @@
 ///|
-/// A cookie's `SameSite` attribute (RFC 6265bis). `NoRestriction` is
+/// A cookie's `SameSite` attribute (RFC 6265bis-22). `NoRestriction` is
 /// `SameSite=None`.
 pub(all) enum SameSite {
   Strict
