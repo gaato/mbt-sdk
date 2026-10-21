@@ -73,6 +73,8 @@ fn literal_to_json(source : String) -> Json raise {
     Some(rest) => rest.to_owned()
     None => fail("expected `export default`")
   }
+  let text = text.trim(chars=" \t\n\r")
+  let text = text.strip_suffix("as const").unwrap_or(text).to_owned()
   let chars = text.to_array()
   let out = StringBuilder()
   let mut i = 0
@@ -105,7 +107,17 @@ fn literal_to_json(source : String) -> Json raise {
             (chars[i].is_ascii_alphabetic() || chars[i] == '-') {
         i += 1
       }
-      out.write_string("\"\{String::from_array(chars[start:i])}\"")
+      let word = String::from_array(chars[start:i])
+      let mut j = i
+      while j < chars.length() && chars[j] is (' ' | '\t') {
+        j += 1
+      }
+      // A key is followed by `:`; `null`, `true` and `false` are values.
+      if j < chars.length() && chars[j] == ':' {
+        out.write_string("\"\{word}\"")
+      } else {
+        out.write_string(word)
+      }
     } else if c == ',' {
       let mut j = i + 1
       while j < chars.length() && chars[j] is (' ' | '\n' | '\r' | '\t') {
