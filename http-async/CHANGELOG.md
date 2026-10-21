@@ -8,6 +8,14 @@ note.
 
 ## [Unreleased]
 
+### Changed
+
+- **A `*.example.com` entry in `NO_PROXY` bypasses the proxy for
+  `example.com` and its subdomains**, as `.example.com` does. The entry
+  was skipped, so those hosts went through the proxy; Go reads `*.` this
+  way. NO_PROXY handling is now also checked against the NO_PROXY tables of
+  Go's `httpproxy` and curl (see NOTICE).
+
 ## [0.4.2] - 2026-10-19
 
 ### Changed

@@ -73,7 +73,7 @@ a document:
 
 | Behaviour | Followed | Where |
 |---|---|---|
-| `HTTP_PROXY`, `HTTPS_PROXY`, `ALL_PROXY`, `NO_PROXY` | curl, Go and httpx: lower-case name first, an empty value unset, `ALL_PROXY` as the fallback; `NO_PROXY` as curl reads it, plus CIDR and `host:port` entries; upper-case `HTTP_PROXY` ignored when `REQUEST_METHOD` is set (httpoxy, CVE-2016-5385) | `http-async/src/proxy.mbt`, `no_proxy.mbt` |
+| `HTTP_PROXY`, `HTTPS_PROXY`, `ALL_PROXY`, `NO_PROXY` | curl, Go and httpx: lower-case name first, an empty value unset, `ALL_PROXY` as the fallback; `NO_PROXY` as curl reads it, plus CIDR and `host:port` entries and Go's `*.domain` (which, unlike Go, also covers the domain itself, as a leading dot does in curl); upper-case `HTTP_PROXY` ignored when `REQUEST_METHOD` is set (httpoxy, CVE-2016-5385) | `http-async/src/proxy.mbt`, `no_proxy.mbt` |
 | `retry-after-ms` | The OpenAI SDKs: milliseconds, preferred over `Retry-After` | `http/src/retry_after.mbt` (`retry_after_ms`) |
 | Decimal seconds in `Retry-After` | The OpenAI SDKs parse it as a float; RFC 9110's `delay-seconds` is `1*DIGIT` | `http/src/retry_after.mbt` (`parse_retry_after`) |
 | `x-should-retry` | The Stainless-generated SDKs | `sdk-runtime/src/retry.mbt` |
@@ -89,4 +89,3 @@ be fixed; the fix removes its row.
 | Document | The code |
 |---|---|
 | draft-ietf-httpbis-rfc6265bis-22 §5.6: a pair without `=` is a cookie with an empty name; the 4096-byte limit covers the name and value | `parse_set_cookie` ignores such a pair, as RFC 6265 §5.2 does, and applies the limit to the whole `Set-Cookie` value |
-| curl and Go: a `*.example.com` entry in `NO_PROXY` | `no_proxy.mbt` drops it, so the host goes through the proxy |

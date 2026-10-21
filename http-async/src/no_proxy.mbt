@@ -15,7 +15,8 @@ priv enum NoProxyRule {
 ///|
 /// The rules of a `NO_PROXY` value, by curl's reading: comma-separated
 /// entries, spaces around them ignored; `*` for every host; a host name,
-/// with or without a leading dot, for itself and its subdomains; an IPv4 or
+/// with or without a leading dot or `*.` (Go), for itself and its
+/// subdomains; an IPv4 or
 /// IPv6 address, bracketed or not, optionally a `/prefix` network (curl
 /// 7.86, Go, reqwest). `host:port` and `[v6]:port` restrict an entry to that
 /// port, as httpx, Go and Python do. Entries that are none of these are
@@ -72,6 +73,11 @@ fn no_proxy_rule(entry : String) -> NoProxyRule? {
     return Some(Network(address~, prefix=32, port~))
   }
   let mut name = host.to_lower()
+  // `*.example.com` is `.example.com`, as Go reads it; curl has no such form
+  // and would skip the entry, which sends the hosts it names to the proxy.
+  if name.has_prefix("*.") {
+    name = name[1:].to_owned()
+  }
   if name.has_prefix(".") {
     name = name[1:].to_owned()
   }
