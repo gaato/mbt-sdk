@@ -51,9 +51,7 @@ jobs:
         run: scripts/gates.sh
 
       - name: Coverage ledger
-        run: |
-          command -v jq >/dev/null && command -v gawk >/dev/null || { apt-get update && apt-get install -y --no-install-recommends jq gawk; }
-          scripts/coverage_report.sh
+        run: moon run scripts/coverage_report.mbtx
 
       - name: HTTP adapter on moonrun Wasm
         run: |

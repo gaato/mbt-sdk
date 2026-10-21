@@ -18,7 +18,7 @@ Tests column: a backticked file path, then the quoted names of that file's
 tests, as in `` `jsonrpc/src/framer_wbtest.mbt`: "first", "second" ``. A test
 counts only if it drives the structure to its limit and one past it, or pins a
 default the row states; one that merely uses the feature does not.
-`scripts/bounds_check.sh`, run by `scripts/gates.sh`, enforces the naming: it
+`scripts/bounds_check.mbtx`, run by `scripts/gates.sh`, enforces the naming: it
 fails when a row names no test or a named test is not declared in the named
 file. Whether a named test really reaches the bound is checked in review. The
 other tables describe where no limit is enforced, so they stay prose.

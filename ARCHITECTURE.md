@@ -99,9 +99,9 @@ unpublished module where the async behaviour of the layers below is run.
 - **Ledgers.** `RESOURCE_BOUNDS.md` lists every structure that grows with
   input from the network, a peer or the number of requests, with its bound
   and, for each enforced limit, the tests that drive it to the limit;
-  `scripts/bounds_check.sh` checks that those tests exist.
+  `scripts/bounds_check.mbtx` checks that those tests exist.
   `TEST_COVERAGE.md` explains every line of the hand-written modules that
-  tests do not reach; `scripts/coverage_report.sh` fails on any other.
+  tests do not reach; `scripts/coverage_report.mbtx` fails on any other.
 - **Specifications.** `SPECIFICATIONS.md` records the documents followed,
   the errata that touch implemented sections, the conventions followed
   where no document applies, and known deviations.

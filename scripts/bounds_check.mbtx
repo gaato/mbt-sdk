@@ -1,0 +1,233 @@
+// Checks the "Enforced limits" table of RESOURCE_BOUNDS.md against the tests.
+//
+// Every row's last cell ("Tests") names the tests that check its bound, as a
+// backticked file path followed by the quoted names of that file's tests:
+//
+//   `http/src/sse/parser_test.mbt`: "first test", "second test"; `jsonrpc/src/framer_wbtest.mbt`: "third"
+//
+// File paths are relative to the directory that holds the ledger: the
+// repository root, whose RESOURCE_BOUNDS.md covers every hand-written module.
+//
+// The check fails when a row names no test, a name comes before any file, a
+// file does not exist, or a file declares no `test "<name>" {` or
+// `async test "<name>" {` line with that exact name. It does not judge whether
+// a test really drives the bound; that is the reviewer's job (see the ledger's
+// header).
+//
+// Usage, from the repository root:
+//   moon run scripts/bounds_check.mbtx [-- DIR]   (checks DIR/RESOURCE_BOUNDS.md; DIR defaults to .)
+//
+// Exit status: 0 = every row names tests that exist, 1 = a row does not,
+// 2 = the table is missing or has no Tests column.
+
+import {
+  "moonbitlang/async@0.22.5",
+  "moonbitlang/async@0.22.5/fs",
+  "moonbitlang/async@0.22.5/stdio",
+  "moonbitlang/core/env",
+  "moonbitlang/x@0.5.6/sys",
+}
+
+///|
+/// Prints `message` on stderr and exits with `code`.
+async fn[T] die(code : Int, message : String) -> T {
+  @stdio.stderr.write("\{message}\n")
+  @sys.exit(code)
+  panic()
+}
+
+///|
+/// Whether `path` is a regular file, or a link to one.
+async fn is_file(path : String) -> Bool {
+  (@fs.kind(path) is Regular) catch {
+    _ => false
+  }
+}
+
+///|
+/// What a row of the table names.
+enum Finding {
+  /// A test `name` declared in `file`.
+  Test(file~ : String, name~ : String)
+  /// A test name before any file in its cell.
+  Orphan(name~ : String)
+  /// A row that names no test.
+  Empty
+}
+
+///|
+/// The rows of the "Enforced limits" table: its header's last cell, and each
+/// row's label (the first cell up to " (") with what it names.
+fn table(text : String) -> (String?, Array[(String, Finding)]) {
+  let found = []
+  let mut header = None
+  let mut in_table = false
+  let mut seen_header = false
+  for raw in text.split("\n") {
+    let line = raw.to_owned()
+    if line.has_prefix("## ") {
+      in_table = line == "## Enforced limits"
+      seen_header = false
+      continue
+    }
+    if !in_table || !line.has_prefix("|") || separator(line) {
+      continue
+    }
+    // A row starts and ends with "|", so the first and last fields are empty.
+    let cells = line.split("|").to_array()
+    let first = cells[1].trim(chars=" ").to_owned()
+    let last = cells[cells.length() - 2].trim(chars=" ").to_owned()
+    if !seen_header {
+      seen_header = true
+      if header is None {
+        header = Some(last)
+      }
+      continue
+    }
+    let label = match first.find(" (") {
+      Some(at) => first.view(end_offset=at).to_owned()
+      None => first
+    }
+    let before = found.length()
+    let mut file = ""
+    for token in tokens(last) {
+      match token {
+        File(path) => file = path
+        Name(name) if file == "" => found.push((label, Orphan(name~)))
+        Name(name) => found.push((label, Test(file~, name~)))
+      }
+    }
+    if found.length() == before {
+      found.push((label, Empty))
+    }
+  }
+  (header, found)
+}
+
+///|
+/// A row like `|---|:--:|`.
+fn separator(line : String) -> Bool {
+  line.length() >= 3 &&
+  line.has_suffix("|") &&
+  line
+  .view(start_offset=1, end_offset=line.length() - 1)
+  .iter()
+  .all(c => c is ('-' | ':' | '|' | ' '))
+}
+
+///|
+priv enum Token {
+  File(String)
+  Name(String)
+}
+
+///|
+/// The backticked paths and the quoted names of a cell, in order. A quote or
+/// backtick without its closing one is skipped.
+fn tokens(cell : String) -> Array[Token] {
+  let out = []
+  for i = 0; i < cell.length(); {
+    let c = cell[i]
+    if c == '`' || c == '"' {
+      let close = cell
+        .view(start_offset=i + 1)
+        .find(if c == '`' { "`" } else { "\"" })
+      if close is Some(len) {
+        let token = cell
+          .view(start_offset=i + 1, end_offset=i + 1 + len)
+          .to_owned()
+        out.push(if c == '`' { File(token) } else { Name(token) })
+        continue i + len + 2
+      }
+    }
+    continue i + 1
+  }
+  out
+}
+
+///|
+async fn main {
+  let dir = match @env.args() {
+    [_] => "."
+    [_, dir] => dir
+    _ => die(2, "usage: moon run scripts/bounds_check.mbtx [-- DIR]")
+  }
+  let cwd = @env.current_dir().unwrap_or(".")
+  let module_root = "\{cwd}/\{dir.trim_end(chars="/")}"
+  let ledger = "\{module_root}/RESOURCE_BOUNDS.md"
+  guard is_file(ledger) else {
+    die(2, "bounds_check.mbtx: no ledger at \{ledger}")
+  }
+  let (header, found) = table(@fs.read_file(ledger).text())
+  guard header is Some("Tests") else {
+    die(
+      2,
+      "bounds_check.mbtx: no \"Enforced limits\" table whose last column is Tests in \{ledger}",
+    )
+  }
+  // The rows that name a test, in order, with the tests found.
+  let rows : Map[String, Int] = Map([])
+  let mut bad = false
+  let mut tests = 0
+  // The lines of each named file, None for a file that does not exist.
+  let declared : Map[String, Array[String]?] = Map([])
+  for item in found {
+    let (label, finding) = item
+    match finding {
+      Test(file~, name~) => {
+        if !rows.contains(label) {
+          rows[label] = 0
+        }
+        let path = "\{module_root}/\{file}"
+        if !declared.contains(path) {
+          declared[path] = if is_file(path) {
+            Some(
+              @fs.read_file(path)
+              .text()
+              .split("\n")
+              .map(l => l.to_owned())
+              .to_array(),
+            )
+          } else {
+            None
+          }
+        }
+        guard declared[path] is Some(lines) else {
+          println("NO FILE     \{label}: \{file}")
+          bad = true
+          continue
+        }
+        if lines.contains("test \"\{name}\" {") ||
+          lines.contains("async test \"\{name}\" {") {
+          rows[label] = rows[label] + 1
+          tests += 1
+        } else {
+          println("NO TEST     \{label}: \{file} has no test \"\{name}\"")
+          bad = true
+        }
+      }
+      Orphan(name~) => {
+        println(
+          "NO FILE     \{label}: \"\{name}\" follows no backticked file path",
+        )
+        bad = true
+      }
+      Empty => {
+        println("NO TESTS    \{label}: the row names no test")
+        bad = true
+      }
+    }
+  }
+  for label, count in rows {
+    println(
+      "\{label.pad_end(56, ' ')} \{count.to_string().pad_start(2, ' ')} tests",
+    )
+  }
+  if bad {
+    println("bounds check: FAIL")
+    @sys.exit(1)
+  }
+  println(
+    "bounds check: OK - \{rows.length()} enforced limits name \{tests} tests that exist",
+  )
+}
