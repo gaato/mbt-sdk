@@ -1,0 +1,5 @@
+import {
+  "gaato/http",
+  "moonbitlang/core/json",
+  "moonbitlang/core/string",
+} for "wbtest"

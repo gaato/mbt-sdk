@@ -105,9 +105,13 @@ unpublished module where the async behaviour of the layers below is run.
 - **Specifications.** `SPECIFICATIONS.md` records the documents followed,
   the errata that touch implemented sections, the conventions followed
   where no document applies, and known deviations.
-- **Reference tables.** Behaviour defined by other implementations rather
-  than a document is checked against their own tables, ported with their
-  licenses recorded in the module's NOTICE (NO_PROXY against Go and curl).
+- **Third-party test data.** Published test suites are run as data, pinned
+  to a commit, with their licenses in the module's NOTICE: web-platform-tests'
+  URL tables in `conformance/`, and the NO_PROXY tables of Go and curl in
+  `http-async`. `scripts/gen_vectors.mbtx` rewrites the larger ones as
+  MoonBit test files when their pins move. Where this code deliberately
+  differs from a suite, the rows it skips are named by category and
+  counted, and the difference is listed in `SPECIFICATIONS.md`.
 - **Live and scheduled.** `scripts/live.sh` runs the SDKs against the real
   APIs and local compatible servers; `scripts/conformance.sh` runs the
   transport, SSE parser and runtime against https://badhttp.dev. The
