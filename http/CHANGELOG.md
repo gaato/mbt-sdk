@@ -7,6 +7,16 @@ never does. Every breaking change is listed with a migration note.
 
 ## [Unreleased]
 
+### Changed
+
+- **`parse_retry_after` and `retry_after_ms` accept the obsolete HTTP-date
+  forms.** RFC 9110 §5.6.7 requires a recipient to accept rfc850-date
+  (`Sunday, 06-Nov-94 08:49:37 GMT`) and asctime-date
+  (`Sun Nov  6 08:49:37 1994`) as well as IMF-fixdate; both were refused.
+  A two-digit year that would put the date more than 50 years after the
+  clock is taken from the century before, as §5.6.7 says. HTTP-date stays
+  case-sensitive and the weekday is still checked.
+
 ## [0.4.1] - 2026-10-19
 
 ### Added

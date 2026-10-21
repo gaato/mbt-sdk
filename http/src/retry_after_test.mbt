@@ -149,16 +149,79 @@ test "Gregorian leap years and month boundaries" {
 }
 
 ///|
-test "invalid dates obsolete formats and inconsistent weekday are rejected" {
+test "the obsolete rfc850-date and asctime-date are accepted" {
+  // RFC 9110 §5.6.7: a recipient MUST accept all three forms.
+  let now = 784111777000L - 1000L
   for
     date in [
-      "Sunday, 06-Nov-94 08:49:37 GMT", "Sun Nov  6 08:49:37 1994", "Sun, 06 Nov 1994 08:49:37 UTC",
-      "sun, 06 Nov 1994 08:49:37 GMT", "Mon, 06 Nov 1994 08:49:37 GMT", "Sun, 06 Xxx 1994 08:49:37 GMT",
-      "Sun, 06 nov 1994 08:49:37 GMT", "Thu, 29 Feb 1900 00:00:00 GMT", "Wed, 29 Feb 2023 00:00:00 GMT",
-      "Mon, 31 Apr 2024 00:00:00 GMT", "Thu, 00 Feb 2024 00:00:00 GMT", "Thu, 32 Feb 2024 00:00:00 GMT",
-      "Thu, 29 Feb 2024 24:00:00 GMT", "Thu, 29 Feb 2024 00:60:00 GMT", "Thu, 29 Feb 2024 00:00:61 GMT",
-      "Thu, 29 Feb 0000 00:00:00 GMT", "Thu, 2x Feb 2024 00:00:00 GMT", "Thu, 29 Feb 2024 00-00:00 GMT",
-      "Thu, 29 Feb 2024 00:00:00 GMT extra", "🌙🌙🌙🌙🌙🌙🌙🌙🌙🌙🌙🌙🌙abc",
+      "Sunday, 06-Nov-94 08:49:37 GMT", "Sun Nov  6 08:49:37 1994", "Sun Nov 06 08:49:37 1994",
+    ] {
+    assert_eq(
+      @http.parse_retry_after(date, now_unix_ms=now),
+      Some(1000),
+      msg=date,
+    )
+  }
+}
+
+///|
+test "a two-digit year more than 50 years ahead is from the century before" {
+  // 2026-10-21: 70 is 2070 and 76 is 2076, both ahead; 77 is 1977. Each
+  // weekday holds only for the year the rule picks.
+  let now = 1792540800000L
+  for
+    (date, expected) in [
+      ("Wednesday, 01-Jan-70 00:00:00 GMT", Some(2147483647)),
+      ("Wednesday, 21-Oct-76 00:00:00 GMT", Some(2147483647)),
+      ("Saturday, 01-Jan-77 00:00:00 GMT", Some(0)),
+      ("Thursday, 01-Jan-70 00:00:00 GMT", None),
+      ("Friday, 01-Jan-77 00:00:00 GMT", None),
+    ] {
+    assert_eq(
+      @http.parse_retry_after(date, now_unix_ms=now),
+      expected,
+      msg=date,
+    )
+  }
+  // A clock before 1970 is in 1969, so 68 is 1968, whose 1 January was a
+  // Monday.
+  assert_eq(
+    @http.parse_retry_after("Monday, 01-Jan-68 00:00:00 GMT", now_unix_ms=-1L),
+    Some(0),
+  )
+  assert_eq(
+    @http.parse_retry_after(
+      "Tuesday, 08-Nov-94 08:49:37 GMT",
+      now_unix_ms=784111777000L + 2L * 86400000L - 1000L,
+    ),
+    Some(1000),
+  )
+}
+
+///|
+test "malformed obsolete dates are rejected" {
+  for
+    date in [
+      "sunday, 06-Nov-94 08:49:37 GMT", "Sun, 06-Nov-94 08:49:37 GMT", "Sunday, 06-Nov-1994 08:49:37 GMT",
+      "Sunday, 06 Nov 94 08:49:37 GMT", "Sunday, 06-Nov-94 08:49:37 UTC", "Monday, 06-Nov-94 08:49:37 GMT",
+      "Sunday, 06-nov-94 08:49:37 GMT", "Sunday,06-Nov-94 08:49:37 GMT", "Sun Nov 6 08:49:37 1994",
+      "Sun Nov  6 08:49:37 1994 GMT", "sun Nov  6 08:49:37 1994", "Sun Nov  6 08:49:37 94",
+      "Mon Nov  6 08:49:37 1994", "Sun Nov 6  08:49:37 1994", "Sun Nov  6 08:49 37 1994",
+    ] {
+    assert_eq(@http.parse_retry_after(date, now_unix_ms=0L), None, msg=date)
+  }
+}
+
+///|
+test "invalid dates and inconsistent weekday are rejected" {
+  for
+    date in [
+      "Sun, 06 Nov 1994 08:49:37 UTC", "sun, 06 Nov 1994 08:49:37 GMT", "Mon, 06 Nov 1994 08:49:37 GMT",
+      "Sun, 06 Xxx 1994 08:49:37 GMT", "Sun, 06 nov 1994 08:49:37 GMT", "Thu, 29 Feb 1900 00:00:00 GMT",
+      "Wed, 29 Feb 2023 00:00:00 GMT", "Mon, 31 Apr 2024 00:00:00 GMT", "Thu, 00 Feb 2024 00:00:00 GMT",
+      "Thu, 32 Feb 2024 00:00:00 GMT", "Thu, 29 Feb 2024 24:00:00 GMT", "Thu, 29 Feb 2024 00:60:00 GMT",
+      "Thu, 29 Feb 2024 00:00:61 GMT", "Thu, 29 Feb 0000 00:00:00 GMT", "Thu, 2x Feb 2024 00:00:00 GMT",
+      "Thu, 29 Feb 2024 00-00:00 GMT", "Thu, 29 Feb 2024 00:00:00 GMT extra", "🌙🌙🌙🌙🌙🌙🌙🌙🌙🌙🌙🌙🌙abc",
     ] {
     assert_eq(@http.parse_retry_after(date, now_unix_ms=0L), None, msg=date)
   }

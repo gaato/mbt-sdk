@@ -87,7 +87,6 @@ be fixed; the fix removes its row.
 
 | Document | The code |
 |---|---|
-| RFC 9110 §5.6.7: a recipient MUST accept the obsolete rfc850-date and asctime-date | `parse_retry_after` accepts only IMF-fixdate |
 | RFC 9110 §9.1: method names are case-sensitive | `is_idempotent` lower-cases the method |
 | RFC 8288 §3.3: occurrences of `rel` after the first MUST be ignored | `parse_next_link` reads every `rel` |
 | JSON-RPC 2.0 §4, §5: a request has `method`, a response `result` or `error`, never both | `Message::from_json` decodes an object with `method` and `result` as a request |
