@@ -1,0 +1,53 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "gaato/mbt-sdk-conformance/harness"
+
+import {
+  "moonbitlang/core/debug",
+  "moonbitlang/core/random",
+}
+
+// Values
+pub fn[F : Feeder] check_after_end(() -> F, Bytes, label? : String) -> Unit raise
+
+pub fn[F : Feeder] check_rules(() -> F, Bytes, @random.Rand, label? : String) -> Transcript raise
+
+pub fn[F : Feeder] check_splits(() -> F, Bytes, @random.Rand, label? : String) -> Transcript raise
+
+pub fn[F : Feeder] check_truncation(() -> F, Bytes, @random.Rand, label? : String) -> Unit raise
+
+pub fn corrupt(@random.Rand, Bytes) -> Bytes
+
+pub fn[F : Feeder] fuzz(() -> F, Array[Bytes], @random.Rand, rounds~ : Int) -> Array[(String, Int)] raise
+
+pub fn hostile_chunks(Bytes) -> Array[Bytes]
+
+pub fn random_chunks(@random.Rand, Bytes) -> Array[Bytes]
+
+pub fn[F : Feeder] run(F, Array[Bytes]) -> Transcript
+
+pub fn seeded(Int) -> @random.Rand
+
+pub fn single_bytes(Bytes) -> Array[Bytes]
+
+// Errors
+pub(all) suberror Failed {
+  Failed(String)
+} derive(@debug.Debug)
+pub fn Failed::to_repr(Self) -> @debug.Repr
+
+// Types and methods
+pub(all) struct Transcript {
+  results : Array[String]
+  error : String?
+} derive(Eq, @debug.Debug)
+pub fn Transcript::equal(Self, Self) -> Bool
+pub fn Transcript::not_equal(Self, Self) -> Bool
+pub fn Transcript::to_repr(Self) -> @debug.Repr
+
+// Type aliases
+
+// Traits
+pub(open) trait Feeder {
+  fn feed(Self, Bytes) -> Array[String] raise Failed
+  fn finish(Self) -> Array[String] raise Failed
+}

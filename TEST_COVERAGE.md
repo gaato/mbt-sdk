@@ -43,7 +43,9 @@ rerun the tests.
   sdk-runtime's async behaviour runs (sdk-runtime itself cannot depend on
   `moonbitlang/async`); without it `sdk-runtime/src/client.mbt` drops from
   104/119 to 4/119 and `paginator.mbt` to 0/28. The live API tests are left
-  out because they need credentials and the network.
+  out because they need credentials and the network. Every `conformance`
+  package drives too: the chunking checks of the SSE parser and the line
+  framer live there, in the shared harness.
 - Counts are Coveralls lines: lines with at least one instrumented point,
   covered when any point on them ran.
 

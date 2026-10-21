@@ -3,7 +3,3 @@ import {
   "moonbitlang/core/json",
   "moonbitlang/core/encoding/utf8",
 }
-
-import {
-  "moonbitlang/core/random",
-} for "wbtest"

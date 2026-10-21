@@ -1,0 +1,7 @@
+import {
+  "gaato/http",
+  "gaato/http/sse",
+  "gaato/mbt-sdk-conformance/harness",
+  "moonbitlang/core/encoding/utf8",
+  "moonbitlang/core/random",
+} for "wbtest"

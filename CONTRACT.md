@@ -127,3 +127,8 @@ fn LineFramer::finish(Self) -> Bytes? raise DecodeError
    here reports a failure once and then behaves as an ended stream, which
    is what its callers (`each_event`, the JSON-RPC connection) need to stop
    cleanly.
+
+The conformance module (`conformance/`) holds both parsers to rules 1, 2, 4
+and 5 on fixed corpora, generated streams and seeded corruptions, through
+the harness in `conformance/src/harness`; the bound tests named in
+`RESOURCE_BOUNDS.md` hold them to rule 3.

@@ -23,7 +23,7 @@ run scripts/release.sh check
 # Every enforced limit in RESOURCE_BOUNDS.md names tests that exist.
 run scripts/bounds_check.sh
 run moon update
-for m in http jsonrpc sdk-runtime openai anthropic codex-protocol github; do
+for m in http jsonrpc sdk-runtime openai anthropic codex-protocol github conformance; do
   for t in "${all_targets[@]}"; do run moon -C "$m" check --deny-warn --target "$t"; done
 done
 for m in fixtures/gen/badhttp fixtures/gen/petstore3; do

@@ -52,12 +52,13 @@ if [[ "${1:-}" == "--from-json" ]]; then
 else
   cd "$repo_root"
   json_file="$repo_root/_build/coverage_report.json"
-  # Test drivers: every package of the measured modules, and every
-  # runtime-tests package except the live API tests (they need credentials)
-  # and badhttp (it calls badhttp.dev); both would make the numbers depend on
-  # the network.
+  # Test drivers: every package of the measured modules and of conformance,
+  # and every runtime-tests package except the live API tests (they need
+  # credentials) and badhttp (it calls badhttp.dev); both would make the
+  # numbers depend on the network.
   mapfile -t drivers < <(
     for m in "${MODULES[@]}"; do find "$m/src" -name moon.pkg -printf '%h\n'; done
+    find conformance/src -name moon.pkg -printf '%h\n'
     find runtime-tests/src -name moon.pkg -printf '%h\n' \
       | grep -v -e '^runtime-tests/src/live$' -e '^runtime-tests/src/badhttp$'
   )

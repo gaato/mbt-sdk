@@ -88,6 +88,14 @@ unpublished module where the async behaviour of the layers below is run.
   formatting, the public interfaces (`pkg.generated.mbti`), and the
   generator's census of each vendored spec. CI runs them on a pinned
   toolchain image.
+- **Conformance** (`conformance/`, unpublished): the sans-IO parsers held
+  to the rules of `CONTRACT.md` by one harness, from outside their modules
+  as a consumer would see them. Every input runs whole, cut in two at every
+  place, a byte at a time, around every CR and multibyte character and at
+  random, and must give the same results and error; every prefix gives out
+  only what it determines; a finished or failed parser stays silent; and
+  seeded corruptions of each corpus hold to the same rules, the outcomes
+  counted in a snapshot.
 - **Ledgers.** `RESOURCE_BOUNDS.md` lists every structure that grows with
   input from the network, a peer or the number of requests, with its bound
   and, for each enforced limit, the tests that drive it to the limit;
