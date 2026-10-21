@@ -86,7 +86,9 @@ test "the storage model and the cookie header follow RFC 6265 scenarios" {
       Some("foo=bar; foo2=bar2"),
     ),
     (
-      "ignored lines between",
+      // RFC 6265bis-22 §5.6 step 3: a pair without `=` is a value without a
+      // name, sent alone; §5.7 step 2 ignores an empty name and value.
+      "a nameless cookie between, an empty pair ignored",
       [
         ("http://a.com/", "a=b"),
         ("http://a.com/", "="),
@@ -94,7 +96,7 @@ test "the storage model and the cookie header follow RFC 6265 scenarios" {
         ("http://a.com/", "c=d"),
       ],
       "http://a.com/",
-      Some("a=b; c=d"),
+      Some("a=b; novalue; c=d"),
     ),
     (
       "quoted value kept",
@@ -774,6 +776,52 @@ test "the per-domain cap evicts the least recently accessed cookie" {
   // Another domain has its own allowance.
   set_at(jar, "http://b.com/", "d=v", T0 + 14L)
   assert_eq(jar.length(), 4)
+}
+
+///|
+test "the per-domain cap evicts cookies that are not Secure first" {
+  // RFC 6265bis-22 §5.7, removing excess cookies: after the expired ones,
+  // a domain's cookies that are not Secure go before its Secure ones.
+  let jar = test_jar(max_per_domain=3)
+  set_at(jar, "https://a.com/", "s0=v; Secure", T0)
+  set_at(jar, "https://a.com/", "s1=v; Secure", T0 + 1L)
+  set_at(jar, "https://a.com/", "p0=v", T0 + 2L)
+  set_at(jar, "https://a.com/", "p1=v", T0 + 3L)
+  assert_eq(pairs(jar), ["s0=v", "s1=v", "p1=v"])
+  // With only Secure cookies left, the least recently accessed goes.
+  let jar = test_jar(max_per_domain=2)
+  set_at(jar, "https://a.com/", "s0=v; Secure", T0)
+  set_at(jar, "https://a.com/", "s1=v; Secure", T0 + 1L)
+  set_at(jar, "https://a.com/", "s2=v; Secure", T0 + 2L)
+  assert_eq(pairs(jar), ["s1=v", "s2=v"])
+}
+
+///|
+test "cookies are kept and sent as RFC 6265bis-22 section 5.7 stores them" {
+  // Step 19: SameSite=None only on a Secure cookie.
+  let jar = test_jar()
+  set_at(jar, "https://a.com/", "a=1; SameSite=None", T0)
+  set_at(jar, "https://a.com/", "b=1; SameSite=None; Secure", T0 + 1L)
+  set_at(jar, "https://a.com/", "c=1; SameSite=Lax", T0 + 2L)
+  assert_eq(pairs(jar), ["b=1", "c=1"])
+  // Step 22: a cookie without a name may not look like a prefixed one.
+  let jar = test_jar()
+  for
+    line in ["__Secure-x; Secure", "=__Host-x=1; Secure; Path=/", "__SECURE-y"] {
+    set_at(jar, "https://a.com/", line, T0)
+  }
+  set_at(jar, "https://a.com/", "plain", T0 + 1L)
+  assert_eq(pairs(jar), ["=plain"])
+  assert_eq(get_at(jar, "https://a.com/", T0 + 2L), Some("plain"))
+  // Step 23: a host-only cookie and a domain cookie of the same name, domain
+  // and path are two cookies; each replaces only its own kind.
+  let jar = test_jar()
+  set_at(jar, "http://a.com/", "n=host", T0)
+  set_at(jar, "http://a.com/", "n=domain; Domain=a.com", T0 + 1L)
+  set_at(jar, "http://a.com/", "n=host2", T0 + 2L)
+  assert_eq(pairs(jar), ["n=domain", "n=host2"])
+  assert_eq(get_at(jar, "http://a.com/", T0 + 3L), Some("n=host2; n=domain"))
+  assert_eq(get_at(jar, "http://www.a.com/", T0 + 3L), Some("n=domain"))
 }
 
 ///|

@@ -29,7 +29,7 @@ fn parsed(text : String) -> String {
 }
 
 ///|
-test "set-cookie name-value pairs parse leniently, as RFC 6265 section 5.2" {
+test "set-cookie name-value pairs parse leniently, as RFC 6265bis-22 section 5.6" {
   let cases = [
     ("SID=31d4d96e407aad42", "\"SID\"=\"31d4d96e407aad42\""),
     ("  foo  =  bar  ", "\"foo\"=\"bar\""),
@@ -40,13 +40,18 @@ test "set-cookie name-value pairs parse leniently, as RFC 6265 section 5.2" {
     ("foo=bar, baz=qux", "\"foo\"=\"bar, baz=qux\""),
     ("foo = b a r ;", "\"foo\"=\"b a r\""),
     ("f\u{e9}=caf\u{e9}", "\"f\u{e9}\"=\"caf\u{e9}\""),
-    // No `=`, an empty name, or a control character: ignored whole.
-    ("foo", "ignored"),
-    ("foo; bar=baz", "ignored"),
-    ("=bar", "ignored"),
-    ("  =bar", "ignored"),
+    // No `=` or an empty name: a value without a name (step 3).
+    ("foo", "\"\"=\"foo\""),
+    ("foo; bar=baz", "\"\"=\"foo\""),
+    ("=bar", "\"\"=\"bar\""),
+    ("  =bar", "\"\"=\"bar\""),
+    (" foo bar ", "\"\"=\"foo bar\""),
+    // An empty name and value (§5.7 step 2) or a control character: ignored
+    // whole.
     ("=", "ignored"),
+    (" = ", "ignored"),
     ("", "ignored"),
+    ("; Path=/", "ignored"),
     ("foo=b\r\nar", "ignored"),
     ("foo=bar; Path=/\n", "ignored"),
     ("foo=b\u{7f}ar", "ignored"),
@@ -80,7 +85,10 @@ test "set-cookie attributes parse case-insensitively, the last one winning" {
     ),
     ("a=b; Domain=.Example.COM", "\"a\"=\"b\" domain=example.com"),
     ("a=b; Domain=..example.com", "\"a\"=\"b\" domain=.example.com"),
-    ("a=b; Domain=example.com; Domain=", "\"a\"=\"b\" domain=example.com"),
+    // The last Domain wins even when empty, which makes the cookie host-only
+    // (§5.7 steps 7 and 10).
+    ("a=b; Domain=example.com; Domain=", "\"a\"=\"b\""),
+    ("a=b; Domain=; Domain=example.com", "\"a\"=\"b\" domain=example.com"),
     ("a=b; Domain=.", "\"a\"=\"b\""),
     ("a=b; Path=/foo; path=/bar", "\"a\"=\"b\" path=\"/bar\""),
     ("a=b; Path", "\"a\"=\"b\" path=\"\""),
@@ -100,16 +108,19 @@ test "set-cookie attributes parse case-insensitively, the last one winning" {
 }
 
 ///|
-test "a set-cookie value is ignored past 4096 bytes and an attribute past 1024" {
-  // 4096 bytes in all: "n=" plus 4094 bytes of value.
-  let fits = "n=" + "v".repeat(4094)
-  let over = "n=" + "v".repeat(4095)
-  assert_eq(utf8_length(fits), max_cookie_bytes)
+test "a cookie is ignored past 4096 bytes of name and value and an attribute past 1024" {
+  // RFC 6265bis-22 §5.6 step 5: the name and value, after trimming, may take
+  // 4096 bytes; the `=`, whitespace and attributes do not count.
+  let fits = "n=" + "v".repeat(4095)
+  let over = "n=" + "v".repeat(4096)
+  assert_eq(utf8_length("n") + utf8_length("v".repeat(4095)), max_cookie_bytes)
   assert_true(parse_set_cookie(fits) is Some(_))
+  assert_true(parse_set_cookie("  " + fits + "  ; Path=/; Secure") is Some(_))
   assert_eq(parsed(over), "ignored")
+  assert_true(parse_set_cookie("v".repeat(4096)) is Some(_))
+  assert_eq(parsed("v".repeat(4097)), "ignored")
   // Bytes are counted in UTF-8: each é takes two.
-  let wide = "n=" + "\u{e9}".repeat(2047)
-  assert_eq(utf8_length(wide), 4096)
+  let wide = "n=" + "\u{e9}".repeat(2047) + "v"
   assert_true(parse_set_cookie(wide) is Some(_))
   assert_eq(parsed(wide + "v"), "ignored")
   assert_eq(utf8_length("\u{1F36A}\u{800}\u{7FF}"), 9)

@@ -1,7 +1,7 @@
 ///|
-/// The most a `Set-Cookie` value may take, in UTF-8 bytes of its name, value
-/// and attributes together: the per-cookie size RFC 6265 §6.1 asks user
-/// agents to support. A longer one is ignored whole.
+/// The most a cookie's name and value may take together, in UTF-8 bytes
+/// (RFC 6265bis-22 §5.6 step 5); a longer one is ignored whole. Attributes
+/// are bounded one by one, by `max_attribute_bytes`.
 let max_cookie_bytes : Int32 = 4096
 
 ///|
@@ -10,16 +10,18 @@ let max_cookie_bytes : Int32 = 4096
 let max_attribute_bytes : Int32 = 1024
 
 ///|
-/// A `Set-Cookie` value parsed by RFC 6265 §5.2, before the storage model
-/// decides what it means for the request.
+/// A `Set-Cookie` value parsed by RFC 6265bis-22 §5.6, before the storage
+/// model decides what it means for the request.
 priv struct SetCookie {
+  /// Empty for a cookie without `=` in its name-value pair.
   name : String
   value : String
   /// The last valid `Expires`, in Unix milliseconds.
   expires_ms : Int64?
   /// The last valid `Max-Age`, in seconds; it overrides `Expires`.
   max_age : Int64?
-  /// The last non-empty `Domain`, lowercased, one leading dot removed.
+  /// The last `Domain`, lowercased, one leading dot removed; `None` when
+  /// there is none or the last one is empty (§5.7 step 10: host-only).
   domain : String?
   /// The last `Path` value, which may still need the default path.
   path : String?
@@ -29,21 +31,25 @@ priv struct SetCookie {
 }
 
 ///|
-/// Parses a `Set-Cookie` value, or returns `None` when RFC 6265 §5.2 ignores
-/// it: no `=` in the name-value pair, an empty name, a control character
-/// other than HTAB anywhere (RFC 6265bis-22 §5.6), or more than `max_cookie_bytes`.
-/// Unknown and malformed attributes are skipped.
+/// Parses a `Set-Cookie` value as RFC 6265bis-22 §5.6 does, or returns
+/// `None` when it is ignored: a control character other than HTAB anywhere,
+/// a name and value longer than `max_cookie_bytes` together, or, by §5.7
+/// step 2, an empty name and an empty value. A pair without `=` is a value
+/// with an empty name. Unknown and malformed attributes are skipped.
 fn parse_set_cookie(text : String) -> SetCookie? {
-  guard utf8_length(text) <= max_cookie_bytes && !has_control(text) else {
-    return None
-  }
+  guard !has_control(text) else { return None }
   let (pair, attributes) = match text.split_once(";") {
     Some((pair, attributes)) => (pair, attributes)
     None => (text[:], ""[:])
   }
-  guard pair.split_once("=") is Some((name, value)) else { return None }
-  let name = trim_wsp(name)
-  guard !name.is_empty() else { return None }
+  let (name, value) = match pair.split_once("=") {
+    Some((name, value)) => (trim_wsp(name), trim_wsp(value))
+    None => ("", trim_wsp(pair))
+  }
+  guard !(name.is_empty() && value.is_empty()) &&
+    utf8_length(name) + utf8_length(value) <= max_cookie_bytes else {
+    return None
+  }
   let mut expires_ms = None
   let mut max_age = None
   let mut domain = None
@@ -70,9 +76,7 @@ fn parse_set_cookie(text : String) -> SetCookie? {
         }
       "domain" => {
         let value = value.strip_prefix(".").unwrap_or(value[:]).to_owned()
-        if !value.is_empty() {
-          domain = Some(value.to_lower())
-        }
+        domain = if value.is_empty() { None } else { Some(value.to_lower()) }
       }
       "path" => path = Some(value)
       "secure" => secure = true
@@ -89,7 +93,7 @@ fn parse_set_cookie(text : String) -> SetCookie? {
   }
   Some({
     name,
-    value: trim_wsp(value),
+    value,
     expires_ms,
     max_age,
     domain,
@@ -101,7 +105,7 @@ fn parse_set_cookie(text : String) -> SetCookie? {
 }
 
 ///|
-/// RFC 6265 §5.2.2: an optional `-` then digits. Magnitudes of 10^18 and
+/// RFC 6265bis-22 §5.6.2: an optional `-` then digits. Magnitudes of 10^18 and
 /// more read as 10^18, far past the lifetime cap the caller applies.
 fn parse_max_age(text : String) -> Int64? {
   let (negative, digits) = match text.strip_prefix("-") {
@@ -122,7 +126,7 @@ fn parse_max_age(text : String) -> Int64? {
 }
 
 ///|
-/// Strips leading and trailing SP and HTAB, the whitespace of RFC 6265 §5.2.
+/// Strips leading and trailing SP and HTAB, the WSP of RFC 6265bis-22 §5.6.
 fn trim_wsp(text : StringView) -> String {
   text.trim(chars=" \t").to_owned()
 }

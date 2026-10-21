@@ -16,6 +16,23 @@ never does. Every breaking change is listed with a migration note.
   A two-digit year that would put the date more than 50 years after the
   clock is taken from the century before, as §5.6.7 says. HTTP-date stays
   case-sensitive and the weekday is still checked.
+- **`CookieJar` parses and stores cookies as RFC 6265bis-22 does**, the
+  draft in the RFC Editor queue that will obsolete RFC 6265, and as
+  browsers do. Migration: these change which cookies a jar keeps and sends.
+  - A `Set-Cookie` without `=` (or with an empty name) is a cookie without
+    a name, sent as its value alone; it was ignored. An empty name and value
+    are still ignored, and so is a nameless cookie whose value starts with
+    `__Secure-` or `__Host-`.
+  - The 4096-byte limit covers the name and value, not the whole line, so
+    long attributes no longer get a cookie ignored; each attribute value is
+    still limited to 1024 bytes.
+  - An empty `Domain` after a valid one makes the cookie host-only; the
+    earlier value was kept.
+  - `SameSite=None` without `Secure` is ignored.
+  - A host-only cookie and a `Domain` cookie with the same name, domain and
+    path are two cookies; the second no longer replaces the first.
+  - A domain over `max_per_domain` loses its cookies that are not Secure
+    before its Secure ones.
 - **`parse_link_next` reads only the first `rel` of a link value.** RFC 8288
   §3.3 says later occurrences MUST be ignored; a value such as
   `<a>; rel=prev; rel=next` was taken as the next page.

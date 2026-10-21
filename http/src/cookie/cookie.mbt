@@ -16,7 +16,7 @@ pub extend SameSite with Eq::{equal, not_equal}
 pub extend SameSite with @debug.Debug::{to_repr}
 
 ///|
-/// A stored cookie, with the fields of the RFC 6265 §5.3 storage model.
+/// A stored cookie, with the fields of the RFC 6265bis-22 §5.7 storage model.
 ///
 /// `domain` is the request host for a host-only cookie and the `Domain`
 /// attribute otherwise. `expires_ms` is `None` for a session cookie. Times are

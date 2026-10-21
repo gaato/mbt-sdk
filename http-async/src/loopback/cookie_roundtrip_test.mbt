@@ -94,10 +94,11 @@ async test "rebuilt Set-Cookie lines keep SameSite and every other attribute" {
 
 ///|
 /// moonbitlang/async 0.22.5 keeps one value per attribute, the last, even an
-/// empty or invalid one, where RFC 6265 §5.2 ignores those and keeps the
-/// earlier valid value; it also reads `Max-Age=+60` as 60, which §5.2.2
-/// ignores. The rebuilt line can only carry what was kept. Pinned here so
-/// that an upstream fix shows up.
+/// invalid one, where RFC 6265bis-22 §5.6 ignores an invalid `Expires` and
+/// keeps the earlier valid value; it also reads `Max-Age=+60` as 60, which
+/// §5.6.2 ignores. The rebuilt line can only carry what was kept. Pinned
+/// here so that an upstream fix shows up. An empty last `Domain` is kept by
+/// both, and makes the cookie host-only (§5.7 step 10).
 async test "attributes moonbitlang/async keeps only the last of are lost" {
   let raw = [
     "l1=v; Domain=example.com; Domain=", "l2=v; Expires=Wed, 09 Jun 2027 10:18:14 GMT; Expires=bogus",
@@ -107,7 +108,7 @@ async test "attributes moonbitlang/async keeps only the last of are lost" {
   assert_eq(lines, ["l1=v; Domain=", "l2=v; Expires=bogus", "l3=v; Max-Age=60"])
   let raw_read = raw.map(line => jar_reading(line)[0])
   let rebuilt_read = lines.map(line => jar_reading(line)[0])
-  assert_eq(raw_read[0].domain, "example.com")
+  assert_eq(raw_read[0].domain, "www.example.com")
   assert_eq(rebuilt_read[0].domain, "www.example.com")
   assert_true(raw_read[1].expires_ms is Some(_))
   assert_eq(rebuilt_read[1].expires_ms, None)
@@ -117,9 +118,10 @@ async test "attributes moonbitlang/async keeps only the last of are lost" {
 
 ///|
 /// moonbitlang/async 0.22.5 refuses a whole response for a `Set-Cookie`
-/// without `=` or with a `Max-Age` that is not an Int64, which RFC 6265 §5.2
-/// ignores (the line, or the attribute). `send` raises `Protocol`; this
-/// cannot be fixed after the parse. Pinned so that an upstream fix shows up.
+/// without `=`, which RFC 6265bis-22 §5.6 reads as a cookie without a name,
+/// or with a `Max-Age` that is not an Int64, an attribute §5.6.2 ignores.
+/// `send` raises `Protocol`; this cannot be fixed after the parse. Pinned so
+/// that an upstream fix shows up.
 async test "Set-Cookie lines moonbitlang/async refuses fail the whole response" {
   let refused = [
     "nameonly", "x=v; Max-Age=soon", "x=v; Max-Age=3600, c=d", "x=v; Max-Age=99999999999999999999",
@@ -133,6 +135,6 @@ async test "Set-Cookie lines moonbitlang/async refuses fail the whole response" 
     }
     assert_eq(outcome, "Protocol", msg=line)
   }
-  // The jar itself ignores the first line and keeps the other cookies.
-  assert_eq(refused.map(line => jar_reading(line).length()), [0, 1, 1, 1])
+  // The jar itself keeps every one of these cookies.
+  assert_eq(refused.map(line => jar_reading(line).length()), [1, 1, 1, 1])
 }

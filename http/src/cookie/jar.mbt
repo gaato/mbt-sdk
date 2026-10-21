@@ -21,7 +21,7 @@ priv struct Entry {
 }
 
 ///|
-/// An RFC 6265 cookie store for an HTTP client: `store` takes the
+/// An RFC 6265bis-22 cookie store for an HTTP client: `store` takes the
 /// `Set-Cookie` headers of a response, `header_for` builds the `Cookie`
 /// header of a request.
 ///
@@ -60,7 +60,8 @@ pub struct CookieJar {
 ///
 /// `max_per_domain` (default 50) and `max_total` (default 3000) bound how many
 /// cookies it keeps; a cookie past either evicts expired cookies first, then
-/// the least recently accessed (RFC 6265 §5.3). Negative limits count as 0.
+/// the least recently accessed, those that are not Secure first when a
+/// domain is over its cap (RFC 6265bis-22 §5.7). Negative limits count as 0.
 /// `is_public_suffix` names further domains a cookie may not be set for, such
 /// as a Public Suffix List lookup; single-label domains are always refused.
 pub fn CookieJar::new(
@@ -99,7 +100,7 @@ pub fn CookieJar::store(
 ///|
 /// Returns the `Cookie` header value for a request to `request_url`, or
 /// `None` when no cookie matches, and marks the cookies sent as accessed.
-/// Longer paths come first, then earlier-created cookies (RFC 6265 §5.4).
+/// Longer paths come first, then earlier-created cookies (RFC 6265bis-22 §5.8.3).
 pub fn CookieJar::header_for(self : CookieJar, request_url : String) -> String? {
   guard parse_request_url(request_url) is Some(url) else { return None }
   self.header_at(url, self.clock.now_unix_ms())
@@ -140,7 +141,7 @@ pub fn CookieJar::clear_domain(self : CookieJar, domain : String) -> Unit {
 
 ///|
 /// Removes the session cookies (those without `Expires` or `Max-Age`), as
-/// RFC 6265 §5.3 does when a session ends.
+/// RFC 6265bis-22 §5.7 does when the session is over.
 pub fn CookieJar::clear_session(self : CookieJar) -> Unit {
   self.remove_where(cookie => cookie.expires_ms is None)
 }
@@ -153,12 +154,14 @@ pub fn CookieJar::remove_expired(self : CookieJar) -> Unit {
 }
 
 ///|
-/// The RFC 6265 §5.3 storage model for one `Set-Cookie` value received at
-/// `now_ms`, with the RFC 6265bis-22 additions browsers apply: Secure cookies
-/// only from secure origins, the `__Secure-` and `__Host-` prefixes, and no
-/// insecure overwrite of a Secure cookie. Expired cookies are evicted first
-/// (§5.3 asks for that whenever one exists), so none of these rules, the
-/// replacement of a cookie or the caps ever consult one.
+/// The RFC 6265bis-22 §5.7 storage model for one `Set-Cookie` value received
+/// at `now_ms`: Secure cookies only from secure origins (step 13), no
+/// insecure overwrite of a Secure cookie (step 16), `SameSite=None` only
+/// when Secure (step 19), and the `__Secure-` and `__Host-` prefixes (steps
+/// 20–22). Step 18, which refuses cookies from cross-site requests, does not
+/// apply: a client has no notion of a site. Expired cookies are evicted
+/// first (§5.7 asks for that whenever one exists), so none of these rules,
+/// the replacement of a cookie or the caps ever consult one.
 fn CookieJar::store_at(
   self : CookieJar,
   url : RequestUrl,
@@ -175,6 +178,9 @@ fn CookieJar::store_at(
     _ => default_path(url.path)
   }
   guard !parsed.secure || url.is_secure() else { return }
+  guard parsed.secure || !(parsed.same_site is Some(NoRestriction)) else {
+    return
+  }
   guard prefix_allows(parsed, host_only) else { return }
   guard parsed.secure ||
     url.is_secure() ||
@@ -188,7 +194,10 @@ fn CookieJar::store_at(
   let mut creation_ms = now_ms
   let mut sequence = self.next_sequence
   for i, entry in entries {
-    if entry.cookie.name == parsed.name && entry.cookie.path == path {
+    // Step 23: the same name, domain, host-only flag and path.
+    if entry.cookie.name == parsed.name &&
+      entry.cookie.host_only == host_only &&
+      entry.cookie.path == path {
       creation_ms = entry.cookie.creation_ms
       sequence = entry.sequence
       entries.remove(i) |> ignore
@@ -226,7 +235,7 @@ fn CookieJar::store_at(
 }
 
 ///|
-/// RFC 6265 §5.3 steps 4-6: the cookie's domain and host-only flag, or
+/// RFC 6265bis-22 §5.7 steps 7-10: the cookie's domain and host-only flag, or
 /// `None` when the `Domain` attribute is not one `host` may set.
 fn CookieJar::cookie_domain(
   self : CookieJar,
@@ -256,13 +265,19 @@ fn CookieJar::cookie_domain(
 }
 
 ///|
-/// RFC 6265bis-22 §4.1.3: a `__Secure-` cookie must be Secure; a `__Host-`
-/// cookie must also be host-only with a `Path` attribute whose value is `/`
-/// (not one that falls back to a default path of `/`). Prefixes match
-/// ignoring ASCII case, as browsers do.
+/// RFC 6265bis-22 §5.7 steps 20–22: a `__Secure-` cookie must be Secure; a
+/// `__Host-` cookie must also be host-only with a `Path` attribute whose
+/// value is `/`; a cookie without a name may not have a value that starts
+/// with either prefix, which a server would read as a prefixed name.
+/// Prefixes match ignoring ASCII case. Step 21 also accepts a `Path` that
+/// falls back to a default path of `/`; this does not, as Chromium, which
+/// compares the attribute's value, does not.
 fn prefix_allows(parsed : SetCookie, host_only : Bool) -> Bool {
   let name = parsed.name.to_lower()
-  if name.has_prefix("__secure-") {
+  if name.is_empty() {
+    let value = parsed.value.to_lower()
+    !value.has_prefix("__secure-") && !value.has_prefix("__host-")
+  } else if name.has_prefix("__secure-") {
     parsed.secure
   } else if name.has_prefix("__host-") {
     parsed.secure && host_only && parsed.path == Some("/")
@@ -296,7 +311,7 @@ fn CookieJar::shadows_secure(
 }
 
 ///|
-/// RFC 6265 §5.3 step 3: `Max-Age` wins over `Expires`; a nonpositive one
+/// RFC 6265bis-22 §5.7 step 6: `Max-Age` wins over `Expires`; a nonpositive one
 /// expires the cookie at once. Either is cut to `max_lifetime_ms`.
 fn expiry(parsed : SetCookie, now_ms : Int64) -> Int64? {
   let latest = now_ms + max_lifetime_ms
@@ -315,9 +330,12 @@ fn expiry(parsed : SetCookie, now_ms : Int64) -> Int64? {
 }
 
 ///|
-/// Applies the bounds after a cookie joins `domain`'s entries. `store_at`
-/// has already evicted the expired cookies (RFC 6265 §5.3's first choice),
-/// so the least recently accessed go.
+/// Applies the bounds after a cookie joins `domain`'s entries, in the order
+/// RFC 6265bis-22 §5.7 gives for removing excess cookies. `store_at` has
+/// already evicted the expired cookies, the first choice; then a domain over
+/// its cap loses its cookies that are not Secure, then any of its cookies,
+/// and a jar over its cap loses any cookie, the least recently accessed
+/// first each time.
 fn CookieJar::enforce_limits(self : CookieJar, domain : String) -> Unit {
   while self.domains.get(domain) is Some(entries) &&
         entries.length() > self.max_per_domain {
@@ -329,7 +347,8 @@ fn CookieJar::enforce_limits(self : CookieJar, domain : String) -> Unit {
 }
 
 ///|
-/// Removes the least recently accessed cookie, of one domain or of all.
+/// Removes the least recently accessed cookie of all, or of one domain,
+/// where a cookie that is not Secure goes before a Secure one.
 fn CookieJar::evict_oldest(self : CookieJar, only~ : String?) -> Unit {
   let mut oldest : (String, Int32, Entry)? = None
   for domain, entries in self.domains {
@@ -338,6 +357,11 @@ fn CookieJar::evict_oldest(self : CookieJar, only~ : String?) -> Unit {
     }
     for i, entry in entries {
       match oldest {
+        Some((_, _, best)) if only is Some(_) &&
+          entry.cookie.secure != best.cookie.secure =>
+          if best.cookie.secure {
+            oldest = Some((domain, i, entry))
+          }
         Some((_, _, best)) if !accessed_before(entry, best) => ()
         _ => oldest = Some((domain, i, entry))
       }
@@ -385,9 +409,10 @@ fn CookieJar::remove_where(self : CookieJar, drop : (Cookie) -> Bool) -> Unit {
 }
 
 ///|
-/// RFC 6265 §5.4 at `now_ms`: the matching cookies' `name=value` pairs,
-/// longer paths first, then earlier creation. Expired cookies met on the way
-/// are evicted; the ones sent are marked accessed.
+/// RFC 6265bis-22 §5.8.3 at `now_ms`: the matching cookies' `name=value`
+/// pairs, just the value for a cookie without a name, longer paths first,
+/// then earlier creation. Expired cookies met on the way are evicted; the
+/// ones sent are marked accessed.
 fn CookieJar::header_at(
   self : CookieJar,
   url : RequestUrl,
@@ -431,8 +456,10 @@ fn CookieJar::header_at(
     if i > 0 {
       header.write_string("; ")
     }
-    header.write_string(entry.cookie.name)
-    header.write_char('=')
+    if !entry.cookie.name.is_empty() {
+      header.write_string(entry.cookie.name)
+      header.write_char('=')
+    }
     header.write_string(entry.cookie.value)
   }
   Some(header.to_string())

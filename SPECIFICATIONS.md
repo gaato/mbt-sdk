@@ -21,8 +21,8 @@ errata are tracked in
 | RFC 3986, URI Generic Syntax | Internet Standard (STD 66); updated by RFC 7320, 8820 | `http/src/url.mbt` (`Url::parse`, `Url::resolve`, `percent_encode`); `http/src/redirect.mbt` | Parsing, strict reference resolution (§5.2), `remove_dot_segments` (§5.2.4), recomposition (§5.3). `sdk-runtime`'s base-URL join (`client.mbt`, `resolve_url`) is deliberately not §5.2: it appends to the base path |
 | RFC 5952, IPv6 text representation | Proposed Standard; updates RFC 4291 | `http/src/ipv6.mbt` (`ipv6_text`) | The canonical form of IPv6 hosts (§4, §5) |
 | RFC 4291, IPv6 addressing | Draft Standard; updated by RFC 5952, 6052, 7136, 7346, 7371, 8064 | `http-async/src/no_proxy.mbt` | IPv6 addresses and prefixes in `NO_PROXY` |
-| draft-ietf-httpbis-rfc6265bis-22, Cookies | Internet-Draft, revision 22, in the RFC Editor queue; will obsolete RFC 6265 | `http/src/cookie/` | `SameSite`, cookie prefixes (§4.1.3), the 400-day lifetime cap (§5.5), the 1024-byte attribute limit and control characters (§5.6), not overwriting Secure cookies (§5.7 step 16). The rest still follows RFC 6265; see "Known deviations" |
-| RFC 6265, HTTP State Management | Proposed Standard; obsoletes RFC 2965 | `http/src/cookie/` (`parse_set_cookie`, `parse_cookie_date`, `domain_match`, `path_match`, `CookieJar`) | Date parsing (§5.1.1), domain- and path-match (§5.1.3, §5.1.4), `Set-Cookie` parsing (§5.2), the storage model (§5.3), the `Cookie` header (§5.4), the size limits (§6.1) |
+| draft-ietf-httpbis-rfc6265bis-22, Cookies | Internet-Draft, revision 22, in the RFC Editor queue; will obsolete RFC 6265 | `http/src/cookie/` (`parse_set_cookie`, `parse_cookie_date`, `domain_match`, `path_match`, `CookieJar`) | Date parsing (§5.1.1), domain- and path-match (§5.1.3, §5.1.4), the prefixes (§5.4), the 400-day lifetime cap (§5.5), `Set-Cookie` parsing (§5.6), the storage model (§5.7), the `Cookie` header (§5.8.3). Two steps of §5.7 differ: step 18, which refuses cookies from cross-site requests, does not apply to a client, and step 21's `__Host-` cookie needs a `Path=/` attribute, not one that falls back to a default path of `/`, as Chromium does |
+| RFC 6265, HTTP State Management | Proposed Standard; obsoletes RFC 2965 | `http/src/cookie/jar.mbt` | Superseded here by 6265bis-22; the default caps of 50 cookies per domain and 3000 in all are its §6.1 minimums |
 | RFC 8288, Web Linking | Proposed Standard; obsoletes RFC 5988 | `http/src/link.mbt` (`parse_link_next`) | Only the target of `rel="next"`, unresolved, from the first `rel` parameter (§3.3); target attributes (Appendix B.2 steps 15–16) are not parsed |
 | RFC 7578, multipart/form-data | Proposed Standard; obsoletes RFC 2388 | `http/src/multipart/` | Part framing (§4.1), `Content-Disposition` with `name` and `filename` (§4.2) |
 | RFC 2046, MIME media types | Draft Standard; updated by RFC 2646, 3798, 5147, 6657, 8098 | `http/src/multipart/multipart.mbt` (`is_boundary_char`, `validate_boundary`) | Boundary characters and length (§5.1.1) |
@@ -83,9 +83,5 @@ a document:
 
 ## Known deviations
 
-Places where the code departs from a document it claims to follow. Each is to
-be fixed; the fix removes its row.
-
-| Document | The code |
-|---|---|
-| draft-ietf-httpbis-rfc6265bis-22 §5.6: a pair without `=` is a cookie with an empty name; the 4096-byte limit covers the name and value | `parse_set_cookie` ignores such a pair, as RFC 6265 §5.2 does, and applies the limit to the whole `Set-Cookie` value |
+Places where the code departs from a document it claims to follow, to be
+fixed, each in a row of a table here that its fix removes. None are known.
