@@ -107,9 +107,9 @@ unpublished module where the async behaviour of the layers below is run.
   where no document applies, and known deviations.
 - **Third-party test data.** Published test suites are run as data, pinned
   to a commit, with their licenses in the module's NOTICE: web-platform-tests'
-  URL tables and the http-state cookie tests in `conformance/`, and the
-  NO_PROXY tables of Go and curl in
-  `http-async`. `scripts/gen_vectors.mbtx` rewrites the larger ones as
+  URL and event-stream tests, the http-state cookie tests and go.lsp.dev's
+  JSON-RPC vectors in `conformance/`, and the NO_PROXY tables of Go and curl
+  in `http-async`. `scripts/gen_vectors.mbtx` rewrites the larger ones as
   MoonBit test files when their pins move. Where this code deliberately
   differs from a suite, the rows it skips are named by category and
   counted, and the difference is listed in `SPECIFICATIONS.md`.

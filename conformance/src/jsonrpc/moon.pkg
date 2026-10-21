@@ -2,5 +2,6 @@ import {
   "gaato/jsonrpc",
   "gaato/mbt-sdk-conformance/harness",
   "moonbitlang/core/encoding/utf8",
+  "moonbitlang/core/json",
   "moonbitlang/core/random",
 } for "wbtest"
