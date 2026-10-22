@@ -13,7 +13,7 @@ import {
 pub(all) suberror MockError {
   Unexpected(String)
   Mismatch(String)
-  Unconsumed(Int)
+  Unconsumed(Int32)
   Violated(String)
 } derive(@debug.Debug)
 pub fn MockError::to_repr(Self) -> @debug.Repr
@@ -22,11 +22,11 @@ pub fn MockError::to_repr(Self) -> @debug.Repr
 pub struct FakeClock {
   // private fields
 }
-pub fn FakeClock::advance(Self, Int) -> Unit
+pub fn FakeClock::advance(Self, Int32) -> Unit
 pub fn FakeClock::new(start_unix_ms? : Int64) -> Self
 pub fn FakeClock::now_unix_ms(Self) -> Int64
-pub async fn FakeClock::sleep(Self, Int) -> Unit noraise
-pub fn FakeClock::slept(Self) -> Array[Int]
+pub async fn FakeClock::sleep(Self, Int32) -> Unit noraise
+pub fn FakeClock::slept(Self) -> Array[Int32]
 pub impl @clock.Clock for FakeClock
 
 pub struct FakeTransport {
@@ -40,7 +40,7 @@ pub fn FakeTransport::new() -> Self
 pub async fn FakeTransport::send(Self, @http.Request) -> @http.Response raise @http.HttpError
 pub async fn FakeTransport::send_stream(Self, @http.Request) -> (@http.ResponseHead, &@http.BodyStream) raise @http.HttpError
 pub fn FakeTransport::sent(Self) -> Array[@http.Request]
-pub fn FakeTransport::streams_closed(Self) -> Int
+pub fn FakeTransport::streams_closed(Self) -> Int32
 pub impl @http.Transport for FakeTransport
 
 // Type aliases

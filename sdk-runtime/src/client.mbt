@@ -460,6 +460,7 @@ async fn[T] Client::admit_and_exchange(
 /// transport failure, and running out of time, are captured as values, so
 /// the only error that can leave this function is a cancellation, and the
 /// `errdefer` settles the attempt for exactly that case.
+#warnings("-result_error_return")
 async fn[T] Client::exchange_guarded(
   self : Client,
   bucket : String,

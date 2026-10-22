@@ -11,9 +11,9 @@ pub fn append_query(String, String, String) -> String
 
 pub fn encode_utf8(String) -> Bytes
 
-pub async fn follow_redirects(Request, async (Request) -> Response raise HttpError, max_redirects? : Int, allow_downgrade? : Bool, credential_headers? : Array[String], on_redirect? : (RedirectHop) -> Unit) -> Response raise RedirectError
+pub async fn follow_redirects(Request, async (Request) -> Response raise HttpError, max_redirects? : Int32, allow_downgrade? : Bool, credential_headers? : Array[String], on_redirect? : (RedirectHop) -> Unit) -> Response raise RedirectError
 
-pub async fn follow_redirects_stream(Request, async (Request) -> (ResponseHead, &BodyStream) raise HttpError, max_redirects? : Int, allow_downgrade? : Bool, credential_headers? : Array[String], on_redirect? : (StreamRedirectHop) -> Unit) -> (ResponseHead, &BodyStream) raise RedirectError
+pub async fn follow_redirects_stream(Request, async (Request) -> (ResponseHead, &BodyStream) raise HttpError, max_redirects? : Int32, allow_downgrade? : Bool, credential_headers? : Array[String], on_redirect? : (StreamRedirectHop) -> Unit) -> (ResponseHead, &BodyStream) raise RedirectError
 
 pub fn form_urlencode(ArrayView[(String, String)]) -> String
 
@@ -21,32 +21,32 @@ pub fn is_idempotent(Request) -> Bool
 
 pub fn parse_link_next(Headers) -> String?
 
-pub fn parse_retry_after(String, now_unix_ms? : Int64) -> Int?
+pub fn parse_retry_after(String, now_unix_ms? : Int64) -> Int32?
 
 pub fn percent_encode(String) -> String
 
 pub fn percent_encode_path(String) -> String
 
-pub fn redirects(max_redirects? : Int, allow_downgrade? : Bool, credential_headers? : Array[String], on_redirect? : (RedirectHop) -> Unit) -> async (Request, async (Request) -> Response raise HttpError) -> Response raise HttpError
+pub fn redirects(max_redirects? : Int32, allow_downgrade? : Bool, credential_headers? : Array[String], on_redirect? : (RedirectHop) -> Unit) -> async (Request, async (Request) -> Response raise HttpError) -> Response raise HttpError
 
-pub fn retry_after_ms(Headers, now_unix_ms? : Int64) -> Int?
+pub fn retry_after_ms(Headers, now_unix_ms? : Int64) -> Int32?
 
 pub async fn send_with(&Transport, Array[async (Request, async (Request) -> Response raise HttpError) -> Response raise HttpError], Request) -> Response raise HttpError
 
 // Errors
 pub(all) suberror HttpError {
   Connect(String)
-  Timeout(phase~ : Phase, ms~ : Int)
+  Timeout(phase~ : Phase, ms~ : Int32)
   Network(phase~ : Phase, message~ : String)
   Protocol(String)
-  Proxy(status~ : Int, message~ : String)
+  Proxy(status~ : Int32, message~ : String)
 } derive(@debug.Debug)
 pub fn HttpError::is_unsent(Self) -> Bool
 pub fn HttpError::to_repr(Self) -> @debug.Repr
 
 pub(all) suberror RedirectError {
   Transport(HttpError)
-  TooManyRedirects(max~ : Int, location~ : String)
+  TooManyRedirects(max~ : Int32, location~ : String)
   Downgrade(location~ : String)
   BadLocation(location~ : String, reason~ : String)
   UnreplayableBody(location~ : String)
@@ -83,7 +83,7 @@ pub fn Headers::from_array(Array[(String, String)]) -> Self
 pub fn Headers::get(Self, String) -> String?
 pub fn Headers::get_all(Self, String) -> Array[String]
 pub fn Headers::iter(Self) -> Iter[(String, String)]
-pub fn Headers::length(Self) -> Int
+pub fn Headers::length(Self) -> Int32
 pub fn Headers::new() -> Self
 pub fn Headers::not_equal(Self, Self) -> Bool
 pub fn Headers::remove(Self, String) -> Unit
@@ -133,7 +133,7 @@ pub fn Request::put(String) -> Self
 pub fn Request::to_repr(Self) -> @debug.Repr
 
 pub(all) struct Response {
-  status : Int
+  status : Int32
   headers : Headers
   body : Bytes
 } derive(Eq, @debug.Debug)
@@ -145,7 +145,7 @@ pub fn Response::text(Self) -> String raise @utf8.Malformed
 pub fn Response::to_repr(Self) -> @debug.Repr
 
 pub(all) struct ResponseHead {
-  status : Int
+  status : Int32
   headers : Headers
 } derive(Eq, @debug.Debug)
 pub fn ResponseHead::equal(Self, Self) -> Bool
@@ -175,7 +175,7 @@ pub struct Url {
   scheme : String?
   userinfo : String?
   host : String?
-  port : Int?
+  port : Int32?
   path : String
   query : String?
   fragment : String?
@@ -187,7 +187,7 @@ pub fn Url::merge_query_params(Self, Array[(String, String)]) -> Self
 pub fn Url::not_equal(Self, Self) -> Bool
 pub fn Url::output(Self, &Logger) -> Unit
 pub fn Url::parse(String) -> Self raise UrlError
-pub fn Url::port_or_default(Self) -> Int?
+pub fn Url::port_or_default(Self) -> Int32?
 pub fn Url::query_params(Self) -> Array[(String, String)]
 pub fn Url::resolve(Self, Self) -> Self
 pub fn Url::same_origin(Self, Self) -> Bool

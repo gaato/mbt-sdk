@@ -17,7 +17,7 @@ pub fn[F : Feeder] check_truncation(() -> F, Bytes, @random.Rand, label? : Strin
 
 pub fn corrupt(@random.Rand, Bytes) -> Bytes
 
-pub fn[F : Feeder] fuzz(() -> F, Array[Bytes], @random.Rand, rounds~ : Int) -> Array[(String, Int)] raise
+pub fn[F : Feeder] fuzz(() -> F, Array[Bytes], @random.Rand, rounds~ : Int32) -> Array[(String, Int32)] raise
 
 pub fn hostile_chunks(Bytes) -> Array[Bytes]
 
@@ -25,7 +25,7 @@ pub fn random_chunks(@random.Rand, Bytes) -> Array[Bytes]
 
 pub fn[F : Feeder] run(F, Array[Bytes]) -> Transcript
 
-pub fn seeded(Int) -> @random.Rand
+pub fn seeded(Int32) -> @random.Rand
 
 pub fn single_bytes(Bytes) -> Array[Bytes]
 

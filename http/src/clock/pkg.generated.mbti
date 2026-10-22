@@ -11,6 +11,6 @@ package "gaato/http/clock"
 
 // Traits
 pub(open) trait Clock {
-  async fn sleep(Self, Int) -> Unit noraise
+  async fn sleep(Self, Int32) -> Unit noraise
   fn now_unix_ms(Self) -> Int64
 }

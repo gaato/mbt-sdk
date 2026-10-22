@@ -15,7 +15,7 @@ pub fn encode_body(Array[Part], String) -> (String, @http.Body) raise MultipartE
 
 pub fn encode_segments(Array[Part], String) -> (String, Array[Bytes]) raise MultipartError
 
-pub fn encode_segments_fresh(Array[Part], random? : () -> Double, attempts? : Int) -> (String, Array[Bytes]) raise MultipartError
+pub fn encode_segments_fresh(Array[Part], random? : () -> Double, attempts? : Int32) -> (String, Array[Bytes]) raise MultipartError
 
 pub fn join_segments(Array[Bytes]) -> Bytes
 

@@ -13,7 +13,7 @@ pub fn decode_line(Bytes, envelope~ : Envelope) -> Message raise DecodeError
 pub(all) suberror DecodeError {
   InvalidJson(String)
   InvalidMessage(String)
-  LineTooLong(Int)
+  LineTooLong(Int32)
 } derive(Eq, @debug.Debug)
 pub fn DecodeError::equal(Self, Self) -> Bool
 pub fn DecodeError::not_equal(Self, Self) -> Bool
@@ -33,7 +33,7 @@ pub struct LineFramer {
 }
 pub fn LineFramer::feed(Self, Bytes) -> Array[Bytes] raise DecodeError
 pub fn LineFramer::finish(Self) -> Bytes? raise DecodeError
-pub fn LineFramer::new(max_line? : Int) -> Self
+pub fn LineFramer::new(max_line? : Int32) -> Self
 
 pub(all) enum Message {
   Request(id~ : RequestId, name~ : String, params~ : Json?)
@@ -55,7 +55,7 @@ pub(all) enum RequestId {
 } derive(Eq, Hash, @debug.Debug)
 pub fn RequestId::equal(Self, Self) -> Bool
 pub fn RequestId::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
-pub fn RequestId::hash(Self) -> Int
+pub fn RequestId::hash(Self) -> Int32
 pub fn RequestId::hash_combine(Self, Hasher) -> Unit
 pub fn RequestId::not_equal(Self, Self) -> Bool
 pub fn RequestId::to_json(Self) -> Json
@@ -64,7 +64,7 @@ pub impl ToJson for RequestId
 pub impl @json.FromJson for RequestId
 
 pub(all) struct RpcError {
-  code : Int
+  code : Int32
   message : String
   data : Json?
 } derive(Eq, @debug.Debug)
@@ -74,7 +74,7 @@ pub fn RpcError::internal_error(message? : String) -> Self
 pub fn RpcError::invalid_params(message? : String) -> Self
 pub fn RpcError::invalid_request(message? : String) -> Self
 pub fn RpcError::method_not_found(String) -> Self
-pub fn RpcError::new(code~ : Int, message~ : String, data? : Json) -> Self
+pub fn RpcError::new(code~ : Int32, message~ : String, data? : Json) -> Self
 pub fn RpcError::not_equal(Self, Self) -> Bool
 pub fn RpcError::parse_error(message? : String) -> Self
 pub fn RpcError::to_json(Self) -> Json

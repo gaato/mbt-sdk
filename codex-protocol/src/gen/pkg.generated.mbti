@@ -197,11 +197,11 @@ pub impl ToJson for CodexErrorInfoActiveTurnNotSteerable
 pub impl @moonbitlang/core/json.FromJson for CodexErrorInfoActiveTurnNotSteerable
 
 pub(all) struct CodexErrorInfoHttpConnectionFailed {
-  http_status_code : @gaato/sdk-runtime/json.Presence[Int]
+  http_status_code : @gaato/sdk-runtime/json.Presence[Int32]
 } derive(Eq, @debug.Debug)
 pub fn CodexErrorInfoHttpConnectionFailed::equal(Self, Self) -> Bool
 pub fn CodexErrorInfoHttpConnectionFailed::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
-pub fn CodexErrorInfoHttpConnectionFailed::new(http_status_code? : Int) -> Self
+pub fn CodexErrorInfoHttpConnectionFailed::new(http_status_code? : Int32) -> Self
 pub fn CodexErrorInfoHttpConnectionFailed::not_equal(Self, Self) -> Bool
 pub fn CodexErrorInfoHttpConnectionFailed::to_json(Self) -> Json
 pub fn CodexErrorInfoHttpConnectionFailed::to_repr(Self) -> @debug.Repr
@@ -209,11 +209,11 @@ pub impl ToJson for CodexErrorInfoHttpConnectionFailed
 pub impl @moonbitlang/core/json.FromJson for CodexErrorInfoHttpConnectionFailed
 
 pub(all) struct CodexErrorInfoResponseStreamConnectionFailed {
-  http_status_code : @gaato/sdk-runtime/json.Presence[Int]
+  http_status_code : @gaato/sdk-runtime/json.Presence[Int32]
 } derive(Eq, @debug.Debug)
 pub fn CodexErrorInfoResponseStreamConnectionFailed::equal(Self, Self) -> Bool
 pub fn CodexErrorInfoResponseStreamConnectionFailed::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
-pub fn CodexErrorInfoResponseStreamConnectionFailed::new(http_status_code? : Int) -> Self
+pub fn CodexErrorInfoResponseStreamConnectionFailed::new(http_status_code? : Int32) -> Self
 pub fn CodexErrorInfoResponseStreamConnectionFailed::not_equal(Self, Self) -> Bool
 pub fn CodexErrorInfoResponseStreamConnectionFailed::to_json(Self) -> Json
 pub fn CodexErrorInfoResponseStreamConnectionFailed::to_repr(Self) -> @debug.Repr
@@ -221,11 +221,11 @@ pub impl ToJson for CodexErrorInfoResponseStreamConnectionFailed
 pub impl @moonbitlang/core/json.FromJson for CodexErrorInfoResponseStreamConnectionFailed
 
 pub(all) struct CodexErrorInfoResponseStreamDisconnected {
-  http_status_code : @gaato/sdk-runtime/json.Presence[Int]
+  http_status_code : @gaato/sdk-runtime/json.Presence[Int32]
 } derive(Eq, @debug.Debug)
 pub fn CodexErrorInfoResponseStreamDisconnected::equal(Self, Self) -> Bool
 pub fn CodexErrorInfoResponseStreamDisconnected::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
-pub fn CodexErrorInfoResponseStreamDisconnected::new(http_status_code? : Int) -> Self
+pub fn CodexErrorInfoResponseStreamDisconnected::new(http_status_code? : Int32) -> Self
 pub fn CodexErrorInfoResponseStreamDisconnected::not_equal(Self, Self) -> Bool
 pub fn CodexErrorInfoResponseStreamDisconnected::to_json(Self) -> Json
 pub fn CodexErrorInfoResponseStreamDisconnected::to_repr(Self) -> @debug.Repr
@@ -233,11 +233,11 @@ pub impl ToJson for CodexErrorInfoResponseStreamDisconnected
 pub impl @moonbitlang/core/json.FromJson for CodexErrorInfoResponseStreamDisconnected
 
 pub(all) struct CodexErrorInfoResponseTooManyFailedAttempts {
-  http_status_code : @gaato/sdk-runtime/json.Presence[Int]
+  http_status_code : @gaato/sdk-runtime/json.Presence[Int32]
 } derive(Eq, @debug.Debug)
 pub fn CodexErrorInfoResponseTooManyFailedAttempts::equal(Self, Self) -> Bool
 pub fn CodexErrorInfoResponseTooManyFailedAttempts::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
-pub fn CodexErrorInfoResponseTooManyFailedAttempts::new(http_status_code? : Int) -> Self
+pub fn CodexErrorInfoResponseTooManyFailedAttempts::new(http_status_code? : Int32) -> Self
 pub fn CodexErrorInfoResponseTooManyFailedAttempts::not_equal(Self, Self) -> Bool
 pub fn CodexErrorInfoResponseTooManyFailedAttempts::to_json(Self) -> Json
 pub fn CodexErrorInfoResponseTooManyFailedAttempts::to_repr(Self) -> @debug.Repr
@@ -1152,14 +1152,14 @@ pub impl ToJson for MemoryCitation
 pub impl @moonbitlang/core/json.FromJson for MemoryCitation
 
 pub(all) struct MemoryCitationEntry {
-  line_end : UInt
-  line_start : UInt
+  line_end : UInt32
+  line_start : UInt32
   note : String
   path : String
 } derive(Eq, @debug.Debug)
 pub fn MemoryCitationEntry::equal(Self, Self) -> Bool
 pub fn MemoryCitationEntry::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
-pub fn MemoryCitationEntry::new(line_end~ : UInt, line_start~ : UInt, note~ : String, path~ : String) -> Self
+pub fn MemoryCitationEntry::new(line_end~ : UInt32, line_start~ : UInt32, note~ : String, path~ : String) -> Self
 pub fn MemoryCitationEntry::not_equal(Self, Self) -> Bool
 pub fn MemoryCitationEntry::to_json(Self) -> Json
 pub fn MemoryCitationEntry::to_repr(Self) -> @debug.Repr
@@ -1590,12 +1590,12 @@ pub(all) struct SubAgentSourceThreadSpawn {
   agent_nickname : @gaato/sdk-runtime/json.Presence[String]
   agent_path : @gaato/sdk-runtime/json.Presence[String]
   agent_role : @gaato/sdk-runtime/json.Presence[String]
-  depth : Int
+  depth : Int32
   parent_thread_id : String
 } derive(Eq, @debug.Debug)
 pub fn SubAgentSourceThreadSpawn::equal(Self, Self) -> Bool
 pub fn SubAgentSourceThreadSpawn::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
-pub fn SubAgentSourceThreadSpawn::new(depth~ : Int, parent_thread_id~ : String, agent_nickname? : String, agent_path? : String, agent_role? : String) -> Self
+pub fn SubAgentSourceThreadSpawn::new(depth~ : Int32, parent_thread_id~ : String, agent_nickname? : String, agent_path? : String, agent_role? : String) -> Self
 pub fn SubAgentSourceThreadSpawn::not_equal(Self, Self) -> Bool
 pub fn SubAgentSourceThreadSpawn::to_json(Self) -> Json
 pub fn SubAgentSourceThreadSpawn::to_repr(Self) -> @debug.Repr
@@ -1758,7 +1758,7 @@ pub(all) struct ThreadItemCommandExecution {
   command_actions : Array[CommandAction]
   cwd : String
   duration_ms : @gaato/sdk-runtime/json.Presence[Int64]
-  exit_code : @gaato/sdk-runtime/json.Presence[Int]
+  exit_code : @gaato/sdk-runtime/json.Presence[Int32]
   id : String
   plugin_id : @gaato/sdk-runtime/json.Presence[String]
   process_id : @gaato/sdk-runtime/json.Presence[String]
@@ -1769,7 +1769,7 @@ pub(all) struct ThreadItemCommandExecution {
 } derive(Eq, @debug.Debug)
 pub fn ThreadItemCommandExecution::equal(Self, Self) -> Bool
 pub fn ThreadItemCommandExecution::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
-pub fn ThreadItemCommandExecution::new(command~ : String, command_actions~ : Array[CommandAction], cwd~ : String, id~ : String, status~ : CommandExecutionStatus, type_~ : String, aggregated_output? : String, duration_ms? : Int64, exit_code? : Int, plugin_id? : String, process_id? : String, script_path? : String, source? : CommandExecutionSource) -> Self
+pub fn ThreadItemCommandExecution::new(command~ : String, command_actions~ : Array[CommandAction], cwd~ : String, id~ : String, status~ : CommandExecutionStatus, type_~ : String, aggregated_output? : String, duration_ms? : Int64, exit_code? : Int32, plugin_id? : String, process_id? : String, script_path? : String, source? : CommandExecutionSource) -> Self
 pub fn ThreadItemCommandExecution::not_equal(Self, Self) -> Bool
 pub fn ThreadItemCommandExecution::to_json(Self) -> Json
 pub fn ThreadItemCommandExecution::to_repr(Self) -> @debug.Repr

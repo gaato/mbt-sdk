@@ -16,5 +16,5 @@ pub(open) trait Gate {
 }
 
 pub(open) trait Timer {
-  async fn within(Self, Int, async () -> Unit noraise) -> Bool noraise
+  async fn within(Self, Int32, async () -> Unit noraise) -> Bool noraise
 }

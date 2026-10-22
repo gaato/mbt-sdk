@@ -12,17 +12,17 @@ import {
 
 // Types and methods
 pub(all) struct Backoff {
-  base_ms : Int
-  max_ms : Int
+  base_ms : Int32
+  max_ms : Int32
   jitter : Jitter
 } derive(Eq, @debug.Debug)
-pub fn Backoff::delay_ms(Self, Int, Double) -> Int
+pub fn Backoff::delay_ms(Self, Int32, Double) -> Int32
 pub fn Backoff::equal(Self, Self) -> Bool
 pub fn Backoff::not_equal(Self, Self) -> Bool
 pub fn Backoff::to_repr(Self) -> @debug.Repr
 
 pub(all) enum Decision {
-  Wait(Int)
+  Wait(Int32)
   Stop(StopReason)
 } derive(Eq, @debug.Debug)
 pub fn Decision::equal(Self, Self) -> Bool
@@ -33,7 +33,7 @@ pub fn Decision::to_repr(Self) -> @debug.Repr
 pub(all) enum Jitter {
   NoJitter
   Full
-  Proportional(lo~ : Int, hi~ : Int)
+  Proportional(lo~ : Int32, hi~ : Int32)
 } derive(Eq, @debug.Debug)
 pub fn Jitter::equal(Self, Self) -> Bool
 pub fn Jitter::not_equal(Self, Self) -> Bool
@@ -51,7 +51,7 @@ pub fn Methods::not_equal(Self, Self) -> Bool
 pub fn Methods::to_repr(Self) -> @debug.Repr
 
 pub(all) enum Outcome {
-  Response(status~ : Int, headers~ : @http.Headers)
+  Response(status~ : Int32, headers~ : @http.Headers)
   Failure(@http.HttpError)
 } derive(@debug.Debug)
 pub fn Outcome::to_repr(Self) -> @debug.Repr
@@ -67,8 +67,8 @@ pub fn RetryAfter::to_repr(Self) -> @debug.Repr
 
 #non_exhaustive
 pub(all) enum RetryAfterCap {
-  StopAbove(Int)
-  BackoffAbove(Int)
+  StopAbove(Int32)
+  BackoffAbove(Int32)
   NoCap
 } derive(Eq, @debug.Debug)
 pub fn RetryAfterCap::equal(Self, Self) -> Bool
@@ -86,7 +86,7 @@ pub fn RetryAfterSource::not_equal(Self, Self) -> Bool
 pub fn RetryAfterSource::to_repr(Self) -> @debug.Repr
 
 pub(all) struct RetryRule {
-  max_retries : Int
+  max_retries : Int32
   statuses : Array[StatusRule]
   sent_failures : Methods
   unsent_failures : Bool
@@ -94,15 +94,15 @@ pub(all) struct RetryRule {
   retry_after : RetryAfter
   backoff : Backoff
 } derive(Eq, @debug.Debug)
-pub fn RetryRule::decide(Self, Outcome, @http.Request, attempt~ : Int, random~ : Double, now_unix_ms? : Int64, remaining_ms? : Int64, server_delay_ms? : Int, idempotent? : Bool, replayable? : Bool) -> Decision
+pub fn RetryRule::decide(Self, Outcome, @http.Request, attempt~ : Int32, random~ : Double, now_unix_ms? : Int64, remaining_ms? : Int64, server_delay_ms? : Int32, idempotent? : Bool, replayable? : Bool) -> Decision
 pub fn RetryRule::equal(Self, Self) -> Bool
 pub fn RetryRule::never() -> Self
 pub fn RetryRule::not_equal(Self, Self) -> Bool
 pub fn RetryRule::to_repr(Self) -> @debug.Repr
 
 pub(all) enum StatusMatch {
-  Code(Int)
-  Range(Int, Int)
+  Code(Int32)
+  Range(Int32, Int32)
 } derive(Eq, @debug.Debug)
 pub fn StatusMatch::equal(Self, Self) -> Bool
 pub fn StatusMatch::not_equal(Self, Self) -> Bool
@@ -123,8 +123,8 @@ pub(all) enum StopReason {
   MethodNotAllowed
   NotReplayable
   ServerSaidNo
-  RetryAfterTooLong(Int)
-  Budget(Int)
+  RetryAfterTooLong(Int32)
+  Budget(Int32)
 } derive(Eq, @debug.Debug)
 pub fn StopReason::equal(Self, Self) -> Bool
 pub fn StopReason::not_equal(Self, Self) -> Bool

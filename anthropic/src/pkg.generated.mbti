@@ -28,13 +28,13 @@ pub fn tool_choice_tool(String, disable_parallel_tool_use? : Bool) -> @gen.ToolC
 pub struct Anthropic {
   // private fields
 }
-pub async fn Anthropic::count_tokens(Self, MessageRequest) -> Int raise @sdk-runtime.SdkError
+pub async fn Anthropic::count_tokens(Self, MessageRequest) -> Int32 raise @sdk-runtime.SdkError
 pub async fn Anthropic::create_message(Self, MessageRequest) -> MessageResponse raise @sdk-runtime.SdkError
 pub async fn Anthropic::create_message_params(Self, @gen.CreateMessageParams) -> @gen.Message raise @sdk-runtime.SdkError
 pub fn Anthropic::from_client(@sdk-runtime.Client, version? : String) -> Self
-pub async fn Anthropic::list_models(Self, limit? : Int, after_id? : String, before_id? : String, lifecycle? : Array[@gen.ModelsListLifecycleItem]) -> @gen.ListResponseModelInfo raise @sdk-runtime.SdkError
-pub fn Anthropic::new(api_key~ : String, &@http.Transport, &@clock.Clock, base_url? : String, version? : String, auth_header? : AuthHeader, retry? : @sdk-runtime.RetryPolicy, timer? : &@sync.Timer, timeout_ms? : Int, total_timeout_ms? : Int) -> Self
-pub fn Anthropic::paginate_models(Self, limit? : Int, lifecycle? : Array[@gen.ModelsListLifecycleItem]) -> @sdk-runtime.Paginator[@gen.ModelInfo, @sdk-runtime.SdkError]
+pub async fn Anthropic::list_models(Self, limit? : Int32, after_id? : String, before_id? : String, lifecycle? : Array[@gen.ModelsListLifecycleItem]) -> @gen.ListResponseModelInfo raise @sdk-runtime.SdkError
+pub fn Anthropic::new(api_key~ : String, &@http.Transport, &@clock.Clock, base_url? : String, version? : String, auth_header? : AuthHeader, retry? : @sdk-runtime.RetryPolicy, timer? : &@sync.Timer, timeout_ms? : Int32, total_timeout_ms? : Int32) -> Self
+pub fn Anthropic::paginate_models(Self, limit? : Int32, lifecycle? : Array[@gen.ModelsListLifecycleItem]) -> @sdk-runtime.Paginator[@gen.ModelInfo, @sdk-runtime.SdkError]
 pub async fn Anthropic::retrieve_model(Self, String) -> @gen.ModelInfo raise @sdk-runtime.SdkError
 pub async fn[E : Error] Anthropic::stream_message(Self, MessageRequest, async (MessageEvent) -> Unit raise E) -> Unit
 pub async fn[E : Error] Anthropic::stream_message_params(Self, @gen.CreateMessageParams, async (@gen.MessageStreamEvent) -> Unit raise E) -> Unit
@@ -96,12 +96,12 @@ pub fn Message::user_blocks(Array[@gen.InputContentBlock]) -> Self
 #non_exhaustive
 pub(all) enum MessageEvent {
   MessageStart(MessageResponse)
-  ContentBlockStart(index~ : Int, block~ : ContentBlock)
-  TextDelta(index~ : Int, text~ : String)
-  ThinkingDelta(index~ : Int, thinking~ : String)
-  SignatureDelta(index~ : Int, signature~ : String)
-  InputJsonDelta(index~ : Int, partial_json~ : String)
-  ContentBlockStop(index~ : Int)
+  ContentBlockStart(index~ : Int32, block~ : ContentBlock)
+  TextDelta(index~ : Int32, text~ : String)
+  ThinkingDelta(index~ : Int32, thinking~ : String)
+  SignatureDelta(index~ : Int32, signature~ : String)
+  InputJsonDelta(index~ : Int32, partial_json~ : String)
+  ContentBlockStop(index~ : Int32)
   MessageDelta(delta~ : @gen.MessageDelta, usage~ : @gen.MessageDeltaUsage)
   MessageStop
   Ping
@@ -114,7 +114,7 @@ pub fn MessageEvent::to_repr(Self) -> @debug.Repr
 
 pub(all) struct MessageRequest {
   model : String
-  max_tokens : Int
+  max_tokens : Int32
   messages : Array[Message]
   system : String?
   temperature : Double?
@@ -127,7 +127,7 @@ pub(all) struct MessageRequest {
   extra : Map[String, Json]
 } derive(Eq, @debug.Debug)
 pub fn MessageRequest::equal(Self, Self) -> Bool
-pub fn MessageRequest::new(model~ : String, max_tokens~ : Int, messages~ : Array[Message], system? : String, temperature? : Double, stop_sequences? : Array[String], tools? : Array[ToolDef], tool_choice? : @gen.ToolChoice, thinking? : @gen.ThinkingConfigParam, output_config? : @gen.OutputConfig, metadata? : @gen.Metadata, extra? : Map[String, Json]) -> Self
+pub fn MessageRequest::new(model~ : String, max_tokens~ : Int32, messages~ : Array[Message], system? : String, temperature? : Double, stop_sequences? : Array[String], tools? : Array[ToolDef], tool_choice? : @gen.ToolChoice, thinking? : @gen.ThinkingConfigParam, output_config? : @gen.OutputConfig, metadata? : @gen.Metadata, extra? : Map[String, Json]) -> Self
 pub fn MessageRequest::not_equal(Self, Self) -> Bool
 pub fn MessageRequest::to_count_tokens_params(Self) -> @gen.CountMessageTokensParams
 pub fn MessageRequest::to_params(Self, stream? : Bool) -> @gen.CreateMessageParams

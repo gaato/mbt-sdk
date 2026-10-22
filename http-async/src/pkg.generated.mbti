@@ -8,7 +8,7 @@ import {
 }
 
 // Values
-pub async fn[X] with_timeout_opt(&@clock.Clock, Int, async () -> X) -> X?
+pub async fn[X] with_timeout_opt(&@clock.Clock, Int32, async () -> X) -> X?
 
 // Errors
 
@@ -17,15 +17,15 @@ pub struct AsyncClock {
 }
 pub fn AsyncClock::new() -> Self
 pub fn AsyncClock::now_unix_ms(Self) -> Int64
-pub async fn AsyncClock::sleep(Self, Int) -> Unit noraise
+pub async fn AsyncClock::sleep(Self, Int32) -> Unit noraise
 pub impl @clock.Clock for AsyncClock
 
 pub struct AsyncTransport {
   // private fields
 }
 pub fn AsyncTransport::close(Self) -> Unit
-pub fn AsyncTransport::idle_connections(Self) -> Int
-pub fn AsyncTransport::new(timeout_ms? : Int, connect_timeout_ms? : Int, write_timeout_ms? : Int, read_timeout_ms? : Int, pool_timeout_ms? : Int, max_connections? : Int, max_connections_per_origin? : Int, max_idle_per_origin? : Int, idle_max_ms? : Int, max_body_bytes? : Int, proxy? : String, trust_env? : Bool, clock? : &@clock.Clock) -> Self
+pub fn AsyncTransport::idle_connections(Self) -> Int32
+pub fn AsyncTransport::new(timeout_ms? : Int32, connect_timeout_ms? : Int32, write_timeout_ms? : Int32, read_timeout_ms? : Int32, pool_timeout_ms? : Int32, max_connections? : Int32, max_connections_per_origin? : Int32, max_idle_per_origin? : Int32, idle_max_ms? : Int32, max_body_bytes? : Int32, proxy? : String, trust_env? : Bool, clock? : &@clock.Clock) -> Self
 pub async fn AsyncTransport::send(Self, @http.Request) -> @http.Response raise @http.HttpError
 pub async fn AsyncTransport::send_stream(Self, @http.Request) -> (@http.ResponseHead, &@http.BodyStream) raise @http.HttpError
 pub impl @http.Transport for AsyncTransport
@@ -34,13 +34,13 @@ pub struct ClockTimer {
   // private fields
 }
 pub fn ClockTimer::new(clock? : &@clock.Clock) -> Self
-pub async fn ClockTimer::within(Self, Int, async () -> Unit noraise) -> Bool noraise
+pub async fn ClockTimer::within(Self, Int32, async () -> Unit noraise) -> Bool noraise
 pub impl @sync.Timer for ClockTimer
 
 pub struct DeadlineTransport {
   // private fields
 }
-pub fn DeadlineTransport::new(&@http.Transport, timeout_ms~ : Int) -> Self
+pub fn DeadlineTransport::new(&@http.Transport, timeout_ms~ : Int32) -> Self
 pub async fn DeadlineTransport::send(Self, @http.Request) -> @http.Response raise @http.HttpError
 pub async fn DeadlineTransport::send_stream(Self, @http.Request) -> (@http.ResponseHead, &@http.BodyStream) raise @http.HttpError
 pub impl @http.Transport for DeadlineTransport
@@ -49,7 +49,7 @@ pub struct SemaphoreGate {
   // private fields
 }
 pub async fn SemaphoreGate::acquire(Self) -> Unit noraise
-pub fn SemaphoreGate::new(permits? : Int) -> Self
+pub fn SemaphoreGate::new(permits? : Int32) -> Self
 pub fn SemaphoreGate::release(Self) -> Unit
 pub impl @sync.Gate for SemaphoreGate
 

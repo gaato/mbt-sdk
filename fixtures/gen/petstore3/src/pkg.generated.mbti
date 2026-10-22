@@ -45,9 +45,9 @@ pub fn find_pets_by_tags_decode_json(Json) -> Array[Pet] raise @json.JsonDecodeE
 
 pub fn find_pets_by_tags_request(Array[String]) -> @http.Request
 
-pub fn get_inventory_decode(@http.Response) -> Map[String, Int] raise @sdk-runtime.SdkError
+pub fn get_inventory_decode(@http.Response) -> Map[String, Int32] raise @sdk-runtime.SdkError
 
-pub fn get_inventory_decode_json(Json) -> Map[String, Int] raise @json.JsonDecodeError
+pub fn get_inventory_decode_json(Json) -> Map[String, Int32] raise @json.JsonDecodeError
 
 pub fn get_inventory_request() -> @http.Request
 
@@ -107,13 +107,13 @@ pub fn upload_file_request(Int64, additional_metadata? : String) -> @http.Reques
 
 // Types and methods
 pub(all) struct ApiResponse {
-  code : Int?
+  code : Int32?
   type_ : String?
   message : String?
 } derive(Eq, @debug.Debug)
 pub fn ApiResponse::equal(Self, Self) -> Bool
 pub fn ApiResponse::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
-pub fn ApiResponse::new(code? : Int, type_? : String, message? : String) -> Self
+pub fn ApiResponse::new(code? : Int32, type_? : String, message? : String) -> Self
 pub fn ApiResponse::not_equal(Self, Self) -> Bool
 pub fn ApiResponse::to_json(Self) -> Json
 pub fn ApiResponse::to_repr(Self) -> @debug.Repr
@@ -151,14 +151,14 @@ pub impl @json.FromJson for FindPetsByStatusStatus
 pub(all) struct Order {
   id : Int64?
   pet_id : Int64?
-  quantity : Int?
+  quantity : Int32?
   ship_date : String?
   status : OrderStatus?
   complete : Bool?
 } derive(Eq, @debug.Debug)
 pub fn Order::equal(Self, Self) -> Bool
 pub fn Order::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
-pub fn Order::new(id? : Int64, pet_id? : Int64, quantity? : Int, ship_date? : String, status? : OrderStatus, complete? : Bool) -> Self
+pub fn Order::new(id? : Int64, pet_id? : Int64, quantity? : Int32, ship_date? : String, status? : OrderStatus, complete? : Bool) -> Self
 pub fn Order::not_equal(Self, Self) -> Bool
 pub fn Order::to_json(Self) -> Json
 pub fn Order::to_repr(Self) -> @debug.Repr
@@ -233,11 +233,11 @@ pub(all) struct User {
   email : String?
   password : String?
   phone : String?
-  user_status : Int?
+  user_status : Int32?
 } derive(Eq, @debug.Debug)
 pub fn User::equal(Self, Self) -> Bool
 pub fn User::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
-pub fn User::new(id? : Int64, username? : String, first_name? : String, last_name? : String, email? : String, password? : String, phone? : String, user_status? : Int) -> Self
+pub fn User::new(id? : Int64, username? : String, first_name? : String, last_name? : String, email? : String, password? : String, phone? : String, user_status? : Int32) -> Self
 pub fn User::not_equal(Self, Self) -> Bool
 pub fn User::to_json(Self) -> Json
 pub fn User::to_repr(Self) -> @debug.Repr

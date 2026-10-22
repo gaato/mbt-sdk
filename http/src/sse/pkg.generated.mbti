@@ -7,7 +7,7 @@ import {
 }
 
 // Values
-pub async fn[E : Error] each_event(&@http.BodyStream, async (SseEvent) -> Unit raise E, max_event_bytes? : Int) -> Unit
+pub async fn[E : Error] each_event(&@http.BodyStream, async (SseEvent) -> Unit raise E, max_event_bytes? : Int32) -> Unit
 
 // Errors
 
@@ -16,7 +16,7 @@ pub(all) struct SseEvent {
   event : String
   data : String
   id : String?
-  retry : Int?
+  retry : Int32?
 } derive(Eq, @debug.Debug)
 pub fn SseEvent::equal(Self, Self) -> Bool
 pub fn SseEvent::not_equal(Self, Self) -> Bool
@@ -27,7 +27,7 @@ pub struct SseParser {
 }
 pub fn SseParser::feed(Self, Bytes) -> Array[SseEvent] raise @http.HttpError
 pub fn SseParser::finish(Self) -> Array[SseEvent] raise @http.HttpError
-pub fn SseParser::new(max_event_bytes? : Int) -> Self
+pub fn SseParser::new(max_event_bytes? : Int32) -> Self
 
 // Type aliases
 

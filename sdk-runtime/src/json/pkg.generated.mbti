@@ -10,7 +10,7 @@ pub fn expect_object(Json, @moonbitlang/core/json.JsonPath) -> Map[String, Json]
 
 pub fn[T : @moonbitlang/core/json.FromJson] field(Map[String, Json], String, @moonbitlang/core/json.JsonPath) -> T raise @moonbitlang/core/json.JsonDecodeError
 
-pub fn[T] open_int(Json, @moonbitlang/core/json.JsonPath, (Int) -> T?, (Int) -> T) -> T raise @moonbitlang/core/json.JsonDecodeError
+pub fn[T] open_int(Json, @moonbitlang/core/json.JsonPath, (Int32) -> T?, (Int32) -> T) -> T raise @moonbitlang/core/json.JsonDecodeError
 
 pub fn[T] open_string(Json, @moonbitlang/core/json.JsonPath, (String) -> T?, (String) -> T) -> T raise @moonbitlang/core/json.JsonDecodeError
 

@@ -10,7 +10,7 @@ import {
 
 // Errors
 pub suberror NoQuiescence {
-  NoQuiescence(rounds~ : Int)
+  NoQuiescence(rounds~ : Int32)
 } derive(@debug.Debug)
 pub fn NoQuiescence::to_repr(Self) -> @debug.Repr
 
@@ -19,13 +19,13 @@ pub struct VirtualClock {
   // private fields
 }
 pub fn VirtualClock::VirtualClock(start_ms? : Int64) -> Self
-pub async fn VirtualClock::advance(Self, Int) -> Unit raise NoQuiescence
+pub async fn VirtualClock::advance(Self, Int32) -> Unit raise NoQuiescence
 pub async fn VirtualClock::advance_to_next(Self) -> Bool raise NoQuiescence
 pub fn VirtualClock::next_deadline(Self) -> Int64?
 pub fn VirtualClock::now_unix_ms(Self) -> Int64
-pub fn VirtualClock::pending(Self) -> Array[Int]
-pub async fn VirtualClock::settle(Self, stable_rounds? : Int, max_rounds? : Int) -> Unit raise NoQuiescence
-pub async fn VirtualClock::sleep(Self, Int) -> Unit noraise
+pub fn VirtualClock::pending(Self) -> Array[Int32]
+pub async fn VirtualClock::settle(Self, stable_rounds? : Int32, max_rounds? : Int32) -> Unit raise NoQuiescence
+pub async fn VirtualClock::sleep(Self, Int32) -> Unit noraise
 pub fn VirtualClock::touch(Self) -> Unit
 pub impl @clock.Clock for VirtualClock
 

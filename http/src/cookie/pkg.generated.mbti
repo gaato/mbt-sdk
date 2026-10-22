@@ -40,8 +40,8 @@ pub fn CookieJar::clear_domain(Self, String) -> Unit
 pub fn CookieJar::clear_session(Self) -> Unit
 pub fn CookieJar::header_for(Self, String) -> String?
 pub fn CookieJar::iter(Self) -> Iter[Cookie]
-pub fn CookieJar::length(Self) -> Int
-pub fn CookieJar::new(&@clock.Clock, max_per_domain? : Int, max_total? : Int, is_public_suffix? : (String) -> Bool) -> Self
+pub fn CookieJar::length(Self) -> Int32
+pub fn CookieJar::new(&@clock.Clock, max_per_domain? : Int32, max_total? : Int32, is_public_suffix? : (String) -> Bool) -> Self
 pub fn CookieJar::remove_expired(Self) -> Unit
 pub fn CookieJar::store(Self, @http.Headers, String) -> Unit
 
