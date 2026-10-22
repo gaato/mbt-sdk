@@ -5,7 +5,7 @@
 
 name = "gaato/http"
 
-version = "0.4.1"
+version = "0.5.0"
 
 license = "Apache-2.0"
 

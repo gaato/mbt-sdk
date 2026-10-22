@@ -7,6 +7,8 @@ never does. Every breaking change is listed with a migration note.
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-10-22
+
 ### Changed
 
 - **`parse_retry_after` and `retry_after_ms` accept the obsolete HTTP-date

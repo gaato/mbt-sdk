@@ -8,6 +8,8 @@ note.
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-10-22
+
 ### Changed
 
 - **A `*.example.com` entry in `NO_PROXY` bypasses the proxy for
