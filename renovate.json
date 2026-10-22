@@ -26,6 +26,13 @@
       "automerge": true,
       "automergeType": "pr",
       "platformAutomerge": false
+    },
+    {
+      "description": "gaato/.github is our own reusable workflow, referenced at main so a change reaches every repository at once.",
+      "matchPackageNames": [
+        "gaato/.github"
+      ],
+      "enabled": false
     }
   ]
 }

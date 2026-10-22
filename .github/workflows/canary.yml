@@ -1,17 +1,10 @@
 name: Canary
 
-# Same gates as CI, on the newest upstream MoonBit release (latest) and on the
-# nightly toolchain. A failure here with a green CI means the language or
-# toolchain changed under us. Read the two channels differently:
-#   latest  - the release users install has moved: fix it once in the
-#             generator/runtime, regenerate, and bump the pinned image in ci.yml.
-#   nightly - an early warning of what the next release will do; nightly itself
-#             is sometimes broken, so confirm before changing anything.
+# The generator and the overlay applier run Python tooling through uv.
 
 on:
   schedule:
-    # 06:17 JST: after the nightly and latest images are rebuilt (12:10 and
-    # 11:17 UTC in gaato/moonbit-docker), with results ready by morning in Japan.
+    # 06:17 JST, after gaato/moonbit-docker rebuilds the latest and nightly images.
     - cron: "17 21 * * *"
   workflow_dispatch:
 
@@ -19,38 +12,8 @@ permissions:
   contents: read
 
 jobs:
-  gates:
-    name: gates (${{ matrix.channel }})
-    runs-on: ubuntu-26.04
-    timeout-minutes: 30
-    strategy:
-      fail-fast: false
-      matrix:
-        channel: [latest, nightly]
-    container:
-      image: ghcr.io/gaato/moonbit:${{ matrix.channel }}
-    steps:
-      - name: Check out repository
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          persist-credentials: false
-
-      - name: Trust the workspace (container runs as a different user)
-        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
-
-      - name: Set up Node (js target tests)
-        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
-        with:
-          node-version: 24
-
-      - name: Set up uv
-        uses: astral-sh/setup-uv@1c37ad07a6a961277cf70c0d37d6f313000f5884 # v10.3.0
-
-      - name: Toolchain versions
-        run: moon version --all
-
-      - name: Overlays apply and generated code is current
-        run: scripts/generate.sh --check
-
-      - name: Gates
-        run: scripts/gates.sh
+  canary:
+    uses: gaato/.github/.github/workflows/moonbit-canary.yml@main
+    with:
+      gates: scripts/generate.sh --check && scripts/gates.sh
+      uv: true
