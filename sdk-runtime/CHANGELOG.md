@@ -11,6 +11,7 @@ note.
 ### Changed
 
 - **Builds on `gaato/http` 0.5.0**, whose cookie jar, Retry-After and Link parsing follow RFC 6265bis-22, RFC 9110 and RFC 8288 more closely; see its CHANGELOG.
+- **The README has sections and compile-checked examples.** Install, usage, a package table and sections on errors, retries, timeouts, rate limits and pagination. Each re-exported retry rule type has its own doc comment.
 
 ## [0.7.0] - 2026-10-19
 

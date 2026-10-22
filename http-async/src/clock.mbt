@@ -7,7 +7,7 @@ pub struct AsyncClock {}
 ///
 /// ```mbt check
 /// test {
-///   let _ = @adapter.AsyncClock::new()
+///   let _ = @http_async.AsyncClock::new()
 /// }
 /// ```
 pub fn AsyncClock::new() -> AsyncClock {
@@ -44,8 +44,8 @@ pub impl @clock.Clock for AsyncClock with fn now_unix_ms(_self) {
 ///
 /// ```mbt check
 /// async test {
-///   let clock = @adapter.AsyncClock::new()
-///   assert_eq(@adapter.with_timeout_opt(clock, 1000, () => 7), Some(7))
+///   let clock = @http_async.AsyncClock::new()
+///   assert_eq(@http_async.with_timeout_opt(clock, 1000, () => 7), Some(7))
 /// }
 /// ```
 pub async fn[X] with_timeout_opt(

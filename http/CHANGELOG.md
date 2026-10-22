@@ -7,6 +7,10 @@ never does. Every breaking change is listed with a migration note.
 
 ## [Unreleased]
 
+### Changed
+
+- **The README has sections and compile-checked examples.** Install, usage, a package table and one section per topic (transports, errors, redirects, server-sent events, cookies, retries), with absolute links that work on mooncakes.io.
+
 ## [0.5.0] - 2026-10-22
 
 ### Changed

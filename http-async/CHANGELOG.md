@@ -8,6 +8,10 @@ note.
 
 ## [Unreleased]
 
+### Changed
+
+- **The README has sections and a compile-checked example.** Install, usage, a package table and one section per topic (targets, timeouts, connections, bodies, proxies, virtual time), with absolute links that work on mooncakes.io. The `VirtualClock` constructor and its `now_unix_ms` have doc comments.
+
 ## [0.5.0] - 2026-10-22
 
 ### Changed

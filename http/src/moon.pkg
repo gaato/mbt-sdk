@@ -6,5 +6,6 @@ import {
 }
 
 import {
+  "gaato/http/sse",
   "moonbitlang/core/random",
 } for "test"

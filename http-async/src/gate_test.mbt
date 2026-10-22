@@ -1,7 +1,7 @@
 ///|
 async test "semaphore gate respects permit count" {
   for permits in [1, 2] {
-    let gate = @adapter.SemaphoreGate::new(permits~)
+    let gate = @http_async.SemaphoreGate::new(permits~)
     let active = Ref(0)
     let peak = Ref(0)
     @async.with_task_group(group => {
@@ -23,7 +23,7 @@ async test "semaphore gate respects permit count" {
 
 ///|
 async test "cancelled gate waiter consumes no slot" {
-  let gate = @adapter.SemaphoreGate::new()
+  let gate = @http_async.SemaphoreGate::new()
   gate.acquire()
   let acquired = Ref(false)
   @async.with_task_group(group => {

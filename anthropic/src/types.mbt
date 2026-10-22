@@ -1,23 +1,64 @@
 ///|
-/// Generated types that the facade uses in its own signatures, re-exported so
-/// callers can name them as `@anthropic.X`. Everything else generated from the
-/// spec is reachable through `gaato/anthropic/gen`.
-pub using @gen {
-  type StopReason,
-  type Usage,
-  type ModelInfo,
-  type ListResponseModelInfo,
-  type ModelsListLifecycleItem,
-  type InputContentBlock,
-  type ToolChoice,
-  type ThinkingConfigParam,
-  type OutputConfig,
-  type Metadata,
-  type MessageDelta,
-  type MessageDeltaUsage,
-  type CreateMessageParams,
-  type MessageStreamEvent,
-}
+/// Why the model stopped generating, as in the `stop_reason` of a
+/// `MessageResponse`.
+pub using @gen {type StopReason}
+
+///|
+/// Token counts billed for a message.
+pub using @gen {type Usage}
+
+///|
+/// A model as `list_models` and `retrieve_model` return it.
+pub using @gen {type ModelInfo}
+
+///|
+/// One page of `list_models`.
+pub using @gen {type ListResponseModelInfo}
+
+///|
+/// A model lifecycle stage that `list_models` can filter by.
+pub using @gen {type ModelsListLifecycleItem}
+
+///|
+/// A content block of an input message: text, image, document, tool use or
+/// result, and others.
+pub using @gen {type InputContentBlock}
+
+///|
+/// How the model may use the request's tools; the `tool_choice_*` helpers build
+/// the common ones.
+pub using @gen {type ToolChoice}
+
+///|
+/// Whether and how the model thinks before answering.
+pub using @gen {type ThinkingConfigParam}
+
+///|
+/// Output settings of a request: the effort level and a structured output
+/// format.
+pub using @gen {type OutputConfig}
+
+///|
+/// Request metadata: an opaque id of the end user.
+pub using @gen {type Metadata}
+
+///|
+/// The top-level changes in a `message_delta` stream event, such as the stop
+/// reason.
+pub using @gen {type MessageDelta}
+
+///|
+/// The cumulative token counts in a `message_delta` stream event.
+pub using @gen {type MessageDeltaUsage}
+
+///|
+/// The full Messages request, for `create_message_params` and
+/// `stream_message_params`.
+pub using @gen {type CreateMessageParams}
+
+///|
+/// A raw Messages stream event as the server sends it.
+pub using @gen {type MessageStreamEvent}
 
 ///|
 /// Selects the credential header used by the API.
@@ -78,7 +119,8 @@ pub extend Role with @debug.Debug::{to_repr}
 
 ///|
 /// Input content as plain text or typed content blocks. A block the generated
-/// vocabulary does not know is carried losslessly as `@gen.InputContentBlock::Unknown`.
+/// vocabulary does not know is carried losslessly as
+/// `@gen.InputContentBlock::Unknown`.
 #non_exhaustive
 pub(all) enum InputContent {
   Text(String)
@@ -176,7 +218,8 @@ pub fn Message::assistant(text : String) -> Message {
 }
 
 ///|
-/// Creates a user message from typed content blocks (images, documents, tool results, ...).
+/// Creates a user message from typed content blocks (images, documents, tool
+/// results, ...).
 pub fn Message::user_blocks(blocks : Array[InputContentBlock]) -> Message {
   { role: User, content: Blocks(blocks.copy()), }
 }
@@ -246,7 +289,8 @@ pub fn Message::from_response(response : MessageResponse) -> Message {
 }
 
 ///|
-/// Input accepted by buffered and streaming message creation and by token counting.
+/// Input accepted by buffered and streaming message creation and by token
+/// counting.
 ///
 /// The typed fields cover the common surface; `extra` is merged into the JSON
 /// body after the typed fields and validated against the generated schema, so

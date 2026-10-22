@@ -12,7 +12,7 @@ pub struct ClockTimer {
 ///
 /// ```mbt check
 /// async test {
-///   let timer = @adapter.ClockTimer::new()
+///   let timer = @http_async.ClockTimer::new()
 ///   let done = Ref(false)
 ///   assert_true(timer.within(1000, () => done.val = true))
 ///   assert_true(done.val)

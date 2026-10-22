@@ -27,7 +27,7 @@ module now imports `gaato/anthropic@0.2.0`.
 - Stop reasons and usage use generated types; optional nullable metadata uses
   `Presence` to preserve absent/null/value distinctions.
 - Code constructing public request, response, and tool records directly may
-  need new fields. Prefer the constructors. See `anthropic/README.md` for migration.
+  need new fields. Prefer the constructors. See [Migration from 0.1.0](#migration-from-010).
 
 ## Scope and evidence
 
@@ -48,3 +48,19 @@ are not bumped and they are not being republished.
 Pushing the version bump to `main` triggers the existing release workflow after
 CI succeeds. Review the candidate diff and publish dry-run before authorizing
 that push; no manual publish is needed.
+
+## Migration from 0.1.0
+
+- `base_url` now names the server root because generated paths include `/v1`.
+  For OpenRouter use `https://openrouter.ai/api`; remove a trailing `/v1` from
+  other compatible server roots.
+- `InputContent::Blocks` now takes generated `InputContentBlock` values.
+  Unknown block kinds can be represented with `InputContentBlock::Unknown`.
+- Stop reasons, usage, and message delta values use generated types. Nullable
+  optional metadata uses `gaato/sdk-runtime/json.Presence` to distinguish
+  absent, null, and present values.
+- `ContentBlock::Thinking` now contains both `thinking` and `signature`;
+  `MessageEvent::MessageDelta` contains generated `delta` and `usage` values.
+  `tool_choice` accepts a generated `ToolChoice`; the `tool_choice_auto`,
+  `tool_choice_any`, `tool_choice_none`, and `tool_choice_tool` helpers
+  construct common choices.

@@ -7,6 +7,7 @@ pub suberror NoQuiescence {
 } derive(Debug)
 
 ///|
+/// Makes `to_repr` callable on the error with dot syntax.
 pub extend NoQuiescence with @debug.Debug::{to_repr}
 
 ///|
@@ -40,6 +41,7 @@ pub struct VirtualClock {
 }
 
 ///|
+/// A clock reading `start_ms` (Unix milliseconds) with no pending timers.
 pub fn VirtualClock::VirtualClock(
   start_ms~ : Int64 = 1_700_000_000_000L,
 ) -> VirtualClock {
@@ -77,6 +79,7 @@ pub impl @clock.Clock for VirtualClock with fn sleep(self, milliseconds) {
 }
 
 ///|
+/// The virtual time, in Unix milliseconds; it changes only through `advance`.
 pub impl @clock.Clock for VirtualClock with fn now_unix_ms(self) {
   self.now
 }

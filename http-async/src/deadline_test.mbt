@@ -15,7 +15,7 @@ impl @http.Transport for SlowTransport with fn send_stream(_self, _request) {
 
 ///|
 async test "deadline bounds buffered exchange and streaming head" {
-  let transport = @adapter.DeadlineTransport::new(
+  let transport = @http_async.DeadlineTransport::new(
     SlowTransport::{ },
     timeout_ms=5,
   )
@@ -43,7 +43,7 @@ async test "deadline passes responses and original errors through" {
     headers: @http.Headers::new(),
     body: b"ok",
   })
-  let transport = @adapter.DeadlineTransport::new(fake, timeout_ms=1000)
+  let transport = @http_async.DeadlineTransport::new(fake, timeout_ms=1000)
   assert_eq(transport.send(@http.Request::get("/")).body, b"ok")
   for streaming in [false, true] {
     for
@@ -73,7 +73,7 @@ async test "deadline passes responses and original errors through" {
     { status: 202, headers: @http.Headers::new(), },
     [b"chunk"],
   )
-  let short = @adapter.DeadlineTransport::new(fake, timeout_ms=5)
+  let short = @http_async.DeadlineTransport::new(fake, timeout_ms=5)
   let (head, stream) = short.send_stream(@http.Request::get("/"))
   assert_eq(head.status, 202)
   @async.sleep(10)
@@ -86,7 +86,7 @@ async test "deadline passes responses and original errors through" {
 async test "nonpositive deadlines expire before invoking inner transport" {
   let fake = @mock.FakeTransport::new()
   for ms in [0, -1] {
-    let transport = @adapter.DeadlineTransport::new(fake, timeout_ms=ms)
+    let transport = @http_async.DeadlineTransport::new(fake, timeout_ms=ms)
     try transport.send(@http.Request::get("/")) catch {
       @http.HttpError::Timeout(phase=Unknown, ms=actual) =>
         assert_eq(actual, ms)

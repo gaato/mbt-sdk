@@ -9,7 +9,7 @@ async test "with_timeout_opt returns what f produces before the deadline" {
   @async.with_task_group(group => {
     group.spawn_bg(() => {
       outcome.val = Some(
-        @adapter.with_timeout_opt(clock, 100, () => release.get()),
+        @http_async.with_timeout_opt(clock, 100, () => release.get()),
       )
     })
     clock.advance(99)
@@ -30,7 +30,7 @@ async test "with_timeout_opt cancels f when the deadline comes first" {
   @async.with_task_group(group => {
     group.spawn_bg(() => {
       outcome.val = Some(
-        @adapter.with_timeout_opt(clock, 100, () => {
+        @http_async.with_timeout_opt(clock, 100, () => {
           defer log.push("f exited")
           let value = release.get()
           log.push("f finished")
@@ -52,12 +52,12 @@ async test "with_timeout_opt with a nonpositive deadline only keeps a ready resu
   let never : @aqueue.Queue[Int32] = Queue(kind=Unbounded)
   for milliseconds in [0, -5] {
     assert_eq(
-      @adapter.with_timeout_opt(clock, milliseconds, () => 7),
+      @http_async.with_timeout_opt(clock, milliseconds, () => 7),
       Some(7),
       msg="ready result at \{milliseconds} ms",
     )
     assert_eq(
-      @adapter.with_timeout_opt(clock, milliseconds, () => never.get()),
+      @http_async.with_timeout_opt(clock, milliseconds, () => never.get()),
       None,
       msg="waiting f at \{milliseconds} ms",
     )
@@ -69,7 +69,7 @@ async test "with_timeout_opt with a nonpositive deadline only keeps a ready resu
 async test "with_timeout_opt propagates errors from f" {
   let clock = @simclock.VirtualClock()
   let outcome = try {
-    let _ : Int32? = @adapter.with_timeout_opt(clock, 100, () => raise Boom)
+    let _ : Int32? = @http_async.with_timeout_opt(clock, 100, () => raise Boom)
     "returned"
   } catch {
     Boom => "Boom"

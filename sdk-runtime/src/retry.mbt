@@ -1,20 +1,58 @@
 ///|
-/// The retry rule types of `gaato/http/retry`, re-exported so an SDK can
-/// write and adjust a policy as `@runtime.X` without importing that package.
-pub using @retry {
-  type RetryRule,
-  type StatusRule,
-  type StatusMatch,
-  type Methods,
-  type RetryAfter,
-  type RetryAfterSource,
-  type RetryAfterCap,
-  type Backoff,
-  type Jitter,
-  type Outcome,
-  type Decision,
-  type StopReason,
-}
+/// A retry rule of `gaato/http/retry`: which failures to retry, how long to
+/// wait, and how often.
+pub using @retry {type RetryRule}
+
+///|
+/// Response statuses a `RetryRule` retries, and for which methods (from
+/// `gaato/http/retry`).
+pub using @retry {type StatusRule}
+
+///|
+/// One status code or an inclusive range of them, in a `StatusRule` (from
+/// `gaato/http/retry`).
+pub using @retry {type StatusMatch}
+
+///|
+/// The request methods a retry is allowed for (from `gaato/http/retry`).
+pub using @retry {type Methods}
+
+///|
+/// How a server-requested delay is read and bounded (from `gaato/http/retry`).
+pub using @retry {type RetryAfter}
+
+///|
+/// A header a server-requested delay is read from (from `gaato/http/retry`).
+pub using @retry {type RetryAfterSource}
+
+///|
+/// What to do with a server-requested delay over a limit (from
+/// `gaato/http/retry`).
+pub using @retry {type RetryAfterCap}
+
+///|
+/// Exponential backoff between attempts, in milliseconds (from
+/// `gaato/http/retry`).
+pub using @retry {type Backoff}
+
+///|
+/// How a backoff delay is spread so clients do not retry in lockstep (from
+/// `gaato/http/retry`).
+pub using @retry {type Jitter}
+
+///|
+/// The result of an attempt that did not succeed: a status or an `HttpError`
+/// (from `gaato/http/retry`).
+pub using @retry {type Outcome}
+
+///|
+/// What to do after a failed attempt: wait and retry, or stop (from
+/// `gaato/http/retry`).
+pub using @retry {type Decision}
+
+///|
+/// Why a `RetryRule` stopped retrying (from `gaato/http/retry`).
+pub using @retry {type StopReason}
 
 ///|
 /// A retry policy for `Client`: a `RetryRule` of `gaato/http/retry` applied

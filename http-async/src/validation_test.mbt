@@ -1,6 +1,6 @@
 ///|
 async test "unknown methods and invalid URLs are Protocol before connecting" {
-  let transport = @adapter.AsyncTransport::new()
+  let transport = @http_async.AsyncTransport::new()
   let unknown = {
     ..@http.Request::get("http://127.0.0.1:1"),
     http_method: "CUSTOM",
@@ -33,7 +33,7 @@ async test "unknown methods and invalid URLs are Protocol before connecting" {
 async test "nonpositive timeouts expire immediately with their original value" {
   for ms in [0, -1] {
     for streaming in [false, true] {
-      let transport = @adapter.AsyncTransport::new(timeout_ms=ms)
+      let transport = @http_async.AsyncTransport::new(timeout_ms=ms)
       try {
         let request = @http.Request::get("http://127.0.0.1:1")
         if streaming {

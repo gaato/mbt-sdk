@@ -184,7 +184,7 @@ fn AsyncTransport::checkin(
 ///
 /// ```mbt check
 /// test {
-///   let transport = @adapter.AsyncTransport::new()
+///   let transport = @http_async.AsyncTransport::new()
 ///   transport.close()
 ///   assert_eq(transport.idle_connections(), 0)
 /// }

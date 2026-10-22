@@ -31,7 +31,7 @@ async fn js_upload(total : Int64, declared : Bool) -> (String, Zeros) {
     length?,
   )
   let label = try
-    @adapter.AsyncTransport::new(timeout_ms=5000).send(request)
+    @http_async.AsyncTransport::new(timeout_ms=5000).send(request)
   catch {
     @http.HttpError::Protocol(message) => "Protocol: " + message
     @http.HttpError::Network(phase~, ..) =>

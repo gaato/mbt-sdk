@@ -48,7 +48,7 @@ The OpenAI and Anthropic clients retry and time out as the official SDKs do (600
 
 For OpenAI-compatible servers that implement Chat Completions, use `ChatRequest` with `chat_completion` or `stream_chat_completion`. The opt-in live suite also accepts `OPENAI_COMPAT_BASE_URL` and `OPENAI_COMPAT_MODEL`; `OPENAI_COMPAT_API_KEY` is optional for local servers.
 
-Anthropic now generates its Messages, token-counting, and Models types and operations from the official SDK's vendored OpenAPI document. See [the Anthropic module](anthropic/README.md) for scope and migration notes, including the `base_url` change.
+Anthropic now generates its Messages, token-counting, and Models types and operations from the official SDK's vendored OpenAPI document. See [the Anthropic module](anthropic/README.md) for scope, [the 0.2.0 notes](docs/anthropic-0.2.0.md#migration-from-010) for migrating from 0.1.0, including the `base_url` change, and [live tests](docs/live-tests.md) for the opt-in official API tests.
 
 `gaato/github` is the first module that generates a whole API rather than a chosen slice, and the first consumer of the runtime's `Paginator`, `parse_link_next`, `WindowLimiter` and `rate_limit_headers`. Its facade stays thin on purpose: the generated types are the public surface, so no hand-written mirror has to follow 1,221 operations. See [the GitHub module](github/README.md) and `docs/design-m8.md`.
 
@@ -67,7 +67,7 @@ openai/spec/openai.yaml → overlays/fix.yaml → overlays/moonbit.yaml → norm
 - GitHub runs the same two stages over `github/spec/api.github.com.2022-11-28.yaml` with `--include-all`, so every operation in the document is generated; `github/overlays/fix.yaml` carries the upstream corrections and `github/overlays/moonbit.yaml` the MoonBit decisions. `docs/census.md` lists which responses stayed raw `Json` and why.
 - Codex uses `codex-protocol/spec/schema.json` → selected JSON Schema (draft-07) reference closure → shared IR/emitter → `codex-protocol/src/gen`. The schema is pinned to CLI 0.155.1; regeneration is offline and is covered by the same `--check` gate.
 
-```fish
+```sh
 scripts/generate.sh          # apply overlays and regenerate
 scripts/generate.sh --check  # CI: fail if the committed output is stale
 scripts/gates.sh             # every check and test (native tests open loopback sockets)

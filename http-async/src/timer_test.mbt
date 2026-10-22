@@ -1,7 +1,7 @@
 ///|
 async test "ClockTimer reports work that finishes in time" {
   let clock = @simclock.VirtualClock()
-  let timer = @adapter.ClockTimer::new(clock~)
+  let timer = @http_async.ClockTimer::new(clock~)
   let release : @aqueue.Queue[Int32] = Queue(kind=Unbounded)
   let got : Ref[Int32?] = Ref(None)
   let outcome : Ref[Bool?] = Ref(None)
@@ -24,7 +24,7 @@ async test "ClockTimer reports work that finishes in time" {
 ///|
 async test "ClockTimer cancels work when time runs out" {
   let clock = @simclock.VirtualClock()
-  let timer = @adapter.ClockTimer::new(clock~)
+  let timer = @http_async.ClockTimer::new(clock~)
   let never : @aqueue.Queue[Int32] = Queue(kind=Unbounded)
   let log : Array[String] = []
   let outcome : Ref[Bool?] = Ref(None)
@@ -49,7 +49,7 @@ async test "ClockTimer cancels work when time runs out" {
 ///|
 async test "ClockTimer with a nonpositive budget does not start the work" {
   let clock = @simclock.VirtualClock(start_ms=0)
-  let timer = @adapter.ClockTimer::new(clock~)
+  let timer = @http_async.ClockTimer::new(clock~)
   let started = Ref(false)
   for milliseconds in [0, -5] {
     assert_false(timer.within(milliseconds, () => started.val = true))
@@ -60,7 +60,7 @@ async test "ClockTimer with a nonpositive budget does not start the work" {
 
 ///|
 async test "ClockTimer works through the trait object" {
-  let timer : &@sync.Timer = @adapter.ClockTimer::new(
+  let timer : &@sync.Timer = @http_async.ClockTimer::new(
     clock=@simclock.VirtualClock(),
   )
   let done = Ref(false)

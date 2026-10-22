@@ -14,6 +14,7 @@ change itself is the diff of `src/gen/pkg.generated.mbti`.
 ### Changed
 
 - **Builds on `gaato/http` 0.5.0**, whose cookie jar, Retry-After and Link parsing follow RFC 6265bis-22, RFC 9110 and RFC 8288 more closely; see its CHANGELOG.
+- **The README has sections and compile-checked examples.** Install, usage that sends a request, and sections on operations, streaming, compatible servers, retries and timeouts; the examples no longer name a specific model.
 
 ## [0.6.0] - 2026-10-19
 

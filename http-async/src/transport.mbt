@@ -90,16 +90,16 @@ pub struct AsyncTransport {
 ///
 /// ```mbt check
 /// test {
-///   let _ = @adapter.AsyncTransport::new(timeout_ms=1000)
-///   let _ = @adapter.AsyncTransport::new(
+///   let _ = @http_async.AsyncTransport::new(timeout_ms=1000)
+///   let _ = @http_async.AsyncTransport::new(
 ///     connect_timeout_ms=5000,
 ///     read_timeout_ms=60000,
 ///   )
-///   let _ = @adapter.AsyncTransport::new(max_connections_per_origin=8)
-///   let _ = @adapter.AsyncTransport::new(max_idle_per_origin=0)
-///   let _ = @adapter.AsyncTransport::new(max_body_bytes=1_048_576)
-///   let _ = @adapter.AsyncTransport::new(proxy="http://user:pass@proxy:3128")
-///   let _ = @adapter.AsyncTransport::new(trust_env=false)
+///   let _ = @http_async.AsyncTransport::new(max_connections_per_origin=8)
+///   let _ = @http_async.AsyncTransport::new(max_idle_per_origin=0)
+///   let _ = @http_async.AsyncTransport::new(max_body_bytes=1_048_576)
+///   let _ = @http_async.AsyncTransport::new(proxy="http://user:pass@proxy:3128")
+///   let _ = @http_async.AsyncTransport::new(trust_env=false)
 /// }
 /// ```
 pub fn AsyncTransport::new(
