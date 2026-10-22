@@ -51,7 +51,7 @@ run "${py[@]}" tools/gen/census.py specs/petstore3/openapi.json petstore3 --expe
 run "${py[@]}" tools/gen/census.py openai/spec/openai.yaml openai --derive-operation-ids --overlay openai/overlays/fix.yaml --overlay openai/overlays/moonbit.yaml --expect-zero
 # Anthropic currently ships four operations; the full upstream spec includes unsupported beta APIs.
 run "${py[@]}" tools/gen/census.py anthropic/spec/anthropic.json anthropic --ops messages_post,messages_count_tokens_post,models_list,models_get --overlay anthropic/overlays/moonbit.yaml --expect-zero
-# GitHub generates every operation in the document, so the census covers all 1,221.
+# GitHub generates every operation in the document, so the census covers all of them.
 run "${py[@]}" tools/gen/census.py github/spec/api.github.com.2022-11-28.yaml github --overlay github/overlays/fix.yaml --overlay github/overlays/moonbit.yaml --expect-zero
 # Only meaningful in CI: in a jj working copy `git diff` compares against the parent change,
 # so uncommitted edits would look stale. Set MBT_SDK_CHECK_MBTI=1 to enforce locally.

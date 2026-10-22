@@ -24,7 +24,7 @@ Status: experimental. The HTTP, runtime and API modules are published on [moonca
 | `gaato/sdk-runtime` | [![mooncakes](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fmooncakes.io%2Fapi%2Fv0%2Fmodules%2Fgaato%2Fsdk-runtime&query=%24.version&label=mooncakes&prefix=v)](https://mooncakes.io/docs/gaato/sdk-runtime) | API-agnostic client runtime: error taxonomy, a pluggable retry decision with `RetryPolicy` presets over `gaato/http/retry` rules, per-attempt and per-call time limits, paired `acquire`/`release` rate limiting, a per-attempt observer, pagination with the SDK's own error type, auth, tri-state JSON fields, open enums | `gaato/http` |
 | `gaato/openai` | [![mooncakes](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fmooncakes.io%2Fapi%2Fv0%2Fmodules%2Fgaato%2Fopenai&query=%24.version&label=mooncakes&prefix=v)](https://mooncakes.io/docs/gaato/openai) | First consumer: a stable hand-written facade for models, embeddings, Responses, and Chat Completions (buffered and streaming), backed by types and operations generated from the vendored OpenAPI spec | `gaato/http`, `gaato/sdk-runtime` |
 | `gaato/anthropic` | [![mooncakes](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fmooncakes.io%2Fapi%2Fv0%2Fmodules%2Fgaato%2Fanthropic&query=%24.version&label=mooncakes&prefix=v)](https://mooncakes.io/docs/gaato/anthropic) | Messages (buffered and streaming), token counting, and Models, backed by generated first-party spec types and operations | `gaato/http`, `gaato/sdk-runtime` |
-| `gaato/github` | [![mooncakes](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fmooncakes.io%2Fapi%2Fv0%2Fmodules%2Fgaato%2Fgithub&query=%24.version&label=mooncakes&prefix=v)](https://mooncakes.io/docs/gaato/github) | The whole GitHub REST API: all 1,221 operations and their types generated from the first-party OpenAPI description, under a thin facade that sends, paginates and reads errors, plus an untyped GraphQL passthrough; [scope and usage](github/README.md) | `gaato/http`, `gaato/sdk-runtime` |
+| `gaato/github` | [![mooncakes](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fmooncakes.io%2Fapi%2Fv0%2Fmodules%2Fgaato%2Fgithub&query=%24.version&label=mooncakes&prefix=v)](https://mooncakes.io/docs/gaato/github) | The whole GitHub REST API: every operation and its types generated from the first-party OpenAPI description, under a thin facade that sends, paginates and reads errors, plus an untyped GraphQL passthrough; [scope and usage](github/README.md) | `gaato/http`, `gaato/sdk-runtime` |
 | `runtime-tests/` | — | Unpublished. Executes the async behaviour of the modules above (a module without an async runtime cannot run `async test`) | everything |
 
 HTTP SDK modules never import an async runtime (see [ARCHITECTURE.md](ARCHITECTURE.md)): the caller passes a `Transport` and a `Clock`. That keeps them portable and makes retry, rate-limit and streaming logic testable with fakes and a fake clock. The Codex SDK keeps generated protocol types portable and puts connection/process ownership in a separate async module.
@@ -37,7 +37,7 @@ let transport = @http_async.AsyncTransport::new(
 )
 let clock = @http_async.AsyncClock::new()
 let openai = @openai.OpenAI::new(api_key~, transport, clock, timer=@http_async.ClockTimer::new())
-openai.stream_response(@openai.ResponseRequest::new(model="gpt-5.6-sol", input="Hello"), event => {
+openai.stream_response(@openai.ResponseRequest::new(model~, input="Hello"), event => {
   if event is OutputTextDelta(text) { print(text) }
 })
 ```
@@ -50,7 +50,7 @@ For OpenAI-compatible servers that implement Chat Completions, use `ChatRequest`
 
 Anthropic now generates its Messages, token-counting, and Models types and operations from the official SDK's vendored OpenAPI document. See [the Anthropic module](anthropic/README.md) for scope, [the 0.2.0 notes](docs/anthropic-0.2.0.md#migration-from-010) for migrating from 0.1.0, including the `base_url` change, and [live tests](docs/live-tests.md) for the opt-in official API tests.
 
-`gaato/github` is the first module that generates a whole API rather than a chosen slice, and the first consumer of the runtime's `Paginator`, `parse_link_next`, `WindowLimiter` and `rate_limit_headers`. Its facade stays thin on purpose: the generated types are the public surface, so no hand-written mirror has to follow 1,221 operations. See [the GitHub module](github/README.md) and `docs/design-m8.md`.
+`gaato/github` is the first module that generates a whole API rather than a chosen slice, and the first consumer of the runtime's `Paginator`, `parse_link_next`, `WindowLimiter` and `rate_limit_headers`. Its facade stays thin on purpose: the generated types are the public surface, so no hand-written mirror has to follow every operation. See [the GitHub module](github/README.md) and `docs/design-m8.md`.
 
 GitHub's GraphQL API is reached through the same client but is deliberately not generated: in OpenAPI a response's shape belongs to the operation, which is what the generator compiles, while in GraphQL it belongs to the query document the caller wrote. There is no operation-to-type table to generate, so `graphql` is a passthrough over `Json` that raises when the reply carries an `errors` array — which GitHub sends with HTTP `200`.
 
