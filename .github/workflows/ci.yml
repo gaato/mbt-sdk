@@ -55,8 +55,3 @@ jobs:
 
       - name: Coverage ledger
         run: moon run scripts/coverage_report.mbtx
-
-      - name: HTTP adapter on moonrun Wasm
-        run: |
-          moon check http-async/src http-async/src/loopback --target wasm --deny-warn
-          moon test http-async/src http-async/src/loopback --target wasm --verbose

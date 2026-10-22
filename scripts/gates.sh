@@ -41,6 +41,10 @@ run timeout 120 moon -C runtime-tests test --target wasm-gc
 [ "$js" = 1 ] && run timeout 120 moon -C runtime-tests test --target js
 [ "$native_tests" = 1 ] && run timeout 120 moon -C runtime-tests test --target native
 
+# The HTTP adapter on moonrun Wasm.
+run moon check http-async/src http-async/src/loopback --target wasm --deny-warn
+run moon test http-async/src http-async/src/loopback --target wasm --verbose
+
 py=(uv run --with pyyaml --with jsonpath-rfc9535 python); [ -x .venv/bin/python ] && py=(.venv/bin/python)
 run "${py[@]}" -m unittest discover -s tools/gen/tests -v
 run scripts/generate.sh --check

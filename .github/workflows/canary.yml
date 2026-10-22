@@ -15,5 +15,5 @@ jobs:
   canary:
     uses: gaato/.github/.github/workflows/moonbit-canary.yml@main
     with:
-      gates: scripts/generate.sh --check && scripts/gates.sh
+      gates: scripts/gates.sh
       uv: true
