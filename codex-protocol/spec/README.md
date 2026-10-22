@@ -10,7 +10,7 @@ Protocol documentation: [Codex app-server](https://learn.chatgpt.com/docs/app-se
 
 Capture with the pinned CLI (fish):
 
-```fish
+```sh
 codex --version
 codex app-server generate-json-schema --out /tmp/codex-schema
 cp /tmp/codex-schema/codex_app_server_protocol.schemas.json codex-protocol/spec/schema.json

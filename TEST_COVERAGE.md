@@ -13,7 +13,7 @@ a closed ledger:
 
 ## Running it
 
-```fish
+```sh
 moon run scripts/coverage_report.mbtx                    # measure, print tables, check the ledger
 moon run scripts/coverage_report.mbtx -- --from-json _build/coverage_report.json   # recheck only
 ```

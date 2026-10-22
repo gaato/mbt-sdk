@@ -1,0 +1,4 @@
+{
+  "modules": ["http", "http-async", "sdk-runtime", "openai", "anthropic", "github"],
+  "generated": ["openai/src/gen", "anthropic/src/gen", "github/src/gen"]
+}

@@ -50,6 +50,9 @@ jobs:
       - name: Gates
         run: scripts/gates.sh
 
+      - name: Docs audit
+        run: moon run scripts/docs_audit.mbtx --self-test
+
       - name: Coverage ledger
         run: moon run scripts/coverage_report.mbtx
 

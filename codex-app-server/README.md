@@ -67,9 +67,9 @@ Import `gaato/codex-app-server` as `@codex`, `gaato/codex-protocol/gen` as
 completion wait. `src/examples/initialize` runs the real CLI handshake without
 starting a thread or making a model request:
 
-```fish
-set codex_smoke_home (mktemp -d /tmp/mbt-sdk-codex-home.XXXXXX)
-moon run --target native codex-app-server/src/examples/initialize -- $codex_smoke_home
+```sh
+codex_smoke_home=$(mktemp -d /tmp/mbt-sdk-codex-home.XXXXXX)
+moon run --target native codex-app-server/src/examples/initialize -- "$codex_smoke_home"
 ```
 
 ## Lifetime and errors

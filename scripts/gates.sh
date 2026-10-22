@@ -24,6 +24,8 @@ run scripts/release.sh check
 run moon update
 # Every enforced limit in RESOURCE_BOUNDS.md names tests that exist.
 run moon run scripts/bounds_check.mbtx
+# READMEs and doc comments follow the rules shared by every gaato MoonBit repository.
+run moon run scripts/docs_audit.mbtx --self-test
 for m in http jsonrpc sdk-runtime openai anthropic codex-protocol github conformance; do
   for t in "${all_targets[@]}"; do run moon -C "$m" check --deny-warn --target "$t"; done
 done

@@ -1,0 +1,724 @@
+///|
+/// Audit the repository's documentation against the rules every gaato
+/// MoonBit module shares, so each module page on mooncakes.io reads the same.
+///
+/// 1. Shell examples: no code block is fenced as `fish`; commands are written
+///    for POSIX `sh`.
+/// 2. Published links: a Markdown file inside a published module directory
+///    links only to absolute URLs or anchors. mooncakes.io serves these files
+///    away from the repository, so a relative link breaks or lands on raw
+///    text there.
+/// 3. Repository links: every other relative link names a file or directory
+///    that exists.
+/// 4. Module README: `moon.mod` says `readme = "README.md"`, the README is
+///    the compile-checked `overview.mbt.md` of the root package, and it has a
+///    title, an `## Install` section and a `## License` section.
+/// 5. One README per page: the root package has no `README.mbt.md` or
+///    `README.md` of its own. mooncakes.io appends that file after the module
+///    README, so the page would show two.
+/// 6. Doc comments: every top-level `pub` declaration in a published, hand
+///    written package has a `///` doc comment. A file whose first line says
+///    `DO NOT EDIT` is generated and skipped.
+///
+/// The published modules and generated sources are listed in
+/// `scripts/docs_audit.json`; what a module leaves out of its package comes
+/// from its `.moonignore`. Deliberate exceptions live in
+/// `scripts/docs_audit.allow`, one `<file> <key>` per line with a ` #`
+/// reason. Unknown or stale entries fail the audit.
+///
+/// This file is identical in every gaato MoonBit repository; change it in all
+/// of them at once and keep repository differences in the two files above.
+import {
+  "moonbitlang/async",
+  "moonbitlang/async/fs",
+  "moonbitlang/core/env",
+  "moonbitlang/core/json",
+}
+
+///|
+/// Directory names the walk skips: build output, dependencies, and VCS data.
+let skipped_dirs : Array[String] = [
+  "_build", ".mooncakes", "node_modules", "target", ".git", ".jj", ".wrangler",
+]
+
+///|
+/// A published module: its directory (`""` for the repository root), the
+/// paths its package leaves out, and its `moon.mod` text.
+struct Module {
+  dir : String
+  ignored : Array[String]
+  moon_mod : String
+}
+
+///|
+/// Everything the audit reads, so the self-test can add files to a copy.
+struct Repo {
+  markdown : Array[(String, String)]
+  sources : Array[(String, String)]
+  existing : Set[String]
+  modules : Array[Module]
+  generated : Array[String]
+}
+
+///|
+/// `path` inside `dir`, or `path` itself for the repository root.
+fn join(dir : String, path : String) -> String {
+  if dir.is_empty() {
+    path
+  } else if path.is_empty() {
+    dir
+  } else {
+    "\{dir}/\{path}"
+  }
+}
+
+///|
+/// Whether `path` is `prefix` itself or lies below it.
+fn under(path : String, prefix : String) -> Bool {
+  prefix.is_empty() || path == prefix || path.has_prefix("\{prefix}/")
+}
+
+///|
+/// The module whose package contains `path`, if any.
+fn published_module(repo : Repo, path : String) -> Module? {
+  for m in repo.modules {
+    if under(path, m.dir) &&
+      !m.ignored.iter().any(ignored => under(path, join(m.dir, ignored))) {
+      return Some(m)
+    }
+  }
+  None
+}
+
+///|
+/// The value of `key = "value"` in a `moon.mod`, if present.
+fn mod_field(moon_mod : String, key : String) -> String? {
+  for raw in moon_mod.split("\n") {
+    let line = raw.trim()
+    guard line.has_prefix(key) else { continue }
+    let rest = line[key.length():].trim()
+    guard rest.has_prefix("=") else { continue }
+    let value = rest[1:].trim()
+    guard value.length() >= 2 && value.has_prefix("\"") && value.has_suffix("\"") else {
+      continue
+    }
+    return Some(value[1:value.length() - 1].to_owned())
+  }
+  None
+}
+
+///|
+/// The root package directory of `m`.
+fn root_package(m : Module) -> String {
+  match mod_field(m.moon_mod, "source") {
+    Some(source) if source != "." && !source.is_empty() => join(m.dir, source)
+    _ => m.dir
+  }
+}
+
+///|
+/// The paths a `.moonignore` leaves out of the package, relative to its
+/// module. Only literal paths are supported; a glob fails the audit rather
+/// than being read wrongly.
+fn parse_moonignore(text : String) -> Array[String] raise {
+  let paths : Array[String] = []
+  for raw in text.split("\n") {
+    let line = raw.trim()
+    if line.is_empty() || line.has_prefix("#") {
+      continue
+    }
+    if line.contains_any(chars="*?[!") {
+      fail(".moonignore pattern \{line} is not a literal path")
+    }
+    let line = if line.has_prefix("/") { line[1:] } else { line }
+    let line = if line.has_suffix("/") {
+      line[:line.length() - 1]
+    } else {
+      line
+    }
+    paths.push(line.to_owned())
+  }
+  paths
+}
+
+///|
+/// `line` with inline code spans removed, so links shown as code are skipped.
+fn without_code_spans(line : String) -> String {
+  let out = StringBuilder()
+  let mut in_code = false
+  for c in line {
+    if c == '`' {
+      in_code = !in_code
+    } else if !in_code {
+      out.write_char(c)
+    }
+  }
+  out.to_string()
+}
+
+///|
+/// The targets of `[text](target)` links on `line`.
+fn link_targets(line : String) -> Array[String] {
+  let targets : Array[String] = []
+  let chars = without_code_spans(line).to_array()
+  for i in 0..<chars.length() {
+    guard chars[i] == ']' && i + 1 < chars.length() && chars[i + 1] == '(' else {
+      continue
+    }
+    let target = StringBuilder()
+    let mut depth = 0
+    for j in (i + 2)..<chars.length() {
+      let c = chars[j]
+      if c == '(' {
+        depth += 1
+      } else if c == ')' {
+        if depth == 0 {
+          break
+        }
+        depth -= 1
+      }
+      target.write_char(c)
+    }
+    let text = target.to_string().trim().to_owned()
+    // `[text](target "title")` keeps only the target.
+    let text = match text.find(" ") {
+      Some(space) => text[:space].to_owned()
+      None => text
+    }
+    targets.push(text)
+  }
+  targets
+}
+
+///|
+fn is_external(target : String) -> Bool {
+  target.has_prefix("http://") ||
+  target.has_prefix("https://") ||
+  target.has_prefix("mailto:") ||
+  target.has_prefix("#")
+}
+
+///|
+/// `target` resolved against the directory of `file`, without its anchor.
+fn resolve(file : String, target : String) -> String {
+  let target = match target.find("#") {
+    Some(hash) => target[:hash].to_owned()
+    None => target
+  }
+  let parts : Array[String] = file.split("/").map(p => p.to_owned()).to_array()
+  ignore(parts.pop())
+  for part in target.split("/") {
+    match part {
+      "" | "." => ()
+      ".." => ignore(parts.pop())
+      _ => parts.push(part.to_owned())
+    }
+  }
+  parts.join("/")
+}
+
+///|
+/// Rules 1–3: fences and links in every Markdown file.
+fn scan_markdown(repo : Repo, found : Map[String, String]) -> Unit {
+  for file in repo.markdown {
+    let (path, text) = file
+    let published = published_module(repo, path) is Some(_)
+    let mut in_fence = false
+    for index, line in text.split("\n").to_array() {
+      let trimmed = line.trim().to_owned()
+      if trimmed.has_prefix("```") {
+        if !in_fence && trimmed.has_prefix("```fish") {
+          found["\{path} fish:\{index + 1}"] = "a `fish` code block; write the commands for sh"
+        }
+        in_fence = !in_fence
+        continue
+      }
+      if in_fence {
+        continue
+      }
+      for target in link_targets(line.to_owned()) {
+        if target.is_empty() || is_external(target) {
+          continue
+        }
+        if published {
+          found["\{path} \{target}"] = "relative link in a published file; mooncakes.io cannot follow it, use an absolute URL"
+        } else if !repo.existing.contains(resolve(path, target)) {
+          found["\{path} \{target}"] = "link to a missing file"
+        }
+      }
+    }
+  }
+}
+
+///|
+/// The lines of `text` outside fenced code blocks.
+fn prose_lines(text : String) -> Array[String] {
+  let lines : Array[String] = []
+  let mut in_fence = false
+  for line in text.split("\n") {
+    if line.trim().has_prefix("```") {
+      in_fence = !in_fence
+    } else if !in_fence {
+      lines.push(line.trim_end().to_owned())
+    }
+  }
+  lines
+}
+
+///|
+fn markdown_text(repo : Repo, path : String) -> String? {
+  for file in repo.markdown {
+    if file.0 == path {
+      return Some(file.1)
+    }
+  }
+  None
+}
+
+///|
+/// Rules 4 and 5: each published module's README.
+fn scan_modules(repo : Repo, found : Map[String, String]) -> Unit {
+  for m in repo.modules {
+    let mod_path = join(m.dir, "moon.mod")
+    let readme = join(m.dir, "README.md")
+    if mod_field(m.moon_mod, "readme") != Some("README.md") {
+      found["\{mod_path} readme"] = "set readme = \"README.md\" so mooncakes.io shows the module README"
+    }
+    let root = root_package(m)
+    if root != m.dir {
+      for name in ["README.mbt.md", "README.md"] {
+        let doubled = join(root, name)
+        if repo.existing.contains(doubled) {
+          found["\{doubled} doubled"] = "mooncakes.io appends the root package's README after the module README; rename it to overview.mbt.md"
+        }
+      }
+    }
+    let overview = join(root, "overview.mbt.md")
+    match (markdown_text(repo, readme), markdown_text(repo, overview)) {
+      (None, _) => found["\{readme} missing"] = "a published module needs a README.md"
+      (Some(_), None) =>
+        found["\{readme} overview"] = "keep the README in \{overview} so its examples compile, and link README.md to it"
+      (Some(text), Some(overview_text)) => {
+        if text != overview_text {
+          found["\{readme} overview"] = "README.md differs from \{overview}; make it a symbolic link to that file"
+        }
+        let lines = prose_lines(text)
+        let first = lines.iter().find_first(line => !line.is_empty())
+        if !(first is Some(line) && line.has_prefix("# ")) {
+          found["\{readme} heading:title"] = "the README starts with a `# ` title"
+        }
+        for section in ["Install", "License"] {
+          if !lines.contains("## \{section}") {
+            found["\{readme} heading:\{section}"] = "the README needs a `## \{section}` section"
+          }
+        }
+      }
+    }
+  }
+}
+
+///|
+/// The name a declaration line is reported under: the line up to its
+/// parameters, body or value, so the key survives edits to those.
+fn declaration_key(line : String) -> String {
+  let chars = line.to_array()
+  let start = match chars.search(' ') {
+    Some(space) => space
+    None => 0
+  }
+  let mut end = chars.length()
+  for i in start..<chars.length() {
+    if chars[i] is ('(' | '{' | '=') {
+      end = i
+      break
+    }
+  }
+  String::from_array(chars[:end]).trim().to_owned()
+}
+
+///|
+fn is_public_declaration(line : String) -> Bool {
+  line.has_prefix("pub ") || line.has_prefix("pub(")
+}
+
+///|
+/// Rule 6: doc comments on public declarations of published packages.
+fn scan_sources(repo : Repo, found : Map[String, String]) -> Unit {
+  for file in repo.sources {
+    let (path, text) = file
+    guard published_module(repo, path) is Some(m) &&
+      under(path, root_package(m)) &&
+      !repo.generated.iter().any(prefix => under(path, prefix)) else {
+      continue
+    }
+    let lines = text.split("\n").map(line => line.to_owned()).to_array()
+    // A file whose header says it is generated takes its docs from the
+    // generator.
+    if lines.length() > 0 && lines[0].contains("DO NOT EDIT") {
+      continue
+    }
+    for index, line in lines {
+      guard is_public_declaration(line) else { continue }
+      // Attributes such as `#deprecated` sit between the doc and the item.
+      let mut above = index - 1
+      while above >= 0 && lines[above].has_prefix("#") {
+        above -= 1
+      }
+      let documented = above >= 0 &&
+        lines[above].has_prefix("///") &&
+        lines[above].trim() != "///|"
+      if !documented {
+        found["\{path} doc:\{declaration_key(line)}"] = "a public declaration without a `///` doc comment"
+      }
+    }
+  }
+}
+
+///|
+fn parse_allow(text : String) -> Set[String] raise {
+  let allowed : Set[String] = Set([])
+  for raw in text.split("\n") {
+    let line = raw.trim().to_owned()
+    if line.is_empty() || line.has_prefix("#") {
+      continue
+    }
+    // The reason starts at ` #`, so a link's own `#fragment` stays in the key.
+    guard line.find(" #") is Some(hash) && !line[hash + 2:].trim().is_empty() else {
+      fail("allow entry requires a reason: \{line}")
+    }
+    let key = line[:hash].trim().to_owned()
+    if allowed.contains(key) {
+      fail("duplicate allow entry: \{key}")
+    }
+    allowed.add(key)
+  }
+  allowed
+}
+
+///|
+fn audit(repo : Repo, allow : String) -> Unit raise {
+  let allowed = parse_allow(allow)
+  let found : Map[String, String] = Map([])
+  scan_markdown(repo, found)
+  scan_modules(repo, found)
+  scan_sources(repo, found)
+  let problems : Array[String] = []
+  for key, message in found {
+    if !allowed.contains(key) {
+      problems.push("\{key}: \{message}")
+    }
+  }
+  for key in allowed {
+    if !found.contains(key) {
+      problems.push("stale allow entry: \{key}")
+    }
+  }
+  if !problems.is_empty() {
+    problems.sort()
+    fail(problems.join("\n"))
+  }
+}
+
+///|
+fn must_fail(run : () -> Unit raise) -> Unit raise {
+  try run() catch {
+    _ => ()
+  } noraise {
+    _ => fail("negative docs audit self-test unexpectedly passed")
+  }
+}
+
+///|
+/// The strings in the array `key` of the configuration object.
+fn config_strings(config : Json, key : String) -> Array[String] raise {
+  guard config is Object(fields) && fields.get(key) is Some(Array(values)) else {
+    fail("scripts/docs_audit.json needs an array \"\{key}\"")
+  }
+  values.map(value => {
+    guard value is String(s) else {
+      fail("scripts/docs_audit.json \"\{key}\" holds strings")
+    }
+    s
+  })
+}
+
+///|
+async fn main {
+  let args = @env.args()
+  let self_test = args.length() == 2 && args[1] == "--self-test"
+  if args.length() > 2 || (args.length() == 2 && !self_test) {
+    fail("usage: moon run scripts/docs_audit.mbtx [--self-test]")
+  }
+  let config = @json.parse(@fs.read_file("scripts/docs_audit.json").text())
+  let module_dirs = config_strings(config, "modules").map(dir => {
+    if dir == "." {
+      ""
+    } else {
+      dir
+    }
+  })
+  let generated = config_strings(config, "generated")
+  let existing : Set[String] = Set([])
+  let markdown_paths : Array[String] = []
+  let source_paths : Array[String] = []
+  @fs.walk(
+    ".",
+    (dir, entries) => {
+      let prefix = if dir == "." {
+        ""
+      } else {
+        dir["./".length():].to_owned() + "/"
+      }
+      for entry in entries {
+        let path = prefix + entry
+        existing.add(path)
+        if entry.has_suffix(".md") {
+          markdown_paths.push(path)
+        } else if entry.has_suffix(".mbt") &&
+          !entry.has_suffix("_test.mbt") &&
+          !entry.has_suffix("_wbtest.mbt") &&
+          !path.contains("/internal/") {
+          source_paths.push(path)
+        }
+      }
+    },
+    exclude=path => skipped_dirs.iter().any(name => path.has_suffix("/\{name}")),
+    max_concurrency=1,
+  )
+  markdown_paths.sort()
+  source_paths.sort()
+  let markdown : Array[(String, String)] = []
+  for path in markdown_paths {
+    markdown.push((path, @fs.read_file(path).text()))
+  }
+  let sources : Array[(String, String)] = []
+  for path in source_paths {
+    sources.push((path, @fs.read_file(path).text()))
+  }
+  let modules : Array[Module] = []
+  for dir in module_dirs {
+    let ignore_path = join(dir, ".moonignore")
+    let ignored = if existing.contains(ignore_path) {
+      parse_moonignore(@fs.read_file(ignore_path).text())
+    } else {
+      []
+    }
+    let moon_mod = @fs.read_file(join(dir, "moon.mod")).text()
+    modules.push({ dir, ignored, moon_mod })
+  }
+  if self_test {
+    run_self_test()
+    println("Docs audit self-tests: OK")
+  }
+  let repo : Repo = { markdown, sources, existing, modules, generated }
+  audit(repo, @fs.read_file("scripts/docs_audit.allow").text())
+  println("Docs audit: OK")
+}
+
+///|
+let selftest_overview : String =
+  #|# gaato/selftest
+  #|
+  #|Testing.
+  #|
+  #|## Install
+  #|
+  #|```sh
+  #|moon add gaato/selftest
+  #|```
+  #|
+  #|## License
+  #|
+  #|Apache-2.0.
+
+///|
+let selftest_mod : String =
+  #|name = "gaato/selftest"
+  #|
+  #|readme = "README.md"
+  #|
+  #|source = "src"
+
+///|
+/// `repo` with a published module `selftest/` holding `markdown` and
+/// `sources`.
+fn selftest(
+  repo : Repo,
+  markdown~ : Array[(String, String)],
+  sources? : Array[(String, String)] = [],
+  moon_mod? : String = selftest_mod,
+) -> Repo {
+  let existing = repo.existing.copy()
+  for file in markdown {
+    existing.add(file.0)
+  }
+  {
+    markdown: repo.markdown.copy()..push_iter(markdown.iter()),
+    sources: repo.sources.copy()..push_iter(sources.iter()),
+    existing,
+    modules: repo.modules.copy()..push({ dir: "selftest", ignored: ["test"], moon_mod }),
+    generated: repo.generated.copy()..push("selftest/src/gen"),
+  }
+}
+
+///|
+/// Checks each rule against fixtures in an otherwise empty repository, so
+/// the self-test does not depend on the state of the real files.
+fn run_self_test() -> Unit raise {
+  let repo : Repo = {
+    markdown: [],
+    sources: [],
+    existing: Set(["other/README.md"]),
+    modules: [],
+    generated: [],
+  }
+  let allow = ""
+  let overview = selftest_overview
+  let good = [
+    ("selftest/README.md", overview),
+    ("selftest/src/overview.mbt.md", overview),
+  ]
+  audit(selftest(repo, markdown=good), allow)
+  // A fish fence fails; one inside another fence's body does not open one.
+  must_fail(() => {
+    audit(
+      selftest(repo, markdown=good.copy()..push(("guide/x.md", "```fish\nls\n```\n"))),
+      allow,
+    )
+  })
+  audit(
+    selftest(repo, markdown=good.copy()..push(("guide/x.md", "```sh\nls\n```\n"))),
+    allow,
+  )
+  // A relative link to an existing file fails in a published file and
+  // passes in a directory the package leaves out or outside any module.
+  let relative = "See [the readme](README.md).\n"
+  must_fail(() => {
+    audit(
+      selftest(repo, markdown=good.copy()..push(("selftest/x.md", relative))),
+      allow,
+    )
+  })
+  audit(
+    selftest(
+      repo,
+      markdown=good.copy()..push(("selftest/test/x.md", "[up](../README.md)\n")),
+    ),
+    allow,
+  )
+  audit(selftest(repo, markdown=good.copy()..push(("other/x.md", relative))), allow)
+  audit(
+    selftest(repo, 
+      markdown=good.copy()..push(
+        ("selftest/x.md", "See [it](https://github.com/gaato/x/blob/main/a.md#b).\n"),
+      ),
+    ),
+    allow,
+  )
+  // A missing target fails; links in code spans and blocks are ignored.
+  must_fail(() => {
+    audit(
+      selftest(repo, markdown=good.copy()..push(("guide/x.md", "[gone](missing.md)\n"))),
+      allow,
+    )
+  })
+  audit(
+    selftest(repo, markdown=good.copy()..push(("guide/x.md", "`[gone](missing.md)`\n"))),
+    allow,
+  )
+  audit(
+    selftest(repo, 
+      markdown=good.copy()..push(
+        ("guide/x.md", "```text\n[gone](missing.md)\n```\n"),
+      ),
+    ),
+    allow,
+  )
+  // Allow entries cover one key each and go stale when it goes away; a
+  // link's fragment is part of its key, not the start of the reason.
+  let gone = selftest(repo, 
+    markdown=good.copy()..push(("guide/x.md", "[gone](missing.md#part)\n")),
+  )
+  audit(gone, allow + "\nguide/x.md missing.md#part # self-test\n")
+  must_fail(() => {
+    audit(
+      selftest(repo, markdown=good),
+      allow + "\nguide/x.md missing.md#part # self-test\n",
+    )
+  })
+  must_fail(() => audit(gone, allow + "\nguide/x.md missing.md#part\n"))
+  // The module README: readme field, overview, title and sections.
+  must_fail(() => {
+    audit(
+      selftest(repo, markdown=good, moon_mod="name = \"gaato/selftest\"\n\nsource = \"src\"\n"),
+      allow,
+    )
+  })
+  must_fail(() => audit(selftest(repo, markdown=[good[0]]), allow))
+  must_fail(() => {
+    audit(
+      selftest(repo, markdown=[good[0], ("selftest/src/overview.mbt.md", "# other\n")]),
+      allow,
+    )
+  })
+  let no_install = "# gaato/selftest\n\n## License\n\nApache-2.0.\n"
+  must_fail(() => {
+    audit(
+      selftest(repo, markdown=[
+        ("selftest/README.md", no_install),
+        ("selftest/src/overview.mbt.md", no_install),
+      ]),
+      allow,
+    )
+  })
+  // A section heading inside a code block does not count.
+  let fenced = "# gaato/selftest\n\n```text\n## Install\n```\n\n## License\n"
+  must_fail(() => {
+    audit(
+      selftest(repo, markdown=[
+        ("selftest/README.md", fenced),
+        ("selftest/src/overview.mbt.md", fenced),
+      ]),
+      allow,
+    )
+  })
+  // A README of the root package would be shown a second time.
+  must_fail(() => {
+    audit(
+      selftest(repo, 
+        markdown=good.copy()..push(("selftest/src/README.mbt.md", overview)),
+      ),
+      allow,
+    )
+  })
+  // Public declarations need a doc comment, attributes may sit in between,
+  // and generated, private and test-only code is not checked.
+  let documented = "///|\n/// Adds one.\n#deprecated\npub fn add_one(x : Int) -> Int {\n  x + 1\n}\n"
+  audit(
+    selftest(repo, markdown=good, sources=[("selftest/src/lib.mbt", documented)]),
+    allow,
+  )
+  let bare = "///|\npub(all) struct Point {\n  x : Int\n}\n"
+  must_fail(() => {
+    audit(selftest(repo, markdown=good, sources=[("selftest/src/lib.mbt", bare)]), allow)
+  })
+  audit(
+    selftest(repo, 
+      markdown=good,
+      sources=[("selftest/src/lib.mbt", bare)],
+    ),
+    allow + "\nselftest/src/lib.mbt doc:pub(all) struct Point # self-test\n",
+  )
+  audit(
+    selftest(repo, markdown=good, sources=[("selftest/src/gen/lib.mbt", bare)]),
+    allow,
+  )
+  audit(
+    selftest(repo, markdown=good, sources=[("selftest/test/lib.mbt", bare)]),
+    allow,
+  )
+  audit(
+    selftest(repo, markdown=good, sources=[("selftest/src/lib.mbt", "///|\nfn helper() -> Unit {\n  ()\n}\n")]),
+    allow,
+  )
+}

@@ -1,0 +1,2 @@
+# Markdown links and fences that the docs audit accepts although its rules
+# reject them. Each entry is `<file> <link> # reason`.

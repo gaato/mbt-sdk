@@ -90,13 +90,13 @@ M1 の既知の制限:
 
 ## 検証
 
-```fish
+```sh
 cd ~/ghq/github.com/gaato/mbt-sdk
-moon -C http check --deny-warn --target wasm-gc; and moon -C http check --deny-warn --target native; and moon -C http check --deny-warn --target js
-moon -C http test --target wasm-gc; and moon -C http test --target native; and moon -C http test --target js
-moon -C http-async check --deny-warn --target native; and moon -C http-async check --deny-warn --target js
+moon -C http check --deny-warn --target wasm-gc && moon -C http check --deny-warn --target native && moon -C http check --deny-warn --target js
+moon -C http test --target wasm-gc && moon -C http test --target native && moon -C http test --target js
+moon -C http-async check --deny-warn --target native && moon -C http-async check --deny-warn --target js
 moon -C http-async test --target native
-moon fmt --check; and moon info; and jj diff --stat '**/*.mbti'   # mbti 差分なし
+moon fmt --check && moon info && jj diff --stat '**/*.mbti'   # mbti 差分なし
 ```
 - SSE: WHATWG 仕様の例をすべてテストにする。加えて「同じ入力を全バイト位置で 2 分割しても結果が同じ」ことを総当たりで確認(多バイト文字・`\r\n` の分割を含む)。
 - http-async: loopback サーバで、通常応答・4xx をそのまま返すこと・チャンク分割された SSE をストリームで読めること・タイムアウトで `Timeout` が上がることを確認。js は `check` のみ(実行テストは M2 で node の test runner を入れてから)。

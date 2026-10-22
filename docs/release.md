@@ -14,7 +14,7 @@ Write the entry in the PR that makes the change, under `## [Unreleased]` of ever
 
 ## Cutting a release
 
-```fish
+```sh
 scripts/release.sh bump http 0.2.0       # sets http/moon.mod and every "gaato/http@…" import, dates the CHANGELOG
 scripts/gates.sh                         # green, including native loopback tests
 moon run scripts/coverage_report.mbtx    # ledger OK (CI runs it too; see TEST_COVERAGE.md)
