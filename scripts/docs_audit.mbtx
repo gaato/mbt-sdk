@@ -1,3 +1,14 @@
+----
+import {
+  "moonbitlang/async",
+  "moonbitlang/async/fs",
+  "moonbitlang/core/env",
+  "moonbitlang/core/json",
+}
+// Paths are relative to this script: the audit only reads its repository.
+permission(fs: { "read": [".."] })
+----
+
 ///|
 /// Audit the repository's documentation against the rules every gaato
 /// MoonBit module shares, so each module page on mooncakes.io reads the same.
@@ -28,12 +39,6 @@
 ///
 /// This file is identical in every gaato MoonBit repository; change it in all
 /// of them at once and keep repository differences in the two files above.
-import {
-  "moonbitlang/async",
-  "moonbitlang/async/fs",
-  "moonbitlang/core/env",
-  "moonbitlang/core/json",
-}
 
 ///|
 /// Directory names the walk skips: build output, dependencies, and VCS data.

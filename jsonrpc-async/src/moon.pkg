@@ -18,8 +18,8 @@ import {
   "moonbitlang/core/encoding/utf8",
 } for "wbtest"
 
-// The process import is used only by native files. Moon does not yet support
-// conditional imports; on JS it is intentionally unused. Keep other warnings on.
+// The process import is native-only. moon accepts #cfg imports, but the
+// pinned moonc still rejects them in moon.pkg, so it is unused on JS.
 
 warnings = "-unused_package"
 

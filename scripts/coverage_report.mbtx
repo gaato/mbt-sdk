@@ -1,3 +1,16 @@
+----
+import {
+  "moonbitlang/async@0.22.5",
+  "moonbitlang/async@0.22.5/fs",
+  "moonbitlang/async@0.22.5/shell",
+  "moonbitlang/async@0.22.5/stdio",
+  "moonbitlang/core/env",
+  "moonbitlang/core/json",
+  "moonbitlang/core/string",
+  "moonbitlang/x@0.5.6/sys",
+}
+----
+
 // Test-coverage report for the hand-written modules.
 //
 // Runs one instrumented native test run, writes a Coveralls JSON report,
@@ -22,17 +35,6 @@
 //   trace maps and counters explicitly.
 // - `-f summary` omits fully covered files; use the Coveralls JSON.
 // - moon's bundled tcc cannot link on some hosts (openSUSE); use the system cc.
-
-import {
-  "moonbitlang/async@0.22.5",
-  "moonbitlang/async@0.22.5/fs",
-  "moonbitlang/async@0.22.5/shell",
-  "moonbitlang/async@0.22.5/stdio",
-  "moonbitlang/core/env",
-  "moonbitlang/core/json",
-  "moonbitlang/core/string",
-  "moonbitlang/x@0.5.6/sys",
-}
 
 ///|
 /// The measured modules (workspace member directories). Generated code

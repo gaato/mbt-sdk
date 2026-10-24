@@ -39,8 +39,8 @@ import {
 
 supported_targets = "js + native + wasm"
 
-// The wbtest socket import is used only by native and Wasm files. Moon does
-// not yet support conditional imports; on JS it is intentionally unused.
+// The socket import is native/Wasm-only. moon accepts #cfg imports, but the
+// pinned moonc still rejects them in moon.pkg, so it is unused on JS.
 
 warnings = "-unused_package"
 

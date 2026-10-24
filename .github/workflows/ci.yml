@@ -20,7 +20,7 @@ jobs:
     timeout-minutes: 30
     container:
       # Pinned toolchain. canary.yml runs the same gates on :latest and :nightly.
-      image: ghcr.io/gaato/moonbit:0.10.16
+      image: ghcr.io/gaato/moonbit:0.10.17-d971670cd
     steps:
       - name: Check out repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1

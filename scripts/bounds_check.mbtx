@@ -1,3 +1,13 @@
+----
+import {
+  "moonbitlang/async@0.22.5",
+  "moonbitlang/async@0.22.5/fs",
+  "moonbitlang/async@0.22.5/stdio",
+  "moonbitlang/core/env",
+  "moonbitlang/x@0.5.6/sys",
+}
+----
+
 // Checks the "Enforced limits" table of RESOURCE_BOUNDS.md against the tests.
 //
 // Every row's last cell ("Tests") names the tests that check its bound, as a
@@ -19,14 +29,6 @@
 //
 // Exit status: 0 = every row names tests that exist, 1 = a row does not,
 // 2 = the table is missing or has no Tests column.
-
-import {
-  "moonbitlang/async@0.22.5",
-  "moonbitlang/async@0.22.5/fs",
-  "moonbitlang/async@0.22.5/stdio",
-  "moonbitlang/core/env",
-  "moonbitlang/x@0.5.6/sys",
-}
 
 ///|
 /// Prints `message` on stderr and exits with `code`.

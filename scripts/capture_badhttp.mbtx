@@ -1,3 +1,12 @@
+----
+import {
+  "moonbitlang/async@0.22.5",
+  "moonbitlang/async@0.22.5/fs",
+  "moonbitlang/async@0.22.5/shell",
+  "moonbitlang/core/encoding/utf8",
+}
+----
+
 // Records badhttp.dev's responses for runtime-tests/src/badhttp_replay,
 // which replays them offline through a loopback server. badhttp.dev
 // releases everything it serves under CC0-1.0 (https://badhttp.dev/license).
@@ -13,13 +22,6 @@
 // quarter of a second apart.
 //
 // This is not part of the gates: it runs when badhttp.dev's version moves.
-
-import {
-  "moonbitlang/async@0.22.5",
-  "moonbitlang/async@0.22.5/fs",
-  "moonbitlang/async@0.22.5/shell",
-  "moonbitlang/core/encoding/utf8",
-}
 
 ///|
 let base : String = "https://badhttp.dev"
