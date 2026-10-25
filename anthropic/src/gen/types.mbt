@@ -167,37 +167,92 @@ pub impl @json.FromJson for AllowedCaller with fn from_json(value, path) {
 
 ///|
 ///
-/// Generated representation of AuthenticationError.
-pub(all) struct AuthenticationError {
-  message : String
+/// The time-to-live for the cache control breakpoint. This may be one the following values: - `5m`: 5 minutes - `1h`: 1 hour Defaults to `5m`. See [prompt caching pricing](https://platform.claude.com/docs/en/build-with-claude/prompt-caching) for details.
+#non_exhaustive
+pub(all) enum CacheControlEphemeralTtl {
+  Value5m
+  Value1h
+  Custom(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend CacheControlEphemeralTtl with Eq::{equal, not_equal}
+
+///|
+pub extend CacheControlEphemeralTtl with @debug.Debug::{to_repr}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend CacheControlEphemeralTtl with ToJson::{to_json}
+
+///|
+pub impl ToJson for CacheControlEphemeralTtl with fn to_json(self) {
+  let raw = match self {
+    Value5m => "5m"
+    Value1h => "1h"
+    Custom(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend CacheControlEphemeralTtl with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for CacheControlEphemeralTtl with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "5m" => Some(Value5m)
+        "1h" => Some(Value1h)
+        _ => None
+      }
+    },
+    raw => Custom(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of CacheControlEphemeral.
+pub(all) struct CacheControlEphemeral {
+  ttl : CacheControlEphemeralTtl?
   type_ : String
 } derive(Eq, @debug.Debug)
 
 ///|
-pub extend AuthenticationError with Eq::{equal, not_equal}
+pub extend CacheControlEphemeral with Eq::{equal, not_equal}
 
 ///|
-pub extend AuthenticationError with @debug.Debug::{to_repr}
+pub extend CacheControlEphemeral with @debug.Debug::{to_repr}
 
 ///|
 ///
-/// Creates a AuthenticationError with omitted optional fields absent.
-pub fn AuthenticationError::new(
-  message~ : String,
+/// Creates a CacheControlEphemeral with omitted optional fields absent.
+pub fn CacheControlEphemeral::new(
   type_~ : String,
-) -> AuthenticationError {
-  { message, type_, }
+  ttl? : CacheControlEphemeralTtl,
+) -> CacheControlEphemeral {
+  { ttl, type_, }
 }
 
 ///|
 ///
 /// Encodes this value as JSON.
-pub extend AuthenticationError with ToJson::{to_json}
+pub extend CacheControlEphemeral with ToJson::{to_json}
 
 ///|
-pub impl ToJson for AuthenticationError with fn to_json(self) {
+pub impl ToJson for CacheControlEphemeral with fn to_json(self) {
   @sdkjson.ObjBuilder::new()
-  .field("message", self.message)
+  .opt("ttl", self.ttl)
   .field("type", self.type_)
   .build()
 }
@@ -205,59 +260,1229 @@ pub impl ToJson for AuthenticationError with fn to_json(self) {
 ///|
 ///
 /// Decodes this value from JSON.
-pub extend AuthenticationError with @json.FromJson::{from_json}
+pub extend CacheControlEphemeral with @json.FromJson::{from_json}
 
 ///|
-pub impl @json.FromJson for AuthenticationError with fn from_json(value, path) {
+pub impl @json.FromJson for CacheControlEphemeral with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    message: required_field(obj, "message", path),
+    ttl: @sdkjson.opt_field(obj, "ttl", path),
     type_: required_field(obj, "type", path),
   }
 }
 
 ///|
 ///
-/// The tools available after a message exceed a limit on their number or their size.
-pub(all) struct AvailableToolsLimitExceededErrorDetails {} derive (
-  Eq,
-  @debug.Debug,
-)
+/// Create a cache control breakpoint at this content block.
+#non_exhaustive
+pub(all) enum RequestBashCodeExecutionToolResultBlockCacheControl {
+  Ephemeral(CacheControlEphemeral)
+  Unknown(String, Json)
+} derive(Eq, @debug.Debug)
 
 ///|
-pub extend AvailableToolsLimitExceededErrorDetails with Eq::{equal, not_equal}
+pub extend RequestBashCodeExecutionToolResultBlockCacheControl with Eq::{
+  equal,
+  not_equal,
+}
 
 ///|
-pub extend AvailableToolsLimitExceededErrorDetails with @debug.Debug::{to_repr}
+pub extend RequestBashCodeExecutionToolResultBlockCacheControl with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this tagged union as JSON.
+pub extend RequestBashCodeExecutionToolResultBlockCacheControl with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for RequestBashCodeExecutionToolResultBlockCacheControl with fn to_json(
+  self,
+) {
+  match self {
+    Ephemeral(value) => Json(value)
+    Unknown(_, value) => value
+  }
+}
+
+///|
+///
+/// Decodes this tagged union from JSON.
+pub extend RequestBashCodeExecutionToolResultBlockCacheControl with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for RequestBashCodeExecutionToolResultBlockCacheControl with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  let tag : String = required_field(obj, "type", path)
+  match tag {
+    "ephemeral" => Ephemeral(@json.from_json(value, path~))
+    other => Unknown(other, value)
+  }
+}
+
+///|
+///
+/// Generated string enum BashCodeExecutionToolResultErrorCode.
+#non_exhaustive
+pub(all) enum BashCodeExecutionToolResultErrorCode {
+  InvalidToolInput
+  Unavailable
+  TooManyRequests
+  ExecutionTimeExceeded
+  OutputFileTooLarge
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend BashCodeExecutionToolResultErrorCode with Eq::{equal, not_equal}
+
+///|
+pub extend BashCodeExecutionToolResultErrorCode with @debug.Debug::{to_repr}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend BashCodeExecutionToolResultErrorCode with ToJson::{to_json}
+
+///|
+pub impl ToJson for BashCodeExecutionToolResultErrorCode with fn to_json(self) {
+  let raw = match self {
+    InvalidToolInput => "invalid_tool_input"
+    Unavailable => "unavailable"
+    TooManyRequests => "too_many_requests"
+    ExecutionTimeExceeded => "execution_time_exceeded"
+    OutputFileTooLarge => "output_file_too_large"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend BashCodeExecutionToolResultErrorCode with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for BashCodeExecutionToolResultErrorCode with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "invalid_tool_input" => Some(InvalidToolInput)
+        "unavailable" => Some(Unavailable)
+        "too_many_requests" => Some(TooManyRequests)
+        "execution_time_exceeded" => Some(ExecutionTimeExceeded)
+        "output_file_too_large" => Some(OutputFileTooLarge)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of RequestBashCodeExecutionToolResultError.
+pub(all) struct RequestBashCodeExecutionToolResultError {
+  error_code : BashCodeExecutionToolResultErrorCode
+  type_ : String
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestBashCodeExecutionToolResultError with Eq::{equal, not_equal}
+
+///|
+pub extend RequestBashCodeExecutionToolResultError with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a RequestBashCodeExecutionToolResultError with omitted optional fields absent.
+pub fn RequestBashCodeExecutionToolResultError::new(
+  error_code~ : BashCodeExecutionToolResultErrorCode,
+  type_~ : String,
+) -> RequestBashCodeExecutionToolResultError {
+  { error_code, type_, }
+}
 
 ///|
 ///
 /// Encodes this value as JSON.
-pub extend AvailableToolsLimitExceededErrorDetails with ToJson::{to_json}
+pub extend RequestBashCodeExecutionToolResultError with ToJson::{to_json}
 
 ///|
-pub impl ToJson for AvailableToolsLimitExceededErrorDetails with fn to_json(
-  _self,
+pub impl ToJson for RequestBashCodeExecutionToolResultError with fn to_json(
+  self,
 ) {
   @sdkjson.ObjBuilder::new()
-  .field("error_code", "available_tools_limit_exceeded")
+  .field("error_code", self.error_code)
+  .field("type", self.type_)
   .build()
 }
 
 ///|
 ///
 /// Decodes this value from JSON.
-pub extend AvailableToolsLimitExceededErrorDetails with @json.FromJson::{
+pub extend RequestBashCodeExecutionToolResultError with @json.FromJson::{
   from_json,
 }
 
 ///|
-pub impl @json.FromJson for AvailableToolsLimitExceededErrorDetails with fn from_json(
+pub impl @json.FromJson for RequestBashCodeExecutionToolResultError with fn from_json(
   value,
   path,
 ) {
-  let _ = @sdkjson.expect_object(value, path)
-  AvailableToolsLimitExceededErrorDetails::{ }
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    error_code: required_field(obj, "error_code", path),
+    type_: required_field(obj, "type", path),
+  }
+}
+
+///|
+///
+/// Generated representation of RequestBashCodeExecutionOutputBlock.
+pub(all) struct RequestBashCodeExecutionOutputBlock {
+  file_id : String
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestBashCodeExecutionOutputBlock with Eq::{equal, not_equal}
+
+///|
+pub extend RequestBashCodeExecutionOutputBlock with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a RequestBashCodeExecutionOutputBlock with omitted optional fields absent.
+pub fn RequestBashCodeExecutionOutputBlock::new(
+  file_id~ : String,
+) -> RequestBashCodeExecutionOutputBlock {
+  { file_id, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend RequestBashCodeExecutionOutputBlock with ToJson::{to_json}
+
+///|
+pub impl ToJson for RequestBashCodeExecutionOutputBlock with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("file_id", self.file_id)
+  .field("type", "bash_code_execution_output")
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend RequestBashCodeExecutionOutputBlock with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for RequestBashCodeExecutionOutputBlock with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  { file_id: required_field(obj, "file_id", path), }
+}
+
+///|
+///
+/// Generated representation of RequestBashCodeExecutionResultBlock.
+pub(all) struct RequestBashCodeExecutionResultBlock {
+  content : Array[RequestBashCodeExecutionOutputBlock]
+  return_code : Int32
+  stderr : String
+  stdout : String
+  type_ : String
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestBashCodeExecutionResultBlock with Eq::{equal, not_equal}
+
+///|
+pub extend RequestBashCodeExecutionResultBlock with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a RequestBashCodeExecutionResultBlock with omitted optional fields absent.
+pub fn RequestBashCodeExecutionResultBlock::new(
+  content~ : Array[RequestBashCodeExecutionOutputBlock],
+  return_code~ : Int32,
+  stderr~ : String,
+  stdout~ : String,
+  type_~ : String,
+) -> RequestBashCodeExecutionResultBlock {
+  { content, return_code, stderr, stdout, type_, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend RequestBashCodeExecutionResultBlock with ToJson::{to_json}
+
+///|
+pub impl ToJson for RequestBashCodeExecutionResultBlock with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("content", self.content)
+  .field("return_code", self.return_code)
+  .field("stderr", self.stderr)
+  .field("stdout", self.stdout)
+  .field("type", self.type_)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend RequestBashCodeExecutionResultBlock with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for RequestBashCodeExecutionResultBlock with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    content: required_field(obj, "content", path),
+    return_code: required_field(obj, "return_code", path),
+    stderr: required_field(obj, "stderr", path),
+    stdout: required_field(obj, "stdout", path),
+    type_: required_field(obj, "type", path),
+  }
+}
+
+///|
+///
+/// Generated tagged union RequestBashCodeExecutionToolResultBlockContent.
+#non_exhaustive
+pub(all) enum RequestBashCodeExecutionToolResultBlockContent {
+  BashCodeExecutionToolResultError(RequestBashCodeExecutionToolResultError)
+  BashCodeExecutionResult(RequestBashCodeExecutionResultBlock)
+  Unknown(String, Json)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestBashCodeExecutionToolResultBlockContent with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend RequestBashCodeExecutionToolResultBlockContent with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this tagged union as JSON.
+pub extend RequestBashCodeExecutionToolResultBlockContent with ToJson::{to_json}
+
+///|
+pub impl ToJson for RequestBashCodeExecutionToolResultBlockContent with fn to_json(
+  self,
+) {
+  match self {
+    BashCodeExecutionToolResultError(value) => Json(value)
+    BashCodeExecutionResult(value) => Json(value)
+    Unknown(_, value) => value
+  }
+}
+
+///|
+///
+/// Decodes this tagged union from JSON.
+pub extend RequestBashCodeExecutionToolResultBlockContent with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for RequestBashCodeExecutionToolResultBlockContent with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  let tag : String = required_field(obj, "type", path)
+  match tag {
+    "bash_code_execution_tool_result_error" =>
+      BashCodeExecutionToolResultError(@json.from_json(value, path~))
+    "bash_code_execution_result" =>
+      BashCodeExecutionResult(@json.from_json(value, path~))
+    other => Unknown(other, value)
+  }
+}
+
+///|
+///
+/// Generated representation of RequestBashCodeExecutionToolResultBlock.
+pub(all) struct RequestBashCodeExecutionToolResultBlock {
+  cache_control : @sdkjson.Presence[
+    RequestBashCodeExecutionToolResultBlockCacheControl,
+  ]
+  content : RequestBashCodeExecutionToolResultBlockContent
+  tool_use_id : String
+  type_ : String
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestBashCodeExecutionToolResultBlock with Eq::{equal, not_equal}
+
+///|
+pub extend RequestBashCodeExecutionToolResultBlock with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a RequestBashCodeExecutionToolResultBlock with omitted optional fields absent.
+pub fn RequestBashCodeExecutionToolResultBlock::new(
+  content~ : RequestBashCodeExecutionToolResultBlockContent,
+  tool_use_id~ : String,
+  type_~ : String,
+  cache_control? : RequestBashCodeExecutionToolResultBlockCacheControl,
+) -> RequestBashCodeExecutionToolResultBlock {
+  {
+    cache_control: @sdkjson.Presence::from_option(cache_control),
+    content,
+    tool_use_id,
+    type_,
+  }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend RequestBashCodeExecutionToolResultBlock with ToJson::{to_json}
+
+///|
+pub impl ToJson for RequestBashCodeExecutionToolResultBlock with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .presence("cache_control", self.cache_control)
+  .field("content", self.content)
+  .field("tool_use_id", self.tool_use_id)
+  .field("type", self.type_)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend RequestBashCodeExecutionToolResultBlock with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for RequestBashCodeExecutionToolResultBlock with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    cache_control: @sdkjson.presence_field(obj, "cache_control", path),
+    content: required_field(obj, "content", path),
+    tool_use_id: required_field(obj, "tool_use_id", path),
+    type_: required_field(obj, "type", path),
+  }
+}
+
+///|
+///
+/// Create a cache control breakpoint at this content block.
+#non_exhaustive
+pub(all) enum RequestCodeExecutionToolResultBlockCacheControl {
+  Ephemeral(CacheControlEphemeral)
+  Unknown(String, Json)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestCodeExecutionToolResultBlockCacheControl with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend RequestCodeExecutionToolResultBlockCacheControl with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this tagged union as JSON.
+pub extend RequestCodeExecutionToolResultBlockCacheControl with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for RequestCodeExecutionToolResultBlockCacheControl with fn to_json(
+  self,
+) {
+  match self {
+    Ephemeral(value) => Json(value)
+    Unknown(_, value) => value
+  }
+}
+
+///|
+///
+/// Decodes this tagged union from JSON.
+pub extend RequestCodeExecutionToolResultBlockCacheControl with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for RequestCodeExecutionToolResultBlockCacheControl with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  let tag : String = required_field(obj, "type", path)
+  match tag {
+    "ephemeral" => Ephemeral(@json.from_json(value, path~))
+    other => Unknown(other, value)
+  }
+}
+
+///|
+///
+/// Generated string enum CodeExecutionToolResultErrorCode.
+#non_exhaustive
+pub(all) enum CodeExecutionToolResultErrorCode {
+  InvalidToolInput
+  Unavailable
+  TooManyRequests
+  ExecutionTimeExceeded
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend CodeExecutionToolResultErrorCode with Eq::{equal, not_equal}
+
+///|
+pub extend CodeExecutionToolResultErrorCode with @debug.Debug::{to_repr}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend CodeExecutionToolResultErrorCode with ToJson::{to_json}
+
+///|
+pub impl ToJson for CodeExecutionToolResultErrorCode with fn to_json(self) {
+  let raw = match self {
+    InvalidToolInput => "invalid_tool_input"
+    Unavailable => "unavailable"
+    TooManyRequests => "too_many_requests"
+    ExecutionTimeExceeded => "execution_time_exceeded"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend CodeExecutionToolResultErrorCode with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for CodeExecutionToolResultErrorCode with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "invalid_tool_input" => Some(InvalidToolInput)
+        "unavailable" => Some(Unavailable)
+        "too_many_requests" => Some(TooManyRequests)
+        "execution_time_exceeded" => Some(ExecutionTimeExceeded)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of RequestCodeExecutionToolResultError.
+pub(all) struct RequestCodeExecutionToolResultError {
+  error_code : CodeExecutionToolResultErrorCode
+  type_ : String
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestCodeExecutionToolResultError with Eq::{equal, not_equal}
+
+///|
+pub extend RequestCodeExecutionToolResultError with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a RequestCodeExecutionToolResultError with omitted optional fields absent.
+pub fn RequestCodeExecutionToolResultError::new(
+  error_code~ : CodeExecutionToolResultErrorCode,
+  type_~ : String,
+) -> RequestCodeExecutionToolResultError {
+  { error_code, type_, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend RequestCodeExecutionToolResultError with ToJson::{to_json}
+
+///|
+pub impl ToJson for RequestCodeExecutionToolResultError with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("error_code", self.error_code)
+  .field("type", self.type_)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend RequestCodeExecutionToolResultError with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for RequestCodeExecutionToolResultError with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    error_code: required_field(obj, "error_code", path),
+    type_: required_field(obj, "type", path),
+  }
+}
+
+///|
+///
+/// Generated representation of RequestCodeExecutionOutputBlock.
+pub(all) struct RequestCodeExecutionOutputBlock {
+  file_id : String
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestCodeExecutionOutputBlock with Eq::{equal, not_equal}
+
+///|
+pub extend RequestCodeExecutionOutputBlock with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a RequestCodeExecutionOutputBlock with omitted optional fields absent.
+pub fn RequestCodeExecutionOutputBlock::new(
+  file_id~ : String,
+) -> RequestCodeExecutionOutputBlock {
+  { file_id, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend RequestCodeExecutionOutputBlock with ToJson::{to_json}
+
+///|
+pub impl ToJson for RequestCodeExecutionOutputBlock with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("file_id", self.file_id)
+  .field("type", "code_execution_output")
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend RequestCodeExecutionOutputBlock with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for RequestCodeExecutionOutputBlock with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  { file_id: required_field(obj, "file_id", path), }
+}
+
+///|
+///
+/// Generated representation of RequestCodeExecutionResultBlock.
+pub(all) struct RequestCodeExecutionResultBlock {
+  content : Array[RequestCodeExecutionOutputBlock]
+  return_code : Int32
+  stderr : String
+  stdout : String
+  type_ : String
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestCodeExecutionResultBlock with Eq::{equal, not_equal}
+
+///|
+pub extend RequestCodeExecutionResultBlock with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a RequestCodeExecutionResultBlock with omitted optional fields absent.
+pub fn RequestCodeExecutionResultBlock::new(
+  content~ : Array[RequestCodeExecutionOutputBlock],
+  return_code~ : Int32,
+  stderr~ : String,
+  stdout~ : String,
+  type_~ : String,
+) -> RequestCodeExecutionResultBlock {
+  { content, return_code, stderr, stdout, type_, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend RequestCodeExecutionResultBlock with ToJson::{to_json}
+
+///|
+pub impl ToJson for RequestCodeExecutionResultBlock with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("content", self.content)
+  .field("return_code", self.return_code)
+  .field("stderr", self.stderr)
+  .field("stdout", self.stdout)
+  .field("type", self.type_)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend RequestCodeExecutionResultBlock with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for RequestCodeExecutionResultBlock with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    content: required_field(obj, "content", path),
+    return_code: required_field(obj, "return_code", path),
+    stderr: required_field(obj, "stderr", path),
+    stdout: required_field(obj, "stdout", path),
+    type_: required_field(obj, "type", path),
+  }
+}
+
+///|
+///
+/// Code execution result with encrypted stdout for PFC + web_search results.
+pub(all) struct RequestEncryptedCodeExecutionResultBlock {
+  content : Array[RequestCodeExecutionOutputBlock]
+  encrypted_stdout : String
+  return_code : Int32
+  stderr : String
+  type_ : String
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestEncryptedCodeExecutionResultBlock with Eq::{equal, not_equal}
+
+///|
+pub extend RequestEncryptedCodeExecutionResultBlock with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a RequestEncryptedCodeExecutionResultBlock with omitted optional fields absent.
+pub fn RequestEncryptedCodeExecutionResultBlock::new(
+  content~ : Array[RequestCodeExecutionOutputBlock],
+  encrypted_stdout~ : String,
+  return_code~ : Int32,
+  stderr~ : String,
+  type_~ : String,
+) -> RequestEncryptedCodeExecutionResultBlock {
+  { content, encrypted_stdout, return_code, stderr, type_, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend RequestEncryptedCodeExecutionResultBlock with ToJson::{to_json}
+
+///|
+pub impl ToJson for RequestEncryptedCodeExecutionResultBlock with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .field("content", self.content)
+  .field("encrypted_stdout", self.encrypted_stdout)
+  .field("return_code", self.return_code)
+  .field("stderr", self.stderr)
+  .field("type", self.type_)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend RequestEncryptedCodeExecutionResultBlock with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for RequestEncryptedCodeExecutionResultBlock with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    content: required_field(obj, "content", path),
+    encrypted_stdout: required_field(obj, "encrypted_stdout", path),
+    return_code: required_field(obj, "return_code", path),
+    stderr: required_field(obj, "stderr", path),
+    type_: required_field(obj, "type", path),
+  }
+}
+
+///|
+///
+/// Generated tagged union RequestCodeExecutionToolResultBlockContent.
+#non_exhaustive
+pub(all) enum RequestCodeExecutionToolResultBlockContent {
+  CodeExecutionToolResultError(RequestCodeExecutionToolResultError)
+  CodeExecutionResult(RequestCodeExecutionResultBlock)
+  EncryptedCodeExecutionResult(RequestEncryptedCodeExecutionResultBlock)
+  Unknown(String, Json)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestCodeExecutionToolResultBlockContent with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend RequestCodeExecutionToolResultBlockContent with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this tagged union as JSON.
+pub extend RequestCodeExecutionToolResultBlockContent with ToJson::{to_json}
+
+///|
+pub impl ToJson for RequestCodeExecutionToolResultBlockContent with fn to_json(
+  self,
+) {
+  match self {
+    CodeExecutionToolResultError(value) => Json(value)
+    CodeExecutionResult(value) => Json(value)
+    EncryptedCodeExecutionResult(value) => Json(value)
+    Unknown(_, value) => value
+  }
+}
+
+///|
+///
+/// Decodes this tagged union from JSON.
+pub extend RequestCodeExecutionToolResultBlockContent with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for RequestCodeExecutionToolResultBlockContent with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  let tag : String = required_field(obj, "type", path)
+  match tag {
+    "code_execution_tool_result_error" =>
+      CodeExecutionToolResultError(@json.from_json(value, path~))
+    "code_execution_result" =>
+      CodeExecutionResult(@json.from_json(value, path~))
+    "encrypted_code_execution_result" =>
+      EncryptedCodeExecutionResult(@json.from_json(value, path~))
+    other => Unknown(other, value)
+  }
+}
+
+///|
+///
+/// Generated representation of RequestCodeExecutionToolResultBlock.
+pub(all) struct RequestCodeExecutionToolResultBlock {
+  cache_control : @sdkjson.Presence[
+    RequestCodeExecutionToolResultBlockCacheControl,
+  ]
+  content : RequestCodeExecutionToolResultBlockContent
+  tool_use_id : String
+  type_ : String
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestCodeExecutionToolResultBlock with Eq::{equal, not_equal}
+
+///|
+pub extend RequestCodeExecutionToolResultBlock with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a RequestCodeExecutionToolResultBlock with omitted optional fields absent.
+pub fn RequestCodeExecutionToolResultBlock::new(
+  content~ : RequestCodeExecutionToolResultBlockContent,
+  tool_use_id~ : String,
+  type_~ : String,
+  cache_control? : RequestCodeExecutionToolResultBlockCacheControl,
+) -> RequestCodeExecutionToolResultBlock {
+  {
+    cache_control: @sdkjson.Presence::from_option(cache_control),
+    content,
+    tool_use_id,
+    type_,
+  }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend RequestCodeExecutionToolResultBlock with ToJson::{to_json}
+
+///|
+pub impl ToJson for RequestCodeExecutionToolResultBlock with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .presence("cache_control", self.cache_control)
+  .field("content", self.content)
+  .field("tool_use_id", self.tool_use_id)
+  .field("type", self.type_)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend RequestCodeExecutionToolResultBlock with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for RequestCodeExecutionToolResultBlock with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    cache_control: @sdkjson.presence_field(obj, "cache_control", path),
+    content: required_field(obj, "content", path),
+    tool_use_id: required_field(obj, "tool_use_id", path),
+    type_: required_field(obj, "type", path),
+  }
+}
+
+///|
+///
+/// Create a cache control breakpoint at this content block.
+#non_exhaustive
+pub(all) enum RequestContainerUploadBlockCacheControl {
+  Ephemeral(CacheControlEphemeral)
+  Unknown(String, Json)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestContainerUploadBlockCacheControl with Eq::{equal, not_equal}
+
+///|
+pub extend RequestContainerUploadBlockCacheControl with @debug.Debug::{to_repr}
+
+///|
+///
+/// Encodes this tagged union as JSON.
+pub extend RequestContainerUploadBlockCacheControl with ToJson::{to_json}
+
+///|
+pub impl ToJson for RequestContainerUploadBlockCacheControl with fn to_json(
+  self,
+) {
+  match self {
+    Ephemeral(value) => Json(value)
+    Unknown(_, value) => value
+  }
+}
+
+///|
+///
+/// Decodes this tagged union from JSON.
+pub extend RequestContainerUploadBlockCacheControl with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for RequestContainerUploadBlockCacheControl with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  let tag : String = required_field(obj, "type", path)
+  match tag {
+    "ephemeral" => Ephemeral(@json.from_json(value, path~))
+    other => Unknown(other, value)
+  }
+}
+
+///|
+///
+/// A content block that represents a file to be uploaded to the container Files uploaded via this block will be available in the container's input directory.
+pub(all) struct RequestContainerUploadBlock {
+  cache_control : @sdkjson.Presence[RequestContainerUploadBlockCacheControl]
+  file_id : String
+  type_ : String
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestContainerUploadBlock with Eq::{equal, not_equal}
+
+///|
+pub extend RequestContainerUploadBlock with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a RequestContainerUploadBlock with omitted optional fields absent.
+pub fn RequestContainerUploadBlock::new(
+  file_id~ : String,
+  type_~ : String,
+  cache_control? : RequestContainerUploadBlockCacheControl,
+) -> RequestContainerUploadBlock {
+  {
+    cache_control: @sdkjson.Presence::from_option(cache_control),
+    file_id,
+    type_,
+  }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend RequestContainerUploadBlock with ToJson::{to_json}
+
+///|
+pub impl ToJson for RequestContainerUploadBlock with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .presence("cache_control", self.cache_control)
+  .field("file_id", self.file_id)
+  .field("type", self.type_)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend RequestContainerUploadBlock with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for RequestContainerUploadBlock with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    cache_control: @sdkjson.presence_field(obj, "cache_control", path),
+    file_id: required_field(obj, "file_id", path),
+    type_: required_field(obj, "type", path),
+  }
+}
+
+///|
+///
+/// Create a cache control breakpoint at this content block.
+#non_exhaustive
+pub(all) enum RequestDocumentBlockCacheControl {
+  Ephemeral(CacheControlEphemeral)
+  Unknown(String, Json)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestDocumentBlockCacheControl with Eq::{equal, not_equal}
+
+///|
+pub extend RequestDocumentBlockCacheControl with @debug.Debug::{to_repr}
+
+///|
+///
+/// Encodes this tagged union as JSON.
+pub extend RequestDocumentBlockCacheControl with ToJson::{to_json}
+
+///|
+pub impl ToJson for RequestDocumentBlockCacheControl with fn to_json(self) {
+  match self {
+    Ephemeral(value) => Json(value)
+    Unknown(_, value) => value
+  }
+}
+
+///|
+///
+/// Decodes this tagged union from JSON.
+pub extend RequestDocumentBlockCacheControl with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for RequestDocumentBlockCacheControl with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  let tag : String = required_field(obj, "type", path)
+  match tag {
+    "ephemeral" => Ephemeral(@json.from_json(value, path~))
+    other => Unknown(other, value)
+  }
+}
+
+///|
+///
+/// Generated representation of RequestCitationsConfig.
+pub(all) struct RequestCitationsConfig {
+  enabled : Bool?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestCitationsConfig with Eq::{equal, not_equal}
+
+///|
+pub extend RequestCitationsConfig with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a RequestCitationsConfig with omitted optional fields absent.
+pub fn RequestCitationsConfig::new(enabled? : Bool) -> RequestCitationsConfig {
+  { enabled, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend RequestCitationsConfig with ToJson::{to_json}
+
+///|
+pub impl ToJson for RequestCitationsConfig with fn to_json(self) {
+  @sdkjson.ObjBuilder::new().opt("enabled", self.enabled).build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend RequestCitationsConfig with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for RequestCitationsConfig with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  { enabled: @sdkjson.opt_field(obj, "enabled", path), }
+}
+
+///|
+///
+/// Generated representation of Base64PDFSource.
+pub(all) struct Base64PDFSource {
+  data : String
+  type_ : String
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend Base64PDFSource with Eq::{equal, not_equal}
+
+///|
+pub extend Base64PDFSource with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a Base64PDFSource with omitted optional fields absent.
+pub fn Base64PDFSource::new(data~ : String, type_~ : String) -> Base64PDFSource {
+  { data, type_, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend Base64PDFSource with ToJson::{to_json}
+
+///|
+pub impl ToJson for Base64PDFSource with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("data", self.data)
+  .field("media_type", "application/pdf")
+  .field("type", self.type_)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend Base64PDFSource with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for Base64PDFSource with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    data: required_field(obj, "data", path),
+    type_: required_field(obj, "type", path),
+  }
+}
+
+///|
+///
+/// Create a cache control breakpoint at this content block.
+#non_exhaustive
+pub(all) enum RequestImageBlockCacheControl {
+  Ephemeral(CacheControlEphemeral)
+  Unknown(String, Json)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestImageBlockCacheControl with Eq::{equal, not_equal}
+
+///|
+pub extend RequestImageBlockCacheControl with @debug.Debug::{to_repr}
+
+///|
+///
+/// Encodes this tagged union as JSON.
+pub extend RequestImageBlockCacheControl with ToJson::{to_json}
+
+///|
+pub impl ToJson for RequestImageBlockCacheControl with fn to_json(self) {
+  match self {
+    Ephemeral(value) => Json(value)
+    Unknown(_, value) => value
+  }
+}
+
+///|
+///
+/// Decodes this tagged union from JSON.
+pub extend RequestImageBlockCacheControl with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for RequestImageBlockCacheControl with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  let tag : String = required_field(obj, "type", path)
+  match tag {
+    "ephemeral" => Ephemeral(@json.from_json(value, path~))
+    other => Unknown(other, value)
+  }
 }
 
 ///|
@@ -378,35 +1603,37 @@ pub impl @json.FromJson for Base64ImageSource with fn from_json(value, path) {
 
 ///|
 ///
-/// Generated representation of Base64PDFSource.
-pub(all) struct Base64PDFSource {
-  data : String
+/// Generated representation of FileImageSource.
+pub(all) struct FileImageSource {
+  file_id : String
   type_ : String
 } derive(Eq, @debug.Debug)
 
 ///|
-pub extend Base64PDFSource with Eq::{equal, not_equal}
+pub extend FileImageSource with Eq::{equal, not_equal}
 
 ///|
-pub extend Base64PDFSource with @debug.Debug::{to_repr}
+pub extend FileImageSource with @debug.Debug::{to_repr}
 
 ///|
 ///
-/// Creates a Base64PDFSource with omitted optional fields absent.
-pub fn Base64PDFSource::new(data~ : String, type_~ : String) -> Base64PDFSource {
-  { data, type_, }
+/// Creates a FileImageSource with omitted optional fields absent.
+pub fn FileImageSource::new(
+  file_id~ : String,
+  type_~ : String,
+) -> FileImageSource {
+  { file_id, type_, }
 }
 
 ///|
 ///
 /// Encodes this value as JSON.
-pub extend Base64PDFSource with ToJson::{to_json}
+pub extend FileImageSource with ToJson::{to_json}
 
 ///|
-pub impl ToJson for Base64PDFSource with fn to_json(self) {
+pub impl ToJson for FileImageSource with fn to_json(self) {
   @sdkjson.ObjBuilder::new()
-  .field("data", self.data)
-  .field("media_type", "application/pdf")
+  .field("file_id", self.file_id)
   .field("type", self.type_)
   .build()
 }
@@ -414,10 +1641,1102 @@ pub impl ToJson for Base64PDFSource with fn to_json(self) {
 ///|
 ///
 /// Decodes this value from JSON.
-pub extend Base64PDFSource with @json.FromJson::{from_json}
+pub extend FileImageSource with @json.FromJson::{from_json}
 
 ///|
-pub impl @json.FromJson for Base64PDFSource with fn from_json(value, path) {
+pub impl @json.FromJson for FileImageSource with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    file_id: required_field(obj, "file_id", path),
+    type_: required_field(obj, "type", path),
+  }
+}
+
+///|
+///
+/// Generated representation of URLImageSource.
+pub(all) struct URLImageSource {
+  type_ : String
+  url : String
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend URLImageSource with Eq::{equal, not_equal}
+
+///|
+pub extend URLImageSource with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a URLImageSource with omitted optional fields absent.
+pub fn URLImageSource::new(type_~ : String, url~ : String) -> URLImageSource {
+  { type_, url, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend URLImageSource with ToJson::{to_json}
+
+///|
+pub impl ToJson for URLImageSource with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("type", self.type_)
+  .field("url", self.url)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend URLImageSource with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for URLImageSource with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    type_: required_field(obj, "type", path),
+    url: required_field(obj, "url", path),
+  }
+}
+
+///|
+///
+/// Generated tagged union RequestImageBlockSource.
+#non_exhaustive
+pub(all) enum RequestImageBlockSource {
+  Base64(Base64ImageSource)
+  File(FileImageSource)
+  Url(URLImageSource)
+  Unknown(String, Json)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestImageBlockSource with Eq::{equal, not_equal}
+
+///|
+pub extend RequestImageBlockSource with @debug.Debug::{to_repr}
+
+///|
+///
+/// Encodes this tagged union as JSON.
+pub extend RequestImageBlockSource with ToJson::{to_json}
+
+///|
+pub impl ToJson for RequestImageBlockSource with fn to_json(self) {
+  match self {
+    Base64(value) => Json(value)
+    File(value) => Json(value)
+    Url(value) => Json(value)
+    Unknown(_, value) => value
+  }
+}
+
+///|
+///
+/// Decodes this tagged union from JSON.
+pub extend RequestImageBlockSource with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for RequestImageBlockSource with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  let tag : String = required_field(obj, "type", path)
+  match tag {
+    "base64" => Base64(@json.from_json(value, path~))
+    "file" => File(@json.from_json(value, path~))
+    "url" => Url(@json.from_json(value, path~))
+    other => Unknown(other, value)
+  }
+}
+
+///|
+///
+/// What the server does when this image exceeds the model's maximum image size. `"downsize"` (the default) scales the image down to fit, which changes the dimensions the model observes without telling you. `"error"` instead rejects the request with a 400 error naming the image's dimensions and the largest dimensions that fit, so you can scale the image deliberately — your image is never silently scaled down.
+#non_exhaustive
+pub(all) enum RequestImageTransformationsOversizedImage {
+  Downsize
+  Error
+  Custom(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestImageTransformationsOversizedImage with Eq::{equal, not_equal}
+
+///|
+pub extend RequestImageTransformationsOversizedImage with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend RequestImageTransformationsOversizedImage with ToJson::{to_json}
+
+///|
+pub impl ToJson for RequestImageTransformationsOversizedImage with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Downsize => "downsize"
+    Error => "error"
+    Custom(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend RequestImageTransformationsOversizedImage with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for RequestImageTransformationsOversizedImage with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "downsize" => Some(Downsize)
+        "error" => Some(Error)
+        _ => None
+      }
+    },
+    raw => Custom(raw),
+  )
+}
+
+///|
+///
+/// Configures the transformations the server applies to this image before the model observes it. Each key names a condition the server transforms images for; its value selects the transformation applied. Omitted keys keep their default behavior, and an empty object is equivalent to omitting the field.
+pub(all) struct RequestImageTransformations {
+  oversized_image : RequestImageTransformationsOversizedImage?
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestImageTransformations with Eq::{equal, not_equal}
+
+///|
+pub extend RequestImageTransformations with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a RequestImageTransformations with omitted optional fields absent.
+pub fn RequestImageTransformations::new(
+  oversized_image? : RequestImageTransformationsOversizedImage,
+) -> RequestImageTransformations {
+  { oversized_image, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend RequestImageTransformations with ToJson::{to_json}
+
+///|
+pub impl ToJson for RequestImageTransformations with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .opt("oversized_image", self.oversized_image)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend RequestImageTransformations with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for RequestImageTransformations with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  { oversized_image: @sdkjson.opt_field(obj, "oversized_image", path), }
+}
+
+///|
+///
+/// Generated representation of RequestImageBlock.
+pub(all) struct RequestImageBlock {
+  cache_control : @sdkjson.Presence[RequestImageBlockCacheControl]
+  source : RequestImageBlockSource
+  transformations : @sdkjson.Presence[RequestImageTransformations]
+  type_ : String
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestImageBlock with Eq::{equal, not_equal}
+
+///|
+pub extend RequestImageBlock with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a RequestImageBlock with omitted optional fields absent.
+pub fn RequestImageBlock::new(
+  source~ : RequestImageBlockSource,
+  type_~ : String,
+  cache_control? : RequestImageBlockCacheControl,
+  transformations? : RequestImageTransformations,
+) -> RequestImageBlock {
+  {
+    cache_control: @sdkjson.Presence::from_option(cache_control),
+    source,
+    transformations: @sdkjson.Presence::from_option(transformations),
+    type_,
+  }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend RequestImageBlock with ToJson::{to_json}
+
+///|
+pub impl ToJson for RequestImageBlock with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .presence("cache_control", self.cache_control)
+  .field("source", self.source)
+  .presence("transformations", self.transformations)
+  .field("type", self.type_)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend RequestImageBlock with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for RequestImageBlock with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    cache_control: @sdkjson.presence_field(obj, "cache_control", path),
+    source: required_field(obj, "source", path),
+    transformations: @sdkjson.presence_field(obj, "transformations", path),
+    type_: required_field(obj, "type", path),
+  }
+}
+
+///|
+///
+/// Create a cache control breakpoint at this content block.
+#non_exhaustive
+pub(all) enum RequestTextBlockCacheControl {
+  Ephemeral(CacheControlEphemeral)
+  Unknown(String, Json)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestTextBlockCacheControl with Eq::{equal, not_equal}
+
+///|
+pub extend RequestTextBlockCacheControl with @debug.Debug::{to_repr}
+
+///|
+///
+/// Encodes this tagged union as JSON.
+pub extend RequestTextBlockCacheControl with ToJson::{to_json}
+
+///|
+pub impl ToJson for RequestTextBlockCacheControl with fn to_json(self) {
+  match self {
+    Ephemeral(value) => Json(value)
+    Unknown(_, value) => value
+  }
+}
+
+///|
+///
+/// Decodes this tagged union from JSON.
+pub extend RequestTextBlockCacheControl with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for RequestTextBlockCacheControl with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  let tag : String = required_field(obj, "type", path)
+  match tag {
+    "ephemeral" => Ephemeral(@json.from_json(value, path~))
+    other => Unknown(other, value)
+  }
+}
+
+///|
+///
+/// Generated representation of RequestCharLocationCitation.
+pub(all) struct RequestCharLocationCitation {
+  cited_text : String
+  document_index : Int32
+  document_title : String?
+  end_char_index : Int32
+  start_char_index : Int32
+  type_ : String
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestCharLocationCitation with Eq::{equal, not_equal}
+
+///|
+pub extend RequestCharLocationCitation with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a RequestCharLocationCitation with omitted optional fields absent.
+pub fn RequestCharLocationCitation::new(
+  cited_text~ : String,
+  document_index~ : Int32,
+  end_char_index~ : Int32,
+  start_char_index~ : Int32,
+  type_~ : String,
+  document_title? : String,
+) -> RequestCharLocationCitation {
+  {
+    cited_text,
+    document_index,
+    document_title,
+    end_char_index,
+    start_char_index,
+    type_,
+  }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend RequestCharLocationCitation with ToJson::{to_json}
+
+///|
+pub impl ToJson for RequestCharLocationCitation with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("cited_text", self.cited_text)
+  .field("document_index", self.document_index)
+  .presence(
+    "document_title",
+    nullable_presence(self.document_title.map(value => value)),
+  )
+  .field("end_char_index", self.end_char_index)
+  .field("start_char_index", self.start_char_index)
+  .field("type", self.type_)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend RequestCharLocationCitation with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for RequestCharLocationCitation with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    cited_text: required_field(obj, "cited_text", path),
+    document_index: required_field(obj, "document_index", path),
+    document_title: decode_nullable_field(obj, "document_title", path),
+    end_char_index: required_field(obj, "end_char_index", path),
+    start_char_index: required_field(obj, "start_char_index", path),
+    type_: required_field(obj, "type", path),
+  }
+}
+
+///|
+///
+/// Generated representation of RequestContentBlockLocationCitation.
+pub(all) struct RequestContentBlockLocationCitation {
+  cited_text : String
+  document_index : Int32
+  document_title : String?
+  end_block_index : Int32
+  start_block_index : Int32
+  type_ : String
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestContentBlockLocationCitation with Eq::{equal, not_equal}
+
+///|
+pub extend RequestContentBlockLocationCitation with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a RequestContentBlockLocationCitation with omitted optional fields absent.
+pub fn RequestContentBlockLocationCitation::new(
+  cited_text~ : String,
+  document_index~ : Int32,
+  end_block_index~ : Int32,
+  start_block_index~ : Int32,
+  type_~ : String,
+  document_title? : String,
+) -> RequestContentBlockLocationCitation {
+  {
+    cited_text,
+    document_index,
+    document_title,
+    end_block_index,
+    start_block_index,
+    type_,
+  }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend RequestContentBlockLocationCitation with ToJson::{to_json}
+
+///|
+pub impl ToJson for RequestContentBlockLocationCitation with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("cited_text", self.cited_text)
+  .field("document_index", self.document_index)
+  .presence(
+    "document_title",
+    nullable_presence(self.document_title.map(value => value)),
+  )
+  .field("end_block_index", self.end_block_index)
+  .field("start_block_index", self.start_block_index)
+  .field("type", self.type_)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend RequestContentBlockLocationCitation with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for RequestContentBlockLocationCitation with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    cited_text: required_field(obj, "cited_text", path),
+    document_index: required_field(obj, "document_index", path),
+    document_title: decode_nullable_field(obj, "document_title", path),
+    end_block_index: required_field(obj, "end_block_index", path),
+    start_block_index: required_field(obj, "start_block_index", path),
+    type_: required_field(obj, "type", path),
+  }
+}
+
+///|
+///
+/// Generated representation of RequestPageLocationCitation.
+pub(all) struct RequestPageLocationCitation {
+  cited_text : String
+  document_index : Int32
+  document_title : String?
+  end_page_number : Int32
+  start_page_number : Int32
+  type_ : String
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestPageLocationCitation with Eq::{equal, not_equal}
+
+///|
+pub extend RequestPageLocationCitation with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a RequestPageLocationCitation with omitted optional fields absent.
+pub fn RequestPageLocationCitation::new(
+  cited_text~ : String,
+  document_index~ : Int32,
+  end_page_number~ : Int32,
+  start_page_number~ : Int32,
+  type_~ : String,
+  document_title? : String,
+) -> RequestPageLocationCitation {
+  {
+    cited_text,
+    document_index,
+    document_title,
+    end_page_number,
+    start_page_number,
+    type_,
+  }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend RequestPageLocationCitation with ToJson::{to_json}
+
+///|
+pub impl ToJson for RequestPageLocationCitation with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("cited_text", self.cited_text)
+  .field("document_index", self.document_index)
+  .presence(
+    "document_title",
+    nullable_presence(self.document_title.map(value => value)),
+  )
+  .field("end_page_number", self.end_page_number)
+  .field("start_page_number", self.start_page_number)
+  .field("type", self.type_)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend RequestPageLocationCitation with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for RequestPageLocationCitation with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    cited_text: required_field(obj, "cited_text", path),
+    document_index: required_field(obj, "document_index", path),
+    document_title: decode_nullable_field(obj, "document_title", path),
+    end_page_number: required_field(obj, "end_page_number", path),
+    start_page_number: required_field(obj, "start_page_number", path),
+    type_: required_field(obj, "type", path),
+  }
+}
+
+///|
+///
+/// Generated representation of RequestSearchResultLocationCitation.
+pub(all) struct RequestSearchResultLocationCitation {
+  cited_text : String
+  end_block_index : Int32
+  search_result_index : Int32
+  source : String
+  start_block_index : Int32
+  title : String?
+  type_ : String
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestSearchResultLocationCitation with Eq::{equal, not_equal}
+
+///|
+pub extend RequestSearchResultLocationCitation with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a RequestSearchResultLocationCitation with omitted optional fields absent.
+pub fn RequestSearchResultLocationCitation::new(
+  cited_text~ : String,
+  end_block_index~ : Int32,
+  search_result_index~ : Int32,
+  source~ : String,
+  start_block_index~ : Int32,
+  type_~ : String,
+  title? : String,
+) -> RequestSearchResultLocationCitation {
+  {
+    cited_text,
+    end_block_index,
+    search_result_index,
+    source,
+    start_block_index,
+    title,
+    type_,
+  }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend RequestSearchResultLocationCitation with ToJson::{to_json}
+
+///|
+pub impl ToJson for RequestSearchResultLocationCitation with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("cited_text", self.cited_text)
+  .field("end_block_index", self.end_block_index)
+  .field("search_result_index", self.search_result_index)
+  .field("source", self.source)
+  .field("start_block_index", self.start_block_index)
+  .presence("title", nullable_presence(self.title.map(value => value)))
+  .field("type", self.type_)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend RequestSearchResultLocationCitation with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for RequestSearchResultLocationCitation with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    cited_text: required_field(obj, "cited_text", path),
+    end_block_index: required_field(obj, "end_block_index", path),
+    search_result_index: required_field(obj, "search_result_index", path),
+    source: required_field(obj, "source", path),
+    start_block_index: required_field(obj, "start_block_index", path),
+    title: decode_nullable_field(obj, "title", path),
+    type_: required_field(obj, "type", path),
+  }
+}
+
+///|
+///
+/// Generated representation of RequestWebSearchResultLocationCitation.
+pub(all) struct RequestWebSearchResultLocationCitation {
+  cited_text : String
+  encrypted_index : String
+  title : String?
+  type_ : String
+  url : String
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestWebSearchResultLocationCitation with Eq::{equal, not_equal}
+
+///|
+pub extend RequestWebSearchResultLocationCitation with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a RequestWebSearchResultLocationCitation with omitted optional fields absent.
+pub fn RequestWebSearchResultLocationCitation::new(
+  cited_text~ : String,
+  encrypted_index~ : String,
+  type_~ : String,
+  url~ : String,
+  title? : String,
+) -> RequestWebSearchResultLocationCitation {
+  { cited_text, encrypted_index, title, type_, url, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend RequestWebSearchResultLocationCitation with ToJson::{to_json}
+
+///|
+pub impl ToJson for RequestWebSearchResultLocationCitation with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("cited_text", self.cited_text)
+  .field("encrypted_index", self.encrypted_index)
+  .presence("title", nullable_presence(self.title.map(value => value)))
+  .field("type", self.type_)
+  .field("url", self.url)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend RequestWebSearchResultLocationCitation with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for RequestWebSearchResultLocationCitation with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    cited_text: required_field(obj, "cited_text", path),
+    encrypted_index: required_field(obj, "encrypted_index", path),
+    title: decode_nullable_field(obj, "title", path),
+    type_: required_field(obj, "type", path),
+    url: required_field(obj, "url", path),
+  }
+}
+
+///|
+///
+/// Generated tagged union RequestTextBlockCitationsItem.
+#non_exhaustive
+pub(all) enum RequestTextBlockCitationsItem {
+  CharLocation(RequestCharLocationCitation)
+  ContentBlockLocation(RequestContentBlockLocationCitation)
+  PageLocation(RequestPageLocationCitation)
+  SearchResultLocation(RequestSearchResultLocationCitation)
+  WebSearchResultLocation(RequestWebSearchResultLocationCitation)
+  Unknown(String, Json)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestTextBlockCitationsItem with Eq::{equal, not_equal}
+
+///|
+pub extend RequestTextBlockCitationsItem with @debug.Debug::{to_repr}
+
+///|
+///
+/// Encodes this tagged union as JSON.
+pub extend RequestTextBlockCitationsItem with ToJson::{to_json}
+
+///|
+pub impl ToJson for RequestTextBlockCitationsItem with fn to_json(self) {
+  match self {
+    CharLocation(value) => Json(value)
+    ContentBlockLocation(value) => Json(value)
+    PageLocation(value) => Json(value)
+    SearchResultLocation(value) => Json(value)
+    WebSearchResultLocation(value) => Json(value)
+    Unknown(_, value) => value
+  }
+}
+
+///|
+///
+/// Decodes this tagged union from JSON.
+pub extend RequestTextBlockCitationsItem with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for RequestTextBlockCitationsItem with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  let tag : String = required_field(obj, "type", path)
+  match tag {
+    "char_location" => CharLocation(@json.from_json(value, path~))
+    "content_block_location" =>
+      ContentBlockLocation(@json.from_json(value, path~))
+    "page_location" => PageLocation(@json.from_json(value, path~))
+    "search_result_location" =>
+      SearchResultLocation(@json.from_json(value, path~))
+    "web_search_result_location" =>
+      WebSearchResultLocation(@json.from_json(value, path~))
+    other => Unknown(other, value)
+  }
+}
+
+///|
+///
+/// Generated representation of RequestTextBlock.
+pub(all) struct RequestTextBlock {
+  cache_control : @sdkjson.Presence[RequestTextBlockCacheControl]
+  citations : @sdkjson.Presence[Array[RequestTextBlockCitationsItem]]
+  text : String
+  type_ : String
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestTextBlock with Eq::{equal, not_equal}
+
+///|
+pub extend RequestTextBlock with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a RequestTextBlock with omitted optional fields absent.
+pub fn RequestTextBlock::new(
+  text~ : String,
+  type_~ : String,
+  cache_control? : RequestTextBlockCacheControl,
+  citations? : Array[RequestTextBlockCitationsItem],
+) -> RequestTextBlock {
+  {
+    cache_control: @sdkjson.Presence::from_option(cache_control),
+    citations: @sdkjson.Presence::from_option(citations),
+    text,
+    type_,
+  }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend RequestTextBlock with ToJson::{to_json}
+
+///|
+pub impl ToJson for RequestTextBlock with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .presence("cache_control", self.cache_control)
+  .presence("citations", self.citations)
+  .field("text", self.text)
+  .field("type", self.type_)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend RequestTextBlock with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for RequestTextBlock with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    cache_control: @sdkjson.presence_field(obj, "cache_control", path),
+    citations: @sdkjson.presence_field(obj, "citations", path),
+    text: required_field(obj, "text", path),
+    type_: required_field(obj, "type", path),
+  }
+}
+
+///|
+///
+/// Generated tagged union ContentBlockSourceContentValueArrayItem.
+#non_exhaustive
+pub(all) enum ContentBlockSourceContentValueArrayItem {
+  Image(RequestImageBlock)
+  Text(RequestTextBlock)
+  Unknown(String, Json)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ContentBlockSourceContentValueArrayItem with Eq::{equal, not_equal}
+
+///|
+pub extend ContentBlockSourceContentValueArrayItem with @debug.Debug::{to_repr}
+
+///|
+///
+/// Encodes this tagged union as JSON.
+pub extend ContentBlockSourceContentValueArrayItem with ToJson::{to_json}
+
+///|
+pub impl ToJson for ContentBlockSourceContentValueArrayItem with fn to_json(
+  self,
+) {
+  match self {
+    Image(value) => Json(value)
+    Text(value) => Json(value)
+    Unknown(_, value) => value
+  }
+}
+
+///|
+///
+/// Decodes this tagged union from JSON.
+pub extend ContentBlockSourceContentValueArrayItem with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for ContentBlockSourceContentValueArrayItem with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  let tag : String = required_field(obj, "type", path)
+  match tag {
+    "image" => Image(@json.from_json(value, path~))
+    "text" => Text(@json.from_json(value, path~))
+    other => Unknown(other, value)
+  }
+}
+
+///|
+///
+/// Generated untagged union ContentBlockSourceContent.
+#non_exhaustive
+pub(all) enum ContentBlockSourceContent {
+  Text(String)
+  ValueArray(Array[ContentBlockSourceContentValueArrayItem])
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ContentBlockSourceContent with Eq::{equal, not_equal}
+
+///|
+pub extend ContentBlockSourceContent with @debug.Debug::{to_repr}
+
+///|
+///
+/// Encodes this union as JSON.
+pub extend ContentBlockSourceContent with ToJson::{to_json}
+
+///|
+pub impl ToJson for ContentBlockSourceContent with fn to_json(self) {
+  match self {
+    Text(value) => Json(value)
+    ValueArray(value) => Json(value)
+  }
+}
+
+///|
+///
+/// Decodes this union from JSON.
+pub extend ContentBlockSourceContent with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for ContentBlockSourceContent with fn from_json(
+  value,
+  path,
+) {
+  if value is String(_) {
+    let decoded : String = @json.from_json(value, path~)
+    return Text(decoded)
+  }
+  if json_array_matches(value, item => item is Object(_)) {
+    let decoded : Array[ContentBlockSourceContentValueArrayItem] = @json.from_json(
+      value,
+      path~,
+    )
+    return ValueArray(decoded)
+  }
+  raise @json.JsonDecodeError(
+    (path, "JSON shape does not match any ContentBlockSourceContent variant"),
+  )
+}
+
+///|
+///
+/// Generated representation of ContentBlockSource.
+pub(all) struct ContentBlockSource {
+  content : ContentBlockSourceContent
+  type_ : String
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ContentBlockSource with Eq::{equal, not_equal}
+
+///|
+pub extend ContentBlockSource with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a ContentBlockSource with omitted optional fields absent.
+pub fn ContentBlockSource::new(
+  content~ : ContentBlockSourceContent,
+  type_~ : String,
+) -> ContentBlockSource {
+  { content, type_, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend ContentBlockSource with ToJson::{to_json}
+
+///|
+pub impl ToJson for ContentBlockSource with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("content", self.content)
+  .field("type", self.type_)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend ContentBlockSource with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for ContentBlockSource with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    content: required_field(obj, "content", path),
+    type_: required_field(obj, "type", path),
+  }
+}
+
+///|
+///
+/// Generated representation of FileDocumentSource.
+pub(all) struct FileDocumentSource {
+  file_id : String
+  type_ : String
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend FileDocumentSource with Eq::{equal, not_equal}
+
+///|
+pub extend FileDocumentSource with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a FileDocumentSource with omitted optional fields absent.
+pub fn FileDocumentSource::new(
+  file_id~ : String,
+  type_~ : String,
+) -> FileDocumentSource {
+  { file_id, type_, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend FileDocumentSource with ToJson::{to_json}
+
+///|
+pub impl ToJson for FileDocumentSource with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("file_id", self.file_id)
+  .field("type", self.type_)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend FileDocumentSource with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for FileDocumentSource with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    file_id: required_field(obj, "file_id", path),
+    type_: required_field(obj, "type", path),
+  }
+}
+
+///|
+///
+/// Generated representation of PlainTextSource.
+pub(all) struct PlainTextSource {
+  data : String
+  type_ : String
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend PlainTextSource with Eq::{equal, not_equal}
+
+///|
+pub extend PlainTextSource with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a PlainTextSource with omitted optional fields absent.
+pub fn PlainTextSource::new(data~ : String, type_~ : String) -> PlainTextSource {
+  { data, type_, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend PlainTextSource with ToJson::{to_json}
+
+///|
+pub impl ToJson for PlainTextSource with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("data", self.data)
+  .field("media_type", "text/plain")
+  .field("type", self.type_)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend PlainTextSource with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for PlainTextSource with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
   {
     data: required_field(obj, "data", path),
@@ -427,36 +2746,852 @@ pub impl @json.FromJson for Base64PDFSource with fn from_json(value, path) {
 
 ///|
 ///
-/// Generated string enum BashCodeExecutionToolResultErrorCode.
-#non_exhaustive
-pub(all) enum BashCodeExecutionToolResultErrorCode {
-  InvalidToolInput
-  Unavailable
-  TooManyRequests
-  ExecutionTimeExceeded
-  OutputFileTooLarge
-  Unknown(String)
+/// Generated representation of URLPDFSource.
+pub(all) struct URLPDFSource {
+  type_ : String
+  url : String
 } derive(Eq, @debug.Debug)
 
 ///|
-pub extend BashCodeExecutionToolResultErrorCode with Eq::{equal, not_equal}
+pub extend URLPDFSource with Eq::{equal, not_equal}
 
 ///|
-pub extend BashCodeExecutionToolResultErrorCode with @debug.Debug::{to_repr}
+pub extend URLPDFSource with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a URLPDFSource with omitted optional fields absent.
+pub fn URLPDFSource::new(type_~ : String, url~ : String) -> URLPDFSource {
+  { type_, url, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend URLPDFSource with ToJson::{to_json}
+
+///|
+pub impl ToJson for URLPDFSource with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("type", self.type_)
+  .field("url", self.url)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend URLPDFSource with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for URLPDFSource with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    type_: required_field(obj, "type", path),
+    url: required_field(obj, "url", path),
+  }
+}
+
+///|
+///
+/// Generated tagged union RequestDocumentBlockSource.
+#non_exhaustive
+pub(all) enum RequestDocumentBlockSource {
+  Base64(Base64PDFSource)
+  Content(ContentBlockSource)
+  File(FileDocumentSource)
+  Text(PlainTextSource)
+  Url(URLPDFSource)
+  Unknown(String, Json)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestDocumentBlockSource with Eq::{equal, not_equal}
+
+///|
+pub extend RequestDocumentBlockSource with @debug.Debug::{to_repr}
+
+///|
+///
+/// Encodes this tagged union as JSON.
+pub extend RequestDocumentBlockSource with ToJson::{to_json}
+
+///|
+pub impl ToJson for RequestDocumentBlockSource with fn to_json(self) {
+  match self {
+    Base64(value) => Json(value)
+    Content(value) => Json(value)
+    File(value) => Json(value)
+    Text(value) => Json(value)
+    Url(value) => Json(value)
+    Unknown(_, value) => value
+  }
+}
+
+///|
+///
+/// Decodes this tagged union from JSON.
+pub extend RequestDocumentBlockSource with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for RequestDocumentBlockSource with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  let tag : String = required_field(obj, "type", path)
+  match tag {
+    "base64" => Base64(@json.from_json(value, path~))
+    "content" => Content(@json.from_json(value, path~))
+    "file" => File(@json.from_json(value, path~))
+    "text" => Text(@json.from_json(value, path~))
+    "url" => Url(@json.from_json(value, path~))
+    other => Unknown(other, value)
+  }
+}
+
+///|
+///
+/// Generated representation of RequestDocumentBlock.
+pub(all) struct RequestDocumentBlock {
+  cache_control : @sdkjson.Presence[RequestDocumentBlockCacheControl]
+  citations : @sdkjson.Presence[RequestCitationsConfig]
+  context : @sdkjson.Presence[String]
+  source : RequestDocumentBlockSource
+  title : @sdkjson.Presence[String]
+  type_ : String
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestDocumentBlock with Eq::{equal, not_equal}
+
+///|
+pub extend RequestDocumentBlock with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a RequestDocumentBlock with omitted optional fields absent.
+pub fn RequestDocumentBlock::new(
+  source~ : RequestDocumentBlockSource,
+  type_~ : String,
+  cache_control? : RequestDocumentBlockCacheControl,
+  citations? : RequestCitationsConfig,
+  context? : String,
+  title? : String,
+) -> RequestDocumentBlock {
+  {
+    cache_control: @sdkjson.Presence::from_option(cache_control),
+    citations: @sdkjson.Presence::from_option(citations),
+    context: @sdkjson.Presence::from_option(context),
+    source,
+    title: @sdkjson.Presence::from_option(title),
+    type_,
+  }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend RequestDocumentBlock with ToJson::{to_json}
+
+///|
+pub impl ToJson for RequestDocumentBlock with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .presence("cache_control", self.cache_control)
+  .presence("citations", self.citations)
+  .presence("context", self.context)
+  .field("source", self.source)
+  .presence("title", self.title)
+  .field("type", self.type_)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend RequestDocumentBlock with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for RequestDocumentBlock with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    cache_control: @sdkjson.presence_field(obj, "cache_control", path),
+    citations: @sdkjson.presence_field(obj, "citations", path),
+    context: @sdkjson.presence_field(obj, "context", path),
+    source: required_field(obj, "source", path),
+    title: @sdkjson.presence_field(obj, "title", path),
+    type_: required_field(obj, "type", path),
+  }
+}
+
+///|
+///
+/// Generated representation of RequestRedactedThinkingBlock.
+pub(all) struct RequestRedactedThinkingBlock {
+  data : String
+  type_ : String
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestRedactedThinkingBlock with Eq::{equal, not_equal}
+
+///|
+pub extend RequestRedactedThinkingBlock with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a RequestRedactedThinkingBlock with omitted optional fields absent.
+pub fn RequestRedactedThinkingBlock::new(
+  data~ : String,
+  type_~ : String,
+) -> RequestRedactedThinkingBlock {
+  { data, type_, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend RequestRedactedThinkingBlock with ToJson::{to_json}
+
+///|
+pub impl ToJson for RequestRedactedThinkingBlock with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("data", self.data)
+  .field("type", self.type_)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend RequestRedactedThinkingBlock with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for RequestRedactedThinkingBlock with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    data: required_field(obj, "data", path),
+    type_: required_field(obj, "type", path),
+  }
+}
+
+///|
+///
+/// Create a cache control breakpoint at this content block.
+#non_exhaustive
+pub(all) enum RequestSearchResultBlockCacheControl {
+  Ephemeral(CacheControlEphemeral)
+  Unknown(String, Json)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestSearchResultBlockCacheControl with Eq::{equal, not_equal}
+
+///|
+pub extend RequestSearchResultBlockCacheControl with @debug.Debug::{to_repr}
+
+///|
+///
+/// Encodes this tagged union as JSON.
+pub extend RequestSearchResultBlockCacheControl with ToJson::{to_json}
+
+///|
+pub impl ToJson for RequestSearchResultBlockCacheControl with fn to_json(self) {
+  match self {
+    Ephemeral(value) => Json(value)
+    Unknown(_, value) => value
+  }
+}
+
+///|
+///
+/// Decodes this tagged union from JSON.
+pub extend RequestSearchResultBlockCacheControl with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for RequestSearchResultBlockCacheControl with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  let tag : String = required_field(obj, "type", path)
+  match tag {
+    "ephemeral" => Ephemeral(@json.from_json(value, path~))
+    other => Unknown(other, value)
+  }
+}
+
+///|
+///
+/// Generated representation of RequestSearchResultBlock.
+pub(all) struct RequestSearchResultBlock {
+  cache_control : @sdkjson.Presence[RequestSearchResultBlockCacheControl]
+  citations : RequestCitationsConfig?
+  content : Array[RequestTextBlock]
+  source : String
+  title : String
+  type_ : String
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestSearchResultBlock with Eq::{equal, not_equal}
+
+///|
+pub extend RequestSearchResultBlock with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a RequestSearchResultBlock with omitted optional fields absent.
+pub fn RequestSearchResultBlock::new(
+  content~ : Array[RequestTextBlock],
+  source~ : String,
+  title~ : String,
+  type_~ : String,
+  cache_control? : RequestSearchResultBlockCacheControl,
+  citations? : RequestCitationsConfig,
+) -> RequestSearchResultBlock {
+  {
+    cache_control: @sdkjson.Presence::from_option(cache_control),
+    citations,
+    content,
+    source,
+    title,
+    type_,
+  }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend RequestSearchResultBlock with ToJson::{to_json}
+
+///|
+pub impl ToJson for RequestSearchResultBlock with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .presence("cache_control", self.cache_control)
+  .opt("citations", self.citations)
+  .field("content", self.content)
+  .field("source", self.source)
+  .field("title", self.title)
+  .field("type", self.type_)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend RequestSearchResultBlock with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for RequestSearchResultBlock with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    cache_control: @sdkjson.presence_field(obj, "cache_control", path),
+    citations: @sdkjson.opt_field(obj, "citations", path),
+    content: required_field(obj, "content", path),
+    source: required_field(obj, "source", path),
+    title: required_field(obj, "title", path),
+    type_: required_field(obj, "type", path),
+  }
+}
+
+///|
+///
+/// Create a cache control breakpoint at this content block.
+#non_exhaustive
+pub(all) enum RequestServerToolUseBlockCacheControl {
+  Ephemeral(CacheControlEphemeral)
+  Unknown(String, Json)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestServerToolUseBlockCacheControl with Eq::{equal, not_equal}
+
+///|
+pub extend RequestServerToolUseBlockCacheControl with @debug.Debug::{to_repr}
+
+///|
+///
+/// Encodes this tagged union as JSON.
+pub extend RequestServerToolUseBlockCacheControl with ToJson::{to_json}
+
+///|
+pub impl ToJson for RequestServerToolUseBlockCacheControl with fn to_json(self) {
+  match self {
+    Ephemeral(value) => Json(value)
+    Unknown(_, value) => value
+  }
+}
+
+///|
+///
+/// Decodes this tagged union from JSON.
+pub extend RequestServerToolUseBlockCacheControl with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for RequestServerToolUseBlockCacheControl with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  let tag : String = required_field(obj, "type", path)
+  match tag {
+    "ephemeral" => Ephemeral(@json.from_json(value, path~))
+    other => Unknown(other, value)
+  }
+}
+
+///|
+///
+/// Tool invocation generated by a server-side tool.
+pub(all) struct ServerToolCaller {
+  tool_id : String
+  type_ : String
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ServerToolCaller with Eq::{equal, not_equal}
+
+///|
+pub extend ServerToolCaller with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a ServerToolCaller with omitted optional fields absent.
+pub fn ServerToolCaller::new(
+  tool_id~ : String,
+  type_~ : String,
+) -> ServerToolCaller {
+  { tool_id, type_, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend ServerToolCaller with ToJson::{to_json}
+
+///|
+pub impl ToJson for ServerToolCaller with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("tool_id", self.tool_id)
+  .field("type", self.type_)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend ServerToolCaller with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for ServerToolCaller with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    tool_id: required_field(obj, "tool_id", path),
+    type_: required_field(obj, "type", path),
+  }
+}
+
+///|
+///
+/// Generated representation of ServerToolCaller20260120.
+pub(all) struct ServerToolCaller20260120 {
+  tool_id : String
+  type_ : String
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ServerToolCaller20260120 with Eq::{equal, not_equal}
+
+///|
+pub extend ServerToolCaller20260120 with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a ServerToolCaller20260120 with omitted optional fields absent.
+pub fn ServerToolCaller20260120::new(
+  tool_id~ : String,
+  type_~ : String,
+) -> ServerToolCaller20260120 {
+  { tool_id, type_, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend ServerToolCaller20260120 with ToJson::{to_json}
+
+///|
+pub impl ToJson for ServerToolCaller20260120 with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("tool_id", self.tool_id)
+  .field("type", self.type_)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend ServerToolCaller20260120 with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for ServerToolCaller20260120 with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    tool_id: required_field(obj, "tool_id", path),
+    type_: required_field(obj, "type", path),
+  }
+}
+
+///|
+///
+/// Tool invocation directly from the model.
+pub(all) struct DirectCaller {
+  type_ : String
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend DirectCaller with Eq::{equal, not_equal}
+
+///|
+pub extend DirectCaller with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a DirectCaller with omitted optional fields absent.
+pub fn DirectCaller::new(type_~ : String) -> DirectCaller {
+  { type_, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend DirectCaller with ToJson::{to_json}
+
+///|
+pub impl ToJson for DirectCaller with fn to_json(self) {
+  @sdkjson.ObjBuilder::new().field("type", self.type_).build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend DirectCaller with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for DirectCaller with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  { type_: required_field(obj, "type", path), }
+}
+
+///|
+///
+/// Generated tagged union RequestServerToolUseBlockCaller.
+#non_exhaustive
+pub(all) enum RequestServerToolUseBlockCaller {
+  CodeExecution20250825(ServerToolCaller)
+  CodeExecution20260120(ServerToolCaller20260120)
+  Direct(DirectCaller)
+  Unknown(String, Json)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestServerToolUseBlockCaller with Eq::{equal, not_equal}
+
+///|
+pub extend RequestServerToolUseBlockCaller with @debug.Debug::{to_repr}
+
+///|
+///
+/// Encodes this tagged union as JSON.
+pub extend RequestServerToolUseBlockCaller with ToJson::{to_json}
+
+///|
+pub impl ToJson for RequestServerToolUseBlockCaller with fn to_json(self) {
+  match self {
+    CodeExecution20250825(value) => Json(value)
+    CodeExecution20260120(value) => Json(value)
+    Direct(value) => Json(value)
+    Unknown(_, value) => value
+  }
+}
+
+///|
+///
+/// Decodes this tagged union from JSON.
+pub extend RequestServerToolUseBlockCaller with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for RequestServerToolUseBlockCaller with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  let tag : String = required_field(obj, "type", path)
+  match tag {
+    "code_execution_20250825" =>
+      CodeExecution20250825(@json.from_json(value, path~))
+    "code_execution_20260120" =>
+      CodeExecution20260120(@json.from_json(value, path~))
+    "direct" => Direct(@json.from_json(value, path~))
+    other => Unknown(other, value)
+  }
+}
+
+///|
+///
+/// Generated string enum RequestServerToolUseBlockName.
+#non_exhaustive
+pub(all) enum RequestServerToolUseBlockName {
+  WebSearch
+  WebFetch
+  CodeExecution
+  BashCodeExecution
+  TextEditorCodeExecution
+  ToolSearchToolRegex
+  ToolSearchToolBm25
+  Custom(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestServerToolUseBlockName with Eq::{equal, not_equal}
+
+///|
+pub extend RequestServerToolUseBlockName with @debug.Debug::{to_repr}
 
 ///|
 ///
 /// Encodes this string enum as JSON.
-pub extend BashCodeExecutionToolResultErrorCode with ToJson::{to_json}
+pub extend RequestServerToolUseBlockName with ToJson::{to_json}
 
 ///|
-pub impl ToJson for BashCodeExecutionToolResultErrorCode with fn to_json(self) {
+pub impl ToJson for RequestServerToolUseBlockName with fn to_json(self) {
+  let raw = match self {
+    WebSearch => "web_search"
+    WebFetch => "web_fetch"
+    CodeExecution => "code_execution"
+    BashCodeExecution => "bash_code_execution"
+    TextEditorCodeExecution => "text_editor_code_execution"
+    ToolSearchToolRegex => "tool_search_tool_regex"
+    ToolSearchToolBm25 => "tool_search_tool_bm25"
+    Custom(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend RequestServerToolUseBlockName with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for RequestServerToolUseBlockName with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "web_search" => Some(WebSearch)
+        "web_fetch" => Some(WebFetch)
+        "code_execution" => Some(CodeExecution)
+        "bash_code_execution" => Some(BashCodeExecution)
+        "text_editor_code_execution" => Some(TextEditorCodeExecution)
+        "tool_search_tool_regex" => Some(ToolSearchToolRegex)
+        "tool_search_tool_bm25" => Some(ToolSearchToolBm25)
+        _ => None
+      }
+    },
+    raw => Custom(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of RequestServerToolUseBlock.
+pub(all) struct RequestServerToolUseBlock {
+  cache_control : @sdkjson.Presence[RequestServerToolUseBlockCacheControl]
+  caller : RequestServerToolUseBlockCaller?
+  id : String
+  input : Json
+  name : RequestServerToolUseBlockName
+  type_ : String
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestServerToolUseBlock with Eq::{equal, not_equal}
+
+///|
+pub extend RequestServerToolUseBlock with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a RequestServerToolUseBlock with omitted optional fields absent.
+pub fn RequestServerToolUseBlock::new(
+  id~ : String,
+  input~ : Json,
+  name~ : RequestServerToolUseBlockName,
+  type_~ : String,
+  cache_control? : RequestServerToolUseBlockCacheControl,
+  caller? : RequestServerToolUseBlockCaller,
+) -> RequestServerToolUseBlock {
+  {
+    cache_control: @sdkjson.Presence::from_option(cache_control),
+    caller,
+    id,
+    input,
+    name,
+    type_,
+  }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend RequestServerToolUseBlock with ToJson::{to_json}
+
+///|
+pub impl ToJson for RequestServerToolUseBlock with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .presence("cache_control", self.cache_control)
+  .opt("caller", self.caller)
+  .field("id", self.id)
+  .field("input", self.input)
+  .field("name", self.name)
+  .field("type", self.type_)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend RequestServerToolUseBlock with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for RequestServerToolUseBlock with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    cache_control: @sdkjson.presence_field(obj, "cache_control", path),
+    caller: @sdkjson.opt_field(obj, "caller", path),
+    id: required_field(obj, "id", path),
+    input: required_field(obj, "input", path),
+    name: required_field(obj, "name", path),
+    type_: required_field(obj, "type", path),
+  }
+}
+
+///|
+///
+/// Create a cache control breakpoint at this content block.
+#non_exhaustive
+pub(all) enum RequestTextEditorCodeExecutionToolResultBlockCacheControl {
+  Ephemeral(CacheControlEphemeral)
+  Unknown(String, Json)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestTextEditorCodeExecutionToolResultBlockCacheControl with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend RequestTextEditorCodeExecutionToolResultBlockCacheControl with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this tagged union as JSON.
+pub extend RequestTextEditorCodeExecutionToolResultBlockCacheControl with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for RequestTextEditorCodeExecutionToolResultBlockCacheControl with fn to_json(
+  self,
+) {
+  match self {
+    Ephemeral(value) => Json(value)
+    Unknown(_, value) => value
+  }
+}
+
+///|
+///
+/// Decodes this tagged union from JSON.
+pub extend RequestTextEditorCodeExecutionToolResultBlockCacheControl with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for RequestTextEditorCodeExecutionToolResultBlockCacheControl with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  let tag : String = required_field(obj, "type", path)
+  match tag {
+    "ephemeral" => Ephemeral(@json.from_json(value, path~))
+    other => Unknown(other, value)
+  }
+}
+
+///|
+///
+/// Generated string enum TextEditorCodeExecutionToolResultErrorCode.
+#non_exhaustive
+pub(all) enum TextEditorCodeExecutionToolResultErrorCode {
+  InvalidToolInput
+  Unavailable
+  TooManyRequests
+  ExecutionTimeExceeded
+  FileNotFound
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend TextEditorCodeExecutionToolResultErrorCode with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend TextEditorCodeExecutionToolResultErrorCode with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend TextEditorCodeExecutionToolResultErrorCode with ToJson::{to_json}
+
+///|
+pub impl ToJson for TextEditorCodeExecutionToolResultErrorCode with fn to_json(
+  self,
+) {
   let raw = match self {
     InvalidToolInput => "invalid_tool_input"
     Unavailable => "unavailable"
     TooManyRequests => "too_many_requests"
     ExecutionTimeExceeded => "execution_time_exceeded"
-    OutputFileTooLarge => "output_file_too_large"
+    FileNotFound => "file_not_found"
     Unknown(raw) => raw
   }
   Json(raw)
@@ -465,10 +3600,12 @@ pub impl ToJson for BashCodeExecutionToolResultErrorCode with fn to_json(self) {
 ///|
 ///
 /// Decodes this string enum from JSON.
-pub extend BashCodeExecutionToolResultErrorCode with @json.FromJson::{from_json}
+pub extend TextEditorCodeExecutionToolResultErrorCode with @json.FromJson::{
+  from_json,
+}
 
 ///|
-pub impl @json.FromJson for BashCodeExecutionToolResultErrorCode with fn from_json(
+pub impl @json.FromJson for TextEditorCodeExecutionToolResultErrorCode with fn from_json(
   value,
   path,
 ) {
@@ -481,7 +3618,7 @@ pub impl @json.FromJson for BashCodeExecutionToolResultErrorCode with fn from_js
         "unavailable" => Some(Unavailable)
         "too_many_requests" => Some(TooManyRequests)
         "execution_time_exceeded" => Some(ExecutionTimeExceeded)
-        "output_file_too_large" => Some(OutputFileTooLarge)
+        "file_not_found" => Some(FileNotFound)
         _ => None
       }
     },
@@ -491,30 +3628,112 @@ pub impl @json.FromJson for BashCodeExecutionToolResultErrorCode with fn from_js
 
 ///|
 ///
-/// The time-to-live for the cache control breakpoint. This may be one the following values: - `5m`: 5 minutes - `1h`: 1 hour Defaults to `5m`. See [prompt caching pricing](https://platform.claude.com/docs/en/build-with-claude/prompt-caching) for details.
+/// Generated representation of RequestTextEditorCodeExecutionToolResultError.
+pub(all) struct RequestTextEditorCodeExecutionToolResultError {
+  error_code : TextEditorCodeExecutionToolResultErrorCode
+  error_message : @sdkjson.Presence[String]
+  type_ : String
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestTextEditorCodeExecutionToolResultError with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend RequestTextEditorCodeExecutionToolResultError with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a RequestTextEditorCodeExecutionToolResultError with omitted optional fields absent.
+pub fn RequestTextEditorCodeExecutionToolResultError::new(
+  error_code~ : TextEditorCodeExecutionToolResultErrorCode,
+  type_~ : String,
+  error_message? : String,
+) -> RequestTextEditorCodeExecutionToolResultError {
+  {
+    error_code,
+    error_message: @sdkjson.Presence::from_option(error_message),
+    type_,
+  }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend RequestTextEditorCodeExecutionToolResultError with ToJson::{to_json}
+
+///|
+pub impl ToJson for RequestTextEditorCodeExecutionToolResultError with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .field("error_code", self.error_code)
+  .presence("error_message", self.error_message)
+  .field("type", self.type_)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend RequestTextEditorCodeExecutionToolResultError with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for RequestTextEditorCodeExecutionToolResultError with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    error_code: required_field(obj, "error_code", path),
+    error_message: @sdkjson.presence_field(obj, "error_message", path),
+    type_: required_field(obj, "type", path),
+  }
+}
+
+///|
+///
+/// Generated string enum RequestTextEditorCodeExecutionViewResultBlockFileType.
 #non_exhaustive
-pub(all) enum CacheControlEphemeralTtl {
-  Value5m
-  Value1h
+pub(all) enum RequestTextEditorCodeExecutionViewResultBlockFileType {
+  Text
+  Image
+  Pdf
   Custom(String)
 } derive(Eq, @debug.Debug)
 
 ///|
-pub extend CacheControlEphemeralTtl with Eq::{equal, not_equal}
+pub extend RequestTextEditorCodeExecutionViewResultBlockFileType with Eq::{
+  equal,
+  not_equal,
+}
 
 ///|
-pub extend CacheControlEphemeralTtl with @debug.Debug::{to_repr}
+pub extend RequestTextEditorCodeExecutionViewResultBlockFileType with @debug.Debug::{
+  to_repr,
+}
 
 ///|
 ///
 /// Encodes this string enum as JSON.
-pub extend CacheControlEphemeralTtl with ToJson::{to_json}
+pub extend RequestTextEditorCodeExecutionViewResultBlockFileType with ToJson::{
+  to_json,
+}
 
 ///|
-pub impl ToJson for CacheControlEphemeralTtl with fn to_json(self) {
+pub impl ToJson for RequestTextEditorCodeExecutionViewResultBlockFileType with fn to_json(
+  self,
+) {
   let raw = match self {
-    Value5m => "5m"
-    Value1h => "1h"
+    Text => "text"
+    Image => "image"
+    Pdf => "pdf"
     Custom(raw) => raw
   }
   Json(raw)
@@ -523,10 +3742,12 @@ pub impl ToJson for CacheControlEphemeralTtl with fn to_json(self) {
 ///|
 ///
 /// Decodes this string enum from JSON.
-pub extend CacheControlEphemeralTtl with @json.FromJson::{from_json}
+pub extend RequestTextEditorCodeExecutionViewResultBlockFileType with @json.FromJson::{
+  from_json,
+}
 
 ///|
-pub impl @json.FromJson for CacheControlEphemeralTtl with fn from_json(
+pub impl @json.FromJson for RequestTextEditorCodeExecutionViewResultBlockFileType with fn from_json(
   value,
   path,
 ) {
@@ -535,8 +3756,9 @@ pub impl @json.FromJson for CacheControlEphemeralTtl with fn from_json(
     path,
     raw => {
       match raw {
-        "5m" => Some(Value5m)
-        "1h" => Some(Value1h)
+        "text" => Some(Text)
+        "image" => Some(Image)
+        "pdf" => Some(Pdf)
         _ => None
       }
     },
@@ -546,37 +3768,63 @@ pub impl @json.FromJson for CacheControlEphemeralTtl with fn from_json(
 
 ///|
 ///
-/// Generated representation of CacheControlEphemeral.
-pub(all) struct CacheControlEphemeral {
-  ttl : CacheControlEphemeralTtl?
+/// Generated representation of RequestTextEditorCodeExecutionViewResultBlock.
+pub(all) struct RequestTextEditorCodeExecutionViewResultBlock {
+  content : String
+  file_type : RequestTextEditorCodeExecutionViewResultBlockFileType
+  num_lines : @sdkjson.Presence[Int32]
+  start_line : @sdkjson.Presence[Int32]
+  total_lines : @sdkjson.Presence[Int32]
   type_ : String
 } derive(Eq, @debug.Debug)
 
 ///|
-pub extend CacheControlEphemeral with Eq::{equal, not_equal}
+pub extend RequestTextEditorCodeExecutionViewResultBlock with Eq::{
+  equal,
+  not_equal,
+}
 
 ///|
-pub extend CacheControlEphemeral with @debug.Debug::{to_repr}
+pub extend RequestTextEditorCodeExecutionViewResultBlock with @debug.Debug::{
+  to_repr,
+}
 
 ///|
 ///
-/// Creates a CacheControlEphemeral with omitted optional fields absent.
-pub fn CacheControlEphemeral::new(
+/// Creates a RequestTextEditorCodeExecutionViewResultBlock with omitted optional fields absent.
+pub fn RequestTextEditorCodeExecutionViewResultBlock::new(
+  content~ : String,
+  file_type~ : RequestTextEditorCodeExecutionViewResultBlockFileType,
   type_~ : String,
-  ttl? : CacheControlEphemeralTtl,
-) -> CacheControlEphemeral {
-  { ttl, type_, }
+  num_lines? : Int32,
+  start_line? : Int32,
+  total_lines? : Int32,
+) -> RequestTextEditorCodeExecutionViewResultBlock {
+  {
+    content,
+    file_type,
+    num_lines: @sdkjson.Presence::from_option(num_lines),
+    start_line: @sdkjson.Presence::from_option(start_line),
+    total_lines: @sdkjson.Presence::from_option(total_lines),
+    type_,
+  }
 }
 
 ///|
 ///
 /// Encodes this value as JSON.
-pub extend CacheControlEphemeral with ToJson::{to_json}
+pub extend RequestTextEditorCodeExecutionViewResultBlock with ToJson::{to_json}
 
 ///|
-pub impl ToJson for CacheControlEphemeral with fn to_json(self) {
+pub impl ToJson for RequestTextEditorCodeExecutionViewResultBlock with fn to_json(
+  self,
+) {
   @sdkjson.ObjBuilder::new()
-  .opt("ttl", self.ttl)
+  .field("content", self.content)
+  .field("file_type", self.file_type)
+  .presence("num_lines", self.num_lines)
+  .presence("start_line", self.start_line)
+  .presence("total_lines", self.total_lines)
   .field("type", self.type_)
   .build()
 }
@@ -584,15 +3832,2913 @@ pub impl ToJson for CacheControlEphemeral with fn to_json(self) {
 ///|
 ///
 /// Decodes this value from JSON.
-pub extend CacheControlEphemeral with @json.FromJson::{from_json}
+pub extend RequestTextEditorCodeExecutionViewResultBlock with @json.FromJson::{
+  from_json,
+}
 
 ///|
-pub impl @json.FromJson for CacheControlEphemeral with fn from_json(value, path) {
+pub impl @json.FromJson for RequestTextEditorCodeExecutionViewResultBlock with fn from_json(
+  value,
+  path,
+) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    ttl: @sdkjson.opt_field(obj, "ttl", path),
+    content: required_field(obj, "content", path),
+    file_type: required_field(obj, "file_type", path),
+    num_lines: @sdkjson.presence_field(obj, "num_lines", path),
+    start_line: @sdkjson.presence_field(obj, "start_line", path),
+    total_lines: @sdkjson.presence_field(obj, "total_lines", path),
     type_: required_field(obj, "type", path),
   }
+}
+
+///|
+///
+/// Generated representation of RequestTextEditorCodeExecutionCreateResultBlock.
+pub(all) struct RequestTextEditorCodeExecutionCreateResultBlock {
+  is_file_update : Bool
+  type_ : String
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestTextEditorCodeExecutionCreateResultBlock with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend RequestTextEditorCodeExecutionCreateResultBlock with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a RequestTextEditorCodeExecutionCreateResultBlock with omitted optional fields absent.
+pub fn RequestTextEditorCodeExecutionCreateResultBlock::new(
+  is_file_update~ : Bool,
+  type_~ : String,
+) -> RequestTextEditorCodeExecutionCreateResultBlock {
+  { is_file_update, type_, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend RequestTextEditorCodeExecutionCreateResultBlock with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for RequestTextEditorCodeExecutionCreateResultBlock with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .field("is_file_update", self.is_file_update)
+  .field("type", self.type_)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend RequestTextEditorCodeExecutionCreateResultBlock with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for RequestTextEditorCodeExecutionCreateResultBlock with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    is_file_update: required_field(obj, "is_file_update", path),
+    type_: required_field(obj, "type", path),
+  }
+}
+
+///|
+///
+/// Generated representation of RequestTextEditorCodeExecutionStrReplaceResultBlock.
+pub(all) struct RequestTextEditorCodeExecutionStrReplaceResultBlock {
+  lines : @sdkjson.Presence[Array[String]]
+  new_lines : @sdkjson.Presence[Int32]
+  new_start : @sdkjson.Presence[Int32]
+  old_lines : @sdkjson.Presence[Int32]
+  old_start : @sdkjson.Presence[Int32]
+  type_ : String
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestTextEditorCodeExecutionStrReplaceResultBlock with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend RequestTextEditorCodeExecutionStrReplaceResultBlock with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a RequestTextEditorCodeExecutionStrReplaceResultBlock with omitted optional fields absent.
+pub fn RequestTextEditorCodeExecutionStrReplaceResultBlock::new(
+  type_~ : String,
+  lines? : Array[String],
+  new_lines? : Int32,
+  new_start? : Int32,
+  old_lines? : Int32,
+  old_start? : Int32,
+) -> RequestTextEditorCodeExecutionStrReplaceResultBlock {
+  {
+    lines: @sdkjson.Presence::from_option(lines),
+    new_lines: @sdkjson.Presence::from_option(new_lines),
+    new_start: @sdkjson.Presence::from_option(new_start),
+    old_lines: @sdkjson.Presence::from_option(old_lines),
+    old_start: @sdkjson.Presence::from_option(old_start),
+    type_,
+  }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend RequestTextEditorCodeExecutionStrReplaceResultBlock with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for RequestTextEditorCodeExecutionStrReplaceResultBlock with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .presence("lines", self.lines)
+  .presence("new_lines", self.new_lines)
+  .presence("new_start", self.new_start)
+  .presence("old_lines", self.old_lines)
+  .presence("old_start", self.old_start)
+  .field("type", self.type_)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend RequestTextEditorCodeExecutionStrReplaceResultBlock with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for RequestTextEditorCodeExecutionStrReplaceResultBlock with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    lines: @sdkjson.presence_field(obj, "lines", path),
+    new_lines: @sdkjson.presence_field(obj, "new_lines", path),
+    new_start: @sdkjson.presence_field(obj, "new_start", path),
+    old_lines: @sdkjson.presence_field(obj, "old_lines", path),
+    old_start: @sdkjson.presence_field(obj, "old_start", path),
+    type_: required_field(obj, "type", path),
+  }
+}
+
+///|
+///
+/// Generated tagged union RequestTextEditorCodeExecutionToolResultBlockContent.
+#non_exhaustive
+pub(all) enum RequestTextEditorCodeExecutionToolResultBlockContent {
+  TextEditorCodeExecutionToolResultError(
+    RequestTextEditorCodeExecutionToolResultError
+  )
+  TextEditorCodeExecutionViewResult(
+    RequestTextEditorCodeExecutionViewResultBlock
+  )
+  TextEditorCodeExecutionCreateResult(
+    RequestTextEditorCodeExecutionCreateResultBlock
+  )
+  TextEditorCodeExecutionStrReplaceResult(
+    RequestTextEditorCodeExecutionStrReplaceResultBlock
+  )
+  Unknown(String, Json)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestTextEditorCodeExecutionToolResultBlockContent with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend RequestTextEditorCodeExecutionToolResultBlockContent with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this tagged union as JSON.
+pub extend RequestTextEditorCodeExecutionToolResultBlockContent with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for RequestTextEditorCodeExecutionToolResultBlockContent with fn to_json(
+  self,
+) {
+  match self {
+    TextEditorCodeExecutionToolResultError(value) => Json(value)
+    TextEditorCodeExecutionViewResult(value) => Json(value)
+    TextEditorCodeExecutionCreateResult(value) => Json(value)
+    TextEditorCodeExecutionStrReplaceResult(value) => Json(value)
+    Unknown(_, value) => value
+  }
+}
+
+///|
+///
+/// Decodes this tagged union from JSON.
+pub extend RequestTextEditorCodeExecutionToolResultBlockContent with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for RequestTextEditorCodeExecutionToolResultBlockContent with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  let tag : String = required_field(obj, "type", path)
+  match tag {
+    "text_editor_code_execution_tool_result_error" =>
+      TextEditorCodeExecutionToolResultError(@json.from_json(value, path~))
+    "text_editor_code_execution_view_result" =>
+      TextEditorCodeExecutionViewResult(@json.from_json(value, path~))
+    "text_editor_code_execution_create_result" =>
+      TextEditorCodeExecutionCreateResult(@json.from_json(value, path~))
+    "text_editor_code_execution_str_replace_result" =>
+      TextEditorCodeExecutionStrReplaceResult(@json.from_json(value, path~))
+    other => Unknown(other, value)
+  }
+}
+
+///|
+///
+/// Generated representation of RequestTextEditorCodeExecutionToolResultBlock.
+pub(all) struct RequestTextEditorCodeExecutionToolResultBlock {
+  cache_control : @sdkjson.Presence[
+    RequestTextEditorCodeExecutionToolResultBlockCacheControl,
+  ]
+  content : RequestTextEditorCodeExecutionToolResultBlockContent
+  tool_use_id : String
+  type_ : String
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestTextEditorCodeExecutionToolResultBlock with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend RequestTextEditorCodeExecutionToolResultBlock with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Creates a RequestTextEditorCodeExecutionToolResultBlock with omitted optional fields absent.
+pub fn RequestTextEditorCodeExecutionToolResultBlock::new(
+  content~ : RequestTextEditorCodeExecutionToolResultBlockContent,
+  tool_use_id~ : String,
+  type_~ : String,
+  cache_control? : RequestTextEditorCodeExecutionToolResultBlockCacheControl,
+) -> RequestTextEditorCodeExecutionToolResultBlock {
+  {
+    cache_control: @sdkjson.Presence::from_option(cache_control),
+    content,
+    tool_use_id,
+    type_,
+  }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend RequestTextEditorCodeExecutionToolResultBlock with ToJson::{to_json}
+
+///|
+pub impl ToJson for RequestTextEditorCodeExecutionToolResultBlock with fn to_json(
+  self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .presence("cache_control", self.cache_control)
+  .field("content", self.content)
+  .field("tool_use_id", self.tool_use_id)
+  .field("type", self.type_)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend RequestTextEditorCodeExecutionToolResultBlock with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for RequestTextEditorCodeExecutionToolResultBlock with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    cache_control: @sdkjson.presence_field(obj, "cache_control", path),
+    content: required_field(obj, "content", path),
+    tool_use_id: required_field(obj, "tool_use_id", path),
+    type_: required_field(obj, "type", path),
+  }
+}
+
+///|
+///
+/// Generated representation of RequestThinkingBlock.
+pub(all) struct RequestThinkingBlock {
+  signature : String
+  thinking : String
+  type_ : String
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestThinkingBlock with Eq::{equal, not_equal}
+
+///|
+pub extend RequestThinkingBlock with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a RequestThinkingBlock with omitted optional fields absent.
+pub fn RequestThinkingBlock::new(
+  signature~ : String,
+  thinking~ : String,
+  type_~ : String,
+) -> RequestThinkingBlock {
+  { signature, thinking, type_, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend RequestThinkingBlock with ToJson::{to_json}
+
+///|
+pub impl ToJson for RequestThinkingBlock with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("signature", self.signature)
+  .field("thinking", self.thinking)
+  .field("type", self.type_)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend RequestThinkingBlock with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for RequestThinkingBlock with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    signature: required_field(obj, "signature", path),
+    thinking: required_field(obj, "thinking", path),
+    type_: required_field(obj, "type", path),
+  }
+}
+
+///|
+///
+/// Create a cache control breakpoint at this content block.
+#non_exhaustive
+pub(all) enum RequestToolResultBlockCacheControl {
+  Ephemeral(CacheControlEphemeral)
+  Unknown(String, Json)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestToolResultBlockCacheControl with Eq::{equal, not_equal}
+
+///|
+pub extend RequestToolResultBlockCacheControl with @debug.Debug::{to_repr}
+
+///|
+///
+/// Encodes this tagged union as JSON.
+pub extend RequestToolResultBlockCacheControl with ToJson::{to_json}
+
+///|
+pub impl ToJson for RequestToolResultBlockCacheControl with fn to_json(self) {
+  match self {
+    Ephemeral(value) => Json(value)
+    Unknown(_, value) => value
+  }
+}
+
+///|
+///
+/// Decodes this tagged union from JSON.
+pub extend RequestToolResultBlockCacheControl with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for RequestToolResultBlockCacheControl with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  let tag : String = required_field(obj, "type", path)
+  match tag {
+    "ephemeral" => Ephemeral(@json.from_json(value, path~))
+    other => Unknown(other, value)
+  }
+}
+
+///|
+///
+/// Create a cache control breakpoint at this content block.
+#non_exhaustive
+pub(all) enum RequestBrowserStateBlockCacheControl {
+  Ephemeral(CacheControlEphemeral)
+  Unknown(String, Json)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestBrowserStateBlockCacheControl with Eq::{equal, not_equal}
+
+///|
+pub extend RequestBrowserStateBlockCacheControl with @debug.Debug::{to_repr}
+
+///|
+///
+/// Encodes this tagged union as JSON.
+pub extend RequestBrowserStateBlockCacheControl with ToJson::{to_json}
+
+///|
+pub impl ToJson for RequestBrowserStateBlockCacheControl with fn to_json(self) {
+  match self {
+    Ephemeral(value) => Json(value)
+    Unknown(_, value) => value
+  }
+}
+
+///|
+///
+/// Decodes this tagged union from JSON.
+pub extend RequestBrowserStateBlockCacheControl with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for RequestBrowserStateBlockCacheControl with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  let tag : String = required_field(obj, "type", path)
+  match tag {
+    "ephemeral" => Ephemeral(@json.from_json(value, path~))
+    other => Unknown(other, value)
+  }
+}
+
+///|
+///
+/// A file download that finished during this call, reported with the same `download_id` as its `download_started` — or without a prior `download_started`, when the download finished during the call that started it (at most one state change per `download_id` per result).
+pub(all) struct BrowserStateChangeDownloadCompleted {
+  download_id : String
+  path : @sdkjson.Presence[String]
+  size_bytes : @sdkjson.Presence[Int32]
+  type_ : String
+  url : String
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend BrowserStateChangeDownloadCompleted with Eq::{equal, not_equal}
+
+///|
+pub extend BrowserStateChangeDownloadCompleted with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a BrowserStateChangeDownloadCompleted with omitted optional fields absent.
+pub fn BrowserStateChangeDownloadCompleted::new(
+  download_id~ : String,
+  type_~ : String,
+  url~ : String,
+  path? : String,
+  size_bytes? : Int32,
+) -> BrowserStateChangeDownloadCompleted {
+  {
+    download_id,
+    path: @sdkjson.Presence::from_option(path),
+    size_bytes: @sdkjson.Presence::from_option(size_bytes),
+    type_,
+    url,
+  }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend BrowserStateChangeDownloadCompleted with ToJson::{to_json}
+
+///|
+pub impl ToJson for BrowserStateChangeDownloadCompleted with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("download_id", self.download_id)
+  .presence("path", self.path)
+  .presence("size_bytes", self.size_bytes)
+  .field("type", self.type_)
+  .field("url", self.url)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend BrowserStateChangeDownloadCompleted with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for BrowserStateChangeDownloadCompleted with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    download_id: required_field(obj, "download_id", path),
+    path: @sdkjson.presence_field(obj, "path", path),
+    size_bytes: @sdkjson.presence_field(obj, "size_bytes", path),
+    type_: required_field(obj, "type", path),
+    url: required_field(obj, "url", path),
+  }
+}
+
+///|
+///
+/// A file download that failed — or was cancelled — during this call.
+pub(all) struct BrowserStateChangeDownloadFailed {
+  download_id : String
+  error : @sdkjson.Presence[String]
+  type_ : String
+  url : String
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend BrowserStateChangeDownloadFailed with Eq::{equal, not_equal}
+
+///|
+pub extend BrowserStateChangeDownloadFailed with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a BrowserStateChangeDownloadFailed with omitted optional fields absent.
+pub fn BrowserStateChangeDownloadFailed::new(
+  download_id~ : String,
+  type_~ : String,
+  url~ : String,
+  error? : String,
+) -> BrowserStateChangeDownloadFailed {
+  { download_id, error: @sdkjson.Presence::from_option(error), type_, url, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend BrowserStateChangeDownloadFailed with ToJson::{to_json}
+
+///|
+pub impl ToJson for BrowserStateChangeDownloadFailed with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("download_id", self.download_id)
+  .presence("error", self.error)
+  .field("type", self.type_)
+  .field("url", self.url)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend BrowserStateChangeDownloadFailed with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for BrowserStateChangeDownloadFailed with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    download_id: required_field(obj, "download_id", path),
+    error: @sdkjson.presence_field(obj, "error", path),
+    type_: required_field(obj, "type", path),
+    url: required_field(obj, "url", path),
+  }
+}
+
+///|
+///
+/// A file download that started during this call.
+pub(all) struct BrowserStateChangeDownloadStarted {
+  download_id : String
+  type_ : String
+  url : String
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend BrowserStateChangeDownloadStarted with Eq::{equal, not_equal}
+
+///|
+pub extend BrowserStateChangeDownloadStarted with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a BrowserStateChangeDownloadStarted with omitted optional fields absent.
+pub fn BrowserStateChangeDownloadStarted::new(
+  download_id~ : String,
+  type_~ : String,
+  url~ : String,
+) -> BrowserStateChangeDownloadStarted {
+  { download_id, type_, url, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend BrowserStateChangeDownloadStarted with ToJson::{to_json}
+
+///|
+pub impl ToJson for BrowserStateChangeDownloadStarted with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("download_id", self.download_id)
+  .field("type", self.type_)
+  .field("url", self.url)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend BrowserStateChangeDownloadStarted with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for BrowserStateChangeDownloadStarted with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    download_id: required_field(obj, "download_id", path),
+    type_: required_field(obj, "type", path),
+    url: required_field(obj, "url", path),
+  }
+}
+
+///|
+///
+/// A tab this call's execution opened that remains open at its end — the creation delta of the `tabs` inventory, not an event log. Carries only the `tab_id`; the tab's `title` and `url` live on its `tabs` entry, which must include the same `tab_id`. A tab opened during a failed call gets no deferred `tab_opened`; it simply appears in the next result's `tabs` inventory.
+pub(all) struct BrowserStateChangeTabOpened {
+  tab_id : String
+  type_ : String
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend BrowserStateChangeTabOpened with Eq::{equal, not_equal}
+
+///|
+pub extend BrowserStateChangeTabOpened with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a BrowserStateChangeTabOpened with omitted optional fields absent.
+pub fn BrowserStateChangeTabOpened::new(
+  tab_id~ : String,
+  type_~ : String,
+) -> BrowserStateChangeTabOpened {
+  { tab_id, type_, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend BrowserStateChangeTabOpened with ToJson::{to_json}
+
+///|
+pub impl ToJson for BrowserStateChangeTabOpened with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("tab_id", self.tab_id)
+  .field("type", self.type_)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend BrowserStateChangeTabOpened with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for BrowserStateChangeTabOpened with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    tab_id: required_field(obj, "tab_id", path),
+    type_: required_field(obj, "type", path),
+  }
+}
+
+///|
+///
+/// Generated tagged union RequestBrowserStateBlockStateChangesItem.
+#non_exhaustive
+pub(all) enum RequestBrowserStateBlockStateChangesItem {
+  DownloadCompleted(BrowserStateChangeDownloadCompleted)
+  DownloadFailed(BrowserStateChangeDownloadFailed)
+  DownloadStarted(BrowserStateChangeDownloadStarted)
+  TabOpened(BrowserStateChangeTabOpened)
+  Unknown(String, Json)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestBrowserStateBlockStateChangesItem with Eq::{equal, not_equal}
+
+///|
+pub extend RequestBrowserStateBlockStateChangesItem with @debug.Debug::{to_repr}
+
+///|
+///
+/// Encodes this tagged union as JSON.
+pub extend RequestBrowserStateBlockStateChangesItem with ToJson::{to_json}
+
+///|
+pub impl ToJson for RequestBrowserStateBlockStateChangesItem with fn to_json(
+  self,
+) {
+  match self {
+    DownloadCompleted(value) => Json(value)
+    DownloadFailed(value) => Json(value)
+    DownloadStarted(value) => Json(value)
+    TabOpened(value) => Json(value)
+    Unknown(_, value) => value
+  }
+}
+
+///|
+///
+/// Decodes this tagged union from JSON.
+pub extend RequestBrowserStateBlockStateChangesItem with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for RequestBrowserStateBlockStateChangesItem with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  let tag : String = required_field(obj, "type", path)
+  match tag {
+    "download_completed" => DownloadCompleted(@json.from_json(value, path~))
+    "download_failed" => DownloadFailed(@json.from_json(value, path~))
+    "download_started" => DownloadStarted(@json.from_json(value, path~))
+    "tab_opened" => TabOpened(@json.from_json(value, path~))
+    other => Unknown(other, value)
+  }
+}
+
+///|
+///
+/// One open browser tab reported in a `browser_state` block's `tabs` inventory. `tab_id` is the caller-assigned identifier for the tab; `title` and `url` describe the page the tab is currently showing and may be empty strings (a blank tab legitimately has both empty). `active` marks the tab that is active after this call; whenever `tabs` is non-empty, exactly one entry is marked.
+pub(all) struct BrowserStateTabEntry {
+  active : Bool?
+  tab_id : String
+  title : String
+  url : String
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend BrowserStateTabEntry with Eq::{equal, not_equal}
+
+///|
+pub extend BrowserStateTabEntry with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a BrowserStateTabEntry with omitted optional fields absent.
+pub fn BrowserStateTabEntry::new(
+  tab_id~ : String,
+  title~ : String,
+  url~ : String,
+  active? : Bool,
+) -> BrowserStateTabEntry {
+  { active, tab_id, title, url, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend BrowserStateTabEntry with ToJson::{to_json}
+
+///|
+pub impl ToJson for BrowserStateTabEntry with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .opt("active", self.active)
+  .field("tab_id", self.tab_id)
+  .field("title", self.title)
+  .field("url", self.url)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend BrowserStateTabEntry with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for BrowserStateTabEntry with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    active: @sdkjson.opt_field(obj, "active", path),
+    tab_id: required_field(obj, "tab_id", path),
+    title: required_field(obj, "title", path),
+    url: required_field(obj, "url", path),
+  }
+}
+
+///|
+///
+/// The caller's browser state after a browser toolset member call — the full inventory of open tabs, which tab is active, and any side effects (tabs opened, download state changes) the call produced. At most one per `tool_result`, only on a non-error result answering a browser toolset member `tool_use`. The server renders the model-visible text from it; the model never sees the raw fields.
+pub(all) struct RequestBrowserStateBlock {
+  cache_control : @sdkjson.Presence[RequestBrowserStateBlockCacheControl]
+  state_changes : @sdkjson.Presence[
+    Array[RequestBrowserStateBlockStateChangesItem],
+  ]
+  tabs : Array[BrowserStateTabEntry]
+  type_ : String
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestBrowserStateBlock with Eq::{equal, not_equal}
+
+///|
+pub extend RequestBrowserStateBlock with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a RequestBrowserStateBlock with omitted optional fields absent.
+pub fn RequestBrowserStateBlock::new(
+  tabs~ : Array[BrowserStateTabEntry],
+  type_~ : String,
+  cache_control? : RequestBrowserStateBlockCacheControl,
+  state_changes? : Array[RequestBrowserStateBlockStateChangesItem],
+) -> RequestBrowserStateBlock {
+  {
+    cache_control: @sdkjson.Presence::from_option(cache_control),
+    state_changes: @sdkjson.Presence::from_option(state_changes),
+    tabs,
+    type_,
+  }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend RequestBrowserStateBlock with ToJson::{to_json}
+
+///|
+pub impl ToJson for RequestBrowserStateBlock with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .presence("cache_control", self.cache_control)
+  .presence("state_changes", self.state_changes)
+  .field("tabs", self.tabs)
+  .field("type", self.type_)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend RequestBrowserStateBlock with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for RequestBrowserStateBlock with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    cache_control: @sdkjson.presence_field(obj, "cache_control", path),
+    state_changes: @sdkjson.presence_field(obj, "state_changes", path),
+    tabs: required_field(obj, "tabs", path),
+    type_: required_field(obj, "type", path),
+  }
+}
+
+///|
+///
+/// Create a cache control breakpoint at this content block.
+#non_exhaustive
+pub(all) enum RequestToolReferenceBlockCacheControl {
+  Ephemeral(CacheControlEphemeral)
+  Unknown(String, Json)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestToolReferenceBlockCacheControl with Eq::{equal, not_equal}
+
+///|
+pub extend RequestToolReferenceBlockCacheControl with @debug.Debug::{to_repr}
+
+///|
+///
+/// Encodes this tagged union as JSON.
+pub extend RequestToolReferenceBlockCacheControl with ToJson::{to_json}
+
+///|
+pub impl ToJson for RequestToolReferenceBlockCacheControl with fn to_json(self) {
+  match self {
+    Ephemeral(value) => Json(value)
+    Unknown(_, value) => value
+  }
+}
+
+///|
+///
+/// Decodes this tagged union from JSON.
+pub extend RequestToolReferenceBlockCacheControl with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for RequestToolReferenceBlockCacheControl with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  let tag : String = required_field(obj, "type", path)
+  match tag {
+    "ephemeral" => Ephemeral(@json.from_json(value, path~))
+    other => Unknown(other, value)
+  }
+}
+
+///|
+///
+/// Tool reference block that can be included in tool_result content.
+pub(all) struct RequestToolReferenceBlock {
+  cache_control : @sdkjson.Presence[RequestToolReferenceBlockCacheControl]
+  tool_name : String
+  type_ : String
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestToolReferenceBlock with Eq::{equal, not_equal}
+
+///|
+pub extend RequestToolReferenceBlock with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a RequestToolReferenceBlock with omitted optional fields absent.
+pub fn RequestToolReferenceBlock::new(
+  tool_name~ : String,
+  type_~ : String,
+  cache_control? : RequestToolReferenceBlockCacheControl,
+) -> RequestToolReferenceBlock {
+  {
+    cache_control: @sdkjson.Presence::from_option(cache_control),
+    tool_name,
+    type_,
+  }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend RequestToolReferenceBlock with ToJson::{to_json}
+
+///|
+pub impl ToJson for RequestToolReferenceBlock with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .presence("cache_control", self.cache_control)
+  .field("tool_name", self.tool_name)
+  .field("type", self.type_)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend RequestToolReferenceBlock with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for RequestToolReferenceBlock with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    cache_control: @sdkjson.presence_field(obj, "cache_control", path),
+    tool_name: required_field(obj, "tool_name", path),
+    type_: required_field(obj, "type", path),
+  }
+}
+
+///|
+///
+/// Generated tagged union RequestToolResultBlockContentValueArrayItem.
+#non_exhaustive
+pub(all) enum RequestToolResultBlockContentValueArrayItem {
+  BrowserState(RequestBrowserStateBlock)
+  Document(RequestDocumentBlock)
+  Image(RequestImageBlock)
+  SearchResult(RequestSearchResultBlock)
+  Text(RequestTextBlock)
+  ToolReference(RequestToolReferenceBlock)
+  Unknown(String, Json)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestToolResultBlockContentValueArrayItem with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend RequestToolResultBlockContentValueArrayItem with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this tagged union as JSON.
+pub extend RequestToolResultBlockContentValueArrayItem with ToJson::{to_json}
+
+///|
+pub impl ToJson for RequestToolResultBlockContentValueArrayItem with fn to_json(
+  self,
+) {
+  match self {
+    BrowserState(value) => Json(value)
+    Document(value) => Json(value)
+    Image(value) => Json(value)
+    SearchResult(value) => Json(value)
+    Text(value) => Json(value)
+    ToolReference(value) => Json(value)
+    Unknown(_, value) => value
+  }
+}
+
+///|
+///
+/// Decodes this tagged union from JSON.
+pub extend RequestToolResultBlockContentValueArrayItem with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for RequestToolResultBlockContentValueArrayItem with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  let tag : String = required_field(obj, "type", path)
+  match tag {
+    "browser_state" => BrowserState(@json.from_json(value, path~))
+    "document" => Document(@json.from_json(value, path~))
+    "image" => Image(@json.from_json(value, path~))
+    "search_result" => SearchResult(@json.from_json(value, path~))
+    "text" => Text(@json.from_json(value, path~))
+    "tool_reference" => ToolReference(@json.from_json(value, path~))
+    other => Unknown(other, value)
+  }
+}
+
+///|
+///
+/// Generated untagged union RequestToolResultBlockContent.
+#non_exhaustive
+pub(all) enum RequestToolResultBlockContent {
+  Text(String)
+  ValueArray(Array[RequestToolResultBlockContentValueArrayItem])
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestToolResultBlockContent with Eq::{equal, not_equal}
+
+///|
+pub extend RequestToolResultBlockContent with @debug.Debug::{to_repr}
+
+///|
+///
+/// Encodes this union as JSON.
+pub extend RequestToolResultBlockContent with ToJson::{to_json}
+
+///|
+pub impl ToJson for RequestToolResultBlockContent with fn to_json(self) {
+  match self {
+    Text(value) => Json(value)
+    ValueArray(value) => Json(value)
+  }
+}
+
+///|
+///
+/// Decodes this union from JSON.
+pub extend RequestToolResultBlockContent with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for RequestToolResultBlockContent with fn from_json(
+  value,
+  path,
+) {
+  if value is String(_) {
+    let decoded : String = @json.from_json(value, path~)
+    return Text(decoded)
+  }
+  if json_array_matches(value, item => item is Object(_)) {
+    let decoded : Array[RequestToolResultBlockContentValueArrayItem] = @json.from_json(
+      value,
+      path~,
+    )
+    return ValueArray(decoded)
+  }
+  raise @json.JsonDecodeError(
+    (
+      path, "JSON shape does not match any RequestToolResultBlockContent variant",
+    ),
+  )
+}
+
+///|
+///
+/// Generated representation of RequestToolResultBlock.
+pub(all) struct RequestToolResultBlock {
+  cache_control : @sdkjson.Presence[RequestToolResultBlockCacheControl]
+  content : RequestToolResultBlockContent?
+  is_error : Bool?
+  tool_use_id : String
+  toolset_name : @sdkjson.Presence[String]
+  type_ : String
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestToolResultBlock with Eq::{equal, not_equal}
+
+///|
+pub extend RequestToolResultBlock with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a RequestToolResultBlock with omitted optional fields absent.
+pub fn RequestToolResultBlock::new(
+  tool_use_id~ : String,
+  type_~ : String,
+  cache_control? : RequestToolResultBlockCacheControl,
+  content? : RequestToolResultBlockContent,
+  is_error? : Bool,
+  toolset_name? : String,
+) -> RequestToolResultBlock {
+  {
+    cache_control: @sdkjson.Presence::from_option(cache_control),
+    content,
+    is_error,
+    tool_use_id,
+    toolset_name: @sdkjson.Presence::from_option(toolset_name),
+    type_,
+  }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend RequestToolResultBlock with ToJson::{to_json}
+
+///|
+pub impl ToJson for RequestToolResultBlock with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .presence("cache_control", self.cache_control)
+  .opt("content", self.content)
+  .opt("is_error", self.is_error)
+  .field("tool_use_id", self.tool_use_id)
+  .presence("toolset_name", self.toolset_name)
+  .field("type", self.type_)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend RequestToolResultBlock with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for RequestToolResultBlock with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    cache_control: @sdkjson.presence_field(obj, "cache_control", path),
+    content: @sdkjson.opt_field(obj, "content", path),
+    is_error: @sdkjson.opt_field(obj, "is_error", path),
+    tool_use_id: required_field(obj, "tool_use_id", path),
+    toolset_name: @sdkjson.presence_field(obj, "toolset_name", path),
+    type_: required_field(obj, "type", path),
+  }
+}
+
+///|
+///
+/// Create a cache control breakpoint at this content block.
+#non_exhaustive
+pub(all) enum RequestToolSearchToolResultBlockCacheControl {
+  Ephemeral(CacheControlEphemeral)
+  Unknown(String, Json)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestToolSearchToolResultBlockCacheControl with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend RequestToolSearchToolResultBlockCacheControl with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this tagged union as JSON.
+pub extend RequestToolSearchToolResultBlockCacheControl with ToJson::{to_json}
+
+///|
+pub impl ToJson for RequestToolSearchToolResultBlockCacheControl with fn to_json(
+  self,
+) {
+  match self {
+    Ephemeral(value) => Json(value)
+    Unknown(_, value) => value
+  }
+}
+
+///|
+///
+/// Decodes this tagged union from JSON.
+pub extend RequestToolSearchToolResultBlockCacheControl with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for RequestToolSearchToolResultBlockCacheControl with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  let tag : String = required_field(obj, "type", path)
+  match tag {
+    "ephemeral" => Ephemeral(@json.from_json(value, path~))
+    other => Unknown(other, value)
+  }
+}
+
+///|
+///
+/// Generated string enum ToolSearchToolResultErrorCode.
+#non_exhaustive
+pub(all) enum ToolSearchToolResultErrorCode {
+  InvalidToolInput
+  Unavailable
+  TooManyRequests
+  ExecutionTimeExceeded
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend ToolSearchToolResultErrorCode with Eq::{equal, not_equal}
+
+///|
+pub extend ToolSearchToolResultErrorCode with @debug.Debug::{to_repr}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend ToolSearchToolResultErrorCode with ToJson::{to_json}
+
+///|
+pub impl ToJson for ToolSearchToolResultErrorCode with fn to_json(self) {
+  let raw = match self {
+    InvalidToolInput => "invalid_tool_input"
+    Unavailable => "unavailable"
+    TooManyRequests => "too_many_requests"
+    ExecutionTimeExceeded => "execution_time_exceeded"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend ToolSearchToolResultErrorCode with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for ToolSearchToolResultErrorCode with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "invalid_tool_input" => Some(InvalidToolInput)
+        "unavailable" => Some(Unavailable)
+        "too_many_requests" => Some(TooManyRequests)
+        "execution_time_exceeded" => Some(ExecutionTimeExceeded)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of RequestToolSearchToolResultError.
+pub(all) struct RequestToolSearchToolResultError {
+  error_code : ToolSearchToolResultErrorCode
+  error_message : @sdkjson.Presence[String]
+  type_ : String
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestToolSearchToolResultError with Eq::{equal, not_equal}
+
+///|
+pub extend RequestToolSearchToolResultError with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a RequestToolSearchToolResultError with omitted optional fields absent.
+pub fn RequestToolSearchToolResultError::new(
+  error_code~ : ToolSearchToolResultErrorCode,
+  type_~ : String,
+  error_message? : String,
+) -> RequestToolSearchToolResultError {
+  {
+    error_code,
+    error_message: @sdkjson.Presence::from_option(error_message),
+    type_,
+  }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend RequestToolSearchToolResultError with ToJson::{to_json}
+
+///|
+pub impl ToJson for RequestToolSearchToolResultError with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("error_code", self.error_code)
+  .presence("error_message", self.error_message)
+  .field("type", self.type_)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend RequestToolSearchToolResultError with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for RequestToolSearchToolResultError with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    error_code: required_field(obj, "error_code", path),
+    error_message: @sdkjson.presence_field(obj, "error_message", path),
+    type_: required_field(obj, "type", path),
+  }
+}
+
+///|
+///
+/// Generated representation of RequestToolSearchToolSearchResultBlock.
+pub(all) struct RequestToolSearchToolSearchResultBlock {
+  tool_references : Array[RequestToolReferenceBlock]
+  type_ : String
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestToolSearchToolSearchResultBlock with Eq::{equal, not_equal}
+
+///|
+pub extend RequestToolSearchToolSearchResultBlock with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a RequestToolSearchToolSearchResultBlock with omitted optional fields absent.
+pub fn RequestToolSearchToolSearchResultBlock::new(
+  tool_references~ : Array[RequestToolReferenceBlock],
+  type_~ : String,
+) -> RequestToolSearchToolSearchResultBlock {
+  { tool_references, type_, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend RequestToolSearchToolSearchResultBlock with ToJson::{to_json}
+
+///|
+pub impl ToJson for RequestToolSearchToolSearchResultBlock with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("tool_references", self.tool_references)
+  .field("type", self.type_)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend RequestToolSearchToolSearchResultBlock with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for RequestToolSearchToolSearchResultBlock with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    tool_references: required_field(obj, "tool_references", path),
+    type_: required_field(obj, "type", path),
+  }
+}
+
+///|
+///
+/// Generated tagged union RequestToolSearchToolResultBlockContent.
+#non_exhaustive
+pub(all) enum RequestToolSearchToolResultBlockContent {
+  ToolSearchToolResultError(RequestToolSearchToolResultError)
+  ToolSearchToolSearchResult(RequestToolSearchToolSearchResultBlock)
+  Unknown(String, Json)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestToolSearchToolResultBlockContent with Eq::{equal, not_equal}
+
+///|
+pub extend RequestToolSearchToolResultBlockContent with @debug.Debug::{to_repr}
+
+///|
+///
+/// Encodes this tagged union as JSON.
+pub extend RequestToolSearchToolResultBlockContent with ToJson::{to_json}
+
+///|
+pub impl ToJson for RequestToolSearchToolResultBlockContent with fn to_json(
+  self,
+) {
+  match self {
+    ToolSearchToolResultError(value) => Json(value)
+    ToolSearchToolSearchResult(value) => Json(value)
+    Unknown(_, value) => value
+  }
+}
+
+///|
+///
+/// Decodes this tagged union from JSON.
+pub extend RequestToolSearchToolResultBlockContent with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for RequestToolSearchToolResultBlockContent with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  let tag : String = required_field(obj, "type", path)
+  match tag {
+    "tool_search_tool_result_error" =>
+      ToolSearchToolResultError(@json.from_json(value, path~))
+    "tool_search_tool_search_result" =>
+      ToolSearchToolSearchResult(@json.from_json(value, path~))
+    other => Unknown(other, value)
+  }
+}
+
+///|
+///
+/// Generated representation of RequestToolSearchToolResultBlock.
+pub(all) struct RequestToolSearchToolResultBlock {
+  cache_control : @sdkjson.Presence[
+    RequestToolSearchToolResultBlockCacheControl,
+  ]
+  content : RequestToolSearchToolResultBlockContent
+  tool_use_id : String
+  type_ : String
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestToolSearchToolResultBlock with Eq::{equal, not_equal}
+
+///|
+pub extend RequestToolSearchToolResultBlock with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a RequestToolSearchToolResultBlock with omitted optional fields absent.
+pub fn RequestToolSearchToolResultBlock::new(
+  content~ : RequestToolSearchToolResultBlockContent,
+  tool_use_id~ : String,
+  type_~ : String,
+  cache_control? : RequestToolSearchToolResultBlockCacheControl,
+) -> RequestToolSearchToolResultBlock {
+  {
+    cache_control: @sdkjson.Presence::from_option(cache_control),
+    content,
+    tool_use_id,
+    type_,
+  }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend RequestToolSearchToolResultBlock with ToJson::{to_json}
+
+///|
+pub impl ToJson for RequestToolSearchToolResultBlock with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .presence("cache_control", self.cache_control)
+  .field("content", self.content)
+  .field("tool_use_id", self.tool_use_id)
+  .field("type", self.type_)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend RequestToolSearchToolResultBlock with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for RequestToolSearchToolResultBlock with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    cache_control: @sdkjson.presence_field(obj, "cache_control", path),
+    content: required_field(obj, "content", path),
+    tool_use_id: required_field(obj, "tool_use_id", path),
+    type_: required_field(obj, "type", path),
+  }
+}
+
+///|
+///
+/// Create a cache control breakpoint at this content block.
+#non_exhaustive
+pub(all) enum RequestToolUseBlockCacheControl {
+  Ephemeral(CacheControlEphemeral)
+  Unknown(String, Json)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestToolUseBlockCacheControl with Eq::{equal, not_equal}
+
+///|
+pub extend RequestToolUseBlockCacheControl with @debug.Debug::{to_repr}
+
+///|
+///
+/// Encodes this tagged union as JSON.
+pub extend RequestToolUseBlockCacheControl with ToJson::{to_json}
+
+///|
+pub impl ToJson for RequestToolUseBlockCacheControl with fn to_json(self) {
+  match self {
+    Ephemeral(value) => Json(value)
+    Unknown(_, value) => value
+  }
+}
+
+///|
+///
+/// Decodes this tagged union from JSON.
+pub extend RequestToolUseBlockCacheControl with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for RequestToolUseBlockCacheControl with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  let tag : String = required_field(obj, "type", path)
+  match tag {
+    "ephemeral" => Ephemeral(@json.from_json(value, path~))
+    other => Unknown(other, value)
+  }
+}
+
+///|
+///
+/// Generated tagged union RequestToolUseBlockCaller.
+#non_exhaustive
+pub(all) enum RequestToolUseBlockCaller {
+  CodeExecution20250825(ServerToolCaller)
+  CodeExecution20260120(ServerToolCaller20260120)
+  Direct(DirectCaller)
+  Unknown(String, Json)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestToolUseBlockCaller with Eq::{equal, not_equal}
+
+///|
+pub extend RequestToolUseBlockCaller with @debug.Debug::{to_repr}
+
+///|
+///
+/// Encodes this tagged union as JSON.
+pub extend RequestToolUseBlockCaller with ToJson::{to_json}
+
+///|
+pub impl ToJson for RequestToolUseBlockCaller with fn to_json(self) {
+  match self {
+    CodeExecution20250825(value) => Json(value)
+    CodeExecution20260120(value) => Json(value)
+    Direct(value) => Json(value)
+    Unknown(_, value) => value
+  }
+}
+
+///|
+///
+/// Decodes this tagged union from JSON.
+pub extend RequestToolUseBlockCaller with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for RequestToolUseBlockCaller with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  let tag : String = required_field(obj, "type", path)
+  match tag {
+    "code_execution_20250825" =>
+      CodeExecution20250825(@json.from_json(value, path~))
+    "code_execution_20260120" =>
+      CodeExecution20260120(@json.from_json(value, path~))
+    "direct" => Direct(@json.from_json(value, path~))
+    other => Unknown(other, value)
+  }
+}
+
+///|
+///
+/// Generated representation of RequestToolUseBlock.
+pub(all) struct RequestToolUseBlock {
+  cache_control : @sdkjson.Presence[RequestToolUseBlockCacheControl]
+  caller : RequestToolUseBlockCaller?
+  id : String
+  input : Json
+  name : String
+  toolset_name : @sdkjson.Presence[String]
+  type_ : String
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestToolUseBlock with Eq::{equal, not_equal}
+
+///|
+pub extend RequestToolUseBlock with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a RequestToolUseBlock with omitted optional fields absent.
+pub fn RequestToolUseBlock::new(
+  id~ : String,
+  input~ : Json,
+  name~ : String,
+  type_~ : String,
+  cache_control? : RequestToolUseBlockCacheControl,
+  caller? : RequestToolUseBlockCaller,
+  toolset_name? : String,
+) -> RequestToolUseBlock {
+  {
+    cache_control: @sdkjson.Presence::from_option(cache_control),
+    caller,
+    id,
+    input,
+    name,
+    toolset_name: @sdkjson.Presence::from_option(toolset_name),
+    type_,
+  }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend RequestToolUseBlock with ToJson::{to_json}
+
+///|
+pub impl ToJson for RequestToolUseBlock with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .presence("cache_control", self.cache_control)
+  .opt("caller", self.caller)
+  .field("id", self.id)
+  .field("input", self.input)
+  .field("name", self.name)
+  .presence("toolset_name", self.toolset_name)
+  .field("type", self.type_)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend RequestToolUseBlock with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for RequestToolUseBlock with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    cache_control: @sdkjson.presence_field(obj, "cache_control", path),
+    caller: @sdkjson.opt_field(obj, "caller", path),
+    id: required_field(obj, "id", path),
+    input: required_field(obj, "input", path),
+    name: required_field(obj, "name", path),
+    toolset_name: @sdkjson.presence_field(obj, "toolset_name", path),
+    type_: required_field(obj, "type", path),
+  }
+}
+
+///|
+///
+/// Create a cache control breakpoint at this content block.
+#non_exhaustive
+pub(all) enum RequestWebFetchToolResultBlockCacheControl {
+  Ephemeral(CacheControlEphemeral)
+  Unknown(String, Json)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestWebFetchToolResultBlockCacheControl with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend RequestWebFetchToolResultBlockCacheControl with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this tagged union as JSON.
+pub extend RequestWebFetchToolResultBlockCacheControl with ToJson::{to_json}
+
+///|
+pub impl ToJson for RequestWebFetchToolResultBlockCacheControl with fn to_json(
+  self,
+) {
+  match self {
+    Ephemeral(value) => Json(value)
+    Unknown(_, value) => value
+  }
+}
+
+///|
+///
+/// Decodes this tagged union from JSON.
+pub extend RequestWebFetchToolResultBlockCacheControl with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for RequestWebFetchToolResultBlockCacheControl with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  let tag : String = required_field(obj, "type", path)
+  match tag {
+    "ephemeral" => Ephemeral(@json.from_json(value, path~))
+    other => Unknown(other, value)
+  }
+}
+
+///|
+///
+/// Generated tagged union RequestWebFetchToolResultBlockCaller.
+#non_exhaustive
+pub(all) enum RequestWebFetchToolResultBlockCaller {
+  CodeExecution20250825(ServerToolCaller)
+  CodeExecution20260120(ServerToolCaller20260120)
+  Direct(DirectCaller)
+  Unknown(String, Json)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestWebFetchToolResultBlockCaller with Eq::{equal, not_equal}
+
+///|
+pub extend RequestWebFetchToolResultBlockCaller with @debug.Debug::{to_repr}
+
+///|
+///
+/// Encodes this tagged union as JSON.
+pub extend RequestWebFetchToolResultBlockCaller with ToJson::{to_json}
+
+///|
+pub impl ToJson for RequestWebFetchToolResultBlockCaller with fn to_json(self) {
+  match self {
+    CodeExecution20250825(value) => Json(value)
+    CodeExecution20260120(value) => Json(value)
+    Direct(value) => Json(value)
+    Unknown(_, value) => value
+  }
+}
+
+///|
+///
+/// Decodes this tagged union from JSON.
+pub extend RequestWebFetchToolResultBlockCaller with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for RequestWebFetchToolResultBlockCaller with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  let tag : String = required_field(obj, "type", path)
+  match tag {
+    "code_execution_20250825" =>
+      CodeExecution20250825(@json.from_json(value, path~))
+    "code_execution_20260120" =>
+      CodeExecution20260120(@json.from_json(value, path~))
+    "direct" => Direct(@json.from_json(value, path~))
+    other => Unknown(other, value)
+  }
+}
+
+///|
+///
+/// Generated string enum WebFetchToolResultErrorCode.
+#non_exhaustive
+pub(all) enum WebFetchToolResultErrorCode {
+  InvalidToolInput
+  UrlTooLong
+  UrlNotAllowed
+  UrlNotInPriorContext
+  UrlNotAccessible
+  UnsupportedContentType
+  TooManyRequests
+  MaxUsesExceeded
+  Unavailable
+  ContentTooLarge
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend WebFetchToolResultErrorCode with Eq::{equal, not_equal}
+
+///|
+pub extend WebFetchToolResultErrorCode with @debug.Debug::{to_repr}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend WebFetchToolResultErrorCode with ToJson::{to_json}
+
+///|
+pub impl ToJson for WebFetchToolResultErrorCode with fn to_json(self) {
+  let raw = match self {
+    InvalidToolInput => "invalid_tool_input"
+    UrlTooLong => "url_too_long"
+    UrlNotAllowed => "url_not_allowed"
+    UrlNotInPriorContext => "url_not_in_prior_context"
+    UrlNotAccessible => "url_not_accessible"
+    UnsupportedContentType => "unsupported_content_type"
+    TooManyRequests => "too_many_requests"
+    MaxUsesExceeded => "max_uses_exceeded"
+    Unavailable => "unavailable"
+    ContentTooLarge => "content_too_large"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend WebFetchToolResultErrorCode with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for WebFetchToolResultErrorCode with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "invalid_tool_input" => Some(InvalidToolInput)
+        "url_too_long" => Some(UrlTooLong)
+        "url_not_allowed" => Some(UrlNotAllowed)
+        "url_not_in_prior_context" => Some(UrlNotInPriorContext)
+        "url_not_accessible" => Some(UrlNotAccessible)
+        "unsupported_content_type" => Some(UnsupportedContentType)
+        "too_many_requests" => Some(TooManyRequests)
+        "max_uses_exceeded" => Some(MaxUsesExceeded)
+        "unavailable" => Some(Unavailable)
+        "content_too_large" => Some(ContentTooLarge)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of RequestWebFetchToolResultError.
+pub(all) struct RequestWebFetchToolResultError {
+  error_code : WebFetchToolResultErrorCode
+  type_ : String
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestWebFetchToolResultError with Eq::{equal, not_equal}
+
+///|
+pub extend RequestWebFetchToolResultError with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a RequestWebFetchToolResultError with omitted optional fields absent.
+pub fn RequestWebFetchToolResultError::new(
+  error_code~ : WebFetchToolResultErrorCode,
+  type_~ : String,
+) -> RequestWebFetchToolResultError {
+  { error_code, type_, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend RequestWebFetchToolResultError with ToJson::{to_json}
+
+///|
+pub impl ToJson for RequestWebFetchToolResultError with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("error_code", self.error_code)
+  .field("type", self.type_)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend RequestWebFetchToolResultError with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for RequestWebFetchToolResultError with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    error_code: required_field(obj, "error_code", path),
+    type_: required_field(obj, "type", path),
+  }
+}
+
+///|
+///
+/// Generated representation of RequestWebFetchResultBlock.
+pub(all) struct RequestWebFetchResultBlock {
+  content : RequestDocumentBlock
+  retrieved_at : @sdkjson.Presence[String]
+  type_ : String
+  url : String
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestWebFetchResultBlock with Eq::{equal, not_equal}
+
+///|
+pub extend RequestWebFetchResultBlock with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a RequestWebFetchResultBlock with omitted optional fields absent.
+pub fn RequestWebFetchResultBlock::new(
+  content~ : RequestDocumentBlock,
+  type_~ : String,
+  url~ : String,
+  retrieved_at? : String,
+) -> RequestWebFetchResultBlock {
+  {
+    content,
+    retrieved_at: @sdkjson.Presence::from_option(retrieved_at),
+    type_,
+    url,
+  }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend RequestWebFetchResultBlock with ToJson::{to_json}
+
+///|
+pub impl ToJson for RequestWebFetchResultBlock with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("content", self.content)
+  .presence("retrieved_at", self.retrieved_at)
+  .field("type", self.type_)
+  .field("url", self.url)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend RequestWebFetchResultBlock with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for RequestWebFetchResultBlock with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    content: required_field(obj, "content", path),
+    retrieved_at: @sdkjson.presence_field(obj, "retrieved_at", path),
+    type_: required_field(obj, "type", path),
+    url: required_field(obj, "url", path),
+  }
+}
+
+///|
+///
+/// Generated tagged union RequestWebFetchToolResultBlockContent.
+#non_exhaustive
+pub(all) enum RequestWebFetchToolResultBlockContent {
+  WebFetchToolResultError(RequestWebFetchToolResultError)
+  WebFetchResult(RequestWebFetchResultBlock)
+  Unknown(String, Json)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestWebFetchToolResultBlockContent with Eq::{equal, not_equal}
+
+///|
+pub extend RequestWebFetchToolResultBlockContent with @debug.Debug::{to_repr}
+
+///|
+///
+/// Encodes this tagged union as JSON.
+pub extend RequestWebFetchToolResultBlockContent with ToJson::{to_json}
+
+///|
+pub impl ToJson for RequestWebFetchToolResultBlockContent with fn to_json(self) {
+  match self {
+    WebFetchToolResultError(value) => Json(value)
+    WebFetchResult(value) => Json(value)
+    Unknown(_, value) => value
+  }
+}
+
+///|
+///
+/// Decodes this tagged union from JSON.
+pub extend RequestWebFetchToolResultBlockContent with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for RequestWebFetchToolResultBlockContent with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  let tag : String = required_field(obj, "type", path)
+  match tag {
+    "web_fetch_tool_result_error" =>
+      WebFetchToolResultError(@json.from_json(value, path~))
+    "web_fetch_result" => WebFetchResult(@json.from_json(value, path~))
+    other => Unknown(other, value)
+  }
+}
+
+///|
+///
+/// Generated representation of RequestWebFetchToolResultBlock.
+pub(all) struct RequestWebFetchToolResultBlock {
+  cache_control : @sdkjson.Presence[RequestWebFetchToolResultBlockCacheControl]
+  caller : RequestWebFetchToolResultBlockCaller?
+  content : RequestWebFetchToolResultBlockContent
+  tool_use_id : String
+  type_ : String
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestWebFetchToolResultBlock with Eq::{equal, not_equal}
+
+///|
+pub extend RequestWebFetchToolResultBlock with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a RequestWebFetchToolResultBlock with omitted optional fields absent.
+pub fn RequestWebFetchToolResultBlock::new(
+  content~ : RequestWebFetchToolResultBlockContent,
+  tool_use_id~ : String,
+  type_~ : String,
+  cache_control? : RequestWebFetchToolResultBlockCacheControl,
+  caller? : RequestWebFetchToolResultBlockCaller,
+) -> RequestWebFetchToolResultBlock {
+  {
+    cache_control: @sdkjson.Presence::from_option(cache_control),
+    caller,
+    content,
+    tool_use_id,
+    type_,
+  }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend RequestWebFetchToolResultBlock with ToJson::{to_json}
+
+///|
+pub impl ToJson for RequestWebFetchToolResultBlock with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .presence("cache_control", self.cache_control)
+  .opt("caller", self.caller)
+  .field("content", self.content)
+  .field("tool_use_id", self.tool_use_id)
+  .field("type", self.type_)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend RequestWebFetchToolResultBlock with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for RequestWebFetchToolResultBlock with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    cache_control: @sdkjson.presence_field(obj, "cache_control", path),
+    caller: @sdkjson.opt_field(obj, "caller", path),
+    content: required_field(obj, "content", path),
+    tool_use_id: required_field(obj, "tool_use_id", path),
+    type_: required_field(obj, "type", path),
+  }
+}
+
+///|
+///
+/// Create a cache control breakpoint at this content block.
+#non_exhaustive
+pub(all) enum RequestWebSearchToolResultBlockCacheControl {
+  Ephemeral(CacheControlEphemeral)
+  Unknown(String, Json)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestWebSearchToolResultBlockCacheControl with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend RequestWebSearchToolResultBlockCacheControl with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this tagged union as JSON.
+pub extend RequestWebSearchToolResultBlockCacheControl with ToJson::{to_json}
+
+///|
+pub impl ToJson for RequestWebSearchToolResultBlockCacheControl with fn to_json(
+  self,
+) {
+  match self {
+    Ephemeral(value) => Json(value)
+    Unknown(_, value) => value
+  }
+}
+
+///|
+///
+/// Decodes this tagged union from JSON.
+pub extend RequestWebSearchToolResultBlockCacheControl with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for RequestWebSearchToolResultBlockCacheControl with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  let tag : String = required_field(obj, "type", path)
+  match tag {
+    "ephemeral" => Ephemeral(@json.from_json(value, path~))
+    other => Unknown(other, value)
+  }
+}
+
+///|
+///
+/// Generated tagged union RequestWebSearchToolResultBlockCaller.
+#non_exhaustive
+pub(all) enum RequestWebSearchToolResultBlockCaller {
+  CodeExecution20250825(ServerToolCaller)
+  CodeExecution20260120(ServerToolCaller20260120)
+  Direct(DirectCaller)
+  Unknown(String, Json)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestWebSearchToolResultBlockCaller with Eq::{equal, not_equal}
+
+///|
+pub extend RequestWebSearchToolResultBlockCaller with @debug.Debug::{to_repr}
+
+///|
+///
+/// Encodes this tagged union as JSON.
+pub extend RequestWebSearchToolResultBlockCaller with ToJson::{to_json}
+
+///|
+pub impl ToJson for RequestWebSearchToolResultBlockCaller with fn to_json(self) {
+  match self {
+    CodeExecution20250825(value) => Json(value)
+    CodeExecution20260120(value) => Json(value)
+    Direct(value) => Json(value)
+    Unknown(_, value) => value
+  }
+}
+
+///|
+///
+/// Decodes this tagged union from JSON.
+pub extend RequestWebSearchToolResultBlockCaller with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for RequestWebSearchToolResultBlockCaller with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  let tag : String = required_field(obj, "type", path)
+  match tag {
+    "code_execution_20250825" =>
+      CodeExecution20250825(@json.from_json(value, path~))
+    "code_execution_20260120" =>
+      CodeExecution20260120(@json.from_json(value, path~))
+    "direct" => Direct(@json.from_json(value, path~))
+    other => Unknown(other, value)
+  }
+}
+
+///|
+///
+/// Generated representation of RequestWebSearchResultBlock.
+pub(all) struct RequestWebSearchResultBlock {
+  encrypted_content : String
+  page_age : @sdkjson.Presence[String]
+  title : String
+  url : String
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestWebSearchResultBlock with Eq::{equal, not_equal}
+
+///|
+pub extend RequestWebSearchResultBlock with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a RequestWebSearchResultBlock with omitted optional fields absent.
+pub fn RequestWebSearchResultBlock::new(
+  encrypted_content~ : String,
+  title~ : String,
+  url~ : String,
+  page_age? : String,
+) -> RequestWebSearchResultBlock {
+  {
+    encrypted_content,
+    page_age: @sdkjson.Presence::from_option(page_age),
+    title,
+    url,
+  }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend RequestWebSearchResultBlock with ToJson::{to_json}
+
+///|
+pub impl ToJson for RequestWebSearchResultBlock with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("encrypted_content", self.encrypted_content)
+  .presence("page_age", self.page_age)
+  .field("title", self.title)
+  .field("type", "web_search_result")
+  .field("url", self.url)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend RequestWebSearchResultBlock with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for RequestWebSearchResultBlock with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    encrypted_content: required_field(obj, "encrypted_content", path),
+    page_age: @sdkjson.presence_field(obj, "page_age", path),
+    title: required_field(obj, "title", path),
+    url: required_field(obj, "url", path),
+  }
+}
+
+///|
+///
+/// Generated string enum WebSearchToolResultErrorCode.
+#non_exhaustive
+pub(all) enum WebSearchToolResultErrorCode {
+  InvalidToolInput
+  Unavailable
+  MaxUsesExceeded
+  TooManyRequests
+  QueryTooLong
+  RequestTooLarge
+  Unknown(String)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend WebSearchToolResultErrorCode with Eq::{equal, not_equal}
+
+///|
+pub extend WebSearchToolResultErrorCode with @debug.Debug::{to_repr}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend WebSearchToolResultErrorCode with ToJson::{to_json}
+
+///|
+pub impl ToJson for WebSearchToolResultErrorCode with fn to_json(self) {
+  let raw = match self {
+    InvalidToolInput => "invalid_tool_input"
+    Unavailable => "unavailable"
+    MaxUsesExceeded => "max_uses_exceeded"
+    TooManyRequests => "too_many_requests"
+    QueryTooLong => "query_too_long"
+    RequestTooLarge => "request_too_large"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend WebSearchToolResultErrorCode with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for WebSearchToolResultErrorCode with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "invalid_tool_input" => Some(InvalidToolInput)
+        "unavailable" => Some(Unavailable)
+        "max_uses_exceeded" => Some(MaxUsesExceeded)
+        "too_many_requests" => Some(TooManyRequests)
+        "query_too_long" => Some(QueryTooLong)
+        "request_too_large" => Some(RequestTooLarge)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of RequestWebSearchToolResultError.
+pub(all) struct RequestWebSearchToolResultError {
+  error_code : WebSearchToolResultErrorCode
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestWebSearchToolResultError with Eq::{equal, not_equal}
+
+///|
+pub extend RequestWebSearchToolResultError with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a RequestWebSearchToolResultError with omitted optional fields absent.
+pub fn RequestWebSearchToolResultError::new(
+  error_code~ : WebSearchToolResultErrorCode,
+) -> RequestWebSearchToolResultError {
+  { error_code, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend RequestWebSearchToolResultError with ToJson::{to_json}
+
+///|
+pub impl ToJson for RequestWebSearchToolResultError with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("error_code", self.error_code)
+  .field("type", "web_search_tool_result_error")
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend RequestWebSearchToolResultError with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for RequestWebSearchToolResultError with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  { error_code: required_field(obj, "error_code", path), }
+}
+
+///|
+///
+/// Generated untagged union RequestWebSearchToolResultBlockContent.
+#non_exhaustive
+pub(all) enum RequestWebSearchToolResultBlockContent {
+  RequestWebSearchResultBlockArray(Array[RequestWebSearchResultBlock])
+  RequestWebSearchToolResultError(RequestWebSearchToolResultError)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestWebSearchToolResultBlockContent with Eq::{equal, not_equal}
+
+///|
+pub extend RequestWebSearchToolResultBlockContent with @debug.Debug::{to_repr}
+
+///|
+///
+/// Encodes this union as JSON.
+pub extend RequestWebSearchToolResultBlockContent with ToJson::{to_json}
+
+///|
+pub impl ToJson for RequestWebSearchToolResultBlockContent with fn to_json(self) {
+  match self {
+    RequestWebSearchResultBlockArray(value) => Json(value)
+    RequestWebSearchToolResultError(value) => Json(value)
+  }
+}
+
+///|
+///
+/// Decodes this union from JSON.
+pub extend RequestWebSearchToolResultBlockContent with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for RequestWebSearchToolResultBlockContent with fn from_json(
+  value,
+  path,
+) {
+  if json_array_matches(value, item => item is Object(_)) {
+    let decoded : Array[RequestWebSearchResultBlock] = @json.from_json(
+      value,
+      path~,
+    )
+    return RequestWebSearchResultBlockArray(decoded)
+  }
+  if value is Object(_) {
+    let decoded : RequestWebSearchToolResultError = @json.from_json(
+      value,
+      path~,
+    )
+    return RequestWebSearchToolResultError(decoded)
+  }
+  raise @json.JsonDecodeError(
+    (
+      path, "JSON shape does not match any RequestWebSearchToolResultBlockContent variant",
+    ),
+  )
+}
+
+///|
+///
+/// Generated representation of RequestWebSearchToolResultBlock.
+pub(all) struct RequestWebSearchToolResultBlock {
+  cache_control : @sdkjson.Presence[RequestWebSearchToolResultBlockCacheControl]
+  caller : RequestWebSearchToolResultBlockCaller?
+  content : RequestWebSearchToolResultBlockContent
+  tool_use_id : String
+  type_ : String
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend RequestWebSearchToolResultBlock with Eq::{equal, not_equal}
+
+///|
+pub extend RequestWebSearchToolResultBlock with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a RequestWebSearchToolResultBlock with omitted optional fields absent.
+pub fn RequestWebSearchToolResultBlock::new(
+  content~ : RequestWebSearchToolResultBlockContent,
+  tool_use_id~ : String,
+  type_~ : String,
+  cache_control? : RequestWebSearchToolResultBlockCacheControl,
+  caller? : RequestWebSearchToolResultBlockCaller,
+) -> RequestWebSearchToolResultBlock {
+  {
+    cache_control: @sdkjson.Presence::from_option(cache_control),
+    caller,
+    content,
+    tool_use_id,
+    type_,
+  }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend RequestWebSearchToolResultBlock with ToJson::{to_json}
+
+///|
+pub impl ToJson for RequestWebSearchToolResultBlock with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .presence("cache_control", self.cache_control)
+  .opt("caller", self.caller)
+  .field("content", self.content)
+  .field("tool_use_id", self.tool_use_id)
+  .field("type", self.type_)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend RequestWebSearchToolResultBlock with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for RequestWebSearchToolResultBlock with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    cache_control: @sdkjson.presence_field(obj, "cache_control", path),
+    caller: @sdkjson.opt_field(obj, "caller", path),
+    content: required_field(obj, "content", path),
+    tool_use_id: required_field(obj, "tool_use_id", path),
+    type_: required_field(obj, "type", path),
+  }
+}
+
+///|
+///
+/// Generated tagged union InputContentBlock.
+#non_exhaustive
+pub(all) enum InputContentBlock {
+  BashCodeExecutionToolResult(RequestBashCodeExecutionToolResultBlock)
+  CodeExecutionToolResult(RequestCodeExecutionToolResultBlock)
+  ContainerUpload(RequestContainerUploadBlock)
+  Document(RequestDocumentBlock)
+  Image(RequestImageBlock)
+  RedactedThinking(RequestRedactedThinkingBlock)
+  SearchResult(RequestSearchResultBlock)
+  ServerToolUse(RequestServerToolUseBlock)
+  Text(RequestTextBlock)
+  TextEditorCodeExecutionToolResult(
+    RequestTextEditorCodeExecutionToolResultBlock
+  )
+  Thinking(RequestThinkingBlock)
+  ToolResult(RequestToolResultBlock)
+  ToolSearchToolResult(RequestToolSearchToolResultBlock)
+  ToolUse(RequestToolUseBlock)
+  WebFetchToolResult(RequestWebFetchToolResultBlock)
+  WebSearchToolResult(RequestWebSearchToolResultBlock)
+  Unknown(String, Json)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend InputContentBlock with Eq::{equal, not_equal}
+
+///|
+pub extend InputContentBlock with @debug.Debug::{to_repr}
+
+///|
+///
+/// Encodes this tagged union as JSON.
+pub extend InputContentBlock with ToJson::{to_json}
+
+///|
+pub impl ToJson for InputContentBlock with fn to_json(self) {
+  match self {
+    BashCodeExecutionToolResult(value) => Json(value)
+    CodeExecutionToolResult(value) => Json(value)
+    ContainerUpload(value) => Json(value)
+    Document(value) => Json(value)
+    Image(value) => Json(value)
+    RedactedThinking(value) => Json(value)
+    SearchResult(value) => Json(value)
+    ServerToolUse(value) => Json(value)
+    Text(value) => Json(value)
+    TextEditorCodeExecutionToolResult(value) => Json(value)
+    Thinking(value) => Json(value)
+    ToolResult(value) => Json(value)
+    ToolSearchToolResult(value) => Json(value)
+    ToolUse(value) => Json(value)
+    WebFetchToolResult(value) => Json(value)
+    WebSearchToolResult(value) => Json(value)
+    Unknown(_, value) => value
+  }
+}
+
+///|
+///
+/// Decodes this tagged union from JSON.
+pub extend InputContentBlock with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for InputContentBlock with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  let tag : String = required_field(obj, "type", path)
+  match tag {
+    "bash_code_execution_tool_result" =>
+      BashCodeExecutionToolResult(@json.from_json(value, path~))
+    "code_execution_tool_result" =>
+      CodeExecutionToolResult(@json.from_json(value, path~))
+    "container_upload" => ContainerUpload(@json.from_json(value, path~))
+    "document" => Document(@json.from_json(value, path~))
+    "image" => Image(@json.from_json(value, path~))
+    "redacted_thinking" => RedactedThinking(@json.from_json(value, path~))
+    "search_result" => SearchResult(@json.from_json(value, path~))
+    "server_tool_use" => ServerToolUse(@json.from_json(value, path~))
+    "text" => Text(@json.from_json(value, path~))
+    "text_editor_code_execution_tool_result" =>
+      TextEditorCodeExecutionToolResult(@json.from_json(value, path~))
+    "thinking" => Thinking(@json.from_json(value, path~))
+    "tool_result" => ToolResult(@json.from_json(value, path~))
+    "tool_search_tool_result" =>
+      ToolSearchToolResult(@json.from_json(value, path~))
+    "tool_use" => ToolUse(@json.from_json(value, path~))
+    "web_fetch_tool_result" => WebFetchToolResult(@json.from_json(value, path~))
+    "web_search_tool_result" =>
+      WebSearchToolResult(@json.from_json(value, path~))
+    other => Unknown(other, value)
+  }
+}
+
+///|
+///
+/// Generated untagged union InputMessageContent.
+#non_exhaustive
+pub(all) enum InputMessageContent {
+  Text(String)
+  InputContentBlockArray(Array[InputContentBlock])
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend InputMessageContent with Eq::{equal, not_equal}
+
+///|
+pub extend InputMessageContent with @debug.Debug::{to_repr}
+
+///|
+///
+/// Encodes this union as JSON.
+pub extend InputMessageContent with ToJson::{to_json}
+
+///|
+pub impl ToJson for InputMessageContent with fn to_json(self) {
+  match self {
+    Text(value) => Json(value)
+    InputContentBlockArray(value) => Json(value)
+  }
+}
+
+///|
+///
+/// Decodes this union from JSON.
+pub extend InputMessageContent with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for InputMessageContent with fn from_json(value, path) {
+  if value is String(_) {
+    let decoded : String = @json.from_json(value, path~)
+    return Text(decoded)
+  }
+  if json_array_matches(value, item => item is Object(_)) {
+    let decoded : Array[InputContentBlock] = @json.from_json(value, path~)
+    return InputContentBlockArray(decoded)
+  }
+  raise @json.JsonDecodeError(
+    (path, "JSON shape does not match any InputMessageContent variant"),
+  )
+}
+
+///|
+///
+/// Generated representation of AssistantInputMessage.
+pub(all) struct AssistantInputMessage {
+  content : InputMessageContent
+  role : String
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AssistantInputMessage with Eq::{equal, not_equal}
+
+///|
+pub extend AssistantInputMessage with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a AssistantInputMessage with omitted optional fields absent.
+pub fn AssistantInputMessage::new(
+  content~ : InputMessageContent,
+  role~ : String,
+) -> AssistantInputMessage {
+  { content, role, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AssistantInputMessage with ToJson::{to_json}
+
+///|
+pub impl ToJson for AssistantInputMessage with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("content", self.content)
+  .field("role", self.role)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AssistantInputMessage with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for AssistantInputMessage with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    content: required_field(obj, "content", path),
+    role: required_field(obj, "role", path),
+  }
+}
+
+///|
+///
+/// Generated representation of AuthenticationError.
+pub(all) struct AuthenticationError {
+  message : String
+  type_ : String
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend AuthenticationError with Eq::{equal, not_equal}
+
+///|
+pub extend AuthenticationError with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a AuthenticationError with omitted optional fields absent.
+pub fn AuthenticationError::new(
+  message~ : String,
+  type_~ : String,
+) -> AuthenticationError {
+  { message, type_, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AuthenticationError with ToJson::{to_json}
+
+///|
+pub impl ToJson for AuthenticationError with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("message", self.message)
+  .field("type", self.type_)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AuthenticationError with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for AuthenticationError with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    message: required_field(obj, "message", path),
+    type_: required_field(obj, "type", path),
+  }
+}
+
+///|
+///
+/// The tools available after a message exceed a limit on their number or their size.
+pub(all) struct AvailableToolsLimitExceededErrorDetails {} derive (
+  Eq,
+  @debug.Debug,
+)
+
+///|
+pub extend AvailableToolsLimitExceededErrorDetails with Eq::{equal, not_equal}
+
+///|
+pub extend AvailableToolsLimitExceededErrorDetails with @debug.Debug::{to_repr}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend AvailableToolsLimitExceededErrorDetails with ToJson::{to_json}
+
+///|
+pub impl ToJson for AvailableToolsLimitExceededErrorDetails with fn to_json(
+  _self,
+) {
+  @sdkjson.ObjBuilder::new()
+  .field("error_code", "available_tools_limit_exceeded")
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend AvailableToolsLimitExceededErrorDetails with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for AvailableToolsLimitExceededErrorDetails with fn from_json(
+  value,
+  path,
+) {
+  let _ = @sdkjson.expect_object(value, path)
+  AvailableToolsLimitExceededErrorDetails::{ }
 }
 
 ///|
@@ -2210,311 +8356,6 @@ pub impl @json.FromJson for BrowserScrollToConfig with fn from_json(value, path)
   {
     defer_loading: @sdkjson.presence_field(obj, "defer_loading", path),
     enabled: @sdkjson.presence_field(obj, "enabled", path),
-  }
-}
-
-///|
-///
-/// A file download that finished during this call, reported with the same `download_id` as its `download_started` — or without a prior `download_started`, when the download finished during the call that started it (at most one state change per `download_id` per result).
-pub(all) struct BrowserStateChangeDownloadCompleted {
-  download_id : String
-  path : @sdkjson.Presence[String]
-  size_bytes : @sdkjson.Presence[Int32]
-  type_ : String
-  url : String
-} derive(Eq, @debug.Debug)
-
-///|
-pub extend BrowserStateChangeDownloadCompleted with Eq::{equal, not_equal}
-
-///|
-pub extend BrowserStateChangeDownloadCompleted with @debug.Debug::{to_repr}
-
-///|
-///
-/// Creates a BrowserStateChangeDownloadCompleted with omitted optional fields absent.
-pub fn BrowserStateChangeDownloadCompleted::new(
-  download_id~ : String,
-  type_~ : String,
-  url~ : String,
-  path? : String,
-  size_bytes? : Int32,
-) -> BrowserStateChangeDownloadCompleted {
-  {
-    download_id,
-    path: @sdkjson.Presence::from_option(path),
-    size_bytes: @sdkjson.Presence::from_option(size_bytes),
-    type_,
-    url,
-  }
-}
-
-///|
-///
-/// Encodes this value as JSON.
-pub extend BrowserStateChangeDownloadCompleted with ToJson::{to_json}
-
-///|
-pub impl ToJson for BrowserStateChangeDownloadCompleted with fn to_json(self) {
-  @sdkjson.ObjBuilder::new()
-  .field("download_id", self.download_id)
-  .presence("path", self.path)
-  .presence("size_bytes", self.size_bytes)
-  .field("type", self.type_)
-  .field("url", self.url)
-  .build()
-}
-
-///|
-///
-/// Decodes this value from JSON.
-pub extend BrowserStateChangeDownloadCompleted with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for BrowserStateChangeDownloadCompleted with fn from_json(
-  value,
-  path,
-) {
-  let obj = @sdkjson.expect_object(value, path)
-  {
-    download_id: required_field(obj, "download_id", path),
-    path: @sdkjson.presence_field(obj, "path", path),
-    size_bytes: @sdkjson.presence_field(obj, "size_bytes", path),
-    type_: required_field(obj, "type", path),
-    url: required_field(obj, "url", path),
-  }
-}
-
-///|
-///
-/// A file download that failed — or was cancelled — during this call.
-pub(all) struct BrowserStateChangeDownloadFailed {
-  download_id : String
-  error : @sdkjson.Presence[String]
-  type_ : String
-  url : String
-} derive(Eq, @debug.Debug)
-
-///|
-pub extend BrowserStateChangeDownloadFailed with Eq::{equal, not_equal}
-
-///|
-pub extend BrowserStateChangeDownloadFailed with @debug.Debug::{to_repr}
-
-///|
-///
-/// Creates a BrowserStateChangeDownloadFailed with omitted optional fields absent.
-pub fn BrowserStateChangeDownloadFailed::new(
-  download_id~ : String,
-  type_~ : String,
-  url~ : String,
-  error? : String,
-) -> BrowserStateChangeDownloadFailed {
-  { download_id, error: @sdkjson.Presence::from_option(error), type_, url, }
-}
-
-///|
-///
-/// Encodes this value as JSON.
-pub extend BrowserStateChangeDownloadFailed with ToJson::{to_json}
-
-///|
-pub impl ToJson for BrowserStateChangeDownloadFailed with fn to_json(self) {
-  @sdkjson.ObjBuilder::new()
-  .field("download_id", self.download_id)
-  .presence("error", self.error)
-  .field("type", self.type_)
-  .field("url", self.url)
-  .build()
-}
-
-///|
-///
-/// Decodes this value from JSON.
-pub extend BrowserStateChangeDownloadFailed with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for BrowserStateChangeDownloadFailed with fn from_json(
-  value,
-  path,
-) {
-  let obj = @sdkjson.expect_object(value, path)
-  {
-    download_id: required_field(obj, "download_id", path),
-    error: @sdkjson.presence_field(obj, "error", path),
-    type_: required_field(obj, "type", path),
-    url: required_field(obj, "url", path),
-  }
-}
-
-///|
-///
-/// A file download that started during this call.
-pub(all) struct BrowserStateChangeDownloadStarted {
-  download_id : String
-  type_ : String
-  url : String
-} derive(Eq, @debug.Debug)
-
-///|
-pub extend BrowserStateChangeDownloadStarted with Eq::{equal, not_equal}
-
-///|
-pub extend BrowserStateChangeDownloadStarted with @debug.Debug::{to_repr}
-
-///|
-///
-/// Creates a BrowserStateChangeDownloadStarted with omitted optional fields absent.
-pub fn BrowserStateChangeDownloadStarted::new(
-  download_id~ : String,
-  type_~ : String,
-  url~ : String,
-) -> BrowserStateChangeDownloadStarted {
-  { download_id, type_, url, }
-}
-
-///|
-///
-/// Encodes this value as JSON.
-pub extend BrowserStateChangeDownloadStarted with ToJson::{to_json}
-
-///|
-pub impl ToJson for BrowserStateChangeDownloadStarted with fn to_json(self) {
-  @sdkjson.ObjBuilder::new()
-  .field("download_id", self.download_id)
-  .field("type", self.type_)
-  .field("url", self.url)
-  .build()
-}
-
-///|
-///
-/// Decodes this value from JSON.
-pub extend BrowserStateChangeDownloadStarted with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for BrowserStateChangeDownloadStarted with fn from_json(
-  value,
-  path,
-) {
-  let obj = @sdkjson.expect_object(value, path)
-  {
-    download_id: required_field(obj, "download_id", path),
-    type_: required_field(obj, "type", path),
-    url: required_field(obj, "url", path),
-  }
-}
-
-///|
-///
-/// A tab this call's execution opened that remains open at its end — the creation delta of the `tabs` inventory, not an event log. Carries only the `tab_id`; the tab's `title` and `url` live on its `tabs` entry, which must include the same `tab_id`. A tab opened during a failed call gets no deferred `tab_opened`; it simply appears in the next result's `tabs` inventory.
-pub(all) struct BrowserStateChangeTabOpened {
-  tab_id : String
-  type_ : String
-} derive(Eq, @debug.Debug)
-
-///|
-pub extend BrowserStateChangeTabOpened with Eq::{equal, not_equal}
-
-///|
-pub extend BrowserStateChangeTabOpened with @debug.Debug::{to_repr}
-
-///|
-///
-/// Creates a BrowserStateChangeTabOpened with omitted optional fields absent.
-pub fn BrowserStateChangeTabOpened::new(
-  tab_id~ : String,
-  type_~ : String,
-) -> BrowserStateChangeTabOpened {
-  { tab_id, type_, }
-}
-
-///|
-///
-/// Encodes this value as JSON.
-pub extend BrowserStateChangeTabOpened with ToJson::{to_json}
-
-///|
-pub impl ToJson for BrowserStateChangeTabOpened with fn to_json(self) {
-  @sdkjson.ObjBuilder::new()
-  .field("tab_id", self.tab_id)
-  .field("type", self.type_)
-  .build()
-}
-
-///|
-///
-/// Decodes this value from JSON.
-pub extend BrowserStateChangeTabOpened with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for BrowserStateChangeTabOpened with fn from_json(
-  value,
-  path,
-) {
-  let obj = @sdkjson.expect_object(value, path)
-  {
-    tab_id: required_field(obj, "tab_id", path),
-    type_: required_field(obj, "type", path),
-  }
-}
-
-///|
-///
-/// One open browser tab reported in a `browser_state` block's `tabs` inventory. `tab_id` is the caller-assigned identifier for the tab; `title` and `url` describe the page the tab is currently showing and may be empty strings (a blank tab legitimately has both empty). `active` marks the tab that is active after this call; whenever `tabs` is non-empty, exactly one entry is marked.
-pub(all) struct BrowserStateTabEntry {
-  active : Bool?
-  tab_id : String
-  title : String
-  url : String
-} derive(Eq, @debug.Debug)
-
-///|
-pub extend BrowserStateTabEntry with Eq::{equal, not_equal}
-
-///|
-pub extend BrowserStateTabEntry with @debug.Debug::{to_repr}
-
-///|
-///
-/// Creates a BrowserStateTabEntry with omitted optional fields absent.
-pub fn BrowserStateTabEntry::new(
-  tab_id~ : String,
-  title~ : String,
-  url~ : String,
-  active? : Bool,
-) -> BrowserStateTabEntry {
-  { active, tab_id, title, url, }
-}
-
-///|
-///
-/// Encodes this value as JSON.
-pub extend BrowserStateTabEntry with ToJson::{to_json}
-
-///|
-pub impl ToJson for BrowserStateTabEntry with fn to_json(self) {
-  @sdkjson.ObjBuilder::new()
-  .opt("active", self.active)
-  .field("tab_id", self.tab_id)
-  .field("title", self.title)
-  .field("url", self.url)
-  .build()
-}
-
-///|
-///
-/// Decodes this value from JSON.
-pub extend BrowserStateTabEntry with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for BrowserStateTabEntry with fn from_json(value, path) {
-  let obj = @sdkjson.expect_object(value, path)
-  {
-    active: @sdkjson.opt_field(obj, "active", path),
-    tab_id: required_field(obj, "tab_id", path),
-    title: required_field(obj, "title", path),
-    url: required_field(obj, "url", path),
   }
 }
 
@@ -4268,67 +10109,6 @@ pub impl @json.FromJson for CmekKeyUnreachableErrorDetails with fn from_json(
 ) {
   let _ = @sdkjson.expect_object(value, path)
   CmekKeyUnreachableErrorDetails::{ }
-}
-
-///|
-///
-/// Generated string enum CodeExecutionToolResultErrorCode.
-#non_exhaustive
-pub(all) enum CodeExecutionToolResultErrorCode {
-  InvalidToolInput
-  Unavailable
-  TooManyRequests
-  ExecutionTimeExceeded
-  Unknown(String)
-} derive(Eq, @debug.Debug)
-
-///|
-pub extend CodeExecutionToolResultErrorCode with Eq::{equal, not_equal}
-
-///|
-pub extend CodeExecutionToolResultErrorCode with @debug.Debug::{to_repr}
-
-///|
-///
-/// Encodes this string enum as JSON.
-pub extend CodeExecutionToolResultErrorCode with ToJson::{to_json}
-
-///|
-pub impl ToJson for CodeExecutionToolResultErrorCode with fn to_json(self) {
-  let raw = match self {
-    InvalidToolInput => "invalid_tool_input"
-    Unavailable => "unavailable"
-    TooManyRequests => "too_many_requests"
-    ExecutionTimeExceeded => "execution_time_exceeded"
-    Unknown(raw) => raw
-  }
-  Json(raw)
-}
-
-///|
-///
-/// Decodes this string enum from JSON.
-pub extend CodeExecutionToolResultErrorCode with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for CodeExecutionToolResultErrorCode with fn from_json(
-  value,
-  path,
-) {
-  @sdkjson.open_string(
-    value,
-    path,
-    raw => {
-      match raw {
-        "invalid_tool_input" => Some(InvalidToolInput)
-        "unavailable" => Some(Unavailable)
-        "too_many_requests" => Some(TooManyRequests)
-        "execution_time_exceeded" => Some(ExecutionTimeExceeded)
-        _ => None
-      }
-    },
-    raw => Unknown(raw),
-  )
 }
 
 ///|
@@ -7030,1095 +12810,6 @@ pub impl @json.FromJson for ContentBlockDeltaEvent with fn from_json(
 
 ///|
 ///
-/// Create a cache control breakpoint at this content block.
-#non_exhaustive
-pub(all) enum RequestImageBlockCacheControl {
-  Ephemeral(CacheControlEphemeral)
-  Unknown(String, Json)
-} derive(Eq, @debug.Debug)
-
-///|
-pub extend RequestImageBlockCacheControl with Eq::{equal, not_equal}
-
-///|
-pub extend RequestImageBlockCacheControl with @debug.Debug::{to_repr}
-
-///|
-///
-/// Encodes this tagged union as JSON.
-pub extend RequestImageBlockCacheControl with ToJson::{to_json}
-
-///|
-pub impl ToJson for RequestImageBlockCacheControl with fn to_json(self) {
-  match self {
-    Ephemeral(value) => Json(value)
-    Unknown(_, value) => value
-  }
-}
-
-///|
-///
-/// Decodes this tagged union from JSON.
-pub extend RequestImageBlockCacheControl with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for RequestImageBlockCacheControl with fn from_json(
-  value,
-  path,
-) {
-  let obj = @sdkjson.expect_object(value, path)
-  let tag : String = required_field(obj, "type", path)
-  match tag {
-    "ephemeral" => Ephemeral(@json.from_json(value, path~))
-    other => Unknown(other, value)
-  }
-}
-
-///|
-///
-/// Generated representation of FileImageSource.
-pub(all) struct FileImageSource {
-  file_id : String
-  type_ : String
-} derive(Eq, @debug.Debug)
-
-///|
-pub extend FileImageSource with Eq::{equal, not_equal}
-
-///|
-pub extend FileImageSource with @debug.Debug::{to_repr}
-
-///|
-///
-/// Creates a FileImageSource with omitted optional fields absent.
-pub fn FileImageSource::new(
-  file_id~ : String,
-  type_~ : String,
-) -> FileImageSource {
-  { file_id, type_, }
-}
-
-///|
-///
-/// Encodes this value as JSON.
-pub extend FileImageSource with ToJson::{to_json}
-
-///|
-pub impl ToJson for FileImageSource with fn to_json(self) {
-  @sdkjson.ObjBuilder::new()
-  .field("file_id", self.file_id)
-  .field("type", self.type_)
-  .build()
-}
-
-///|
-///
-/// Decodes this value from JSON.
-pub extend FileImageSource with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for FileImageSource with fn from_json(value, path) {
-  let obj = @sdkjson.expect_object(value, path)
-  {
-    file_id: required_field(obj, "file_id", path),
-    type_: required_field(obj, "type", path),
-  }
-}
-
-///|
-///
-/// Generated representation of URLImageSource.
-pub(all) struct URLImageSource {
-  type_ : String
-  url : String
-} derive(Eq, @debug.Debug)
-
-///|
-pub extend URLImageSource with Eq::{equal, not_equal}
-
-///|
-pub extend URLImageSource with @debug.Debug::{to_repr}
-
-///|
-///
-/// Creates a URLImageSource with omitted optional fields absent.
-pub fn URLImageSource::new(type_~ : String, url~ : String) -> URLImageSource {
-  { type_, url, }
-}
-
-///|
-///
-/// Encodes this value as JSON.
-pub extend URLImageSource with ToJson::{to_json}
-
-///|
-pub impl ToJson for URLImageSource with fn to_json(self) {
-  @sdkjson.ObjBuilder::new()
-  .field("type", self.type_)
-  .field("url", self.url)
-  .build()
-}
-
-///|
-///
-/// Decodes this value from JSON.
-pub extend URLImageSource with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for URLImageSource with fn from_json(value, path) {
-  let obj = @sdkjson.expect_object(value, path)
-  {
-    type_: required_field(obj, "type", path),
-    url: required_field(obj, "url", path),
-  }
-}
-
-///|
-///
-/// Generated tagged union RequestImageBlockSource.
-#non_exhaustive
-pub(all) enum RequestImageBlockSource {
-  Base64(Base64ImageSource)
-  File(FileImageSource)
-  Url(URLImageSource)
-  Unknown(String, Json)
-} derive(Eq, @debug.Debug)
-
-///|
-pub extend RequestImageBlockSource with Eq::{equal, not_equal}
-
-///|
-pub extend RequestImageBlockSource with @debug.Debug::{to_repr}
-
-///|
-///
-/// Encodes this tagged union as JSON.
-pub extend RequestImageBlockSource with ToJson::{to_json}
-
-///|
-pub impl ToJson for RequestImageBlockSource with fn to_json(self) {
-  match self {
-    Base64(value) => Json(value)
-    File(value) => Json(value)
-    Url(value) => Json(value)
-    Unknown(_, value) => value
-  }
-}
-
-///|
-///
-/// Decodes this tagged union from JSON.
-pub extend RequestImageBlockSource with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for RequestImageBlockSource with fn from_json(
-  value,
-  path,
-) {
-  let obj = @sdkjson.expect_object(value, path)
-  let tag : String = required_field(obj, "type", path)
-  match tag {
-    "base64" => Base64(@json.from_json(value, path~))
-    "file" => File(@json.from_json(value, path~))
-    "url" => Url(@json.from_json(value, path~))
-    other => Unknown(other, value)
-  }
-}
-
-///|
-///
-/// What the server does when this image exceeds the model's maximum image size. `"downsize"` (the default) scales the image down to fit, which changes the dimensions the model observes without telling you. `"error"` instead rejects the request with a 400 error naming the image's dimensions and the largest dimensions that fit, so you can scale the image deliberately — your image is never silently scaled down.
-#non_exhaustive
-pub(all) enum RequestImageTransformationsOversizedImage {
-  Downsize
-  Error
-  Custom(String)
-} derive(Eq, @debug.Debug)
-
-///|
-pub extend RequestImageTransformationsOversizedImage with Eq::{equal, not_equal}
-
-///|
-pub extend RequestImageTransformationsOversizedImage with @debug.Debug::{
-  to_repr,
-}
-
-///|
-///
-/// Encodes this string enum as JSON.
-pub extend RequestImageTransformationsOversizedImage with ToJson::{to_json}
-
-///|
-pub impl ToJson for RequestImageTransformationsOversizedImage with fn to_json(
-  self,
-) {
-  let raw = match self {
-    Downsize => "downsize"
-    Error => "error"
-    Custom(raw) => raw
-  }
-  Json(raw)
-}
-
-///|
-///
-/// Decodes this string enum from JSON.
-pub extend RequestImageTransformationsOversizedImage with @json.FromJson::{
-  from_json,
-}
-
-///|
-pub impl @json.FromJson for RequestImageTransformationsOversizedImage with fn from_json(
-  value,
-  path,
-) {
-  @sdkjson.open_string(
-    value,
-    path,
-    raw => {
-      match raw {
-        "downsize" => Some(Downsize)
-        "error" => Some(Error)
-        _ => None
-      }
-    },
-    raw => Custom(raw),
-  )
-}
-
-///|
-///
-/// Configures the transformations the server applies to this image before the model observes it. Each key names a condition the server transforms images for; its value selects the transformation applied. Omitted keys keep their default behavior, and an empty object is equivalent to omitting the field.
-pub(all) struct RequestImageTransformations {
-  oversized_image : RequestImageTransformationsOversizedImage?
-} derive(Eq, @debug.Debug)
-
-///|
-pub extend RequestImageTransformations with Eq::{equal, not_equal}
-
-///|
-pub extend RequestImageTransformations with @debug.Debug::{to_repr}
-
-///|
-///
-/// Creates a RequestImageTransformations with omitted optional fields absent.
-pub fn RequestImageTransformations::new(
-  oversized_image? : RequestImageTransformationsOversizedImage,
-) -> RequestImageTransformations {
-  { oversized_image, }
-}
-
-///|
-///
-/// Encodes this value as JSON.
-pub extend RequestImageTransformations with ToJson::{to_json}
-
-///|
-pub impl ToJson for RequestImageTransformations with fn to_json(self) {
-  @sdkjson.ObjBuilder::new()
-  .opt("oversized_image", self.oversized_image)
-  .build()
-}
-
-///|
-///
-/// Decodes this value from JSON.
-pub extend RequestImageTransformations with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for RequestImageTransformations with fn from_json(
-  value,
-  path,
-) {
-  let obj = @sdkjson.expect_object(value, path)
-  { oversized_image: @sdkjson.opt_field(obj, "oversized_image", path), }
-}
-
-///|
-///
-/// Generated representation of RequestImageBlock.
-pub(all) struct RequestImageBlock {
-  cache_control : @sdkjson.Presence[RequestImageBlockCacheControl]
-  source : RequestImageBlockSource
-  transformations : @sdkjson.Presence[RequestImageTransformations]
-  type_ : String
-} derive(Eq, @debug.Debug)
-
-///|
-pub extend RequestImageBlock with Eq::{equal, not_equal}
-
-///|
-pub extend RequestImageBlock with @debug.Debug::{to_repr}
-
-///|
-///
-/// Creates a RequestImageBlock with omitted optional fields absent.
-pub fn RequestImageBlock::new(
-  source~ : RequestImageBlockSource,
-  type_~ : String,
-  cache_control? : RequestImageBlockCacheControl,
-  transformations? : RequestImageTransformations,
-) -> RequestImageBlock {
-  {
-    cache_control: @sdkjson.Presence::from_option(cache_control),
-    source,
-    transformations: @sdkjson.Presence::from_option(transformations),
-    type_,
-  }
-}
-
-///|
-///
-/// Encodes this value as JSON.
-pub extend RequestImageBlock with ToJson::{to_json}
-
-///|
-pub impl ToJson for RequestImageBlock with fn to_json(self) {
-  @sdkjson.ObjBuilder::new()
-  .presence("cache_control", self.cache_control)
-  .field("source", self.source)
-  .presence("transformations", self.transformations)
-  .field("type", self.type_)
-  .build()
-}
-
-///|
-///
-/// Decodes this value from JSON.
-pub extend RequestImageBlock with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for RequestImageBlock with fn from_json(value, path) {
-  let obj = @sdkjson.expect_object(value, path)
-  {
-    cache_control: @sdkjson.presence_field(obj, "cache_control", path),
-    source: required_field(obj, "source", path),
-    transformations: @sdkjson.presence_field(obj, "transformations", path),
-    type_: required_field(obj, "type", path),
-  }
-}
-
-///|
-///
-/// Create a cache control breakpoint at this content block.
-#non_exhaustive
-pub(all) enum RequestTextBlockCacheControl {
-  Ephemeral(CacheControlEphemeral)
-  Unknown(String, Json)
-} derive(Eq, @debug.Debug)
-
-///|
-pub extend RequestTextBlockCacheControl with Eq::{equal, not_equal}
-
-///|
-pub extend RequestTextBlockCacheControl with @debug.Debug::{to_repr}
-
-///|
-///
-/// Encodes this tagged union as JSON.
-pub extend RequestTextBlockCacheControl with ToJson::{to_json}
-
-///|
-pub impl ToJson for RequestTextBlockCacheControl with fn to_json(self) {
-  match self {
-    Ephemeral(value) => Json(value)
-    Unknown(_, value) => value
-  }
-}
-
-///|
-///
-/// Decodes this tagged union from JSON.
-pub extend RequestTextBlockCacheControl with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for RequestTextBlockCacheControl with fn from_json(
-  value,
-  path,
-) {
-  let obj = @sdkjson.expect_object(value, path)
-  let tag : String = required_field(obj, "type", path)
-  match tag {
-    "ephemeral" => Ephemeral(@json.from_json(value, path~))
-    other => Unknown(other, value)
-  }
-}
-
-///|
-///
-/// Generated representation of RequestCharLocationCitation.
-pub(all) struct RequestCharLocationCitation {
-  cited_text : String
-  document_index : Int32
-  document_title : String?
-  end_char_index : Int32
-  start_char_index : Int32
-  type_ : String
-} derive(Eq, @debug.Debug)
-
-///|
-pub extend RequestCharLocationCitation with Eq::{equal, not_equal}
-
-///|
-pub extend RequestCharLocationCitation with @debug.Debug::{to_repr}
-
-///|
-///
-/// Creates a RequestCharLocationCitation with omitted optional fields absent.
-pub fn RequestCharLocationCitation::new(
-  cited_text~ : String,
-  document_index~ : Int32,
-  end_char_index~ : Int32,
-  start_char_index~ : Int32,
-  type_~ : String,
-  document_title? : String,
-) -> RequestCharLocationCitation {
-  {
-    cited_text,
-    document_index,
-    document_title,
-    end_char_index,
-    start_char_index,
-    type_,
-  }
-}
-
-///|
-///
-/// Encodes this value as JSON.
-pub extend RequestCharLocationCitation with ToJson::{to_json}
-
-///|
-pub impl ToJson for RequestCharLocationCitation with fn to_json(self) {
-  @sdkjson.ObjBuilder::new()
-  .field("cited_text", self.cited_text)
-  .field("document_index", self.document_index)
-  .presence(
-    "document_title",
-    nullable_presence(self.document_title.map(value => value)),
-  )
-  .field("end_char_index", self.end_char_index)
-  .field("start_char_index", self.start_char_index)
-  .field("type", self.type_)
-  .build()
-}
-
-///|
-///
-/// Decodes this value from JSON.
-pub extend RequestCharLocationCitation with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for RequestCharLocationCitation with fn from_json(
-  value,
-  path,
-) {
-  let obj = @sdkjson.expect_object(value, path)
-  {
-    cited_text: required_field(obj, "cited_text", path),
-    document_index: required_field(obj, "document_index", path),
-    document_title: decode_nullable_field(obj, "document_title", path),
-    end_char_index: required_field(obj, "end_char_index", path),
-    start_char_index: required_field(obj, "start_char_index", path),
-    type_: required_field(obj, "type", path),
-  }
-}
-
-///|
-///
-/// Generated representation of RequestContentBlockLocationCitation.
-pub(all) struct RequestContentBlockLocationCitation {
-  cited_text : String
-  document_index : Int32
-  document_title : String?
-  end_block_index : Int32
-  start_block_index : Int32
-  type_ : String
-} derive(Eq, @debug.Debug)
-
-///|
-pub extend RequestContentBlockLocationCitation with Eq::{equal, not_equal}
-
-///|
-pub extend RequestContentBlockLocationCitation with @debug.Debug::{to_repr}
-
-///|
-///
-/// Creates a RequestContentBlockLocationCitation with omitted optional fields absent.
-pub fn RequestContentBlockLocationCitation::new(
-  cited_text~ : String,
-  document_index~ : Int32,
-  end_block_index~ : Int32,
-  start_block_index~ : Int32,
-  type_~ : String,
-  document_title? : String,
-) -> RequestContentBlockLocationCitation {
-  {
-    cited_text,
-    document_index,
-    document_title,
-    end_block_index,
-    start_block_index,
-    type_,
-  }
-}
-
-///|
-///
-/// Encodes this value as JSON.
-pub extend RequestContentBlockLocationCitation with ToJson::{to_json}
-
-///|
-pub impl ToJson for RequestContentBlockLocationCitation with fn to_json(self) {
-  @sdkjson.ObjBuilder::new()
-  .field("cited_text", self.cited_text)
-  .field("document_index", self.document_index)
-  .presence(
-    "document_title",
-    nullable_presence(self.document_title.map(value => value)),
-  )
-  .field("end_block_index", self.end_block_index)
-  .field("start_block_index", self.start_block_index)
-  .field("type", self.type_)
-  .build()
-}
-
-///|
-///
-/// Decodes this value from JSON.
-pub extend RequestContentBlockLocationCitation with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for RequestContentBlockLocationCitation with fn from_json(
-  value,
-  path,
-) {
-  let obj = @sdkjson.expect_object(value, path)
-  {
-    cited_text: required_field(obj, "cited_text", path),
-    document_index: required_field(obj, "document_index", path),
-    document_title: decode_nullable_field(obj, "document_title", path),
-    end_block_index: required_field(obj, "end_block_index", path),
-    start_block_index: required_field(obj, "start_block_index", path),
-    type_: required_field(obj, "type", path),
-  }
-}
-
-///|
-///
-/// Generated representation of RequestPageLocationCitation.
-pub(all) struct RequestPageLocationCitation {
-  cited_text : String
-  document_index : Int32
-  document_title : String?
-  end_page_number : Int32
-  start_page_number : Int32
-  type_ : String
-} derive(Eq, @debug.Debug)
-
-///|
-pub extend RequestPageLocationCitation with Eq::{equal, not_equal}
-
-///|
-pub extend RequestPageLocationCitation with @debug.Debug::{to_repr}
-
-///|
-///
-/// Creates a RequestPageLocationCitation with omitted optional fields absent.
-pub fn RequestPageLocationCitation::new(
-  cited_text~ : String,
-  document_index~ : Int32,
-  end_page_number~ : Int32,
-  start_page_number~ : Int32,
-  type_~ : String,
-  document_title? : String,
-) -> RequestPageLocationCitation {
-  {
-    cited_text,
-    document_index,
-    document_title,
-    end_page_number,
-    start_page_number,
-    type_,
-  }
-}
-
-///|
-///
-/// Encodes this value as JSON.
-pub extend RequestPageLocationCitation with ToJson::{to_json}
-
-///|
-pub impl ToJson for RequestPageLocationCitation with fn to_json(self) {
-  @sdkjson.ObjBuilder::new()
-  .field("cited_text", self.cited_text)
-  .field("document_index", self.document_index)
-  .presence(
-    "document_title",
-    nullable_presence(self.document_title.map(value => value)),
-  )
-  .field("end_page_number", self.end_page_number)
-  .field("start_page_number", self.start_page_number)
-  .field("type", self.type_)
-  .build()
-}
-
-///|
-///
-/// Decodes this value from JSON.
-pub extend RequestPageLocationCitation with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for RequestPageLocationCitation with fn from_json(
-  value,
-  path,
-) {
-  let obj = @sdkjson.expect_object(value, path)
-  {
-    cited_text: required_field(obj, "cited_text", path),
-    document_index: required_field(obj, "document_index", path),
-    document_title: decode_nullable_field(obj, "document_title", path),
-    end_page_number: required_field(obj, "end_page_number", path),
-    start_page_number: required_field(obj, "start_page_number", path),
-    type_: required_field(obj, "type", path),
-  }
-}
-
-///|
-///
-/// Generated representation of RequestSearchResultLocationCitation.
-pub(all) struct RequestSearchResultLocationCitation {
-  cited_text : String
-  end_block_index : Int32
-  search_result_index : Int32
-  source : String
-  start_block_index : Int32
-  title : String?
-  type_ : String
-} derive(Eq, @debug.Debug)
-
-///|
-pub extend RequestSearchResultLocationCitation with Eq::{equal, not_equal}
-
-///|
-pub extend RequestSearchResultLocationCitation with @debug.Debug::{to_repr}
-
-///|
-///
-/// Creates a RequestSearchResultLocationCitation with omitted optional fields absent.
-pub fn RequestSearchResultLocationCitation::new(
-  cited_text~ : String,
-  end_block_index~ : Int32,
-  search_result_index~ : Int32,
-  source~ : String,
-  start_block_index~ : Int32,
-  type_~ : String,
-  title? : String,
-) -> RequestSearchResultLocationCitation {
-  {
-    cited_text,
-    end_block_index,
-    search_result_index,
-    source,
-    start_block_index,
-    title,
-    type_,
-  }
-}
-
-///|
-///
-/// Encodes this value as JSON.
-pub extend RequestSearchResultLocationCitation with ToJson::{to_json}
-
-///|
-pub impl ToJson for RequestSearchResultLocationCitation with fn to_json(self) {
-  @sdkjson.ObjBuilder::new()
-  .field("cited_text", self.cited_text)
-  .field("end_block_index", self.end_block_index)
-  .field("search_result_index", self.search_result_index)
-  .field("source", self.source)
-  .field("start_block_index", self.start_block_index)
-  .presence("title", nullable_presence(self.title.map(value => value)))
-  .field("type", self.type_)
-  .build()
-}
-
-///|
-///
-/// Decodes this value from JSON.
-pub extend RequestSearchResultLocationCitation with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for RequestSearchResultLocationCitation with fn from_json(
-  value,
-  path,
-) {
-  let obj = @sdkjson.expect_object(value, path)
-  {
-    cited_text: required_field(obj, "cited_text", path),
-    end_block_index: required_field(obj, "end_block_index", path),
-    search_result_index: required_field(obj, "search_result_index", path),
-    source: required_field(obj, "source", path),
-    start_block_index: required_field(obj, "start_block_index", path),
-    title: decode_nullable_field(obj, "title", path),
-    type_: required_field(obj, "type", path),
-  }
-}
-
-///|
-///
-/// Generated representation of RequestWebSearchResultLocationCitation.
-pub(all) struct RequestWebSearchResultLocationCitation {
-  cited_text : String
-  encrypted_index : String
-  title : String?
-  type_ : String
-  url : String
-} derive(Eq, @debug.Debug)
-
-///|
-pub extend RequestWebSearchResultLocationCitation with Eq::{equal, not_equal}
-
-///|
-pub extend RequestWebSearchResultLocationCitation with @debug.Debug::{to_repr}
-
-///|
-///
-/// Creates a RequestWebSearchResultLocationCitation with omitted optional fields absent.
-pub fn RequestWebSearchResultLocationCitation::new(
-  cited_text~ : String,
-  encrypted_index~ : String,
-  type_~ : String,
-  url~ : String,
-  title? : String,
-) -> RequestWebSearchResultLocationCitation {
-  { cited_text, encrypted_index, title, type_, url, }
-}
-
-///|
-///
-/// Encodes this value as JSON.
-pub extend RequestWebSearchResultLocationCitation with ToJson::{to_json}
-
-///|
-pub impl ToJson for RequestWebSearchResultLocationCitation with fn to_json(self) {
-  @sdkjson.ObjBuilder::new()
-  .field("cited_text", self.cited_text)
-  .field("encrypted_index", self.encrypted_index)
-  .presence("title", nullable_presence(self.title.map(value => value)))
-  .field("type", self.type_)
-  .field("url", self.url)
-  .build()
-}
-
-///|
-///
-/// Decodes this value from JSON.
-pub extend RequestWebSearchResultLocationCitation with @json.FromJson::{
-  from_json,
-}
-
-///|
-pub impl @json.FromJson for RequestWebSearchResultLocationCitation with fn from_json(
-  value,
-  path,
-) {
-  let obj = @sdkjson.expect_object(value, path)
-  {
-    cited_text: required_field(obj, "cited_text", path),
-    encrypted_index: required_field(obj, "encrypted_index", path),
-    title: decode_nullable_field(obj, "title", path),
-    type_: required_field(obj, "type", path),
-    url: required_field(obj, "url", path),
-  }
-}
-
-///|
-///
-/// Generated tagged union RequestTextBlockCitationsItem.
-#non_exhaustive
-pub(all) enum RequestTextBlockCitationsItem {
-  CharLocation(RequestCharLocationCitation)
-  ContentBlockLocation(RequestContentBlockLocationCitation)
-  PageLocation(RequestPageLocationCitation)
-  SearchResultLocation(RequestSearchResultLocationCitation)
-  WebSearchResultLocation(RequestWebSearchResultLocationCitation)
-  Unknown(String, Json)
-} derive(Eq, @debug.Debug)
-
-///|
-pub extend RequestTextBlockCitationsItem with Eq::{equal, not_equal}
-
-///|
-pub extend RequestTextBlockCitationsItem with @debug.Debug::{to_repr}
-
-///|
-///
-/// Encodes this tagged union as JSON.
-pub extend RequestTextBlockCitationsItem with ToJson::{to_json}
-
-///|
-pub impl ToJson for RequestTextBlockCitationsItem with fn to_json(self) {
-  match self {
-    CharLocation(value) => Json(value)
-    ContentBlockLocation(value) => Json(value)
-    PageLocation(value) => Json(value)
-    SearchResultLocation(value) => Json(value)
-    WebSearchResultLocation(value) => Json(value)
-    Unknown(_, value) => value
-  }
-}
-
-///|
-///
-/// Decodes this tagged union from JSON.
-pub extend RequestTextBlockCitationsItem with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for RequestTextBlockCitationsItem with fn from_json(
-  value,
-  path,
-) {
-  let obj = @sdkjson.expect_object(value, path)
-  let tag : String = required_field(obj, "type", path)
-  match tag {
-    "char_location" => CharLocation(@json.from_json(value, path~))
-    "content_block_location" =>
-      ContentBlockLocation(@json.from_json(value, path~))
-    "page_location" => PageLocation(@json.from_json(value, path~))
-    "search_result_location" =>
-      SearchResultLocation(@json.from_json(value, path~))
-    "web_search_result_location" =>
-      WebSearchResultLocation(@json.from_json(value, path~))
-    other => Unknown(other, value)
-  }
-}
-
-///|
-///
-/// Generated representation of RequestTextBlock.
-pub(all) struct RequestTextBlock {
-  cache_control : @sdkjson.Presence[RequestTextBlockCacheControl]
-  citations : @sdkjson.Presence[Array[RequestTextBlockCitationsItem]]
-  text : String
-  type_ : String
-} derive(Eq, @debug.Debug)
-
-///|
-pub extend RequestTextBlock with Eq::{equal, not_equal}
-
-///|
-pub extend RequestTextBlock with @debug.Debug::{to_repr}
-
-///|
-///
-/// Creates a RequestTextBlock with omitted optional fields absent.
-pub fn RequestTextBlock::new(
-  text~ : String,
-  type_~ : String,
-  cache_control? : RequestTextBlockCacheControl,
-  citations? : Array[RequestTextBlockCitationsItem],
-) -> RequestTextBlock {
-  {
-    cache_control: @sdkjson.Presence::from_option(cache_control),
-    citations: @sdkjson.Presence::from_option(citations),
-    text,
-    type_,
-  }
-}
-
-///|
-///
-/// Encodes this value as JSON.
-pub extend RequestTextBlock with ToJson::{to_json}
-
-///|
-pub impl ToJson for RequestTextBlock with fn to_json(self) {
-  @sdkjson.ObjBuilder::new()
-  .presence("cache_control", self.cache_control)
-  .presence("citations", self.citations)
-  .field("text", self.text)
-  .field("type", self.type_)
-  .build()
-}
-
-///|
-///
-/// Decodes this value from JSON.
-pub extend RequestTextBlock with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for RequestTextBlock with fn from_json(value, path) {
-  let obj = @sdkjson.expect_object(value, path)
-  {
-    cache_control: @sdkjson.presence_field(obj, "cache_control", path),
-    citations: @sdkjson.presence_field(obj, "citations", path),
-    text: required_field(obj, "text", path),
-    type_: required_field(obj, "type", path),
-  }
-}
-
-///|
-///
-/// Generated tagged union ContentBlockSourceContentValueArrayItem.
-#non_exhaustive
-pub(all) enum ContentBlockSourceContentValueArrayItem {
-  Image(RequestImageBlock)
-  Text(RequestTextBlock)
-  Unknown(String, Json)
-} derive(Eq, @debug.Debug)
-
-///|
-pub extend ContentBlockSourceContentValueArrayItem with Eq::{equal, not_equal}
-
-///|
-pub extend ContentBlockSourceContentValueArrayItem with @debug.Debug::{to_repr}
-
-///|
-///
-/// Encodes this tagged union as JSON.
-pub extend ContentBlockSourceContentValueArrayItem with ToJson::{to_json}
-
-///|
-pub impl ToJson for ContentBlockSourceContentValueArrayItem with fn to_json(
-  self,
-) {
-  match self {
-    Image(value) => Json(value)
-    Text(value) => Json(value)
-    Unknown(_, value) => value
-  }
-}
-
-///|
-///
-/// Decodes this tagged union from JSON.
-pub extend ContentBlockSourceContentValueArrayItem with @json.FromJson::{
-  from_json,
-}
-
-///|
-pub impl @json.FromJson for ContentBlockSourceContentValueArrayItem with fn from_json(
-  value,
-  path,
-) {
-  let obj = @sdkjson.expect_object(value, path)
-  let tag : String = required_field(obj, "type", path)
-  match tag {
-    "image" => Image(@json.from_json(value, path~))
-    "text" => Text(@json.from_json(value, path~))
-    other => Unknown(other, value)
-  }
-}
-
-///|
-///
-/// Generated untagged union ContentBlockSourceContent.
-#non_exhaustive
-pub(all) enum ContentBlockSourceContent {
-  Text(String)
-  ValueArray(Array[ContentBlockSourceContentValueArrayItem])
-} derive(Eq, @debug.Debug)
-
-///|
-pub extend ContentBlockSourceContent with Eq::{equal, not_equal}
-
-///|
-pub extend ContentBlockSourceContent with @debug.Debug::{to_repr}
-
-///|
-///
-/// Encodes this union as JSON.
-pub extend ContentBlockSourceContent with ToJson::{to_json}
-
-///|
-pub impl ToJson for ContentBlockSourceContent with fn to_json(self) {
-  match self {
-    Text(value) => Json(value)
-    ValueArray(value) => Json(value)
-  }
-}
-
-///|
-///
-/// Decodes this union from JSON.
-pub extend ContentBlockSourceContent with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for ContentBlockSourceContent with fn from_json(
-  value,
-  path,
-) {
-  if value is String(_) {
-    let decoded : String = @json.from_json(value, path~)
-    return Text(decoded)
-  }
-  if json_array_matches(value, item => item is Object(_)) {
-    let decoded : Array[ContentBlockSourceContentValueArrayItem] = @json.from_json(
-      value,
-      path~,
-    )
-    return ValueArray(decoded)
-  }
-  raise @json.JsonDecodeError(
-    (path, "JSON shape does not match any ContentBlockSourceContent variant"),
-  )
-}
-
-///|
-///
-/// Generated representation of ContentBlockSource.
-pub(all) struct ContentBlockSource {
-  content : ContentBlockSourceContent
-  type_ : String
-} derive(Eq, @debug.Debug)
-
-///|
-pub extend ContentBlockSource with Eq::{equal, not_equal}
-
-///|
-pub extend ContentBlockSource with @debug.Debug::{to_repr}
-
-///|
-///
-/// Creates a ContentBlockSource with omitted optional fields absent.
-pub fn ContentBlockSource::new(
-  content~ : ContentBlockSourceContent,
-  type_~ : String,
-) -> ContentBlockSource {
-  { content, type_, }
-}
-
-///|
-///
-/// Encodes this value as JSON.
-pub extend ContentBlockSource with ToJson::{to_json}
-
-///|
-pub impl ToJson for ContentBlockSource with fn to_json(self) {
-  @sdkjson.ObjBuilder::new()
-  .field("content", self.content)
-  .field("type", self.type_)
-  .build()
-}
-
-///|
-///
-/// Decodes this value from JSON.
-pub extend ContentBlockSource with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for ContentBlockSource with fn from_json(value, path) {
-  let obj = @sdkjson.expect_object(value, path)
-  {
-    content: required_field(obj, "content", path),
-    type_: required_field(obj, "type", path),
-  }
-}
-
-///|
-///
 /// Generated representation of ResponseBashCodeExecutionToolResultError.
 pub(all) struct ResponseBashCodeExecutionToolResultError {
   error_code : BashCodeExecutionToolResultErrorCode
@@ -8887,152 +13578,6 @@ pub impl @json.FromJson for ResponseRedactedThinkingBlock with fn from_json(
 
 ///|
 ///
-/// Tool invocation generated by a server-side tool.
-pub(all) struct ServerToolCaller {
-  tool_id : String
-  type_ : String
-} derive(Eq, @debug.Debug)
-
-///|
-pub extend ServerToolCaller with Eq::{equal, not_equal}
-
-///|
-pub extend ServerToolCaller with @debug.Debug::{to_repr}
-
-///|
-///
-/// Creates a ServerToolCaller with omitted optional fields absent.
-pub fn ServerToolCaller::new(
-  tool_id~ : String,
-  type_~ : String,
-) -> ServerToolCaller {
-  { tool_id, type_, }
-}
-
-///|
-///
-/// Encodes this value as JSON.
-pub extend ServerToolCaller with ToJson::{to_json}
-
-///|
-pub impl ToJson for ServerToolCaller with fn to_json(self) {
-  @sdkjson.ObjBuilder::new()
-  .field("tool_id", self.tool_id)
-  .field("type", self.type_)
-  .build()
-}
-
-///|
-///
-/// Decodes this value from JSON.
-pub extend ServerToolCaller with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for ServerToolCaller with fn from_json(value, path) {
-  let obj = @sdkjson.expect_object(value, path)
-  {
-    tool_id: required_field(obj, "tool_id", path),
-    type_: required_field(obj, "type", path),
-  }
-}
-
-///|
-///
-/// Generated representation of ServerToolCaller20260120.
-pub(all) struct ServerToolCaller20260120 {
-  tool_id : String
-  type_ : String
-} derive(Eq, @debug.Debug)
-
-///|
-pub extend ServerToolCaller20260120 with Eq::{equal, not_equal}
-
-///|
-pub extend ServerToolCaller20260120 with @debug.Debug::{to_repr}
-
-///|
-///
-/// Creates a ServerToolCaller20260120 with omitted optional fields absent.
-pub fn ServerToolCaller20260120::new(
-  tool_id~ : String,
-  type_~ : String,
-) -> ServerToolCaller20260120 {
-  { tool_id, type_, }
-}
-
-///|
-///
-/// Encodes this value as JSON.
-pub extend ServerToolCaller20260120 with ToJson::{to_json}
-
-///|
-pub impl ToJson for ServerToolCaller20260120 with fn to_json(self) {
-  @sdkjson.ObjBuilder::new()
-  .field("tool_id", self.tool_id)
-  .field("type", self.type_)
-  .build()
-}
-
-///|
-///
-/// Decodes this value from JSON.
-pub extend ServerToolCaller20260120 with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for ServerToolCaller20260120 with fn from_json(
-  value,
-  path,
-) {
-  let obj = @sdkjson.expect_object(value, path)
-  {
-    tool_id: required_field(obj, "tool_id", path),
-    type_: required_field(obj, "type", path),
-  }
-}
-
-///|
-///
-/// Tool invocation directly from the model.
-pub(all) struct DirectCaller {
-  type_ : String
-} derive(Eq, @debug.Debug)
-
-///|
-pub extend DirectCaller with Eq::{equal, not_equal}
-
-///|
-pub extend DirectCaller with @debug.Debug::{to_repr}
-
-///|
-///
-/// Creates a DirectCaller with omitted optional fields absent.
-pub fn DirectCaller::new(type_~ : String) -> DirectCaller {
-  { type_, }
-}
-
-///|
-///
-/// Encodes this value as JSON.
-pub extend DirectCaller with ToJson::{to_json}
-
-///|
-pub impl ToJson for DirectCaller with fn to_json(self) {
-  @sdkjson.ObjBuilder::new().field("type", self.type_).build()
-}
-
-///|
-///
-/// Decodes this value from JSON.
-pub extend DirectCaller with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for DirectCaller with fn from_json(value, path) {
-  let obj = @sdkjson.expect_object(value, path)
-  { type_: required_field(obj, "type", path), }
-}
-
-///|
-///
 /// Generated tagged union ResponseServerToolUseBlockCaller.
 #non_exhaustive
 pub(all) enum ResponseServerToolUseBlockCaller {
@@ -9335,79 +13880,6 @@ pub impl @json.FromJson for ResponseTextBlock with fn from_json(value, path) {
     text: required_field(obj, "text", path),
     type_: required_field(obj, "type", path),
   }
-}
-
-///|
-///
-/// Generated string enum TextEditorCodeExecutionToolResultErrorCode.
-#non_exhaustive
-pub(all) enum TextEditorCodeExecutionToolResultErrorCode {
-  InvalidToolInput
-  Unavailable
-  TooManyRequests
-  ExecutionTimeExceeded
-  FileNotFound
-  Unknown(String)
-} derive(Eq, @debug.Debug)
-
-///|
-pub extend TextEditorCodeExecutionToolResultErrorCode with Eq::{
-  equal,
-  not_equal,
-}
-
-///|
-pub extend TextEditorCodeExecutionToolResultErrorCode with @debug.Debug::{
-  to_repr,
-}
-
-///|
-///
-/// Encodes this string enum as JSON.
-pub extend TextEditorCodeExecutionToolResultErrorCode with ToJson::{to_json}
-
-///|
-pub impl ToJson for TextEditorCodeExecutionToolResultErrorCode with fn to_json(
-  self,
-) {
-  let raw = match self {
-    InvalidToolInput => "invalid_tool_input"
-    Unavailable => "unavailable"
-    TooManyRequests => "too_many_requests"
-    ExecutionTimeExceeded => "execution_time_exceeded"
-    FileNotFound => "file_not_found"
-    Unknown(raw) => raw
-  }
-  Json(raw)
-}
-
-///|
-///
-/// Decodes this string enum from JSON.
-pub extend TextEditorCodeExecutionToolResultErrorCode with @json.FromJson::{
-  from_json,
-}
-
-///|
-pub impl @json.FromJson for TextEditorCodeExecutionToolResultErrorCode with fn from_json(
-  value,
-  path,
-) {
-  @sdkjson.open_string(
-    value,
-    path,
-    raw => {
-      match raw {
-        "invalid_tool_input" => Some(InvalidToolInput)
-        "unavailable" => Some(Unavailable)
-        "too_many_requests" => Some(TooManyRequests)
-        "execution_time_exceeded" => Some(ExecutionTimeExceeded)
-        "file_not_found" => Some(FileNotFound)
-        _ => None
-      }
-    },
-    raw => Unknown(raw),
-  )
 }
 
 ///|
@@ -9982,67 +14454,6 @@ pub impl @json.FromJson for ResponseThinkingBlock with fn from_json(value, path)
 
 ///|
 ///
-/// Generated string enum ToolSearchToolResultErrorCode.
-#non_exhaustive
-pub(all) enum ToolSearchToolResultErrorCode {
-  InvalidToolInput
-  Unavailable
-  TooManyRequests
-  ExecutionTimeExceeded
-  Unknown(String)
-} derive(Eq, @debug.Debug)
-
-///|
-pub extend ToolSearchToolResultErrorCode with Eq::{equal, not_equal}
-
-///|
-pub extend ToolSearchToolResultErrorCode with @debug.Debug::{to_repr}
-
-///|
-///
-/// Encodes this string enum as JSON.
-pub extend ToolSearchToolResultErrorCode with ToJson::{to_json}
-
-///|
-pub impl ToJson for ToolSearchToolResultErrorCode with fn to_json(self) {
-  let raw = match self {
-    InvalidToolInput => "invalid_tool_input"
-    Unavailable => "unavailable"
-    TooManyRequests => "too_many_requests"
-    ExecutionTimeExceeded => "execution_time_exceeded"
-    Unknown(raw) => raw
-  }
-  Json(raw)
-}
-
-///|
-///
-/// Decodes this string enum from JSON.
-pub extend ToolSearchToolResultErrorCode with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for ToolSearchToolResultErrorCode with fn from_json(
-  value,
-  path,
-) {
-  @sdkjson.open_string(
-    value,
-    path,
-    raw => {
-      match raw {
-        "invalid_tool_input" => Some(InvalidToolInput)
-        "unavailable" => Some(Unavailable)
-        "too_many_requests" => Some(TooManyRequests)
-        "execution_time_exceeded" => Some(ExecutionTimeExceeded)
-        _ => None
-      }
-    },
-    raw => Unknown(raw),
-  )
-}
-
-///|
-///
 /// Generated representation of ResponseToolSearchToolResultError.
 pub(all) struct ResponseToolSearchToolResultError {
   error_code : ToolSearchToolResultErrorCode
@@ -10508,85 +14919,6 @@ pub impl @json.FromJson for ResponseWebFetchToolResultBlockCaller with fn from_j
 
 ///|
 ///
-/// Generated string enum WebFetchToolResultErrorCode.
-#non_exhaustive
-pub(all) enum WebFetchToolResultErrorCode {
-  InvalidToolInput
-  UrlTooLong
-  UrlNotAllowed
-  UrlNotInPriorContext
-  UrlNotAccessible
-  UnsupportedContentType
-  TooManyRequests
-  MaxUsesExceeded
-  Unavailable
-  ContentTooLarge
-  Unknown(String)
-} derive(Eq, @debug.Debug)
-
-///|
-pub extend WebFetchToolResultErrorCode with Eq::{equal, not_equal}
-
-///|
-pub extend WebFetchToolResultErrorCode with @debug.Debug::{to_repr}
-
-///|
-///
-/// Encodes this string enum as JSON.
-pub extend WebFetchToolResultErrorCode with ToJson::{to_json}
-
-///|
-pub impl ToJson for WebFetchToolResultErrorCode with fn to_json(self) {
-  let raw = match self {
-    InvalidToolInput => "invalid_tool_input"
-    UrlTooLong => "url_too_long"
-    UrlNotAllowed => "url_not_allowed"
-    UrlNotInPriorContext => "url_not_in_prior_context"
-    UrlNotAccessible => "url_not_accessible"
-    UnsupportedContentType => "unsupported_content_type"
-    TooManyRequests => "too_many_requests"
-    MaxUsesExceeded => "max_uses_exceeded"
-    Unavailable => "unavailable"
-    ContentTooLarge => "content_too_large"
-    Unknown(raw) => raw
-  }
-  Json(raw)
-}
-
-///|
-///
-/// Decodes this string enum from JSON.
-pub extend WebFetchToolResultErrorCode with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for WebFetchToolResultErrorCode with fn from_json(
-  value,
-  path,
-) {
-  @sdkjson.open_string(
-    value,
-    path,
-    raw => {
-      match raw {
-        "invalid_tool_input" => Some(InvalidToolInput)
-        "url_too_long" => Some(UrlTooLong)
-        "url_not_allowed" => Some(UrlNotAllowed)
-        "url_not_in_prior_context" => Some(UrlNotInPriorContext)
-        "url_not_accessible" => Some(UrlNotAccessible)
-        "unsupported_content_type" => Some(UnsupportedContentType)
-        "too_many_requests" => Some(TooManyRequests)
-        "max_uses_exceeded" => Some(MaxUsesExceeded)
-        "unavailable" => Some(Unavailable)
-        "content_too_large" => Some(ContentTooLarge)
-        _ => None
-      }
-    },
-    raw => Unknown(raw),
-  )
-}
-
-///|
-///
 /// Generated representation of ResponseWebFetchToolResultError.
 pub(all) struct ResponseWebFetchToolResultError {
   error_code : WebFetchToolResultErrorCode
@@ -10681,55 +15013,6 @@ pub impl @json.FromJson for ResponseCitationsConfig with fn from_json(
 ) {
   let obj = @sdkjson.expect_object(value, path)
   { enabled: required_field(obj, "enabled", path), }
-}
-
-///|
-///
-/// Generated representation of PlainTextSource.
-pub(all) struct PlainTextSource {
-  data : String
-  type_ : String
-} derive(Eq, @debug.Debug)
-
-///|
-pub extend PlainTextSource with Eq::{equal, not_equal}
-
-///|
-pub extend PlainTextSource with @debug.Debug::{to_repr}
-
-///|
-///
-/// Creates a PlainTextSource with omitted optional fields absent.
-pub fn PlainTextSource::new(data~ : String, type_~ : String) -> PlainTextSource {
-  { data, type_, }
-}
-
-///|
-///
-/// Encodes this value as JSON.
-pub extend PlainTextSource with ToJson::{to_json}
-
-///|
-pub impl ToJson for PlainTextSource with fn to_json(self) {
-  @sdkjson.ObjBuilder::new()
-  .field("data", self.data)
-  .field("media_type", "text/plain")
-  .field("type", self.type_)
-  .build()
-}
-
-///|
-///
-/// Decodes this value from JSON.
-pub extend PlainTextSource with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for PlainTextSource with fn from_json(value, path) {
-  let obj = @sdkjson.expect_object(value, path)
-  {
-    data: required_field(obj, "data", path),
-    type_: required_field(obj, "type", path),
-  }
 }
 
 ///|
@@ -11070,73 +15353,6 @@ pub impl @json.FromJson for ResponseWebSearchToolResultBlockCaller with fn from_
     "direct" => Direct(@json.from_json(value, path~))
     other => Unknown(other, value)
   }
-}
-
-///|
-///
-/// Generated string enum WebSearchToolResultErrorCode.
-#non_exhaustive
-pub(all) enum WebSearchToolResultErrorCode {
-  InvalidToolInput
-  Unavailable
-  MaxUsesExceeded
-  TooManyRequests
-  QueryTooLong
-  RequestTooLarge
-  Unknown(String)
-} derive(Eq, @debug.Debug)
-
-///|
-pub extend WebSearchToolResultErrorCode with Eq::{equal, not_equal}
-
-///|
-pub extend WebSearchToolResultErrorCode with @debug.Debug::{to_repr}
-
-///|
-///
-/// Encodes this string enum as JSON.
-pub extend WebSearchToolResultErrorCode with ToJson::{to_json}
-
-///|
-pub impl ToJson for WebSearchToolResultErrorCode with fn to_json(self) {
-  let raw = match self {
-    InvalidToolInput => "invalid_tool_input"
-    Unavailable => "unavailable"
-    MaxUsesExceeded => "max_uses_exceeded"
-    TooManyRequests => "too_many_requests"
-    QueryTooLong => "query_too_long"
-    RequestTooLarge => "request_too_large"
-    Unknown(raw) => raw
-  }
-  Json(raw)
-}
-
-///|
-///
-/// Decodes this string enum from JSON.
-pub extend WebSearchToolResultErrorCode with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for WebSearchToolResultErrorCode with fn from_json(
-  value,
-  path,
-) {
-  @sdkjson.open_string(
-    value,
-    path,
-    raw => {
-      match raw {
-        "invalid_tool_input" => Some(InvalidToolInput)
-        "unavailable" => Some(Unavailable)
-        "max_uses_exceeded" => Some(MaxUsesExceeded)
-        "too_many_requests" => Some(TooManyRequests)
-        "query_too_long" => Some(QueryTooLong)
-        "request_too_large" => Some(RequestTooLarge)
-        _ => None
-      }
-    },
-    raw => Unknown(raw),
-  )
 }
 
 ///|
@@ -11699,2673 +15915,30 @@ pub impl @json.FromJson for CountMessageTokensParamsCacheControl with fn from_js
 
 ///|
 ///
-/// Create a cache control breakpoint at this content block.
+/// Generated tagged union SystemInputMessageContentValueArrayItem.
 #non_exhaustive
-pub(all) enum RequestBashCodeExecutionToolResultBlockCacheControl {
-  Ephemeral(CacheControlEphemeral)
-  Unknown(String, Json)
-} derive(Eq, @debug.Debug)
-
-///|
-pub extend RequestBashCodeExecutionToolResultBlockCacheControl with Eq::{
-  equal,
-  not_equal,
-}
-
-///|
-pub extend RequestBashCodeExecutionToolResultBlockCacheControl with @debug.Debug::{
-  to_repr,
-}
-
-///|
-///
-/// Encodes this tagged union as JSON.
-pub extend RequestBashCodeExecutionToolResultBlockCacheControl with ToJson::{
-  to_json,
-}
-
-///|
-pub impl ToJson for RequestBashCodeExecutionToolResultBlockCacheControl with fn to_json(
-  self,
-) {
-  match self {
-    Ephemeral(value) => Json(value)
-    Unknown(_, value) => value
-  }
-}
-
-///|
-///
-/// Decodes this tagged union from JSON.
-pub extend RequestBashCodeExecutionToolResultBlockCacheControl with @json.FromJson::{
-  from_json,
-}
-
-///|
-pub impl @json.FromJson for RequestBashCodeExecutionToolResultBlockCacheControl with fn from_json(
-  value,
-  path,
-) {
-  let obj = @sdkjson.expect_object(value, path)
-  let tag : String = required_field(obj, "type", path)
-  match tag {
-    "ephemeral" => Ephemeral(@json.from_json(value, path~))
-    other => Unknown(other, value)
-  }
-}
-
-///|
-///
-/// Generated representation of RequestBashCodeExecutionToolResultError.
-pub(all) struct RequestBashCodeExecutionToolResultError {
-  error_code : BashCodeExecutionToolResultErrorCode
-  type_ : String
-} derive(Eq, @debug.Debug)
-
-///|
-pub extend RequestBashCodeExecutionToolResultError with Eq::{equal, not_equal}
-
-///|
-pub extend RequestBashCodeExecutionToolResultError with @debug.Debug::{to_repr}
-
-///|
-///
-/// Creates a RequestBashCodeExecutionToolResultError with omitted optional fields absent.
-pub fn RequestBashCodeExecutionToolResultError::new(
-  error_code~ : BashCodeExecutionToolResultErrorCode,
-  type_~ : String,
-) -> RequestBashCodeExecutionToolResultError {
-  { error_code, type_, }
-}
-
-///|
-///
-/// Encodes this value as JSON.
-pub extend RequestBashCodeExecutionToolResultError with ToJson::{to_json}
-
-///|
-pub impl ToJson for RequestBashCodeExecutionToolResultError with fn to_json(
-  self,
-) {
-  @sdkjson.ObjBuilder::new()
-  .field("error_code", self.error_code)
-  .field("type", self.type_)
-  .build()
-}
-
-///|
-///
-/// Decodes this value from JSON.
-pub extend RequestBashCodeExecutionToolResultError with @json.FromJson::{
-  from_json,
-}
-
-///|
-pub impl @json.FromJson for RequestBashCodeExecutionToolResultError with fn from_json(
-  value,
-  path,
-) {
-  let obj = @sdkjson.expect_object(value, path)
-  {
-    error_code: required_field(obj, "error_code", path),
-    type_: required_field(obj, "type", path),
-  }
-}
-
-///|
-///
-/// Generated representation of RequestBashCodeExecutionOutputBlock.
-pub(all) struct RequestBashCodeExecutionOutputBlock {
-  file_id : String
-} derive(Eq, @debug.Debug)
-
-///|
-pub extend RequestBashCodeExecutionOutputBlock with Eq::{equal, not_equal}
-
-///|
-pub extend RequestBashCodeExecutionOutputBlock with @debug.Debug::{to_repr}
-
-///|
-///
-/// Creates a RequestBashCodeExecutionOutputBlock with omitted optional fields absent.
-pub fn RequestBashCodeExecutionOutputBlock::new(
-  file_id~ : String,
-) -> RequestBashCodeExecutionOutputBlock {
-  { file_id, }
-}
-
-///|
-///
-/// Encodes this value as JSON.
-pub extend RequestBashCodeExecutionOutputBlock with ToJson::{to_json}
-
-///|
-pub impl ToJson for RequestBashCodeExecutionOutputBlock with fn to_json(self) {
-  @sdkjson.ObjBuilder::new()
-  .field("file_id", self.file_id)
-  .field("type", "bash_code_execution_output")
-  .build()
-}
-
-///|
-///
-/// Decodes this value from JSON.
-pub extend RequestBashCodeExecutionOutputBlock with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for RequestBashCodeExecutionOutputBlock with fn from_json(
-  value,
-  path,
-) {
-  let obj = @sdkjson.expect_object(value, path)
-  { file_id: required_field(obj, "file_id", path), }
-}
-
-///|
-///
-/// Generated representation of RequestBashCodeExecutionResultBlock.
-pub(all) struct RequestBashCodeExecutionResultBlock {
-  content : Array[RequestBashCodeExecutionOutputBlock]
-  return_code : Int32
-  stderr : String
-  stdout : String
-  type_ : String
-} derive(Eq, @debug.Debug)
-
-///|
-pub extend RequestBashCodeExecutionResultBlock with Eq::{equal, not_equal}
-
-///|
-pub extend RequestBashCodeExecutionResultBlock with @debug.Debug::{to_repr}
-
-///|
-///
-/// Creates a RequestBashCodeExecutionResultBlock with omitted optional fields absent.
-pub fn RequestBashCodeExecutionResultBlock::new(
-  content~ : Array[RequestBashCodeExecutionOutputBlock],
-  return_code~ : Int32,
-  stderr~ : String,
-  stdout~ : String,
-  type_~ : String,
-) -> RequestBashCodeExecutionResultBlock {
-  { content, return_code, stderr, stdout, type_, }
-}
-
-///|
-///
-/// Encodes this value as JSON.
-pub extend RequestBashCodeExecutionResultBlock with ToJson::{to_json}
-
-///|
-pub impl ToJson for RequestBashCodeExecutionResultBlock with fn to_json(self) {
-  @sdkjson.ObjBuilder::new()
-  .field("content", self.content)
-  .field("return_code", self.return_code)
-  .field("stderr", self.stderr)
-  .field("stdout", self.stdout)
-  .field("type", self.type_)
-  .build()
-}
-
-///|
-///
-/// Decodes this value from JSON.
-pub extend RequestBashCodeExecutionResultBlock with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for RequestBashCodeExecutionResultBlock with fn from_json(
-  value,
-  path,
-) {
-  let obj = @sdkjson.expect_object(value, path)
-  {
-    content: required_field(obj, "content", path),
-    return_code: required_field(obj, "return_code", path),
-    stderr: required_field(obj, "stderr", path),
-    stdout: required_field(obj, "stdout", path),
-    type_: required_field(obj, "type", path),
-  }
-}
-
-///|
-///
-/// Generated tagged union RequestBashCodeExecutionToolResultBlockContent.
-#non_exhaustive
-pub(all) enum RequestBashCodeExecutionToolResultBlockContent {
-  BashCodeExecutionToolResultError(RequestBashCodeExecutionToolResultError)
-  BashCodeExecutionResult(RequestBashCodeExecutionResultBlock)
-  Unknown(String, Json)
-} derive(Eq, @debug.Debug)
-
-///|
-pub extend RequestBashCodeExecutionToolResultBlockContent with Eq::{
-  equal,
-  not_equal,
-}
-
-///|
-pub extend RequestBashCodeExecutionToolResultBlockContent with @debug.Debug::{
-  to_repr,
-}
-
-///|
-///
-/// Encodes this tagged union as JSON.
-pub extend RequestBashCodeExecutionToolResultBlockContent with ToJson::{to_json}
-
-///|
-pub impl ToJson for RequestBashCodeExecutionToolResultBlockContent with fn to_json(
-  self,
-) {
-  match self {
-    BashCodeExecutionToolResultError(value) => Json(value)
-    BashCodeExecutionResult(value) => Json(value)
-    Unknown(_, value) => value
-  }
-}
-
-///|
-///
-/// Decodes this tagged union from JSON.
-pub extend RequestBashCodeExecutionToolResultBlockContent with @json.FromJson::{
-  from_json,
-}
-
-///|
-pub impl @json.FromJson for RequestBashCodeExecutionToolResultBlockContent with fn from_json(
-  value,
-  path,
-) {
-  let obj = @sdkjson.expect_object(value, path)
-  let tag : String = required_field(obj, "type", path)
-  match tag {
-    "bash_code_execution_tool_result_error" =>
-      BashCodeExecutionToolResultError(@json.from_json(value, path~))
-    "bash_code_execution_result" =>
-      BashCodeExecutionResult(@json.from_json(value, path~))
-    other => Unknown(other, value)
-  }
-}
-
-///|
-///
-/// Generated representation of RequestBashCodeExecutionToolResultBlock.
-pub(all) struct RequestBashCodeExecutionToolResultBlock {
-  cache_control : @sdkjson.Presence[
-    RequestBashCodeExecutionToolResultBlockCacheControl,
-  ]
-  content : RequestBashCodeExecutionToolResultBlockContent
-  tool_use_id : String
-  type_ : String
-} derive(Eq, @debug.Debug)
-
-///|
-pub extend RequestBashCodeExecutionToolResultBlock with Eq::{equal, not_equal}
-
-///|
-pub extend RequestBashCodeExecutionToolResultBlock with @debug.Debug::{to_repr}
-
-///|
-///
-/// Creates a RequestBashCodeExecutionToolResultBlock with omitted optional fields absent.
-pub fn RequestBashCodeExecutionToolResultBlock::new(
-  content~ : RequestBashCodeExecutionToolResultBlockContent,
-  tool_use_id~ : String,
-  type_~ : String,
-  cache_control? : RequestBashCodeExecutionToolResultBlockCacheControl,
-) -> RequestBashCodeExecutionToolResultBlock {
-  {
-    cache_control: @sdkjson.Presence::from_option(cache_control),
-    content,
-    tool_use_id,
-    type_,
-  }
-}
-
-///|
-///
-/// Encodes this value as JSON.
-pub extend RequestBashCodeExecutionToolResultBlock with ToJson::{to_json}
-
-///|
-pub impl ToJson for RequestBashCodeExecutionToolResultBlock with fn to_json(
-  self,
-) {
-  @sdkjson.ObjBuilder::new()
-  .presence("cache_control", self.cache_control)
-  .field("content", self.content)
-  .field("tool_use_id", self.tool_use_id)
-  .field("type", self.type_)
-  .build()
-}
-
-///|
-///
-/// Decodes this value from JSON.
-pub extend RequestBashCodeExecutionToolResultBlock with @json.FromJson::{
-  from_json,
-}
-
-///|
-pub impl @json.FromJson for RequestBashCodeExecutionToolResultBlock with fn from_json(
-  value,
-  path,
-) {
-  let obj = @sdkjson.expect_object(value, path)
-  {
-    cache_control: @sdkjson.presence_field(obj, "cache_control", path),
-    content: required_field(obj, "content", path),
-    tool_use_id: required_field(obj, "tool_use_id", path),
-    type_: required_field(obj, "type", path),
-  }
-}
-
-///|
-///
-/// Create a cache control breakpoint at this content block.
-#non_exhaustive
-pub(all) enum RequestCodeExecutionToolResultBlockCacheControl {
-  Ephemeral(CacheControlEphemeral)
-  Unknown(String, Json)
-} derive(Eq, @debug.Debug)
-
-///|
-pub extend RequestCodeExecutionToolResultBlockCacheControl with Eq::{
-  equal,
-  not_equal,
-}
-
-///|
-pub extend RequestCodeExecutionToolResultBlockCacheControl with @debug.Debug::{
-  to_repr,
-}
-
-///|
-///
-/// Encodes this tagged union as JSON.
-pub extend RequestCodeExecutionToolResultBlockCacheControl with ToJson::{
-  to_json,
-}
-
-///|
-pub impl ToJson for RequestCodeExecutionToolResultBlockCacheControl with fn to_json(
-  self,
-) {
-  match self {
-    Ephemeral(value) => Json(value)
-    Unknown(_, value) => value
-  }
-}
-
-///|
-///
-/// Decodes this tagged union from JSON.
-pub extend RequestCodeExecutionToolResultBlockCacheControl with @json.FromJson::{
-  from_json,
-}
-
-///|
-pub impl @json.FromJson for RequestCodeExecutionToolResultBlockCacheControl with fn from_json(
-  value,
-  path,
-) {
-  let obj = @sdkjson.expect_object(value, path)
-  let tag : String = required_field(obj, "type", path)
-  match tag {
-    "ephemeral" => Ephemeral(@json.from_json(value, path~))
-    other => Unknown(other, value)
-  }
-}
-
-///|
-///
-/// Generated representation of RequestCodeExecutionToolResultError.
-pub(all) struct RequestCodeExecutionToolResultError {
-  error_code : CodeExecutionToolResultErrorCode
-  type_ : String
-} derive(Eq, @debug.Debug)
-
-///|
-pub extend RequestCodeExecutionToolResultError with Eq::{equal, not_equal}
-
-///|
-pub extend RequestCodeExecutionToolResultError with @debug.Debug::{to_repr}
-
-///|
-///
-/// Creates a RequestCodeExecutionToolResultError with omitted optional fields absent.
-pub fn RequestCodeExecutionToolResultError::new(
-  error_code~ : CodeExecutionToolResultErrorCode,
-  type_~ : String,
-) -> RequestCodeExecutionToolResultError {
-  { error_code, type_, }
-}
-
-///|
-///
-/// Encodes this value as JSON.
-pub extend RequestCodeExecutionToolResultError with ToJson::{to_json}
-
-///|
-pub impl ToJson for RequestCodeExecutionToolResultError with fn to_json(self) {
-  @sdkjson.ObjBuilder::new()
-  .field("error_code", self.error_code)
-  .field("type", self.type_)
-  .build()
-}
-
-///|
-///
-/// Decodes this value from JSON.
-pub extend RequestCodeExecutionToolResultError with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for RequestCodeExecutionToolResultError with fn from_json(
-  value,
-  path,
-) {
-  let obj = @sdkjson.expect_object(value, path)
-  {
-    error_code: required_field(obj, "error_code", path),
-    type_: required_field(obj, "type", path),
-  }
-}
-
-///|
-///
-/// Generated representation of RequestCodeExecutionOutputBlock.
-pub(all) struct RequestCodeExecutionOutputBlock {
-  file_id : String
-} derive(Eq, @debug.Debug)
-
-///|
-pub extend RequestCodeExecutionOutputBlock with Eq::{equal, not_equal}
-
-///|
-pub extend RequestCodeExecutionOutputBlock with @debug.Debug::{to_repr}
-
-///|
-///
-/// Creates a RequestCodeExecutionOutputBlock with omitted optional fields absent.
-pub fn RequestCodeExecutionOutputBlock::new(
-  file_id~ : String,
-) -> RequestCodeExecutionOutputBlock {
-  { file_id, }
-}
-
-///|
-///
-/// Encodes this value as JSON.
-pub extend RequestCodeExecutionOutputBlock with ToJson::{to_json}
-
-///|
-pub impl ToJson for RequestCodeExecutionOutputBlock with fn to_json(self) {
-  @sdkjson.ObjBuilder::new()
-  .field("file_id", self.file_id)
-  .field("type", "code_execution_output")
-  .build()
-}
-
-///|
-///
-/// Decodes this value from JSON.
-pub extend RequestCodeExecutionOutputBlock with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for RequestCodeExecutionOutputBlock with fn from_json(
-  value,
-  path,
-) {
-  let obj = @sdkjson.expect_object(value, path)
-  { file_id: required_field(obj, "file_id", path), }
-}
-
-///|
-///
-/// Generated representation of RequestCodeExecutionResultBlock.
-pub(all) struct RequestCodeExecutionResultBlock {
-  content : Array[RequestCodeExecutionOutputBlock]
-  return_code : Int32
-  stderr : String
-  stdout : String
-  type_ : String
-} derive(Eq, @debug.Debug)
-
-///|
-pub extend RequestCodeExecutionResultBlock with Eq::{equal, not_equal}
-
-///|
-pub extend RequestCodeExecutionResultBlock with @debug.Debug::{to_repr}
-
-///|
-///
-/// Creates a RequestCodeExecutionResultBlock with omitted optional fields absent.
-pub fn RequestCodeExecutionResultBlock::new(
-  content~ : Array[RequestCodeExecutionOutputBlock],
-  return_code~ : Int32,
-  stderr~ : String,
-  stdout~ : String,
-  type_~ : String,
-) -> RequestCodeExecutionResultBlock {
-  { content, return_code, stderr, stdout, type_, }
-}
-
-///|
-///
-/// Encodes this value as JSON.
-pub extend RequestCodeExecutionResultBlock with ToJson::{to_json}
-
-///|
-pub impl ToJson for RequestCodeExecutionResultBlock with fn to_json(self) {
-  @sdkjson.ObjBuilder::new()
-  .field("content", self.content)
-  .field("return_code", self.return_code)
-  .field("stderr", self.stderr)
-  .field("stdout", self.stdout)
-  .field("type", self.type_)
-  .build()
-}
-
-///|
-///
-/// Decodes this value from JSON.
-pub extend RequestCodeExecutionResultBlock with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for RequestCodeExecutionResultBlock with fn from_json(
-  value,
-  path,
-) {
-  let obj = @sdkjson.expect_object(value, path)
-  {
-    content: required_field(obj, "content", path),
-    return_code: required_field(obj, "return_code", path),
-    stderr: required_field(obj, "stderr", path),
-    stdout: required_field(obj, "stdout", path),
-    type_: required_field(obj, "type", path),
-  }
-}
-
-///|
-///
-/// Code execution result with encrypted stdout for PFC + web_search results.
-pub(all) struct RequestEncryptedCodeExecutionResultBlock {
-  content : Array[RequestCodeExecutionOutputBlock]
-  encrypted_stdout : String
-  return_code : Int32
-  stderr : String
-  type_ : String
-} derive(Eq, @debug.Debug)
-
-///|
-pub extend RequestEncryptedCodeExecutionResultBlock with Eq::{equal, not_equal}
-
-///|
-pub extend RequestEncryptedCodeExecutionResultBlock with @debug.Debug::{to_repr}
-
-///|
-///
-/// Creates a RequestEncryptedCodeExecutionResultBlock with omitted optional fields absent.
-pub fn RequestEncryptedCodeExecutionResultBlock::new(
-  content~ : Array[RequestCodeExecutionOutputBlock],
-  encrypted_stdout~ : String,
-  return_code~ : Int32,
-  stderr~ : String,
-  type_~ : String,
-) -> RequestEncryptedCodeExecutionResultBlock {
-  { content, encrypted_stdout, return_code, stderr, type_, }
-}
-
-///|
-///
-/// Encodes this value as JSON.
-pub extend RequestEncryptedCodeExecutionResultBlock with ToJson::{to_json}
-
-///|
-pub impl ToJson for RequestEncryptedCodeExecutionResultBlock with fn to_json(
-  self,
-) {
-  @sdkjson.ObjBuilder::new()
-  .field("content", self.content)
-  .field("encrypted_stdout", self.encrypted_stdout)
-  .field("return_code", self.return_code)
-  .field("stderr", self.stderr)
-  .field("type", self.type_)
-  .build()
-}
-
-///|
-///
-/// Decodes this value from JSON.
-pub extend RequestEncryptedCodeExecutionResultBlock with @json.FromJson::{
-  from_json,
-}
-
-///|
-pub impl @json.FromJson for RequestEncryptedCodeExecutionResultBlock with fn from_json(
-  value,
-  path,
-) {
-  let obj = @sdkjson.expect_object(value, path)
-  {
-    content: required_field(obj, "content", path),
-    encrypted_stdout: required_field(obj, "encrypted_stdout", path),
-    return_code: required_field(obj, "return_code", path),
-    stderr: required_field(obj, "stderr", path),
-    type_: required_field(obj, "type", path),
-  }
-}
-
-///|
-///
-/// Generated tagged union RequestCodeExecutionToolResultBlockContent.
-#non_exhaustive
-pub(all) enum RequestCodeExecutionToolResultBlockContent {
-  CodeExecutionToolResultError(RequestCodeExecutionToolResultError)
-  CodeExecutionResult(RequestCodeExecutionResultBlock)
-  EncryptedCodeExecutionResult(RequestEncryptedCodeExecutionResultBlock)
-  Unknown(String, Json)
-} derive(Eq, @debug.Debug)
-
-///|
-pub extend RequestCodeExecutionToolResultBlockContent with Eq::{
-  equal,
-  not_equal,
-}
-
-///|
-pub extend RequestCodeExecutionToolResultBlockContent with @debug.Debug::{
-  to_repr,
-}
-
-///|
-///
-/// Encodes this tagged union as JSON.
-pub extend RequestCodeExecutionToolResultBlockContent with ToJson::{to_json}
-
-///|
-pub impl ToJson for RequestCodeExecutionToolResultBlockContent with fn to_json(
-  self,
-) {
-  match self {
-    CodeExecutionToolResultError(value) => Json(value)
-    CodeExecutionResult(value) => Json(value)
-    EncryptedCodeExecutionResult(value) => Json(value)
-    Unknown(_, value) => value
-  }
-}
-
-///|
-///
-/// Decodes this tagged union from JSON.
-pub extend RequestCodeExecutionToolResultBlockContent with @json.FromJson::{
-  from_json,
-}
-
-///|
-pub impl @json.FromJson for RequestCodeExecutionToolResultBlockContent with fn from_json(
-  value,
-  path,
-) {
-  let obj = @sdkjson.expect_object(value, path)
-  let tag : String = required_field(obj, "type", path)
-  match tag {
-    "code_execution_tool_result_error" =>
-      CodeExecutionToolResultError(@json.from_json(value, path~))
-    "code_execution_result" =>
-      CodeExecutionResult(@json.from_json(value, path~))
-    "encrypted_code_execution_result" =>
-      EncryptedCodeExecutionResult(@json.from_json(value, path~))
-    other => Unknown(other, value)
-  }
-}
-
-///|
-///
-/// Generated representation of RequestCodeExecutionToolResultBlock.
-pub(all) struct RequestCodeExecutionToolResultBlock {
-  cache_control : @sdkjson.Presence[
-    RequestCodeExecutionToolResultBlockCacheControl,
-  ]
-  content : RequestCodeExecutionToolResultBlockContent
-  tool_use_id : String
-  type_ : String
-} derive(Eq, @debug.Debug)
-
-///|
-pub extend RequestCodeExecutionToolResultBlock with Eq::{equal, not_equal}
-
-///|
-pub extend RequestCodeExecutionToolResultBlock with @debug.Debug::{to_repr}
-
-///|
-///
-/// Creates a RequestCodeExecutionToolResultBlock with omitted optional fields absent.
-pub fn RequestCodeExecutionToolResultBlock::new(
-  content~ : RequestCodeExecutionToolResultBlockContent,
-  tool_use_id~ : String,
-  type_~ : String,
-  cache_control? : RequestCodeExecutionToolResultBlockCacheControl,
-) -> RequestCodeExecutionToolResultBlock {
-  {
-    cache_control: @sdkjson.Presence::from_option(cache_control),
-    content,
-    tool_use_id,
-    type_,
-  }
-}
-
-///|
-///
-/// Encodes this value as JSON.
-pub extend RequestCodeExecutionToolResultBlock with ToJson::{to_json}
-
-///|
-pub impl ToJson for RequestCodeExecutionToolResultBlock with fn to_json(self) {
-  @sdkjson.ObjBuilder::new()
-  .presence("cache_control", self.cache_control)
-  .field("content", self.content)
-  .field("tool_use_id", self.tool_use_id)
-  .field("type", self.type_)
-  .build()
-}
-
-///|
-///
-/// Decodes this value from JSON.
-pub extend RequestCodeExecutionToolResultBlock with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for RequestCodeExecutionToolResultBlock with fn from_json(
-  value,
-  path,
-) {
-  let obj = @sdkjson.expect_object(value, path)
-  {
-    cache_control: @sdkjson.presence_field(obj, "cache_control", path),
-    content: required_field(obj, "content", path),
-    tool_use_id: required_field(obj, "tool_use_id", path),
-    type_: required_field(obj, "type", path),
-  }
-}
-
-///|
-///
-/// Create a cache control breakpoint at this content block.
-#non_exhaustive
-pub(all) enum RequestContainerUploadBlockCacheControl {
-  Ephemeral(CacheControlEphemeral)
-  Unknown(String, Json)
-} derive(Eq, @debug.Debug)
-
-///|
-pub extend RequestContainerUploadBlockCacheControl with Eq::{equal, not_equal}
-
-///|
-pub extend RequestContainerUploadBlockCacheControl with @debug.Debug::{to_repr}
-
-///|
-///
-/// Encodes this tagged union as JSON.
-pub extend RequestContainerUploadBlockCacheControl with ToJson::{to_json}
-
-///|
-pub impl ToJson for RequestContainerUploadBlockCacheControl with fn to_json(
-  self,
-) {
-  match self {
-    Ephemeral(value) => Json(value)
-    Unknown(_, value) => value
-  }
-}
-
-///|
-///
-/// Decodes this tagged union from JSON.
-pub extend RequestContainerUploadBlockCacheControl with @json.FromJson::{
-  from_json,
-}
-
-///|
-pub impl @json.FromJson for RequestContainerUploadBlockCacheControl with fn from_json(
-  value,
-  path,
-) {
-  let obj = @sdkjson.expect_object(value, path)
-  let tag : String = required_field(obj, "type", path)
-  match tag {
-    "ephemeral" => Ephemeral(@json.from_json(value, path~))
-    other => Unknown(other, value)
-  }
-}
-
-///|
-///
-/// A content block that represents a file to be uploaded to the container Files uploaded via this block will be available in the container's input directory.
-pub(all) struct RequestContainerUploadBlock {
-  cache_control : @sdkjson.Presence[RequestContainerUploadBlockCacheControl]
-  file_id : String
-  type_ : String
-} derive(Eq, @debug.Debug)
-
-///|
-pub extend RequestContainerUploadBlock with Eq::{equal, not_equal}
-
-///|
-pub extend RequestContainerUploadBlock with @debug.Debug::{to_repr}
-
-///|
-///
-/// Creates a RequestContainerUploadBlock with omitted optional fields absent.
-pub fn RequestContainerUploadBlock::new(
-  file_id~ : String,
-  type_~ : String,
-  cache_control? : RequestContainerUploadBlockCacheControl,
-) -> RequestContainerUploadBlock {
-  {
-    cache_control: @sdkjson.Presence::from_option(cache_control),
-    file_id,
-    type_,
-  }
-}
-
-///|
-///
-/// Encodes this value as JSON.
-pub extend RequestContainerUploadBlock with ToJson::{to_json}
-
-///|
-pub impl ToJson for RequestContainerUploadBlock with fn to_json(self) {
-  @sdkjson.ObjBuilder::new()
-  .presence("cache_control", self.cache_control)
-  .field("file_id", self.file_id)
-  .field("type", self.type_)
-  .build()
-}
-
-///|
-///
-/// Decodes this value from JSON.
-pub extend RequestContainerUploadBlock with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for RequestContainerUploadBlock with fn from_json(
-  value,
-  path,
-) {
-  let obj = @sdkjson.expect_object(value, path)
-  {
-    cache_control: @sdkjson.presence_field(obj, "cache_control", path),
-    file_id: required_field(obj, "file_id", path),
-    type_: required_field(obj, "type", path),
-  }
-}
-
-///|
-///
-/// Create a cache control breakpoint at this content block.
-#non_exhaustive
-pub(all) enum RequestDocumentBlockCacheControl {
-  Ephemeral(CacheControlEphemeral)
-  Unknown(String, Json)
-} derive(Eq, @debug.Debug)
-
-///|
-pub extend RequestDocumentBlockCacheControl with Eq::{equal, not_equal}
-
-///|
-pub extend RequestDocumentBlockCacheControl with @debug.Debug::{to_repr}
-
-///|
-///
-/// Encodes this tagged union as JSON.
-pub extend RequestDocumentBlockCacheControl with ToJson::{to_json}
-
-///|
-pub impl ToJson for RequestDocumentBlockCacheControl with fn to_json(self) {
-  match self {
-    Ephemeral(value) => Json(value)
-    Unknown(_, value) => value
-  }
-}
-
-///|
-///
-/// Decodes this tagged union from JSON.
-pub extend RequestDocumentBlockCacheControl with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for RequestDocumentBlockCacheControl with fn from_json(
-  value,
-  path,
-) {
-  let obj = @sdkjson.expect_object(value, path)
-  let tag : String = required_field(obj, "type", path)
-  match tag {
-    "ephemeral" => Ephemeral(@json.from_json(value, path~))
-    other => Unknown(other, value)
-  }
-}
-
-///|
-///
-/// Generated representation of RequestCitationsConfig.
-pub(all) struct RequestCitationsConfig {
-  enabled : Bool?
-} derive(Eq, @debug.Debug)
-
-///|
-pub extend RequestCitationsConfig with Eq::{equal, not_equal}
-
-///|
-pub extend RequestCitationsConfig with @debug.Debug::{to_repr}
-
-///|
-///
-/// Creates a RequestCitationsConfig with omitted optional fields absent.
-pub fn RequestCitationsConfig::new(enabled? : Bool) -> RequestCitationsConfig {
-  { enabled, }
-}
-
-///|
-///
-/// Encodes this value as JSON.
-pub extend RequestCitationsConfig with ToJson::{to_json}
-
-///|
-pub impl ToJson for RequestCitationsConfig with fn to_json(self) {
-  @sdkjson.ObjBuilder::new().opt("enabled", self.enabled).build()
-}
-
-///|
-///
-/// Decodes this value from JSON.
-pub extend RequestCitationsConfig with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for RequestCitationsConfig with fn from_json(
-  value,
-  path,
-) {
-  let obj = @sdkjson.expect_object(value, path)
-  { enabled: @sdkjson.opt_field(obj, "enabled", path), }
-}
-
-///|
-///
-/// Generated representation of FileDocumentSource.
-pub(all) struct FileDocumentSource {
-  file_id : String
-  type_ : String
-} derive(Eq, @debug.Debug)
-
-///|
-pub extend FileDocumentSource with Eq::{equal, not_equal}
-
-///|
-pub extend FileDocumentSource with @debug.Debug::{to_repr}
-
-///|
-///
-/// Creates a FileDocumentSource with omitted optional fields absent.
-pub fn FileDocumentSource::new(
-  file_id~ : String,
-  type_~ : String,
-) -> FileDocumentSource {
-  { file_id, type_, }
-}
-
-///|
-///
-/// Encodes this value as JSON.
-pub extend FileDocumentSource with ToJson::{to_json}
-
-///|
-pub impl ToJson for FileDocumentSource with fn to_json(self) {
-  @sdkjson.ObjBuilder::new()
-  .field("file_id", self.file_id)
-  .field("type", self.type_)
-  .build()
-}
-
-///|
-///
-/// Decodes this value from JSON.
-pub extend FileDocumentSource with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for FileDocumentSource with fn from_json(value, path) {
-  let obj = @sdkjson.expect_object(value, path)
-  {
-    file_id: required_field(obj, "file_id", path),
-    type_: required_field(obj, "type", path),
-  }
-}
-
-///|
-///
-/// Generated representation of URLPDFSource.
-pub(all) struct URLPDFSource {
-  type_ : String
-  url : String
-} derive(Eq, @debug.Debug)
-
-///|
-pub extend URLPDFSource with Eq::{equal, not_equal}
-
-///|
-pub extend URLPDFSource with @debug.Debug::{to_repr}
-
-///|
-///
-/// Creates a URLPDFSource with omitted optional fields absent.
-pub fn URLPDFSource::new(type_~ : String, url~ : String) -> URLPDFSource {
-  { type_, url, }
-}
-
-///|
-///
-/// Encodes this value as JSON.
-pub extend URLPDFSource with ToJson::{to_json}
-
-///|
-pub impl ToJson for URLPDFSource with fn to_json(self) {
-  @sdkjson.ObjBuilder::new()
-  .field("type", self.type_)
-  .field("url", self.url)
-  .build()
-}
-
-///|
-///
-/// Decodes this value from JSON.
-pub extend URLPDFSource with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for URLPDFSource with fn from_json(value, path) {
-  let obj = @sdkjson.expect_object(value, path)
-  {
-    type_: required_field(obj, "type", path),
-    url: required_field(obj, "url", path),
-  }
-}
-
-///|
-///
-/// Generated tagged union RequestDocumentBlockSource.
-#non_exhaustive
-pub(all) enum RequestDocumentBlockSource {
-  Base64(Base64PDFSource)
-  Content(ContentBlockSource)
-  File(FileDocumentSource)
-  Text(PlainTextSource)
-  Url(URLPDFSource)
-  Unknown(String, Json)
-} derive(Eq, @debug.Debug)
-
-///|
-pub extend RequestDocumentBlockSource with Eq::{equal, not_equal}
-
-///|
-pub extend RequestDocumentBlockSource with @debug.Debug::{to_repr}
-
-///|
-///
-/// Encodes this tagged union as JSON.
-pub extend RequestDocumentBlockSource with ToJson::{to_json}
-
-///|
-pub impl ToJson for RequestDocumentBlockSource with fn to_json(self) {
-  match self {
-    Base64(value) => Json(value)
-    Content(value) => Json(value)
-    File(value) => Json(value)
-    Text(value) => Json(value)
-    Url(value) => Json(value)
-    Unknown(_, value) => value
-  }
-}
-
-///|
-///
-/// Decodes this tagged union from JSON.
-pub extend RequestDocumentBlockSource with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for RequestDocumentBlockSource with fn from_json(
-  value,
-  path,
-) {
-  let obj = @sdkjson.expect_object(value, path)
-  let tag : String = required_field(obj, "type", path)
-  match tag {
-    "base64" => Base64(@json.from_json(value, path~))
-    "content" => Content(@json.from_json(value, path~))
-    "file" => File(@json.from_json(value, path~))
-    "text" => Text(@json.from_json(value, path~))
-    "url" => Url(@json.from_json(value, path~))
-    other => Unknown(other, value)
-  }
-}
-
-///|
-///
-/// Generated representation of RequestDocumentBlock.
-pub(all) struct RequestDocumentBlock {
-  cache_control : @sdkjson.Presence[RequestDocumentBlockCacheControl]
-  citations : @sdkjson.Presence[RequestCitationsConfig]
-  context : @sdkjson.Presence[String]
-  source : RequestDocumentBlockSource
-  title : @sdkjson.Presence[String]
-  type_ : String
-} derive(Eq, @debug.Debug)
-
-///|
-pub extend RequestDocumentBlock with Eq::{equal, not_equal}
-
-///|
-pub extend RequestDocumentBlock with @debug.Debug::{to_repr}
-
-///|
-///
-/// Creates a RequestDocumentBlock with omitted optional fields absent.
-pub fn RequestDocumentBlock::new(
-  source~ : RequestDocumentBlockSource,
-  type_~ : String,
-  cache_control? : RequestDocumentBlockCacheControl,
-  citations? : RequestCitationsConfig,
-  context? : String,
-  title? : String,
-) -> RequestDocumentBlock {
-  {
-    cache_control: @sdkjson.Presence::from_option(cache_control),
-    citations: @sdkjson.Presence::from_option(citations),
-    context: @sdkjson.Presence::from_option(context),
-    source,
-    title: @sdkjson.Presence::from_option(title),
-    type_,
-  }
-}
-
-///|
-///
-/// Encodes this value as JSON.
-pub extend RequestDocumentBlock with ToJson::{to_json}
-
-///|
-pub impl ToJson for RequestDocumentBlock with fn to_json(self) {
-  @sdkjson.ObjBuilder::new()
-  .presence("cache_control", self.cache_control)
-  .presence("citations", self.citations)
-  .presence("context", self.context)
-  .field("source", self.source)
-  .presence("title", self.title)
-  .field("type", self.type_)
-  .build()
-}
-
-///|
-///
-/// Decodes this value from JSON.
-pub extend RequestDocumentBlock with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for RequestDocumentBlock with fn from_json(value, path) {
-  let obj = @sdkjson.expect_object(value, path)
-  {
-    cache_control: @sdkjson.presence_field(obj, "cache_control", path),
-    citations: @sdkjson.presence_field(obj, "citations", path),
-    context: @sdkjson.presence_field(obj, "context", path),
-    source: required_field(obj, "source", path),
-    title: @sdkjson.presence_field(obj, "title", path),
-    type_: required_field(obj, "type", path),
-  }
-}
-
-///|
-///
-/// Generated representation of RequestRedactedThinkingBlock.
-pub(all) struct RequestRedactedThinkingBlock {
-  data : String
-  type_ : String
-} derive(Eq, @debug.Debug)
-
-///|
-pub extend RequestRedactedThinkingBlock with Eq::{equal, not_equal}
-
-///|
-pub extend RequestRedactedThinkingBlock with @debug.Debug::{to_repr}
-
-///|
-///
-/// Creates a RequestRedactedThinkingBlock with omitted optional fields absent.
-pub fn RequestRedactedThinkingBlock::new(
-  data~ : String,
-  type_~ : String,
-) -> RequestRedactedThinkingBlock {
-  { data, type_, }
-}
-
-///|
-///
-/// Encodes this value as JSON.
-pub extend RequestRedactedThinkingBlock with ToJson::{to_json}
-
-///|
-pub impl ToJson for RequestRedactedThinkingBlock with fn to_json(self) {
-  @sdkjson.ObjBuilder::new()
-  .field("data", self.data)
-  .field("type", self.type_)
-  .build()
-}
-
-///|
-///
-/// Decodes this value from JSON.
-pub extend RequestRedactedThinkingBlock with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for RequestRedactedThinkingBlock with fn from_json(
-  value,
-  path,
-) {
-  let obj = @sdkjson.expect_object(value, path)
-  {
-    data: required_field(obj, "data", path),
-    type_: required_field(obj, "type", path),
-  }
-}
-
-///|
-///
-/// Create a cache control breakpoint at this content block.
-#non_exhaustive
-pub(all) enum RequestSearchResultBlockCacheControl {
-  Ephemeral(CacheControlEphemeral)
-  Unknown(String, Json)
-} derive(Eq, @debug.Debug)
-
-///|
-pub extend RequestSearchResultBlockCacheControl with Eq::{equal, not_equal}
-
-///|
-pub extend RequestSearchResultBlockCacheControl with @debug.Debug::{to_repr}
-
-///|
-///
-/// Encodes this tagged union as JSON.
-pub extend RequestSearchResultBlockCacheControl with ToJson::{to_json}
-
-///|
-pub impl ToJson for RequestSearchResultBlockCacheControl with fn to_json(self) {
-  match self {
-    Ephemeral(value) => Json(value)
-    Unknown(_, value) => value
-  }
-}
-
-///|
-///
-/// Decodes this tagged union from JSON.
-pub extend RequestSearchResultBlockCacheControl with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for RequestSearchResultBlockCacheControl with fn from_json(
-  value,
-  path,
-) {
-  let obj = @sdkjson.expect_object(value, path)
-  let tag : String = required_field(obj, "type", path)
-  match tag {
-    "ephemeral" => Ephemeral(@json.from_json(value, path~))
-    other => Unknown(other, value)
-  }
-}
-
-///|
-///
-/// Generated representation of RequestSearchResultBlock.
-pub(all) struct RequestSearchResultBlock {
-  cache_control : @sdkjson.Presence[RequestSearchResultBlockCacheControl]
-  citations : RequestCitationsConfig?
-  content : Array[RequestTextBlock]
-  source : String
-  title : String
-  type_ : String
-} derive(Eq, @debug.Debug)
-
-///|
-pub extend RequestSearchResultBlock with Eq::{equal, not_equal}
-
-///|
-pub extend RequestSearchResultBlock with @debug.Debug::{to_repr}
-
-///|
-///
-/// Creates a RequestSearchResultBlock with omitted optional fields absent.
-pub fn RequestSearchResultBlock::new(
-  content~ : Array[RequestTextBlock],
-  source~ : String,
-  title~ : String,
-  type_~ : String,
-  cache_control? : RequestSearchResultBlockCacheControl,
-  citations? : RequestCitationsConfig,
-) -> RequestSearchResultBlock {
-  {
-    cache_control: @sdkjson.Presence::from_option(cache_control),
-    citations,
-    content,
-    source,
-    title,
-    type_,
-  }
-}
-
-///|
-///
-/// Encodes this value as JSON.
-pub extend RequestSearchResultBlock with ToJson::{to_json}
-
-///|
-pub impl ToJson for RequestSearchResultBlock with fn to_json(self) {
-  @sdkjson.ObjBuilder::new()
-  .presence("cache_control", self.cache_control)
-  .opt("citations", self.citations)
-  .field("content", self.content)
-  .field("source", self.source)
-  .field("title", self.title)
-  .field("type", self.type_)
-  .build()
-}
-
-///|
-///
-/// Decodes this value from JSON.
-pub extend RequestSearchResultBlock with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for RequestSearchResultBlock with fn from_json(
-  value,
-  path,
-) {
-  let obj = @sdkjson.expect_object(value, path)
-  {
-    cache_control: @sdkjson.presence_field(obj, "cache_control", path),
-    citations: @sdkjson.opt_field(obj, "citations", path),
-    content: required_field(obj, "content", path),
-    source: required_field(obj, "source", path),
-    title: required_field(obj, "title", path),
-    type_: required_field(obj, "type", path),
-  }
-}
-
-///|
-///
-/// Create a cache control breakpoint at this content block.
-#non_exhaustive
-pub(all) enum RequestServerToolUseBlockCacheControl {
-  Ephemeral(CacheControlEphemeral)
-  Unknown(String, Json)
-} derive(Eq, @debug.Debug)
-
-///|
-pub extend RequestServerToolUseBlockCacheControl with Eq::{equal, not_equal}
-
-///|
-pub extend RequestServerToolUseBlockCacheControl with @debug.Debug::{to_repr}
-
-///|
-///
-/// Encodes this tagged union as JSON.
-pub extend RequestServerToolUseBlockCacheControl with ToJson::{to_json}
-
-///|
-pub impl ToJson for RequestServerToolUseBlockCacheControl with fn to_json(self) {
-  match self {
-    Ephemeral(value) => Json(value)
-    Unknown(_, value) => value
-  }
-}
-
-///|
-///
-/// Decodes this tagged union from JSON.
-pub extend RequestServerToolUseBlockCacheControl with @json.FromJson::{
-  from_json,
-}
-
-///|
-pub impl @json.FromJson for RequestServerToolUseBlockCacheControl with fn from_json(
-  value,
-  path,
-) {
-  let obj = @sdkjson.expect_object(value, path)
-  let tag : String = required_field(obj, "type", path)
-  match tag {
-    "ephemeral" => Ephemeral(@json.from_json(value, path~))
-    other => Unknown(other, value)
-  }
-}
-
-///|
-///
-/// Generated tagged union RequestServerToolUseBlockCaller.
-#non_exhaustive
-pub(all) enum RequestServerToolUseBlockCaller {
-  CodeExecution20250825(ServerToolCaller)
-  CodeExecution20260120(ServerToolCaller20260120)
-  Direct(DirectCaller)
-  Unknown(String, Json)
-} derive(Eq, @debug.Debug)
-
-///|
-pub extend RequestServerToolUseBlockCaller with Eq::{equal, not_equal}
-
-///|
-pub extend RequestServerToolUseBlockCaller with @debug.Debug::{to_repr}
-
-///|
-///
-/// Encodes this tagged union as JSON.
-pub extend RequestServerToolUseBlockCaller with ToJson::{to_json}
-
-///|
-pub impl ToJson for RequestServerToolUseBlockCaller with fn to_json(self) {
-  match self {
-    CodeExecution20250825(value) => Json(value)
-    CodeExecution20260120(value) => Json(value)
-    Direct(value) => Json(value)
-    Unknown(_, value) => value
-  }
-}
-
-///|
-///
-/// Decodes this tagged union from JSON.
-pub extend RequestServerToolUseBlockCaller with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for RequestServerToolUseBlockCaller with fn from_json(
-  value,
-  path,
-) {
-  let obj = @sdkjson.expect_object(value, path)
-  let tag : String = required_field(obj, "type", path)
-  match tag {
-    "code_execution_20250825" =>
-      CodeExecution20250825(@json.from_json(value, path~))
-    "code_execution_20260120" =>
-      CodeExecution20260120(@json.from_json(value, path~))
-    "direct" => Direct(@json.from_json(value, path~))
-    other => Unknown(other, value)
-  }
-}
-
-///|
-///
-/// Generated string enum RequestServerToolUseBlockName.
-#non_exhaustive
-pub(all) enum RequestServerToolUseBlockName {
-  WebSearch
-  WebFetch
-  CodeExecution
-  BashCodeExecution
-  TextEditorCodeExecution
-  ToolSearchToolRegex
-  ToolSearchToolBm25
-  Custom(String)
-} derive(Eq, @debug.Debug)
-
-///|
-pub extend RequestServerToolUseBlockName with Eq::{equal, not_equal}
-
-///|
-pub extend RequestServerToolUseBlockName with @debug.Debug::{to_repr}
-
-///|
-///
-/// Encodes this string enum as JSON.
-pub extend RequestServerToolUseBlockName with ToJson::{to_json}
-
-///|
-pub impl ToJson for RequestServerToolUseBlockName with fn to_json(self) {
-  let raw = match self {
-    WebSearch => "web_search"
-    WebFetch => "web_fetch"
-    CodeExecution => "code_execution"
-    BashCodeExecution => "bash_code_execution"
-    TextEditorCodeExecution => "text_editor_code_execution"
-    ToolSearchToolRegex => "tool_search_tool_regex"
-    ToolSearchToolBm25 => "tool_search_tool_bm25"
-    Custom(raw) => raw
-  }
-  Json(raw)
-}
-
-///|
-///
-/// Decodes this string enum from JSON.
-pub extend RequestServerToolUseBlockName with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for RequestServerToolUseBlockName with fn from_json(
-  value,
-  path,
-) {
-  @sdkjson.open_string(
-    value,
-    path,
-    raw => {
-      match raw {
-        "web_search" => Some(WebSearch)
-        "web_fetch" => Some(WebFetch)
-        "code_execution" => Some(CodeExecution)
-        "bash_code_execution" => Some(BashCodeExecution)
-        "text_editor_code_execution" => Some(TextEditorCodeExecution)
-        "tool_search_tool_regex" => Some(ToolSearchToolRegex)
-        "tool_search_tool_bm25" => Some(ToolSearchToolBm25)
-        _ => None
-      }
-    },
-    raw => Custom(raw),
-  )
-}
-
-///|
-///
-/// Generated representation of RequestServerToolUseBlock.
-pub(all) struct RequestServerToolUseBlock {
-  cache_control : @sdkjson.Presence[RequestServerToolUseBlockCacheControl]
-  caller : RequestServerToolUseBlockCaller?
-  id : String
-  input : Json
-  name : RequestServerToolUseBlockName
-  type_ : String
-} derive(Eq, @debug.Debug)
-
-///|
-pub extend RequestServerToolUseBlock with Eq::{equal, not_equal}
-
-///|
-pub extend RequestServerToolUseBlock with @debug.Debug::{to_repr}
-
-///|
-///
-/// Creates a RequestServerToolUseBlock with omitted optional fields absent.
-pub fn RequestServerToolUseBlock::new(
-  id~ : String,
-  input~ : Json,
-  name~ : RequestServerToolUseBlockName,
-  type_~ : String,
-  cache_control? : RequestServerToolUseBlockCacheControl,
-  caller? : RequestServerToolUseBlockCaller,
-) -> RequestServerToolUseBlock {
-  {
-    cache_control: @sdkjson.Presence::from_option(cache_control),
-    caller,
-    id,
-    input,
-    name,
-    type_,
-  }
-}
-
-///|
-///
-/// Encodes this value as JSON.
-pub extend RequestServerToolUseBlock with ToJson::{to_json}
-
-///|
-pub impl ToJson for RequestServerToolUseBlock with fn to_json(self) {
-  @sdkjson.ObjBuilder::new()
-  .presence("cache_control", self.cache_control)
-  .opt("caller", self.caller)
-  .field("id", self.id)
-  .field("input", self.input)
-  .field("name", self.name)
-  .field("type", self.type_)
-  .build()
-}
-
-///|
-///
-/// Decodes this value from JSON.
-pub extend RequestServerToolUseBlock with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for RequestServerToolUseBlock with fn from_json(
-  value,
-  path,
-) {
-  let obj = @sdkjson.expect_object(value, path)
-  {
-    cache_control: @sdkjson.presence_field(obj, "cache_control", path),
-    caller: @sdkjson.opt_field(obj, "caller", path),
-    id: required_field(obj, "id", path),
-    input: required_field(obj, "input", path),
-    name: required_field(obj, "name", path),
-    type_: required_field(obj, "type", path),
-  }
-}
-
-///|
-///
-/// Create a cache control breakpoint at this content block.
-#non_exhaustive
-pub(all) enum RequestTextEditorCodeExecutionToolResultBlockCacheControl {
-  Ephemeral(CacheControlEphemeral)
-  Unknown(String, Json)
-} derive(Eq, @debug.Debug)
-
-///|
-pub extend RequestTextEditorCodeExecutionToolResultBlockCacheControl with Eq::{
-  equal,
-  not_equal,
-}
-
-///|
-pub extend RequestTextEditorCodeExecutionToolResultBlockCacheControl with @debug.Debug::{
-  to_repr,
-}
-
-///|
-///
-/// Encodes this tagged union as JSON.
-pub extend RequestTextEditorCodeExecutionToolResultBlockCacheControl with ToJson::{
-  to_json,
-}
-
-///|
-pub impl ToJson for RequestTextEditorCodeExecutionToolResultBlockCacheControl with fn to_json(
-  self,
-) {
-  match self {
-    Ephemeral(value) => Json(value)
-    Unknown(_, value) => value
-  }
-}
-
-///|
-///
-/// Decodes this tagged union from JSON.
-pub extend RequestTextEditorCodeExecutionToolResultBlockCacheControl with @json.FromJson::{
-  from_json,
-}
-
-///|
-pub impl @json.FromJson for RequestTextEditorCodeExecutionToolResultBlockCacheControl with fn from_json(
-  value,
-  path,
-) {
-  let obj = @sdkjson.expect_object(value, path)
-  let tag : String = required_field(obj, "type", path)
-  match tag {
-    "ephemeral" => Ephemeral(@json.from_json(value, path~))
-    other => Unknown(other, value)
-  }
-}
-
-///|
-///
-/// Generated representation of RequestTextEditorCodeExecutionToolResultError.
-pub(all) struct RequestTextEditorCodeExecutionToolResultError {
-  error_code : TextEditorCodeExecutionToolResultErrorCode
-  error_message : @sdkjson.Presence[String]
-  type_ : String
-} derive(Eq, @debug.Debug)
-
-///|
-pub extend RequestTextEditorCodeExecutionToolResultError with Eq::{
-  equal,
-  not_equal,
-}
-
-///|
-pub extend RequestTextEditorCodeExecutionToolResultError with @debug.Debug::{
-  to_repr,
-}
-
-///|
-///
-/// Creates a RequestTextEditorCodeExecutionToolResultError with omitted optional fields absent.
-pub fn RequestTextEditorCodeExecutionToolResultError::new(
-  error_code~ : TextEditorCodeExecutionToolResultErrorCode,
-  type_~ : String,
-  error_message? : String,
-) -> RequestTextEditorCodeExecutionToolResultError {
-  {
-    error_code,
-    error_message: @sdkjson.Presence::from_option(error_message),
-    type_,
-  }
-}
-
-///|
-///
-/// Encodes this value as JSON.
-pub extend RequestTextEditorCodeExecutionToolResultError with ToJson::{to_json}
-
-///|
-pub impl ToJson for RequestTextEditorCodeExecutionToolResultError with fn to_json(
-  self,
-) {
-  @sdkjson.ObjBuilder::new()
-  .field("error_code", self.error_code)
-  .presence("error_message", self.error_message)
-  .field("type", self.type_)
-  .build()
-}
-
-///|
-///
-/// Decodes this value from JSON.
-pub extend RequestTextEditorCodeExecutionToolResultError with @json.FromJson::{
-  from_json,
-}
-
-///|
-pub impl @json.FromJson for RequestTextEditorCodeExecutionToolResultError with fn from_json(
-  value,
-  path,
-) {
-  let obj = @sdkjson.expect_object(value, path)
-  {
-    error_code: required_field(obj, "error_code", path),
-    error_message: @sdkjson.presence_field(obj, "error_message", path),
-    type_: required_field(obj, "type", path),
-  }
-}
-
-///|
-///
-/// Generated string enum RequestTextEditorCodeExecutionViewResultBlockFileType.
-#non_exhaustive
-pub(all) enum RequestTextEditorCodeExecutionViewResultBlockFileType {
-  Text
-  Image
-  Pdf
-  Custom(String)
-} derive(Eq, @debug.Debug)
-
-///|
-pub extend RequestTextEditorCodeExecutionViewResultBlockFileType with Eq::{
-  equal,
-  not_equal,
-}
-
-///|
-pub extend RequestTextEditorCodeExecutionViewResultBlockFileType with @debug.Debug::{
-  to_repr,
-}
-
-///|
-///
-/// Encodes this string enum as JSON.
-pub extend RequestTextEditorCodeExecutionViewResultBlockFileType with ToJson::{
-  to_json,
-}
-
-///|
-pub impl ToJson for RequestTextEditorCodeExecutionViewResultBlockFileType with fn to_json(
-  self,
-) {
-  let raw = match self {
-    Text => "text"
-    Image => "image"
-    Pdf => "pdf"
-    Custom(raw) => raw
-  }
-  Json(raw)
-}
-
-///|
-///
-/// Decodes this string enum from JSON.
-pub extend RequestTextEditorCodeExecutionViewResultBlockFileType with @json.FromJson::{
-  from_json,
-}
-
-///|
-pub impl @json.FromJson for RequestTextEditorCodeExecutionViewResultBlockFileType with fn from_json(
-  value,
-  path,
-) {
-  @sdkjson.open_string(
-    value,
-    path,
-    raw => {
-      match raw {
-        "text" => Some(Text)
-        "image" => Some(Image)
-        "pdf" => Some(Pdf)
-        _ => None
-      }
-    },
-    raw => Custom(raw),
-  )
-}
-
-///|
-///
-/// Generated representation of RequestTextEditorCodeExecutionViewResultBlock.
-pub(all) struct RequestTextEditorCodeExecutionViewResultBlock {
-  content : String
-  file_type : RequestTextEditorCodeExecutionViewResultBlockFileType
-  num_lines : @sdkjson.Presence[Int32]
-  start_line : @sdkjson.Presence[Int32]
-  total_lines : @sdkjson.Presence[Int32]
-  type_ : String
-} derive(Eq, @debug.Debug)
-
-///|
-pub extend RequestTextEditorCodeExecutionViewResultBlock with Eq::{
-  equal,
-  not_equal,
-}
-
-///|
-pub extend RequestTextEditorCodeExecutionViewResultBlock with @debug.Debug::{
-  to_repr,
-}
-
-///|
-///
-/// Creates a RequestTextEditorCodeExecutionViewResultBlock with omitted optional fields absent.
-pub fn RequestTextEditorCodeExecutionViewResultBlock::new(
-  content~ : String,
-  file_type~ : RequestTextEditorCodeExecutionViewResultBlockFileType,
-  type_~ : String,
-  num_lines? : Int32,
-  start_line? : Int32,
-  total_lines? : Int32,
-) -> RequestTextEditorCodeExecutionViewResultBlock {
-  {
-    content,
-    file_type,
-    num_lines: @sdkjson.Presence::from_option(num_lines),
-    start_line: @sdkjson.Presence::from_option(start_line),
-    total_lines: @sdkjson.Presence::from_option(total_lines),
-    type_,
-  }
-}
-
-///|
-///
-/// Encodes this value as JSON.
-pub extend RequestTextEditorCodeExecutionViewResultBlock with ToJson::{to_json}
-
-///|
-pub impl ToJson for RequestTextEditorCodeExecutionViewResultBlock with fn to_json(
-  self,
-) {
-  @sdkjson.ObjBuilder::new()
-  .field("content", self.content)
-  .field("file_type", self.file_type)
-  .presence("num_lines", self.num_lines)
-  .presence("start_line", self.start_line)
-  .presence("total_lines", self.total_lines)
-  .field("type", self.type_)
-  .build()
-}
-
-///|
-///
-/// Decodes this value from JSON.
-pub extend RequestTextEditorCodeExecutionViewResultBlock with @json.FromJson::{
-  from_json,
-}
-
-///|
-pub impl @json.FromJson for RequestTextEditorCodeExecutionViewResultBlock with fn from_json(
-  value,
-  path,
-) {
-  let obj = @sdkjson.expect_object(value, path)
-  {
-    content: required_field(obj, "content", path),
-    file_type: required_field(obj, "file_type", path),
-    num_lines: @sdkjson.presence_field(obj, "num_lines", path),
-    start_line: @sdkjson.presence_field(obj, "start_line", path),
-    total_lines: @sdkjson.presence_field(obj, "total_lines", path),
-    type_: required_field(obj, "type", path),
-  }
-}
-
-///|
-///
-/// Generated representation of RequestTextEditorCodeExecutionCreateResultBlock.
-pub(all) struct RequestTextEditorCodeExecutionCreateResultBlock {
-  is_file_update : Bool
-  type_ : String
-} derive(Eq, @debug.Debug)
-
-///|
-pub extend RequestTextEditorCodeExecutionCreateResultBlock with Eq::{
-  equal,
-  not_equal,
-}
-
-///|
-pub extend RequestTextEditorCodeExecutionCreateResultBlock with @debug.Debug::{
-  to_repr,
-}
-
-///|
-///
-/// Creates a RequestTextEditorCodeExecutionCreateResultBlock with omitted optional fields absent.
-pub fn RequestTextEditorCodeExecutionCreateResultBlock::new(
-  is_file_update~ : Bool,
-  type_~ : String,
-) -> RequestTextEditorCodeExecutionCreateResultBlock {
-  { is_file_update, type_, }
-}
-
-///|
-///
-/// Encodes this value as JSON.
-pub extend RequestTextEditorCodeExecutionCreateResultBlock with ToJson::{
-  to_json,
-}
-
-///|
-pub impl ToJson for RequestTextEditorCodeExecutionCreateResultBlock with fn to_json(
-  self,
-) {
-  @sdkjson.ObjBuilder::new()
-  .field("is_file_update", self.is_file_update)
-  .field("type", self.type_)
-  .build()
-}
-
-///|
-///
-/// Decodes this value from JSON.
-pub extend RequestTextEditorCodeExecutionCreateResultBlock with @json.FromJson::{
-  from_json,
-}
-
-///|
-pub impl @json.FromJson for RequestTextEditorCodeExecutionCreateResultBlock with fn from_json(
-  value,
-  path,
-) {
-  let obj = @sdkjson.expect_object(value, path)
-  {
-    is_file_update: required_field(obj, "is_file_update", path),
-    type_: required_field(obj, "type", path),
-  }
-}
-
-///|
-///
-/// Generated representation of RequestTextEditorCodeExecutionStrReplaceResultBlock.
-pub(all) struct RequestTextEditorCodeExecutionStrReplaceResultBlock {
-  lines : @sdkjson.Presence[Array[String]]
-  new_lines : @sdkjson.Presence[Int32]
-  new_start : @sdkjson.Presence[Int32]
-  old_lines : @sdkjson.Presence[Int32]
-  old_start : @sdkjson.Presence[Int32]
-  type_ : String
-} derive(Eq, @debug.Debug)
-
-///|
-pub extend RequestTextEditorCodeExecutionStrReplaceResultBlock with Eq::{
-  equal,
-  not_equal,
-}
-
-///|
-pub extend RequestTextEditorCodeExecutionStrReplaceResultBlock with @debug.Debug::{
-  to_repr,
-}
-
-///|
-///
-/// Creates a RequestTextEditorCodeExecutionStrReplaceResultBlock with omitted optional fields absent.
-pub fn RequestTextEditorCodeExecutionStrReplaceResultBlock::new(
-  type_~ : String,
-  lines? : Array[String],
-  new_lines? : Int32,
-  new_start? : Int32,
-  old_lines? : Int32,
-  old_start? : Int32,
-) -> RequestTextEditorCodeExecutionStrReplaceResultBlock {
-  {
-    lines: @sdkjson.Presence::from_option(lines),
-    new_lines: @sdkjson.Presence::from_option(new_lines),
-    new_start: @sdkjson.Presence::from_option(new_start),
-    old_lines: @sdkjson.Presence::from_option(old_lines),
-    old_start: @sdkjson.Presence::from_option(old_start),
-    type_,
-  }
-}
-
-///|
-///
-/// Encodes this value as JSON.
-pub extend RequestTextEditorCodeExecutionStrReplaceResultBlock with ToJson::{
-  to_json,
-}
-
-///|
-pub impl ToJson for RequestTextEditorCodeExecutionStrReplaceResultBlock with fn to_json(
-  self,
-) {
-  @sdkjson.ObjBuilder::new()
-  .presence("lines", self.lines)
-  .presence("new_lines", self.new_lines)
-  .presence("new_start", self.new_start)
-  .presence("old_lines", self.old_lines)
-  .presence("old_start", self.old_start)
-  .field("type", self.type_)
-  .build()
-}
-
-///|
-///
-/// Decodes this value from JSON.
-pub extend RequestTextEditorCodeExecutionStrReplaceResultBlock with @json.FromJson::{
-  from_json,
-}
-
-///|
-pub impl @json.FromJson for RequestTextEditorCodeExecutionStrReplaceResultBlock with fn from_json(
-  value,
-  path,
-) {
-  let obj = @sdkjson.expect_object(value, path)
-  {
-    lines: @sdkjson.presence_field(obj, "lines", path),
-    new_lines: @sdkjson.presence_field(obj, "new_lines", path),
-    new_start: @sdkjson.presence_field(obj, "new_start", path),
-    old_lines: @sdkjson.presence_field(obj, "old_lines", path),
-    old_start: @sdkjson.presence_field(obj, "old_start", path),
-    type_: required_field(obj, "type", path),
-  }
-}
-
-///|
-///
-/// Generated tagged union RequestTextEditorCodeExecutionToolResultBlockContent.
-#non_exhaustive
-pub(all) enum RequestTextEditorCodeExecutionToolResultBlockContent {
-  TextEditorCodeExecutionToolResultError(
-    RequestTextEditorCodeExecutionToolResultError
-  )
-  TextEditorCodeExecutionViewResult(
-    RequestTextEditorCodeExecutionViewResultBlock
-  )
-  TextEditorCodeExecutionCreateResult(
-    RequestTextEditorCodeExecutionCreateResultBlock
-  )
-  TextEditorCodeExecutionStrReplaceResult(
-    RequestTextEditorCodeExecutionStrReplaceResultBlock
-  )
-  Unknown(String, Json)
-} derive(Eq, @debug.Debug)
-
-///|
-pub extend RequestTextEditorCodeExecutionToolResultBlockContent with Eq::{
-  equal,
-  not_equal,
-}
-
-///|
-pub extend RequestTextEditorCodeExecutionToolResultBlockContent with @debug.Debug::{
-  to_repr,
-}
-
-///|
-///
-/// Encodes this tagged union as JSON.
-pub extend RequestTextEditorCodeExecutionToolResultBlockContent with ToJson::{
-  to_json,
-}
-
-///|
-pub impl ToJson for RequestTextEditorCodeExecutionToolResultBlockContent with fn to_json(
-  self,
-) {
-  match self {
-    TextEditorCodeExecutionToolResultError(value) => Json(value)
-    TextEditorCodeExecutionViewResult(value) => Json(value)
-    TextEditorCodeExecutionCreateResult(value) => Json(value)
-    TextEditorCodeExecutionStrReplaceResult(value) => Json(value)
-    Unknown(_, value) => value
-  }
-}
-
-///|
-///
-/// Decodes this tagged union from JSON.
-pub extend RequestTextEditorCodeExecutionToolResultBlockContent with @json.FromJson::{
-  from_json,
-}
-
-///|
-pub impl @json.FromJson for RequestTextEditorCodeExecutionToolResultBlockContent with fn from_json(
-  value,
-  path,
-) {
-  let obj = @sdkjson.expect_object(value, path)
-  let tag : String = required_field(obj, "type", path)
-  match tag {
-    "text_editor_code_execution_tool_result_error" =>
-      TextEditorCodeExecutionToolResultError(@json.from_json(value, path~))
-    "text_editor_code_execution_view_result" =>
-      TextEditorCodeExecutionViewResult(@json.from_json(value, path~))
-    "text_editor_code_execution_create_result" =>
-      TextEditorCodeExecutionCreateResult(@json.from_json(value, path~))
-    "text_editor_code_execution_str_replace_result" =>
-      TextEditorCodeExecutionStrReplaceResult(@json.from_json(value, path~))
-    other => Unknown(other, value)
-  }
-}
-
-///|
-///
-/// Generated representation of RequestTextEditorCodeExecutionToolResultBlock.
-pub(all) struct RequestTextEditorCodeExecutionToolResultBlock {
-  cache_control : @sdkjson.Presence[
-    RequestTextEditorCodeExecutionToolResultBlockCacheControl,
-  ]
-  content : RequestTextEditorCodeExecutionToolResultBlockContent
-  tool_use_id : String
-  type_ : String
-} derive(Eq, @debug.Debug)
-
-///|
-pub extend RequestTextEditorCodeExecutionToolResultBlock with Eq::{
-  equal,
-  not_equal,
-}
-
-///|
-pub extend RequestTextEditorCodeExecutionToolResultBlock with @debug.Debug::{
-  to_repr,
-}
-
-///|
-///
-/// Creates a RequestTextEditorCodeExecutionToolResultBlock with omitted optional fields absent.
-pub fn RequestTextEditorCodeExecutionToolResultBlock::new(
-  content~ : RequestTextEditorCodeExecutionToolResultBlockContent,
-  tool_use_id~ : String,
-  type_~ : String,
-  cache_control? : RequestTextEditorCodeExecutionToolResultBlockCacheControl,
-) -> RequestTextEditorCodeExecutionToolResultBlock {
-  {
-    cache_control: @sdkjson.Presence::from_option(cache_control),
-    content,
-    tool_use_id,
-    type_,
-  }
-}
-
-///|
-///
-/// Encodes this value as JSON.
-pub extend RequestTextEditorCodeExecutionToolResultBlock with ToJson::{to_json}
-
-///|
-pub impl ToJson for RequestTextEditorCodeExecutionToolResultBlock with fn to_json(
-  self,
-) {
-  @sdkjson.ObjBuilder::new()
-  .presence("cache_control", self.cache_control)
-  .field("content", self.content)
-  .field("tool_use_id", self.tool_use_id)
-  .field("type", self.type_)
-  .build()
-}
-
-///|
-///
-/// Decodes this value from JSON.
-pub extend RequestTextEditorCodeExecutionToolResultBlock with @json.FromJson::{
-  from_json,
-}
-
-///|
-pub impl @json.FromJson for RequestTextEditorCodeExecutionToolResultBlock with fn from_json(
-  value,
-  path,
-) {
-  let obj = @sdkjson.expect_object(value, path)
-  {
-    cache_control: @sdkjson.presence_field(obj, "cache_control", path),
-    content: required_field(obj, "content", path),
-    tool_use_id: required_field(obj, "tool_use_id", path),
-    type_: required_field(obj, "type", path),
-  }
-}
-
-///|
-///
-/// Generated representation of RequestThinkingBlock.
-pub(all) struct RequestThinkingBlock {
-  signature : String
-  thinking : String
-  type_ : String
-} derive(Eq, @debug.Debug)
-
-///|
-pub extend RequestThinkingBlock with Eq::{equal, not_equal}
-
-///|
-pub extend RequestThinkingBlock with @debug.Debug::{to_repr}
-
-///|
-///
-/// Creates a RequestThinkingBlock with omitted optional fields absent.
-pub fn RequestThinkingBlock::new(
-  signature~ : String,
-  thinking~ : String,
-  type_~ : String,
-) -> RequestThinkingBlock {
-  { signature, thinking, type_, }
-}
-
-///|
-///
-/// Encodes this value as JSON.
-pub extend RequestThinkingBlock with ToJson::{to_json}
-
-///|
-pub impl ToJson for RequestThinkingBlock with fn to_json(self) {
-  @sdkjson.ObjBuilder::new()
-  .field("signature", self.signature)
-  .field("thinking", self.thinking)
-  .field("type", self.type_)
-  .build()
-}
-
-///|
-///
-/// Decodes this value from JSON.
-pub extend RequestThinkingBlock with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for RequestThinkingBlock with fn from_json(value, path) {
-  let obj = @sdkjson.expect_object(value, path)
-  {
-    signature: required_field(obj, "signature", path),
-    thinking: required_field(obj, "thinking", path),
-    type_: required_field(obj, "type", path),
-  }
-}
-
-///|
-///
-/// Create a cache control breakpoint at this content block.
-#non_exhaustive
-pub(all) enum RequestToolResultBlockCacheControl {
-  Ephemeral(CacheControlEphemeral)
-  Unknown(String, Json)
-} derive(Eq, @debug.Debug)
-
-///|
-pub extend RequestToolResultBlockCacheControl with Eq::{equal, not_equal}
-
-///|
-pub extend RequestToolResultBlockCacheControl with @debug.Debug::{to_repr}
-
-///|
-///
-/// Encodes this tagged union as JSON.
-pub extend RequestToolResultBlockCacheControl with ToJson::{to_json}
-
-///|
-pub impl ToJson for RequestToolResultBlockCacheControl with fn to_json(self) {
-  match self {
-    Ephemeral(value) => Json(value)
-    Unknown(_, value) => value
-  }
-}
-
-///|
-///
-/// Decodes this tagged union from JSON.
-pub extend RequestToolResultBlockCacheControl with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for RequestToolResultBlockCacheControl with fn from_json(
-  value,
-  path,
-) {
-  let obj = @sdkjson.expect_object(value, path)
-  let tag : String = required_field(obj, "type", path)
-  match tag {
-    "ephemeral" => Ephemeral(@json.from_json(value, path~))
-    other => Unknown(other, value)
-  }
-}
-
-///|
-///
-/// Create a cache control breakpoint at this content block.
-#non_exhaustive
-pub(all) enum RequestBrowserStateBlockCacheControl {
-  Ephemeral(CacheControlEphemeral)
-  Unknown(String, Json)
-} derive(Eq, @debug.Debug)
-
-///|
-pub extend RequestBrowserStateBlockCacheControl with Eq::{equal, not_equal}
-
-///|
-pub extend RequestBrowserStateBlockCacheControl with @debug.Debug::{to_repr}
-
-///|
-///
-/// Encodes this tagged union as JSON.
-pub extend RequestBrowserStateBlockCacheControl with ToJson::{to_json}
-
-///|
-pub impl ToJson for RequestBrowserStateBlockCacheControl with fn to_json(self) {
-  match self {
-    Ephemeral(value) => Json(value)
-    Unknown(_, value) => value
-  }
-}
-
-///|
-///
-/// Decodes this tagged union from JSON.
-pub extend RequestBrowserStateBlockCacheControl with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for RequestBrowserStateBlockCacheControl with fn from_json(
-  value,
-  path,
-) {
-  let obj = @sdkjson.expect_object(value, path)
-  let tag : String = required_field(obj, "type", path)
-  match tag {
-    "ephemeral" => Ephemeral(@json.from_json(value, path~))
-    other => Unknown(other, value)
-  }
-}
-
-///|
-///
-/// Generated tagged union RequestBrowserStateBlockStateChangesItem.
-#non_exhaustive
-pub(all) enum RequestBrowserStateBlockStateChangesItem {
-  DownloadCompleted(BrowserStateChangeDownloadCompleted)
-  DownloadFailed(BrowserStateChangeDownloadFailed)
-  DownloadStarted(BrowserStateChangeDownloadStarted)
-  TabOpened(BrowserStateChangeTabOpened)
-  Unknown(String, Json)
-} derive(Eq, @debug.Debug)
-
-///|
-pub extend RequestBrowserStateBlockStateChangesItem with Eq::{equal, not_equal}
-
-///|
-pub extend RequestBrowserStateBlockStateChangesItem with @debug.Debug::{to_repr}
-
-///|
-///
-/// Encodes this tagged union as JSON.
-pub extend RequestBrowserStateBlockStateChangesItem with ToJson::{to_json}
-
-///|
-pub impl ToJson for RequestBrowserStateBlockStateChangesItem with fn to_json(
-  self,
-) {
-  match self {
-    DownloadCompleted(value) => Json(value)
-    DownloadFailed(value) => Json(value)
-    DownloadStarted(value) => Json(value)
-    TabOpened(value) => Json(value)
-    Unknown(_, value) => value
-  }
-}
-
-///|
-///
-/// Decodes this tagged union from JSON.
-pub extend RequestBrowserStateBlockStateChangesItem with @json.FromJson::{
-  from_json,
-}
-
-///|
-pub impl @json.FromJson for RequestBrowserStateBlockStateChangesItem with fn from_json(
-  value,
-  path,
-) {
-  let obj = @sdkjson.expect_object(value, path)
-  let tag : String = required_field(obj, "type", path)
-  match tag {
-    "download_completed" => DownloadCompleted(@json.from_json(value, path~))
-    "download_failed" => DownloadFailed(@json.from_json(value, path~))
-    "download_started" => DownloadStarted(@json.from_json(value, path~))
-    "tab_opened" => TabOpened(@json.from_json(value, path~))
-    other => Unknown(other, value)
-  }
-}
-
-///|
-///
-/// The caller's browser state after a browser toolset member call — the full inventory of open tabs, which tab is active, and any side effects (tabs opened, download state changes) the call produced. At most one per `tool_result`, only on a non-error result answering a browser toolset member `tool_use`. The server renders the model-visible text from it; the model never sees the raw fields.
-pub(all) struct RequestBrowserStateBlock {
-  cache_control : @sdkjson.Presence[RequestBrowserStateBlockCacheControl]
-  state_changes : @sdkjson.Presence[
-    Array[RequestBrowserStateBlockStateChangesItem],
-  ]
-  tabs : Array[BrowserStateTabEntry]
-  type_ : String
-} derive(Eq, @debug.Debug)
-
-///|
-pub extend RequestBrowserStateBlock with Eq::{equal, not_equal}
-
-///|
-pub extend RequestBrowserStateBlock with @debug.Debug::{to_repr}
-
-///|
-///
-/// Creates a RequestBrowserStateBlock with omitted optional fields absent.
-pub fn RequestBrowserStateBlock::new(
-  tabs~ : Array[BrowserStateTabEntry],
-  type_~ : String,
-  cache_control? : RequestBrowserStateBlockCacheControl,
-  state_changes? : Array[RequestBrowserStateBlockStateChangesItem],
-) -> RequestBrowserStateBlock {
-  {
-    cache_control: @sdkjson.Presence::from_option(cache_control),
-    state_changes: @sdkjson.Presence::from_option(state_changes),
-    tabs,
-    type_,
-  }
-}
-
-///|
-///
-/// Encodes this value as JSON.
-pub extend RequestBrowserStateBlock with ToJson::{to_json}
-
-///|
-pub impl ToJson for RequestBrowserStateBlock with fn to_json(self) {
-  @sdkjson.ObjBuilder::new()
-  .presence("cache_control", self.cache_control)
-  .presence("state_changes", self.state_changes)
-  .field("tabs", self.tabs)
-  .field("type", self.type_)
-  .build()
-}
-
-///|
-///
-/// Decodes this value from JSON.
-pub extend RequestBrowserStateBlock with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for RequestBrowserStateBlock with fn from_json(
-  value,
-  path,
-) {
-  let obj = @sdkjson.expect_object(value, path)
-  {
-    cache_control: @sdkjson.presence_field(obj, "cache_control", path),
-    state_changes: @sdkjson.presence_field(obj, "state_changes", path),
-    tabs: required_field(obj, "tabs", path),
-    type_: required_field(obj, "type", path),
-  }
-}
-
-///|
-///
-/// Create a cache control breakpoint at this content block.
-#non_exhaustive
-pub(all) enum RequestToolReferenceBlockCacheControl {
-  Ephemeral(CacheControlEphemeral)
-  Unknown(String, Json)
-} derive(Eq, @debug.Debug)
-
-///|
-pub extend RequestToolReferenceBlockCacheControl with Eq::{equal, not_equal}
-
-///|
-pub extend RequestToolReferenceBlockCacheControl with @debug.Debug::{to_repr}
-
-///|
-///
-/// Encodes this tagged union as JSON.
-pub extend RequestToolReferenceBlockCacheControl with ToJson::{to_json}
-
-///|
-pub impl ToJson for RequestToolReferenceBlockCacheControl with fn to_json(self) {
-  match self {
-    Ephemeral(value) => Json(value)
-    Unknown(_, value) => value
-  }
-}
-
-///|
-///
-/// Decodes this tagged union from JSON.
-pub extend RequestToolReferenceBlockCacheControl with @json.FromJson::{
-  from_json,
-}
-
-///|
-pub impl @json.FromJson for RequestToolReferenceBlockCacheControl with fn from_json(
-  value,
-  path,
-) {
-  let obj = @sdkjson.expect_object(value, path)
-  let tag : String = required_field(obj, "type", path)
-  match tag {
-    "ephemeral" => Ephemeral(@json.from_json(value, path~))
-    other => Unknown(other, value)
-  }
-}
-
-///|
-///
-/// Tool reference block that can be included in tool_result content.
-pub(all) struct RequestToolReferenceBlock {
-  cache_control : @sdkjson.Presence[RequestToolReferenceBlockCacheControl]
-  tool_name : String
-  type_ : String
-} derive(Eq, @debug.Debug)
-
-///|
-pub extend RequestToolReferenceBlock with Eq::{equal, not_equal}
-
-///|
-pub extend RequestToolReferenceBlock with @debug.Debug::{to_repr}
-
-///|
-///
-/// Creates a RequestToolReferenceBlock with omitted optional fields absent.
-pub fn RequestToolReferenceBlock::new(
-  tool_name~ : String,
-  type_~ : String,
-  cache_control? : RequestToolReferenceBlockCacheControl,
-) -> RequestToolReferenceBlock {
-  {
-    cache_control: @sdkjson.Presence::from_option(cache_control),
-    tool_name,
-    type_,
-  }
-}
-
-///|
-///
-/// Encodes this value as JSON.
-pub extend RequestToolReferenceBlock with ToJson::{to_json}
-
-///|
-pub impl ToJson for RequestToolReferenceBlock with fn to_json(self) {
-  @sdkjson.ObjBuilder::new()
-  .presence("cache_control", self.cache_control)
-  .field("tool_name", self.tool_name)
-  .field("type", self.type_)
-  .build()
-}
-
-///|
-///
-/// Decodes this value from JSON.
-pub extend RequestToolReferenceBlock with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for RequestToolReferenceBlock with fn from_json(
-  value,
-  path,
-) {
-  let obj = @sdkjson.expect_object(value, path)
-  {
-    cache_control: @sdkjson.presence_field(obj, "cache_control", path),
-    tool_name: required_field(obj, "tool_name", path),
-    type_: required_field(obj, "type", path),
-  }
-}
-
-///|
-///
-/// Generated tagged union RequestToolResultBlockContentValueArrayItem.
-#non_exhaustive
-pub(all) enum RequestToolResultBlockContentValueArrayItem {
-  BrowserState(RequestBrowserStateBlock)
-  Document(RequestDocumentBlock)
-  Image(RequestImageBlock)
-  SearchResult(RequestSearchResultBlock)
+pub(all) enum SystemInputMessageContentValueArrayItem {
   Text(RequestTextBlock)
-  ToolReference(RequestToolReferenceBlock)
   Unknown(String, Json)
 } derive(Eq, @debug.Debug)
 
 ///|
-pub extend RequestToolResultBlockContentValueArrayItem with Eq::{
-  equal,
-  not_equal,
-}
+pub extend SystemInputMessageContentValueArrayItem with Eq::{equal, not_equal}
 
 ///|
-pub extend RequestToolResultBlockContentValueArrayItem with @debug.Debug::{
-  to_repr,
-}
+pub extend SystemInputMessageContentValueArrayItem with @debug.Debug::{to_repr}
 
 ///|
 ///
 /// Encodes this tagged union as JSON.
-pub extend RequestToolResultBlockContentValueArrayItem with ToJson::{to_json}
+pub extend SystemInputMessageContentValueArrayItem with ToJson::{to_json}
 
 ///|
-pub impl ToJson for RequestToolResultBlockContentValueArrayItem with fn to_json(
+pub impl ToJson for SystemInputMessageContentValueArrayItem with fn to_json(
   self,
 ) {
   match self {
-    BrowserState(value) => Json(value)
-    Document(value) => Json(value)
-    Image(value) => Json(value)
-    SearchResult(value) => Json(value)
     Text(value) => Json(value)
-    ToolReference(value) => Json(value)
     Unknown(_, value) => value
   }
 }
@@ -14373,50 +15946,45 @@ pub impl ToJson for RequestToolResultBlockContentValueArrayItem with fn to_json(
 ///|
 ///
 /// Decodes this tagged union from JSON.
-pub extend RequestToolResultBlockContentValueArrayItem with @json.FromJson::{
+pub extend SystemInputMessageContentValueArrayItem with @json.FromJson::{
   from_json,
 }
 
 ///|
-pub impl @json.FromJson for RequestToolResultBlockContentValueArrayItem with fn from_json(
+pub impl @json.FromJson for SystemInputMessageContentValueArrayItem with fn from_json(
   value,
   path,
 ) {
   let obj = @sdkjson.expect_object(value, path)
   let tag : String = required_field(obj, "type", path)
   match tag {
-    "browser_state" => BrowserState(@json.from_json(value, path~))
-    "document" => Document(@json.from_json(value, path~))
-    "image" => Image(@json.from_json(value, path~))
-    "search_result" => SearchResult(@json.from_json(value, path~))
     "text" => Text(@json.from_json(value, path~))
-    "tool_reference" => ToolReference(@json.from_json(value, path~))
     other => Unknown(other, value)
   }
 }
 
 ///|
 ///
-/// Generated untagged union RequestToolResultBlockContent.
+/// Generated untagged union SystemInputMessageContent.
 #non_exhaustive
-pub(all) enum RequestToolResultBlockContent {
+pub(all) enum SystemInputMessageContent {
   Text(String)
-  ValueArray(Array[RequestToolResultBlockContentValueArrayItem])
+  ValueArray(Array[SystemInputMessageContentValueArrayItem])
 } derive(Eq, @debug.Debug)
 
 ///|
-pub extend RequestToolResultBlockContent with Eq::{equal, not_equal}
+pub extend SystemInputMessageContent with Eq::{equal, not_equal}
 
 ///|
-pub extend RequestToolResultBlockContent with @debug.Debug::{to_repr}
+pub extend SystemInputMessageContent with @debug.Debug::{to_repr}
 
 ///|
 ///
 /// Encodes this union as JSON.
-pub extend RequestToolResultBlockContent with ToJson::{to_json}
+pub extend SystemInputMessageContent with ToJson::{to_json}
 
 ///|
-pub impl ToJson for RequestToolResultBlockContent with fn to_json(self) {
+pub impl ToJson for SystemInputMessageContent with fn to_json(self) {
   match self {
     Text(value) => Json(value)
     ValueArray(value) => Json(value)
@@ -14426,10 +15994,10 @@ pub impl ToJson for RequestToolResultBlockContent with fn to_json(self) {
 ///|
 ///
 /// Decodes this union from JSON.
-pub extend RequestToolResultBlockContent with @json.FromJson::{from_json}
+pub extend SystemInputMessageContent with @json.FromJson::{from_json}
 
 ///|
-pub impl @json.FromJson for RequestToolResultBlockContent with fn from_json(
+pub impl @json.FromJson for SystemInputMessageContent with fn from_json(
   value,
   path,
 ) {
@@ -14438,1516 +16006,48 @@ pub impl @json.FromJson for RequestToolResultBlockContent with fn from_json(
     return Text(decoded)
   }
   if json_array_matches(value, item => item is Object(_)) {
-    let decoded : Array[RequestToolResultBlockContentValueArrayItem] = @json.from_json(
+    let decoded : Array[SystemInputMessageContentValueArrayItem] = @json.from_json(
       value,
       path~,
     )
     return ValueArray(decoded)
   }
   raise @json.JsonDecodeError(
-    (
-      path, "JSON shape does not match any RequestToolResultBlockContent variant",
-    ),
+    (path, "JSON shape does not match any SystemInputMessageContent variant"),
   )
 }
 
 ///|
 ///
-/// Generated representation of RequestToolResultBlock.
-pub(all) struct RequestToolResultBlock {
-  cache_control : @sdkjson.Presence[RequestToolResultBlockCacheControl]
-  content : RequestToolResultBlockContent?
-  is_error : Bool?
-  tool_use_id : String
-  toolset_name : @sdkjson.Presence[String]
-  type_ : String
+/// Generated representation of SystemInputMessage.
+pub(all) struct SystemInputMessage {
+  content : SystemInputMessageContent
+  role : String
 } derive(Eq, @debug.Debug)
 
 ///|
-pub extend RequestToolResultBlock with Eq::{equal, not_equal}
+pub extend SystemInputMessage with Eq::{equal, not_equal}
 
 ///|
-pub extend RequestToolResultBlock with @debug.Debug::{to_repr}
+pub extend SystemInputMessage with @debug.Debug::{to_repr}
 
 ///|
 ///
-/// Creates a RequestToolResultBlock with omitted optional fields absent.
-pub fn RequestToolResultBlock::new(
-  tool_use_id~ : String,
-  type_~ : String,
-  cache_control? : RequestToolResultBlockCacheControl,
-  content? : RequestToolResultBlockContent,
-  is_error? : Bool,
-  toolset_name? : String,
-) -> RequestToolResultBlock {
-  {
-    cache_control: @sdkjson.Presence::from_option(cache_control),
-    content,
-    is_error,
-    tool_use_id,
-    toolset_name: @sdkjson.Presence::from_option(toolset_name),
-    type_,
-  }
-}
-
-///|
-///
-/// Encodes this value as JSON.
-pub extend RequestToolResultBlock with ToJson::{to_json}
-
-///|
-pub impl ToJson for RequestToolResultBlock with fn to_json(self) {
-  @sdkjson.ObjBuilder::new()
-  .presence("cache_control", self.cache_control)
-  .opt("content", self.content)
-  .opt("is_error", self.is_error)
-  .field("tool_use_id", self.tool_use_id)
-  .presence("toolset_name", self.toolset_name)
-  .field("type", self.type_)
-  .build()
-}
-
-///|
-///
-/// Decodes this value from JSON.
-pub extend RequestToolResultBlock with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for RequestToolResultBlock with fn from_json(
-  value,
-  path,
-) {
-  let obj = @sdkjson.expect_object(value, path)
-  {
-    cache_control: @sdkjson.presence_field(obj, "cache_control", path),
-    content: @sdkjson.opt_field(obj, "content", path),
-    is_error: @sdkjson.opt_field(obj, "is_error", path),
-    tool_use_id: required_field(obj, "tool_use_id", path),
-    toolset_name: @sdkjson.presence_field(obj, "toolset_name", path),
-    type_: required_field(obj, "type", path),
-  }
-}
-
-///|
-///
-/// Create a cache control breakpoint at this content block.
-#non_exhaustive
-pub(all) enum RequestToolSearchToolResultBlockCacheControl {
-  Ephemeral(CacheControlEphemeral)
-  Unknown(String, Json)
-} derive(Eq, @debug.Debug)
-
-///|
-pub extend RequestToolSearchToolResultBlockCacheControl with Eq::{
-  equal,
-  not_equal,
-}
-
-///|
-pub extend RequestToolSearchToolResultBlockCacheControl with @debug.Debug::{
-  to_repr,
-}
-
-///|
-///
-/// Encodes this tagged union as JSON.
-pub extend RequestToolSearchToolResultBlockCacheControl with ToJson::{to_json}
-
-///|
-pub impl ToJson for RequestToolSearchToolResultBlockCacheControl with fn to_json(
-  self,
-) {
-  match self {
-    Ephemeral(value) => Json(value)
-    Unknown(_, value) => value
-  }
-}
-
-///|
-///
-/// Decodes this tagged union from JSON.
-pub extend RequestToolSearchToolResultBlockCacheControl with @json.FromJson::{
-  from_json,
-}
-
-///|
-pub impl @json.FromJson for RequestToolSearchToolResultBlockCacheControl with fn from_json(
-  value,
-  path,
-) {
-  let obj = @sdkjson.expect_object(value, path)
-  let tag : String = required_field(obj, "type", path)
-  match tag {
-    "ephemeral" => Ephemeral(@json.from_json(value, path~))
-    other => Unknown(other, value)
-  }
-}
-
-///|
-///
-/// Generated representation of RequestToolSearchToolResultError.
-pub(all) struct RequestToolSearchToolResultError {
-  error_code : ToolSearchToolResultErrorCode
-  error_message : @sdkjson.Presence[String]
-  type_ : String
-} derive(Eq, @debug.Debug)
-
-///|
-pub extend RequestToolSearchToolResultError with Eq::{equal, not_equal}
-
-///|
-pub extend RequestToolSearchToolResultError with @debug.Debug::{to_repr}
-
-///|
-///
-/// Creates a RequestToolSearchToolResultError with omitted optional fields absent.
-pub fn RequestToolSearchToolResultError::new(
-  error_code~ : ToolSearchToolResultErrorCode,
-  type_~ : String,
-  error_message? : String,
-) -> RequestToolSearchToolResultError {
-  {
-    error_code,
-    error_message: @sdkjson.Presence::from_option(error_message),
-    type_,
-  }
-}
-
-///|
-///
-/// Encodes this value as JSON.
-pub extend RequestToolSearchToolResultError with ToJson::{to_json}
-
-///|
-pub impl ToJson for RequestToolSearchToolResultError with fn to_json(self) {
-  @sdkjson.ObjBuilder::new()
-  .field("error_code", self.error_code)
-  .presence("error_message", self.error_message)
-  .field("type", self.type_)
-  .build()
-}
-
-///|
-///
-/// Decodes this value from JSON.
-pub extend RequestToolSearchToolResultError with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for RequestToolSearchToolResultError with fn from_json(
-  value,
-  path,
-) {
-  let obj = @sdkjson.expect_object(value, path)
-  {
-    error_code: required_field(obj, "error_code", path),
-    error_message: @sdkjson.presence_field(obj, "error_message", path),
-    type_: required_field(obj, "type", path),
-  }
-}
-
-///|
-///
-/// Generated representation of RequestToolSearchToolSearchResultBlock.
-pub(all) struct RequestToolSearchToolSearchResultBlock {
-  tool_references : Array[RequestToolReferenceBlock]
-  type_ : String
-} derive(Eq, @debug.Debug)
-
-///|
-pub extend RequestToolSearchToolSearchResultBlock with Eq::{equal, not_equal}
-
-///|
-pub extend RequestToolSearchToolSearchResultBlock with @debug.Debug::{to_repr}
-
-///|
-///
-/// Creates a RequestToolSearchToolSearchResultBlock with omitted optional fields absent.
-pub fn RequestToolSearchToolSearchResultBlock::new(
-  tool_references~ : Array[RequestToolReferenceBlock],
-  type_~ : String,
-) -> RequestToolSearchToolSearchResultBlock {
-  { tool_references, type_, }
-}
-
-///|
-///
-/// Encodes this value as JSON.
-pub extend RequestToolSearchToolSearchResultBlock with ToJson::{to_json}
-
-///|
-pub impl ToJson for RequestToolSearchToolSearchResultBlock with fn to_json(self) {
-  @sdkjson.ObjBuilder::new()
-  .field("tool_references", self.tool_references)
-  .field("type", self.type_)
-  .build()
-}
-
-///|
-///
-/// Decodes this value from JSON.
-pub extend RequestToolSearchToolSearchResultBlock with @json.FromJson::{
-  from_json,
-}
-
-///|
-pub impl @json.FromJson for RequestToolSearchToolSearchResultBlock with fn from_json(
-  value,
-  path,
-) {
-  let obj = @sdkjson.expect_object(value, path)
-  {
-    tool_references: required_field(obj, "tool_references", path),
-    type_: required_field(obj, "type", path),
-  }
-}
-
-///|
-///
-/// Generated tagged union RequestToolSearchToolResultBlockContent.
-#non_exhaustive
-pub(all) enum RequestToolSearchToolResultBlockContent {
-  ToolSearchToolResultError(RequestToolSearchToolResultError)
-  ToolSearchToolSearchResult(RequestToolSearchToolSearchResultBlock)
-  Unknown(String, Json)
-} derive(Eq, @debug.Debug)
-
-///|
-pub extend RequestToolSearchToolResultBlockContent with Eq::{equal, not_equal}
-
-///|
-pub extend RequestToolSearchToolResultBlockContent with @debug.Debug::{to_repr}
-
-///|
-///
-/// Encodes this tagged union as JSON.
-pub extend RequestToolSearchToolResultBlockContent with ToJson::{to_json}
-
-///|
-pub impl ToJson for RequestToolSearchToolResultBlockContent with fn to_json(
-  self,
-) {
-  match self {
-    ToolSearchToolResultError(value) => Json(value)
-    ToolSearchToolSearchResult(value) => Json(value)
-    Unknown(_, value) => value
-  }
-}
-
-///|
-///
-/// Decodes this tagged union from JSON.
-pub extend RequestToolSearchToolResultBlockContent with @json.FromJson::{
-  from_json,
-}
-
-///|
-pub impl @json.FromJson for RequestToolSearchToolResultBlockContent with fn from_json(
-  value,
-  path,
-) {
-  let obj = @sdkjson.expect_object(value, path)
-  let tag : String = required_field(obj, "type", path)
-  match tag {
-    "tool_search_tool_result_error" =>
-      ToolSearchToolResultError(@json.from_json(value, path~))
-    "tool_search_tool_search_result" =>
-      ToolSearchToolSearchResult(@json.from_json(value, path~))
-    other => Unknown(other, value)
-  }
-}
-
-///|
-///
-/// Generated representation of RequestToolSearchToolResultBlock.
-pub(all) struct RequestToolSearchToolResultBlock {
-  cache_control : @sdkjson.Presence[
-    RequestToolSearchToolResultBlockCacheControl,
-  ]
-  content : RequestToolSearchToolResultBlockContent
-  tool_use_id : String
-  type_ : String
-} derive(Eq, @debug.Debug)
-
-///|
-pub extend RequestToolSearchToolResultBlock with Eq::{equal, not_equal}
-
-///|
-pub extend RequestToolSearchToolResultBlock with @debug.Debug::{to_repr}
-
-///|
-///
-/// Creates a RequestToolSearchToolResultBlock with omitted optional fields absent.
-pub fn RequestToolSearchToolResultBlock::new(
-  content~ : RequestToolSearchToolResultBlockContent,
-  tool_use_id~ : String,
-  type_~ : String,
-  cache_control? : RequestToolSearchToolResultBlockCacheControl,
-) -> RequestToolSearchToolResultBlock {
-  {
-    cache_control: @sdkjson.Presence::from_option(cache_control),
-    content,
-    tool_use_id,
-    type_,
-  }
-}
-
-///|
-///
-/// Encodes this value as JSON.
-pub extend RequestToolSearchToolResultBlock with ToJson::{to_json}
-
-///|
-pub impl ToJson for RequestToolSearchToolResultBlock with fn to_json(self) {
-  @sdkjson.ObjBuilder::new()
-  .presence("cache_control", self.cache_control)
-  .field("content", self.content)
-  .field("tool_use_id", self.tool_use_id)
-  .field("type", self.type_)
-  .build()
-}
-
-///|
-///
-/// Decodes this value from JSON.
-pub extend RequestToolSearchToolResultBlock with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for RequestToolSearchToolResultBlock with fn from_json(
-  value,
-  path,
-) {
-  let obj = @sdkjson.expect_object(value, path)
-  {
-    cache_control: @sdkjson.presence_field(obj, "cache_control", path),
-    content: required_field(obj, "content", path),
-    tool_use_id: required_field(obj, "tool_use_id", path),
-    type_: required_field(obj, "type", path),
-  }
-}
-
-///|
-///
-/// Create a cache control breakpoint at this content block.
-#non_exhaustive
-pub(all) enum RequestToolUseBlockCacheControl {
-  Ephemeral(CacheControlEphemeral)
-  Unknown(String, Json)
-} derive(Eq, @debug.Debug)
-
-///|
-pub extend RequestToolUseBlockCacheControl with Eq::{equal, not_equal}
-
-///|
-pub extend RequestToolUseBlockCacheControl with @debug.Debug::{to_repr}
-
-///|
-///
-/// Encodes this tagged union as JSON.
-pub extend RequestToolUseBlockCacheControl with ToJson::{to_json}
-
-///|
-pub impl ToJson for RequestToolUseBlockCacheControl with fn to_json(self) {
-  match self {
-    Ephemeral(value) => Json(value)
-    Unknown(_, value) => value
-  }
-}
-
-///|
-///
-/// Decodes this tagged union from JSON.
-pub extend RequestToolUseBlockCacheControl with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for RequestToolUseBlockCacheControl with fn from_json(
-  value,
-  path,
-) {
-  let obj = @sdkjson.expect_object(value, path)
-  let tag : String = required_field(obj, "type", path)
-  match tag {
-    "ephemeral" => Ephemeral(@json.from_json(value, path~))
-    other => Unknown(other, value)
-  }
-}
-
-///|
-///
-/// Generated tagged union RequestToolUseBlockCaller.
-#non_exhaustive
-pub(all) enum RequestToolUseBlockCaller {
-  CodeExecution20250825(ServerToolCaller)
-  CodeExecution20260120(ServerToolCaller20260120)
-  Direct(DirectCaller)
-  Unknown(String, Json)
-} derive(Eq, @debug.Debug)
-
-///|
-pub extend RequestToolUseBlockCaller with Eq::{equal, not_equal}
-
-///|
-pub extend RequestToolUseBlockCaller with @debug.Debug::{to_repr}
-
-///|
-///
-/// Encodes this tagged union as JSON.
-pub extend RequestToolUseBlockCaller with ToJson::{to_json}
-
-///|
-pub impl ToJson for RequestToolUseBlockCaller with fn to_json(self) {
-  match self {
-    CodeExecution20250825(value) => Json(value)
-    CodeExecution20260120(value) => Json(value)
-    Direct(value) => Json(value)
-    Unknown(_, value) => value
-  }
-}
-
-///|
-///
-/// Decodes this tagged union from JSON.
-pub extend RequestToolUseBlockCaller with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for RequestToolUseBlockCaller with fn from_json(
-  value,
-  path,
-) {
-  let obj = @sdkjson.expect_object(value, path)
-  let tag : String = required_field(obj, "type", path)
-  match tag {
-    "code_execution_20250825" =>
-      CodeExecution20250825(@json.from_json(value, path~))
-    "code_execution_20260120" =>
-      CodeExecution20260120(@json.from_json(value, path~))
-    "direct" => Direct(@json.from_json(value, path~))
-    other => Unknown(other, value)
-  }
-}
-
-///|
-///
-/// Generated representation of RequestToolUseBlock.
-pub(all) struct RequestToolUseBlock {
-  cache_control : @sdkjson.Presence[RequestToolUseBlockCacheControl]
-  caller : RequestToolUseBlockCaller?
-  id : String
-  input : Json
-  name : String
-  toolset_name : @sdkjson.Presence[String]
-  type_ : String
-} derive(Eq, @debug.Debug)
-
-///|
-pub extend RequestToolUseBlock with Eq::{equal, not_equal}
-
-///|
-pub extend RequestToolUseBlock with @debug.Debug::{to_repr}
-
-///|
-///
-/// Creates a RequestToolUseBlock with omitted optional fields absent.
-pub fn RequestToolUseBlock::new(
-  id~ : String,
-  input~ : Json,
-  name~ : String,
-  type_~ : String,
-  cache_control? : RequestToolUseBlockCacheControl,
-  caller? : RequestToolUseBlockCaller,
-  toolset_name? : String,
-) -> RequestToolUseBlock {
-  {
-    cache_control: @sdkjson.Presence::from_option(cache_control),
-    caller,
-    id,
-    input,
-    name,
-    toolset_name: @sdkjson.Presence::from_option(toolset_name),
-    type_,
-  }
-}
-
-///|
-///
-/// Encodes this value as JSON.
-pub extend RequestToolUseBlock with ToJson::{to_json}
-
-///|
-pub impl ToJson for RequestToolUseBlock with fn to_json(self) {
-  @sdkjson.ObjBuilder::new()
-  .presence("cache_control", self.cache_control)
-  .opt("caller", self.caller)
-  .field("id", self.id)
-  .field("input", self.input)
-  .field("name", self.name)
-  .presence("toolset_name", self.toolset_name)
-  .field("type", self.type_)
-  .build()
-}
-
-///|
-///
-/// Decodes this value from JSON.
-pub extend RequestToolUseBlock with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for RequestToolUseBlock with fn from_json(value, path) {
-  let obj = @sdkjson.expect_object(value, path)
-  {
-    cache_control: @sdkjson.presence_field(obj, "cache_control", path),
-    caller: @sdkjson.opt_field(obj, "caller", path),
-    id: required_field(obj, "id", path),
-    input: required_field(obj, "input", path),
-    name: required_field(obj, "name", path),
-    toolset_name: @sdkjson.presence_field(obj, "toolset_name", path),
-    type_: required_field(obj, "type", path),
-  }
-}
-
-///|
-///
-/// Create a cache control breakpoint at this content block.
-#non_exhaustive
-pub(all) enum RequestWebFetchToolResultBlockCacheControl {
-  Ephemeral(CacheControlEphemeral)
-  Unknown(String, Json)
-} derive(Eq, @debug.Debug)
-
-///|
-pub extend RequestWebFetchToolResultBlockCacheControl with Eq::{
-  equal,
-  not_equal,
-}
-
-///|
-pub extend RequestWebFetchToolResultBlockCacheControl with @debug.Debug::{
-  to_repr,
-}
-
-///|
-///
-/// Encodes this tagged union as JSON.
-pub extend RequestWebFetchToolResultBlockCacheControl with ToJson::{to_json}
-
-///|
-pub impl ToJson for RequestWebFetchToolResultBlockCacheControl with fn to_json(
-  self,
-) {
-  match self {
-    Ephemeral(value) => Json(value)
-    Unknown(_, value) => value
-  }
-}
-
-///|
-///
-/// Decodes this tagged union from JSON.
-pub extend RequestWebFetchToolResultBlockCacheControl with @json.FromJson::{
-  from_json,
-}
-
-///|
-pub impl @json.FromJson for RequestWebFetchToolResultBlockCacheControl with fn from_json(
-  value,
-  path,
-) {
-  let obj = @sdkjson.expect_object(value, path)
-  let tag : String = required_field(obj, "type", path)
-  match tag {
-    "ephemeral" => Ephemeral(@json.from_json(value, path~))
-    other => Unknown(other, value)
-  }
-}
-
-///|
-///
-/// Generated tagged union RequestWebFetchToolResultBlockCaller.
-#non_exhaustive
-pub(all) enum RequestWebFetchToolResultBlockCaller {
-  CodeExecution20250825(ServerToolCaller)
-  CodeExecution20260120(ServerToolCaller20260120)
-  Direct(DirectCaller)
-  Unknown(String, Json)
-} derive(Eq, @debug.Debug)
-
-///|
-pub extend RequestWebFetchToolResultBlockCaller with Eq::{equal, not_equal}
-
-///|
-pub extend RequestWebFetchToolResultBlockCaller with @debug.Debug::{to_repr}
-
-///|
-///
-/// Encodes this tagged union as JSON.
-pub extend RequestWebFetchToolResultBlockCaller with ToJson::{to_json}
-
-///|
-pub impl ToJson for RequestWebFetchToolResultBlockCaller with fn to_json(self) {
-  match self {
-    CodeExecution20250825(value) => Json(value)
-    CodeExecution20260120(value) => Json(value)
-    Direct(value) => Json(value)
-    Unknown(_, value) => value
-  }
-}
-
-///|
-///
-/// Decodes this tagged union from JSON.
-pub extend RequestWebFetchToolResultBlockCaller with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for RequestWebFetchToolResultBlockCaller with fn from_json(
-  value,
-  path,
-) {
-  let obj = @sdkjson.expect_object(value, path)
-  let tag : String = required_field(obj, "type", path)
-  match tag {
-    "code_execution_20250825" =>
-      CodeExecution20250825(@json.from_json(value, path~))
-    "code_execution_20260120" =>
-      CodeExecution20260120(@json.from_json(value, path~))
-    "direct" => Direct(@json.from_json(value, path~))
-    other => Unknown(other, value)
-  }
-}
-
-///|
-///
-/// Generated representation of RequestWebFetchToolResultError.
-pub(all) struct RequestWebFetchToolResultError {
-  error_code : WebFetchToolResultErrorCode
-  type_ : String
-} derive(Eq, @debug.Debug)
-
-///|
-pub extend RequestWebFetchToolResultError with Eq::{equal, not_equal}
-
-///|
-pub extend RequestWebFetchToolResultError with @debug.Debug::{to_repr}
-
-///|
-///
-/// Creates a RequestWebFetchToolResultError with omitted optional fields absent.
-pub fn RequestWebFetchToolResultError::new(
-  error_code~ : WebFetchToolResultErrorCode,
-  type_~ : String,
-) -> RequestWebFetchToolResultError {
-  { error_code, type_, }
-}
-
-///|
-///
-/// Encodes this value as JSON.
-pub extend RequestWebFetchToolResultError with ToJson::{to_json}
-
-///|
-pub impl ToJson for RequestWebFetchToolResultError with fn to_json(self) {
-  @sdkjson.ObjBuilder::new()
-  .field("error_code", self.error_code)
-  .field("type", self.type_)
-  .build()
-}
-
-///|
-///
-/// Decodes this value from JSON.
-pub extend RequestWebFetchToolResultError with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for RequestWebFetchToolResultError with fn from_json(
-  value,
-  path,
-) {
-  let obj = @sdkjson.expect_object(value, path)
-  {
-    error_code: required_field(obj, "error_code", path),
-    type_: required_field(obj, "type", path),
-  }
-}
-
-///|
-///
-/// Generated representation of RequestWebFetchResultBlock.
-pub(all) struct RequestWebFetchResultBlock {
-  content : RequestDocumentBlock
-  retrieved_at : @sdkjson.Presence[String]
-  type_ : String
-  url : String
-} derive(Eq, @debug.Debug)
-
-///|
-pub extend RequestWebFetchResultBlock with Eq::{equal, not_equal}
-
-///|
-pub extend RequestWebFetchResultBlock with @debug.Debug::{to_repr}
-
-///|
-///
-/// Creates a RequestWebFetchResultBlock with omitted optional fields absent.
-pub fn RequestWebFetchResultBlock::new(
-  content~ : RequestDocumentBlock,
-  type_~ : String,
-  url~ : String,
-  retrieved_at? : String,
-) -> RequestWebFetchResultBlock {
-  {
-    content,
-    retrieved_at: @sdkjson.Presence::from_option(retrieved_at),
-    type_,
-    url,
-  }
-}
-
-///|
-///
-/// Encodes this value as JSON.
-pub extend RequestWebFetchResultBlock with ToJson::{to_json}
-
-///|
-pub impl ToJson for RequestWebFetchResultBlock with fn to_json(self) {
-  @sdkjson.ObjBuilder::new()
-  .field("content", self.content)
-  .presence("retrieved_at", self.retrieved_at)
-  .field("type", self.type_)
-  .field("url", self.url)
-  .build()
-}
-
-///|
-///
-/// Decodes this value from JSON.
-pub extend RequestWebFetchResultBlock with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for RequestWebFetchResultBlock with fn from_json(
-  value,
-  path,
-) {
-  let obj = @sdkjson.expect_object(value, path)
-  {
-    content: required_field(obj, "content", path),
-    retrieved_at: @sdkjson.presence_field(obj, "retrieved_at", path),
-    type_: required_field(obj, "type", path),
-    url: required_field(obj, "url", path),
-  }
-}
-
-///|
-///
-/// Generated tagged union RequestWebFetchToolResultBlockContent.
-#non_exhaustive
-pub(all) enum RequestWebFetchToolResultBlockContent {
-  WebFetchToolResultError(RequestWebFetchToolResultError)
-  WebFetchResult(RequestWebFetchResultBlock)
-  Unknown(String, Json)
-} derive(Eq, @debug.Debug)
-
-///|
-pub extend RequestWebFetchToolResultBlockContent with Eq::{equal, not_equal}
-
-///|
-pub extend RequestWebFetchToolResultBlockContent with @debug.Debug::{to_repr}
-
-///|
-///
-/// Encodes this tagged union as JSON.
-pub extend RequestWebFetchToolResultBlockContent with ToJson::{to_json}
-
-///|
-pub impl ToJson for RequestWebFetchToolResultBlockContent with fn to_json(self) {
-  match self {
-    WebFetchToolResultError(value) => Json(value)
-    WebFetchResult(value) => Json(value)
-    Unknown(_, value) => value
-  }
-}
-
-///|
-///
-/// Decodes this tagged union from JSON.
-pub extend RequestWebFetchToolResultBlockContent with @json.FromJson::{
-  from_json,
-}
-
-///|
-pub impl @json.FromJson for RequestWebFetchToolResultBlockContent with fn from_json(
-  value,
-  path,
-) {
-  let obj = @sdkjson.expect_object(value, path)
-  let tag : String = required_field(obj, "type", path)
-  match tag {
-    "web_fetch_tool_result_error" =>
-      WebFetchToolResultError(@json.from_json(value, path~))
-    "web_fetch_result" => WebFetchResult(@json.from_json(value, path~))
-    other => Unknown(other, value)
-  }
-}
-
-///|
-///
-/// Generated representation of RequestWebFetchToolResultBlock.
-pub(all) struct RequestWebFetchToolResultBlock {
-  cache_control : @sdkjson.Presence[RequestWebFetchToolResultBlockCacheControl]
-  caller : RequestWebFetchToolResultBlockCaller?
-  content : RequestWebFetchToolResultBlockContent
-  tool_use_id : String
-  type_ : String
-} derive(Eq, @debug.Debug)
-
-///|
-pub extend RequestWebFetchToolResultBlock with Eq::{equal, not_equal}
-
-///|
-pub extend RequestWebFetchToolResultBlock with @debug.Debug::{to_repr}
-
-///|
-///
-/// Creates a RequestWebFetchToolResultBlock with omitted optional fields absent.
-pub fn RequestWebFetchToolResultBlock::new(
-  content~ : RequestWebFetchToolResultBlockContent,
-  tool_use_id~ : String,
-  type_~ : String,
-  cache_control? : RequestWebFetchToolResultBlockCacheControl,
-  caller? : RequestWebFetchToolResultBlockCaller,
-) -> RequestWebFetchToolResultBlock {
-  {
-    cache_control: @sdkjson.Presence::from_option(cache_control),
-    caller,
-    content,
-    tool_use_id,
-    type_,
-  }
-}
-
-///|
-///
-/// Encodes this value as JSON.
-pub extend RequestWebFetchToolResultBlock with ToJson::{to_json}
-
-///|
-pub impl ToJson for RequestWebFetchToolResultBlock with fn to_json(self) {
-  @sdkjson.ObjBuilder::new()
-  .presence("cache_control", self.cache_control)
-  .opt("caller", self.caller)
-  .field("content", self.content)
-  .field("tool_use_id", self.tool_use_id)
-  .field("type", self.type_)
-  .build()
-}
-
-///|
-///
-/// Decodes this value from JSON.
-pub extend RequestWebFetchToolResultBlock with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for RequestWebFetchToolResultBlock with fn from_json(
-  value,
-  path,
-) {
-  let obj = @sdkjson.expect_object(value, path)
-  {
-    cache_control: @sdkjson.presence_field(obj, "cache_control", path),
-    caller: @sdkjson.opt_field(obj, "caller", path),
-    content: required_field(obj, "content", path),
-    tool_use_id: required_field(obj, "tool_use_id", path),
-    type_: required_field(obj, "type", path),
-  }
-}
-
-///|
-///
-/// Create a cache control breakpoint at this content block.
-#non_exhaustive
-pub(all) enum RequestWebSearchToolResultBlockCacheControl {
-  Ephemeral(CacheControlEphemeral)
-  Unknown(String, Json)
-} derive(Eq, @debug.Debug)
-
-///|
-pub extend RequestWebSearchToolResultBlockCacheControl with Eq::{
-  equal,
-  not_equal,
-}
-
-///|
-pub extend RequestWebSearchToolResultBlockCacheControl with @debug.Debug::{
-  to_repr,
-}
-
-///|
-///
-/// Encodes this tagged union as JSON.
-pub extend RequestWebSearchToolResultBlockCacheControl with ToJson::{to_json}
-
-///|
-pub impl ToJson for RequestWebSearchToolResultBlockCacheControl with fn to_json(
-  self,
-) {
-  match self {
-    Ephemeral(value) => Json(value)
-    Unknown(_, value) => value
-  }
-}
-
-///|
-///
-/// Decodes this tagged union from JSON.
-pub extend RequestWebSearchToolResultBlockCacheControl with @json.FromJson::{
-  from_json,
-}
-
-///|
-pub impl @json.FromJson for RequestWebSearchToolResultBlockCacheControl with fn from_json(
-  value,
-  path,
-) {
-  let obj = @sdkjson.expect_object(value, path)
-  let tag : String = required_field(obj, "type", path)
-  match tag {
-    "ephemeral" => Ephemeral(@json.from_json(value, path~))
-    other => Unknown(other, value)
-  }
-}
-
-///|
-///
-/// Generated tagged union RequestWebSearchToolResultBlockCaller.
-#non_exhaustive
-pub(all) enum RequestWebSearchToolResultBlockCaller {
-  CodeExecution20250825(ServerToolCaller)
-  CodeExecution20260120(ServerToolCaller20260120)
-  Direct(DirectCaller)
-  Unknown(String, Json)
-} derive(Eq, @debug.Debug)
-
-///|
-pub extend RequestWebSearchToolResultBlockCaller with Eq::{equal, not_equal}
-
-///|
-pub extend RequestWebSearchToolResultBlockCaller with @debug.Debug::{to_repr}
-
-///|
-///
-/// Encodes this tagged union as JSON.
-pub extend RequestWebSearchToolResultBlockCaller with ToJson::{to_json}
-
-///|
-pub impl ToJson for RequestWebSearchToolResultBlockCaller with fn to_json(self) {
-  match self {
-    CodeExecution20250825(value) => Json(value)
-    CodeExecution20260120(value) => Json(value)
-    Direct(value) => Json(value)
-    Unknown(_, value) => value
-  }
-}
-
-///|
-///
-/// Decodes this tagged union from JSON.
-pub extend RequestWebSearchToolResultBlockCaller with @json.FromJson::{
-  from_json,
-}
-
-///|
-pub impl @json.FromJson for RequestWebSearchToolResultBlockCaller with fn from_json(
-  value,
-  path,
-) {
-  let obj = @sdkjson.expect_object(value, path)
-  let tag : String = required_field(obj, "type", path)
-  match tag {
-    "code_execution_20250825" =>
-      CodeExecution20250825(@json.from_json(value, path~))
-    "code_execution_20260120" =>
-      CodeExecution20260120(@json.from_json(value, path~))
-    "direct" => Direct(@json.from_json(value, path~))
-    other => Unknown(other, value)
-  }
-}
-
-///|
-///
-/// Generated representation of RequestWebSearchResultBlock.
-pub(all) struct RequestWebSearchResultBlock {
-  encrypted_content : String
-  page_age : @sdkjson.Presence[String]
-  title : String
-  url : String
-} derive(Eq, @debug.Debug)
-
-///|
-pub extend RequestWebSearchResultBlock with Eq::{equal, not_equal}
-
-///|
-pub extend RequestWebSearchResultBlock with @debug.Debug::{to_repr}
-
-///|
-///
-/// Creates a RequestWebSearchResultBlock with omitted optional fields absent.
-pub fn RequestWebSearchResultBlock::new(
-  encrypted_content~ : String,
-  title~ : String,
-  url~ : String,
-  page_age? : String,
-) -> RequestWebSearchResultBlock {
-  {
-    encrypted_content,
-    page_age: @sdkjson.Presence::from_option(page_age),
-    title,
-    url,
-  }
-}
-
-///|
-///
-/// Encodes this value as JSON.
-pub extend RequestWebSearchResultBlock with ToJson::{to_json}
-
-///|
-pub impl ToJson for RequestWebSearchResultBlock with fn to_json(self) {
-  @sdkjson.ObjBuilder::new()
-  .field("encrypted_content", self.encrypted_content)
-  .presence("page_age", self.page_age)
-  .field("title", self.title)
-  .field("type", "web_search_result")
-  .field("url", self.url)
-  .build()
-}
-
-///|
-///
-/// Decodes this value from JSON.
-pub extend RequestWebSearchResultBlock with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for RequestWebSearchResultBlock with fn from_json(
-  value,
-  path,
-) {
-  let obj = @sdkjson.expect_object(value, path)
-  {
-    encrypted_content: required_field(obj, "encrypted_content", path),
-    page_age: @sdkjson.presence_field(obj, "page_age", path),
-    title: required_field(obj, "title", path),
-    url: required_field(obj, "url", path),
-  }
-}
-
-///|
-///
-/// Generated representation of RequestWebSearchToolResultError.
-pub(all) struct RequestWebSearchToolResultError {
-  error_code : WebSearchToolResultErrorCode
-} derive(Eq, @debug.Debug)
-
-///|
-pub extend RequestWebSearchToolResultError with Eq::{equal, not_equal}
-
-///|
-pub extend RequestWebSearchToolResultError with @debug.Debug::{to_repr}
-
-///|
-///
-/// Creates a RequestWebSearchToolResultError with omitted optional fields absent.
-pub fn RequestWebSearchToolResultError::new(
-  error_code~ : WebSearchToolResultErrorCode,
-) -> RequestWebSearchToolResultError {
-  { error_code, }
-}
-
-///|
-///
-/// Encodes this value as JSON.
-pub extend RequestWebSearchToolResultError with ToJson::{to_json}
-
-///|
-pub impl ToJson for RequestWebSearchToolResultError with fn to_json(self) {
-  @sdkjson.ObjBuilder::new()
-  .field("error_code", self.error_code)
-  .field("type", "web_search_tool_result_error")
-  .build()
-}
-
-///|
-///
-/// Decodes this value from JSON.
-pub extend RequestWebSearchToolResultError with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for RequestWebSearchToolResultError with fn from_json(
-  value,
-  path,
-) {
-  let obj = @sdkjson.expect_object(value, path)
-  { error_code: required_field(obj, "error_code", path), }
-}
-
-///|
-///
-/// Generated untagged union RequestWebSearchToolResultBlockContent.
-#non_exhaustive
-pub(all) enum RequestWebSearchToolResultBlockContent {
-  RequestWebSearchResultBlockArray(Array[RequestWebSearchResultBlock])
-  RequestWebSearchToolResultError(RequestWebSearchToolResultError)
-} derive(Eq, @debug.Debug)
-
-///|
-pub extend RequestWebSearchToolResultBlockContent with Eq::{equal, not_equal}
-
-///|
-pub extend RequestWebSearchToolResultBlockContent with @debug.Debug::{to_repr}
-
-///|
-///
-/// Encodes this union as JSON.
-pub extend RequestWebSearchToolResultBlockContent with ToJson::{to_json}
-
-///|
-pub impl ToJson for RequestWebSearchToolResultBlockContent with fn to_json(self) {
-  match self {
-    RequestWebSearchResultBlockArray(value) => Json(value)
-    RequestWebSearchToolResultError(value) => Json(value)
-  }
-}
-
-///|
-///
-/// Decodes this union from JSON.
-pub extend RequestWebSearchToolResultBlockContent with @json.FromJson::{
-  from_json,
-}
-
-///|
-pub impl @json.FromJson for RequestWebSearchToolResultBlockContent with fn from_json(
-  value,
-  path,
-) {
-  if json_array_matches(value, item => item is Object(_)) {
-    let decoded : Array[RequestWebSearchResultBlock] = @json.from_json(
-      value,
-      path~,
-    )
-    return RequestWebSearchResultBlockArray(decoded)
-  }
-  if value is Object(_) {
-    let decoded : RequestWebSearchToolResultError = @json.from_json(
-      value,
-      path~,
-    )
-    return RequestWebSearchToolResultError(decoded)
-  }
-  raise @json.JsonDecodeError(
-    (
-      path, "JSON shape does not match any RequestWebSearchToolResultBlockContent variant",
-    ),
-  )
-}
-
-///|
-///
-/// Generated representation of RequestWebSearchToolResultBlock.
-pub(all) struct RequestWebSearchToolResultBlock {
-  cache_control : @sdkjson.Presence[RequestWebSearchToolResultBlockCacheControl]
-  caller : RequestWebSearchToolResultBlockCaller?
-  content : RequestWebSearchToolResultBlockContent
-  tool_use_id : String
-  type_ : String
-} derive(Eq, @debug.Debug)
-
-///|
-pub extend RequestWebSearchToolResultBlock with Eq::{equal, not_equal}
-
-///|
-pub extend RequestWebSearchToolResultBlock with @debug.Debug::{to_repr}
-
-///|
-///
-/// Creates a RequestWebSearchToolResultBlock with omitted optional fields absent.
-pub fn RequestWebSearchToolResultBlock::new(
-  content~ : RequestWebSearchToolResultBlockContent,
-  tool_use_id~ : String,
-  type_~ : String,
-  cache_control? : RequestWebSearchToolResultBlockCacheControl,
-  caller? : RequestWebSearchToolResultBlockCaller,
-) -> RequestWebSearchToolResultBlock {
-  {
-    cache_control: @sdkjson.Presence::from_option(cache_control),
-    caller,
-    content,
-    tool_use_id,
-    type_,
-  }
-}
-
-///|
-///
-/// Encodes this value as JSON.
-pub extend RequestWebSearchToolResultBlock with ToJson::{to_json}
-
-///|
-pub impl ToJson for RequestWebSearchToolResultBlock with fn to_json(self) {
-  @sdkjson.ObjBuilder::new()
-  .presence("cache_control", self.cache_control)
-  .opt("caller", self.caller)
-  .field("content", self.content)
-  .field("tool_use_id", self.tool_use_id)
-  .field("type", self.type_)
-  .build()
-}
-
-///|
-///
-/// Decodes this value from JSON.
-pub extend RequestWebSearchToolResultBlock with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for RequestWebSearchToolResultBlock with fn from_json(
-  value,
-  path,
-) {
-  let obj = @sdkjson.expect_object(value, path)
-  {
-    cache_control: @sdkjson.presence_field(obj, "cache_control", path),
-    caller: @sdkjson.opt_field(obj, "caller", path),
-    content: required_field(obj, "content", path),
-    tool_use_id: required_field(obj, "tool_use_id", path),
-    type_: required_field(obj, "type", path),
-  }
-}
-
-///|
-///
-/// Generated tagged union InputContentBlock.
-#non_exhaustive
-pub(all) enum InputContentBlock {
-  BashCodeExecutionToolResult(RequestBashCodeExecutionToolResultBlock)
-  CodeExecutionToolResult(RequestCodeExecutionToolResultBlock)
-  ContainerUpload(RequestContainerUploadBlock)
-  Document(RequestDocumentBlock)
-  Image(RequestImageBlock)
-  RedactedThinking(RequestRedactedThinkingBlock)
-  SearchResult(RequestSearchResultBlock)
-  ServerToolUse(RequestServerToolUseBlock)
-  Text(RequestTextBlock)
-  TextEditorCodeExecutionToolResult(
-    RequestTextEditorCodeExecutionToolResultBlock
-  )
-  Thinking(RequestThinkingBlock)
-  ToolResult(RequestToolResultBlock)
-  ToolSearchToolResult(RequestToolSearchToolResultBlock)
-  ToolUse(RequestToolUseBlock)
-  WebFetchToolResult(RequestWebFetchToolResultBlock)
-  WebSearchToolResult(RequestWebSearchToolResultBlock)
-  Unknown(String, Json)
-} derive(Eq, @debug.Debug)
-
-///|
-pub extend InputContentBlock with Eq::{equal, not_equal}
-
-///|
-pub extend InputContentBlock with @debug.Debug::{to_repr}
-
-///|
-///
-/// Encodes this tagged union as JSON.
-pub extend InputContentBlock with ToJson::{to_json}
-
-///|
-pub impl ToJson for InputContentBlock with fn to_json(self) {
-  match self {
-    BashCodeExecutionToolResult(value) => Json(value)
-    CodeExecutionToolResult(value) => Json(value)
-    ContainerUpload(value) => Json(value)
-    Document(value) => Json(value)
-    Image(value) => Json(value)
-    RedactedThinking(value) => Json(value)
-    SearchResult(value) => Json(value)
-    ServerToolUse(value) => Json(value)
-    Text(value) => Json(value)
-    TextEditorCodeExecutionToolResult(value) => Json(value)
-    Thinking(value) => Json(value)
-    ToolResult(value) => Json(value)
-    ToolSearchToolResult(value) => Json(value)
-    ToolUse(value) => Json(value)
-    WebFetchToolResult(value) => Json(value)
-    WebSearchToolResult(value) => Json(value)
-    Unknown(_, value) => value
-  }
-}
-
-///|
-///
-/// Decodes this tagged union from JSON.
-pub extend InputContentBlock with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for InputContentBlock with fn from_json(value, path) {
-  let obj = @sdkjson.expect_object(value, path)
-  let tag : String = required_field(obj, "type", path)
-  match tag {
-    "bash_code_execution_tool_result" =>
-      BashCodeExecutionToolResult(@json.from_json(value, path~))
-    "code_execution_tool_result" =>
-      CodeExecutionToolResult(@json.from_json(value, path~))
-    "container_upload" => ContainerUpload(@json.from_json(value, path~))
-    "document" => Document(@json.from_json(value, path~))
-    "image" => Image(@json.from_json(value, path~))
-    "redacted_thinking" => RedactedThinking(@json.from_json(value, path~))
-    "search_result" => SearchResult(@json.from_json(value, path~))
-    "server_tool_use" => ServerToolUse(@json.from_json(value, path~))
-    "text" => Text(@json.from_json(value, path~))
-    "text_editor_code_execution_tool_result" =>
-      TextEditorCodeExecutionToolResult(@json.from_json(value, path~))
-    "thinking" => Thinking(@json.from_json(value, path~))
-    "tool_result" => ToolResult(@json.from_json(value, path~))
-    "tool_search_tool_result" =>
-      ToolSearchToolResult(@json.from_json(value, path~))
-    "tool_use" => ToolUse(@json.from_json(value, path~))
-    "web_fetch_tool_result" => WebFetchToolResult(@json.from_json(value, path~))
-    "web_search_tool_result" =>
-      WebSearchToolResult(@json.from_json(value, path~))
-    other => Unknown(other, value)
-  }
-}
-
-///|
-///
-/// Generated untagged union InputMessageContent.
-#non_exhaustive
-pub(all) enum InputMessageContent {
-  Text(String)
-  InputContentBlockArray(Array[InputContentBlock])
-} derive(Eq, @debug.Debug)
-
-///|
-pub extend InputMessageContent with Eq::{equal, not_equal}
-
-///|
-pub extend InputMessageContent with @debug.Debug::{to_repr}
-
-///|
-///
-/// Encodes this union as JSON.
-pub extend InputMessageContent with ToJson::{to_json}
-
-///|
-pub impl ToJson for InputMessageContent with fn to_json(self) {
-  match self {
-    Text(value) => Json(value)
-    InputContentBlockArray(value) => Json(value)
-  }
-}
-
-///|
-///
-/// Decodes this union from JSON.
-pub extend InputMessageContent with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for InputMessageContent with fn from_json(value, path) {
-  if value is String(_) {
-    let decoded : String = @json.from_json(value, path~)
-    return Text(decoded)
-  }
-  if json_array_matches(value, item => item is Object(_)) {
-    let decoded : Array[InputContentBlock] = @json.from_json(value, path~)
-    return InputContentBlockArray(decoded)
-  }
-  raise @json.JsonDecodeError(
-    (path, "JSON shape does not match any InputMessageContent variant"),
-  )
-}
-
-///|
-///
-/// Generated string enum InputMessageRole.
-#non_exhaustive
-pub(all) enum InputMessageRole {
-  User
-  Assistant
-  System
-  Custom(String)
-} derive(Eq, @debug.Debug)
-
-///|
-pub extend InputMessageRole with Eq::{equal, not_equal}
-
-///|
-pub extend InputMessageRole with @debug.Debug::{to_repr}
-
-///|
-///
-/// Encodes this string enum as JSON.
-pub extend InputMessageRole with ToJson::{to_json}
-
-///|
-pub impl ToJson for InputMessageRole with fn to_json(self) {
-  let raw = match self {
-    User => "user"
-    Assistant => "assistant"
-    System => "system"
-    Custom(raw) => raw
-  }
-  Json(raw)
-}
-
-///|
-///
-/// Decodes this string enum from JSON.
-pub extend InputMessageRole with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for InputMessageRole with fn from_json(value, path) {
-  @sdkjson.open_string(
-    value,
-    path,
-    raw => {
-      match raw {
-        "user" => Some(User)
-        "assistant" => Some(Assistant)
-        "system" => Some(System)
-        _ => None
-      }
-    },
-    raw => Custom(raw),
-  )
-}
-
-///|
-///
-/// Generated representation of InputMessage.
-pub(all) struct InputMessage {
-  content : InputMessageContent
-  role : InputMessageRole
-} derive(Eq, @debug.Debug)
-
-///|
-pub extend InputMessage with Eq::{equal, not_equal}
-
-///|
-pub extend InputMessage with @debug.Debug::{to_repr}
-
-///|
-///
-/// Creates a InputMessage with omitted optional fields absent.
-pub fn InputMessage::new(
-  content~ : InputMessageContent,
-  role~ : InputMessageRole,
-) -> InputMessage {
+/// Creates a SystemInputMessage with omitted optional fields absent.
+pub fn SystemInputMessage::new(
+  content~ : SystemInputMessageContent,
+  role~ : String,
+) -> SystemInputMessage {
   { content, role, }
 }
 
 ///|
 ///
 /// Encodes this value as JSON.
-pub extend InputMessage with ToJson::{to_json}
+pub extend SystemInputMessage with ToJson::{to_json}
 
 ///|
-pub impl ToJson for InputMessage with fn to_json(self) {
+pub impl ToJson for SystemInputMessage with fn to_json(self) {
   @sdkjson.ObjBuilder::new()
   .field("content", self.content)
   .field("role", self.role)
@@ -15957,14 +16057,114 @@ pub impl ToJson for InputMessage with fn to_json(self) {
 ///|
 ///
 /// Decodes this value from JSON.
-pub extend InputMessage with @json.FromJson::{from_json}
+pub extend SystemInputMessage with @json.FromJson::{from_json}
 
 ///|
-pub impl @json.FromJson for InputMessage with fn from_json(value, path) {
+pub impl @json.FromJson for SystemInputMessage with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
   {
     content: required_field(obj, "content", path),
     role: required_field(obj, "role", path),
+  }
+}
+
+///|
+///
+/// Generated representation of UserInputMessage.
+pub(all) struct UserInputMessage {
+  content : InputMessageContent
+  role : String
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend UserInputMessage with Eq::{equal, not_equal}
+
+///|
+pub extend UserInputMessage with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a UserInputMessage with omitted optional fields absent.
+pub fn UserInputMessage::new(
+  content~ : InputMessageContent,
+  role~ : String,
+) -> UserInputMessage {
+  { content, role, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend UserInputMessage with ToJson::{to_json}
+
+///|
+pub impl ToJson for UserInputMessage with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("content", self.content)
+  .field("role", self.role)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend UserInputMessage with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for UserInputMessage with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    content: required_field(obj, "content", path),
+    role: required_field(obj, "role", path),
+  }
+}
+
+///|
+///
+/// Generated tagged union InputMessageUnion.
+#non_exhaustive
+pub(all) enum InputMessageUnion {
+  Assistant(AssistantInputMessage)
+  System(SystemInputMessage)
+  User(UserInputMessage)
+  Unknown(String, Json)
+} derive(Eq, @debug.Debug)
+
+///|
+pub extend InputMessageUnion with Eq::{equal, not_equal}
+
+///|
+pub extend InputMessageUnion with @debug.Debug::{to_repr}
+
+///|
+///
+/// Encodes this tagged union as JSON.
+pub extend InputMessageUnion with ToJson::{to_json}
+
+///|
+pub impl ToJson for InputMessageUnion with fn to_json(self) {
+  match self {
+    Assistant(value) => Json(value)
+    System(value) => Json(value)
+    User(value) => Json(value)
+    Unknown(_, value) => value
+  }
+}
+
+///|
+///
+/// Decodes this tagged union from JSON.
+pub extend InputMessageUnion with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for InputMessageUnion with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  let tag : String = required_field(obj, "role", path)
+  match tag {
+    "assistant" => Assistant(@json.from_json(value, path~))
+    "system" => System(@json.from_json(value, path~))
+    "user" => User(@json.from_json(value, path~))
+    other => Unknown(other, value)
   }
 }
 
@@ -19544,7 +19744,7 @@ pub impl @json.FromJson for CountMessageTokensParamsToolsItem with fn from_json(
 /// Generated representation of CountMessageTokensParams.
 pub(all) struct CountMessageTokensParams {
   cache_control : @sdkjson.Presence[CountMessageTokensParamsCacheControl]
-  messages : Array[InputMessage]
+  messages : Array[InputMessageUnion]
   model : String
   output_config : OutputConfig?
   speed : @sdkjson.Presence[Speed]
@@ -19564,7 +19764,7 @@ pub extend CountMessageTokensParams with @debug.Debug::{to_repr}
 ///
 /// Creates a CountMessageTokensParams with omitted optional fields absent.
 pub fn CountMessageTokensParams::new(
-  messages~ : Array[InputMessage],
+  messages~ : Array[InputMessageUnion],
   model~ : String,
   cache_control? : CountMessageTokensParamsCacheControl,
   output_config? : OutputConfig,
@@ -20098,7 +20298,7 @@ pub impl @json.FromJson for CreateMessageParamsToolsItem with fn from_json(
 /// The parameters of a request for the next message in a conversation. See the [Messages API guide](https://platform.claude.com/docs/en/build-with-claude/working-with-messages#basic-request-and-response) to learn more about requests and responses.
 pub(all) struct CreateMessageParams {
   model : String
-  messages : Array[InputMessage]
+  messages : Array[InputMessageUnion]
   cache_control : @sdkjson.Presence[CreateMessageParamsCacheControl]
   container : @sdkjson.Presence[CreateMessageParamsContainer]
   diagnostics : @sdkjson.Presence[DiagnosticsParam]
@@ -20111,12 +20311,9 @@ pub(all) struct CreateMessageParams {
   stop_sequences : Array[String]?
   stream : Bool?
   system : CreateMessageParamsSystem?
-  temperature : Double?
   thinking : ThinkingConfigParam?
   tool_choice : ToolChoice?
   tools : Array[CreateMessageParamsToolsItem]?
-  top_k : Int32?
-  top_p : Double?
 } derive(Eq, @debug.Debug)
 
 ///|
@@ -20130,7 +20327,7 @@ pub extend CreateMessageParams with @debug.Debug::{to_repr}
 /// Creates a CreateMessageParams with omitted optional fields absent.
 pub fn CreateMessageParams::new(
   model~ : String,
-  messages~ : Array[InputMessage],
+  messages~ : Array[InputMessageUnion],
   max_tokens~ : Int32,
   cache_control? : CreateMessageParamsCacheControl,
   container? : CreateMessageParamsContainer,
@@ -20143,12 +20340,9 @@ pub fn CreateMessageParams::new(
   stop_sequences? : Array[String],
   stream? : Bool,
   system? : CreateMessageParamsSystem,
-  temperature? : Double,
   thinking? : ThinkingConfigParam,
   tool_choice? : ToolChoice,
   tools? : Array[CreateMessageParamsToolsItem],
-  top_k? : Int32,
-  top_p? : Double,
 ) -> CreateMessageParams {
   {
     model,
@@ -20165,12 +20359,9 @@ pub fn CreateMessageParams::new(
     stop_sequences,
     stream,
     system,
-    temperature,
     thinking,
     tool_choice,
     tools,
-    top_k,
-    top_p,
   }
 }
 
@@ -20196,12 +20387,9 @@ pub impl ToJson for CreateMessageParams with fn to_json(self) {
   .opt("stop_sequences", self.stop_sequences)
   .opt("stream", self.stream)
   .opt("system", self.system)
-  .opt("temperature", self.temperature)
   .opt("thinking", self.thinking)
   .opt("tool_choice", self.tool_choice)
   .opt("tools", self.tools)
-  .opt("top_k", self.top_k)
-  .opt("top_p", self.top_p)
   .build()
 }
 
@@ -20228,12 +20416,9 @@ pub impl @json.FromJson for CreateMessageParams with fn from_json(value, path) {
     stop_sequences: @sdkjson.opt_field(obj, "stop_sequences", path),
     stream: @sdkjson.opt_field(obj, "stream", path),
     system: @sdkjson.opt_field(obj, "system", path),
-    temperature: @sdkjson.opt_field(obj, "temperature", path),
     thinking: @sdkjson.opt_field(obj, "thinking", path),
     tool_choice: @sdkjson.opt_field(obj, "tool_choice", path),
     tools: @sdkjson.opt_field(obj, "tools", path),
-    top_k: @sdkjson.opt_field(obj, "top_k", path),
-    top_p: @sdkjson.opt_field(obj, "top_p", path),
   }
 }
 
