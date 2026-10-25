@@ -2,8 +2,8 @@
 fn json_response(
   body : String,
   status~ : Int32 = 200,
-  headers~ : @http.Headers = @http.Headers::new(),
-) -> @http.Response {
+  headers~ : @http.Headers = @http.Headers::empty(),
+) -> @mock.Buffered {
   { status, headers, body: @utf8.encode(body), }
 }
 
@@ -41,7 +41,7 @@ fn assert_auth_header(request : @http.Request) -> Unit raise {
 ///|
 async test "OpenAI operations send exact requests and decode spec examples" {
   bounded(() => {
-    let transport = @mock.FakeTransport::new()
+    let transport = @mock.FakeBackend::new()
     transport.expect(
       "GET",
       "/v1/models",
@@ -140,11 +140,11 @@ async test "OpenAI operations send exact requests and decode spec examples" {
       assert_eq(request.headers.get("openai-organization"), Some("org-test"))
       assert_eq(request.headers.get("openai-project"), Some("proj-test"))
     }
-    assert_eq(sent[0].http_method, "GET")
+    assert_eq(sent[0].meth.to_string(), "GET")
     assert_eq(sent[0].url, "https://api.openai.com/v1/models")
-    assert_eq(sent[0].body, Bytes(b""))
+    assert_eq(sent[0].body, Empty)
     assert_eq(sent[0].headers.get("content-type"), None)
-    assert_eq(sent[1].http_method, "GET")
+    assert_eq(sent[1].meth.to_string(), "GET")
     assert_eq(sent[1].url, "https://api.openai.com/v1/models/gpt-4o-mini")
     assert_eq(@json.parse(@utf8.decode(sent[2].body.as_bytes().unwrap())), {
       "input": ["The food was delicious"],
@@ -186,7 +186,7 @@ fn chat_fixture(
 ///|
 async test "chat completions send exact JSON and retain nullable and unknown response values" {
   bounded(() => {
-    let transport = @mock.FakeTransport::new()
+    let transport = @mock.FakeBackend::new()
     transport.expect(
       "POST",
       "/v1/chat/completions",
@@ -288,11 +288,11 @@ async test "chat completion streaming handles split reasoning usage and DONE" {
       "\n\ndata: " +
       usage +
       "\n\ndata: [DONE]\n\ndata: not-json\n\n"
-    let transport = @mock.FakeTransport::new()
+    let transport = @mock.FakeBackend::new()
     transport.expect_stream(
       "POST",
       "/chat/completions",
-      { status: 200, headers: @http.Headers::new(), },
+      { status: 200, headers: @http.Headers::empty(), },
       split_chunks(sse, [1, 5, 17, 61, 157, 311]),
     )
     let client = @openai_sdk.OpenAI::from_client(
@@ -351,13 +351,13 @@ async test "tool calls decode from OpenAI and Ollama fixtures and stream in wire
     let finished =
       #|{"id":"chatcmpl-stream","object":"chat.completion.chunk","created":1750000000,"model":"gpt-chat","choices":[{"index":0,"delta":{},"finish_reason":"tool_calls"}]}
       #|
-    let transport = @mock.FakeTransport::new()
+    let transport = @mock.FakeBackend::new()
     transport.expect("POST", "/chat/completions", json_response(documented))
     transport.expect("POST", "/chat/completions", json_response(ollama))
     transport.expect_stream(
       "POST",
       "/chat/completions",
-      { status: 200, headers: @http.Headers::new(), },
+      { status: 200, headers: @http.Headers::empty(), },
       split_chunks(
         "data: " +
         chunk1 +
@@ -497,7 +497,7 @@ impl @runtime.RateLimiter for RecordingLimiter with fn release(
 ///|
 async test "OpenAI assigns the contract bucket to every operation" {
   bounded(() => {
-    let transport = @mock.FakeTransport::new()
+    let transport = @mock.FakeBackend::new()
     transport.expect("GET", "/models", json_response("{\"data\":[]}"))
     transport.expect(
       "GET",
@@ -524,13 +524,13 @@ async test "OpenAI assigns the contract bucket to every operation" {
     transport.expect_stream(
       "POST",
       "/responses",
-      { status: 200, headers: @http.Headers::new(), },
+      { status: 200, headers: @http.Headers::empty(), },
       [b"data: [DONE]\n\n"],
     )
     transport.expect_stream(
       "POST",
       "/chat/completions",
-      { status: 200, headers: @http.Headers::new(), },
+      { status: 200, headers: @http.Headers::empty(), },
       [b"data: [DONE]\n\n"],
     )
     let limiter = RecordingLimiter::{ acquired: [], observed: [], }
@@ -576,7 +576,7 @@ async test "OpenAI assigns the contract bucket to every operation" {
     ])
     assert_eq(limiter.observed, limiter.acquired)
     limiter.acquire("direct-check", global_exempt=false)
-    limiter.release("direct-check", status=200, headers=@http.Headers::new())
+    limiter.release("direct-check", status=200, headers=@http.Headers::empty())
     assert_eq(limiter.acquired.last(), Some("direct-check"))
     assert_eq(limiter.observed.last(), Some("direct-check"))
     assert_eq(transport.streams_closed(), 2)
@@ -587,7 +587,7 @@ async test "OpenAI assigns the contract bucket to every operation" {
 ///|
 async test "HTTP errors expose API bodies and a 429 retries before success" {
   bounded(() => {
-    let failures = @mock.FakeTransport::new()
+    let failures = @mock.FakeBackend::new()
     failures.expect(
       "GET",
       "/models",
@@ -644,14 +644,14 @@ async test "HTTP errors expose API bodies and a 429 retries before success" {
     }
     failures.assert_complete()
 
-    let retrying = @mock.FakeTransport::new()
+    let retrying = @mock.FakeBackend::new()
     retrying.expect(
       "POST",
       "/embeddings",
       json_response(
         "{\"error\":{\"message\":\"slow down\"}}",
         status=429,
-        headers=@http.Headers::from_array([("retry-after", "0.25")]),
+        headers=@http.Headers::of([("retry-after", "0.25")]),
       ),
     )
     retrying.expect(
@@ -717,11 +717,11 @@ async test "streaming decodes spec events across chunks and stops at DONE" {
       "\n\ndata: " +
       completed +
       "\n\ndata: [DONE]\n\ndata: not-json\n\n"
-    let transport = @mock.FakeTransport::new()
+    let transport = @mock.FakeBackend::new()
     transport.expect_stream(
       "POST",
       "/responses",
-      { status: 200, headers: @http.Headers::new(), },
+      { status: 200, headers: @http.Headers::empty(), },
       split_chunks(sse, [1, 7, 19, 43, 101, 211]),
     )
     let client = @openai_sdk.OpenAI::new(
@@ -786,11 +786,11 @@ async test "streaming closes on callback and decode errors" {
     let created = "{\"type\":\"response.created\",\"response\":" +
       response_fixture("r", "in_progress", "g", "[]") +
       "}"
-    let callback_transport = @mock.FakeTransport::new()
+    let callback_transport = @mock.FakeBackend::new()
     callback_transport.expect_stream(
       "POST",
       "/responses",
-      { status: 200, headers: @http.Headers::new(), },
+      { status: 200, headers: @http.Headers::empty(), },
       [@utf8.encode("data: " + created + "\n\n")],
     )
     let callback_client = @openai_sdk.OpenAI::new(
@@ -812,11 +812,11 @@ async test "streaming closes on callback and decode errors" {
     assert_eq(callback_transport.streams_closed(), 1)
     callback_transport.assert_complete()
 
-    let decode_transport = @mock.FakeTransport::new()
+    let decode_transport = @mock.FakeBackend::new()
     decode_transport.expect_stream(
       "POST",
       "/responses",
-      { status: 200, headers: @http.Headers::new(), },
+      { status: 200, headers: @http.Headers::empty(), },
       [
         b"data: {\"type\":\"response.output_text.delta\",\"delta\":\"missing generated fields\"}\n\n",
       ],
@@ -832,7 +832,8 @@ async test "streaming closes on callback and decode errors" {
         _ => (),
       )
     catch {
-      @runtime.Decode(
+      @runtime.Deserialization(
+        _,
         body=b"{\"type\":\"response.output_text.delta\",\"delta\":\"missing generated fields\"}",
         ..
       ) => ()
@@ -848,7 +849,7 @@ async test "streaming closes on callback and decode errors" {
 ///|
 async test "missing required fields decode and extra collisions send nothing" {
   bounded(() => {
-    let missing = @mock.FakeTransport::new()
+    let missing = @mock.FakeBackend::new()
     missing.expect(
       "POST",
       "/responses",
@@ -864,14 +865,14 @@ async test "missing required fields decode and extra collisions send nothing" {
         @openai_sdk.ResponseRequest::new(model="g", input="i"),
       )
     catch {
-      @runtime.Decode(body~, ..) => assert_true(body.length() > 0)
+      @runtime.Deserialization(_, body~, ..) => assert_true(body.length() > 0)
       _ => fail("missing id must become Decode")
     } noraise {
       _ => fail("missing id must fail")
     }
     missing.assert_complete()
 
-    let collision_transport = @mock.FakeTransport::new()
+    let collision_transport = @mock.FakeBackend::new()
     let collision_client = @openai_sdk.OpenAI::new(
       api_key="key",
       collision_transport,
@@ -884,12 +885,13 @@ async test "missing required fields decode and extra collisions send nothing" {
         }),
       )
     catch {
-      @runtime.Config(message) => assert_true(message.contains("stream"))
+      @runtime.InvalidRequest(message~) =>
+        assert_true(message.contains("stream"))
       _ => fail("collision must become Config")
     } noraise {
       _ => fail("collision must fail")
     }
-    assert_eq(collision_transport.sent(), [])
+    assert_eq(collision_transport.sent().length(), 0)
     collision_transport.assert_complete()
   })
 }
@@ -899,7 +901,7 @@ test "OpenAI Debug never contains the API key" {
   let key = "sk-runtime-test-secret"
   let client = @openai_sdk.OpenAI::new(
     api_key=key,
-    @mock.FakeTransport::new(),
+    @mock.FakeBackend::new(),
     @mock.FakeClock::new(),
   )
   let representation = @debug.Repr(client).to_string()

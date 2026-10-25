@@ -1,16 +1,15 @@
 import {
-  "gaato/http",
-  "gaato/http/clock",
-  "gaato/http/sse",
-  "gaato/http/sync",
+  "gaato/mttp/model",
+  "gaato/mttp/clock",
   "gaato/openai/gen",
-  "gaato/sdk-runtime" @runtime,
-  "gaato/sdk-runtime/json" @sdkjson,
+  "gaato/mttp/client",
+  "gaato/mttp/jsonkit" @sdkjson,
   "moonbitlang/core/debug",
   "moonbitlang/core/encoding/utf8",
   "moonbitlang/core/json",
 }
 
 import {
-  "gaato/http/mock",
+  "gaato/mttp/testing",
+  "gaato/mttp/clock/fake" @mock,
 } for "test"

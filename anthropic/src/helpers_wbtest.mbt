@@ -80,8 +80,7 @@ test "request body is the generated encoding plus extra, and extra is validated"
       extra=Map::from_array([(key, Json::null())]),
     )
     try message_body(collision, false) catch {
-      @runtime.Config(message) => assert_true(message.contains(key))
-      _ => fail("expected Config")
+      @client.InvalidRequest(message~) => assert_true(message.contains(key))
     } noraise {
       _ => fail("known extra key must fail")
     }
@@ -91,8 +90,7 @@ test "request body is the generated encoding plus extra, and extra is validated"
     "top_p": "high",
   })
   try message_body(invalid, false) catch {
-    @runtime.Config(message) => assert_true(message.contains("top_p"))
-    _ => fail("expected Config")
+    @client.InvalidRequest(message~) => assert_true(message.contains("top_p"))
   } noraise {
     _ => fail("schema violation in extra must fail")
   }

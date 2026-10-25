@@ -3,31 +3,27 @@ fn limited(
   status : Int32,
   headers : Array[(String, String)],
   body : String,
-) -> @runtime.SdkError {
-  let headers = @http.Headers::from_array(headers)
+) -> Error {
+  let headers = @model.Headers::of(headers)
   let body = @utf8.encode(body)
-  if status == 429 {
-    @runtime.RateLimited(retry_after_ms=None, headers~, body~)
-  } else {
-    @runtime.Status(status~, headers~, body~)
-  }
+  @client.UnexpectedStatus({ status, headers, }, body~)
 }
 
 ///|
 fn github_retry() -> GitHubRetry {
-  { policy: @runtime.RetryPolicy::conservative().with_max_retries(3), }
+  { policy: @client.RetryPolicy::conservative().with_max_retries(3), }
 }
 
 ///|
 test "a secondary limit waits retry-after, else a minute doubling, past the generic cap" {
-  let post = @http.Request::post("/repos/o/r/issues")
+  let post = @model.Request::post("/repos/o/r/issues")
   let named = limited(
     403,
     [],
     "{\"message\":\"You have exceeded a secondary rate limit.\"}",
   )
   let decisions = [0, 1, 2, 3].map(attempt => {
-    github_retry().decide(named, @runtime.RetryContext::new(post, attempt~))
+    github_retry().decide(named, @client.RetryContext::new(post, attempt~))
   })
   assert_eq(decisions, [
     Wait(60000),
@@ -38,7 +34,7 @@ test "a secondary limit waits retry-after, else a minute doubling, past the gene
   // Retry-After wins, whatever the policy's cap (60 s here).
   let told = limited(429, [("retry-after", "300")], "{}")
   assert_eq(
-    github_retry().decide(told, @runtime.RetryContext::new(post)),
+    github_retry().decide(told, @client.RetryContext::new(post)),
     Wait(300000),
   )
   // An HTTP date is read against the attempt's clock.
@@ -50,21 +46,21 @@ test "a secondary limit waits retry-after, else a minute doubling, past the gene
   assert_eq(
     github_retry().decide(
       dated,
-      @runtime.RetryContext::new(post, now_unix_ms=60000L),
+      @client.RetryContext::new(post, now_unix_ms=60000L),
     ),
     Wait(30000),
   )
   // Zero falls back to the minute, as octokit's `Number(h) || 60`.
   let zero = limited(403, [("retry-after", "0")], "{}")
   assert_eq(
-    github_retry().decide(zero, @runtime.RetryContext::new(post)),
+    github_retry().decide(zero, @client.RetryContext::new(post)),
     Wait(60000),
   )
   // The remaining time bounds it.
   assert_eq(
     github_retry().decide(
       named,
-      @runtime.RetryContext::new(post, remaining_ms=60000L),
+      @client.RetryContext::new(post, remaining_ms=60000L),
     ),
     Stop(Budget(60000)),
   )
@@ -72,23 +68,23 @@ test "a secondary limit waits retry-after, else a minute doubling, past the gene
   assert_eq(
     github_retry().decide(
       named,
-      @runtime.RetryContext::new(post, replayable=false),
+      @client.RetryContext::new(post, replayable=false),
     ),
     Stop(NotReplayable),
   )
   // The doubling saturates.
   let many : GitHubRetry = {
-    policy: @runtime.RetryPolicy::conservative().with_max_retries(100),
+    policy: @client.RetryPolicy::conservative().with_max_retries(100),
   }
   assert_eq(
-    many.decide(named, @runtime.RetryContext::new(post, attempt=40)),
+    many.decide(named, @client.RetryContext::new(post, attempt=40)),
     Wait(2147483647),
   )
 }
 
 ///|
 test "a primary limit waits until a second past the reset, once" {
-  let get = @http.Request::get("/repos/o/r")
+  let get = @model.Request::get("/repos/o/r")
   let spent = limited(
     403,
     [("x-ratelimit-remaining", "0"), ("x-ratelimit-reset", "100")],
@@ -97,14 +93,14 @@ test "a primary limit waits until a second past the reset, once" {
   assert_eq(
     github_retry().decide(
       spent,
-      @runtime.RetryContext::new(get, now_unix_ms=40500L),
+      @client.RetryContext::new(get, now_unix_ms=40500L),
     ),
     Wait(61000),
   )
   assert_eq(
     github_retry().decide(
       spent,
-      @runtime.RetryContext::new(get, attempt=1, now_unix_ms=40500L),
+      @client.RetryContext::new(get, attempt=1, now_unix_ms=40500L),
     ),
     Stop(Exhausted),
   )
@@ -117,21 +113,21 @@ test "a primary limit waits until a second past the reset, once" {
   assert_eq(
     github_retry().decide(
       spent_429,
-      @runtime.RetryContext::new(get, attempt=1, now_unix_ms=40500L),
+      @client.RetryContext::new(get, attempt=1, now_unix_ms=40500L),
     ),
     Stop(Exhausted),
   )
   assert_eq(
     github_retry().decide(
       spent,
-      @runtime.RetryContext::new(get, now_unix_ms=0L, remaining_ms=100000L),
+      @client.RetryContext::new(get, now_unix_ms=0L, remaining_ms=100000L),
     ),
     Stop(Budget(101000)),
   )
   // Without a reset there is nothing to wait for.
   let unknown = limited(403, [("x-ratelimit-remaining", "0")], "{}")
   assert_eq(
-    github_retry().decide(unknown, @runtime.RetryContext::new(get)),
+    github_retry().decide(unknown, @client.RetryContext::new(get)),
     Stop(NotRetryable),
   )
   // A GraphQL RATE_LIMITED reply is a primary limit too.
@@ -143,16 +139,13 @@ test "a primary limit waits until a second past the reset, once" {
   assert_eq(
     github_retry().decide(
       graphql,
-      @runtime.RetryContext::new(get, bucket="graphql"),
+      @client.RetryContext::new(get, bucket="graphql"),
     ),
     Wait(11000),
   )
   // Retries disabled means none.
-  let none : GitHubRetry = { policy: @runtime.RetryPolicy::none(), }
-  assert_eq(
-    none.decide(spent, @runtime.RetryContext::new(get)),
-    Stop(Exhausted),
-  )
+  let none : GitHubRetry = { policy: @client.RetryPolicy::none(), }
+  assert_eq(none.decide(spent, @client.RetryContext::new(get)), Stop(Exhausted))
 }
 
 ///|
@@ -173,8 +166,9 @@ test "the primary wait rounds up to whole seconds and never goes negative" {
 
 ///|
 test "a transient graphql failure is retried with backoff for queries only" {
-  let post = @http.Request::post("/graphql")
-  let transient = @runtime.Decode(
+  let post = @model.Request::post("/graphql")
+  let transient = GraphqlFailure(
+    { status: 200, headers: @model.Headers::empty(), },
     message="graphql: Something went wrong",
     body=@utf8.encode(
       "{\"errors\":[{\"message\":\"Something went wrong while executing your query.\"}]}",
@@ -183,7 +177,7 @@ test "a transient graphql failure is retried with backoff for queries only" {
   let decide = (bucket : String, attempt : Int32) => {
     github_retry().decide(
       transient,
-      @runtime.RetryContext::new(post, bucket~, attempt~, random=0.5),
+      @client.RetryContext::new(post, bucket~, attempt~, random=0.5),
     )
   }
   assert_eq(decide("graphql", 0), Wait(500))
@@ -191,14 +185,15 @@ test "a transient graphql failure is retried with backoff for queries only" {
   assert_eq(decide("graphql", 3), Stop(Exhausted))
   assert_eq(decide("graphql:mutation", 0), Stop(NotRetryable))
   // Another decode failure is never retried.
-  let other = @runtime.Decode(
+  let other = GraphqlFailure(
+    { status: 200, headers: @model.Headers::empty(), },
     message="bad",
     body=b"{\"errors\":[{\"message\":\"Field 'x' doesn't exist\"}]}",
   )
   assert_eq(
     github_retry().decide(
       other,
-      @runtime.RetryContext::new(post, bucket="graphql"),
+      @client.RetryContext::new(post, bucket="graphql"),
     ),
     Stop(NotRetryable),
   )
@@ -206,44 +201,39 @@ test "a transient graphql failure is retried with backoff for queries only" {
 
 ///|
 test "everything else is the policy's, cap included" {
-  let get = @http.Request::get("/repos/o/r")
-  let post = @http.Request::post("/repos/o/r/issues")
+  let get = @model.Request::get("/repos/o/r")
+  let post = @model.Request::post("/repos/o/r/issues")
   let bad_gateway = limited(502, [], "")
   assert_eq(
-    github_retry().decide(bad_gateway, @runtime.RetryContext::new(post)),
+    github_retry().decide(bad_gateway, @client.RetryContext::new(post)),
     Stop(MethodNotAllowed),
   )
   assert_eq(
-    github_retry().decide(bad_gateway, @runtime.RetryContext::new(get)),
+    github_retry().decide(bad_gateway, @client.RetryContext::new(get)),
     Wait(500),
   )
-  // A plain 429 whose wait is over the policy's cap: StopAbove stops,
-  // BackoffAbove falls back to the backoff.
-  let long = limited(429, [("x-ratelimit-remaining", "10")], "{}")
-  let long = match long {
-    @runtime.RateLimited(headers~, body~, ..) =>
-      @runtime.RateLimited(retry_after_ms=Some(90000), headers~, body~)
-    other => other
-  }
+  // A 503 with Retry-After exercises the generic cap. A 429 carrying the
+  // header is a GitHub secondary limit and deliberately bypasses that cap.
+  let long = limited(503, [("retry-after", "90")], "{}")
   assert_eq(
-    github_retry().decide(long, @runtime.RetryContext::new(get)),
+    github_retry().decide(long, @client.RetryContext::new(get)),
     Stop(RetryAfterTooLong(90000)),
   )
   let lenient : GitHubRetry = {
     policy: {
       rule: {
-        ..@runtime.RetryPolicy::conservative().rule,
+        ..@client.RetryPolicy::conservative().rule,
         retry_after: {
-          ..@runtime.RetryPolicy::conservative().rule.retry_after,
+          ..@client.RetryPolicy::conservative().rule.retry_after,
           cap: BackoffAbove(60000),
         },
       },
     },
   }
-  assert_eq(lenient.decide(long, @runtime.RetryContext::new(get)), Wait(500))
+  assert_eq(lenient.decide(long, @client.RetryContext::new(get)), Wait(500))
   let forbidden = limited(403, [], "{\"message\":\"Resource not accessible\"}")
   assert_eq(
-    github_retry().decide(forbidden, @runtime.RetryContext::new(get)),
+    github_retry().decide(forbidden, @client.RetryContext::new(get)),
     Stop(NotRetryable),
   )
 }

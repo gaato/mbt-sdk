@@ -1,0 +1,77 @@
+----
+import {
+  "moonbitlang/async@0.22.5",
+  "moonbitlang/async@0.22.5/fs",
+  "moonbitlang/async@0.22.5/shell",
+}
+----
+
+///|
+suberror CheckFailed {
+  CheckFailed(String)
+}
+
+///|
+async fn run(program : String, args : Array[String]) -> Unit {
+  println("+ " + program + " " + args.join(" "))
+  let status = @shell.Cmd(program, args, stdout=Inherit, stderr=Inherit).status()
+  if status != 0 {
+    raise CheckFailed("command exited " + status.to_string())
+  }
+}
+
+///|
+async fn main {
+  let packages = [
+    "openai/src", "openai/src/gen", "anthropic/src", "anthropic/src/gen", "github/src",
+    "github/src/gen", "codex-protocol/src/gen", "codex-protocol/src/tests", "fixtures/gen/badhttp/src",
+    "fixtures/gen/petstore3/src",
+  ]
+  let behaviours = [
+    "runtime-tests/src/openai", "runtime-tests/src/anthropic", "runtime-tests/src/github",
+  ]
+  // Explicit package paths keep the sibling mttp workspace and opt-in network
+  // suites out of SDK test execution; all packages still receive type checks.
+  for target in ["native", "wasm-gc", "wasm", "js"] {
+    run("moon", ["check", "--target", target, "--deny-warn"])
+    run(
+      "timeout",
+      ["120", "moon", "test", ..packages, "--target", target, "--deny-warn"],
+    )
+  }
+  for target in ["native", "js"] {
+    run(
+      "timeout",
+      ["45", "moon", "test", ..behaviours, "--target", target, "--deny-warn"],
+    )
+  }
+  run(
+    "moon",
+    [
+      "fmt", "--check", ..packages, ..behaviours, "runtime-tests/src/sdk_mock", "runtime-tests/src/live",
+      "runtime-tests/src/badhttp",
+    ],
+  )
+  run("moon", ["info", ..packages, "runtime-tests/src/sdk_mock"])
+  run("moon", ["run", "scripts/docs_audit.mbtx", "--self-test"])
+  run("moon", ["run", "scripts/bounds_check.mbtx"])
+  let local_python = try {
+    @fs.kind(".venv/bin/python") |> ignore
+    true
+  } catch {
+    _ => false
+  }
+  let tests = ["-m", "unittest", "discover", "-s", "tools/gen/tests"]
+  if local_python {
+    run(".venv/bin/python", tests)
+  } else {
+    run(
+      "uv",
+      [
+        "run", "--with", "pyyaml", "--with", "jsonpath-rfc9535", "python", ..tests,
+      ],
+    )
+  }
+  run("scripts/generate.sh", ["--check"])
+  println("mttp SDK migration checks: OK")
+}

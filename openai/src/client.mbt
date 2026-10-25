@@ -1,7 +1,7 @@
 ///|
-/// A thin OpenAI client backed by the transport-independent SDK runtime.
+/// A thin OpenAI client backed by the runtime-free mttp Client.
 pub struct OpenAI {
-  priv client : @runtime.Client
+  priv client : @client.Client
 }
 
 ///|
@@ -24,59 +24,56 @@ pub impl @debug.Debug for OpenAI with fn to_repr(_self) {
 /// retries of 408, 409, 429 and every 5xx, and of a timeout or network
 /// failure, for every method including POST, so a generation can run twice;
 /// `x-should-retry` is obeyed, and a Retry-After over two minutes is not
-/// waited for. Pass `retry=@runtime.RetryPolicy::conservative()` to retry a
+/// waited for. Pass `retry=@client.RetryPolicy::conservative()` to retry a
 /// POST only on 429 and on failures that prove nothing was sent.
 ///
-/// With a `timer` (such as `gaato/http-async`'s `ClockTimer`), each attempt
+/// Each attempt
 /// is limited to `timeout_ms` (600 s, the official default) and, when
 /// `total_timeout_ms` is given, the whole call, retries included, to that.
-/// Without one this module sets no time limit and only the transport's own
-/// timeouts apply.
+/// A supplied timer controls policy cancellation; otherwise the Client uses
+/// its clock-based fallback, alongside backend phase deadlines.
 pub fn OpenAI::new(
   api_key~ : String,
-  transport : &@http.Transport,
+  backend : &@client.Backend,
   clock : &@clock.Clock,
   base_url~ : String = "https://api.openai.com/v1",
   organization? : String,
   project? : String,
-  retry? : @runtime.RetryPolicy,
-  timer? : &@sync.Timer,
+  retry? : @client.RetryPolicy,
+  timer? : &@clock.Timer,
   timeout_ms~ : Int32 = 600_000,
   total_timeout_ms? : Int32,
 ) -> OpenAI {
-  let headers = @http.Headers::new()
+  let mut headers = @model.Headers::of([("authorization", "Bearer " + api_key)])
   if organization is Some(value) {
-    headers.set("openai-organization", value)
+    headers = headers.set("openai-organization", value)
   }
   if project is Some(value) {
-    headers.set("openai-project", value)
+    headers = headers.set("openai-project", value)
   }
-  let retry : &@runtime.RetryDecider = match retry {
+  let retry : &@client.RetryDecider = match retry {
     Some(policy) => policy
-    None => @runtime.RetryPolicy::stainless(cap=StopAbove(120000))
+    None => @client.RetryPolicy::stainless(cap=StopAbove(120000))
   }
-  let timeouts = timer.map(timer => {
-    @runtime.Timeouts::new(
-      timer,
-      attempt_ms=timeout_ms,
-      total_ms?=total_timeout_ms,
-    )
-  })
   {
-    client: @runtime.Client::new(
-      transport,
+    client: @client.Client::new(
+      backend,
       clock,
       base_url~,
-      default_headers=headers,
-      auth=@runtime.Bearer(api_key),
+      headers~,
+      options={
+        ..@client.RequestOptions::default(),
+        timeout_ms: Some(timeout_ms),
+      },
       retry~,
-      timeouts?,
+      timer?,
+      total_ms?=total_timeout_ms,
     ),
   }
 }
 
 ///|
 /// Wraps a preconfigured runtime client for compatible APIs, Azure, and tests.
-pub fn OpenAI::from_client(client : @runtime.Client) -> OpenAI {
+pub fn OpenAI::from_client(client : @client.Client) -> OpenAI {
   { client, }
 }

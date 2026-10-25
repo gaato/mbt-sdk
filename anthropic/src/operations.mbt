@@ -1,11 +1,26 @@
 ///|
 fn decode_http_response(
-  response : @http.Response,
-) -> MessageResponse raise @runtime.SdkError {
-  decode_message_response(parse_json_body(response.body)) catch {
+  head : @model.ResponseHead,
+  body : Bytes,
+) -> MessageResponse raise @client.ResponseError {
+  decode_message_response(parse_json_body(body)) catch {
     error =>
-      raise @runtime.Decode(message=error.to_string(), body=response.body)
+      raise @client.Deserialization(head, message=error.to_string(), body~)
   }
+}
+
+///|
+async fn[T] Anthropic::send_with(
+  self : Anthropic,
+  request : @model.Request,
+  reader : @client.ResponseAs[T],
+  bucket : String,
+) -> T {
+  self.client.send(
+    @client.ClientRequest::new(request, reader).attribute(
+      @client.rate_limit_bucket, bucket,
+    ),
+  ).body
 }
 
 ///|
@@ -13,129 +28,136 @@ fn decode_http_response(
 pub async fn Anthropic::create_message(
   self : Anthropic,
   request : MessageRequest,
-) -> MessageResponse raise @runtime.SdkError {
+) -> MessageResponse {
   let (params, body) = message_body(request, false)
-  let response = self.client.send(
-    @gen.messages_post_request(params, anthropic_version=self.version).json_body(
+  self.send_with(
+    @gen.messages_post_request(params, anthropic_version=self.version).body_json(
       body,
     ),
-    bucket="messages",
+    @client.as_bytes().map_with_head((bytes, head) => {
+      decode_http_response(head, bytes)
+    }),
+    "messages",
   )
-  decode_http_response(response)
 }
 
 ///|
-/// Creates and buffers one message from a generated request, for parameters the
-/// facade request does not model. `stream` is ignored.
+/// Creates a buffered message from generated parameters. `stream` is ignored.
 pub async fn Anthropic::create_message_params(
   self : Anthropic,
   params : CreateMessageParams,
-) -> @gen.Message raise @runtime.SdkError {
+) -> @gen.Message {
   let params = { ..params, stream: None, }
-  let response = self.client.send(
+  self.send_with(
     @gen.messages_post_request(params, anthropic_version=self.version),
-    bucket="messages",
+    @client.as_bytes().map_with_head((bytes, head) => {
+      @gen.messages_post_decode(head, bytes)
+    }),
+    "messages",
   )
-  @gen.messages_post_decode(response)
 }
 
 ///|
-fn decode_stream_data(data : String) -> MessageEvent raise @runtime.SdkError {
+fn decode_stream_data(
+  head : @model.ResponseHead,
+  data : String,
+) -> MessageEvent raise @client.ResponseError {
   let body = @utf8.encode(data)
   decode_message_event(parse_json_body(body)) catch {
-    error => raise @runtime.Decode(message=error.to_string(), body~)
+    error =>
+      raise @client.Deserialization(head, message=error.to_string(), body~)
   }
 }
 
 ///|
 fn decode_stream_event(
+  head : @model.ResponseHead,
   data : String,
-) -> MessageStreamEvent raise @runtime.SdkError {
+) -> MessageStreamEvent raise @client.ResponseError {
   let body = @utf8.encode(data)
-  let event : MessageStreamEvent = @json.from_json(parse_json_body(body)) catch {
-    error => raise @runtime.Decode(message=error.to_string(), body~)
+  @json.from_json(parse_json_body(body)) catch {
+    error =>
+      raise @client.Deserialization(head, message=error.to_string(), body~)
   }
-  event
 }
 
 ///|
-async fn[E : Error] Anthropic::each_stream_data(
+async fn Anthropic::each_stream_data(
   self : Anthropic,
-  request : @http.Request,
-  f : async (String) -> Unit raise E,
+  request : @model.Request,
+  f : async (@model.ResponseHead, String) -> Unit,
 ) -> Unit {
-  let (_, stream) = self.client.send_stream(
+  self.send_with(
     request.header("accept", "text/event-stream"),
-    bucket="messages",
+    @client.from_head(head => {
+      @client.as_sse(
+        // Compatible gateways add this sentinel; Anthropic streams still end at EOF.
+        event => if event.data != "[DONE]" { f(head, event.data) },
+      )
+    }),
+    "messages",
   )
-  // Anthropic itself ends with message_stop and EOF, but OpenAI-compatible
-  // gateways such as OpenRouter add an OpenAI-style `data: [DONE]` sentinel.
-  // It carries no event, so it is skipped rather than decoded.
-  @sse.each_event(stream, event => if event.data != "[DONE]" { f(event.data) })
 }
 
 ///|
-/// Creates a streaming message and dispatches decoded events in arrival order.
-/// The stream is read through EOF and closed after success or any failure.
-pub async fn[E : Error] Anthropic::stream_message(
+/// Dispatches message events in order, reading through EOF and closing on failure.
+pub async fn Anthropic::stream_message(
   self : Anthropic,
   request : MessageRequest,
-  f : async (MessageEvent) -> Unit raise E,
+  f : async (MessageEvent) -> Unit,
 ) -> Unit {
   let (params, body) = message_body(request, true)
   self.each_stream_data(
-    @gen.messages_post_request(params, anthropic_version=self.version).json_body(
+    @gen.messages_post_request(params, anthropic_version=self.version).body_json(
       body,
     ),
-    data => f(decode_stream_data(data)),
+    (head, data) => f(decode_stream_data(head, data)),
   )
 }
 
 ///|
-/// Creates a streaming message from a generated request and dispatches the
-/// generated events. `stream` is forced on; `ping`, `error` and future event
-/// kinds arrive as `MessageStreamEvent::Unknown`.
-pub async fn[E : Error] Anthropic::stream_message_params(
+/// Streams generated events. `stream` is forced on; future event kinds remain Unknown.
+pub async fn Anthropic::stream_message_params(
   self : Anthropic,
   params : CreateMessageParams,
-  f : async (MessageStreamEvent) -> Unit raise E,
+  f : async (MessageStreamEvent) -> Unit,
 ) -> Unit {
   let params = { ..params, stream: Some(true), }
   self.each_stream_data(
     @gen.messages_post_request(params, anthropic_version=self.version),
-    data => f(decode_stream_event(data)),
+    (head, data) => f(decode_stream_event(head, data)),
   )
 }
 
 ///|
-/// Counts the input tokens of a request without creating a message.
+/// Counts input tokens without creating a message.
 pub async fn Anthropic::count_tokens(
   self : Anthropic,
   request : MessageRequest,
-) -> Int32 raise @runtime.SdkError {
+) -> Int32 {
   let (params, body) = count_tokens_body(request)
-  let response = self.client.send(
+  self.send_with(
     @gen.messages_count_tokens_post_request(
       params,
       anthropic_version=self.version,
-    ).json_body(body),
-    bucket="messages",
+    ).body_json(body),
+    @client.as_bytes().map_with_head((bytes, head) => {
+      @gen.messages_count_tokens_post_decode(head, bytes).input_tokens
+    }),
+    "messages",
   )
-  @gen.messages_count_tokens_post_decode(response).input_tokens
 }
 
 ///|
-/// Lists one page of models. Follow `has_more` with `after_id=last_id`.
-/// Without `lifecycle` the API lists active and deprecated models; retired
-/// models appear only when `Retired` is requested.
+/// Lists a page of models. Follow `has_more` with `after_id=last_id`.
 pub async fn Anthropic::list_models(
   self : Anthropic,
   limit? : Int32,
   after_id? : String,
   before_id? : String,
   lifecycle? : Array[ModelsListLifecycleItem],
-) -> ListResponseModelInfo raise @runtime.SdkError {
-  let response = self.client.send(
+) -> ListResponseModelInfo {
+  self.send_with(
     @gen.models_list_request(
       limit?,
       after_id?,
@@ -143,21 +165,23 @@ pub async fn Anthropic::list_models(
       lifecycle?,
       anthropic_version=self.version,
     ),
-    bucket="models",
+    @client.as_bytes().map_with_head((bytes, head) => {
+      @gen.models_list_decode(head, bytes)
+    }),
+    "models",
   )
-  @gen.models_list_decode(response)
 }
 
 ///|
-/// Iterates over every model page by page, following `has_more` with `after_id = last_id`.
+/// Iterates model pages following `has_more` and `last_id`.
 pub fn Anthropic::paginate_models(
   self : Anthropic,
   limit? : Int32,
   lifecycle? : Array[ModelsListLifecycleItem],
-) -> @runtime.Paginator[ModelInfo, @runtime.SdkError] {
-  @runtime.Paginator::with_cursor(cursor => {
+) -> @client.Paginator[ModelInfo, Error] {
+  @client.Paginator::with_cursor(cursor => {
     let page = self.list_models(limit?, lifecycle?, after_id?=cursor)
-    @runtime.Page::{
+    @client.Page::{
       items: page.data,
       next: if page.has_more {
         page.last_id
@@ -173,10 +197,12 @@ pub fn Anthropic::paginate_models(
 pub async fn Anthropic::retrieve_model(
   self : Anthropic,
   model_id : String,
-) -> ModelInfo raise @runtime.SdkError {
-  let response = self.client.send(
+) -> ModelInfo {
+  self.send_with(
     @gen.models_get_request(model_id, anthropic_version=self.version),
-    bucket="models",
+    @client.as_bytes().map_with_head((bytes, head) => {
+      @gen.models_get_decode(head, bytes)
+    }),
+    "models",
   )
-  @gen.models_get_decode(response)
 }

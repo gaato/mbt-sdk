@@ -22,35 +22,38 @@ fn parse_json_body(body : Bytes) -> Json raise {
 
 ///|
 fn[T : @json.FromJson] decode_response(
-  response : @http.Response,
-) -> T raise @runtime.SdkError {
-  @json.from_json(parse_json_body(response.body)) catch {
+  head : @model.ResponseHead,
+  body : Bytes,
+) -> T raise @client.ResponseError {
+  @json.from_json(parse_json_body(body)) catch {
     error =>
-      raise @runtime.Decode(message=error.to_string(), body=response.body)
+      raise @client.Deserialization(head, message=error.to_string(), body~)
   }
 }
 
 ///|
 ///
-/// Return the given status code (or a random one from a comma-separated list) The caller handles the response as @http.Response.
+/// Return the given status code (or a random one from a comma-separated list) The caller handles the response as @model.Response.
 pub fn get_status_code_request(
   code : String,
   retry_after? : Int32,
-) -> @http.Request {
-  let mut url = "/status/" + @http.percent_encode(parameter_value(code))
+) -> @model.Request {
+  let mut url = "/status/" + @model.percent_encode(parameter_value(code))
   match retry_after {
     Some(value) =>
-      url = @http.append_query(url, "retry-after", parameter_value(value))
+      url = @model.append_query(url, "retry-after", parameter_value(value))
     None => ()
   }
-  @http.Request::get(url)
+  @model.Request::get(url)
 }
 
 ///|
 ///
 /// Wait before responding
-pub fn get_delay_seconds_request(seconds : Double) -> @http.Request {
-  @http.Request::get("/delay/" + @http.percent_encode(parameter_value(seconds)))
+pub fn get_delay_seconds_request(seconds : Double) -> @model.Request {
+  @model.Request::get(
+    "/delay/" + @model.percent_encode(parameter_value(seconds)),
+  )
 }
 
 ///|
@@ -66,74 +69,78 @@ pub fn get_delay_seconds_decode_json(
 ///
 /// Decodes a successful get_delay_seconds response.
 pub fn get_delay_seconds_decode(
-  response : @http.Response,
-) -> Json raise @runtime.SdkError {
-  decode_response(response)
+  head : @model.ResponseHead,
+  body : Bytes,
+) -> Json raise @client.ResponseError {
+  decode_response(head, body)
 }
 
 ///|
 ///
-/// Stream a chunked body slowly The caller handles the response as @http.Response.
+/// Stream a chunked body slowly The caller handles the response as @model.Response.
 pub fn get_drip_request(
   duration? : Double,
   chunks? : Int32,
   code? : Int32,
-) -> @http.Request {
+) -> @model.Request {
   let mut url = "/drip"
   match duration {
     Some(value) =>
-      url = @http.append_query(url, "duration", parameter_value(value))
+      url = @model.append_query(url, "duration", parameter_value(value))
     None => ()
   }
   match chunks {
     Some(value) =>
-      url = @http.append_query(url, "chunks", parameter_value(value))
+      url = @model.append_query(url, "chunks", parameter_value(value))
     None => ()
   }
   match code {
-    Some(value) => url = @http.append_query(url, "code", parameter_value(value))
+    Some(value) =>
+      url = @model.append_query(url, "code", parameter_value(value))
     None => ()
   }
-  @http.Request::get(url)
+  @model.Request::get(url)
 }
 
 ///|
 ///
-/// Declare a Content-Length, then send fewer bytes and close The caller handles the response as @http.Response.
-pub fn get_truncate_request(length? : Int32, send? : Int32) -> @http.Request {
+/// Declare a Content-Length, then send fewer bytes and close The caller handles the response as @model.Response.
+pub fn get_truncate_request(length? : Int32, send? : Int32) -> @model.Request {
   let mut url = "/truncate"
   match length {
     Some(value) =>
-      url = @http.append_query(url, "length", parameter_value(value))
+      url = @model.append_query(url, "length", parameter_value(value))
     None => ()
   }
   match send {
-    Some(value) => url = @http.append_query(url, "send", parameter_value(value))
+    Some(value) =>
+      url = @model.append_query(url, "send", parameter_value(value))
     None => ()
   }
-  @http.Request::get(url)
+  @model.Request::get(url)
 }
 
 ///|
 ///
-/// Serve a specific kind of broken or mislabeled JSON The caller handles the response as @http.Response.
+/// Serve a specific kind of broken or mislabeled JSON The caller handles the response as @model.Response.
 pub fn get_badjson_flavor_request(
   flavor : GetBadjsonFlavorFlavor,
   code? : Int32,
-) -> @http.Request {
-  let mut url = "/badjson/" + @http.percent_encode(parameter_value(flavor))
+) -> @model.Request {
+  let mut url = "/badjson/" + @model.percent_encode(parameter_value(flavor))
   match code {
-    Some(value) => url = @http.append_query(url, "code", parameter_value(value))
+    Some(value) =>
+      url = @model.append_query(url, "code", parameter_value(value))
     None => ()
   }
-  @http.Request::get(url)
+  @model.Request::get(url)
 }
 
 ///|
 ///
 /// Index of the Server-Sent Events flavors, their limits and the reconnect rule
-pub fn get_sse_request() -> @http.Request {
-  @http.Request::get("/sse")
+pub fn get_sse_request() -> @model.Request {
+  @model.Request::get("/sse")
 }
 
 ///|
@@ -147,14 +154,15 @@ pub fn get_sse_decode_json(value : Json) -> Json raise @json.JsonDecodeError {
 ///
 /// Decodes a successful get_sse response.
 pub fn get_sse_decode(
-  response : @http.Response,
-) -> Json raise @runtime.SdkError {
-  decode_response(response)
+  head : @model.ResponseHead,
+  body : Bytes,
+) -> Json raise @client.ResponseError {
+  decode_response(head, body)
 }
 
 ///|
 ///
-/// A Server-Sent Events stream that misbehaves in the chosen way; GET /sse lists the flavors The caller handles the response as @http.Response.
+/// A Server-Sent Events stream that misbehaves in the chosen way; GET /sse lists the flavors The caller handles the response as @model.Response.
 pub fn get_sse_flavor_request(
   flavor : GetSseFlavorFlavor,
   events? : Int32,
@@ -162,29 +170,29 @@ pub fn get_sse_flavor_request(
   seconds? : Double,
   bytes? : Int32,
   last_event_id? : String,
-) -> @http.Request {
-  let mut url = "/sse/" + @http.percent_encode(parameter_value(flavor))
+) -> @model.Request {
+  let mut url = "/sse/" + @model.percent_encode(parameter_value(flavor))
   match events {
     Some(value) =>
-      url = @http.append_query(url, "events", parameter_value(value))
+      url = @model.append_query(url, "events", parameter_value(value))
     None => ()
   }
   match interval {
     Some(value) =>
-      url = @http.append_query(url, "interval", parameter_value(value))
+      url = @model.append_query(url, "interval", parameter_value(value))
     None => ()
   }
   match seconds {
     Some(value) =>
-      url = @http.append_query(url, "seconds", parameter_value(value))
+      url = @model.append_query(url, "seconds", parameter_value(value))
     None => ()
   }
   match bytes {
     Some(value) =>
-      url = @http.append_query(url, "bytes", parameter_value(value))
+      url = @model.append_query(url, "bytes", parameter_value(value))
     None => ()
   }
-  let mut request = @http.Request::get(url)
+  let mut request = @model.Request::get(url)
   match last_event_id {
     Some(value) =>
       request = request.header("Last-Event-ID", parameter_value(value))
@@ -196,8 +204,8 @@ pub fn get_sse_flavor_request(
 ///|
 ///
 /// Index of the range-request flavors: the self-describing document, limits, where If-Range is handled
-pub fn get_range_request() -> @http.Request {
-  @http.Request::get("/range")
+pub fn get_range_request() -> @model.Request {
+  @model.Request::get("/range")
 }
 
 ///|
@@ -211,27 +219,28 @@ pub fn get_range_decode_json(value : Json) -> Json raise @json.JsonDecodeError {
 ///
 /// Decodes a successful get_range response.
 pub fn get_range_decode(
-  response : @http.Response,
-) -> Json raise @runtime.SdkError {
-  decode_response(response)
+  head : @model.ResponseHead,
+  body : Bytes,
+) -> Json raise @client.ResponseError {
+  decode_response(head, body)
 }
 
 ///|
 ///
-/// A resumable download that misbehaves in the chosen way; GET /range lists the flavors The caller handles the response as @http.Response.
+/// A resumable download that misbehaves in the chosen way; GET /range lists the flavors The caller handles the response as @model.Response.
 pub fn get_range_flavor_request(
   flavor : GetRangeFlavorFlavor,
   length? : Int32,
   range? : String,
   if_range? : String,
-) -> @http.Request {
-  let mut url = "/range/" + @http.percent_encode(parameter_value(flavor))
+) -> @model.Request {
+  let mut url = "/range/" + @model.percent_encode(parameter_value(flavor))
   match length {
     Some(value) =>
-      url = @http.append_query(url, "length", parameter_value(value))
+      url = @model.append_query(url, "length", parameter_value(value))
     None => ()
   }
-  let mut request = @http.Request::get(url)
+  let mut request = @model.Request::get(url)
   match range {
     Some(value) => request = request.header("Range", parameter_value(value))
     None => ()
@@ -246,8 +255,8 @@ pub fn get_range_flavor_request(
 ///|
 ///
 /// Index of the conditional-request flavors and the caching model (no-cache: store, revalidate every use)
-pub fn get_etag_request() -> @http.Request {
-  @http.Request::get("/etag")
+pub fn get_etag_request() -> @model.Request {
+  @model.Request::get("/etag")
 }
 
 ///|
@@ -261,23 +270,24 @@ pub fn get_etag_decode_json(value : Json) -> Json raise @json.JsonDecodeError {
 ///
 /// Decodes a successful get_etag response.
 pub fn get_etag_decode(
-  response : @http.Response,
-) -> Json raise @runtime.SdkError {
-  decode_response(response)
+  head : @model.ResponseHead,
+  body : Bytes,
+) -> Json raise @client.ResponseError {
+  decode_response(head, body)
 }
 
 ///|
 ///
-/// A small document whose validators (ETag and Last-Modified) misbehave in the chosen way; GET /etag lists the flavors The caller handles the response as @http.Response.
+/// A small document whose validators (ETag and Last-Modified) misbehave in the chosen way; GET /etag lists the flavors The caller handles the response as @model.Response.
 pub fn get_etag_flavor_request(
   flavor : GetEtagFlavorFlavor,
   if_none_match? : String,
   if_modified_since? : String,
   if_match? : String,
   if_unmodified_since? : String,
-) -> @http.Request {
-  let mut request = @http.Request::get(
-    "/etag/" + @http.percent_encode(parameter_value(flavor)),
+) -> @model.Request {
+  let mut request = @model.Request::get(
+    "/etag/" + @model.percent_encode(parameter_value(flavor)),
   )
   match if_none_match {
     Some(value) =>
@@ -304,8 +314,8 @@ pub fn get_etag_flavor_request(
 ///|
 ///
 /// Index of the Set-Cookie flavors, the politeness rules and the limits
-pub fn get_cookies_request() -> @http.Request {
-  @http.Request::get("/cookies")
+pub fn get_cookies_request() -> @model.Request {
+  @model.Request::get("/cookies")
 }
 
 ///|
@@ -321,9 +331,10 @@ pub fn get_cookies_decode_json(
 ///
 /// Decodes a successful get_cookies response.
 pub fn get_cookies_decode(
-  response : @http.Response,
-) -> Json raise @runtime.SdkError {
-  decode_response(response)
+  head : @model.ResponseHead,
+  body : Bytes,
+) -> Json raise @client.ResponseError {
+  decode_response(head, body)
 }
 
 ///|
@@ -334,19 +345,19 @@ pub fn get_cookies_flavor_request(
   count? : Int32,
   bytes? : Int32,
   cookie? : String,
-) -> @http.Request {
-  let mut url = "/cookies/" + @http.percent_encode(parameter_value(flavor))
+) -> @model.Request {
+  let mut url = "/cookies/" + @model.percent_encode(parameter_value(flavor))
   match count {
     Some(value) =>
-      url = @http.append_query(url, "count", parameter_value(value))
+      url = @model.append_query(url, "count", parameter_value(value))
     None => ()
   }
   match bytes {
     Some(value) =>
-      url = @http.append_query(url, "bytes", parameter_value(value))
+      url = @model.append_query(url, "bytes", parameter_value(value))
     None => ()
   }
-  let mut request = @http.Request::get(url)
+  let mut request = @model.Request::get(url)
   match cookie {
     Some(value) => request = request.header("Cookie", parameter_value(value))
     None => ()
@@ -367,16 +378,17 @@ pub fn get_cookies_flavor_decode_json(
 ///
 /// Decodes a successful get_cookies_flavor response.
 pub fn get_cookies_flavor_decode(
-  response : @http.Response,
-) -> Json raise @runtime.SdkError {
-  decode_response(response)
+  head : @model.ResponseHead,
+  body : Bytes,
+) -> Json raise @client.ResponseError {
+  decode_response(head, body)
 }
 
 ///|
 ///
 /// Index of the HTTP-authentication flavors, the public fake test credentials, the safety warning, and the witness block: what eight real clients did at every flavor, derived from the /clients.jsonl auth rows
-pub fn get_auth_request() -> @http.Request {
-  @http.Request::get("/auth")
+pub fn get_auth_request() -> @model.Request {
+  @model.Request::get("/auth")
 }
 
 ///|
@@ -390,16 +402,17 @@ pub fn get_auth_decode_json(value : Json) -> Json raise @json.JsonDecodeError {
 ///
 /// Decodes a successful get_auth response.
 pub fn get_auth_decode(
-  response : @http.Response,
-) -> Json raise @runtime.SdkError {
-  decode_response(response)
+  head : @model.ResponseHead,
+  body : Bytes,
+) -> Json raise @client.ResponseError {
+  decode_response(head, body)
 }
 
 ///|
 ///
 /// HTTP authentication that misbehaves in the chosen way; GET /auth lists the flavors and the public fake test credentials
-pub fn get_auth_flavor_request(flavor : GetAuthFlavorFlavor) -> @http.Request {
-  @http.Request::get("/auth/" + @http.percent_encode(parameter_value(flavor)))
+pub fn get_auth_flavor_request(flavor : GetAuthFlavorFlavor) -> @model.Request {
+  @model.Request::get("/auth/" + @model.percent_encode(parameter_value(flavor)))
 }
 
 ///|
@@ -415,16 +428,17 @@ pub fn get_auth_flavor_decode_json(
 ///
 /// Decodes a successful get_auth_flavor response.
 pub fn get_auth_flavor_decode(
-  response : @http.Response,
-) -> Json raise @runtime.SdkError {
-  decode_response(response)
+  head : @model.ResponseHead,
+  body : Bytes,
+) -> Json raise @client.ResponseError {
+  decode_response(head, body)
 }
 
 ///|
 ///
 /// Index of the cross-host credential-boundary flavors: the two hosts, what each flavor crosses, the public test credentials, and the no-open-redirect statement
-pub fn get_crosshost_request() -> @http.Request {
-  @http.Request::get("/crosshost")
+pub fn get_crosshost_request() -> @model.Request {
+  @model.Request::get("/crosshost")
 }
 
 ///|
@@ -440,16 +454,17 @@ pub fn get_crosshost_decode_json(
 ///
 /// Decodes a successful get_crosshost response.
 pub fn get_crosshost_decode(
-  response : @http.Response,
-) -> Json raise @runtime.SdkError {
-  decode_response(response)
+  head : @model.ResponseHead,
+  body : Bytes,
+) -> Json raise @client.ResponseError {
+  decode_response(head, body)
 }
 
 ///|
 ///
 /// The oracle: reports which credential headers reached this hop, without ever echoing their values. Served on both badhttp.dev and alt.badhttp.dev.
-pub fn get_crosshost_land_request() -> @http.Request {
-  @http.Request::get("/crosshost/land")
+pub fn get_crosshost_land_request() -> @model.Request {
+  @model.Request::get("/crosshost/land")
 }
 
 ///|
@@ -465,27 +480,28 @@ pub fn get_crosshost_land_decode_json(
 ///
 /// Decodes a successful get_crosshost_land response.
 pub fn get_crosshost_land_decode(
-  response : @http.Response,
-) -> Json raise @runtime.SdkError {
-  decode_response(response)
+  head : @model.ResponseHead,
+  body : Bytes,
+) -> Json raise @client.ResponseError {
+  decode_response(head, body)
 }
 
 ///|
 ///
-/// A redirect that crosses a specific host, scheme or cookie boundary, landing on /crosshost/land; GET /crosshost lists the flavors and which host each starts on The caller handles the response as @http.Response.
+/// A redirect that crosses a specific host, scheme or cookie boundary, landing on /crosshost/land; GET /crosshost lists the flavors and which host each starts on The caller handles the response as @model.Response.
 pub fn get_crosshost_flavor_request(
   flavor : GetCrosshostFlavorFlavor,
-) -> @http.Request {
-  @http.Request::get(
-    "/crosshost/" + @http.percent_encode(parameter_value(flavor)),
+) -> @model.Request {
+  @model.Request::get(
+    "/crosshost/" + @model.percent_encode(parameter_value(flavor)),
   )
 }
 
 ///|
 ///
 /// Index of the content-coding flavors: the document, the verification headers, what the edge makes of each flavor for a client without gzip, and the Accept-Encoding the edge reports for you
-pub fn get_compress_request() -> @http.Request {
-  @http.Request::get("/compress")
+pub fn get_compress_request() -> @model.Request {
+  @model.Request::get("/compress")
 }
 
 ///|
@@ -501,36 +517,39 @@ pub fn get_compress_decode_json(
 ///
 /// Decodes a successful get_compress response.
 pub fn get_compress_decode(
-  response : @http.Response,
-) -> Json raise @runtime.SdkError {
-  decode_response(response)
+  head : @model.ResponseHead,
+  body : Bytes,
+) -> Json raise @client.ResponseError {
+  decode_response(head, body)
 }
 
 ///|
 ///
-/// A response whose content coding misbehaves in the chosen way; GET /compress lists the flavors. Send Accept-Encoding: gzip to receive the bytes as sent. The caller handles the response as @http.Response.
+/// A response whose content coding misbehaves in the chosen way; GET /compress lists the flavors. Send Accept-Encoding: gzip to receive the bytes as sent. The caller handles the response as @model.Response.
 pub fn get_compress_flavor_request(
   flavor : GetCompressFlavorFlavor,
   length? : Int32,
   code? : Int32,
   size? : Int32,
   accept_encoding? : String,
-) -> @http.Request {
-  let mut url = "/compress/" + @http.percent_encode(parameter_value(flavor))
+) -> @model.Request {
+  let mut url = "/compress/" + @model.percent_encode(parameter_value(flavor))
   match length {
     Some(value) =>
-      url = @http.append_query(url, "length", parameter_value(value))
+      url = @model.append_query(url, "length", parameter_value(value))
     None => ()
   }
   match code {
-    Some(value) => url = @http.append_query(url, "code", parameter_value(value))
+    Some(value) =>
+      url = @model.append_query(url, "code", parameter_value(value))
     None => ()
   }
   match size {
-    Some(value) => url = @http.append_query(url, "size", parameter_value(value))
+    Some(value) =>
+      url = @model.append_query(url, "size", parameter_value(value))
     None => ()
   }
-  let mut request = @http.Request::get(url)
+  let mut request = @model.Request::get(url)
   match accept_encoding {
     Some(value) =>
       request = request.header("Accept-Encoding", parameter_value(value))
@@ -547,21 +566,23 @@ pub fn get_flaky_percent_request(
   fail? : Int32,
   seed? : String,
   i? : Int32,
-) -> @http.Request {
-  let mut url = "/flaky/" + @http.percent_encode(parameter_value(percent))
+) -> @model.Request {
+  let mut url = "/flaky/" + @model.percent_encode(parameter_value(percent))
   match fail {
-    Some(value) => url = @http.append_query(url, "fail", parameter_value(value))
+    Some(value) =>
+      url = @model.append_query(url, "fail", parameter_value(value))
     None => ()
   }
   match seed {
-    Some(value) => url = @http.append_query(url, "seed", parameter_value(value))
+    Some(value) =>
+      url = @model.append_query(url, "seed", parameter_value(value))
     None => ()
   }
   match i {
-    Some(value) => url = @http.append_query(url, "i", parameter_value(value))
+    Some(value) => url = @model.append_query(url, "i", parameter_value(value))
     None => ()
   }
-  @http.Request::get(url)
+  @model.Request::get(url)
 }
 
 ///|
@@ -577,9 +598,10 @@ pub fn get_flaky_percent_decode_json(
 ///
 /// Decodes a successful get_flaky_percent response.
 pub fn get_flaky_percent_decode(
-  response : @http.Response,
-) -> Json raise @runtime.SdkError {
-  decode_response(response)
+  head : @model.ResponseHead,
+  body : Bytes,
+) -> Json raise @client.ResponseError {
+  decode_response(head, body)
 }
 
 ///|
@@ -589,18 +611,19 @@ pub fn get_redirect_hops_request(
   hops : GetRedirectHopsHops,
   code? : Int32,
   absolute? : Bool,
-) -> @http.Request {
-  let mut url = "/redirect/" + @http.percent_encode(parameter_value(hops))
+) -> @model.Request {
+  let mut url = "/redirect/" + @model.percent_encode(parameter_value(hops))
   match code {
-    Some(value) => url = @http.append_query(url, "code", parameter_value(value))
+    Some(value) =>
+      url = @model.append_query(url, "code", parameter_value(value))
     None => ()
   }
   match absolute {
     Some(value) =>
-      url = @http.append_query(url, "absolute", parameter_value(value))
+      url = @model.append_query(url, "absolute", parameter_value(value))
     None => ()
   }
-  @http.Request::get(url)
+  @model.Request::get(url)
 }
 
 ///|
@@ -616,16 +639,17 @@ pub fn get_redirect_hops_decode_json(
 ///
 /// Decodes a successful get_redirect_hops response.
 pub fn get_redirect_hops_decode(
-  response : @http.Response,
-) -> Json raise @runtime.SdkError {
-  decode_response(response)
+  head : @model.ResponseHead,
+  body : Bytes,
+) -> Json raise @client.ResponseError {
+  decode_response(head, body)
 }
 
 ///|
 ///
 /// Echo the request headers as JSON
-pub fn get_headers_request() -> @http.Request {
-  @http.Request::get("/headers")
+pub fn get_headers_request() -> @model.Request {
+  @model.Request::get("/headers")
 }
 
 ///|
@@ -641,16 +665,17 @@ pub fn get_headers_decode_json(
 ///
 /// Decodes a successful get_headers response.
 pub fn get_headers_decode(
-  response : @http.Response,
-) -> Json raise @runtime.SdkError {
-  decode_response(response)
+  head : @model.ResponseHead,
+  body : Bytes,
+) -> Json raise @client.ResponseError {
+  decode_response(head, body)
 }
 
 ///|
 ///
 /// Echo method, path, query, headers and body (16 KB cap) as JSON
-pub fn post_echo_request() -> @http.Request {
-  @http.Request::post("/echo")
+pub fn post_echo_request() -> @model.Request {
+  @model.Request::post("/echo")
 }
 
 ///|
@@ -664,16 +689,17 @@ pub fn post_echo_decode_json(value : Json) -> Json raise @json.JsonDecodeError {
 ///
 /// Decodes a successful post_echo response.
 pub fn post_echo_decode(
-  response : @http.Response,
-) -> Json raise @runtime.SdkError {
-  decode_response(response)
+  head : @model.ResponseHead,
+  body : Bytes,
+) -> Json raise @client.ResponseError {
+  decode_response(head, body)
 }
 
 ///|
 ///
 /// Echo method, path, query, headers and body (16 KB cap) as JSON
-pub fn put_echo_request() -> @http.Request {
-  @http.Request::put("/echo")
+pub fn put_echo_request() -> @model.Request {
+  @model.Request::put("/echo")
 }
 
 ///|
@@ -687,16 +713,17 @@ pub fn put_echo_decode_json(value : Json) -> Json raise @json.JsonDecodeError {
 ///
 /// Decodes a successful put_echo response.
 pub fn put_echo_decode(
-  response : @http.Response,
-) -> Json raise @runtime.SdkError {
-  decode_response(response)
+  head : @model.ResponseHead,
+  body : Bytes,
+) -> Json raise @client.ResponseError {
+  decode_response(head, body)
 }
 
 ///|
 ///
 /// Echo method, path, query, headers and body (16 KB cap) as JSON
-pub fn patch_echo_request() -> @http.Request {
-  @http.Request::patch("/echo")
+pub fn patch_echo_request() -> @model.Request {
+  @model.Request::patch("/echo")
 }
 
 ///|
@@ -710,16 +737,17 @@ pub fn patch_echo_decode_json(value : Json) -> Json raise @json.JsonDecodeError 
 ///
 /// Decodes a successful patch_echo response.
 pub fn patch_echo_decode(
-  response : @http.Response,
-) -> Json raise @runtime.SdkError {
-  decode_response(response)
+  head : @model.ResponseHead,
+  body : Bytes,
+) -> Json raise @client.ResponseError {
+  decode_response(head, body)
 }
 
 ///|
 ///
 /// Echo method, path, query, headers and body (16 KB cap) as JSON
-pub fn delete_echo_request() -> @http.Request {
-  @http.Request::delete("/echo")
+pub fn delete_echo_request() -> @model.Request {
+  @model.Request::delete("/echo")
 }
 
 ///|
@@ -735,30 +763,31 @@ pub fn delete_echo_decode_json(
 ///
 /// Decodes a successful delete_echo response.
 pub fn delete_echo_decode(
-  response : @http.Response,
-) -> Json raise @runtime.SdkError {
-  decode_response(response)
+  head : @model.ResponseHead,
+  body : Bytes,
+) -> Json raise @client.ResponseError {
+  decode_response(head, body)
 }
 
 ///|
 ///
-/// Always 405 with an Allow header, so clients can practice handling it The caller handles the response as @http.Response.
-pub fn get_echo_request() -> @http.Request {
-  @http.Request::get("/echo")
+/// Always 405 with an Allow header, so clients can practice handling it The caller handles the response as @model.Response.
+pub fn get_echo_request() -> @model.Request {
+  @model.Request::get("/echo")
 }
 
 ///|
 ///
-/// Always 405 with an Allow header, so clients can practice handling it The caller handles the response as @http.Response.
-pub fn head_echo_request() -> @http.Request {
-  @http.Request::new("HEAD", "/echo")
+/// Always 405 with an Allow header, so clients can practice handling it The caller handles the response as @model.Response.
+pub fn head_echo_request() -> @model.Request {
+  @model.Request::new(@model.Method::parse("HEAD"), "/echo")
 }
 
 ///|
 ///
 /// Index of the x402 payment scenarios: networks, price limits, pay-to address, facilitators
-pub fn get_402_request() -> @http.Request {
-  @http.Request::get("/402")
+pub fn get_402_request() -> @model.Request {
+  @model.Request::get("/402")
 }
 
 ///|
@@ -772,119 +801,120 @@ pub fn get_402_decode_json(value : Json) -> Json raise @json.JsonDecodeError {
 ///
 /// Decodes a successful get_402 response.
 pub fn get_402_decode(
-  response : @http.Response,
-) -> Json raise @runtime.SdkError {
-  decode_response(response)
+  head : @model.ResponseHead,
+  body : Bytes,
+) -> Json raise @client.ResponseError {
+  decode_response(head, body)
 }
 
 ///|
 ///
-/// A real x402 paywall for testing clients, v2 and v1 in one response: pay 0.001–1.00 USDC (test USDC on Base Sepolia by default, ?network=base for real USDC) and get a 200 with a receipt and the transaction hash The caller handles the response as @http.Response.
+/// A real x402 paywall for testing clients, v2 and v1 in one response: pay 0.001–1.00 USDC (test USDC on Base Sepolia by default, ?network=base for real USDC) and get a 200 with a receipt and the transaction hash The caller handles the response as @model.Response.
 pub fn get_402_pay_request(
   network? : Get402PayNetwork,
   amount? : Double,
-) -> @http.Request {
+) -> @model.Request {
   let mut url = "/402/pay"
   match network {
     Some(value) =>
-      url = @http.append_query(url, "network", parameter_value(value))
+      url = @model.append_query(url, "network", parameter_value(value))
     None => ()
   }
   match amount {
     Some(value) =>
-      url = @http.append_query(url, "amount", parameter_value(value))
+      url = @model.append_query(url, "amount", parameter_value(value))
     None => ()
   }
-  @http.Request::get(url)
+  @model.Request::get(url)
 }
 
 ///|
 ///
-/// The same paywall, real USDC on Base mainnet only: the stable resource URL for a client or catalogue that wants mainnet The caller handles the response as @http.Response.
-pub fn get_402_pay_base_request(amount? : Double) -> @http.Request {
+/// The same paywall, real USDC on Base mainnet only: the stable resource URL for a client or catalogue that wants mainnet The caller handles the response as @model.Response.
+pub fn get_402_pay_base_request(amount? : Double) -> @model.Request {
   let mut url = "/402/pay/base"
   match amount {
     Some(value) =>
-      url = @http.append_query(url, "amount", parameter_value(value))
+      url = @model.append_query(url, "amount", parameter_value(value))
     None => ()
   }
-  @http.Request::get(url)
+  @model.Request::get(url)
 }
 
 ///|
 ///
-/// The same paywall, test USDC on Base Sepolia only (what the bare /402/pay offers) The caller handles the response as @http.Response.
-pub fn get_402_pay_base_sepolia_request(amount? : Double) -> @http.Request {
+/// The same paywall, test USDC on Base Sepolia only (what the bare /402/pay offers) The caller handles the response as @model.Response.
+pub fn get_402_pay_base_sepolia_request(amount? : Double) -> @model.Request {
   let mut url = "/402/pay/base-sepolia"
   match amount {
     Some(value) =>
-      url = @http.append_query(url, "amount", parameter_value(value))
+      url = @model.append_query(url, "amount", parameter_value(value))
     None => ()
   }
-  @http.Request::get(url)
+  @model.Request::get(url)
 }
 
 ///|
 ///
-/// x402 paywalls that misbehave on purpose (v2 header + v1 body, like /402/pay). Every scenario here returns a valid-looking 402 and then never settles anything; the one that works is /402/pay. The caller handles the response as @http.Response.
+/// x402 paywalls that misbehave on purpose (v2 header + v1 body, like /402/pay). Every scenario here returns a valid-looking 402 and then never settles anything; the one that works is /402/pay. The caller handles the response as @model.Response.
 pub fn get_402_scenario_request(
   scenario : Get402ScenarioScenario,
   network? : Get402ScenarioNetwork,
   amount? : Double,
   reason? : String,
   seconds? : Double,
-) -> @http.Request {
-  let mut url = "/402/" + @http.percent_encode(parameter_value(scenario))
+) -> @model.Request {
+  let mut url = "/402/" + @model.percent_encode(parameter_value(scenario))
   match network {
     Some(value) =>
-      url = @http.append_query(url, "network", parameter_value(value))
+      url = @model.append_query(url, "network", parameter_value(value))
     None => ()
   }
   match amount {
     Some(value) =>
-      url = @http.append_query(url, "amount", parameter_value(value))
+      url = @model.append_query(url, "amount", parameter_value(value))
     None => ()
   }
   match reason {
     Some(value) =>
-      url = @http.append_query(url, "reason", parameter_value(value))
+      url = @model.append_query(url, "reason", parameter_value(value))
     None => ()
   }
   match seconds {
     Some(value) =>
-      url = @http.append_query(url, "seconds", parameter_value(value))
+      url = @model.append_query(url, "seconds", parameter_value(value))
     None => ()
   }
-  @http.Request::get(url)
+  @model.Request::get(url)
 }
 
 ///|
 ///
-/// A malformed 402 of the chosen flavor; GET /402/broken lists them. Never settles. The caller handles the response as @http.Response.
+/// A malformed 402 of the chosen flavor; GET /402/broken lists them. Never settles. The caller handles the response as @model.Response.
 pub fn get_402_broken_flavor_request(
   flavor : Get402BrokenFlavorFlavor,
   network? : Get402BrokenFlavorNetwork,
   amount? : Double,
-) -> @http.Request {
-  let mut url = "/402/broken/" + @http.percent_encode(parameter_value(flavor))
+) -> @model.Request {
+  let mut url = "/402/broken/" + @model.percent_encode(parameter_value(flavor))
   match network {
     Some(value) =>
-      url = @http.append_query(url, "network", parameter_value(value))
+      url = @model.append_query(url, "network", parameter_value(value))
     None => ()
   }
   match amount {
     Some(value) =>
-      url = @http.append_query(url, "amount", parameter_value(value))
+      url = @model.append_query(url, "amount", parameter_value(value))
     None => ()
   }
-  @http.Request::get(url)
+  @model.Request::get(url)
 }
 
 ///|
 ///
 /// Public books: every dollar spent and earned by this service (hosting accrues on a clock and is computed, not listed in costs[]; totals.costs = totals.itemized_costs + totals.hosting_accrued), with the receive address's balance and itemized transfer list read live from chain and reconciled against the booked numbers, the measured basis for the hosting figure, and a solvency line reading the project payer wallet's balance live against the next bill
-pub fn get_books_json_request() -> @http.Request {
-  @http.Request::get("/books.json")
+pub fn get_books_json_request() -> @model.Request {
+  @model.Request::get("/books.json")
 }
 
 ///|
@@ -900,23 +930,24 @@ pub fn get_books_json_decode_json(
 ///
 /// Decodes a successful get_books_json response.
 pub fn get_books_json_decode(
-  response : @http.Response,
-) -> Json raise @runtime.SdkError {
-  decode_response(response)
+  head : @model.ResponseHead,
+  body : Bytes,
+) -> Json raise @client.ResponseError {
+  decode_response(head, body)
 }
 
 ///|
 ///
-/// Short guidance for agents (llms.txt) The caller handles the response as @http.Response.
-pub fn get_llms_txt_request() -> @http.Request {
-  @http.Request::get("/llms.txt")
+/// Short guidance for agents (llms.txt) The caller handles the response as @model.Response.
+pub fn get_llms_txt_request() -> @model.Request {
+  @model.Request::get("/llms.txt")
 }
 
 ///|
 ///
 /// Liveness
-pub fn get_health_request() -> @http.Request {
-  @http.Request::get("/health")
+pub fn get_health_request() -> @model.Request {
+  @model.Request::get("/health")
 }
 
 ///|
@@ -930,16 +961,17 @@ pub fn get_health_decode_json(value : Json) -> Json raise @json.JsonDecodeError 
 ///
 /// Decodes a successful get_health response.
 pub fn get_health_decode(
-  response : @http.Response,
-) -> Json raise @runtime.SdkError {
-  decode_response(response)
+  head : @model.ResponseHead,
+  body : Bytes,
+) -> Json raise @client.ResponseError {
+  decode_response(head, body)
 }
 
 ///|
 ///
 /// The catalogue as data: an index over every documented DEFECT behaviour (what_is_not_a_row names what is deliberately excluded), with the licence, the self_check block recording that every row was replayed and its fields compared to the wire, the capture notes, and what this service does NOT cover (RFC 9112 message syntax — it emits none, and cannot, because a CDN re-serializes every response)
-pub fn get_corpus_request() -> @http.Request {
-  @http.Request::get("/corpus")
+pub fn get_corpus_request() -> @model.Request {
+  @model.Request::get("/corpus")
 }
 
 ///|
@@ -953,23 +985,24 @@ pub fn get_corpus_decode_json(value : Json) -> Json raise @json.JsonDecodeError 
 ///
 /// Decodes a successful get_corpus response.
 pub fn get_corpus_decode(
-  response : @http.Response,
-) -> Json raise @runtime.SdkError {
-  decode_response(response)
+  head : @model.ResponseHead,
+  body : Bytes,
+) -> Json raise @client.ResponseError {
+  decode_response(head, body)
 }
 
 ///|
 ///
-/// One JSON object per line, one line per documented DEFECT behaviour: url, method, request_headers, defect, specs, layer, deterministic_bytes (true means the same request returns the same body bytes — re-derived from the wire on every deploy), varies_by, a ready-to-run capture curl, and the licence on every row The caller handles the response as @http.Response.
-pub fn get_corpus_jsonl_request() -> @http.Request {
-  @http.Request::get("/corpus.jsonl")
+/// One JSON object per line, one line per documented DEFECT behaviour: url, method, request_headers, defect, specs, layer, deterministic_bytes (true means the same request returns the same body bytes — re-derived from the wire on every deploy), varies_by, a ready-to-run capture curl, and the licence on every row The caller handles the response as @model.Response.
+pub fn get_corpus_jsonl_request() -> @model.Request {
+  @model.Request::get("/corpus.jsonl")
 }
 
 ///|
 ///
 /// What real HTTP clients did, as data: an index over 384 dated observations in three families — /compress (168: six decoding clients plus two non-decoding controls x 21 flavors), /crosshost (72: eight clients x 9 flavors — eight boundaries and a same-origin control) and /auth (144: the same eight clients x 18 flavors, each handed the documented fake credentials through its own mechanism) — each family with its own outcome legend, per-flavor disagreement count, client roster and the note that an outcome describes what the caller received and is never a verdict on the client
-pub fn get_clients_request() -> @http.Request {
-  @http.Request::get("/clients")
+pub fn get_clients_request() -> @model.Request {
+  @model.Request::get("/clients")
 }
 
 ///|
@@ -985,23 +1018,24 @@ pub fn get_clients_decode_json(
 ///
 /// Decodes a successful get_clients response.
 pub fn get_clients_decode(
-  response : @http.Response,
-) -> Json raise @runtime.SdkError {
-  decode_response(response)
+  head : @model.ResponseHead,
+  body : Bytes,
+) -> Json raise @client.ResponseError {
+  decode_response(head, body)
 }
 
 ///|
 ///
-/// One JSON object per line, one line per observation, family on every row: the client and its version, what it received (compress: whether the bytes matched the flavor's documented plaintext; crosshost: which sent headers arrived after the redirect, on which host and port, over which transport, and which cookies under the badhttp_ prefix came back — the three the jar hop mints and the harness's own badhttp_witness; auth: how the documented fake credentials were handed to the client (mechanism_kind), how many requests it made, and the final /auth response's status and server-reported fields), what it reported, and corpus_id joining the row back to /corpus.jsonl. A dated capture, not a live measurement The caller handles the response as @http.Response.
-pub fn get_clients_jsonl_request() -> @http.Request {
-  @http.Request::get("/clients.jsonl")
+/// One JSON object per line, one line per observation, family on every row: the client and its version, what it received (compress: whether the bytes matched the flavor's documented plaintext; crosshost: which sent headers arrived after the redirect, on which host and port, over which transport, and which cookies under the badhttp_ prefix came back — the three the jar hop mints and the harness's own badhttp_witness; auth: how the documented fake credentials were handed to the client (mechanism_kind), how many requests it made, and the final /auth response's status and server-reported fields), what it reported, and corpus_id joining the row back to /corpus.jsonl. A dated capture, not a live measurement The caller handles the response as @model.Response.
+pub fn get_clients_jsonl_request() -> @model.Request {
+  @model.Request::get("/clients.jsonl")
 }
 
 ///|
 ///
 /// funding.json manifest (fundingjson.org v1.1.0): who runs this, what it costs to run for a year, and the one channel it can be funded through. Vouched for by /.well-known/funding-manifest-urls. projects[] names the one project with its public repository (added 2026-09-18, when the source was published)
-pub fn get_funding_json_request() -> @http.Request {
-  @http.Request::get("/funding.json")
+pub fn get_funding_json_request() -> @model.Request {
+  @model.Request::get("/funding.json")
 }
 
 ///|
@@ -1017,16 +1051,17 @@ pub fn get_funding_json_decode_json(
 ///
 /// Decodes a successful get_funding_json response.
 pub fn get_funding_json_decode(
-  response : @http.Response,
-) -> Json raise @runtime.SdkError {
-  decode_response(response)
+  head : @model.ResponseHead,
+  body : Bytes,
+) -> Json raise @client.ResponseError {
+  decode_response(head, body)
 }
 
 ///|
 ///
 /// Licensing, stated separately for the two things people confuse: CC0-1.0 for everything this server emits, MIT for the Worker source
-pub fn get_license_request() -> @http.Request {
-  @http.Request::get("/license")
+pub fn get_license_request() -> @model.Request {
+  @model.Request::get("/license")
 }
 
 ///|
@@ -1042,7 +1077,8 @@ pub fn get_license_decode_json(
 ///
 /// Decodes a successful get_license response.
 pub fn get_license_decode(
-  response : @http.Response,
-) -> Json raise @runtime.SdkError {
-  decode_response(response)
+  head : @model.ResponseHead,
+  body : Bytes,
+) -> Json raise @client.ResponseError {
+  decode_response(head, body)
 }

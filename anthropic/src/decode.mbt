@@ -188,9 +188,9 @@ fn decode_api_error_body(body : Bytes) -> ApiErrorBody raise {
 ///|
 /// Extracts an Anthropic error envelope from an HTTP status failure.
 /// Returns None for transport, decode, configuration, and malformed error bodies.
-pub fn api_error(error : @runtime.SdkError) -> ApiErrorBody? {
+pub fn api_error(error : Error) -> ApiErrorBody? {
   let body = match error {
-    @runtime.Status(body~, ..) | @runtime.RateLimited(body~, ..) => body
+    @client.UnexpectedStatus(_, body~) => body
     _ => return None
   }
   try decode_api_error_body(body) catch {

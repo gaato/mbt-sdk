@@ -1,7 +1,7 @@
 ///|
 async test "model pagination follows last_id and collects every item" {
   bounded(() => {
-    let transport = @mock.FakeTransport::new()
+    let transport = @mock.FakeBackend::new()
     for
       (id, more, path) in [
         ("m1", true, "/v1/models?limit=1&lifecycle%5B%5D=active"),
@@ -29,7 +29,7 @@ async test "model pagination follows last_id and collects every item" {
 async test "empty model pages and missing last_id end pagination" {
   bounded(() => {
     for has_more in [false, true] {
-      let transport = @mock.FakeTransport::new()
+      let transport = @mock.FakeBackend::new()
       let body =
         $|{"data":[],"has_more":\{has_more},"first_id":null,"last_id":null}
       transport.expect("GET", "/v1/models", json_response(body))

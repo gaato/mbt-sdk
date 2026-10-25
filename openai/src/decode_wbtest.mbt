@@ -1,6 +1,11 @@
 ///|
-fn test_response(body : String) -> @http.Response {
-  { status: 200, headers: @http.Headers::new(), body: @utf8.encode(body), }
+fn test_response(body : String) -> Bytes {
+  @utf8.encode(body)
+}
+
+///|
+fn success_head() -> @model.ResponseHead {
+  { status: 200, headers: @model.Headers::empty(), }
 }
 
 ///|
@@ -85,7 +90,7 @@ test "model number decoding accepts values above Int32 and rejects invalid Int64
 test "generated response conversion skips reasoning and unknown output items" {
   let text = openrouter_response_fixture()
   let raw = @json.parse(text)
-  let response = decode_response(test_response(text))
+  let response = decode_response(success_head(), test_response(text))
   assert_eq(response.id, "resp_openrouter_fixture")
   assert_eq(response.status, Unknown("future_status"))
   assert_eq(response.output_text, "hello world")
@@ -158,8 +163,7 @@ test "request body builder uses generated JSON and rejects every known extra col
       extra=Map::from_array([(key, Json::null())]),
     )
     try response_parts(collision, false) catch {
-      @runtime.Config(message) => assert_true(message.contains(key))
-      _ => fail("expected Config")
+      @client.InvalidRequest(message~) => assert_true(message.contains(key))
     } noraise {
       _ => fail("known extra key must fail")
     }
@@ -212,8 +216,7 @@ test "chat request conversion validates roles and uses explicit tool_call_id" {
         ),
       )
     catch {
-      @runtime.Config(message) => assert_true(message.contains(key))
-      _ => fail("expected Config")
+      @client.InvalidRequest(message~) => assert_true(message.contains(key))
     } noraise {
       _ => fail("known chat key must fail")
     }
@@ -234,8 +237,7 @@ test "chat request conversion validates roles and uses explicit tool_call_id" {
       ),
     )
   catch {
-    @runtime.Config(message) => assert_true(message.contains("future"))
-    _ => fail("expected Config")
+    @client.InvalidRequest(message~) => assert_true(message.contains("future"))
   } noraise {
     _ => fail("unknown role must fail")
   }
@@ -354,7 +356,7 @@ test "responses decode function calls and function argument events" {
     #|  "usage":null,"parallel_tool_calls":true
     #|}
     #|
-  let response = decode_response(test_response(text))
+  let response = decode_response(success_head(), test_response(text))
   assert_eq(response.tool_calls, [
     { id: "call_1", name: "get_weather", arguments: "{\"city\":\"Tokyo\"}", },
   ])
@@ -381,7 +383,7 @@ test "chat decoding retains invalid tool argument JSON as raw text" {
   let text =
     #|{"id":"chatcmpl-bad-args","object":"chat.completion","created":1,"model":"gpt","choices":[{"index":0,"message":{"role":"assistant","content":null,"refusal":null,"tool_calls":[{"id":"call_bad","type":"function","function":{"name":"lookup","arguments":"{"}}]},"finish_reason":"tool_calls","logprobs":null}],"usage":null}
     #|
-  let completion = decode_chat_completion(test_response(text))
+  let completion = decode_chat_completion(success_head(), test_response(text))
   assert_eq(completion.tool_calls[0].arguments, "{")
   try ignore(completion.tool_calls[0].arguments_json()) catch {
     @json.InvalidEof => ()
