@@ -15,10 +15,13 @@ are optional unless the field is required, and keep a wildcard arm.
 
 ## [Unreleased]
 
+## [0.12.1] - 2026-10-24
+
 ### Changed
 
 - **Builds on `gaato/http` 0.5.0**, whose cookie jar, Retry-After and Link parsing follow RFC 6265bis-22, RFC 9110 and RFC 8288 more closely; see its CHANGELOG.
 - **The README has sections and compile-checked examples.** The usage example now sends a message. The migration notes from 0.1.0 moved to docs/anthropic-0.2.0.md in the repository and the live-test procedure to docs/live-tests.md. Each re-exported generated type has its own doc comment.
+- **Regenerated from the upstream spec fetched 2026-10-24** (sha256 `f538a797852c`). The public API is unchanged.
 
 ## [0.12.0] - 2026-10-20
 
