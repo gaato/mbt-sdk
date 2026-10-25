@@ -2,106 +2,106 @@
 package "gaato/fixture-petstore3"
 
 import {
-  "gaato/http",
-  "gaato/sdk-runtime",
+  "gaato/mttp/client",
+  "gaato/mttp/model",
   "moonbitlang/core/debug",
   "moonbitlang/core/json",
 }
 
 // Values
-pub fn add_pet_decode(@http.Response) -> Pet raise @sdk-runtime.SdkError
+pub fn add_pet_decode(@model.ResponseHead, Bytes) -> Pet raise @client.ResponseError
 
 pub fn add_pet_decode_json(Json) -> Pet raise @json.JsonDecodeError
 
-pub fn add_pet_request(Pet) -> @http.Request
+pub fn add_pet_request(Pet) -> @model.Request
 
-pub fn create_user_decode(@http.Response) -> User raise @sdk-runtime.SdkError
+pub fn create_user_decode(@model.ResponseHead, Bytes) -> User raise @client.ResponseError
 
 pub fn create_user_decode_json(Json) -> User raise @json.JsonDecodeError
 
-pub fn create_user_request(User) -> @http.Request
+pub fn create_user_request(User) -> @model.Request
 
-pub fn create_users_with_list_input_decode(@http.Response) -> User raise @sdk-runtime.SdkError
+pub fn create_users_with_list_input_decode(@model.ResponseHead, Bytes) -> User raise @client.ResponseError
 
 pub fn create_users_with_list_input_decode_json(Json) -> User raise @json.JsonDecodeError
 
-pub fn create_users_with_list_input_request(Array[User]) -> @http.Request
+pub fn create_users_with_list_input_request(Array[User]) -> @model.Request
 
-pub fn delete_order_request(Int64) -> @http.Request
+pub fn delete_order_request(Int64) -> @model.Request
 
-pub fn delete_pet_request(Int64, api_key? : String) -> @http.Request
+pub fn delete_pet_request(Int64, api_key? : String) -> @model.Request
 
-pub fn delete_user_request(String) -> @http.Request
+pub fn delete_user_request(String) -> @model.Request
 
-pub fn find_pets_by_status_decode(@http.Response) -> Array[Pet] raise @sdk-runtime.SdkError
+pub fn find_pets_by_status_decode(@model.ResponseHead, Bytes) -> Array[Pet] raise @client.ResponseError
 
 pub fn find_pets_by_status_decode_json(Json) -> Array[Pet] raise @json.JsonDecodeError
 
-pub fn find_pets_by_status_request(FindPetsByStatusStatus) -> @http.Request
+pub fn find_pets_by_status_request(FindPetsByStatusStatus) -> @model.Request
 
-pub fn find_pets_by_tags_decode(@http.Response) -> Array[Pet] raise @sdk-runtime.SdkError
+pub fn find_pets_by_tags_decode(@model.ResponseHead, Bytes) -> Array[Pet] raise @client.ResponseError
 
 pub fn find_pets_by_tags_decode_json(Json) -> Array[Pet] raise @json.JsonDecodeError
 
-pub fn find_pets_by_tags_request(Array[String]) -> @http.Request
+pub fn find_pets_by_tags_request(Array[String]) -> @model.Request
 
-pub fn get_inventory_decode(@http.Response) -> Map[String, Int32] raise @sdk-runtime.SdkError
+pub fn get_inventory_decode(@model.ResponseHead, Bytes) -> Map[String, Int32] raise @client.ResponseError
 
 pub fn get_inventory_decode_json(Json) -> Map[String, Int32] raise @json.JsonDecodeError
 
-pub fn get_inventory_request() -> @http.Request
+pub fn get_inventory_request() -> @model.Request
 
-pub fn get_order_by_id_decode(@http.Response) -> Order raise @sdk-runtime.SdkError
+pub fn get_order_by_id_decode(@model.ResponseHead, Bytes) -> Order raise @client.ResponseError
 
 pub fn get_order_by_id_decode_json(Json) -> Order raise @json.JsonDecodeError
 
-pub fn get_order_by_id_request(Int64) -> @http.Request
+pub fn get_order_by_id_request(Int64) -> @model.Request
 
-pub fn get_pet_by_id_decode(@http.Response) -> Pet raise @sdk-runtime.SdkError
+pub fn get_pet_by_id_decode(@model.ResponseHead, Bytes) -> Pet raise @client.ResponseError
 
 pub fn get_pet_by_id_decode_json(Json) -> Pet raise @json.JsonDecodeError
 
-pub fn get_pet_by_id_request(Int64) -> @http.Request
+pub fn get_pet_by_id_request(Int64) -> @model.Request
 
-pub fn get_user_by_name_decode(@http.Response) -> User raise @sdk-runtime.SdkError
+pub fn get_user_by_name_decode(@model.ResponseHead, Bytes) -> User raise @client.ResponseError
 
 pub fn get_user_by_name_decode_json(Json) -> User raise @json.JsonDecodeError
 
-pub fn get_user_by_name_request(String) -> @http.Request
+pub fn get_user_by_name_request(String) -> @model.Request
 
-pub fn login_user_decode(@http.Response) -> String raise @sdk-runtime.SdkError
+pub fn login_user_decode(@model.ResponseHead, Bytes) -> String raise @client.ResponseError
 
 pub fn login_user_decode_json(Json) -> String raise @json.JsonDecodeError
 
-pub fn login_user_request(username? : String, password? : String) -> @http.Request
+pub fn login_user_request(username? : String, password? : String) -> @model.Request
 
-pub fn logout_user_request() -> @http.Request
+pub fn logout_user_request() -> @model.Request
 
-pub fn place_order_decode(@http.Response) -> Order raise @sdk-runtime.SdkError
+pub fn place_order_decode(@model.ResponseHead, Bytes) -> Order raise @client.ResponseError
 
 pub fn place_order_decode_json(Json) -> Order raise @json.JsonDecodeError
 
-pub fn place_order_request(Order) -> @http.Request
+pub fn place_order_request(Order) -> @model.Request
 
-pub fn update_pet_decode(@http.Response) -> Pet raise @sdk-runtime.SdkError
+pub fn update_pet_decode(@model.ResponseHead, Bytes) -> Pet raise @client.ResponseError
 
 pub fn update_pet_decode_json(Json) -> Pet raise @json.JsonDecodeError
 
-pub fn update_pet_request(Pet) -> @http.Request
+pub fn update_pet_request(Pet) -> @model.Request
 
-pub fn update_pet_with_form_decode(@http.Response) -> Pet raise @sdk-runtime.SdkError
+pub fn update_pet_with_form_decode(@model.ResponseHead, Bytes) -> Pet raise @client.ResponseError
 
 pub fn update_pet_with_form_decode_json(Json) -> Pet raise @json.JsonDecodeError
 
-pub fn update_pet_with_form_request(Int64, name? : String, status? : String) -> @http.Request
+pub fn update_pet_with_form_request(Int64, name? : String, status? : String) -> @model.Request
 
-pub fn update_user_request(String, User) -> @http.Request
+pub fn update_user_request(String, User) -> @model.Request
 
-pub fn upload_file_decode(@http.Response) -> ApiResponse raise @sdk-runtime.SdkError
+pub fn upload_file_decode(@model.ResponseHead, Bytes) -> ApiResponse raise @client.ResponseError
 
 pub fn upload_file_decode_json(Json) -> ApiResponse raise @json.JsonDecodeError
 
-pub fn upload_file_request(Int64, additional_metadata? : String) -> @http.Request
+pub fn upload_file_request(Int64, additional_metadata? : String) -> @model.Request
 
 // Errors
 

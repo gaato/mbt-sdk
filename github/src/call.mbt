@@ -9,14 +9,17 @@
 ///       @gen.repos_get_decode,
 ///     )
 ///
-/// Failures arrive as `@runtime.SdkError`; `api_error` reads GitHub's error
+/// Failures arrive as `Error`; `api_error` reads GitHub's error
 /// body out of one.
-pub async fn[T] GitHub::call(
+pub async fn[T, E : Error] GitHub::call(
   self : GitHub,
-  request : @http.Request,
-  decode : (@http.Response) -> T raise @runtime.SdkError,
-) -> T raise @runtime.SdkError {
-  decode(self.send(request))
+  request : @model.Request,
+  decode : (@model.ResponseHead, Bytes) -> T raise E,
+) -> T raise Error {
+  self.send_with(
+    request,
+    @client.as_bytes().map_with_head((bytes, head) => decode(head, bytes)),
+  ).body
 }
 
 ///|
@@ -27,11 +30,22 @@ pub async fn[T] GitHub::call(
 /// such as `application/vnd.github.diff`.
 pub async fn GitHub::send(
   self : GitHub,
-  request : @http.Request,
-) -> @http.Response raise @runtime.SdkError {
+  request : @model.Request,
+) -> @client.Reply[Bytes] raise Error {
+  self.send_with(request, @client.as_bytes())
+}
+
+///|
+async fn[T] GitHub::send_with(
+  self : GitHub,
+  request : @model.Request,
+  reader : @client.ResponseAs[T],
+) -> @client.Reply[T] {
   self.client.send(
-    request,
-    bucket=rate_limit_bucket(request.http_method, request.url),
+    @client.ClientRequest::new(request, reader).attribute(
+      @client.rate_limit_bucket,
+      rate_limit_bucket(request.meth.to_string(), request.url),
+    ),
   )
 }
 
@@ -87,7 +101,7 @@ fn rate_limit_bucket(http_method : String, url : String) -> String {
 /// notification-sending write also holds the next plain write for 3 s, where
 /// octokit keeps a separate 3 s queue for them; the stricter spacing meets
 /// both of its limits. Reads are not paced.
-fn github_pace(bucket : String) -> @runtime.Pace {
+fn github_pace(bucket : String) -> @ratelimit.Pace {
   match bucket {
     "core:write" | "graphql" | "graphql:mutation" =>
       { group: "write", min_interval_ms: 1000, }

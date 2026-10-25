@@ -2,24 +2,27 @@
 package "gaato/github"
 
 import {
-  "gaato/http",
-  "gaato/http/clock",
-  "gaato/http/retry",
-  "gaato/http/sync",
-  "gaato/sdk-runtime",
+  "gaato/mttp/client",
+  "gaato/mttp/client/retry",
+  "gaato/mttp/clock",
+  "gaato/mttp/model",
   "moonbitlang/core/debug",
 }
 
 // Values
-pub fn api_error(@sdk-runtime.SdkError) -> ApiErrorBody?
+pub fn api_error(Error) -> ApiErrorBody?
 
-pub fn graphql_errors(@sdk-runtime.SdkError) -> Array[GraphqlError]?
+pub fn graphql_errors(Error) -> Array[GraphqlError]?
 
-pub fn is_not_modified(@sdk-runtime.SdkError) -> Bool
+pub fn is_not_modified(Error) -> Bool
 
-pub fn is_secondary_rate_limit(@sdk-runtime.SdkError) -> Bool
+pub fn is_secondary_rate_limit(Error) -> Bool
 
 // Errors
+pub(all) suberror GraphqlFailure {
+  GraphqlFailure(@model.ResponseHead, message~ : String, body~ : Bytes)
+} derive(@debug.Debug)
+pub fn GraphqlFailure::to_repr(Self) -> @debug.Repr
 
 // Types and methods
 pub(all) struct ApiErrorBody {
@@ -35,22 +38,22 @@ pub fn ApiErrorBody::to_repr(Self) -> @debug.Repr
 pub struct GitHub {
   // private fields
 }
-pub async fn[T] GitHub::call(Self, @http.Request, (@http.Response) -> T raise @sdk-runtime.SdkError) -> T raise @sdk-runtime.SdkError
-pub fn GitHub::from_client(@sdk-runtime.Client, graphql_url? : String) -> Self
-pub async fn GitHub::graphql(Self, query~ : String, variables? : Json, operation_name? : String) -> Json raise @sdk-runtime.SdkError
-pub fn[T] GitHub::graphql_paginator(Self, (Json) -> (Array[T], String?) raise @sdk-runtime.SdkError, query~ : String, variables? : Json, cursor_variable? : String, operation_name? : String) -> @sdk-runtime.Paginator[T, @sdk-runtime.SdkError]
-pub async fn GitHub::graphql_response(Self, query~ : String, variables? : Json, operation_name? : String) -> Json raise @sdk-runtime.SdkError
-pub fn GitHub::new(&@http.Transport, &@clock.Clock, token? : String, base_url? : String, api_version? : String, user_agent? : String, retry? : @sdk-runtime.RetryPolicy, limiter? : &@sdk-runtime.RateLimiter, graphql_url? : String, gate? : () -> &@sync.Gate, timeouts? : @sdk-runtime.Timeouts) -> Self
-pub fn[T] GitHub::paginator(Self, @http.Request, (@http.Response) -> Array[T] raise @sdk-runtime.SdkError) -> @sdk-runtime.Paginator[T, @sdk-runtime.SdkError]
-pub async fn GitHub::send(Self, @http.Request) -> @http.Response raise @sdk-runtime.SdkError
+pub async fn[T, E : Error] GitHub::call(Self, @model.Request, (@model.ResponseHead, Bytes) -> T raise E) -> T
+pub fn GitHub::from_client(@client.Client, graphql_url? : String) -> Self
+pub async fn GitHub::graphql(Self, query~ : String, variables? : Json, operation_name? : String) -> Json
+pub fn[T] GitHub::graphql_paginator(Self, (Json) -> (Array[T], String?) raise, query~ : String, variables? : Json, cursor_variable? : String, operation_name? : String) -> @client.Paginator[T, Error]
+pub async fn GitHub::graphql_response(Self, query~ : String, variables? : Json, operation_name? : String) -> Json
+pub fn GitHub::new(&@client.Backend, &@clock.Clock, token? : String, base_url? : String, api_version? : String, user_agent? : String, retry? : @client.RetryPolicy, limiter? : &@client.RateLimiter, graphql_url? : String, gate? : () -> &@clock.Gate, timer? : &@clock.Timer, options? : @client.RequestOptions, total_timeout_ms? : Int32) -> Self
+pub fn[T, E : Error] GitHub::paginator(Self, @model.Request, (@model.ResponseHead, Bytes) -> Array[T] raise E) -> @client.Paginator[T, Error]
+pub async fn GitHub::send(Self, @model.Request) -> @client.Reply[Bytes]
 pub fn GitHub::to_repr(Self) -> @debug.Repr
 pub impl @debug.Debug for GitHub
 
 pub(all) struct GitHubRetry {
-  policy : @sdk-runtime.RetryPolicy
+  policy : @client.RetryPolicy
 }
-pub fn GitHubRetry::decide(Self, @sdk-runtime.SdkError, @sdk-runtime.RetryContext) -> @retry.Decision
-pub impl @sdk-runtime.RetryDecider for GitHubRetry
+pub fn GitHubRetry::decide(Self, Error, @client.RetryContext) -> @retry.Decision
+pub impl @client.RetryDecider for GitHubRetry
 
 pub(all) struct GraphqlError {
   message : String

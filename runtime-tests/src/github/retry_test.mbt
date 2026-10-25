@@ -3,11 +3,11 @@ async test "secondary limits retry GET and POST with server or fallback delays" 
   bounded(() => {
     for http_method in ["GET", "POST"] {
       for header in [true, false] {
-        let transport = @mock.FakeTransport::new()
+        let transport = @mock.FakeBackend::new()
         let headers = if header {
-          @http.Headers::from_array([("retry-after", "3")])
+          @http.Headers::of([("retry-after", "3")])
         } else {
-          @http.Headers::new()
+          @http.Headers::empty()
         }
         transport.expect(
           http_method,
@@ -52,7 +52,7 @@ async test "plain forbidden and the retry count stop retries; the fallback doubl
           [60000, 120000, 240000],
         ),
       ] {
-      let transport = @mock.FakeTransport::new()
+      let transport = @mock.FakeBackend::new()
       for _ in 0..<count {
         transport.expect("GET", "/test", json_response(body, status=403))
       }
@@ -64,7 +64,7 @@ async test "plain forbidden and the retry count stop retries; the fallback doubl
         retry=@runtime.RetryPolicy::default().with_max_retries(retries),
       )
       try gh.send(@http.Request::get("/test")) catch {
-        error => assert_eq(error.status(), Some(403))
+        error => assert_eq(@runtime.status_of(error), Some(403))
       } noraise {
         _ => fail("403 must fail after retries stop")
       }
@@ -91,7 +91,7 @@ fn assert_conservative_backoff(slept : Array[Int32]) -> Unit raise {
 ///|
 async test "a 502 is retried three times for GET and not at all for POST" {
   bounded(() => {
-    let transport = @mock.FakeTransport::new()
+    let transport = @mock.FakeBackend::new()
     for _ in 0..<4 {
       transport.expect(
         "GET",
@@ -102,7 +102,7 @@ async test "a 502 is retried three times for GET and not at all for POST" {
     let clock = @mock.FakeClock::new()
     let gh = @github_sdk.GitHub::new(transport, clock, limiter=no_limiter())
     try gh.send(@http.Request::get("/repos/o/r")) catch {
-      error => assert_eq(error.status(), Some(502))
+      error => assert_eq(@runtime.status_of(error), Some(502))
     } noraise {
       _ => fail("the fourth 502 must be raised")
     }
@@ -111,7 +111,7 @@ async test "a 502 is retried three times for GET and not at all for POST" {
     transport.assert_complete()
 
     // GitHub has no idempotency key: a resent POST could open a second issue.
-    let writes = @mock.FakeTransport::new()
+    let writes = @mock.FakeBackend::new()
     writes.expect(
       "POST",
       "/repos/o/r/issues",
@@ -120,7 +120,7 @@ async test "a 502 is retried three times for GET and not at all for POST" {
     let clock = @mock.FakeClock::new()
     let gh = @github_sdk.GitHub::new(writes, clock, limiter=no_limiter())
     try gh.send(@http.Request::post("/repos/o/r/issues")) catch {
-      error => assert_eq(error.status(), Some(502))
+      error => assert_eq(@runtime.status_of(error), Some(502))
     } noraise {
       _ => fail("a POST 502 must be raised")
     }
@@ -132,7 +132,7 @@ async test "a 502 is retried three times for GET and not at all for POST" {
 ///|
 async test "a secondary limit without retry-after waits a minute, then two" {
   bounded(() => {
-    let transport = @mock.FakeTransport::new()
+    let transport = @mock.FakeBackend::new()
     for _ in 0..<2 {
       transport.expect(
         "POST",
@@ -162,7 +162,7 @@ async test "a primary limit waits until a second past the reset, once" {
         headers=rate_limit_headers(0, reset),
       )
     }
-    let transport = @mock.FakeTransport::new()
+    let transport = @mock.FakeBackend::new()
     transport.expect("GET", "/repos/o/r", exhausted(100))
     transport.expect("GET", "/repos/o/r", exhausted(200))
     let clock = @mock.FakeClock::new()
@@ -170,14 +170,14 @@ async test "a primary limit waits until a second past the reset, once" {
     // retry leaves, it has reset, so nothing waits twice.
     let gh = @github_sdk.GitHub::new(transport, clock, token="ghp_test")
     try gh.send(@http.Request::get("/repos/o/r")) catch {
-      error => assert_eq(error.status(), Some(403))
+      error => assert_eq(@runtime.status_of(error), Some(403))
     } noraise {
       _ => fail("a second primary limit must be raised")
     }
     assert_eq(clock.slept(), [101000])
     transport.assert_complete()
 
-    let recovering = @mock.FakeTransport::new()
+    let recovering = @mock.FakeBackend::new()
     recovering.expect("POST", "/repos/o/r/labels", exhausted(10))
     recovering.expect("POST", "/repos/o/r/labels", json_response("{}"))
     let clock = @mock.FakeClock::new()
@@ -193,7 +193,7 @@ async test "a transient graphql failure is retried for a query, not a mutation" 
   bounded(() => {
     let transient =
       #|{"data":null,"errors":[{"message":"Something went wrong while executing your query. Please include `0400:3E2B` when reporting this issue."}]}
-    let transport = @mock.FakeTransport::new()
+    let transport = @mock.FakeBackend::new()
     transport.expect(
       "POST",
       "https://api.github.com/graphql",
@@ -213,7 +213,7 @@ async test "a transient graphql failure is retried for a query, not a mutation" 
     assert_conservative_backoff(clock.slept())
     transport.assert_complete()
 
-    let mutation = @mock.FakeTransport::new()
+    let mutation = @mock.FakeBackend::new()
     mutation.expect(
       "POST",
       "https://api.github.com/graphql",
@@ -226,7 +226,7 @@ async test "a transient graphql failure is retried for a query, not a mutation" 
         query="mutation { addStar(input: {starrableId: \"x\"}) { clientMutationId } }",
       )
     catch {
-      @runtime.Decode(..) as error =>
+      @github_sdk.GraphqlFailure(_, ..) as error =>
         assert_true(@github_sdk.graphql_errors(error) is Some([_]))
       error => fail("expected Decode: " + @debug.to_string(error))
     } noraise {
@@ -236,7 +236,7 @@ async test "a transient graphql failure is retried for a query, not a mutation" 
     mutation.assert_complete()
 
     // graphql_response returns a mutation's failed envelope as before.
-    let kept = @mock.FakeTransport::new()
+    let kept = @mock.FakeBackend::new()
     kept.expect(
       "POST",
       "https://api.github.com/graphql",
@@ -258,13 +258,13 @@ async test "a transient graphql failure is retried for a query, not a mutation" 
 ///|
 async test "a secondary limit reported in a graphql 200 is waited out" {
   bounded(() => {
-    let transport = @mock.FakeTransport::new()
+    let transport = @mock.FakeBackend::new()
     transport.expect(
       "POST",
       "https://api.github.com/graphql",
       json_response(
         "{\"errors\":[{\"message\":\"You have exceeded a secondary rate limit.\"}]}",
-        headers=@http.Headers::from_array([("retry-after", "5")]),
+        headers=@http.Headers::of([("retry-after", "5")]),
       ),
     )
     transport.expect(
@@ -293,12 +293,12 @@ async test "writes, graphql, notifications and searches are spaced; reads are no
         ("POST", "https://api.github.com/graphql", [1000]),
       ] {
       let (http_method, url, waits) = case
-      let transport = @mock.FakeTransport::new()
+      let transport = @mock.FakeBackend::new()
       transport.expect(http_method, url, json_response("{}"))
       transport.expect(http_method, url, json_response("{}"))
       let clock = @mock.FakeClock::new()
       let gh = @github_sdk.GitHub::new(transport, clock, token="ghp_test")
-      let request : @http.Request = { ..@http.Request::get(url), http_method, }
+      let request = @http.Request::new(@http.Method::parse(http_method), url)
       ignore(gh.send(request))
       ignore(gh.send(request))
       assert_eq((url, clock.slept()), (url, waits))
@@ -307,7 +307,7 @@ async test "writes, graphql, notifications and searches are spaced; reads are no
 
     // A notification-sending write holds the next plain write for 3 s; a
     // plain write holds the next notification-sending one for 1 s.
-    let transport = @mock.FakeTransport::new()
+    let transport = @mock.FakeBackend::new()
     transport.expect("POST", "/repos/o/r/issues", json_response("{}"))
     transport.expect("POST", "/repos/o/r/labels", json_response("{}"))
     transport.expect("POST", "/repos/o/r/issues", json_response("{}"))
@@ -327,9 +327,8 @@ async test "a write shares the core window it names in x-ratelimit-resource" {
     let core = (remaining : Int32, reset : Int32) => {
       let headers = rate_limit_headers(remaining, reset)
       headers.set("x-ratelimit-resource", "core")
-      headers
     }
-    let transport = @mock.FakeTransport::new()
+    let transport = @mock.FakeBackend::new()
     transport.expect(
       "POST",
       "/repos/o/r/labels",
@@ -371,7 +370,7 @@ async test "the caller's gate holds each paced group across a request" {
   bounded(() => {
     let log = []
     let groups = []
-    let transport = @mock.FakeTransport::new()
+    let transport = @mock.FakeBackend::new()
     transport.expect("POST", "/repos/o/r/labels", json_response("{}"))
     transport.expect("GET", "/repos/o/r", json_response("{}"))
     let gh = @github_sdk.GitHub::new(

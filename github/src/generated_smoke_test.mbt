@@ -522,16 +522,16 @@ fn full_repository_example() -> String {
 ///|
 test "generated requests carry the method and the path of the operation" {
   let repo = @gen.repos_get_request("gaato", "mbt-sdk")
-  assert_eq(repo.http_method, "GET")
+  assert_eq(repo.meth.to_string(), "GET")
   assert_eq(repo.url, "/repos/gaato/mbt-sdk")
-  assert_eq(repo.body, Bytes(b""))
+  assert_eq(repo.body, Empty)
   // No generated operation sets headers: the client's defaults supply them.
   assert_eq(repo.headers.length(), 0)
   let listed = @gen.repos_list_for_user_request("gaato", per_page=100)
-  assert_eq(listed.http_method, "GET")
+  assert_eq(listed.meth.to_string(), "GET")
   assert_eq(listed.url, "/users/gaato/repos?per_page=100")
   let searched = @gen.search_repos_request("moonbit sdk", per_page=50)
-  assert_eq(searched.http_method, "GET")
+  assert_eq(searched.meth.to_string(), "GET")
   assert_eq(searched.url, "/search/repositories?q=moonbit%20sdk&per_page=50")
 }
 
@@ -554,12 +554,14 @@ test "the spec example of repos/get decodes into the generated type" {
   assert_eq(repo.default_branch, "master")
   assert_eq(repo.license.unwrap().key, "mit")
   // The same payload arrives through the response decoder the facade calls.
-  let response : @http.Response = {
+  let head : @model.ResponseHead = {
     status: 200,
-    headers: @http.Headers::from_array([
+    headers: @model.Headers::of([
       ("content-type", "application/json; charset=utf-8"),
     ]),
-    body: @utf8.encode(value.stringify()),
   }
-  assert_eq(@gen.repos_get_decode(response).full_name, "octocat/Hello-World")
+  assert_eq(
+    @gen.repos_get_decode(head, @utf8.encode(value.stringify())).full_name,
+    "octocat/Hello-World",
+  )
 }

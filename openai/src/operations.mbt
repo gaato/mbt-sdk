@@ -19,80 +19,100 @@ fn embedding_response_from_generated(
 }
 
 ///|
+async fn[T] OpenAI::send_with(
+  self : OpenAI,
+  request : @model.Request,
+  reader : @client.ResponseAs[T],
+  bucket : String,
+) -> T {
+  self.client.send(
+    @client.ClientRequest::new(request, reader).attribute(
+      @client.rate_limit_bucket, bucket,
+    ),
+  ).body
+}
+
+///|
 /// Creates and buffers one Chat Completions response.
 pub async fn OpenAI::chat_completion(
   self : OpenAI,
   request : ChatRequest,
-) -> ChatCompletion raise @runtime.SdkError {
+) -> ChatCompletion {
   let (generated, body) = chat_parts(request, false)
-  let response = self.client.send(
-    @gen.create_chat_completion_request(generated).json_body(body),
-    bucket="chat",
+  self.send_with(
+    @gen.create_chat_completion_request(generated).body_json(body),
+    @client.as_bytes().map_with_head((bytes, head) => {
+      decode_chat_completion(head, bytes)
+    }),
+    "chat",
   )
-  decode_chat_completion(response)
 }
 
 ///|
 fn decode_chat_stream_data(
+  head : @model.ResponseHead,
   data : String,
-) -> Array[ChatEvent] raise @runtime.SdkError {
+) -> Array[ChatEvent] raise @client.ResponseError {
   let body = @utf8.encode(data)
   let raw = parse_json_body(body) catch {
-    error => raise @runtime.Decode(message=error.to_string(), body~)
+    error =>
+      raise @client.Deserialization(head, message=error.to_string(), body~)
   }
   decode_chat_chunk(raw) catch {
-    error => raise @runtime.Decode(message=error.to_string(), body~)
+    error =>
+      raise @client.Deserialization(head, message=error.to_string(), body~)
   }
 }
 
 ///|
-/// Creates a streaming Chat Completions response and dispatches events in wire order.
-/// The request enables the final usage chunk and the stream is always closed.
-pub async fn[E : Error] OpenAI::stream_chat_completion(
+/// Dispatches Chat Completions events in wire order, including final usage.
+/// EOF, [DONE], decoding failure and callback failure close the stream.
+pub async fn OpenAI::stream_chat_completion(
   self : OpenAI,
   request : ChatRequest,
-  f : async (ChatEvent) -> Unit raise E,
+  f : async (ChatEvent) -> Unit,
 ) -> Unit {
   let (generated, body) = chat_parts(request, true)
-  let (_, stream) = self.client.send_stream(
+  self.send_with(
     @gen.create_chat_completion_request(generated)
     .header("accept", "text/event-stream")
-    .json_body(body),
-    bucket="chat",
+    .body_json(body),
+    @client.from_head(head => {
+      @client.as_sse(
+        event => {
+          for decoded in decode_chat_stream_data(head, event.data) {
+            f(decoded)
+          }
+        },
+        stop=event => event.data == "[DONE]",
+      )
+    }),
+    "chat",
   )
-  @sse.each_event(stream, event => {
-    if event.data == "[DONE]" {
-      raise StreamDone
-    }
-    for decoded in decode_chat_stream_data(event.data) {
-      f(decoded)
-    }
-  }) catch {
-    StreamDone => ()
-    error => raise error
-  }
 }
 
 ///|
 /// Lists the models visible to the configured account.
-pub async fn OpenAI::list_models(
-  self : OpenAI,
-) -> Array[Model] raise @runtime.SdkError {
-  let response = self.client.send(@gen.list_models_request(), bucket="models")
-  @gen.list_models_decode(response).data.map(model_from_generated)
+pub async fn OpenAI::list_models(self : OpenAI) -> Array[Model] {
+  self.send_with(
+    @gen.list_models_request(),
+    @client.as_bytes().map_with_head((bytes, head) => {
+      @gen.list_models_decode(head, bytes).data.map(model_from_generated)
+    }),
+    "models",
+  )
 }
 
 ///|
 /// Retrieves one model by identifier.
-pub async fn OpenAI::retrieve_model(
-  self : OpenAI,
-  model : String,
-) -> Model raise @runtime.SdkError {
-  let response = self.client.send(
+pub async fn OpenAI::retrieve_model(self : OpenAI, model : String) -> Model {
+  self.send_with(
     @gen.retrieve_model_request(model),
-    bucket="models",
+    @client.as_bytes().map_with_head((bytes, head) => {
+      model_from_generated(@gen.retrieve_model_decode(head, bytes))
+    }),
+    "models",
   )
-  model_from_generated(@gen.retrieve_model_decode(response))
 }
 
 ///|
@@ -100,18 +120,22 @@ pub async fn OpenAI::retrieve_model(
 pub async fn OpenAI::create_embeddings(
   self : OpenAI,
   request : EmbeddingRequest,
-) -> EmbeddingResponse raise @runtime.SdkError {
+) -> EmbeddingResponse {
   let body = @gen.CreateEmbeddingRequest::new(
     model=request.model,
     input=@gen.TextArray(request.input.copy()),
     dimensions?=request.dimensions,
     user?=request.user,
   )
-  let response = self.client.send(
+  self.send_with(
     @gen.create_embedding_request(body),
-    bucket="embeddings",
+    @client.as_bytes().map_with_head((bytes, head) => {
+      embedding_response_from_generated(
+        @gen.create_embedding_decode(head, bytes),
+      )
+    }),
+    "embeddings",
   )
-  embedding_response_from_generated(@gen.create_embedding_decode(response))
 }
 
 ///|
@@ -119,50 +143,47 @@ pub async fn OpenAI::create_embeddings(
 pub async fn OpenAI::create_response(
   self : OpenAI,
   request : ResponseRequest,
-) -> Response raise @runtime.SdkError {
+) -> Response {
   let (generated, body) = response_parts(request, false)
-  let response = self.client.send(
-    @gen.create_response_request(generated).json_body(body),
-    bucket="responses",
+  self.send_with(
+    @gen.create_response_request(generated).body_json(body),
+    @client.as_bytes().map_with_head((bytes, head) => {
+      decode_response(head, bytes)
+    }),
+    "responses",
   )
-  decode_response(response)
 }
 
 ///|
-priv suberror StreamDone {
-  StreamDone
-}
-
-///|
-fn decode_stream_data(data : String) -> ResponseEvent raise @runtime.SdkError {
+fn decode_stream_data(
+  head : @model.ResponseHead,
+  data : String,
+) -> ResponseEvent raise @client.ResponseError {
   let body = @utf8.encode(data)
   decode_response_event(parse_json_body(body)) catch {
-    error => raise @runtime.Decode(message=error.to_string(), body~)
+    error =>
+      raise @client.Deserialization(head, message=error.to_string(), body~)
   }
 }
 
 ///|
-/// Creates a streaming response and dispatches decoded events in arrival order.
-/// The stream is closed after EOF, `[DONE]`, decoding failure, or callback failure.
-pub async fn[E : Error] OpenAI::stream_response(
+/// Dispatches Responses events in wire order, closing on EOF, [DONE] or failure.
+/// User callback failures happen outside the retry attempt.
+pub async fn OpenAI::stream_response(
   self : OpenAI,
   request : ResponseRequest,
-  f : async (ResponseEvent) -> Unit raise E,
+  f : async (ResponseEvent) -> Unit,
 ) -> Unit {
   let (generated, body) = response_parts(request, true)
-  let (_, stream) = self.client.send_stream(
+  self.send_with(
     @gen.create_response_request(generated)
     .header("accept", "text/event-stream")
-    .json_body(body),
-    bucket="responses",
+    .body_json(body),
+    @client.from_head(head => {
+      @client.as_sse(event => f(decode_stream_data(head, event.data)), stop=event => {
+        event.data == "[DONE]"
+      })
+    }),
+    "responses",
   )
-  @sse.each_event(stream, event => {
-    if event.data == "[DONE]" {
-      raise StreamDone
-    }
-    f(decode_stream_data(event.data))
-  }) catch {
-    StreamDone => ()
-    error => raise error
-  }
 }

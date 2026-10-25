@@ -22,11 +22,12 @@ fn parse_json_body(body : Bytes) -> Json raise {
 
 ///|
 fn[T : @json.FromJson] decode_response(
-  response : @http.Response,
-) -> T raise @runtime.SdkError {
-  @json.from_json(parse_json_body(response.body)) catch {
+  head : @model.ResponseHead,
+  body : Bytes,
+) -> T raise @client.ResponseError {
+  @json.from_json(parse_json_body(body)) catch {
     error =>
-      raise @runtime.Decode(message=error.to_string(), body=response.body)
+      raise @client.Deserialization(head, message=error.to_string(), body~)
   }
 }
 
@@ -35,8 +36,8 @@ fn[T : @json.FromJson] decode_response(
 /// **Starting a new project?** We recommend trying [Responses](/docs/api-reference/responses) to take advantage of the latest OpenAI platform features. Compare [Chat Completions with Responses](/docs/guides/responses-vs-chat-completions?api-mode=responses). --- Creates a model response for the given chat conversation. Learn more in the [text generation](/docs/guides/text-generation), [vision](/docs/guides/vision), and [audio](/docs/guides/audio) guides. Parameter support can differ depending on the model used to generate the response, particularly for newer reasoning models. Parameters that are only supported for reasoning models are noted below. For the current state of unsupported parameters in reasoning models, [refer to the reasoning guide](/docs/guides/reasoning).
 pub fn create_chat_completion_request(
   body : CreateChatCompletionRequest,
-) -> @http.Request {
-  @http.Request::post("/chat/completions").json_body(Json(body))
+) -> @model.Request {
+  @model.Request::post("/chat/completions").body_json(Json(body))
 }
 
 ///|
@@ -52,16 +53,19 @@ pub fn create_chat_completion_decode_json(
 ///
 /// Decodes a successful createChatCompletion response.
 pub fn create_chat_completion_decode(
-  response : @http.Response,
-) -> CreateChatCompletionResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @model.ResponseHead,
+  body : Bytes,
+) -> CreateChatCompletionResponse raise @client.ResponseError {
+  decode_response(head, body)
 }
 
 ///|
 ///
 /// Creates an embedding vector representing the input text.
-pub fn create_embedding_request(body : CreateEmbeddingRequest) -> @http.Request {
-  @http.Request::post("/embeddings").json_body(Json(body))
+pub fn create_embedding_request(
+  body : CreateEmbeddingRequest,
+) -> @model.Request {
+  @model.Request::post("/embeddings").body_json(Json(body))
 }
 
 ///|
@@ -77,16 +81,17 @@ pub fn create_embedding_decode_json(
 ///
 /// Decodes a successful createEmbedding response.
 pub fn create_embedding_decode(
-  response : @http.Response,
-) -> CreateEmbeddingResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @model.ResponseHead,
+  body : Bytes,
+) -> CreateEmbeddingResponse raise @client.ResponseError {
+  decode_response(head, body)
 }
 
 ///|
 ///
 /// Lists the currently available models, and provides basic information about each one such as the owner and availability.
-pub fn list_models_request() -> @http.Request {
-  @http.Request::get("/models")
+pub fn list_models_request() -> @model.Request {
+  @model.Request::get("/models")
 }
 
 ///|
@@ -102,16 +107,19 @@ pub fn list_models_decode_json(
 ///
 /// Decodes a successful listModels response.
 pub fn list_models_decode(
-  response : @http.Response,
-) -> ListModelsResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @model.ResponseHead,
+  body : Bytes,
+) -> ListModelsResponse raise @client.ResponseError {
+  decode_response(head, body)
 }
 
 ///|
 ///
 /// Retrieves a model instance, providing basic information about the model such as the owner and permissioning.
-pub fn retrieve_model_request(model : String) -> @http.Request {
-  @http.Request::get("/models/" + @http.percent_encode(parameter_value(model)))
+pub fn retrieve_model_request(model : String) -> @model.Request {
+  @model.Request::get(
+    "/models/" + @model.percent_encode(parameter_value(model)),
+  )
 }
 
 ///|
@@ -127,16 +135,17 @@ pub fn retrieve_model_decode_json(
 ///
 /// Decodes a successful retrieveModel response.
 pub fn retrieve_model_decode(
-  response : @http.Response,
-) -> Model raise @runtime.SdkError {
-  decode_response(response)
+  head : @model.ResponseHead,
+  body : Bytes,
+) -> Model raise @client.ResponseError {
+  decode_response(head, body)
 }
 
 ///|
 ///
 /// Creates a model response. Provide [text](/docs/guides/text) or [image](/docs/guides/images) inputs to generate [text](/docs/guides/text) or [JSON](/docs/guides/structured-outputs) outputs. Have the model call your own [custom code](/docs/guides/function-calling) or use built-in [tools](/docs/guides/tools) like [web search](/docs/guides/tools-web-search) or [file search](/docs/guides/tools-file-search) to use your own data as input for the model's response.
-pub fn create_response_request(body : CreateResponse) -> @http.Request {
-  @http.Request::post("/responses").json_body(Json(body))
+pub fn create_response_request(body : CreateResponse) -> @model.Request {
+  @model.Request::post("/responses").body_json(Json(body))
 }
 
 ///|
@@ -152,7 +161,8 @@ pub fn create_response_decode_json(
 ///
 /// Decodes a successful createResponse response.
 pub fn create_response_decode(
-  response : @http.Response,
-) -> Response raise @runtime.SdkError {
-  decode_response(response)
+  head : @model.ResponseHead,
+  body : Bytes,
+) -> Response raise @client.ResponseError {
+  decode_response(head, body)
 }

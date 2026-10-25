@@ -662,7 +662,7 @@ def _path_expression(operation: Operation) -> str:
             continue
         if part in parameters:
             parameter = parameters[part]
-            encoder = "@http.percent_encode_path" if parameter.path_segments else "@http.percent_encode"
+            encoder = "@model.percent_encode_path" if parameter.path_segments else "@model.percent_encode"
             expressions.append(f"{encoder}(parameter_value({parameter.moon_name}))")
         else:
             expressions.append(_moon_string(part))
@@ -724,11 +724,11 @@ def _operation(operation: Operation) -> str:
             parameters.append(f"{field.moon_name}? : {field.type.moon_type()}")
     fallback = f"Builds the {operation.operation_id} request."
     if operation.response_type is None:
-        fallback += " The caller handles the response as @http.Response."
-    description = " ".join((operation.description, "The caller handles the response as @http.Response." if operation.response_type is None else "")).strip()
+        fallback += " The caller handles the response as @model.Response."
+    description = " ".join((operation.description, "The caller handles the response as @model.Response." if operation.response_type is None else "")).strip()
     lines = _doc(description, fallback)
     raises = " raise @multipart.MultipartError" if operation.multipart_fields else ""
-    lines.append(f"pub fn {request_name}({', '.join(parameters)}) -> @http.Request{raises} {{")
+    lines.append(f"pub fn {request_name}({', '.join(parameters)}) -> @model.Request{raises} {{")
     query_parameters = [parameter for parameter in operation.parameters if parameter.location == "query"]
     if query_parameters:
         lines.append(f"  let mut url = {_path_expression(operation)}")
@@ -736,28 +736,28 @@ def _operation(operation: Operation) -> str:
             name = _moon_string(parameter.json_name)
             if parameter.style == "deepObject":
                 if parameter.required:
-                    lines.extend([f"  for key, value in {parameter.moon_name} {{", f"    url = @http.append_query(url, {name} + \"[\" + key + \"]\", parameter_value(value))", "  }"])
+                    lines.extend([f"  for key, value in {parameter.moon_name} {{", f"    url = @model.append_query(url, {name} + \"[\" + key + \"]\", parameter_value(value))", "  }"])
                 else:
-                    lines.extend([f"  match {parameter.moon_name} {{", "    Some(values) =>", "      for key, value in values {", f"        url = @http.append_query(url, {name} + \"[\" + key + \"]\", parameter_value(value))", "      }", "    None => ()", "  }"])
+                    lines.extend([f"  match {parameter.moon_name} {{", "    Some(values) =>", "      for key, value in values {", f"        url = @model.append_query(url, {name} + \"[\" + key + \"]\", parameter_value(value))", "      }", "    None => ()", "  }"])
             elif parameter.type.kind == "array":
                 if parameter.required:
-                    lines.extend([f"  for value in {parameter.moon_name} {{", f"    url = @http.append_query(url, {name}, parameter_value(value))", "  }"])
+                    lines.extend([f"  for value in {parameter.moon_name} {{", f"    url = @model.append_query(url, {name}, parameter_value(value))", "  }"])
                 else:
-                    lines.extend([f"  match {parameter.moon_name} {{", "    Some(values) =>", "      for value in values {", f"        url = @http.append_query(url, {name}, parameter_value(value))", "      }", "    None => ()", "  }"])
+                    lines.extend([f"  match {parameter.moon_name} {{", "    Some(values) =>", "      for value in values {", f"        url = @model.append_query(url, {name}, parameter_value(value))", "      }", "    None => ()", "  }"])
             elif parameter.required:
-                lines.append(f"  url = @http.append_query(url, {name}, parameter_value({parameter.moon_name}))")
+                lines.append(f"  url = @model.append_query(url, {name}, parameter_value({parameter.moon_name}))")
             else:
-                lines.extend([f"  match {parameter.moon_name} {{", f"    Some(value) => url = @http.append_query(url, {name}, parameter_value(value))", "    None => ()", "  }"])
+                lines.extend([f"  match {parameter.moon_name} {{", f"    Some(value) => url = @model.append_query(url, {name}, parameter_value(value))", "    None => ()", "  }"])
         path_expression = "url"
     else:
         path_expression = _path_expression(operation)
     constructor = {"GET": "get", "POST": "post", "PUT": "put", "PATCH": "patch", "DELETE": "delete"}.get(operation.method)
     if constructor:
-        expression = f"@http.Request::{constructor}({path_expression})"
+        expression = f"@model.Request::{constructor}({path_expression})"
     else:
-        expression = f"@http.Request::new({_moon_string(operation.method)}, {path_expression})"
+        expression = f"@model.Request::new(@model.Method::parse({_moon_string(operation.method)}), {path_expression})"
     if operation.request_type is not None:
-        expression += f".json_body({_to_json(operation.request_type, 'body')})"
+        expression += f".body_json({_to_json(operation.request_type, 'body')})"
     header_parameters = [parameter for parameter in operation.parameters if parameter.location == "header"]
     if header_parameters or operation.multipart_fields:
         binding = "let mut" if header_parameters else "let"
@@ -842,7 +842,7 @@ def _operation(operation: Operation) -> str:
                     else:
                         assert field.type is not None
                         lines.append(f"  if {value} is Some(value) {{ parts.push(@multipart.Part::json({name}, {_to_json(field.type, 'value')})) }}")
-            lines.append("  @multipart.apply(request, parts, boundary)")
+            lines.append("  @multipart.body(request, parts, boundary~)")
         else:
             lines.append("  request")
         lines.append("}")
@@ -861,7 +861,7 @@ def _operation(operation: Operation) -> str:
             ]
         )
         lines.extend(_doc(f"Decodes a successful {operation.operation_id} response.", ""))
-        lines.extend([f"pub fn {decode_name}(", "  response : @http.Response,", f") -> {operation.response_type.moon_type()} raise @runtime.SdkError {{", "  decode_response(response)", "}"])
+        lines.extend([f"pub fn {decode_name}(", "  head : @model.ResponseHead,", "  body : Bytes,", f") -> {operation.response_type.moon_type()} raise @client.ResponseError {{", "  decode_response(head, body)", "}"])
     return "\n".join(lines)
 
 
@@ -888,11 +888,12 @@ fn parse_json_body(body : Bytes) -> Json raise {
 
 ///|
 fn[T : @json.FromJson] decode_response(
-  response : @http.Response,
-) -> T raise @runtime.SdkError {
-  @json.from_json(parse_json_body(response.body)) catch {
+  head : @model.ResponseHead,
+  body : Bytes,
+) -> T raise @client.ResponseError {
+  @json.from_json(parse_json_body(body)) catch {
     error =>
-      raise @runtime.Decode(message=error.to_string(), body=response.body)
+      raise @client.Deserialization(head, message=error.to_string(), body~)
   }
 }'''
 
@@ -1004,13 +1005,13 @@ fn json_array_matches(
     operations = HEADER + "\n\n".join(operation_helpers + operation_sources) + "\n"
     # Import only what the emitted code references: `--deny-warn` rejects unused packages.
     body = types + operations
-    imports = ['  "gaato/http",'] if "@http." in body else []
-    if "@runtime." in body:
-        imports.append('  "gaato/sdk-runtime" @runtime,')
+    imports = ['  "gaato/mttp/model",'] if "@model." in body else []
+    if "@client." in body:
+        imports.append('  "gaato/mttp/client",')
     if "@sdkjson." in body:
-        imports.append('  "gaato/sdk-runtime/json" @sdkjson,')
+        imports.append('  "gaato/mttp/jsonkit" @sdkjson,')
     if "@multipart." in body:
-        imports.append('  "gaato/http/multipart" @multipart,')
+        imports.append('  "gaato/mttp/multipart",')
     if "@debug." in body:
         imports.append('  "moonbitlang/core/debug",')
     if "@utf8." in body:

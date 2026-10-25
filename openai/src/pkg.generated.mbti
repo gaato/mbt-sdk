@@ -2,16 +2,14 @@
 package "gaato/openai"
 
 import {
-  "gaato/http",
-  "gaato/http/clock",
-  "gaato/http/sync",
-  "gaato/sdk-runtime",
+  "gaato/mttp/client",
+  "gaato/mttp/clock",
   "moonbitlang/core/debug",
   "moonbitlang/core/json",
 }
 
 // Values
-pub fn api_error(@sdk-runtime.SdkError) -> ApiErrorBody?
+pub fn api_error(Error) -> ApiErrorBody?
 
 // Errors
 
@@ -136,15 +134,15 @@ pub fn Model::to_repr(Self) -> @debug.Repr
 pub struct OpenAI {
   // private fields
 }
-pub async fn OpenAI::chat_completion(Self, ChatRequest) -> ChatCompletion raise @sdk-runtime.SdkError
-pub async fn OpenAI::create_embeddings(Self, EmbeddingRequest) -> EmbeddingResponse raise @sdk-runtime.SdkError
-pub async fn OpenAI::create_response(Self, ResponseRequest) -> Response raise @sdk-runtime.SdkError
-pub fn OpenAI::from_client(@sdk-runtime.Client) -> Self
-pub async fn OpenAI::list_models(Self) -> Array[Model] raise @sdk-runtime.SdkError
-pub fn OpenAI::new(api_key~ : String, &@http.Transport, &@clock.Clock, base_url? : String, organization? : String, project? : String, retry? : @sdk-runtime.RetryPolicy, timer? : &@sync.Timer, timeout_ms? : Int32, total_timeout_ms? : Int32) -> Self
-pub async fn OpenAI::retrieve_model(Self, String) -> Model raise @sdk-runtime.SdkError
-pub async fn[E : Error] OpenAI::stream_chat_completion(Self, ChatRequest, async (ChatEvent) -> Unit raise E) -> Unit
-pub async fn[E : Error] OpenAI::stream_response(Self, ResponseRequest, async (ResponseEvent) -> Unit raise E) -> Unit
+pub async fn OpenAI::chat_completion(Self, ChatRequest) -> ChatCompletion
+pub async fn OpenAI::create_embeddings(Self, EmbeddingRequest) -> EmbeddingResponse
+pub async fn OpenAI::create_response(Self, ResponseRequest) -> Response
+pub fn OpenAI::from_client(@client.Client) -> Self
+pub async fn OpenAI::list_models(Self) -> Array[Model]
+pub fn OpenAI::new(api_key~ : String, &@client.Backend, &@clock.Clock, base_url? : String, organization? : String, project? : String, retry? : @client.RetryPolicy, timer? : &@clock.Timer, timeout_ms? : Int32, total_timeout_ms? : Int32) -> Self
+pub async fn OpenAI::retrieve_model(Self, String) -> Model
+pub async fn OpenAI::stream_chat_completion(Self, ChatRequest, async (ChatEvent) -> Unit) -> Unit
+pub async fn OpenAI::stream_response(Self, ResponseRequest, async (ResponseEvent) -> Unit) -> Unit
 pub fn OpenAI::to_repr(Self) -> @debug.Repr
 pub impl @debug.Debug for OpenAI
 

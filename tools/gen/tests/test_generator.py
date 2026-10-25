@@ -785,10 +785,10 @@ class IRTests(unittest.TestCase):
         self.assertIn("tag : Array[String]", source)
         self.assertIn("limit? : Int32", source)
         self.assertIn("mode? : TestOperationMode", source)
-        self.assertIn('@http.append_query(url, "tag", parameter_value(value))', source)
+        self.assertIn('@model.append_query(url, "tag", parameter_value(value))', source)
         self.assertNotIn("fn append_query", source)
         self.assertNotIn("fn percent_encode", source)
-        self.assertIn('"gaato/http"', emit(ir)["moon.pkg"])
+        self.assertIn('"gaato/mttp/model"', emit(ir)["moon.pkg"])
 
     def test_deep_object_query_serializes_bracketed_map_keys(self):
         parameter = {
@@ -842,7 +842,7 @@ class IRTests(unittest.TestCase):
         ir = IRBuilder(document(operation(responses=responses)), "example/gen").build()
         self.assertIsNone(ir.operations[0].response_type)
         source = emit(ir)["operations.mbt"]
-        self.assertIn("caller handles the response as @http.Response", source)
+        self.assertIn("caller handles the response as @model.Response", source)
         self.assertNotIn("test_operation_decode", source)
 
     def test_typed_map_uses_map_json_traits_for_round_trip(self):
@@ -853,7 +853,7 @@ class IRTests(unittest.TestCase):
         self.assertEqual(operation_ir.response_type.moon_type(), "Map[String, Int32]")
         source = emit(ir)["operations.mbt"]
         self.assertIn("body : Map[String, Int32]", source)
-        self.assertIn("-> Map[String, Int32] raise @runtime.SdkError", source)
+        self.assertIn("-> Map[String, Int32] raise @client.ResponseError", source)
 
     def test_properties_and_typed_map_are_a_diagnostic(self):
         schema = {
@@ -920,8 +920,8 @@ class IRTests(unittest.TestCase):
         self.assertIn("@multipart.Part::file(\"file\", file_filename, file_content_type, file)", source)
         self.assertIn("@multipart.Part::text(\"title\", parameter_value(title))", source)
         self.assertIn("@multipart.Part::json(\"metadata\", Json(value))", source)
-        self.assertIn("@multipart.apply(request, parts, boundary)", source)
-        self.assertIn('"gaato/http/multipart" @multipart', generated["moon.pkg"])
+        self.assertIn("@multipart.body(request, parts, boundary~)", source)
+        self.assertIn('"gaato/mttp/multipart"', generated["moon.pkg"])
 
     def test_json_body_wins_when_form_is_an_alternative(self):
         content = {
@@ -955,12 +955,12 @@ class IRTests(unittest.TestCase):
         ir = IRBuilder(contents({"x-moonbit-path-segments": True}), "example/gen").build()
         self.assertEqual([parameter.path_segments for parameter in ir.operations[0].parameters], [False, True])
         source = emit(ir)["operations.mbt"]
-        self.assertIn('"/repos/" + @http.percent_encode(parameter_value(owner)) + "/contents/" + @http.percent_encode_path(parameter_value(path))', source)
+        self.assertIn('"/repos/" + @model.percent_encode(parameter_value(owner)) + "/contents/" + @model.percent_encode_path(parameter_value(path))', source)
         self.assertNotIn("fn percent_encode", source)
         # Without the knob the same parameter escapes `/` like any other value.
         plain = emit(IRBuilder(contents({}), "example/gen").build())["operations.mbt"]
-        self.assertNotIn("@http.percent_encode_path", plain)
-        self.assertIn('"/contents/" + @http.percent_encode(parameter_value(path))', plain)
+        self.assertNotIn("@model.percent_encode_path", plain)
+        self.assertIn('"/contents/" + @model.percent_encode(parameter_value(path))', plain)
 
     def test_path_segments_only_operation_omits_the_plain_encoder(self):
         parameters = [{"name": "ref", "in": "path", "required": True, "schema": {"type": "string"}, "x-moonbit-path-segments": True}]
@@ -972,12 +972,12 @@ class IRTests(unittest.TestCase):
         sources = emit(IRBuilder(doc, "example/gen").build())
         source = sources["operations.mbt"]
         self.assertNotIn("fn percent_encode", source)
-        self.assertIn("@http.percent_encode_path(parameter_value(ref_))", source)
-        self.assertIn('"gaato/http"', sources["moon.pkg"])
+        self.assertIn("@model.percent_encode_path(parameter_value(ref_))", source)
+        self.assertIn('"gaato/mttp/model"', sources["moon.pkg"])
         self.assertIn('"moonbitlang/core/encoding/utf8"', sources["moon.pkg"])
         doc["paths"]["/git/ref/{ref}"]["get"]["responses"] = {"204": {"description": "No content"}}
         sources = emit(IRBuilder(doc, "example/gen").build())
-        self.assertIn('"gaato/http"', sources["moon.pkg"])
+        self.assertIn('"gaato/mttp/model"', sources["moon.pkg"])
         self.assertNotIn('"moonbitlang/core/encoding/utf8"', sources["moon.pkg"])
 
     def test_path_segments_outside_a_path_parameter_is_a_diagnostic(self):
@@ -1010,9 +1010,9 @@ class IRTests(unittest.TestCase):
             "components": {"schemas": schemas},
         }
         sources = emit(IRBuilder(doc, "example/gen").build())
-        self.assertIn('@http.Request::post("/raw").json_body(body)\n', sources["operations.mbt"])
+        self.assertIn('@model.Request::post("/raw").body_json(body)\n', sources["operations.mbt"])
         # A named union body still needs the encode call.
-        self.assertIn('@http.Request::post("/mixed").json_body(Json(body))\n', sources["operations.mbt"])
+        self.assertIn('@model.Request::post("/mixed").body_json(Json(body))\n', sources["operations.mbt"])
         self.assertIn("    Text(value) => Json(value)\n    Object(value) => value\n", sources["types.mbt"])
 
 

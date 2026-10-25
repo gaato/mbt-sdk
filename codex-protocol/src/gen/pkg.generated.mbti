@@ -2,7 +2,9 @@
 package "gaato/codex-protocol/gen"
 
 import {
+  "gaato/mttp/jsonkit",
   "moonbitlang/core/debug",
+  "moonbitlang/core/json",
 }
 
 // Values
@@ -20,31 +22,31 @@ pub fn turn_start(TurnStartParams) -> Call[TurnStartResponse]
 
 // Types and methods
 pub(all) struct AdditionalFileSystemPermissions {
-  entries : @gaato/sdk-runtime/json.Presence[Array[FileSystemSandboxEntry]]
-  glob_scan_max_depth : @gaato/sdk-runtime/json.Presence[UInt64Number]
-  read : @gaato/sdk-runtime/json.Presence[Array[String]]
-  write : @gaato/sdk-runtime/json.Presence[Array[String]]
+  entries : @jsonkit.Presence[Array[FileSystemSandboxEntry]]
+  glob_scan_max_depth : @jsonkit.Presence[UInt64Number]
+  read : @jsonkit.Presence[Array[String]]
+  write : @jsonkit.Presence[Array[String]]
 } derive(Eq, @debug.Debug)
 pub fn AdditionalFileSystemPermissions::equal(Self, Self) -> Bool
-pub fn AdditionalFileSystemPermissions::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn AdditionalFileSystemPermissions::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn AdditionalFileSystemPermissions::new(entries? : Array[FileSystemSandboxEntry], glob_scan_max_depth? : UInt64Number, read? : Array[String], write? : Array[String]) -> Self
 pub fn AdditionalFileSystemPermissions::not_equal(Self, Self) -> Bool
 pub fn AdditionalFileSystemPermissions::to_json(Self) -> Json
 pub fn AdditionalFileSystemPermissions::to_repr(Self) -> @debug.Repr
 pub impl ToJson for AdditionalFileSystemPermissions
-pub impl @moonbitlang/core/json.FromJson for AdditionalFileSystemPermissions
+pub impl @json.FromJson for AdditionalFileSystemPermissions
 
 pub(all) struct AdditionalNetworkPermissions {
-  enabled : @gaato/sdk-runtime/json.Presence[Bool]
+  enabled : @jsonkit.Presence[Bool]
 } derive(Eq, @debug.Debug)
 pub fn AdditionalNetworkPermissions::equal(Self, Self) -> Bool
-pub fn AdditionalNetworkPermissions::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn AdditionalNetworkPermissions::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn AdditionalNetworkPermissions::new(enabled? : Bool) -> Self
 pub fn AdditionalNetworkPermissions::not_equal(Self, Self) -> Bool
 pub fn AdditionalNetworkPermissions::to_json(Self) -> Json
 pub fn AdditionalNetworkPermissions::to_repr(Self) -> @debug.Repr
 pub impl ToJson for AdditionalNetworkPermissions
-pub impl @moonbitlang/core/json.FromJson for AdditionalNetworkPermissions
+pub impl @json.FromJson for AdditionalNetworkPermissions
 
 pub(all) struct AgentMessageDeltaNotification {
   delta : String
@@ -53,13 +55,13 @@ pub(all) struct AgentMessageDeltaNotification {
   turn_id : String
 } derive(Eq, @debug.Debug)
 pub fn AgentMessageDeltaNotification::equal(Self, Self) -> Bool
-pub fn AgentMessageDeltaNotification::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn AgentMessageDeltaNotification::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn AgentMessageDeltaNotification::new(delta~ : String, item_id~ : String, thread_id~ : String, turn_id~ : String) -> Self
 pub fn AgentMessageDeltaNotification::not_equal(Self, Self) -> Bool
 pub fn AgentMessageDeltaNotification::to_json(Self) -> Json
 pub fn AgentMessageDeltaNotification::to_repr(Self) -> @debug.Repr
 pub impl ToJson for AgentMessageDeltaNotification
-pub impl @moonbitlang/core/json.FromJson for AgentMessageDeltaNotification
+pub impl @json.FromJson for AgentMessageDeltaNotification
 
 #non_exhaustive
 pub(all) enum ApprovalsReviewer {
@@ -69,12 +71,12 @@ pub(all) enum ApprovalsReviewer {
   Unknown(String)
 } derive(Eq, @debug.Debug)
 pub fn ApprovalsReviewer::equal(Self, Self) -> Bool
-pub fn ApprovalsReviewer::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ApprovalsReviewer::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn ApprovalsReviewer::not_equal(Self, Self) -> Bool
 pub fn ApprovalsReviewer::to_json(Self) -> Json
 pub fn ApprovalsReviewer::to_repr(Self) -> @debug.Repr
 pub impl ToJson for ApprovalsReviewer
-pub impl @moonbitlang/core/json.FromJson for ApprovalsReviewer
+pub impl @json.FromJson for ApprovalsReviewer
 
 #non_exhaustive
 pub(all) enum AskForApproval {
@@ -85,12 +87,12 @@ pub(all) enum AskForApproval {
   UnknownValue(Json)
 } derive(Eq, @debug.Debug)
 pub fn AskForApproval::equal(Self, Self) -> Bool
-pub fn AskForApproval::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn AskForApproval::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn AskForApproval::not_equal(Self, Self) -> Bool
 pub fn AskForApproval::to_json(Self) -> Json
 pub fn AskForApproval::to_repr(Self) -> @debug.Repr
 pub impl ToJson for AskForApproval
-pub impl @moonbitlang/core/json.FromJson for AskForApproval
+pub impl @json.FromJson for AskForApproval
 
 pub(all) struct AskForApprovalGranular {
   mcp_elicitations : Bool
@@ -100,59 +102,59 @@ pub(all) struct AskForApprovalGranular {
   skill_approval : Bool?
 } derive(Eq, @debug.Debug)
 pub fn AskForApprovalGranular::equal(Self, Self) -> Bool
-pub fn AskForApprovalGranular::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn AskForApprovalGranular::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn AskForApprovalGranular::new(mcp_elicitations~ : Bool, rules~ : Bool, sandbox_approval~ : Bool, request_permissions? : Bool, skill_approval? : Bool) -> Self
 pub fn AskForApprovalGranular::not_equal(Self, Self) -> Bool
 pub fn AskForApprovalGranular::to_json(Self) -> Json
 pub fn AskForApprovalGranular::to_repr(Self) -> @debug.Repr
 pub impl ToJson for AskForApprovalGranular
-pub impl @moonbitlang/core/json.FromJson for AskForApprovalGranular
+pub impl @json.FromJson for AskForApprovalGranular
 
 pub(all) struct AsyncUserInputQuestion {
-  options : @gaato/sdk-runtime/json.Presence[Array[String]]
+  options : @jsonkit.Presence[Array[String]]
   title : String
 } derive(Eq, @debug.Debug)
 pub fn AsyncUserInputQuestion::equal(Self, Self) -> Bool
-pub fn AsyncUserInputQuestion::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn AsyncUserInputQuestion::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn AsyncUserInputQuestion::new(title~ : String, options? : Array[String]) -> Self
 pub fn AsyncUserInputQuestion::not_equal(Self, Self) -> Bool
 pub fn AsyncUserInputQuestion::to_json(Self) -> Json
 pub fn AsyncUserInputQuestion::to_repr(Self) -> @debug.Repr
 pub impl ToJson for AsyncUserInputQuestion
-pub impl @moonbitlang/core/json.FromJson for AsyncUserInputQuestion
+pub impl @json.FromJson for AsyncUserInputQuestion
 
 pub(all) struct ByteRange {
   end : UInt64Number
   start : UInt64Number
 } derive(Eq, @debug.Debug)
 pub fn ByteRange::equal(Self, Self) -> Bool
-pub fn ByteRange::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ByteRange::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn ByteRange::new(end~ : UInt64Number, start~ : UInt64Number) -> Self
 pub fn ByteRange::not_equal(Self, Self) -> Bool
 pub fn ByteRange::to_json(Self) -> Json
 pub fn ByteRange::to_repr(Self) -> @debug.Repr
 pub impl ToJson for ByteRange
-pub impl @moonbitlang/core/json.FromJson for ByteRange
+pub impl @json.FromJson for ByteRange
 
 pub struct Call[T] {
   name : String
   params : Json
-  decode : (Json) -> T raise @moonbitlang/core/json.JsonDecodeError
+  decode : (Json) -> T raise @json.JsonDecodeError
 }
 
 pub(all) struct ClientInfo {
   name : String
-  title : @gaato/sdk-runtime/json.Presence[String]
+  title : @jsonkit.Presence[String]
   version : String
 } derive(Eq, @debug.Debug)
 pub fn ClientInfo::equal(Self, Self) -> Bool
-pub fn ClientInfo::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ClientInfo::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn ClientInfo::new(name~ : String, version~ : String, title? : String) -> Self
 pub fn ClientInfo::not_equal(Self, Self) -> Bool
 pub fn ClientInfo::to_json(Self) -> Json
 pub fn ClientInfo::to_repr(Self) -> @debug.Repr
 pub impl ToJson for ClientInfo
-pub impl @moonbitlang/core/json.FromJson for ClientInfo
+pub impl @json.FromJson for ClientInfo
 
 #non_exhaustive
 pub(all) enum CodexErrorInfo {
@@ -177,85 +179,85 @@ pub(all) enum CodexErrorInfo {
   UnknownValue(Json)
 } derive(Eq, @debug.Debug)
 pub fn CodexErrorInfo::equal(Self, Self) -> Bool
-pub fn CodexErrorInfo::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn CodexErrorInfo::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn CodexErrorInfo::not_equal(Self, Self) -> Bool
 pub fn CodexErrorInfo::to_json(Self) -> Json
 pub fn CodexErrorInfo::to_repr(Self) -> @debug.Repr
 pub impl ToJson for CodexErrorInfo
-pub impl @moonbitlang/core/json.FromJson for CodexErrorInfo
+pub impl @json.FromJson for CodexErrorInfo
 
 pub(all) struct CodexErrorInfoActiveTurnNotSteerable {
   turn_kind : NonSteerableTurnKind
 } derive(Eq, @debug.Debug)
 pub fn CodexErrorInfoActiveTurnNotSteerable::equal(Self, Self) -> Bool
-pub fn CodexErrorInfoActiveTurnNotSteerable::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn CodexErrorInfoActiveTurnNotSteerable::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn CodexErrorInfoActiveTurnNotSteerable::new(turn_kind~ : NonSteerableTurnKind) -> Self
 pub fn CodexErrorInfoActiveTurnNotSteerable::not_equal(Self, Self) -> Bool
 pub fn CodexErrorInfoActiveTurnNotSteerable::to_json(Self) -> Json
 pub fn CodexErrorInfoActiveTurnNotSteerable::to_repr(Self) -> @debug.Repr
 pub impl ToJson for CodexErrorInfoActiveTurnNotSteerable
-pub impl @moonbitlang/core/json.FromJson for CodexErrorInfoActiveTurnNotSteerable
+pub impl @json.FromJson for CodexErrorInfoActiveTurnNotSteerable
 
 pub(all) struct CodexErrorInfoHttpConnectionFailed {
-  http_status_code : @gaato/sdk-runtime/json.Presence[Int32]
+  http_status_code : @jsonkit.Presence[Int32]
 } derive(Eq, @debug.Debug)
 pub fn CodexErrorInfoHttpConnectionFailed::equal(Self, Self) -> Bool
-pub fn CodexErrorInfoHttpConnectionFailed::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn CodexErrorInfoHttpConnectionFailed::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn CodexErrorInfoHttpConnectionFailed::new(http_status_code? : Int32) -> Self
 pub fn CodexErrorInfoHttpConnectionFailed::not_equal(Self, Self) -> Bool
 pub fn CodexErrorInfoHttpConnectionFailed::to_json(Self) -> Json
 pub fn CodexErrorInfoHttpConnectionFailed::to_repr(Self) -> @debug.Repr
 pub impl ToJson for CodexErrorInfoHttpConnectionFailed
-pub impl @moonbitlang/core/json.FromJson for CodexErrorInfoHttpConnectionFailed
+pub impl @json.FromJson for CodexErrorInfoHttpConnectionFailed
 
 pub(all) struct CodexErrorInfoResponseStreamConnectionFailed {
-  http_status_code : @gaato/sdk-runtime/json.Presence[Int32]
+  http_status_code : @jsonkit.Presence[Int32]
 } derive(Eq, @debug.Debug)
 pub fn CodexErrorInfoResponseStreamConnectionFailed::equal(Self, Self) -> Bool
-pub fn CodexErrorInfoResponseStreamConnectionFailed::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn CodexErrorInfoResponseStreamConnectionFailed::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn CodexErrorInfoResponseStreamConnectionFailed::new(http_status_code? : Int32) -> Self
 pub fn CodexErrorInfoResponseStreamConnectionFailed::not_equal(Self, Self) -> Bool
 pub fn CodexErrorInfoResponseStreamConnectionFailed::to_json(Self) -> Json
 pub fn CodexErrorInfoResponseStreamConnectionFailed::to_repr(Self) -> @debug.Repr
 pub impl ToJson for CodexErrorInfoResponseStreamConnectionFailed
-pub impl @moonbitlang/core/json.FromJson for CodexErrorInfoResponseStreamConnectionFailed
+pub impl @json.FromJson for CodexErrorInfoResponseStreamConnectionFailed
 
 pub(all) struct CodexErrorInfoResponseStreamDisconnected {
-  http_status_code : @gaato/sdk-runtime/json.Presence[Int32]
+  http_status_code : @jsonkit.Presence[Int32]
 } derive(Eq, @debug.Debug)
 pub fn CodexErrorInfoResponseStreamDisconnected::equal(Self, Self) -> Bool
-pub fn CodexErrorInfoResponseStreamDisconnected::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn CodexErrorInfoResponseStreamDisconnected::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn CodexErrorInfoResponseStreamDisconnected::new(http_status_code? : Int32) -> Self
 pub fn CodexErrorInfoResponseStreamDisconnected::not_equal(Self, Self) -> Bool
 pub fn CodexErrorInfoResponseStreamDisconnected::to_json(Self) -> Json
 pub fn CodexErrorInfoResponseStreamDisconnected::to_repr(Self) -> @debug.Repr
 pub impl ToJson for CodexErrorInfoResponseStreamDisconnected
-pub impl @moonbitlang/core/json.FromJson for CodexErrorInfoResponseStreamDisconnected
+pub impl @json.FromJson for CodexErrorInfoResponseStreamDisconnected
 
 pub(all) struct CodexErrorInfoResponseTooManyFailedAttempts {
-  http_status_code : @gaato/sdk-runtime/json.Presence[Int32]
+  http_status_code : @jsonkit.Presence[Int32]
 } derive(Eq, @debug.Debug)
 pub fn CodexErrorInfoResponseTooManyFailedAttempts::equal(Self, Self) -> Bool
-pub fn CodexErrorInfoResponseTooManyFailedAttempts::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn CodexErrorInfoResponseTooManyFailedAttempts::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn CodexErrorInfoResponseTooManyFailedAttempts::new(http_status_code? : Int32) -> Self
 pub fn CodexErrorInfoResponseTooManyFailedAttempts::not_equal(Self, Self) -> Bool
 pub fn CodexErrorInfoResponseTooManyFailedAttempts::to_json(Self) -> Json
 pub fn CodexErrorInfoResponseTooManyFailedAttempts::to_repr(Self) -> @debug.Repr
 pub impl ToJson for CodexErrorInfoResponseTooManyFailedAttempts
-pub impl @moonbitlang/core/json.FromJson for CodexErrorInfoResponseTooManyFailedAttempts
+pub impl @json.FromJson for CodexErrorInfoResponseTooManyFailedAttempts
 
 pub(all) struct CollabAgentState {
-  message : @gaato/sdk-runtime/json.Presence[String]
+  message : @jsonkit.Presence[String]
   status : CollabAgentStatus
 } derive(Eq, @debug.Debug)
 pub fn CollabAgentState::equal(Self, Self) -> Bool
-pub fn CollabAgentState::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn CollabAgentState::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn CollabAgentState::new(status~ : CollabAgentStatus, message? : String) -> Self
 pub fn CollabAgentState::not_equal(Self, Self) -> Bool
 pub fn CollabAgentState::to_json(Self) -> Json
 pub fn CollabAgentState::to_repr(Self) -> @debug.Repr
 pub impl ToJson for CollabAgentState
-pub impl @moonbitlang/core/json.FromJson for CollabAgentState
+pub impl @json.FromJson for CollabAgentState
 
 #non_exhaustive
 pub(all) enum CollabAgentStatus {
@@ -269,12 +271,12 @@ pub(all) enum CollabAgentStatus {
   Unknown(String)
 } derive(Eq, @debug.Debug)
 pub fn CollabAgentStatus::equal(Self, Self) -> Bool
-pub fn CollabAgentStatus::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn CollabAgentStatus::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn CollabAgentStatus::not_equal(Self, Self) -> Bool
 pub fn CollabAgentStatus::to_json(Self) -> Json
 pub fn CollabAgentStatus::to_repr(Self) -> @debug.Repr
 pub impl ToJson for CollabAgentStatus
-pub impl @moonbitlang/core/json.FromJson for CollabAgentStatus
+pub impl @json.FromJson for CollabAgentStatus
 
 #non_exhaustive
 pub(all) enum CollabAgentTool {
@@ -290,12 +292,12 @@ pub(all) enum CollabAgentTool {
   Unknown(String)
 } derive(Eq, @debug.Debug)
 pub fn CollabAgentTool::equal(Self, Self) -> Bool
-pub fn CollabAgentTool::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn CollabAgentTool::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn CollabAgentTool::not_equal(Self, Self) -> Bool
 pub fn CollabAgentTool::to_json(Self) -> Json
 pub fn CollabAgentTool::to_repr(Self) -> @debug.Repr
 pub impl ToJson for CollabAgentTool
-pub impl @moonbitlang/core/json.FromJson for CollabAgentTool
+pub impl @json.FromJson for CollabAgentTool
 
 #non_exhaustive
 pub(all) enum CollabAgentToolCallStatus {
@@ -306,12 +308,12 @@ pub(all) enum CollabAgentToolCallStatus {
   Unknown(String)
 } derive(Eq, @debug.Debug)
 pub fn CollabAgentToolCallStatus::equal(Self, Self) -> Bool
-pub fn CollabAgentToolCallStatus::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn CollabAgentToolCallStatus::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn CollabAgentToolCallStatus::not_equal(Self, Self) -> Bool
 pub fn CollabAgentToolCallStatus::to_json(Self) -> Json
 pub fn CollabAgentToolCallStatus::to_repr(Self) -> @debug.Repr
 pub impl ToJson for CollabAgentToolCallStatus
-pub impl @moonbitlang/core/json.FromJson for CollabAgentToolCallStatus
+pub impl @json.FromJson for CollabAgentToolCallStatus
 
 #non_exhaustive
 pub(all) enum CommandAction {
@@ -322,39 +324,39 @@ pub(all) enum CommandAction {
   Unknown(String, Json)
 } derive(Eq, @debug.Debug)
 pub fn CommandAction::equal(Self, Self) -> Bool
-pub fn CommandAction::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn CommandAction::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn CommandAction::not_equal(Self, Self) -> Bool
 pub fn CommandAction::to_json(Self) -> Json
 pub fn CommandAction::to_repr(Self) -> @debug.Repr
 pub impl ToJson for CommandAction
-pub impl @moonbitlang/core/json.FromJson for CommandAction
+pub impl @json.FromJson for CommandAction
 
 pub(all) struct CommandActionKnownUnknown {
   command : String
   type_ : String
 } derive(Eq, @debug.Debug)
 pub fn CommandActionKnownUnknown::equal(Self, Self) -> Bool
-pub fn CommandActionKnownUnknown::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn CommandActionKnownUnknown::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn CommandActionKnownUnknown::new(command~ : String, type_~ : String) -> Self
 pub fn CommandActionKnownUnknown::not_equal(Self, Self) -> Bool
 pub fn CommandActionKnownUnknown::to_json(Self) -> Json
 pub fn CommandActionKnownUnknown::to_repr(Self) -> @debug.Repr
 pub impl ToJson for CommandActionKnownUnknown
-pub impl @moonbitlang/core/json.FromJson for CommandActionKnownUnknown
+pub impl @json.FromJson for CommandActionKnownUnknown
 
 pub(all) struct CommandActionListFiles {
   command : String
-  path : @gaato/sdk-runtime/json.Presence[String]
+  path : @jsonkit.Presence[String]
   type_ : String
 } derive(Eq, @debug.Debug)
 pub fn CommandActionListFiles::equal(Self, Self) -> Bool
-pub fn CommandActionListFiles::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn CommandActionListFiles::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn CommandActionListFiles::new(command~ : String, type_~ : String, path? : String) -> Self
 pub fn CommandActionListFiles::not_equal(Self, Self) -> Bool
 pub fn CommandActionListFiles::to_json(Self) -> Json
 pub fn CommandActionListFiles::to_repr(Self) -> @debug.Repr
 pub impl ToJson for CommandActionListFiles
-pub impl @moonbitlang/core/json.FromJson for CommandActionListFiles
+pub impl @json.FromJson for CommandActionListFiles
 
 pub(all) struct CommandActionRead {
   command : String
@@ -363,28 +365,28 @@ pub(all) struct CommandActionRead {
   type_ : String
 } derive(Eq, @debug.Debug)
 pub fn CommandActionRead::equal(Self, Self) -> Bool
-pub fn CommandActionRead::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn CommandActionRead::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn CommandActionRead::new(command~ : String, name~ : String, path~ : String, type_~ : String) -> Self
 pub fn CommandActionRead::not_equal(Self, Self) -> Bool
 pub fn CommandActionRead::to_json(Self) -> Json
 pub fn CommandActionRead::to_repr(Self) -> @debug.Repr
 pub impl ToJson for CommandActionRead
-pub impl @moonbitlang/core/json.FromJson for CommandActionRead
+pub impl @json.FromJson for CommandActionRead
 
 pub(all) struct CommandActionSearch {
   command : String
-  path : @gaato/sdk-runtime/json.Presence[String]
-  query : @gaato/sdk-runtime/json.Presence[String]
+  path : @jsonkit.Presence[String]
+  query : @jsonkit.Presence[String]
   type_ : String
 } derive(Eq, @debug.Debug)
 pub fn CommandActionSearch::equal(Self, Self) -> Bool
-pub fn CommandActionSearch::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn CommandActionSearch::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn CommandActionSearch::new(command~ : String, type_~ : String, path? : String, query? : String) -> Self
 pub fn CommandActionSearch::not_equal(Self, Self) -> Bool
 pub fn CommandActionSearch::to_json(Self) -> Json
 pub fn CommandActionSearch::to_repr(Self) -> @debug.Repr
 pub impl ToJson for CommandActionSearch
-pub impl @moonbitlang/core/json.FromJson for CommandActionSearch
+pub impl @json.FromJson for CommandActionSearch
 
 #non_exhaustive
 pub(all) enum CommandExecutionApprovalDecision {
@@ -397,36 +399,36 @@ pub(all) enum CommandExecutionApprovalDecision {
   UnknownValue(Json)
 } derive(Eq, @debug.Debug)
 pub fn CommandExecutionApprovalDecision::equal(Self, Self) -> Bool
-pub fn CommandExecutionApprovalDecision::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn CommandExecutionApprovalDecision::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn CommandExecutionApprovalDecision::not_equal(Self, Self) -> Bool
 pub fn CommandExecutionApprovalDecision::to_json(Self) -> Json
 pub fn CommandExecutionApprovalDecision::to_repr(Self) -> @debug.Repr
 pub impl ToJson for CommandExecutionApprovalDecision
-pub impl @moonbitlang/core/json.FromJson for CommandExecutionApprovalDecision
+pub impl @json.FromJson for CommandExecutionApprovalDecision
 
 pub(all) struct CommandExecutionApprovalDecisionAcceptWithExecpolicyAmendment {
   execpolicy_amendment : Array[String]
 } derive(Eq, @debug.Debug)
 pub fn CommandExecutionApprovalDecisionAcceptWithExecpolicyAmendment::equal(Self, Self) -> Bool
-pub fn CommandExecutionApprovalDecisionAcceptWithExecpolicyAmendment::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn CommandExecutionApprovalDecisionAcceptWithExecpolicyAmendment::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn CommandExecutionApprovalDecisionAcceptWithExecpolicyAmendment::new(execpolicy_amendment~ : Array[String]) -> Self
 pub fn CommandExecutionApprovalDecisionAcceptWithExecpolicyAmendment::not_equal(Self, Self) -> Bool
 pub fn CommandExecutionApprovalDecisionAcceptWithExecpolicyAmendment::to_json(Self) -> Json
 pub fn CommandExecutionApprovalDecisionAcceptWithExecpolicyAmendment::to_repr(Self) -> @debug.Repr
 pub impl ToJson for CommandExecutionApprovalDecisionAcceptWithExecpolicyAmendment
-pub impl @moonbitlang/core/json.FromJson for CommandExecutionApprovalDecisionAcceptWithExecpolicyAmendment
+pub impl @json.FromJson for CommandExecutionApprovalDecisionAcceptWithExecpolicyAmendment
 
 pub(all) struct CommandExecutionApprovalDecisionApplyNetworkPolicyAmendment {
   network_policy_amendment : NetworkPolicyAmendment
 } derive(Eq, @debug.Debug)
 pub fn CommandExecutionApprovalDecisionApplyNetworkPolicyAmendment::equal(Self, Self) -> Bool
-pub fn CommandExecutionApprovalDecisionApplyNetworkPolicyAmendment::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn CommandExecutionApprovalDecisionApplyNetworkPolicyAmendment::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn CommandExecutionApprovalDecisionApplyNetworkPolicyAmendment::new(network_policy_amendment~ : NetworkPolicyAmendment) -> Self
 pub fn CommandExecutionApprovalDecisionApplyNetworkPolicyAmendment::not_equal(Self, Self) -> Bool
 pub fn CommandExecutionApprovalDecisionApplyNetworkPolicyAmendment::to_json(Self) -> Json
 pub fn CommandExecutionApprovalDecisionApplyNetworkPolicyAmendment::to_repr(Self) -> @debug.Repr
 pub impl ToJson for CommandExecutionApprovalDecisionApplyNetworkPolicyAmendment
-pub impl @moonbitlang/core/json.FromJson for CommandExecutionApprovalDecisionApplyNetworkPolicyAmendment
+pub impl @json.FromJson for CommandExecutionApprovalDecisionApplyNetworkPolicyAmendment
 
 #non_exhaustive
 pub(all) enum CommandExecutionApprovalKind {
@@ -435,49 +437,49 @@ pub(all) enum CommandExecutionApprovalKind {
   Unknown(String)
 } derive(Eq, @debug.Debug)
 pub fn CommandExecutionApprovalKind::equal(Self, Self) -> Bool
-pub fn CommandExecutionApprovalKind::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn CommandExecutionApprovalKind::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn CommandExecutionApprovalKind::not_equal(Self, Self) -> Bool
 pub fn CommandExecutionApprovalKind::to_json(Self) -> Json
 pub fn CommandExecutionApprovalKind::to_repr(Self) -> @debug.Repr
 pub impl ToJson for CommandExecutionApprovalKind
-pub impl @moonbitlang/core/json.FromJson for CommandExecutionApprovalKind
+pub impl @json.FromJson for CommandExecutionApprovalKind
 
 pub(all) struct CommandExecutionRequestApprovalParams {
-  approval_id : @gaato/sdk-runtime/json.Presence[String]
-  command : @gaato/sdk-runtime/json.Presence[String]
-  command_actions : @gaato/sdk-runtime/json.Presence[Array[CommandAction]]
-  cwd : @gaato/sdk-runtime/json.Presence[String]
-  environment_id : @gaato/sdk-runtime/json.Presence[String]
+  approval_id : @jsonkit.Presence[String]
+  command : @jsonkit.Presence[String]
+  command_actions : @jsonkit.Presence[Array[CommandAction]]
+  cwd : @jsonkit.Presence[String]
+  environment_id : @jsonkit.Presence[String]
   item_id : String
   kind : CommandExecutionApprovalKind?
-  network_approval_context : @gaato/sdk-runtime/json.Presence[NetworkApprovalContext]
-  proposed_execpolicy_amendment : @gaato/sdk-runtime/json.Presence[Array[String]]
-  proposed_network_policy_amendments : @gaato/sdk-runtime/json.Presence[Array[NetworkPolicyAmendment]]
-  reason : @gaato/sdk-runtime/json.Presence[String]
+  network_approval_context : @jsonkit.Presence[NetworkApprovalContext]
+  proposed_execpolicy_amendment : @jsonkit.Presence[Array[String]]
+  proposed_network_policy_amendments : @jsonkit.Presence[Array[NetworkPolicyAmendment]]
+  reason : @jsonkit.Presence[String]
   started_at_ms : Int64
   thread_id : String
   turn_id : String
 } derive(Eq, @debug.Debug)
 pub fn CommandExecutionRequestApprovalParams::equal(Self, Self) -> Bool
-pub fn CommandExecutionRequestApprovalParams::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn CommandExecutionRequestApprovalParams::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn CommandExecutionRequestApprovalParams::new(item_id~ : String, started_at_ms~ : Int64, thread_id~ : String, turn_id~ : String, approval_id? : String, command? : String, command_actions? : Array[CommandAction], cwd? : String, environment_id? : String, kind? : CommandExecutionApprovalKind, network_approval_context? : NetworkApprovalContext, proposed_execpolicy_amendment? : Array[String], proposed_network_policy_amendments? : Array[NetworkPolicyAmendment], reason? : String) -> Self
 pub fn CommandExecutionRequestApprovalParams::not_equal(Self, Self) -> Bool
 pub fn CommandExecutionRequestApprovalParams::to_json(Self) -> Json
 pub fn CommandExecutionRequestApprovalParams::to_repr(Self) -> @debug.Repr
 pub impl ToJson for CommandExecutionRequestApprovalParams
-pub impl @moonbitlang/core/json.FromJson for CommandExecutionRequestApprovalParams
+pub impl @json.FromJson for CommandExecutionRequestApprovalParams
 
 pub(all) struct CommandExecutionRequestApprovalResponse {
   decision : CommandExecutionApprovalDecision
 } derive(Eq, @debug.Debug)
 pub fn CommandExecutionRequestApprovalResponse::equal(Self, Self) -> Bool
-pub fn CommandExecutionRequestApprovalResponse::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn CommandExecutionRequestApprovalResponse::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn CommandExecutionRequestApprovalResponse::new(decision~ : CommandExecutionApprovalDecision) -> Self
 pub fn CommandExecutionRequestApprovalResponse::not_equal(Self, Self) -> Bool
 pub fn CommandExecutionRequestApprovalResponse::to_json(Self) -> Json
 pub fn CommandExecutionRequestApprovalResponse::to_repr(Self) -> @debug.Repr
 pub impl ToJson for CommandExecutionRequestApprovalResponse
-pub impl @moonbitlang/core/json.FromJson for CommandExecutionRequestApprovalResponse
+pub impl @json.FromJson for CommandExecutionRequestApprovalResponse
 
 #non_exhaustive
 pub(all) enum CommandExecutionSource {
@@ -488,12 +490,12 @@ pub(all) enum CommandExecutionSource {
   Unknown(String)
 } derive(Eq, @debug.Debug)
 pub fn CommandExecutionSource::equal(Self, Self) -> Bool
-pub fn CommandExecutionSource::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn CommandExecutionSource::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn CommandExecutionSource::not_equal(Self, Self) -> Bool
 pub fn CommandExecutionSource::to_json(Self) -> Json
 pub fn CommandExecutionSource::to_repr(Self) -> @debug.Repr
 pub impl ToJson for CommandExecutionSource
-pub impl @moonbitlang/core/json.FromJson for CommandExecutionSource
+pub impl @json.FromJson for CommandExecutionSource
 
 #non_exhaustive
 pub(all) enum CommandExecutionStatus {
@@ -504,12 +506,12 @@ pub(all) enum CommandExecutionStatus {
   Unknown(String)
 } derive(Eq, @debug.Debug)
 pub fn CommandExecutionStatus::equal(Self, Self) -> Bool
-pub fn CommandExecutionStatus::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn CommandExecutionStatus::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn CommandExecutionStatus::not_equal(Self, Self) -> Bool
 pub fn CommandExecutionStatus::to_json(Self) -> Json
 pub fn CommandExecutionStatus::to_repr(Self) -> @debug.Repr
 pub impl ToJson for CommandExecutionStatus
-pub impl @moonbitlang/core/json.FromJson for CommandExecutionStatus
+pub impl @json.FromJson for CommandExecutionStatus
 
 #non_exhaustive
 pub(all) enum DynamicToolCallOutputContentItem {
@@ -519,51 +521,51 @@ pub(all) enum DynamicToolCallOutputContentItem {
   Unknown(String, Json)
 } derive(Eq, @debug.Debug)
 pub fn DynamicToolCallOutputContentItem::equal(Self, Self) -> Bool
-pub fn DynamicToolCallOutputContentItem::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn DynamicToolCallOutputContentItem::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn DynamicToolCallOutputContentItem::not_equal(Self, Self) -> Bool
 pub fn DynamicToolCallOutputContentItem::to_json(Self) -> Json
 pub fn DynamicToolCallOutputContentItem::to_repr(Self) -> @debug.Repr
 pub impl ToJson for DynamicToolCallOutputContentItem
-pub impl @moonbitlang/core/json.FromJson for DynamicToolCallOutputContentItem
+pub impl @json.FromJson for DynamicToolCallOutputContentItem
 
 pub(all) struct DynamicToolCallOutputContentItemInputAudio {
   audio_url : String
   type_ : String
 } derive(Eq, @debug.Debug)
 pub fn DynamicToolCallOutputContentItemInputAudio::equal(Self, Self) -> Bool
-pub fn DynamicToolCallOutputContentItemInputAudio::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn DynamicToolCallOutputContentItemInputAudio::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn DynamicToolCallOutputContentItemInputAudio::new(audio_url~ : String, type_~ : String) -> Self
 pub fn DynamicToolCallOutputContentItemInputAudio::not_equal(Self, Self) -> Bool
 pub fn DynamicToolCallOutputContentItemInputAudio::to_json(Self) -> Json
 pub fn DynamicToolCallOutputContentItemInputAudio::to_repr(Self) -> @debug.Repr
 pub impl ToJson for DynamicToolCallOutputContentItemInputAudio
-pub impl @moonbitlang/core/json.FromJson for DynamicToolCallOutputContentItemInputAudio
+pub impl @json.FromJson for DynamicToolCallOutputContentItemInputAudio
 
 pub(all) struct DynamicToolCallOutputContentItemInputImage {
   image_url : String
   type_ : String
 } derive(Eq, @debug.Debug)
 pub fn DynamicToolCallOutputContentItemInputImage::equal(Self, Self) -> Bool
-pub fn DynamicToolCallOutputContentItemInputImage::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn DynamicToolCallOutputContentItemInputImage::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn DynamicToolCallOutputContentItemInputImage::new(image_url~ : String, type_~ : String) -> Self
 pub fn DynamicToolCallOutputContentItemInputImage::not_equal(Self, Self) -> Bool
 pub fn DynamicToolCallOutputContentItemInputImage::to_json(Self) -> Json
 pub fn DynamicToolCallOutputContentItemInputImage::to_repr(Self) -> @debug.Repr
 pub impl ToJson for DynamicToolCallOutputContentItemInputImage
-pub impl @moonbitlang/core/json.FromJson for DynamicToolCallOutputContentItemInputImage
+pub impl @json.FromJson for DynamicToolCallOutputContentItemInputImage
 
 pub(all) struct DynamicToolCallOutputContentItemInputText {
   text : String
   type_ : String
 } derive(Eq, @debug.Debug)
 pub fn DynamicToolCallOutputContentItemInputText::equal(Self, Self) -> Bool
-pub fn DynamicToolCallOutputContentItemInputText::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn DynamicToolCallOutputContentItemInputText::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn DynamicToolCallOutputContentItemInputText::new(text~ : String, type_~ : String) -> Self
 pub fn DynamicToolCallOutputContentItemInputText::not_equal(Self, Self) -> Bool
 pub fn DynamicToolCallOutputContentItemInputText::to_json(Self) -> Json
 pub fn DynamicToolCallOutputContentItemInputText::to_repr(Self) -> @debug.Repr
 pub impl ToJson for DynamicToolCallOutputContentItemInputText
-pub impl @moonbitlang/core/json.FromJson for DynamicToolCallOutputContentItemInputText
+pub impl @json.FromJson for DynamicToolCallOutputContentItemInputText
 
 #non_exhaustive
 pub(all) enum DynamicToolCallStatus {
@@ -573,12 +575,12 @@ pub(all) enum DynamicToolCallStatus {
   Unknown(String)
 } derive(Eq, @debug.Debug)
 pub fn DynamicToolCallStatus::equal(Self, Self) -> Bool
-pub fn DynamicToolCallStatus::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn DynamicToolCallStatus::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn DynamicToolCallStatus::not_equal(Self, Self) -> Bool
 pub fn DynamicToolCallStatus::to_json(Self) -> Json
 pub fn DynamicToolCallStatus::to_repr(Self) -> @debug.Repr
 pub impl ToJson for DynamicToolCallStatus
-pub impl @moonbitlang/core/json.FromJson for DynamicToolCallStatus
+pub impl @json.FromJson for DynamicToolCallStatus
 
 pub(all) struct ErrorNotification {
   error : TurnError
@@ -587,13 +589,13 @@ pub(all) struct ErrorNotification {
   will_retry : Bool
 } derive(Eq, @debug.Debug)
 pub fn ErrorNotification::equal(Self, Self) -> Bool
-pub fn ErrorNotification::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ErrorNotification::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn ErrorNotification::new(error~ : TurnError, thread_id~ : String, turn_id~ : String, will_retry~ : Bool) -> Self
 pub fn ErrorNotification::not_equal(Self, Self) -> Bool
 pub fn ErrorNotification::to_json(Self) -> Json
 pub fn ErrorNotification::to_repr(Self) -> @debug.Repr
 pub impl ToJson for ErrorNotification
-pub impl @moonbitlang/core/json.FromJson for ErrorNotification
+pub impl @json.FromJson for ErrorNotification
 
 #non_exhaustive
 pub(all) enum Event {
@@ -606,7 +608,7 @@ pub(all) enum Event {
   ItemAgentMessageDelta(AgentMessageDeltaNotification)
   Unknown(String, Json?)
 }
-pub fn Event::decode(String, Json?) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn Event::decode(String, Json?) -> Self raise @json.JsonDecodeError
 
 #non_exhaustive
 pub(all) enum FileChangeApprovalDecision {
@@ -617,41 +619,41 @@ pub(all) enum FileChangeApprovalDecision {
   Custom(String)
 } derive(Eq, @debug.Debug)
 pub fn FileChangeApprovalDecision::equal(Self, Self) -> Bool
-pub fn FileChangeApprovalDecision::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn FileChangeApprovalDecision::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn FileChangeApprovalDecision::not_equal(Self, Self) -> Bool
 pub fn FileChangeApprovalDecision::to_json(Self) -> Json
 pub fn FileChangeApprovalDecision::to_repr(Self) -> @debug.Repr
 pub impl ToJson for FileChangeApprovalDecision
-pub impl @moonbitlang/core/json.FromJson for FileChangeApprovalDecision
+pub impl @json.FromJson for FileChangeApprovalDecision
 
 pub(all) struct FileChangeRequestApprovalParams {
-  grant_root : @gaato/sdk-runtime/json.Presence[String]
+  grant_root : @jsonkit.Presence[String]
   item_id : String
-  reason : @gaato/sdk-runtime/json.Presence[String]
+  reason : @jsonkit.Presence[String]
   started_at_ms : Int64
   thread_id : String
   turn_id : String
 } derive(Eq, @debug.Debug)
 pub fn FileChangeRequestApprovalParams::equal(Self, Self) -> Bool
-pub fn FileChangeRequestApprovalParams::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn FileChangeRequestApprovalParams::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn FileChangeRequestApprovalParams::new(item_id~ : String, started_at_ms~ : Int64, thread_id~ : String, turn_id~ : String, grant_root? : String, reason? : String) -> Self
 pub fn FileChangeRequestApprovalParams::not_equal(Self, Self) -> Bool
 pub fn FileChangeRequestApprovalParams::to_json(Self) -> Json
 pub fn FileChangeRequestApprovalParams::to_repr(Self) -> @debug.Repr
 pub impl ToJson for FileChangeRequestApprovalParams
-pub impl @moonbitlang/core/json.FromJson for FileChangeRequestApprovalParams
+pub impl @json.FromJson for FileChangeRequestApprovalParams
 
 pub(all) struct FileChangeRequestApprovalResponse {
   decision : FileChangeApprovalDecision
 } derive(Eq, @debug.Debug)
 pub fn FileChangeRequestApprovalResponse::equal(Self, Self) -> Bool
-pub fn FileChangeRequestApprovalResponse::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn FileChangeRequestApprovalResponse::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn FileChangeRequestApprovalResponse::new(decision~ : FileChangeApprovalDecision) -> Self
 pub fn FileChangeRequestApprovalResponse::not_equal(Self, Self) -> Bool
 pub fn FileChangeRequestApprovalResponse::to_json(Self) -> Json
 pub fn FileChangeRequestApprovalResponse::to_repr(Self) -> @debug.Repr
 pub impl ToJson for FileChangeRequestApprovalResponse
-pub impl @moonbitlang/core/json.FromJson for FileChangeRequestApprovalResponse
+pub impl @json.FromJson for FileChangeRequestApprovalResponse
 
 #non_exhaustive
 pub(all) enum FileSystemAccessMode {
@@ -661,12 +663,12 @@ pub(all) enum FileSystemAccessMode {
   Unknown(String)
 } derive(Eq, @debug.Debug)
 pub fn FileSystemAccessMode::equal(Self, Self) -> Bool
-pub fn FileSystemAccessMode::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn FileSystemAccessMode::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn FileSystemAccessMode::not_equal(Self, Self) -> Bool
 pub fn FileSystemAccessMode::to_json(Self) -> Json
 pub fn FileSystemAccessMode::to_repr(Self) -> @debug.Repr
 pub impl ToJson for FileSystemAccessMode
-pub impl @moonbitlang/core/json.FromJson for FileSystemAccessMode
+pub impl @json.FromJson for FileSystemAccessMode
 
 #non_exhaustive
 pub(all) enum FileSystemPath {
@@ -676,64 +678,64 @@ pub(all) enum FileSystemPath {
   Unknown(String, Json)
 } derive(Eq, @debug.Debug)
 pub fn FileSystemPath::equal(Self, Self) -> Bool
-pub fn FileSystemPath::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn FileSystemPath::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn FileSystemPath::not_equal(Self, Self) -> Bool
 pub fn FileSystemPath::to_json(Self) -> Json
 pub fn FileSystemPath::to_repr(Self) -> @debug.Repr
 pub impl ToJson for FileSystemPath
-pub impl @moonbitlang/core/json.FromJson for FileSystemPath
+pub impl @json.FromJson for FileSystemPath
 
 pub(all) struct FileSystemPathGlobPattern {
   pattern : String
   type_ : String
 } derive(Eq, @debug.Debug)
 pub fn FileSystemPathGlobPattern::equal(Self, Self) -> Bool
-pub fn FileSystemPathGlobPattern::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn FileSystemPathGlobPattern::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn FileSystemPathGlobPattern::new(pattern~ : String, type_~ : String) -> Self
 pub fn FileSystemPathGlobPattern::not_equal(Self, Self) -> Bool
 pub fn FileSystemPathGlobPattern::to_json(Self) -> Json
 pub fn FileSystemPathGlobPattern::to_repr(Self) -> @debug.Repr
 pub impl ToJson for FileSystemPathGlobPattern
-pub impl @moonbitlang/core/json.FromJson for FileSystemPathGlobPattern
+pub impl @json.FromJson for FileSystemPathGlobPattern
 
 pub(all) struct FileSystemPathPath {
   path : String
   type_ : String
 } derive(Eq, @debug.Debug)
 pub fn FileSystemPathPath::equal(Self, Self) -> Bool
-pub fn FileSystemPathPath::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn FileSystemPathPath::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn FileSystemPathPath::new(path~ : String, type_~ : String) -> Self
 pub fn FileSystemPathPath::not_equal(Self, Self) -> Bool
 pub fn FileSystemPathPath::to_json(Self) -> Json
 pub fn FileSystemPathPath::to_repr(Self) -> @debug.Repr
 pub impl ToJson for FileSystemPathPath
-pub impl @moonbitlang/core/json.FromJson for FileSystemPathPath
+pub impl @json.FromJson for FileSystemPathPath
 
 pub(all) struct FileSystemPathSpecial {
   type_ : String
   value : FileSystemSpecialPath
 } derive(Eq, @debug.Debug)
 pub fn FileSystemPathSpecial::equal(Self, Self) -> Bool
-pub fn FileSystemPathSpecial::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn FileSystemPathSpecial::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn FileSystemPathSpecial::new(type_~ : String, value~ : FileSystemSpecialPath) -> Self
 pub fn FileSystemPathSpecial::not_equal(Self, Self) -> Bool
 pub fn FileSystemPathSpecial::to_json(Self) -> Json
 pub fn FileSystemPathSpecial::to_repr(Self) -> @debug.Repr
 pub impl ToJson for FileSystemPathSpecial
-pub impl @moonbitlang/core/json.FromJson for FileSystemPathSpecial
+pub impl @json.FromJson for FileSystemPathSpecial
 
 pub(all) struct FileSystemSandboxEntry {
   access : FileSystemAccessMode
   path : FileSystemPath
 } derive(Eq, @debug.Debug)
 pub fn FileSystemSandboxEntry::equal(Self, Self) -> Bool
-pub fn FileSystemSandboxEntry::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn FileSystemSandboxEntry::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn FileSystemSandboxEntry::new(access~ : FileSystemAccessMode, path~ : FileSystemPath) -> Self
 pub fn FileSystemSandboxEntry::not_equal(Self, Self) -> Bool
 pub fn FileSystemSandboxEntry::to_json(Self) -> Json
 pub fn FileSystemSandboxEntry::to_repr(Self) -> @debug.Repr
 pub impl ToJson for FileSystemSandboxEntry
-pub impl @moonbitlang/core/json.FromJson for FileSystemSandboxEntry
+pub impl @json.FromJson for FileSystemSandboxEntry
 
 #non_exhaustive
 pub(all) enum FileSystemSpecialPath {
@@ -746,87 +748,87 @@ pub(all) enum FileSystemSpecialPath {
   Unknown(String, Json)
 } derive(Eq, @debug.Debug)
 pub fn FileSystemSpecialPath::equal(Self, Self) -> Bool
-pub fn FileSystemSpecialPath::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn FileSystemSpecialPath::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn FileSystemSpecialPath::not_equal(Self, Self) -> Bool
 pub fn FileSystemSpecialPath::to_json(Self) -> Json
 pub fn FileSystemSpecialPath::to_repr(Self) -> @debug.Repr
 pub impl ToJson for FileSystemSpecialPath
-pub impl @moonbitlang/core/json.FromJson for FileSystemSpecialPath
+pub impl @json.FromJson for FileSystemSpecialPath
 
 pub(all) struct FileSystemSpecialPathKnownUnknown {
   kind : String
   path : String
-  subpath : @gaato/sdk-runtime/json.Presence[String]
+  subpath : @jsonkit.Presence[String]
 } derive(Eq, @debug.Debug)
 pub fn FileSystemSpecialPathKnownUnknown::equal(Self, Self) -> Bool
-pub fn FileSystemSpecialPathKnownUnknown::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn FileSystemSpecialPathKnownUnknown::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn FileSystemSpecialPathKnownUnknown::new(kind~ : String, path~ : String, subpath? : String) -> Self
 pub fn FileSystemSpecialPathKnownUnknown::not_equal(Self, Self) -> Bool
 pub fn FileSystemSpecialPathKnownUnknown::to_json(Self) -> Json
 pub fn FileSystemSpecialPathKnownUnknown::to_repr(Self) -> @debug.Repr
 pub impl ToJson for FileSystemSpecialPathKnownUnknown
-pub impl @moonbitlang/core/json.FromJson for FileSystemSpecialPathKnownUnknown
+pub impl @json.FromJson for FileSystemSpecialPathKnownUnknown
 
 pub(all) struct FileSystemSpecialPathMinimal {
   kind : String
 } derive(Eq, @debug.Debug)
 pub fn FileSystemSpecialPathMinimal::equal(Self, Self) -> Bool
-pub fn FileSystemSpecialPathMinimal::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn FileSystemSpecialPathMinimal::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn FileSystemSpecialPathMinimal::new(kind~ : String) -> Self
 pub fn FileSystemSpecialPathMinimal::not_equal(Self, Self) -> Bool
 pub fn FileSystemSpecialPathMinimal::to_json(Self) -> Json
 pub fn FileSystemSpecialPathMinimal::to_repr(Self) -> @debug.Repr
 pub impl ToJson for FileSystemSpecialPathMinimal
-pub impl @moonbitlang/core/json.FromJson for FileSystemSpecialPathMinimal
+pub impl @json.FromJson for FileSystemSpecialPathMinimal
 
 pub(all) struct FileSystemSpecialPathProjectRoots {
   kind : String
-  subpath : @gaato/sdk-runtime/json.Presence[String]
+  subpath : @jsonkit.Presence[String]
 } derive(Eq, @debug.Debug)
 pub fn FileSystemSpecialPathProjectRoots::equal(Self, Self) -> Bool
-pub fn FileSystemSpecialPathProjectRoots::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn FileSystemSpecialPathProjectRoots::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn FileSystemSpecialPathProjectRoots::new(kind~ : String, subpath? : String) -> Self
 pub fn FileSystemSpecialPathProjectRoots::not_equal(Self, Self) -> Bool
 pub fn FileSystemSpecialPathProjectRoots::to_json(Self) -> Json
 pub fn FileSystemSpecialPathProjectRoots::to_repr(Self) -> @debug.Repr
 pub impl ToJson for FileSystemSpecialPathProjectRoots
-pub impl @moonbitlang/core/json.FromJson for FileSystemSpecialPathProjectRoots
+pub impl @json.FromJson for FileSystemSpecialPathProjectRoots
 
 pub(all) struct FileSystemSpecialPathRoot {
   kind : String
 } derive(Eq, @debug.Debug)
 pub fn FileSystemSpecialPathRoot::equal(Self, Self) -> Bool
-pub fn FileSystemSpecialPathRoot::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn FileSystemSpecialPathRoot::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn FileSystemSpecialPathRoot::new(kind~ : String) -> Self
 pub fn FileSystemSpecialPathRoot::not_equal(Self, Self) -> Bool
 pub fn FileSystemSpecialPathRoot::to_json(Self) -> Json
 pub fn FileSystemSpecialPathRoot::to_repr(Self) -> @debug.Repr
 pub impl ToJson for FileSystemSpecialPathRoot
-pub impl @moonbitlang/core/json.FromJson for FileSystemSpecialPathRoot
+pub impl @json.FromJson for FileSystemSpecialPathRoot
 
 pub(all) struct FileSystemSpecialPathSlashTmp {
   kind : String
 } derive(Eq, @debug.Debug)
 pub fn FileSystemSpecialPathSlashTmp::equal(Self, Self) -> Bool
-pub fn FileSystemSpecialPathSlashTmp::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn FileSystemSpecialPathSlashTmp::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn FileSystemSpecialPathSlashTmp::new(kind~ : String) -> Self
 pub fn FileSystemSpecialPathSlashTmp::not_equal(Self, Self) -> Bool
 pub fn FileSystemSpecialPathSlashTmp::to_json(Self) -> Json
 pub fn FileSystemSpecialPathSlashTmp::to_repr(Self) -> @debug.Repr
 pub impl ToJson for FileSystemSpecialPathSlashTmp
-pub impl @moonbitlang/core/json.FromJson for FileSystemSpecialPathSlashTmp
+pub impl @json.FromJson for FileSystemSpecialPathSlashTmp
 
 pub(all) struct FileSystemSpecialPathTmpdir {
   kind : String
 } derive(Eq, @debug.Debug)
 pub fn FileSystemSpecialPathTmpdir::equal(Self, Self) -> Bool
-pub fn FileSystemSpecialPathTmpdir::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn FileSystemSpecialPathTmpdir::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn FileSystemSpecialPathTmpdir::new(kind~ : String) -> Self
 pub fn FileSystemSpecialPathTmpdir::not_equal(Self, Self) -> Bool
 pub fn FileSystemSpecialPathTmpdir::to_json(Self) -> Json
 pub fn FileSystemSpecialPathTmpdir::to_repr(Self) -> @debug.Repr
 pub impl ToJson for FileSystemSpecialPathTmpdir
-pub impl @moonbitlang/core/json.FromJson for FileSystemSpecialPathTmpdir
+pub impl @json.FromJson for FileSystemSpecialPathTmpdir
 
 pub(all) struct FileUpdateChange {
   diff : String
@@ -834,13 +836,13 @@ pub(all) struct FileUpdateChange {
   path : String
 } derive(Eq, @debug.Debug)
 pub fn FileUpdateChange::equal(Self, Self) -> Bool
-pub fn FileUpdateChange::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn FileUpdateChange::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn FileUpdateChange::new(diff~ : String, kind~ : PatchChangeKind, path~ : String) -> Self
 pub fn FileUpdateChange::not_equal(Self, Self) -> Bool
 pub fn FileUpdateChange::to_json(Self) -> Json
 pub fn FileUpdateChange::to_repr(Self) -> @debug.Repr
 pub impl ToJson for FileUpdateChange
-pub impl @moonbitlang/core/json.FromJson for FileUpdateChange
+pub impl @json.FromJson for FileUpdateChange
 
 #non_exhaustive
 pub(all) enum FunctionCallOutputBody {
@@ -848,12 +850,12 @@ pub(all) enum FunctionCallOutputBody {
   FunctionCallOutputContentItemArray(Array[FunctionCallOutputContentItem])
 } derive(Eq, @debug.Debug)
 pub fn FunctionCallOutputBody::equal(Self, Self) -> Bool
-pub fn FunctionCallOutputBody::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn FunctionCallOutputBody::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn FunctionCallOutputBody::not_equal(Self, Self) -> Bool
 pub fn FunctionCallOutputBody::to_json(Self) -> Json
 pub fn FunctionCallOutputBody::to_repr(Self) -> @debug.Repr
 pub impl ToJson for FunctionCallOutputBody
-pub impl @moonbitlang/core/json.FromJson for FunctionCallOutputBody
+pub impl @json.FromJson for FunctionCallOutputBody
 
 #non_exhaustive
 pub(all) enum FunctionCallOutputContentItem {
@@ -864,105 +866,105 @@ pub(all) enum FunctionCallOutputContentItem {
   Unknown(String, Json)
 } derive(Eq, @debug.Debug)
 pub fn FunctionCallOutputContentItem::equal(Self, Self) -> Bool
-pub fn FunctionCallOutputContentItem::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn FunctionCallOutputContentItem::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn FunctionCallOutputContentItem::not_equal(Self, Self) -> Bool
 pub fn FunctionCallOutputContentItem::to_json(Self) -> Json
 pub fn FunctionCallOutputContentItem::to_repr(Self) -> @debug.Repr
 pub impl ToJson for FunctionCallOutputContentItem
-pub impl @moonbitlang/core/json.FromJson for FunctionCallOutputContentItem
+pub impl @json.FromJson for FunctionCallOutputContentItem
 
 pub(all) struct FunctionCallOutputContentItemEncryptedContent {
   encrypted_content : String
   type_ : String
 } derive(Eq, @debug.Debug)
 pub fn FunctionCallOutputContentItemEncryptedContent::equal(Self, Self) -> Bool
-pub fn FunctionCallOutputContentItemEncryptedContent::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn FunctionCallOutputContentItemEncryptedContent::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn FunctionCallOutputContentItemEncryptedContent::new(encrypted_content~ : String, type_~ : String) -> Self
 pub fn FunctionCallOutputContentItemEncryptedContent::not_equal(Self, Self) -> Bool
 pub fn FunctionCallOutputContentItemEncryptedContent::to_json(Self) -> Json
 pub fn FunctionCallOutputContentItemEncryptedContent::to_repr(Self) -> @debug.Repr
 pub impl ToJson for FunctionCallOutputContentItemEncryptedContent
-pub impl @moonbitlang/core/json.FromJson for FunctionCallOutputContentItemEncryptedContent
+pub impl @json.FromJson for FunctionCallOutputContentItemEncryptedContent
 
 pub(all) struct FunctionCallOutputContentItemInputAudio {
   audio_url : String
   type_ : String
 } derive(Eq, @debug.Debug)
 pub fn FunctionCallOutputContentItemInputAudio::equal(Self, Self) -> Bool
-pub fn FunctionCallOutputContentItemInputAudio::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn FunctionCallOutputContentItemInputAudio::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn FunctionCallOutputContentItemInputAudio::new(audio_url~ : String, type_~ : String) -> Self
 pub fn FunctionCallOutputContentItemInputAudio::not_equal(Self, Self) -> Bool
 pub fn FunctionCallOutputContentItemInputAudio::to_json(Self) -> Json
 pub fn FunctionCallOutputContentItemInputAudio::to_repr(Self) -> @debug.Repr
 pub impl ToJson for FunctionCallOutputContentItemInputAudio
-pub impl @moonbitlang/core/json.FromJson for FunctionCallOutputContentItemInputAudio
+pub impl @json.FromJson for FunctionCallOutputContentItemInputAudio
 
 pub(all) struct FunctionCallOutputContentItemInputImage {
-  detail : @gaato/sdk-runtime/json.Presence[ImageDetail]
+  detail : @jsonkit.Presence[ImageDetail]
   image_url : String
   type_ : String
 } derive(Eq, @debug.Debug)
 pub fn FunctionCallOutputContentItemInputImage::equal(Self, Self) -> Bool
-pub fn FunctionCallOutputContentItemInputImage::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn FunctionCallOutputContentItemInputImage::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn FunctionCallOutputContentItemInputImage::new(image_url~ : String, type_~ : String, detail? : ImageDetail) -> Self
 pub fn FunctionCallOutputContentItemInputImage::not_equal(Self, Self) -> Bool
 pub fn FunctionCallOutputContentItemInputImage::to_json(Self) -> Json
 pub fn FunctionCallOutputContentItemInputImage::to_repr(Self) -> @debug.Repr
 pub impl ToJson for FunctionCallOutputContentItemInputImage
-pub impl @moonbitlang/core/json.FromJson for FunctionCallOutputContentItemInputImage
+pub impl @json.FromJson for FunctionCallOutputContentItemInputImage
 
 pub(all) struct FunctionCallOutputContentItemInputText {
   text : String
   type_ : String
 } derive(Eq, @debug.Debug)
 pub fn FunctionCallOutputContentItemInputText::equal(Self, Self) -> Bool
-pub fn FunctionCallOutputContentItemInputText::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn FunctionCallOutputContentItemInputText::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn FunctionCallOutputContentItemInputText::new(text~ : String, type_~ : String) -> Self
 pub fn FunctionCallOutputContentItemInputText::not_equal(Self, Self) -> Bool
 pub fn FunctionCallOutputContentItemInputText::to_json(Self) -> Json
 pub fn FunctionCallOutputContentItemInputText::to_repr(Self) -> @debug.Repr
 pub impl ToJson for FunctionCallOutputContentItemInputText
-pub impl @moonbitlang/core/json.FromJson for FunctionCallOutputContentItemInputText
+pub impl @json.FromJson for FunctionCallOutputContentItemInputText
 
 pub(all) struct GitInfo {
-  branch : @gaato/sdk-runtime/json.Presence[String]
-  origin_url : @gaato/sdk-runtime/json.Presence[String]
-  sha : @gaato/sdk-runtime/json.Presence[String]
+  branch : @jsonkit.Presence[String]
+  origin_url : @jsonkit.Presence[String]
+  sha : @jsonkit.Presence[String]
 } derive(Eq, @debug.Debug)
 pub fn GitInfo::equal(Self, Self) -> Bool
-pub fn GitInfo::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn GitInfo::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn GitInfo::new(branch? : String, origin_url? : String, sha? : String) -> Self
 pub fn GitInfo::not_equal(Self, Self) -> Bool
 pub fn GitInfo::to_json(Self) -> Json
 pub fn GitInfo::to_repr(Self) -> @debug.Repr
 pub impl ToJson for GitInfo
-pub impl @moonbitlang/core/json.FromJson for GitInfo
+pub impl @json.FromJson for GitInfo
 
 pub(all) struct GrantedPermissionProfile {
-  file_system : @gaato/sdk-runtime/json.Presence[AdditionalFileSystemPermissions]
-  network : @gaato/sdk-runtime/json.Presence[AdditionalNetworkPermissions]
+  file_system : @jsonkit.Presence[AdditionalFileSystemPermissions]
+  network : @jsonkit.Presence[AdditionalNetworkPermissions]
 } derive(Eq, @debug.Debug)
 pub fn GrantedPermissionProfile::equal(Self, Self) -> Bool
-pub fn GrantedPermissionProfile::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn GrantedPermissionProfile::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn GrantedPermissionProfile::new(file_system? : AdditionalFileSystemPermissions, network? : AdditionalNetworkPermissions) -> Self
 pub fn GrantedPermissionProfile::not_equal(Self, Self) -> Bool
 pub fn GrantedPermissionProfile::to_json(Self) -> Json
 pub fn GrantedPermissionProfile::to_repr(Self) -> @debug.Repr
 pub impl ToJson for GrantedPermissionProfile
-pub impl @moonbitlang/core/json.FromJson for GrantedPermissionProfile
+pub impl @json.FromJson for GrantedPermissionProfile
 
 pub(all) struct HookPromptFragment {
   hook_run_id : String
   text : String
 } derive(Eq, @debug.Debug)
 pub fn HookPromptFragment::equal(Self, Self) -> Bool
-pub fn HookPromptFragment::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn HookPromptFragment::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn HookPromptFragment::new(hook_run_id~ : String, text~ : String) -> Self
 pub fn HookPromptFragment::not_equal(Self, Self) -> Bool
 pub fn HookPromptFragment::to_json(Self) -> Json
 pub fn HookPromptFragment::to_repr(Self) -> @debug.Repr
 pub impl ToJson for HookPromptFragment
-pub impl @moonbitlang/core/json.FromJson for HookPromptFragment
+pub impl @json.FromJson for HookPromptFragment
 
 #non_exhaustive
 pub(all) enum ImageDetail {
@@ -973,12 +975,12 @@ pub(all) enum ImageDetail {
   Unknown(String)
 } derive(Eq, @debug.Debug)
 pub fn ImageDetail::equal(Self, Self) -> Bool
-pub fn ImageDetail::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ImageDetail::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn ImageDetail::not_equal(Self, Self) -> Bool
 pub fn ImageDetail::to_json(Self) -> Json
 pub fn ImageDetail::to_repr(Self) -> @debug.Repr
 pub impl ToJson for ImageDetail
-pub impl @moonbitlang/core/json.FromJson for ImageDetail
+pub impl @json.FromJson for ImageDetail
 
 #non_exhaustive
 pub(all) enum ImageGenerationFailure {
@@ -986,55 +988,55 @@ pub(all) enum ImageGenerationFailure {
   Unknown(String, Json)
 } derive(Eq, @debug.Debug)
 pub fn ImageGenerationFailure::equal(Self, Self) -> Bool
-pub fn ImageGenerationFailure::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ImageGenerationFailure::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn ImageGenerationFailure::not_equal(Self, Self) -> Bool
 pub fn ImageGenerationFailure::to_json(Self) -> Json
 pub fn ImageGenerationFailure::to_repr(Self) -> @debug.Repr
 pub impl ToJson for ImageGenerationFailure
-pub impl @moonbitlang/core/json.FromJson for ImageGenerationFailure
+pub impl @json.FromJson for ImageGenerationFailure
 
 pub(all) struct ImageGenerationFailureUsageLimitExceeded {
   limit_id : String
-  resets_at : @gaato/sdk-runtime/json.Presence[Int64]
+  resets_at : @jsonkit.Presence[Int64]
   type_ : String
 } derive(Eq, @debug.Debug)
 pub fn ImageGenerationFailureUsageLimitExceeded::equal(Self, Self) -> Bool
-pub fn ImageGenerationFailureUsageLimitExceeded::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ImageGenerationFailureUsageLimitExceeded::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn ImageGenerationFailureUsageLimitExceeded::new(limit_id~ : String, type_~ : String, resets_at? : Int64) -> Self
 pub fn ImageGenerationFailureUsageLimitExceeded::not_equal(Self, Self) -> Bool
 pub fn ImageGenerationFailureUsageLimitExceeded::to_json(Self) -> Json
 pub fn ImageGenerationFailureUsageLimitExceeded::to_repr(Self) -> @debug.Repr
 pub impl ToJson for ImageGenerationFailureUsageLimitExceeded
-pub impl @moonbitlang/core/json.FromJson for ImageGenerationFailureUsageLimitExceeded
+pub impl @json.FromJson for ImageGenerationFailureUsageLimitExceeded
 
 pub(all) struct InitializeCapabilities {
   experimental_api : Bool?
-  extensions : @gaato/sdk-runtime/json.Presence[Json]
+  extensions : @jsonkit.Presence[Json]
   mcp_server_openai_form_elicitation : Bool?
-  opt_out_notification_methods : @gaato/sdk-runtime/json.Presence[Array[String]]
+  opt_out_notification_methods : @jsonkit.Presence[Array[String]]
   request_attestation : Bool?
 } derive(Eq, @debug.Debug)
 pub fn InitializeCapabilities::equal(Self, Self) -> Bool
-pub fn InitializeCapabilities::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn InitializeCapabilities::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn InitializeCapabilities::new(experimental_api? : Bool, extensions? : Json, mcp_server_openai_form_elicitation? : Bool, opt_out_notification_methods? : Array[String], request_attestation? : Bool) -> Self
 pub fn InitializeCapabilities::not_equal(Self, Self) -> Bool
 pub fn InitializeCapabilities::to_json(Self) -> Json
 pub fn InitializeCapabilities::to_repr(Self) -> @debug.Repr
 pub impl ToJson for InitializeCapabilities
-pub impl @moonbitlang/core/json.FromJson for InitializeCapabilities
+pub impl @json.FromJson for InitializeCapabilities
 
 pub(all) struct InitializeParams {
-  capabilities : @gaato/sdk-runtime/json.Presence[InitializeCapabilities]
+  capabilities : @jsonkit.Presence[InitializeCapabilities]
   client_info : ClientInfo
 } derive(Eq, @debug.Debug)
 pub fn InitializeParams::equal(Self, Self) -> Bool
-pub fn InitializeParams::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn InitializeParams::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn InitializeParams::new(client_info~ : ClientInfo, capabilities? : InitializeCapabilities) -> Self
 pub fn InitializeParams::not_equal(Self, Self) -> Bool
 pub fn InitializeParams::to_json(Self) -> Json
 pub fn InitializeParams::to_repr(Self) -> @debug.Repr
 pub impl ToJson for InitializeParams
-pub impl @moonbitlang/core/json.FromJson for InitializeParams
+pub impl @json.FromJson for InitializeParams
 
 pub(all) struct InitializeResponse {
   codex_home : String
@@ -1043,13 +1045,13 @@ pub(all) struct InitializeResponse {
   user_agent : String
 } derive(Eq, @debug.Debug)
 pub fn InitializeResponse::equal(Self, Self) -> Bool
-pub fn InitializeResponse::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn InitializeResponse::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn InitializeResponse::new(codex_home~ : String, platform_family~ : String, platform_os~ : String, user_agent~ : String) -> Self
 pub fn InitializeResponse::not_equal(Self, Self) -> Bool
 pub fn InitializeResponse::to_json(Self) -> Json
 pub fn InitializeResponse::to_repr(Self) -> @debug.Repr
 pub impl ToJson for InitializeResponse
-pub impl @moonbitlang/core/json.FromJson for InitializeResponse
+pub impl @json.FromJson for InitializeResponse
 
 pub(all) struct ItemCompletedNotification {
   completed_at_ms : Int64
@@ -1058,13 +1060,13 @@ pub(all) struct ItemCompletedNotification {
   turn_id : String
 } derive(Eq, @debug.Debug)
 pub fn ItemCompletedNotification::equal(Self, Self) -> Bool
-pub fn ItemCompletedNotification::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ItemCompletedNotification::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn ItemCompletedNotification::new(completed_at_ms~ : Int64, item~ : ThreadItem, thread_id~ : String, turn_id~ : String) -> Self
 pub fn ItemCompletedNotification::not_equal(Self, Self) -> Bool
 pub fn ItemCompletedNotification::to_json(Self) -> Json
 pub fn ItemCompletedNotification::to_repr(Self) -> @debug.Repr
 pub impl ToJson for ItemCompletedNotification
-pub impl @moonbitlang/core/json.FromJson for ItemCompletedNotification
+pub impl @json.FromJson for ItemCompletedNotification
 
 pub(all) struct ItemStartedNotification {
   item : ThreadItem
@@ -1073,55 +1075,55 @@ pub(all) struct ItemStartedNotification {
   turn_id : String
 } derive(Eq, @debug.Debug)
 pub fn ItemStartedNotification::equal(Self, Self) -> Bool
-pub fn ItemStartedNotification::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ItemStartedNotification::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn ItemStartedNotification::new(item~ : ThreadItem, started_at_ms~ : Int64, thread_id~ : String, turn_id~ : String) -> Self
 pub fn ItemStartedNotification::not_equal(Self, Self) -> Bool
 pub fn ItemStartedNotification::to_json(Self) -> Json
 pub fn ItemStartedNotification::to_repr(Self) -> @debug.Repr
 pub impl ToJson for ItemStartedNotification
-pub impl @moonbitlang/core/json.FromJson for ItemStartedNotification
+pub impl @json.FromJson for ItemStartedNotification
 
 pub(all) struct McpToolCallAppContext {
-  action_name : @gaato/sdk-runtime/json.Presence[String]
-  app_name : @gaato/sdk-runtime/json.Presence[String]
+  action_name : @jsonkit.Presence[String]
+  app_name : @jsonkit.Presence[String]
   connector_id : String
-  link_id : @gaato/sdk-runtime/json.Presence[String]
-  resource_uri : @gaato/sdk-runtime/json.Presence[String]
+  link_id : @jsonkit.Presence[String]
+  resource_uri : @jsonkit.Presence[String]
 } derive(Eq, @debug.Debug)
 pub fn McpToolCallAppContext::equal(Self, Self) -> Bool
-pub fn McpToolCallAppContext::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn McpToolCallAppContext::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn McpToolCallAppContext::new(connector_id~ : String, action_name? : String, app_name? : String, link_id? : String, resource_uri? : String) -> Self
 pub fn McpToolCallAppContext::not_equal(Self, Self) -> Bool
 pub fn McpToolCallAppContext::to_json(Self) -> Json
 pub fn McpToolCallAppContext::to_repr(Self) -> @debug.Repr
 pub impl ToJson for McpToolCallAppContext
-pub impl @moonbitlang/core/json.FromJson for McpToolCallAppContext
+pub impl @json.FromJson for McpToolCallAppContext
 
 pub(all) struct McpToolCallError {
   message : String
 } derive(Eq, @debug.Debug)
 pub fn McpToolCallError::equal(Self, Self) -> Bool
-pub fn McpToolCallError::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn McpToolCallError::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn McpToolCallError::new(message~ : String) -> Self
 pub fn McpToolCallError::not_equal(Self, Self) -> Bool
 pub fn McpToolCallError::to_json(Self) -> Json
 pub fn McpToolCallError::to_repr(Self) -> @debug.Repr
 pub impl ToJson for McpToolCallError
-pub impl @moonbitlang/core/json.FromJson for McpToolCallError
+pub impl @json.FromJson for McpToolCallError
 
 pub(all) struct McpToolCallResult {
-  meta : @gaato/sdk-runtime/json.Presence[Json]
+  meta : @jsonkit.Presence[Json]
   content : Array[Json]
-  structured_content : @gaato/sdk-runtime/json.Presence[Json]
+  structured_content : @jsonkit.Presence[Json]
 } derive(Eq, @debug.Debug)
 pub fn McpToolCallResult::equal(Self, Self) -> Bool
-pub fn McpToolCallResult::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn McpToolCallResult::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn McpToolCallResult::new(content~ : Array[Json], meta? : Json, structured_content? : Json) -> Self
 pub fn McpToolCallResult::not_equal(Self, Self) -> Bool
 pub fn McpToolCallResult::to_json(Self) -> Json
 pub fn McpToolCallResult::to_repr(Self) -> @debug.Repr
 pub impl ToJson for McpToolCallResult
-pub impl @moonbitlang/core/json.FromJson for McpToolCallResult
+pub impl @json.FromJson for McpToolCallResult
 
 #non_exhaustive
 pub(all) enum McpToolCallStatus {
@@ -1131,25 +1133,25 @@ pub(all) enum McpToolCallStatus {
   Unknown(String)
 } derive(Eq, @debug.Debug)
 pub fn McpToolCallStatus::equal(Self, Self) -> Bool
-pub fn McpToolCallStatus::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn McpToolCallStatus::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn McpToolCallStatus::not_equal(Self, Self) -> Bool
 pub fn McpToolCallStatus::to_json(Self) -> Json
 pub fn McpToolCallStatus::to_repr(Self) -> @debug.Repr
 pub impl ToJson for McpToolCallStatus
-pub impl @moonbitlang/core/json.FromJson for McpToolCallStatus
+pub impl @json.FromJson for McpToolCallStatus
 
 pub(all) struct MemoryCitation {
   entries : Array[MemoryCitationEntry]
   thread_ids : Array[String]
 } derive(Eq, @debug.Debug)
 pub fn MemoryCitation::equal(Self, Self) -> Bool
-pub fn MemoryCitation::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn MemoryCitation::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn MemoryCitation::new(entries~ : Array[MemoryCitationEntry], thread_ids~ : Array[String]) -> Self
 pub fn MemoryCitation::not_equal(Self, Self) -> Bool
 pub fn MemoryCitation::to_json(Self) -> Json
 pub fn MemoryCitation::to_repr(Self) -> @debug.Repr
 pub impl ToJson for MemoryCitation
-pub impl @moonbitlang/core/json.FromJson for MemoryCitation
+pub impl @json.FromJson for MemoryCitation
 
 pub(all) struct MemoryCitationEntry {
   line_end : UInt32
@@ -1158,13 +1160,13 @@ pub(all) struct MemoryCitationEntry {
   path : String
 } derive(Eq, @debug.Debug)
 pub fn MemoryCitationEntry::equal(Self, Self) -> Bool
-pub fn MemoryCitationEntry::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn MemoryCitationEntry::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn MemoryCitationEntry::new(line_end~ : UInt32, line_start~ : UInt32, note~ : String, path~ : String) -> Self
 pub fn MemoryCitationEntry::not_equal(Self, Self) -> Bool
 pub fn MemoryCitationEntry::to_json(Self) -> Json
 pub fn MemoryCitationEntry::to_repr(Self) -> @debug.Repr
 pub impl ToJson for MemoryCitationEntry
-pub impl @moonbitlang/core/json.FromJson for MemoryCitationEntry
+pub impl @json.FromJson for MemoryCitationEntry
 
 #non_exhaustive
 pub(all) enum MessagePhase {
@@ -1173,38 +1175,38 @@ pub(all) enum MessagePhase {
   Unknown(String)
 } derive(Eq, @debug.Debug)
 pub fn MessagePhase::equal(Self, Self) -> Bool
-pub fn MessagePhase::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn MessagePhase::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn MessagePhase::not_equal(Self, Self) -> Bool
 pub fn MessagePhase::to_json(Self) -> Json
 pub fn MessagePhase::to_repr(Self) -> @debug.Repr
 pub impl ToJson for MessagePhase
-pub impl @moonbitlang/core/json.FromJson for MessagePhase
+pub impl @json.FromJson for MessagePhase
 
 pub(all) struct MisalignmentErrorDetails {
-  detailed_explanation : @gaato/sdk-runtime/json.Presence[String]
-  error_type : @gaato/sdk-runtime/json.Presence[String]
-  steer : @gaato/sdk-runtime/json.Presence[MisalignmentSteer]
+  detailed_explanation : @jsonkit.Presence[String]
+  error_type : @jsonkit.Presence[String]
+  steer : @jsonkit.Presence[MisalignmentSteer]
 } derive(Eq, @debug.Debug)
 pub fn MisalignmentErrorDetails::equal(Self, Self) -> Bool
-pub fn MisalignmentErrorDetails::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn MisalignmentErrorDetails::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn MisalignmentErrorDetails::new(detailed_explanation? : String, error_type? : String, steer? : MisalignmentSteer) -> Self
 pub fn MisalignmentErrorDetails::not_equal(Self, Self) -> Bool
 pub fn MisalignmentErrorDetails::to_json(Self) -> Json
 pub fn MisalignmentErrorDetails::to_repr(Self) -> @debug.Repr
 pub impl ToJson for MisalignmentErrorDetails
-pub impl @moonbitlang/core/json.FromJson for MisalignmentErrorDetails
+pub impl @json.FromJson for MisalignmentErrorDetails
 
 pub(all) struct MisalignmentSteer {
   message : String
 } derive(Eq, @debug.Debug)
 pub fn MisalignmentSteer::equal(Self, Self) -> Bool
-pub fn MisalignmentSteer::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn MisalignmentSteer::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn MisalignmentSteer::new(message~ : String) -> Self
 pub fn MisalignmentSteer::not_equal(Self, Self) -> Bool
 pub fn MisalignmentSteer::to_json(Self) -> Json
 pub fn MisalignmentSteer::to_repr(Self) -> @debug.Repr
 pub impl ToJson for MisalignmentSteer
-pub impl @moonbitlang/core/json.FromJson for MisalignmentSteer
+pub impl @json.FromJson for MisalignmentSteer
 
 #non_exhaustive
 pub(all) enum NetworkAccess {
@@ -1213,25 +1215,25 @@ pub(all) enum NetworkAccess {
   Unknown(String)
 } derive(Eq, @debug.Debug)
 pub fn NetworkAccess::equal(Self, Self) -> Bool
-pub fn NetworkAccess::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn NetworkAccess::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn NetworkAccess::not_equal(Self, Self) -> Bool
 pub fn NetworkAccess::to_json(Self) -> Json
 pub fn NetworkAccess::to_repr(Self) -> @debug.Repr
 pub impl ToJson for NetworkAccess
-pub impl @moonbitlang/core/json.FromJson for NetworkAccess
+pub impl @json.FromJson for NetworkAccess
 
 pub(all) struct NetworkApprovalContext {
   host : String
   protocol : NetworkApprovalProtocol
 } derive(Eq, @debug.Debug)
 pub fn NetworkApprovalContext::equal(Self, Self) -> Bool
-pub fn NetworkApprovalContext::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn NetworkApprovalContext::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn NetworkApprovalContext::new(host~ : String, protocol~ : NetworkApprovalProtocol) -> Self
 pub fn NetworkApprovalContext::not_equal(Self, Self) -> Bool
 pub fn NetworkApprovalContext::to_json(Self) -> Json
 pub fn NetworkApprovalContext::to_repr(Self) -> @debug.Repr
 pub impl ToJson for NetworkApprovalContext
-pub impl @moonbitlang/core/json.FromJson for NetworkApprovalContext
+pub impl @json.FromJson for NetworkApprovalContext
 
 #non_exhaustive
 pub(all) enum NetworkApprovalProtocol {
@@ -1242,25 +1244,25 @@ pub(all) enum NetworkApprovalProtocol {
   Unknown(String)
 } derive(Eq, @debug.Debug)
 pub fn NetworkApprovalProtocol::equal(Self, Self) -> Bool
-pub fn NetworkApprovalProtocol::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn NetworkApprovalProtocol::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn NetworkApprovalProtocol::not_equal(Self, Self) -> Bool
 pub fn NetworkApprovalProtocol::to_json(Self) -> Json
 pub fn NetworkApprovalProtocol::to_repr(Self) -> @debug.Repr
 pub impl ToJson for NetworkApprovalProtocol
-pub impl @moonbitlang/core/json.FromJson for NetworkApprovalProtocol
+pub impl @json.FromJson for NetworkApprovalProtocol
 
 pub(all) struct NetworkPolicyAmendment {
   action : NetworkPolicyRuleAction
   host : String
 } derive(Eq, @debug.Debug)
 pub fn NetworkPolicyAmendment::equal(Self, Self) -> Bool
-pub fn NetworkPolicyAmendment::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn NetworkPolicyAmendment::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn NetworkPolicyAmendment::new(action~ : NetworkPolicyRuleAction, host~ : String) -> Self
 pub fn NetworkPolicyAmendment::not_equal(Self, Self) -> Bool
 pub fn NetworkPolicyAmendment::to_json(Self) -> Json
 pub fn NetworkPolicyAmendment::to_repr(Self) -> @debug.Repr
 pub impl ToJson for NetworkPolicyAmendment
-pub impl @moonbitlang/core/json.FromJson for NetworkPolicyAmendment
+pub impl @json.FromJson for NetworkPolicyAmendment
 
 #non_exhaustive
 pub(all) enum NetworkPolicyRuleAction {
@@ -1269,12 +1271,12 @@ pub(all) enum NetworkPolicyRuleAction {
   Unknown(String)
 } derive(Eq, @debug.Debug)
 pub fn NetworkPolicyRuleAction::equal(Self, Self) -> Bool
-pub fn NetworkPolicyRuleAction::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn NetworkPolicyRuleAction::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn NetworkPolicyRuleAction::not_equal(Self, Self) -> Bool
 pub fn NetworkPolicyRuleAction::to_json(Self) -> Json
 pub fn NetworkPolicyRuleAction::to_repr(Self) -> @debug.Repr
 pub impl ToJson for NetworkPolicyRuleAction
-pub impl @moonbitlang/core/json.FromJson for NetworkPolicyRuleAction
+pub impl @json.FromJson for NetworkPolicyRuleAction
 
 #non_exhaustive
 pub(all) enum NonSteerableTurnKind {
@@ -1283,12 +1285,12 @@ pub(all) enum NonSteerableTurnKind {
   Unknown(String)
 } derive(Eq, @debug.Debug)
 pub fn NonSteerableTurnKind::equal(Self, Self) -> Bool
-pub fn NonSteerableTurnKind::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn NonSteerableTurnKind::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn NonSteerableTurnKind::not_equal(Self, Self) -> Bool
 pub fn NonSteerableTurnKind::to_json(Self) -> Json
 pub fn NonSteerableTurnKind::to_repr(Self) -> @debug.Repr
 pub impl ToJson for NonSteerableTurnKind
-pub impl @moonbitlang/core/json.FromJson for NonSteerableTurnKind
+pub impl @json.FromJson for NonSteerableTurnKind
 
 #non_exhaustive
 pub(all) enum PatchApplyStatus {
@@ -1299,12 +1301,12 @@ pub(all) enum PatchApplyStatus {
   Unknown(String)
 } derive(Eq, @debug.Debug)
 pub fn PatchApplyStatus::equal(Self, Self) -> Bool
-pub fn PatchApplyStatus::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn PatchApplyStatus::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn PatchApplyStatus::not_equal(Self, Self) -> Bool
 pub fn PatchApplyStatus::to_json(Self) -> Json
 pub fn PatchApplyStatus::to_repr(Self) -> @debug.Repr
 pub impl ToJson for PatchApplyStatus
-pub impl @moonbitlang/core/json.FromJson for PatchApplyStatus
+pub impl @json.FromJson for PatchApplyStatus
 
 #non_exhaustive
 pub(all) enum PatchChangeKind {
@@ -1314,49 +1316,49 @@ pub(all) enum PatchChangeKind {
   Unknown(String, Json)
 } derive(Eq, @debug.Debug)
 pub fn PatchChangeKind::equal(Self, Self) -> Bool
-pub fn PatchChangeKind::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn PatchChangeKind::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn PatchChangeKind::not_equal(Self, Self) -> Bool
 pub fn PatchChangeKind::to_json(Self) -> Json
 pub fn PatchChangeKind::to_repr(Self) -> @debug.Repr
 pub impl ToJson for PatchChangeKind
-pub impl @moonbitlang/core/json.FromJson for PatchChangeKind
+pub impl @json.FromJson for PatchChangeKind
 
 pub(all) struct PatchChangeKindAdd {
   type_ : String
 } derive(Eq, @debug.Debug)
 pub fn PatchChangeKindAdd::equal(Self, Self) -> Bool
-pub fn PatchChangeKindAdd::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn PatchChangeKindAdd::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn PatchChangeKindAdd::new(type_~ : String) -> Self
 pub fn PatchChangeKindAdd::not_equal(Self, Self) -> Bool
 pub fn PatchChangeKindAdd::to_json(Self) -> Json
 pub fn PatchChangeKindAdd::to_repr(Self) -> @debug.Repr
 pub impl ToJson for PatchChangeKindAdd
-pub impl @moonbitlang/core/json.FromJson for PatchChangeKindAdd
+pub impl @json.FromJson for PatchChangeKindAdd
 
 pub(all) struct PatchChangeKindDelete {
   type_ : String
 } derive(Eq, @debug.Debug)
 pub fn PatchChangeKindDelete::equal(Self, Self) -> Bool
-pub fn PatchChangeKindDelete::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn PatchChangeKindDelete::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn PatchChangeKindDelete::new(type_~ : String) -> Self
 pub fn PatchChangeKindDelete::not_equal(Self, Self) -> Bool
 pub fn PatchChangeKindDelete::to_json(Self) -> Json
 pub fn PatchChangeKindDelete::to_repr(Self) -> @debug.Repr
 pub impl ToJson for PatchChangeKindDelete
-pub impl @moonbitlang/core/json.FromJson for PatchChangeKindDelete
+pub impl @json.FromJson for PatchChangeKindDelete
 
 pub(all) struct PatchChangeKindUpdate {
-  move_path : @gaato/sdk-runtime/json.Presence[String]
+  move_path : @jsonkit.Presence[String]
   type_ : String
 } derive(Eq, @debug.Debug)
 pub fn PatchChangeKindUpdate::equal(Self, Self) -> Bool
-pub fn PatchChangeKindUpdate::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn PatchChangeKindUpdate::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn PatchChangeKindUpdate::new(type_~ : String, move_path? : String) -> Self
 pub fn PatchChangeKindUpdate::not_equal(Self, Self) -> Bool
 pub fn PatchChangeKindUpdate::to_json(Self) -> Json
 pub fn PatchChangeKindUpdate::to_repr(Self) -> @debug.Repr
 pub impl ToJson for PatchChangeKindUpdate
-pub impl @moonbitlang/core/json.FromJson for PatchChangeKindUpdate
+pub impl @json.FromJson for PatchChangeKindUpdate
 
 #non_exhaustive
 pub(all) enum PermissionGrantScope {
@@ -1365,45 +1367,45 @@ pub(all) enum PermissionGrantScope {
   Custom(String)
 } derive(Eq, @debug.Debug)
 pub fn PermissionGrantScope::equal(Self, Self) -> Bool
-pub fn PermissionGrantScope::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn PermissionGrantScope::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn PermissionGrantScope::not_equal(Self, Self) -> Bool
 pub fn PermissionGrantScope::to_json(Self) -> Json
 pub fn PermissionGrantScope::to_repr(Self) -> @debug.Repr
 pub impl ToJson for PermissionGrantScope
-pub impl @moonbitlang/core/json.FromJson for PermissionGrantScope
+pub impl @json.FromJson for PermissionGrantScope
 
 pub(all) struct PermissionsRequestApprovalParams {
   cwd : String
-  environment_id : @gaato/sdk-runtime/json.Presence[String]
+  environment_id : @jsonkit.Presence[String]
   item_id : String
   permissions : RequestPermissionProfile
-  reason : @gaato/sdk-runtime/json.Presence[String]
+  reason : @jsonkit.Presence[String]
   started_at_ms : Int64
   thread_id : String
   turn_id : String
 } derive(Eq, @debug.Debug)
 pub fn PermissionsRequestApprovalParams::equal(Self, Self) -> Bool
-pub fn PermissionsRequestApprovalParams::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn PermissionsRequestApprovalParams::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn PermissionsRequestApprovalParams::new(cwd~ : String, item_id~ : String, permissions~ : RequestPermissionProfile, started_at_ms~ : Int64, thread_id~ : String, turn_id~ : String, environment_id? : String, reason? : String) -> Self
 pub fn PermissionsRequestApprovalParams::not_equal(Self, Self) -> Bool
 pub fn PermissionsRequestApprovalParams::to_json(Self) -> Json
 pub fn PermissionsRequestApprovalParams::to_repr(Self) -> @debug.Repr
 pub impl ToJson for PermissionsRequestApprovalParams
-pub impl @moonbitlang/core/json.FromJson for PermissionsRequestApprovalParams
+pub impl @json.FromJson for PermissionsRequestApprovalParams
 
 pub(all) struct PermissionsRequestApprovalResponse {
   permissions : GrantedPermissionProfile
   scope : PermissionGrantScope?
-  strict_auto_review : @gaato/sdk-runtime/json.Presence[Bool]
+  strict_auto_review : @jsonkit.Presence[Bool]
 } derive(Eq, @debug.Debug)
 pub fn PermissionsRequestApprovalResponse::equal(Self, Self) -> Bool
-pub fn PermissionsRequestApprovalResponse::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn PermissionsRequestApprovalResponse::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn PermissionsRequestApprovalResponse::new(permissions~ : GrantedPermissionProfile, scope? : PermissionGrantScope, strict_auto_review? : Bool) -> Self
 pub fn PermissionsRequestApprovalResponse::not_equal(Self, Self) -> Bool
 pub fn PermissionsRequestApprovalResponse::to_json(Self) -> Json
 pub fn PermissionsRequestApprovalResponse::to_repr(Self) -> @debug.Repr
 pub impl ToJson for PermissionsRequestApprovalResponse
-pub impl @moonbitlang/core/json.FromJson for PermissionsRequestApprovalResponse
+pub impl @json.FromJson for PermissionsRequestApprovalResponse
 
 #non_exhaustive
 pub(all) enum Personality {
@@ -1413,12 +1415,12 @@ pub(all) enum Personality {
   Custom(String)
 } derive(Eq, @debug.Debug)
 pub fn Personality::equal(Self, Self) -> Bool
-pub fn Personality::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn Personality::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn Personality::not_equal(Self, Self) -> Bool
 pub fn Personality::to_json(Self) -> Json
 pub fn Personality::to_repr(Self) -> @debug.Repr
 pub impl ToJson for Personality
-pub impl @moonbitlang/core/json.FromJson for Personality
+pub impl @json.FromJson for Personality
 
 #non_exhaustive
 pub(all) enum ReasoningSummary {
@@ -1429,25 +1431,25 @@ pub(all) enum ReasoningSummary {
   Custom(String)
 } derive(Eq, @debug.Debug)
 pub fn ReasoningSummary::equal(Self, Self) -> Bool
-pub fn ReasoningSummary::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ReasoningSummary::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn ReasoningSummary::not_equal(Self, Self) -> Bool
 pub fn ReasoningSummary::to_json(Self) -> Json
 pub fn ReasoningSummary::to_repr(Self) -> @debug.Repr
 pub impl ToJson for ReasoningSummary
-pub impl @moonbitlang/core/json.FromJson for ReasoningSummary
+pub impl @json.FromJson for ReasoningSummary
 
 pub(all) struct RequestPermissionProfile {
-  file_system : @gaato/sdk-runtime/json.Presence[AdditionalFileSystemPermissions]
-  network : @gaato/sdk-runtime/json.Presence[AdditionalNetworkPermissions]
+  file_system : @jsonkit.Presence[AdditionalFileSystemPermissions]
+  network : @jsonkit.Presence[AdditionalNetworkPermissions]
 } derive(Eq, @debug.Debug)
 pub fn RequestPermissionProfile::equal(Self, Self) -> Bool
-pub fn RequestPermissionProfile::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn RequestPermissionProfile::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn RequestPermissionProfile::new(file_system? : AdditionalFileSystemPermissions, network? : AdditionalNetworkPermissions) -> Self
 pub fn RequestPermissionProfile::not_equal(Self, Self) -> Bool
 pub fn RequestPermissionProfile::to_json(Self) -> Json
 pub fn RequestPermissionProfile::to_repr(Self) -> @debug.Repr
 pub impl ToJson for RequestPermissionProfile
-pub impl @moonbitlang/core/json.FromJson for RequestPermissionProfile
+pub impl @json.FromJson for RequestPermissionProfile
 
 #non_exhaustive
 pub(all) enum SandboxMode {
@@ -1457,12 +1459,12 @@ pub(all) enum SandboxMode {
   Custom(String)
 } derive(Eq, @debug.Debug)
 pub fn SandboxMode::equal(Self, Self) -> Bool
-pub fn SandboxMode::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn SandboxMode::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn SandboxMode::not_equal(Self, Self) -> Bool
 pub fn SandboxMode::to_json(Self) -> Json
 pub fn SandboxMode::to_repr(Self) -> @debug.Repr
 pub impl ToJson for SandboxMode
-pub impl @moonbitlang/core/json.FromJson for SandboxMode
+pub impl @json.FromJson for SandboxMode
 
 #non_exhaustive
 pub(all) enum SandboxPolicy {
@@ -1473,50 +1475,50 @@ pub(all) enum SandboxPolicy {
   Unknown(String, Json)
 } derive(Eq, @debug.Debug)
 pub fn SandboxPolicy::equal(Self, Self) -> Bool
-pub fn SandboxPolicy::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn SandboxPolicy::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn SandboxPolicy::not_equal(Self, Self) -> Bool
 pub fn SandboxPolicy::to_json(Self) -> Json
 pub fn SandboxPolicy::to_repr(Self) -> @debug.Repr
 pub impl ToJson for SandboxPolicy
-pub impl @moonbitlang/core/json.FromJson for SandboxPolicy
+pub impl @json.FromJson for SandboxPolicy
 
 pub(all) struct SandboxPolicyDangerFullAccess {
   type_ : String
 } derive(Eq, @debug.Debug)
 pub fn SandboxPolicyDangerFullAccess::equal(Self, Self) -> Bool
-pub fn SandboxPolicyDangerFullAccess::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn SandboxPolicyDangerFullAccess::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn SandboxPolicyDangerFullAccess::new(type_~ : String) -> Self
 pub fn SandboxPolicyDangerFullAccess::not_equal(Self, Self) -> Bool
 pub fn SandboxPolicyDangerFullAccess::to_json(Self) -> Json
 pub fn SandboxPolicyDangerFullAccess::to_repr(Self) -> @debug.Repr
 pub impl ToJson for SandboxPolicyDangerFullAccess
-pub impl @moonbitlang/core/json.FromJson for SandboxPolicyDangerFullAccess
+pub impl @json.FromJson for SandboxPolicyDangerFullAccess
 
 pub(all) struct SandboxPolicyExternalSandbox {
   network_access : NetworkAccess?
   type_ : String
 } derive(Eq, @debug.Debug)
 pub fn SandboxPolicyExternalSandbox::equal(Self, Self) -> Bool
-pub fn SandboxPolicyExternalSandbox::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn SandboxPolicyExternalSandbox::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn SandboxPolicyExternalSandbox::new(type_~ : String, network_access? : NetworkAccess) -> Self
 pub fn SandboxPolicyExternalSandbox::not_equal(Self, Self) -> Bool
 pub fn SandboxPolicyExternalSandbox::to_json(Self) -> Json
 pub fn SandboxPolicyExternalSandbox::to_repr(Self) -> @debug.Repr
 pub impl ToJson for SandboxPolicyExternalSandbox
-pub impl @moonbitlang/core/json.FromJson for SandboxPolicyExternalSandbox
+pub impl @json.FromJson for SandboxPolicyExternalSandbox
 
 pub(all) struct SandboxPolicyReadOnly {
   network_access : Bool?
   type_ : String
 } derive(Eq, @debug.Debug)
 pub fn SandboxPolicyReadOnly::equal(Self, Self) -> Bool
-pub fn SandboxPolicyReadOnly::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn SandboxPolicyReadOnly::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn SandboxPolicyReadOnly::new(type_~ : String, network_access? : Bool) -> Self
 pub fn SandboxPolicyReadOnly::not_equal(Self, Self) -> Bool
 pub fn SandboxPolicyReadOnly::to_json(Self) -> Json
 pub fn SandboxPolicyReadOnly::to_repr(Self) -> @debug.Repr
 pub impl ToJson for SandboxPolicyReadOnly
-pub impl @moonbitlang/core/json.FromJson for SandboxPolicyReadOnly
+pub impl @json.FromJson for SandboxPolicyReadOnly
 
 pub(all) struct SandboxPolicyWorkspaceWrite {
   exclude_slash_tmp : Bool?
@@ -1526,13 +1528,13 @@ pub(all) struct SandboxPolicyWorkspaceWrite {
   writable_roots : Array[String]?
 } derive(Eq, @debug.Debug)
 pub fn SandboxPolicyWorkspaceWrite::equal(Self, Self) -> Bool
-pub fn SandboxPolicyWorkspaceWrite::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn SandboxPolicyWorkspaceWrite::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn SandboxPolicyWorkspaceWrite::new(type_~ : String, exclude_slash_tmp? : Bool, exclude_tmpdir_env_var? : Bool, network_access? : Bool, writable_roots? : Array[String]) -> Self
 pub fn SandboxPolicyWorkspaceWrite::not_equal(Self, Self) -> Bool
 pub fn SandboxPolicyWorkspaceWrite::to_json(Self) -> Json
 pub fn SandboxPolicyWorkspaceWrite::to_repr(Self) -> @debug.Repr
 pub impl ToJson for SandboxPolicyWorkspaceWrite
-pub impl @moonbitlang/core/json.FromJson for SandboxPolicyWorkspaceWrite
+pub impl @json.FromJson for SandboxPolicyWorkspaceWrite
 
 #non_exhaustive
 pub(all) enum SessionSource {
@@ -1546,12 +1548,12 @@ pub(all) enum SessionSource {
   UnknownValue(Json)
 } derive(Eq, @debug.Debug)
 pub fn SessionSource::equal(Self, Self) -> Bool
-pub fn SessionSource::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn SessionSource::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn SessionSource::not_equal(Self, Self) -> Bool
 pub fn SessionSource::to_json(Self) -> Json
 pub fn SessionSource::to_repr(Self) -> @debug.Repr
 pub impl ToJson for SessionSource
-pub impl @moonbitlang/core/json.FromJson for SessionSource
+pub impl @json.FromJson for SessionSource
 
 #non_exhaustive
 pub(all) enum SubAgentActivityKind {
@@ -1562,12 +1564,12 @@ pub(all) enum SubAgentActivityKind {
   Unknown(String)
 } derive(Eq, @debug.Debug)
 pub fn SubAgentActivityKind::equal(Self, Self) -> Bool
-pub fn SubAgentActivityKind::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn SubAgentActivityKind::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn SubAgentActivityKind::not_equal(Self, Self) -> Bool
 pub fn SubAgentActivityKind::to_json(Self) -> Json
 pub fn SubAgentActivityKind::to_repr(Self) -> @debug.Repr
 pub impl ToJson for SubAgentActivityKind
-pub impl @moonbitlang/core/json.FromJson for SubAgentActivityKind
+pub impl @json.FromJson for SubAgentActivityKind
 
 #non_exhaustive
 pub(all) enum SubAgentSource {
@@ -1579,80 +1581,80 @@ pub(all) enum SubAgentSource {
   UnknownValue(Json)
 } derive(Eq, @debug.Debug)
 pub fn SubAgentSource::equal(Self, Self) -> Bool
-pub fn SubAgentSource::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn SubAgentSource::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn SubAgentSource::not_equal(Self, Self) -> Bool
 pub fn SubAgentSource::to_json(Self) -> Json
 pub fn SubAgentSource::to_repr(Self) -> @debug.Repr
 pub impl ToJson for SubAgentSource
-pub impl @moonbitlang/core/json.FromJson for SubAgentSource
+pub impl @json.FromJson for SubAgentSource
 
 pub(all) struct SubAgentSourceThreadSpawn {
-  agent_nickname : @gaato/sdk-runtime/json.Presence[String]
-  agent_path : @gaato/sdk-runtime/json.Presence[String]
-  agent_role : @gaato/sdk-runtime/json.Presence[String]
+  agent_nickname : @jsonkit.Presence[String]
+  agent_path : @jsonkit.Presence[String]
+  agent_role : @jsonkit.Presence[String]
   depth : Int32
   parent_thread_id : String
 } derive(Eq, @debug.Debug)
 pub fn SubAgentSourceThreadSpawn::equal(Self, Self) -> Bool
-pub fn SubAgentSourceThreadSpawn::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn SubAgentSourceThreadSpawn::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn SubAgentSourceThreadSpawn::new(depth~ : Int32, parent_thread_id~ : String, agent_nickname? : String, agent_path? : String, agent_role? : String) -> Self
 pub fn SubAgentSourceThreadSpawn::not_equal(Self, Self) -> Bool
 pub fn SubAgentSourceThreadSpawn::to_json(Self) -> Json
 pub fn SubAgentSourceThreadSpawn::to_repr(Self) -> @debug.Repr
 pub impl ToJson for SubAgentSourceThreadSpawn
-pub impl @moonbitlang/core/json.FromJson for SubAgentSourceThreadSpawn
+pub impl @json.FromJson for SubAgentSourceThreadSpawn
 
 pub(all) struct TextElement {
   byte_range : ByteRange
-  placeholder : @gaato/sdk-runtime/json.Presence[String]
+  placeholder : @jsonkit.Presence[String]
 } derive(Eq, @debug.Debug)
 pub fn TextElement::equal(Self, Self) -> Bool
-pub fn TextElement::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn TextElement::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn TextElement::new(byte_range~ : ByteRange, placeholder? : String) -> Self
 pub fn TextElement::not_equal(Self, Self) -> Bool
 pub fn TextElement::to_json(Self) -> Json
 pub fn TextElement::to_repr(Self) -> @debug.Repr
 pub impl ToJson for TextElement
-pub impl @moonbitlang/core/json.FromJson for TextElement
+pub impl @json.FromJson for TextElement
 
 pub(all) struct Thread {
-  agent_nickname : @gaato/sdk-runtime/json.Presence[String]
-  agent_role : @gaato/sdk-runtime/json.Presence[String]
+  agent_nickname : @jsonkit.Presence[String]
+  agent_role : @jsonkit.Presence[String]
   cli_version : String
   created_at : Int64
   cwd : String
   ephemeral : Bool
-  forked_from_id : @gaato/sdk-runtime/json.Presence[String]
-  git_info : @gaato/sdk-runtime/json.Presence[GitInfo]
+  forked_from_id : @jsonkit.Presence[String]
+  git_info : @jsonkit.Presence[GitInfo]
   history_mode : ThreadHistoryMode?
   id : String
-  model : @gaato/sdk-runtime/json.Presence[String]
+  model : @jsonkit.Presence[String]
   model_provider : String
-  name : @gaato/sdk-runtime/json.Presence[String]
-  originator : @gaato/sdk-runtime/json.Presence[String]
-  parent_thread_id : @gaato/sdk-runtime/json.Presence[String]
-  path : @gaato/sdk-runtime/json.Presence[String]
+  name : @jsonkit.Presence[String]
+  originator : @jsonkit.Presence[String]
+  parent_thread_id : @jsonkit.Presence[String]
+  path : @jsonkit.Presence[String]
   preview : String
   project_id : String?
-  reasoning_effort : @gaato/sdk-runtime/json.Presence[String]
-  recency_at : @gaato/sdk-runtime/json.Presence[Int64]
-  section : @gaato/sdk-runtime/json.Presence[ThreadSection]
-  section_entered_at : @gaato/sdk-runtime/json.Presence[Int64]
+  reasoning_effort : @jsonkit.Presence[String]
+  recency_at : @jsonkit.Presence[Int64]
+  section : @jsonkit.Presence[ThreadSection]
+  section_entered_at : @jsonkit.Presence[Int64]
   session_id : String
   source : SessionSource
   status : ThreadStatus
-  thread_source : @gaato/sdk-runtime/json.Presence[String]
+  thread_source : @jsonkit.Presence[String]
   turns : Array[Turn]
   updated_at : Int64
 } derive(Eq, @debug.Debug)
 pub fn Thread::equal(Self, Self) -> Bool
-pub fn Thread::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn Thread::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn Thread::new(cli_version~ : String, created_at~ : Int64, cwd~ : String, ephemeral~ : Bool, id~ : String, model_provider~ : String, preview~ : String, session_id~ : String, source~ : SessionSource, status~ : ThreadStatus, turns~ : Array[Turn], updated_at~ : Int64, agent_nickname? : String, agent_role? : String, forked_from_id? : String, git_info? : GitInfo, history_mode? : ThreadHistoryMode, model? : String, name? : String, originator? : String, parent_thread_id? : String, path? : String, project_id? : String, reasoning_effort? : String, recency_at? : Int64, section? : ThreadSection, section_entered_at? : Int64, thread_source? : String) -> Self
 pub fn Thread::not_equal(Self, Self) -> Bool
 pub fn Thread::to_json(Self) -> Json
 pub fn Thread::to_repr(Self) -> @debug.Repr
 pub impl ToJson for Thread
-pub impl @moonbitlang/core/json.FromJson for Thread
+pub impl @json.FromJson for Thread
 
 #non_exhaustive
 pub(all) enum ThreadActiveFlag {
@@ -1661,12 +1663,12 @@ pub(all) enum ThreadActiveFlag {
   Unknown(String)
 } derive(Eq, @debug.Debug)
 pub fn ThreadActiveFlag::equal(Self, Self) -> Bool
-pub fn ThreadActiveFlag::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ThreadActiveFlag::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn ThreadActiveFlag::not_equal(Self, Self) -> Bool
 pub fn ThreadActiveFlag::to_json(Self) -> Json
 pub fn ThreadActiveFlag::to_repr(Self) -> @debug.Repr
 pub impl ToJson for ThreadActiveFlag
-pub impl @moonbitlang/core/json.FromJson for ThreadActiveFlag
+pub impl @json.FromJson for ThreadActiveFlag
 
 #non_exhaustive
 pub(all) enum ThreadHistoryMode {
@@ -1675,12 +1677,12 @@ pub(all) enum ThreadHistoryMode {
   Unknown(String)
 } derive(Eq, @debug.Debug)
 pub fn ThreadHistoryMode::equal(Self, Self) -> Bool
-pub fn ThreadHistoryMode::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ThreadHistoryMode::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn ThreadHistoryMode::not_equal(Self, Self) -> Bool
 pub fn ThreadHistoryMode::to_json(Self) -> Json
 pub fn ThreadHistoryMode::to_repr(Self) -> @debug.Repr
 pub impl ToJson for ThreadHistoryMode
-pub impl @moonbitlang/core/json.FromJson for ThreadHistoryMode
+pub impl @json.FromJson for ThreadHistoryMode
 
 #non_exhaustive
 pub(all) enum ThreadItem {
@@ -1706,37 +1708,37 @@ pub(all) enum ThreadItem {
   Unknown(String, Json)
 } derive(Eq, @debug.Debug)
 pub fn ThreadItem::equal(Self, Self) -> Bool
-pub fn ThreadItem::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ThreadItem::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn ThreadItem::not_equal(Self, Self) -> Bool
 pub fn ThreadItem::to_json(Self) -> Json
 pub fn ThreadItem::to_repr(Self) -> @debug.Repr
 pub impl ToJson for ThreadItem
-pub impl @moonbitlang/core/json.FromJson for ThreadItem
+pub impl @json.FromJson for ThreadItem
 
 pub(all) struct ThreadItemAgentMessage {
-  delivery : @gaato/sdk-runtime/json.Presence[String]
+  delivery : @jsonkit.Presence[String]
   id : String
-  memory_citation : @gaato/sdk-runtime/json.Presence[MemoryCitation]
-  phase : @gaato/sdk-runtime/json.Presence[MessagePhase]
-  questions : @gaato/sdk-runtime/json.Presence[Array[AsyncUserInputQuestion]]
+  memory_citation : @jsonkit.Presence[MemoryCitation]
+  phase : @jsonkit.Presence[MessagePhase]
+  questions : @jsonkit.Presence[Array[AsyncUserInputQuestion]]
   text : String
   type_ : String
 } derive(Eq, @debug.Debug)
 pub fn ThreadItemAgentMessage::equal(Self, Self) -> Bool
-pub fn ThreadItemAgentMessage::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ThreadItemAgentMessage::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn ThreadItemAgentMessage::new(id~ : String, text~ : String, type_~ : String, delivery? : String, memory_citation? : MemoryCitation, phase? : MessagePhase, questions? : Array[AsyncUserInputQuestion]) -> Self
 pub fn ThreadItemAgentMessage::not_equal(Self, Self) -> Bool
 pub fn ThreadItemAgentMessage::to_json(Self) -> Json
 pub fn ThreadItemAgentMessage::to_repr(Self) -> @debug.Repr
 pub impl ToJson for ThreadItemAgentMessage
-pub impl @moonbitlang/core/json.FromJson for ThreadItemAgentMessage
+pub impl @json.FromJson for ThreadItemAgentMessage
 
 pub(all) struct ThreadItemCollabAgentToolCall {
   agents_states : Map[String, CollabAgentState]
   id : String
-  model : @gaato/sdk-runtime/json.Presence[String]
-  prompt : @gaato/sdk-runtime/json.Presence[String]
-  reasoning_effort : @gaato/sdk-runtime/json.Presence[String]
+  model : @jsonkit.Presence[String]
+  prompt : @jsonkit.Presence[String]
+  reasoning_effort : @jsonkit.Presence[String]
   receiver_thread_ids : Array[String]
   sender_thread_id : String
   status : CollabAgentToolCallStatus
@@ -1744,70 +1746,70 @@ pub(all) struct ThreadItemCollabAgentToolCall {
   type_ : String
 } derive(Eq, @debug.Debug)
 pub fn ThreadItemCollabAgentToolCall::equal(Self, Self) -> Bool
-pub fn ThreadItemCollabAgentToolCall::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ThreadItemCollabAgentToolCall::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn ThreadItemCollabAgentToolCall::new(agents_states~ : Map[String, CollabAgentState], id~ : String, receiver_thread_ids~ : Array[String], sender_thread_id~ : String, status~ : CollabAgentToolCallStatus, tool~ : CollabAgentTool, type_~ : String, model? : String, prompt? : String, reasoning_effort? : String) -> Self
 pub fn ThreadItemCollabAgentToolCall::not_equal(Self, Self) -> Bool
 pub fn ThreadItemCollabAgentToolCall::to_json(Self) -> Json
 pub fn ThreadItemCollabAgentToolCall::to_repr(Self) -> @debug.Repr
 pub impl ToJson for ThreadItemCollabAgentToolCall
-pub impl @moonbitlang/core/json.FromJson for ThreadItemCollabAgentToolCall
+pub impl @json.FromJson for ThreadItemCollabAgentToolCall
 
 pub(all) struct ThreadItemCommandExecution {
-  aggregated_output : @gaato/sdk-runtime/json.Presence[String]
+  aggregated_output : @jsonkit.Presence[String]
   command : String
   command_actions : Array[CommandAction]
   cwd : String
-  duration_ms : @gaato/sdk-runtime/json.Presence[Int64]
-  exit_code : @gaato/sdk-runtime/json.Presence[Int32]
+  duration_ms : @jsonkit.Presence[Int64]
+  exit_code : @jsonkit.Presence[Int32]
   id : String
-  plugin_id : @gaato/sdk-runtime/json.Presence[String]
-  process_id : @gaato/sdk-runtime/json.Presence[String]
-  script_path : @gaato/sdk-runtime/json.Presence[String]
+  plugin_id : @jsonkit.Presence[String]
+  process_id : @jsonkit.Presence[String]
+  script_path : @jsonkit.Presence[String]
   source : CommandExecutionSource?
   status : CommandExecutionStatus
   type_ : String
 } derive(Eq, @debug.Debug)
 pub fn ThreadItemCommandExecution::equal(Self, Self) -> Bool
-pub fn ThreadItemCommandExecution::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ThreadItemCommandExecution::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn ThreadItemCommandExecution::new(command~ : String, command_actions~ : Array[CommandAction], cwd~ : String, id~ : String, status~ : CommandExecutionStatus, type_~ : String, aggregated_output? : String, duration_ms? : Int64, exit_code? : Int32, plugin_id? : String, process_id? : String, script_path? : String, source? : CommandExecutionSource) -> Self
 pub fn ThreadItemCommandExecution::not_equal(Self, Self) -> Bool
 pub fn ThreadItemCommandExecution::to_json(Self) -> Json
 pub fn ThreadItemCommandExecution::to_repr(Self) -> @debug.Repr
 pub impl ToJson for ThreadItemCommandExecution
-pub impl @moonbitlang/core/json.FromJson for ThreadItemCommandExecution
+pub impl @json.FromJson for ThreadItemCommandExecution
 
 pub(all) struct ThreadItemContextCompaction {
   id : String
   type_ : String
 } derive(Eq, @debug.Debug)
 pub fn ThreadItemContextCompaction::equal(Self, Self) -> Bool
-pub fn ThreadItemContextCompaction::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ThreadItemContextCompaction::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn ThreadItemContextCompaction::new(id~ : String, type_~ : String) -> Self
 pub fn ThreadItemContextCompaction::not_equal(Self, Self) -> Bool
 pub fn ThreadItemContextCompaction::to_json(Self) -> Json
 pub fn ThreadItemContextCompaction::to_repr(Self) -> @debug.Repr
 pub impl ToJson for ThreadItemContextCompaction
-pub impl @moonbitlang/core/json.FromJson for ThreadItemContextCompaction
+pub impl @json.FromJson for ThreadItemContextCompaction
 
 pub(all) struct ThreadItemDynamicToolCall {
   arguments : Json?
-  content_items : @gaato/sdk-runtime/json.Presence[Array[DynamicToolCallOutputContentItem]]
-  duration_ms : @gaato/sdk-runtime/json.Presence[Int64]
+  content_items : @jsonkit.Presence[Array[DynamicToolCallOutputContentItem]]
+  duration_ms : @jsonkit.Presence[Int64]
   id : String
-  namespace_ : @gaato/sdk-runtime/json.Presence[String]
+  namespace_ : @jsonkit.Presence[String]
   status : DynamicToolCallStatus
-  success : @gaato/sdk-runtime/json.Presence[Bool]
+  success : @jsonkit.Presence[Bool]
   tool : String
   type_ : String
 } derive(Eq, @debug.Debug)
 pub fn ThreadItemDynamicToolCall::equal(Self, Self) -> Bool
-pub fn ThreadItemDynamicToolCall::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ThreadItemDynamicToolCall::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn ThreadItemDynamicToolCall::new(id~ : String, status~ : DynamicToolCallStatus, tool~ : String, type_~ : String, arguments? : Json, content_items? : Array[DynamicToolCallOutputContentItem], duration_ms? : Int64, namespace_? : String, success? : Bool) -> Self
 pub fn ThreadItemDynamicToolCall::not_equal(Self, Self) -> Bool
 pub fn ThreadItemDynamicToolCall::to_json(Self) -> Json
 pub fn ThreadItemDynamicToolCall::to_repr(Self) -> @debug.Repr
 pub impl ToJson for ThreadItemDynamicToolCall
-pub impl @moonbitlang/core/json.FromJson for ThreadItemDynamicToolCall
+pub impl @json.FromJson for ThreadItemDynamicToolCall
 
 pub(all) struct ThreadItemEnteredReviewMode {
   id : String
@@ -1815,13 +1817,13 @@ pub(all) struct ThreadItemEnteredReviewMode {
   type_ : String
 } derive(Eq, @debug.Debug)
 pub fn ThreadItemEnteredReviewMode::equal(Self, Self) -> Bool
-pub fn ThreadItemEnteredReviewMode::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ThreadItemEnteredReviewMode::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn ThreadItemEnteredReviewMode::new(id~ : String, review~ : String, type_~ : String) -> Self
 pub fn ThreadItemEnteredReviewMode::not_equal(Self, Self) -> Bool
 pub fn ThreadItemEnteredReviewMode::to_json(Self) -> Json
 pub fn ThreadItemEnteredReviewMode::to_repr(Self) -> @debug.Repr
 pub impl ToJson for ThreadItemEnteredReviewMode
-pub impl @moonbitlang/core/json.FromJson for ThreadItemEnteredReviewMode
+pub impl @json.FromJson for ThreadItemEnteredReviewMode
 
 pub(all) struct ThreadItemExitedReviewMode {
   id : String
@@ -1829,13 +1831,13 @@ pub(all) struct ThreadItemExitedReviewMode {
   type_ : String
 } derive(Eq, @debug.Debug)
 pub fn ThreadItemExitedReviewMode::equal(Self, Self) -> Bool
-pub fn ThreadItemExitedReviewMode::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ThreadItemExitedReviewMode::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn ThreadItemExitedReviewMode::new(id~ : String, review~ : String, type_~ : String) -> Self
 pub fn ThreadItemExitedReviewMode::not_equal(Self, Self) -> Bool
 pub fn ThreadItemExitedReviewMode::to_json(Self) -> Json
 pub fn ThreadItemExitedReviewMode::to_repr(Self) -> @debug.Repr
 pub impl ToJson for ThreadItemExitedReviewMode
-pub impl @moonbitlang/core/json.FromJson for ThreadItemExitedReviewMode
+pub impl @json.FromJson for ThreadItemExitedReviewMode
 
 pub(all) struct ThreadItemFileChange {
   changes : Array[FileUpdateChange]
@@ -1844,29 +1846,29 @@ pub(all) struct ThreadItemFileChange {
   type_ : String
 } derive(Eq, @debug.Debug)
 pub fn ThreadItemFileChange::equal(Self, Self) -> Bool
-pub fn ThreadItemFileChange::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ThreadItemFileChange::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn ThreadItemFileChange::new(changes~ : Array[FileUpdateChange], id~ : String, status~ : PatchApplyStatus, type_~ : String) -> Self
 pub fn ThreadItemFileChange::not_equal(Self, Self) -> Bool
 pub fn ThreadItemFileChange::to_json(Self) -> Json
 pub fn ThreadItemFileChange::to_repr(Self) -> @debug.Repr
 pub impl ToJson for ThreadItemFileChange
-pub impl @moonbitlang/core/json.FromJson for ThreadItemFileChange
+pub impl @json.FromJson for ThreadItemFileChange
 
 pub(all) struct ThreadItemFunctionCallOutput {
   id : String
   name : String
-  namespace_ : @gaato/sdk-runtime/json.Presence[String]
+  namespace_ : @jsonkit.Presence[String]
   output : FunctionCallOutputBody
   type_ : String
 } derive(Eq, @debug.Debug)
 pub fn ThreadItemFunctionCallOutput::equal(Self, Self) -> Bool
-pub fn ThreadItemFunctionCallOutput::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ThreadItemFunctionCallOutput::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn ThreadItemFunctionCallOutput::new(id~ : String, name~ : String, output~ : FunctionCallOutputBody, type_~ : String, namespace_? : String) -> Self
 pub fn ThreadItemFunctionCallOutput::not_equal(Self, Self) -> Bool
 pub fn ThreadItemFunctionCallOutput::to_json(Self) -> Json
 pub fn ThreadItemFunctionCallOutput::to_repr(Self) -> @debug.Repr
 pub impl ToJson for ThreadItemFunctionCallOutput
-pub impl @moonbitlang/core/json.FromJson for ThreadItemFunctionCallOutput
+pub impl @json.FromJson for ThreadItemFunctionCallOutput
 
 pub(all) struct ThreadItemHookPrompt {
   fragments : Array[HookPromptFragment]
@@ -1874,32 +1876,32 @@ pub(all) struct ThreadItemHookPrompt {
   type_ : String
 } derive(Eq, @debug.Debug)
 pub fn ThreadItemHookPrompt::equal(Self, Self) -> Bool
-pub fn ThreadItemHookPrompt::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ThreadItemHookPrompt::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn ThreadItemHookPrompt::new(fragments~ : Array[HookPromptFragment], id~ : String, type_~ : String) -> Self
 pub fn ThreadItemHookPrompt::not_equal(Self, Self) -> Bool
 pub fn ThreadItemHookPrompt::to_json(Self) -> Json
 pub fn ThreadItemHookPrompt::to_repr(Self) -> @debug.Repr
 pub impl ToJson for ThreadItemHookPrompt
-pub impl @moonbitlang/core/json.FromJson for ThreadItemHookPrompt
+pub impl @json.FromJson for ThreadItemHookPrompt
 
 pub(all) struct ThreadItemImageGeneration {
-  failure : @gaato/sdk-runtime/json.Presence[ImageGenerationFailure]
+  failure : @jsonkit.Presence[ImageGenerationFailure]
   id : String
   result : String
-  revised_prompt : @gaato/sdk-runtime/json.Presence[String]
-  saved_path : @gaato/sdk-runtime/json.Presence[String]
+  revised_prompt : @jsonkit.Presence[String]
+  saved_path : @jsonkit.Presence[String]
   status : String
-  transparent_background : @gaato/sdk-runtime/json.Presence[Bool]
+  transparent_background : @jsonkit.Presence[Bool]
   type_ : String
 } derive(Eq, @debug.Debug)
 pub fn ThreadItemImageGeneration::equal(Self, Self) -> Bool
-pub fn ThreadItemImageGeneration::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ThreadItemImageGeneration::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn ThreadItemImageGeneration::new(id~ : String, result~ : String, status~ : String, type_~ : String, failure? : ImageGenerationFailure, revised_prompt? : String, saved_path? : String, transparent_background? : Bool) -> Self
 pub fn ThreadItemImageGeneration::not_equal(Self, Self) -> Bool
 pub fn ThreadItemImageGeneration::to_json(Self) -> Json
 pub fn ThreadItemImageGeneration::to_repr(Self) -> @debug.Repr
 pub impl ToJson for ThreadItemImageGeneration
-pub impl @moonbitlang/core/json.FromJson for ThreadItemImageGeneration
+pub impl @json.FromJson for ThreadItemImageGeneration
 
 pub(all) struct ThreadItemImageView {
   id : String
@@ -1907,37 +1909,37 @@ pub(all) struct ThreadItemImageView {
   type_ : String
 } derive(Eq, @debug.Debug)
 pub fn ThreadItemImageView::equal(Self, Self) -> Bool
-pub fn ThreadItemImageView::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ThreadItemImageView::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn ThreadItemImageView::new(id~ : String, path~ : String, type_~ : String) -> Self
 pub fn ThreadItemImageView::not_equal(Self, Self) -> Bool
 pub fn ThreadItemImageView::to_json(Self) -> Json
 pub fn ThreadItemImageView::to_repr(Self) -> @debug.Repr
 pub impl ToJson for ThreadItemImageView
-pub impl @moonbitlang/core/json.FromJson for ThreadItemImageView
+pub impl @json.FromJson for ThreadItemImageView
 
 pub(all) struct ThreadItemMcpToolCall {
-  app_context : @gaato/sdk-runtime/json.Presence[McpToolCallAppContext]
+  app_context : @jsonkit.Presence[McpToolCallAppContext]
   arguments : Json?
-  duration_ms : @gaato/sdk-runtime/json.Presence[Int64]
-  error : @gaato/sdk-runtime/json.Presence[McpToolCallError]
+  duration_ms : @jsonkit.Presence[Int64]
+  error : @jsonkit.Presence[McpToolCallError]
   id : String
-  mcp_app_resource_uri : @gaato/sdk-runtime/json.Presence[String]
-  plugin_id : @gaato/sdk-runtime/json.Presence[String]
-  read_only_hint : @gaato/sdk-runtime/json.Presence[Bool]
-  result : @gaato/sdk-runtime/json.Presence[McpToolCallResult]
+  mcp_app_resource_uri : @jsonkit.Presence[String]
+  plugin_id : @jsonkit.Presence[String]
+  read_only_hint : @jsonkit.Presence[Bool]
+  result : @jsonkit.Presence[McpToolCallResult]
   server : String
   status : McpToolCallStatus
   tool : String
   type_ : String
 } derive(Eq, @debug.Debug)
 pub fn ThreadItemMcpToolCall::equal(Self, Self) -> Bool
-pub fn ThreadItemMcpToolCall::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ThreadItemMcpToolCall::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn ThreadItemMcpToolCall::new(id~ : String, server~ : String, status~ : McpToolCallStatus, tool~ : String, type_~ : String, app_context? : McpToolCallAppContext, arguments? : Json, duration_ms? : Int64, error? : McpToolCallError, mcp_app_resource_uri? : String, plugin_id? : String, read_only_hint? : Bool, result? : McpToolCallResult) -> Self
 pub fn ThreadItemMcpToolCall::not_equal(Self, Self) -> Bool
 pub fn ThreadItemMcpToolCall::to_json(Self) -> Json
 pub fn ThreadItemMcpToolCall::to_repr(Self) -> @debug.Repr
 pub impl ToJson for ThreadItemMcpToolCall
-pub impl @moonbitlang/core/json.FromJson for ThreadItemMcpToolCall
+pub impl @json.FromJson for ThreadItemMcpToolCall
 
 pub(all) struct ThreadItemPlan {
   id : String
@@ -1945,13 +1947,13 @@ pub(all) struct ThreadItemPlan {
   type_ : String
 } derive(Eq, @debug.Debug)
 pub fn ThreadItemPlan::equal(Self, Self) -> Bool
-pub fn ThreadItemPlan::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ThreadItemPlan::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn ThreadItemPlan::new(id~ : String, text~ : String, type_~ : String) -> Self
 pub fn ThreadItemPlan::not_equal(Self, Self) -> Bool
 pub fn ThreadItemPlan::to_json(Self) -> Json
 pub fn ThreadItemPlan::to_repr(Self) -> @debug.Repr
 pub impl ToJson for ThreadItemPlan
-pub impl @moonbitlang/core/json.FromJson for ThreadItemPlan
+pub impl @json.FromJson for ThreadItemPlan
 
 pub(all) struct ThreadItemReasoning {
   content : Array[String]?
@@ -1960,13 +1962,13 @@ pub(all) struct ThreadItemReasoning {
   type_ : String
 } derive(Eq, @debug.Debug)
 pub fn ThreadItemReasoning::equal(Self, Self) -> Bool
-pub fn ThreadItemReasoning::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ThreadItemReasoning::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn ThreadItemReasoning::new(id~ : String, type_~ : String, content? : Array[String], summary? : Array[String]) -> Self
 pub fn ThreadItemReasoning::not_equal(Self, Self) -> Bool
 pub fn ThreadItemReasoning::to_json(Self) -> Json
 pub fn ThreadItemReasoning::to_repr(Self) -> @debug.Repr
 pub impl ToJson for ThreadItemReasoning
-pub impl @moonbitlang/core/json.FromJson for ThreadItemReasoning
+pub impl @json.FromJson for ThreadItemReasoning
 
 pub(all) struct ThreadItemSleep {
   duration_ms : UInt64Number
@@ -1974,13 +1976,13 @@ pub(all) struct ThreadItemSleep {
   type_ : String
 } derive(Eq, @debug.Debug)
 pub fn ThreadItemSleep::equal(Self, Self) -> Bool
-pub fn ThreadItemSleep::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ThreadItemSleep::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn ThreadItemSleep::new(duration_ms~ : UInt64Number, id~ : String, type_~ : String) -> Self
 pub fn ThreadItemSleep::not_equal(Self, Self) -> Bool
 pub fn ThreadItemSleep::to_json(Self) -> Json
 pub fn ThreadItemSleep::to_repr(Self) -> @debug.Repr
 pub impl ToJson for ThreadItemSleep
-pub impl @moonbitlang/core/json.FromJson for ThreadItemSleep
+pub impl @json.FromJson for ThreadItemSleep
 
 pub(all) struct ThreadItemSubAgentActivity {
   agent_path : String
@@ -1990,144 +1992,144 @@ pub(all) struct ThreadItemSubAgentActivity {
   type_ : String
 } derive(Eq, @debug.Debug)
 pub fn ThreadItemSubAgentActivity::equal(Self, Self) -> Bool
-pub fn ThreadItemSubAgentActivity::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ThreadItemSubAgentActivity::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn ThreadItemSubAgentActivity::new(agent_path~ : String, agent_thread_id~ : String, id~ : String, kind~ : SubAgentActivityKind, type_~ : String) -> Self
 pub fn ThreadItemSubAgentActivity::not_equal(Self, Self) -> Bool
 pub fn ThreadItemSubAgentActivity::to_json(Self) -> Json
 pub fn ThreadItemSubAgentActivity::to_repr(Self) -> @debug.Repr
 pub impl ToJson for ThreadItemSubAgentActivity
-pub impl @moonbitlang/core/json.FromJson for ThreadItemSubAgentActivity
+pub impl @json.FromJson for ThreadItemSubAgentActivity
 
 pub(all) struct ThreadItemUserMessage {
-  client_id : @gaato/sdk-runtime/json.Presence[String]
+  client_id : @jsonkit.Presence[String]
   content : Array[UserInput]
   id : String
   type_ : String
 } derive(Eq, @debug.Debug)
 pub fn ThreadItemUserMessage::equal(Self, Self) -> Bool
-pub fn ThreadItemUserMessage::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ThreadItemUserMessage::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn ThreadItemUserMessage::new(content~ : Array[UserInput], id~ : String, type_~ : String, client_id? : String) -> Self
 pub fn ThreadItemUserMessage::not_equal(Self, Self) -> Bool
 pub fn ThreadItemUserMessage::to_json(Self) -> Json
 pub fn ThreadItemUserMessage::to_repr(Self) -> @debug.Repr
 pub impl ToJson for ThreadItemUserMessage
-pub impl @moonbitlang/core/json.FromJson for ThreadItemUserMessage
+pub impl @json.FromJson for ThreadItemUserMessage
 
 pub(all) struct ThreadItemWebSearch {
-  action : @gaato/sdk-runtime/json.Presence[WebSearchAction]
+  action : @jsonkit.Presence[WebSearchAction]
   id : String
   query : String
-  results : @gaato/sdk-runtime/json.Presence[Array[Json]]
+  results : @jsonkit.Presence[Array[Json]]
   type_ : String
 } derive(Eq, @debug.Debug)
 pub fn ThreadItemWebSearch::equal(Self, Self) -> Bool
-pub fn ThreadItemWebSearch::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ThreadItemWebSearch::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn ThreadItemWebSearch::new(id~ : String, query~ : String, type_~ : String, action? : WebSearchAction, results? : Array[Json]) -> Self
 pub fn ThreadItemWebSearch::not_equal(Self, Self) -> Bool
 pub fn ThreadItemWebSearch::to_json(Self) -> Json
 pub fn ThreadItemWebSearch::to_repr(Self) -> @debug.Repr
 pub impl ToJson for ThreadItemWebSearch
-pub impl @moonbitlang/core/json.FromJson for ThreadItemWebSearch
+pub impl @json.FromJson for ThreadItemWebSearch
 
 pub(all) struct ThreadResumeParams {
-  approval_policy : @gaato/sdk-runtime/json.Presence[AskForApproval]
-  approvals_reviewer : @gaato/sdk-runtime/json.Presence[ApprovalsReviewer]
-  base_instructions : @gaato/sdk-runtime/json.Presence[String]
-  config : @gaato/sdk-runtime/json.Presence[Json]
-  cwd : @gaato/sdk-runtime/json.Presence[String]
-  developer_instructions : @gaato/sdk-runtime/json.Presence[String]
+  approval_policy : @jsonkit.Presence[AskForApproval]
+  approvals_reviewer : @jsonkit.Presence[ApprovalsReviewer]
+  base_instructions : @jsonkit.Presence[String]
+  config : @jsonkit.Presence[Json]
+  cwd : @jsonkit.Presence[String]
+  developer_instructions : @jsonkit.Presence[String]
   exclude_turns : Bool?
-  model : @gaato/sdk-runtime/json.Presence[String]
-  model_provider : @gaato/sdk-runtime/json.Presence[String]
-  personality : @gaato/sdk-runtime/json.Presence[Personality]
-  sandbox : @gaato/sdk-runtime/json.Presence[SandboxMode]
-  service_tier : @gaato/sdk-runtime/json.Presence[String]
+  model : @jsonkit.Presence[String]
+  model_provider : @jsonkit.Presence[String]
+  personality : @jsonkit.Presence[Personality]
+  sandbox : @jsonkit.Presence[SandboxMode]
+  service_tier : @jsonkit.Presence[String]
   thread_id : String
 } derive(Eq, @debug.Debug)
 pub fn ThreadResumeParams::equal(Self, Self) -> Bool
-pub fn ThreadResumeParams::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ThreadResumeParams::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn ThreadResumeParams::new(thread_id~ : String, approval_policy? : AskForApproval, approvals_reviewer? : ApprovalsReviewer, base_instructions? : String, config? : Json, cwd? : String, developer_instructions? : String, exclude_turns? : Bool, model? : String, model_provider? : String, personality? : Personality, sandbox? : SandboxMode, service_tier? : String) -> Self
 pub fn ThreadResumeParams::not_equal(Self, Self) -> Bool
 pub fn ThreadResumeParams::to_json(Self) -> Json
 pub fn ThreadResumeParams::to_repr(Self) -> @debug.Repr
 pub impl ToJson for ThreadResumeParams
-pub impl @moonbitlang/core/json.FromJson for ThreadResumeParams
+pub impl @json.FromJson for ThreadResumeParams
 
 pub(all) struct ThreadResumeResponse {
   approval_policy : AskForApproval
   approvals_reviewer : ApprovalsReviewer
   cwd : String
   instruction_sources : Array[String]?
-  items_backwards_cursor : @gaato/sdk-runtime/json.Presence[String]
+  items_backwards_cursor : @jsonkit.Presence[String]
   model : String
   model_provider : String
-  reasoning_effort : @gaato/sdk-runtime/json.Presence[String]
+  reasoning_effort : @jsonkit.Presence[String]
   sandbox : SandboxPolicy
-  service_tier : @gaato/sdk-runtime/json.Presence[String]
+  service_tier : @jsonkit.Presence[String]
   thread : Thread
-  turns_backwards_cursor : @gaato/sdk-runtime/json.Presence[String]
+  turns_backwards_cursor : @jsonkit.Presence[String]
 } derive(Eq, @debug.Debug)
 pub fn ThreadResumeResponse::equal(Self, Self) -> Bool
-pub fn ThreadResumeResponse::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ThreadResumeResponse::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn ThreadResumeResponse::new(approval_policy~ : AskForApproval, approvals_reviewer~ : ApprovalsReviewer, cwd~ : String, model~ : String, model_provider~ : String, sandbox~ : SandboxPolicy, thread~ : Thread, instruction_sources? : Array[String], items_backwards_cursor? : String, reasoning_effort? : String, service_tier? : String, turns_backwards_cursor? : String) -> Self
 pub fn ThreadResumeResponse::not_equal(Self, Self) -> Bool
 pub fn ThreadResumeResponse::to_json(Self) -> Json
 pub fn ThreadResumeResponse::to_repr(Self) -> @debug.Repr
 pub impl ToJson for ThreadResumeResponse
-pub impl @moonbitlang/core/json.FromJson for ThreadResumeResponse
+pub impl @json.FromJson for ThreadResumeResponse
 
 pub(all) struct ThreadSection {
-  appearance : @gaato/sdk-runtime/json.Presence[ThreadSectionAppearance]
+  appearance : @jsonkit.Presence[ThreadSectionAppearance]
   id : String
   name : String
 } derive(Eq, @debug.Debug)
 pub fn ThreadSection::equal(Self, Self) -> Bool
-pub fn ThreadSection::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ThreadSection::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn ThreadSection::new(id~ : String, name~ : String, appearance? : ThreadSectionAppearance) -> Self
 pub fn ThreadSection::not_equal(Self, Self) -> Bool
 pub fn ThreadSection::to_json(Self) -> Json
 pub fn ThreadSection::to_repr(Self) -> @debug.Repr
 pub impl ToJson for ThreadSection
-pub impl @moonbitlang/core/json.FromJson for ThreadSection
+pub impl @json.FromJson for ThreadSection
 
 pub(all) struct ThreadSectionAppearance {
-  color : @gaato/sdk-runtime/json.Presence[String]
-  icon : @gaato/sdk-runtime/json.Presence[String]
+  color : @jsonkit.Presence[String]
+  icon : @jsonkit.Presence[String]
 } derive(Eq, @debug.Debug)
 pub fn ThreadSectionAppearance::equal(Self, Self) -> Bool
-pub fn ThreadSectionAppearance::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ThreadSectionAppearance::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn ThreadSectionAppearance::new(color? : String, icon? : String) -> Self
 pub fn ThreadSectionAppearance::not_equal(Self, Self) -> Bool
 pub fn ThreadSectionAppearance::to_json(Self) -> Json
 pub fn ThreadSectionAppearance::to_repr(Self) -> @debug.Repr
 pub impl ToJson for ThreadSectionAppearance
-pub impl @moonbitlang/core/json.FromJson for ThreadSectionAppearance
+pub impl @json.FromJson for ThreadSectionAppearance
 
 pub(all) struct ThreadStartParams {
-  approval_policy : @gaato/sdk-runtime/json.Presence[AskForApproval]
-  approvals_reviewer : @gaato/sdk-runtime/json.Presence[ApprovalsReviewer]
-  base_instructions : @gaato/sdk-runtime/json.Presence[String]
-  config : @gaato/sdk-runtime/json.Presence[Json]
-  cwd : @gaato/sdk-runtime/json.Presence[String]
-  developer_instructions : @gaato/sdk-runtime/json.Presence[String]
-  ephemeral : @gaato/sdk-runtime/json.Presence[Bool]
-  model : @gaato/sdk-runtime/json.Presence[String]
-  model_provider : @gaato/sdk-runtime/json.Presence[String]
-  personality : @gaato/sdk-runtime/json.Presence[Personality]
-  sandbox : @gaato/sdk-runtime/json.Presence[SandboxMode]
-  service_name : @gaato/sdk-runtime/json.Presence[String]
-  service_tier : @gaato/sdk-runtime/json.Presence[String]
-  session_start_source : @gaato/sdk-runtime/json.Presence[ThreadStartSource]
-  thread_source : @gaato/sdk-runtime/json.Presence[String]
+  approval_policy : @jsonkit.Presence[AskForApproval]
+  approvals_reviewer : @jsonkit.Presence[ApprovalsReviewer]
+  base_instructions : @jsonkit.Presence[String]
+  config : @jsonkit.Presence[Json]
+  cwd : @jsonkit.Presence[String]
+  developer_instructions : @jsonkit.Presence[String]
+  ephemeral : @jsonkit.Presence[Bool]
+  model : @jsonkit.Presence[String]
+  model_provider : @jsonkit.Presence[String]
+  personality : @jsonkit.Presence[Personality]
+  sandbox : @jsonkit.Presence[SandboxMode]
+  service_name : @jsonkit.Presence[String]
+  service_tier : @jsonkit.Presence[String]
+  session_start_source : @jsonkit.Presence[ThreadStartSource]
+  thread_source : @jsonkit.Presence[String]
 } derive(Eq, @debug.Debug)
 pub fn ThreadStartParams::equal(Self, Self) -> Bool
-pub fn ThreadStartParams::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ThreadStartParams::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn ThreadStartParams::new(approval_policy? : AskForApproval, approvals_reviewer? : ApprovalsReviewer, base_instructions? : String, config? : Json, cwd? : String, developer_instructions? : String, ephemeral? : Bool, model? : String, model_provider? : String, personality? : Personality, sandbox? : SandboxMode, service_name? : String, service_tier? : String, session_start_source? : ThreadStartSource, thread_source? : String) -> Self
 pub fn ThreadStartParams::not_equal(Self, Self) -> Bool
 pub fn ThreadStartParams::to_json(Self) -> Json
 pub fn ThreadStartParams::to_repr(Self) -> @debug.Repr
 pub impl ToJson for ThreadStartParams
-pub impl @moonbitlang/core/json.FromJson for ThreadStartParams
+pub impl @json.FromJson for ThreadStartParams
 
 pub(all) struct ThreadStartResponse {
   approval_policy : AskForApproval
@@ -2136,19 +2138,19 @@ pub(all) struct ThreadStartResponse {
   instruction_sources : Array[String]?
   model : String
   model_provider : String
-  reasoning_effort : @gaato/sdk-runtime/json.Presence[String]
+  reasoning_effort : @jsonkit.Presence[String]
   sandbox : SandboxPolicy
-  service_tier : @gaato/sdk-runtime/json.Presence[String]
+  service_tier : @jsonkit.Presence[String]
   thread : Thread
 } derive(Eq, @debug.Debug)
 pub fn ThreadStartResponse::equal(Self, Self) -> Bool
-pub fn ThreadStartResponse::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ThreadStartResponse::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn ThreadStartResponse::new(approval_policy~ : AskForApproval, approvals_reviewer~ : ApprovalsReviewer, cwd~ : String, model~ : String, model_provider~ : String, sandbox~ : SandboxPolicy, thread~ : Thread, instruction_sources? : Array[String], reasoning_effort? : String, service_tier? : String) -> Self
 pub fn ThreadStartResponse::not_equal(Self, Self) -> Bool
 pub fn ThreadStartResponse::to_json(Self) -> Json
 pub fn ThreadStartResponse::to_repr(Self) -> @debug.Repr
 pub impl ToJson for ThreadStartResponse
-pub impl @moonbitlang/core/json.FromJson for ThreadStartResponse
+pub impl @json.FromJson for ThreadStartResponse
 
 #non_exhaustive
 pub(all) enum ThreadStartSource {
@@ -2157,24 +2159,24 @@ pub(all) enum ThreadStartSource {
   Custom(String)
 } derive(Eq, @debug.Debug)
 pub fn ThreadStartSource::equal(Self, Self) -> Bool
-pub fn ThreadStartSource::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ThreadStartSource::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn ThreadStartSource::not_equal(Self, Self) -> Bool
 pub fn ThreadStartSource::to_json(Self) -> Json
 pub fn ThreadStartSource::to_repr(Self) -> @debug.Repr
 pub impl ToJson for ThreadStartSource
-pub impl @moonbitlang/core/json.FromJson for ThreadStartSource
+pub impl @json.FromJson for ThreadStartSource
 
 pub(all) struct ThreadStartedNotification {
   thread : Thread
 } derive(Eq, @debug.Debug)
 pub fn ThreadStartedNotification::equal(Self, Self) -> Bool
-pub fn ThreadStartedNotification::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ThreadStartedNotification::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn ThreadStartedNotification::new(thread~ : Thread) -> Self
 pub fn ThreadStartedNotification::not_equal(Self, Self) -> Bool
 pub fn ThreadStartedNotification::to_json(Self) -> Json
 pub fn ThreadStartedNotification::to_repr(Self) -> @debug.Repr
 pub impl ToJson for ThreadStartedNotification
-pub impl @moonbitlang/core/json.FromJson for ThreadStartedNotification
+pub impl @json.FromJson for ThreadStartedNotification
 
 #non_exhaustive
 pub(all) enum ThreadStatus {
@@ -2185,89 +2187,89 @@ pub(all) enum ThreadStatus {
   Unknown(String, Json)
 } derive(Eq, @debug.Debug)
 pub fn ThreadStatus::equal(Self, Self) -> Bool
-pub fn ThreadStatus::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ThreadStatus::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn ThreadStatus::not_equal(Self, Self) -> Bool
 pub fn ThreadStatus::to_json(Self) -> Json
 pub fn ThreadStatus::to_repr(Self) -> @debug.Repr
 pub impl ToJson for ThreadStatus
-pub impl @moonbitlang/core/json.FromJson for ThreadStatus
+pub impl @json.FromJson for ThreadStatus
 
 pub(all) struct ThreadStatusActive {
   active_flags : Array[ThreadActiveFlag]
   type_ : String
 } derive(Eq, @debug.Debug)
 pub fn ThreadStatusActive::equal(Self, Self) -> Bool
-pub fn ThreadStatusActive::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ThreadStatusActive::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn ThreadStatusActive::new(active_flags~ : Array[ThreadActiveFlag], type_~ : String) -> Self
 pub fn ThreadStatusActive::not_equal(Self, Self) -> Bool
 pub fn ThreadStatusActive::to_json(Self) -> Json
 pub fn ThreadStatusActive::to_repr(Self) -> @debug.Repr
 pub impl ToJson for ThreadStatusActive
-pub impl @moonbitlang/core/json.FromJson for ThreadStatusActive
+pub impl @json.FromJson for ThreadStatusActive
 
 pub(all) struct ThreadStatusIdle {
   type_ : String
 } derive(Eq, @debug.Debug)
 pub fn ThreadStatusIdle::equal(Self, Self) -> Bool
-pub fn ThreadStatusIdle::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ThreadStatusIdle::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn ThreadStatusIdle::new(type_~ : String) -> Self
 pub fn ThreadStatusIdle::not_equal(Self, Self) -> Bool
 pub fn ThreadStatusIdle::to_json(Self) -> Json
 pub fn ThreadStatusIdle::to_repr(Self) -> @debug.Repr
 pub impl ToJson for ThreadStatusIdle
-pub impl @moonbitlang/core/json.FromJson for ThreadStatusIdle
+pub impl @json.FromJson for ThreadStatusIdle
 
 pub(all) struct ThreadStatusNotLoaded {
   type_ : String
 } derive(Eq, @debug.Debug)
 pub fn ThreadStatusNotLoaded::equal(Self, Self) -> Bool
-pub fn ThreadStatusNotLoaded::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ThreadStatusNotLoaded::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn ThreadStatusNotLoaded::new(type_~ : String) -> Self
 pub fn ThreadStatusNotLoaded::not_equal(Self, Self) -> Bool
 pub fn ThreadStatusNotLoaded::to_json(Self) -> Json
 pub fn ThreadStatusNotLoaded::to_repr(Self) -> @debug.Repr
 pub impl ToJson for ThreadStatusNotLoaded
-pub impl @moonbitlang/core/json.FromJson for ThreadStatusNotLoaded
+pub impl @json.FromJson for ThreadStatusNotLoaded
 
 pub(all) struct ThreadStatusSystemError {
   type_ : String
 } derive(Eq, @debug.Debug)
 pub fn ThreadStatusSystemError::equal(Self, Self) -> Bool
-pub fn ThreadStatusSystemError::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ThreadStatusSystemError::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn ThreadStatusSystemError::new(type_~ : String) -> Self
 pub fn ThreadStatusSystemError::not_equal(Self, Self) -> Bool
 pub fn ThreadStatusSystemError::to_json(Self) -> Json
 pub fn ThreadStatusSystemError::to_repr(Self) -> @debug.Repr
 pub impl ToJson for ThreadStatusSystemError
-pub impl @moonbitlang/core/json.FromJson for ThreadStatusSystemError
+pub impl @json.FromJson for ThreadStatusSystemError
 
 pub(all) struct ToolRequestUserInputAnswer {
   answers : Array[String]
 } derive(Eq, @debug.Debug)
 pub fn ToolRequestUserInputAnswer::equal(Self, Self) -> Bool
-pub fn ToolRequestUserInputAnswer::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ToolRequestUserInputAnswer::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn ToolRequestUserInputAnswer::new(answers~ : Array[String]) -> Self
 pub fn ToolRequestUserInputAnswer::not_equal(Self, Self) -> Bool
 pub fn ToolRequestUserInputAnswer::to_json(Self) -> Json
 pub fn ToolRequestUserInputAnswer::to_repr(Self) -> @debug.Repr
 pub impl ToJson for ToolRequestUserInputAnswer
-pub impl @moonbitlang/core/json.FromJson for ToolRequestUserInputAnswer
+pub impl @json.FromJson for ToolRequestUserInputAnswer
 
 pub(all) struct ToolRequestUserInputOption {
   description : String
   label : String
 } derive(Eq, @debug.Debug)
 pub fn ToolRequestUserInputOption::equal(Self, Self) -> Bool
-pub fn ToolRequestUserInputOption::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ToolRequestUserInputOption::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn ToolRequestUserInputOption::new(description~ : String, label~ : String) -> Self
 pub fn ToolRequestUserInputOption::not_equal(Self, Self) -> Bool
 pub fn ToolRequestUserInputOption::to_json(Self) -> Json
 pub fn ToolRequestUserInputOption::to_repr(Self) -> @debug.Repr
 pub impl ToJson for ToolRequestUserInputOption
-pub impl @moonbitlang/core/json.FromJson for ToolRequestUserInputOption
+pub impl @json.FromJson for ToolRequestUserInputOption
 
 pub(all) struct ToolRequestUserInputParams {
-  auto_resolution_ms : @gaato/sdk-runtime/json.Presence[UInt64Number]
+  auto_resolution_ms : @jsonkit.Presence[UInt64Number]
   is_blocking : Bool
   item_id : String
   questions : Array[ToolRequestUserInputQuestion]
@@ -2275,102 +2277,102 @@ pub(all) struct ToolRequestUserInputParams {
   turn_id : String
 } derive(Eq, @debug.Debug)
 pub fn ToolRequestUserInputParams::equal(Self, Self) -> Bool
-pub fn ToolRequestUserInputParams::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ToolRequestUserInputParams::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn ToolRequestUserInputParams::new(is_blocking~ : Bool, item_id~ : String, questions~ : Array[ToolRequestUserInputQuestion], thread_id~ : String, turn_id~ : String, auto_resolution_ms? : UInt64Number) -> Self
 pub fn ToolRequestUserInputParams::not_equal(Self, Self) -> Bool
 pub fn ToolRequestUserInputParams::to_json(Self) -> Json
 pub fn ToolRequestUserInputParams::to_repr(Self) -> @debug.Repr
 pub impl ToJson for ToolRequestUserInputParams
-pub impl @moonbitlang/core/json.FromJson for ToolRequestUserInputParams
+pub impl @json.FromJson for ToolRequestUserInputParams
 
 pub(all) struct ToolRequestUserInputQuestion {
   header : String
   id : String
   is_other : Bool?
   is_secret : Bool?
-  options : @gaato/sdk-runtime/json.Presence[Array[ToolRequestUserInputOption]]
+  options : @jsonkit.Presence[Array[ToolRequestUserInputOption]]
   question : String
 } derive(Eq, @debug.Debug)
 pub fn ToolRequestUserInputQuestion::equal(Self, Self) -> Bool
-pub fn ToolRequestUserInputQuestion::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ToolRequestUserInputQuestion::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn ToolRequestUserInputQuestion::new(header~ : String, id~ : String, question~ : String, is_other? : Bool, is_secret? : Bool, options? : Array[ToolRequestUserInputOption]) -> Self
 pub fn ToolRequestUserInputQuestion::not_equal(Self, Self) -> Bool
 pub fn ToolRequestUserInputQuestion::to_json(Self) -> Json
 pub fn ToolRequestUserInputQuestion::to_repr(Self) -> @debug.Repr
 pub impl ToJson for ToolRequestUserInputQuestion
-pub impl @moonbitlang/core/json.FromJson for ToolRequestUserInputQuestion
+pub impl @json.FromJson for ToolRequestUserInputQuestion
 
 pub(all) struct ToolRequestUserInputResponse {
   answers : Map[String, ToolRequestUserInputAnswer]
 } derive(Eq, @debug.Debug)
 pub fn ToolRequestUserInputResponse::equal(Self, Self) -> Bool
-pub fn ToolRequestUserInputResponse::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn ToolRequestUserInputResponse::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn ToolRequestUserInputResponse::new(answers~ : Map[String, ToolRequestUserInputAnswer]) -> Self
 pub fn ToolRequestUserInputResponse::not_equal(Self, Self) -> Bool
 pub fn ToolRequestUserInputResponse::to_json(Self) -> Json
 pub fn ToolRequestUserInputResponse::to_repr(Self) -> @debug.Repr
 pub impl ToJson for ToolRequestUserInputResponse
-pub impl @moonbitlang/core/json.FromJson for ToolRequestUserInputResponse
+pub impl @json.FromJson for ToolRequestUserInputResponse
 
 pub(all) struct Turn {
-  completed_at : @gaato/sdk-runtime/json.Presence[Int64]
-  duration_ms : @gaato/sdk-runtime/json.Presence[Int64]
-  error : @gaato/sdk-runtime/json.Presence[TurnError]
+  completed_at : @jsonkit.Presence[Int64]
+  duration_ms : @jsonkit.Presence[Int64]
+  error : @jsonkit.Presence[TurnError]
   id : String
   items : Array[ThreadItem]
   items_view : TurnItemsView?
-  started_at : @gaato/sdk-runtime/json.Presence[Int64]
+  started_at : @jsonkit.Presence[Int64]
   status : TurnStatus
 } derive(Eq, @debug.Debug)
 pub fn Turn::equal(Self, Self) -> Bool
-pub fn Turn::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn Turn::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn Turn::new(id~ : String, items~ : Array[ThreadItem], status~ : TurnStatus, completed_at? : Int64, duration_ms? : Int64, error? : TurnError, items_view? : TurnItemsView, started_at? : Int64) -> Self
 pub fn Turn::not_equal(Self, Self) -> Bool
 pub fn Turn::to_json(Self) -> Json
 pub fn Turn::to_repr(Self) -> @debug.Repr
 pub impl ToJson for Turn
-pub impl @moonbitlang/core/json.FromJson for Turn
+pub impl @json.FromJson for Turn
 
 pub(all) struct TurnCompletedNotification {
   thread_id : String
   turn : Turn
 } derive(Eq, @debug.Debug)
 pub fn TurnCompletedNotification::equal(Self, Self) -> Bool
-pub fn TurnCompletedNotification::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn TurnCompletedNotification::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn TurnCompletedNotification::new(thread_id~ : String, turn~ : Turn) -> Self
 pub fn TurnCompletedNotification::not_equal(Self, Self) -> Bool
 pub fn TurnCompletedNotification::to_json(Self) -> Json
 pub fn TurnCompletedNotification::to_repr(Self) -> @debug.Repr
 pub impl ToJson for TurnCompletedNotification
-pub impl @moonbitlang/core/json.FromJson for TurnCompletedNotification
+pub impl @json.FromJson for TurnCompletedNotification
 
 pub(all) struct TurnError {
-  additional_details : @gaato/sdk-runtime/json.Presence[String]
-  codex_error_info : @gaato/sdk-runtime/json.Presence[CodexErrorInfo]
+  additional_details : @jsonkit.Presence[String]
+  codex_error_info : @jsonkit.Presence[CodexErrorInfo]
   message : String
-  misalignment : @gaato/sdk-runtime/json.Presence[MisalignmentErrorDetails]
+  misalignment : @jsonkit.Presence[MisalignmentErrorDetails]
 } derive(Eq, @debug.Debug)
 pub fn TurnError::equal(Self, Self) -> Bool
-pub fn TurnError::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn TurnError::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn TurnError::new(message~ : String, additional_details? : String, codex_error_info? : CodexErrorInfo, misalignment? : MisalignmentErrorDetails) -> Self
 pub fn TurnError::not_equal(Self, Self) -> Bool
 pub fn TurnError::to_json(Self) -> Json
 pub fn TurnError::to_repr(Self) -> @debug.Repr
 pub impl ToJson for TurnError
-pub impl @moonbitlang/core/json.FromJson for TurnError
+pub impl @json.FromJson for TurnError
 
 pub(all) struct TurnInterruptParams {
   thread_id : String
   turn_id : String
 } derive(Eq, @debug.Debug)
 pub fn TurnInterruptParams::equal(Self, Self) -> Bool
-pub fn TurnInterruptParams::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn TurnInterruptParams::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn TurnInterruptParams::new(thread_id~ : String, turn_id~ : String) -> Self
 pub fn TurnInterruptParams::not_equal(Self, Self) -> Bool
 pub fn TurnInterruptParams::to_json(Self) -> Json
 pub fn TurnInterruptParams::to_repr(Self) -> @debug.Repr
 pub impl ToJson for TurnInterruptParams
-pub impl @moonbitlang/core/json.FromJson for TurnInterruptParams
+pub impl @json.FromJson for TurnInterruptParams
 
 #non_exhaustive
 pub(all) enum TurnItemsView {
@@ -2380,64 +2382,64 @@ pub(all) enum TurnItemsView {
   Unknown(String)
 } derive(Eq, @debug.Debug)
 pub fn TurnItemsView::equal(Self, Self) -> Bool
-pub fn TurnItemsView::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn TurnItemsView::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn TurnItemsView::not_equal(Self, Self) -> Bool
 pub fn TurnItemsView::to_json(Self) -> Json
 pub fn TurnItemsView::to_repr(Self) -> @debug.Repr
 pub impl ToJson for TurnItemsView
-pub impl @moonbitlang/core/json.FromJson for TurnItemsView
+pub impl @json.FromJson for TurnItemsView
 
 pub(all) struct TurnStartParams {
-  approval_policy : @gaato/sdk-runtime/json.Presence[AskForApproval]
-  approvals_reviewer : @gaato/sdk-runtime/json.Presence[ApprovalsReviewer]
-  client_user_message_id : @gaato/sdk-runtime/json.Presence[String]
-  cwd : @gaato/sdk-runtime/json.Presence[String]
-  effort : @gaato/sdk-runtime/json.Presence[String]
+  approval_policy : @jsonkit.Presence[AskForApproval]
+  approvals_reviewer : @jsonkit.Presence[ApprovalsReviewer]
+  client_user_message_id : @jsonkit.Presence[String]
+  cwd : @jsonkit.Presence[String]
+  effort : @jsonkit.Presence[String]
   input : Array[UserInput]
-  model : @gaato/sdk-runtime/json.Presence[String]
-  output_schema : @gaato/sdk-runtime/json.Presence[Json]
-  personality : @gaato/sdk-runtime/json.Presence[Personality]
-  sandbox_policy : @gaato/sdk-runtime/json.Presence[SandboxPolicy]
-  service_tier : @gaato/sdk-runtime/json.Presence[String]
-  service_tier_for_turn : @gaato/sdk-runtime/json.Presence[String]
-  summary : @gaato/sdk-runtime/json.Presence[ReasoningSummary]
+  model : @jsonkit.Presence[String]
+  output_schema : @jsonkit.Presence[Json]
+  personality : @jsonkit.Presence[Personality]
+  sandbox_policy : @jsonkit.Presence[SandboxPolicy]
+  service_tier : @jsonkit.Presence[String]
+  service_tier_for_turn : @jsonkit.Presence[String]
+  summary : @jsonkit.Presence[ReasoningSummary]
   thread_id : String
-  tool_output : @gaato/sdk-runtime/json.Presence[TurnToolOutput]
-  turn_trigger : @gaato/sdk-runtime/json.Presence[String]
+  tool_output : @jsonkit.Presence[TurnToolOutput]
+  turn_trigger : @jsonkit.Presence[String]
 } derive(Eq, @debug.Debug)
 pub fn TurnStartParams::equal(Self, Self) -> Bool
-pub fn TurnStartParams::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn TurnStartParams::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn TurnStartParams::new(input~ : Array[UserInput], thread_id~ : String, approval_policy? : AskForApproval, approvals_reviewer? : ApprovalsReviewer, client_user_message_id? : String, cwd? : String, effort? : String, model? : String, output_schema? : Json, personality? : Personality, sandbox_policy? : SandboxPolicy, service_tier? : String, service_tier_for_turn? : String, summary? : ReasoningSummary, tool_output? : TurnToolOutput, turn_trigger? : String) -> Self
 pub fn TurnStartParams::not_equal(Self, Self) -> Bool
 pub fn TurnStartParams::to_json(Self) -> Json
 pub fn TurnStartParams::to_repr(Self) -> @debug.Repr
 pub impl ToJson for TurnStartParams
-pub impl @moonbitlang/core/json.FromJson for TurnStartParams
+pub impl @json.FromJson for TurnStartParams
 
 pub(all) struct TurnStartResponse {
   turn : Turn
 } derive(Eq, @debug.Debug)
 pub fn TurnStartResponse::equal(Self, Self) -> Bool
-pub fn TurnStartResponse::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn TurnStartResponse::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn TurnStartResponse::new(turn~ : Turn) -> Self
 pub fn TurnStartResponse::not_equal(Self, Self) -> Bool
 pub fn TurnStartResponse::to_json(Self) -> Json
 pub fn TurnStartResponse::to_repr(Self) -> @debug.Repr
 pub impl ToJson for TurnStartResponse
-pub impl @moonbitlang/core/json.FromJson for TurnStartResponse
+pub impl @json.FromJson for TurnStartResponse
 
 pub(all) struct TurnStartedNotification {
   thread_id : String
   turn : Turn
 } derive(Eq, @debug.Debug)
 pub fn TurnStartedNotification::equal(Self, Self) -> Bool
-pub fn TurnStartedNotification::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn TurnStartedNotification::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn TurnStartedNotification::new(thread_id~ : String, turn~ : Turn) -> Self
 pub fn TurnStartedNotification::not_equal(Self, Self) -> Bool
 pub fn TurnStartedNotification::to_json(Self) -> Json
 pub fn TurnStartedNotification::to_repr(Self) -> @debug.Repr
 pub impl ToJson for TurnStartedNotification
-pub impl @moonbitlang/core/json.FromJson for TurnStartedNotification
+pub impl @json.FromJson for TurnStartedNotification
 
 #non_exhaustive
 pub(all) enum TurnStatus {
@@ -2448,37 +2450,37 @@ pub(all) enum TurnStatus {
   Unknown(String)
 } derive(Eq, @debug.Debug)
 pub fn TurnStatus::equal(Self, Self) -> Bool
-pub fn TurnStatus::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn TurnStatus::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn TurnStatus::not_equal(Self, Self) -> Bool
 pub fn TurnStatus::to_json(Self) -> Json
 pub fn TurnStatus::to_repr(Self) -> @debug.Repr
 pub impl ToJson for TurnStatus
-pub impl @moonbitlang/core/json.FromJson for TurnStatus
+pub impl @json.FromJson for TurnStatus
 
 pub(all) struct TurnToolOutput {
   name : String
-  namespace_ : @gaato/sdk-runtime/json.Presence[String]
+  namespace_ : @jsonkit.Presence[String]
   output : FunctionCallOutputBody
 } derive(Eq, @debug.Debug)
 pub fn TurnToolOutput::equal(Self, Self) -> Bool
-pub fn TurnToolOutput::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn TurnToolOutput::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn TurnToolOutput::new(name~ : String, output~ : FunctionCallOutputBody, namespace_? : String) -> Self
 pub fn TurnToolOutput::not_equal(Self, Self) -> Bool
 pub fn TurnToolOutput::to_json(Self) -> Json
 pub fn TurnToolOutput::to_repr(Self) -> @debug.Repr
 pub impl ToJson for TurnToolOutput
-pub impl @moonbitlang/core/json.FromJson for TurnToolOutput
+pub impl @json.FromJson for TurnToolOutput
 
 pub(all) struct UInt64Number {
   value : UInt64
 } derive(Eq, @debug.Debug)
 pub fn UInt64Number::equal(Self, Self) -> Bool
-pub fn UInt64Number::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn UInt64Number::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn UInt64Number::not_equal(Self, Self) -> Bool
 pub fn UInt64Number::to_json(Self) -> Json
 pub fn UInt64Number::to_repr(Self) -> @debug.Repr
 pub impl ToJson for UInt64Number
-pub impl @moonbitlang/core/json.FromJson for UInt64Number
+pub impl @json.FromJson for UInt64Number
 
 #non_exhaustive
 pub(all) enum UserInput {
@@ -2492,66 +2494,66 @@ pub(all) enum UserInput {
   Unknown(String, Json)
 } derive(Eq, @debug.Debug)
 pub fn UserInput::equal(Self, Self) -> Bool
-pub fn UserInput::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn UserInput::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn UserInput::not_equal(Self, Self) -> Bool
 pub fn UserInput::to_json(Self) -> Json
 pub fn UserInput::to_repr(Self) -> @debug.Repr
 pub impl ToJson for UserInput
-pub impl @moonbitlang/core/json.FromJson for UserInput
+pub impl @json.FromJson for UserInput
 
 pub(all) struct UserInputAudio {
   type_ : String
   url : String
 } derive(Eq, @debug.Debug)
 pub fn UserInputAudio::equal(Self, Self) -> Bool
-pub fn UserInputAudio::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn UserInputAudio::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn UserInputAudio::new(type_~ : String, url~ : String) -> Self
 pub fn UserInputAudio::not_equal(Self, Self) -> Bool
 pub fn UserInputAudio::to_json(Self) -> Json
 pub fn UserInputAudio::to_repr(Self) -> @debug.Repr
 pub impl ToJson for UserInputAudio
-pub impl @moonbitlang/core/json.FromJson for UserInputAudio
+pub impl @json.FromJson for UserInputAudio
 
 pub(all) struct UserInputImage {
-  detail : @gaato/sdk-runtime/json.Presence[ImageDetail]
+  detail : @jsonkit.Presence[ImageDetail]
   type_ : String
   url : String
 } derive(Eq, @debug.Debug)
 pub fn UserInputImage::equal(Self, Self) -> Bool
-pub fn UserInputImage::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn UserInputImage::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn UserInputImage::new(type_~ : String, url~ : String, detail? : ImageDetail) -> Self
 pub fn UserInputImage::not_equal(Self, Self) -> Bool
 pub fn UserInputImage::to_json(Self) -> Json
 pub fn UserInputImage::to_repr(Self) -> @debug.Repr
 pub impl ToJson for UserInputImage
-pub impl @moonbitlang/core/json.FromJson for UserInputImage
+pub impl @json.FromJson for UserInputImage
 
 pub(all) struct UserInputLocalAudio {
   path : String
   type_ : String
 } derive(Eq, @debug.Debug)
 pub fn UserInputLocalAudio::equal(Self, Self) -> Bool
-pub fn UserInputLocalAudio::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn UserInputLocalAudio::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn UserInputLocalAudio::new(path~ : String, type_~ : String) -> Self
 pub fn UserInputLocalAudio::not_equal(Self, Self) -> Bool
 pub fn UserInputLocalAudio::to_json(Self) -> Json
 pub fn UserInputLocalAudio::to_repr(Self) -> @debug.Repr
 pub impl ToJson for UserInputLocalAudio
-pub impl @moonbitlang/core/json.FromJson for UserInputLocalAudio
+pub impl @json.FromJson for UserInputLocalAudio
 
 pub(all) struct UserInputLocalImage {
-  detail : @gaato/sdk-runtime/json.Presence[ImageDetail]
+  detail : @jsonkit.Presence[ImageDetail]
   path : String
   type_ : String
 } derive(Eq, @debug.Debug)
 pub fn UserInputLocalImage::equal(Self, Self) -> Bool
-pub fn UserInputLocalImage::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn UserInputLocalImage::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn UserInputLocalImage::new(path~ : String, type_~ : String, detail? : ImageDetail) -> Self
 pub fn UserInputLocalImage::not_equal(Self, Self) -> Bool
 pub fn UserInputLocalImage::to_json(Self) -> Json
 pub fn UserInputLocalImage::to_repr(Self) -> @debug.Repr
 pub impl ToJson for UserInputLocalImage
-pub impl @moonbitlang/core/json.FromJson for UserInputLocalImage
+pub impl @json.FromJson for UserInputLocalImage
 
 pub(all) struct UserInputMention {
   name : String
@@ -2559,13 +2561,13 @@ pub(all) struct UserInputMention {
   type_ : String
 } derive(Eq, @debug.Debug)
 pub fn UserInputMention::equal(Self, Self) -> Bool
-pub fn UserInputMention::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn UserInputMention::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn UserInputMention::new(name~ : String, path~ : String, type_~ : String) -> Self
 pub fn UserInputMention::not_equal(Self, Self) -> Bool
 pub fn UserInputMention::to_json(Self) -> Json
 pub fn UserInputMention::to_repr(Self) -> @debug.Repr
 pub impl ToJson for UserInputMention
-pub impl @moonbitlang/core/json.FromJson for UserInputMention
+pub impl @json.FromJson for UserInputMention
 
 pub(all) struct UserInputSkill {
   name : String
@@ -2573,13 +2575,13 @@ pub(all) struct UserInputSkill {
   type_ : String
 } derive(Eq, @debug.Debug)
 pub fn UserInputSkill::equal(Self, Self) -> Bool
-pub fn UserInputSkill::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn UserInputSkill::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn UserInputSkill::new(name~ : String, path~ : String, type_~ : String) -> Self
 pub fn UserInputSkill::not_equal(Self, Self) -> Bool
 pub fn UserInputSkill::to_json(Self) -> Json
 pub fn UserInputSkill::to_repr(Self) -> @debug.Repr
 pub impl ToJson for UserInputSkill
-pub impl @moonbitlang/core/json.FromJson for UserInputSkill
+pub impl @json.FromJson for UserInputSkill
 
 pub(all) struct UserInputText {
   text : String
@@ -2587,13 +2589,13 @@ pub(all) struct UserInputText {
   type_ : String
 } derive(Eq, @debug.Debug)
 pub fn UserInputText::equal(Self, Self) -> Bool
-pub fn UserInputText::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn UserInputText::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn UserInputText::new(text~ : String, type_~ : String, text_elements? : Array[TextElement]) -> Self
 pub fn UserInputText::not_equal(Self, Self) -> Bool
 pub fn UserInputText::to_json(Self) -> Json
 pub fn UserInputText::to_repr(Self) -> @debug.Repr
 pub impl ToJson for UserInputText
-pub impl @moonbitlang/core/json.FromJson for UserInputText
+pub impl @json.FromJson for UserInputText
 
 #non_exhaustive
 pub(all) enum WebSearchAction {
@@ -2604,65 +2606,65 @@ pub(all) enum WebSearchAction {
   Unknown(String, Json)
 } derive(Eq, @debug.Debug)
 pub fn WebSearchAction::equal(Self, Self) -> Bool
-pub fn WebSearchAction::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn WebSearchAction::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn WebSearchAction::not_equal(Self, Self) -> Bool
 pub fn WebSearchAction::to_json(Self) -> Json
 pub fn WebSearchAction::to_repr(Self) -> @debug.Repr
 pub impl ToJson for WebSearchAction
-pub impl @moonbitlang/core/json.FromJson for WebSearchAction
+pub impl @json.FromJson for WebSearchAction
 
 pub(all) struct WebSearchActionFindInPage {
-  pattern : @gaato/sdk-runtime/json.Presence[String]
+  pattern : @jsonkit.Presence[String]
   type_ : String
-  url : @gaato/sdk-runtime/json.Presence[String]
+  url : @jsonkit.Presence[String]
 } derive(Eq, @debug.Debug)
 pub fn WebSearchActionFindInPage::equal(Self, Self) -> Bool
-pub fn WebSearchActionFindInPage::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn WebSearchActionFindInPage::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn WebSearchActionFindInPage::new(type_~ : String, pattern? : String, url? : String) -> Self
 pub fn WebSearchActionFindInPage::not_equal(Self, Self) -> Bool
 pub fn WebSearchActionFindInPage::to_json(Self) -> Json
 pub fn WebSearchActionFindInPage::to_repr(Self) -> @debug.Repr
 pub impl ToJson for WebSearchActionFindInPage
-pub impl @moonbitlang/core/json.FromJson for WebSearchActionFindInPage
+pub impl @json.FromJson for WebSearchActionFindInPage
 
 pub(all) struct WebSearchActionOpenPage {
   type_ : String
-  url : @gaato/sdk-runtime/json.Presence[String]
+  url : @jsonkit.Presence[String]
 } derive(Eq, @debug.Debug)
 pub fn WebSearchActionOpenPage::equal(Self, Self) -> Bool
-pub fn WebSearchActionOpenPage::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn WebSearchActionOpenPage::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn WebSearchActionOpenPage::new(type_~ : String, url? : String) -> Self
 pub fn WebSearchActionOpenPage::not_equal(Self, Self) -> Bool
 pub fn WebSearchActionOpenPage::to_json(Self) -> Json
 pub fn WebSearchActionOpenPage::to_repr(Self) -> @debug.Repr
 pub impl ToJson for WebSearchActionOpenPage
-pub impl @moonbitlang/core/json.FromJson for WebSearchActionOpenPage
+pub impl @json.FromJson for WebSearchActionOpenPage
 
 pub(all) struct WebSearchActionOther {
   type_ : String
 } derive(Eq, @debug.Debug)
 pub fn WebSearchActionOther::equal(Self, Self) -> Bool
-pub fn WebSearchActionOther::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn WebSearchActionOther::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn WebSearchActionOther::new(type_~ : String) -> Self
 pub fn WebSearchActionOther::not_equal(Self, Self) -> Bool
 pub fn WebSearchActionOther::to_json(Self) -> Json
 pub fn WebSearchActionOther::to_repr(Self) -> @debug.Repr
 pub impl ToJson for WebSearchActionOther
-pub impl @moonbitlang/core/json.FromJson for WebSearchActionOther
+pub impl @json.FromJson for WebSearchActionOther
 
 pub(all) struct WebSearchActionSearch {
-  queries : @gaato/sdk-runtime/json.Presence[Array[String]]
-  query : @gaato/sdk-runtime/json.Presence[String]
+  queries : @jsonkit.Presence[Array[String]]
+  query : @jsonkit.Presence[String]
   type_ : String
 } derive(Eq, @debug.Debug)
 pub fn WebSearchActionSearch::equal(Self, Self) -> Bool
-pub fn WebSearchActionSearch::from_json(Json, @moonbitlang/core/json.JsonPath) -> Self raise @moonbitlang/core/json.JsonDecodeError
+pub fn WebSearchActionSearch::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn WebSearchActionSearch::new(type_~ : String, queries? : Array[String], query? : String) -> Self
 pub fn WebSearchActionSearch::not_equal(Self, Self) -> Bool
 pub fn WebSearchActionSearch::to_json(Self) -> Json
 pub fn WebSearchActionSearch::to_repr(Self) -> @debug.Repr
 pub impl ToJson for WebSearchActionSearch
-pub impl @moonbitlang/core/json.FromJson for WebSearchActionSearch
+pub impl @json.FromJson for WebSearchActionSearch
 
 // Type aliases
 

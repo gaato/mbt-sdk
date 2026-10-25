@@ -1,8 +1,8 @@
 import {
-  "gaato/http",
-  "gaato/http/mock",
-  "gaato/http/sync",
-  "gaato/sdk-runtime" @runtime,
+  "gaato/mttp/model" @http,
+  "gaato/mbt-sdk-runtime-tests/sdk_mock" @mock,
+  "gaato/mttp/clock" @sync,
+  "gaato/mttp/client" @runtime,
   "gaato/openai" @openai_sdk,
   "moonbitlang/async",
   "moonbitlang/core/debug",

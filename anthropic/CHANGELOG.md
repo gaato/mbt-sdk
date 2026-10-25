@@ -15,6 +15,10 @@ are optional unless the field is required, and keep a wildcard arm.
 
 ## [Unreleased]
 
+### Migration to mttp
+
+- **Breaking: migrates generated operations and the facade to `gaato/mttp`.** Supply a `Backend` and `Clock`; generated decoders take `(ResponseHead, Bytes)`. HTTP failures retain their head and body as `UnexpectedStatus`, and operations propagate open errors. See the [migration guide](https://github.com/gaato/mbt-sdk/blob/main/docs/mttp-migration.md) for headers, limits, timers, streaming and GitHub GraphQL changes.
+
 ### Changed
 
 - **Builds on `gaato/http` 0.5.0**, whose cookie jar, Retry-After and Link parsing follow RFC 6265bis-22, RFC 9110 and RFC 8288 more closely; see its CHANGELOG.

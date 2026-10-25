@@ -26,13 +26,13 @@
 /// is returned (see `GitHubRetry`):
 ///
 /// - a `RATE_LIMITED` error (the point budget is spent) is raised as
-///   `@runtime.RateLimited` with the reply's headers and body, and retried
+///   `GraphqlFailure` with the reply's headers and body, and retried
 ///   once, one second after `x-ratelimit-reset`;
 /// - an error naming the secondary rate limit is raised as
-///   `@runtime.RateLimited` as well, and retried after `retry-after` or at
+///   `GraphqlFailure` as well, and retried after `retry-after` or at
 ///   least a minute;
 /// - "Something went wrong while executing your query" is raised as
-///   `@runtime.Decode` and retried with the policy's backoff, but only when
+///   `GraphqlFailure` and retried with the policy's backoff, but only when
 ///   the document holds no mutation, since a mutation may have been applied.
 ///
 /// Requests are metered and paced in the `"graphql"` bucket, or
@@ -42,7 +42,7 @@ pub async fn GitHub::graphql(
   query~ : String,
   variables? : Json,
   operation_name? : String,
-) -> Json raise @runtime.SdkError {
+) -> Json raise Error {
   let (response, envelope) = self.graphql_exchange(
     query, variables, operation_name,
   )
@@ -65,7 +65,7 @@ pub async fn GitHub::graphql_response(
   query~ : String,
   variables? : Json,
   operation_name? : String,
-) -> Json raise @runtime.SdkError {
+) -> Json raise Error {
   self.graphql_exchange(query, variables, operation_name).1
 }
 
@@ -110,13 +110,13 @@ pub async fn GitHub::graphql_response(
 /// `graphql` does.
 pub fn[T] GitHub::graphql_paginator(
   self : GitHub,
-  page : (Json) -> (Array[T], String?) raise @runtime.SdkError,
+  page : (Json) -> (Array[T], String?) raise Error,
   query~ : String,
   variables? : Json,
   cursor_variable~ : String = "after",
   operation_name? : String,
-) -> @runtime.Paginator[T, @runtime.SdkError] {
-  @runtime.Paginator::with_cursor(cursor => {
+) -> @client.Paginator[T, Error] {
+  @client.Paginator::with_cursor(cursor => {
     let variables = match cursor {
       None => variables
       Some(cursor) => Some(with_cursor(variables, cursor_variable, cursor))
@@ -125,7 +125,7 @@ pub fn[T] GitHub::graphql_paginator(
       query, variables, operation_name,
     )
     let (items, next) = page(graphql_data(envelope, response))
-    @runtime.Page::{ items, next, }
+    @client.Page::{ items, next, }
   })
 }
 
@@ -172,9 +172,9 @@ pub extend GraphqlError with @debug.Debug::{to_repr}
 /// Extracts the GraphQL `errors` array from a failure.
 ///
 /// This is the counterpart of `api_error`. `graphql` reports a non-empty
-/// `errors` array as `@runtime.Decode` — the response decoded, it simply did not
+/// `errors` array as `GraphqlFailure` — the response decoded, it simply did not
 /// carry the value that was asked for — or, for a rate limit, as
-/// `@runtime.RateLimited`, and attaches the body to either, which this reads
+/// `GraphqlFailure`, and attaches the body to either, which this reads
 /// back:
 ///
 ///     if @github.graphql_errors(error) is Some(errors) {
@@ -186,11 +186,11 @@ pub extend GraphqlError with @debug.Debug::{to_repr}
 /// Returns None for a body that is not a GraphQL envelope with errors, which
 /// includes every REST-shaped failure of the endpoint: an unauthenticated
 /// request is answered `403` with a `message` body that `api_error` reads.
-pub fn graphql_errors(error : @runtime.SdkError) -> Array[GraphqlError]? {
+pub fn graphql_errors(error : Error) -> Array[GraphqlError]? {
   let body = match error {
-    @runtime.Decode(body~, ..)
-    | @runtime.Status(body~, ..)
-    | @runtime.RateLimited(body~, ..) => body
+    GraphqlFailure(_, body~, ..)
+    | @client.Deserialization(_, body~, ..)
+    | @client.UnexpectedStatus(_, body~) => body
     _ => return None
   }
   try decode_graphql_errors(body) catch {
@@ -227,57 +227,61 @@ async fn GitHub::graphql_exchange(
   query : String,
   variables : Json?,
   operation_name : String?,
-) -> (@http.Response, Json) raise @runtime.SdkError {
+) -> (BufferedResponse, Json) raise Error {
   let mutation = is_mutation_document(query)
-  let parsed : Ref[Json?] = { val: None, }
-  let response = self.client.send(
-    @http.Request::post(self.graphql_url)
+  let request = @model.Request::post(self.graphql_url)
     .header("accept", "application/json")
-    .json_body(
+    .body_json(
       @sdkjson.ObjBuilder::new()
       .field("query", query)
       .opt("variables", variables)
       .opt("operationName", operation_name)
       .build(),
+    )
+  self.client.send(
+    @client.ClientRequest::new(
+      request,
+      @client.as_bytes().map_with_head((body, head) => {
+        let response : BufferedResponse = { head, body, }
+        let envelope = graphql_envelope(response)
+        check_graphql_reply(envelope, response, mutation~)
+        (response, envelope)
+      }),
+    ).attribute(
+      @client.rate_limit_bucket,
+      if mutation {
+        graphql_mutation_bucket
+      } else {
+        graphql_bucket
+      },
     ),
-    bucket=if mutation { graphql_mutation_bucket } else { graphql_bucket },
-    accept=response => {
-      parsed.val = None
-      let envelope = graphql_envelope(response)
-      check_graphql_reply(envelope, response, mutation~)
-      parsed.val = Some(envelope)
-    },
-  )
-  match parsed.val {
-    Some(envelope) => (response, envelope)
-    None => (response, graphql_envelope(response))
-  }
+  ).body
 }
 
 ///|
 /// Raises, for `GitHubRetry` to decide, the errors of a `200` reply that are
 /// worth another attempt: a spent point budget (`RATE_LIMITED`) or a secondary
-/// rate limit as `RateLimited` with the reply's headers and body, and a
-/// transient failure of a document without a mutation as `Decode`. Any other
-/// reply passes.
+/// rate limit or a transient failure of a document without a mutation. Each
+/// raises `GraphqlFailure` with the original head and body. Other replies pass.
 fn check_graphql_reply(
   envelope : Json,
-  response : @http.Response,
+  response : BufferedResponse,
   mutation~ : Bool,
-) -> Unit raise @runtime.SdkError {
+) -> Unit raise Error {
   guard envelope_errors(envelope) is Some(errors) && errors.length() > 0 else {
     return
   }
   if has_condition(errors, GraphqlRateLimited) ||
     has_condition(errors, GraphqlSecondary) {
-    raise @runtime.RateLimited(
-      retry_after_ms=@http.retry_after_ms(response.headers),
-      headers=response.headers,
+    raise GraphqlFailure(
+      response.head,
+      message=graphql_error_message(errors),
       body=response.body,
     )
   }
   if !mutation && has_condition(errors, GraphqlTransient) {
-    raise @runtime.Decode(
+    raise GraphqlFailure(
+      response.head,
       message=graphql_error_message(errors),
       body=response.body,
     )
@@ -428,40 +432,47 @@ fn skip_string(chars : Array[Char], start : Int32) -> Int32 {
 
 ///|
 /// Parses a GraphQL reply body.
-fn graphql_envelope(response : @http.Response) -> Json raise @runtime.SdkError {
-  response.json() catch {
+fn graphql_envelope(response : BufferedResponse) -> Json raise Error {
+  @json.parse(@utf8.decode(response.body)) catch {
     error =>
-      raise @runtime.Decode(message=error.to_string(), body=response.body)
+      raise GraphqlFailure(
+        response.head,
+        message=error.to_string(),
+        body=response.body,
+      )
   }
 }
 
 ///|
 /// Reads `data` out of an envelope, raising when the reply reports errors.
 ///
-/// The raise is `@runtime.Decode` rather than `@runtime.Status`: the request
+/// The raise is `GraphqlFailure` rather than `UnexpectedStatus`: the request
 /// succeeded at the HTTP level, so reporting it as a status would put a `200` in
-/// `SdkError::status` and mislead anything that branches on one. The errors
+/// HTTP failure classification and mislead anything branching on it. The errors
 /// worth retrying never get here: `check_graphql_reply` raised them inside the
 /// retry loop.
 fn graphql_data(
   envelope : Json,
-  response : @http.Response,
-) -> Json raise @runtime.SdkError {
+  response : BufferedResponse,
+) -> Json raise Error {
   if envelope_errors(envelope) is Some(errors) && errors.length() > 0 {
-    raise @runtime.Decode(
+    raise GraphqlFailure(
+      response.head,
       message=graphql_error_message(errors),
       body=response.body,
     )
   }
   guard envelope is Object(fields) else {
-    raise @runtime.Decode(
+    raise GraphqlFailure(
+      response.head,
       message="graphql response is not an object",
       body=response.body,
     )
   }
   match fields.get("data") {
     Some(Null) | None =>
-      raise @runtime.Decode(
+      raise GraphqlFailure(
+        response.head,
         message="graphql response carries neither data nor errors",
         body=response.body,
       )
@@ -513,13 +524,13 @@ fn with_cursor(
   variables : Json?,
   name : String,
   cursor : String,
-) -> Json raise @runtime.SdkError {
+) -> Json raise Error {
   let fields = match variables {
     None | Some(Null) => Map([])
     Some(Object(source)) => source.copy()
     Some(_) =>
-      raise @runtime.Config(
-        "graphql variables must be an object to carry the \{name} cursor",
+      raise @client.InvalidRequest(
+        message="graphql variables must be an object to carry the \{name} cursor",
       )
   }
   fields[name] = Json(cursor)

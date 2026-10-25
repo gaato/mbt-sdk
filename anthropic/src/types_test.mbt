@@ -37,7 +37,7 @@ test "constructors snapshot mutable inputs and Anthropic Debug redacts the key" 
   let key = "anthropic-key-that-must-not-leak"
   let client = @anthropic.Anthropic::new(
     api_key=key,
-    @mock.FakeTransport::new(),
+    @testing.BackendStub::new(),
     @mock.FakeClock::new(),
   )
   let representation = @debug.Repr(client).to_string()
@@ -108,15 +108,17 @@ test "api_error extracts only valid status and rate-limit envelopes" {
   }
   assert_eq(
     @anthropic.api_error(
-      @runtime.Status(status=401, headers=@http.Headers::new(), body~),
+      @client.UnexpectedStatus(
+        { status: 401, headers: @model.Headers::empty(), },
+        body~,
+      ),
     ),
     Some(expected),
   )
   assert_eq(
     @anthropic.api_error(
-      @runtime.RateLimited(
-        retry_after_ms=Some(1000),
-        headers=@http.Headers::new(),
+      @client.UnexpectedStatus(
+        { status: 429, headers: @model.Headers::empty(), },
         body~,
       ),
     ),
@@ -129,14 +131,16 @@ test "api_error extracts only valid status and rate-limit envelopes" {
     ] {
     assert_eq(
       @anthropic.api_error(
-        @runtime.Status(
-          status=400,
-          headers=@http.Headers::new(),
+        @client.UnexpectedStatus(
+          { status: 400, headers: @model.Headers::empty(), },
           body=malformed,
         ),
       ),
       None,
     )
   }
-  assert_eq(@anthropic.api_error(@runtime.Config("not an HTTP error")), None)
+  assert_eq(
+    @anthropic.api_error(@client.InvalidRequest(message="not an HTTP error")),
+    None,
+  )
 }

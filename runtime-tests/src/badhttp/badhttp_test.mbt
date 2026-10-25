@@ -170,22 +170,47 @@ async test "status 429 with retry-after classifies as RateLimited" {
 ///|
 async test "generated badhttp fixture builds, decodes and classifies requests" {
   bounded(() => {
-    let c = client(retry=@runtime.RetryPolicy::none())
-    let headers_response = c.send(@fixture.get_headers_request())
+    let backend = @backend.AsyncBackend::new(timeout_ms=15000)
+    defer backend.close()
+    let c = @mttp.Client::new(
+      backend,
+      @net_runtime.AsyncClock::new(),
+      base_url=BASE,
+      retry=@mttp.RetryPolicy::none(),
+    )
+    let headers_response = c.send(
+      @mttp.ClientRequest::new(@fixture.get_headers_request(), @mttp.as_bytes()),
+    )
     assert_eq(headers_response.status, 200)
-    guard @fixture.get_headers_decode(headers_response) is Object(_) else {
+    guard @fixture.get_headers_decode(
+        { status: headers_response.status, headers: headers_response.headers, },
+        headers_response.body,
+      )
+      is Object(_) else {
       fail("expected GET /headers to decode as a JSON object")
     }
-    let echo_response = c.send(@fixture.post_echo_request())
+    let echo_response = c.send(
+      @mttp.ClientRequest::new(@fixture.post_echo_request(), @mttp.as_bytes()),
+    )
     assert_eq(echo_response.status, 200)
-    guard @fixture.post_echo_decode(echo_response)
+    guard @fixture.post_echo_decode(
+        { status: echo_response.status, headers: echo_response.headers, },
+        echo_response.body,
+      )
       is { "method": String("POST"), .. } else {
       fail("expected POST /echo to report method POST")
     }
-    try c.send(@fixture.get_status_code_request("429", retry_after=1)) catch {
-      @runtime.RateLimited(retry_after_ms~, ..) =>
-        assert_eq(retry_after_ms, Some(1000))
-      error => fail("expected RateLimited, got \{@debug.to_string(error)}")
+    try
+      c.send(
+        @mttp.ClientRequest::new(
+          @fixture.get_status_code_request("429", retry_after=1),
+          @mttp.as_bytes(),
+        ),
+      )
+    catch {
+      @mttp.UnexpectedStatus(head, ..) =>
+        assert_eq(@model.retry_after_ms(head.headers), Some(1000))
+      error => fail("expected UnexpectedStatus, got \{@debug.to_string(error)}")
     } noraise {
       response => fail("expected an error, got status \{response.status}")
     }

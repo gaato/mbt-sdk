@@ -66,7 +66,7 @@ test "default headers carry the version, the media type, and a user agent" {
 
 ///|
 test "a request that sets a default header keeps its own value" {
-  // @runtime.Client::prepare appends a default only when the request does not
+  // @client.Client::prepare appends a default only when the request does not
   // already carry that name, so an operation asking for a non-JSON
   // representation overrides the client's accept header. Pinning the mechanism
   // here: the names the client defaults are exactly the names a request can
@@ -75,7 +75,7 @@ test "a request that sets a default header keeps its own value" {
     api_version="2022-11-28",
     user_agent="gaato-mbt-sdk/0.1.0",
   )
-  let request = @http.Request::get("/repos/o/r/compare/main...topic")
+  let request = @model.Request::get("/repos/o/r/compare/main...topic")
     .header("accept", "application/vnd.github.diff")
     .header("user-agent", "my-tool/2")
   for pair in defaults.iter() {

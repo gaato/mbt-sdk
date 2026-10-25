@@ -10,7 +10,7 @@
 /// caller's query rather than to the schema — so it is served by the `graphql`
 /// passthrough over `Json`.
 pub struct GitHub {
-  priv client : @runtime.Client
+  priv client : @client.Client
   priv graphql_url : String
 }
 
@@ -54,36 +54,40 @@ pub impl @debug.Debug for GitHub with fn to_repr(_self) {
 /// notifications 3 s and searches 2 s, as octokit does. `gate` makes the
 /// requests of each of those groups serial, as docs.github.com asks ("make
 /// requests serially instead of concurrently"): pass
-/// `gate=() => @http_async.SemaphoreGate::new()` from `gaato/http-async`.
+/// `gate=() => @runtime.SemaphoreGate::new()` from `gaato/mttp-net/runtime`.
 /// Without it concurrent requests are only spaced, not serialised. `gate` is
-/// ignored when `limiter` is given. Pass `limiter=@runtime.NoLimiter::new()`
+/// ignored when `limiter` is given. Pass `limiter=@client.NoLimiter::new()`
 /// to opt out of both.
 ///
-/// `timeouts` limits each attempt and each call (`@runtime.Timeouts`); without
-/// it only the transport's own timeouts apply.
+/// `options.timeout_ms` limits each attempt and `total_timeout_ms` the whole
+/// call. A supplied `timer` controls cancellation; otherwise the client's
+/// clock fallback applies alongside the backend's phase deadlines.
 ///
 /// `graphql_url` is the GraphQL endpoint, which is not under the REST root:
 /// GitHub Enterprise Server serves REST from `/api/v3` and GraphQL from
 /// `/api/graphql`. It is derived from `base_url` and only needs passing for a
 /// deployment that puts the two somewhere else.
 pub fn GitHub::new(
-  transport : &@http.Transport,
+  backend : &@client.Backend,
   clock : &@clock.Clock,
   token? : String,
   base_url~ : String = "https://api.github.com",
   api_version~ : String = "2022-11-28",
   user_agent~ : String = "gaato-mbt-sdk/0.1.0",
-  retry? : @runtime.RetryPolicy,
-  limiter? : &@runtime.RateLimiter,
+  retry? : @client.RetryPolicy,
+  limiter? : &@client.RateLimiter,
   graphql_url? : String,
-  gate? : () -> &@sync.Gate,
-  timeouts? : @runtime.Timeouts,
+  gate? : () -> &@clock.Gate,
+  timer? : &@clock.Timer,
+  options~ : @client.RequestOptions = @client.RequestOptions::default(),
+  total_timeout_ms? : Int32,
 ) -> GitHub {
-  let auth = match token {
-    Some(token) => @runtime.Bearer(token)
-    None => @runtime.NoAuth
+  let headers = default_headers(api_version~, user_agent~)
+  let headers = match token {
+    Some(token) => headers.set("authorization", "Bearer " + token)
+    None => headers
   }
-  let limiter : &@runtime.RateLimiter = match limiter {
+  let limiter : &@client.RateLimiter = match limiter {
     Some(limiter) => limiter
     None => default_limiter(clock, gate?)
   }
@@ -93,19 +97,20 @@ pub fn GitHub::new(
   }
   let retry = GitHubRetry::{
     policy: retry.unwrap_or_else(() => {
-      @runtime.RetryPolicy::conservative().with_max_retries(3)
+      @client.RetryPolicy::conservative().with_max_retries(3)
     }),
   }
   {
-    client: @runtime.Client::new(
-      transport,
+    client: @client.Client::new(
+      backend,
       clock,
       base_url~,
-      default_headers=default_headers(api_version~, user_agent~),
-      auth~,
+      headers~,
       retry~,
       limiter~,
-      timeouts?,
+      timer?,
+      options~,
+      total_ms?=total_timeout_ms,
     ),
     graphql_url,
   }
@@ -122,7 +127,7 @@ pub fn GitHub::new(
 /// cannot be derived from it here and defaults to GitHub's own. Pass
 /// `graphql_url` for anything else.
 pub fn GitHub::from_client(
-  client : @runtime.Client,
+  client : @client.Client,
   graphql_url~ : String = "https://api.github.com/graphql",
 ) -> GitHub {
   { client, graphql_url, }
@@ -133,8 +138,8 @@ pub fn GitHub::from_client(
 fn default_headers(
   api_version~ : String,
   user_agent~ : String,
-) -> @http.Headers {
-  @http.Headers::from_array([
+) -> @model.Headers {
+  @model.Headers::of([
     ("accept", "application/vnd.github+json"),
     ("x-github-api-version", api_version),
     ("user-agent", user_agent),
@@ -169,11 +174,11 @@ fn default_graphql_url(base_url : String) -> String {
 /// gate.
 fn default_limiter(
   clock : &@clock.Clock,
-  gate? : () -> &@sync.Gate,
-) -> @runtime.WindowLimiter {
-  @runtime.WindowLimiter::new(
+  gate? : () -> &@clock.Gate,
+) -> @ratelimit.WindowLimiter {
+  @ratelimit.WindowLimiter::new(
     clock,
-    @runtime.rate_limit_headers(
+    @ratelimit.rate_limit_headers(
       remaining="x-ratelimit-remaining",
       reset_unix_seconds="x-ratelimit-reset",
     ),

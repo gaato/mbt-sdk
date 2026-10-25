@@ -4,7 +4,7 @@
 /// GitHub paginates with RFC 8288 `Link` headers rather than a cursor in the
 /// body, so the paginator's cursor is the `rel="next"` URL exactly as the
 /// server wrote it: absolute, and already carrying the page size and every
-/// filter of the first request. `@runtime.Client` resolves an absolute request
+/// filter of the first request. `@client.Client` resolves an absolute request
 /// URL by passing it through, so the following pages need no rebuilding here.
 ///
 /// The decoder is the generated `<operation>_decode` of an operation whose
@@ -20,20 +20,23 @@
 /// A search operation does not answer this shape: its payload is an envelope
 /// with `items` and `total_count`, so wrap `search_*_decode` in a decoder that
 /// returns the `items` field.
-pub fn[T] GitHub::paginator(
+pub fn[T, E : Error] GitHub::paginator(
   self : GitHub,
-  first : @http.Request,
-  decode : (@http.Response) -> Array[T] raise @runtime.SdkError,
-) -> @runtime.Paginator[T, @runtime.SdkError] {
-  @runtime.Paginator::with_cursor(cursor => {
+  first : @model.Request,
+  decode : (@model.ResponseHead, Bytes) -> Array[T] raise E,
+) -> @client.Paginator[T, Error] {
+  @client.Paginator::with_cursor(cursor => {
     let request = match cursor {
       Some(url) => { ..first, url, }
       None => first
     }
-    let response = self.send(request)
-    @runtime.Page::{
-      items: decode(response),
-      next: @http.parse_link_next(response.headers),
+    let response = self.send_with(
+      request,
+      @client.as_bytes().map_with_head((bytes, head) => decode(head, bytes)),
+    )
+    @client.Page::{
+      items: response.body,
+      next: @model.parse_link_next(response.headers),
     }
   })
 }
