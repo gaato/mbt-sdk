@@ -35,6 +35,12 @@ class MinimalSliceTest(unittest.TestCase):
             self.assertNotIn("fn percent_encode", ops)
             self.assertNotIn("@sdkjson", pkg)
             self.assertIn("get_headers_decode", ops)
+            self.assertIn("head : @model.ResponseHead", ops)
+            self.assertIn("body : Bytes", ops)
+            self.assertIn("@client.Deserialization(head,", ops)
+            self.assertNotIn("response.body", ops)
+            self.assertIn('"gaato/mttp/model"', pkg)
+            self.assertIn('"gaato/mttp/client"', pkg)
 
 
 if __name__ == "__main__":

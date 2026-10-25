@@ -3,6 +3,10 @@
 // gates: run them with scripts/conformance.sh. Keep the request count small;
 // the service allows 100 requests per 10 s per IP.
 import {
+  "gaato/mttp/model",
+  "gaato/mttp/client" @mttp,
+  "gaato/mttp-net/backend",
+  "gaato/mttp-net/runtime" @net_runtime,
   "gaato/http",
   "gaato/http/sse",
   "gaato/http-async" @adapter,

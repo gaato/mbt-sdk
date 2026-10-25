@@ -15,12 +15,14 @@ test "header values are stringified without query escaping" {
 
 ///|
 test "typed map response decodes and encodes as a JSON object" {
-  let response : @http.Response = {
+  let head : @model.ResponseHead = {
     status: 200,
-    headers: @http.Headers::new(),
-    body: @utf8.encode("{\"available\":2,\"pending\":1}"),
+    headers: @model.Headers::empty(),
   }
-  let inventory = get_inventory_decode(response)
+  let inventory = get_inventory_decode(
+    head,
+    @utf8.encode("{\"available\":2,\"pending\":1}"),
+  )
   assert_eq(inventory.get("available"), Some(2))
   assert_eq(Json(inventory), @json.parse("{\"available\":2,\"pending\":1}"))
 }

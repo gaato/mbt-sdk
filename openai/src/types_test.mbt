@@ -42,7 +42,7 @@ test "constructors snapshot mutable inputs and OpenAI Debug redacts the key" {
   let key = "sk-key-that-must-not-leak"
   let client = @openai.OpenAI::new(
     api_key=key,
-    @mock.FakeTransport::new(),
+    @testing.BackendStub::new(),
     @mock.FakeClock::new(),
   )
   let representation = @debug.Repr(client).to_string()
@@ -51,7 +51,7 @@ test "constructors snapshot mutable inputs and OpenAI Debug redacts the key" {
 }
 
 ///|
-test "api_error extracts Status and RateLimited bodies only" {
+test "api_error extracts unexpected HTTP status bodies only" {
   let body = b"{\"error\":{\"message\":\"bad key\",\"type\":\"invalid_request_error\",\"param\":null,\"code\":\"invalid_api_key\"}}"
   let expected : @openai.ApiErrorBody = {
     message: "bad key",
@@ -61,26 +61,36 @@ test "api_error extracts Status and RateLimited bodies only" {
   }
   assert_eq(
     @openai.api_error(
-      @runtime.Status(status=401, headers=@http.Headers::new(), body~),
-    ),
-    Some(expected),
-  )
-  assert_eq(
-    @openai.api_error(
-      @runtime.RateLimited(
-        retry_after_ms=Some(1000),
-        headers=@http.Headers::new(),
+      @client.UnexpectedStatus(
+        { status: 401, headers: @model.Headers::empty(), },
         body~,
       ),
     ),
     Some(expected),
   )
-  assert_eq(@openai.api_error(@runtime.Decode(message="bad", body~)), None)
   assert_eq(
     @openai.api_error(
-      @runtime.Status(
-        status=400,
-        headers=@http.Headers::new(),
+      @client.UnexpectedStatus(
+        { status: 429, headers: @model.Headers::of([("retry-after", "1")]), },
+        body~,
+      ),
+    ),
+    Some(expected),
+  )
+  assert_eq(
+    @openai.api_error(
+      @client.Deserialization(
+        { status: 200, headers: @model.Headers::empty(), },
+        message="bad",
+        body~,
+      ),
+    ),
+    None,
+  )
+  assert_eq(
+    @openai.api_error(
+      @client.UnexpectedStatus(
+        { status: 400, headers: @model.Headers::empty(), },
         body=b"not json",
       ),
     ),

@@ -24,7 +24,7 @@ impl @sync.Timer for ScriptedTimer with fn within(self, milliseconds, f) {
 let message_ok : String = "{\"id\":\"m\",\"model\":\"model\",\"role\":\"assistant\",\"content\":[],\"stop_reason\":null,\"usage\":{\"input_tokens\":1,\"output_tokens\":0}}"
 
 ///|
-async fn ask(client : @anthropic_sdk.Anthropic) -> Unit raise @runtime.SdkError {
+async fn ask(client : @anthropic_sdk.Anthropic) -> Unit raise Error {
   ignore(
     client.create_message(
       @anthropic_sdk.MessageRequest::new(model="model", max_tokens=1, messages=[]),
@@ -45,7 +45,7 @@ fn assert_stainless_backoff(slept : Array[Int32]) -> Unit raise {
 ///|
 async test "a POST is retried on 500 and on 529 overloaded" {
   bounded(() => {
-    let transport = @mock.FakeTransport::new()
+    let transport = @mock.FakeBackend::new()
     transport.expect(
       "POST",
       "/v1/messages",
@@ -62,7 +62,7 @@ async test "a POST is retried on 500 and on 529 overloaded" {
     assert_stainless_backoff(clock.slept())
     transport.assert_complete()
 
-    let failing = @mock.FakeTransport::new()
+    let failing = @mock.FakeBackend::new()
     for _ in 0..<3 {
       failing.expect("POST", "/v1/messages", json_response("{}", status=529))
     }
@@ -70,7 +70,7 @@ async test "a POST is retried on 500 and on 529 overloaded" {
     try
       ask(@anthropic_sdk.Anthropic::new(api_key="key", failing, clock))
     catch {
-      error => assert_eq(error.status(), Some(529))
+      error => assert_eq(@runtime.status_of(error), Some(529))
     } noraise {
       _ => fail("the third 529 must be raised")
     }
@@ -83,7 +83,7 @@ async test "a POST is retried on 500 and on 529 overloaded" {
 ///|
 async test "conservative() keeps a POST from being retried on 529" {
   bounded(() => {
-    let transport = @mock.FakeTransport::new()
+    let transport = @mock.FakeBackend::new()
     transport.expect("POST", "/v1/messages", json_response("{}", status=529))
     let clock = @mock.FakeClock::new()
     let client = @anthropic_sdk.Anthropic::new(
@@ -93,7 +93,7 @@ async test "conservative() keeps a POST from being retried on 529" {
       retry=@runtime.RetryPolicy::conservative(),
     )
     try ask(client) catch {
-      error => assert_eq(error.status(), Some(529))
+      error => assert_eq(@runtime.status_of(error), Some(529))
     } noraise {
       _ => fail("529 must be raised")
     }
@@ -105,35 +105,35 @@ async test "conservative() keeps a POST from being retried on 529" {
 ///|
 async test "x-should-retry overrides the status rules" {
   bounded(() => {
-    let refused = @mock.FakeTransport::new()
+    let refused = @mock.FakeBackend::new()
     refused.expect(
       "POST",
       "/v1/messages",
       json_response(
         "{}",
         status=500,
-        headers=@http.Headers::from_array([("x-should-retry", "false")]),
+        headers=@http.Headers::of([("x-should-retry", "false")]),
       ),
     )
     let clock = @mock.FakeClock::new()
     try
       ask(@anthropic_sdk.Anthropic::new(api_key="key", refused, clock))
     catch {
-      error => assert_eq(error.status(), Some(500))
+      error => assert_eq(@runtime.status_of(error), Some(500))
     } noraise {
       _ => fail("x-should-retry: false must stop")
     }
     assert_eq(clock.slept(), [])
     refused.assert_complete()
 
-    let forced = @mock.FakeTransport::new()
+    let forced = @mock.FakeBackend::new()
     forced.expect(
       "POST",
       "/v1/messages",
       json_response(
         "{}",
         status=400,
-        headers=@http.Headers::from_array([("x-should-retry", "true")]),
+        headers=@http.Headers::of([("x-should-retry", "true")]),
       ),
     )
     forced.expect("POST", "/v1/messages", json_response(message_ok))
@@ -147,14 +147,14 @@ async test "x-should-retry overrides the status rules" {
 ///|
 async test "any Retry-After is waited out, unless the total limit cannot fit it" {
   bounded(() => {
-    let transport = @mock.FakeTransport::new()
+    let transport = @mock.FakeBackend::new()
     transport.expect(
       "POST",
       "/v1/messages",
       json_response(
         "{}",
         status=429,
-        headers=@http.Headers::from_array([("retry-after", "121")]),
+        headers=@http.Headers::of([("retry-after", "121")]),
       ),
     )
     transport.expect("POST", "/v1/messages", json_response(message_ok))
@@ -164,14 +164,14 @@ async test "any Retry-After is waited out, unless the total limit cannot fit it"
     transport.assert_complete()
 
     // With a total limit the wait that would outlast it is not begun.
-    let bounded_call = @mock.FakeTransport::new()
+    let bounded_call = @mock.FakeBackend::new()
     bounded_call.expect(
       "POST",
       "/v1/messages",
       json_response(
         "{}",
         status=429,
-        headers=@http.Headers::from_array([("retry-after", "121")]),
+        headers=@http.Headers::of([("retry-after", "121")]),
       ),
     )
     let clock = @mock.FakeClock::new()
@@ -183,7 +183,7 @@ async test "any Retry-After is waited out, unless the total limit cannot fit it"
       total_timeout_ms=60000,
     )
     try ask(client) catch {
-      error => assert_eq(error.status(), Some(429))
+      error => assert_eq(@runtime.status_of(error), Some(429))
     } noraise {
       _ => fail("a wait past the total limit must raise")
     }
@@ -195,7 +195,7 @@ async test "any Retry-After is waited out, unless the total limit cannot fit it"
 ///|
 async test "a timer limits each attempt to 600 s and a timed-out POST is retried" {
   bounded(() => {
-    let transport = @mock.FakeTransport::new()
+    let transport = @mock.FakeBackend::new()
     transport.expect("POST", "/v1/messages", json_response(message_ok))
     let timer = ScriptedTimer::{ budgets: [], expire: 1, }
     let clock = @mock.FakeClock::new()
@@ -205,7 +205,7 @@ async test "a timer limits each attempt to 600 s and a timed-out POST is retried
     transport.assert_complete()
 
     let timer = ScriptedTimer::{ budgets: [], expire: 3, }
-    let idle = @mock.FakeTransport::new()
+    let idle = @mock.FakeBackend::new()
     try
       ask(
         @anthropic_sdk.Anthropic::new(
@@ -217,7 +217,7 @@ async test "a timer limits each attempt to 600 s and a timed-out POST is retried
         ),
       )
     catch {
-      @runtime.Transport(Timeout(phase=Unknown, ms=1000)) => ()
+      @http.TransportError(kind=Timeout(ms=1000), phase=Unknown, ..) => ()
       _ => fail("expected the attempt timeout")
     } noraise {
       _ => fail("an attempt that never finishes must time out")

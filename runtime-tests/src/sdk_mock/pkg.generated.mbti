@@ -1,0 +1,38 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "gaato/mbt-sdk-runtime-tests/sdk_mock"
+
+import {
+  "gaato/mttp/client",
+  "gaato/mttp/clock/fake",
+  "gaato/mttp/model",
+}
+
+// Values
+
+// Errors
+
+// Types and methods
+pub(all) struct Buffered {
+  status : Int32
+  headers : @model.Headers
+  body : Bytes
+}
+
+pub struct FakeBackend {
+  // private fields
+}
+pub fn FakeBackend::assert_complete(Self) -> Unit raise
+pub fn FakeBackend::close(Self) -> Unit
+pub fn FakeBackend::expect(Self, String, String, Buffered) -> Unit
+pub fn FakeBackend::expect_error(Self, String, String, @model.TransportError) -> Unit
+pub fn FakeBackend::expect_stream(Self, String, String, @model.ResponseHead, Array[Bytes]) -> Unit
+pub fn FakeBackend::new() -> Self
+pub async fn FakeBackend::send(Self, @model.Request, @client.RequestOptions) -> @model.Response raise @model.TransportError
+pub fn FakeBackend::sent(Self) -> Array[@model.Request]
+pub fn FakeBackend::streams_closed(Self) -> Int32
+pub impl @client.Backend for FakeBackend
+
+// Type aliases
+pub using @fake {type FakeClock}
+
+// Traits

@@ -2,8 +2,8 @@
 fn json_response(
   body : String,
   status~ : Int32 = 200,
-  headers~ : @http.Headers = @http.Headers::new(),
-) -> @http.Response {
+  headers~ : @http.Headers = @http.Headers::empty(),
+) -> @mock.Buffered {
   { status, headers, body: @utf8.encode(body), }
 }
 
@@ -20,7 +20,7 @@ async fn bounded(f : async () -> Unit) -> Unit {
 ///|
 async test "Anthropic sends the generated request and decodes a compatible response" {
   bounded(() => {
-    let transport = @mock.FakeTransport::new()
+    let transport = @mock.FakeBackend::new()
     transport.expect(
       "POST",
       "/v1/messages",
@@ -58,7 +58,7 @@ async test "Anthropic sends the generated request and decodes a compatible respo
     assert_eq(response.stop_reason, Some(@anthropic_sdk.StopReason::EndTurn))
     let sent = transport.sent()
     assert_eq(sent.length(), 1)
-    assert_eq(sent[0].http_method, "POST")
+    assert_eq(sent[0].meth.to_string(), "POST")
     assert_eq(sent[0].url, "https://api.anthropic.com/v1/messages")
     assert_eq(sent[0].headers.get("x-api-key"), Some("test-key"))
     assert_eq(sent[0].headers.get("authorization"), None)
@@ -82,7 +82,7 @@ async test "Anthropic sends the generated request and decodes a compatible respo
 ///|
 async test "Anthropic tool use round trip and stream accumulator use FakeTransport" {
   bounded(() => {
-    let transport = @mock.FakeTransport::new()
+    let transport = @mock.FakeBackend::new()
     transport.expect(
       "POST",
       "/v1/messages",
@@ -109,7 +109,7 @@ async test "Anthropic tool use round trip and stream accumulator use FakeTranspo
     transport.expect_stream(
       "POST",
       "/v1/messages",
-      { status: 200, headers: @http.Headers::new(), },
+      { status: 200, headers: @http.Headers::empty(), },
       split_chunks(sse, [2, 31, 117, 233]),
     )
     let client = @anthropic_sdk.Anthropic::from_client(
@@ -237,7 +237,7 @@ impl @runtime.RateLimiter for RecordingLimiter with fn release(
 ///|
 async test "from_client uses Bearer configuration, version, and per-operation buckets" {
   bounded(() => {
-    let transport = @mock.FakeTransport::new()
+    let transport = @mock.FakeBackend::new()
     transport.expect(
       "POST",
       "/v1/messages",
@@ -264,7 +264,7 @@ async test "from_client uses Bearer configuration, version, and per-operation bu
       transport,
       @mock.FakeClock::new(),
       base_url="https://openrouter.ai/api",
-      auth=@runtime.Bearer("router-key"),
+      headers=@http.Headers::of([("authorization", "Bearer router-key")]),
       limiter~,
     )
     let client = @anthropic_sdk.Anthropic::from_client(
@@ -308,7 +308,7 @@ async test "from_client uses Bearer configuration, version, and per-operation bu
 ///|
 async test "HTTP errors expose API bodies and 429 retries before success" {
   bounded(() => {
-    let failures = @mock.FakeTransport::new()
+    let failures = @mock.FakeBackend::new()
     let error_body = "{\"type\":\"error\",\"error\":{\"type\":\"authentication_error\",\"message\":\"bad key\"},\"request_id\":\"req_1\"}"
     failures.expect(
       "POST",
@@ -336,14 +336,14 @@ async test "HTTP errors expose API bodies and 429 retries before success" {
     }
     failures.assert_complete()
 
-    let retrying = @mock.FakeTransport::new()
+    let retrying = @mock.FakeBackend::new()
     retrying.expect(
       "POST",
       "/v1/messages",
       json_response(
         "{\"type\":\"error\",\"error\":{\"type\":\"rate_limit_error\",\"message\":\"slow down\"}}",
         status=429,
-        headers=@http.Headers::from_array([("retry-after", "0.25")]),
+        headers=@http.Headers::of([("retry-after", "0.25")]),
       ),
     )
     retrying.expect(
@@ -417,11 +417,11 @@ async test "stream decodes every event across chunks and reads past message_stop
       "\n\ndata: {\"type\":\"message_stop\"}\n\ndata: {\"type\":\"ping\"}\n\n" +
       // OpenAI-compatible gateways (OpenRouter) append this sentinel; Anthropic itself does not.
       "data: [DONE]\n\n"
-    let transport = @mock.FakeTransport::new()
+    let transport = @mock.FakeBackend::new()
     transport.expect_stream(
       "POST",
       "/v1/messages",
-      { status: 200, headers: @http.Headers::new(), },
+      { status: 200, headers: @http.Headers::empty(), },
       split_chunks(sse, [1, 8, 33, 101, 227]),
     )
     let client = @anthropic_sdk.Anthropic::new(
@@ -493,11 +493,11 @@ priv suberror CallbackFailure {
 ///|
 async test "stream closes on callback and decode errors" {
   bounded(() => {
-    let callback_transport = @mock.FakeTransport::new()
+    let callback_transport = @mock.FakeBackend::new()
     callback_transport.expect_stream(
       "POST",
       "/v1/messages",
-      { status: 200, headers: @http.Headers::new(), },
+      { status: 200, headers: @http.Headers::empty(), },
       [b"data: {\"type\":\"ping\"}\n\n"],
     )
     let callback_client = @anthropic_sdk.Anthropic::new(
@@ -519,11 +519,11 @@ async test "stream closes on callback and decode errors" {
     assert_eq(callback_transport.streams_closed(), 1)
     callback_transport.assert_complete()
 
-    let decode_transport = @mock.FakeTransport::new()
+    let decode_transport = @mock.FakeBackend::new()
     decode_transport.expect_stream(
       "POST",
       "/v1/messages",
-      { status: 200, headers: @http.Headers::new(), },
+      { status: 200, headers: @http.Headers::empty(), },
       [b"data: {\n\n"],
     )
     let decode_client = @anthropic_sdk.Anthropic::new(
@@ -537,7 +537,7 @@ async test "stream closes on callback and decode errors" {
         _ => (),
       )
     catch {
-      @runtime.Decode(body=b"{", ..) => ()
+      @runtime.Deserialization(_, body=b"{", ..) => ()
       _ => fail("invalid event data must become Decode")
     } noraise {
       _ => fail("invalid event data must fail")
@@ -550,7 +550,7 @@ async test "stream closes on callback and decode errors" {
 ///|
 async test "missing fields decode and extra collisions send nothing" {
   bounded(() => {
-    let missing = @mock.FakeTransport::new()
+    let missing = @mock.FakeBackend::new()
     missing.expect(
       "POST",
       "/v1/messages",
@@ -568,14 +568,14 @@ async test "missing fields decode and extra collisions send nothing" {
         @anthropic_sdk.MessageRequest::new(model="m", max_tokens=1, messages=[]),
       )
     catch {
-      @runtime.Decode(body~, ..) => assert_true(body.length() > 0)
+      @runtime.Deserialization(_, body~, ..) => assert_true(body.length() > 0)
       _ => fail("missing id must become Decode")
     } noraise {
       _ => fail("missing id must fail")
     }
     missing.assert_complete()
 
-    let collision_transport = @mock.FakeTransport::new()
+    let collision_transport = @mock.FakeBackend::new()
     let collision_client = @anthropic_sdk.Anthropic::new(
       api_key="key",
       collision_transport,
@@ -591,12 +591,13 @@ async test "missing fields decode and extra collisions send nothing" {
         ),
       )
     catch {
-      @runtime.Config(message) => assert_true(message.contains("stream"))
+      @runtime.InvalidRequest(message~) =>
+        assert_true(message.contains("stream"))
       _ => fail("collision must become Config")
     } noraise {
       _ => fail("collision must fail")
     }
-    assert_eq(collision_transport.sent(), [])
+    assert_eq(collision_transport.sent().length(), 0)
     collision_transport.assert_complete()
   })
 }
@@ -604,7 +605,7 @@ async test "missing fields decode and extra collisions send nothing" {
 ///|
 async test "count_tokens and the generated passthrough share the transport" {
   bounded(() => {
-    let transport = @mock.FakeTransport::new()
+    let transport = @mock.FakeBackend::new()
     transport.expect(
       "POST",
       "/v1/messages/count_tokens",
@@ -620,7 +621,7 @@ async test "count_tokens and the generated passthrough share the transport" {
     transport.expect_stream(
       "POST",
       "/v1/messages",
-      { status: 200, headers: @http.Headers::new(), },
+      { status: 200, headers: @http.Headers::empty(), },
       [
         b"data: {\"type\":\"ping\"}\n\ndata: {\"type\":\"content_block_delta\",\"index\":0,\"delta\":{\"type\":\"text_delta\",\"text\":\"Hi\"}}\n\ndata: {\"type\":\"message_stop\"}\n\n",
       ],
