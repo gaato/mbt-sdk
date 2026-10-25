@@ -53,6 +53,13 @@ Codex protocol generation uses `mttp/jsonkit`; its wire vocabulary is unchanged.
 The legacy `http`, `http-async` and `sdk-runtime` implementations remain intact
 for unmigrated consumers and their regression suites.
 
+The unreleased manifests reserve OpenAI 0.7.0, Anthropic 0.13.0, GitHub 0.18.0
+and codex-protocol 0.2.0 because their dependency graph changes. Runtime test
+consumers name those versions. codex-app-server remains on its released
+codex-protocol requirement until its separate runtime migration; workspace
+checking also verifies it against the local protocol code. No package is
+published by these edits.
+
 ## Validation
 
 Run `moon run scripts/mttp-check.mbtx` from the repository root for the scoped
