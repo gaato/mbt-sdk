@@ -1,8 +1,8 @@
 # api.github.com.2022-11-28.yaml
 
 - Source: https://raw.githubusercontent.com/github/rest-api-description/main/descriptions/api.github.com/api.github.com.2022-11-28.yaml
-- Fetched: 2026-10-18
-- sha256: 88b84f4f57b5b31785747f85115ed3a77fbf94a3c0f9cc186849b05c6e83581d
+- Fetched: 2026-11-04
+- sha256: aa0dc054f3e649291c138656e38cbb682e41cc5aec56f7942eccbce684002186
 - OpenAPI version: 3.0.3 (info.version 1.1.4)
 
 GitHub publishes the description of every REST API version in `github/rest-api-description`. Three files describe the same 1,221 operations:
