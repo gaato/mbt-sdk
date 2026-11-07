@@ -93,6 +93,7 @@ pub fn Message::assistant_blocks(Array[@gen.InputContentBlock]) -> Self
 pub fn Message::equal(Self, Self) -> Bool
 pub fn Message::from_response(MessageResponse) -> Self
 pub fn Message::not_equal(Self, Self) -> Bool
+pub fn Message::system(String) -> Self
 pub fn Message::to_repr(Self) -> @debug.Repr
 pub fn Message::tool_result(tool_use_id~ : String, content~ : String, is_error? : Bool) -> Self
 pub fn Message::user(String) -> Self
@@ -124,7 +125,6 @@ pub(all) struct MessageRequest {
   max_tokens : Int32
   messages : Array[Message]
   system : String?
-  temperature : Double?
   stop_sequences : Array[String]?
   tools : Array[ToolDef]?
   tool_choice : @gen.ToolChoice?
@@ -134,7 +134,7 @@ pub(all) struct MessageRequest {
   extra : Map[String, @json.Json]
 }
 pub fn MessageRequest::equal(Self, Self) -> Bool
-pub fn MessageRequest::new(model~ : String, max_tokens~ : Int32, messages~ : Array[Message], system? : String, temperature? : Double, stop_sequences? : Array[String], tools? : Array[ToolDef], tool_choice? : @gen.ToolChoice, thinking? : @gen.ThinkingConfigParam, output_config? : @gen.OutputConfig, metadata? : @gen.Metadata, extra? : Map[String, @json.Json]) -> Self
+pub fn MessageRequest::new(model~ : String, max_tokens~ : Int32, messages~ : Array[Message], system? : String, stop_sequences? : Array[String], tools? : Array[ToolDef], tool_choice? : @gen.ToolChoice, thinking? : @gen.ThinkingConfigParam, output_config? : @gen.OutputConfig, metadata? : @gen.Metadata, extra? : Map[String, @json.Json]) -> Self
 pub fn MessageRequest::not_equal(Self, Self) -> Bool
 pub fn MessageRequest::to_count_tokens_params(Self) -> @gen.CountMessageTokensParams
 pub fn MessageRequest::to_params(Self, stream? : Bool) -> @gen.CreateMessageParams
@@ -162,6 +162,7 @@ pub fn MessageResponse::tool_uses(Self) -> Array[(String, String, @json.Json)]
 pub(all) enum Role {
   User
   Assistant
+  System
 }
 pub fn Role::equal(Self, Self) -> Bool
 pub fn Role::not_equal(Self, Self) -> Bool
