@@ -7,7 +7,6 @@ import {
   "moonbitlang/core/env",
   "moonbitlang/core/json",
   "moonbitlang/core/string",
-  "moonbitlang/x@0.5.6/sys",
 }
 ----
 
@@ -66,10 +65,9 @@ let usage : String = "usage: moon run scripts/coverage_report.mbtx [-- --from-js
 
 ///|
 /// Prints `message` on stderr and exits with `code`.
-async fn[T] die(code : Int, message : String) -> T {
-  @stdio.stderr.write("\{message}\n")
-  @sys.exit(code)
-  panic()
+fn[T] die(code : Int, message : String) -> T {
+  eprintln(message)
+  @env.exit(code)
 }
 
 ///|
@@ -388,5 +386,5 @@ async fn main {
     }
     err => raise err
   }
-  @sys.exit(status)
+  @env.exit(status)
 }
