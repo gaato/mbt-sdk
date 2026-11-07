@@ -87,7 +87,7 @@ fn table(text : String) -> (String?, Array[(String, Finding)]) {
       continue
     }
     let label = match first.find(" (") {
-      Some(at) => first.view(end_offset=at).to_owned()
+      Some(at) => first.exact_view(end=at).to_owned()
       None => first
     }
     let before = found.length()
@@ -112,7 +112,7 @@ fn separator(line : String) -> Bool {
   line.length() >= 3 &&
   line.has_suffix("|") &&
   line
-  .view(start_offset=1, end_offset=line.length() - 1)
+  .exact_view(start=1, end=line.length() - 1)
   .iter()
   .all(c => c is ('-' | ':' | '|' | ' '))
 }
@@ -132,11 +132,11 @@ fn tokens(cell : String) -> Array[Token] {
     let c = cell[i]
     if c == '`' || c == '"' {
       let close = cell
-        .view(start_offset=i + 1)
+        .exact_view(start=i + 1)
         .find(if c == '`' { "`" } else { "\"" })
       if close is Some(len) {
         let token = cell
-          .view(start_offset=i + 1, end_offset=i + 1 + len)
+          .exact_view(start=i + 1, end=i + 1 + len)
           .to_owned()
         out.push(if c == '`' { File(token) } else { Name(token) })
         continue i + len + 2

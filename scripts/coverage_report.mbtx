@@ -125,7 +125,7 @@ async fn find(root : String, keep : (String) -> Bool) -> Array[String] {
 /// The package directories under `root`.
 async fn packages(root : String) -> Array[String] {
   find(root, name => name == "moon.pkg").map(path => {
-    path.view(end_offset=path.length() - "/moon.pkg".length()).to_owned()
+    path.exact_view(end=path.length() - "/moon.pkg".length()).to_owned()
   })
 }
 
@@ -292,8 +292,8 @@ async fn check(json_file : String) -> Int {
     if tot == 0 {
       continue
     }
-    let package_dir = file.view(end_offset=file.rev_find("/").unwrap()).to_owned()
-    let module_dir = file.view(end_offset=file.find("/").unwrap()).to_owned()
+    let package_dir = file.exact_view(end=file.rev_find("/").unwrap()).to_owned()
+    let module_dir = file.exact_view(end=file.find("/").unwrap()).to_owned()
     add(by_package, package_dir, cov, tot)
     add(by_module, module_dir, cov, tot)
     lcov += cov
