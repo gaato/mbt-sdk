@@ -144,9 +144,11 @@ waits.
 
 ## Known limitations
 
-An IPv6 literal host (`http://[::1]:8080/`, as an origin or a proxy) cannot be
-dialled: moonbitlang/async passes the bracketed address to name resolution,
-which fails with `Connect`. Use a host name instead.
+On a host whose only IPv6 address is the loopback, such as a Docker container
+without IPv6, an IPv6 literal host (`http://[::1]/` too) fails with `Connect`:
+moonbitlang/async resolves literals with getaddrinfo and `AI_ADDRCONFIG`,
+which then returns no IPv6 address. Only the loopback could be reached over
+IPv6 there anyway.
 
 ## Links
 

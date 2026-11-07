@@ -1,13 +1,15 @@
 ///|
-// A raw TCP proxy for one test, under the 5 s deadline of the other socket
-// tests: each accepted connection goes to `handler`, which owns it. `run` gets
-// the port and a count of the connections accepted so far.
+// A raw TCP proxy (or origin) for one test, listening on `bind`, under the
+// 5 s deadline of the other socket tests: each accepted connection goes to
+// `handler`, which owns it. `run` gets the port and a count of the
+// connections accepted so far.
 async fn with_proxy(
+  bind~ : String = "127.0.0.1:0",
   handler : async (@socket.Tcp) -> Unit,
   run : async (Int32, () -> Int32) -> Unit,
 ) -> Unit {
   @async.with_timeout(5000, () => {
-    let server = @socket.TcpServer(@socket.Addr::parse("127.0.0.1:0"))
+    let server = @socket.TcpServer(@socket.Addr::parse(bind))
     defer server.close()
     let accepted = Ref(0)
     @async.with_task_group(group => {
