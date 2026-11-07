@@ -8,6 +8,8 @@ note.
 
 ## [Unreleased]
 
+## [0.5.1] - 2026-11-07
+
 ### Changed
 
 - **Requires `moonbitlang/async` 0.22.7.** Migration: a project that pins
