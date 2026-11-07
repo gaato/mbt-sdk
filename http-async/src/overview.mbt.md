@@ -142,6 +142,14 @@ code runs the same way on every run and target. `settle` raises
 `NoQuiescence` when the tasks never go idle, such as a retry loop that never
 waits.
 
+## Known limitations
+
+On a host whose only IPv6 address is the loopback, such as a Docker container
+without IPv6, an IPv6 literal host (`http://[::1]/` too) fails with `Connect`:
+moonbitlang/async resolves literals with getaddrinfo and `AI_ADDRCONFIG`,
+which then returns no IPv6 address. Only the loopback could be reached over
+IPv6 there anyway.
+
 ## Links
 
 - [Changelog](https://github.com/gaato/mbt-sdk/blob/main/http-async/CHANGELOG.md)

@@ -1,21 +1,23 @@
 // IPv6 literal hosts, as origins and as proxies, over the IPv6 loopback.
 
 ///|
-/// Whether this host can listen on the IPv6 loopback. Some containers have
-/// none; there a test prints a `skip:` line and passes, as the live tests do
-/// without their credentials.
+/// Whether this host can dial the IPv6 loopback. moonbitlang/async resolves
+/// every host, literals too, with getaddrinfo and `AI_ADDRCONFIG`, which
+/// glibc answers with no address for `::1` when loopback is the host's only
+/// IPv6 address, as in a Docker container without IPv6 (CI). There a test
+/// prints a `skip:` line and passes, as the live tests do without their
+/// credentials.
 async fn ipv6_loopback(name : String) -> Bool {
-  try @socket.TcpServer(@socket.Addr::parse("[::1]:0")) catch {
+  try {
+    @socket.TcpServer(@socket.Addr::parse("[::1]:0")).close()
+    ignore(@socket.Addr::resolve("::1", port=0))
+  } catch {
     _ => {
-      println("skip: \{name}: no IPv6 loopback")
-      false
-    }
-  } noraise {
-    server => {
-      server.close()
-      true
+      println("skip: \{name}: this host cannot dial the IPv6 loopback")
+      return false
     }
   }
+  true
 }
 
 ///|

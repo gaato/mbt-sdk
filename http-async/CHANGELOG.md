@@ -26,7 +26,9 @@ note.
 - **IPv6 literal hosts can be dialled**, as an origin
   (`http://[::1]:8080/`) and as a proxy (`proxy="http://[::1]:3128"`); they
   failed with `Connect`. A tunnel to an IPv6 origin sends its `CONNECT`
-  authority with brackets (`[2001:db8::1]:443`).
+  authority with brackets (`[2001:db8::1]:443`). They still fail on a host
+  whose only IPv6 address is the loopback, `[::1]` included (see Known
+  limitations in the README).
 - **A malformed `Set-Cookie` line no longer fails the response.** A line
   without `=`, or with a `Max-Age` that is not an optional `-` and digits
   that fit an Int64, failed the whole response with `Protocol`.
