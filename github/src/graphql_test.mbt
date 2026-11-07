@@ -1,6 +1,10 @@
 ///|
-fn decode_error(body : Bytes) -> @runtime.SdkError {
-  @runtime.Decode(message="graphql: …", body~)
+fn decode_error(body : Bytes) -> Error {
+  @github.GraphqlFailure(
+    { status: 200, headers: @model.Headers::empty(), },
+    message="graphql: …",
+    body~,
+  )
 }
 
 ///|
@@ -87,5 +91,8 @@ test "graphql_errors declines everything that is not a GraphQL envelope" {
   )
   assert_eq(@github.graphql_errors(decode_error(body("[]"))), None)
   // A transport or configuration failure carries no body to read.
-  assert_eq(@github.graphql_errors(@runtime.Config("no token")), None)
+  assert_eq(
+    @github.graphql_errors(@client.InvalidRequest(message="no token")),
+    None,
+  )
 }

@@ -6,14 +6,10 @@ fn body(text : String) -> Bytes {
 ///|
 fn status_error(
   status : Int32,
-  headers~ : @http.Headers = @http.Headers::new(),
+  headers~ : @model.Headers = @model.Headers::empty(),
   body~ : Bytes = b"",
-) -> @runtime.SdkError {
-  if status == 429 {
-    @runtime.RateLimited(retry_after_ms=None, headers~, body~)
-  } else {
-    @runtime.Status(status~, headers~, body~)
-  }
+) -> Error {
+  @client.UnexpectedStatus({ status, headers, }, body~)
 }
 
 ///|
@@ -76,11 +72,14 @@ test "api_error returns None for bodies and failures that are not GitHub errors"
   assert_eq(@github.api_error(status_error(500, body=body(unrelated))), None)
   assert_eq(
     @github.api_error(
-      @runtime.Transport(@http.HttpError::Timeout(phase=Head, ms=1000)),
+      @model.TransportError(kind=Timeout(ms=1000), phase=Head, detail="timeout"),
     ),
     None,
   )
-  assert_eq(@github.api_error(@runtime.Config("no base url")), None)
+  assert_eq(
+    @github.api_error(@client.InvalidRequest(message="no base url")),
+    None,
+  )
 }
 
 ///|
@@ -89,7 +88,9 @@ test "is_not_modified recognises the answer to a conditional request" {
   assert_false(@github.is_not_modified(status_error(404)))
   assert_false(@github.is_not_modified(status_error(429)))
   assert_false(
-    @github.is_not_modified(@runtime.Transport(@http.HttpError::Connect("x"))),
+    @github.is_not_modified(
+      @model.TransportError(kind=Connect, phase=Dial, detail="x"),
+    ),
   )
 }
 
@@ -101,7 +102,7 @@ test "is_secondary_rate_limit separates the secondary limit from the hourly quot
     #|{"message":"API rate limit exceeded for 203.0.113.1. (But here's the good news: Authenticated requests get a higher rate limit.)","documentation_url":"https://docs.github.com/rest/overview/rate-limits-for-the-rest-api"}
 
   // 403 with retry-after: the documented secondary-limit response.
-  let retry_after = @http.Headers::from_array([("retry-after", "60")])
+  let retry_after = @model.Headers::of([("retry-after", "60")])
   assert_true(
     @github.is_secondary_rate_limit(
       status_error(403, headers=retry_after, body=body(secondary)),
@@ -118,7 +119,7 @@ test "is_secondary_rate_limit separates the secondary limit from the hourly quot
     @github.is_secondary_rate_limit(status_error(403, body=body(secondary))),
   )
   // The hourly quota is a different mechanism: WindowLimiter paces it.
-  let exhausted = @http.Headers::from_array([
+  let exhausted = @model.Headers::of([
     ("x-ratelimit-remaining", "0"),
     ("x-ratelimit-reset", "1700000000"),
   ])
@@ -140,7 +141,7 @@ test "is_secondary_rate_limit separates the secondary limit from the hourly quot
   )
   assert_false(
     @github.is_secondary_rate_limit(
-      @runtime.Transport(@http.HttpError::Timeout(phase=Head, ms=1000)),
+      @model.TransportError(kind=Timeout(ms=1000), phase=Head, detail="timeout"),
     ),
   )
 }
@@ -149,7 +150,7 @@ test "is_secondary_rate_limit separates the secondary limit from the hourly quot
 test "Debug hides the token a client was built with" {
   let token = "ghp-token-that-must-not-leak"
   let client = @github.GitHub::new(
-    @mock.FakeTransport::new(),
+    @testing.BackendStub::new(),
     @mock.FakeClock::new(),
     token~,
   )

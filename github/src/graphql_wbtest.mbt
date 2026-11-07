@@ -76,7 +76,7 @@ test "a cursor is added to a copy of the variables" {
 ///|
 test "variables that cannot carry a cursor are rejected" {
   try with_cursor(Some(Json::array([])), "after", "abc") catch {
-    @runtime.Config(message) => assert_true(message.contains("after"))
+    @client.InvalidRequest(message~) => assert_true(message.contains("after"))
     _ => fail("expected a configuration error")
   } noraise {
     _ => fail("a cursor cannot be threaded through an array of variables")

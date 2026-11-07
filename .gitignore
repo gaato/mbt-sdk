@@ -8,7 +8,7 @@ __pycache__/
 openai/spec/*.patched.json
 anthropic/spec/*.patched.json
 github/spec/*.patched.json
-.venv/
+.venv
 
 # local secrets never belong here
 .env

@@ -22,19 +22,20 @@ fn parse_json_body(body : Bytes) -> Json raise {
 
 ///|
 fn[T : @json.FromJson] decode_response(
-  response : @http.Response,
-) -> T raise @runtime.SdkError {
-  @json.from_json(parse_json_body(response.body)) catch {
+  head : @model.ResponseHead,
+  body : Bytes,
+) -> T raise @client.ResponseError {
+  @json.from_json(parse_json_body(body)) catch {
     error =>
-      raise @runtime.Decode(message=error.to_string(), body=response.body)
+      raise @client.Deserialization(head, message=error.to_string(), body~)
   }
 }
 
 ///|
 ///
 /// Update an existing pet.
-pub fn update_pet_request(body : Pet) -> @http.Request {
-  @http.Request::put("/pet").json_body(Json(body))
+pub fn update_pet_request(body : Pet) -> @model.Request {
+  @model.Request::put("/pet").body_json(Json(body))
 }
 
 ///|
@@ -48,16 +49,17 @@ pub fn update_pet_decode_json(value : Json) -> Pet raise @json.JsonDecodeError {
 ///
 /// Decodes a successful updatePet response.
 pub fn update_pet_decode(
-  response : @http.Response,
-) -> Pet raise @runtime.SdkError {
-  decode_response(response)
+  head : @model.ResponseHead,
+  body : Bytes,
+) -> Pet raise @client.ResponseError {
+  decode_response(head, body)
 }
 
 ///|
 ///
 /// Add a new pet to the store.
-pub fn add_pet_request(body : Pet) -> @http.Request {
-  @http.Request::post("/pet").json_body(Json(body))
+pub fn add_pet_request(body : Pet) -> @model.Request {
+  @model.Request::post("/pet").body_json(Json(body))
 }
 
 ///|
@@ -70,8 +72,11 @@ pub fn add_pet_decode_json(value : Json) -> Pet raise @json.JsonDecodeError {
 ///|
 ///
 /// Decodes a successful addPet response.
-pub fn add_pet_decode(response : @http.Response) -> Pet raise @runtime.SdkError {
-  decode_response(response)
+pub fn add_pet_decode(
+  head : @model.ResponseHead,
+  body : Bytes,
+) -> Pet raise @client.ResponseError {
+  decode_response(head, body)
 }
 
 ///|
@@ -79,10 +84,10 @@ pub fn add_pet_decode(response : @http.Response) -> Pet raise @runtime.SdkError 
 /// Finds Pets by status.
 pub fn find_pets_by_status_request(
   status : FindPetsByStatusStatus,
-) -> @http.Request {
+) -> @model.Request {
   let mut url = "/pet/findByStatus"
-  url = @http.append_query(url, "status", parameter_value(status))
-  @http.Request::get(url)
+  url = @model.append_query(url, "status", parameter_value(status))
+  @model.Request::get(url)
 }
 
 ///|
@@ -98,20 +103,21 @@ pub fn find_pets_by_status_decode_json(
 ///
 /// Decodes a successful findPetsByStatus response.
 pub fn find_pets_by_status_decode(
-  response : @http.Response,
-) -> Array[Pet] raise @runtime.SdkError {
-  decode_response(response)
+  head : @model.ResponseHead,
+  body : Bytes,
+) -> Array[Pet] raise @client.ResponseError {
+  decode_response(head, body)
 }
 
 ///|
 ///
 /// Finds Pets by tags.
-pub fn find_pets_by_tags_request(tags : Array[String]) -> @http.Request {
+pub fn find_pets_by_tags_request(tags : Array[String]) -> @model.Request {
   let mut url = "/pet/findByTags"
   for value in tags {
-    url = @http.append_query(url, "tags", parameter_value(value))
+    url = @model.append_query(url, "tags", parameter_value(value))
   }
-  @http.Request::get(url)
+  @model.Request::get(url)
 }
 
 ///|
@@ -127,16 +133,17 @@ pub fn find_pets_by_tags_decode_json(
 ///
 /// Decodes a successful findPetsByTags response.
 pub fn find_pets_by_tags_decode(
-  response : @http.Response,
-) -> Array[Pet] raise @runtime.SdkError {
-  decode_response(response)
+  head : @model.ResponseHead,
+  body : Bytes,
+) -> Array[Pet] raise @client.ResponseError {
+  decode_response(head, body)
 }
 
 ///|
 ///
 /// Find pet by ID.
-pub fn get_pet_by_id_request(pet_id : Int64) -> @http.Request {
-  @http.Request::get("/pet/" + @http.percent_encode(parameter_value(pet_id)))
+pub fn get_pet_by_id_request(pet_id : Int64) -> @model.Request {
+  @model.Request::get("/pet/" + @model.percent_encode(parameter_value(pet_id)))
 }
 
 ///|
@@ -152,9 +159,10 @@ pub fn get_pet_by_id_decode_json(
 ///
 /// Decodes a successful getPetById response.
 pub fn get_pet_by_id_decode(
-  response : @http.Response,
-) -> Pet raise @runtime.SdkError {
-  decode_response(response)
+  head : @model.ResponseHead,
+  body : Bytes,
+) -> Pet raise @client.ResponseError {
+  decode_response(head, body)
 }
 
 ///|
@@ -164,18 +172,19 @@ pub fn update_pet_with_form_request(
   pet_id : Int64,
   name? : String,
   status? : String,
-) -> @http.Request {
-  let mut url = "/pet/" + @http.percent_encode(parameter_value(pet_id))
+) -> @model.Request {
+  let mut url = "/pet/" + @model.percent_encode(parameter_value(pet_id))
   match name {
-    Some(value) => url = @http.append_query(url, "name", parameter_value(value))
+    Some(value) =>
+      url = @model.append_query(url, "name", parameter_value(value))
     None => ()
   }
   match status {
     Some(value) =>
-      url = @http.append_query(url, "status", parameter_value(value))
+      url = @model.append_query(url, "status", parameter_value(value))
     None => ()
   }
-  @http.Request::post(url)
+  @model.Request::post(url)
 }
 
 ///|
@@ -191,17 +200,18 @@ pub fn update_pet_with_form_decode_json(
 ///
 /// Decodes a successful updatePetWithForm response.
 pub fn update_pet_with_form_decode(
-  response : @http.Response,
-) -> Pet raise @runtime.SdkError {
-  decode_response(response)
+  head : @model.ResponseHead,
+  body : Bytes,
+) -> Pet raise @client.ResponseError {
+  decode_response(head, body)
 }
 
 ///|
 ///
-/// Deletes a pet. The caller handles the response as @http.Response.
-pub fn delete_pet_request(pet_id : Int64, api_key? : String) -> @http.Request {
-  let mut request = @http.Request::delete(
-    "/pet/" + @http.percent_encode(parameter_value(pet_id)),
+/// Deletes a pet. The caller handles the response as @model.Response.
+pub fn delete_pet_request(pet_id : Int64, api_key? : String) -> @model.Request {
+  let mut request = @model.Request::delete(
+    "/pet/" + @model.percent_encode(parameter_value(pet_id)),
   )
   match api_key {
     Some(value) => request = request.header("api_key", parameter_value(value))
@@ -216,20 +226,20 @@ pub fn delete_pet_request(pet_id : Int64, api_key? : String) -> @http.Request {
 pub fn upload_file_request(
   pet_id : Int64,
   additional_metadata? : String,
-) -> @http.Request {
+) -> @model.Request {
   let mut url = "/pet/" +
-    @http.percent_encode(parameter_value(pet_id)) +
+    @model.percent_encode(parameter_value(pet_id)) +
     "/uploadImage"
   match additional_metadata {
     Some(value) =>
-      url = @http.append_query(
+      url = @model.append_query(
         url,
         "additionalMetadata",
         parameter_value(value),
       )
     None => ()
   }
-  @http.Request::post(url)
+  @model.Request::post(url)
 }
 
 ///|
@@ -245,16 +255,17 @@ pub fn upload_file_decode_json(
 ///
 /// Decodes a successful uploadFile response.
 pub fn upload_file_decode(
-  response : @http.Response,
-) -> ApiResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @model.ResponseHead,
+  body : Bytes,
+) -> ApiResponse raise @client.ResponseError {
+  decode_response(head, body)
 }
 
 ///|
 ///
 /// Returns pet inventories by status.
-pub fn get_inventory_request() -> @http.Request {
-  @http.Request::get("/store/inventory")
+pub fn get_inventory_request() -> @model.Request {
+  @model.Request::get("/store/inventory")
 }
 
 ///|
@@ -270,16 +281,17 @@ pub fn get_inventory_decode_json(
 ///
 /// Decodes a successful getInventory response.
 pub fn get_inventory_decode(
-  response : @http.Response,
-) -> Map[String, Int32] raise @runtime.SdkError {
-  decode_response(response)
+  head : @model.ResponseHead,
+  body : Bytes,
+) -> Map[String, Int32] raise @client.ResponseError {
+  decode_response(head, body)
 }
 
 ///|
 ///
 /// Place an order for a pet.
-pub fn place_order_request(body : Order) -> @http.Request {
-  @http.Request::post("/store/order").json_body(Json(body))
+pub fn place_order_request(body : Order) -> @model.Request {
+  @model.Request::post("/store/order").body_json(Json(body))
 }
 
 ///|
@@ -295,17 +307,18 @@ pub fn place_order_decode_json(
 ///
 /// Decodes a successful placeOrder response.
 pub fn place_order_decode(
-  response : @http.Response,
-) -> Order raise @runtime.SdkError {
-  decode_response(response)
+  head : @model.ResponseHead,
+  body : Bytes,
+) -> Order raise @client.ResponseError {
+  decode_response(head, body)
 }
 
 ///|
 ///
 /// Find purchase order by ID.
-pub fn get_order_by_id_request(order_id : Int64) -> @http.Request {
-  @http.Request::get(
-    "/store/order/" + @http.percent_encode(parameter_value(order_id)),
+pub fn get_order_by_id_request(order_id : Int64) -> @model.Request {
+  @model.Request::get(
+    "/store/order/" + @model.percent_encode(parameter_value(order_id)),
   )
 }
 
@@ -322,25 +335,26 @@ pub fn get_order_by_id_decode_json(
 ///
 /// Decodes a successful getOrderById response.
 pub fn get_order_by_id_decode(
-  response : @http.Response,
-) -> Order raise @runtime.SdkError {
-  decode_response(response)
+  head : @model.ResponseHead,
+  body : Bytes,
+) -> Order raise @client.ResponseError {
+  decode_response(head, body)
 }
 
 ///|
 ///
-/// Delete purchase order by identifier. The caller handles the response as @http.Response.
-pub fn delete_order_request(order_id : Int64) -> @http.Request {
-  @http.Request::delete(
-    "/store/order/" + @http.percent_encode(parameter_value(order_id)),
+/// Delete purchase order by identifier. The caller handles the response as @model.Response.
+pub fn delete_order_request(order_id : Int64) -> @model.Request {
+  @model.Request::delete(
+    "/store/order/" + @model.percent_encode(parameter_value(order_id)),
   )
 }
 
 ///|
 ///
 /// Create user.
-pub fn create_user_request(body : User) -> @http.Request {
-  @http.Request::post("/user").json_body(Json(body))
+pub fn create_user_request(body : User) -> @model.Request {
+  @model.Request::post("/user").body_json(Json(body))
 }
 
 ///|
@@ -356,9 +370,10 @@ pub fn create_user_decode_json(
 ///
 /// Decodes a successful createUser response.
 pub fn create_user_decode(
-  response : @http.Response,
-) -> User raise @runtime.SdkError {
-  decode_response(response)
+  head : @model.ResponseHead,
+  body : Bytes,
+) -> User raise @client.ResponseError {
+  decode_response(head, body)
 }
 
 ///|
@@ -366,8 +381,8 @@ pub fn create_user_decode(
 /// Creates list of users with given input array.
 pub fn create_users_with_list_input_request(
   body : Array[User],
-) -> @http.Request {
-  @http.Request::post("/user/createWithList").json_body(Json(body))
+) -> @model.Request {
+  @model.Request::post("/user/createWithList").body_json(Json(body))
 }
 
 ///|
@@ -383,9 +398,10 @@ pub fn create_users_with_list_input_decode_json(
 ///
 /// Decodes a successful createUsersWithListInput response.
 pub fn create_users_with_list_input_decode(
-  response : @http.Response,
-) -> User raise @runtime.SdkError {
-  decode_response(response)
+  head : @model.ResponseHead,
+  body : Bytes,
+) -> User raise @client.ResponseError {
+  decode_response(head, body)
 }
 
 ///|
@@ -394,19 +410,19 @@ pub fn create_users_with_list_input_decode(
 pub fn login_user_request(
   username? : String,
   password? : String,
-) -> @http.Request {
+) -> @model.Request {
   let mut url = "/user/login"
   match username {
     Some(value) =>
-      url = @http.append_query(url, "username", parameter_value(value))
+      url = @model.append_query(url, "username", parameter_value(value))
     None => ()
   }
   match password {
     Some(value) =>
-      url = @http.append_query(url, "password", parameter_value(value))
+      url = @model.append_query(url, "password", parameter_value(value))
     None => ()
   }
-  @http.Request::get(url)
+  @model.Request::get(url)
 }
 
 ///|
@@ -422,23 +438,26 @@ pub fn login_user_decode_json(
 ///
 /// Decodes a successful loginUser response.
 pub fn login_user_decode(
-  response : @http.Response,
-) -> String raise @runtime.SdkError {
-  decode_response(response)
+  head : @model.ResponseHead,
+  body : Bytes,
+) -> String raise @client.ResponseError {
+  decode_response(head, body)
 }
 
 ///|
 ///
-/// Logs out current logged in user session. The caller handles the response as @http.Response.
-pub fn logout_user_request() -> @http.Request {
-  @http.Request::get("/user/logout")
+/// Logs out current logged in user session. The caller handles the response as @model.Response.
+pub fn logout_user_request() -> @model.Request {
+  @model.Request::get("/user/logout")
 }
 
 ///|
 ///
 /// Get user by user name.
-pub fn get_user_by_name_request(username : String) -> @http.Request {
-  @http.Request::get("/user/" + @http.percent_encode(parameter_value(username)))
+pub fn get_user_by_name_request(username : String) -> @model.Request {
+  @model.Request::get(
+    "/user/" + @model.percent_encode(parameter_value(username)),
+  )
 }
 
 ///|
@@ -454,25 +473,26 @@ pub fn get_user_by_name_decode_json(
 ///
 /// Decodes a successful getUserByName response.
 pub fn get_user_by_name_decode(
-  response : @http.Response,
-) -> User raise @runtime.SdkError {
-  decode_response(response)
+  head : @model.ResponseHead,
+  body : Bytes,
+) -> User raise @client.ResponseError {
+  decode_response(head, body)
 }
 
 ///|
 ///
-/// Update user resource. The caller handles the response as @http.Response.
-pub fn update_user_request(username : String, body : User) -> @http.Request {
-  @http.Request::put("/user/" + @http.percent_encode(parameter_value(username))).json_body(
-    Json(body),
-  )
+/// Update user resource. The caller handles the response as @model.Response.
+pub fn update_user_request(username : String, body : User) -> @model.Request {
+  @model.Request::put(
+    "/user/" + @model.percent_encode(parameter_value(username)),
+  ).body_json(Json(body))
 }
 
 ///|
 ///
-/// Delete user resource. The caller handles the response as @http.Response.
-pub fn delete_user_request(username : String) -> @http.Request {
-  @http.Request::delete(
-    "/user/" + @http.percent_encode(parameter_value(username)),
+/// Delete user resource. The caller handles the response as @model.Response.
+pub fn delete_user_request(username : String) -> @model.Request {
+  @model.Request::delete(
+    "/user/" + @model.percent_encode(parameter_value(username)),
   )
 }

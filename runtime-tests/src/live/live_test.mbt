@@ -17,11 +17,8 @@ async fn bounded(f : async () -> Unit) -> Unit {
 ///|
 /// The transport every live test uses, configured as the READMEs recommend:
 /// a buffered body is bounded, since the transport reads one whole otherwise.
-fn live_transport() -> @adapter.AsyncTransport {
-  @adapter.AsyncTransport::new(
-    timeout_ms=45000,
-    max_body_bytes=64 * 1024 * 1024,
-  )
+fn live_transport() -> @backend.AsyncBackend {
+  @backend.AsyncBackend::new(timeout_ms=45000, max_body_bytes=64 * 1024 * 1024)
 }
 
 ///|
@@ -49,18 +46,18 @@ fn runtime_client(api_key : String, base_url : String) -> @runtime.Client {
     live_transport(),
     @adapter.AsyncClock::new(),
     base_url~,
-    auth=@runtime.Bearer(api_key),
+    headers=@model.Headers::of([("authorization", "Bearer " + api_key)]),
     retry=live_retry(),
   )
 }
 
 ///|
-fn openai_error(error : @runtime.SdkError) -> String {
+fn openai_error(error : Error) -> String {
   @debug.to_string(@openai_sdk.api_error(error))
 }
 
 ///|
-fn anthropic_error(error : @runtime.SdkError) -> String {
+fn anthropic_error(error : Error) -> String {
   @debug.to_string(@anthropic_sdk.api_error(error))
 }
 
@@ -68,8 +65,8 @@ fn anthropic_error(error : @runtime.SdkError) -> String {
 fn sdk_failure(
   provider : String,
   model : String,
-  explain : (@runtime.SdkError) -> String,
-  error : @runtime.SdkError,
+  explain : (Error) -> String,
+  error : Error,
 ) -> String {
   "provider=\{provider} model=\{model} api_error=\{explain(error)} sdk_error=\{@debug.to_string(error)}"
 }
@@ -79,47 +76,17 @@ async fn[X] with_model_fallback(
   provider : String,
   candidates : Array[String],
   call : async (String) -> X,
-  explain : (@runtime.SdkError) -> String,
+  explain : (Error) -> String,
 ) -> (String, X) {
   let failures : Array[String] = []
   for model in candidates {
     try call(model) catch {
-      @runtime.Transport(inner) =>
-        failures.push(
-          sdk_failure(provider, model, explain, @runtime.Transport(inner)),
-        )
-      @runtime.Status(status~, headers~, body~) =>
-        failures.push(
-          sdk_failure(
-            provider,
-            model,
-            explain,
-            @runtime.Status(status~, headers~, body~),
-          ),
-        )
-      @runtime.RateLimited(retry_after_ms~, headers~, body~) =>
-        failures.push(
-          sdk_failure(
-            provider,
-            model,
-            explain,
-            @runtime.RateLimited(retry_after_ms~, headers~, body~),
-          ),
-        )
-      @runtime.Decode(message~, body~) =>
-        failures.push(
-          sdk_failure(
-            provider,
-            model,
-            explain,
-            @runtime.Decode(message~, body~),
-          ),
-        )
-      @runtime.Config(message) =>
-        failures.push(
-          sdk_failure(provider, model, explain, @runtime.Config(message)),
-        )
-      error => raise error
+      error =>
+        if is_sdk_error(error) {
+          failures.push(sdk_failure(provider, model, explain, error))
+        } else {
+          raise error
+        }
     } noraise {
       value => return (model, value)
     }
@@ -134,40 +101,12 @@ async fn[X] one_call(
   call : async () -> X,
 ) -> X {
   call() catch {
-    @runtime.Transport(inner) =>
-      fail(
-        sdk_failure(provider, model, openai_error, @runtime.Transport(inner)),
-      )
-    @runtime.Status(status~, headers~, body~) =>
-      fail(
-        sdk_failure(
-          provider,
-          model,
-          openai_error,
-          @runtime.Status(status~, headers~, body~),
-        ),
-      )
-    @runtime.RateLimited(retry_after_ms~, headers~, body~) =>
-      fail(
-        sdk_failure(
-          provider,
-          model,
-          openai_error,
-          @runtime.RateLimited(retry_after_ms~, headers~, body~),
-        ),
-      )
-    @runtime.Decode(message~, body~) =>
-      fail(
-        sdk_failure(
-          provider,
-          model,
-          openai_error,
-          @runtime.Decode(message~, body~),
-        ),
-      )
-    @runtime.Config(message) =>
-      fail(sdk_failure(provider, model, openai_error, @runtime.Config(message)))
-    error => raise error
+    error =>
+      if is_sdk_error(error) {
+        fail(sdk_failure(provider, model, openai_error, error))
+      } else {
+        raise error
+      }
   }
 }
 
@@ -178,42 +117,12 @@ async fn[X] one_anthropic_call(
   call : async () -> X,
 ) -> X {
   call() catch {
-    @runtime.Transport(inner) =>
-      fail(
-        sdk_failure(provider, model, anthropic_error, @runtime.Transport(inner)),
-      )
-    @runtime.Status(status~, headers~, body~) =>
-      fail(
-        sdk_failure(
-          provider,
-          model,
-          anthropic_error,
-          @runtime.Status(status~, headers~, body~),
-        ),
-      )
-    @runtime.RateLimited(retry_after_ms~, headers~, body~) =>
-      fail(
-        sdk_failure(
-          provider,
-          model,
-          anthropic_error,
-          @runtime.RateLimited(retry_after_ms~, headers~, body~),
-        ),
-      )
-    @runtime.Decode(message~, body~) =>
-      fail(
-        sdk_failure(
-          provider,
-          model,
-          anthropic_error,
-          @runtime.Decode(message~, body~),
-        ),
-      )
-    @runtime.Config(message) =>
-      fail(
-        sdk_failure(provider, model, anthropic_error, @runtime.Config(message)),
-      )
-    error => raise error
+    error =>
+      if is_sdk_error(error) {
+        fail(sdk_failure(provider, model, anthropic_error, error))
+      } else {
+        raise error
+      }
   }
 }
 
@@ -420,16 +329,16 @@ async test "live local OpenAI-compatible Chat Completions API" {
       )
       return
     }
-    let auth = match optional_setting("OPENAI_COMPAT_API_KEY") {
-      Some(key) => @runtime.Bearer(key)
-      None => @runtime.NoAuth
+    let headers = match optional_setting("OPENAI_COMPAT_API_KEY") {
+      Some(key) => @model.Headers::of([("authorization", "Bearer " + key)])
+      None => @model.Headers::empty()
     }
     let client = @openai_sdk.OpenAI::from_client(
       @runtime.Client::new(
         live_transport(),
         @adapter.AsyncClock::new(),
         base_url~,
-        auth~,
+        headers~,
         retry=live_retry(),
       ),
     )
@@ -544,7 +453,7 @@ async test "live local Anthropic-compatible Messages API" {
             transport,
             clock,
             base_url~,
-            auth=@runtime.NoAuth,
+            headers=@model.Headers::empty(),
             retry=live_retry(),
           ),
         )
@@ -901,16 +810,12 @@ async test "live Anthropic official minimal operations" {
 // -----------------------------------------------------------------------------
 
 ///|
-fn github_error(error : @runtime.SdkError) -> String {
+fn github_error(error : Error) -> String {
   @debug.to_string(@github_sdk.api_error(error))
 }
 
 ///|
-fn github_failure(
-  operation : String,
-  hint : String,
-  error : @runtime.SdkError,
-) -> String {
+fn github_failure(operation : String, hint : String, error : Error) -> String {
   "provider=GitHub op=\{operation} \{hint}api_error=\{github_error(error)} sdk_error=\{@debug.to_string(error)}"
 }
 
@@ -921,29 +826,12 @@ async fn[X] one_github_call(
   hint~ : String = "",
 ) -> X {
   call() catch {
-    @runtime.Transport(inner) =>
-      fail(github_failure(operation, hint, @runtime.Transport(inner)))
-    @runtime.Status(status~, headers~, body~) =>
-      fail(
-        github_failure(
-          operation,
-          hint,
-          @runtime.Status(status~, headers~, body~),
-        ),
-      )
-    @runtime.RateLimited(retry_after_ms~, headers~, body~) =>
-      fail(
-        github_failure(
-          operation,
-          hint,
-          @runtime.RateLimited(retry_after_ms~, headers~, body~),
-        ),
-      )
-    @runtime.Decode(message~, body~) =>
-      fail(github_failure(operation, hint, @runtime.Decode(message~, body~)))
-    @runtime.Config(message) =>
-      fail(github_failure(operation, hint, @runtime.Config(message)))
-    error => raise error
+    error =>
+      if is_sdk_error(error) {
+        fail(github_failure(operation, hint, error))
+      } else {
+        raise error
+      }
   }
 }
 
@@ -979,9 +867,9 @@ async test "live GitHub REST read paths, Link pagination, and rate limits" {
     // The authenticated client keeps its limiter in reach, so check 3 can read
     // what the limiter made of the x-ratelimit-* headers it just saw.
     let clock = @adapter.AsyncClock::new()
-    let limiter = @runtime.WindowLimiter::new(
+    let limiter = @ratelimit.WindowLimiter::new(
       clock,
-      @runtime.rate_limit_headers(
+      @ratelimit.rate_limit_headers(
         remaining="x-ratelimit-remaining",
         reset_unix_seconds="x-ratelimit-reset",
       ),
@@ -1101,9 +989,9 @@ async test "live GitHub GraphQL passthrough, error envelope, and point budget" {
       return
     }
     let clock = @adapter.AsyncClock::new()
-    let limiter = @runtime.WindowLimiter::new(
+    let limiter = @ratelimit.WindowLimiter::new(
       clock,
-      @runtime.rate_limit_headers(
+      @ratelimit.rate_limit_headers(
         remaining="x-ratelimit-remaining",
         reset_unix_seconds="x-ratelimit-reset",
       ),
@@ -1141,7 +1029,7 @@ async test "live GitHub GraphQL passthrough, error envelope, and point budget" {
       #|query { repository(owner: "gaato", name: "mbt-sdk-does-not-exist-4f2a9") { id } }
     try gh.graphql(query=missing) catch {
       error => {
-        if error.status() is Some(status) {
+        if @runtime.status_of(error) is Some(status) {
           validation_failure(
             "GitHub",
             "graphql NOT_FOUND",

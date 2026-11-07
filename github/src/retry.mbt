@@ -9,12 +9,12 @@
 /// only for an idempotent request, because GitHub has no idempotency key and a
 /// resent POST can open a second issue or comment.
 pub(all) struct GitHubRetry {
-  policy : @runtime.RetryPolicy
+  policy : @client.RetryPolicy
 }
 
 ///|
 /// Exposes the retry decision as a method.
-pub extend GitHubRetry with @runtime.RetryDecider::{decide}
+pub extend GitHubRetry with @client.RetryDecider::{decide}
 
 ///|
 /// Decides a retry, recognising three GitHub conditions before handing the
@@ -37,7 +37,7 @@ pub extend GitHubRetry with @runtime.RetryDecider::{decide}
 ///   rather than guess, and the policy's retry count and the remaining time
 ///   bound it as above.
 /// - **Transient GraphQL failure** ("Something went wrong while executing
-///   your query", raised as `Decode` by `graphql` for a document that is not
+///   your query", raised as `GraphqlFailure` by `graphql` for a document that is not
 ///   a mutation, in the `"graphql"` bucket): waits the policy's backoff, within
 ///   its retry count and the remaining time. A mutation's (`"graphql:mutation"`)
 ///   is never retried, since it may have been applied.
@@ -48,21 +48,20 @@ pub extend GitHubRetry with @runtime.RetryDecider::{decide}
 /// ```mbt check
 /// test {
 ///   let retry : @github.GitHubRetry = {
-///     policy: @runtime.RetryPolicy::conservative().with_max_retries(3),
+///     policy: @client.RetryPolicy::conservative().with_max_retries(3),
 ///   }
-///   let post = @http.Request::post("/repos/o/r/issues")
-///   let limited = @runtime.Status(
-///     status=403,
-///     headers=@http.Headers::new(),
+///   let post = @model.Request::post("/repos/o/r/issues")
+///   let limited = @client.UnexpectedStatus(
+///     { status: 403, headers: @model.Headers::empty(), },
 ///     body=b"{\"message\":\"You have exceeded a secondary rate limit.\"}",
 ///   )
 ///   let waits = [0, 1, 2, 3].map(attempt => {
-///     retry.decide(limited, @runtime.RetryContext::new(post, attempt~))
+///     retry.decide(limited, @client.RetryContext::new(post, attempt~))
 ///   })
 ///   assert_eq(waits, [Wait(60000), Wait(120000), Wait(240000), Stop(Exhausted)])
 /// }
 /// ```
-pub impl @runtime.RetryDecider for GitHubRetry with fn decide(
+pub impl @client.RetryDecider for GitHubRetry with fn decide(
   self,
   error,
   context,
@@ -79,8 +78,8 @@ pub impl @runtime.RetryDecider for GitHubRetry with fn decide(
 /// A failure GitHub's own rules decide, with the headers its wait is read
 /// from.
 priv enum GitHubCondition {
-  Secondary(@http.Headers)
-  Primary(@http.Headers)
+  Secondary(@model.Headers)
+  Primary(@model.Headers)
   TransientGraphql
 }
 
@@ -88,20 +87,22 @@ priv enum GitHubCondition {
 /// Recognises the conditions `GitHubRetry` decides itself. The secondary limit
 /// is checked first: a `403` that names it is not the hourly quota even when
 /// that quota is also spent.
-fn github_condition(
-  error : @runtime.SdkError,
-  bucket : String,
-) -> GitHubCondition? {
+fn github_condition(error : Error, bucket : String) -> GitHubCondition? {
   let (headers, body) = match error {
-    @runtime.Status(status=403 | 429, headers~, body~)
-    | @runtime.RateLimited(headers~, body~, ..) => (headers, body)
-    @runtime.Decode(body~, ..) =>
-      return if bucket == graphql_bucket &&
-        graphql_reply_has(body, GraphqlTransient) {
-        Some(TransientGraphql)
-      } else {
-        None
+    @client.UnexpectedStatus(head, body~) if head.status == 403 ||
+      head.status == 429 => (head.headers, body)
+    GraphqlFailure(head, body~, ..) => {
+      if is_secondary_rate_limit(error) {
+        return Some(Secondary(head.headers))
       }
+      if graphql_reply_has(body, GraphqlRateLimited) {
+        return Some(Primary(head.headers))
+      }
+      if bucket == graphql_bucket && graphql_reply_has(body, GraphqlTransient) {
+        return Some(TransientGraphql)
+      }
+      return None
+    }
     _ => return None
   }
   if is_secondary_rate_limit(error) {
@@ -120,8 +121,8 @@ fn github_condition(
 /// and a body that can be sent again.
 fn GitHubRetry::refusal(
   self : GitHubRetry,
-  context : @runtime.RetryContext,
-) -> @runtime.Decision? {
+  context : @client.RetryContext,
+) -> @client.Decision? {
   if context.attempt >= self.policy.rule.max_retries {
     Some(Stop(Exhausted))
   } else if !context.replayable {
@@ -136,8 +137,8 @@ fn GitHubRetry::refusal(
 /// time.
 fn within_budget(
   delay : Int32,
-  context : @runtime.RetryContext,
-) -> @runtime.Decision {
+  context : @client.RetryContext,
+) -> @client.Decision {
   if context.remaining_ms is Some(remaining) && delay.to_int64() >= remaining {
     Stop(Budget(delay))
   } else {
@@ -150,14 +151,14 @@ fn within_budget(
 /// per retry already made, saturating at the longest `Int` wait.
 fn GitHubRetry::secondary_decision(
   self : GitHubRetry,
-  headers : @http.Headers,
-  context : @runtime.RetryContext,
-) -> @runtime.Decision {
+  headers : @model.Headers,
+  context : @client.RetryContext,
+) -> @client.Decision {
   if self.refusal(context) is Some(decision) {
     return decision
   }
   let delay = match
-    @http.retry_after_ms(headers, now_unix_ms=context.now_unix_ms) {
+    @model.retry_after_ms(headers, now_unix_ms=context.now_unix_ms) {
     Some(ms) if ms > 0 => ms
     _ => {
       let mut ms = 60000L
@@ -176,9 +177,9 @@ fn GitHubRetry::secondary_decision(
 /// first retry.
 fn GitHubRetry::primary_decision(
   self : GitHubRetry,
-  headers : @http.Headers,
-  context : @runtime.RetryContext,
-) -> @runtime.Decision {
+  headers : @model.Headers,
+  context : @client.RetryContext,
+) -> @client.Decision {
   if self.refusal(context) is Some(decision) {
     return decision
   }
@@ -232,8 +233,8 @@ fn parse_unix_seconds(value : String) -> Int64? {
 /// made.
 fn GitHubRetry::transient_decision(
   self : GitHubRetry,
-  context : @runtime.RetryContext,
-) -> @runtime.Decision {
+  context : @client.RetryContext,
+) -> @client.Decision {
   if self.refusal(context) is Some(decision) {
     return decision
   }

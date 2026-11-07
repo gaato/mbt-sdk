@@ -1,4 +1,6 @@
 members = [
+  "../mttp/mttp",
+  "../mttp/mttp-net",
   "http",
   "http-async",
   "jsonrpc",

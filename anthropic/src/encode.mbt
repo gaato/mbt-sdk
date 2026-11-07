@@ -100,23 +100,29 @@ fn[T : ToJson + @json.FromJson] merge_extra(
   params : T,
   extra : Map[String, Json],
   what : String,
-) -> (T, Json) raise @runtime.SdkError {
+) -> (T, Json) raise @client.InvalidRequest {
   for key, _ in extra {
     if is_message_key(key) {
-      raise @runtime.Config("extra parameter collides with known key: " + key)
+      raise @client.InvalidRequest(
+        message="extra parameter collides with known key: " + key,
+      )
     }
   }
   let body = ToJson::to_json(params)
   guard body is Object(fields) else {
-    raise @runtime.Config("generated " + what + " must be an object")
+    raise @client.InvalidRequest(
+      message="generated " + what + " must be an object",
+    )
   }
   for key, value in extra {
     fields[key] = value
   }
   let validated : T = @json.from_json(body) catch {
     error =>
-      raise @runtime.Config(
-        what + " does not match the generated schema: " + error.to_string(),
+      raise @client.InvalidRequest(
+        message=what +
+          " does not match the generated schema: " +
+          error.to_string(),
       )
   }
   (validated, body)
@@ -127,14 +133,14 @@ fn[T : ToJson + @json.FromJson] merge_extra(
 fn message_body(
   request : MessageRequest,
   stream : Bool,
-) -> (CreateMessageParams, Json) raise @runtime.SdkError {
+) -> (CreateMessageParams, Json) raise @client.InvalidRequest {
   merge_extra(request.to_params(stream~), request.extra, "message request")
 }
 
 ///|
 fn count_tokens_body(
   request : MessageRequest,
-) -> (@gen.CountMessageTokensParams, Json) raise @runtime.SdkError {
+) -> (@gen.CountMessageTokensParams, Json) raise @client.InvalidRequest {
   merge_extra(
     request.to_count_tokens_params(),
     request.extra,

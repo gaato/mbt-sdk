@@ -22,11 +22,12 @@ fn parse_json_body(body : Bytes) -> Json raise {
 
 ///|
 fn[T : @json.FromJson] decode_response(
-  response : @http.Response,
-) -> T raise @runtime.SdkError {
-  @json.from_json(parse_json_body(response.body)) catch {
+  head : @model.ResponseHead,
+  body : Bytes,
+) -> T raise @client.ResponseError {
+  @json.from_json(parse_json_body(body)) catch {
     error =>
-      raise @runtime.Decode(message=error.to_string(), body=response.body)
+      raise @client.Deserialization(head, message=error.to_string(), body~)
   }
 }
 
@@ -38,8 +39,8 @@ pub fn messages_post_request(
   anthropic_version? : String,
   anthropic_user_profile_id? : String,
   anthropic_workspace_id? : String,
-) -> @http.Request {
-  let mut request = @http.Request::post("/v1/messages").json_body(Json(body))
+) -> @model.Request {
+  let mut request = @model.Request::post("/v1/messages").body_json(Json(body))
   match anthropic_version {
     Some(value) =>
       request = request.header("anthropic-version", parameter_value(value))
@@ -74,9 +75,10 @@ pub fn messages_post_decode_json(
 ///
 /// Decodes a successful messages_post response.
 pub fn messages_post_decode(
-  response : @http.Response,
-) -> Message raise @runtime.SdkError {
-  decode_response(response)
+  head : @model.ResponseHead,
+  body : Bytes,
+) -> Message raise @client.ResponseError {
+  decode_response(head, body)
 }
 
 ///|
@@ -91,31 +93,31 @@ pub fn models_list_request(
   anthropic_beta? : Array[String],
   x_api_key? : String,
   anthropic_workspace_id? : String,
-) -> @http.Request {
+) -> @model.Request {
   let mut url = "/v1/models"
   match before_id {
     Some(value) =>
-      url = @http.append_query(url, "before_id", parameter_value(value))
+      url = @model.append_query(url, "before_id", parameter_value(value))
     None => ()
   }
   match after_id {
     Some(value) =>
-      url = @http.append_query(url, "after_id", parameter_value(value))
+      url = @model.append_query(url, "after_id", parameter_value(value))
     None => ()
   }
   match limit {
     Some(value) =>
-      url = @http.append_query(url, "limit", parameter_value(value))
+      url = @model.append_query(url, "limit", parameter_value(value))
     None => ()
   }
   match lifecycle {
     Some(values) =>
       for value in values {
-        url = @http.append_query(url, "lifecycle[]", parameter_value(value))
+        url = @model.append_query(url, "lifecycle[]", parameter_value(value))
       }
     None => ()
   }
-  let mut request = @http.Request::get(url)
+  let mut request = @model.Request::get(url)
   match anthropic_version {
     Some(value) =>
       request = request.header("anthropic-version", parameter_value(value))
@@ -154,9 +156,10 @@ pub fn models_list_decode_json(
 ///
 /// Decodes a successful models_list response.
 pub fn models_list_decode(
-  response : @http.Response,
-) -> ListResponseModelInfo raise @runtime.SdkError {
-  decode_response(response)
+  head : @model.ResponseHead,
+  body : Bytes,
+) -> ListResponseModelInfo raise @client.ResponseError {
+  decode_response(head, body)
 }
 
 ///|
@@ -168,9 +171,9 @@ pub fn models_get_request(
   anthropic_beta? : Array[String],
   x_api_key? : String,
   anthropic_workspace_id? : String,
-) -> @http.Request {
-  let mut request = @http.Request::get(
-    "/v1/models/" + @http.percent_encode(parameter_value(model_id)),
+) -> @model.Request {
+  let mut request = @model.Request::get(
+    "/v1/models/" + @model.percent_encode(parameter_value(model_id)),
   )
   match anthropic_version {
     Some(value) =>
@@ -210,9 +213,10 @@ pub fn models_get_decode_json(
 ///
 /// Decodes a successful models_get response.
 pub fn models_get_decode(
-  response : @http.Response,
-) -> ModelInfo raise @runtime.SdkError {
-  decode_response(response)
+  head : @model.ResponseHead,
+  body : Bytes,
+) -> ModelInfo raise @client.ResponseError {
+  decode_response(head, body)
 }
 
 ///|
@@ -223,8 +227,8 @@ pub fn messages_count_tokens_post_request(
   anthropic_version? : String,
   anthropic_user_profile_id? : String,
   anthropic_workspace_id? : String,
-) -> @http.Request {
-  let mut request = @http.Request::post("/v1/messages/count_tokens").json_body(
+) -> @model.Request {
+  let mut request = @model.Request::post("/v1/messages/count_tokens").body_json(
     Json(body),
   )
   match anthropic_version {
@@ -261,7 +265,8 @@ pub fn messages_count_tokens_post_decode_json(
 ///
 /// Decodes a successful messages_count_tokens_post response.
 pub fn messages_count_tokens_post_decode(
-  response : @http.Response,
-) -> CountMessageTokensResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @model.ResponseHead,
+  body : Bytes,
+) -> CountMessageTokensResponse raise @client.ResponseError {
+  decode_response(head, body)
 }
