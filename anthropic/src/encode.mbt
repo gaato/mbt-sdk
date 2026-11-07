@@ -1,18 +1,45 @@
 ///|
-fn input_role(role : Role) -> @gen.InputMessageRole {
-  match role {
-    User => @gen.InputMessageRole::User
-    Assistant => @gen.InputMessageRole::Assistant
-  }
-}
-
-///|
-fn input_message(message : Message) -> @gen.InputMessage {
+/// Each role is its own generated message type. A system message accepts only
+/// text, so a non-text block in one is sent as it is, and the API rejects it.
+fn input_message(message : Message) -> @gen.InputMessageUnion {
   let content = match message.content {
     Text(text) => @gen.InputMessageContent::Text(text)
     Blocks(blocks) => @gen.InputMessageContent::InputContentBlockArray(blocks)
   }
-  @gen.InputMessage::new(role=input_role(message.role), content~)
+  match message.role {
+    User =>
+      @gen.InputMessageUnion::User(
+        @gen.UserInputMessage::new(role="user", content~),
+      )
+    Assistant =>
+      @gen.InputMessageUnion::Assistant(
+        @gen.AssistantInputMessage::new(role="assistant", content~),
+      )
+    System => {
+      let content = match message.content {
+        Text(text) => @gen.SystemInputMessageContent::Text(text)
+        Blocks(blocks) =>
+          @gen.SystemInputMessageContent::ValueArray(
+            blocks.map(block => {
+              match block {
+                Text(text) =>
+                  @gen.SystemInputMessageContentValueArrayItem::Text(text)
+                other => {
+                  let json = other.to_json()
+                  @gen.SystemInputMessageContentValueArrayItem::Unknown(
+                    block_type(json),
+                    json,
+                  )
+                }
+              }
+            }),
+          )
+      }
+      @gen.InputMessageUnion::System(
+        @gen.SystemInputMessage::new(role="system", content~),
+      )
+    }
+  }
 }
 
 ///|
@@ -37,7 +64,6 @@ pub fn MessageRequest::to_params(
     messages=self.messages.map(input_message),
     max_tokens=self.max_tokens,
     system?=self.system.map(text => @gen.CreateMessageParamsSystem::Text(text)),
-    temperature?=self.temperature,
     stop_sequences?=self.stop_sequences,
     tools?=self.tools.map(tools => {
       tools.map(tool => {
@@ -83,7 +109,6 @@ fn is_message_key(key : String) -> Bool {
     | "max_tokens"
     | "messages"
     | "system"
-    | "temperature"
     | "stop_sequences"
     | "tools"
     | "tool_choice"

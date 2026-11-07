@@ -10,7 +10,7 @@ test "constructors snapshot mutable inputs and Anthropic Debug redacts the key" 
     { role: @anthropic.User, content: @anthropic.Blocks(blocks), },
   ]
   let stops = ["END"]
-  let extra : Map[String, Json] = { "top_p": 0.5 }
+  let extra : Map[String, Json] = { "service_tier": "auto" }
   let request = @anthropic.MessageRequest::new(
     model="claude-opus-5",
     max_tokens=64,
@@ -32,7 +32,7 @@ test "constructors snapshot mutable inputs and Anthropic Debug redacts the key" 
   }
   assert_eq(saved.length(), 1)
   assert_eq(request.stop_sequences, Some(["END"]))
-  assert_eq(request.extra, { "top_p": 0.5 })
+  assert_eq(request.extra, { "service_tier": "auto" })
 
   let key = "anthropic-key-that-must-not-leak"
   let client = @anthropic.Anthropic::new(

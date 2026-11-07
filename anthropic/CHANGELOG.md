@@ -15,10 +15,18 @@ are optional unless the field is required, and keep a wildcard arm.
 
 ## [Unreleased]
 
+## [0.13.0] - 2026-11-07
+
 ### Changed
 
 - **Builds on `gaato/http` 0.5.0**, whose cookie jar, Retry-After and Link parsing follow RFC 6265bis-22, RFC 9110 and RFC 8288 more closely; see its CHANGELOG.
 - **The README has sections and compile-checked examples.** The usage example now sends a message. The migration notes from 0.1.0 moved to docs/anthropic-0.2.0.md in the repository and the live-test procedure to docs/live-tests.md. Each re-exported generated type has its own doc comment.
+- **Regenerated from the upstream spec fetched 2026-11-07** (sha256 `d5be78f1f9a8`), which follows API version 2026-10-21. The public API changed; see the `pkg.generated.mbti` diff. `@gen.InputMessage` is now `@gen.InputMessageUnion`, with one type per role (`UserInputMessage`, `AssistantInputMessage`, `SystemInputMessage`), and `CreateMessageParams` no longer has `temperature`, `top_p` or `top_k`.
+- **`MessageRequest` no longer has `temperature`.** API version 2026-10-21 removed `temperature`, `top_p` and `top_k`, and returns 400 for a request that sends any of them; Claude 4.7 and later models already accepted only the defaults. Migration: drop `temperature=`. A request that relies on a non-default value on an older model can still send it with `extra={ "temperature": ... }` and `version="2023-06-01"`, which is what `Anthropic::new` sends unless told otherwise, but the generated `CreateMessageParams` no longer models it.
+
+### Added
+
+- **`Role::System` and `Message::system(text)`** send a mid-conversation system message (`role: "system"` in `messages`), which must directly follow a user turn and which only some models accept; see https://platform.claude.com/docs/en/build-with-claude/mid-conversation-system-messages. A system message takes only text, so a non-text block in one is sent as it is and the API rejects it. `Role` is `#non_exhaustive`, so a `match` on it already has a wildcard arm.
 
 ## [0.12.0] - 2026-10-20
 
