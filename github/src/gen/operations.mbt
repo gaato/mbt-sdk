@@ -220,7 +220,7 @@ pub fn security_advisories_get_global_advisory_decode(
 pub fn agent_automations_list_automations_request(
   page? : Int32,
   per_page? : Int32,
-  owner_type? : AgentAutomationsListAutomationsOwnerType,
+  type_? : AgentAutomationsListAutomationsType,
 ) -> @http.Request {
   let mut url = "/agents/automations"
   match page {
@@ -232,9 +232,8 @@ pub fn agent_automations_list_automations_request(
       url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
-  match owner_type {
-    Some(value) =>
-      url = @http.append_query(url, "owner_type", parameter_value(value))
+  match type_ {
+    Some(value) => url = @http.append_query(url, "type", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -260,157 +259,13 @@ pub fn agent_automations_list_automations_decode(
 
 ///|
 ///
-/// List available automation tools
-pub fn agent_automations_list_available_automation_tools_request() -> @http.Request {
-  @http.Request::get("/agents/automations/available-tools")
-}
-
-///|
-///
-/// Decodes a parsed successful agent-automations/list-available-automation-tools response.
-pub fn agent_automations_list_available_automation_tools_decode_json(
-  value : Json,
-) -> Array[AgentAutomationsListAvailableAutomationToolsResponseItem] raise @json.JsonDecodeError {
-  @json.from_json(value)
-}
-
-///|
-///
-/// Decodes a successful agent-automations/list-available-automation-tools response.
-pub fn agent_automations_list_available_automation_tools_decode(
-  response : @http.Response,
-) -> Array[AgentAutomationsListAvailableAutomationToolsResponseItem] raise @runtime.SdkError {
-  decode_response(response)
-}
-
-///|
-///
-/// List available automation triggers
-pub fn agent_automations_list_available_automation_triggers_request() -> @http.Request {
-  @http.Request::get("/agents/automations/available-triggers")
-}
-
-///|
-///
-/// Decodes a parsed successful agent-automations/list-available-automation-triggers response.
-pub fn agent_automations_list_available_automation_triggers_decode_json(
-  value : Json,
-) -> Array[AgentAutomationsListAvailableAutomationTriggersResponseItem] raise @json.JsonDecodeError {
-  @json.from_json(value)
-}
-
-///|
-///
-/// Decodes a successful agent-automations/list-available-automation-triggers response.
-pub fn agent_automations_list_available_automation_triggers_decode(
-  response : @http.Response,
-) -> Array[AgentAutomationsListAvailableAutomationTriggersResponseItem] raise @runtime.SdkError {
-  decode_response(response)
-}
-
-///|
-///
-/// Get an automation by ID
-pub fn agent_automations_get_automation_request(
-  automation_id : String,
-) -> @http.Request {
-  @http.Request::get(
-    "/agents/automations/" +
-    @http.percent_encode(parameter_value(automation_id)),
-  )
-}
-
-///|
-///
-/// Decodes a parsed successful agent-automations/get-automation response.
-pub fn agent_automations_get_automation_decode_json(
-  value : Json,
-) -> AgentAutomationsGetAutomationResponse raise @json.JsonDecodeError {
-  @json.from_json(value)
-}
-
-///|
-///
-/// Decodes a successful agent-automations/get-automation response.
-pub fn agent_automations_get_automation_decode(
-  response : @http.Response,
-) -> AgentAutomationsGetAutomationResponse raise @runtime.SdkError {
-  decode_response(response)
-}
-
-///|
-///
-/// List tasks for an automation
-pub fn agent_automations_list_automation_tasks_request(
-  automation_id : String,
-  per_page? : Int32,
-  page? : Int32,
-  sort? : AgentAutomationsListAutomationTasksSort,
-  direction? : AgentAutomationsListAutomationTasksDirection,
-  state? : String,
-  is_archived? : Bool,
-) -> @http.Request {
-  let mut url = "/agents/automations/" +
-    @http.percent_encode(parameter_value(automation_id)) +
-    "/tasks"
-  match per_page {
-    Some(value) =>
-      url = @http.append_query(url, "per_page", parameter_value(value))
-    None => ()
-  }
-  match page {
-    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
-    None => ()
-  }
-  match sort {
-    Some(value) => url = @http.append_query(url, "sort", parameter_value(value))
-    None => ()
-  }
-  match direction {
-    Some(value) =>
-      url = @http.append_query(url, "direction", parameter_value(value))
-    None => ()
-  }
-  match state {
-    Some(value) =>
-      url = @http.append_query(url, "state", parameter_value(value))
-    None => ()
-  }
-  match is_archived {
-    Some(value) =>
-      url = @http.append_query(url, "is_archived", parameter_value(value))
-    None => ()
-  }
-  @http.Request::get(url)
-}
-
-///|
-///
-/// Decodes a parsed successful agent-automations/list-automation-tasks response.
-pub fn agent_automations_list_automation_tasks_decode_json(
-  value : Json,
-) -> AgentAutomationsListAutomationTasksResponse raise @json.JsonDecodeError {
-  @json.from_json(value)
-}
-
-///|
-///
-/// Decodes a successful agent-automations/list-automation-tasks response.
-pub fn agent_automations_list_automation_tasks_decode(
-  response : @http.Response,
-) -> AgentAutomationsListAutomationTasksResponse raise @runtime.SdkError {
-  decode_response(response)
-}
-
-///|
-///
 /// List automations for a repository
 pub fn agent_automations_list_repo_automations_request(
   owner : String,
   repo : String,
   page? : Int32,
   per_page? : Int32,
-  owner_type? : AgentAutomationsListRepoAutomationsOwnerType,
+  type_? : AgentAutomationsListRepoAutomationsType,
 ) -> @http.Request {
   let mut url = "/agents/repos/" +
     @http.percent_encode(parameter_value(owner)) +
@@ -426,9 +281,8 @@ pub fn agent_automations_list_repo_automations_request(
       url = @http.append_query(url, "per_page", parameter_value(value))
     None => ()
   }
-  match owner_type {
-    Some(value) =>
-      url = @http.append_query(url, "owner_type", parameter_value(value))
+  match type_ {
+    Some(value) => url = @http.append_query(url, "type", parameter_value(value))
     None => ()
   }
   @http.Request::get(url)
@@ -489,7 +343,75 @@ pub fn agent_automations_create_repo_automation_decode(
 
 ///|
 ///
-/// Get an automation for a repository
+/// List available automation tools for a repository
+pub fn agent_automations_list_available_repo_automation_tools_request(
+  owner : String,
+  repo : String,
+) -> @http.Request {
+  @http.Request::get(
+    "/agents/repos/" +
+    @http.percent_encode(parameter_value(owner)) +
+    "/" +
+    @http.percent_encode(parameter_value(repo)) +
+    "/automations/available-tools",
+  )
+}
+
+///|
+///
+/// Decodes a parsed successful agent-automations/list-available-repo-automation-tools response.
+pub fn agent_automations_list_available_repo_automation_tools_decode_json(
+  value : Json,
+) -> AgentAutomationsListAvailableRepoAutomationToolsResponse raise @json.JsonDecodeError {
+  @json.from_json(value)
+}
+
+///|
+///
+/// Decodes a successful agent-automations/list-available-repo-automation-tools response.
+pub fn agent_automations_list_available_repo_automation_tools_decode(
+  response : @http.Response,
+) -> AgentAutomationsListAvailableRepoAutomationToolsResponse raise @runtime.SdkError {
+  decode_response(response)
+}
+
+///|
+///
+/// List available automation triggers for a repository
+pub fn agent_automations_list_available_repo_automation_triggers_request(
+  owner : String,
+  repo : String,
+) -> @http.Request {
+  @http.Request::get(
+    "/agents/repos/" +
+    @http.percent_encode(parameter_value(owner)) +
+    "/" +
+    @http.percent_encode(parameter_value(repo)) +
+    "/automations/available-triggers",
+  )
+}
+
+///|
+///
+/// Decodes a parsed successful agent-automations/list-available-repo-automation-triggers response.
+pub fn agent_automations_list_available_repo_automation_triggers_decode_json(
+  value : Json,
+) -> Array[AgentAutomationsListAvailableRepoAutomationTriggersResponseItem] raise @json.JsonDecodeError {
+  @json.from_json(value)
+}
+
+///|
+///
+/// Decodes a successful agent-automations/list-available-repo-automation-triggers response.
+pub fn agent_automations_list_available_repo_automation_triggers_decode(
+  response : @http.Response,
+) -> Array[AgentAutomationsListAvailableRepoAutomationTriggersResponseItem] raise @runtime.SdkError {
+  decode_response(response)
+}
+
+///|
+///
+/// Get an automation
 pub fn agent_automations_get_repo_automation_request(
   owner : String,
   repo : String,
@@ -525,7 +447,7 @@ pub fn agent_automations_get_repo_automation_decode(
 
 ///|
 ///
-/// Edit an automation for a repository
+/// Update an automation
 pub fn agent_automations_edit_repo_automation_request(
   owner : String,
   repo : String,
@@ -562,7 +484,7 @@ pub fn agent_automations_edit_repo_automation_decode(
 
 ///|
 ///
-/// Delete an automation for a repository The caller handles the response as @http.Response.
+/// Delete an automation The caller handles the response as @http.Response.
 pub fn agent_automations_delete_repo_automation_request(
   owner : String,
   repo : String,
@@ -575,6 +497,295 @@ pub fn agent_automations_delete_repo_automation_request(
     @http.percent_encode(parameter_value(repo)) +
     "/automations/" +
     @http.percent_encode(parameter_value(automation_id)),
+  )
+}
+
+///|
+///
+/// List revisions for an automation
+pub fn agent_automations_list_automation_revisions_request(
+  owner : String,
+  repo : String,
+  automation_id : String,
+  cursor? : String,
+  per_page? : Int32,
+) -> @http.Request {
+  let mut url = "/agents/repos/" +
+    @http.percent_encode(parameter_value(owner)) +
+    "/" +
+    @http.percent_encode(parameter_value(repo)) +
+    "/automations/" +
+    @http.percent_encode(parameter_value(automation_id)) +
+    "/revisions"
+  match cursor {
+    Some(value) =>
+      url = @http.append_query(url, "cursor", parameter_value(value))
+    None => ()
+  }
+  match per_page {
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
+    None => ()
+  }
+  @http.Request::get(url)
+}
+
+///|
+///
+/// Decodes a parsed successful agent-automations/list-automation-revisions response.
+pub fn agent_automations_list_automation_revisions_decode_json(
+  value : Json,
+) -> AgentAutomationsListAutomationRevisionsResponse raise @json.JsonDecodeError {
+  @json.from_json(value)
+}
+
+///|
+///
+/// Decodes a successful agent-automations/list-automation-revisions response.
+pub fn agent_automations_list_automation_revisions_decode(
+  response : @http.Response,
+) -> AgentAutomationsListAutomationRevisionsResponse raise @runtime.SdkError {
+  decode_response(response)
+}
+
+///|
+///
+/// Get an automation revision
+pub fn agent_automations_get_automation_revision_request(
+  owner : String,
+  repo : String,
+  automation_id : String,
+  revision_id : String,
+) -> @http.Request {
+  @http.Request::get(
+    "/agents/repos/" +
+    @http.percent_encode(parameter_value(owner)) +
+    "/" +
+    @http.percent_encode(parameter_value(repo)) +
+    "/automations/" +
+    @http.percent_encode(parameter_value(automation_id)) +
+    "/revisions/" +
+    @http.percent_encode(parameter_value(revision_id)),
+  )
+}
+
+///|
+///
+/// Decodes a parsed successful agent-automations/get-automation-revision response.
+pub fn agent_automations_get_automation_revision_decode_json(
+  value : Json,
+) -> AgentAutomationsGetAutomationRevisionResponse raise @json.JsonDecodeError {
+  @json.from_json(value)
+}
+
+///|
+///
+/// Decodes a successful agent-automations/get-automation-revision response.
+pub fn agent_automations_get_automation_revision_decode(
+  response : @http.Response,
+) -> AgentAutomationsGetAutomationRevisionResponse raise @runtime.SdkError {
+  decode_response(response)
+}
+
+///|
+///
+/// List tasks for an automation in a repository
+pub fn agent_automations_list_repo_automation_tasks_request(
+  owner : String,
+  repo : String,
+  automation_id : String,
+  per_page? : Int32,
+  page? : Int32,
+  sort? : AgentAutomationsListRepoAutomationTasksSort,
+  direction? : AgentAutomationsListRepoAutomationTasksDirection,
+  state? : String,
+  is_archived? : Bool,
+) -> @http.Request {
+  let mut url = "/agents/repos/" +
+    @http.percent_encode(parameter_value(owner)) +
+    "/" +
+    @http.percent_encode(parameter_value(repo)) +
+    "/automations/" +
+    @http.percent_encode(parameter_value(automation_id)) +
+    "/tasks"
+  match per_page {
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
+    None => ()
+  }
+  match page {
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
+    None => ()
+  }
+  match sort {
+    Some(value) => url = @http.append_query(url, "sort", parameter_value(value))
+    None => ()
+  }
+  match direction {
+    Some(value) =>
+      url = @http.append_query(url, "direction", parameter_value(value))
+    None => ()
+  }
+  match state {
+    Some(value) =>
+      url = @http.append_query(url, "state", parameter_value(value))
+    None => ()
+  }
+  match is_archived {
+    Some(value) =>
+      url = @http.append_query(url, "is_archived", parameter_value(value))
+    None => ()
+  }
+  @http.Request::get(url)
+}
+
+///|
+///
+/// Decodes a parsed successful agent-automations/list-repo-automation-tasks response.
+pub fn agent_automations_list_repo_automation_tasks_decode_json(
+  value : Json,
+) -> AgentAutomationsListRepoAutomationTasksResponse raise @json.JsonDecodeError {
+  @json.from_json(value)
+}
+
+///|
+///
+/// Decodes a successful agent-automations/list-repo-automation-tasks response.
+pub fn agent_automations_list_repo_automation_tasks_decode(
+  response : @http.Response,
+) -> AgentAutomationsListRepoAutomationTasksResponse raise @runtime.SdkError {
+  decode_response(response)
+}
+
+///|
+///
+/// Run an automation
+pub fn agent_automations_create_repo_automation_task_request(
+  owner : String,
+  repo : String,
+  automation_id : String,
+  body : AgentAutomationsCreateRepoAutomationTaskRequest,
+) -> @http.Request {
+  @http.Request::post(
+    "/agents/repos/" +
+    @http.percent_encode(parameter_value(owner)) +
+    "/" +
+    @http.percent_encode(parameter_value(repo)) +
+    "/automations/" +
+    @http.percent_encode(parameter_value(automation_id)) +
+    "/tasks",
+  ).json_body(Json(body))
+}
+
+///|
+///
+/// Decodes a parsed successful agent-automations/create-repo-automation-task response.
+pub fn agent_automations_create_repo_automation_task_decode_json(
+  value : Json,
+) -> AgentAutomationsCreateRepoAutomationTaskResponse raise @json.JsonDecodeError {
+  @json.from_json(value)
+}
+
+///|
+///
+/// Decodes a successful agent-automations/create-repo-automation-task response.
+pub fn agent_automations_create_repo_automation_task_decode(
+  response : @http.Response,
+) -> AgentAutomationsCreateRepoAutomationTaskResponse raise @runtime.SdkError {
+  decode_response(response)
+}
+
+///|
+///
+/// Get Agent Merge configuration for a pull request
+pub fn agent_merge_get_agent_merge_enrollment_request(
+  owner : String,
+  repo : String,
+  pull_number : Int64,
+) -> @http.Request {
+  @http.Request::get(
+    "/agents/repos/" +
+    @http.percent_encode(parameter_value(owner)) +
+    "/" +
+    @http.percent_encode(parameter_value(repo)) +
+    "/pulls/" +
+    @http.percent_encode(parameter_value(pull_number)) +
+    "/agent-merge",
+  )
+}
+
+///|
+///
+/// Decodes a parsed successful agent-merge/get-agent-merge-enrollment response.
+pub fn agent_merge_get_agent_merge_enrollment_decode_json(
+  value : Json,
+) -> AgentMergeGetAgentMergeEnrollmentResponse raise @json.JsonDecodeError {
+  @json.from_json(value)
+}
+
+///|
+///
+/// Decodes a successful agent-merge/get-agent-merge-enrollment response.
+pub fn agent_merge_get_agent_merge_enrollment_decode(
+  response : @http.Response,
+) -> AgentMergeGetAgentMergeEnrollmentResponse raise @runtime.SdkError {
+  decode_response(response)
+}
+
+///|
+///
+/// Update Agent Merge configuration for a pull request
+pub fn agent_merge_put_agent_merge_enrollment_request(
+  owner : String,
+  repo : String,
+  pull_number : Int64,
+  body : AgentMergePutAgentMergeEnrollmentRequest,
+) -> @http.Request {
+  @http.Request::put(
+    "/agents/repos/" +
+    @http.percent_encode(parameter_value(owner)) +
+    "/" +
+    @http.percent_encode(parameter_value(repo)) +
+    "/pulls/" +
+    @http.percent_encode(parameter_value(pull_number)) +
+    "/agent-merge",
+  ).json_body(Json(body))
+}
+
+///|
+///
+/// Decodes a parsed successful agent-merge/put-agent-merge-enrollment response.
+pub fn agent_merge_put_agent_merge_enrollment_decode_json(
+  value : Json,
+) -> AgentMergePutAgentMergeEnrollmentResponse raise @json.JsonDecodeError {
+  @json.from_json(value)
+}
+
+///|
+///
+/// Decodes a successful agent-merge/put-agent-merge-enrollment response.
+pub fn agent_merge_put_agent_merge_enrollment_decode(
+  response : @http.Response,
+) -> AgentMergePutAgentMergeEnrollmentResponse raise @runtime.SdkError {
+  decode_response(response)
+}
+
+///|
+///
+/// Disable Agent Merge for a pull request The caller handles the response as @http.Response.
+pub fn agent_merge_delete_agent_merge_enrollment_request(
+  owner : String,
+  repo : String,
+  pull_number : Int64,
+) -> @http.Request {
+  @http.Request::delete(
+    "/agents/repos/" +
+    @http.percent_encode(parameter_value(owner)) +
+    "/" +
+    @http.percent_encode(parameter_value(repo)) +
+    "/pulls/" +
+    @http.percent_encode(parameter_value(pull_number)) +
+    "/agent-merge",
   )
 }
 
@@ -2164,6 +2375,51 @@ pub fn copilot_copilot_users_usage_metrics_decode(
 
 ///|
 ///
+/// Get the Copilot code review policy for an enterprise
+pub fn copilot_get_enterprise_code_review_policy_request(
+  enterprise : String,
+) -> @http.Request {
+  @http.Request::get(
+    "/enterprises/" +
+    @http.percent_encode(parameter_value(enterprise)) +
+    "/copilot/policies/code-review",
+  )
+}
+
+///|
+///
+/// Decodes a parsed successful copilot/get-enterprise-code-review-policy response.
+pub fn copilot_get_enterprise_code_review_policy_decode_json(
+  value : Json,
+) -> EnterpriseCopilotCodeReviewPolicy raise @json.JsonDecodeError {
+  @json.from_json(value)
+}
+
+///|
+///
+/// Decodes a successful copilot/get-enterprise-code-review-policy response.
+pub fn copilot_get_enterprise_code_review_policy_decode(
+  response : @http.Response,
+) -> EnterpriseCopilotCodeReviewPolicy raise @runtime.SdkError {
+  decode_response(response)
+}
+
+///|
+///
+/// Set the Copilot code review policy for an enterprise The caller handles the response as @http.Response.
+pub fn copilot_set_enterprise_code_review_policy_request(
+  enterprise : String,
+  body : CopilotSetEnterpriseCodeReviewPolicyRequest,
+) -> @http.Request {
+  @http.Request::put(
+    "/enterprises/" +
+    @http.percent_encode(parameter_value(enterprise)) +
+    "/copilot/policies/code-review",
+  ).json_body(Json(body))
+}
+
+///|
+///
 /// Set the coding agent policy for an enterprise The caller handles the response as @http.Response.
 pub fn copilot_set_enterprise_coding_agent_policy_request(
   enterprise : String,
@@ -3589,6 +3845,7 @@ pub fn activity_list_public_events_for_repo_network_decode(
 /// List notifications for the authenticated user
 pub fn activity_list_notifications_for_authenticated_user_request(
   all? : Bool,
+  is_done? : Bool,
   participating? : Bool,
   since? : String,
   before? : String,
@@ -3598,6 +3855,11 @@ pub fn activity_list_notifications_for_authenticated_user_request(
   let mut url = "/notifications"
   match all {
     Some(value) => url = @http.append_query(url, "all", parameter_value(value))
+    None => ()
+  }
+  match is_done {
+    Some(value) =>
+      url = @http.append_query(url, "is_done", parameter_value(value))
     None => ()
   }
   match participating {
@@ -9476,6 +9738,132 @@ pub fn copilot_cancel_copilot_seat_assignment_for_users_decode(
 
 ///|
 ///
+/// Get the Copilot code review runner configuration for an organization
+pub fn copilot_get_organization_code_review_runner_request(
+  org : String,
+) -> @http.Request {
+  @http.Request::get(
+    "/orgs/" +
+    @http.percent_encode(parameter_value(org)) +
+    "/copilot/code-review/runner",
+  )
+}
+
+///|
+///
+/// Decodes a parsed successful copilot/get-organization-code-review-runner response.
+pub fn copilot_get_organization_code_review_runner_decode_json(
+  value : Json,
+) -> OrganizationCopilotCodeReviewRunner raise @json.JsonDecodeError {
+  @json.from_json(value)
+}
+
+///|
+///
+/// Decodes a successful copilot/get-organization-code-review-runner response.
+pub fn copilot_get_organization_code_review_runner_decode(
+  response : @http.Response,
+) -> OrganizationCopilotCodeReviewRunner raise @runtime.SdkError {
+  decode_response(response)
+}
+
+///|
+///
+/// Set the Copilot code review runner configuration for an organization
+pub fn copilot_set_organization_code_review_runner_request(
+  org : String,
+  body : CopilotSetOrganizationCodeReviewRunnerRequest,
+) -> @http.Request {
+  @http.Request::put(
+    "/orgs/" +
+    @http.percent_encode(parameter_value(org)) +
+    "/copilot/code-review/runner",
+  ).json_body(Json(body))
+}
+
+///|
+///
+/// Decodes a parsed successful copilot/set-organization-code-review-runner response.
+pub fn copilot_set_organization_code_review_runner_decode_json(
+  value : Json,
+) -> OrganizationCopilotCodeReviewRunner raise @json.JsonDecodeError {
+  @json.from_json(value)
+}
+
+///|
+///
+/// Decodes a successful copilot/set-organization-code-review-runner response.
+pub fn copilot_set_organization_code_review_runner_decode(
+  response : @http.Response,
+) -> OrganizationCopilotCodeReviewRunner raise @runtime.SdkError {
+  decode_response(response)
+}
+
+///|
+///
+/// Get Copilot code review settings for an organization
+pub fn copilot_get_organization_code_review_settings_request(
+  org : String,
+) -> @http.Request {
+  @http.Request::get(
+    "/orgs/" +
+    @http.percent_encode(parameter_value(org)) +
+    "/copilot/code-review/settings",
+  )
+}
+
+///|
+///
+/// Decodes a parsed successful copilot/get-organization-code-review-settings response.
+pub fn copilot_get_organization_code_review_settings_decode_json(
+  value : Json,
+) -> OrganizationCopilotCodeReviewSettings raise @json.JsonDecodeError {
+  @json.from_json(value)
+}
+
+///|
+///
+/// Decodes a successful copilot/get-organization-code-review-settings response.
+pub fn copilot_get_organization_code_review_settings_decode(
+  response : @http.Response,
+) -> OrganizationCopilotCodeReviewSettings raise @runtime.SdkError {
+  decode_response(response)
+}
+
+///|
+///
+/// Update Copilot code review settings for an organization
+pub fn copilot_update_organization_code_review_settings_request(
+  org : String,
+  body : CopilotUpdateOrganizationCodeReviewSettingsRequest,
+) -> @http.Request {
+  @http.Request::patch(
+    "/orgs/" +
+    @http.percent_encode(parameter_value(org)) +
+    "/copilot/code-review/settings",
+  ).json_body(Json(body))
+}
+
+///|
+///
+/// Decodes a parsed successful copilot/update-organization-code-review-settings response.
+pub fn copilot_update_organization_code_review_settings_decode_json(
+  value : Json,
+) -> OrganizationCopilotCodeReviewSettings raise @json.JsonDecodeError {
+  @json.from_json(value)
+}
+
+///|
+///
+/// Decodes a successful copilot/update-organization-code-review-settings response.
+pub fn copilot_update_organization_code_review_settings_decode(
+  response : @http.Response,
+) -> OrganizationCopilotCodeReviewSettings raise @runtime.SdkError {
+  decode_response(response)
+}
+
+///|
+///
 /// Get Copilot cloud agent permissions for an organization
 pub fn copilot_get_copilot_coding_agent_permissions_organization_request(
   org : String,
@@ -9855,6 +10243,51 @@ pub fn copilot_copilot_organization_users_usage_metrics_decode(
   response : @http.Response,
 ) -> CopilotUsageMetrics28DayReport raise @runtime.SdkError {
   decode_response(response)
+}
+
+///|
+///
+/// Get the Copilot code review policy for an organization
+pub fn copilot_get_organization_code_review_policy_request(
+  org : String,
+) -> @http.Request {
+  @http.Request::get(
+    "/orgs/" +
+    @http.percent_encode(parameter_value(org)) +
+    "/copilot/policies/code-review",
+  )
+}
+
+///|
+///
+/// Decodes a parsed successful copilot/get-organization-code-review-policy response.
+pub fn copilot_get_organization_code_review_policy_decode_json(
+  value : Json,
+) -> OrganizationCopilotCodeReviewPolicy raise @json.JsonDecodeError {
+  @json.from_json(value)
+}
+
+///|
+///
+/// Decodes a successful copilot/get-organization-code-review-policy response.
+pub fn copilot_get_organization_code_review_policy_decode(
+  response : @http.Response,
+) -> OrganizationCopilotCodeReviewPolicy raise @runtime.SdkError {
+  decode_response(response)
+}
+
+///|
+///
+/// Set the Copilot code review policy for an organization The caller handles the response as @http.Response.
+pub fn copilot_set_organization_code_review_policy_request(
+  org : String,
+  body : CopilotSetOrganizationCodeReviewPolicyRequest,
+) -> @http.Request {
+  @http.Request::put(
+    "/orgs/" +
+    @http.percent_encode(parameter_value(org)) +
+    "/copilot/policies/code-review",
+  ).json_body(Json(body))
 }
 
 ///|
@@ -15865,6 +16298,91 @@ pub fn teams_delete_in_org_request(
     @http.percent_encode(parameter_value(org)) +
     "/teams/" +
     @http.percent_encode(parameter_value(team_slug)),
+  )
+}
+
+///|
+///
+/// Get Copilot customizations for a team
+pub fn copilot_get_copilot_team_customizations_request(
+  org : String,
+  team_slug : String,
+) -> @http.Request {
+  @http.Request::get(
+    "/orgs/" +
+    @http.percent_encode(parameter_value(org)) +
+    "/teams/" +
+    @http.percent_encode(parameter_value(team_slug)) +
+    "/copilot/customizations",
+  )
+}
+
+///|
+///
+/// Decodes a parsed successful copilot/get-copilot-team-customizations response.
+pub fn copilot_get_copilot_team_customizations_decode_json(
+  value : Json,
+) -> Json raise @json.JsonDecodeError {
+  @json.from_json(value)
+}
+
+///|
+///
+/// Decodes a successful copilot/get-copilot-team-customizations response.
+pub fn copilot_get_copilot_team_customizations_decode(
+  response : @http.Response,
+) -> Json raise @runtime.SdkError {
+  decode_response(response)
+}
+
+///|
+///
+/// Set Copilot customizations for a team
+pub fn copilot_set_copilot_team_customizations_request(
+  org : String,
+  team_slug : String,
+  body : Json,
+) -> @http.Request {
+  @http.Request::put(
+    "/orgs/" +
+    @http.percent_encode(parameter_value(org)) +
+    "/teams/" +
+    @http.percent_encode(parameter_value(team_slug)) +
+    "/copilot/customizations",
+  ).json_body(body)
+}
+
+///|
+///
+/// Decodes a parsed successful copilot/set-copilot-team-customizations response.
+pub fn copilot_set_copilot_team_customizations_decode_json(
+  value : Json,
+) -> Json raise @json.JsonDecodeError {
+  @json.from_json(value)
+}
+
+///|
+///
+/// Decodes a successful copilot/set-copilot-team-customizations response.
+pub fn copilot_set_copilot_team_customizations_decode(
+  response : @http.Response,
+) -> Json raise @runtime.SdkError {
+  decode_response(response)
+}
+
+///|
+///
+/// Delete Copilot customizations for a team The caller handles the response as @http.Response.
+pub fn copilot_delete_copilot_team_customizations_request(
+  org : String,
+  team_slug : String,
+) -> @http.Request {
+  @http.Request::delete(
+    "/orgs/" +
+    @http.percent_encode(parameter_value(org)) +
+    "/teams/" +
+    @http.percent_encode(parameter_value(team_slug)) +
+    "/copilot/customizations",
   )
 }
 
@@ -24711,6 +25229,75 @@ pub fn copilot_get_copilot_cloud_agent_configuration_decode(
 
 ///|
 ///
+/// Get Copilot code review settings for a repository
+pub fn copilot_get_repository_code_review_settings_request(
+  owner : String,
+  repo : String,
+) -> @http.Request {
+  @http.Request::get(
+    "/repos/" +
+    @http.percent_encode(parameter_value(owner)) +
+    "/" +
+    @http.percent_encode(parameter_value(repo)) +
+    "/copilot/code-review/settings",
+  )
+}
+
+///|
+///
+/// Decodes a parsed successful copilot/get-repository-code-review-settings response.
+pub fn copilot_get_repository_code_review_settings_decode_json(
+  value : Json,
+) -> RepositoryCopilotCodeReviewSettings raise @json.JsonDecodeError {
+  @json.from_json(value)
+}
+
+///|
+///
+/// Decodes a successful copilot/get-repository-code-review-settings response.
+pub fn copilot_get_repository_code_review_settings_decode(
+  response : @http.Response,
+) -> RepositoryCopilotCodeReviewSettings raise @runtime.SdkError {
+  decode_response(response)
+}
+
+///|
+///
+/// Update Copilot code review settings for a repository
+pub fn copilot_update_repository_code_review_settings_request(
+  owner : String,
+  repo : String,
+  body : CopilotUpdateRepositoryCodeReviewSettingsRequest,
+) -> @http.Request {
+  @http.Request::patch(
+    "/repos/" +
+    @http.percent_encode(parameter_value(owner)) +
+    "/" +
+    @http.percent_encode(parameter_value(repo)) +
+    "/copilot/code-review/settings",
+  ).json_body(Json(body))
+}
+
+///|
+///
+/// Decodes a parsed successful copilot/update-repository-code-review-settings response.
+pub fn copilot_update_repository_code_review_settings_decode_json(
+  value : Json,
+) -> RepositoryCopilotCodeReviewSettings raise @json.JsonDecodeError {
+  @json.from_json(value)
+}
+
+///|
+///
+/// Decodes a successful copilot/update-repository-code-review-settings response.
+pub fn copilot_update_repository_code_review_settings_decode(
+  response : @http.Response,
+) -> RepositoryCopilotCodeReviewSettings raise @runtime.SdkError {
+  decode_response(response)
+}
+
+///|
+///
 /// List Dependabot alerts for a repository
 pub fn dependabot_list_alerts_for_repo_request(
   owner : String,
@@ -24906,6 +25493,75 @@ pub fn dependabot_update_alert_decode_json(
 pub fn dependabot_update_alert_decode(
   response : @http.Response,
 ) -> DependabotAlert raise @runtime.SdkError {
+  decode_response(response)
+}
+
+///|
+///
+/// Get repository Dependabot runner settings
+pub fn dependabot_get_repository_runner_settings_request(
+  owner : String,
+  repo : String,
+) -> @http.Request {
+  @http.Request::get(
+    "/repos/" +
+    @http.percent_encode(parameter_value(owner)) +
+    "/" +
+    @http.percent_encode(parameter_value(repo)) +
+    "/dependabot/runner-settings",
+  )
+}
+
+///|
+///
+/// Decodes a parsed successful dependabot/get-repository-runner-settings response.
+pub fn dependabot_get_repository_runner_settings_decode_json(
+  value : Json,
+) -> DependabotRunnerSettings raise @json.JsonDecodeError {
+  @json.from_json(value)
+}
+
+///|
+///
+/// Decodes a successful dependabot/get-repository-runner-settings response.
+pub fn dependabot_get_repository_runner_settings_decode(
+  response : @http.Response,
+) -> DependabotRunnerSettings raise @runtime.SdkError {
+  decode_response(response)
+}
+
+///|
+///
+/// Set repository Dependabot runner settings
+pub fn dependabot_set_repository_runner_settings_request(
+  owner : String,
+  repo : String,
+  body : DependabotRunnerSettingsUpdate,
+) -> @http.Request {
+  @http.Request::put(
+    "/repos/" +
+    @http.percent_encode(parameter_value(owner)) +
+    "/" +
+    @http.percent_encode(parameter_value(repo)) +
+    "/dependabot/runner-settings",
+  ).json_body(Json(body))
+}
+
+///|
+///
+/// Decodes a parsed successful dependabot/set-repository-runner-settings response.
+pub fn dependabot_set_repository_runner_settings_decode_json(
+  value : Json,
+) -> DependabotRunnerSettings raise @json.JsonDecodeError {
+  @json.from_json(value)
+}
+
+///|
+///
+/// Decodes a successful dependabot/set-repository-runner-settings response.
+pub fn dependabot_set_repository_runner_settings_decode(
+  response : @http.Response,
+) -> DependabotRunnerSettings raise @runtime.SdkError {
   decode_response(response)
 }
 
@@ -28740,6 +29396,206 @@ pub fn issues_update_decode(
 
 ///|
 ///
+/// List issue artifacts
+pub fn issues_list_issue_artifacts_request(
+  owner : String,
+  repo : String,
+  issue_number : Int32,
+  type_? : IssuesListIssueArtifactsType,
+  per_page? : Int32,
+  page? : Int32,
+) -> @http.Request {
+  let mut url = "/repos/" +
+    @http.percent_encode(parameter_value(owner)) +
+    "/" +
+    @http.percent_encode(parameter_value(repo)) +
+    "/issues/" +
+    @http.percent_encode(parameter_value(issue_number)) +
+    "/artifacts"
+  match type_ {
+    Some(value) => url = @http.append_query(url, "type", parameter_value(value))
+    None => ()
+  }
+  match per_page {
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
+    None => ()
+  }
+  match page {
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
+    None => ()
+  }
+  @http.Request::get(url)
+}
+
+///|
+///
+/// Decodes a parsed successful issues/list-issue-artifacts response.
+pub fn issues_list_issue_artifacts_decode_json(
+  value : Json,
+) -> Array[IssueArtifact] raise @json.JsonDecodeError {
+  @json.from_json(value)
+}
+
+///|
+///
+/// Decodes a successful issues/list-issue-artifacts response.
+pub fn issues_list_issue_artifacts_decode(
+  response : @http.Response,
+) -> Array[IssueArtifact] raise @runtime.SdkError {
+  decode_response(response)
+}
+
+///|
+///
+/// Create an issue artifact
+pub fn issues_create_issue_artifact_request(
+  owner : String,
+  repo : String,
+  issue_number : Int32,
+  body : IssuesCreateIssueArtifactRequest,
+) -> @http.Request {
+  @http.Request::post(
+    "/repos/" +
+    @http.percent_encode(parameter_value(owner)) +
+    "/" +
+    @http.percent_encode(parameter_value(repo)) +
+    "/issues/" +
+    @http.percent_encode(parameter_value(issue_number)) +
+    "/artifacts",
+  ).json_body(Json(body))
+}
+
+///|
+///
+/// Decodes a parsed successful issues/create-issue-artifact response.
+pub fn issues_create_issue_artifact_decode_json(
+  value : Json,
+) -> IssueArtifact raise @json.JsonDecodeError {
+  @json.from_json(value)
+}
+
+///|
+///
+/// Decodes a successful issues/create-issue-artifact response.
+pub fn issues_create_issue_artifact_decode(
+  response : @http.Response,
+) -> IssueArtifact raise @runtime.SdkError {
+  decode_response(response)
+}
+
+///|
+///
+/// Get an issue artifact
+pub fn issues_get_issue_artifact_request(
+  owner : String,
+  repo : String,
+  issue_number : Int32,
+  artifact_number : Int32,
+  per_page? : Int32,
+  page? : Int32,
+) -> @http.Request {
+  let mut url = "/repos/" +
+    @http.percent_encode(parameter_value(owner)) +
+    "/" +
+    @http.percent_encode(parameter_value(repo)) +
+    "/issues/" +
+    @http.percent_encode(parameter_value(issue_number)) +
+    "/artifacts/" +
+    @http.percent_encode(parameter_value(artifact_number))
+  match per_page {
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
+    None => ()
+  }
+  match page {
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
+    None => ()
+  }
+  @http.Request::get(url)
+}
+
+///|
+///
+/// Decodes a parsed successful issues/get-issue-artifact response.
+pub fn issues_get_issue_artifact_decode_json(
+  value : Json,
+) -> Json raise @json.JsonDecodeError {
+  @json.from_json(value)
+}
+
+///|
+///
+/// Decodes a successful issues/get-issue-artifact response.
+pub fn issues_get_issue_artifact_decode(
+  response : @http.Response,
+) -> Json raise @runtime.SdkError {
+  decode_response(response)
+}
+
+///|
+///
+/// Update an issue artifact
+pub fn issues_update_issue_artifact_request(
+  owner : String,
+  repo : String,
+  issue_number : Int32,
+  artifact_number : Int32,
+  body : IssuesUpdateIssueArtifactRequest,
+) -> @http.Request {
+  @http.Request::patch(
+    "/repos/" +
+    @http.percent_encode(parameter_value(owner)) +
+    "/" +
+    @http.percent_encode(parameter_value(repo)) +
+    "/issues/" +
+    @http.percent_encode(parameter_value(issue_number)) +
+    "/artifacts/" +
+    @http.percent_encode(parameter_value(artifact_number)),
+  ).json_body(Json(body))
+}
+
+///|
+///
+/// Decodes a parsed successful issues/update-issue-artifact response.
+pub fn issues_update_issue_artifact_decode_json(
+  value : Json,
+) -> IssueArtifact raise @json.JsonDecodeError {
+  @json.from_json(value)
+}
+
+///|
+///
+/// Decodes a successful issues/update-issue-artifact response.
+pub fn issues_update_issue_artifact_decode(
+  response : @http.Response,
+) -> IssueArtifact raise @runtime.SdkError {
+  decode_response(response)
+}
+
+///|
+///
+/// Delete an issue artifact The caller handles the response as @http.Response.
+pub fn issues_delete_issue_artifact_request(
+  owner : String,
+  repo : String,
+  issue_number : Int32,
+  artifact_number : Int32,
+) -> @http.Request {
+  @http.Request::delete(
+    "/repos/" +
+    @http.percent_encode(parameter_value(owner)) +
+    "/" +
+    @http.percent_encode(parameter_value(repo)) +
+    "/issues/" +
+    @http.percent_encode(parameter_value(issue_number)) +
+    "/artifacts/" +
+    @http.percent_encode(parameter_value(artifact_number)),
+  )
+}
+
+///|
+///
 /// Add assignees to an issue
 pub fn issues_add_assignees_request(
   owner : String,
@@ -30820,6 +31676,7 @@ pub fn activity_list_repo_notifications_for_authenticated_user_request(
   owner : String,
   repo : String,
   all? : Bool,
+  is_done? : Bool,
   participating? : Bool,
   since? : String,
   before? : String,
@@ -30833,6 +31690,11 @@ pub fn activity_list_repo_notifications_for_authenticated_user_request(
     "/notifications"
   match all {
     Some(value) => url = @http.append_query(url, "all", parameter_value(value))
+    None => ()
+  }
+  match is_done {
+    Some(value) =>
+      url = @http.append_query(url, "is_done", parameter_value(value))
     None => ()
   }
   match participating {
@@ -32071,6 +32933,44 @@ pub fn pulls_list_commits_decode_json(
 pub fn pulls_list_commits_decode(
   response : @http.Response,
 ) -> Array[Commit] raise @runtime.SdkError {
+  decode_response(response)
+}
+
+///|
+///
+/// Request a Copilot code review for a pull request
+pub fn pulls_request_copilot_code_review_request(
+  owner : String,
+  repo : String,
+  pull_number : Int32,
+  body : PullsRequestCopilotCodeReviewRequest,
+) -> @http.Request {
+  @http.Request::post(
+    "/repos/" +
+    @http.percent_encode(parameter_value(owner)) +
+    "/" +
+    @http.percent_encode(parameter_value(repo)) +
+    "/pulls/" +
+    @http.percent_encode(parameter_value(pull_number)) +
+    "/copilot-code-review",
+  ).json_body(Json(body))
+}
+
+///|
+///
+/// Decodes a parsed successful pulls/request-copilot-code-review response.
+pub fn pulls_request_copilot_code_review_decode_json(
+  value : Json,
+) -> CopilotCodeReviewRequest raise @json.JsonDecodeError {
+  @json.from_json(value)
+}
+
+///|
+///
+/// Decodes a successful pulls/request-copilot-code-review response.
+pub fn pulls_request_copilot_code_review_decode(
+  response : @http.Response,
+) -> CopilotCodeReviewRequest raise @runtime.SdkError {
   decode_response(response)
 }
 
@@ -34577,6 +35477,176 @@ pub fn security_advisories_update_repository_advisory_decode_json(
 pub fn security_advisories_update_repository_advisory_decode(
   response : @http.Response,
 ) -> RepositoryAdvisory raise @runtime.SdkError {
+  decode_response(response)
+}
+
+///|
+///
+/// List repository security advisory comments
+pub fn security_advisories_list_repository_advisory_comments_request(
+  owner : String,
+  repo : String,
+  ghsa_id : String,
+  since? : String,
+  per_page? : Int32,
+  page? : Int32,
+) -> @http.Request {
+  let mut url = "/repos/" +
+    @http.percent_encode(parameter_value(owner)) +
+    "/" +
+    @http.percent_encode(parameter_value(repo)) +
+    "/security-advisories/" +
+    @http.percent_encode(parameter_value(ghsa_id)) +
+    "/comments"
+  match since {
+    Some(value) =>
+      url = @http.append_query(url, "since", parameter_value(value))
+    None => ()
+  }
+  match per_page {
+    Some(value) =>
+      url = @http.append_query(url, "per_page", parameter_value(value))
+    None => ()
+  }
+  match page {
+    Some(value) => url = @http.append_query(url, "page", parameter_value(value))
+    None => ()
+  }
+  @http.Request::get(url)
+}
+
+///|
+///
+/// Decodes a parsed successful security-advisories/list-repository-advisory-comments response.
+pub fn security_advisories_list_repository_advisory_comments_decode_json(
+  value : Json,
+) -> Array[RepositoryAdvisoryComment] raise @json.JsonDecodeError {
+  @json.from_json(value)
+}
+
+///|
+///
+/// Decodes a successful security-advisories/list-repository-advisory-comments response.
+pub fn security_advisories_list_repository_advisory_comments_decode(
+  response : @http.Response,
+) -> Array[RepositoryAdvisoryComment] raise @runtime.SdkError {
+  decode_response(response)
+}
+
+///|
+///
+/// Create a repository advisory comment
+pub fn security_advisories_create_repository_advisory_comment_request(
+  owner : String,
+  repo : String,
+  ghsa_id : String,
+  body : SecurityAdvisoriesCreateRepositoryAdvisoryCommentRequest,
+) -> @http.Request {
+  @http.Request::post(
+    "/repos/" +
+    @http.percent_encode(parameter_value(owner)) +
+    "/" +
+    @http.percent_encode(parameter_value(repo)) +
+    "/security-advisories/" +
+    @http.percent_encode(parameter_value(ghsa_id)) +
+    "/comments",
+  ).json_body(Json(body))
+}
+
+///|
+///
+/// Decodes a parsed successful security-advisories/create-repository-advisory-comment response.
+pub fn security_advisories_create_repository_advisory_comment_decode_json(
+  value : Json,
+) -> RepositoryAdvisoryComment raise @json.JsonDecodeError {
+  @json.from_json(value)
+}
+
+///|
+///
+/// Decodes a successful security-advisories/create-repository-advisory-comment response.
+pub fn security_advisories_create_repository_advisory_comment_decode(
+  response : @http.Response,
+) -> RepositoryAdvisoryComment raise @runtime.SdkError {
+  decode_response(response)
+}
+
+///|
+///
+/// Get a repository advisory comment
+pub fn security_advisories_get_repository_advisory_comment_request(
+  owner : String,
+  repo : String,
+  ghsa_id : String,
+  comment_id : Int64,
+) -> @http.Request {
+  @http.Request::get(
+    "/repos/" +
+    @http.percent_encode(parameter_value(owner)) +
+    "/" +
+    @http.percent_encode(parameter_value(repo)) +
+    "/security-advisories/" +
+    @http.percent_encode(parameter_value(ghsa_id)) +
+    "/comments/" +
+    @http.percent_encode(parameter_value(comment_id)),
+  )
+}
+
+///|
+///
+/// Decodes a parsed successful security-advisories/get-repository-advisory-comment response.
+pub fn security_advisories_get_repository_advisory_comment_decode_json(
+  value : Json,
+) -> RepositoryAdvisoryComment raise @json.JsonDecodeError {
+  @json.from_json(value)
+}
+
+///|
+///
+/// Decodes a successful security-advisories/get-repository-advisory-comment response.
+pub fn security_advisories_get_repository_advisory_comment_decode(
+  response : @http.Response,
+) -> RepositoryAdvisoryComment raise @runtime.SdkError {
+  decode_response(response)
+}
+
+///|
+///
+/// Update a repository advisory comment
+pub fn security_advisories_update_repository_advisory_comment_request(
+  owner : String,
+  repo : String,
+  ghsa_id : String,
+  comment_id : Int64,
+  body : SecurityAdvisoriesUpdateRepositoryAdvisoryCommentRequest,
+) -> @http.Request {
+  @http.Request::patch(
+    "/repos/" +
+    @http.percent_encode(parameter_value(owner)) +
+    "/" +
+    @http.percent_encode(parameter_value(repo)) +
+    "/security-advisories/" +
+    @http.percent_encode(parameter_value(ghsa_id)) +
+    "/comments/" +
+    @http.percent_encode(parameter_value(comment_id)),
+  ).json_body(Json(body))
+}
+
+///|
+///
+/// Decodes a parsed successful security-advisories/update-repository-advisory-comment response.
+pub fn security_advisories_update_repository_advisory_comment_decode_json(
+  value : Json,
+) -> RepositoryAdvisoryComment raise @json.JsonDecodeError {
+  @json.from_json(value)
+}
+
+///|
+///
+/// Decodes a successful security-advisories/update-repository-advisory-comment response.
+pub fn security_advisories_update_repository_advisory_comment_decode(
+  response : @http.Response,
+) -> RepositoryAdvisoryComment raise @runtime.SdkError {
   decode_response(response)
 }
 

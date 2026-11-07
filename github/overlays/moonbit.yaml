@@ -333,3 +333,11 @@ actions:
       but it sits outside `data`, so the payload the decoder sees carries no tag.
     update:
       x-moonbit-json: true
+  - target: "$['paths']['/repos/{owner}/{repo}/issues/{issue_number}/artifacts/{artifact_number}']['get']['responses']['200']['content']['application/json']['schema']"
+    description: >-
+      An issue artifact is returned bare (`issue-artifact`) or wrapped with its version history
+      (`{artifact, versions, has_next_page, total_count}`). The two required sets do not overlap,
+      but neither branch has a tag, and the document does not say when GitHub sends which, so
+      picking one would be a guess about the API.
+    update:
+      x-moonbit-json: true
