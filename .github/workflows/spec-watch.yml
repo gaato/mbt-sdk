@@ -1,7 +1,7 @@
 name: Spec watch
 
 # Fetches the upstream OpenAI, Anthropic and GitHub specs daily. When changed: re-vendor, apply the
-# overlays, regenerate, bump the module version when src changed, run the gates,
+# overlays, regenerate, run the gates, bump the module version when src changed,
 # and open a PR. When generation, the gates and CI all pass, the PR is merged
 # here and release.yml publishes; otherwise it stays open for a human.
 # Overlay actions that no longer match (zero-match) or no longer change anything
@@ -98,20 +98,43 @@ jobs:
           status=$?
           echo "generate_status=$status" >> "$GITHUB_OUTPUT"
           echo "generate.sh exited $status"; tail -n 20 "$RUNNER_TEMP/generate.log"
-          set -e
           # Each container starts without the registry index, which moon info needs.
-          moonbit bash -c 'moon update && moon fmt && moon info' || true
+          # The bump reads the .mbti diff, which is only meaningful when this succeeded.
+          moonbit bash -c 'moon update && moon fmt && moon info' > "$RUNNER_TEMP/info.log" 2>&1
+          status=$?
+          echo "info_status=$status" >> "$GITHUB_OUTPUT"
+          echo "moon info exited $status"; tail -n 20 "$RUNNER_TEMP/info.log"
+
+      - name: Gates (native and wasm-gc; the PR's CI run adds js)
+        if: steps.fetch.outputs.changed == 'true'
+        id: gates
+        run: |
+          set +e
+          moonbit scripts/gates.sh --no-js > "$RUNNER_TEMP/gates.log" 2>&1
+          status=$?
+          echo "gates_status=$status" >> "$GITHUB_OUTPUT"
+          echo "gates.sh exited $status"; tail -n 20 "$RUNNER_TEMP/gates.log"
 
       # Only src ships. A spec change that leaves src alone releases nothing; a
       # src change with the same public API (.mbti) is a patch. Generated types
       # are pub(all), so any public API change is breaking: minor while 0.x.
       # The changelog entry goes under [Unreleased], which the bump then dates.
+      # This runs after the gates so that the PR body reports their result next
+      # to the version, and it trusts the .mbti diff only when moon info passed.
       - name: Bump the module version
         if: steps.fetch.outputs.changed == 'true'
         id: bump
+        env:
+          INFO_STATUS: ${{ steps.regen.outputs.info_status }}
         run: |
           if [ -z "$(git status --porcelain -- "$PROVIDER/src")" ]; then
             echo "Nothing under $PROVIDER/src changed; no release."
+            exit 0
+          fi
+          # Without a fresh moon info the .mbti files are stale, and an unchanged
+          # .mbti would pass a breaking change off as a patch.
+          if [ "$INFO_STATUS" != 0 ]; then
+            echo "summary=not decided (moon info failed, so the public API change is unknown; a human picks the version)" >> "$GITHUB_OUTPUT"
             exit 0
           fi
           current="$(sed -nE 's/^version = "(.*)"$/\1/p' "$PROVIDER/moon.mod")"
@@ -135,16 +158,6 @@ jobs:
           scripts/release.sh bump "$PROVIDER" "$next"
           echo "version=$next" >> "$GITHUB_OUTPUT"
           echo "summary=$current → $next ($kind)" >> "$GITHUB_OUTPUT"
-
-      - name: Gates (native and wasm-gc; the PR's CI run adds js)
-        if: steps.fetch.outputs.changed == 'true'
-        id: gates
-        run: |
-          set +e
-          moonbit scripts/gates.sh --no-js > "$RUNNER_TEMP/gates.log" 2>&1
-          status=$?
-          echo "gates_status=$status" >> "$GITHUB_OUTPUT"
-          echo "gates.sh exited $status"; tail -n 20 "$RUNNER_TEMP/gates.log"
 
       - name: Open pull request
         if: steps.fetch.outputs.changed == 'true'
@@ -177,17 +190,27 @@ jobs:
             echo "Upstream spec changed (sha256 \`${{ steps.fetch.outputs.new }}\`)."
             echo
             echo "- overlay + generator exit status: \`${{ steps.regen.outputs.generate_status }}\`"
+            echo "- moon info exit status: \`${{ steps.regen.outputs.info_status }}\`"
             echo "- gates exit status: \`${{ steps.gates.outputs.gates_status }}\`"
             echo "- release: ${{ steps.bump.outputs.summary || 'none (nothing under src changed)' }}"
             echo
-            echo "Spec watch merges this PR itself when both are \`0\` and CI passes; otherwise it waits for a human."
+            echo "Spec watch merges this PR itself when generation and gates are \`0\` and CI passes; otherwise it waits for a human."
             echo
             echo '<details><summary>generate.log</summary>'; echo; echo '```'; tail -n 80 "$RUNNER_TEMP/generate.log"; echo '```'; echo '</details>'
+            echo '<details><summary>info.log (tail)</summary>'; echo; echo '```'; tail -n 40 "$RUNNER_TEMP/info.log"; echo '```'; echo '</details>'
             echo '<details><summary>gates.log (tail)</summary>'; echo; echo '```'; tail -n 60 "$RUNNER_TEMP/gates.log"; echo '```'; echo '</details>'
           } > "$RUNNER_TEMP/body.md"
           url="$(gh pr create --base main --head "$branch" \
             --title "Update vendored $PROVIDER spec" --body-file "$RUNNER_TEMP/body.md")"
-          echo "number=${url##*/}" >> "$GITHUB_OUTPUT"
+          number="${url##*/}"
+          echo "number=$number" >> "$GITHUB_OUTPUT"
+          # An older upstream hash of this provider is now out of date: close its PR
+          # and branch, so at most one spec-watch PR per provider stays open.
+          gh pr list --state open --limit 100 --json number,headRefName \
+            --jq ".[] | select(.headRefName | startswith(\"spec-watch/$PROVIDER/\")) | select(.headRefName != \"$branch\") | .number" |
+            while read -r old; do
+              gh pr close "$old" --comment "Superseded by #$number." --delete-branch
+            done
 
       # pull_request runs for PRs opened with GITHUB_TOKEN wait for approval, but
       # workflow_dispatch runs start at once and report on the branch head.
