@@ -14,10 +14,13 @@ are optional unless the field is required, and keep a wildcard arm.
 
 ## [Unreleased]
 
+## [0.18.0] - 2026-11-07
+
 ### Changed
 
 - **Builds on `gaato/http` 0.5.0**, whose cookie jar, Retry-After and Link parsing follow RFC 6265bis-22, RFC 9110 and RFC 8288 more closely; see its CHANGELOG.
 - **The README has sections and compile-checked examples.** Requests and responses, downloads and redirects, pagination, GraphQL, rate limits, errors and retries, and GitHub Enterprise Server each have a section, and the link to the census of untyped fields works on mooncakes.io.
+- **Regenerated from the upstream spec fetched 2026-11-07** (sha256 `5a1dbf69f5e2`). The public API changed; see the `pkg.generated.mbti` diff. The response of `issues/get-issue-artifact` is `Json`, because the spec offers two untagged shapes for it.
 
 ## [0.17.0] - 2026-10-19
 
