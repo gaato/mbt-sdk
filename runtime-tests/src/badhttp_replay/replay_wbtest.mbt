@@ -232,9 +232,11 @@ async test "recorded cookies responses reach the jar as RFC 6265bis-22 stores th
   // first semicolon; Max-Age wins over a 1970 Expires; an ISO 8601 Expires
   // is ignored; 9999 is cut to 400 days; Domain=example.com and Domain=dev
   // are refused; of name-prefixes only the two valid ones stay; huge is
-  // exactly 4096 bytes of name and value. nameless fails in the transport:
-  // moonbitlang/async refuses a Set-Cookie without "=", which the jar would
-  // keep (see loopback/cookie_roundtrip_test.mbt in http-async).
+  // exactly 4096 bytes of name and value. nameless keeps one of its two
+  // lines: moonbitlang/async drops the Set-Cookie without "=" (RFC 6265
+  // §5.2), which the jar would keep as a cookie without a name, and hands on
+  // the one with an empty name (see loopback/cookie_roundtrip_test.mbt in
+  // http-async).
   debug_inspect(
     rows,
     content=(
@@ -254,7 +256,7 @@ async test "recorded cookies responses reach the jar as RFC 6265bis-22 stores th
       #|  "name-prefixes: __Host-badhttp_good=1 path=/ persistent secure | __Secure-badhttp_good=1 path=/cookies persistent secure",
       #|  "quoted: badhttp_quoted=\"hello world\" path=/cookies persistent | badhttp_semi=\"semi path=/cookies persistent",
       #|  "utf8: badhttp_utf8=☃ path=/cookies persistent",
-      #|  "nameless: Protocol",
+      #|  "nameless: =badhttp_empty_name path=/cookies/echo persistent",
       #|  "huge: badhttp_huge=4084 bytes path=/cookies persistent",
       #|]
     ),

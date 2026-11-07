@@ -22,5 +22,5 @@ import {
   "gaato/anthropic@0.12.0",
   "gaato/github@0.17.0",
   "gaato/fixture-badhttp@0.0.0",
-  "moonbitlang/async@0.22.5",
+  "moonbitlang/async@0.22.7",
 }

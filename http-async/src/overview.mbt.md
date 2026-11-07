@@ -142,12 +142,6 @@ code runs the same way on every run and target. `settle` raises
 `NoQuiescence` when the tasks never go idle, such as a retry loop that never
 waits.
 
-## Known limitations
-
-An IPv6 literal host (`http://[::1]:8080/`, as an origin or a proxy) cannot be
-dialled: moonbitlang/async passes the bracketed address to name resolution,
-which fails with `Connect`. Use a host name instead.
-
 ## Links
 
 - [Changelog](https://github.com/gaato/mbt-sdk/blob/main/http-async/CHANGELOG.md)

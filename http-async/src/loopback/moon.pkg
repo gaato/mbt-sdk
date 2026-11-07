@@ -25,5 +25,6 @@ options(
     "phase_test.mbt": [ "native", "wasm" ],
     "upload_test.mbt": [ "native", "wasm" ],
     "proxy_test.mbt": [ "native", "wasm" ],
+    "ipv6_test.mbt": [ "native", "wasm" ],
   },
 )
