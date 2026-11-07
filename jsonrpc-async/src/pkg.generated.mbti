@@ -7,18 +7,20 @@ import {
   "moonbitlang/async/io",
   "moonbitlang/async/process",
   "moonbitlang/core/debug",
+  "moonbitlang/core/json",
 }
 
 // Values
-pub async fn[X] spawn_child(@async.TaskGroup[X], String, Array[String], cwd? : String, extra_env? : Map[String, String], stderr? : &@process.ProcessOutput, envelope? : @jsonrpc.Envelope, max_line? : Int32, max_notifications? : Int32, max_inbound? : Int32, on_request? : async (String, Json?) -> Result[Json, @jsonrpc.RpcError], on_notification? : async (String, Json?) -> Unit) -> Child
+pub async fn[X] spawn_child(@async.TaskGroup[X], String, Array[String], cwd? : String, extra_env? : Map[String, String], stderr? : &@process.ProcessOutput, envelope? : @jsonrpc.Envelope, max_line? : Int32, max_notifications? : Int32, max_inbound? : Int32, on_request? : async (String, @json.Json?) -> Result[@json.Json, @jsonrpc.RpcError], on_notification? : async (String, @json.Json?) -> Unit) -> Child
 
 // Errors
+#derive(@debug.Debug)
 pub(all) suberror RpcFailure {
   Remote(@jsonrpc.RpcError)
   Transport(String)
   Timeout(Int32)
   Closed
-} derive(@debug.Debug)
+}
 pub fn RpcFailure::to_repr(Self) -> @debug.Repr
 
 // Types and methods
@@ -31,16 +33,16 @@ pub async fn Child::shutdown(Self, timeout_ms? : Int32) -> Int32
 pub struct Connection {
   // private fields
 }
-pub async fn Connection::call(Self, String, params? : Json, timeout_ms? : Int32) -> Json raise RpcFailure
+pub async fn Connection::call(Self, String, params? : @json.Json, timeout_ms? : Int32) -> @json.Json raise RpcFailure
 pub fn Connection::close(Self) -> Unit
 pub fn Connection::decode_errors(Self) -> Int32
 pub fn Connection::is_closed(Self) -> Bool
-pub async fn Connection::notify(Self, String, params? : Json) -> Unit raise RpcFailure
-pub fn[X] Connection::start(@async.TaskGroup[X], &@io.Reader, &@io.Writer, close_writer? : () -> Unit, envelope? : @jsonrpc.Envelope, max_line? : Int32, max_notifications? : Int32, max_inbound? : Int32, on_request? : async (String, Json?) -> Result[Json, @jsonrpc.RpcError], on_notification? : async (String, Json?) -> Unit) -> Self
+pub async fn Connection::notify(Self, String, params? : @json.Json) -> Unit raise RpcFailure
+pub fn[X] Connection::start(@async.TaskGroup[X], &@io.Reader, &@io.Writer, close_writer? : () -> Unit, envelope? : @jsonrpc.Envelope, max_line? : Int32, max_notifications? : Int32, max_inbound? : Int32, on_request? : async (String, @json.Json?) -> Result[@json.Json, @jsonrpc.RpcError], on_notification? : async (String, @json.Json?) -> Unit) -> Self
 
 // Type aliases
-pub type NotificationHandler = async (String, Json?) -> Unit
+pub type NotificationHandler = async (String, @json.Json?) -> Unit
 
-pub type RequestHandler = async (String, Json?) -> Result[Json, @jsonrpc.RpcError]
+pub type RequestHandler = async (String, @json.Json?) -> Result[@json.Json, @jsonrpc.RpcError]
 
 // Traits

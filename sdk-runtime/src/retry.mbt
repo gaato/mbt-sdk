@@ -73,10 +73,11 @@ pub using @retry {type StopReason}
 ///   assert_eq(policy.allow_non_idempotent().decide(busy, context), Wait(500))
 /// }
 /// ```
+#derive(Eq, Debug)
 pub(all) struct RetryPolicy {
   /// What is retried, how long to wait, and when to stop.
   rule : RetryRule
-} derive(Eq, Debug)
+}
 
 ///|
 /// Equality for retry policy values.

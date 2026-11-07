@@ -191,13 +191,14 @@ fn[T : @json.FromJson] decode_json_map(
 ///|
 ///
 /// Client-declared capabilities negotiated during initialize.
+#derive(Eq, @debug.Debug)
 pub(all) struct InitializeCapabilities {
   experimental_api : Bool?
   extensions : @sdkjson.Presence[Json]
   mcp_server_openai_form_elicitation : Bool?
   opt_out_notification_methods : @sdkjson.Presence[Array[String]]
   request_attestation : Bool?
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend InitializeCapabilities with Eq::{equal, not_equal}
@@ -272,11 +273,12 @@ pub impl @json.FromJson for InitializeCapabilities with fn from_json(
 ///|
 ///
 /// Generated representation of ClientInfo.
+#derive(Eq, @debug.Debug)
 pub(all) struct ClientInfo {
   name : String
   title : @sdkjson.Presence[String]
   version : String
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ClientInfo with Eq::{equal, not_equal}
@@ -327,10 +329,11 @@ pub impl @json.FromJson for ClientInfo with fn from_json(value, path) {
 ///|
 ///
 /// Generated representation of InitializeParams.
+#derive(Eq, @debug.Debug)
 pub(all) struct InitializeParams {
   capabilities : @sdkjson.Presence[InitializeCapabilities]
   client_info : ClientInfo
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend InitializeParams with Eq::{equal, not_equal}
@@ -378,12 +381,13 @@ pub impl @json.FromJson for InitializeParams with fn from_json(value, path) {
 ///|
 ///
 /// Generated representation of InitializeResponse.
+#derive(Eq, @debug.Debug)
 pub(all) struct InitializeResponse {
   codex_home : String
   platform_family : String
   platform_os : String
   user_agent : String
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend InitializeResponse with Eq::{equal, not_equal}
@@ -437,13 +441,14 @@ pub impl @json.FromJson for InitializeResponse with fn from_json(value, path) {
 ///|
 ///
 /// Generated representation of AskForApprovalGranular.
+#derive(Eq, @debug.Debug)
 pub(all) struct AskForApprovalGranular {
   mcp_elicitations : Bool
   request_permissions : Bool?
   rules : Bool
   sandbox_approval : Bool
   skill_approval : Bool?
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend AskForApprovalGranular with Eq::{equal, not_equal}
@@ -509,6 +514,7 @@ pub impl @json.FromJson for AskForApprovalGranular with fn from_json(
 ///|
 ///
 /// Generated externally tagged union AskForApproval.
+#derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum AskForApproval {
   Untrusted
@@ -516,7 +522,7 @@ pub(all) enum AskForApproval {
   Never
   Granular(AskForApprovalGranular)
   UnknownValue(Json)
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend AskForApproval with Eq::{equal, not_equal}
@@ -572,13 +578,14 @@ pub impl @json.FromJson for AskForApproval with fn from_json(value, path) {
 ///|
 ///
 /// Configures who approval requests are routed to for review. Examples include sandbox escapes, blocked network access, MCP approval prompts, and ARC escalations. Defaults to `user`. `auto_review` uses a carefully prompted subagent to gather relevant context and apply a risk-based decision framework before approving or denying the request. The legacy value `guardian_subagent` is accepted for compatibility.
+#derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum ApprovalsReviewer {
   User
   AutoReview
   GuardianSubagent
   Unknown(String)
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ApprovalsReviewer with Eq::{equal, not_equal}
@@ -627,13 +634,14 @@ pub impl @json.FromJson for ApprovalsReviewer with fn from_json(value, path) {
 ///|
 ///
 /// Generated string enum Personality.
+#derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum Personality {
   None
   Friendly
   Pragmatic
   Custom(String)
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend Personality with Eq::{equal, not_equal}
@@ -682,13 +690,14 @@ pub impl @json.FromJson for Personality with fn from_json(value, path) {
 ///|
 ///
 /// Generated string enum SandboxMode.
+#derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum SandboxMode {
   ReadOnly
   WorkspaceWrite
   DangerFullAccess
   Custom(String)
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend SandboxMode with Eq::{equal, not_equal}
@@ -737,12 +746,13 @@ pub impl @json.FromJson for SandboxMode with fn from_json(value, path) {
 ///|
 ///
 /// Generated string enum ThreadStartSource.
+#derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum ThreadStartSource {
   Startup
   Clear
   Custom(String)
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ThreadStartSource with Eq::{equal, not_equal}
@@ -789,6 +799,7 @@ pub impl @json.FromJson for ThreadStartSource with fn from_json(value, path) {
 ///|
 ///
 /// Generated representation of ThreadStartParams.
+#derive(Eq, @debug.Debug)
 pub(all) struct ThreadStartParams {
   approval_policy : @sdkjson.Presence[AskForApproval]
   approvals_reviewer : @sdkjson.Presence[ApprovalsReviewer]
@@ -805,7 +816,7 @@ pub(all) struct ThreadStartParams {
   service_tier : @sdkjson.Presence[String]
   session_start_source : @sdkjson.Presence[ThreadStartSource]
   thread_source : @sdkjson.Presence[String]
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ThreadStartParams with Eq::{equal, not_equal}
@@ -914,9 +925,10 @@ pub impl @json.FromJson for ThreadStartParams with fn from_json(value, path) {
 ///|
 ///
 /// Generated representation of SandboxPolicyDangerFullAccess.
+#derive(Eq, @debug.Debug)
 pub(all) struct SandboxPolicyDangerFullAccess {
   type_ : String
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend SandboxPolicyDangerFullAccess with Eq::{equal, not_equal}
@@ -960,10 +972,11 @@ pub impl @json.FromJson for SandboxPolicyDangerFullAccess with fn from_json(
 ///|
 ///
 /// Generated representation of SandboxPolicyReadOnly.
+#derive(Eq, @debug.Debug)
 pub(all) struct SandboxPolicyReadOnly {
   network_access : Bool?
   type_ : String
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend SandboxPolicyReadOnly with Eq::{equal, not_equal}
@@ -1011,12 +1024,13 @@ pub impl @json.FromJson for SandboxPolicyReadOnly with fn from_json(value, path)
 ///|
 ///
 /// Generated string enum NetworkAccess.
+#derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum NetworkAccess {
   Restricted
   Enabled
   Unknown(String)
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend NetworkAccess with Eq::{equal, not_equal}
@@ -1063,10 +1077,11 @@ pub impl @json.FromJson for NetworkAccess with fn from_json(value, path) {
 ///|
 ///
 /// Generated representation of SandboxPolicyExternalSandbox.
+#derive(Eq, @debug.Debug)
 pub(all) struct SandboxPolicyExternalSandbox {
   network_access : NetworkAccess?
   type_ : String
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend SandboxPolicyExternalSandbox with Eq::{equal, not_equal}
@@ -1117,13 +1132,14 @@ pub impl @json.FromJson for SandboxPolicyExternalSandbox with fn from_json(
 ///|
 ///
 /// Generated representation of SandboxPolicyWorkspaceWrite.
+#derive(Eq, @debug.Debug)
 pub(all) struct SandboxPolicyWorkspaceWrite {
   exclude_slash_tmp : Bool?
   exclude_tmpdir_env_var : Bool?
   network_access : Bool?
   type_ : String
   writable_roots : Array[String]?
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend SandboxPolicyWorkspaceWrite with Eq::{equal, not_equal}
@@ -1189,6 +1205,7 @@ pub impl @json.FromJson for SandboxPolicyWorkspaceWrite with fn from_json(
 ///|
 ///
 /// Generated tagged union SandboxPolicy.
+#derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum SandboxPolicy {
   DangerFullAccess(SandboxPolicyDangerFullAccess)
@@ -1196,7 +1213,7 @@ pub(all) enum SandboxPolicy {
   ExternalSandbox(SandboxPolicyExternalSandbox)
   WorkspaceWrite(SandboxPolicyWorkspaceWrite)
   Unknown(String, Json)
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend SandboxPolicy with Eq::{equal, not_equal}
@@ -1241,11 +1258,12 @@ pub impl @json.FromJson for SandboxPolicy with fn from_json(value, path) {
 ///|
 ///
 /// Generated representation of GitInfo.
+#derive(Eq, @debug.Debug)
 pub(all) struct GitInfo {
   branch : @sdkjson.Presence[String]
   origin_url : @sdkjson.Presence[String]
   sha : @sdkjson.Presence[String]
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend GitInfo with Eq::{equal, not_equal}
@@ -1300,12 +1318,13 @@ pub impl @json.FromJson for GitInfo with fn from_json(value, path) {
 ///|
 ///
 /// Generated string enum ThreadHistoryMode.
+#derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum ThreadHistoryMode {
   Legacy
   Paginated
   Unknown(String)
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ThreadHistoryMode with Eq::{equal, not_equal}
@@ -1352,10 +1371,11 @@ pub impl @json.FromJson for ThreadHistoryMode with fn from_json(value, path) {
 ///|
 ///
 /// Extensible visual presentation for a custom thread section.
+#derive(Eq, @debug.Debug)
 pub(all) struct ThreadSectionAppearance {
   color : @sdkjson.Presence[String]
   icon : @sdkjson.Presence[String]
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ThreadSectionAppearance with Eq::{equal, not_equal}
@@ -1409,11 +1429,12 @@ pub impl @json.FromJson for ThreadSectionAppearance with fn from_json(
 ///|
 ///
 /// An independently persisted, user-visible thread section.
+#derive(Eq, @debug.Debug)
 pub(all) struct ThreadSection {
   appearance : @sdkjson.Presence[ThreadSectionAppearance]
   id : String
   name : String
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ThreadSection with Eq::{equal, not_equal}
@@ -1464,13 +1485,14 @@ pub impl @json.FromJson for ThreadSection with fn from_json(value, path) {
 ///|
 ///
 /// Generated representation of SubAgentSourceThreadSpawn.
+#derive(Eq, @debug.Debug)
 pub(all) struct SubAgentSourceThreadSpawn {
   agent_nickname : @sdkjson.Presence[String]
   agent_path : @sdkjson.Presence[String]
   agent_role : @sdkjson.Presence[String]
   depth : Int32
   parent_thread_id : String
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend SubAgentSourceThreadSpawn with Eq::{equal, not_equal}
@@ -1536,6 +1558,7 @@ pub impl @json.FromJson for SubAgentSourceThreadSpawn with fn from_json(
 ///|
 ///
 /// Generated externally tagged union SubAgentSource.
+#derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum SubAgentSource {
   Review
@@ -1544,7 +1567,7 @@ pub(all) enum SubAgentSource {
   ThreadSpawn(SubAgentSourceThreadSpawn)
   Other(String)
   UnknownValue(Json)
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend SubAgentSource with Eq::{equal, not_equal}
@@ -1606,6 +1629,7 @@ pub impl @json.FromJson for SubAgentSource with fn from_json(value, path) {
 ///|
 ///
 /// Generated externally tagged union SessionSource.
+#derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum SessionSource {
   Cli
@@ -1616,7 +1640,7 @@ pub(all) enum SessionSource {
   Custom(String)
   SubAgent(SubAgentSource)
   UnknownValue(Json)
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend SessionSource with Eq::{equal, not_equal}
@@ -1680,9 +1704,10 @@ pub impl @json.FromJson for SessionSource with fn from_json(value, path) {
 ///|
 ///
 /// Generated representation of ThreadStatusNotLoaded.
+#derive(Eq, @debug.Debug)
 pub(all) struct ThreadStatusNotLoaded {
   type_ : String
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ThreadStatusNotLoaded with Eq::{equal, not_equal}
@@ -1721,9 +1746,10 @@ pub impl @json.FromJson for ThreadStatusNotLoaded with fn from_json(value, path)
 ///|
 ///
 /// Generated representation of ThreadStatusIdle.
+#derive(Eq, @debug.Debug)
 pub(all) struct ThreadStatusIdle {
   type_ : String
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ThreadStatusIdle with Eq::{equal, not_equal}
@@ -1762,9 +1788,10 @@ pub impl @json.FromJson for ThreadStatusIdle with fn from_json(value, path) {
 ///|
 ///
 /// Generated representation of ThreadStatusSystemError.
+#derive(Eq, @debug.Debug)
 pub(all) struct ThreadStatusSystemError {
   type_ : String
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ThreadStatusSystemError with Eq::{equal, not_equal}
@@ -1806,12 +1833,13 @@ pub impl @json.FromJson for ThreadStatusSystemError with fn from_json(
 ///|
 ///
 /// Generated string enum ThreadActiveFlag.
+#derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum ThreadActiveFlag {
   WaitingOnApproval
   WaitingOnUserInput
   Unknown(String)
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ThreadActiveFlag with Eq::{equal, not_equal}
@@ -1858,10 +1886,11 @@ pub impl @json.FromJson for ThreadActiveFlag with fn from_json(value, path) {
 ///|
 ///
 /// Generated representation of ThreadStatusActive.
+#derive(Eq, @debug.Debug)
 pub(all) struct ThreadStatusActive {
   active_flags : Array[ThreadActiveFlag]
   type_ : String
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ThreadStatusActive with Eq::{equal, not_equal}
@@ -1909,6 +1938,7 @@ pub impl @json.FromJson for ThreadStatusActive with fn from_json(value, path) {
 ///|
 ///
 /// Generated tagged union ThreadStatus.
+#derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum ThreadStatus {
   NotLoaded(ThreadStatusNotLoaded)
@@ -1916,7 +1946,7 @@ pub(all) enum ThreadStatus {
   SystemError(ThreadStatusSystemError)
   Active(ThreadStatusActive)
   Unknown(String, Json)
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ThreadStatus with Eq::{equal, not_equal}
@@ -1961,9 +1991,10 @@ pub impl @json.FromJson for ThreadStatus with fn from_json(value, path) {
 ///|
 ///
 /// Generated representation of CodexErrorInfoHttpConnectionFailed.
+#derive(Eq, @debug.Debug)
 pub(all) struct CodexErrorInfoHttpConnectionFailed {
   http_status_code : @sdkjson.Presence[Int32]
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend CodexErrorInfoHttpConnectionFailed with Eq::{equal, not_equal}
@@ -2009,9 +2040,10 @@ pub impl @json.FromJson for CodexErrorInfoHttpConnectionFailed with fn from_json
 ///|
 ///
 /// Generated representation of CodexErrorInfoResponseStreamConnectionFailed.
+#derive(Eq, @debug.Debug)
 pub(all) struct CodexErrorInfoResponseStreamConnectionFailed {
   http_status_code : @sdkjson.Presence[Int32]
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend CodexErrorInfoResponseStreamConnectionFailed with Eq::{
@@ -2066,9 +2098,10 @@ pub impl @json.FromJson for CodexErrorInfoResponseStreamConnectionFailed with fn
 ///|
 ///
 /// Generated representation of CodexErrorInfoResponseStreamDisconnected.
+#derive(Eq, @debug.Debug)
 pub(all) struct CodexErrorInfoResponseStreamDisconnected {
   http_status_code : @sdkjson.Presence[Int32]
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend CodexErrorInfoResponseStreamDisconnected with Eq::{equal, not_equal}
@@ -2118,9 +2151,10 @@ pub impl @json.FromJson for CodexErrorInfoResponseStreamDisconnected with fn fro
 ///|
 ///
 /// Generated representation of CodexErrorInfoResponseTooManyFailedAttempts.
+#derive(Eq, @debug.Debug)
 pub(all) struct CodexErrorInfoResponseTooManyFailedAttempts {
   http_status_code : @sdkjson.Presence[Int32]
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend CodexErrorInfoResponseTooManyFailedAttempts with Eq::{
@@ -2175,12 +2209,13 @@ pub impl @json.FromJson for CodexErrorInfoResponseTooManyFailedAttempts with fn 
 ///|
 ///
 /// Generated string enum NonSteerableTurnKind.
+#derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum NonSteerableTurnKind {
   Review
   Compact
   Unknown(String)
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend NonSteerableTurnKind with Eq::{equal, not_equal}
@@ -2227,9 +2262,10 @@ pub impl @json.FromJson for NonSteerableTurnKind with fn from_json(value, path) 
 ///|
 ///
 /// Generated representation of CodexErrorInfoActiveTurnNotSteerable.
+#derive(Eq, @debug.Debug)
 pub(all) struct CodexErrorInfoActiveTurnNotSteerable {
   turn_kind : NonSteerableTurnKind
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend CodexErrorInfoActiveTurnNotSteerable with Eq::{equal, not_equal}
@@ -2273,6 +2309,7 @@ pub impl @json.FromJson for CodexErrorInfoActiveTurnNotSteerable with fn from_js
 ///|
 ///
 /// This translation layer make sure that we expose codex error code in camel case. When an upstream HTTP status is available (for example, from the Responses API or a provider), it is forwarded in `httpStatusCode` on the relevant `codexErrorInfo` variant.
+#derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum CodexErrorInfo {
   ContextWindowExceeded
@@ -2294,7 +2331,7 @@ pub(all) enum CodexErrorInfo {
   ResponseTooManyFailedAttempts(CodexErrorInfoResponseTooManyFailedAttempts)
   ActiveTurnNotSteerable(CodexErrorInfoActiveTurnNotSteerable)
   UnknownValue(Json)
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend CodexErrorInfo with Eq::{equal, not_equal}
@@ -2415,9 +2452,10 @@ pub impl @json.FromJson for CodexErrorInfo with fn from_json(value, path) {
 ///|
 ///
 /// Generated representation of MisalignmentSteer.
+#derive(Eq, @debug.Debug)
 pub(all) struct MisalignmentSteer {
   message : String
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend MisalignmentSteer with Eq::{equal, not_equal}
@@ -2456,11 +2494,12 @@ pub impl @json.FromJson for MisalignmentSteer with fn from_json(value, path) {
 ///|
 ///
 /// Generated representation of MisalignmentErrorDetails.
+#derive(Eq, @debug.Debug)
 pub(all) struct MisalignmentErrorDetails {
   detailed_explanation : @sdkjson.Presence[String]
   error_type : @sdkjson.Presence[String]
   steer : @sdkjson.Presence[MisalignmentSteer]
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend MisalignmentErrorDetails with Eq::{equal, not_equal}
@@ -2520,12 +2559,13 @@ pub impl @json.FromJson for MisalignmentErrorDetails with fn from_json(
 ///|
 ///
 /// Generated representation of TurnError.
+#derive(Eq, @debug.Debug)
 pub(all) struct TurnError {
   additional_details : @sdkjson.Presence[String]
   codex_error_info : @sdkjson.Presence[CodexErrorInfo]
   message : String
   misalignment : @sdkjson.Presence[MisalignmentErrorDetails]
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend TurnError with Eq::{equal, not_equal}
@@ -2584,10 +2624,11 @@ pub impl @json.FromJson for TurnError with fn from_json(value, path) {
 ///|
 ///
 /// Generated representation of ByteRange.
+#derive(Eq, @debug.Debug)
 pub(all) struct ByteRange {
   end : UInt64Number
   start : UInt64Number
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ByteRange with Eq::{equal, not_equal}
@@ -2632,10 +2673,11 @@ pub impl @json.FromJson for ByteRange with fn from_json(value, path) {
 ///|
 ///
 /// Generated representation of TextElement.
+#derive(Eq, @debug.Debug)
 pub(all) struct TextElement {
   byte_range : ByteRange
   placeholder : @sdkjson.Presence[String]
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend TextElement with Eq::{equal, not_equal}
@@ -2683,11 +2725,12 @@ pub impl @json.FromJson for TextElement with fn from_json(value, path) {
 ///|
 ///
 /// Generated representation of UserInputText.
+#derive(Eq, @debug.Debug)
 pub(all) struct UserInputText {
   text : String
   text_elements : Array[TextElement]?
   type_ : String
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend UserInputText with Eq::{equal, not_equal}
@@ -2738,6 +2781,7 @@ pub impl @json.FromJson for UserInputText with fn from_json(value, path) {
 ///|
 ///
 /// Generated string enum ImageDetail.
+#derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum ImageDetail {
   Auto
@@ -2745,7 +2789,7 @@ pub(all) enum ImageDetail {
   High
   Original
   Unknown(String)
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ImageDetail with Eq::{equal, not_equal}
@@ -2796,11 +2840,12 @@ pub impl @json.FromJson for ImageDetail with fn from_json(value, path) {
 ///|
 ///
 /// Generated representation of UserInputImage.
+#derive(Eq, @debug.Debug)
 pub(all) struct UserInputImage {
   detail : @sdkjson.Presence[ImageDetail]
   type_ : String
   url : String
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend UserInputImage with Eq::{equal, not_equal}
@@ -2851,11 +2896,12 @@ pub impl @json.FromJson for UserInputImage with fn from_json(value, path) {
 ///|
 ///
 /// Generated representation of UserInputLocalImage.
+#derive(Eq, @debug.Debug)
 pub(all) struct UserInputLocalImage {
   detail : @sdkjson.Presence[ImageDetail]
   path : String
   type_ : String
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend UserInputLocalImage with Eq::{equal, not_equal}
@@ -2906,10 +2952,11 @@ pub impl @json.FromJson for UserInputLocalImage with fn from_json(value, path) {
 ///|
 ///
 /// Generated representation of UserInputAudio.
+#derive(Eq, @debug.Debug)
 pub(all) struct UserInputAudio {
   type_ : String
   url : String
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend UserInputAudio with Eq::{equal, not_equal}
@@ -2954,10 +3001,11 @@ pub impl @json.FromJson for UserInputAudio with fn from_json(value, path) {
 ///|
 ///
 /// Generated representation of UserInputLocalAudio.
+#derive(Eq, @debug.Debug)
 pub(all) struct UserInputLocalAudio {
   path : String
   type_ : String
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend UserInputLocalAudio with Eq::{equal, not_equal}
@@ -3005,11 +3053,12 @@ pub impl @json.FromJson for UserInputLocalAudio with fn from_json(value, path) {
 ///|
 ///
 /// Generated representation of UserInputSkill.
+#derive(Eq, @debug.Debug)
 pub(all) struct UserInputSkill {
   name : String
   path : String
   type_ : String
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend UserInputSkill with Eq::{equal, not_equal}
@@ -3060,11 +3109,12 @@ pub impl @json.FromJson for UserInputSkill with fn from_json(value, path) {
 ///|
 ///
 /// Generated representation of UserInputMention.
+#derive(Eq, @debug.Debug)
 pub(all) struct UserInputMention {
   name : String
   path : String
   type_ : String
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend UserInputMention with Eq::{equal, not_equal}
@@ -3115,6 +3165,7 @@ pub impl @json.FromJson for UserInputMention with fn from_json(value, path) {
 ///|
 ///
 /// Generated tagged union UserInput.
+#derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum UserInput {
   Text(UserInputText)
@@ -3125,7 +3176,7 @@ pub(all) enum UserInput {
   Skill(UserInputSkill)
   Mention(UserInputMention)
   Unknown(String, Json)
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend UserInput with Eq::{equal, not_equal}
@@ -3176,12 +3227,13 @@ pub impl @json.FromJson for UserInput with fn from_json(value, path) {
 ///|
 ///
 /// Generated representation of ThreadItemUserMessage.
+#derive(Eq, @debug.Debug)
 pub(all) struct ThreadItemUserMessage {
   client_id : @sdkjson.Presence[String]
   content : Array[UserInput]
   id : String
   type_ : String
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ThreadItemUserMessage with Eq::{equal, not_equal}
@@ -3235,10 +3287,11 @@ pub impl @json.FromJson for ThreadItemUserMessage with fn from_json(value, path)
 ///|
 ///
 /// Generated representation of HookPromptFragment.
+#derive(Eq, @debug.Debug)
 pub(all) struct HookPromptFragment {
   hook_run_id : String
   text : String
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend HookPromptFragment with Eq::{equal, not_equal}
@@ -3286,11 +3339,12 @@ pub impl @json.FromJson for HookPromptFragment with fn from_json(value, path) {
 ///|
 ///
 /// Generated representation of ThreadItemHookPrompt.
+#derive(Eq, @debug.Debug)
 pub(all) struct ThreadItemHookPrompt {
   fragments : Array[HookPromptFragment]
   id : String
   type_ : String
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ThreadItemHookPrompt with Eq::{equal, not_equal}
@@ -3341,12 +3395,13 @@ pub impl @json.FromJson for ThreadItemHookPrompt with fn from_json(value, path) 
 ///|
 ///
 /// Generated representation of MemoryCitationEntry.
+#derive(Eq, @debug.Debug)
 pub(all) struct MemoryCitationEntry {
   line_end : UInt32
   line_start : UInt32
   note : String
   path : String
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend MemoryCitationEntry with Eq::{equal, not_equal}
@@ -3400,10 +3455,11 @@ pub impl @json.FromJson for MemoryCitationEntry with fn from_json(value, path) {
 ///|
 ///
 /// Generated representation of MemoryCitation.
+#derive(Eq, @debug.Debug)
 pub(all) struct MemoryCitation {
   entries : Array[MemoryCitationEntry]
   thread_ids : Array[String]
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend MemoryCitation with Eq::{equal, not_equal}
@@ -3451,12 +3507,13 @@ pub impl @json.FromJson for MemoryCitation with fn from_json(value, path) {
 ///|
 ///
 /// Classifies an assistant message as interim commentary or final answer text. Providers do not emit this consistently, so callers must treat `None` as "phase unknown" and keep compatibility behavior for legacy models.
+#derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum MessagePhase {
   Commentary
   FinalAnswer
   Unknown(String)
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend MessagePhase with Eq::{equal, not_equal}
@@ -3503,10 +3560,11 @@ pub impl @json.FromJson for MessagePhase with fn from_json(value, path) {
 ///|
 ///
 /// Generated representation of AsyncUserInputQuestion.
+#derive(Eq, @debug.Debug)
 pub(all) struct AsyncUserInputQuestion {
   options : @sdkjson.Presence[Array[String]]
   title : String
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend AsyncUserInputQuestion with Eq::{equal, not_equal}
@@ -3557,6 +3615,7 @@ pub impl @json.FromJson for AsyncUserInputQuestion with fn from_json(
 ///|
 ///
 /// Generated representation of ThreadItemAgentMessage.
+#derive(Eq, @debug.Debug)
 pub(all) struct ThreadItemAgentMessage {
   delivery : @sdkjson.Presence[String]
   id : String
@@ -3565,7 +3624,7 @@ pub(all) struct ThreadItemAgentMessage {
   questions : @sdkjson.Presence[Array[AsyncUserInputQuestion]]
   text : String
   type_ : String
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ThreadItemAgentMessage with Eq::{equal, not_equal}
@@ -3639,10 +3698,11 @@ pub impl @json.FromJson for ThreadItemAgentMessage with fn from_json(
 ///|
 ///
 /// Generated representation of FunctionCallOutputContentItemInputText.
+#derive(Eq, @debug.Debug)
 pub(all) struct FunctionCallOutputContentItemInputText {
   text : String
   type_ : String
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend FunctionCallOutputContentItemInputText with Eq::{equal, not_equal}
@@ -3695,11 +3755,12 @@ pub impl @json.FromJson for FunctionCallOutputContentItemInputText with fn from_
 ///|
 ///
 /// Generated representation of FunctionCallOutputContentItemInputImage.
+#derive(Eq, @debug.Debug)
 pub(all) struct FunctionCallOutputContentItemInputImage {
   detail : @sdkjson.Presence[ImageDetail]
   image_url : String
   type_ : String
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend FunctionCallOutputContentItemInputImage with Eq::{equal, not_equal}
@@ -3757,10 +3818,11 @@ pub impl @json.FromJson for FunctionCallOutputContentItemInputImage with fn from
 ///|
 ///
 /// Generated representation of FunctionCallOutputContentItemInputAudio.
+#derive(Eq, @debug.Debug)
 pub(all) struct FunctionCallOutputContentItemInputAudio {
   audio_url : String
   type_ : String
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend FunctionCallOutputContentItemInputAudio with Eq::{equal, not_equal}
@@ -3815,10 +3877,11 @@ pub impl @json.FromJson for FunctionCallOutputContentItemInputAudio with fn from
 ///|
 ///
 /// Generated representation of FunctionCallOutputContentItemEncryptedContent.
+#derive(Eq, @debug.Debug)
 pub(all) struct FunctionCallOutputContentItemEncryptedContent {
   encrypted_content : String
   type_ : String
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend FunctionCallOutputContentItemEncryptedContent with Eq::{
@@ -3878,6 +3941,7 @@ pub impl @json.FromJson for FunctionCallOutputContentItemEncryptedContent with f
 ///|
 ///
 /// Responses API compatible content items that can be returned by a tool call. This is a subset of ContentItem with the types we support as function call outputs.
+#derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum FunctionCallOutputContentItem {
   InputText(FunctionCallOutputContentItemInputText)
@@ -3885,7 +3949,7 @@ pub(all) enum FunctionCallOutputContentItem {
   InputAudio(FunctionCallOutputContentItemInputAudio)
   EncryptedContent(FunctionCallOutputContentItemEncryptedContent)
   Unknown(String, Json)
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend FunctionCallOutputContentItem with Eq::{equal, not_equal}
@@ -3933,11 +3997,12 @@ pub impl @json.FromJson for FunctionCallOutputContentItem with fn from_json(
 ///|
 ///
 /// Generated untagged union FunctionCallOutputBody.
+#derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum FunctionCallOutputBody {
   Text(String)
   FunctionCallOutputContentItemArray(Array[FunctionCallOutputContentItem])
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend FunctionCallOutputBody with Eq::{equal, not_equal}
@@ -3987,13 +4052,14 @@ pub impl @json.FromJson for FunctionCallOutputBody with fn from_json(
 ///|
 ///
 /// Generated representation of ThreadItemFunctionCallOutput.
+#derive(Eq, @debug.Debug)
 pub(all) struct ThreadItemFunctionCallOutput {
   id : String
   name : String
   namespace_ : @sdkjson.Presence[String]
   output : FunctionCallOutputBody
   type_ : String
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ThreadItemFunctionCallOutput with Eq::{equal, not_equal}
@@ -4059,11 +4125,12 @@ pub impl @json.FromJson for ThreadItemFunctionCallOutput with fn from_json(
 ///|
 ///
 /// EXPERIMENTAL - proposed plan item content. The completed plan item is authoritative and may not match the concatenation of `PlanDelta` text.
+#derive(Eq, @debug.Debug)
 pub(all) struct ThreadItemPlan {
   id : String
   text : String
   type_ : String
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ThreadItemPlan with Eq::{equal, not_equal}
@@ -4114,12 +4181,13 @@ pub impl @json.FromJson for ThreadItemPlan with fn from_json(value, path) {
 ///|
 ///
 /// Generated representation of ThreadItemReasoning.
+#derive(Eq, @debug.Debug)
 pub(all) struct ThreadItemReasoning {
   content : Array[String]?
   id : String
   summary : Array[String]?
   type_ : String
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ThreadItemReasoning with Eq::{equal, not_equal}
@@ -4173,12 +4241,13 @@ pub impl @json.FromJson for ThreadItemReasoning with fn from_json(value, path) {
 ///|
 ///
 /// Generated representation of CommandActionRead.
+#derive(Eq, @debug.Debug)
 pub(all) struct CommandActionRead {
   command : String
   name : String
   path : String
   type_ : String
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend CommandActionRead with Eq::{equal, not_equal}
@@ -4232,11 +4301,12 @@ pub impl @json.FromJson for CommandActionRead with fn from_json(value, path) {
 ///|
 ///
 /// Generated representation of CommandActionListFiles.
+#derive(Eq, @debug.Debug)
 pub(all) struct CommandActionListFiles {
   command : String
   path : @sdkjson.Presence[String]
   type_ : String
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend CommandActionListFiles with Eq::{equal, not_equal}
@@ -4290,12 +4360,13 @@ pub impl @json.FromJson for CommandActionListFiles with fn from_json(
 ///|
 ///
 /// Generated representation of CommandActionSearch.
+#derive(Eq, @debug.Debug)
 pub(all) struct CommandActionSearch {
   command : String
   path : @sdkjson.Presence[String]
   query : @sdkjson.Presence[String]
   type_ : String
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend CommandActionSearch with Eq::{equal, not_equal}
@@ -4354,10 +4425,11 @@ pub impl @json.FromJson for CommandActionSearch with fn from_json(value, path) {
 ///|
 ///
 /// Generated representation of CommandActionKnownUnknown.
+#derive(Eq, @debug.Debug)
 pub(all) struct CommandActionKnownUnknown {
   command : String
   type_ : String
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend CommandActionKnownUnknown with Eq::{equal, not_equal}
@@ -4408,6 +4480,7 @@ pub impl @json.FromJson for CommandActionKnownUnknown with fn from_json(
 ///|
 ///
 /// Generated tagged union CommandAction.
+#derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum CommandAction {
   Read(CommandActionRead)
@@ -4415,7 +4488,7 @@ pub(all) enum CommandAction {
   Search(CommandActionSearch)
   KnownUnknown(CommandActionKnownUnknown)
   Unknown(String, Json)
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend CommandAction with Eq::{equal, not_equal}
@@ -4460,6 +4533,7 @@ pub impl @json.FromJson for CommandAction with fn from_json(value, path) {
 ///|
 ///
 /// Generated string enum CommandExecutionSource.
+#derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum CommandExecutionSource {
   Agent
@@ -4467,7 +4541,7 @@ pub(all) enum CommandExecutionSource {
   UnifiedExecStartup
   UnifiedExecInteraction
   Unknown(String)
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend CommandExecutionSource with Eq::{equal, not_equal}
@@ -4521,6 +4595,7 @@ pub impl @json.FromJson for CommandExecutionSource with fn from_json(
 ///|
 ///
 /// Generated string enum CommandExecutionStatus.
+#derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum CommandExecutionStatus {
   InProgress
@@ -4528,7 +4603,7 @@ pub(all) enum CommandExecutionStatus {
   Failed
   Declined
   Unknown(String)
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend CommandExecutionStatus with Eq::{equal, not_equal}
@@ -4582,6 +4657,7 @@ pub impl @json.FromJson for CommandExecutionStatus with fn from_json(
 ///|
 ///
 /// Generated representation of ThreadItemCommandExecution.
+#derive(Eq, @debug.Debug)
 pub(all) struct ThreadItemCommandExecution {
   aggregated_output : @sdkjson.Presence[String]
   command : String
@@ -4596,7 +4672,7 @@ pub(all) struct ThreadItemCommandExecution {
   source : CommandExecutionSource?
   status : CommandExecutionStatus
   type_ : String
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ThreadItemCommandExecution with Eq::{equal, not_equal}
@@ -4697,9 +4773,10 @@ pub impl @json.FromJson for ThreadItemCommandExecution with fn from_json(
 ///|
 ///
 /// Generated representation of PatchChangeKindAdd.
+#derive(Eq, @debug.Debug)
 pub(all) struct PatchChangeKindAdd {
   type_ : String
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend PatchChangeKindAdd with Eq::{equal, not_equal}
@@ -4738,9 +4815,10 @@ pub impl @json.FromJson for PatchChangeKindAdd with fn from_json(value, path) {
 ///|
 ///
 /// Generated representation of PatchChangeKindDelete.
+#derive(Eq, @debug.Debug)
 pub(all) struct PatchChangeKindDelete {
   type_ : String
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend PatchChangeKindDelete with Eq::{equal, not_equal}
@@ -4779,10 +4857,11 @@ pub impl @json.FromJson for PatchChangeKindDelete with fn from_json(value, path)
 ///|
 ///
 /// Generated representation of PatchChangeKindUpdate.
+#derive(Eq, @debug.Debug)
 pub(all) struct PatchChangeKindUpdate {
   move_path : @sdkjson.Presence[String]
   type_ : String
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend PatchChangeKindUpdate with Eq::{equal, not_equal}
@@ -4830,13 +4909,14 @@ pub impl @json.FromJson for PatchChangeKindUpdate with fn from_json(value, path)
 ///|
 ///
 /// Generated tagged union PatchChangeKind.
+#derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum PatchChangeKind {
   Add(PatchChangeKindAdd)
   Delete(PatchChangeKindDelete)
   Update(PatchChangeKindUpdate)
   Unknown(String, Json)
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend PatchChangeKind with Eq::{equal, not_equal}
@@ -4879,11 +4959,12 @@ pub impl @json.FromJson for PatchChangeKind with fn from_json(value, path) {
 ///|
 ///
 /// Generated representation of FileUpdateChange.
+#derive(Eq, @debug.Debug)
 pub(all) struct FileUpdateChange {
   diff : String
   kind : PatchChangeKind
   path : String
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend FileUpdateChange with Eq::{equal, not_equal}
@@ -4934,6 +5015,7 @@ pub impl @json.FromJson for FileUpdateChange with fn from_json(value, path) {
 ///|
 ///
 /// Generated string enum PatchApplyStatus.
+#derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum PatchApplyStatus {
   InProgress
@@ -4941,7 +5023,7 @@ pub(all) enum PatchApplyStatus {
   Failed
   Declined
   Unknown(String)
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend PatchApplyStatus with Eq::{equal, not_equal}
@@ -4992,12 +5074,13 @@ pub impl @json.FromJson for PatchApplyStatus with fn from_json(value, path) {
 ///|
 ///
 /// Generated representation of ThreadItemFileChange.
+#derive(Eq, @debug.Debug)
 pub(all) struct ThreadItemFileChange {
   changes : Array[FileUpdateChange]
   id : String
   status : PatchApplyStatus
   type_ : String
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ThreadItemFileChange with Eq::{equal, not_equal}
@@ -5051,13 +5134,14 @@ pub impl @json.FromJson for ThreadItemFileChange with fn from_json(value, path) 
 ///|
 ///
 /// Generated representation of McpToolCallAppContext.
+#derive(Eq, @debug.Debug)
 pub(all) struct McpToolCallAppContext {
   action_name : @sdkjson.Presence[String]
   app_name : @sdkjson.Presence[String]
   connector_id : String
   link_id : @sdkjson.Presence[String]
   resource_uri : @sdkjson.Presence[String]
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend McpToolCallAppContext with Eq::{equal, not_equal}
@@ -5120,9 +5204,10 @@ pub impl @json.FromJson for McpToolCallAppContext with fn from_json(value, path)
 ///|
 ///
 /// Generated representation of McpToolCallError.
+#derive(Eq, @debug.Debug)
 pub(all) struct McpToolCallError {
   message : String
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend McpToolCallError with Eq::{equal, not_equal}
@@ -5161,11 +5246,12 @@ pub impl @json.FromJson for McpToolCallError with fn from_json(value, path) {
 ///|
 ///
 /// Generated representation of McpToolCallResult.
+#derive(Eq, @debug.Debug)
 pub(all) struct McpToolCallResult {
   meta : @sdkjson.Presence[Json]
   content : Array[Json]
   structured_content : @sdkjson.Presence[Json]
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend McpToolCallResult with Eq::{equal, not_equal}
@@ -5220,13 +5306,14 @@ pub impl @json.FromJson for McpToolCallResult with fn from_json(value, path) {
 ///|
 ///
 /// Generated string enum McpToolCallStatus.
+#derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum McpToolCallStatus {
   InProgress
   Completed
   Failed
   Unknown(String)
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend McpToolCallStatus with Eq::{equal, not_equal}
@@ -5275,6 +5362,7 @@ pub impl @json.FromJson for McpToolCallStatus with fn from_json(value, path) {
 ///|
 ///
 /// Generated representation of ThreadItemMcpToolCall.
+#derive(Eq, @debug.Debug)
 pub(all) struct ThreadItemMcpToolCall {
   app_context : @sdkjson.Presence[McpToolCallAppContext]
   arguments : Json?
@@ -5289,7 +5377,7 @@ pub(all) struct ThreadItemMcpToolCall {
   status : McpToolCallStatus
   tool : String
   type_ : String
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ThreadItemMcpToolCall with Eq::{equal, not_equal}
@@ -5389,10 +5477,11 @@ pub impl @json.FromJson for ThreadItemMcpToolCall with fn from_json(value, path)
 ///|
 ///
 /// Generated representation of DynamicToolCallOutputContentItemInputText.
+#derive(Eq, @debug.Debug)
 pub(all) struct DynamicToolCallOutputContentItemInputText {
   text : String
   type_ : String
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend DynamicToolCallOutputContentItemInputText with Eq::{equal, not_equal}
@@ -5449,10 +5538,11 @@ pub impl @json.FromJson for DynamicToolCallOutputContentItemInputText with fn fr
 ///|
 ///
 /// Generated representation of DynamicToolCallOutputContentItemInputImage.
+#derive(Eq, @debug.Debug)
 pub(all) struct DynamicToolCallOutputContentItemInputImage {
   image_url : String
   type_ : String
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend DynamicToolCallOutputContentItemInputImage with Eq::{
@@ -5512,10 +5602,11 @@ pub impl @json.FromJson for DynamicToolCallOutputContentItemInputImage with fn f
 ///|
 ///
 /// Generated representation of DynamicToolCallOutputContentItemInputAudio.
+#derive(Eq, @debug.Debug)
 pub(all) struct DynamicToolCallOutputContentItemInputAudio {
   audio_url : String
   type_ : String
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend DynamicToolCallOutputContentItemInputAudio with Eq::{
@@ -5575,13 +5666,14 @@ pub impl @json.FromJson for DynamicToolCallOutputContentItemInputAudio with fn f
 ///|
 ///
 /// Generated tagged union DynamicToolCallOutputContentItem.
+#derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum DynamicToolCallOutputContentItem {
   InputText(DynamicToolCallOutputContentItemInputText)
   InputImage(DynamicToolCallOutputContentItemInputImage)
   InputAudio(DynamicToolCallOutputContentItemInputAudio)
   Unknown(String, Json)
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend DynamicToolCallOutputContentItem with Eq::{equal, not_equal}
@@ -5627,13 +5719,14 @@ pub impl @json.FromJson for DynamicToolCallOutputContentItem with fn from_json(
 ///|
 ///
 /// Generated string enum DynamicToolCallStatus.
+#derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum DynamicToolCallStatus {
   InProgress
   Completed
   Failed
   Unknown(String)
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend DynamicToolCallStatus with Eq::{equal, not_equal}
@@ -5682,6 +5775,7 @@ pub impl @json.FromJson for DynamicToolCallStatus with fn from_json(value, path)
 ///|
 ///
 /// Generated representation of ThreadItemDynamicToolCall.
+#derive(Eq, @debug.Debug)
 pub(all) struct ThreadItemDynamicToolCall {
   arguments : Json?
   content_items : @sdkjson.Presence[Array[DynamicToolCallOutputContentItem]]
@@ -5692,7 +5786,7 @@ pub(all) struct ThreadItemDynamicToolCall {
   success : @sdkjson.Presence[Bool]
   tool : String
   type_ : String
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ThreadItemDynamicToolCall with Eq::{equal, not_equal}
@@ -5777,6 +5871,7 @@ pub impl @json.FromJson for ThreadItemDynamicToolCall with fn from_json(
 ///|
 ///
 /// Generated string enum CollabAgentStatus.
+#derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum CollabAgentStatus {
   PendingInit
@@ -5787,7 +5882,7 @@ pub(all) enum CollabAgentStatus {
   Shutdown
   NotFound
   Unknown(String)
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend CollabAgentStatus with Eq::{equal, not_equal}
@@ -5844,10 +5939,11 @@ pub impl @json.FromJson for CollabAgentStatus with fn from_json(value, path) {
 ///|
 ///
 /// Generated representation of CollabAgentState.
+#derive(Eq, @debug.Debug)
 pub(all) struct CollabAgentState {
   message : @sdkjson.Presence[String]
   status : CollabAgentStatus
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend CollabAgentState with Eq::{equal, not_equal}
@@ -5895,6 +5991,7 @@ pub impl @json.FromJson for CollabAgentState with fn from_json(value, path) {
 ///|
 ///
 /// Generated string enum CollabAgentToolCallStatus.
+#derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum CollabAgentToolCallStatus {
   InProgress
@@ -5902,7 +5999,7 @@ pub(all) enum CollabAgentToolCallStatus {
   Failed
   Interrupted
   Unknown(String)
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend CollabAgentToolCallStatus with Eq::{equal, not_equal}
@@ -5956,6 +6053,7 @@ pub impl @json.FromJson for CollabAgentToolCallStatus with fn from_json(
 ///|
 ///
 /// Generated string enum CollabAgentTool.
+#derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum CollabAgentTool {
   SpawnAgent
@@ -5968,7 +6066,7 @@ pub(all) enum CollabAgentTool {
   InterruptAgent
   ListAgents
   Unknown(String)
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend CollabAgentTool with Eq::{equal, not_equal}
@@ -6029,6 +6127,7 @@ pub impl @json.FromJson for CollabAgentTool with fn from_json(value, path) {
 ///|
 ///
 /// Generated representation of ThreadItemCollabAgentToolCall.
+#derive(Eq, @debug.Debug)
 pub(all) struct ThreadItemCollabAgentToolCall {
   agents_states : Map[String, CollabAgentState]
   id : String
@@ -6040,7 +6139,7 @@ pub(all) struct ThreadItemCollabAgentToolCall {
   status : CollabAgentToolCallStatus
   tool : CollabAgentTool
   type_ : String
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ThreadItemCollabAgentToolCall with Eq::{equal, not_equal}
@@ -6129,6 +6228,7 @@ pub impl @json.FromJson for ThreadItemCollabAgentToolCall with fn from_json(
 ///|
 ///
 /// Generated string enum SubAgentActivityKind.
+#derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum SubAgentActivityKind {
   Started
@@ -6136,7 +6236,7 @@ pub(all) enum SubAgentActivityKind {
   Interrupted
   Completed
   Unknown(String)
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend SubAgentActivityKind with Eq::{equal, not_equal}
@@ -6187,13 +6287,14 @@ pub impl @json.FromJson for SubAgentActivityKind with fn from_json(value, path) 
 ///|
 ///
 /// Generated representation of ThreadItemSubAgentActivity.
+#derive(Eq, @debug.Debug)
 pub(all) struct ThreadItemSubAgentActivity {
   agent_path : String
   agent_thread_id : String
   id : String
   kind : SubAgentActivityKind
   type_ : String
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ThreadItemSubAgentActivity with Eq::{equal, not_equal}
@@ -6253,11 +6354,12 @@ pub impl @json.FromJson for ThreadItemSubAgentActivity with fn from_json(
 ///|
 ///
 /// Generated representation of WebSearchActionSearch.
+#derive(Eq, @debug.Debug)
 pub(all) struct WebSearchActionSearch {
   queries : @sdkjson.Presence[Array[String]]
   query : @sdkjson.Presence[String]
   type_ : String
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend WebSearchActionSearch with Eq::{equal, not_equal}
@@ -6312,10 +6414,11 @@ pub impl @json.FromJson for WebSearchActionSearch with fn from_json(value, path)
 ///|
 ///
 /// Generated representation of WebSearchActionOpenPage.
+#derive(Eq, @debug.Debug)
 pub(all) struct WebSearchActionOpenPage {
   type_ : String
   url : @sdkjson.Presence[String]
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend WebSearchActionOpenPage with Eq::{equal, not_equal}
@@ -6366,11 +6469,12 @@ pub impl @json.FromJson for WebSearchActionOpenPage with fn from_json(
 ///|
 ///
 /// Generated representation of WebSearchActionFindInPage.
+#derive(Eq, @debug.Debug)
 pub(all) struct WebSearchActionFindInPage {
   pattern : @sdkjson.Presence[String]
   type_ : String
   url : @sdkjson.Presence[String]
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend WebSearchActionFindInPage with Eq::{equal, not_equal}
@@ -6428,9 +6532,10 @@ pub impl @json.FromJson for WebSearchActionFindInPage with fn from_json(
 ///|
 ///
 /// Generated representation of WebSearchActionOther.
+#derive(Eq, @debug.Debug)
 pub(all) struct WebSearchActionOther {
   type_ : String
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend WebSearchActionOther with Eq::{equal, not_equal}
@@ -6469,6 +6574,7 @@ pub impl @json.FromJson for WebSearchActionOther with fn from_json(value, path) 
 ///|
 ///
 /// Generated tagged union WebSearchAction.
+#derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum WebSearchAction {
   Search(WebSearchActionSearch)
@@ -6476,7 +6582,7 @@ pub(all) enum WebSearchAction {
   FindInPage(WebSearchActionFindInPage)
   Other(WebSearchActionOther)
   Unknown(String, Json)
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend WebSearchAction with Eq::{equal, not_equal}
@@ -6521,13 +6627,14 @@ pub impl @json.FromJson for WebSearchAction with fn from_json(value, path) {
 ///|
 ///
 /// Generated representation of ThreadItemWebSearch.
+#derive(Eq, @debug.Debug)
 pub(all) struct ThreadItemWebSearch {
   action : @sdkjson.Presence[WebSearchAction]
   id : String
   query : String
   results : @sdkjson.Presence[Array[Json]]
   type_ : String
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ThreadItemWebSearch with Eq::{equal, not_equal}
@@ -6590,11 +6697,12 @@ pub impl @json.FromJson for ThreadItemWebSearch with fn from_json(value, path) {
 ///|
 ///
 /// Generated representation of ThreadItemImageView.
+#derive(Eq, @debug.Debug)
 pub(all) struct ThreadItemImageView {
   id : String
   path : String
   type_ : String
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ThreadItemImageView with Eq::{equal, not_equal}
@@ -6645,11 +6753,12 @@ pub impl @json.FromJson for ThreadItemImageView with fn from_json(value, path) {
 ///|
 ///
 /// Display item emitted by the interruptible `clock.sleep` tool.
+#derive(Eq, @debug.Debug)
 pub(all) struct ThreadItemSleep {
   duration_ms : UInt64Number
   id : String
   type_ : String
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ThreadItemSleep with Eq::{equal, not_equal}
@@ -6700,11 +6809,12 @@ pub impl @json.FromJson for ThreadItemSleep with fn from_json(value, path) {
 ///|
 ///
 /// Generated representation of ImageGenerationFailureUsageLimitExceeded.
+#derive(Eq, @debug.Debug)
 pub(all) struct ImageGenerationFailureUsageLimitExceeded {
   limit_id : String
   resets_at : @sdkjson.Presence[Int64]
   type_ : String
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ImageGenerationFailureUsageLimitExceeded with Eq::{equal, not_equal}
@@ -6762,11 +6872,12 @@ pub impl @json.FromJson for ImageGenerationFailureUsageLimitExceeded with fn fro
 ///|
 ///
 /// Generated tagged union ImageGenerationFailure.
+#derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum ImageGenerationFailure {
   UsageLimitExceeded(ImageGenerationFailureUsageLimitExceeded)
   Unknown(String, Json)
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ImageGenerationFailure with Eq::{equal, not_equal}
@@ -6808,6 +6919,7 @@ pub impl @json.FromJson for ImageGenerationFailure with fn from_json(
 ///|
 ///
 /// Generated representation of ThreadItemImageGeneration.
+#derive(Eq, @debug.Debug)
 pub(all) struct ThreadItemImageGeneration {
   failure : @sdkjson.Presence[ImageGenerationFailure]
   id : String
@@ -6817,7 +6929,7 @@ pub(all) struct ThreadItemImageGeneration {
   status : String
   transparent_background : @sdkjson.Presence[Bool]
   type_ : String
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ThreadItemImageGeneration with Eq::{equal, not_equal}
@@ -6899,11 +7011,12 @@ pub impl @json.FromJson for ThreadItemImageGeneration with fn from_json(
 ///|
 ///
 /// Generated representation of ThreadItemEnteredReviewMode.
+#derive(Eq, @debug.Debug)
 pub(all) struct ThreadItemEnteredReviewMode {
   id : String
   review : String
   type_ : String
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ThreadItemEnteredReviewMode with Eq::{equal, not_equal}
@@ -6957,11 +7070,12 @@ pub impl @json.FromJson for ThreadItemEnteredReviewMode with fn from_json(
 ///|
 ///
 /// Generated representation of ThreadItemExitedReviewMode.
+#derive(Eq, @debug.Debug)
 pub(all) struct ThreadItemExitedReviewMode {
   id : String
   review : String
   type_ : String
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ThreadItemExitedReviewMode with Eq::{equal, not_equal}
@@ -7015,10 +7129,11 @@ pub impl @json.FromJson for ThreadItemExitedReviewMode with fn from_json(
 ///|
 ///
 /// Generated representation of ThreadItemContextCompaction.
+#derive(Eq, @debug.Debug)
 pub(all) struct ThreadItemContextCompaction {
   id : String
   type_ : String
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ThreadItemContextCompaction with Eq::{equal, not_equal}
@@ -7069,6 +7184,7 @@ pub impl @json.FromJson for ThreadItemContextCompaction with fn from_json(
 ///|
 ///
 /// Generated tagged union ThreadItem.
+#derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum ThreadItem {
   UserMessage(ThreadItemUserMessage)
@@ -7091,7 +7207,7 @@ pub(all) enum ThreadItem {
   ExitedReviewMode(ThreadItemExitedReviewMode)
   ContextCompaction(ThreadItemContextCompaction)
   Unknown(String, Json)
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ThreadItem with Eq::{equal, not_equal}
@@ -7166,13 +7282,14 @@ pub impl @json.FromJson for ThreadItem with fn from_json(value, path) {
 ///|
 ///
 /// Generated string enum TurnItemsView.
+#derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum TurnItemsView {
   NotLoaded
   Summary
   Full
   Unknown(String)
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend TurnItemsView with Eq::{equal, not_equal}
@@ -7221,6 +7338,7 @@ pub impl @json.FromJson for TurnItemsView with fn from_json(value, path) {
 ///|
 ///
 /// Generated string enum TurnStatus.
+#derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum TurnStatus {
   Completed
@@ -7228,7 +7346,7 @@ pub(all) enum TurnStatus {
   Failed
   InProgress
   Unknown(String)
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend TurnStatus with Eq::{equal, not_equal}
@@ -7279,6 +7397,7 @@ pub impl @json.FromJson for TurnStatus with fn from_json(value, path) {
 ///|
 ///
 /// Generated representation of Turn.
+#derive(Eq, @debug.Debug)
 pub(all) struct Turn {
   completed_at : @sdkjson.Presence[Int64]
   duration_ms : @sdkjson.Presence[Int64]
@@ -7288,7 +7407,7 @@ pub(all) struct Turn {
   items_view : TurnItemsView?
   started_at : @sdkjson.Presence[Int64]
   status : TurnStatus
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend Turn with Eq::{equal, not_equal}
@@ -7372,6 +7491,7 @@ pub impl @json.FromJson for Turn with fn from_json(value, path) {
 ///|
 ///
 /// Generated representation of Thread.
+#derive(Eq, @debug.Debug)
 pub(all) struct Thread {
   agent_nickname : @sdkjson.Presence[String]
   agent_role : @sdkjson.Presence[String]
@@ -7401,7 +7521,7 @@ pub(all) struct Thread {
   thread_source : @sdkjson.Presence[String]
   turns : Array[Turn]
   updated_at : Int64
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend Thread with Eq::{equal, not_equal}
@@ -7568,6 +7688,7 @@ pub impl @json.FromJson for Thread with fn from_json(value, path) {
 ///|
 ///
 /// Generated representation of ThreadStartResponse.
+#derive(Eq, @debug.Debug)
 pub(all) struct ThreadStartResponse {
   approval_policy : AskForApproval
   approvals_reviewer : ApprovalsReviewer
@@ -7579,7 +7700,7 @@ pub(all) struct ThreadStartResponse {
   sandbox : SandboxPolicy
   service_tier : @sdkjson.Presence[String]
   thread : Thread
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ThreadStartResponse with Eq::{equal, not_equal}
@@ -7662,6 +7783,7 @@ pub impl @json.FromJson for ThreadStartResponse with fn from_json(value, path) {
 ///|
 ///
 /// There are three ways to resume a thread: 1. By thread_id: load the thread from disk by thread_id and resume it. 2. By history: instantiate the thread from memory and resume it. 3. By path: load the thread from disk by path and resume it. For non-running threads, the precedence is: history > non-empty path > thread_id. If using history or a non-empty path for a non-running thread, the thread_id param will be ignored. If thread_id identifies a running thread, app-server rejoins that thread and treats a non-empty path as a consistency check against the active rollout path. Empty string path values are treated as absent. Prefer using thread_id whenever possible.
+#derive(Eq, @debug.Debug)
 pub(all) struct ThreadResumeParams {
   approval_policy : @sdkjson.Presence[AskForApproval]
   approvals_reviewer : @sdkjson.Presence[ApprovalsReviewer]
@@ -7676,7 +7798,7 @@ pub(all) struct ThreadResumeParams {
   sandbox : @sdkjson.Presence[SandboxMode]
   service_tier : @sdkjson.Presence[String]
   thread_id : String
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ThreadResumeParams with Eq::{equal, not_equal}
@@ -7775,6 +7897,7 @@ pub impl @json.FromJson for ThreadResumeParams with fn from_json(value, path) {
 ///|
 ///
 /// Generated representation of ThreadResumeResponse.
+#derive(Eq, @debug.Debug)
 pub(all) struct ThreadResumeResponse {
   approval_policy : AskForApproval
   approvals_reviewer : ApprovalsReviewer
@@ -7788,7 +7911,7 @@ pub(all) struct ThreadResumeResponse {
   service_tier : @sdkjson.Presence[String]
   thread : Thread
   turns_backwards_cursor : @sdkjson.Presence[String]
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ThreadResumeResponse with Eq::{equal, not_equal}
@@ -7887,6 +8010,7 @@ pub impl @json.FromJson for ThreadResumeResponse with fn from_json(value, path) 
 ///|
 ///
 /// A summary of the reasoning performed by the model. This can be useful for debugging and understanding the model's reasoning process. See https://platform.openai.com/docs/guides/reasoning?api-mode=responses#reasoning-summaries
+#derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum ReasoningSummary {
   Auto
@@ -7894,7 +8018,7 @@ pub(all) enum ReasoningSummary {
   Detailed
   None
   Custom(String)
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ReasoningSummary with Eq::{equal, not_equal}
@@ -7945,11 +8069,12 @@ pub impl @json.FromJson for ReasoningSummary with fn from_json(value, path) {
 ///|
 ///
 /// Generated representation of TurnToolOutput.
+#derive(Eq, @debug.Debug)
 pub(all) struct TurnToolOutput {
   name : String
   namespace_ : @sdkjson.Presence[String]
   output : FunctionCallOutputBody
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend TurnToolOutput with Eq::{equal, not_equal}
@@ -8000,6 +8125,7 @@ pub impl @json.FromJson for TurnToolOutput with fn from_json(value, path) {
 ///|
 ///
 /// Generated representation of TurnStartParams.
+#derive(Eq, @debug.Debug)
 pub(all) struct TurnStartParams {
   approval_policy : @sdkjson.Presence[AskForApproval]
   approvals_reviewer : @sdkjson.Presence[ApprovalsReviewer]
@@ -8017,7 +8143,7 @@ pub(all) struct TurnStartParams {
   thread_id : String
   tool_output : @sdkjson.Presence[TurnToolOutput]
   turn_trigger : @sdkjson.Presence[String]
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend TurnStartParams with Eq::{equal, not_equal}
@@ -8130,9 +8256,10 @@ pub impl @json.FromJson for TurnStartParams with fn from_json(value, path) {
 ///|
 ///
 /// Generated representation of TurnStartResponse.
+#derive(Eq, @debug.Debug)
 pub(all) struct TurnStartResponse {
   turn : Turn
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend TurnStartResponse with Eq::{equal, not_equal}
@@ -8171,10 +8298,11 @@ pub impl @json.FromJson for TurnStartResponse with fn from_json(value, path) {
 ///|
 ///
 /// Generated representation of TurnInterruptParams.
+#derive(Eq, @debug.Debug)
 pub(all) struct TurnInterruptParams {
   thread_id : String
   turn_id : String
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend TurnInterruptParams with Eq::{equal, not_equal}
@@ -8222,12 +8350,13 @@ pub impl @json.FromJson for TurnInterruptParams with fn from_json(value, path) {
 ///|
 ///
 /// Distinguishes a command approval from input sent to an existing terminal.
+#derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum CommandExecutionApprovalKind {
   Command
   WriteStdin
   Unknown(String)
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend CommandExecutionApprovalKind with Eq::{equal, not_equal}
@@ -8277,6 +8406,7 @@ pub impl @json.FromJson for CommandExecutionApprovalKind with fn from_json(
 ///|
 ///
 /// Generated string enum NetworkApprovalProtocol.
+#derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum NetworkApprovalProtocol {
   Http
@@ -8284,7 +8414,7 @@ pub(all) enum NetworkApprovalProtocol {
   Socks5Tcp
   Socks5Udp
   Unknown(String)
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend NetworkApprovalProtocol with Eq::{equal, not_equal}
@@ -8338,10 +8468,11 @@ pub impl @json.FromJson for NetworkApprovalProtocol with fn from_json(
 ///|
 ///
 /// Generated representation of NetworkApprovalContext.
+#derive(Eq, @debug.Debug)
 pub(all) struct NetworkApprovalContext {
   host : String
   protocol : NetworkApprovalProtocol
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend NetworkApprovalContext with Eq::{equal, not_equal}
@@ -8392,12 +8523,13 @@ pub impl @json.FromJson for NetworkApprovalContext with fn from_json(
 ///|
 ///
 /// Generated string enum NetworkPolicyRuleAction.
+#derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum NetworkPolicyRuleAction {
   Allow
   Deny
   Unknown(String)
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend NetworkPolicyRuleAction with Eq::{equal, not_equal}
@@ -8447,10 +8579,11 @@ pub impl @json.FromJson for NetworkPolicyRuleAction with fn from_json(
 ///|
 ///
 /// Generated representation of NetworkPolicyAmendment.
+#derive(Eq, @debug.Debug)
 pub(all) struct NetworkPolicyAmendment {
   action : NetworkPolicyRuleAction
   host : String
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend NetworkPolicyAmendment with Eq::{equal, not_equal}
@@ -8501,6 +8634,7 @@ pub impl @json.FromJson for NetworkPolicyAmendment with fn from_json(
 ///|
 ///
 /// Generated representation of CommandExecutionRequestApprovalParams.
+#derive(Eq, @debug.Debug)
 pub(all) struct CommandExecutionRequestApprovalParams {
   approval_id : @sdkjson.Presence[String]
   command : @sdkjson.Presence[String]
@@ -8518,7 +8652,7 @@ pub(all) struct CommandExecutionRequestApprovalParams {
   started_at_ms : Int64
   thread_id : String
   turn_id : String
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend CommandExecutionRequestApprovalParams with Eq::{equal, not_equal}
@@ -8640,9 +8774,10 @@ pub impl @json.FromJson for CommandExecutionRequestApprovalParams with fn from_j
 ///|
 ///
 /// Generated representation of CommandExecutionApprovalDecisionAcceptWithExecpolicyAmendment.
+#derive(Eq, @debug.Debug)
 pub(all) struct CommandExecutionApprovalDecisionAcceptWithExecpolicyAmendment {
   execpolicy_amendment : Array[String]
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend CommandExecutionApprovalDecisionAcceptWithExecpolicyAmendment with Eq::{
@@ -8699,9 +8834,10 @@ pub impl @json.FromJson for CommandExecutionApprovalDecisionAcceptWithExecpolicy
 ///|
 ///
 /// Generated representation of CommandExecutionApprovalDecisionApplyNetworkPolicyAmendment.
+#derive(Eq, @debug.Debug)
 pub(all) struct CommandExecutionApprovalDecisionApplyNetworkPolicyAmendment {
   network_policy_amendment : NetworkPolicyAmendment
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend CommandExecutionApprovalDecisionApplyNetworkPolicyAmendment with Eq::{
@@ -8762,6 +8898,7 @@ pub impl @json.FromJson for CommandExecutionApprovalDecisionApplyNetworkPolicyAm
 ///|
 ///
 /// Generated externally tagged union CommandExecutionApprovalDecision.
+#derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum CommandExecutionApprovalDecision {
   Accept
@@ -8775,7 +8912,7 @@ pub(all) enum CommandExecutionApprovalDecision {
   Decline
   Cancel
   UnknownValue(Json)
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend CommandExecutionApprovalDecision with Eq::{equal, not_equal}
@@ -8855,9 +8992,10 @@ pub impl @json.FromJson for CommandExecutionApprovalDecision with fn from_json(
 ///|
 ///
 /// Generated representation of CommandExecutionRequestApprovalResponse.
+#derive(Eq, @debug.Debug)
 pub(all) struct CommandExecutionRequestApprovalResponse {
   decision : CommandExecutionApprovalDecision
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend CommandExecutionRequestApprovalResponse with Eq::{equal, not_equal}
@@ -8905,6 +9043,7 @@ pub impl @json.FromJson for CommandExecutionRequestApprovalResponse with fn from
 ///|
 ///
 /// Generated representation of FileChangeRequestApprovalParams.
+#derive(Eq, @debug.Debug)
 pub(all) struct FileChangeRequestApprovalParams {
   grant_root : @sdkjson.Presence[String]
   item_id : String
@@ -8912,7 +9051,7 @@ pub(all) struct FileChangeRequestApprovalParams {
   started_at_ms : Int64
   thread_id : String
   turn_id : String
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend FileChangeRequestApprovalParams with Eq::{equal, not_equal}
@@ -8985,6 +9124,7 @@ pub impl @json.FromJson for FileChangeRequestApprovalParams with fn from_json(
 ///|
 ///
 /// Generated string enum FileChangeApprovalDecision.
+#derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum FileChangeApprovalDecision {
   Accept
@@ -8992,7 +9132,7 @@ pub(all) enum FileChangeApprovalDecision {
   Decline
   Cancel
   Custom(String)
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend FileChangeApprovalDecision with Eq::{equal, not_equal}
@@ -9046,9 +9186,10 @@ pub impl @json.FromJson for FileChangeApprovalDecision with fn from_json(
 ///|
 ///
 /// Generated representation of FileChangeRequestApprovalResponse.
+#derive(Eq, @debug.Debug)
 pub(all) struct FileChangeRequestApprovalResponse {
   decision : FileChangeApprovalDecision
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend FileChangeRequestApprovalResponse with Eq::{equal, not_equal}
@@ -9092,13 +9233,14 @@ pub impl @json.FromJson for FileChangeRequestApprovalResponse with fn from_json(
 ///|
 ///
 /// Generated string enum FileSystemAccessMode.
+#derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum FileSystemAccessMode {
   Read
   Write
   Deny
   Unknown(String)
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend FileSystemAccessMode with Eq::{equal, not_equal}
@@ -9147,10 +9289,11 @@ pub impl @json.FromJson for FileSystemAccessMode with fn from_json(value, path) 
 ///|
 ///
 /// Generated representation of FileSystemPathPath.
+#derive(Eq, @debug.Debug)
 pub(all) struct FileSystemPathPath {
   path : String
   type_ : String
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend FileSystemPathPath with Eq::{equal, not_equal}
@@ -9198,10 +9341,11 @@ pub impl @json.FromJson for FileSystemPathPath with fn from_json(value, path) {
 ///|
 ///
 /// Generated representation of FileSystemPathGlobPattern.
+#derive(Eq, @debug.Debug)
 pub(all) struct FileSystemPathGlobPattern {
   pattern : String
   type_ : String
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend FileSystemPathGlobPattern with Eq::{equal, not_equal}
@@ -9252,9 +9396,10 @@ pub impl @json.FromJson for FileSystemPathGlobPattern with fn from_json(
 ///|
 ///
 /// Generated representation of FileSystemSpecialPathRoot.
+#derive(Eq, @debug.Debug)
 pub(all) struct FileSystemSpecialPathRoot {
   kind : String
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend FileSystemSpecialPathRoot with Eq::{equal, not_equal}
@@ -9298,9 +9443,10 @@ pub impl @json.FromJson for FileSystemSpecialPathRoot with fn from_json(
 ///|
 ///
 /// Generated representation of FileSystemSpecialPathMinimal.
+#derive(Eq, @debug.Debug)
 pub(all) struct FileSystemSpecialPathMinimal {
   kind : String
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend FileSystemSpecialPathMinimal with Eq::{equal, not_equal}
@@ -9344,10 +9490,11 @@ pub impl @json.FromJson for FileSystemSpecialPathMinimal with fn from_json(
 ///|
 ///
 /// Generated representation of FileSystemSpecialPathProjectRoots.
+#derive(Eq, @debug.Debug)
 pub(all) struct FileSystemSpecialPathProjectRoots {
   kind : String
   subpath : @sdkjson.Presence[String]
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend FileSystemSpecialPathProjectRoots with Eq::{equal, not_equal}
@@ -9398,9 +9545,10 @@ pub impl @json.FromJson for FileSystemSpecialPathProjectRoots with fn from_json(
 ///|
 ///
 /// Generated representation of FileSystemSpecialPathTmpdir.
+#derive(Eq, @debug.Debug)
 pub(all) struct FileSystemSpecialPathTmpdir {
   kind : String
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend FileSystemSpecialPathTmpdir with Eq::{equal, not_equal}
@@ -9444,9 +9592,10 @@ pub impl @json.FromJson for FileSystemSpecialPathTmpdir with fn from_json(
 ///|
 ///
 /// Generated representation of FileSystemSpecialPathSlashTmp.
+#derive(Eq, @debug.Debug)
 pub(all) struct FileSystemSpecialPathSlashTmp {
   kind : String
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend FileSystemSpecialPathSlashTmp with Eq::{equal, not_equal}
@@ -9490,11 +9639,12 @@ pub impl @json.FromJson for FileSystemSpecialPathSlashTmp with fn from_json(
 ///|
 ///
 /// Generated representation of FileSystemSpecialPathKnownUnknown.
+#derive(Eq, @debug.Debug)
 pub(all) struct FileSystemSpecialPathKnownUnknown {
   kind : String
   path : String
   subpath : @sdkjson.Presence[String]
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend FileSystemSpecialPathKnownUnknown with Eq::{equal, not_equal}
@@ -9548,6 +9698,7 @@ pub impl @json.FromJson for FileSystemSpecialPathKnownUnknown with fn from_json(
 ///|
 ///
 /// Generated tagged union FileSystemSpecialPath.
+#derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum FileSystemSpecialPath {
   Root(FileSystemSpecialPathRoot)
@@ -9557,7 +9708,7 @@ pub(all) enum FileSystemSpecialPath {
   SlashTmp(FileSystemSpecialPathSlashTmp)
   KnownUnknown(FileSystemSpecialPathKnownUnknown)
   Unknown(String, Json)
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend FileSystemSpecialPath with Eq::{equal, not_equal}
@@ -9606,10 +9757,11 @@ pub impl @json.FromJson for FileSystemSpecialPath with fn from_json(value, path)
 ///|
 ///
 /// Generated representation of FileSystemPathSpecial.
+#derive(Eq, @debug.Debug)
 pub(all) struct FileSystemPathSpecial {
   type_ : String
   value : FileSystemSpecialPath
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend FileSystemPathSpecial with Eq::{equal, not_equal}
@@ -9657,13 +9809,14 @@ pub impl @json.FromJson for FileSystemPathSpecial with fn from_json(value, path)
 ///|
 ///
 /// Generated tagged union FileSystemPath.
+#derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum FileSystemPath {
   Path(FileSystemPathPath)
   GlobPattern(FileSystemPathGlobPattern)
   Special(FileSystemPathSpecial)
   Unknown(String, Json)
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend FileSystemPath with Eq::{equal, not_equal}
@@ -9706,10 +9859,11 @@ pub impl @json.FromJson for FileSystemPath with fn from_json(value, path) {
 ///|
 ///
 /// Generated representation of FileSystemSandboxEntry.
+#derive(Eq, @debug.Debug)
 pub(all) struct FileSystemSandboxEntry {
   access : FileSystemAccessMode
   path : FileSystemPath
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend FileSystemSandboxEntry with Eq::{equal, not_equal}
@@ -9760,12 +9914,13 @@ pub impl @json.FromJson for FileSystemSandboxEntry with fn from_json(
 ///|
 ///
 /// Generated representation of AdditionalFileSystemPermissions.
+#derive(Eq, @debug.Debug)
 pub(all) struct AdditionalFileSystemPermissions {
   entries : @sdkjson.Presence[Array[FileSystemSandboxEntry]]
   glob_scan_max_depth : @sdkjson.Presence[UInt64Number]
   read : @sdkjson.Presence[Array[String]]
   write : @sdkjson.Presence[Array[String]]
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend AdditionalFileSystemPermissions with Eq::{equal, not_equal}
@@ -9827,9 +9982,10 @@ pub impl @json.FromJson for AdditionalFileSystemPermissions with fn from_json(
 ///|
 ///
 /// Generated representation of AdditionalNetworkPermissions.
+#derive(Eq, @debug.Debug)
 pub(all) struct AdditionalNetworkPermissions {
   enabled : @sdkjson.Presence[Bool]
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend AdditionalNetworkPermissions with Eq::{equal, not_equal}
@@ -9873,10 +10029,11 @@ pub impl @json.FromJson for AdditionalNetworkPermissions with fn from_json(
 ///|
 ///
 /// Generated representation of RequestPermissionProfile.
+#derive(Eq, @debug.Debug)
 pub(all) struct RequestPermissionProfile {
   file_system : @sdkjson.Presence[AdditionalFileSystemPermissions]
   network : @sdkjson.Presence[AdditionalNetworkPermissions]
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend RequestPermissionProfile with Eq::{equal, not_equal}
@@ -9930,6 +10087,7 @@ pub impl @json.FromJson for RequestPermissionProfile with fn from_json(
 ///|
 ///
 /// Generated representation of PermissionsRequestApprovalParams.
+#derive(Eq, @debug.Debug)
 pub(all) struct PermissionsRequestApprovalParams {
   cwd : String
   environment_id : @sdkjson.Presence[String]
@@ -9939,7 +10097,7 @@ pub(all) struct PermissionsRequestApprovalParams {
   started_at_ms : Int64
   thread_id : String
   turn_id : String
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend PermissionsRequestApprovalParams with Eq::{equal, not_equal}
@@ -10020,10 +10178,11 @@ pub impl @json.FromJson for PermissionsRequestApprovalParams with fn from_json(
 ///|
 ///
 /// Generated representation of GrantedPermissionProfile.
+#derive(Eq, @debug.Debug)
 pub(all) struct GrantedPermissionProfile {
   file_system : @sdkjson.Presence[AdditionalFileSystemPermissions]
   network : @sdkjson.Presence[AdditionalNetworkPermissions]
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend GrantedPermissionProfile with Eq::{equal, not_equal}
@@ -10077,12 +10236,13 @@ pub impl @json.FromJson for GrantedPermissionProfile with fn from_json(
 ///|
 ///
 /// Generated string enum PermissionGrantScope.
+#derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum PermissionGrantScope {
   Turn
   Session
   Custom(String)
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend PermissionGrantScope with Eq::{equal, not_equal}
@@ -10129,11 +10289,12 @@ pub impl @json.FromJson for PermissionGrantScope with fn from_json(value, path) 
 ///|
 ///
 /// Generated representation of PermissionsRequestApprovalResponse.
+#derive(Eq, @debug.Debug)
 pub(all) struct PermissionsRequestApprovalResponse {
   permissions : GrantedPermissionProfile
   scope : PermissionGrantScope?
   strict_auto_review : @sdkjson.Presence[Bool]
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend PermissionsRequestApprovalResponse with Eq::{equal, not_equal}
@@ -10191,10 +10352,11 @@ pub impl @json.FromJson for PermissionsRequestApprovalResponse with fn from_json
 ///|
 ///
 /// EXPERIMENTAL. Defines a single selectable option for request_user_input.
+#derive(Eq, @debug.Debug)
 pub(all) struct ToolRequestUserInputOption {
   description : String
   label : String
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ToolRequestUserInputOption with Eq::{equal, not_equal}
@@ -10245,6 +10407,7 @@ pub impl @json.FromJson for ToolRequestUserInputOption with fn from_json(
 ///|
 ///
 /// EXPERIMENTAL. Represents one request_user_input question and its required options.
+#derive(Eq, @debug.Debug)
 pub(all) struct ToolRequestUserInputQuestion {
   header : String
   id : String
@@ -10252,7 +10415,7 @@ pub(all) struct ToolRequestUserInputQuestion {
   is_secret : Bool?
   options : @sdkjson.Presence[Array[ToolRequestUserInputOption]]
   question : String
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ToolRequestUserInputQuestion with Eq::{equal, not_equal}
@@ -10322,6 +10485,7 @@ pub impl @json.FromJson for ToolRequestUserInputQuestion with fn from_json(
 ///|
 ///
 /// EXPERIMENTAL. Params sent with a request_user_input event.
+#derive(Eq, @debug.Debug)
 pub(all) struct ToolRequestUserInputParams {
   auto_resolution_ms : @sdkjson.Presence[UInt64Number]
   is_blocking : Bool
@@ -10329,7 +10493,7 @@ pub(all) struct ToolRequestUserInputParams {
   questions : Array[ToolRequestUserInputQuestion]
   thread_id : String
   turn_id : String
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ToolRequestUserInputParams with Eq::{equal, not_equal}
@@ -10399,9 +10563,10 @@ pub impl @json.FromJson for ToolRequestUserInputParams with fn from_json(
 ///|
 ///
 /// EXPERIMENTAL. Captures a user's answer to a request_user_input question.
+#derive(Eq, @debug.Debug)
 pub(all) struct ToolRequestUserInputAnswer {
   answers : Array[String]
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ToolRequestUserInputAnswer with Eq::{equal, not_equal}
@@ -10445,9 +10610,10 @@ pub impl @json.FromJson for ToolRequestUserInputAnswer with fn from_json(
 ///|
 ///
 /// EXPERIMENTAL. Response payload mapping question ids to answers.
+#derive(Eq, @debug.Debug)
 pub(all) struct ToolRequestUserInputResponse {
   answers : Map[String, ToolRequestUserInputAnswer]
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ToolRequestUserInputResponse with Eq::{equal, not_equal}
@@ -10498,12 +10664,13 @@ pub impl @json.FromJson for ToolRequestUserInputResponse with fn from_json(
 ///|
 ///
 /// Generated representation of ErrorNotification.
+#derive(Eq, @debug.Debug)
 pub(all) struct ErrorNotification {
   error : TurnError
   thread_id : String
   turn_id : String
   will_retry : Bool
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ErrorNotification with Eq::{equal, not_equal}
@@ -10557,9 +10724,10 @@ pub impl @json.FromJson for ErrorNotification with fn from_json(value, path) {
 ///|
 ///
 /// Generated representation of ThreadStartedNotification.
+#derive(Eq, @debug.Debug)
 pub(all) struct ThreadStartedNotification {
   thread : Thread
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ThreadStartedNotification with Eq::{equal, not_equal}
@@ -10603,10 +10771,11 @@ pub impl @json.FromJson for ThreadStartedNotification with fn from_json(
 ///|
 ///
 /// Generated representation of TurnStartedNotification.
+#derive(Eq, @debug.Debug)
 pub(all) struct TurnStartedNotification {
   thread_id : String
   turn : Turn
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend TurnStartedNotification with Eq::{equal, not_equal}
@@ -10657,10 +10826,11 @@ pub impl @json.FromJson for TurnStartedNotification with fn from_json(
 ///|
 ///
 /// Generated representation of TurnCompletedNotification.
+#derive(Eq, @debug.Debug)
 pub(all) struct TurnCompletedNotification {
   thread_id : String
   turn : Turn
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend TurnCompletedNotification with Eq::{equal, not_equal}
@@ -10711,12 +10881,13 @@ pub impl @json.FromJson for TurnCompletedNotification with fn from_json(
 ///|
 ///
 /// Generated representation of ItemStartedNotification.
+#derive(Eq, @debug.Debug)
 pub(all) struct ItemStartedNotification {
   item : ThreadItem
   started_at_ms : Int64
   thread_id : String
   turn_id : String
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ItemStartedNotification with Eq::{equal, not_equal}
@@ -10776,12 +10947,13 @@ pub impl @json.FromJson for ItemStartedNotification with fn from_json(
 ///|
 ///
 /// Generated representation of ItemCompletedNotification.
+#derive(Eq, @debug.Debug)
 pub(all) struct ItemCompletedNotification {
   completed_at_ms : Int64
   item : ThreadItem
   thread_id : String
   turn_id : String
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ItemCompletedNotification with Eq::{equal, not_equal}
@@ -10841,12 +11013,13 @@ pub impl @json.FromJson for ItemCompletedNotification with fn from_json(
 ///|
 ///
 /// Generated representation of AgentMessageDeltaNotification.
+#derive(Eq, @debug.Debug)
 pub(all) struct AgentMessageDeltaNotification {
   delta : String
   item_id : String
   thread_id : String
   turn_id : String
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend AgentMessageDeltaNotification with Eq::{equal, not_equal}

@@ -6,12 +6,13 @@
 ///   let _ = @jsonrpc_async.RpcFailure::Timeout(1000)
 /// }
 /// ```
+#derive(Debug)
 pub(all) suberror RpcFailure {
   Remote(@jsonrpc.RpcError)
   Transport(String)
   Timeout(Int32)
   Closed
-} derive(Debug)
+}
 
 ///|
 /// Formats RPC failures for diagnostics.

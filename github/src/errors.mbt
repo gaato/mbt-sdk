@@ -17,12 +17,13 @@
 ///   assert_eq(body.message, "Not Found")
 /// }
 /// ```
+#derive(Eq, @debug.Debug)
 pub(all) struct ApiErrorBody {
   message : String
   documentation_url : String?
   status : String?
   errors : Array[Json]?
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 /// Compares API error bodies field by field.

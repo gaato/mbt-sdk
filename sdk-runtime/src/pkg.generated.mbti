@@ -7,6 +7,7 @@ import {
   "gaato/http/retry",
   "gaato/http/sync",
   "moonbitlang/core/debug",
+  "moonbitlang/core/json",
 }
 
 // Values
@@ -15,13 +16,14 @@ pub fn classify(@http.Response, now_unix_ms? : Int64) -> @http.Response raise Sd
 pub fn rate_limit_headers(remaining~ : String, reset_after_seconds? : String, reset_unix_seconds? : String) -> (@http.Headers, Int64) -> RateLimitState?
 
 // Errors
+#derive(@debug.Debug)
 pub(all) suberror SdkError {
   Transport(@http.HttpError)
   Status(status~ : Int32, headers~ : @http.Headers, body~ : Bytes)
   RateLimited(retry_after_ms~ : Int32?, headers~ : @http.Headers, body~ : Bytes)
   Decode(message~ : String, body~ : Bytes)
   Config(String)
-} derive(@debug.Debug)
+}
 pub fn SdkError::is_retryable(Self) -> Bool
 pub fn SdkError::outcome(Self) -> @retry.Outcome?
 pub fn SdkError::status(Self) -> Int32?
@@ -54,24 +56,26 @@ pub struct Client {
 }
 pub fn Client::new(&@http.Transport, &@clock.Clock, base_url~ : String, default_headers? : @http.Headers, auth? : Auth, retry? : &RetryDecider, limiter? : &RateLimiter, middleware? : Array[async (@http.Request, async (@http.Request) -> @http.Response raise @http.HttpError) -> @http.Response raise @http.HttpError], observer? : (Attempt) -> Unit, random? : () -> Double, timeouts? : Timeouts) -> Self
 pub async fn Client::send(Self, @http.Request, bucket? : String, global_exempt? : Bool, body? : () -> Bytes, accept? : (@http.Response) -> Unit raise SdkError) -> @http.Response raise SdkError
-pub async fn Client::send_json(Self, @http.Request, bucket? : String, global_exempt? : Bool, body? : () -> Bytes, accept? : (@http.Response) -> Unit raise SdkError) -> Json raise SdkError
+pub async fn Client::send_json(Self, @http.Request, bucket? : String, global_exempt? : Bool, body? : () -> Bytes, accept? : (@http.Response) -> Unit raise SdkError) -> @json.Json raise SdkError
 pub async fn Client::send_stream(Self, @http.Request, bucket? : String, global_exempt? : Bool, body? : () -> Bytes) -> (@http.ResponseHead, &@http.BodyStream) raise SdkError
 
+#derive(Eq, @debug.Debug)
 pub(all) struct GlobalWindow {
   limit : Int32
   window_ms : Int32
-} derive(Eq, @debug.Debug)
+}
 pub fn GlobalWindow::equal(Self, Self) -> Bool
 pub fn GlobalWindow::not_equal(Self, Self) -> Bool
 pub fn GlobalWindow::to_repr(Self) -> @debug.Repr
 
 #non_exhaustive
+#derive(Eq, @debug.Debug)
 pub(all) enum LimitScope {
   Bucket
   Global
   Shared
   Ignore
-} derive(Eq, @debug.Debug)
+}
 pub fn LimitScope::equal(Self, Self) -> Bool
 pub fn LimitScope::not_equal(Self, Self) -> Bool
 pub fn LimitScope::to_repr(Self) -> @debug.Repr
@@ -83,10 +87,11 @@ pub fn NoLimiter::new() -> Self
 pub async fn NoLimiter::release(Self, String, status~ : Int32, headers~ : @http.Headers) -> Unit
 pub impl RateLimiter for NoLimiter
 
+#derive(Eq, @debug.Debug)
 pub(all) struct Pace {
   group : String
   min_interval_ms : Int32
-} derive(Eq, @debug.Debug)
+}
 pub fn Pace::equal(Self, Self) -> Bool
 pub fn Pace::not_equal(Self, Self) -> Bool
 pub fn Pace::to_repr(Self) -> @debug.Repr
@@ -105,10 +110,11 @@ pub fn[T, E : Error] Paginator::new(async () -> Array[T]? raise E) -> Self[T, E]
 pub async fn[T, E : Error] Paginator::next_page(Self[T, E]) -> Array[T]? raise E
 pub fn[T, E : Error] Paginator::with_cursor(async (String?) -> Page[T] raise E) -> Self[T, E]
 
+#derive(Eq, @debug.Debug)
 pub(all) struct RateLimitState {
   remaining : Int32
   reset_at_unix_ms : Int64
-} derive(Eq, @debug.Debug)
+}
 pub fn RateLimitState::equal(Self, Self) -> Bool
 pub fn RateLimitState::not_equal(Self, Self) -> Bool
 pub fn RateLimitState::to_repr(Self) -> @debug.Repr
@@ -124,9 +130,10 @@ pub struct RetryContext {
 }
 pub fn RetryContext::new(@http.Request, bucket? : String, attempt? : Int32, random? : Double, now_unix_ms? : Int64, remaining_ms? : Int64, replayable? : Bool) -> Self
 
+#derive(Eq, @debug.Debug)
 pub(all) struct RetryPolicy {
   rule : @retry.RetryRule
-} derive(Eq, @debug.Debug)
+}
 pub fn RetryPolicy::allow_non_idempotent(Self) -> Self
 pub fn RetryPolicy::conservative() -> Self
 pub fn RetryPolicy::decide(Self, SdkError, RetryContext) -> @retry.Decision

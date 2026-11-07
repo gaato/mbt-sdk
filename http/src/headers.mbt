@@ -8,9 +8,10 @@
 ///   assert_eq(headers.get("ACCEPT"), Some("text/plain"))
 /// }
 /// ```
+#derive(Eq, Debug)
 pub struct Headers {
   priv mut pairs : Array[(String, String)]
-} derive(Eq, Debug)
+}
 
 ///|
 /// Explicit equality methods for normalized, ordered pairs.

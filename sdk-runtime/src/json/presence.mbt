@@ -8,11 +8,12 @@
 ///   assert_false(value.is_absent())
 /// }
 /// ```
+#derive(Eq, Debug)
 pub(all) enum Presence[T] {
   Absent
   Null
   Value(T)
-} derive(Eq, Debug)
+}
 
 ///|
 /// Compares presence and, for Value, the contained value.

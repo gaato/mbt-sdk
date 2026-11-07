@@ -22,12 +22,13 @@
 ///   assert_eq(rule.statuses.length(), 2)
 /// }
 /// ```
+#derive(Eq, Debug)
 pub(all) enum StatusMatch {
   /// Exactly this status.
   Code(Int32)
   /// Every status from the first to the second, both included.
   Range(Int32, Int32)
-} derive(Eq, Debug)
+}
 
 ///|
 /// Equality for status matches.
@@ -47,6 +48,7 @@ fn StatusMatch::contains(self : StatusMatch, status : Int32) -> Bool {
 
 ///|
 /// Which request methods a retry is allowed for.
+#derive(Eq, Debug)
 #non_exhaustive
 pub(all) enum Methods {
   /// No method.
@@ -59,7 +61,7 @@ pub(all) enum Methods {
   Listed(Array[String])
   /// Every method.
   Any
-} derive(Eq, Debug)
+}
 
 ///|
 /// Equality for method sets.
@@ -71,12 +73,13 @@ pub extend Methods with @debug.Debug::{to_repr}
 
 ///|
 /// Response statuses that may be retried, and for which methods.
+#derive(Eq, Debug)
 pub(all) struct StatusRule {
   /// The statuses this rule covers.
   statuses : Array[StatusMatch]
   /// The methods a response with one of those statuses may be retried for.
   methods : Methods
-} derive(Eq, Debug)
+}
 
 ///|
 /// Equality for status rules.
@@ -88,6 +91,7 @@ pub extend StatusRule with @debug.Debug::{to_repr}
 
 ///|
 /// Where a server-requested delay is read from.
+#derive(Eq, Debug)
 #non_exhaustive
 pub(all) enum RetryAfterSource {
   /// Nowhere: the backoff always decides.
@@ -97,7 +101,7 @@ pub(all) enum RetryAfterSource {
   /// `retry-after-ms`, then `Retry-After`, as `@http.retry_after_ms` reads
   /// them (the OpenAI SDKs' behaviour).
   MsThenHeader
-} derive(Eq, Debug)
+}
 
 ///|
 /// Equality for delay sources.
@@ -110,6 +114,7 @@ pub extend RetryAfterSource with @debug.Debug::{to_repr}
 ///|
 /// What to do with a server-requested delay longer than a limit, in
 /// milliseconds.
+#derive(Eq, Debug)
 #non_exhaustive
 pub(all) enum RetryAfterCap {
   /// Give up (`StopReason::RetryAfterTooLong`) rather than wait longer.
@@ -118,7 +123,7 @@ pub(all) enum RetryAfterCap {
   BackoffAbove(Int32)
   /// Wait as long as the server asks.
   NoCap
-} derive(Eq, Debug)
+}
 
 ///|
 /// Equality for delay caps.
@@ -130,6 +135,7 @@ pub extend RetryAfterCap with @debug.Debug::{to_repr}
 
 ///|
 /// How a server-requested delay is read and bounded.
+#derive(Eq, Debug)
 pub(all) struct RetryAfter {
   /// Where the delay comes from.
   source : RetryAfterSource
@@ -137,7 +143,7 @@ pub(all) struct RetryAfter {
   cap : RetryAfterCap
   /// Whether a delay of 0 means "use the backoff" rather than "retry now".
   zero_means_backoff : Bool
-} derive(Eq, Debug)
+}
 
 ///|
 /// Equality for delay settings.
@@ -150,6 +156,7 @@ pub extend RetryAfter with @debug.Debug::{to_repr}
 ///|
 /// How the exponential delay is spread, so that clients do not retry in
 /// lockstep. Multipliers are per mille.
+#derive(Eq, Debug)
 #non_exhaustive
 pub(all) enum Jitter {
   /// The exponential delay itself.
@@ -159,7 +166,7 @@ pub(all) enum Jitter {
   /// The delay times a multiplier from `lo` to `hi` per mille: (800, 1200)
   /// is ±20 %, (750, 1000) is up to 25 % shorter.
   Proportional(lo~ : Int32, hi~ : Int32)
-} derive(Eq, Debug)
+}
 
 ///|
 /// Equality for jitter settings.
@@ -172,6 +179,7 @@ pub extend Jitter with @debug.Debug::{to_repr}
 ///|
 /// Exponential backoff: `base_ms` doubled per attempt up to `max_ms`, then
 /// jittered.
+#derive(Eq, Debug)
 pub(all) struct Backoff {
   /// The delay before the first retry, before jitter.
   base_ms : Int32
@@ -179,7 +187,7 @@ pub(all) struct Backoff {
   max_ms : Int32
   /// How the delay is spread.
   jitter : Jitter
-} derive(Eq, Debug)
+}
 
 ///|
 /// Equality for backoff settings.
@@ -207,6 +215,7 @@ pub extend Backoff with @debug.Debug::{to_repr}
 ///   assert_eq(rule.decide(busy, get, attempt=2, random=0.0), Stop(Exhausted))
 /// }
 /// ```
+#derive(Eq, Debug)
 pub(all) struct RetryRule {
   /// How many retries follow the first attempt.
   max_retries : Int32
@@ -226,7 +235,7 @@ pub(all) struct RetryRule {
   retry_after : RetryAfter
   /// The delay when the server asks for none.
   backoff : Backoff
-} derive(Eq, Debug)
+}
 
 ///|
 /// Equality for retry rules.
@@ -252,12 +261,13 @@ pub fn RetryRule::never() -> RetryRule {
 
 ///|
 /// The result of an attempt that did not succeed.
+#derive(Debug)
 pub(all) enum Outcome {
   /// A response whose status the caller treats as a failure.
   Response(status~ : Int32, headers~ : @http.Headers)
   /// A transport failure.
   Failure(@http.HttpError)
-} derive(Debug)
+}
 
 ///|
 /// Debug representation of an outcome.
@@ -265,6 +275,7 @@ pub extend Outcome with @debug.Debug::{to_repr}
 
 ///|
 /// Why `decide` stopped.
+#derive(Eq, Debug)
 #non_exhaustive
 pub(all) enum StopReason {
   /// `max_retries` retries were already made.
@@ -281,7 +292,7 @@ pub(all) enum StopReason {
   RetryAfterTooLong(Int32)
   /// Waiting this many milliseconds would use up the remaining budget.
   Budget(Int32)
-} derive(Eq, Debug)
+}
 
 ///|
 /// Equality for stop reasons.
@@ -293,12 +304,13 @@ pub extend StopReason with @debug.Debug::{to_repr}
 
 ///|
 /// What to do after a failed attempt.
+#derive(Eq, Debug)
 pub(all) enum Decision {
   /// Wait this many milliseconds, then send the request again.
   Wait(Int32)
   /// Do not retry.
   Stop(StopReason)
-} derive(Eq, Debug)
+}
 
 ///|
 /// Equality for decisions.

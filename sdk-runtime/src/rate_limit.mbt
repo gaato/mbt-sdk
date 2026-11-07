@@ -1,9 +1,10 @@
 ///|
 /// Remaining requests and the Unix millisecond instant when a window resets.
+#derive(Eq, Debug)
 pub(all) struct RateLimitState {
   remaining : Int32
   reset_at_unix_ms : Int64
-} derive(Eq, Debug)
+}
 
 ///|
 /// Equality for rate-limit states.
@@ -82,10 +83,11 @@ pub impl RateLimiter for NoLimiter with fn release(
 /// admissions in each `window_ms`. Both must be positive; a window with a
 /// non-positive limit or length imposes no limit, since it would otherwise
 /// block forever or reset on every admission.
+#derive(Eq, Debug)
 pub(all) struct GlobalWindow {
   limit : Int32
   window_ms : Int32
-} derive(Eq, Debug)
+}
 
 ///|
 /// Equality for global windows.
@@ -100,10 +102,11 @@ pub extend GlobalWindow with @debug.Debug::{to_repr}
 /// maps each bucket to its group; admissions in a group start at least
 /// `min_interval_ms` apart, whatever the server's window says. A non-positive
 /// interval imposes no spacing.
+#derive(Eq, Debug)
 pub(all) struct Pace {
   group : String
   min_interval_ms : Int32
-} derive(Eq, Debug)
+}
 
 ///|
 /// Equality for paces.
@@ -116,6 +119,7 @@ pub extend Pace with @debug.Debug::{to_repr}
 ///|
 /// What a 429 response does to a `WindowLimiter`. Each case applies the
 /// Retry-After delay (or the configured default) differently.
+#derive(Eq, Debug)
 #non_exhaustive
 pub(all) enum LimitScope {
   /// The request's bucket is empty until the delay ends; the account-wide
@@ -130,7 +134,7 @@ pub(all) enum LimitScope {
   Shared
   /// The response changes nothing: no state is recorded and no block is set.
   Ignore
-} derive(Eq, Debug)
+}
 
 ///|
 /// Equality for limit scopes.

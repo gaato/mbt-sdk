@@ -18,6 +18,7 @@ pub(open) trait Transport {
 
 ///|
 /// The step of an exchange a transport failure happened in.
+#derive(Eq, Debug)
 #non_exhaustive
 pub(all) enum Phase {
   /// Waiting for a connection slot, when the transport caps connections.
@@ -33,7 +34,7 @@ pub(all) enum Phase {
   /// Somewhere in the exchange: the layer reporting the failure cannot see
   /// which step, as with fetch or a deadline wrapped around a whole transport.
   Unknown
-} derive(Eq, Debug)
+}
 
 ///|
 /// Equality for phases.
@@ -45,6 +46,7 @@ pub extend Phase with @debug.Debug::{to_repr}
 
 ///|
 /// Transport failures, separate from ordinary HTTP response statuses.
+#derive(Debug)
 pub(all) suberror HttpError {
   /// No connection was made, so no byte of the request was sent: the host
   /// did not resolve, the connection or TLS handshake failed, or the
@@ -63,7 +65,7 @@ pub(all) suberror HttpError {
   /// it. A proxy forwarding a plain `http://` request answers with an
   /// ordinary response instead.
   Proxy(status~ : Int32, message~ : String)
-} derive(Debug)
+}
 
 ///|
 /// Debug representation of a transport failure.

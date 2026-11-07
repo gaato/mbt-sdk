@@ -2,9 +2,10 @@
 
 ///|
 /// An unsigned 64-bit integer encoded as a JSON number, not a JSON string.
+#derive(Eq, @debug.Debug)
 pub(all) struct UInt64Number {
   value : UInt64
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend UInt64Number with Eq::{equal, not_equal}

@@ -9,9 +9,10 @@ import {
 // Values
 
 // Errors
+#derive(@debug.Debug)
 pub suberror NoQuiescence {
   NoQuiescence(rounds~ : Int32)
-} derive(@debug.Debug)
+}
 pub fn NoQuiescence::to_repr(Self) -> @debug.Repr
 
 // Types and methods

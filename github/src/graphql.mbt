@@ -152,13 +152,14 @@ pub fn[T] GitHub::graphql_paginator(
 ///   assert_eq(error.type_, Some("NOT_FOUND"))
 /// }
 /// ```
+#derive(Eq, @debug.Debug)
 pub(all) struct GraphqlError {
   message : String
   type_ : String?
   path : Array[Json]?
   locations : Array[Json]?
   extensions : Json?
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 /// Compares GraphQL errors field by field.

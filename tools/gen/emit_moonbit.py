@@ -81,7 +81,7 @@ def _encoded_value(type_ref: TypeRef, value: str) -> str:
     return value
 
 
-DERIVE = " derive(Eq, @debug.Debug)"
+DERIVE = "#derive(Eq, @debug.Debug)"
 
 
 def _derive_extends(name: str) -> list[str]:
@@ -96,11 +96,11 @@ def _derive_extends(name: str) -> list[str]:
 
 def _struct(declaration: Struct) -> str:
     lines = _doc(declaration.description, f"Generated representation of {declaration.name}.")
-    lines.append(f"pub(all) struct {declaration.name} {{")
+    lines.extend([DERIVE, f"pub(all) struct {declaration.name} {{"])
     fields = [field for field in declaration.fields if field.constant is None]
     for field in fields:
         lines.append(f"  {field.moon_name} : {_field_type(field)}")
-    lines.append("}" + DERIVE)
+    lines.append("}")
     lines.extend(_derive_extends(declaration.name))
     if fields:
         required = [field for field in fields if field.presence == Presence.REQUIRED]
@@ -211,10 +211,10 @@ def _struct(declaration: Struct) -> str:
 
 def _string_enum(declaration: StringEnum) -> str:
     lines = _doc(declaration.description, f"Generated string enum {declaration.name}.")
-    lines.extend(["#non_exhaustive", f"pub(all) enum {declaration.name} {{"])
+    lines.extend([DERIVE, "#non_exhaustive", f"pub(all) enum {declaration.name} {{"])
     lines.extend(f"  {variant.name}" for variant in declaration.variants)
     lines.append(f"  {declaration.fallback}(String)")
-    lines.append("}" + DERIVE)
+    lines.append("}")
     lines.extend(_derive_extends(declaration.name))
     lines.extend(_doc("Encodes this string enum as JSON.", ""))
     lines.append(f"pub extend {declaration.name} with ToJson::{{to_json}}")
@@ -253,9 +253,9 @@ def _shape_guard(shape: str, value: str) -> str:
 
 def _union(declaration: UntaggedUnion) -> str:
     lines = _doc(declaration.description, f"Generated untagged union {declaration.name}.")
-    lines.extend(["#non_exhaustive", f"pub(all) enum {declaration.name} {{"])
+    lines.extend([DERIVE, "#non_exhaustive", f"pub(all) enum {declaration.name} {{"])
     lines.extend(f"  {variant.name}({variant.type.moon_type()})" for variant in declaration.variants)
-    lines.append("}" + DERIVE)
+    lines.append("}")
     lines.extend(_derive_extends(declaration.name))
     lines.extend(_doc("Encodes this union as JSON.", ""))
     lines.append(f"pub extend {declaration.name} with ToJson::{{to_json}}")
@@ -273,11 +273,11 @@ def _union(declaration: UntaggedUnion) -> str:
 
 def _external_union(declaration: ExternalUnion) -> str:
     lines = _doc(declaration.description, f"Generated externally tagged union {declaration.name}.")
-    lines.extend(["#non_exhaustive", f"pub(all) enum {declaration.name} {{"])
+    lines.extend([DERIVE, "#non_exhaustive", f"pub(all) enum {declaration.name} {{"])
     for variant in declaration.variants:
         payload = f"({variant.type.moon_type()})" if variant.type else ""
         lines.append(f"  {variant.name}{payload}")
-    lines.extend(["  UnknownValue(Json)", "}" + DERIVE])
+    lines.extend(["  UnknownValue(Json)", "}"])
     lines.extend(_derive_extends(declaration.name))
     lines.extend(_doc("Encodes this union as JSON.", ""))
     lines.append(f"pub extend {declaration.name} with ToJson::{{to_json}}")
@@ -307,10 +307,10 @@ def _external_union(declaration: ExternalUnion) -> str:
 
 def _tagged_union(declaration: TaggedUnion) -> str:
     lines = _doc(declaration.description, f"Generated tagged union {declaration.name}.")
-    lines.extend(["#non_exhaustive", f"pub(all) enum {declaration.name} {{"])
+    lines.extend([DERIVE, "#non_exhaustive", f"pub(all) enum {declaration.name} {{"])
     lines.extend(f"  {variant.name}({variant.type.moon_type()})" for variant in declaration.variants)
     lines.append(f"  {declaration.fallback}(String, Json)")
-    lines.append("}" + DERIVE)
+    lines.append("}")
     lines.extend(_derive_extends(declaration.name))
     lines.extend(_doc("Encodes this tagged union as JSON.", ""))
     lines.append(f"pub extend {declaration.name} with ToJson::{{to_json}}")
@@ -386,7 +386,7 @@ def _tagged_union(declaration: TaggedUnion) -> str:
 
 def _newtype(declaration: Newtype) -> str:
     lines = _doc(declaration.description, f"Generated newtype {declaration.name}.")
-    lines.append(f"pub(all) struct {declaration.name}({declaration.inner.moon_type()})" + DERIVE)
+    lines.extend([DERIVE, f"pub(all) struct {declaration.name}({declaration.inner.moon_type()})"])
     lines.extend(_derive_extends(declaration.name))
     lines.extend(_doc("Encodes this newtype as JSON.", ""))
     lines.append(f"pub extend {declaration.name} with ToJson::{{to_json}}")

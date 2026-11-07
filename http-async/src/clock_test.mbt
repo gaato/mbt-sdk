@@ -1,5 +1,6 @@
 ///|
-suberror Boom derive(Debug)
+#derive(Debug)
+suberror Boom
 
 ///|
 async test "with_timeout_opt returns what f produces before the deadline" {

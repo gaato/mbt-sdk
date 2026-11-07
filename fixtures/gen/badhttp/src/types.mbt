@@ -3,6 +3,7 @@
 ///|
 ///
 /// Generated string enum GetBadjsonFlavorFlavor.
+#derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum GetBadjsonFlavorFlavor {
   Truncated
@@ -22,7 +23,7 @@ pub(all) enum GetBadjsonFlavorFlavor {
   Deep
   Utf16
   Custom(String)
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend GetBadjsonFlavorFlavor with Eq::{equal, not_equal}
@@ -100,6 +101,7 @@ pub impl @json.FromJson for GetBadjsonFlavorFlavor with fn from_json(
 ///|
 ///
 /// Generated string enum GetSseFlavorFlavor.
+#derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum GetSseFlavorFlavor {
   Ok
@@ -117,7 +119,7 @@ pub(all) enum GetSseFlavorFlavor {
   Big
   Resume
   Custom(String)
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend GetSseFlavorFlavor with Eq::{equal, not_equal}
@@ -188,6 +190,7 @@ pub impl @json.FromJson for GetSseFlavorFlavor with fn from_json(value, path) {
 ///|
 ///
 /// Generated string enum GetRangeFlavorFlavor.
+#derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum GetRangeFlavorFlavor {
   Ok
@@ -205,7 +208,7 @@ pub(all) enum GetRangeFlavorFlavor {
   UnknownTotal
   IfRangeIgnored
   Custom(String)
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend GetRangeFlavorFlavor with Eq::{equal, not_equal}
@@ -276,6 +279,7 @@ pub impl @json.FromJson for GetRangeFlavorFlavor with fn from_json(value, path) 
 ///|
 ///
 /// Generated string enum GetEtagFlavorFlavor.
+#derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum GetEtagFlavorFlavor {
   Ok
@@ -289,7 +293,7 @@ pub(all) enum GetEtagFlavorFlavor {
   BadDate
   Future
   Custom(String)
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend GetEtagFlavorFlavor with Eq::{equal, not_equal}
@@ -352,6 +356,7 @@ pub impl @json.FromJson for GetEtagFlavorFlavor with fn from_json(value, path) {
 ///|
 ///
 /// Generated string enum GetCookiesFlavorFlavor.
+#derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum GetCookiesFlavorFlavor {
   Ok
@@ -374,7 +379,7 @@ pub(all) enum GetCookiesFlavorFlavor {
   Nameless
   Huge
   Custom(String)
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend GetCookiesFlavorFlavor with Eq::{equal, not_equal}
@@ -458,6 +463,7 @@ pub impl @json.FromJson for GetCookiesFlavorFlavor with fn from_json(
 ///|
 ///
 /// Generated string enum GetAuthFlavorFlavor.
+#derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum GetAuthFlavorFlavor {
   Basic
@@ -479,7 +485,7 @@ pub(all) enum GetAuthFlavorFlavor {
   Proxy
   Redirect
   Custom(String)
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend GetAuthFlavorFlavor with Eq::{equal, not_equal}
@@ -558,6 +564,7 @@ pub impl @json.FromJson for GetAuthFlavorFlavor with fn from_json(value, path) {
 ///|
 ///
 /// Generated string enum GetCrosshostFlavorFlavor.
+#derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum GetCrosshostFlavorFlavor {
   SameOrigin
@@ -570,7 +577,7 @@ pub(all) enum GetCrosshostFlavorFlavor {
   RelativeAuthority
   Jar
   Custom(String)
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend GetCrosshostFlavorFlavor with Eq::{equal, not_equal}
@@ -634,6 +641,7 @@ pub impl @json.FromJson for GetCrosshostFlavorFlavor with fn from_json(
 ///|
 ///
 /// Generated string enum GetCompressFlavorFlavor.
+#derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum GetCompressFlavorFlavor {
   Ok
@@ -658,7 +666,7 @@ pub(all) enum GetCompressFlavorFlavor {
   GzipFile
   Bomb
   Custom(String)
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend GetCompressFlavorFlavor with Eq::{equal, not_equal}
@@ -746,11 +754,12 @@ pub impl @json.FromJson for GetCompressFlavorFlavor with fn from_json(
 ///|
 ///
 /// Generated untagged union GetRedirectHopsHops.
+#derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum GetRedirectHopsHops {
   Int(Int32)
   Text(String)
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend GetRedirectHopsHops with Eq::{equal, not_equal}
@@ -794,12 +803,13 @@ pub impl @json.FromJson for GetRedirectHopsHops with fn from_json(value, path) {
 ///|
 ///
 /// Generated string enum Get402PayNetwork.
+#derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum Get402PayNetwork {
   BaseSepolia
   Base
   Custom(String)
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend Get402PayNetwork with Eq::{equal, not_equal}
@@ -846,6 +856,7 @@ pub impl @json.FromJson for Get402PayNetwork with fn from_json(value, path) {
 ///|
 ///
 /// Generated string enum Get402ScenarioScenario.
+#derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum Get402ScenarioScenario {
   Never
@@ -856,7 +867,7 @@ pub(all) enum Get402ScenarioScenario {
   Overpriced
   WrongNetwork
   Custom(String)
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend Get402ScenarioScenario with Eq::{equal, not_equal}
@@ -916,12 +927,13 @@ pub impl @json.FromJson for Get402ScenarioScenario with fn from_json(
 ///|
 ///
 /// Generated string enum Get402ScenarioNetwork.
+#derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum Get402ScenarioNetwork {
   BaseSepolia
   Base
   Custom(String)
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend Get402ScenarioNetwork with Eq::{equal, not_equal}
@@ -968,6 +980,7 @@ pub impl @json.FromJson for Get402ScenarioNetwork with fn from_json(value, path)
 ///|
 ///
 /// Generated string enum Get402BrokenFlavorFlavor.
+#derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum Get402BrokenFlavorFlavor {
   NotBase64
@@ -981,7 +994,7 @@ pub(all) enum Get402BrokenFlavorFlavor {
   MissingHeader
   V1Body
   Custom(String)
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend Get402BrokenFlavorFlavor with Eq::{equal, not_equal}
@@ -1047,12 +1060,13 @@ pub impl @json.FromJson for Get402BrokenFlavorFlavor with fn from_json(
 ///|
 ///
 /// Generated string enum Get402BrokenFlavorNetwork.
+#derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum Get402BrokenFlavorNetwork {
   BaseSepolia
   Base
   Custom(String)
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend Get402BrokenFlavorNetwork with Eq::{equal, not_equal}

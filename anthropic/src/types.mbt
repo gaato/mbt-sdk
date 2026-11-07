@@ -62,11 +62,12 @@ pub using @gen {type MessageStreamEvent}
 
 ///|
 /// Selects the credential header used by the API.
+#derive(Eq, Debug)
 #non_exhaustive
 pub(all) enum AuthHeader {
   XApiKey
   Bearer
-} derive(Eq, Debug)
+}
 
 ///|
 /// Compares authentication-header choices.
@@ -88,10 +89,11 @@ pub extend AuthHeader with @debug.Debug::{to_repr}
 ///   assert_eq(error.message, "invalid request")
 /// }
 /// ```
+#derive(Eq, Debug)
 pub(all) struct ApiErrorBody {
   type_ : String
   message : String
-} derive(Eq, Debug)
+}
 
 ///|
 /// Compares API error bodies field by field.
@@ -103,11 +105,12 @@ pub extend ApiErrorBody with @debug.Debug::{to_repr}
 
 ///|
 /// A participant in a Messages API conversation.
+#derive(Eq, Debug)
 #non_exhaustive
 pub(all) enum Role {
   User
   Assistant
-} derive(Eq, Debug)
+}
 
 ///|
 /// Compares message roles.
@@ -121,11 +124,12 @@ pub extend Role with @debug.Debug::{to_repr}
 /// Input content as plain text or typed content blocks. A block the generated
 /// vocabulary does not know is carried losslessly as
 /// `@gen.InputContentBlock::Unknown`.
+#derive(Eq, Debug)
 #non_exhaustive
 pub(all) enum InputContent {
   Text(String)
   Blocks(Array[InputContentBlock])
-} derive(Eq, Debug)
+}
 
 ///|
 /// Compares input content, including typed blocks.
@@ -146,12 +150,13 @@ pub extend InputContent with @debug.Debug::{to_repr}
 ///   assert_eq(tool.name, "lookup")
 /// }
 /// ```
+#derive(Eq, Debug)
 pub(all) struct ToolDef {
   name : String
   description : String?
   input_schema : Json
   strict : Bool?
-} derive(Eq, Debug)
+}
 
 ///|
 /// Compares tool definitions field by field.
@@ -174,10 +179,11 @@ pub fn ToolDef::new(
 
 ///|
 /// One user or assistant turn sent to the Messages API.
+#derive(Eq, Debug)
 pub(all) struct Message {
   role : Role
   content : InputContent
-} derive(Eq, Debug)
+}
 
 ///|
 /// Compares messages field by field.
@@ -297,6 +303,7 @@ pub fn Message::from_response(response : MessageResponse) -> Message {
 /// any other documented parameter (`top_p`, `service_tier`, ...) can be passed
 /// without a facade change. For full control build a `@gen.CreateMessageParams`
 /// and use `Anthropic::create_message_params`.
+#derive(Eq, Debug)
 pub(all) struct MessageRequest {
   model : String
   max_tokens : Int32
@@ -310,7 +317,7 @@ pub(all) struct MessageRequest {
   output_config : OutputConfig?
   metadata : Metadata?
   extra : Map[String, Json]
-} derive(Eq, Debug)
+}
 
 ///|
 /// Compares message requests field by field.
@@ -374,6 +381,7 @@ fn copy_message(message : Message) -> Message {
 ///|
 /// One output content block. Blocks beyond text, thinking and tool use keep
 /// their JSON; the typed form is on `MessageResponse::message`.
+#derive(Eq, Debug)
 #non_exhaustive
 pub(all) enum ContentBlock {
   Text(String)
@@ -381,7 +389,7 @@ pub(all) enum ContentBlock {
   RedactedThinking(String)
   ToolUse(id~ : String, name~ : String, input~ : Json)
   Other(String, Json)
-} derive(Eq, Debug)
+}
 
 ///|
 /// Compares output content blocks.
@@ -394,6 +402,7 @@ pub extend ContentBlock with @debug.Debug::{to_repr}
 ///|
 /// A decoded message: the facade view (`content`), the generated view
 /// (`message`) and the original JSON (`raw`).
+#derive(Eq, Debug)
 pub(all) struct MessageResponse {
   id : String
   model : String
@@ -403,7 +412,7 @@ pub(all) struct MessageResponse {
   usage : Usage
   message : @gen.Message
   raw : Json
-} derive(Eq, Debug)
+}
 
 ///|
 /// Compares decoded messages field by field.
@@ -442,6 +451,7 @@ pub fn MessageResponse::tool_uses(
 ///|
 /// One event from a streaming message. Event and delta kinds outside the
 /// generated vocabulary retain their raw JSON.
+#derive(Eq, Debug)
 #non_exhaustive
 pub(all) enum MessageEvent {
   MessageStart(MessageResponse)
@@ -456,7 +466,7 @@ pub(all) enum MessageEvent {
   Ping
   Error(ApiErrorBody)
   Other(String, Json)
-} derive(Eq, Debug)
+}
 
 ///|
 /// Compares message events, including retained unknown JSON.

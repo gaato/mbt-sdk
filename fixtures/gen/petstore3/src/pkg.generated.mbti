@@ -11,19 +11,19 @@ import {
 // Values
 pub fn add_pet_decode(@http.Response) -> Pet raise @sdk-runtime.SdkError
 
-pub fn add_pet_decode_json(Json) -> Pet raise @json.JsonDecodeError
+pub fn add_pet_decode_json(@json.Json) -> Pet raise @json.JsonDecodeError
 
 pub fn add_pet_request(Pet) -> @http.Request
 
 pub fn create_user_decode(@http.Response) -> User raise @sdk-runtime.SdkError
 
-pub fn create_user_decode_json(Json) -> User raise @json.JsonDecodeError
+pub fn create_user_decode_json(@json.Json) -> User raise @json.JsonDecodeError
 
 pub fn create_user_request(User) -> @http.Request
 
 pub fn create_users_with_list_input_decode(@http.Response) -> User raise @sdk-runtime.SdkError
 
-pub fn create_users_with_list_input_decode_json(Json) -> User raise @json.JsonDecodeError
+pub fn create_users_with_list_input_decode_json(@json.Json) -> User raise @json.JsonDecodeError
 
 pub fn create_users_with_list_input_request(Array[User]) -> @http.Request
 
@@ -35,43 +35,43 @@ pub fn delete_user_request(String) -> @http.Request
 
 pub fn find_pets_by_status_decode(@http.Response) -> Array[Pet] raise @sdk-runtime.SdkError
 
-pub fn find_pets_by_status_decode_json(Json) -> Array[Pet] raise @json.JsonDecodeError
+pub fn find_pets_by_status_decode_json(@json.Json) -> Array[Pet] raise @json.JsonDecodeError
 
 pub fn find_pets_by_status_request(FindPetsByStatusStatus) -> @http.Request
 
 pub fn find_pets_by_tags_decode(@http.Response) -> Array[Pet] raise @sdk-runtime.SdkError
 
-pub fn find_pets_by_tags_decode_json(Json) -> Array[Pet] raise @json.JsonDecodeError
+pub fn find_pets_by_tags_decode_json(@json.Json) -> Array[Pet] raise @json.JsonDecodeError
 
 pub fn find_pets_by_tags_request(Array[String]) -> @http.Request
 
 pub fn get_inventory_decode(@http.Response) -> Map[String, Int32] raise @sdk-runtime.SdkError
 
-pub fn get_inventory_decode_json(Json) -> Map[String, Int32] raise @json.JsonDecodeError
+pub fn get_inventory_decode_json(@json.Json) -> Map[String, Int32] raise @json.JsonDecodeError
 
 pub fn get_inventory_request() -> @http.Request
 
 pub fn get_order_by_id_decode(@http.Response) -> Order raise @sdk-runtime.SdkError
 
-pub fn get_order_by_id_decode_json(Json) -> Order raise @json.JsonDecodeError
+pub fn get_order_by_id_decode_json(@json.Json) -> Order raise @json.JsonDecodeError
 
 pub fn get_order_by_id_request(Int64) -> @http.Request
 
 pub fn get_pet_by_id_decode(@http.Response) -> Pet raise @sdk-runtime.SdkError
 
-pub fn get_pet_by_id_decode_json(Json) -> Pet raise @json.JsonDecodeError
+pub fn get_pet_by_id_decode_json(@json.Json) -> Pet raise @json.JsonDecodeError
 
 pub fn get_pet_by_id_request(Int64) -> @http.Request
 
 pub fn get_user_by_name_decode(@http.Response) -> User raise @sdk-runtime.SdkError
 
-pub fn get_user_by_name_decode_json(Json) -> User raise @json.JsonDecodeError
+pub fn get_user_by_name_decode_json(@json.Json) -> User raise @json.JsonDecodeError
 
 pub fn get_user_by_name_request(String) -> @http.Request
 
 pub fn login_user_decode(@http.Response) -> String raise @sdk-runtime.SdkError
 
-pub fn login_user_decode_json(Json) -> String raise @json.JsonDecodeError
+pub fn login_user_decode_json(@json.Json) -> String raise @json.JsonDecodeError
 
 pub fn login_user_request(username? : String, password? : String) -> @http.Request
 
@@ -79,19 +79,19 @@ pub fn logout_user_request() -> @http.Request
 
 pub fn place_order_decode(@http.Response) -> Order raise @sdk-runtime.SdkError
 
-pub fn place_order_decode_json(Json) -> Order raise @json.JsonDecodeError
+pub fn place_order_decode_json(@json.Json) -> Order raise @json.JsonDecodeError
 
 pub fn place_order_request(Order) -> @http.Request
 
 pub fn update_pet_decode(@http.Response) -> Pet raise @sdk-runtime.SdkError
 
-pub fn update_pet_decode_json(Json) -> Pet raise @json.JsonDecodeError
+pub fn update_pet_decode_json(@json.Json) -> Pet raise @json.JsonDecodeError
 
 pub fn update_pet_request(Pet) -> @http.Request
 
 pub fn update_pet_with_form_decode(@http.Response) -> Pet raise @sdk-runtime.SdkError
 
-pub fn update_pet_with_form_decode_json(Json) -> Pet raise @json.JsonDecodeError
+pub fn update_pet_with_form_decode_json(@json.Json) -> Pet raise @json.JsonDecodeError
 
 pub fn update_pet_with_form_request(Int64, name? : String, status? : String) -> @http.Request
 
@@ -99,55 +99,59 @@ pub fn update_user_request(String, User) -> @http.Request
 
 pub fn upload_file_decode(@http.Response) -> ApiResponse raise @sdk-runtime.SdkError
 
-pub fn upload_file_decode_json(Json) -> ApiResponse raise @json.JsonDecodeError
+pub fn upload_file_decode_json(@json.Json) -> ApiResponse raise @json.JsonDecodeError
 
 pub fn upload_file_request(Int64, additional_metadata? : String) -> @http.Request
 
 // Errors
 
 // Types and methods
+#derive(Eq, @debug.Debug)
 pub(all) struct ApiResponse {
   code : Int32?
   type_ : String?
   message : String?
-} derive(Eq, @debug.Debug)
+}
 pub fn ApiResponse::equal(Self, Self) -> Bool
-pub fn ApiResponse::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ApiResponse::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn ApiResponse::new(code? : Int32, type_? : String, message? : String) -> Self
 pub fn ApiResponse::not_equal(Self, Self) -> Bool
-pub fn ApiResponse::to_json(Self) -> Json
+pub fn ApiResponse::to_json(Self) -> @json.Json
 pub fn ApiResponse::to_repr(Self) -> @debug.Repr
-pub impl ToJson for ApiResponse
 pub impl @json.FromJson for ApiResponse
+pub impl @json.ToJson for ApiResponse
 
+#derive(Eq, @debug.Debug)
 pub(all) struct Category {
   id : Int64?
   name : String?
-} derive(Eq, @debug.Debug)
+}
 pub fn Category::equal(Self, Self) -> Bool
-pub fn Category::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn Category::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn Category::new(id? : Int64, name? : String) -> Self
 pub fn Category::not_equal(Self, Self) -> Bool
-pub fn Category::to_json(Self) -> Json
+pub fn Category::to_json(Self) -> @json.Json
 pub fn Category::to_repr(Self) -> @debug.Repr
-pub impl ToJson for Category
 pub impl @json.FromJson for Category
+pub impl @json.ToJson for Category
 
 #non_exhaustive
+#derive(Eq, @debug.Debug)
 pub(all) enum FindPetsByStatusStatus {
   Available
   Pending
   Sold
   Custom(String)
-} derive(Eq, @debug.Debug)
+}
 pub fn FindPetsByStatusStatus::equal(Self, Self) -> Bool
-pub fn FindPetsByStatusStatus::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn FindPetsByStatusStatus::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn FindPetsByStatusStatus::not_equal(Self, Self) -> Bool
-pub fn FindPetsByStatusStatus::to_json(Self) -> Json
+pub fn FindPetsByStatusStatus::to_json(Self) -> @json.Json
 pub fn FindPetsByStatusStatus::to_repr(Self) -> @debug.Repr
-pub impl ToJson for FindPetsByStatusStatus
 pub impl @json.FromJson for FindPetsByStatusStatus
+pub impl @json.ToJson for FindPetsByStatusStatus
 
+#derive(Eq, @debug.Debug)
 pub(all) struct Order {
   id : Int64?
   pet_id : Int64?
@@ -155,31 +159,33 @@ pub(all) struct Order {
   ship_date : String?
   status : OrderStatus?
   complete : Bool?
-} derive(Eq, @debug.Debug)
+}
 pub fn Order::equal(Self, Self) -> Bool
-pub fn Order::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn Order::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn Order::new(id? : Int64, pet_id? : Int64, quantity? : Int32, ship_date? : String, status? : OrderStatus, complete? : Bool) -> Self
 pub fn Order::not_equal(Self, Self) -> Bool
-pub fn Order::to_json(Self) -> Json
+pub fn Order::to_json(Self) -> @json.Json
 pub fn Order::to_repr(Self) -> @debug.Repr
-pub impl ToJson for Order
 pub impl @json.FromJson for Order
+pub impl @json.ToJson for Order
 
 #non_exhaustive
+#derive(Eq, @debug.Debug)
 pub(all) enum OrderStatus {
   Placed
   Approved
   Delivered
   Unknown(String)
-} derive(Eq, @debug.Debug)
+}
 pub fn OrderStatus::equal(Self, Self) -> Bool
-pub fn OrderStatus::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn OrderStatus::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn OrderStatus::not_equal(Self, Self) -> Bool
-pub fn OrderStatus::to_json(Self) -> Json
+pub fn OrderStatus::to_json(Self) -> @json.Json
 pub fn OrderStatus::to_repr(Self) -> @debug.Repr
-pub impl ToJson for OrderStatus
 pub impl @json.FromJson for OrderStatus
+pub impl @json.ToJson for OrderStatus
 
+#derive(Eq, @debug.Debug)
 pub(all) struct Pet {
   id : Int64?
   name : String
@@ -187,44 +193,47 @@ pub(all) struct Pet {
   photo_urls : Array[String]
   tags : Array[Tag]?
   status : PetStatus?
-} derive(Eq, @debug.Debug)
+}
 pub fn Pet::equal(Self, Self) -> Bool
-pub fn Pet::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn Pet::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn Pet::new(name~ : String, photo_urls~ : Array[String], id? : Int64, category? : Category, tags? : Array[Tag], status? : PetStatus) -> Self
 pub fn Pet::not_equal(Self, Self) -> Bool
-pub fn Pet::to_json(Self) -> Json
+pub fn Pet::to_json(Self) -> @json.Json
 pub fn Pet::to_repr(Self) -> @debug.Repr
-pub impl ToJson for Pet
 pub impl @json.FromJson for Pet
+pub impl @json.ToJson for Pet
 
 #non_exhaustive
+#derive(Eq, @debug.Debug)
 pub(all) enum PetStatus {
   Available
   Pending
   Sold
   Unknown(String)
-} derive(Eq, @debug.Debug)
+}
 pub fn PetStatus::equal(Self, Self) -> Bool
-pub fn PetStatus::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn PetStatus::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn PetStatus::not_equal(Self, Self) -> Bool
-pub fn PetStatus::to_json(Self) -> Json
+pub fn PetStatus::to_json(Self) -> @json.Json
 pub fn PetStatus::to_repr(Self) -> @debug.Repr
-pub impl ToJson for PetStatus
 pub impl @json.FromJson for PetStatus
+pub impl @json.ToJson for PetStatus
 
+#derive(Eq, @debug.Debug)
 pub(all) struct Tag {
   id : Int64?
   name : String?
-} derive(Eq, @debug.Debug)
+}
 pub fn Tag::equal(Self, Self) -> Bool
-pub fn Tag::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn Tag::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn Tag::new(id? : Int64, name? : String) -> Self
 pub fn Tag::not_equal(Self, Self) -> Bool
-pub fn Tag::to_json(Self) -> Json
+pub fn Tag::to_json(Self) -> @json.Json
 pub fn Tag::to_repr(Self) -> @debug.Repr
-pub impl ToJson for Tag
 pub impl @json.FromJson for Tag
+pub impl @json.ToJson for Tag
 
+#derive(Eq, @debug.Debug)
 pub(all) struct User {
   id : Int64?
   username : String?
@@ -234,15 +243,15 @@ pub(all) struct User {
   password : String?
   phone : String?
   user_status : Int32?
-} derive(Eq, @debug.Debug)
+}
 pub fn User::equal(Self, Self) -> Bool
-pub fn User::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn User::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
 pub fn User::new(id? : Int64, username? : String, first_name? : String, last_name? : String, email? : String, password? : String, phone? : String, user_status? : Int32) -> Self
 pub fn User::not_equal(Self, Self) -> Bool
-pub fn User::to_json(Self) -> Json
+pub fn User::to_json(Self) -> @json.Json
 pub fn User::to_repr(Self) -> @debug.Repr
-pub impl ToJson for User
 pub impl @json.FromJson for User
+pub impl @json.ToJson for User
 
 // Type aliases
 

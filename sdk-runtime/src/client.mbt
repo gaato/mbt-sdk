@@ -459,8 +459,11 @@ async fn[T] Client::admit_and_exchange(
 /// The exchange itself, within `budget` milliseconds when there is one. A
 /// transport failure, and running out of time, are captured as values, so
 /// the only error that can leave this function is a cancellation, and the
-/// `errdefer` settles the attempt for exactly that case.
-#warnings("-result_error_return")
+/// `errdefer` settles the attempt for exactly that case. The settling is left
+/// cancellable on purpose: sdk-runtime is not tied to one async runtime, so it
+/// cannot call `protect_from_cancel`, and `settle_without_response` defers its
+/// observer so that it runs even when a suspended release is cut short.
+#warnings("-result_error_return-cancellable_defer")
 async fn[T] Client::exchange_guarded(
   self : Client,
   bucket : String,

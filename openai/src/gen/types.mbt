@@ -202,9 +202,10 @@ fn[T : @json.FromJson] decode_presence_json_map(
 ///|
 ///
 /// Specifying a particular function via `{"name": "my_function"}` forces the model to call that function.
+#derive(Eq, @debug.Debug)
 pub(all) struct ChatCompletionFunctionCallOption {
   name : String
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ChatCompletionFunctionCallOption with Eq::{equal, not_equal}
@@ -248,11 +249,12 @@ pub impl @json.FromJson for ChatCompletionFunctionCallOption with fn from_json(
 ///|
 ///
 /// Generated representation of ChatCompletionFunctions.
+#derive(Eq, @debug.Debug)
 pub(all) struct ChatCompletionFunctions {
   description : String?
   name : String
   parameters : Json?
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ChatCompletionFunctions with Eq::{equal, not_equal}
@@ -306,10 +308,11 @@ pub impl @json.FromJson for ChatCompletionFunctions with fn from_json(
 ///|
 ///
 /// The function that the model called.
+#derive(Eq, @debug.Debug)
 pub(all) struct ChatCompletionMessageToolCallFunction {
   name : String
   arguments : String
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ChatCompletionMessageToolCallFunction with Eq::{equal, not_equal}
@@ -362,10 +365,11 @@ pub impl @json.FromJson for ChatCompletionMessageToolCallFunction with fn from_j
 ///|
 ///
 /// Generated representation of ChatCompletionMessageToolCall.
+#derive(Eq, @debug.Debug)
 pub(all) struct ChatCompletionMessageToolCall {
   id : String
   function : ChatCompletionMessageToolCallFunction
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ChatCompletionMessageToolCall with Eq::{equal, not_equal}
@@ -417,10 +421,11 @@ pub impl @json.FromJson for ChatCompletionMessageToolCall with fn from_json(
 ///|
 ///
 /// Generated representation of ChatCompletionMessageToolCallChunkFunction.
+#derive(Eq, @debug.Debug)
 pub(all) struct ChatCompletionMessageToolCallChunkFunction {
   name : String?
   arguments : String?
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ChatCompletionMessageToolCallChunkFunction with Eq::{
@@ -480,11 +485,12 @@ pub impl @json.FromJson for ChatCompletionMessageToolCallChunkFunction with fn f
 ///|
 ///
 /// Generated representation of ChatCompletionMessageToolCallChunk.
+#derive(Eq, @debug.Debug)
 pub(all) struct ChatCompletionMessageToolCallChunk {
   index : Int32
   id : String?
   function : ChatCompletionMessageToolCallChunkFunction?
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ChatCompletionMessageToolCallChunk with Eq::{equal, not_equal}
@@ -539,9 +545,10 @@ pub impl @json.FromJson for ChatCompletionMessageToolCallChunk with fn from_json
 ///|
 ///
 /// Generated representation of ChatCompletionNamedToolChoiceFunction.
+#derive(Eq, @debug.Debug)
 pub(all) struct ChatCompletionNamedToolChoiceFunction {
   name : String
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ChatCompletionNamedToolChoiceFunction with Eq::{equal, not_equal}
@@ -587,9 +594,10 @@ pub impl @json.FromJson for ChatCompletionNamedToolChoiceFunction with fn from_j
 ///|
 ///
 /// Specifies a tool the model should use. Use to force the model to call a specific function.
+#derive(Eq, @debug.Debug)
 pub(all) struct ChatCompletionNamedToolChoice {
   function : ChatCompletionNamedToolChoiceFunction
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ChatCompletionNamedToolChoice with Eq::{equal, not_equal}
@@ -636,10 +644,11 @@ pub impl @json.FromJson for ChatCompletionNamedToolChoice with fn from_json(
 ///|
 ///
 /// Learn about [text inputs](/docs/guides/text-generation).
+#derive(Eq, @debug.Debug)
 pub(all) struct ChatCompletionRequestMessageContentPartText {
   type_ : String
   text : String
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ChatCompletionRequestMessageContentPartText with Eq::{
@@ -699,10 +708,11 @@ pub impl @json.FromJson for ChatCompletionRequestMessageContentPartText with fn 
 ///|
 ///
 /// Generated representation of ChatCompletionRequestMessageContentPartRefusal.
+#derive(Eq, @debug.Debug)
 pub(all) struct ChatCompletionRequestMessageContentPartRefusal {
   type_ : String
   refusal : String
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ChatCompletionRequestMessageContentPartRefusal with Eq::{
@@ -762,12 +772,13 @@ pub impl @json.FromJson for ChatCompletionRequestMessageContentPartRefusal with 
 ///|
 ///
 /// Generated tagged union ChatCompletionRequestAssistantMessageContentPart.
+#derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum ChatCompletionRequestAssistantMessageContentPart {
   Text(ChatCompletionRequestMessageContentPartText)
   Refusal(ChatCompletionRequestMessageContentPartRefusal)
   Unknown(String, Json)
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ChatCompletionRequestAssistantMessageContentPart with Eq::{
@@ -822,13 +833,14 @@ pub impl @json.FromJson for ChatCompletionRequestAssistantMessageContentPart wit
 ///|
 ///
 /// The contents of the assistant message. Required unless `tool_calls` or `function_call` is specified.
+#derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum ChatCompletionRequestAssistantMessageContent {
   Text(String)
   ChatCompletionRequestAssistantMessageContentPartArray(
     Array[ChatCompletionRequestAssistantMessageContentPart]
   )
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ChatCompletionRequestAssistantMessageContent with Eq::{
@@ -889,9 +901,10 @@ pub impl @json.FromJson for ChatCompletionRequestAssistantMessageContent with fn
 ///|
 ///
 /// Data about a previous audio response from the model. [Learn more](/docs/guides/audio).
+#derive(Eq, @debug.Debug)
 pub(all) struct ChatCompletionRequestAssistantMessageAudio {
   id : String
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ChatCompletionRequestAssistantMessageAudio with Eq::{
@@ -944,10 +957,11 @@ pub impl @json.FromJson for ChatCompletionRequestAssistantMessageAudio with fn f
 ///|
 ///
 /// Deprecated and replaced by `tool_calls`. The name and arguments of a function that should be called, as generated by the model.
+#derive(Eq, @debug.Debug)
 pub(all) struct ChatCompletionRequestAssistantMessageFunctionCall {
   arguments : String
   name : String
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ChatCompletionRequestAssistantMessageFunctionCall with Eq::{
@@ -1009,6 +1023,7 @@ pub impl @json.FromJson for ChatCompletionRequestAssistantMessageFunctionCall wi
 ///|
 ///
 /// Messages sent by the model in response to user messages.
+#derive(Eq, @debug.Debug)
 pub(all) struct ChatCompletionRequestAssistantMessage {
   content : @sdkjson.Presence[ChatCompletionRequestAssistantMessageContent]
   refusal : @sdkjson.Presence[String]
@@ -1019,7 +1034,7 @@ pub(all) struct ChatCompletionRequestAssistantMessage {
   function_call : @sdkjson.Presence[
     ChatCompletionRequestAssistantMessageFunctionCall,
   ]
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ChatCompletionRequestAssistantMessage with Eq::{equal, not_equal}
@@ -1095,13 +1110,14 @@ pub impl @json.FromJson for ChatCompletionRequestAssistantMessage with fn from_j
 ///|
 ///
 /// The contents of the developer message.
+#derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum ChatCompletionRequestDeveloperMessageContent {
   Text(String)
   ChatCompletionRequestMessageContentPartTextArray(
     Array[ChatCompletionRequestMessageContentPartText]
   )
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ChatCompletionRequestDeveloperMessageContent with Eq::{
@@ -1162,11 +1178,12 @@ pub impl @json.FromJson for ChatCompletionRequestDeveloperMessageContent with fn
 ///|
 ///
 /// Developer-provided instructions that the model should follow, regardless of messages sent by the user. With o1 models and newer, `developer` messages replace the previous `system` messages.
+#derive(Eq, @debug.Debug)
 pub(all) struct ChatCompletionRequestDeveloperMessage {
   content : ChatCompletionRequestDeveloperMessageContent
   role : String
   name : String?
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ChatCompletionRequestDeveloperMessage with Eq::{equal, not_equal}
@@ -1222,11 +1239,12 @@ pub impl @json.FromJson for ChatCompletionRequestDeveloperMessage with fn from_j
 ///|
 ///
 /// Generated representation of ChatCompletionRequestFunctionMessage.
+#derive(Eq, @debug.Debug)
 pub(all) struct ChatCompletionRequestFunctionMessage {
   role : String
   content : String?
   name : String
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ChatCompletionRequestFunctionMessage with Eq::{equal, not_equal}
@@ -1280,11 +1298,12 @@ pub impl @json.FromJson for ChatCompletionRequestFunctionMessage with fn from_js
 ///|
 ///
 /// Generated tagged union ChatCompletionRequestSystemMessageContentPart.
+#derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum ChatCompletionRequestSystemMessageContentPart {
   Text(ChatCompletionRequestMessageContentPartText)
   Unknown(String, Json)
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ChatCompletionRequestSystemMessageContentPart with Eq::{
@@ -1335,13 +1354,14 @@ pub impl @json.FromJson for ChatCompletionRequestSystemMessageContentPart with f
 ///|
 ///
 /// The contents of the system message.
+#derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum ChatCompletionRequestSystemMessageContent {
   Text(String)
   ChatCompletionRequestSystemMessageContentPartArray(
     Array[ChatCompletionRequestSystemMessageContentPart]
   )
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ChatCompletionRequestSystemMessageContent with Eq::{equal, not_equal}
@@ -1399,11 +1419,12 @@ pub impl @json.FromJson for ChatCompletionRequestSystemMessageContent with fn fr
 ///|
 ///
 /// Developer-provided instructions that the model should follow, regardless of messages sent by the user. With o1 models and newer, use `developer` messages for this purpose instead.
+#derive(Eq, @debug.Debug)
 pub(all) struct ChatCompletionRequestSystemMessage {
   content : ChatCompletionRequestSystemMessageContent
   role : String
   name : String?
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ChatCompletionRequestSystemMessage with Eq::{equal, not_equal}
@@ -1457,13 +1478,14 @@ pub impl @json.FromJson for ChatCompletionRequestSystemMessage with fn from_json
 ///|
 ///
 /// Specifies the detail level of the image. Learn more in the [Vision guide](/docs/guides/vision#low-or-high-fidelity-image-understanding).
+#derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum ChatCompletionRequestMessageContentPartImageImageUrlDetail {
   Auto
   Low
   High
   Custom(String)
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ChatCompletionRequestMessageContentPartImageImageUrlDetail with Eq::{
@@ -1526,10 +1548,11 @@ pub impl @json.FromJson for ChatCompletionRequestMessageContentPartImageImageUrl
 ///|
 ///
 /// Generated representation of ChatCompletionRequestMessageContentPartImageImageUrl.
+#derive(Eq, @debug.Debug)
 pub(all) struct ChatCompletionRequestMessageContentPartImageImageUrl {
   url : String
   detail : ChatCompletionRequestMessageContentPartImageImageUrlDetail?
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ChatCompletionRequestMessageContentPartImageImageUrl with Eq::{
@@ -1591,10 +1614,11 @@ pub impl @json.FromJson for ChatCompletionRequestMessageContentPartImageImageUrl
 ///|
 ///
 /// Learn about [image inputs](/docs/guides/vision).
+#derive(Eq, @debug.Debug)
 pub(all) struct ChatCompletionRequestMessageContentPartImage {
   type_ : String
   image_url : ChatCompletionRequestMessageContentPartImageImageUrl
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ChatCompletionRequestMessageContentPartImage with Eq::{
@@ -1654,12 +1678,13 @@ pub impl @json.FromJson for ChatCompletionRequestMessageContentPartImage with fn
 ///|
 ///
 /// The format of the encoded audio data. Currently supports "wav" and "mp3".
+#derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum ChatCompletionRequestMessageContentPartAudioInputAudioFormat {
   Wav
   Mp3
   Custom(String)
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ChatCompletionRequestMessageContentPartAudioInputAudioFormat with Eq::{
@@ -1720,10 +1745,11 @@ pub impl @json.FromJson for ChatCompletionRequestMessageContentPartAudioInputAud
 ///|
 ///
 /// Generated representation of ChatCompletionRequestMessageContentPartAudioInputAudio.
+#derive(Eq, @debug.Debug)
 pub(all) struct ChatCompletionRequestMessageContentPartAudioInputAudio {
   data : String
   format : ChatCompletionRequestMessageContentPartAudioInputAudioFormat
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ChatCompletionRequestMessageContentPartAudioInputAudio with Eq::{
@@ -1785,10 +1811,11 @@ pub impl @json.FromJson for ChatCompletionRequestMessageContentPartAudioInputAud
 ///|
 ///
 /// Learn about [audio inputs](/docs/guides/audio).
+#derive(Eq, @debug.Debug)
 pub(all) struct ChatCompletionRequestMessageContentPartAudio {
   type_ : String
   input_audio : ChatCompletionRequestMessageContentPartAudioInputAudio
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ChatCompletionRequestMessageContentPartAudio with Eq::{
@@ -1848,11 +1875,12 @@ pub impl @json.FromJson for ChatCompletionRequestMessageContentPartAudio with fn
 ///|
 ///
 /// Generated representation of ChatCompletionRequestMessageContentPartFileFile.
+#derive(Eq, @debug.Debug)
 pub(all) struct ChatCompletionRequestMessageContentPartFileFile {
   filename : String?
   file_data : String?
   file_id : String?
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ChatCompletionRequestMessageContentPartFileFile with Eq::{
@@ -1917,10 +1945,11 @@ pub impl @json.FromJson for ChatCompletionRequestMessageContentPartFileFile with
 ///|
 ///
 /// Learn about [file inputs](/docs/guides/text) for text generation.
+#derive(Eq, @debug.Debug)
 pub(all) struct ChatCompletionRequestMessageContentPartFile {
   type_ : String
   file : ChatCompletionRequestMessageContentPartFileFile
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ChatCompletionRequestMessageContentPartFile with Eq::{
@@ -1980,6 +2009,7 @@ pub impl @json.FromJson for ChatCompletionRequestMessageContentPartFile with fn 
 ///|
 ///
 /// Generated tagged union ChatCompletionRequestUserMessageContentPart.
+#derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum ChatCompletionRequestUserMessageContentPart {
   Text(ChatCompletionRequestMessageContentPartText)
@@ -1987,7 +2017,7 @@ pub(all) enum ChatCompletionRequestUserMessageContentPart {
   InputAudio(ChatCompletionRequestMessageContentPartAudio)
   File(ChatCompletionRequestMessageContentPartFile)
   Unknown(String, Json)
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ChatCompletionRequestUserMessageContentPart with Eq::{
@@ -2044,13 +2074,14 @@ pub impl @json.FromJson for ChatCompletionRequestUserMessageContentPart with fn 
 ///|
 ///
 /// The contents of the user message.
+#derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum ChatCompletionRequestUserMessageContent {
   Text(String)
   ChatCompletionRequestUserMessageContentPartArray(
     Array[ChatCompletionRequestUserMessageContentPart]
   )
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ChatCompletionRequestUserMessageContent with Eq::{equal, not_equal}
@@ -2106,11 +2137,12 @@ pub impl @json.FromJson for ChatCompletionRequestUserMessageContent with fn from
 ///|
 ///
 /// Messages sent by an end user, containing prompts or additional context information.
+#derive(Eq, @debug.Debug)
 pub(all) struct ChatCompletionRequestUserMessage {
   content : ChatCompletionRequestUserMessageContent
   role : String
   name : String?
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ChatCompletionRequestUserMessage with Eq::{equal, not_equal}
@@ -2164,11 +2196,12 @@ pub impl @json.FromJson for ChatCompletionRequestUserMessage with fn from_json(
 ///|
 ///
 /// Generated tagged union ChatCompletionRequestToolMessageContentPart.
+#derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum ChatCompletionRequestToolMessageContentPart {
   Text(ChatCompletionRequestMessageContentPartText)
   Unknown(String, Json)
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ChatCompletionRequestToolMessageContentPart with Eq::{
@@ -2219,13 +2252,14 @@ pub impl @json.FromJson for ChatCompletionRequestToolMessageContentPart with fn 
 ///|
 ///
 /// The contents of the tool message.
+#derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum ChatCompletionRequestToolMessageContent {
   Text(String)
   ChatCompletionRequestToolMessageContentPartArray(
     Array[ChatCompletionRequestToolMessageContentPart]
   )
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ChatCompletionRequestToolMessageContent with Eq::{equal, not_equal}
@@ -2281,11 +2315,12 @@ pub impl @json.FromJson for ChatCompletionRequestToolMessageContent with fn from
 ///|
 ///
 /// Generated representation of ChatCompletionRequestToolMessage.
+#derive(Eq, @debug.Debug)
 pub(all) struct ChatCompletionRequestToolMessage {
   role : String
   content : ChatCompletionRequestToolMessageContent
   tool_call_id : String
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ChatCompletionRequestToolMessage with Eq::{equal, not_equal}
@@ -2339,6 +2374,7 @@ pub impl @json.FromJson for ChatCompletionRequestToolMessage with fn from_json(
 ///|
 ///
 /// Generated tagged union ChatCompletionRequestMessage.
+#derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum ChatCompletionRequestMessage {
   Developer(ChatCompletionRequestDeveloperMessage)
@@ -2348,7 +2384,7 @@ pub(all) enum ChatCompletionRequestMessage {
   Tool(ChatCompletionRequestToolMessage)
   Function(ChatCompletionRequestFunctionMessage)
   Unknown(String, Json)
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ChatCompletionRequestMessage with Eq::{equal, not_equal}
@@ -2400,12 +2436,13 @@ pub impl @json.FromJson for ChatCompletionRequestMessage with fn from_json(
 ///|
 ///
 /// A URL citation when using web search.
+#derive(Eq, @debug.Debug)
 pub(all) struct ChatCompletionResponseMessageAnnotationsItemUrlCitation {
   end_index : Int32
   start_index : Int32
   url : String
   title : String
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ChatCompletionResponseMessageAnnotationsItemUrlCitation with Eq::{
@@ -2473,9 +2510,10 @@ pub impl @json.FromJson for ChatCompletionResponseMessageAnnotationsItemUrlCitat
 ///|
 ///
 /// A URL citation when using web search.
+#derive(Eq, @debug.Debug)
 pub(all) struct ChatCompletionResponseMessageAnnotationsItem {
   url_citation : ChatCompletionResponseMessageAnnotationsItemUrlCitation
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ChatCompletionResponseMessageAnnotationsItem with Eq::{
@@ -2531,10 +2569,11 @@ pub impl @json.FromJson for ChatCompletionResponseMessageAnnotationsItem with fn
 ///|
 ///
 /// Deprecated and replaced by `tool_calls`. The name and arguments of a function that should be called, as generated by the model.
+#derive(Eq, @debug.Debug)
 pub(all) struct ChatCompletionResponseMessageFunctionCall {
   arguments : String
   name : String
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ChatCompletionResponseMessageFunctionCall with Eq::{equal, not_equal}
@@ -2591,12 +2630,13 @@ pub impl @json.FromJson for ChatCompletionResponseMessageFunctionCall with fn fr
 ///|
 ///
 /// If the audio output modality is requested, this object contains data about the audio response from the model. [Learn more](/docs/guides/audio).
+#derive(Eq, @debug.Debug)
 pub(all) struct ChatCompletionResponseMessageAudio {
   id : String
   expires_at : Int32
   data : String
   transcript : String
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ChatCompletionResponseMessageAudio with Eq::{equal, not_equal}
@@ -2653,6 +2693,7 @@ pub impl @json.FromJson for ChatCompletionResponseMessageAudio with fn from_json
 ///|
 ///
 /// A chat completion message generated by the model.
+#derive(Eq, @debug.Debug)
 pub(all) struct ChatCompletionResponseMessage {
   content : String?
   refusal : @sdkjson.Presence[String]
@@ -2660,7 +2701,7 @@ pub(all) struct ChatCompletionResponseMessage {
   annotations : Array[ChatCompletionResponseMessageAnnotationsItem]?
   function_call : ChatCompletionResponseMessageFunctionCall?
   audio : @sdkjson.Presence[ChatCompletionResponseMessageAudio]
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ChatCompletionResponseMessage with Eq::{equal, not_equal}
@@ -2731,9 +2772,10 @@ pub impl @json.FromJson for ChatCompletionResponseMessage with fn from_json(
 ///|
 ///
 /// Options for streaming response. Only set this when you set `stream: true`.
+#derive(Eq, @debug.Debug)
 pub(all) struct ChatCompletionStreamOptions {
   include_usage : Bool?
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ChatCompletionStreamOptions with Eq::{equal, not_equal}
@@ -2777,10 +2819,11 @@ pub impl @json.FromJson for ChatCompletionStreamOptions with fn from_json(
 ///|
 ///
 /// Deprecated and replaced by `tool_calls`. The name and arguments of a function that should be called, as generated by the model.
+#derive(Eq, @debug.Debug)
 pub(all) struct ChatCompletionStreamResponseDeltaFunctionCall {
   arguments : String?
   name : String?
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ChatCompletionStreamResponseDeltaFunctionCall with Eq::{
@@ -2840,6 +2883,7 @@ pub impl @json.FromJson for ChatCompletionStreamResponseDeltaFunctionCall with f
 ///|
 ///
 /// The role of the author of this message.
+#derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum ChatCompletionStreamResponseDeltaRole {
   Developer
@@ -2848,7 +2892,7 @@ pub(all) enum ChatCompletionStreamResponseDeltaRole {
   Assistant
   Tool
   Unknown(String)
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ChatCompletionStreamResponseDeltaRole with Eq::{equal, not_equal}
@@ -2906,13 +2950,14 @@ pub impl @json.FromJson for ChatCompletionStreamResponseDeltaRole with fn from_j
 ///|
 ///
 /// A chat completion delta generated by streamed model responses.
+#derive(Eq, @debug.Debug)
 pub(all) struct ChatCompletionStreamResponseDelta {
   content : @sdkjson.Presence[String]
   function_call : ChatCompletionStreamResponseDeltaFunctionCall?
   tool_calls : Array[ChatCompletionMessageToolCallChunk]?
   role : ChatCompletionStreamResponseDeltaRole?
   refusal : @sdkjson.Presence[String]
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ChatCompletionStreamResponseDelta with Eq::{equal, not_equal}
@@ -2978,11 +3023,12 @@ pub impl @json.FromJson for ChatCompletionStreamResponseDelta with fn from_json(
 ///|
 ///
 /// Generated representation of ChatCompletionTokenLogprobTopLogprobsItem.
+#derive(Eq, @debug.Debug)
 pub(all) struct ChatCompletionTokenLogprobTopLogprobsItem {
   token : String
   logprob : Double
   bytes : Array[Int32]?
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ChatCompletionTokenLogprobTopLogprobsItem with Eq::{equal, not_equal}
@@ -3042,12 +3088,13 @@ pub impl @json.FromJson for ChatCompletionTokenLogprobTopLogprobsItem with fn fr
 ///|
 ///
 /// Generated representation of ChatCompletionTokenLogprob.
+#derive(Eq, @debug.Debug)
 pub(all) struct ChatCompletionTokenLogprob {
   token : String
   logprob : Double
   bytes : Array[Int32]?
   top_logprobs : Array[ChatCompletionTokenLogprobTopLogprobsItem]
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ChatCompletionTokenLogprob with Eq::{equal, not_equal}
@@ -3104,12 +3151,13 @@ pub impl @json.FromJson for ChatCompletionTokenLogprob with fn from_json(
 ///|
 ///
 /// Generated representation of FunctionObject.
+#derive(Eq, @debug.Debug)
 pub(all) struct FunctionObject {
   description : String?
   name : String
   parameters : Json?
   strict : @sdkjson.Presence[Bool]
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend FunctionObject with Eq::{equal, not_equal}
@@ -3168,9 +3216,10 @@ pub impl @json.FromJson for FunctionObject with fn from_json(value, path) {
 ///|
 ///
 /// Generated representation of ChatCompletionTool.
+#derive(Eq, @debug.Debug)
 pub(all) struct ChatCompletionTool {
   function : FunctionObject
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ChatCompletionTool with Eq::{equal, not_equal}
@@ -3214,13 +3263,14 @@ pub impl @json.FromJson for ChatCompletionTool with fn from_json(value, path) {
 ///|
 ///
 /// `none` means the model will not call any tool and instead generates a message. `auto` means the model can pick between generating a message or calling one or more tools. `required` means the model must call one or more tools.
+#derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum ChatCompletionToolChoiceOptionText {
   None
   Auto
   Required
   Custom(String)
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ChatCompletionToolChoiceOptionText with Eq::{equal, not_equal}
@@ -3272,11 +3322,12 @@ pub impl @json.FromJson for ChatCompletionToolChoiceOptionText with fn from_json
 ///|
 ///
 /// Controls which (if any) tool is called by the model. `none` means the model will not call any tool and instead generates a message. `auto` means the model can pick between generating a message or calling one or more tools. `required` means the model must call one or more tools. Specifying a particular tool via `{"type": "function", "function": {"name": "my_function"}}` forces the model to call that tool. `none` is the default when no tools are present. `auto` is the default if tools are present.
+#derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum ChatCompletionToolChoiceOption {
   Text(ChatCompletionToolChoiceOptionText)
   ChatCompletionNamedToolChoice(ChatCompletionNamedToolChoice)
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ChatCompletionToolChoiceOption with Eq::{equal, not_equal}
@@ -3328,6 +3379,7 @@ pub impl @json.FromJson for ChatCompletionToolChoiceOption with fn from_json(
 ///|
 ///
 /// Indicates which mouse button was pressed during the click. One of `left`, `right`, `wheel`, `back`, or `forward`.
+#derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum ClickButton {
   Left
@@ -3336,7 +3388,7 @@ pub(all) enum ClickButton {
   Back
   Forward
   Unknown(String)
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ClickButton with Eq::{equal, not_equal}
@@ -3389,12 +3441,13 @@ pub impl @json.FromJson for ClickButton with fn from_json(value, path) {
 ///|
 ///
 /// A click action.
+#derive(Eq, @debug.Debug)
 pub(all) struct Click {
   type_ : String
   button : ClickButton
   x : Int32
   y : Int32
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend Click with Eq::{equal, not_equal}
@@ -3448,10 +3501,11 @@ pub impl @json.FromJson for Click with fn from_json(value, path) {
 ///|
 ///
 /// Generated representation of CodeInterpreterFileOutputFilesItem.
+#derive(Eq, @debug.Debug)
 pub(all) struct CodeInterpreterFileOutputFilesItem {
   mime_type : String
   file_id : String
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend CodeInterpreterFileOutputFilesItem with Eq::{equal, not_equal}
@@ -3502,10 +3556,11 @@ pub impl @json.FromJson for CodeInterpreterFileOutputFilesItem with fn from_json
 ///|
 ///
 /// The output of a code interpreter tool call that is a file.
+#derive(Eq, @debug.Debug)
 pub(all) struct CodeInterpreterFileOutput {
   type_ : String
   files : Array[CodeInterpreterFileOutputFilesItem]
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend CodeInterpreterFileOutput with Eq::{equal, not_equal}
@@ -3556,10 +3611,11 @@ pub impl @json.FromJson for CodeInterpreterFileOutput with fn from_json(
 ///|
 ///
 /// The output of a code interpreter tool call that is text.
+#derive(Eq, @debug.Debug)
 pub(all) struct CodeInterpreterTextOutput {
   type_ : String
   logs : String
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend CodeInterpreterTextOutput with Eq::{equal, not_equal}
@@ -3610,13 +3666,14 @@ pub impl @json.FromJson for CodeInterpreterTextOutput with fn from_json(
 ///|
 ///
 /// The status of the code interpreter tool call.
+#derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum CodeInterpreterToolCallStatus {
   InProgress
   Interpreting
   Completed
   Unknown(String)
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend CodeInterpreterToolCallStatus with Eq::{equal, not_equal}
@@ -3668,12 +3725,13 @@ pub impl @json.FromJson for CodeInterpreterToolCallStatus with fn from_json(
 ///|
 ///
 /// Generated tagged union CodeInterpreterToolOutput.
+#derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum CodeInterpreterToolOutput {
   Logs(CodeInterpreterTextOutput)
   Files(CodeInterpreterFileOutput)
   Unknown(String, Json)
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend CodeInterpreterToolOutput with Eq::{equal, not_equal}
@@ -3717,12 +3775,13 @@ pub impl @json.FromJson for CodeInterpreterToolOutput with fn from_json(
 ///|
 ///
 /// A tool call to run code.
+#derive(Eq, @debug.Debug)
 pub(all) struct CodeInterpreterToolCall {
   id : String
   code : String
   status : CodeInterpreterToolCallStatus
   results : Array[CodeInterpreterToolOutput]
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend CodeInterpreterToolCall with Eq::{equal, not_equal}
@@ -3780,12 +3839,13 @@ pub impl @json.FromJson for CodeInterpreterToolCall with fn from_json(
 ///|
 ///
 /// Breakdown of tokens used in a completion.
+#derive(Eq, @debug.Debug)
 pub(all) struct CompletionUsageCompletionTokensDetails {
   accepted_prediction_tokens : Int32?
   audio_tokens : Int32?
   reasoning_tokens : Int32?
   rejected_prediction_tokens : Int32?
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend CompletionUsageCompletionTokensDetails with Eq::{equal, not_equal}
@@ -3853,10 +3913,11 @@ pub impl @json.FromJson for CompletionUsageCompletionTokensDetails with fn from_
 ///|
 ///
 /// Breakdown of tokens used in the prompt.
+#derive(Eq, @debug.Debug)
 pub(all) struct CompletionUsagePromptTokensDetails {
   audio_tokens : Int32?
   cached_tokens : Int32?
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend CompletionUsagePromptTokensDetails with Eq::{equal, not_equal}
@@ -3907,13 +3968,14 @@ pub impl @json.FromJson for CompletionUsagePromptTokensDetails with fn from_json
 ///|
 ///
 /// Usage statistics for the completion request.
+#derive(Eq, @debug.Debug)
 pub(all) struct CompletionUsage {
   completion_tokens : Int32
   prompt_tokens : Int32
   total_tokens : Int32
   completion_tokens_details : CompletionUsageCompletionTokensDetails?
   prompt_tokens_details : CompletionUsagePromptTokensDetails?
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend CompletionUsage with Eq::{equal, not_equal}
@@ -3980,11 +4042,12 @@ pub impl @json.FromJson for CompletionUsage with fn from_json(value, path) {
 ///|
 ///
 /// A double click action.
+#derive(Eq, @debug.Debug)
 pub(all) struct DoubleClick {
   type_ : String
   x : Int32
   y : Int32
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend DoubleClick with Eq::{equal, not_equal}
@@ -4031,10 +4094,11 @@ pub impl @json.FromJson for DoubleClick with fn from_json(value, path) {
 ///|
 ///
 /// An x/y coordinate pair, e.g. `{ x: 100, y: 200 }`.
+#derive(Eq, @debug.Debug)
 pub(all) struct Coordinate {
   x : Int32
   y : Int32
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend Coordinate with Eq::{equal, not_equal}
@@ -4073,10 +4137,11 @@ pub impl @json.FromJson for Coordinate with fn from_json(value, path) {
 ///|
 ///
 /// A drag action.
+#derive(Eq, @debug.Debug)
 pub(all) struct Drag {
   type_ : String
   path : Array[Coordinate]
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend Drag with Eq::{equal, not_equal}
@@ -4121,10 +4186,11 @@ pub impl @json.FromJson for Drag with fn from_json(value, path) {
 ///|
 ///
 /// A collection of keypresses the model would like to perform.
+#derive(Eq, @debug.Debug)
 pub(all) struct KeyPress {
   type_ : String
   keys : Array[String]
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend KeyPress with Eq::{equal, not_equal}
@@ -4169,11 +4235,12 @@ pub impl @json.FromJson for KeyPress with fn from_json(value, path) {
 ///|
 ///
 /// A mouse move action.
+#derive(Eq, @debug.Debug)
 pub(all) struct Move {
   type_ : String
   x : Int32
   y : Int32
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend Move with Eq::{equal, not_equal}
@@ -4220,9 +4287,10 @@ pub impl @json.FromJson for Move with fn from_json(value, path) {
 ///|
 ///
 /// A screenshot action.
+#derive(Eq, @debug.Debug)
 pub(all) struct Screenshot {
   type_ : String
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend Screenshot with Eq::{equal, not_equal}
@@ -4261,13 +4329,14 @@ pub impl @json.FromJson for Screenshot with fn from_json(value, path) {
 ///|
 ///
 /// A scroll action.
+#derive(Eq, @debug.Debug)
 pub(all) struct Scroll {
   type_ : String
   x : Int32
   y : Int32
   scroll_x : Int32
   scroll_y : Int32
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend Scroll with Eq::{equal, not_equal}
@@ -4324,10 +4393,11 @@ pub impl @json.FromJson for Scroll with fn from_json(value, path) {
 ///|
 ///
 /// An action to type in text.
+#derive(Eq, @debug.Debug)
 pub(all) struct Type {
   type_ : String
   text : String
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend Type with Eq::{equal, not_equal}
@@ -4372,9 +4442,10 @@ pub impl @json.FromJson for Type with fn from_json(value, path) {
 ///|
 ///
 /// A wait action.
+#derive(Eq, @debug.Debug)
 pub(all) struct Wait {
   type_ : String
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend Wait with Eq::{equal, not_equal}
@@ -4413,6 +4484,7 @@ pub impl @json.FromJson for Wait with fn from_json(value, path) {
 ///|
 ///
 /// Generated tagged union ComputerAction.
+#derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum ComputerAction {
   Click(Click)
@@ -4425,7 +4497,7 @@ pub(all) enum ComputerAction {
   Type(Type)
   Wait(Wait)
   Unknown(String, Json)
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ComputerAction with Eq::{equal, not_equal}
@@ -4480,10 +4552,11 @@ pub impl @json.FromJson for ComputerAction with fn from_json(value, path) {
 ///|
 ///
 /// A computer screenshot image used with the computer use tool.
+#derive(Eq, @debug.Debug)
 pub(all) struct ComputerScreenshotImage {
   image_url : String?
   file_id : String?
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ComputerScreenshotImage with Eq::{equal, not_equal}
@@ -4535,11 +4608,12 @@ pub impl @json.FromJson for ComputerScreenshotImage with fn from_json(
 ///|
 ///
 /// A pending safety check for the computer call.
+#derive(Eq, @debug.Debug)
 pub(all) struct ComputerToolCallSafetyCheck {
   id : String
   code : String
   message : String
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ComputerToolCallSafetyCheck with Eq::{equal, not_equal}
@@ -4593,13 +4667,14 @@ pub impl @json.FromJson for ComputerToolCallSafetyCheck with fn from_json(
 ///|
 ///
 /// The status of the item. One of `in_progress`, `completed`, or `incomplete`. Populated when items are returned via API.
+#derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum ComputerToolCallStatus {
   InProgress
   Completed
   Incomplete
   Unknown(String)
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ComputerToolCallStatus with Eq::{equal, not_equal}
@@ -4651,6 +4726,7 @@ pub impl @json.FromJson for ComputerToolCallStatus with fn from_json(
 ///|
 ///
 /// A tool call to a computer use tool. See the [computer use guide](/docs/guides/tools-computer-use) for more information.
+#derive(Eq, @debug.Debug)
 pub(all) struct ComputerToolCall {
   type_ : String
   id : String
@@ -4658,7 +4734,7 @@ pub(all) struct ComputerToolCall {
   action : ComputerAction
   pending_safety_checks : Array[ComputerToolCallSafetyCheck]
   status : ComputerToolCallStatus
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ComputerToolCall with Eq::{equal, not_equal}
@@ -4718,13 +4794,14 @@ pub impl @json.FromJson for ComputerToolCall with fn from_json(value, path) {
 ///|
 ///
 /// Specifies the latency tier to use for processing the request. This parameter is relevant for customers subscribed to the scale tier service: - If set to 'auto', and the Project is Scale tier enabled, the system will utilize scale tier credits until they are exhausted. - If set to 'auto', and the Project is not Scale tier enabled, the request will be processed using the default service tier with a lower uptime SLA and no latency guarentee. - If set to 'default', the request will be processed using the default service tier with a lower uptime SLA and no latency guarentee. - If set to 'flex', the request will be processed with the Flex Processing service tier. [Learn more](/docs/guides/flex-processing). - When not set, the default behavior is 'auto'. When this parameter is set, the response body will include the `service_tier` utilized.
+#derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum ServiceTier {
   Auto
   Default
   Flex
   Unknown(String)
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ServiceTier with Eq::{equal, not_equal}
@@ -4773,12 +4850,13 @@ pub impl @json.FromJson for ServiceTier with fn from_json(value, path) {
 ///|
 ///
 /// Generated string enum ResponseModalitiesItem.
+#derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum ResponseModalitiesItem {
   Text
   Audio
   Custom(String)
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ResponseModalitiesItem with Eq::{equal, not_equal}
@@ -4828,13 +4906,14 @@ pub impl @json.FromJson for ResponseModalitiesItem with fn from_json(
 ///|
 ///
 /// **o-series models only** Constrains effort on reasoning for [reasoning models](https://platform.openai.com/docs/guides/reasoning). Currently supported values are `low`, `medium`, and `high`. Reducing reasoning effort can result in faster responses and fewer tokens used on reasoning in a response.
+#derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum ReasoningEffort {
   Low
   Medium
   High
   Unknown(String)
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ReasoningEffort with Eq::{equal, not_equal}
@@ -4883,12 +4962,13 @@ pub impl @json.FromJson for ReasoningEffort with fn from_json(value, path) {
 ///|
 ///
 /// Approximate location parameters for the search.
+#derive(Eq, @debug.Debug)
 pub(all) struct WebSearchLocation {
   country : String?
   region : String?
   city : String?
   timezone : String?
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend WebSearchLocation with Eq::{equal, not_equal}
@@ -4942,9 +5022,10 @@ pub impl @json.FromJson for WebSearchLocation with fn from_json(value, path) {
 ///|
 ///
 /// Approximate location parameters for the search.
+#derive(Eq, @debug.Debug)
 pub(all) struct CreateChatCompletionRequestWebSearchOptionsUserLocation {
   approximate : WebSearchLocation
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend CreateChatCompletionRequestWebSearchOptionsUserLocation with Eq::{
@@ -5002,13 +5083,14 @@ pub impl @json.FromJson for CreateChatCompletionRequestWebSearchOptionsUserLocat
 ///|
 ///
 /// High level guidance for the amount of context window space to use for the search. One of `low`, `medium`, or `high`. `medium` is the default.
+#derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum WebSearchContextSize {
   Low
   Medium
   High
   Custom(String)
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend WebSearchContextSize with Eq::{equal, not_equal}
@@ -5057,12 +5139,13 @@ pub impl @json.FromJson for WebSearchContextSize with fn from_json(value, path) 
 ///|
 ///
 /// This tool searches the web for relevant results to use in a response. Learn more about the [web search tool](/docs/guides/tools-web-search?api-mode=chat).
+#derive(Eq, @debug.Debug)
 pub(all) struct CreateChatCompletionRequestWebSearchOptions {
   user_location : @sdkjson.Presence[
     CreateChatCompletionRequestWebSearchOptionsUserLocation,
   ]
   search_context_size : WebSearchContextSize?
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend CreateChatCompletionRequestWebSearchOptions with Eq::{
@@ -5125,9 +5208,10 @@ pub impl @json.FromJson for CreateChatCompletionRequestWebSearchOptions with fn 
 ///|
 ///
 /// Default response format. Used to generate text responses.
+#derive(Eq, @debug.Debug)
 pub(all) struct ResponseFormatText {
   type_ : String
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ResponseFormatText with Eq::{equal, not_equal}
@@ -5166,12 +5250,13 @@ pub impl @json.FromJson for ResponseFormatText with fn from_json(value, path) {
 ///|
 ///
 /// Structured Outputs configuration options, including a JSON Schema.
+#derive(Eq, @debug.Debug)
 pub(all) struct ResponseFormatJsonSchemaJsonSchema {
   description : String?
   name : String
   schema : Json?
   strict : @sdkjson.Presence[Bool]
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ResponseFormatJsonSchemaJsonSchema with Eq::{equal, not_equal}
@@ -5228,10 +5313,11 @@ pub impl @json.FromJson for ResponseFormatJsonSchemaJsonSchema with fn from_json
 ///|
 ///
 /// JSON Schema response format. Used to generate structured JSON responses. Learn more about [Structured Outputs](/docs/guides/structured-outputs).
+#derive(Eq, @debug.Debug)
 pub(all) struct ResponseFormatJsonSchema {
   type_ : String
   json_schema : ResponseFormatJsonSchemaJsonSchema
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ResponseFormatJsonSchema with Eq::{equal, not_equal}
@@ -5282,9 +5368,10 @@ pub impl @json.FromJson for ResponseFormatJsonSchema with fn from_json(
 ///|
 ///
 /// JSON object response format. An older method of generating JSON responses. Using `json_schema` is recommended for models that support it. Note that the model will not generate JSON without a system or user message instructing it to do so.
+#derive(Eq, @debug.Debug)
 pub(all) struct ResponseFormatJsonObject {
   type_ : String
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ResponseFormatJsonObject with Eq::{equal, not_equal}
@@ -5328,13 +5415,14 @@ pub impl @json.FromJson for ResponseFormatJsonObject with fn from_json(
 ///|
 ///
 /// An object specifying the format that the model must output. Setting to `{ "type": "json_schema", "json_schema": {...} }` enables Structured Outputs which ensures the model will match your supplied JSON schema. Learn more in the [Structured Outputs guide](/docs/guides/structured-outputs). Setting to `{ "type": "json_object" }` enables the older JSON mode, which ensures the message the model generates is valid JSON. Using `json_schema` is preferred for models that support it.
+#derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum CreateChatCompletionRequestResponseFormat {
   Text(ResponseFormatText)
   JsonSchema(ResponseFormatJsonSchema)
   JsonObject(ResponseFormatJsonObject)
   Unknown(String, Json)
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend CreateChatCompletionRequestResponseFormat with Eq::{equal, not_equal}
@@ -5386,6 +5474,7 @@ pub impl @json.FromJson for CreateChatCompletionRequestResponseFormat with fn fr
 ///|
 ///
 /// Specifies the output audio format. Must be one of `wav`, `mp3`, `flac`, `opus`, or `pcm16`.
+#derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum CreateChatCompletionRequestAudioFormat {
   Wav
@@ -5395,7 +5484,7 @@ pub(all) enum CreateChatCompletionRequestAudioFormat {
   Opus
   Pcm16
   Custom(String)
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend CreateChatCompletionRequestAudioFormat with Eq::{equal, not_equal}
@@ -5455,10 +5544,11 @@ pub impl @json.FromJson for CreateChatCompletionRequestAudioFormat with fn from_
 ///|
 ///
 /// Parameters for audio output. Required when audio output is requested with `modalities: ["audio"]`. [Learn more](/docs/guides/audio).
+#derive(Eq, @debug.Debug)
 pub(all) struct CreateChatCompletionRequestAudio {
   voice : String
   format : CreateChatCompletionRequestAudioFormat
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend CreateChatCompletionRequestAudio with Eq::{equal, not_equal}
@@ -5509,11 +5599,12 @@ pub impl @json.FromJson for CreateChatCompletionRequestAudio with fn from_json(
 ///|
 ///
 /// Not supported with latest reasoning models `o3` and `o4-mini`. Up to 4 sequences where the API will stop generating further tokens. The returned text will not contain the stop sequence.
+#derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum StopConfiguration {
   Text(String)
   TextArray(Array[String])
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend StopConfiguration with Eq::{equal, not_equal}
@@ -5557,13 +5648,14 @@ pub impl @json.FromJson for StopConfiguration with fn from_json(value, path) {
 ///|
 ///
 /// The content that should be matched when generating a model response. If generated tokens would match this content, the entire model response can be returned much more quickly.
+#derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum PredictionContentContent {
   Text(String)
   ChatCompletionRequestMessageContentPartTextArray(
     Array[ChatCompletionRequestMessageContentPartText]
   )
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend PredictionContentContent with Eq::{equal, not_equal}
@@ -5613,10 +5705,11 @@ pub impl @json.FromJson for PredictionContentContent with fn from_json(
 ///|
 ///
 /// Static predicted output content, such as the content of a text file that is being regenerated.
+#derive(Eq, @debug.Debug)
 pub(all) struct PredictionContent {
   type_ : String
   content : PredictionContentContent
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend PredictionContent with Eq::{equal, not_equal}
@@ -5664,11 +5757,12 @@ pub impl @json.FromJson for PredictionContent with fn from_json(value, path) {
 ///|
 ///
 /// Configuration for a [Predicted Output](/docs/guides/predicted-outputs), which can greatly improve response times when large parts of the model response are known ahead of time. This is most common when you are regenerating a file with only minor changes to most of the content.
+#derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum CreateChatCompletionRequestPrediction {
   Content(PredictionContent)
   Unknown(String, Json)
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend CreateChatCompletionRequestPrediction with Eq::{equal, not_equal}
@@ -5712,12 +5806,13 @@ pub impl @json.FromJson for CreateChatCompletionRequestPrediction with fn from_j
 ///|
 ///
 /// `none` means the model will not call a function and instead generates a message. `auto` means the model can pick between generating a message or calling a function.
+#derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum CreateChatCompletionRequestFunctionCallText {
   None
   Auto
   Custom(String)
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend CreateChatCompletionRequestFunctionCallText with Eq::{
@@ -5776,11 +5871,12 @@ pub impl @json.FromJson for CreateChatCompletionRequestFunctionCallText with fn 
 ///|
 ///
 /// Deprecated in favor of `tool_choice`. Controls which (if any) function is called by the model. `none` means the model will not call a function and instead generates a message. `auto` means the model can pick between generating a message or calling a function. Specifying a particular function via `{"name": "my_function"}` forces the model to call that function. `none` is the default when no functions are present. `auto` is the default if functions are present.
+#derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum CreateChatCompletionRequestFunctionCall {
   Text(CreateChatCompletionRequestFunctionCallText)
   ChatCompletionFunctionCallOption(ChatCompletionFunctionCallOption)
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend CreateChatCompletionRequestFunctionCall with Eq::{equal, not_equal}
@@ -5839,6 +5935,7 @@ pub impl @json.FromJson for CreateChatCompletionRequestFunctionCall with fn from
 ///|
 ///
 /// Generated representation of CreateChatCompletionRequest.
+#derive(Eq, @debug.Debug)
 pub(all) struct CreateChatCompletionRequest {
   metadata : @sdkjson.Presence[Map[String, String]]
   temperature : @sdkjson.Presence[Double]
@@ -5871,7 +5968,7 @@ pub(all) struct CreateChatCompletionRequest {
   parallel_tool_calls : Bool?
   function_call : CreateChatCompletionRequestFunctionCall?
   functions : Array[ChatCompletionFunctions]?
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend CreateChatCompletionRequest with Eq::{equal, not_equal}
@@ -6043,6 +6140,7 @@ pub impl @json.FromJson for CreateChatCompletionRequest with fn from_json(
 ///|
 ///
 /// The reason the model stopped generating tokens. This will be `stop` if the model hit a natural stop point or a provided stop sequence, `length` if the maximum number of tokens specified in the request was reached, `content_filter` if content was omitted due to a flag from our content filters, `tool_calls` if the model called a tool, or `function_call` (deprecated) if the model called a function.
+#derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum CreateChatCompletionResponseChoicesItemFinishReason {
   Stop
@@ -6051,7 +6149,7 @@ pub(all) enum CreateChatCompletionResponseChoicesItemFinishReason {
   ContentFilter
   FunctionCall
   Unknown(String)
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend CreateChatCompletionResponseChoicesItemFinishReason with Eq::{
@@ -6118,10 +6216,11 @@ pub impl @json.FromJson for CreateChatCompletionResponseChoicesItemFinishReason 
 ///|
 ///
 /// Log probability information for the choice.
+#derive(Eq, @debug.Debug)
 pub(all) struct CreateChatCompletionResponseChoicesItemLogprobs {
   content : Array[ChatCompletionTokenLogprob]?
   refusal : Array[ChatCompletionTokenLogprob]?
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend CreateChatCompletionResponseChoicesItemLogprobs with Eq::{
@@ -6183,12 +6282,13 @@ pub impl @json.FromJson for CreateChatCompletionResponseChoicesItemLogprobs with
 ///|
 ///
 /// Generated representation of CreateChatCompletionResponseChoicesItem.
+#derive(Eq, @debug.Debug)
 pub(all) struct CreateChatCompletionResponseChoicesItem {
   finish_reason : CreateChatCompletionResponseChoicesItemFinishReason
   index : Int32
   message : ChatCompletionResponseMessage
   logprobs : @sdkjson.Presence[CreateChatCompletionResponseChoicesItemLogprobs]
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend CreateChatCompletionResponseChoicesItem with Eq::{equal, not_equal}
@@ -6254,6 +6354,7 @@ pub impl @json.FromJson for CreateChatCompletionResponseChoicesItem with fn from
 ///|
 ///
 /// Represents a chat completion response returned by model, based on the provided input.
+#derive(Eq, @debug.Debug)
 pub(all) struct CreateChatCompletionResponse {
   id : String
   choices : Array[CreateChatCompletionResponseChoicesItem]
@@ -6262,7 +6363,7 @@ pub(all) struct CreateChatCompletionResponse {
   service_tier : @sdkjson.Presence[ServiceTier]
   system_fingerprint : String?
   usage : CompletionUsage?
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend CreateChatCompletionResponse with Eq::{equal, not_equal}
@@ -6337,10 +6438,11 @@ pub impl @json.FromJson for CreateChatCompletionResponse with fn from_json(
 ///|
 ///
 /// Log probability information for the choice.
+#derive(Eq, @debug.Debug)
 pub(all) struct CreateChatCompletionStreamResponseChoicesItemLogprobs {
   content : Array[ChatCompletionTokenLogprob]?
   refusal : Array[ChatCompletionTokenLogprob]?
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend CreateChatCompletionStreamResponseChoicesItemLogprobs with Eq::{
@@ -6402,6 +6504,7 @@ pub impl @json.FromJson for CreateChatCompletionStreamResponseChoicesItemLogprob
 ///|
 ///
 /// The reason the model stopped generating tokens. This will be `stop` if the model hit a natural stop point or a provided stop sequence, `length` if the maximum number of tokens specified in the request was reached, `content_filter` if content was omitted due to a flag from our content filters, `tool_calls` if the model called a tool, or `function_call` (deprecated) if the model called a function.
+#derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum CreateChatCompletionStreamResponseChoicesItemFinishReason {
   Stop
@@ -6410,7 +6513,7 @@ pub(all) enum CreateChatCompletionStreamResponseChoicesItemFinishReason {
   ContentFilter
   FunctionCall
   Unknown(String)
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend CreateChatCompletionStreamResponseChoicesItemFinishReason with Eq::{
@@ -6477,6 +6580,7 @@ pub impl @json.FromJson for CreateChatCompletionStreamResponseChoicesItemFinishR
 ///|
 ///
 /// Generated representation of CreateChatCompletionStreamResponseChoicesItem.
+#derive(Eq, @debug.Debug)
 pub(all) struct CreateChatCompletionStreamResponseChoicesItem {
   delta : ChatCompletionStreamResponseDelta
   logprobs : @sdkjson.Presence[
@@ -6484,7 +6588,7 @@ pub(all) struct CreateChatCompletionStreamResponseChoicesItem {
   ]
   finish_reason : CreateChatCompletionStreamResponseChoicesItemFinishReason?
   index : Int32
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend CreateChatCompletionStreamResponseChoicesItem with Eq::{
@@ -6558,6 +6662,7 @@ pub impl @json.FromJson for CreateChatCompletionStreamResponseChoicesItem with f
 ///|
 ///
 /// Represents a streamed chunk of a chat completion response returned by the model, based on the provided input. [Learn more](/docs/guides/streaming-responses).
+#derive(Eq, @debug.Debug)
 pub(all) struct CreateChatCompletionStreamResponse {
   id : String
   choices : Array[CreateChatCompletionStreamResponseChoicesItem]
@@ -6566,7 +6671,7 @@ pub(all) struct CreateChatCompletionStreamResponse {
   service_tier : @sdkjson.Presence[ServiceTier]
   system_fingerprint : String?
   usage : @sdkjson.Presence[CompletionUsage]
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend CreateChatCompletionStreamResponse with Eq::{equal, not_equal}
@@ -6641,13 +6746,14 @@ pub impl @json.FromJson for CreateChatCompletionStreamResponse with fn from_json
 ///|
 ///
 /// Input text to embed, encoded as a string or array of tokens. To embed multiple inputs in a single request, pass an array of strings or array of token arrays. The input must not exceed the max input tokens for the model (8192 tokens for `text-embedding-ada-002`), cannot be an empty string, and any array must be 2048 dimensions or less. [Example Python code](https://cookbook.openai.com/examples/how_to_count_tokens_with_tiktoken) for counting tokens. Some models may also impose a limit on total number of tokens summed across inputs.
+#derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum CreateEmbeddingRequestInput {
   Text(String)
   TextArray(Array[String])
   IntArray(Array[Int32])
   IntArrayArray(Array[Array[Int32]])
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend CreateEmbeddingRequestInput with Eq::{equal, not_equal}
@@ -6706,12 +6812,13 @@ pub impl @json.FromJson for CreateEmbeddingRequestInput with fn from_json(
 ///|
 ///
 /// The format to return the embeddings in. Can be either `float` or [`base64`](https://pypi.org/project/pybase64/).
+#derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum CreateEmbeddingRequestEncodingFormat {
   Float
   Base64
   Custom(String)
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend CreateEmbeddingRequestEncodingFormat with Eq::{equal, not_equal}
@@ -6761,13 +6868,14 @@ pub impl @json.FromJson for CreateEmbeddingRequestEncodingFormat with fn from_js
 ///|
 ///
 /// Generated representation of CreateEmbeddingRequest.
+#derive(Eq, @debug.Debug)
 pub(all) struct CreateEmbeddingRequest {
   input : CreateEmbeddingRequestInput
   model : String
   encoding_format : CreateEmbeddingRequestEncodingFormat?
   dimensions : Int32?
   user : String?
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend CreateEmbeddingRequest with Eq::{equal, not_equal}
@@ -6827,10 +6935,11 @@ pub impl @json.FromJson for CreateEmbeddingRequest with fn from_json(
 ///|
 ///
 /// Represents an embedding vector returned by embedding endpoint.
+#derive(Eq, @debug.Debug)
 pub(all) struct Embedding {
   index : Int32
   embedding : Array[Double]
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend Embedding with Eq::{equal, not_equal}
@@ -6876,10 +6985,11 @@ pub impl @json.FromJson for Embedding with fn from_json(value, path) {
 ///|
 ///
 /// The usage information for the request.
+#derive(Eq, @debug.Debug)
 pub(all) struct CreateEmbeddingResponseUsage {
   prompt_tokens : Int32
   total_tokens : Int32
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend CreateEmbeddingResponseUsage with Eq::{equal, not_equal}
@@ -6930,11 +7040,12 @@ pub impl @json.FromJson for CreateEmbeddingResponseUsage with fn from_json(
 ///|
 ///
 /// Generated representation of CreateEmbeddingResponse.
+#derive(Eq, @debug.Debug)
 pub(all) struct CreateEmbeddingResponse {
   data : Array[Embedding]
   model : String
   usage : CreateEmbeddingResponseUsage
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend CreateEmbeddingResponse with Eq::{equal, not_equal}
@@ -6989,13 +7100,14 @@ pub impl @json.FromJson for CreateEmbeddingResponse with fn from_json(
 ///|
 ///
 /// Generated representation of ModelResponseProperties.
+#derive(Eq, @debug.Debug)
 pub(all) struct ModelResponseProperties {
   metadata : @sdkjson.Presence[Map[String, String]]
   temperature : @sdkjson.Presence[Double]
   top_p : @sdkjson.Presence[Double]
   user : String?
   service_tier : @sdkjson.Presence[ServiceTier]
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ModelResponseProperties with Eq::{equal, not_equal}
@@ -7061,13 +7173,14 @@ pub impl @json.FromJson for ModelResponseProperties with fn from_json(
 ///|
 ///
 /// A summary of the reasoning performed by the model. This can be useful for debugging and understanding the model's reasoning process. One of `auto`, `concise`, or `detailed`.
+#derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum ReasoningSummary {
   Auto
   Concise
   Detailed
   Unknown(String)
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ReasoningSummary with Eq::{equal, not_equal}
@@ -7116,13 +7229,14 @@ pub impl @json.FromJson for ReasoningSummary with fn from_json(value, path) {
 ///|
 ///
 /// **Deprecated:** use `summary` instead. A summary of the reasoning performed by the model. This can be useful for debugging and understanding the model's reasoning process. One of `auto`, `concise`, or `detailed`.
+#derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum ReasoningGenerateSummary {
   Auto
   Concise
   Detailed
   Unknown(String)
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ReasoningGenerateSummary with Eq::{equal, not_equal}
@@ -7174,11 +7288,12 @@ pub impl @json.FromJson for ReasoningGenerateSummary with fn from_json(
 ///|
 ///
 /// **o-series models only** Configuration options for [reasoning models](https://platform.openai.com/docs/guides/reasoning).
+#derive(Eq, @debug.Debug)
 pub(all) struct Reasoning {
   effort : @sdkjson.Presence[ReasoningEffort]
   summary : @sdkjson.Presence[ReasoningSummary]
   generate_summary : @sdkjson.Presence[ReasoningGenerateSummary]
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend Reasoning with Eq::{equal, not_equal}
@@ -7233,13 +7348,14 @@ pub impl @json.FromJson for Reasoning with fn from_json(value, path) {
 ///|
 ///
 /// JSON Schema response format. Used to generate structured JSON responses. Learn more about [Structured Outputs](/docs/guides/structured-outputs).
+#derive(Eq, @debug.Debug)
 pub(all) struct TextResponseFormatJsonSchema {
   type_ : String
   description : String?
   name : String
   schema : Json
   strict : @sdkjson.Presence[Bool]
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend TextResponseFormatJsonSchema with Eq::{equal, not_equal}
@@ -7305,13 +7421,14 @@ pub impl @json.FromJson for TextResponseFormatJsonSchema with fn from_json(
 ///|
 ///
 /// An object specifying the format that the model must output. Configuring `{ "type": "json_schema" }` enables Structured Outputs, which ensures the model will match your supplied JSON schema. Learn more in the [Structured Outputs guide](/docs/guides/structured-outputs). The default format is `{ "type": "text" }` with no additional options. **Not recommended for gpt-4o and newer models:** Setting to `{ "type": "json_object" }` enables the older JSON mode, which ensures the message the model generates is valid JSON. Using `json_schema` is preferred for models that support it.
+#derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum TextResponseFormatConfiguration {
   Text(ResponseFormatText)
   JsonSchema(TextResponseFormatJsonSchema)
   JsonObject(ResponseFormatJsonObject)
   Unknown(String, Json)
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend TextResponseFormatConfiguration with Eq::{equal, not_equal}
@@ -7357,9 +7474,10 @@ pub impl @json.FromJson for TextResponseFormatConfiguration with fn from_json(
 ///|
 ///
 /// Configuration options for a text response from the model. Can be plain text or structured JSON data. Learn more: - [Text inputs and outputs](/docs/guides/text) - [Structured Outputs](/docs/guides/structured-outputs)
+#derive(Eq, @debug.Debug)
 pub(all) struct CreateResponseText {
   format : TextResponseFormatConfiguration?
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend CreateResponseText with Eq::{equal, not_equal}
@@ -7400,12 +7518,13 @@ pub impl @json.FromJson for CreateResponseText with fn from_json(value, path) {
 ///|
 ///
 /// The ranker to use for the file search.
+#derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum RankingOptionsRanker {
   Auto
   Default20241115
   Unknown(String)
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend RankingOptionsRanker with Eq::{equal, not_equal}
@@ -7452,10 +7571,11 @@ pub impl @json.FromJson for RankingOptionsRanker with fn from_json(value, path) 
 ///|
 ///
 /// Generated representation of RankingOptions.
+#derive(Eq, @debug.Debug)
 pub(all) struct RankingOptions {
   ranker : RankingOptionsRanker?
   score_threshold : Double?
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend RankingOptions with Eq::{equal, not_equal}
@@ -7503,13 +7623,14 @@ pub impl @json.FromJson for RankingOptions with fn from_json(value, path) {
 ///|
 ///
 /// A tool that searches for relevant content from uploaded files. Learn more about the [file search tool](https://platform.openai.com/docs/guides/tools-file-search).
+#derive(Eq, @debug.Debug)
 pub(all) struct FileSearchTool {
   type_ : String
   vector_store_ids : Array[String]
   max_num_results : Int32?
   ranking_options : RankingOptions?
   filters : @sdkjson.Presence[Json]
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend FileSearchTool with Eq::{equal, not_equal}
@@ -7572,13 +7693,14 @@ pub impl @json.FromJson for FileSearchTool with fn from_json(value, path) {
 ///|
 ///
 /// Defines a function in your own code the model can choose to call. Learn more about [function calling](https://platform.openai.com/docs/guides/function-calling).
+#derive(Eq, @debug.Debug)
 pub(all) struct FunctionTool {
   type_ : String
   name : String
   description : @sdkjson.Presence[String]
   parameters : Json?
   strict : Bool?
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend FunctionTool with Eq::{equal, not_equal}
@@ -7644,12 +7766,13 @@ pub impl @json.FromJson for FunctionTool with fn from_json(value, path) {
 ///|
 ///
 /// Generated representation of ApproximateLocation.
+#derive(Eq, @debug.Debug)
 pub(all) struct ApproximateLocation {
   country : @sdkjson.Presence[String]
   region : @sdkjson.Presence[String]
   city : @sdkjson.Presence[String]
   timezone : @sdkjson.Presence[String]
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ApproximateLocation with Eq::{equal, not_equal}
@@ -7709,13 +7832,14 @@ pub impl @json.FromJson for ApproximateLocation with fn from_json(value, path) {
 ///|
 ///
 /// High level guidance for the amount of context window space to use for the search. One of `low`, `medium`, or `high`. `medium` is the default.
+#derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum WebSearchPreviewToolSearchContextSize {
   Low
   Medium
   High
   Unknown(String)
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend WebSearchPreviewToolSearchContextSize with Eq::{equal, not_equal}
@@ -7769,11 +7893,12 @@ pub impl @json.FromJson for WebSearchPreviewToolSearchContextSize with fn from_j
 ///|
 ///
 /// This tool searches the web for relevant results to use in a response. Learn more about the [web search tool](https://platform.openai.com/docs/guides/tools-web-search).
+#derive(Eq, @debug.Debug)
 pub(all) struct WebSearchPreviewTool {
   type_ : String
   user_location : @sdkjson.Presence[ApproximateLocation]
   search_context_size : WebSearchPreviewToolSearchContextSize?
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend WebSearchPreviewTool with Eq::{equal, not_equal}
@@ -7828,6 +7953,7 @@ pub impl @json.FromJson for WebSearchPreviewTool with fn from_json(value, path) 
 ///|
 ///
 /// The type of computer environment to control.
+#derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum ComputerUsePreviewToolEnvironment {
   Windows
@@ -7836,7 +7962,7 @@ pub(all) enum ComputerUsePreviewToolEnvironment {
   Ubuntu
   Browser
   Unknown(String)
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ComputerUsePreviewToolEnvironment with Eq::{equal, not_equal}
@@ -7892,12 +8018,13 @@ pub impl @json.FromJson for ComputerUsePreviewToolEnvironment with fn from_json(
 ///|
 ///
 /// A tool that controls a virtual computer. Learn more about the [computer tool](https://platform.openai.com/docs/guides/tools-computer-use).
+#derive(Eq, @debug.Debug)
 pub(all) struct ComputerUsePreviewTool {
   type_ : String
   environment : ComputerUsePreviewToolEnvironment
   display_width : Int32
   display_height : Int32
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ComputerUsePreviewTool with Eq::{equal, not_equal}
@@ -7954,6 +8081,7 @@ pub impl @json.FromJson for ComputerUsePreviewTool with fn from_json(
 ///|
 ///
 /// Generated tagged union Tool.
+#derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum Tool {
   FileSearch(FileSearchTool)
@@ -7961,7 +8089,7 @@ pub(all) enum Tool {
   WebSearchPreview(WebSearchPreviewTool)
   ComputerUsePreview(ComputerUsePreviewTool)
   Unknown(String, Json)
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend Tool with Eq::{equal, not_equal}
@@ -8006,12 +8134,13 @@ pub impl @json.FromJson for Tool with fn from_json(value, path) {
 ///|
 ///
 /// The truncation strategy to use for the model response. - `auto`: If the context of this response and previous ones exceeds the model's context window size, the model will truncate the response to fit the context window by dropping input items in the middle of the conversation. - `disabled` (default): If a model response will exceed the context window size for a model, the request will fail with a 400 error.
+#derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum CreateResponseTruncation {
   Auto
   Disabled
   Custom(String)
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend CreateResponseTruncation with Eq::{equal, not_equal}
@@ -8061,11 +8190,12 @@ pub impl @json.FromJson for CreateResponseTruncation with fn from_json(
 ///|
 ///
 /// A citation to a file.
+#derive(Eq, @debug.Debug)
 pub(all) struct FileCitationBody {
   type_ : String
   file_id : String
   index : Int32
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend FileCitationBody with Eq::{equal, not_equal}
@@ -8116,13 +8246,14 @@ pub impl @json.FromJson for FileCitationBody with fn from_json(value, path) {
 ///|
 ///
 /// A citation for a web resource used to generate a model response.
+#derive(Eq, @debug.Debug)
 pub(all) struct UrlCitationBody {
   type_ : String
   url : String
   start_index : Int32
   end_index : Int32
   title : String
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend UrlCitationBody with Eq::{equal, not_equal}
@@ -8179,11 +8310,12 @@ pub impl @json.FromJson for UrlCitationBody with fn from_json(value, path) {
 ///|
 ///
 /// A path to a file.
+#derive(Eq, @debug.Debug)
 pub(all) struct FilePath {
   type_ : String
   file_id : String
   index : Int32
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend FilePath with Eq::{equal, not_equal}
@@ -8234,13 +8366,14 @@ pub impl @json.FromJson for FilePath with fn from_json(value, path) {
 ///|
 ///
 /// Generated tagged union Annotation.
+#derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum Annotation {
   FileCitation(FileCitationBody)
   UrlCitation(UrlCitationBody)
   FilePath(FilePath)
   Unknown(String, Json)
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend Annotation with Eq::{equal, not_equal}
@@ -8283,11 +8416,12 @@ pub impl @json.FromJson for Annotation with fn from_json(value, path) {
 ///|
 ///
 /// A text output from the model.
+#derive(Eq, @debug.Debug)
 pub(all) struct OutputTextContent {
   type_ : String
   text : String
   annotations : Array[Annotation]?
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend OutputTextContent with Eq::{equal, not_equal}
@@ -8338,10 +8472,11 @@ pub impl @json.FromJson for OutputTextContent with fn from_json(value, path) {
 ///|
 ///
 /// A refusal from the model.
+#derive(Eq, @debug.Debug)
 pub(all) struct RefusalContent {
   type_ : String
   refusal : String
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend RefusalContent with Eq::{equal, not_equal}
@@ -8389,12 +8524,13 @@ pub impl @json.FromJson for RefusalContent with fn from_json(value, path) {
 ///|
 ///
 /// Generated tagged union OutputContent.
+#derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum OutputContent {
   OutputText(OutputTextContent)
   Refusal(RefusalContent)
   Unknown(String, Json)
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend OutputContent with Eq::{equal, not_equal}
@@ -8435,13 +8571,14 @@ pub impl @json.FromJson for OutputContent with fn from_json(value, path) {
 ///|
 ///
 /// The status of the message input. One of `in_progress`, `completed`, or `incomplete`. Populated when input items are returned via API.
+#derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum OutputMessageStatus {
   InProgress
   Completed
   Incomplete
   Unknown(String)
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend OutputMessageStatus with Eq::{equal, not_equal}
@@ -8490,12 +8627,13 @@ pub impl @json.FromJson for OutputMessageStatus with fn from_json(value, path) {
 ///|
 ///
 /// An output message from the model.
+#derive(Eq, @debug.Debug)
 pub(all) struct OutputMessage {
   id : String
   type_ : String
   content : Array[OutputContent]
   status : OutputMessageStatus
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend OutputMessage with Eq::{equal, not_equal}
@@ -8550,6 +8688,7 @@ pub impl @json.FromJson for OutputMessage with fn from_json(value, path) {
 ///|
 ///
 /// The role of the message input. One of `user`, `assistant`, `system`, or `developer`.
+#derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum EasyInputMessageRole {
   User
@@ -8557,7 +8696,7 @@ pub(all) enum EasyInputMessageRole {
   System
   Developer
   Custom(String)
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend EasyInputMessageRole with Eq::{equal, not_equal}
@@ -8608,10 +8747,11 @@ pub impl @json.FromJson for EasyInputMessageRole with fn from_json(value, path) 
 ///|
 ///
 /// A text input to the model.
+#derive(Eq, @debug.Debug)
 pub(all) struct InputTextContent {
   type_ : String
   text : String
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend InputTextContent with Eq::{equal, not_equal}
@@ -8659,13 +8799,14 @@ pub impl @json.FromJson for InputTextContent with fn from_json(value, path) {
 ///|
 ///
 /// The detail level of the image to be sent to the model. One of `high`, `low`, or `auto`. Defaults to `auto`.
+#derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum InputImageContentDetail {
   Low
   High
   Auto
   Custom(String)
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend InputImageContentDetail with Eq::{equal, not_equal}
@@ -8717,12 +8858,13 @@ pub impl @json.FromJson for InputImageContentDetail with fn from_json(
 ///|
 ///
 /// An image input to the model. Learn about [image inputs](/docs/guides/vision).
+#derive(Eq, @debug.Debug)
 pub(all) struct InputImageContent {
   type_ : String
   image_url : @sdkjson.Presence[String]
   file_id : @sdkjson.Presence[String]
   detail : InputImageContentDetail
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend InputImageContent with Eq::{equal, not_equal}
@@ -8781,12 +8923,13 @@ pub impl @json.FromJson for InputImageContent with fn from_json(value, path) {
 ///|
 ///
 /// A file input to the model.
+#derive(Eq, @debug.Debug)
 pub(all) struct InputFileContent {
   type_ : String
   file_id : @sdkjson.Presence[String]
   filename : String?
   file_data : String?
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend InputFileContent with Eq::{equal, not_equal}
@@ -8845,13 +8988,14 @@ pub impl @json.FromJson for InputFileContent with fn from_json(value, path) {
 ///|
 ///
 /// Generated tagged union InputContent.
+#derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum InputContent {
   InputText(InputTextContent)
   InputImage(InputImageContent)
   InputFile(InputFileContent)
   Unknown(String, Json)
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend InputContent with Eq::{equal, not_equal}
@@ -8894,11 +9038,12 @@ pub impl @json.FromJson for InputContent with fn from_json(value, path) {
 ///|
 ///
 /// Text, image, or audio input to the model, used to generate a response. Can also contain previous assistant responses.
+#derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum EasyInputMessageContent {
   Text(String)
   InputMessageContentList(Array[InputContent])
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend EasyInputMessageContent with Eq::{equal, not_equal}
@@ -8945,11 +9090,12 @@ pub impl @json.FromJson for EasyInputMessageContent with fn from_json(
 ///|
 ///
 /// A message input to the model with a role indicating instruction following hierarchy. Instructions given with the `developer` or `system` role take precedence over instructions given with the `user` role. Messages with the `assistant` role are presumed to have been generated by the model in previous interactions.
+#derive(Eq, @debug.Debug)
 pub(all) struct EasyInputMessage {
   role : EasyInputMessageRole
   content : EasyInputMessageContent
   type_ : String?
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend EasyInputMessage with Eq::{equal, not_equal}
@@ -9000,13 +9146,14 @@ pub impl @json.FromJson for EasyInputMessage with fn from_json(value, path) {
 ///|
 ///
 /// The role of the message input. One of `user`, `system`, or `developer`.
+#derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum InputMessageRole {
   User
   System
   Developer
   Custom(String)
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend InputMessageRole with Eq::{equal, not_equal}
@@ -9055,13 +9202,14 @@ pub impl @json.FromJson for InputMessageRole with fn from_json(value, path) {
 ///|
 ///
 /// The status of item. One of `in_progress`, `completed`, or `incomplete`. Populated when items are returned via API.
+#derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum InputMessageStatus {
   InProgress
   Completed
   Incomplete
   Custom(String)
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend InputMessageStatus with Eq::{equal, not_equal}
@@ -9110,12 +9258,13 @@ pub impl @json.FromJson for InputMessageStatus with fn from_json(value, path) {
 ///|
 ///
 /// A message input to the model with a role indicating instruction following hierarchy. Instructions given with the `developer` or `system` role take precedence over instructions given with the `user` role.
+#derive(Eq, @debug.Debug)
 pub(all) struct InputMessage {
   type_ : String?
   role : InputMessageRole
   status : InputMessageStatus?
   content : Array[InputContent]
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend InputMessage with Eq::{equal, not_equal}
@@ -9169,6 +9318,7 @@ pub impl @json.FromJson for InputMessage with fn from_json(value, path) {
 ///|
 ///
 /// The status of the file search tool call. One of `in_progress`, `searching`, `incomplete` or `failed`,
+#derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum FileSearchToolCallStatus {
   InProgress
@@ -9177,7 +9327,7 @@ pub(all) enum FileSearchToolCallStatus {
   Incomplete
   Failed
   Unknown(String)
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend FileSearchToolCallStatus with Eq::{equal, not_equal}
@@ -9233,12 +9383,13 @@ pub impl @json.FromJson for FileSearchToolCallStatus with fn from_json(
 ///|
 ///
 /// Generated untagged union VectorStoreFileAttributesValue.
+#derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum VectorStoreFileAttributesValue {
   Text(String)
   Number(Double)
   Bool(Bool)
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend VectorStoreFileAttributesValue with Eq::{equal, not_equal}
@@ -9292,13 +9443,14 @@ pub impl @json.FromJson for VectorStoreFileAttributesValue with fn from_json(
 ///|
 ///
 /// Generated representation of FileSearchToolCallResultsItem.
+#derive(Eq, @debug.Debug)
 pub(all) struct FileSearchToolCallResultsItem {
   file_id : String?
   text : String?
   filename : String?
   attributes : @sdkjson.Presence[Map[String, VectorStoreFileAttributesValue]]
   score : Double?
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend FileSearchToolCallResultsItem with Eq::{equal, not_equal}
@@ -9364,13 +9516,14 @@ pub impl @json.FromJson for FileSearchToolCallResultsItem with fn from_json(
 ///|
 ///
 /// The results of a file search tool call. See the [file search guide](/docs/guides/tools-file-search) for more information.
+#derive(Eq, @debug.Debug)
 pub(all) struct FileSearchToolCall {
   id : String
   type_ : String
   status : FileSearchToolCallStatus
   queries : Array[String]
   results : @sdkjson.Presence[Array[FileSearchToolCallResultsItem]]
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend FileSearchToolCall with Eq::{equal, not_equal}
@@ -9433,11 +9586,12 @@ pub impl @json.FromJson for FileSearchToolCall with fn from_json(value, path) {
 ///|
 ///
 /// A pending safety check for the computer call.
+#derive(Eq, @debug.Debug)
 pub(all) struct ComputerCallSafetyCheckParam {
   id : String
   code : @sdkjson.Presence[String]
   message : @sdkjson.Presence[String]
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ComputerCallSafetyCheckParam with Eq::{equal, not_equal}
@@ -9495,13 +9649,14 @@ pub impl @json.FromJson for ComputerCallSafetyCheckParam with fn from_json(
 ///|
 ///
 /// The status of the message input. One of `in_progress`, `completed`, or `incomplete`. Populated when input items are returned via API.
+#derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum ComputerCallOutputItemParamStatus {
   InProgress
   Completed
   Incomplete
   Custom(String)
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ComputerCallOutputItemParamStatus with Eq::{equal, not_equal}
@@ -9553,6 +9708,7 @@ pub impl @json.FromJson for ComputerCallOutputItemParamStatus with fn from_json(
 ///|
 ///
 /// The output of a computer tool call.
+#derive(Eq, @debug.Debug)
 pub(all) struct ComputerCallOutputItemParam {
   id : @sdkjson.Presence[String]
   call_id : String
@@ -9562,7 +9718,7 @@ pub(all) struct ComputerCallOutputItemParam {
     Array[ComputerCallSafetyCheckParam],
   ]
   status : @sdkjson.Presence[ComputerCallOutputItemParamStatus]
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ComputerCallOutputItemParam with Eq::{equal, not_equal}
@@ -9636,6 +9792,7 @@ pub impl @json.FromJson for ComputerCallOutputItemParam with fn from_json(
 ///|
 ///
 /// The status of the web search tool call.
+#derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum WebSearchToolCallStatus {
   InProgress
@@ -9643,7 +9800,7 @@ pub(all) enum WebSearchToolCallStatus {
   Completed
   Failed
   Unknown(String)
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend WebSearchToolCallStatus with Eq::{equal, not_equal}
@@ -9697,11 +9854,12 @@ pub impl @json.FromJson for WebSearchToolCallStatus with fn from_json(
 ///|
 ///
 /// The results of a web search tool call. See the [web search guide](/docs/guides/tools-web-search) for more information.
+#derive(Eq, @debug.Debug)
 pub(all) struct WebSearchToolCall {
   id : String
   type_ : String
   status : WebSearchToolCallStatus
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend WebSearchToolCall with Eq::{equal, not_equal}
@@ -9752,13 +9910,14 @@ pub impl @json.FromJson for WebSearchToolCall with fn from_json(value, path) {
 ///|
 ///
 /// The status of the item. One of `in_progress`, `completed`, or `incomplete`. Populated when items are returned via API.
+#derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum FunctionToolCallStatus {
   InProgress
   Completed
   Incomplete
   Unknown(String)
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend FunctionToolCallStatus with Eq::{equal, not_equal}
@@ -9810,6 +9969,7 @@ pub impl @json.FromJson for FunctionToolCallStatus with fn from_json(
 ///|
 ///
 /// A tool call to run a function. See the [function calling guide](/docs/guides/function-calling) for more information.
+#derive(Eq, @debug.Debug)
 pub(all) struct FunctionToolCall {
   id : String?
   type_ : String
@@ -9817,7 +9977,7 @@ pub(all) struct FunctionToolCall {
   name : String
   arguments : String
   status : FunctionToolCallStatus?
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend FunctionToolCall with Eq::{equal, not_equal}
@@ -9877,13 +10037,14 @@ pub impl @json.FromJson for FunctionToolCall with fn from_json(value, path) {
 ///|
 ///
 /// The status of the item. One of `in_progress`, `completed`, or `incomplete`. Populated when items are returned via API.
+#derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum FunctionCallOutputItemParamStatus {
   InProgress
   Completed
   Incomplete
   Custom(String)
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend FunctionCallOutputItemParamStatus with Eq::{equal, not_equal}
@@ -9935,13 +10096,14 @@ pub impl @json.FromJson for FunctionCallOutputItemParamStatus with fn from_json(
 ///|
 ///
 /// The output of a function tool call.
+#derive(Eq, @debug.Debug)
 pub(all) struct FunctionCallOutputItemParam {
   id : @sdkjson.Presence[String]
   call_id : String
   type_ : String
   output : String
   status : @sdkjson.Presence[FunctionCallOutputItemParamStatus]
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend FunctionCallOutputItemParam with Eq::{equal, not_equal}
@@ -10007,9 +10169,10 @@ pub impl @json.FromJson for FunctionCallOutputItemParam with fn from_json(
 ///|
 ///
 /// Generated representation of ReasoningItemSummaryItem.
+#derive(Eq, @debug.Debug)
 pub(all) struct ReasoningItemSummaryItem {
   text : String
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ReasoningItemSummaryItem with Eq::{equal, not_equal}
@@ -10056,13 +10219,14 @@ pub impl @json.FromJson for ReasoningItemSummaryItem with fn from_json(
 ///|
 ///
 /// The status of the item. One of `in_progress`, `completed`, or `incomplete`. Populated when items are returned via API.
+#derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum ReasoningItemStatus {
   InProgress
   Completed
   Incomplete
   Unknown(String)
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ReasoningItemStatus with Eq::{equal, not_equal}
@@ -10111,9 +10275,10 @@ pub impl @json.FromJson for ReasoningItemStatus with fn from_json(value, path) {
 ///|
 ///
 /// Generated representation of ReasoningItemContentItem.
+#derive(Eq, @debug.Debug)
 pub(all) struct ReasoningItemContentItem {
   text : String
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ReasoningItemContentItem with Eq::{equal, not_equal}
@@ -10160,13 +10325,14 @@ pub impl @json.FromJson for ReasoningItemContentItem with fn from_json(
 ///|
 ///
 /// A description of the chain of thought used by a reasoning model while generating a response.
+#derive(Eq, @debug.Debug)
 pub(all) struct ReasoningItem {
   type_ : String
   id : String
   summary : Array[ReasoningItemSummaryItem]
   status : ReasoningItemStatus?
   content : Array[ReasoningItemContentItem]?
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ReasoningItem with Eq::{equal, not_equal}
@@ -10223,10 +10389,11 @@ pub impl @json.FromJson for ReasoningItem with fn from_json(value, path) {
 ///|
 ///
 /// An internal identifier for an item to reference.
+#derive(Eq, @debug.Debug)
 pub(all) struct ItemReferenceParam {
   type_ : @sdkjson.Presence[String]
   id : String
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ItemReferenceParam with Eq::{equal, not_equal}
@@ -10274,6 +10441,7 @@ pub impl @json.FromJson for ItemReferenceParam with fn from_json(value, path) {
 ///|
 ///
 /// Generated tagged union InputItem.
+#derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum InputItem {
   OutputMessage(OutputMessage)
@@ -10288,7 +10456,7 @@ pub(all) enum InputItem {
   Reasoning(ReasoningItem)
   ItemReference(ItemReferenceParam)
   Unknown(String, Json)
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend InputItem with Eq::{equal, not_equal}
@@ -10358,11 +10526,12 @@ pub impl @json.FromJson for InputItem with fn from_json(value, path) {
 ///|
 ///
 /// Text, image, or file inputs to the model, used to generate a response. Learn more: - [Text inputs and outputs](/docs/guides/text) - [Image inputs](/docs/guides/images) - [File inputs](/docs/guides/pdf-files) - [Conversation state](/docs/guides/conversation-state) - [Function calling](/docs/guides/function-calling)
+#derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum CreateResponseInput {
   Text(String)
   InputItemArray(Array[InputItem])
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend CreateResponseInput with Eq::{equal, not_equal}
@@ -10406,13 +10575,14 @@ pub impl @json.FromJson for CreateResponseInput with fn from_json(value, path) {
 ///|
 ///
 /// Specify additional output data to include in the model response. Currently supported values are: - `file_search_call.results`: Include the search results of the file search tool call. - `message.input_image.image_url`: Include image urls from the input message. - `computer_call_output.output.image_url`: Include image urls from the computer call output.
+#derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum Includable {
   FileSearchCallResults
   MessageInputImageImageUrl
   ComputerCallOutputOutputImageUrl
   Custom(String)
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend Includable with Eq::{equal, not_equal}
@@ -10462,6 +10632,7 @@ pub impl @json.FromJson for Includable with fn from_json(value, path) {
 ///|
 ///
 /// Generated representation of CreateResponse.
+#derive(Eq, @debug.Debug)
 pub(all) struct CreateResponse {
   metadata : @sdkjson.Presence[Map[String, String]]
   temperature : @sdkjson.Presence[Double]
@@ -10482,7 +10653,7 @@ pub(all) struct CreateResponse {
   parallel_tool_calls : @sdkjson.Presence[Bool]
   store : @sdkjson.Presence[Bool]
   stream : @sdkjson.Presence[Bool]
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend CreateResponse with Eq::{equal, not_equal}
@@ -10605,6 +10776,7 @@ pub impl @json.FromJson for CreateResponse with fn from_json(value, path) {
 ///|
 ///
 /// Content item used to generate a response.
+#derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum Item {
   OutputMessage(OutputMessage)
@@ -10617,7 +10789,7 @@ pub(all) enum Item {
   FunctionCallOutput(FunctionCallOutputItemParam)
   Reasoning(ReasoningItem)
   Unknown(String, Json)
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend Item with Eq::{equal, not_equal}
@@ -10686,11 +10858,12 @@ pub impl @json.FromJson for Item with fn from_json(value, path) {
 ///|
 ///
 /// Describes an OpenAI model offering that can be used with the API.
+#derive(Eq, @debug.Debug)
 pub(all) struct Model {
   id : String
   created : Int64
   owned_by : String?
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend Model with Eq::{equal, not_equal}
@@ -10741,9 +10914,10 @@ pub impl @json.FromJson for Model with fn from_json(value, path) {
 ///|
 ///
 /// Generated representation of ListModelsResponse.
+#derive(Eq, @debug.Debug)
 pub(all) struct ListModelsResponse {
   data : Array[Model]
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ListModelsResponse with Eq::{equal, not_equal}
@@ -10785,6 +10959,7 @@ pub impl @json.FromJson for ListModelsResponse with fn from_json(value, path) {
 ///|
 ///
 /// Generated tagged union OutputItem.
+#derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum OutputItem {
   Message(OutputMessage)
@@ -10794,7 +10969,7 @@ pub(all) enum OutputItem {
   ComputerCall(ComputerToolCall)
   Reasoning(ReasoningItem)
   Unknown(String, Json)
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend OutputItem with Eq::{equal, not_equal}
@@ -10843,9 +11018,10 @@ pub impl @json.FromJson for OutputItem with fn from_json(value, path) {
 ///|
 ///
 /// Configuration options for a text response from the model. Can be plain text or structured JSON data. Learn more: - [Text inputs and outputs](/docs/guides/text) - [Structured Outputs](/docs/guides/structured-outputs)
+#derive(Eq, @debug.Debug)
 pub(all) struct ResponseText {
   format : TextResponseFormatConfiguration?
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ResponseText with Eq::{equal, not_equal}
@@ -10886,12 +11062,13 @@ pub impl @json.FromJson for ResponseText with fn from_json(value, path) {
 ///|
 ///
 /// The truncation strategy to use for the model response. - `auto`: If the context of this response and previous ones exceeds the model's context window size, the model will truncate the response to fit the context window by dropping input items in the middle of the conversation. - `disabled` (default): If a model response will exceed the context window size for a model, the request will fail with a 400 error.
+#derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum ResponseTruncation {
   Auto
   Disabled
   Unknown(String)
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ResponseTruncation with Eq::{equal, not_equal}
@@ -10938,6 +11115,7 @@ pub impl @json.FromJson for ResponseTruncation with fn from_json(value, path) {
 ///|
 ///
 /// The status of the response generation. One of `completed`, `failed`, `in_progress`, or `incomplete`.
+#derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum ResponseStatus {
   Completed
@@ -10945,7 +11123,7 @@ pub(all) enum ResponseStatus {
   InProgress
   Incomplete
   Unknown(String)
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ResponseStatus with Eq::{equal, not_equal}
@@ -10996,6 +11174,7 @@ pub impl @json.FromJson for ResponseStatus with fn from_json(value, path) {
 ///|
 ///
 /// The error code for the response.
+#derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum ResponseErrorCode {
   ServerError
@@ -11017,7 +11196,7 @@ pub(all) enum ResponseErrorCode {
   FailedToDownloadImage
   ImageFileNotFound
   Unknown(String)
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ResponseErrorCode with Eq::{equal, not_equal}
@@ -11096,10 +11275,11 @@ pub impl @json.FromJson for ResponseErrorCode with fn from_json(value, path) {
 ///|
 ///
 /// An error object returned when the model fails to generate a Response.
+#derive(Eq, @debug.Debug)
 pub(all) struct ResponseError {
   code : ResponseErrorCode
   message : String
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ResponseError with Eq::{equal, not_equal}
@@ -11147,12 +11327,13 @@ pub impl @json.FromJson for ResponseError with fn from_json(value, path) {
 ///|
 ///
 /// The reason why the response is incomplete.
+#derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum ResponseIncompleteDetailsReason {
   MaxOutputTokens
   ContentFilter
   Unknown(String)
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ResponseIncompleteDetailsReason with Eq::{equal, not_equal}
@@ -11202,9 +11383,10 @@ pub impl @json.FromJson for ResponseIncompleteDetailsReason with fn from_json(
 ///|
 ///
 /// Details about why the response is incomplete.
+#derive(Eq, @debug.Debug)
 pub(all) struct ResponseIncompleteDetails {
   reason : ResponseIncompleteDetailsReason?
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ResponseIncompleteDetails with Eq::{equal, not_equal}
@@ -11248,9 +11430,10 @@ pub impl @json.FromJson for ResponseIncompleteDetails with fn from_json(
 ///|
 ///
 /// A detailed breakdown of the input tokens.
+#derive(Eq, @debug.Debug)
 pub(all) struct ResponseUsageInputTokensDetails {
   cached_tokens : Int32
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ResponseUsageInputTokensDetails with Eq::{equal, not_equal}
@@ -11294,9 +11477,10 @@ pub impl @json.FromJson for ResponseUsageInputTokensDetails with fn from_json(
 ///|
 ///
 /// A detailed breakdown of the output tokens.
+#derive(Eq, @debug.Debug)
 pub(all) struct ResponseUsageOutputTokensDetails {
   reasoning_tokens : Int32
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ResponseUsageOutputTokensDetails with Eq::{equal, not_equal}
@@ -11342,13 +11526,14 @@ pub impl @json.FromJson for ResponseUsageOutputTokensDetails with fn from_json(
 ///|
 ///
 /// Represents token usage details including input tokens, output tokens, a breakdown of output tokens, and the total tokens used.
+#derive(Eq, @debug.Debug)
 pub(all) struct ResponseUsage {
   input_tokens : Int32
   input_tokens_details : ResponseUsageInputTokensDetails
   output_tokens : Int32
   output_tokens_details : ResponseUsageOutputTokensDetails
   total_tokens : Int32
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ResponseUsage with Eq::{equal, not_equal}
@@ -11411,6 +11596,7 @@ pub impl @json.FromJson for ResponseUsage with fn from_json(value, path) {
 ///|
 ///
 /// Generated representation of Response.
+#derive(Eq, @debug.Debug)
 pub(all) struct Response {
   metadata : Map[String, String]?
   temperature : Double?
@@ -11435,7 +11621,7 @@ pub(all) struct Response {
   output_text : @sdkjson.Presence[String]
   usage : ResponseUsage?
   parallel_tool_calls : Bool
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend Response with Eq::{equal, not_equal}
@@ -11585,10 +11771,11 @@ pub impl @json.FromJson for Response with fn from_json(value, path) {
 ///|
 ///
 /// Emitted when there is a partial audio response.
+#derive(Eq, @debug.Debug)
 pub(all) struct ResponseAudioDeltaEvent {
   type_ : String
   delta : String
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ResponseAudioDeltaEvent with Eq::{equal, not_equal}
@@ -11639,9 +11826,10 @@ pub impl @json.FromJson for ResponseAudioDeltaEvent with fn from_json(
 ///|
 ///
 /// Emitted when the audio response is complete.
+#derive(Eq, @debug.Debug)
 pub(all) struct ResponseAudioDoneEvent {
   type_ : String
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ResponseAudioDoneEvent with Eq::{equal, not_equal}
@@ -11683,10 +11871,11 @@ pub impl @json.FromJson for ResponseAudioDoneEvent with fn from_json(
 ///|
 ///
 /// Emitted when there is a partial transcript of audio.
+#derive(Eq, @debug.Debug)
 pub(all) struct ResponseAudioTranscriptDeltaEvent {
   type_ : String
   delta : String
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ResponseAudioTranscriptDeltaEvent with Eq::{equal, not_equal}
@@ -11737,9 +11926,10 @@ pub impl @json.FromJson for ResponseAudioTranscriptDeltaEvent with fn from_json(
 ///|
 ///
 /// Emitted when the full audio transcript is completed.
+#derive(Eq, @debug.Debug)
 pub(all) struct ResponseAudioTranscriptDoneEvent {
   type_ : String
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ResponseAudioTranscriptDoneEvent with Eq::{equal, not_equal}
@@ -11783,11 +11973,12 @@ pub impl @json.FromJson for ResponseAudioTranscriptDoneEvent with fn from_json(
 ///|
 ///
 /// Emitted when a partial code snippet is added by the code interpreter.
+#derive(Eq, @debug.Debug)
 pub(all) struct ResponseCodeInterpreterCallCodeDeltaEvent {
   type_ : String
   output_index : Int32
   delta : String
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ResponseCodeInterpreterCallCodeDeltaEvent with Eq::{equal, not_equal}
@@ -11847,11 +12038,12 @@ pub impl @json.FromJson for ResponseCodeInterpreterCallCodeDeltaEvent with fn fr
 ///|
 ///
 /// Emitted when code snippet output is finalized by the code interpreter.
+#derive(Eq, @debug.Debug)
 pub(all) struct ResponseCodeInterpreterCallCodeDoneEvent {
   type_ : String
   output_index : Int32
   code : String
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ResponseCodeInterpreterCallCodeDoneEvent with Eq::{equal, not_equal}
@@ -11909,11 +12101,12 @@ pub impl @json.FromJson for ResponseCodeInterpreterCallCodeDoneEvent with fn fro
 ///|
 ///
 /// Emitted when the code interpreter call is completed.
+#derive(Eq, @debug.Debug)
 pub(all) struct ResponseCodeInterpreterCallCompletedEvent {
   type_ : String
   output_index : Int32
   code_interpreter_call : CodeInterpreterToolCall
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ResponseCodeInterpreterCallCompletedEvent with Eq::{equal, not_equal}
@@ -11973,11 +12166,12 @@ pub impl @json.FromJson for ResponseCodeInterpreterCallCompletedEvent with fn fr
 ///|
 ///
 /// Emitted when a code interpreter call is in progress.
+#derive(Eq, @debug.Debug)
 pub(all) struct ResponseCodeInterpreterCallInProgressEvent {
   type_ : String
   output_index : Int32
   code_interpreter_call : CodeInterpreterToolCall
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ResponseCodeInterpreterCallInProgressEvent with Eq::{
@@ -12040,11 +12234,12 @@ pub impl @json.FromJson for ResponseCodeInterpreterCallInProgressEvent with fn f
 ///|
 ///
 /// Emitted when the code interpreter is actively interpreting the code snippet.
+#derive(Eq, @debug.Debug)
 pub(all) struct ResponseCodeInterpreterCallInterpretingEvent {
   type_ : String
   output_index : Int32
   code_interpreter_call : CodeInterpreterToolCall
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ResponseCodeInterpreterCallInterpretingEvent with Eq::{
@@ -12107,10 +12302,11 @@ pub impl @json.FromJson for ResponseCodeInterpreterCallInterpretingEvent with fn
 ///|
 ///
 /// Emitted when the model response is complete.
+#derive(Eq, @debug.Debug)
 pub(all) struct ResponseCompletedEvent {
   type_ : String
   response : Response
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ResponseCompletedEvent with Eq::{equal, not_equal}
@@ -12161,13 +12357,14 @@ pub impl @json.FromJson for ResponseCompletedEvent with fn from_json(
 ///|
 ///
 /// Emitted when a new content part is added.
+#derive(Eq, @debug.Debug)
 pub(all) struct ResponseContentPartAddedEvent {
   type_ : String
   item_id : String
   output_index : Int32
   content_index : Int32
   part : OutputContent
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ResponseContentPartAddedEvent with Eq::{equal, not_equal}
@@ -12227,13 +12424,14 @@ pub impl @json.FromJson for ResponseContentPartAddedEvent with fn from_json(
 ///|
 ///
 /// Emitted when a content part is done.
+#derive(Eq, @debug.Debug)
 pub(all) struct ResponseContentPartDoneEvent {
   type_ : String
   item_id : String
   output_index : Int32
   content_index : Int32
   part : OutputContent
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ResponseContentPartDoneEvent with Eq::{equal, not_equal}
@@ -12293,10 +12491,11 @@ pub impl @json.FromJson for ResponseContentPartDoneEvent with fn from_json(
 ///|
 ///
 /// An event that is emitted when a response is created.
+#derive(Eq, @debug.Debug)
 pub(all) struct ResponseCreatedEvent {
   type_ : String
   response : Response
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ResponseCreatedEvent with Eq::{equal, not_equal}
@@ -12344,12 +12543,13 @@ pub impl @json.FromJson for ResponseCreatedEvent with fn from_json(value, path) 
 ///|
 ///
 /// Emitted when an error occurs.
+#derive(Eq, @debug.Debug)
 pub(all) struct ResponseErrorEvent {
   type_ : String
   code : String?
   message : String
   param : String?
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ResponseErrorEvent with Eq::{equal, not_equal}
@@ -12403,10 +12603,11 @@ pub impl @json.FromJson for ResponseErrorEvent with fn from_json(value, path) {
 ///|
 ///
 /// An event that is emitted when a response fails.
+#derive(Eq, @debug.Debug)
 pub(all) struct ResponseFailedEvent {
   type_ : String
   response : Response
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ResponseFailedEvent with Eq::{equal, not_equal}
@@ -12454,11 +12655,12 @@ pub impl @json.FromJson for ResponseFailedEvent with fn from_json(value, path) {
 ///|
 ///
 /// Emitted when a file search call is completed (results found).
+#derive(Eq, @debug.Debug)
 pub(all) struct ResponseFileSearchCallCompletedEvent {
   type_ : String
   output_index : Int32
   item_id : String
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ResponseFileSearchCallCompletedEvent with Eq::{equal, not_equal}
@@ -12512,11 +12714,12 @@ pub impl @json.FromJson for ResponseFileSearchCallCompletedEvent with fn from_js
 ///|
 ///
 /// Emitted when a file search call is initiated.
+#derive(Eq, @debug.Debug)
 pub(all) struct ResponseFileSearchCallInProgressEvent {
   type_ : String
   output_index : Int32
   item_id : String
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ResponseFileSearchCallInProgressEvent with Eq::{equal, not_equal}
@@ -12572,11 +12775,12 @@ pub impl @json.FromJson for ResponseFileSearchCallInProgressEvent with fn from_j
 ///|
 ///
 /// Emitted when a file search is currently searching.
+#derive(Eq, @debug.Debug)
 pub(all) struct ResponseFileSearchCallSearchingEvent {
   type_ : String
   output_index : Int32
   item_id : String
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ResponseFileSearchCallSearchingEvent with Eq::{equal, not_equal}
@@ -12630,12 +12834,13 @@ pub impl @json.FromJson for ResponseFileSearchCallSearchingEvent with fn from_js
 ///|
 ///
 /// Emitted when there is a partial function-call arguments delta.
+#derive(Eq, @debug.Debug)
 pub(all) struct ResponseFunctionCallArgumentsDeltaEvent {
   type_ : String
   item_id : String
   output_index : Int32
   delta : String
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ResponseFunctionCallArgumentsDeltaEvent with Eq::{equal, not_equal}
@@ -12696,12 +12901,13 @@ pub impl @json.FromJson for ResponseFunctionCallArgumentsDeltaEvent with fn from
 ///|
 ///
 /// Emitted when function-call arguments are finalized.
+#derive(Eq, @debug.Debug)
 pub(all) struct ResponseFunctionCallArgumentsDoneEvent {
   type_ : String
   item_id : String
   output_index : Int32
   arguments : String
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ResponseFunctionCallArgumentsDoneEvent with Eq::{equal, not_equal}
@@ -12760,10 +12966,11 @@ pub impl @json.FromJson for ResponseFunctionCallArgumentsDoneEvent with fn from_
 ///|
 ///
 /// Emitted when the response is in progress.
+#derive(Eq, @debug.Debug)
 pub(all) struct ResponseInProgressEvent {
   type_ : String
   response : Response
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ResponseInProgressEvent with Eq::{equal, not_equal}
@@ -12814,10 +13021,11 @@ pub impl @json.FromJson for ResponseInProgressEvent with fn from_json(
 ///|
 ///
 /// An event that is emitted when a response finishes as incomplete.
+#derive(Eq, @debug.Debug)
 pub(all) struct ResponseIncompleteEvent {
   type_ : String
   response : Response
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ResponseIncompleteEvent with Eq::{equal, not_equal}
@@ -12868,11 +13076,12 @@ pub impl @json.FromJson for ResponseIncompleteEvent with fn from_json(
 ///|
 ///
 /// Emitted when a new output item is added.
+#derive(Eq, @debug.Debug)
 pub(all) struct ResponseOutputItemAddedEvent {
   type_ : String
   output_index : Int32
   item : OutputItem
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ResponseOutputItemAddedEvent with Eq::{equal, not_equal}
@@ -12926,11 +13135,12 @@ pub impl @json.FromJson for ResponseOutputItemAddedEvent with fn from_json(
 ///|
 ///
 /// Emitted when an output item is marked done.
+#derive(Eq, @debug.Debug)
 pub(all) struct ResponseOutputItemDoneEvent {
   type_ : String
   output_index : Int32
   item : OutputItem
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ResponseOutputItemDoneEvent with Eq::{equal, not_equal}
@@ -12984,9 +13194,10 @@ pub impl @json.FromJson for ResponseOutputItemDoneEvent with fn from_json(
 ///|
 ///
 /// Configuration options for a text response from the model. Can be plain text or structured JSON data. Learn more: - [Text inputs and outputs](/docs/guides/text) - [Structured Outputs](/docs/guides/structured-outputs)
+#derive(Eq, @debug.Debug)
 pub(all) struct ResponsePropertiesText {
   format : TextResponseFormatConfiguration?
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ResponsePropertiesText with Eq::{equal, not_equal}
@@ -13030,12 +13241,13 @@ pub impl @json.FromJson for ResponsePropertiesText with fn from_json(
 ///|
 ///
 /// The truncation strategy to use for the model response. - `auto`: If the context of this response and previous ones exceeds the model's context window size, the model will truncate the response to fit the context window by dropping input items in the middle of the conversation. - `disabled` (default): If a model response will exceed the context window size for a model, the request will fail with a 400 error.
+#derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum ResponsePropertiesTruncation {
   Auto
   Disabled
   Unknown(String)
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ResponsePropertiesTruncation with Eq::{equal, not_equal}
@@ -13085,6 +13297,7 @@ pub impl @json.FromJson for ResponsePropertiesTruncation with fn from_json(
 ///|
 ///
 /// Generated representation of ResponseProperties.
+#derive(Eq, @debug.Debug)
 pub(all) struct ResponseProperties {
   previous_response_id : @sdkjson.Presence[String]
   model : String?
@@ -13095,7 +13308,7 @@ pub(all) struct ResponseProperties {
   tools : Array[Tool]?
   tool_choice : Json?
   truncation : @sdkjson.Presence[ResponsePropertiesTruncation]
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ResponseProperties with Eq::{equal, not_equal}
@@ -13176,9 +13389,10 @@ pub impl @json.FromJson for ResponseProperties with fn from_json(value, path) {
 ///|
 ///
 /// The summary part that was added.
+#derive(Eq, @debug.Debug)
 pub(all) struct ResponseReasoningSummaryPartAddedEventPart {
   text : String
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ResponseReasoningSummaryPartAddedEventPart with Eq::{
@@ -13234,13 +13448,14 @@ pub impl @json.FromJson for ResponseReasoningSummaryPartAddedEventPart with fn f
 ///|
 ///
 /// Emitted when a new reasoning summary part is added.
+#derive(Eq, @debug.Debug)
 pub(all) struct ResponseReasoningSummaryPartAddedEvent {
   type_ : String
   item_id : String
   output_index : Int32
   summary_index : Int32
   part : ResponseReasoningSummaryPartAddedEventPart
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ResponseReasoningSummaryPartAddedEvent with Eq::{equal, not_equal}
@@ -13302,9 +13517,10 @@ pub impl @json.FromJson for ResponseReasoningSummaryPartAddedEvent with fn from_
 ///|
 ///
 /// The completed summary part.
+#derive(Eq, @debug.Debug)
 pub(all) struct ResponseReasoningSummaryPartDoneEventPart {
   text : String
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ResponseReasoningSummaryPartDoneEventPart with Eq::{equal, not_equal}
@@ -13357,13 +13573,14 @@ pub impl @json.FromJson for ResponseReasoningSummaryPartDoneEventPart with fn fr
 ///|
 ///
 /// Emitted when a reasoning summary part is completed.
+#derive(Eq, @debug.Debug)
 pub(all) struct ResponseReasoningSummaryPartDoneEvent {
   type_ : String
   item_id : String
   output_index : Int32
   summary_index : Int32
   part : ResponseReasoningSummaryPartDoneEventPart
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ResponseReasoningSummaryPartDoneEvent with Eq::{equal, not_equal}
@@ -13425,13 +13642,14 @@ pub impl @json.FromJson for ResponseReasoningSummaryPartDoneEvent with fn from_j
 ///|
 ///
 /// Emitted when a delta is added to a reasoning summary text.
+#derive(Eq, @debug.Debug)
 pub(all) struct ResponseReasoningSummaryTextDeltaEvent {
   type_ : String
   item_id : String
   output_index : Int32
   summary_index : Int32
   delta : String
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ResponseReasoningSummaryTextDeltaEvent with Eq::{equal, not_equal}
@@ -13493,13 +13711,14 @@ pub impl @json.FromJson for ResponseReasoningSummaryTextDeltaEvent with fn from_
 ///|
 ///
 /// Emitted when a reasoning summary text is completed.
+#derive(Eq, @debug.Debug)
 pub(all) struct ResponseReasoningSummaryTextDoneEvent {
   type_ : String
   item_id : String
   output_index : Int32
   summary_index : Int32
   text : String
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ResponseReasoningSummaryTextDoneEvent with Eq::{equal, not_equal}
@@ -13561,13 +13780,14 @@ pub impl @json.FromJson for ResponseReasoningSummaryTextDoneEvent with fn from_j
 ///|
 ///
 /// Emitted when there is a partial refusal text.
+#derive(Eq, @debug.Debug)
 pub(all) struct ResponseRefusalDeltaEvent {
   type_ : String
   item_id : String
   output_index : Int32
   content_index : Int32
   delta : String
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ResponseRefusalDeltaEvent with Eq::{equal, not_equal}
@@ -13627,13 +13847,14 @@ pub impl @json.FromJson for ResponseRefusalDeltaEvent with fn from_json(
 ///|
 ///
 /// Emitted when refusal text is finalized.
+#derive(Eq, @debug.Debug)
 pub(all) struct ResponseRefusalDoneEvent {
   type_ : String
   item_id : String
   output_index : Int32
   content_index : Int32
   refusal : String
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ResponseRefusalDoneEvent with Eq::{equal, not_equal}
@@ -13693,6 +13914,7 @@ pub impl @json.FromJson for ResponseRefusalDoneEvent with fn from_json(
 ///|
 ///
 /// Emitted when a text annotation is added.
+#derive(Eq, @debug.Debug)
 pub(all) struct ResponseTextAnnotationDeltaEvent {
   type_ : String
   item_id : String
@@ -13700,7 +13922,7 @@ pub(all) struct ResponseTextAnnotationDeltaEvent {
   content_index : Int32
   annotation_index : Int32
   annotation : Annotation
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ResponseTextAnnotationDeltaEvent with Eq::{equal, not_equal}
@@ -13763,13 +13985,14 @@ pub impl @json.FromJson for ResponseTextAnnotationDeltaEvent with fn from_json(
 ///|
 ///
 /// Emitted when there is an additional text delta.
+#derive(Eq, @debug.Debug)
 pub(all) struct ResponseTextDeltaEvent {
   type_ : String
   item_id : String
   output_index : Int32
   content_index : Int32
   delta : String
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ResponseTextDeltaEvent with Eq::{equal, not_equal}
@@ -13829,13 +14052,14 @@ pub impl @json.FromJson for ResponseTextDeltaEvent with fn from_json(
 ///|
 ///
 /// Emitted when text content is finalized.
+#derive(Eq, @debug.Debug)
 pub(all) struct ResponseTextDoneEvent {
   type_ : String
   item_id : String
   output_index : Int32
   content_index : Int32
   text : String
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ResponseTextDoneEvent with Eq::{equal, not_equal}
@@ -13892,11 +14116,12 @@ pub impl @json.FromJson for ResponseTextDoneEvent with fn from_json(value, path)
 ///|
 ///
 /// Emitted when a web search call is completed.
+#derive(Eq, @debug.Debug)
 pub(all) struct ResponseWebSearchCallCompletedEvent {
   type_ : String
   output_index : Int32
   item_id : String
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ResponseWebSearchCallCompletedEvent with Eq::{equal, not_equal}
@@ -13950,11 +14175,12 @@ pub impl @json.FromJson for ResponseWebSearchCallCompletedEvent with fn from_jso
 ///|
 ///
 /// Emitted when a web search call is initiated.
+#derive(Eq, @debug.Debug)
 pub(all) struct ResponseWebSearchCallInProgressEvent {
   type_ : String
   output_index : Int32
   item_id : String
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ResponseWebSearchCallInProgressEvent with Eq::{equal, not_equal}
@@ -14008,11 +14234,12 @@ pub impl @json.FromJson for ResponseWebSearchCallInProgressEvent with fn from_js
 ///|
 ///
 /// Emitted when a web search call is executing.
+#derive(Eq, @debug.Debug)
 pub(all) struct ResponseWebSearchCallSearchingEvent {
   type_ : String
   output_index : Int32
   item_id : String
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ResponseWebSearchCallSearchingEvent with Eq::{equal, not_equal}
@@ -14066,6 +14293,7 @@ pub impl @json.FromJson for ResponseWebSearchCallSearchingEvent with fn from_jso
 ///|
 ///
 /// Generated tagged union ResponseStreamEvent.
+#derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum ResponseStreamEvent {
   ResponseAudioDelta(ResponseAudioDeltaEvent)
@@ -14113,7 +14341,7 @@ pub(all) enum ResponseStreamEvent {
   ResponseWebSearchCallInProgress(ResponseWebSearchCallInProgressEvent)
   ResponseWebSearchCallSearching(ResponseWebSearchCallSearchingEvent)
   Unknown(String, Json)
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ResponseStreamEvent with Eq::{equal, not_equal}

@@ -12,12 +12,13 @@
 ///   assert_eq(error.message, "invalid request")
 /// }
 /// ```
+#derive(Eq, Debug)
 pub(all) struct ApiErrorBody {
   message : String
   type_ : String?
   param : String?
   code : String?
-} derive(Eq, Debug)
+}
 
 ///|
 /// Compares API error bodies field by field.
@@ -29,11 +30,12 @@ pub extend ApiErrorBody with @debug.Debug::{to_repr}
 
 ///|
 /// Basic information about an OpenAI model.
+#derive(Eq, Debug)
 pub(all) struct Model {
   id : String
   created : Int64?
   owned_by : String?
-} derive(Eq, Debug)
+}
 
 ///|
 /// Compares model information field by field.
@@ -45,11 +47,12 @@ pub extend Model with @debug.Debug::{to_repr}
 
 ///|
 /// Token usage reported by a response.
+#derive(Eq, Debug)
 pub(all) struct Usage {
   input_tokens : Int32
   output_tokens : Int32
   total_tokens : Int32
-} derive(Eq, Debug)
+}
 
 ///|
 /// Compares response usage field by field.
@@ -68,12 +71,13 @@ pub extend Usage with @debug.Debug::{to_repr}
 ///   assert_eq(tool.name, "lookup")
 /// }
 /// ```
+#derive(Eq, Debug)
 pub(all) struct ToolDef {
   name : String
   description : String?
   parameters : Json
   strict : Bool?
-} derive(Eq, Debug)
+}
 
 ///|
 /// Compares tool definitions field by field.
@@ -96,11 +100,12 @@ pub fn ToolDef::new(
 
 ///|
 /// A function call produced by a model. Arguments remain raw text until parsed.
+#derive(Eq, Debug)
 pub(all) struct ToolCall {
   id : String
   name : String
   arguments : String
-} derive(Eq, Debug)
+}
 
 ///|
 /// Compares tool calls field by field.
@@ -137,13 +142,14 @@ pub fn ToolCall::arguments_json(self : ToolCall) -> Json raise @json.ParseError 
 ///   assert_eq(message.content, "hello")
 /// }
 /// ```
+#derive(Eq, Debug)
 pub(all) struct ChatMessage {
   role : String
   content : String
   name : String?
   tool_calls : Array[ToolCall]?
   tool_call_id : String?
-} derive(Eq, Debug)
+}
 
 ///|
 /// Compares chat messages field by field.
@@ -244,6 +250,7 @@ pub fn ChatMessage::assistant_tool_calls(
 
 ///|
 /// Input accepted by buffered and streaming Chat Completions operations.
+#derive(Eq, Debug)
 pub(all) struct ChatRequest {
   model : String
   messages : Array[ChatMessage]
@@ -255,7 +262,7 @@ pub(all) struct ChatRequest {
   tools : Array[ToolDef]?
   tool_choice : Json?
   extra : Map[String, Json]
-} derive(Eq, Debug)
+}
 
 ///|
 /// Compares chat requests field by field.
@@ -305,6 +312,7 @@ fn copy_chat_message(message : ChatMessage) -> ChatMessage {
 
 ///|
 /// Why a chat completion stopped. Unknown values are retained.
+#derive(Eq, Debug)
 #non_exhaustive
 pub(all) enum FinishReason {
   Stop
@@ -312,7 +320,7 @@ pub(all) enum FinishReason {
   ToolCalls
   ContentFilter
   Unknown(String)
-} derive(Eq, Debug)
+}
 
 ///|
 /// Compares finish reasons, including unknown raw values.
@@ -324,6 +332,7 @@ pub extend FinishReason with @debug.Debug::{to_repr}
 
 ///|
 /// A buffered chat completion together with its original JSON value.
+#derive(Eq, Debug)
 pub(all) struct ChatCompletion {
   id : String
   model : String
@@ -332,7 +341,7 @@ pub(all) struct ChatCompletion {
   usage : Usage?
   tool_calls : Array[ToolCall]
   raw : Json
-} derive(Eq, Debug)
+}
 
 ///|
 /// Compares chat completions field by field.
@@ -344,6 +353,7 @@ pub extend ChatCompletion with @debug.Debug::{to_repr}
 
 ///|
 /// One event from a streaming chat completion. Unknown chunks retain raw JSON.
+#derive(Eq, Debug)
 #non_exhaustive
 pub(all) enum ChatEvent {
   Delta(String)
@@ -357,7 +367,7 @@ pub(all) enum ChatEvent {
   Finished(FinishReason)
   Usage(Usage)
   Other(String, Json)
-} derive(Eq, Debug)
+}
 
 ///|
 /// Compares chat events, including retained unknown JSON.
@@ -439,12 +449,13 @@ priv struct PendingToolCall {
 
 ///|
 /// Input accepted by the embeddings operation.
+#derive(Eq, Debug)
 pub(all) struct EmbeddingRequest {
   model : String
   input : Array[String]
   dimensions : Int32?
   user : String?
-} derive(Eq, Debug)
+}
 
 ///|
 /// Compares embedding requests field by field.
@@ -476,10 +487,11 @@ pub fn EmbeddingRequest::new(
 
 ///|
 /// One embedding vector and its position in the result list.
+#derive(Eq, Debug)
 pub(all) struct Embedding {
   index : Int32
   embedding : Array[Double]
-} derive(Eq, Debug)
+}
 
 ///|
 /// Compares embedding values field by field.
@@ -491,12 +503,13 @@ pub extend Embedding with @debug.Debug::{to_repr}
 
 ///|
 /// The flattened result of an embeddings operation.
+#derive(Eq, Debug)
 pub(all) struct EmbeddingResponse {
   data : Array[Embedding]
   model : String
   prompt_tokens : Int32
   total_tokens : Int32
-} derive(Eq, Debug)
+}
 
 ///|
 /// Compares embedding responses field by field.
@@ -508,6 +521,7 @@ pub extend EmbeddingResponse with @debug.Debug::{to_repr}
 
 ///|
 /// A response lifecycle status. Unknown values are retained for forward compatibility.
+#derive(Eq, Debug)
 #non_exhaustive
 pub(all) enum ResponseStatus {
   Completed
@@ -517,7 +531,7 @@ pub(all) enum ResponseStatus {
   Cancelled
   Queued
   Unknown(String)
-} derive(Eq, Debug)
+}
 
 ///|
 /// Compares response statuses, including unknown raw values.
@@ -529,6 +543,7 @@ pub extend ResponseStatus with @debug.Debug::{to_repr}
 
 ///|
 /// Input accepted by buffered and streaming response creation.
+#derive(Eq, Debug)
 pub(all) struct ResponseRequest {
   model : String
   input : String
@@ -540,7 +555,7 @@ pub(all) struct ResponseRequest {
   tool_choice : Json?
   extra : Map[String, Json]
   priv tool_outputs : Array[(String, String)]
-} derive(Eq, Debug)
+}
 
 ///|
 /// Compares response requests field by field.
@@ -605,6 +620,7 @@ pub fn ResponseRequest::with_tool_outputs(
 
 ///|
 /// A decoded response together with its original JSON value.
+#derive(Eq, Debug)
 pub(all) struct Response {
   id : String
   status : ResponseStatus
@@ -613,7 +629,7 @@ pub(all) struct Response {
   usage : Usage?
   tool_calls : Array[ToolCall]
   raw : Json
-} derive(Eq, Debug)
+}
 
 ///|
 /// Compares decoded responses field by field.
@@ -625,6 +641,7 @@ pub extend Response with @debug.Debug::{to_repr}
 
 ///|
 /// One event from a streaming response. Unknown event types retain their raw JSON.
+#derive(Eq, Debug)
 #non_exhaustive
 pub(all) enum ResponseEvent {
   Created(Response)
@@ -638,7 +655,7 @@ pub(all) enum ResponseEvent {
   Incomplete(Response)
   Error(ApiErrorBody)
   Other(String, Json)
-} derive(Eq, Debug)
+}
 
 ///|
 /// Compares response events, including retained unknown JSON.

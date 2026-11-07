@@ -50,6 +50,7 @@ pub fn append_query(url : String, name : String, value : String) -> String {
 ///   assert_eq(next.to_string(), "https://example.com/c%20d")
 /// }
 /// ```
+#derive(Eq, Debug)
 pub struct Url {
   scheme : String?
   userinfo : String?
@@ -58,7 +59,7 @@ pub struct Url {
   path : String
   query : String?
   fragment : String?
-} derive(Eq, Debug)
+}
 
 ///|
 /// Compares all components; parsing has already normalised them.
@@ -70,9 +71,10 @@ pub extend Url with @debug.Debug::{to_repr}
 
 ///|
 /// Why a string is not a URI reference this package accepts.
+#derive(Eq, Debug)
 pub(all) suberror UrlError {
   Invalid(String)
-} derive(Eq, Debug)
+}
 
 ///|
 /// Compares refusals by their reason.

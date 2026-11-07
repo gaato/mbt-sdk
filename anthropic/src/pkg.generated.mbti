@@ -41,48 +41,53 @@ pub async fn[E : Error] Anthropic::stream_message_params(Self, @gen.CreateMessag
 pub fn Anthropic::to_repr(Self) -> @debug.Repr
 pub impl @debug.Debug for Anthropic
 
+#derive(Eq, @debug.Debug)
 pub(all) struct ApiErrorBody {
   type_ : String
   message : String
-} derive(Eq, @debug.Debug)
+}
 pub fn ApiErrorBody::equal(Self, Self) -> Bool
 pub fn ApiErrorBody::not_equal(Self, Self) -> Bool
 pub fn ApiErrorBody::to_repr(Self) -> @debug.Repr
 
 #non_exhaustive
+#derive(Eq, @debug.Debug)
 pub(all) enum AuthHeader {
   XApiKey
   Bearer
-} derive(Eq, @debug.Debug)
+}
 pub fn AuthHeader::equal(Self, Self) -> Bool
 pub fn AuthHeader::not_equal(Self, Self) -> Bool
 pub fn AuthHeader::to_repr(Self) -> @debug.Repr
 
 #non_exhaustive
+#derive(Eq, @debug.Debug)
 pub(all) enum ContentBlock {
   Text(String)
   Thinking(thinking~ : String, signature~ : String)
   RedactedThinking(String)
-  ToolUse(id~ : String, name~ : String, input~ : Json)
-  Other(String, Json)
-} derive(Eq, @debug.Debug)
+  ToolUse(id~ : String, name~ : String, input~ : @json.Json)
+  Other(String, @json.Json)
+}
 pub fn ContentBlock::equal(Self, Self) -> Bool
 pub fn ContentBlock::not_equal(Self, Self) -> Bool
 pub fn ContentBlock::to_repr(Self) -> @debug.Repr
 
 #non_exhaustive
+#derive(Eq, @debug.Debug)
 pub(all) enum InputContent {
   Text(String)
   Blocks(Array[@gen.InputContentBlock])
-} derive(Eq, @debug.Debug)
+}
 pub fn InputContent::equal(Self, Self) -> Bool
 pub fn InputContent::not_equal(Self, Self) -> Bool
 pub fn InputContent::to_repr(Self) -> @debug.Repr
 
+#derive(Eq, @debug.Debug)
 pub(all) struct Message {
   role : Role
   content : InputContent
-} derive(Eq, @debug.Debug)
+}
 pub fn Message::assistant(String) -> Self
 pub fn Message::assistant_blocks(Array[@gen.InputContentBlock]) -> Self
 pub fn Message::equal(Self, Self) -> Bool
@@ -94,6 +99,7 @@ pub fn Message::user(String) -> Self
 pub fn Message::user_blocks(Array[@gen.InputContentBlock]) -> Self
 
 #non_exhaustive
+#derive(Eq, @debug.Debug)
 pub(all) enum MessageEvent {
   MessageStart(MessageResponse)
   ContentBlockStart(index~ : Int32, block~ : ContentBlock)
@@ -106,12 +112,13 @@ pub(all) enum MessageEvent {
   MessageStop
   Ping
   Error(ApiErrorBody)
-  Other(String, Json)
-} derive(Eq, @debug.Debug)
+  Other(String, @json.Json)
+}
 pub fn MessageEvent::equal(Self, Self) -> Bool
 pub fn MessageEvent::not_equal(Self, Self) -> Bool
 pub fn MessageEvent::to_repr(Self) -> @debug.Repr
 
+#derive(Eq, @debug.Debug)
 pub(all) struct MessageRequest {
   model : String
   max_tokens : Int32
@@ -124,15 +131,16 @@ pub(all) struct MessageRequest {
   thinking : @gen.ThinkingConfigParam?
   output_config : @gen.OutputConfig?
   metadata : @gen.Metadata?
-  extra : Map[String, Json]
-} derive(Eq, @debug.Debug)
+  extra : Map[String, @json.Json]
+}
 pub fn MessageRequest::equal(Self, Self) -> Bool
-pub fn MessageRequest::new(model~ : String, max_tokens~ : Int32, messages~ : Array[Message], system? : String, temperature? : Double, stop_sequences? : Array[String], tools? : Array[ToolDef], tool_choice? : @gen.ToolChoice, thinking? : @gen.ThinkingConfigParam, output_config? : @gen.OutputConfig, metadata? : @gen.Metadata, extra? : Map[String, Json]) -> Self
+pub fn MessageRequest::new(model~ : String, max_tokens~ : Int32, messages~ : Array[Message], system? : String, temperature? : Double, stop_sequences? : Array[String], tools? : Array[ToolDef], tool_choice? : @gen.ToolChoice, thinking? : @gen.ThinkingConfigParam, output_config? : @gen.OutputConfig, metadata? : @gen.Metadata, extra? : Map[String, @json.Json]) -> Self
 pub fn MessageRequest::not_equal(Self, Self) -> Bool
 pub fn MessageRequest::to_count_tokens_params(Self) -> @gen.CountMessageTokensParams
 pub fn MessageRequest::to_params(Self, stream? : Bool) -> @gen.CreateMessageParams
 pub fn MessageRequest::to_repr(Self) -> @debug.Repr
 
+#derive(Eq, @debug.Debug)
 pub(all) struct MessageResponse {
   id : String
   model : String
@@ -141,31 +149,33 @@ pub(all) struct MessageResponse {
   stop_reason : @gen.StopReason?
   usage : @gen.Usage
   message : @gen.Message
-  raw : Json
-} derive(Eq, @debug.Debug)
+  raw : @json.Json
+}
 pub fn MessageResponse::equal(Self, Self) -> Bool
 pub fn MessageResponse::not_equal(Self, Self) -> Bool
 pub fn MessageResponse::text(Self) -> String
 pub fn MessageResponse::to_repr(Self) -> @debug.Repr
-pub fn MessageResponse::tool_uses(Self) -> Array[(String, String, Json)]
+pub fn MessageResponse::tool_uses(Self) -> Array[(String, String, @json.Json)]
 
 #non_exhaustive
+#derive(Eq, @debug.Debug)
 pub(all) enum Role {
   User
   Assistant
-} derive(Eq, @debug.Debug)
+}
 pub fn Role::equal(Self, Self) -> Bool
 pub fn Role::not_equal(Self, Self) -> Bool
 pub fn Role::to_repr(Self) -> @debug.Repr
 
+#derive(Eq, @debug.Debug)
 pub(all) struct ToolDef {
   name : String
   description : String?
-  input_schema : Json
+  input_schema : @json.Json
   strict : Bool?
-} derive(Eq, @debug.Debug)
+}
 pub fn ToolDef::equal(Self, Self) -> Bool
-pub fn ToolDef::new(name~ : String, input_schema~ : Json, description? : String, strict? : Bool) -> Self
+pub fn ToolDef::new(name~ : String, input_schema~ : @json.Json, description? : String, strict? : Bool) -> Self
 pub fn ToolDef::not_equal(Self, Self) -> Bool
 pub fn ToolDef::to_repr(Self) -> @debug.Repr
 
@@ -173,7 +183,7 @@ pub struct ToolUseAccumulator {
   // private fields
 }
 pub fn ToolUseAccumulator::feed(Self, MessageEvent) -> Unit
-pub fn ToolUseAccumulator::finish(Self) -> Array[(String, String, Json)] raise @json.ParseError
+pub fn ToolUseAccumulator::finish(Self) -> Array[(String, String, @json.Json)] raise @json.ParseError
 pub fn ToolUseAccumulator::new() -> Self
 
 // Type aliases

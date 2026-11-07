@@ -4,6 +4,7 @@ package "gaato/http"
 import {
   "moonbitlang/core/debug",
   "moonbitlang/core/encoding/utf8",
+  "moonbitlang/core/json",
 }
 
 // Values
@@ -34,37 +35,41 @@ pub fn retry_after_ms(Headers, now_unix_ms? : Int64) -> Int32?
 pub async fn send_with(&Transport, Array[async (Request, async (Request) -> Response raise HttpError) -> Response raise HttpError], Request) -> Response raise HttpError
 
 // Errors
+#derive(@debug.Debug)
 pub(all) suberror HttpError {
   Connect(String)
   Timeout(phase~ : Phase, ms~ : Int32)
   Network(phase~ : Phase, message~ : String)
   Protocol(String)
   Proxy(status~ : Int32, message~ : String)
-} derive(@debug.Debug)
+}
 pub fn HttpError::is_unsent(Self) -> Bool
 pub fn HttpError::to_repr(Self) -> @debug.Repr
 
+#derive(@debug.Debug)
 pub(all) suberror RedirectError {
   Transport(HttpError)
   TooManyRedirects(max~ : Int32, location~ : String)
   Downgrade(location~ : String)
   BadLocation(location~ : String, reason~ : String)
   UnreplayableBody(location~ : String)
-} derive(@debug.Debug)
+}
 pub fn RedirectError::to_repr(Self) -> @debug.Repr
 
+#derive(Eq, @debug.Debug)
 pub(all) suberror UrlError {
   Invalid(String)
-} derive(Eq, @debug.Debug)
+}
 pub fn UrlError::equal(Self, Self) -> Bool
 pub fn UrlError::not_equal(Self, Self) -> Bool
 pub fn UrlError::to_repr(Self) -> @debug.Repr
 
 // Types and methods
+#derive(Eq, @debug.Debug)
 pub(all) enum Body {
   Bytes(Bytes)
   Stream(StreamBody)
-} derive(Eq, @debug.Debug)
+}
 pub fn Body::as_bytes(Self) -> Bytes?
 pub fn Body::equal(Self, Self) -> Bool
 pub fn Body::is_replayable(Self) -> Bool
@@ -72,9 +77,10 @@ pub fn Body::length(Self) -> Int64?
 pub fn Body::not_equal(Self, Self) -> Bool
 pub fn Body::to_repr(Self) -> @debug.Repr
 
+#derive(Eq, @debug.Debug)
 pub struct Headers {
   // private fields
-} derive(Eq, @debug.Debug)
+}
 pub fn Headers::append(Self, String, String) -> Unit
 pub fn Headers::contains(Self, String) -> Bool
 pub fn Headers::each(Self, (String, String) -> Unit raise?) -> Unit raise?
@@ -91,6 +97,7 @@ pub fn Headers::set(Self, String, String) -> Unit
 pub fn Headers::to_repr(Self) -> @debug.Repr
 
 #non_exhaustive
+#derive(Eq, @debug.Debug)
 pub(all) enum Phase {
   Pool
   Dial
@@ -98,24 +105,26 @@ pub(all) enum Phase {
   Head
   Body
   Unknown
-} derive(Eq, @debug.Debug)
+}
 pub fn Phase::equal(Self, Self) -> Bool
 pub fn Phase::not_equal(Self, Self) -> Bool
 pub fn Phase::to_repr(Self) -> @debug.Repr
 
+#derive(@debug.Debug)
 pub struct RedirectHop {
   request : Request
   response : Response
   next : Request
-} derive(@debug.Debug)
+}
 pub fn RedirectHop::to_repr(Self) -> @debug.Repr
 
+#derive(Eq, @debug.Debug)
 pub(all) struct Request {
   http_method : String
   url : String
   headers : Headers
   body : Body
-} derive(Eq, @debug.Debug)
+}
 pub fn Request::body_bytes(Self, Bytes) -> Self
 pub fn Request::body_stream(Self, &BodyStream, length? : Int64) -> Self
 pub fn Request::body_text(Self, String) -> Self
@@ -124,7 +133,7 @@ pub fn Request::equal(Self, Self) -> Bool
 pub fn Request::form_body(Self, ArrayView[(String, String)]) -> Self
 pub fn Request::get(String) -> Self
 pub fn Request::header(Self, String, String) -> Self
-pub fn Request::json_body(Self, Json) -> Self
+pub fn Request::json_body(Self, @json.Json) -> Self
 pub fn Request::new(String, String) -> Self
 pub fn Request::not_equal(Self, Self) -> Bool
 pub fn Request::patch(String) -> Self
@@ -132,22 +141,24 @@ pub fn Request::post(String) -> Self
 pub fn Request::put(String) -> Self
 pub fn Request::to_repr(Self) -> @debug.Repr
 
+#derive(Eq, @debug.Debug)
 pub(all) struct Response {
   status : Int32
   headers : Headers
   body : Bytes
-} derive(Eq, @debug.Debug)
+}
 pub fn Response::equal(Self, Self) -> Bool
 pub fn Response::is_success(Self) -> Bool
-pub fn Response::json(Self) -> Json raise
+pub fn Response::json(Self) -> @json.Json raise
 pub fn Response::not_equal(Self, Self) -> Bool
 pub fn Response::text(Self) -> String raise @utf8.Malformed
 pub fn Response::to_repr(Self) -> @debug.Repr
 
+#derive(Eq, @debug.Debug)
 pub(all) struct ResponseHead {
   status : Int32
   headers : Headers
-} derive(Eq, @debug.Debug)
+}
 pub fn ResponseHead::equal(Self, Self) -> Bool
 pub fn ResponseHead::not_equal(Self, Self) -> Bool
 pub fn ResponseHead::to_repr(Self) -> @debug.Repr
@@ -164,13 +175,15 @@ pub fn StreamBody::to_repr(Self) -> @debug.Repr
 pub impl Eq for StreamBody
 pub impl @debug.Debug for StreamBody
 
+#derive(@debug.Debug)
 pub struct StreamRedirectHop {
   request : Request
   head : ResponseHead
   next : Request
-} derive(@debug.Debug)
+}
 pub fn StreamRedirectHop::to_repr(Self) -> @debug.Repr
 
+#derive(Eq, @debug.Debug)
 pub struct Url {
   scheme : String?
   userinfo : String?
@@ -179,7 +192,7 @@ pub struct Url {
   path : String
   query : String?
   fragment : String?
-} derive(Eq, @debug.Debug)
+}
 pub fn Url::append_query_params(Self, Array[(String, String)]) -> Self
 pub fn Url::equal(Self, Self) -> Bool
 pub fn Url::is_absolute(Self) -> Bool

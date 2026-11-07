@@ -6,17 +6,17 @@ import {
 }
 
 // Values
-pub fn expect_object(Json, @moonbitlang/core/json.JsonPath) -> Map[String, Json] raise @moonbitlang/core/json.JsonDecodeError
+pub fn expect_object(@moonbitlang/core/json.Json, @moonbitlang/core/json.JsonPath) -> Map[String, @moonbitlang/core/json.Json] raise @moonbitlang/core/json.JsonDecodeError
 
-pub fn[T : @moonbitlang/core/json.FromJson] field(Map[String, Json], String, @moonbitlang/core/json.JsonPath) -> T raise @moonbitlang/core/json.JsonDecodeError
+pub fn[T : @moonbitlang/core/json.FromJson] field(Map[String, @moonbitlang/core/json.Json], String, @moonbitlang/core/json.JsonPath) -> T raise @moonbitlang/core/json.JsonDecodeError
 
-pub fn[T] open_int(Json, @moonbitlang/core/json.JsonPath, (Int32) -> T?, (Int32) -> T) -> T raise @moonbitlang/core/json.JsonDecodeError
+pub fn[T] open_int(@moonbitlang/core/json.Json, @moonbitlang/core/json.JsonPath, (Int32) -> T?, (Int32) -> T) -> T raise @moonbitlang/core/json.JsonDecodeError
 
-pub fn[T] open_string(Json, @moonbitlang/core/json.JsonPath, (String) -> T?, (String) -> T) -> T raise @moonbitlang/core/json.JsonDecodeError
+pub fn[T] open_string(@moonbitlang/core/json.Json, @moonbitlang/core/json.JsonPath, (String) -> T?, (String) -> T) -> T raise @moonbitlang/core/json.JsonDecodeError
 
-pub fn[T : @moonbitlang/core/json.FromJson] opt_field(Map[String, Json], String, @moonbitlang/core/json.JsonPath) -> T? raise @moonbitlang/core/json.JsonDecodeError
+pub fn[T : @moonbitlang/core/json.FromJson] opt_field(Map[String, @moonbitlang/core/json.Json], String, @moonbitlang/core/json.JsonPath) -> T? raise @moonbitlang/core/json.JsonDecodeError
 
-pub fn[T : @moonbitlang/core/json.FromJson] presence_field(Map[String, Json], String, @moonbitlang/core/json.JsonPath) -> Presence[T] raise @moonbitlang/core/json.JsonDecodeError
+pub fn[T : @moonbitlang/core/json.FromJson] presence_field(Map[String, @moonbitlang/core/json.Json], String, @moonbitlang/core/json.JsonPath) -> Presence[T] raise @moonbitlang/core/json.JsonDecodeError
 
 // Errors
 
@@ -24,17 +24,18 @@ pub fn[T : @moonbitlang/core/json.FromJson] presence_field(Map[String, Json], St
 pub struct ObjBuilder {
   // private fields
 }
-pub fn ObjBuilder::build(Self) -> Json
-pub fn[T : ToJson] ObjBuilder::field(Self, String, T) -> Self
+pub fn ObjBuilder::build(Self) -> @moonbitlang/core/json.Json
+pub fn[T : @moonbitlang/core/json.ToJson] ObjBuilder::field(Self, String, T) -> Self
 pub fn ObjBuilder::new() -> Self
-pub fn[T : ToJson] ObjBuilder::opt(Self, String, T?) -> Self
-pub fn[T : ToJson] ObjBuilder::presence(Self, String, Presence[T]) -> Self
+pub fn[T : @moonbitlang/core/json.ToJson] ObjBuilder::opt(Self, String, T?) -> Self
+pub fn[T : @moonbitlang/core/json.ToJson] ObjBuilder::presence(Self, String, Presence[T]) -> Self
 
+#derive(Eq, @debug.Debug)
 pub(all) enum Presence[T] {
   Absent
   Null
   Value(T)
-} derive(Eq, @debug.Debug)
+}
 pub fn[T : Eq] Presence::equal(Self[T], Self[T]) -> Bool
 pub fn[T] Presence::from_option(T?) -> Self[T]
 pub fn[T] Presence::is_absent(Self[T]) -> Bool

@@ -253,7 +253,7 @@ class IRTests(unittest.TestCase):
         }
         doc = document(operation(request={"$ref": "#/components/schemas/Shape"}, response={"$ref": "#/components/schemas/Shape"}), schemas)
         types = emit(IRBuilder(doc, "example/gen").build())["types.mbt"]
-        self.assertEqual(types.count("} derive(Eq, @debug.Debug)"), 3)
+        self.assertEqual(types.count("#derive(Eq, @debug.Debug)\n"), 3)
         self.assertIn("pub extend Shape with Eq::{equal, not_equal}", types)
         self.assertIn("pub extend Shape with @debug.Debug::{to_repr}", types)
         self.assertIn('"moonbitlang/core/debug"', emit(IRBuilder(doc, "example/gen").build())["moon.pkg"])

@@ -21,7 +21,7 @@ permissions:
   pull-requests: write
 
 env:
-  MOONBIT_IMAGE: ghcr.io/gaato/moonbit:0.10.17-d971670cd
+  MOONBIT_IMAGE: ghcr.io/gaato/moonbit:0.10.20-65efd5b93
 
 jobs:
   watch:

@@ -498,7 +498,8 @@ async test "Client observes a cancelled attempt even when the release suspends" 
 }
 
 ///|
-priv suberror ReleaseRejected derive(Debug)
+#derive(Debug)
+priv suberror ReleaseRejected
 
 ///|
 /// A limiter whose `release` fails, as a remote limiter does for a lease it

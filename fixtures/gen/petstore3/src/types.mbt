@@ -138,13 +138,14 @@ fn decode_optional_int64(
 ///|
 ///
 /// Order Status
+#derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum OrderStatus {
   Placed
   Approved
   Delivered
   Unknown(String)
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend OrderStatus with Eq::{equal, not_equal}
@@ -193,6 +194,7 @@ pub impl @json.FromJson for OrderStatus with fn from_json(value, path) {
 ///|
 ///
 /// Generated representation of Order.
+#derive(Eq, @debug.Debug)
 pub(all) struct Order {
   id : Int64?
   pet_id : Int64?
@@ -200,7 +202,7 @@ pub(all) struct Order {
   ship_date : String?
   status : OrderStatus?
   complete : Bool?
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend Order with Eq::{equal, not_equal}
@@ -260,10 +262,11 @@ pub impl @json.FromJson for Order with fn from_json(value, path) {
 ///|
 ///
 /// Generated representation of Category.
+#derive(Eq, @debug.Debug)
 pub(all) struct Category {
   id : Int64?
   name : String?
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend Category with Eq::{equal, not_equal}
@@ -308,6 +311,7 @@ pub impl @json.FromJson for Category with fn from_json(value, path) {
 ///|
 ///
 /// Generated representation of User.
+#derive(Eq, @debug.Debug)
 pub(all) struct User {
   id : Int64?
   username : String?
@@ -317,7 +321,7 @@ pub(all) struct User {
   password : String?
   phone : String?
   user_status : Int32?
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend User with Eq::{equal, not_equal}
@@ -383,10 +387,11 @@ pub impl @json.FromJson for User with fn from_json(value, path) {
 ///|
 ///
 /// Generated representation of Tag.
+#derive(Eq, @debug.Debug)
 pub(all) struct Tag {
   id : Int64?
   name : String?
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend Tag with Eq::{equal, not_equal}
@@ -431,13 +436,14 @@ pub impl @json.FromJson for Tag with fn from_json(value, path) {
 ///|
 ///
 /// pet status in the store
+#derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum PetStatus {
   Available
   Pending
   Sold
   Unknown(String)
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend PetStatus with Eq::{equal, not_equal}
@@ -486,6 +492,7 @@ pub impl @json.FromJson for PetStatus with fn from_json(value, path) {
 ///|
 ///
 /// Generated representation of Pet.
+#derive(Eq, @debug.Debug)
 pub(all) struct Pet {
   id : Int64?
   name : String
@@ -493,7 +500,7 @@ pub(all) struct Pet {
   photo_urls : Array[String]
   tags : Array[Tag]?
   status : PetStatus?
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend Pet with Eq::{equal, not_equal}
@@ -553,11 +560,12 @@ pub impl @json.FromJson for Pet with fn from_json(value, path) {
 ///|
 ///
 /// Generated representation of ApiResponse.
+#derive(Eq, @debug.Debug)
 pub(all) struct ApiResponse {
   code : Int32?
   type_ : String?
   message : String?
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend ApiResponse with Eq::{equal, not_equal}
@@ -608,13 +616,14 @@ pub impl @json.FromJson for ApiResponse with fn from_json(value, path) {
 ///|
 ///
 /// Generated string enum FindPetsByStatusStatus.
+#derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum FindPetsByStatusStatus {
   Available
   Pending
   Sold
   Custom(String)
-} derive(Eq, @debug.Debug)
+}
 
 ///|
 pub extend FindPetsByStatusStatus with Eq::{equal, not_equal}

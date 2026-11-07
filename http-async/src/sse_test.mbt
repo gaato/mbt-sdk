@@ -7,9 +7,10 @@ struct TestStream {
 }
 
 ///|
+#derive(Debug)
 suberror ScenarioError {
   Callback
-} derive(Debug)
+}
 
 ///|
 impl @http.BodyStream for TestStream with fn read_some(self) {

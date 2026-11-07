@@ -7,6 +7,7 @@
 /// Why a redirect was not followed. A separate error rather than new
 /// `HttpError` variants, which would break exhaustive matches downstream;
 /// `redirects` reports these as `HttpError::Protocol`.
+#derive(Debug)
 pub(all) suberror RedirectError {
   /// A request in the chain failed in the transport.
   Transport(HttpError)
@@ -20,7 +21,7 @@ pub(all) suberror RedirectError {
   /// The redirect keeps the method and body, and the body is a stream that
   /// was already sent (`Body::is_replayable` is false), as Fetch refuses.
   UnreplayableBody(location~ : String)
-} derive(Debug)
+}
 
 ///|
 /// Debug representation of a refused redirect.
@@ -29,11 +30,12 @@ pub extend RedirectError with @debug.Debug::{to_repr}
 ///|
 /// One redirect followed: the request, the 3xx response it got, and the
 /// request sent next.
+#derive(Debug)
 pub struct RedirectHop {
   request : Request
   response : Response
   next : Request
-} derive(Debug)
+}
 
 ///|
 /// Debug representation of a hop.
@@ -96,11 +98,12 @@ pub async fn follow_redirects(
 /// One redirect followed by `follow_redirects_stream`: the request, the head
 /// of the 3xx response it got (its body was closed unread), and the request
 /// sent next.
+#derive(Debug)
 pub struct StreamRedirectHop {
   request : Request
   head : ResponseHead
   next : Request
-} derive(Debug)
+}
 
 ///|
 /// Debug representation of a hop.

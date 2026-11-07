@@ -1,9 +1,10 @@
 ///|
 /// A failure an adapter reports, by its kind: two runs agree when they fail
 /// with the same kind, whatever the message.
+#derive(Debug)
 pub(all) suberror Failed {
   Failed(String)
-} derive(Debug)
+}
 
 ///|
 /// An incremental parser as the checks see it: chunks in, results out, each
@@ -17,10 +18,11 @@ pub(open) trait Feeder {
 ///|
 /// What a run produced: every result in order, and the kind of the error
 /// that ended it, if one did.
+#derive(Eq, Debug)
 pub(all) struct Transcript {
   results : Array[String]
   error : String?
-} derive(Eq, Debug)
+}
 
 ///|
 /// Compares results and error kinds.

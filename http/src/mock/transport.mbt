@@ -1,11 +1,12 @@
 ///|
 /// Script verification errors. Transport calls raise HttpError::Protocol instead.
+#derive(Debug)
 pub(all) suberror MockError {
   Unexpected(String)
   Mismatch(String)
   Unconsumed(Int32)
   Violated(String)
-} derive(Debug)
+}
 
 ///|
 /// Debug representation of a verification error.

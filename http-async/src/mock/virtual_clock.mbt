@@ -2,9 +2,10 @@
 /// Raised by `VirtualClock::settle` when tasks keep making progress for
 /// `rounds` scheduler rounds without ever going idle: a livelock, such as a
 /// retry loop that never waits.
+#derive(Debug)
 pub suberror NoQuiescence {
   NoQuiescence(rounds~ : Int32)
-} derive(Debug)
+}
 
 ///|
 /// Makes `to_repr` callable on the error with dot syntax.

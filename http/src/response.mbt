@@ -12,11 +12,12 @@
 ///   assert_true(response.is_success())
 /// }
 /// ```
+#derive(Eq, Debug)
 pub(all) struct Response {
   status : Int32
   headers : Headers
   body : Bytes
-} derive(Eq, Debug)
+}
 
 ///|
 /// Compares all response fields.
@@ -46,10 +47,11 @@ pub fn Response::is_success(self : Response) -> Bool {
 
 ///|
 /// Status and headers available before consuming a streamed body.
+#derive(Eq, Debug)
 pub(all) struct ResponseHead {
   status : Int32
   headers : Headers
-} derive(Eq, Debug)
+}
 
 ///|
 /// Compares status and headers.

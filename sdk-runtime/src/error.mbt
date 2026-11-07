@@ -1,12 +1,13 @@
 ///|
 /// Failures distinguished by transport, HTTP status, decoding, or configuration.
+#derive(Debug)
 pub(all) suberror SdkError {
   Transport(@http.HttpError)
   Status(status~ : Int32, headers~ : @http.Headers, body~ : Bytes)
   RateLimited(retry_after_ms~ : Int32?, headers~ : @http.Headers, body~ : Bytes)
   Decode(message~ : String, body~ : Bytes)
   Config(String)
-} derive(Debug)
+}
 
 ///|
 /// Formats the classified failure for debugging.

@@ -226,18 +226,20 @@ test "open integers preserve unknown values and reject fractions overflow and ot
 }
 
 ///|
+#derive(Eq, Debug)
 enum Kind {
   Stop
   Unknown(String)
-} derive(Eq, Debug)
+}
 
 ///|
+#derive(Eq, Debug)
 struct Example {
   name : String
   count : Int32?
   note : @json.Presence[String]
   kind : Kind
-} derive(Eq, Debug)
+}
 
 ///|
 impl ToJson for Example with fn to_json(self) {

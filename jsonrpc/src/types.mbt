@@ -9,11 +9,12 @@
 ///   )
 /// }
 /// ```
+#derive(Eq, Debug, Hash)
 pub(all) enum RequestId {
   Number(Int64)
   Str(String)
   Null
-} derive(Eq, Debug, Hash)
+}
 
 ///|
 /// Compares request identifiers.
@@ -75,11 +76,12 @@ pub impl @json.FromJson for RequestId with fn from_json(value, path) {
 ///   assert_eq(error.message, "Invalid params")
 /// }
 /// ```
+#derive(Eq, Debug)
 pub(all) struct RpcError {
   code : Int32
   message : String
   data : Json?
-} derive(Eq, Debug)
+}
 
 ///|
 /// Compares all error fields.
@@ -195,12 +197,13 @@ pub impl @json.FromJson for RpcError with fn from_json(value, path) {
 ///   assert_eq(message, @jsonrpc.Message::Notification(name="ready", params=None))
 /// }
 /// ```
+#derive(Eq, Debug)
 pub(all) enum Message {
   Request(id~ : RequestId, name~ : String, params~ : Json?)
   Notification(name~ : String, params~ : Json?)
   Response(id~ : RequestId, result~ : Json)
   Failure(id~ : RequestId, error~ : RpcError)
-} derive(Eq, Debug)
+}
 
 ///|
 /// Compares all message fields.
@@ -212,10 +215,11 @@ pub extend Message with @debug.Debug::{to_repr}
 
 ///|
 /// Selects whether the `jsonrpc` member is required on the wire.
+#derive(Eq, Debug)
 pub(all) enum Envelope {
   Strict
   Bare
-} derive(Eq, Debug)
+}
 
 ///|
 /// Compares envelope modes.
@@ -227,11 +231,12 @@ pub extend Envelope with @debug.Debug::{to_repr}
 
 ///|
 /// Describes why an NDJSON line could not be decoded.
+#derive(Eq, Debug)
 pub(all) suberror DecodeError {
   InvalidJson(String)
   InvalidMessage(String)
   LineTooLong(Int32)
-} derive(Eq, Debug)
+}
 
 ///|
 /// Compares decode failures.

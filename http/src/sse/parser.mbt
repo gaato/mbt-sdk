@@ -2,12 +2,13 @@
 /// A dispatched event, with resolved type and the current last-event-id.
 /// Retry is the last valid retry seen since the previous dispatched event, in
 /// milliseconds, capped at one hour.
+#derive(Eq, Debug)
 pub(all) struct SseEvent {
   event : String
   data : String
   id : String?
   retry : Int32?
-} derive(Eq, Debug)
+}
 
 ///|
 /// Compares all event fields.

@@ -9,12 +9,13 @@
 ///   assert_eq(request.body, Bytes(b"hello"))
 /// }
 /// ```
+#derive(Eq, Debug)
 pub(all) struct Request {
   http_method : String
   url : String
   headers : Headers
   body : Body
-} derive(Eq, Debug)
+}
 
 ///|
 /// Compares all request fields.

@@ -15,12 +15,13 @@
 ///   assert_true(request.body.is_replayable())
 /// }
 /// ```
+#derive(Eq, Debug)
 pub(all) enum Body {
   /// Bytes in memory, which can be sent any number of times.
   Bytes(Bytes)
   /// A stream, read once by the transport that sends it.
   Stream(StreamBody)
-} derive(Eq, Debug)
+}
 
 ///|
 /// Equality: equal bytes, or the same `StreamBody`.
