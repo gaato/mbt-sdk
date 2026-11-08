@@ -4,7 +4,6 @@ import {
   "moonbitlang/async@0.22.5/fs",
   "moonbitlang/core/env",
   "moonbitlang/core/json",
-  "moonbitlang/x@0.5.6/sys",
 }
 ----
 
@@ -184,7 +183,7 @@ async fn main {
       println(
         "usage: moon run scripts/gen_vectors.mbtx -- url <urltestdata.json> | cookie <parser.ts> <examples.ts> <bsd-examples.ts>",
       )
-      @sys.exit(2)
+      @env.exit(2)
     }
   }
 }

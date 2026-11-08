@@ -41,10 +41,9 @@ async test "Anthropic sends the generated request and decodes a compatible respo
         max_tokens=64,
         messages=[@anthropic_sdk.Message::user("Hello")],
         system="Be brief",
-        temperature=0.2,
         stop_sequences=["END"],
         metadata=@anthropic_gen.Metadata::new(user_id="u1"),
-        extra={ "top_p": 0.9 },
+        extra={ "service_tier": "auto" },
       ),
     )
     assert_eq(response.role, @anthropic_sdk.Assistant)
@@ -69,10 +68,9 @@ async test "Anthropic sends the generated request and decodes a compatible respo
       "max_tokens": 64,
       "messages": [{ "role": "user", "content": "Hello" }],
       "system": "Be brief",
-      "temperature": 0.2,
       "stop_sequences": ["END"],
       "metadata": { "user_id": "u1" },
-      "top_p": 0.9,
+      "service_tier": "auto",
     })
     assert_eq(clock.slept(), [])
     transport.assert_complete()
@@ -474,7 +472,7 @@ async test "stream decodes every event across chunks and reads past message_stop
     let sent = transport.sent()
     assert_eq(sent[0].headers.get("authorization"), Some("Bearer test-key"))
     assert_eq(sent[0].headers.get("accept"), Some("text/event-stream"))
-    assert_eq(sent[0].headers.get("anthropic-version"), Some("2023-06-01"))
+    assert_eq(sent[0].headers.get("anthropic-version"), Some("2026-10-21"))
     assert_eq(sent_json(sent[0]), {
       "model": "model",
       "max_tokens": 64,
@@ -644,9 +642,11 @@ async test "count_tokens and the generated passthrough share the transport" {
       model="claude-opus-5",
       max_tokens=8,
       messages=[
-        @anthropic_gen.InputMessage::new(
-          role=@anthropic_gen.InputMessageRole::User,
-          content=@anthropic_gen.InputMessageContent::Text("hello"),
+        @anthropic_gen.InputMessageUnion::User(
+          @anthropic_gen.UserInputMessage::new(
+            role="user",
+            content=@anthropic_gen.InputMessageContent::Text("hello"),
+          ),
         ),
       ],
       service_tier=@anthropic_gen.CreateMessageParamsServiceTier::StandardOnly,

@@ -130,12 +130,14 @@ case "$cmd" in
         echo "skip    $name@$version (already published)"; continue
       fi
       if [ "$dry" = 1 ]; then
-        # `moon publish --dry-run` exits non-zero even when the server accepts
-        # the dry run, so judge it by its output. A dependant of a module that
-        # this run would publish first cannot be checked yet: its packaged copy
-        # resolves dependencies from the registry.
-        out=$(moon -C "$module" publish --dry-run 2>&1) || true
-        if echo "$out" | grep -q 'Dry run completed successfully'; then
+        # Since moon 0.1.20261104 a dry run the server accepts exits 0 and
+        # prints "Server status: 202 Accepted"; it no longer prints "Dry run
+        # completed successfully" (earlier versions printed that and exited
+        # non-zero). A dependant of a module that this run would publish first
+        # cannot be checked yet: its packaged copy resolves dependencies from
+        # the registry.
+        status=0; out=$(moon -C "$module" publish --dry-run 2>&1) || status=$?
+        if [ "$status" = 0 ]; then
           echo "would   $name@$version"
         # moon says "not found in the registry" for a module that was never
         # published and "no version satisfies" for a new version of one that was.
