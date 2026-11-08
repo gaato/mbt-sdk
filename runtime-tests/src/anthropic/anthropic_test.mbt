@@ -472,7 +472,7 @@ async test "stream decodes every event across chunks and reads past message_stop
     let sent = transport.sent()
     assert_eq(sent[0].headers.get("authorization"), Some("Bearer test-key"))
     assert_eq(sent[0].headers.get("accept"), Some("text/event-stream"))
-    assert_eq(sent[0].headers.get("anthropic-version"), Some("2023-06-01"))
+    assert_eq(sent[0].headers.get("anthropic-version"), Some("2026-10-21"))
     assert_eq(sent_json(sent[0]), {
       "model": "model",
       "max_tokens": 64,
