@@ -10,3 +10,7 @@ import {
   "moonbitlang/async/aqueue",
   "gaato/http/clock",
 } for "test"
+
+// The root package's targets: moonbitlang/async has no event loop on wasm-gc.
+
+supported_targets = "js + native + wasm"

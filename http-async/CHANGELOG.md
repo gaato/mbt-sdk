@@ -8,9 +8,34 @@ note.
 
 ## [Unreleased]
 
+## [0.5.1] - 2026-11-07
+
 ### Changed
 
+- **Requires `moonbitlang/async` 0.22.7.** Migration: a project that pins
+  an older `moonbitlang/async` raises its import to 0.22.7 alongside this
+  module.
+- **`gaato/http-async/mock` declares the targets of the root package**
+  (`js + native + wasm`). moonbitlang/async has no event loop on wasm-gc, so
+  `VirtualClock` could not run there; with 0.22.7 a wasm-gc test of it also
+  fails to compile.
 - **The README has sections and a compile-checked example.** Install, usage, a package table and one section per topic (targets, timeouts, connections, bodies, proxies, virtual time), with absolute links that work on mooncakes.io. The `VirtualClock` constructor and its `now_unix_ms` have doc comments.
+
+### Fixed
+
+- **IPv6 literal hosts can be dialled**, as an origin
+  (`http://[::1]:8080/`) and as a proxy (`proxy="http://[::1]:3128"`); they
+  failed with `Connect`. A tunnel to an IPv6 origin sends its `CONNECT`
+  authority with brackets (`[2001:db8::1]:443`). They still fail on a host
+  whose only IPv6 address is the loopback, `[::1]` included (see Known
+  limitations in the README).
+- **A malformed `Set-Cookie` line no longer fails the response.** A line
+  without `=`, or with a `Max-Age` that is not an optional `-` and digits
+  that fit an Int64, failed the whole response with `Protocol`.
+  As RFC 6265 §5.2 reads them, the line without `=` is now dropped from the
+  response head and the bad `Max-Age` is left off its cookie; the response
+  and its other `Set-Cookie` lines are kept. `Max-Age=+60` is left off too,
+  where it was read as 60.
 
 ## [0.5.0] - 2026-10-22
 

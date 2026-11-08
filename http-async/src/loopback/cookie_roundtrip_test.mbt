@@ -70,7 +70,7 @@ async test "rebuilt Set-Cookie lines keep SameSite and every other attribute" {
     "s7=a=b=c; path=/dir", "s8=v; Path=/a; Path=/dir", "s9=v; SameSite=Strict; SameSite=Lax",
     "s10=v; Max-Age=0", "s11=v;Path=/dir;HttpOnly;SameSite=Lax", "s12=", "s13=v; Domain=",
     "s14=v; Version=1; Comment=hi", "s15=v; Path", "s16=v; Secure=yes", "s17=v; Max-Age=-1; Domain=example.com",
-    "s18=v; Expires=bogus; Max-Age=60",
+    "s18=v; Expires=bogus; Max-Age=60", "s19=v; Max-Age=+60",
   ]
   let lines = rebuilt(raw)
   assert_eq(lines.length(), raw.length())
@@ -93,48 +93,47 @@ async test "rebuilt Set-Cookie lines keep SameSite and every other attribute" {
 }
 
 ///|
-/// moonbitlang/async 0.22.5 keeps one value per attribute, the last, even an
+/// moonbitlang/async keeps one value per attribute, the last, even an
 /// invalid one, where RFC 6265bis-22 §5.6 ignores an invalid `Expires` and
-/// keeps the earlier valid value; it also reads `Max-Age=+60` as 60, which
-/// §5.6.2 ignores. The rebuilt line can only carry what was kept. Pinned
-/// here so that an upstream fix shows up. An empty last `Domain` is kept by
-/// both, and makes the cookie host-only (§5.7 step 10).
+/// keeps the earlier valid value. The rebuilt line can only carry what was
+/// kept. A `Max-Age` too large for an Int64 is ignored, where §5.6.2 reads
+/// it as a very long lifetime, which the jar cuts to 400 days. Pinned here
+/// so that an upstream fix shows up. An empty last `Domain` is kept by both,
+/// and makes the cookie host-only (§5.7 step 10).
 async test "attributes moonbitlang/async keeps only the last of are lost" {
   let raw = [
     "l1=v; Domain=example.com; Domain=", "l2=v; Expires=Wed, 09 Jun 2027 10:18:14 GMT; Expires=bogus",
-    "l3=v; Max-Age=+60",
+    "l3=v; Max-Age=99999999999999999999",
   ]
   let lines = rebuilt(raw)
-  assert_eq(lines, ["l1=v; Domain=", "l2=v; Expires=bogus", "l3=v; Max-Age=60"])
+  assert_eq(lines, ["l1=v; Domain=", "l2=v; Expires=bogus", "l3=v"])
   let raw_read = raw.map(line => jar_reading(line)[0])
   let rebuilt_read = lines.map(line => jar_reading(line)[0])
   assert_eq(raw_read[0].domain, "www.example.com")
   assert_eq(rebuilt_read[0].domain, "www.example.com")
   assert_true(raw_read[1].expires_ms is Some(_))
   assert_eq(rebuilt_read[1].expires_ms, None)
-  assert_eq(raw_read[2].expires_ms, None)
-  assert_eq(rebuilt_read[2].expires_ms, Some(NOW + 60_000L))
+  assert_eq(raw_read[2].expires_ms, Some(NOW + 400L * 86_400_000L))
+  assert_eq(rebuilt_read[2].expires_ms, None)
 }
 
 ///|
-/// moonbitlang/async 0.22.5 refuses a whole response for a `Set-Cookie`
-/// without `=`, which RFC 6265bis-22 §5.6 reads as a cookie without a name,
-/// or with a `Max-Age` that is not an Int64, an attribute §5.6.2 ignores.
-/// `send` raises `Protocol`; this cannot be fixed after the parse. Pinned so
-/// that an upstream fix shows up.
-async test "Set-Cookie lines moonbitlang/async refuses fail the whole response" {
-  let refused = [
-    "nameonly", "x=v; Max-Age=soon", "x=v; Max-Age=3600, c=d", "x=v; Max-Age=99999999999999999999",
+/// moonbitlang/async ignores a `Set-Cookie` line without `=` (RFC 6265
+/// §5.2) and a `Max-Age` that is not an optional `-` and digits fitting an
+/// Int64 (§5.2.2; the last is in the test above), and keeps the response
+/// and its other lines. The jar
+/// reads each rebuilt line as it reads the raw one, except the line without
+/// `=`: RFC 6265bis-22 §5.6 makes it a cookie without a name, which the
+/// transport never hands on.
+async test "unparsable Set-Cookie lines are dropped and the rest kept" {
+  let raw = [
+    "nameonly", "good=1; Path=/dir", "x=v; Max-Age=soon", "y=v; Max-Age=3600, c=d",
   ]
-  for line in refused {
-    let outcome = try rebuilt([line]) catch {
-      @http.HttpError::Protocol(_) => "Protocol"
-      _ => "other error"
-    } noraise {
-      _ => "accepted"
-    }
-    assert_eq(outcome, "Protocol", msg=line)
+  let lines = rebuilt(raw)
+  assert_eq(lines, ["good=1; Path=/dir", "x=v", "y=v"])
+  for i, line in lines {
+    assert_eq(jar_reading(line), jar_reading(raw[i + 1]), msg=raw[i + 1])
   }
-  // The jar itself keeps every one of these cookies.
-  assert_eq(refused.map(line => jar_reading(line).length()), [1, 1, 1, 1])
+  // The jar keeps the cookie without a name.
+  assert_eq(jar_reading(raw[0]).length(), 1)
 }
