@@ -30,10 +30,9 @@ test "request body is the generated encoding plus extra, and extra is validated"
       ]),
     ],
     system="be brief",
-    temperature=0.25,
     stop_sequences=["END"],
     metadata=@gen.Metadata::new(user_id="u1"),
-    extra={ "top_p": 0.9, "provider": { "order": ["anthropic"] } },
+    extra={ "service_tier": "auto", "provider": { "order": ["anthropic"] } },
   )
   let (params, body) = message_body(request, false)
   assert_eq(body, {
@@ -59,19 +58,21 @@ test "request body is the generated encoding plus extra, and extra is validated"
     "metadata": { "user_id": "u1" },
     "stop_sequences": ["END"],
     "system": "be brief",
-    "temperature": 0.25,
-    "top_p": 0.9,
+    "service_tier": "auto",
     "provider": { "order": ["anthropic"] },
   })
   // The generated request reflects the merged body, including extra keys it models.
-  assert_eq(params.top_p, Some(0.9))
+  assert_eq(
+    params.service_tier,
+    Some(@gen.CreateMessageParamsServiceTier::Auto),
+  )
   let (_, streaming) = message_body(request, true)
   guard streaming is Object(fields) else { fail("body must be an object") }
   assert_eq(fields.get("stream"), Some(Json(true)))
   for
     key in [
-      "model", "max_tokens", "messages", "system", "temperature", "stop_sequences",
-      "tools", "tool_choice", "thinking", "output_config", "metadata", "stream",
+      "model", "max_tokens", "messages", "system", "stop_sequences", "tools", "tool_choice",
+      "thinking", "output_config", "metadata", "stream",
     ] {
     let collision = MessageRequest::new(
       model="m",
@@ -88,14 +89,64 @@ test "request body is the generated encoding plus extra, and extra is validated"
   }
   // Extra keys the schema models are validated against it.
   let invalid = MessageRequest::new(model="m", max_tokens=1, messages=[], extra={
-    "top_p": "high",
+    "service_tier": 5,
   })
   try message_body(invalid, false) catch {
-    @runtime.Config(message) => assert_true(message.contains("top_p"))
+    @runtime.Config(message) => assert_true(message.contains("service_tier"))
     _ => fail("expected Config")
   } noraise {
     _ => fail("schema violation in extra must fail")
   }
+}
+
+///|
+test "each role encodes as its own message, and a system message keeps its blocks" {
+  let request = MessageRequest::new(model="claude-opus-5", max_tokens=8, messages=[
+    Message::user("hello"),
+    Message::assistant("hi"),
+    Message::user("translate the rest"),
+    Message::system("answer in French"),
+    {
+      role: System,
+      content: Blocks([
+        @gen.InputContentBlock::Text(
+          @gen.RequestTextBlock::new(text="be brief", type_="text"),
+        ),
+        @gen.InputContentBlock::Unknown("image", {
+          "type": "image",
+          "source": { "data": "x" },
+        }),
+      ]),
+    },
+  ])
+  let (params, body) = message_body(request, false)
+  guard body is Object(fields) else { fail("body must be an object") }
+  assert_eq(
+    fields.get("messages"),
+    Some([
+      { "role": "user", "content": "hello" },
+      { "role": "assistant", "content": "hi" },
+      { "role": "user", "content": "translate the rest" },
+      { "role": "system", "content": "answer in French" },
+      {
+        "role": "system",
+        "content": [
+          { "type": "text", "text": "be brief" },
+          { "type": "image", "source": { "data": "x" } },
+        ],
+      },
+    ]),
+  )
+  guard params.messages[3] is System(system) else {
+    fail("expected a system message")
+  }
+  assert_eq(
+    system.content,
+    @gen.SystemInputMessageContent::Text("answer in French"),
+  )
+  let (_, counted) = count_tokens_body(request)
+  guard counted is Object(counted) else { fail("body must be an object") }
+  assert_eq(counted.get("messages"), fields.get("messages"))
 }
 
 ///|

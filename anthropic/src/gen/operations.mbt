@@ -88,8 +88,6 @@ pub fn models_list_request(
   limit? : Int32,
   lifecycle? : Array[ModelsListLifecycleItem],
   anthropic_version? : String,
-  anthropic_beta? : Array[String],
-  x_api_key? : String,
   anthropic_workspace_id? : String,
 ) -> @http.Request {
   let mut url = "/v1/models"
@@ -119,18 +117,6 @@ pub fn models_list_request(
   match anthropic_version {
     Some(value) =>
       request = request.header("anthropic-version", parameter_value(value))
-    None => ()
-  }
-  match anthropic_beta {
-    Some(values) =>
-      request = request.header(
-        "anthropic-beta",
-        values.map(value => parameter_value(value)).join(","),
-      )
-    None => ()
-  }
-  match x_api_key {
-    Some(value) => request = request.header("x-api-key", parameter_value(value))
     None => ()
   }
   match anthropic_workspace_id {
@@ -165,8 +151,6 @@ pub fn models_list_decode(
 pub fn models_get_request(
   model_id : String,
   anthropic_version? : String,
-  anthropic_beta? : Array[String],
-  x_api_key? : String,
   anthropic_workspace_id? : String,
 ) -> @http.Request {
   let mut request = @http.Request::get(
@@ -175,18 +159,6 @@ pub fn models_get_request(
   match anthropic_version {
     Some(value) =>
       request = request.header("anthropic-version", parameter_value(value))
-    None => ()
-  }
-  match anthropic_beta {
-    Some(values) =>
-      request = request.header(
-        "anthropic-beta",
-        values.map(value => parameter_value(value)).join(","),
-      )
-    None => ()
-  }
-  match x_api_key {
-    Some(value) => request = request.header("x-api-key", parameter_value(value))
     None => ()
   }
   match anthropic_workspace_id {

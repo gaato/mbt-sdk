@@ -104,12 +104,17 @@ pub extend ApiErrorBody with Eq::{equal, not_equal}
 pub extend ApiErrorBody with @debug.Debug::{to_repr}
 
 ///|
-/// A participant in a Messages API conversation.
+/// A participant in a Messages API conversation. `System` is a
+/// mid-conversation system message, which only some models accept and which
+/// must directly follow a user turn; a system prompt for the whole
+/// conversation goes in `MessageRequest.system`. A response is always
+/// `Assistant`.
 #derive(Eq, Debug)
 #non_exhaustive
 pub(all) enum Role {
   User
   Assistant
+  System
 }
 
 ///|
@@ -178,7 +183,7 @@ pub fn ToolDef::new(
 }
 
 ///|
-/// One user or assistant turn sent to the Messages API.
+/// One user, assistant or system turn sent to the Messages API.
 #derive(Eq, Debug)
 pub(all) struct Message {
   role : Role
@@ -221,6 +226,22 @@ pub fn Message::user(text : String) -> Message {
 /// ```
 pub fn Message::assistant(text : String) -> Message {
   { role: Assistant, content: Text(text), }
+}
+
+///|
+/// Creates a mid-conversation system message containing plain text. Place it
+/// right after a user turn; see `Role`.
+///
+/// ```mbt check
+/// test {
+///   assert_eq(@anthropic.Message::system("answer in French"), {
+///     role: @anthropic.System,
+///     content: @anthropic.Text("answer in French"),
+///   })
+/// }
+/// ```
+pub fn Message::system(text : String) -> Message {
+  { role: System, content: Text(text), }
 }
 
 ///|
@@ -269,6 +290,19 @@ pub fn Message::tool_result(
 }
 
 ///|
+/// The `type` tag of a content block's JSON, or `""` when it has none.
+fn block_type(json : Json) -> String {
+  match json {
+    Object(fields) =>
+      match fields.get("type") {
+        Some(String(kind)) => kind
+        _ => ""
+      }
+    _ => ""
+  }
+}
+
+///|
 /// Turns a response into the assistant turn to send back, block for block:
 /// text, thinking (with its signature), tool use and every other block the
 /// API returned are replayed as input blocks. A block the request vocabulary
@@ -277,17 +311,7 @@ pub fn Message::from_response(response : MessageResponse) -> Message {
   let blocks = response.message.content.map(block => {
     let json = block.to_json()
     let converted : InputContentBlock = @json.from_json(json) catch {
-      _ => {
-        let kind = match json {
-          Object(fields) =>
-            match fields.get("type") {
-              Some(String(kind)) => kind
-              _ => ""
-            }
-          _ => ""
-        }
-        @gen.InputContentBlock::Unknown(kind, json)
-      }
+      _ => @gen.InputContentBlock::Unknown(block_type(json), json)
     }
     converted
   })
@@ -300,7 +324,7 @@ pub fn Message::from_response(response : MessageResponse) -> Message {
 ///
 /// The typed fields cover the common surface; `extra` is merged into the JSON
 /// body after the typed fields and validated against the generated schema, so
-/// any other documented parameter (`top_p`, `service_tier`, ...) can be passed
+/// any other documented parameter (`service_tier`, `inference_geo`, ...) can be passed
 /// without a facade change. For full control build a `@gen.CreateMessageParams`
 /// and use `Anthropic::create_message_params`.
 #derive(Eq, Debug)
@@ -309,7 +333,6 @@ pub(all) struct MessageRequest {
   max_tokens : Int32
   messages : Array[Message]
   system : String?
-  temperature : Double?
   stop_sequences : Array[String]?
   tools : Array[ToolDef]?
   tool_choice : ToolChoice?
@@ -345,7 +368,6 @@ pub fn MessageRequest::new(
   max_tokens~ : Int32,
   messages~ : Array[Message],
   system? : String,
-  temperature? : Double,
   stop_sequences? : Array[String],
   tools? : Array[ToolDef],
   tool_choice? : ToolChoice,
@@ -359,7 +381,6 @@ pub fn MessageRequest::new(
     max_tokens,
     messages: messages.map(copy_message),
     system,
-    temperature,
     stop_sequences: stop_sequences.map(Array::copy),
     tools: tools.map(Array::copy),
     tool_choice,
