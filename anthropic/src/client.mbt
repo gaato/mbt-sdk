@@ -28,6 +28,10 @@ pub impl @debug.Debug for Anthropic with fn to_repr(_self) {
 /// so an Anthropic-compatible gateway is addressed by its root as well
 /// (for example `https://openrouter.ai/api`).
 ///
+/// `version` is the `anthropic-version` header. It defaults to `2026-10-21`,
+/// the version the official SDKs send; pass `version="2023-06-01"` for a
+/// gateway or model that does not accept it yet.
+///
 /// `retry` defaults to the official SDK's behaviour (`anthropic-sdk-python`,
 /// `_base_client.py`): `RetryPolicy::stainless(cap=NoCap)`, two retries of
 /// 408, 409, 429 and every 5xx (529 overloaded included), and of a timeout or
@@ -47,7 +51,7 @@ pub fn Anthropic::new(
   transport : &@http.Transport,
   clock : &@clock.Clock,
   base_url~ : String = "https://api.anthropic.com",
-  version~ : String = "2023-06-01",
+  version~ : String = "2026-10-21",
   auth_header~ : AuthHeader = XApiKey,
   retry? : @runtime.RetryPolicy,
   timer? : &@sync.Timer,
@@ -86,7 +90,7 @@ pub fn Anthropic::new(
 /// Wraps a preconfigured runtime client for compatible APIs and tests.
 pub fn Anthropic::from_client(
   client : @runtime.Client,
-  version~ : String = "2023-06-01",
+  version~ : String = "2026-10-21",
 ) -> Anthropic {
   { client, version, }
 }
