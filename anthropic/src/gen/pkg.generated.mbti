@@ -5266,7 +5266,6 @@ pub(all) enum ThreadUnsupportedRequestErrorDetailsUnsupportedItem {
   Hipaa
   InferenceHooks
   Thinking
-  Zdr
   Unknown(String)
 }
 pub fn ThreadUnsupportedRequestErrorDetailsUnsupportedItem::equal(Self, Self) -> Bool

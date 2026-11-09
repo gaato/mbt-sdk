@@ -23304,7 +23304,6 @@ pub(all) enum ThreadUnsupportedRequestErrorDetailsUnsupportedItem {
   Hipaa
   InferenceHooks
   Thinking
-  Zdr
   Unknown(String)
 }
 
@@ -23337,7 +23336,6 @@ pub impl ToJson for ThreadUnsupportedRequestErrorDetailsUnsupportedItem with fn 
     Hipaa => "hipaa"
     InferenceHooks => "inference_hooks"
     Thinking => "thinking"
-    Zdr => "zdr"
     Unknown(raw) => raw
   }
   Json(raw)
@@ -23366,7 +23364,6 @@ pub impl @json.FromJson for ThreadUnsupportedRequestErrorDetailsUnsupportedItem 
         "hipaa" => Some(Hipaa)
         "inference_hooks" => Some(InferenceHooks)
         "thinking" => Some(Thinking)
-        "zdr" => Some(Zdr)
         _ => None
       }
     },
