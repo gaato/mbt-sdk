@@ -104,7 +104,8 @@ case "$cmd" in
     for mod in */moon.mod; do
       sed -i -E "s|\"$name@[0-9][^\"]*\"|\"$name@$version\"|" "$mod"
     done
-    echo "$name -> $version"; grep -l "$name@$version" */moon.mod | sed 's/^/  /'
+    # A module nothing imports has no match; grep's status must not stop the bump.
+    echo "$name -> $version"; { grep -l "$name@$version" */moon.mod || true; } | sed 's/^/  /'
     changelog_release "$module" "$version"
     ;;
   note)
