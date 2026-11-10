@@ -15,7 +15,7 @@ are optional unless the field is required, and keep a wildcard arm.
 
 ## [Unreleased]
 
-## [0.15.0]
+## [0.15.0] - 2026-11-10
 
 ### Changed
 
