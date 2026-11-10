@@ -1,4 +1,0 @@
-import {
-  "gaato/http",
-  "moonbitlang/core/debug",
-}
