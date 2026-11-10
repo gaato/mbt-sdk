@@ -27937,10 +27937,76 @@ pub impl @json.FromJson for CodeScanningAiScanOrgSettingsPrScan with fn from_jso
 
 ///|
 ///
+/// Whether the full repository AI Scan is enabled for the organization. The organization setting respects enterprise policy, and repositories inherit it: when disabled, repositories cannot enable the full repository AI Scan; when enabled, repositories can still opt out.
+#derive(Eq, @debug.Debug)
+#non_exhaustive
+pub(all) enum CodeScanningAiScanOrgSettingsRepositoryScan {
+  Enabled
+  Disabled
+  Unknown(String)
+}
+
+///|
+pub extend CodeScanningAiScanOrgSettingsRepositoryScan with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend CodeScanningAiScanOrgSettingsRepositoryScan with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend CodeScanningAiScanOrgSettingsRepositoryScan with ToJson::{to_json}
+
+///|
+pub impl ToJson for CodeScanningAiScanOrgSettingsRepositoryScan with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Enabled => "enabled"
+    Disabled => "disabled"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend CodeScanningAiScanOrgSettingsRepositoryScan with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for CodeScanningAiScanOrgSettingsRepositoryScan with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "enabled" => Some(Enabled)
+        "disabled" => Some(Disabled)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
 /// The AI Scan organization setting
 #derive(Eq, @debug.Debug)
 pub(all) struct CodeScanningAiScanOrgSettings {
   pr_scan : CodeScanningAiScanOrgSettingsPrScan
+  repository_scan : CodeScanningAiScanOrgSettingsRepositoryScan?
 }
 
 ///|
@@ -27954,8 +28020,9 @@ pub extend CodeScanningAiScanOrgSettings with @debug.Debug::{to_repr}
 /// Creates a CodeScanningAiScanOrgSettings with omitted optional fields absent.
 pub fn CodeScanningAiScanOrgSettings::new(
   pr_scan~ : CodeScanningAiScanOrgSettingsPrScan,
+  repository_scan? : CodeScanningAiScanOrgSettingsRepositoryScan,
 ) -> CodeScanningAiScanOrgSettings {
-  { pr_scan, }
+  { pr_scan, repository_scan, }
 }
 
 ///|
@@ -27965,7 +28032,10 @@ pub extend CodeScanningAiScanOrgSettings with ToJson::{to_json}
 
 ///|
 pub impl ToJson for CodeScanningAiScanOrgSettings with fn to_json(self) {
-  @sdkjson.ObjBuilder::new().field("pr_scan", self.pr_scan).build()
+  @sdkjson.ObjBuilder::new()
+  .field("pr_scan", self.pr_scan)
+  .opt("repository_scan", self.repository_scan)
+  .build()
 }
 
 ///|
@@ -27979,12 +28049,15 @@ pub impl @json.FromJson for CodeScanningAiScanOrgSettings with fn from_json(
   path,
 ) {
   let obj = @sdkjson.expect_object(value, path)
-  { pr_scan: required_field(obj, "pr_scan", path), }
+  {
+    pr_scan: required_field(obj, "pr_scan", path),
+    repository_scan: @sdkjson.opt_field(obj, "repository_scan", path),
+  }
 }
 
 ///|
 ///
-/// Whether AI Scan is enabled for the organization. Organization respects enterprise policy. Disabled organizations prevent repositories from enabling AI Scan. Enabled organizations enable AI Scan for their repositories, but individual repositories can opt out.
+/// Whether AI Scan on pull requests is enabled for the organization. Organization respects enterprise policy. Disabled organizations prevent repositories from enabling AI Scan. Enabled organizations enable AI Scan for their repositories, but individual repositories can opt out.
 #derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum CodeScanningAiScanOrgEnablementUpdatePrScan {
@@ -28049,10 +28122,78 @@ pub impl @json.FromJson for CodeScanningAiScanOrgEnablementUpdatePrScan with fn 
 
 ///|
 ///
+/// Whether the full repository AI Scan is enabled for the organization. Organization respects enterprise policy. Disabled organizations prevent repositories from enabling the full repository AI Scan. Enabled organizations enable it for their repositories, but individual repositories can opt out.
+#derive(Eq, @debug.Debug)
+#non_exhaustive
+pub(all) enum CodeScanningAiScanOrgEnablementUpdateRepositoryScan {
+  Enabled
+  Disabled
+  Custom(String)
+}
+
+///|
+pub extend CodeScanningAiScanOrgEnablementUpdateRepositoryScan with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend CodeScanningAiScanOrgEnablementUpdateRepositoryScan with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend CodeScanningAiScanOrgEnablementUpdateRepositoryScan with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for CodeScanningAiScanOrgEnablementUpdateRepositoryScan with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Enabled => "enabled"
+    Disabled => "disabled"
+    Custom(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend CodeScanningAiScanOrgEnablementUpdateRepositoryScan with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for CodeScanningAiScanOrgEnablementUpdateRepositoryScan with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "enabled" => Some(Enabled)
+        "disabled" => Some(Disabled)
+        _ => None
+      }
+    },
+    raw => Custom(raw),
+  )
+}
+
+///|
+///
 /// The AI Scan organization setting to apply
 #derive(Eq, @debug.Debug)
 pub(all) struct CodeScanningAiScanOrgEnablementUpdate {
   pr_scan : CodeScanningAiScanOrgEnablementUpdatePrScan?
+  repository_scan : CodeScanningAiScanOrgEnablementUpdateRepositoryScan?
 }
 
 ///|
@@ -28066,8 +28207,9 @@ pub extend CodeScanningAiScanOrgEnablementUpdate with @debug.Debug::{to_repr}
 /// Creates a CodeScanningAiScanOrgEnablementUpdate with omitted optional fields absent.
 pub fn CodeScanningAiScanOrgEnablementUpdate::new(
   pr_scan? : CodeScanningAiScanOrgEnablementUpdatePrScan,
+  repository_scan? : CodeScanningAiScanOrgEnablementUpdateRepositoryScan,
 ) -> CodeScanningAiScanOrgEnablementUpdate {
-  { pr_scan, }
+  { pr_scan, repository_scan, }
 }
 
 ///|
@@ -28077,7 +28219,10 @@ pub extend CodeScanningAiScanOrgEnablementUpdate with ToJson::{to_json}
 
 ///|
 pub impl ToJson for CodeScanningAiScanOrgEnablementUpdate with fn to_json(self) {
-  @sdkjson.ObjBuilder::new().opt("pr_scan", self.pr_scan).build()
+  @sdkjson.ObjBuilder::new()
+  .opt("pr_scan", self.pr_scan)
+  .opt("repository_scan", self.repository_scan)
+  .build()
 }
 
 ///|
@@ -28093,7 +28238,10 @@ pub impl @json.FromJson for CodeScanningAiScanOrgEnablementUpdate with fn from_j
   path,
 ) {
   let obj = @sdkjson.expect_object(value, path)
-  { pr_scan: @sdkjson.opt_field(obj, "pr_scan", path), }
+  {
+    pr_scan: @sdkjson.opt_field(obj, "pr_scan", path),
+    repository_scan: @sdkjson.opt_field(obj, "repository_scan", path),
+  }
 }
 
 ///|
@@ -35740,6 +35888,7 @@ pub impl @json.FromJson for Migration with fn from_json(value, path) {
 pub(all) enum OrganizationRoleBaseRole {
   Read
   Triage
+  Moderate
   Write
   Maintain
   Admin
@@ -35762,6 +35911,7 @@ pub impl ToJson for OrganizationRoleBaseRole with fn to_json(self) {
   let raw = match self {
     Read => "read"
     Triage => "triage"
+    Moderate => "moderate"
     Write => "write"
     Maintain => "maintain"
     Admin => "admin"
@@ -35787,6 +35937,7 @@ pub impl @json.FromJson for OrganizationRoleBaseRole with fn from_json(
       match raw {
         "read" => Some(Read)
         "triage" => Some(Triage)
+        "moderate" => Some(Moderate)
         "write" => Some(Write)
         "maintain" => Some(Maintain)
         "admin" => Some(Admin)
@@ -65018,7 +65169,7 @@ pub impl @json.FromJson for CodeQualitySetupUpdateResponse with fn from_json(
 
 ///|
 ///
-/// Whether AI Scan is enabled for the repository.
+/// Whether AI Scan on pull requests is enabled for the repository.
 #derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum CodeScanningAiScanEnablementPrScan {
@@ -65074,10 +65225,76 @@ pub impl @json.FromJson for CodeScanningAiScanEnablementPrScan with fn from_json
 
 ///|
 ///
+/// Whether the full repository AI Scan is enabled for the repository.
+#derive(Eq, @debug.Debug)
+#non_exhaustive
+pub(all) enum CodeScanningAiScanEnablementRepositoryScan {
+  Enabled
+  Disabled
+  Unknown(String)
+}
+
+///|
+pub extend CodeScanningAiScanEnablementRepositoryScan with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend CodeScanningAiScanEnablementRepositoryScan with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend CodeScanningAiScanEnablementRepositoryScan with ToJson::{to_json}
+
+///|
+pub impl ToJson for CodeScanningAiScanEnablementRepositoryScan with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Enabled => "enabled"
+    Disabled => "disabled"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend CodeScanningAiScanEnablementRepositoryScan with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for CodeScanningAiScanEnablementRepositoryScan with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "enabled" => Some(Enabled)
+        "disabled" => Some(Disabled)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
 /// AI Scan enablement for a repository.
 #derive(Eq, @debug.Debug)
 pub(all) struct CodeScanningAiScanEnablement {
   pr_scan : CodeScanningAiScanEnablementPrScan
+  repository_scan : CodeScanningAiScanEnablementRepositoryScan?
 }
 
 ///|
@@ -65091,8 +65308,9 @@ pub extend CodeScanningAiScanEnablement with @debug.Debug::{to_repr}
 /// Creates a CodeScanningAiScanEnablement with omitted optional fields absent.
 pub fn CodeScanningAiScanEnablement::new(
   pr_scan~ : CodeScanningAiScanEnablementPrScan,
+  repository_scan? : CodeScanningAiScanEnablementRepositoryScan,
 ) -> CodeScanningAiScanEnablement {
-  { pr_scan, }
+  { pr_scan, repository_scan, }
 }
 
 ///|
@@ -65102,7 +65320,10 @@ pub extend CodeScanningAiScanEnablement with ToJson::{to_json}
 
 ///|
 pub impl ToJson for CodeScanningAiScanEnablement with fn to_json(self) {
-  @sdkjson.ObjBuilder::new().field("pr_scan", self.pr_scan).build()
+  @sdkjson.ObjBuilder::new()
+  .field("pr_scan", self.pr_scan)
+  .opt("repository_scan", self.repository_scan)
+  .build()
 }
 
 ///|
@@ -65116,12 +65337,15 @@ pub impl @json.FromJson for CodeScanningAiScanEnablement with fn from_json(
   path,
 ) {
   let obj = @sdkjson.expect_object(value, path)
-  { pr_scan: required_field(obj, "pr_scan", path), }
+  {
+    pr_scan: required_field(obj, "pr_scan", path),
+    repository_scan: @sdkjson.opt_field(obj, "repository_scan", path),
+  }
 }
 
 ///|
 ///
-/// Whether to enable or disable AI Scan for the repository.
+/// Whether to enable or disable AI Scan on pull requests for the repository.
 #derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum CodeScanningAiScanEnablementUpdatePrScan {
@@ -65181,10 +65405,78 @@ pub impl @json.FromJson for CodeScanningAiScanEnablementUpdatePrScan with fn fro
 
 ///|
 ///
+/// Whether to enable or disable the full repository AI Scan for the repository.
+#derive(Eq, @debug.Debug)
+#non_exhaustive
+pub(all) enum CodeScanningAiScanEnablementUpdateRepositoryScan {
+  Enabled
+  Disabled
+  Custom(String)
+}
+
+///|
+pub extend CodeScanningAiScanEnablementUpdateRepositoryScan with Eq::{
+  equal,
+  not_equal,
+}
+
+///|
+pub extend CodeScanningAiScanEnablementUpdateRepositoryScan with @debug.Debug::{
+  to_repr,
+}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend CodeScanningAiScanEnablementUpdateRepositoryScan with ToJson::{
+  to_json,
+}
+
+///|
+pub impl ToJson for CodeScanningAiScanEnablementUpdateRepositoryScan with fn to_json(
+  self,
+) {
+  let raw = match self {
+    Enabled => "enabled"
+    Disabled => "disabled"
+    Custom(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend CodeScanningAiScanEnablementUpdateRepositoryScan with @json.FromJson::{
+  from_json,
+}
+
+///|
+pub impl @json.FromJson for CodeScanningAiScanEnablementUpdateRepositoryScan with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "enabled" => Some(Enabled)
+        "disabled" => Some(Disabled)
+        _ => None
+      }
+    },
+    raw => Custom(raw),
+  )
+}
+
+///|
+///
 /// AI Scan enablement update for a repository.
 #derive(Eq, @debug.Debug)
 pub(all) struct CodeScanningAiScanEnablementUpdate {
   pr_scan : CodeScanningAiScanEnablementUpdatePrScan?
+  repository_scan : CodeScanningAiScanEnablementUpdateRepositoryScan?
 }
 
 ///|
@@ -65198,8 +65490,9 @@ pub extend CodeScanningAiScanEnablementUpdate with @debug.Debug::{to_repr}
 /// Creates a CodeScanningAiScanEnablementUpdate with omitted optional fields absent.
 pub fn CodeScanningAiScanEnablementUpdate::new(
   pr_scan? : CodeScanningAiScanEnablementUpdatePrScan,
+  repository_scan? : CodeScanningAiScanEnablementUpdateRepositoryScan,
 ) -> CodeScanningAiScanEnablementUpdate {
-  { pr_scan, }
+  { pr_scan, repository_scan, }
 }
 
 ///|
@@ -65209,7 +65502,10 @@ pub extend CodeScanningAiScanEnablementUpdate with ToJson::{to_json}
 
 ///|
 pub impl ToJson for CodeScanningAiScanEnablementUpdate with fn to_json(self) {
-  @sdkjson.ObjBuilder::new().opt("pr_scan", self.pr_scan).build()
+  @sdkjson.ObjBuilder::new()
+  .opt("pr_scan", self.pr_scan)
+  .opt("repository_scan", self.repository_scan)
+  .build()
 }
 
 ///|
@@ -65223,7 +65519,227 @@ pub impl @json.FromJson for CodeScanningAiScanEnablementUpdate with fn from_json
   path,
 ) {
   let obj = @sdkjson.expect_object(value, path)
-  { pr_scan: @sdkjson.opt_field(obj, "pr_scan", path), }
+  {
+    pr_scan: @sdkjson.opt_field(obj, "pr_scan", path),
+    repository_scan: @sdkjson.opt_field(obj, "repository_scan", path),
+  }
+}
+
+///|
+///
+/// The state of the referenced pull request.
+#derive(Eq, @debug.Debug)
+#non_exhaustive
+pub(all) enum PullRequestsOnAlertsState {
+  Open
+  Closed
+  Merged
+  Unknown(String)
+}
+
+///|
+pub extend PullRequestsOnAlertsState with Eq::{equal, not_equal}
+
+///|
+pub extend PullRequestsOnAlertsState with @debug.Debug::{to_repr}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend PullRequestsOnAlertsState with ToJson::{to_json}
+
+///|
+pub impl ToJson for PullRequestsOnAlertsState with fn to_json(self) {
+  let raw = match self {
+    Open => "open"
+    Closed => "closed"
+    Merged => "merged"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend PullRequestsOnAlertsState with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for PullRequestsOnAlertsState with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "open" => Some(Open)
+        "closed" => Some(Closed)
+        "merged" => Some(Merged)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// A pull request linked to a code scanning alert.
+#derive(Eq, @debug.Debug)
+pub(all) struct PullRequestsOnAlerts {
+  number : Int32
+  id : Int64
+  repository : SimpleRepository
+  title : String
+  state : PullRequestsOnAlertsState
+  merged_at : String?
+  html_url : String
+  url : String
+  draft : Bool
+}
+
+///|
+pub extend PullRequestsOnAlerts with Eq::{equal, not_equal}
+
+///|
+pub extend PullRequestsOnAlerts with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a PullRequestsOnAlerts with omitted optional fields absent.
+pub fn PullRequestsOnAlerts::new(
+  number~ : Int32,
+  id~ : Int64,
+  repository~ : SimpleRepository,
+  title~ : String,
+  state~ : PullRequestsOnAlertsState,
+  html_url~ : String,
+  url~ : String,
+  draft~ : Bool,
+  merged_at? : String,
+) -> PullRequestsOnAlerts {
+  { number, id, repository, title, state, merged_at, html_url, url, draft, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend PullRequestsOnAlerts with ToJson::{to_json}
+
+///|
+pub impl ToJson for PullRequestsOnAlerts with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("number", self.number)
+  .field("id", json_int64_to_json(self.id))
+  .field("repository", self.repository)
+  .field("title", self.title)
+  .field("state", self.state)
+  .presence("merged_at", nullable_presence(self.merged_at.map(value => value)))
+  .field("html_url", self.html_url)
+  .field("url", self.url)
+  .field("draft", self.draft)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend PullRequestsOnAlerts with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for PullRequestsOnAlerts with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    number: required_field(obj, "number", path),
+    id: json_int64(required_field(obj, "id", path), path.add_key("id")),
+    repository: required_field(obj, "repository", path),
+    title: required_field(obj, "title", path),
+    state: required_field(obj, "state", path),
+    merged_at: decode_nullable_field(obj, "merged_at", path),
+    html_url: required_field(obj, "html_url", path),
+    url: required_field(obj, "url", path),
+    draft: required_field(obj, "draft", path),
+  }
+}
+
+///|
+///
+/// A GitHub issue linked to a code scanning alert. The issue may belong to a different repository.
+#derive(Eq, @debug.Debug)
+pub(all) struct CodeScanningAlertLinkedIssue {
+  number : Int32
+  title : String
+  state : String
+  url : String
+  html_url : String
+  repository : SimpleRepository
+  issue_type : IssueType?
+}
+
+///|
+pub extend CodeScanningAlertLinkedIssue with Eq::{equal, not_equal}
+
+///|
+pub extend CodeScanningAlertLinkedIssue with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a CodeScanningAlertLinkedIssue with omitted optional fields absent.
+pub fn CodeScanningAlertLinkedIssue::new(
+  number~ : Int32,
+  title~ : String,
+  state~ : String,
+  url~ : String,
+  html_url~ : String,
+  repository~ : SimpleRepository,
+  issue_type? : IssueType,
+) -> CodeScanningAlertLinkedIssue {
+  { number, title, state, url, html_url, repository, issue_type, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend CodeScanningAlertLinkedIssue with ToJson::{to_json}
+
+///|
+pub impl ToJson for CodeScanningAlertLinkedIssue with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("number", self.number)
+  .field("title", self.title)
+  .field("state", self.state)
+  .field("url", self.url)
+  .field("html_url", self.html_url)
+  .field("repository", self.repository)
+  .presence(
+    "issue_type",
+    nullable_presence(self.issue_type.map(value => value)),
+  )
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend CodeScanningAlertLinkedIssue with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for CodeScanningAlertLinkedIssue with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    number: required_field(obj, "number", path),
+    title: required_field(obj, "title", path),
+    state: required_field(obj, "state", path),
+    url: required_field(obj, "url", path),
+    html_url: required_field(obj, "html_url", path),
+    repository: required_field(obj, "repository", path),
+    issue_type: decode_nullable_field(obj, "issue_type", path),
+  }
 }
 
 ///|
@@ -65248,6 +65764,8 @@ pub(all) struct CodeScanningAlertItems {
   most_recent_instance : CodeScanningAlertInstance
   dismissal_approved_by : @sdkjson.Presence[NullableSimpleUser]
   assignees : Array[SimpleUser]?
+  linked_pull_requests : Array[PullRequestsOnAlerts]?
+  linked_issues : Array[CodeScanningAlertLinkedIssue]?
 }
 
 ///|
@@ -65277,6 +65795,8 @@ pub fn CodeScanningAlertItems::new(
   dismissed_comment? : String,
   dismissal_approved_by? : NullableSimpleUser,
   assignees? : Array[SimpleUser],
+  linked_pull_requests? : Array[PullRequestsOnAlerts],
+  linked_issues? : Array[CodeScanningAlertLinkedIssue],
 ) -> CodeScanningAlertItems {
   {
     number,
@@ -65296,6 +65816,8 @@ pub fn CodeScanningAlertItems::new(
     most_recent_instance,
     dismissal_approved_by: @sdkjson.Presence::from_option(dismissal_approved_by),
     assignees,
+    linked_pull_requests,
+    linked_issues,
   }
 }
 
@@ -65333,6 +65855,8 @@ pub impl ToJson for CodeScanningAlertItems with fn to_json(self) {
   .field("most_recent_instance", self.most_recent_instance)
   .presence("dismissal_approved_by", self.dismissal_approved_by)
   .opt("assignees", self.assignees)
+  .opt("linked_pull_requests", self.linked_pull_requests)
+  .opt("linked_issues", self.linked_issues)
   .build()
 }
 
@@ -65367,6 +65891,8 @@ pub impl @json.FromJson for CodeScanningAlertItems with fn from_json(
       obj, "dismissal_approved_by", path,
     ),
     assignees: @sdkjson.opt_field(obj, "assignees", path),
+    linked_pull_requests: @sdkjson.opt_field(obj, "linked_pull_requests", path),
+    linked_issues: @sdkjson.opt_field(obj, "linked_issues", path),
   }
 }
 
@@ -65622,6 +66148,7 @@ pub(all) struct CodeScanningAlert {
   dismissal_approved_by : @sdkjson.Presence[NullableSimpleUser]
   assignees : Array[SimpleUser]?
   linked_pull_requests : Array[PullRequestSimple]?
+  linked_issues : Array[CodeScanningAlertLinkedIssue]?
 }
 
 ///|
@@ -65652,6 +66179,7 @@ pub fn CodeScanningAlert::new(
   dismissal_approved_by? : NullableSimpleUser,
   assignees? : Array[SimpleUser],
   linked_pull_requests? : Array[PullRequestSimple],
+  linked_issues? : Array[CodeScanningAlertLinkedIssue],
 ) -> CodeScanningAlert {
   {
     number,
@@ -65672,6 +66200,7 @@ pub fn CodeScanningAlert::new(
     dismissal_approved_by: @sdkjson.Presence::from_option(dismissal_approved_by),
     assignees,
     linked_pull_requests,
+    linked_issues,
   }
 }
 
@@ -65710,6 +66239,7 @@ pub impl ToJson for CodeScanningAlert with fn to_json(self) {
   .presence("dismissal_approved_by", self.dismissal_approved_by)
   .opt("assignees", self.assignees)
   .opt("linked_pull_requests", self.linked_pull_requests)
+  .opt("linked_issues", self.linked_issues)
   .build()
 }
 
@@ -65742,6 +66272,7 @@ pub impl @json.FromJson for CodeScanningAlert with fn from_json(value, path) {
     ),
     assignees: @sdkjson.opt_field(obj, "assignees", path),
     linked_pull_requests: @sdkjson.opt_field(obj, "linked_pull_requests", path),
+    linked_issues: @sdkjson.opt_field(obj, "linked_issues", path),
   }
 }
 

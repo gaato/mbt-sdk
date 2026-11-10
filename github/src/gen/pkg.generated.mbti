@@ -25402,10 +25402,11 @@ pub impl @json.ToJson for CodeQualitySetupUpdateState
 #derive(Eq, @debug.Debug)
 pub(all) struct CodeScanningAiScanEnablement {
   pr_scan : CodeScanningAiScanEnablementPrScan
+  repository_scan : CodeScanningAiScanEnablementRepositoryScan?
 }
 pub fn CodeScanningAiScanEnablement::equal(Self, Self) -> Bool
 pub fn CodeScanningAiScanEnablement::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
-pub fn CodeScanningAiScanEnablement::new(pr_scan~ : CodeScanningAiScanEnablementPrScan) -> Self
+pub fn CodeScanningAiScanEnablement::new(pr_scan~ : CodeScanningAiScanEnablementPrScan, repository_scan? : CodeScanningAiScanEnablementRepositoryScan) -> Self
 pub fn CodeScanningAiScanEnablement::not_equal(Self, Self) -> Bool
 pub fn CodeScanningAiScanEnablement::to_json(Self) -> @json.Json
 pub fn CodeScanningAiScanEnablement::to_repr(Self) -> @debug.Repr
@@ -25427,13 +25428,29 @@ pub fn CodeScanningAiScanEnablementPrScan::to_repr(Self) -> @debug.Repr
 pub impl @json.FromJson for CodeScanningAiScanEnablementPrScan
 pub impl @json.ToJson for CodeScanningAiScanEnablementPrScan
 
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum CodeScanningAiScanEnablementRepositoryScan {
+  Enabled
+  Disabled
+  Unknown(String)
+}
+pub fn CodeScanningAiScanEnablementRepositoryScan::equal(Self, Self) -> Bool
+pub fn CodeScanningAiScanEnablementRepositoryScan::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn CodeScanningAiScanEnablementRepositoryScan::not_equal(Self, Self) -> Bool
+pub fn CodeScanningAiScanEnablementRepositoryScan::to_json(Self) -> @json.Json
+pub fn CodeScanningAiScanEnablementRepositoryScan::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for CodeScanningAiScanEnablementRepositoryScan
+pub impl @json.ToJson for CodeScanningAiScanEnablementRepositoryScan
+
 #derive(Eq, @debug.Debug)
 pub(all) struct CodeScanningAiScanEnablementUpdate {
   pr_scan : CodeScanningAiScanEnablementUpdatePrScan?
+  repository_scan : CodeScanningAiScanEnablementUpdateRepositoryScan?
 }
 pub fn CodeScanningAiScanEnablementUpdate::equal(Self, Self) -> Bool
 pub fn CodeScanningAiScanEnablementUpdate::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
-pub fn CodeScanningAiScanEnablementUpdate::new(pr_scan? : CodeScanningAiScanEnablementUpdatePrScan) -> Self
+pub fn CodeScanningAiScanEnablementUpdate::new(pr_scan? : CodeScanningAiScanEnablementUpdatePrScan, repository_scan? : CodeScanningAiScanEnablementUpdateRepositoryScan) -> Self
 pub fn CodeScanningAiScanEnablementUpdate::not_equal(Self, Self) -> Bool
 pub fn CodeScanningAiScanEnablementUpdate::to_json(Self) -> @json.Json
 pub fn CodeScanningAiScanEnablementUpdate::to_repr(Self) -> @debug.Repr
@@ -25455,13 +25472,29 @@ pub fn CodeScanningAiScanEnablementUpdatePrScan::to_repr(Self) -> @debug.Repr
 pub impl @json.FromJson for CodeScanningAiScanEnablementUpdatePrScan
 pub impl @json.ToJson for CodeScanningAiScanEnablementUpdatePrScan
 
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum CodeScanningAiScanEnablementUpdateRepositoryScan {
+  Enabled
+  Disabled
+  Custom(String)
+}
+pub fn CodeScanningAiScanEnablementUpdateRepositoryScan::equal(Self, Self) -> Bool
+pub fn CodeScanningAiScanEnablementUpdateRepositoryScan::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn CodeScanningAiScanEnablementUpdateRepositoryScan::not_equal(Self, Self) -> Bool
+pub fn CodeScanningAiScanEnablementUpdateRepositoryScan::to_json(Self) -> @json.Json
+pub fn CodeScanningAiScanEnablementUpdateRepositoryScan::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for CodeScanningAiScanEnablementUpdateRepositoryScan
+pub impl @json.ToJson for CodeScanningAiScanEnablementUpdateRepositoryScan
+
 #derive(Eq, @debug.Debug)
 pub(all) struct CodeScanningAiScanOrgEnablementUpdate {
   pr_scan : CodeScanningAiScanOrgEnablementUpdatePrScan?
+  repository_scan : CodeScanningAiScanOrgEnablementUpdateRepositoryScan?
 }
 pub fn CodeScanningAiScanOrgEnablementUpdate::equal(Self, Self) -> Bool
 pub fn CodeScanningAiScanOrgEnablementUpdate::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
-pub fn CodeScanningAiScanOrgEnablementUpdate::new(pr_scan? : CodeScanningAiScanOrgEnablementUpdatePrScan) -> Self
+pub fn CodeScanningAiScanOrgEnablementUpdate::new(pr_scan? : CodeScanningAiScanOrgEnablementUpdatePrScan, repository_scan? : CodeScanningAiScanOrgEnablementUpdateRepositoryScan) -> Self
 pub fn CodeScanningAiScanOrgEnablementUpdate::not_equal(Self, Self) -> Bool
 pub fn CodeScanningAiScanOrgEnablementUpdate::to_json(Self) -> @json.Json
 pub fn CodeScanningAiScanOrgEnablementUpdate::to_repr(Self) -> @debug.Repr
@@ -25483,13 +25516,29 @@ pub fn CodeScanningAiScanOrgEnablementUpdatePrScan::to_repr(Self) -> @debug.Repr
 pub impl @json.FromJson for CodeScanningAiScanOrgEnablementUpdatePrScan
 pub impl @json.ToJson for CodeScanningAiScanOrgEnablementUpdatePrScan
 
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum CodeScanningAiScanOrgEnablementUpdateRepositoryScan {
+  Enabled
+  Disabled
+  Custom(String)
+}
+pub fn CodeScanningAiScanOrgEnablementUpdateRepositoryScan::equal(Self, Self) -> Bool
+pub fn CodeScanningAiScanOrgEnablementUpdateRepositoryScan::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn CodeScanningAiScanOrgEnablementUpdateRepositoryScan::not_equal(Self, Self) -> Bool
+pub fn CodeScanningAiScanOrgEnablementUpdateRepositoryScan::to_json(Self) -> @json.Json
+pub fn CodeScanningAiScanOrgEnablementUpdateRepositoryScan::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for CodeScanningAiScanOrgEnablementUpdateRepositoryScan
+pub impl @json.ToJson for CodeScanningAiScanOrgEnablementUpdateRepositoryScan
+
 #derive(Eq, @debug.Debug)
 pub(all) struct CodeScanningAiScanOrgSettings {
   pr_scan : CodeScanningAiScanOrgSettingsPrScan
+  repository_scan : CodeScanningAiScanOrgSettingsRepositoryScan?
 }
 pub fn CodeScanningAiScanOrgSettings::equal(Self, Self) -> Bool
 pub fn CodeScanningAiScanOrgSettings::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
-pub fn CodeScanningAiScanOrgSettings::new(pr_scan~ : CodeScanningAiScanOrgSettingsPrScan) -> Self
+pub fn CodeScanningAiScanOrgSettings::new(pr_scan~ : CodeScanningAiScanOrgSettingsPrScan, repository_scan? : CodeScanningAiScanOrgSettingsRepositoryScan) -> Self
 pub fn CodeScanningAiScanOrgSettings::not_equal(Self, Self) -> Bool
 pub fn CodeScanningAiScanOrgSettings::to_json(Self) -> @json.Json
 pub fn CodeScanningAiScanOrgSettings::to_repr(Self) -> @debug.Repr
@@ -25511,6 +25560,21 @@ pub fn CodeScanningAiScanOrgSettingsPrScan::to_repr(Self) -> @debug.Repr
 pub impl @json.FromJson for CodeScanningAiScanOrgSettingsPrScan
 pub impl @json.ToJson for CodeScanningAiScanOrgSettingsPrScan
 
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum CodeScanningAiScanOrgSettingsRepositoryScan {
+  Enabled
+  Disabled
+  Unknown(String)
+}
+pub fn CodeScanningAiScanOrgSettingsRepositoryScan::equal(Self, Self) -> Bool
+pub fn CodeScanningAiScanOrgSettingsRepositoryScan::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn CodeScanningAiScanOrgSettingsRepositoryScan::not_equal(Self, Self) -> Bool
+pub fn CodeScanningAiScanOrgSettingsRepositoryScan::to_json(Self) -> @json.Json
+pub fn CodeScanningAiScanOrgSettingsRepositoryScan::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for CodeScanningAiScanOrgSettingsRepositoryScan
+pub impl @json.ToJson for CodeScanningAiScanOrgSettingsRepositoryScan
+
 #derive(Eq, @debug.Debug)
 pub(all) struct CodeScanningAlert {
   number : Int32
@@ -25531,10 +25595,11 @@ pub(all) struct CodeScanningAlert {
   dismissal_approved_by : @jsonkit.Presence[NullableSimpleUser]
   assignees : Array[SimpleUser]?
   linked_pull_requests : Array[PullRequestSimple]?
+  linked_issues : Array[CodeScanningAlertLinkedIssue]?
 }
 pub fn CodeScanningAlert::equal(Self, Self) -> Bool
 pub fn CodeScanningAlert::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
-pub fn CodeScanningAlert::new(number~ : Int32, created_at~ : String, url~ : String, html_url~ : String, instances_url~ : String, rule~ : CodeScanningAlertRule, tool~ : CodeScanningAnalysisTool, most_recent_instance~ : CodeScanningAlertInstance, updated_at? : String, state? : CodeScanningAlertState, fixed_at? : String, dismissed_by? : NullableSimpleUser, dismissed_at? : String, dismissed_reason? : CodeScanningAlertDismissedReason, dismissed_comment? : String, dismissal_approved_by? : NullableSimpleUser, assignees? : Array[SimpleUser], linked_pull_requests? : Array[PullRequestSimple]) -> Self
+pub fn CodeScanningAlert::new(number~ : Int32, created_at~ : String, url~ : String, html_url~ : String, instances_url~ : String, rule~ : CodeScanningAlertRule, tool~ : CodeScanningAnalysisTool, most_recent_instance~ : CodeScanningAlertInstance, updated_at? : String, state? : CodeScanningAlertState, fixed_at? : String, dismissed_by? : NullableSimpleUser, dismissed_at? : String, dismissed_reason? : CodeScanningAlertDismissedReason, dismissed_comment? : String, dismissal_approved_by? : NullableSimpleUser, assignees? : Array[SimpleUser], linked_pull_requests? : Array[PullRequestSimple], linked_issues? : Array[CodeScanningAlertLinkedIssue]) -> Self
 pub fn CodeScanningAlert::not_equal(Self, Self) -> Bool
 pub fn CodeScanningAlert::to_json(Self) -> @json.Json
 pub fn CodeScanningAlert::to_repr(Self) -> @debug.Repr
@@ -25680,15 +25745,36 @@ pub(all) struct CodeScanningAlertItems {
   most_recent_instance : CodeScanningAlertInstance
   dismissal_approved_by : @jsonkit.Presence[NullableSimpleUser]
   assignees : Array[SimpleUser]?
+  linked_pull_requests : Array[PullRequestsOnAlerts]?
+  linked_issues : Array[CodeScanningAlertLinkedIssue]?
 }
 pub fn CodeScanningAlertItems::equal(Self, Self) -> Bool
 pub fn CodeScanningAlertItems::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
-pub fn CodeScanningAlertItems::new(number~ : Int32, created_at~ : String, url~ : String, html_url~ : String, instances_url~ : String, rule~ : CodeScanningAlertRuleSummary, tool~ : CodeScanningAnalysisTool, most_recent_instance~ : CodeScanningAlertInstance, updated_at? : String, state? : CodeScanningAlertState, fixed_at? : String, dismissed_by? : NullableSimpleUser, dismissed_at? : String, dismissed_reason? : CodeScanningAlertDismissedReason, dismissed_comment? : String, dismissal_approved_by? : NullableSimpleUser, assignees? : Array[SimpleUser]) -> Self
+pub fn CodeScanningAlertItems::new(number~ : Int32, created_at~ : String, url~ : String, html_url~ : String, instances_url~ : String, rule~ : CodeScanningAlertRuleSummary, tool~ : CodeScanningAnalysisTool, most_recent_instance~ : CodeScanningAlertInstance, updated_at? : String, state? : CodeScanningAlertState, fixed_at? : String, dismissed_by? : NullableSimpleUser, dismissed_at? : String, dismissed_reason? : CodeScanningAlertDismissedReason, dismissed_comment? : String, dismissal_approved_by? : NullableSimpleUser, assignees? : Array[SimpleUser], linked_pull_requests? : Array[PullRequestsOnAlerts], linked_issues? : Array[CodeScanningAlertLinkedIssue]) -> Self
 pub fn CodeScanningAlertItems::not_equal(Self, Self) -> Bool
 pub fn CodeScanningAlertItems::to_json(Self) -> @json.Json
 pub fn CodeScanningAlertItems::to_repr(Self) -> @debug.Repr
 pub impl @json.FromJson for CodeScanningAlertItems
 pub impl @json.ToJson for CodeScanningAlertItems
+
+#derive(Eq, @debug.Debug)
+pub(all) struct CodeScanningAlertLinkedIssue {
+  number : Int32
+  title : String
+  state : String
+  url : String
+  html_url : String
+  repository : SimpleRepository
+  issue_type : IssueType?
+}
+pub fn CodeScanningAlertLinkedIssue::equal(Self, Self) -> Bool
+pub fn CodeScanningAlertLinkedIssue::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn CodeScanningAlertLinkedIssue::new(number~ : Int32, title~ : String, state~ : String, url~ : String, html_url~ : String, repository~ : SimpleRepository, issue_type? : IssueType) -> Self
+pub fn CodeScanningAlertLinkedIssue::not_equal(Self, Self) -> Bool
+pub fn CodeScanningAlertLinkedIssue::to_json(Self) -> @json.Json
+pub fn CodeScanningAlertLinkedIssue::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for CodeScanningAlertLinkedIssue
+pub impl @json.ToJson for CodeScanningAlertLinkedIssue
 
 #derive(Eq, @debug.Debug)
 pub(all) struct CodeScanningAlertLocation {
@@ -42549,6 +42635,7 @@ pub impl @json.ToJson for OrganizationRole
 pub(all) enum OrganizationRoleBaseRole {
   Read
   Triage
+  Moderate
   Write
   Maintain
   Admin
@@ -47649,6 +47736,43 @@ pub fn PullRequestState::to_json(Self) -> @json.Json
 pub fn PullRequestState::to_repr(Self) -> @debug.Repr
 pub impl @json.FromJson for PullRequestState
 pub impl @json.ToJson for PullRequestState
+
+#derive(Eq, @debug.Debug)
+pub(all) struct PullRequestsOnAlerts {
+  number : Int32
+  id : Int64
+  repository : SimpleRepository
+  title : String
+  state : PullRequestsOnAlertsState
+  merged_at : String?
+  html_url : String
+  url : String
+  draft : Bool
+}
+pub fn PullRequestsOnAlerts::equal(Self, Self) -> Bool
+pub fn PullRequestsOnAlerts::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn PullRequestsOnAlerts::new(number~ : Int32, id~ : Int64, repository~ : SimpleRepository, title~ : String, state~ : PullRequestsOnAlertsState, html_url~ : String, url~ : String, draft~ : Bool, merged_at? : String) -> Self
+pub fn PullRequestsOnAlerts::not_equal(Self, Self) -> Bool
+pub fn PullRequestsOnAlerts::to_json(Self) -> @json.Json
+pub fn PullRequestsOnAlerts::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for PullRequestsOnAlerts
+pub impl @json.ToJson for PullRequestsOnAlerts
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum PullRequestsOnAlertsState {
+  Open
+  Closed
+  Merged
+  Unknown(String)
+}
+pub fn PullRequestsOnAlertsState::equal(Self, Self) -> Bool
+pub fn PullRequestsOnAlertsState::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn PullRequestsOnAlertsState::not_equal(Self, Self) -> Bool
+pub fn PullRequestsOnAlertsState::to_json(Self) -> @json.Json
+pub fn PullRequestsOnAlertsState::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for PullRequestsOnAlertsState
+pub impl @json.ToJson for PullRequestsOnAlertsState
 
 #derive(Eq, @debug.Debug)
 pub(all) struct PullsCreateReplyForReviewCommentRequest {
