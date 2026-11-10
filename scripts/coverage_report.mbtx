@@ -1,9 +1,8 @@
 ----
 import {
-  "moonbitlang/async@0.22.7",
-  "moonbitlang/async@0.22.7/fs",
-  "moonbitlang/async@0.22.7/shell",
-  "moonbitlang/async@0.22.7/stdio",
+  "moonbitlang/core/async",
+  "moonbitlang/core/async/fs",
+  "moonbitlang/core/async/shell",
   "moonbitlang/core/env",
   "moonbitlang/core/json",
   "moonbitlang/core/string",
@@ -38,9 +37,7 @@ import {
 ///|
 /// The measured modules (workspace member directories). Generated code
 /// (openai, anthropic, github, codex-protocol) is not measured.
-let modules : Array[String] = [
-  "jsonrpc", "jsonrpc-async", "codex-app-server",
-]
+let modules : Array[String] = ["jsonrpc", "jsonrpc-async", "codex-app-server"]
 
 ///|
 /// Measured sources under a module's `src/` that are left out: a demo binary
@@ -65,7 +62,7 @@ let usage : String = "usage: moon run scripts/coverage_report.mbtx [-- --from-js
 
 ///|
 /// Prints `message` on stderr and exits with `code`.
-fn[T] die(code : Int, message : String) -> T {
+fn[T] die(code : Int32, message : String) -> T {
   eprintln(message)
   @env.exit(code)
 }
@@ -78,7 +75,7 @@ suberror Setup {
 
 ///|
 /// Byte order; `String::compare` puts shorter strings first.
-fn lexical(a : String, b : String) -> Int {
+fn lexical(a : String, b : String) -> Int32 {
   for i in 0..<a.length().min(b.length()) {
     if a[i] != b[i] {
       return a[i].to_int() - b[i].to_int()
@@ -130,7 +127,7 @@ async fn packages(root : String) -> Array[String] {
 ///|
 /// The `name = "..."` of `dir`/moon.mod.
 async fn module_name(dir : String) -> String {
-  for line in @fs.read_file("\{dir}/moon.mod").text().split("\n") {
+  for line in @fs.read_text("\{dir}/moon.mod").split("\n") {
     if line.strip_prefix("name = \"") is Some(rest) &&
       rest.strip_suffix("\"") is Some(name) {
       return name.to_owned()
@@ -149,9 +146,7 @@ async fn measure() -> String {
     drivers.append(packages("\{m}/src"))
   }
   for root in extra_drivers {
-    drivers.append(
-      packages(root).filter(dir => !network_drivers.contains(dir)),
-    )
+    drivers.append(packages(root).filter(dir => !network_drivers.contains(dir)))
   }
   for counter in find("_build", name => name.has_prefix("moonbit_coverage_")) {
     @fs.remove(counter) catch {
@@ -202,9 +197,9 @@ async fn measure() -> String {
 
 ///|
 /// The budgets of TEST_COVERAGE.md: rows like "| http/src/foo.mbt | 12 | reason |".
-async fn budgets(ledger : String) -> Map[String, Int] {
+async fn budgets(ledger : String) -> Map[String, Int32] {
   let budget = Map([])
-  for line in @fs.read_file(ledger).text().split("\n") {
+  for line in @fs.read_text(ledger).split("\n") {
     guard line.has_prefix("|") else { continue }
     let cell = line.split("|").to_array()
     guard cell.length() > 2 else { continue }
@@ -222,14 +217,14 @@ async fn budgets(ledger : String) -> Map[String, Int] {
 
 ///|
 /// `n` in `width` columns, right-aligned, as printf's `%<width>d`.
-fn right(n : Int, width : Int) -> String {
+fn right(n : Int32, width : Int32) -> String {
   n.to_string().pad_start(width, ' ')
 }
 
 ///|
 /// `100 * part / whole` with one decimal, as printf's `%.1f`: rounded to the
 /// nearest tenth, a tie to the even one.
-fn percent(part : Int, whole : Int) -> String {
+fn percent(part : Int32, whole : Int32) -> String {
   let scaled = part.to_int64() * 1000L
   let whole = whole.to_int64()
   let mut tenths = scaled / whole
@@ -242,7 +237,7 @@ fn percent(part : Int, whole : Int) -> String {
 
 ///|
 /// Prints one table row: `label`, `cov/tot` and the percentage.
-fn row(label : String, cov : Int, tot : Int) -> Unit {
+fn row(label : String, cov : Int32, tot : Int32) -> Unit {
   let fraction = "\{right(cov, 5)}/\{tot.to_string().pad_end(5, ' ')}"
   println(
     "\{label.pad_end(28, ' ')} \{fraction} \{percent(cov, tot).pad_start(7, ' ')}%",
@@ -257,26 +252,31 @@ fn header(label : String) -> Unit {
 }
 
 ///|
-fn add(totals : Map[String, (Int, Int)], key : String, cov : Int, tot : Int) -> Unit {
+fn add(
+  totals : Map[String, (Int32, Int32)],
+  key : String,
+  cov : Int32,
+  tot : Int32,
+) -> Unit {
   let (c, t) = totals.get(key).unwrap_or((0, 0))
   totals[key] = (c + cov, t + tot)
 }
 
 ///|
 /// Checks `json_file` against TEST_COVERAGE.md; the exit status.
-async fn check(json_file : String) -> Int {
+async fn check(json_file : String) -> Int32 {
   guard @fs.exists(json_file) else { raise Setup("error: no \{json_file}") }
-  let report = @json.parse(@fs.read_file(json_file).text()) catch {
+  let report = @json.parse(@fs.read_text(json_file)) catch {
     _ => raise Setup("error: \{json_file} is not JSON")
   }
   guard report is { "source_files": Array(files), .. } else {
     raise Setup("error: \{json_file} has no source_files")
   }
   let budget = budgets("TEST_COVERAGE.md")
-  let by_module : Map[String, (Int, Int)] = Map([])
-  let by_package : Map[String, (Int, Int)] = Map([])
+  let by_module : Map[String, (Int32, Int32)] = Map([])
+  let by_package : Map[String, (Int32, Int32)] = Map([])
   let seen : Map[String, Unit] = Map([])
-  let uncovered : Map[String, Int] = Map([])
+  let uncovered : Map[String, Int32] = Map([])
   let mut lcov = 0
   let mut ltot = 0
   for source in files {
@@ -290,7 +290,9 @@ async fn check(json_file : String) -> Int {
     if tot == 0 {
       continue
     }
-    let package_dir = file.exact_view(end=file.rev_find("/").unwrap()).to_owned()
+    let package_dir = file
+      .exact_view(end=file.rev_find("/").unwrap())
+      .to_owned()
     let module_dir = file.exact_view(end=file.find("/").unwrap()).to_owned()
     add(by_package, package_dir, cov, tot)
     add(by_module, module_dir, cov, tot)
@@ -381,7 +383,7 @@ async fn main {
     check(json_file)
   } catch {
     Setup(message) => {
-      @stdio.stderr.write("\{message}\n")
+      eprintln(message)
       2
     }
     err => raise err

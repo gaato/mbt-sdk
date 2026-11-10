@@ -1,7 +1,7 @@
 ----
 import {
-  "moonbitlang/async@0.22.7",
-  "moonbitlang/async@0.22.7/fs",
+  "moonbitlang/core/async",
+  "moonbitlang/core/async/fs",
   "moonbitlang/core/env",
 }
 ----
@@ -30,7 +30,7 @@ import {
 
 ///|
 /// Prints `message` on stderr and exits with `code`.
-fn[T] die(code : Int, message : String) -> T {
+fn[T] die(code : Int32, message : String) -> T {
   eprintln(message)
   @env.exit(code)
 }
@@ -132,9 +132,7 @@ fn tokens(cell : String) -> Array[Token] {
         .exact_view(start=i + 1)
         .find(if c == '`' { "`" } else { "\"" })
       if close is Some(len) {
-        let token = cell
-          .exact_view(start=i + 1, end=i + 1 + len)
-          .to_owned()
+        let token = cell.exact_view(start=i + 1, end=i + 1 + len).to_owned()
         out.push(if c == '`' { File(token) } else { Name(token) })
         continue i + len + 2
       }
@@ -157,7 +155,7 @@ async fn main {
   guard is_file(ledger) else {
     die(2, "bounds_check.mbtx: no ledger at \{ledger}")
   }
-  let (header, found) = table(@fs.read_file(ledger).text())
+  let (header, found) = table(@fs.read_text(ledger))
   guard header is Some("Tests") else {
     die(
       2,
@@ -165,7 +163,7 @@ async fn main {
     )
   }
   // The rows that name a test, in order, with the tests found.
-  let rows : Map[String, Int] = Map([])
+  let rows : Map[String, Int32] = Map([])
   let mut bad = false
   let mut tests = 0
   // The lines of each named file, None for a file that does not exist.
@@ -181,11 +179,7 @@ async fn main {
         if !declared.contains(path) {
           declared[path] = if is_file(path) {
             Some(
-              @fs.read_file(path)
-              .text()
-              .split("\n")
-              .map(l => l.to_owned())
-              .to_array(),
+              @fs.read_text(path).split("\n").map(l => l.to_owned()).to_array(),
             )
           } else {
             None

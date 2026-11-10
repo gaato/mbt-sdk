@@ -1,8 +1,8 @@
 ----
 import {
-  "moonbitlang/async@0.22.7",
-  "moonbitlang/async@0.22.7/fs",
-  "moonbitlang/async@0.22.7/shell",
+  "moonbitlang/core/async",
+  "moonbitlang/core/async/fs",
+  "moonbitlang/core/async/shell",
   "moonbitlang/core/encoding/utf8",
 }
 ----
@@ -68,10 +68,13 @@ async fn fetch(url : String, accept_encoding : String?) -> Bytes {
     Some(coding) => ["-H", "accept-encoding: \{coding}"]
     None => []
   }
-  let output = @shell.Cmd("curl", [
-    "--http1.1", "--raw", "-sS", "--max-time", "30", "-D", "-", "--output", "-",
-    ..headers, url,
-  ]).output()
+  let output = @shell.Cmd(
+    "curl",
+    [
+      "--http1.1", "--raw", "-sS", "--max-time", "30", "-D", "-", "--output", "-",
+      ..headers, url,
+    ],
+  ).output()
   // A response that ends in a reset (sse/drop) makes curl exit non-zero
   // after writing what arrived; keep that.
   if output.stdout_bytes().length() == 0 {
@@ -94,7 +97,10 @@ fn next_hop(url : String, response : Bytes) -> String? {
         if location.has_prefix("//") {
           url[:url.find(":").unwrap() + 1].to_owned() + location
         } else if location.has_prefix("/") {
-          let origin_end = url[8:].find("/").map(i => i + 8).unwrap_or(url.length())
+          let origin_end = url[8:]
+            .find("/")
+            .map(i => i + 8)
+            .unwrap_or(url.length())
           url[:origin_end].to_owned() + location
         } else {
           location
@@ -145,7 +151,7 @@ async fn main {
     out.write_string("  \"\{row.0}\": \"\{hex(row.1)}\",\n")
   }
   out.write_string("}\n")
-  @fs.write_file(
+  @fs.write_text(
     "runtime-tests/src/badhttp_replay/captures_wbtest.mbt",
     out.to_string(),
   )

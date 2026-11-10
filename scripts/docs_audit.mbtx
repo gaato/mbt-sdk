@@ -1,7 +1,7 @@
 ----
 import {
-  "moonbitlang/async@0.22.5",
-  "moonbitlang/async@0.22.5/fs",
+  "moonbitlang/core/async",
+  "moonbitlang/core/async/fs",
   "moonbitlang/core/env",
   "moonbitlang/core/json",
 }
@@ -454,7 +454,7 @@ async fn main {
   if args.length() > 2 || (args.length() == 2 && !self_test) {
     fail("usage: moon run scripts/docs_audit.mbtx [--self-test]")
   }
-  let config = @json.parse(@fs.read_file("scripts/docs_audit.json").text())
+  let config = @json.parse(@fs.read_text("scripts/docs_audit.json"))
   let module_dirs = config_strings(config, "modules").map(dir => {
     if dir == "." {
       ""
@@ -494,21 +494,21 @@ async fn main {
   source_paths.sort()
   let markdown : Array[(String, String)] = []
   for path in markdown_paths {
-    markdown.push((path, @fs.read_file(path).text()))
+    markdown.push((path, @fs.read_text(path)))
   }
   let sources : Array[(String, String)] = []
   for path in source_paths {
-    sources.push((path, @fs.read_file(path).text()))
+    sources.push((path, @fs.read_text(path)))
   }
   let modules : Array[Module] = []
   for dir in module_dirs {
     let ignore_path = join(dir, ".moonignore")
     let ignored = if existing.contains(ignore_path) {
-      parse_moonignore(@fs.read_file(ignore_path).text())
+      parse_moonignore(@fs.read_text(ignore_path))
     } else {
       []
     }
-    let moon_mod = @fs.read_file(join(dir, "moon.mod")).text()
+    let moon_mod = @fs.read_text(join(dir, "moon.mod"))
     modules.push({ dir, ignored, moon_mod })
   }
   if self_test {
@@ -516,7 +516,7 @@ async fn main {
     println("Docs audit self-tests: OK")
   }
   let repo : Repo = { markdown, sources, existing, modules, generated }
-  audit(repo, @fs.read_file("scripts/docs_audit.allow").text())
+  audit(repo, @fs.read_text("scripts/docs_audit.allow"))
   println("Docs audit: OK")
 }
 

@@ -1,7 +1,7 @@
 ----
 import {
-  "moonbitlang/async@0.22.7",
-  "moonbitlang/async@0.22.7/fs",
+  "moonbitlang/core/async",
+  "moonbitlang/core/async/fs",
   "moonbitlang/core/env",
   "moonbitlang/core/json",
 }
@@ -46,7 +46,9 @@ fn string_of_rows(name : String, rows : Array[Json]) -> String {
 ///|
 fn special_url(text : String) -> Bool {
   let lower = text.trim(chars=" \t\n\r").to_lower()
-  ["http:", "https:", "ws:", "wss:"].iter().any(scheme => lower.has_prefix(scheme))
+  ["http:", "https:", "ws:", "wss:"]
+  .iter()
+  .any(scheme => lower.has_prefix(scheme))
 }
 
 ///|
@@ -144,8 +146,8 @@ fn rows_of(json : Json) -> Array[Json] raise {
 
 ///|
 async fn write_if_changed(target : String, text : String) -> Unit {
-  if !@fs.exists(target) || @fs.read_file(target).text() != text {
-    @fs.write_file(target, text)
+  if !@fs.exists(target) || @fs.read_text(target) != text {
+    @fs.write_text(target, text)
     println("wrote \{target}")
   } else {
     println("unchanged \{target}")
@@ -157,7 +159,7 @@ async fn main {
   let args = @env.args()[1:].to_owned()
   match args {
     ["url", source] => {
-      let rows = url_rows(@fs.read_file(source).text())
+      let rows = url_rows(@fs.read_text(source))
       write_if_changed(
         "conformance/src/url/urltestdata_wbtest.mbt",
         header + string_of_rows("urltestdata", rows),
@@ -167,15 +169,15 @@ async fn main {
       let text = header +
         string_of_rows(
           "parser_tests",
-          rows_of(literal_to_json(@fs.read_file(parser).text())),
+          rows_of(literal_to_json(@fs.read_text(parser))),
         ) +
         string_of_rows(
           "date_examples",
-          rows_of(literal_to_json(@fs.read_file(examples).text())),
+          rows_of(literal_to_json(@fs.read_text(examples))),
         ) +
         string_of_rows(
           "date_bsd_examples",
-          rows_of(literal_to_json(@fs.read_file(bsd_examples).text())),
+          rows_of(literal_to_json(@fs.read_text(bsd_examples))),
         )
       write_if_changed("conformance/src/cookie/http_state_wbtest.mbt", text)
     }
