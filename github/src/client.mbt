@@ -10,8 +10,9 @@
 /// caller's query rather than to the schema — so it is served by the `graphql`
 /// passthrough over `Json`.
 pub struct GitHub {
-  priv client : @runtime.Client
+  priv client : @client.Client
   priv graphql_url : String
+  priv retry : GitHubRetry?
 }
 
 ///|
@@ -43,7 +44,8 @@ pub impl @debug.Debug for GitHub with fn to_repr(_self) {
 /// `.patch`, `.sarif` — sets `accept` on its own request, and the runtime keeps
 /// request headers ahead of client defaults.
 ///
-/// `retry` defaults to `RetryPolicy::conservative().with_max_retries(3)` and
+/// `retry` defaults to a conservative SDK rule with three retries and 429
+/// permitted for every method, and
 /// is wrapped in `GitHubRetry`, which also waits out GitHub's primary and
 /// secondary rate limits and retries a transient GraphQL failure of a query.
 ///
@@ -54,36 +56,42 @@ pub impl @debug.Debug for GitHub with fn to_repr(_self) {
 /// notifications 3 s and searches 2 s, as octokit does. `gate` makes the
 /// requests of each of those groups serial, as docs.github.com asks ("make
 /// requests serially instead of concurrently"): pass
-/// `gate=() => @http_async.SemaphoreGate::new()` from `gaato/http-async`.
+/// `gate=() => @runtime.SemaphoreGate::new()` from `gaato/http-async/runtime`.
 /// Without it concurrent requests are only spaced, not serialised. `gate` is
-/// ignored when `limiter` is given. Pass `limiter=@runtime.NoLimiter::new()`
+/// ignored when `limiter` is given. Pass `limiter=@client.NoLimiter::new()`
 /// to opt out of both.
 ///
-/// `timeouts` limits each attempt and each call (`@runtime.Timeouts`); without
-/// it only the transport's own timeouts apply.
+/// `options.timeout_ms` limits each attempt and `total_timeout_ms` the whole
+/// call, including admission and consumption. A total deadline requires a
+/// supplied Timer. Backend phase deadlines can finish attempts earlier.
 ///
 /// `graphql_url` is the GraphQL endpoint, which is not under the REST root:
 /// GitHub Enterprise Server serves REST from `/api/v3` and GraphQL from
 /// `/api/graphql`. It is derived from `base_url` and only needs passing for a
 /// deployment that puts the two somewhere else.
 pub fn GitHub::new(
-  transport : &@http.Transport,
-  clock : &@clock.Clock,
+  backend : &@http.Backend,
+  clock : &@rt.Clock,
   token? : String,
   base_url~ : String = "https://api.github.com",
   api_version~ : String = "2022-11-28",
   user_agent~ : String = "gaato-mbt-sdk/0.1.0",
-  retry? : @runtime.RetryPolicy,
-  limiter? : &@runtime.RateLimiter,
+  retry? : @client.RetryPolicy,
+  limiter? : &@client.RateLimiter,
   graphql_url? : String,
-  gate? : () -> &@sync.Gate,
-  timeouts? : @runtime.Timeouts,
+  gate? : () -> &@rt.Gate,
+  timer? : &@rt.Timer,
+  timeout_ms? : Int32,
+  max_body_bytes? : Int32,
+  read_idle_ms? : Int32,
+  total_timeout_ms? : Int32,
 ) -> GitHub {
-  let auth = match token {
-    Some(token) => @runtime.Bearer(token)
-    None => @runtime.NoAuth
+  let headers = default_headers(api_version~, user_agent~)
+  let headers = match token {
+    Some(token) => headers.set("authorization", "Bearer " + token)
+    None => headers
   }
-  let limiter : &@runtime.RateLimiter = match limiter {
+  let limiter : &@client.RateLimiter = match limiter {
     Some(limiter) => limiter
     None => default_limiter(clock, gate?)
   }
@@ -91,23 +99,43 @@ pub fn GitHub::new(
     Some(url) => url
     None => default_graphql_url(base_url)
   }
-  let retry = GitHubRetry::{
-    policy: retry.unwrap_or_else(() => {
-      @runtime.RetryPolicy::conservative().with_max_retries(3)
-    }),
-  }
+  let retry = GitHubRetry::{ policy: retry.unwrap_or_else(default_retry), }
   {
-    client: @runtime.Client::new(
-      transport,
+    client: @client.Client::new(
+      backend,
       clock,
       base_url~,
-      default_headers=default_headers(api_version~, user_agent~),
-      auth~,
-      retry~,
+      headers~,
+      retry=retry.policy,
       limiter~,
-      timeouts?,
+      timer?,
+      timeout_ms?,
+      max_body_bytes?,
+      read_idle_ms?,
+      total_ms?=total_timeout_ms,
     ),
     graphql_url,
+    retry: Some(retry),
+  }
+}
+
+///|
+// GitHub rejects a rate-limited write before applying it. Keep that exception
+// to conservative method safety in the SDK; mttp's generic preset restricts
+// every status to idempotent requests.
+fn default_retry() -> @client.RetryPolicy {
+  let policy = @client.RetryPolicy::conservative().with_max_retries(3)
+  {
+    rule: {
+      ..policy.rule,
+      statuses: policy.rule.statuses.map(rule => {
+        if rule.statuses is [Code(429)] {
+          { ..rule, methods: Any, }
+        } else {
+          rule
+        }
+      }),
+    },
   }
 }
 
@@ -122,10 +150,10 @@ pub fn GitHub::new(
 /// cannot be derived from it here and defaults to GitHub's own. Pass
 /// `graphql_url` for anything else.
 pub fn GitHub::from_client(
-  client : @runtime.Client,
+  client : @client.Client,
   graphql_url~ : String = "https://api.github.com/graphql",
 ) -> GitHub {
-  { client, graphql_url, }
+  { client, graphql_url, retry: None, }
 }
 
 ///|
@@ -134,7 +162,7 @@ fn default_headers(
   api_version~ : String,
   user_agent~ : String,
 ) -> @http.Headers {
-  @http.Headers::from_array([
+  @http.Headers::of([
     ("accept", "application/vnd.github+json"),
     ("x-github-api-version", api_version),
     ("user-agent", user_agent),
@@ -168,12 +196,12 @@ fn default_graphql_url(base_url : String) -> String {
 /// the resource the response names, with GitHub's pacing and the caller's
 /// gate.
 fn default_limiter(
-  clock : &@clock.Clock,
-  gate? : () -> &@sync.Gate,
-) -> @runtime.WindowLimiter {
-  @runtime.WindowLimiter::new(
+  clock : &@rt.Clock,
+  gate? : () -> &@rt.Gate,
+) -> @ratelimit.WindowLimiter {
+  @ratelimit.WindowLimiter::new(
     clock,
-    @runtime.rate_limit_headers(
+    @ratelimit.rate_limit_headers(
       remaining="x-ratelimit-remaining",
       reset_unix_seconds="x-ratelimit-reset",
     ),

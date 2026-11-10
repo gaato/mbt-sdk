@@ -39,7 +39,7 @@ import {
 /// The measured modules (workspace member directories). Generated code
 /// (openai, anthropic, github, codex-protocol) is not measured.
 let modules : Array[String] = [
-  "http", "http-async", "sdk-runtime", "jsonrpc", "jsonrpc-async", "codex-app-server",
+  "jsonrpc", "jsonrpc-async", "codex-app-server",
 ]
 
 ///|

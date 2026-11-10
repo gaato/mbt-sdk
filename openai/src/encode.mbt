@@ -31,7 +31,7 @@ fn is_chat_key(key : String) -> Bool {
 }
 
 ///|
-fn chat_message_json(message : ChatMessage) -> Json raise @runtime.SdkError {
+fn chat_message_json(message : ChatMessage) -> Json raise ValidationError {
   let fields : Map[String, Json] = { "role": message.role }
   if !(message.role == "assistant" &&
     message.tool_calls is Some(_) &&
@@ -44,14 +44,14 @@ fn chat_message_json(message : ChatMessage) -> Json raise @runtime.SdkError {
   match message.role {
     "system" | "user" =>
       if message.tool_calls is Some(_) || message.tool_call_id is Some(_) {
-        raise @runtime.Config(
-          message.role + " chat message cannot contain tool call fields",
+        raise ValidationError(
+          message=message.role + " chat message cannot contain tool call fields",
         )
       }
     "assistant" => {
       if message.tool_call_id is Some(_) {
-        raise @runtime.Config(
-          "assistant chat message cannot contain tool_call_id",
+        raise ValidationError(
+          message="assistant chat message cannot contain tool_call_id",
         )
       }
       if message.tool_calls is Some(calls) {
@@ -70,14 +70,20 @@ fn chat_message_json(message : ChatMessage) -> Json raise @runtime.SdkError {
     }
     "tool" => {
       if message.tool_calls is Some(_) {
-        raise @runtime.Config("tool chat message cannot contain tool_calls")
+        raise ValidationError(
+          message="tool chat message cannot contain tool_calls",
+        )
       }
       match message.tool_call_id {
         Some(tool_call_id) => fields["tool_call_id"] = Json(tool_call_id)
-        None => raise @runtime.Config("tool chat message requires tool_call_id")
+        None =>
+          raise ValidationError(
+            message="tool chat message requires tool_call_id",
+          )
       }
     }
-    role => raise @runtime.Config("unsupported chat message role: " + role)
+    role =>
+      raise ValidationError(message="unsupported chat message role: " + role)
   }
   Json::object(fields)
 }
@@ -111,10 +117,12 @@ fn response_tool(tool : ToolDef) -> @gen.Tool {
 fn chat_parts(
   request : ChatRequest,
   stream : Bool,
-) -> (@gen.CreateChatCompletionRequest, Json) raise @runtime.SdkError {
+) -> (@gen.CreateChatCompletionRequest, Json) raise ValidationError {
   for key, _ in request.extra {
     if is_chat_key(key) {
-      raise @runtime.Config("extra parameter collides with known key: " + key)
+      raise ValidationError(
+        message="extra parameter collides with known key: " + key,
+      )
     }
   }
   let fields : Map[String, Json] = {
@@ -143,23 +151,26 @@ fn chat_parts(
   let raw = Json::object(fields)
   let generated : @gen.CreateChatCompletionRequest = @json.from_json(raw) catch {
     error =>
-      raise @runtime.Config(
-        "chat request does not match the generated schema: " + error.to_string(),
+      raise ValidationError(
+        message="chat request does not match the generated schema: " +
+          error.to_string(),
       )
   }
   let body = generated.to_json()
   guard body is Object(generated_fields) else {
-    raise @runtime.Config("generated chat request must be an object")
+    raise ValidationError(message="generated chat request must be an object")
   }
   // The upstream generated tool-message type omits the optional `name` field.
   // Restore it after generated validation and encoding until the schema gains it.
   guard generated_fields.get("messages") is Some(Array(messages)) else {
-    raise @runtime.Config("generated chat messages must be an array")
+    raise ValidationError(message="generated chat messages must be an array")
   }
   for index, message in request.messages {
     if message.role == "tool" && message.name is Some(name) {
       guard messages.get(index) is Some(Object(fields)) else {
-        raise @runtime.Config("generated chat message must be an object")
+        raise ValidationError(
+          message="generated chat message must be an object",
+        )
       }
       fields["name"] = Json(name)
     }
@@ -174,10 +185,12 @@ fn chat_parts(
 fn response_parts(
   request : ResponseRequest,
   stream : Bool,
-) -> (@gen.CreateResponse, Json) raise @runtime.SdkError {
+) -> (@gen.CreateResponse, Json) raise ValidationError {
   for key, _ in request.extra {
     if is_response_key(key) {
-      raise @runtime.Config("extra parameter collides with known key: " + key)
+      raise ValidationError(
+        message="extra parameter collides with known key: " + key,
+      )
     }
   }
   let input = if request.tool_outputs.is_empty() {
@@ -218,7 +231,9 @@ fn response_parts(
   )
   let body = generated.to_json()
   guard body is Object(fields) else {
-    raise @runtime.Config("generated response request must be an object")
+    raise ValidationError(
+      message="generated response request must be an object",
+    )
   }
   for key, value in request.extra {
     fields[key] = value

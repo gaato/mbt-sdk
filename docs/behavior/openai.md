@@ -1,6 +1,6 @@
 # OpenAI: retry and timeout behaviour
 
-Surveyed 2026-10-19. The method is in [new-sdk.md](../new-sdk.md); the design that consumes this note is [design-m10.md](../design-m10.md).
+Surveyed 2026-10-19. The method is in [new-sdk.md](../new-sdk.md).
 
 Sources:
 
@@ -21,28 +21,17 @@ Sources:
 | Backoff | `min(0.5 s · 2^n, 8 s) · (1 − 0.25 · random())`, so a factor of 0.75–1.0 | [`#L892`–`#L897`](https://github.com/openai/openai-python/blob/6eaa90ee20b40bbe84a5b1a5031d7cf672c7d368/src/openai/_base_client.py#L892-L897); constants at [`_constants.py#L13-L14`](https://github.com/openai/openai-python/blob/6eaa90ee20b40bbe84a5b1a5031d7cf672c7d368/src/openai/_constants.py#L13-L14) |
 | Timeout | 600 s total, 5 s to connect | `DEFAULT_TIMEOUT = httpx2.Timeout(timeout=600, connect=5.0)` ([`_constants.py#L7`](https://github.com/openai/openai-python/blob/6eaa90ee20b40bbe84a5b1a5031d7cf672c7d368/src/openai/_constants.py#L7)) |
 
-## gaato/openai today (mbt-sdk `e6d31aa`)
+## Current implementation
 
-`OpenAI::new(retry? : RetryPolicy)` defaults to `RetryPolicy::default()` (`sdk-runtime/src/retry.mbt:21`):
+The SDK-local default_retry in src/failures.mbt builds mttp RetryRule: two
+retries, methods Any, 408/409/429 and 500-599, sent/unsent failures,
+x-should-retry, MsThenHeader, StopAbove(120000), and 500 ms to 8 s proportional
+backoff (0.75-1.0). The preset is SDK-owned because vendor semantics do not
+belong in the generic mttp client.
 
-- 2 retries.
-- Statuses 408, 409, 500, 502, 503 and 504 (`sdk-runtime/src/error.mbt:89`), plus 429 through `RateLimited`.
-- A non-idempotent request (every `POST`) is retried only on a 429 or on a transport failure that proves nothing was sent.
-- Retry-After over 60 s gives up.
-- Backoff starts at 500 ms, caps at 30 s, with ±20 % jitter.
-- No `x-should-retry`.
-- No timeout: sdk-runtime has none, and the transport's default applies.
-
-## Divergences and what we adopt
-
-| # | Divergence | Label | Adopt |
-|---|---|---|---|
-| 1 | POST is not retried on 5xx, 408 or 409 | B | Retry every method (`stainless` preset) |
-| 2 | Statuses 501 and 505–599 are not retried | B | Retry 500–599 |
-| 3 | `x-should-retry` is ignored | B | Honour it as an override |
-| 4 | A timeout after the request was sent is not retried for POST | B | Retry sent failures for every method |
-| 5 | Retry-After cap: 60 s here vs 120 s | B | `StopAbove(120000)`: stop above 120 s, as the official SDK does |
-| 6 | Backoff cap 30 s with ±20 % jitter vs 8 s with a 0.75–1.0 factor | B | 500 ms → 8 s, `Proportional(750, 1000)` |
-| 7 | No timeout vs 600 s total / 5 s connect | B | 600 s per call through `Timeouts`, when the caller supplies a timer; connect time stays a transport setting (README) |
-
-User-visible consequence: generation requests can now be sent twice after a 5xx or a timeout. The official SDK accepts this too, but a CHANGELOG `Migration:` note must say so.
+The SDK sets a 600 s attempt budget. AsyncBackend enforces SendOptions; a
+caller-supplied Timer adds a total budget over admission, retries, waits and
+stream callbacks. Connection limits belong to Backend configuration; the
+overview shows 5 seconds. POST retries can duplicate generation and billing.
+Expected response/validation failures are Result values. TransportError,
+cancellation and callback exceptions retain their effects.

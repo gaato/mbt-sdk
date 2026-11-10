@@ -1,6 +1,6 @@
 # Anthropic: retry and timeout behaviour
 
-Surveyed 2026-10-19. The method is in [new-sdk.md](../new-sdk.md); the design that consumes this note is [design-m10.md](../design-m10.md).
+Surveyed 2026-10-19. The method is in [new-sdk.md](../new-sdk.md).
 
 Sources:
 
@@ -23,20 +23,17 @@ Sources:
 
 The two Stainless SDKs differ in one place: OpenAI stops when Retry-After exceeds 120 s, while Anthropic has no cap. A shared preset therefore needs a knob for the Retry-After cap.
 
-## gaato/anthropic today (mbt-sdk `e6d31aa`)
+## Current implementation
 
-`gaato/anthropic` uses the same `RetryPolicy::default()` as openai. See [openai.md](openai.md#gaatoopenai-today-mbt-sdk-e6d31aa).
+The SDK-local default_retry in src/failures.mbt builds mttp RetryRule: two
+retries, methods Any, 408/409/429 and 500-599, sent/unsent failures,
+x-should-retry, MsThenHeader, NoCap, and 500 ms to 8 s proportional
+backoff (0.75-1.0). The preset is SDK-owned because vendor semantics do not
+belong in the generic mttp client.
 
-The consequence for Anthropic: **529 (overloaded) is never retried**, because it is not in the 500/502/503/504 list. POST requests (Messages) are not retried on any 5xx.
-
-## Divergences and what we adopt
-
-| # | Divergence | Label | Adopt |
-|---|---|---|---|
-| 1 | POST is not retried on 5xx, 408 or 409 | B | Retry every method (`stainless` preset) |
-| 2 | 529 and the other 5xx statuses outside 500/502/503/504 are not retried | B | Retry 500–599 |
-| 3 | `x-should-retry` is ignored | B | Honour it |
-| 4 | A timeout after the request was sent is not retried for POST | B | Retry sent failures for every method |
-| 5 | Retry-After above 60 s gives up | B | `NoCap`. The CHANGELOG recommends a total timeout, because a long Retry-After is now waited out. |
-| 6 | Backoff | B | 500 ms → 8 s, `Proportional(750, 1000)` |
-| 7 | No timeout | B | 600 s per call through `Timeouts` when the caller supplies a timer; connect time stays a transport setting |
+The SDK sets a 600 s attempt budget. AsyncBackend enforces SendOptions; a
+caller-supplied Timer adds a total budget over admission, retries, waits and
+stream callbacks. Connection limits belong to Backend configuration; the
+overview shows 5 seconds. POST retries can duplicate generation and billing.
+Expected response/validation failures are Result values. TransportError,
+cancellation and callback exceptions retain their effects.

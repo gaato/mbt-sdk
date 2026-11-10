@@ -3,10 +3,8 @@
 An unofficial GitHub API client for [MoonBit](https://www.moonbitlang.com/).
 Every operation of GitHub's REST API is generated, with its types, from the
 first-party OpenAPI description; GraphQL is a passthrough over `Json`. It is
-built on [`gaato/http`](https://mooncakes.io/docs/gaato/http) and
-[`gaato/sdk-runtime`](https://mooncakes.io/docs/gaato/sdk-runtime) and has no
-async runtime of its own: the caller supplies a `Transport` and a `Clock`, for
-example from [`gaato/http-async`](https://mooncakes.io/docs/gaato/http-async).
+built on [`gaato/mttp`](https://github.com/gaato/mttp) and requires a
+caller-supplied `Backend` and `Clock`; the facade has no async runtime.
 
 > **Status**: unofficial and experimental. Minor releases may contain breaking
 > changes; the
@@ -17,20 +15,24 @@ example from [`gaato/http-async`](https://mooncakes.io/docs/gaato/http-async).
 
 ```sh
 moon add gaato/github
+moon add gaato/http
+moon add gaato/mttp
 moon add gaato/http-async
-moon add moonbitlang/async
 ```
 
 ## Usage
 
-Make a transport and a clock with `gaato/http-async`:
+With `gaato/http-async/backend` imported as `@backend` and
+`gaato/http-async/runtime` as `@runtime` and
+`gaato/http-async/codings` as `@codings` (core/async requires an exact
+experimental package opt-in in your moon.pkg):
 
 ```mbt nocheck
 ///|
-let transport = @http_async.AsyncTransport::new(max_body_bytes=64 * 1024 * 1024)
+let backend = @codings.Decompress::new(@backend.AsyncBackend::new())
 
 ///|
-let clock = @http_async.AsyncClock::new()
+let clock = @runtime.AsyncClock::new()
 ```
 
 Then pass them to the client and call an operation:
@@ -39,24 +41,26 @@ Then pass them to the client and call an operation:
 ///|
 /// Reads a repository's star count.
 pub async fn stars(
-  transport : &@http.Transport,
-  clock : &@clock.Clock,
+  backend : &@http.Backend,
+  clock : &@rt.Clock,
   token~ : String,
-) -> Int32 raise @runtime.SdkError {
-  let gh = @github.GitHub::new(transport, clock, token~)
+) -> Result[Int32, @github.GitHubFailure] {
+  let gh = @github.GitHub::new(backend, clock, token~)
   let repo = gh.call(
     @gen.repos_get_request("gaato", "mbt-sdk"),
     @gen.repos_get_decode,
   )
-  repo.stargazers_count
+  match repo {
+    Ok(repo) => Ok(repo.stargazers_count)
+    Err(error) => Err(error)
+  }
 }
 ```
 
-`call` and `send` read the whole body into memory, so give the transport a
-`max_body_bytes` as above; this client cannot set it because the transport is
-yours. 64 MiB is ample for API JSON, and a longer reply fails with
-`@runtime.Transport(Protocol(..))` rather than growing memory. Files are
-another matter: see [Downloads and redirects](#downloads-and-redirects).
+`call` and `send` buffer successful bodies up to 64 MiB by default. Set
+`max_body_bytes` in `GitHub::new` to change this limit. Overflow
+raises `TransportError` with kind `TooLarge`. Close the backend when its
+owner shuts down.
 
 ## Packages
 
@@ -69,7 +73,8 @@ another matter: see [Downloads and redirects](#downloads-and-redirects).
 
 Each REST operation is a sans-IO pair in `gaato/github/gen`:
 `<operation>_request(...)` builds an `@http.Request`, and
-`<operation>_decode(response)` reads the success payload. The generated types
+`<operation>_decode(head, bytes)` returns the success payload or a
+`ResponseFailure` value. The generated types
 are the public vocabulary; the client only sends, follows and reads.
 
 `call` sends a request and decodes the reply. `send` returns the response, for
@@ -79,13 +84,19 @@ representation, such as a diff:
 ```mbt check
 ///|
 /// Reads the diff between two refs.
-pub async fn compare_diff(gh : @github.GitHub, range : String) -> String {
+pub async fn compare_diff(
+  gh : @github.GitHub,
+  range : String,
+) -> Result[String, @github.GitHubFailure] {
   let response = gh.send(
     @gen.repos_compare_commits_request("gaato", "mbt-sdk", range).header(
       "accept", "application/vnd.github.diff",
     ),
   )
-  response.text()
+  match response {
+    Ok(response) => Ok(@utf8.decode_lossy(response.body))
+    Err(error) => Err(error)
+  }
 }
 ```
 
@@ -111,24 +122,17 @@ short-lived `location`:
   `accept: application/octet-stream` and `code_scanning_get_codeql_database`
   with `accept: application/zip`
 
-The native and Wasm transports do not follow redirects, so `send` raises that
-`302` as `@runtime.Status`. Read `location` from its headers and fetch it with
-`transport.send_stream`, without the token, writing chunks out as they arrive.
-`@http.follow_redirects_stream(request, r => transport.send_stream(r))` does
-both for a request carrying the full URL and the token: it drops
-`Authorization` when the `location` is on another host and closes the `302`
-unread.
-
-On JS, fetch follows the redirect and the file arrives as a buffered body.
-So do raw content (`repos_get_content` with
-`accept: application/vnd.github.raw`, up to 100 MB) and large diffs on every
-target. Send those through a second `GitHub` client whose transport has a
-limit sized for the largest file you accept.
+The default backend does not follow redirects. A `302` returns an HTTP failure
+value; its head retains `location`. For large downloads, use
+an mttp Client with `as_stream` and the `FollowRedirects` backend wrapper.
+It strips sensitive headers on cross-origin redirects and closes intermediate
+bodies. Host fetch redirect behavior has platform constraints documented by
+`gaato/http-async`; select the redirect policy before supplying credentials.
 
 ## Pagination
 
 GitHub paginates with `Link` headers, so `paginator` follows the
-`rel="next"` URL the server wrote. It is an `@runtime.Paginator`, with `each`,
+`rel="next"` URL the server wrote. It is an `@client.Paginator`, with `each`,
 `next_page` and `collect`:
 
 ```mbt check
@@ -137,7 +141,7 @@ GitHub paginates with `Link` headers, so `paginator` follows the
 pub async fn user_repos(
   gh : @github.GitHub,
   user : String,
-) -> Array[@gen.MinimalRepository] raise @runtime.SdkError {
+) -> Result[Array[@gen.MinimalRepository], @github.GitHubFailure] {
   let repos = gh.paginator(
     @gen.repos_list_for_user_request(user, per_page=100),
     @gen.repos_list_for_user_decode,
@@ -154,7 +158,9 @@ GraphQL is not generated: the shape of a reply follows the query you write.
 ```mbt check
 ///|
 /// Reads a repository's star count through GraphQL.
-pub async fn stars_graphql(gh : @github.GitHub) -> Json raise @runtime.SdkError {
+pub async fn stars_graphql(
+  gh : @github.GitHub,
+) -> Result[Json, @github.GitHubFailure] {
   gh.graphql(
     query="query($owner: String!, $name: String!) { repository(owner: $owner, name: $name) { stargazerCount } }",
     variables={ "owner": "gaato", "name": "mbt-sdk" },
@@ -162,12 +168,11 @@ pub async fn stars_graphql(gh : @github.GitHub) -> Json raise @runtime.SdkError 
 }
 ```
 
-A GraphQL failure does not use the HTTP status: the reply is `200` with an
-`errors` array beside a possibly partial `data`. `graphql` raises whenever
-that array is non-empty (`@runtime.Decode`, or `@runtime.RateLimited` for a
-rate limit), and `graphql_errors` reads it back, including `type_`, which
-names the condition (`NOT_FOUND`, `FORBIDDEN`, `RATE_LIMITED`). Use
-`graphql_response` when the partial `data` of such a reply is worth keeping.
+A GraphQL reply may contain HTTP 200 with an `errors` array and partial
+`data`. `graphql` returns a `GraphqlFailure` value for a non-empty array, retaining
+the actual response head and body. `graphql_errors` reads the typed error
+entries back. `graphql_response` returns partial data for errors that are
+not retryable; exhausted rate limits and transient query failures return errors.
 
 `graphql_paginator` walks a connection by passing `pageInfo.endCursor` back
 through a query variable: `after`, unless `cursor_variable` says otherwise.
@@ -177,7 +182,7 @@ through a query variable: `after`, unless `cursor_variable` says otherwise.
 Search and GraphQL are metered separately from the rest of the API, so
 requests to `/search/*` and to `/graphql` use their own buckets. Writes (any
 method but `GET` and `HEAD`) use `core:write`, or `core:notifications` for
-the paths that send notifications. The default `@runtime.WindowLimiter` paces
+the paths that send notifications. The default `@ratelimit.WindowLimiter` paces
 each bucket against `x-ratelimit-remaining` and `x-ratelimit-reset`, keyed by
 `x-ratelimit-resource`, so a write still spends the `core` window.
 
@@ -193,19 +198,24 @@ runtime to do that, so pass a gate, such as `SemaphoreGate` from
 
 ```mbt nocheck
 ///|
-let gh = @github.GitHub::new(transport, clock, token~, gate=() => {
-  @http_async.SemaphoreGate::new()
+let gh = @github.GitHub::new(backend, clock, token~, gate=() => {
+  @runtime.SemaphoreGate::new()
 })
 ```
 
 The gate serialises each group: writes and GraphQL, searches, and reads.
-`timeouts` takes a `@runtime.Timeouts` for per-attempt and per-call limits.
-Pass `limiter=@runtime.NoLimiter::new()` to opt out of the limiter, the pacing
+`timeout_ms` limits each attempt, and `total_timeout_ms` bounds the
+whole call, including admission and stream processing. A total deadline
+requires `timer`; necessary cleanup may continue after expiry.
+Pass `limiter=@client.NoLimiter::new()` to opt out of the limiter, the pacing
 and the gate.
 
 ## Errors and retries
 
-Failures are `@runtime.SdkError`.
+Calls return `Result` with `GitHubFailure`: `Http(ResponseFailure)` for HTTP
+and REST decoding failures, `GraphqlFailure` for GraphQL envelopes, and
+`Validation` for invalid SDK inputs. Transport failures raise `TransportError`;
+unknown decoder exceptions and cancellation retain their identity.
 
 - `api_error` reads GitHub's error body (`message`, `documentation_url`,
   `status`, `errors`) out of one.
@@ -215,7 +225,8 @@ Failures are `@runtime.SdkError`.
   `retry-after` or a message naming it.
 
 Clients created with `GitHub::new` retry through `GitHubRetry` around the
-`retry` policy, by default `@runtime.RetryPolicy::conservative().with_max_retries(3)`:
+`retry` policy, by default an SDK-local conservative rule with three retries
+and 429 permitted for every method:
 
 - Three retries, as octokit. A `5xx`, `408`, `409` or a timeout after sending
   is retried only for an idempotent request: a `POST` is not resent, because
@@ -223,26 +234,25 @@ Clients created with `GitHub::new` retry through `GitHubRetry` around the
   created.
 - A secondary limit is retried for any method, after `retry-after`, or else
   after 60 s, 120 s and 240 s, as GitHub's documentation asks. The policy's
-  Retry-After cap does not apply; its retry count and a `total_ms` in
-  `timeouts` do.
+  Retry-After cap does not apply; its retry count and `total_timeout_ms` do.
 - A primary limit (`x-ratelimit-remaining: 0`, or GraphQL `RATE_LIMITED`) is
   retried once, one second after `x-ratelimit-reset`. That can be up to an
-  hour away, so set a `total_ms` to bound it.
+  hour away, so set `total_timeout_ms` to bound it.
 
 A GraphQL rate limit, a secondary limit reported in a `200`, and "Something
 went wrong while executing your query" are retried like an error status. A
 document holding a mutation is not retried on "Something went wrong", since
-the mutation may have been applied. A rate limit that persists is raised as
-`@runtime.RateLimited`, with the reply's body for `graphql_errors`.
+the mutation may have been applied. A rate limit that persists is returned as
+`GraphqlFailure`, with the reply's body for `graphql_errors`.
 
 ## GitHub Enterprise Server
 
 Point `base_url` at the REST mount:
-`@github.GitHub::new(transport, clock, token~, base_url="https://ghe.example.com/api/v3")`.
+`@github.GitHub::new(backend, clock, token~, base_url="https://ghe.example.com/api/v3")`.
 Enterprise Server serves GraphQL from `/api/graphql`, outside that mount, so
 the GraphQL endpoint is derived from `base_url` rather than appended to it;
 pass `graphql_url` for a deployment that spells it differently. `from_client`
-takes a preconfigured `@runtime.Client` for anything further from the default
+takes a preconfigured `@client.Client` for anything further from the default
 deployment, and takes `graphql_url` too.
 
 ## Links

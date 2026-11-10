@@ -1,6 +1,6 @@
 # Adding an SDK: matching the official behaviour
 
-An SDK built here should behave the way users of the API expect: it retries what the vendor's own SDK retries, waits as long as the server asks, and paces itself the way the server's documentation says. This checklist is how to find that out for a new API before choosing a runtime preset. The reasoning behind it is in [design-m10.md](design-m10.md).
+An SDK built here should behave the way users of the API expect: it retries what the vendor's own SDK retries, waits as long as the server asks, and paces itself the way the server's documentation says. This checklist is how to find that out for a new API before choosing a runtime preset.
 
 It deliberately records no current values. Constants, versions and status lists change upstream; they belong in the per-SDK note (`docs/behavior/<sdk>.md`), pinned to a commit and dated.
 
@@ -55,11 +55,11 @@ Trap: a community library's heuristic (for example "a 429 without a JSON body is
 
 ## 5. Choose the runtime configuration
 
-- Start from the sdk-runtime preset closest to B: the Stainless-style preset for Stainless SDKs (set its Retry-After cap to match the vendor), the conservative default when there is no B.
+- Build an SDK-local mttp RetryRule from B; use mttp's conservative policy when there is no B. Vendor-specific presets stay with the SDK so they cannot silently affect unrelated APIs.
 - Adjust the `RetryRule` fields rather than writing code: statuses and the methods each applies to, whether sent failures are retried, the override header, the Retry-After source and cap, the backoff.
-- Write a `RetryDecider` only for what a rule cannot express: delays read from a body, special limit types detected from messages, waits that must exceed the general cap.
+- Supply a typed `decide_retry` callback only for what a rule cannot express: delays read from a body, special limit types detected from messages, waits that must exceed the general cap.
 - Rate limits: configure `WindowLimiter` with the API's headers (`rate_limit_headers`), and use `pace`, `server_key` and `scope` for spacing, server-assigned bucket ids and limit scopes. Do not hard-code limits the server reports in headers.
-- Timeouts: expose the vendor's default per-call timeout through `Timeouts`, and document the connect timeout as a transport setting.
+- Timeouts: expose the vendor's default per-call timeout through client `timeout_ms`/`total_ms` and Timer, and document the connect timeout as a transport setting.
 - Where B is unsafe for us (for example it resends writes that have no idempotency key), keep the safer behaviour, and record the decision and the reason in the note.
 
 ## 6. Record it

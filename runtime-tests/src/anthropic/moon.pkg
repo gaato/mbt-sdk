@@ -1,13 +1,15 @@
 import {
   "gaato/http",
-  "gaato/http/mock",
-  "gaato/http/sync",
-  "gaato/sdk-runtime" @runtime,
+  "gaato/mbt-sdk-runtime-tests/sdk_mock" @mock,
+  "gaato/http/rt" @sync,
+  "gaato/mttp/client" @runtime,
   "gaato/anthropic" @anthropic_sdk,
   "gaato/anthropic/gen" @anthropic_gen,
-  "moonbitlang/async",
+  "gaato/http/driver",
   "moonbitlang/core/encoding/utf8",
   "moonbitlang/core/json",
 } for "test"
 
-supported_targets = "js + native"
+options(
+  "allow-experimental-packages": [ "gaato/http/driver" ],
+)

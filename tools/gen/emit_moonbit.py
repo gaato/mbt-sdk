@@ -755,9 +755,9 @@ def _operation(operation: Operation) -> str:
     if constructor:
         expression = f"@http.Request::{constructor}({path_expression})"
     else:
-        expression = f"@http.Request::new({_moon_string(operation.method)}, {path_expression})"
+        expression = f"@http.Request::new(@http.Method::parse({_moon_string(operation.method)}), {path_expression})"
     if operation.request_type is not None:
-        expression += f".json_body({_to_json(operation.request_type, 'body')})"
+        expression += f".body_json({_to_json(operation.request_type, 'body')})"
     header_parameters = [parameter for parameter in operation.parameters if parameter.location == "header"]
     if header_parameters or operation.multipart_fields:
         binding = "let mut" if header_parameters else "let"
@@ -842,7 +842,7 @@ def _operation(operation: Operation) -> str:
                     else:
                         assert field.type is not None
                         lines.append(f"  if {value} is Some(value) {{ parts.push(@multipart.Part::json({name}, {_to_json(field.type, 'value')})) }}")
-            lines.append("  @multipart.apply(request, parts, boundary)")
+            lines.append("  @multipart.body(request, parts, boundary~)")
         else:
             lines.append("  request")
         lines.append("}")
@@ -861,7 +861,7 @@ def _operation(operation: Operation) -> str:
             ]
         )
         lines.extend(_doc(f"Decodes a successful {operation.operation_id} response.", ""))
-        lines.extend([f"pub fn {decode_name}(", "  response : @http.Response,", f") -> {operation.response_type.moon_type()} raise @runtime.SdkError {{", "  decode_response(response)", "}"])
+        lines.extend([f"pub fn {decode_name}(", "  head : @http.ResponseHead,", "  body : Bytes,", f") -> Result[{operation.response_type.moon_type()}, @client.ResponseFailure] {{", "  decode_response(head, body)", "}"])
     return "\n".join(lines)
 
 
@@ -888,11 +888,12 @@ fn parse_json_body(body : Bytes) -> Json raise {
 
 ///|
 fn[T : @json.FromJson] decode_response(
-  response : @http.Response,
-) -> T raise @runtime.SdkError {
-  @json.from_json(parse_json_body(response.body)) catch {
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[T, @client.ResponseFailure] {
+  Ok(@json.from_json(parse_json_body(body))) catch {
     error =>
-      raise @runtime.Decode(message=error.to_string(), body=response.body)
+      Err(@client.Deserialization(head, message=error.to_string(), body=body[:body.length().min(@client.max_error_body)].to_owned()))
   }
 }'''
 
@@ -1005,12 +1006,12 @@ fn json_array_matches(
     # Import only what the emitted code references: `--deny-warn` rejects unused packages.
     body = types + operations
     imports = ['  "gaato/http",'] if "@http." in body else []
-    if "@runtime." in body:
-        imports.append('  "gaato/sdk-runtime" @runtime,')
+    if "@client." in body:
+        imports.append('  "gaato/mttp/client",')
     if "@sdkjson." in body:
-        imports.append('  "gaato/sdk-runtime/json" @sdkjson,')
+        imports.append('  "gaato/mttp/jsonkit" @sdkjson,')
     if "@multipart." in body:
-        imports.append('  "gaato/http/multipart" @multipart,')
+        imports.append('  "gaato/mttp/multipart",')
     if "@debug." in body:
         imports.append('  "moonbitlang/core/debug",')
     if "@utf8." in body:

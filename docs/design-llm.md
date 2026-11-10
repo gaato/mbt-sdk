@@ -1,3 +1,7 @@
+> Historical design/release record. API sketches describe the implementation
+> at that time. See [the stack migration](stack-migration.md) and
+> [current architecture](../ARCHITECTURE.md) for the current interfaces.
+
 # 設計メモ — `gaato/llm`(下書き。まだ作らない)
 
 ## 位置づけ

@@ -2,8 +2,8 @@
 fn json_response(
   body : String,
   status~ : Int32 = 200,
-  headers~ : @http.Headers = @http.Headers::new(),
-) -> @http.Response {
+  headers~ : @http.Headers = @http.Headers::empty(),
+) -> @mock.Buffered {
   { status, headers, body: @utf8.encode(body), }
 }
 
@@ -13,14 +13,14 @@ fn sent_json(request : @http.Request) -> Json raise {
 }
 
 ///|
-async fn bounded(f : async () -> Unit) -> Unit {
-  @async.with_timeout(5000, f)
+fn bounded(f : async () -> Unit) -> Unit raise {
+  @driver.run_sync(f)
 }
 
 ///|
-async test "Anthropic sends the generated request and decodes a compatible response" {
+test "Anthropic sends the generated request and decodes a compatible response" {
   bounded(() => {
-    let transport = @mock.FakeTransport::new()
+    let transport = @mock.FakeBackend::new()
     transport.expect(
       "POST",
       "/v1/messages",
@@ -35,15 +35,17 @@ async test "Anthropic sends the generated request and decodes a compatible respo
       clock,
       version="2024-01-01",
     )
-    let response = client.create_message(
-      @anthropic_sdk.MessageRequest::new(
-        model="claude-opus-5",
-        max_tokens=64,
-        messages=[@anthropic_sdk.Message::user("Hello")],
-        system="Be brief",
-        stop_sequences=["END"],
-        metadata=@anthropic_gen.Metadata::new(user_id="u1"),
-        extra={ "service_tier": "auto" },
+    let response = expect(
+      client.create_message(
+        @anthropic_sdk.MessageRequest::new(
+          model="claude-opus-5",
+          max_tokens=64,
+          messages=[@anthropic_sdk.Message::user("Hello")],
+          system="Be brief",
+          stop_sequences=["END"],
+          metadata=@anthropic_gen.Metadata::new(user_id="u1"),
+          extra={ "temperature": 0.2, "top_p": 0.9 },
+        ),
       ),
     )
     assert_eq(response.role, @anthropic_sdk.Assistant)
@@ -57,7 +59,7 @@ async test "Anthropic sends the generated request and decodes a compatible respo
     assert_eq(response.stop_reason, Some(@anthropic_sdk.StopReason::EndTurn))
     let sent = transport.sent()
     assert_eq(sent.length(), 1)
-    assert_eq(sent[0].http_method, "POST")
+    assert_eq(sent[0].meth.to_string(), "POST")
     assert_eq(sent[0].url, "https://api.anthropic.com/v1/messages")
     assert_eq(sent[0].headers.get("x-api-key"), Some("test-key"))
     assert_eq(sent[0].headers.get("authorization"), None)
@@ -68,9 +70,10 @@ async test "Anthropic sends the generated request and decodes a compatible respo
       "max_tokens": 64,
       "messages": [{ "role": "user", "content": "Hello" }],
       "system": "Be brief",
+      "temperature": 0.2,
       "stop_sequences": ["END"],
       "metadata": { "user_id": "u1" },
-      "service_tier": "auto",
+      "top_p": 0.9,
     })
     assert_eq(clock.slept(), [])
     transport.assert_complete()
@@ -78,9 +81,9 @@ async test "Anthropic sends the generated request and decodes a compatible respo
 }
 
 ///|
-async test "Anthropic tool use round trip and stream accumulator use FakeTransport" {
+test "Anthropic tool use round trip and stream accumulator use FakeTransport" {
   bounded(() => {
-    let transport = @mock.FakeTransport::new()
+    let transport = @mock.FakeBackend::new()
     transport.expect(
       "POST",
       "/v1/messages",
@@ -107,7 +110,7 @@ async test "Anthropic tool use round trip and stream accumulator use FakeTranspo
     transport.expect_stream(
       "POST",
       "/v1/messages",
-      { status: 200, headers: @http.Headers::new(), },
+      { status: 200, headers: @http.Headers::empty(), },
       split_chunks(sse, [2, 31, 117, 233]),
     )
     let client = @anthropic_sdk.Anthropic::from_client(
@@ -121,24 +124,26 @@ async test "Anthropic tool use round trip and stream accumulator use FakeTranspo
       "type": "object",
       "properties": { "city": { "type": "string" } },
     }
-    let response = client.create_message(
-      @anthropic_sdk.MessageRequest::new(
-        model="claude",
-        max_tokens=64,
-        messages=[
-          @anthropic_sdk.Message::tool_result(
-            tool_use_id="toolu_previous",
-            content="sunny",
-          ),
-        ],
-        tools=[
-          @anthropic_sdk.ToolDef::new(
-            name="get_weather",
-            description="Get weather",
-            input_schema=schema,
-          ),
-        ],
-        tool_choice=@anthropic_sdk.tool_choice_auto(),
+    let response = expect(
+      client.create_message(
+        @anthropic_sdk.MessageRequest::new(
+          model="claude",
+          max_tokens=64,
+          messages=[
+            @anthropic_sdk.Message::tool_result(
+              tool_use_id="toolu_previous",
+              content="sunny",
+            ),
+          ],
+          tools=[
+            @anthropic_sdk.ToolDef::new(
+              name="get_weather",
+              description="Get weather",
+              input_schema=schema,
+            ),
+          ],
+          tool_choice=@anthropic_sdk.tool_choice_auto(),
+        ),
       ),
     )
     assert_eq(response.stop_reason, Some(@anthropic_sdk.StopReason::ToolUse))
@@ -159,11 +164,13 @@ async test "Anthropic tool use round trip and stream accumulator use FakeTranspo
     }
     assert_eq(block.id, "toolu_1")
     let accumulator = @anthropic_sdk.ToolUseAccumulator::new()
-    client.stream_message(
-      @anthropic_sdk.MessageRequest::new(model="claude", max_tokens=64, messages=[
-        @anthropic_sdk.Message::user("weather"),
-      ]),
-      event => accumulator.feed(event),
+    expect(
+      client.stream_message(
+        @anthropic_sdk.MessageRequest::new(model="claude", max_tokens=64, messages=[
+          @anthropic_sdk.Message::user("weather"),
+        ]),
+        event => accumulator.feed(event),
+      ),
     )
     assert_eq(accumulator.finish(), [
       ("toolu_2", "get_weather", { "city": "Tokyo" }),
@@ -218,6 +225,7 @@ impl @runtime.RateLimiter for RecordingLimiter with fn acquire(
 ) {
   ignore(global_exempt)
   self.acquired.push(bucket)
+  @runtime.Admission::new(bucket, sequence=self.acquired.length().to_int64())
 }
 
 ///|
@@ -229,13 +237,13 @@ impl @runtime.RateLimiter for RecordingLimiter with fn release(
 ) {
   ignore(status)
   ignore(headers)
-  self.observed.push(bucket)
+  self.observed.push(bucket.bucket())
 }
 
 ///|
-async test "from_client uses Bearer configuration, version, and per-operation buckets" {
+test "from_client uses Bearer configuration, version, and per-operation buckets" {
   bounded(() => {
-    let transport = @mock.FakeTransport::new()
+    let transport = @mock.FakeBackend::new()
     transport.expect(
       "POST",
       "/v1/messages",
@@ -262,7 +270,7 @@ async test "from_client uses Bearer configuration, version, and per-operation bu
       transport,
       @mock.FakeClock::new(),
       base_url="https://openrouter.ai/api",
-      auth=@runtime.Bearer("router-key"),
+      headers=@http.Headers::of([("authorization", "Bearer router-key")]),
       limiter~,
     )
     let client = @anthropic_sdk.Anthropic::from_client(
@@ -270,18 +278,22 @@ async test "from_client uses Bearer configuration, version, and per-operation bu
       version="2023-06-01",
     )
     ignore(
-      client.create_message(
-        @anthropic_sdk.MessageRequest::new(model="model", max_tokens=1, messages=[]),
+      expect(
+        client.create_message(
+          @anthropic_sdk.MessageRequest::new(model="model", max_tokens=1, messages=[]),
+        ),
       ),
     )
-    let models = client.list_models(limit=2, lifecycle=[Active, Retired])
+    let models = expect(
+      client.list_models(limit=2, lifecycle=[Active, Retired]),
+    )
     assert_eq(models.data.map(model => model.id), [
       "claude-opus-5", "claude-haiku-4-5",
     ])
     assert_eq(models.has_more, true)
     assert_eq(models.last_id, Some("claude-haiku-4-5"))
     assert_eq(models.data[1].max_tokens, Some(64000))
-    let model = client.retrieve_model("claude-haiku-4-5")
+    let model = expect(client.retrieve_model("claude-haiku-4-5"))
     assert_eq(model.display_name, "Claude Haiku 4.5")
     let sent = transport.sent()
     assert_eq(sent[0].url, "https://openrouter.ai/api/v1/messages")
@@ -304,9 +316,9 @@ async test "from_client uses Bearer configuration, version, and per-operation bu
 }
 
 ///|
-async test "HTTP errors expose API bodies and 429 retries before success" {
+test "HTTP errors expose API bodies and 429 retries before success" {
   bounded(() => {
-    let failures = @mock.FakeTransport::new()
+    let failures = @mock.FakeBackend::new()
     let error_body = "{\"type\":\"error\",\"error\":{\"type\":\"authentication_error\",\"message\":\"bad key\"},\"request_id\":\"req_1\"}"
     failures.expect(
       "POST",
@@ -320,13 +332,15 @@ async test "HTTP errors expose API bodies and 429 retries before success" {
       retry=@runtime.RetryPolicy::none(),
     )
     try
-      no_retry.create_message(
-        @anthropic_sdk.MessageRequest::new(model="m", max_tokens=1, messages=[]),
+      expect(
+        no_retry.create_message(
+          @anthropic_sdk.MessageRequest::new(model="m", max_tokens=1, messages=[]),
+        ),
       )
     catch {
       error =>
         assert_eq(
-          @anthropic_sdk.api_error(error),
+          api_error(error),
           Some({ type_: "authentication_error", message: "bad key", }),
         )
     } noraise {
@@ -334,14 +348,14 @@ async test "HTTP errors expose API bodies and 429 retries before success" {
     }
     failures.assert_complete()
 
-    let retrying = @mock.FakeTransport::new()
+    let retrying = @mock.FakeBackend::new()
     retrying.expect(
       "POST",
       "/v1/messages",
       json_response(
         "{\"type\":\"error\",\"error\":{\"type\":\"rate_limit_error\",\"message\":\"slow down\"}}",
         status=429,
-        headers=@http.Headers::from_array([("retry-after", "0.25")]),
+        headers=@http.Headers::of([("retry-after", "0.25")]),
       ),
     )
     retrying.expect(
@@ -354,8 +368,10 @@ async test "HTTP errors expose API bodies and 429 retries before success" {
     let clock = @mock.FakeClock::new()
     let client = @anthropic_sdk.Anthropic::new(api_key="key", retrying, clock)
     ignore(
-      client.create_message(
-        @anthropic_sdk.MessageRequest::new(model="model", max_tokens=1, messages=[]),
+      expect(
+        client.create_message(
+          @anthropic_sdk.MessageRequest::new(model="model", max_tokens=1, messages=[]),
+        ),
       ),
     )
     assert_eq(clock.slept(), [250])
@@ -380,7 +396,7 @@ fn split_chunks(text : String, ends : Array[Int32]) -> Array[Bytes] {
 }
 
 ///|
-async test "stream decodes every event across chunks and reads past message_stop" {
+test "stream decodes every event across chunks and reads past message_stop" {
   bounded(() => {
     let start = "{\"type\":\"message_start\",\"message\":{\"id\":\"m\",\"model\":\"model\",\"role\":\"assistant\",\"content\":[],\"stop_reason\":null,\"usage\":{\"input_tokens\":2,\"output_tokens\":0}}}"
     let block_start = "{\"type\":\"content_block_start\",\"index\":0,\"content_block\":{\"type\":\"text\",\"text\":\"\"}}"
@@ -415,11 +431,11 @@ async test "stream decodes every event across chunks and reads past message_stop
       "\n\ndata: {\"type\":\"message_stop\"}\n\ndata: {\"type\":\"ping\"}\n\n" +
       // OpenAI-compatible gateways (OpenRouter) append this sentinel; Anthropic itself does not.
       "data: [DONE]\n\n"
-    let transport = @mock.FakeTransport::new()
+    let transport = @mock.FakeBackend::new()
     transport.expect_stream(
       "POST",
       "/v1/messages",
-      { status: 200, headers: @http.Headers::new(), },
+      { status: 200, headers: @http.Headers::empty(), },
       split_chunks(sse, [1, 8, 33, 101, 227]),
     )
     let client = @anthropic_sdk.Anthropic::new(
@@ -429,11 +445,13 @@ async test "stream decodes every event across chunks and reads past message_stop
       auth_header=@anthropic_sdk.Bearer,
     )
     let events : Array[@anthropic_sdk.MessageEvent] = []
-    client.stream_message(
-      @anthropic_sdk.MessageRequest::new(model="model", max_tokens=64, messages=[
-        @anthropic_sdk.Message::user("hello"),
-      ]),
-      event => events.push(event),
+    expect(
+      client.stream_message(
+        @anthropic_sdk.MessageRequest::new(model="model", max_tokens=64, messages=[
+          @anthropic_sdk.Message::user("hello"),
+        ]),
+        event => events.push(event),
+      ),
     )
     assert_eq(events.length(), 12)
     guard events[0] is @anthropic_sdk.MessageStart(started) else {
@@ -489,13 +507,13 @@ priv suberror CallbackFailure {
 }
 
 ///|
-async test "stream closes on callback and decode errors" {
+test "stream closes on callback and decode errors" {
   bounded(() => {
-    let callback_transport = @mock.FakeTransport::new()
+    let callback_transport = @mock.FakeBackend::new()
     callback_transport.expect_stream(
       "POST",
       "/v1/messages",
-      { status: 200, headers: @http.Headers::new(), },
+      { status: 200, headers: @http.Headers::empty(), },
       [b"data: {\"type\":\"ping\"}\n\n"],
     )
     let callback_client = @anthropic_sdk.Anthropic::new(
@@ -504,9 +522,11 @@ async test "stream closes on callback and decode errors" {
       @mock.FakeClock::new(),
     )
     try
-      callback_client.stream_message(
-        @anthropic_sdk.MessageRequest::new(model="m", max_tokens=1, messages=[]),
-        _ => raise CallbackFailure,
+      expect(
+        callback_client.stream_message(
+          @anthropic_sdk.MessageRequest::new(model="m", max_tokens=1, messages=[]),
+          _ => raise CallbackFailure,
+        ),
       )
     catch {
       CallbackFailure => ()
@@ -517,11 +537,11 @@ async test "stream closes on callback and decode errors" {
     assert_eq(callback_transport.streams_closed(), 1)
     callback_transport.assert_complete()
 
-    let decode_transport = @mock.FakeTransport::new()
+    let decode_transport = @mock.FakeBackend::new()
     decode_transport.expect_stream(
       "POST",
       "/v1/messages",
-      { status: 200, headers: @http.Headers::new(), },
+      { status: 200, headers: @http.Headers::empty(), },
       [b"data: {\n\n"],
     )
     let decode_client = @anthropic_sdk.Anthropic::new(
@@ -530,12 +550,14 @@ async test "stream closes on callback and decode errors" {
       @mock.FakeClock::new(),
     )
     try
-      decode_client.stream_message(
-        @anthropic_sdk.MessageRequest::new(model="m", max_tokens=1, messages=[]),
-        _ => (),
+      expect(
+        decode_client.stream_message(
+          @anthropic_sdk.MessageRequest::new(model="m", max_tokens=1, messages=[]),
+          _ => (),
+        ),
       )
     catch {
-      @runtime.Decode(body=b"{", ..) => ()
+      TestResponseFailure(@runtime.Deserialization(_, body=b"{", ..)) => ()
       _ => fail("invalid event data must become Decode")
     } noraise {
       _ => fail("invalid event data must fail")
@@ -546,9 +568,9 @@ async test "stream closes on callback and decode errors" {
 }
 
 ///|
-async test "missing fields decode and extra collisions send nothing" {
+test "missing fields decode and extra collisions send nothing" {
   bounded(() => {
-    let missing = @mock.FakeTransport::new()
+    let missing = @mock.FakeBackend::new()
     missing.expect(
       "POST",
       "/v1/messages",
@@ -562,47 +584,53 @@ async test "missing fields decode and extra collisions send nothing" {
       @mock.FakeClock::new(),
     )
     try
-      client.create_message(
-        @anthropic_sdk.MessageRequest::new(model="m", max_tokens=1, messages=[]),
+      expect(
+        client.create_message(
+          @anthropic_sdk.MessageRequest::new(model="m", max_tokens=1, messages=[]),
+        ),
       )
     catch {
-      @runtime.Decode(body~, ..) => assert_true(body.length() > 0)
+      TestResponseFailure(@runtime.Deserialization(_, body~, ..)) =>
+        assert_true(body.length() > 0)
       _ => fail("missing id must become Decode")
     } noraise {
       _ => fail("missing id must fail")
     }
     missing.assert_complete()
 
-    let collision_transport = @mock.FakeTransport::new()
+    let collision_transport = @mock.FakeBackend::new()
     let collision_client = @anthropic_sdk.Anthropic::new(
       api_key="key",
       collision_transport,
       @mock.FakeClock::new(),
     )
     try
-      collision_client.create_message(
-        @anthropic_sdk.MessageRequest::new(
-          model="m",
-          max_tokens=1,
-          messages=[],
-          extra={ "stream": false },
+      expect(
+        collision_client.create_message(
+          @anthropic_sdk.MessageRequest::new(
+            model="m",
+            max_tokens=1,
+            messages=[],
+            extra={ "stream": false },
+          ),
         ),
       )
     catch {
-      @runtime.Config(message) => assert_true(message.contains("stream"))
+      @runtime.InvalidRequest(message~) =>
+        assert_true(message.contains("stream"))
       _ => fail("collision must become Config")
     } noraise {
       _ => fail("collision must fail")
     }
-    assert_eq(collision_transport.sent(), [])
+    assert_eq(collision_transport.sent().length(), 0)
     collision_transport.assert_complete()
   })
 }
 
 ///|
-async test "count_tokens and the generated passthrough share the transport" {
+test "count_tokens and the generated passthrough share the transport" {
   bounded(() => {
-    let transport = @mock.FakeTransport::new()
+    let transport = @mock.FakeBackend::new()
     transport.expect(
       "POST",
       "/v1/messages/count_tokens",
@@ -618,7 +646,7 @@ async test "count_tokens and the generated passthrough share the transport" {
     transport.expect_stream(
       "POST",
       "/v1/messages",
-      { status: 200, headers: @http.Headers::new(), },
+      { status: 200, headers: @http.Headers::empty(), },
       [
         b"data: {\"type\":\"ping\"}\n\ndata: {\"type\":\"content_block_delta\",\"index\":0,\"delta\":{\"type\":\"text_delta\",\"text\":\"Hi\"}}\n\ndata: {\"type\":\"message_stop\"}\n\n",
       ],
@@ -637,7 +665,7 @@ async test "count_tokens and the generated passthrough share the transport" {
         @anthropic_gen.ThinkingConfigAdaptive::new(type_="adaptive"),
       ),
     )
-    assert_eq(client.count_tokens(request), 21)
+    assert_eq(expect(client.count_tokens(request)), 21)
     let params = @anthropic_gen.CreateMessageParams::new(
       model="claude-opus-5",
       max_tokens=8,
@@ -652,11 +680,11 @@ async test "count_tokens and the generated passthrough share the transport" {
       service_tier=@anthropic_gen.CreateMessageParamsServiceTier::StandardOnly,
       stream=true,
     )
-    let message = client.create_message_params(params)
+    let message = expect(client.create_message_params(params))
     assert_eq(message.id, "m")
     assert_eq(message.stop_reason, Some(@anthropic_gen.StopReason::EndTurn))
     let events : Array[@anthropic_gen.MessageStreamEvent] = []
-    client.stream_message_params(params, event => events.push(event))
+    expect(client.stream_message_params(params, event => events.push(event)))
     assert_eq(events.length(), 3)
     assert_true(
       events[0] is @anthropic_gen.MessageStreamEvent::Unknown("ping", _),

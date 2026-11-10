@@ -2,14 +2,24 @@
 // through a loopback server; runs offline, in the gates.
 import {
   "gaato/http",
-  "gaato/http/cookie",
-  "gaato/http/mock",
-  "gaato/http/sse",
-  "gaato/http-async" @adapter,
-  "moonbitlang/async",
-  "moonbitlang/async/socket",
+  "gaato/mttp/cookie",
+  "gaato/http/sim" @mock,
+  "gaato/mttp/sse",
+  "gaato/http-async/backend",
+  "gaato/http-async/codings",
+  "gaato/http-async/runtime",
+  "gaato/mttp/client",
+  "moonbitlang/core/async",
+  "moonbitlang/core/async/socket",
   "moonbitlang/core/encoding/utf8",
   "moonbitlang/core/string",
 } for "wbtest"
 
 supported_targets = "native"
+
+options(
+  "allow-experimental-packages": [
+    "moonbitlang/core/async",
+    "moonbitlang/core/async/socket",
+  ],
+)

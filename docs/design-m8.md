@@ -1,3 +1,7 @@
+> Historical design/release record. API sketches describe the implementation
+> at that time. See [the stack migration](stack-migration.md) and
+> [current architecture](../ARCHITECTURE.md) for the current interfaces.
+
 # 設計メモ — M8: 3 本目の SDK `gaato/github`(REST API 全面生成)
 
 目的は 2 つ。(1) `gaato/http` + `gaato/sdk-runtime` が LLM API に寄っていないかを、REST らしい相手で確かめる。(2) 生成器を「API の一部を選んで通す」のではなく「ドキュメントを丸ごと通す」使い方で動かし、それが MoonBit で成立するかを実測する。

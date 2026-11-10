@@ -9,30 +9,89 @@
 ///       @gen.repos_get_decode,
 ///     )
 ///
-/// Failures arrive as `@runtime.SdkError`; `api_error` reads GitHub's error
-/// body out of one.
+/// Expected API and decoding failures are GitHubFailure values in Result;
+/// `api_error` reads their error bodies. Transport and callback errors remain
+/// raised effects.
 pub async fn[T] GitHub::call(
   self : GitHub,
   request : @http.Request,
-  decode : (@http.Response) -> T raise @runtime.SdkError,
-) -> T raise @runtime.SdkError {
-  decode(self.send(request))
+  decode : (@http.ResponseHead, Bytes) -> Result[T, @client.ResponseFailure] raise?,
+) -> Result[T, GitHubFailure] {
+  self.send_with(
+    request,
+    @client.as_bytes().map_with_head((result, head) => {
+      match result {
+        Err(error) => Err(Http(error))
+        Ok(bytes) =>
+          match decode(head, bytes) {
+            Ok(value) => Ok(value)
+            Err(error) => Err(Http(error))
+          }
+      }
+    }),
+  ).body
 }
 
 ///|
-/// Sends a generated request and returns the successful response undecoded.
-///
-/// This is for the operations whose body a decoder cannot describe: `204` and
-/// `304` replies, and the representations requested through a non-JSON `accept`
-/// such as `application/vnd.github.diff`.
+/// Sends a request without interpreting the successful body.
 pub async fn GitHub::send(
   self : GitHub,
   request : @http.Request,
-) -> @http.Response raise @runtime.SdkError {
-  self.client.send(
-    request,
-    bucket=rate_limit_bucket(request.http_method, request.url),
+) -> Result[@client.Reply[Bytes], GitHubFailure] {
+  let reply = self.send_with(request, http_reader())
+  match reply.body {
+    Err(error) => Err(error)
+    Ok(body) =>
+      Ok({
+        status: reply.status,
+        headers: reply.headers,
+        body,
+        request: reply.request,
+        attributes: reply.attributes,
+      })
+  }
+}
+
+///|
+fn http_reader() -> @client.ResponseAs[Result[Bytes, GitHubFailure]] {
+  @client.as_bytes().map(result => {
+    match result {
+      Ok(body) => Ok(body)
+      Err(error) => Err(Http(error))
+    }
+  })
+}
+
+///|
+fn[T] GitHub::retry_decision(
+  self : GitHub,
+  attempt : @client.AttemptResult[Result[T, GitHubFailure]],
+  context : @client.RetryContext,
+) -> @client.Decision {
+  match (self.retry, attempt) {
+    (Some(retry), Buffered(reply)) =>
+      match reply.body {
+        Err(error) => retry.decide(error, context)
+        Ok(_) => context.default_decision
+      }
+    _ => context.default_decision
+  }
+}
+
+///|
+async fn[T] GitHub::send_with(
+  self : GitHub,
+  request : @http.Request,
+  reader : @client.ResponseAs[Result[T, GitHubFailure]],
+) -> @client.Reply[Result[T, GitHubFailure]] {
+  @client.RequestPlan::new(request, reader)
+  .attribute(
+    @client.rate_limit_bucket,
+    rate_limit_bucket(request.meth.to_string(), request.url),
   )
+  .send(self.client, decide_retry=(attempt, context) => {
+    self.retry_decision(attempt, context)
+  })
 }
 
 ///|
@@ -87,7 +146,7 @@ fn rate_limit_bucket(http_method : String, url : String) -> String {
 /// notification-sending write also holds the next plain write for 3 s, where
 /// octokit keeps a separate 3 s queue for them; the stricter spacing meets
 /// both of its limits. Reads are not paced.
-fn github_pace(bucket : String) -> @runtime.Pace {
+fn github_pace(bucket : String) -> @ratelimit.Pace {
   match bucket {
     "core:write" | "graphql" | "graphql:mutation" =>
       { group: "write", min_interval_ms: 1000, }

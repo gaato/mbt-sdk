@@ -1,3 +1,7 @@
+> Historical design/release record. API sketches describe the implementation
+> at that time. See [the stack migration](stack-migration.md) and
+> [current architecture](../ARCHITECTURE.md) for the current interfaces.
+
 # 設計メモ — M3: 最初の利用者 `gaato/openai`(薄い手書きスライス)
 
 目的は OpenAI SDK を完成させることではなく、`gaato/http` + `gaato/sdk-runtime` が実際の API で使えるかを確かめること。範囲は models / embeddings / responses(通常とストリーム)だけ。ここで手書きした型と操作は、M4 のジェネレータの出力と突き合わせる正解データにもなる。

@@ -21,7 +21,7 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 
 # Bottom-up: a module is listed after everything it imports.
-PUBLISH_MODULES=(http http-async sdk-runtime openai anthropic github)
+PUBLISH_MODULES=(openai anthropic github)
 # Not published until they have a consumer: jsonrpc jsonrpc-async codex-protocol codex-app-server
 
 module_name() { sed -nE 's/^name = "(.*)"$/\1/p' "$1/moon.mod"; }
@@ -41,6 +41,12 @@ changelog_release() { # <module> <version>
   fi
   if grep -qF "## [$2] - " "$file"; then
     echo "  $file already has [$2]"; return 0
+  fi
+  # Migration work prepares undated headings; date the reviewed entry when
+  # cutting the release instead of creating a duplicate version section.
+  if grep -qxF "## [$2]" "$file"; then
+    sed -i "s/^## \[$2\]$/## [$2] - $date/" "$file"
+    echo "  $file: dated [$2] - $date"; return 0
   fi
   awk -v u="$UNRELEASED" -v v="## [$2] - $date" '
     $0 == u { print; print ""; print v; inside = 1; next }
@@ -114,8 +120,8 @@ case "$cmd" in
       if [ "$(grep -m1 '^## ' "$file")" != "$UNRELEASED" ]; then
         echo "$file: the first section must be '$UNRELEASED'" >&2; status=1
       fi
-      if ! grep -qF "## [$version] - " "$file"; then
-        echo "$file: no '## [$version] - <date>' heading for the version in moon.mod (use 'scripts/release.sh bump')" >&2; status=1
+      if ! grep -qxE "## \[$version\]( - .+)?" "$file"; then
+        echo "$file: no version heading for the version in moon.mod (use 'scripts/release.sh bump')" >&2; status=1
       fi
     done
     exit "$status"

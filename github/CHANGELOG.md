@@ -14,6 +14,18 @@ are optional unless the field is required, and keep a wildcard arm.
 
 ## [Unreleased]
 
+## [0.19.0]
+
+### Changed
+
+- **Use gaato/http 0.6 and gaato/mttp for sending, retries, admission and pagination.**
+  GitHub's primary/secondary rate-limit, pacing and GraphQL retry behavior is
+  retained, including a rejected POST's plain 429 retry. Migration: supply Backend and http/rt ports, handle
+  Result[T, GitHubFailure], and use mttp/jsonkit.Presence. Generated decoders
+  now take ResponseHead and Bytes and return Result[T, ResponseFailure].
+  TransportError and unknown decoder errors remain effects. Replace grouped
+  timeout settings with timeout_ms, total_timeout_ms and Timer.
+
 ## [0.18.0] - 2026-11-07
 
 ### Changed

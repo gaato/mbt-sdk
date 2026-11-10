@@ -1,3 +1,7 @@
+> Historical design/release record. API sketches describe the implementation
+> at that time. See [the stack migration](stack-migration.md) and
+> [current architecture](../ARCHITECTURE.md) for the current interfaces.
+
 # Anthropic 0.2.0 release candidate
 
 Publish only `gaato/anthropic@0.2.0`. Its registry dependencies remain

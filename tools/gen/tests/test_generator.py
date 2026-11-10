@@ -853,7 +853,7 @@ class IRTests(unittest.TestCase):
         self.assertEqual(operation_ir.response_type.moon_type(), "Map[String, Int32]")
         source = emit(ir)["operations.mbt"]
         self.assertIn("body : Map[String, Int32]", source)
-        self.assertIn("-> Map[String, Int32] raise @runtime.SdkError", source)
+        self.assertIn("-> Result[Map[String, Int32], @client.ResponseFailure]", source)
 
     def test_properties_and_typed_map_are_a_diagnostic(self):
         schema = {
@@ -920,8 +920,8 @@ class IRTests(unittest.TestCase):
         self.assertIn("@multipart.Part::file(\"file\", file_filename, file_content_type, file)", source)
         self.assertIn("@multipart.Part::text(\"title\", parameter_value(title))", source)
         self.assertIn("@multipart.Part::json(\"metadata\", Json(value))", source)
-        self.assertIn("@multipart.apply(request, parts, boundary)", source)
-        self.assertIn('"gaato/http/multipart" @multipart', generated["moon.pkg"])
+        self.assertIn("@multipart.body(request, parts, boundary~)", source)
+        self.assertIn('"gaato/mttp/multipart"', generated["moon.pkg"])
 
     def test_json_body_wins_when_form_is_an_alternative(self):
         content = {
@@ -1010,9 +1010,9 @@ class IRTests(unittest.TestCase):
             "components": {"schemas": schemas},
         }
         sources = emit(IRBuilder(doc, "example/gen").build())
-        self.assertIn('@http.Request::post("/raw").json_body(body)\n', sources["operations.mbt"])
+        self.assertIn('@http.Request::post("/raw").body_json(body)\n', sources["operations.mbt"])
         # A named union body still needs the encode call.
-        self.assertIn('@http.Request::post("/mixed").json_body(Json(body))\n', sources["operations.mbt"])
+        self.assertIn('@http.Request::post("/mixed").body_json(Json(body))\n', sources["operations.mbt"])
         self.assertIn("    Text(value) => Json(value)\n    Object(value) => value\n", sources["types.mbt"])
 
 

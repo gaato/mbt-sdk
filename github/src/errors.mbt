@@ -39,9 +39,9 @@ pub extend ApiErrorBody with @debug.Debug::{to_repr}
 /// Returns None for transport, decode, and configuration failures, and for a
 /// body that is not a GitHub error object — an HTML page from an intermediate
 /// proxy, or an empty body.
-pub fn api_error(error : @runtime.SdkError) -> ApiErrorBody? {
+pub fn api_error(error : GitHubFailure) -> ApiErrorBody? {
   let body = match error {
-    @runtime.Status(body~, ..) | @runtime.RateLimited(body~, ..) => body
+    Http(@client.UnexpectedStatus(_, body~)) => body
     _ => return None
   }
   try decode_api_error_body(body) catch {
@@ -58,8 +58,8 @@ pub fn api_error(error : @runtime.SdkError) -> ApiErrorBody? {
 /// `304 Not Modified` and an empty body, which the runtime classifies as a
 /// failure like any other non-2xx status. A cached copy is still valid, and a
 /// `304` is not charged against the rate limit.
-pub fn is_not_modified(error : @runtime.SdkError) -> Bool {
-  error.status() is Some(304)
+pub fn is_not_modified(error : GitHubFailure) -> Bool {
+  error is Http(@client.UnexpectedStatus({ status: 304, .. }, ..))
 }
 
 ///|
@@ -75,14 +75,15 @@ pub fn is_not_modified(error : @runtime.SdkError) -> Bool {
 /// a GraphQL reply. It leaves `x-ratelimit-remaining` untouched, so no limiter
 /// can anticipate it: `GitHubRetry` waits and retries after it occurs.
 ///
-/// The runtime's taxonomy classifies only `429` as `RateLimited`, so a
-/// secondary limit delivered as `403` arrives as `Status`; one delivered in a
-/// GraphQL `200` is raised by `graphql` as `RateLimited`. This predicate spans
-/// all three.
-pub fn is_secondary_rate_limit(error : @runtime.SdkError) -> Bool {
+/// HTTP 403 and 429 arrive as `UnexpectedStatus`; a GraphQL envelope with
+/// HTTP 200 arrives as `GraphqlFailure`. This predicate recognises both forms.
+pub fn is_secondary_rate_limit(error : GitHubFailure) -> Bool {
   let (status, headers, body) = match error {
-    @runtime.Status(status~, headers~, body~) => (status, headers, body)
-    @runtime.RateLimited(headers~, body~, ..) => (429, headers, body)
+    Http(@client.UnexpectedStatus(head, body~)) =>
+      (head.status, head.headers, body)
+    GraphqlFailure(head, body~, ..) =>
+      return head.headers.contains("retry-after") ||
+        mentions_secondary_rate_limit(body)
     _ => return false
   }
   guard status == 403 || status == 429 else { return false }

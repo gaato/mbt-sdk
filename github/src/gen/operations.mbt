@@ -22,11 +22,18 @@ fn parse_json_body(body : Bytes) -> Json raise {
 
 ///|
 fn[T : @json.FromJson] decode_response(
-  response : @http.Response,
-) -> T raise @runtime.SdkError {
-  @json.from_json(parse_json_body(response.body)) catch {
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[T, @client.ResponseFailure] {
+  Ok(@json.from_json(parse_json_body(body))) catch {
     error =>
-      raise @runtime.Decode(message=error.to_string(), body=response.body)
+      Err(
+        @client.Deserialization(
+          head,
+          message=error.to_string(),
+          body=body[:body.length().min(@client.max_error_body)].to_owned(),
+        ),
+      )
   }
 }
 
@@ -48,9 +55,10 @@ pub fn meta_root_decode_json(value : Json) -> Root raise @json.JsonDecodeError {
 ///
 /// Decodes a successful meta/root response.
 pub fn meta_root_decode(
-  response : @http.Response,
-) -> Root raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Root, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -180,9 +188,10 @@ pub fn security_advisories_list_global_advisories_decode_json(
 ///
 /// Decodes a successful security-advisories/list-global-advisories response.
 pub fn security_advisories_list_global_advisories_decode(
-  response : @http.Response,
-) -> Array[GlobalAdvisory] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[GlobalAdvisory], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -209,9 +218,10 @@ pub fn security_advisories_get_global_advisory_decode_json(
 ///
 /// Decodes a successful security-advisories/get-global-advisory response.
 pub fn security_advisories_get_global_advisory_decode(
-  response : @http.Response,
-) -> GlobalAdvisory raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[GlobalAdvisory, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -252,9 +262,13 @@ pub fn agent_automations_list_automations_decode_json(
 ///
 /// Decodes a successful agent-automations/list-automations response.
 pub fn agent_automations_list_automations_decode(
-  response : @http.Response,
-) -> Array[AgentAutomationsListAutomationsResponseItem] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[
+  Array[AgentAutomationsListAutomationsResponseItem],
+  @client.ResponseFailure,
+] {
+  decode_response(head, body)
 }
 
 ///|
@@ -301,9 +315,13 @@ pub fn agent_automations_list_repo_automations_decode_json(
 ///
 /// Decodes a successful agent-automations/list-repo-automations response.
 pub fn agent_automations_list_repo_automations_decode(
-  response : @http.Response,
-) -> AgentAutomationsListRepoAutomationsResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[
+  AgentAutomationsListRepoAutomationsResponse,
+  @client.ResponseFailure,
+] {
+  decode_response(head, body)
 }
 
 ///|
@@ -320,7 +338,7 @@ pub fn agent_automations_create_repo_automation_request(
     "/" +
     @http.percent_encode(parameter_value(repo)) +
     "/automations",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -336,9 +354,13 @@ pub fn agent_automations_create_repo_automation_decode_json(
 ///
 /// Decodes a successful agent-automations/create-repo-automation response.
 pub fn agent_automations_create_repo_automation_decode(
-  response : @http.Response,
-) -> AgentAutomationsCreateRepoAutomationResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[
+  AgentAutomationsCreateRepoAutomationResponse,
+  @client.ResponseFailure,
+] {
+  decode_response(head, body)
 }
 
 ///|
@@ -370,9 +392,13 @@ pub fn agent_automations_list_available_repo_automation_tools_decode_json(
 ///
 /// Decodes a successful agent-automations/list-available-repo-automation-tools response.
 pub fn agent_automations_list_available_repo_automation_tools_decode(
-  response : @http.Response,
-) -> AgentAutomationsListAvailableRepoAutomationToolsResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[
+  AgentAutomationsListAvailableRepoAutomationToolsResponse,
+  @client.ResponseFailure,
+] {
+  decode_response(head, body)
 }
 
 ///|
@@ -404,9 +430,13 @@ pub fn agent_automations_list_available_repo_automation_triggers_decode_json(
 ///
 /// Decodes a successful agent-automations/list-available-repo-automation-triggers response.
 pub fn agent_automations_list_available_repo_automation_triggers_decode(
-  response : @http.Response,
-) -> Array[AgentAutomationsListAvailableRepoAutomationTriggersResponseItem] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[
+  Array[AgentAutomationsListAvailableRepoAutomationTriggersResponseItem],
+  @client.ResponseFailure,
+] {
+  decode_response(head, body)
 }
 
 ///|
@@ -440,9 +470,10 @@ pub fn agent_automations_get_repo_automation_decode_json(
 ///
 /// Decodes a successful agent-automations/get-repo-automation response.
 pub fn agent_automations_get_repo_automation_decode(
-  response : @http.Response,
-) -> AgentAutomationsGetRepoAutomationResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[AgentAutomationsGetRepoAutomationResponse, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -461,7 +492,7 @@ pub fn agent_automations_edit_repo_automation_request(
     @http.percent_encode(parameter_value(repo)) +
     "/automations/" +
     @http.percent_encode(parameter_value(automation_id)),
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -477,9 +508,10 @@ pub fn agent_automations_edit_repo_automation_decode_json(
 ///
 /// Decodes a successful agent-automations/edit-repo-automation response.
 pub fn agent_automations_edit_repo_automation_decode(
-  response : @http.Response,
-) -> AgentAutomationsEditRepoAutomationResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[AgentAutomationsEditRepoAutomationResponse, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -543,9 +575,13 @@ pub fn agent_automations_list_automation_revisions_decode_json(
 ///
 /// Decodes a successful agent-automations/list-automation-revisions response.
 pub fn agent_automations_list_automation_revisions_decode(
-  response : @http.Response,
-) -> AgentAutomationsListAutomationRevisionsResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[
+  AgentAutomationsListAutomationRevisionsResponse,
+  @client.ResponseFailure,
+] {
+  decode_response(head, body)
 }
 
 ///|
@@ -582,9 +618,13 @@ pub fn agent_automations_get_automation_revision_decode_json(
 ///
 /// Decodes a successful agent-automations/get-automation-revision response.
 pub fn agent_automations_get_automation_revision_decode(
-  response : @http.Response,
-) -> AgentAutomationsGetAutomationRevisionResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[
+  AgentAutomationsGetAutomationRevisionResponse,
+  @client.ResponseFailure,
+] {
+  decode_response(head, body)
 }
 
 ///|
@@ -652,9 +692,13 @@ pub fn agent_automations_list_repo_automation_tasks_decode_json(
 ///
 /// Decodes a successful agent-automations/list-repo-automation-tasks response.
 pub fn agent_automations_list_repo_automation_tasks_decode(
-  response : @http.Response,
-) -> AgentAutomationsListRepoAutomationTasksResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[
+  AgentAutomationsListRepoAutomationTasksResponse,
+  @client.ResponseFailure,
+] {
+  decode_response(head, body)
 }
 
 ///|
@@ -674,7 +718,7 @@ pub fn agent_automations_create_repo_automation_task_request(
     "/automations/" +
     @http.percent_encode(parameter_value(automation_id)) +
     "/tasks",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -690,9 +734,13 @@ pub fn agent_automations_create_repo_automation_task_decode_json(
 ///
 /// Decodes a successful agent-automations/create-repo-automation-task response.
 pub fn agent_automations_create_repo_automation_task_decode(
-  response : @http.Response,
-) -> AgentAutomationsCreateRepoAutomationTaskResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[
+  AgentAutomationsCreateRepoAutomationTaskResponse,
+  @client.ResponseFailure,
+] {
+  decode_response(head, body)
 }
 
 ///|
@@ -727,9 +775,10 @@ pub fn agent_merge_get_agent_merge_enrollment_decode_json(
 ///
 /// Decodes a successful agent-merge/get-agent-merge-enrollment response.
 pub fn agent_merge_get_agent_merge_enrollment_decode(
-  response : @http.Response,
-) -> AgentMergeGetAgentMergeEnrollmentResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[AgentMergeGetAgentMergeEnrollmentResponse, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -749,7 +798,7 @@ pub fn agent_merge_put_agent_merge_enrollment_request(
     "/pulls/" +
     @http.percent_encode(parameter_value(pull_number)) +
     "/agent-merge",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -765,9 +814,10 @@ pub fn agent_merge_put_agent_merge_enrollment_decode_json(
 ///
 /// Decodes a successful agent-merge/put-agent-merge-enrollment response.
 pub fn agent_merge_put_agent_merge_enrollment_decode(
-  response : @http.Response,
-) -> AgentMergePutAgentMergeEnrollmentResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[AgentMergePutAgentMergeEnrollmentResponse, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -865,9 +915,10 @@ pub fn agent_tasks_list_tasks_for_repo_decode_json(
 ///
 /// Decodes a successful agent-tasks/list-tasks-for-repo response.
 pub fn agent_tasks_list_tasks_for_repo_decode(
-  response : @http.Response,
-) -> AgentTasksListTasksForRepoResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[AgentTasksListTasksForRepoResponse, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -884,7 +935,7 @@ pub fn agent_tasks_create_task_in_repo_request(
     "/" +
     @http.percent_encode(parameter_value(repo)) +
     "/tasks",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -900,9 +951,10 @@ pub fn agent_tasks_create_task_in_repo_decode_json(
 ///
 /// Decodes a successful agent-tasks/create-task-in-repo response.
 pub fn agent_tasks_create_task_in_repo_decode(
-  response : @http.Response,
-) -> AgentTasksCreateTaskInRepoResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[AgentTasksCreateTaskInRepoResponse, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -936,9 +988,10 @@ pub fn agent_tasks_get_task_by_repo_and_id_decode_json(
 ///
 /// Decodes a successful agent-tasks/get-task-by-repo-and-id response.
 pub fn agent_tasks_get_task_by_repo_and_id_decode(
-  response : @http.Response,
-) -> AgentTasksGetTaskByRepoAndIdResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[AgentTasksGetTaskByRepoAndIdResponse, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -1003,9 +1056,10 @@ pub fn agent_tasks_list_tasks_decode_json(
 ///
 /// Decodes a successful agent-tasks/list-tasks response.
 pub fn agent_tasks_list_tasks_decode(
-  response : @http.Response,
-) -> AgentTasksListTasksResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[AgentTasksListTasksResponse, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -1030,9 +1084,10 @@ pub fn agent_tasks_get_task_by_id_decode_json(
 ///
 /// Decodes a successful agent-tasks/get-task-by-id response.
 pub fn agent_tasks_get_task_by_id_decode(
-  response : @http.Response,
-) -> AgentTasksGetTaskByIdResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[AgentTasksGetTaskByIdResponse, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -1055,9 +1110,10 @@ pub fn apps_get_authenticated_decode_json(
 ///
 /// Decodes a successful apps/get-authenticated response.
 pub fn apps_get_authenticated_decode(
-  response : @http.Response,
-) -> Integration raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Integration, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -1084,9 +1140,10 @@ pub fn apps_create_from_manifest_decode_json(
 ///
 /// Decodes a successful apps/create-from-manifest response.
 pub fn apps_create_from_manifest_decode(
-  response : @http.Response,
-) -> Json raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Json, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -1109,9 +1166,10 @@ pub fn apps_get_webhook_config_for_app_decode_json(
 ///
 /// Decodes a successful apps/get-webhook-config-for-app response.
 pub fn apps_get_webhook_config_for_app_decode(
-  response : @http.Response,
-) -> WebhookConfig raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[WebhookConfig, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -1120,7 +1178,7 @@ pub fn apps_get_webhook_config_for_app_decode(
 pub fn apps_update_webhook_config_for_app_request(
   body : AppsUpdateWebhookConfigForAppRequest,
 ) -> @http.Request {
-  @http.Request::patch("/app/hook/config").json_body(Json(body))
+  @http.Request::patch("/app/hook/config").body_json(Json(body))
 }
 
 ///|
@@ -1136,9 +1194,10 @@ pub fn apps_update_webhook_config_for_app_decode_json(
 ///
 /// Decodes a successful apps/update-webhook-config-for-app response.
 pub fn apps_update_webhook_config_for_app_decode(
-  response : @http.Response,
-) -> WebhookConfig raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[WebhookConfig, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -1181,9 +1240,10 @@ pub fn apps_list_webhook_deliveries_decode_json(
 ///
 /// Decodes a successful apps/list-webhook-deliveries response.
 pub fn apps_list_webhook_deliveries_decode(
-  response : @http.Response,
-) -> Array[HookDeliveryItem] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[HookDeliveryItem], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -1208,9 +1268,10 @@ pub fn apps_get_webhook_delivery_decode_json(
 ///
 /// Decodes a successful apps/get-webhook-delivery response.
 pub fn apps_get_webhook_delivery_decode(
-  response : @http.Response,
-) -> HookDelivery raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[HookDelivery, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -1259,9 +1320,10 @@ pub fn apps_list_installation_requests_for_authenticated_app_decode_json(
 ///
 /// Decodes a successful apps/list-installation-requests-for-authenticated-app response.
 pub fn apps_list_installation_requests_for_authenticated_app_decode(
-  response : @http.Response,
-) -> Array[IntegrationInstallationRequest] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[IntegrationInstallationRequest], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -1309,9 +1371,10 @@ pub fn apps_list_installations_decode_json(
 ///
 /// Decodes a successful apps/list-installations response.
 pub fn apps_list_installations_decode(
-  response : @http.Response,
-) -> Array[Installation] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[Installation], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -1337,9 +1400,10 @@ pub fn apps_get_installation_decode_json(
 ///
 /// Decodes a successful apps/get-installation response.
 pub fn apps_get_installation_decode(
-  response : @http.Response,
-) -> Installation raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Installation, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -1365,7 +1429,7 @@ pub fn apps_create_installation_access_token_request(
     "/app/installations/" +
     @http.percent_encode(parameter_value(installation_id)) +
     "/access_tokens",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -1381,9 +1445,10 @@ pub fn apps_create_installation_access_token_decode_json(
 ///
 /// Decodes a successful apps/create-installation-access-token response.
 pub fn apps_create_installation_access_token_decode(
-  response : @http.Response,
-) -> InstallationToken raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[InstallationToken, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -1423,7 +1488,7 @@ pub fn apps_delete_authorization_request(
     "/applications/" +
     @http.percent_encode(parameter_value(client_id)) +
     "/grant",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -1437,7 +1502,7 @@ pub fn apps_check_token_request(
     "/applications/" +
     @http.percent_encode(parameter_value(client_id)) +
     "/token",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -1453,9 +1518,10 @@ pub fn apps_check_token_decode_json(
 ///
 /// Decodes a successful apps/check-token response.
 pub fn apps_check_token_decode(
-  response : @http.Response,
-) -> Authorization raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Authorization, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -1469,7 +1535,7 @@ pub fn apps_reset_token_request(
     "/applications/" +
     @http.percent_encode(parameter_value(client_id)) +
     "/token",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -1485,9 +1551,10 @@ pub fn apps_reset_token_decode_json(
 ///
 /// Decodes a successful apps/reset-token response.
 pub fn apps_reset_token_decode(
-  response : @http.Response,
-) -> Authorization raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Authorization, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -1501,7 +1568,7 @@ pub fn apps_delete_token_request(
     "/applications/" +
     @http.percent_encode(parameter_value(client_id)) +
     "/token",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -1515,7 +1582,7 @@ pub fn apps_scope_token_request(
     "/applications/" +
     @http.percent_encode(parameter_value(client_id)) +
     "/token/scoped",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -1531,9 +1598,10 @@ pub fn apps_scope_token_decode_json(
 ///
 /// Decodes a successful apps/scope-token response.
 pub fn apps_scope_token_decode(
-  response : @http.Response,
-) -> Authorization raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Authorization, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -1556,9 +1624,10 @@ pub fn apps_get_by_slug_decode_json(
 ///
 /// Decodes a successful apps/get-by-slug response.
 pub fn apps_get_by_slug_decode(
-  response : @http.Response,
-) -> Integration raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Integration, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -1647,9 +1716,10 @@ pub fn codes_of_conduct_get_all_codes_of_conduct_decode_json(
 ///
 /// Decodes a successful codes-of-conduct/get-all-codes-of-conduct response.
 pub fn codes_of_conduct_get_all_codes_of_conduct_decode(
-  response : @http.Response,
-) -> Array[CodeOfConduct] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[CodeOfConduct], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -1674,9 +1744,10 @@ pub fn codes_of_conduct_get_conduct_code_decode_json(
 ///
 /// Decodes a successful codes-of-conduct/get-conduct-code response.
 pub fn codes_of_conduct_get_conduct_code_decode(
-  response : @http.Response,
-) -> CodeOfConduct raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[CodeOfConduct, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -1685,7 +1756,7 @@ pub fn codes_of_conduct_get_conduct_code_decode(
 pub fn credentials_revoke_request(
   body : CredentialsRevokeRequest,
 ) -> @http.Request {
-  @http.Request::post("/credentials/revoke").json_body(Json(body))
+  @http.Request::post("/credentials/revoke").body_json(Json(body))
 }
 
 ///|
@@ -1708,9 +1779,10 @@ pub fn emojis_get_decode_json(
 ///
 /// Decodes a successful emojis/get response.
 pub fn emojis_get_decode(
-  response : @http.Response,
-) -> Map[String, String] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Map[String, String], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -1739,9 +1811,10 @@ pub fn actions_get_actions_cache_retention_limit_for_enterprise_decode_json(
 ///
 /// Decodes a successful actions/get-actions-cache-retention-limit-for-enterprise response.
 pub fn actions_get_actions_cache_retention_limit_for_enterprise_decode(
-  response : @http.Response,
-) -> ActionsCacheRetentionLimitForEnterprise raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[ActionsCacheRetentionLimitForEnterprise, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -1755,7 +1828,7 @@ pub fn actions_set_actions_cache_retention_limit_for_enterprise_request(
     "/enterprises/" +
     @http.percent_encode(parameter_value(enterprise)) +
     "/actions/cache/retention-limit",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -1784,9 +1857,10 @@ pub fn actions_get_actions_cache_storage_limit_for_enterprise_decode_json(
 ///
 /// Decodes a successful actions/get-actions-cache-storage-limit-for-enterprise response.
 pub fn actions_get_actions_cache_storage_limit_for_enterprise_decode(
-  response : @http.Response,
-) -> ActionsCacheStorageLimitForEnterprise raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[ActionsCacheStorageLimitForEnterprise, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -1800,7 +1874,7 @@ pub fn actions_set_actions_cache_storage_limit_for_enterprise_request(
     "/enterprises/" +
     @http.percent_encode(parameter_value(enterprise)) +
     "/actions/cache/storage-limit",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -1829,9 +1903,10 @@ pub fn oidc_list_oidc_custom_property_inclusions_for_enterprise_decode_json(
 ///
 /// Decodes a successful oidc/list-oidc-custom-property-inclusions-for-enterprise response.
 pub fn oidc_list_oidc_custom_property_inclusions_for_enterprise_decode(
-  response : @http.Response,
-) -> Array[OidcCustomPropertyInclusion] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[OidcCustomPropertyInclusion], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -1845,7 +1920,7 @@ pub fn oidc_create_oidc_custom_property_inclusion_for_enterprise_request(
     "/enterprises/" +
     @http.percent_encode(parameter_value(enterprise)) +
     "/actions/oidc/customization/properties/repo",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -1861,9 +1936,10 @@ pub fn oidc_create_oidc_custom_property_inclusion_for_enterprise_decode_json(
 ///
 /// Decodes a successful oidc/create-oidc-custom-property-inclusion-for-enterprise response.
 pub fn oidc_create_oidc_custom_property_inclusion_for_enterprise_decode(
-  response : @http.Response,
-) -> OidcCustomPropertyInclusion raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[OidcCustomPropertyInclusion, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -1924,9 +2000,10 @@ pub fn code_security_get_configurations_for_enterprise_decode_json(
 ///
 /// Decodes a successful code-security/get-configurations-for-enterprise response.
 pub fn code_security_get_configurations_for_enterprise_decode(
-  response : @http.Response,
-) -> Array[CodeSecurityConfiguration] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[CodeSecurityConfiguration], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -1940,7 +2017,7 @@ pub fn code_security_create_configuration_for_enterprise_request(
     "/enterprises/" +
     @http.percent_encode(parameter_value(enterprise)) +
     "/code-security/configurations",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -1956,9 +2033,10 @@ pub fn code_security_create_configuration_for_enterprise_decode_json(
 ///
 /// Decodes a successful code-security/create-configuration-for-enterprise response.
 pub fn code_security_create_configuration_for_enterprise_decode(
-  response : @http.Response,
-) -> CodeSecurityConfiguration raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[CodeSecurityConfiguration, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -1987,9 +2065,13 @@ pub fn code_security_get_default_configurations_for_enterprise_decode_json(
 ///
 /// Decodes a successful code-security/get-default-configurations-for-enterprise response.
 pub fn code_security_get_default_configurations_for_enterprise_decode(
-  response : @http.Response,
-) -> Array[CodeSecurityDefaultConfigurationsItem] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[
+  Array[CodeSecurityDefaultConfigurationsItem],
+  @client.ResponseFailure,
+] {
+  decode_response(head, body)
 }
 
 ///|
@@ -2020,9 +2102,10 @@ pub fn code_security_get_single_configuration_for_enterprise_decode_json(
 ///
 /// Decodes a successful code-security/get-single-configuration-for-enterprise response.
 pub fn code_security_get_single_configuration_for_enterprise_decode(
-  response : @http.Response,
-) -> CodeSecurityConfiguration raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[CodeSecurityConfiguration, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -2038,7 +2121,7 @@ pub fn code_security_update_enterprise_configuration_request(
     @http.percent_encode(parameter_value(enterprise)) +
     "/code-security/configurations/" +
     @http.percent_encode(parameter_value(configuration_id)),
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -2054,9 +2137,10 @@ pub fn code_security_update_enterprise_configuration_decode_json(
 ///
 /// Decodes a successful code-security/update-enterprise-configuration response.
 pub fn code_security_update_enterprise_configuration_decode(
-  response : @http.Response,
-) -> CodeSecurityConfiguration raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[CodeSecurityConfiguration, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -2088,7 +2172,7 @@ pub fn code_security_attach_enterprise_configuration_request(
     "/code-security/configurations/" +
     @http.percent_encode(parameter_value(configuration_id)) +
     "/attach",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -2105,7 +2189,7 @@ pub fn code_security_set_configuration_as_default_for_enterprise_request(
     "/code-security/configurations/" +
     @http.percent_encode(parameter_value(configuration_id)) +
     "/defaults",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -2121,9 +2205,13 @@ pub fn code_security_set_configuration_as_default_for_enterprise_decode_json(
 ///
 /// Decodes a successful code-security/set-configuration-as-default-for-enterprise response.
 pub fn code_security_set_configuration_as_default_for_enterprise_decode(
-  response : @http.Response,
-) -> CodeSecuritySetConfigurationAsDefaultForEnterpriseResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[
+  CodeSecuritySetConfigurationAsDefaultForEnterpriseResponse,
+  @client.ResponseFailure,
+] {
+  decode_response(head, body)
 }
 
 ///|
@@ -2178,9 +2266,13 @@ pub fn code_security_get_repositories_for_enterprise_configuration_decode_json(
 ///
 /// Decodes a successful code-security/get-repositories-for-enterprise-configuration response.
 pub fn code_security_get_repositories_for_enterprise_configuration_decode(
-  response : @http.Response,
-) -> Array[CodeSecurityConfigurationRepositories] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[
+  Array[CodeSecurityConfigurationRepositories],
+  @client.ResponseFailure,
+] {
+  decode_response(head, body)
 }
 
 ///|
@@ -2210,9 +2302,10 @@ pub fn copilot_copilot_enterprise_one_day_usage_metrics_decode_json(
 ///
 /// Decodes a successful copilot/copilot-enterprise-one-day-usage-metrics response.
 pub fn copilot_copilot_enterprise_one_day_usage_metrics_decode(
-  response : @http.Response,
-) -> CopilotUsageMetrics1DayReport raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[CopilotUsageMetrics1DayReport, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -2241,9 +2334,10 @@ pub fn copilot_copilot_enterprise_usage_metrics_decode_json(
 ///
 /// Decodes a successful copilot/copilot-enterprise-usage-metrics response.
 pub fn copilot_copilot_enterprise_usage_metrics_decode(
-  response : @http.Response,
-) -> CopilotUsageMetrics28DayReport raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[CopilotUsageMetrics28DayReport, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -2273,9 +2367,10 @@ pub fn copilot_copilot_enterprise_repos_one_day_report_decode_json(
 ///
 /// Decodes a successful copilot/copilot-enterprise-repos-one-day-report response.
 pub fn copilot_copilot_enterprise_repos_one_day_report_decode(
-  response : @http.Response,
-) -> CopilotUsageMetrics1DayReport raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[CopilotUsageMetrics1DayReport, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -2305,9 +2400,10 @@ pub fn copilot_copilot_enterprise_user_teams_one_day_report_decode_json(
 ///
 /// Decodes a successful copilot/copilot-enterprise-user-teams-one-day-report response.
 pub fn copilot_copilot_enterprise_user_teams_one_day_report_decode(
-  response : @http.Response,
-) -> CopilotUsageMetrics1DayReport raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[CopilotUsageMetrics1DayReport, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -2337,9 +2433,10 @@ pub fn copilot_copilot_users_one_day_usage_metrics_decode_json(
 ///
 /// Decodes a successful copilot/copilot-users-one-day-usage-metrics response.
 pub fn copilot_copilot_users_one_day_usage_metrics_decode(
-  response : @http.Response,
-) -> CopilotUsageMetrics1DayReport raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[CopilotUsageMetrics1DayReport, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -2368,9 +2465,10 @@ pub fn copilot_copilot_users_usage_metrics_decode_json(
 ///
 /// Decodes a successful copilot/copilot-users-usage-metrics response.
 pub fn copilot_copilot_users_usage_metrics_decode(
-  response : @http.Response,
-) -> CopilotUsageMetrics28DayReport raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[CopilotUsageMetrics28DayReport, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -2399,9 +2497,10 @@ pub fn copilot_get_enterprise_code_review_policy_decode_json(
 ///
 /// Decodes a successful copilot/get-enterprise-code-review-policy response.
 pub fn copilot_get_enterprise_code_review_policy_decode(
-  response : @http.Response,
-) -> EnterpriseCopilotCodeReviewPolicy raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[EnterpriseCopilotCodeReviewPolicy, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -2415,7 +2514,7 @@ pub fn copilot_set_enterprise_code_review_policy_request(
     "/enterprises/" +
     @http.percent_encode(parameter_value(enterprise)) +
     "/copilot/policies/code-review",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -2429,7 +2528,7 @@ pub fn copilot_set_enterprise_coding_agent_policy_request(
     "/enterprises/" +
     @http.percent_encode(parameter_value(enterprise)) +
     "/copilot/policies/coding_agent",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -2443,7 +2542,7 @@ pub fn copilot_add_organizations_to_enterprise_coding_agent_policy_request(
     "/enterprises/" +
     @http.percent_encode(parameter_value(enterprise)) +
     "/copilot/policies/coding_agent/organizations",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -2457,7 +2556,7 @@ pub fn copilot_remove_organizations_from_enterprise_coding_agent_policy_request(
     "/enterprises/" +
     @http.percent_encode(parameter_value(enterprise)) +
     "/copilot/policies/coding_agent/organizations",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -2573,9 +2672,10 @@ pub fn dependabot_list_alerts_for_enterprise_decode_json(
 ///
 /// Decodes a successful dependabot/list-alerts-for-enterprise response.
 pub fn dependabot_list_alerts_for_enterprise_decode(
-  response : @http.Response,
-) -> Array[DependabotAlertWithRepository] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[DependabotAlertWithRepository], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -2614,9 +2714,10 @@ pub fn dependabot_repository_access_for_enterprise_decode_json(
 ///
 /// Decodes a successful dependabot/repository-access-for-enterprise response.
 pub fn dependabot_repository_access_for_enterprise_decode(
-  response : @http.Response,
-) -> DependabotRepositoryAccessDetails raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[DependabotRepositoryAccessDetails, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -2630,7 +2731,7 @@ pub fn dependabot_update_repository_access_for_enterprise_request(
     "/enterprises/" +
     @http.percent_encode(parameter_value(enterprise)) +
     "/dependabot/repository-access",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -2644,7 +2745,7 @@ pub fn dependabot_set_repository_access_default_level_for_enterprise_request(
     "/enterprises/" +
     @http.percent_encode(parameter_value(enterprise)) +
     "/dependabot/repository-access/default-level",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -2680,9 +2781,10 @@ pub fn activity_list_public_events_decode_json(
 ///
 /// Decodes a successful activity/list-public-events response.
 pub fn activity_list_public_events_decode(
-  response : @http.Response,
-) -> Array[Event] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[Event], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -2705,9 +2807,10 @@ pub fn activity_get_feeds_decode_json(
 ///
 /// Decodes a successful activity/get-feeds response.
 pub fn activity_get_feeds_decode(
-  response : @http.Response,
-) -> Feed raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Feed, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -2749,16 +2852,17 @@ pub fn gists_list_decode_json(
 ///
 /// Decodes a successful gists/list response.
 pub fn gists_list_decode(
-  response : @http.Response,
-) -> Array[BaseGist] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[BaseGist], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
 ///
 /// Create a gist
 pub fn gists_create_request(body : GistsCreateRequest) -> @http.Request {
-  @http.Request::post("/gists").json_body(Json(body))
+  @http.Request::post("/gists").body_json(Json(body))
 }
 
 ///|
@@ -2774,9 +2878,10 @@ pub fn gists_create_decode_json(
 ///
 /// Decodes a successful gists/create response.
 pub fn gists_create_decode(
-  response : @http.Response,
-) -> GistSimple raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[GistSimple, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -2818,9 +2923,10 @@ pub fn gists_list_public_decode_json(
 ///
 /// Decodes a successful gists/list-public response.
 pub fn gists_list_public_decode(
-  response : @http.Response,
-) -> Array[BaseGist] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[BaseGist], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -2862,9 +2968,10 @@ pub fn gists_list_starred_decode_json(
 ///
 /// Decodes a successful gists/list-starred response.
 pub fn gists_list_starred_decode(
-  response : @http.Response,
-) -> Array[BaseGist] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[BaseGist], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -2887,9 +2994,10 @@ pub fn gists_get_decode_json(
 ///
 /// Decodes a successful gists/get response.
 pub fn gists_get_decode(
-  response : @http.Response,
-) -> GistSimple raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[GistSimple, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -2901,7 +3009,7 @@ pub fn gists_update_request(
 ) -> @http.Request {
   @http.Request::patch(
     "/gists/" + @http.percent_encode(parameter_value(gist_id)),
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -2917,9 +3025,10 @@ pub fn gists_update_decode_json(
 ///
 /// Decodes a successful gists/update response.
 pub fn gists_update_decode(
-  response : @http.Response,
-) -> GistSimple raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[GistSimple, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -2967,9 +3076,10 @@ pub fn gists_list_comments_decode_json(
 ///
 /// Decodes a successful gists/list-comments response.
 pub fn gists_list_comments_decode(
-  response : @http.Response,
-) -> Array[GistComment] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[GistComment], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -2981,7 +3091,7 @@ pub fn gists_create_comment_request(
 ) -> @http.Request {
   @http.Request::post(
     "/gists/" + @http.percent_encode(parameter_value(gist_id)) + "/comments",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -2997,9 +3107,10 @@ pub fn gists_create_comment_decode_json(
 ///
 /// Decodes a successful gists/create-comment response.
 pub fn gists_create_comment_decode(
-  response : @http.Response,
-) -> GistComment raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[GistComment, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -3030,9 +3141,10 @@ pub fn gists_get_comment_decode_json(
 ///
 /// Decodes a successful gists/get-comment response.
 pub fn gists_get_comment_decode(
-  response : @http.Response,
-) -> GistComment raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[GistComment, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -3048,7 +3160,7 @@ pub fn gists_update_comment_request(
     @http.percent_encode(parameter_value(gist_id)) +
     "/comments/" +
     @http.percent_encode(parameter_value(comment_id)),
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -3064,9 +3176,10 @@ pub fn gists_update_comment_decode_json(
 ///
 /// Decodes a successful gists/update-comment response.
 pub fn gists_update_comment_decode(
-  response : @http.Response,
-) -> GistComment raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[GistComment, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -3120,9 +3233,10 @@ pub fn gists_list_commits_decode_json(
 ///
 /// Decodes a successful gists/list-commits response.
 pub fn gists_list_commits_decode(
-  response : @http.Response,
-) -> Array[GistCommit] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[GistCommit], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -3161,9 +3275,10 @@ pub fn gists_list_forks_decode_json(
 ///
 /// Decodes a successful gists/list-forks response.
 pub fn gists_list_forks_decode(
-  response : @http.Response,
-) -> Array[GistSimple] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[GistSimple], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -3188,9 +3303,10 @@ pub fn gists_fork_decode_json(
 ///
 /// Decodes a successful gists/fork response.
 pub fn gists_fork_decode(
-  response : @http.Response,
-) -> BaseGist raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[BaseGist, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -3248,9 +3364,10 @@ pub fn gists_get_revision_decode_json(
 ///
 /// Decodes a successful gists/get-revision response.
 pub fn gists_get_revision_decode(
-  response : @http.Response,
-) -> GistSimple raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[GistSimple, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -3273,9 +3390,10 @@ pub fn gitignore_get_all_templates_decode_json(
 ///
 /// Decodes a successful gitignore/get-all-templates response.
 pub fn gitignore_get_all_templates_decode(
-  response : @http.Response,
-) -> Array[String] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[String], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -3300,9 +3418,10 @@ pub fn gitignore_get_template_decode_json(
 ///
 /// Decodes a successful gitignore/get-template response.
 pub fn gitignore_get_template_decode(
-  response : @http.Response,
-) -> GitignoreTemplate raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[GitignoreTemplate, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -3338,9 +3457,13 @@ pub fn apps_list_repos_accessible_to_installation_decode_json(
 ///
 /// Decodes a successful apps/list-repos-accessible-to-installation response.
 pub fn apps_list_repos_accessible_to_installation_decode(
-  response : @http.Response,
-) -> AppsListReposAccessibleToInstallationResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[
+  AppsListReposAccessibleToInstallationResponse,
+  @client.ResponseFailure,
+] {
+  decode_response(head, body)
 }
 
 ///|
@@ -3441,9 +3564,10 @@ pub fn issues_list_decode_json(
 ///
 /// Decodes a successful issues/list response.
 pub fn issues_list_decode(
-  response : @http.Response,
-) -> Array[Issue] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[Issue], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -3485,9 +3609,10 @@ pub fn licenses_get_all_commonly_used_decode_json(
 ///
 /// Decodes a successful licenses/get-all-commonly-used response.
 pub fn licenses_get_all_commonly_used_decode(
-  response : @http.Response,
-) -> Array[LicenseSimple] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[LicenseSimple], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -3512,16 +3637,17 @@ pub fn licenses_get_decode_json(
 ///
 /// Decodes a successful licenses/get response.
 pub fn licenses_get_decode(
-  response : @http.Response,
-) -> License raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[License, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
 ///
 /// Render a Markdown document The caller handles the response as @http.Response.
 pub fn markdown_render_request(body : MarkdownRenderRequest) -> @http.Request {
-  @http.Request::post("/markdown").json_body(Json(body))
+  @http.Request::post("/markdown").body_json(Json(body))
 }
 
 ///|
@@ -3556,9 +3682,10 @@ pub fn apps_get_subscription_plan_for_account_decode_json(
 ///
 /// Decodes a successful apps/get-subscription-plan-for-account response.
 pub fn apps_get_subscription_plan_for_account_decode(
-  response : @http.Response,
-) -> MarketplacePurchase raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[MarketplacePurchase, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -3594,9 +3721,10 @@ pub fn apps_list_plans_decode_json(
 ///
 /// Decodes a successful apps/list-plans response.
 pub fn apps_list_plans_decode(
-  response : @http.Response,
-) -> Array[MarketplaceListingPlan] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[MarketplaceListingPlan], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -3646,9 +3774,10 @@ pub fn apps_list_accounts_for_plan_decode_json(
 ///
 /// Decodes a successful apps/list-accounts-for-plan response.
 pub fn apps_list_accounts_for_plan_decode(
-  response : @http.Response,
-) -> Array[MarketplacePurchase] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[MarketplacePurchase], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -3676,9 +3805,10 @@ pub fn apps_get_subscription_plan_for_account_stubbed_decode_json(
 ///
 /// Decodes a successful apps/get-subscription-plan-for-account-stubbed response.
 pub fn apps_get_subscription_plan_for_account_stubbed_decode(
-  response : @http.Response,
-) -> MarketplacePurchase raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[MarketplacePurchase, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -3714,9 +3844,10 @@ pub fn apps_list_plans_stubbed_decode_json(
 ///
 /// Decodes a successful apps/list-plans-stubbed response.
 pub fn apps_list_plans_stubbed_decode(
-  response : @http.Response,
-) -> Array[MarketplaceListingPlan] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[MarketplaceListingPlan], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -3766,9 +3897,10 @@ pub fn apps_list_accounts_for_plan_stubbed_decode_json(
 ///
 /// Decodes a successful apps/list-accounts-for-plan-stubbed response.
 pub fn apps_list_accounts_for_plan_stubbed_decode(
-  response : @http.Response,
-) -> Array[MarketplacePurchase] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[MarketplacePurchase], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -3791,9 +3923,10 @@ pub fn meta_get_decode_json(
 ///
 /// Decodes a successful meta/get response.
 pub fn meta_get_decode(
-  response : @http.Response,
-) -> ApiOverview raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[ApiOverview, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -3835,9 +3968,10 @@ pub fn activity_list_public_events_for_repo_network_decode_json(
 ///
 /// Decodes a successful activity/list-public-events-for-repo-network response.
 pub fn activity_list_public_events_for_repo_network_decode(
-  response : @http.Response,
-) -> Array[Event] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[Event], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -3902,9 +4036,10 @@ pub fn activity_list_notifications_for_authenticated_user_decode_json(
 ///
 /// Decodes a successful activity/list-notifications-for-authenticated-user response.
 pub fn activity_list_notifications_for_authenticated_user_decode(
-  response : @http.Response,
-) -> Array[Thread] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[Thread], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -3913,7 +4048,7 @@ pub fn activity_list_notifications_for_authenticated_user_decode(
 pub fn activity_mark_notifications_as_read_request(
   body : ActivityMarkNotificationsAsReadRequest,
 ) -> @http.Request {
-  @http.Request::put("/notifications").json_body(Json(body))
+  @http.Request::put("/notifications").body_json(Json(body))
 }
 
 ///|
@@ -3929,9 +4064,10 @@ pub fn activity_mark_notifications_as_read_decode_json(
 ///
 /// Decodes a successful activity/mark-notifications-as-read response.
 pub fn activity_mark_notifications_as_read_decode(
-  response : @http.Response,
-) -> ActivityMarkNotificationsAsReadResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[ActivityMarkNotificationsAsReadResponse, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -3956,9 +4092,10 @@ pub fn activity_get_thread_decode_json(
 ///
 /// Decodes a successful activity/get-thread response.
 pub fn activity_get_thread_decode(
-  response : @http.Response,
-) -> Thread raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Thread, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -4005,9 +4142,10 @@ pub fn activity_get_thread_subscription_for_authenticated_user_decode_json(
 ///
 /// Decodes a successful activity/get-thread-subscription-for-authenticated-user response.
 pub fn activity_get_thread_subscription_for_authenticated_user_decode(
-  response : @http.Response,
-) -> ThreadSubscription raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[ThreadSubscription, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -4021,7 +4159,7 @@ pub fn activity_set_thread_subscription_request(
     "/notifications/threads/" +
     @http.percent_encode(parameter_value(thread_id)) +
     "/subscription",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -4037,9 +4175,10 @@ pub fn activity_set_thread_subscription_decode_json(
 ///
 /// Decodes a successful activity/set-thread-subscription response.
 pub fn activity_set_thread_subscription_decode(
-  response : @http.Response,
-) -> ThreadSubscription raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[ThreadSubscription, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -4098,9 +4237,10 @@ pub fn orgs_list_decode_json(
 ///
 /// Decodes a successful orgs/list response.
 pub fn orgs_list_decode(
-  response : @http.Response,
-) -> Array[OrganizationSimple] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[OrganizationSimple], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -4129,9 +4269,10 @@ pub fn actions_get_actions_cache_retention_limit_for_organization_decode_json(
 ///
 /// Decodes a successful actions/get-actions-cache-retention-limit-for-organization response.
 pub fn actions_get_actions_cache_retention_limit_for_organization_decode(
-  response : @http.Response,
-) -> ActionsCacheRetentionLimitForOrganization raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[ActionsCacheRetentionLimitForOrganization, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -4145,7 +4286,7 @@ pub fn actions_set_actions_cache_retention_limit_for_organization_request(
     "/organizations/" +
     @http.percent_encode(parameter_value(org)) +
     "/actions/cache/retention-limit",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -4174,9 +4315,10 @@ pub fn actions_get_actions_cache_storage_limit_for_organization_decode_json(
 ///
 /// Decodes a successful actions/get-actions-cache-storage-limit-for-organization response.
 pub fn actions_get_actions_cache_storage_limit_for_organization_decode(
-  response : @http.Response,
-) -> ActionsCacheStorageLimitForOrganization raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[ActionsCacheStorageLimitForOrganization, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -4190,7 +4332,7 @@ pub fn actions_set_actions_cache_storage_limit_for_organization_request(
     "/organizations/" +
     @http.percent_encode(parameter_value(org)) +
     "/actions/cache/storage-limit",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -4283,7 +4425,7 @@ pub fn billing_create_organization_budget_request(
     "/organizations/" +
     @http.percent_encode(parameter_value(org)) +
     "/settings/billing/budgets",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -4299,9 +4441,10 @@ pub fn billing_create_organization_budget_decode_json(
 ///
 /// Decodes a successful billing/create-organization-budget response.
 pub fn billing_create_organization_budget_decode(
-  response : @http.Response,
-) -> CreateBudget raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[CreateBudget, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -4332,7 +4475,7 @@ pub fn billing_update_budget_org_request(
     @http.percent_encode(parameter_value(org)) +
     "/settings/billing/budgets/" +
     @http.percent_encode(parameter_value(budget_id)),
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -4348,9 +4491,10 @@ pub fn billing_update_budget_org_decode_json(
 ///
 /// Decodes a successful billing/update-budget-org response.
 pub fn billing_update_budget_org_decode(
-  response : @http.Response,
-) -> UpdateBudget raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[UpdateBudget, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -4506,9 +4650,10 @@ pub fn orgs_get_decode_json(
 ///
 /// Decodes a successful orgs/get response.
 pub fn orgs_get_decode(
-  response : @http.Response,
-) -> OrganizationFull raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[OrganizationFull, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -4518,7 +4663,7 @@ pub fn orgs_update_request(
   org : String,
   body : OrgsUpdateRequest,
 ) -> @http.Request {
-  @http.Request::patch("/orgs/" + @http.percent_encode(parameter_value(org))).json_body(
+  @http.Request::patch("/orgs/" + @http.percent_encode(parameter_value(org))).body_json(
     Json(body),
   )
 }
@@ -4536,9 +4681,10 @@ pub fn orgs_update_decode_json(
 ///
 /// Decodes a successful orgs/update response.
 pub fn orgs_update_decode(
-  response : @http.Response,
-) -> OrganizationFull raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[OrganizationFull, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -4574,9 +4720,10 @@ pub fn actions_get_actions_cache_usage_for_org_decode_json(
 ///
 /// Decodes a successful actions/get-actions-cache-usage-for-org response.
 pub fn actions_get_actions_cache_usage_for_org_decode(
-  response : @http.Response,
-) -> ActionsCacheUsageOrgEnterprise raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[ActionsCacheUsageOrgEnterprise, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -4615,9 +4762,13 @@ pub fn actions_get_actions_cache_usage_by_repo_for_org_decode_json(
 ///
 /// Decodes a successful actions/get-actions-cache-usage-by-repo-for-org response.
 pub fn actions_get_actions_cache_usage_by_repo_for_org_decode(
-  response : @http.Response,
-) -> ActionsGetActionsCacheUsageByRepoForOrgResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[
+  ActionsGetActionsCacheUsageByRepoForOrgResponse,
+  @client.ResponseFailure,
+] {
+  decode_response(head, body)
 }
 
 ///|
@@ -4656,9 +4807,10 @@ pub fn actions_list_hosted_runners_for_org_decode_json(
 ///
 /// Decodes a successful actions/list-hosted-runners-for-org response.
 pub fn actions_list_hosted_runners_for_org_decode(
-  response : @http.Response,
-) -> ActionsListHostedRunnersForOrgResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[ActionsListHostedRunnersForOrgResponse, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -4672,7 +4824,7 @@ pub fn actions_create_hosted_runner_for_org_request(
     "/orgs/" +
     @http.percent_encode(parameter_value(org)) +
     "/actions/hosted-runners",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -4688,9 +4840,10 @@ pub fn actions_create_hosted_runner_for_org_decode_json(
 ///
 /// Decodes a successful actions/create-hosted-runner-for-org response.
 pub fn actions_create_hosted_runner_for_org_decode(
-  response : @http.Response,
-) -> ActionsHostedRunner raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[ActionsHostedRunner, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -4719,9 +4872,10 @@ pub fn actions_list_custom_images_for_org_decode_json(
 ///
 /// Decodes a successful actions/list-custom-images-for-org response.
 pub fn actions_list_custom_images_for_org_decode(
-  response : @http.Response,
-) -> ActionsListCustomImagesForOrgResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[ActionsListCustomImagesForOrgResponse, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -4752,9 +4906,10 @@ pub fn actions_get_custom_image_for_org_decode_json(
 ///
 /// Decodes a successful actions/get-custom-image-for-org response.
 pub fn actions_get_custom_image_for_org_decode(
-  response : @http.Response,
-) -> ActionsHostedRunnerCustomImage raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[ActionsHostedRunnerCustomImage, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -4801,9 +4956,13 @@ pub fn actions_list_custom_image_versions_for_org_decode_json(
 ///
 /// Decodes a successful actions/list-custom-image-versions-for-org response.
 pub fn actions_list_custom_image_versions_for_org_decode(
-  response : @http.Response,
-) -> ActionsListCustomImageVersionsForOrgResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[
+  ActionsListCustomImageVersionsForOrgResponse,
+  @client.ResponseFailure,
+] {
+  decode_response(head, body)
 }
 
 ///|
@@ -4837,9 +4996,10 @@ pub fn actions_get_custom_image_version_for_org_decode_json(
 ///
 /// Decodes a successful actions/get-custom-image-version-for-org response.
 pub fn actions_get_custom_image_version_for_org_decode(
-  response : @http.Response,
-) -> ActionsHostedRunnerCustomImageVersion raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[ActionsHostedRunnerCustomImageVersion, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -4886,9 +5046,13 @@ pub fn actions_get_hosted_runners_github_owned_images_for_org_decode_json(
 ///
 /// Decodes a successful actions/get-hosted-runners-github-owned-images-for-org response.
 pub fn actions_get_hosted_runners_github_owned_images_for_org_decode(
-  response : @http.Response,
-) -> ActionsGetHostedRunnersGithubOwnedImagesForOrgResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[
+  ActionsGetHostedRunnersGithubOwnedImagesForOrgResponse,
+  @client.ResponseFailure,
+] {
+  decode_response(head, body)
 }
 
 ///|
@@ -4917,9 +5081,13 @@ pub fn actions_get_hosted_runners_partner_images_for_org_decode_json(
 ///
 /// Decodes a successful actions/get-hosted-runners-partner-images-for-org response.
 pub fn actions_get_hosted_runners_partner_images_for_org_decode(
-  response : @http.Response,
-) -> ActionsGetHostedRunnersPartnerImagesForOrgResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[
+  ActionsGetHostedRunnersPartnerImagesForOrgResponse,
+  @client.ResponseFailure,
+] {
+  decode_response(head, body)
 }
 
 ///|
@@ -4948,9 +5116,10 @@ pub fn actions_get_hosted_runners_limits_for_org_decode_json(
 ///
 /// Decodes a successful actions/get-hosted-runners-limits-for-org response.
 pub fn actions_get_hosted_runners_limits_for_org_decode(
-  response : @http.Response,
-) -> ActionsHostedRunnerLimits raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[ActionsHostedRunnerLimits, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -4979,9 +5148,13 @@ pub fn actions_get_hosted_runners_machine_specs_for_org_decode_json(
 ///
 /// Decodes a successful actions/get-hosted-runners-machine-specs-for-org response.
 pub fn actions_get_hosted_runners_machine_specs_for_org_decode(
-  response : @http.Response,
-) -> ActionsGetHostedRunnersMachineSpecsForOrgResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[
+  ActionsGetHostedRunnersMachineSpecsForOrgResponse,
+  @client.ResponseFailure,
+] {
+  decode_response(head, body)
 }
 
 ///|
@@ -5010,9 +5183,13 @@ pub fn actions_get_hosted_runners_platforms_for_org_decode_json(
 ///
 /// Decodes a successful actions/get-hosted-runners-platforms-for-org response.
 pub fn actions_get_hosted_runners_platforms_for_org_decode(
-  response : @http.Response,
-) -> ActionsGetHostedRunnersPlatformsForOrgResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[
+  ActionsGetHostedRunnersPlatformsForOrgResponse,
+  @client.ResponseFailure,
+] {
+  decode_response(head, body)
 }
 
 ///|
@@ -5043,9 +5220,10 @@ pub fn actions_get_hosted_runner_for_org_decode_json(
 ///
 /// Decodes a successful actions/get-hosted-runner-for-org response.
 pub fn actions_get_hosted_runner_for_org_decode(
-  response : @http.Response,
-) -> ActionsHostedRunner raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[ActionsHostedRunner, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -5061,7 +5239,7 @@ pub fn actions_update_hosted_runner_for_org_request(
     @http.percent_encode(parameter_value(org)) +
     "/actions/hosted-runners/" +
     @http.percent_encode(parameter_value(hosted_runner_id)),
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -5077,9 +5255,10 @@ pub fn actions_update_hosted_runner_for_org_decode_json(
 ///
 /// Decodes a successful actions/update-hosted-runner-for-org response.
 pub fn actions_update_hosted_runner_for_org_decode(
-  response : @http.Response,
-) -> ActionsHostedRunner raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[ActionsHostedRunner, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -5110,9 +5289,10 @@ pub fn actions_delete_hosted_runner_for_org_decode_json(
 ///
 /// Decodes a successful actions/delete-hosted-runner-for-org response.
 pub fn actions_delete_hosted_runner_for_org_decode(
-  response : @http.Response,
-) -> ActionsHostedRunner raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[ActionsHostedRunner, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -5141,9 +5321,10 @@ pub fn oidc_list_oidc_custom_property_inclusions_for_org_decode_json(
 ///
 /// Decodes a successful oidc/list-oidc-custom-property-inclusions-for-org response.
 pub fn oidc_list_oidc_custom_property_inclusions_for_org_decode(
-  response : @http.Response,
-) -> Array[OidcCustomPropertyInclusion] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[OidcCustomPropertyInclusion], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -5157,7 +5338,7 @@ pub fn oidc_create_oidc_custom_property_inclusion_for_org_request(
     "/orgs/" +
     @http.percent_encode(parameter_value(org)) +
     "/actions/oidc/customization/properties/repo",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -5173,9 +5354,10 @@ pub fn oidc_create_oidc_custom_property_inclusion_for_org_decode_json(
 ///
 /// Decodes a successful oidc/create-oidc-custom-property-inclusion-for-org response.
 pub fn oidc_create_oidc_custom_property_inclusion_for_org_decode(
-  response : @http.Response,
-) -> OidcCustomPropertyInclusion raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[OidcCustomPropertyInclusion, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -5219,9 +5401,10 @@ pub fn oidc_get_oidc_custom_sub_template_for_org_decode_json(
 ///
 /// Decodes a successful oidc/get-oidc-custom-sub-template-for-org response.
 pub fn oidc_get_oidc_custom_sub_template_for_org_decode(
-  response : @http.Response,
-) -> OidcCustomSub raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[OidcCustomSub, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -5235,7 +5418,7 @@ pub fn oidc_update_oidc_custom_sub_template_for_org_request(
     "/orgs/" +
     @http.percent_encode(parameter_value(org)) +
     "/actions/oidc/customization/sub",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -5251,9 +5434,10 @@ pub fn oidc_update_oidc_custom_sub_template_for_org_decode_json(
 ///
 /// Decodes a successful oidc/update-oidc-custom-sub-template-for-org response.
 pub fn oidc_update_oidc_custom_sub_template_for_org_decode(
-  response : @http.Response,
-) -> EmptyObject raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[EmptyObject, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -5282,9 +5466,10 @@ pub fn actions_get_github_actions_permissions_organization_decode_json(
 ///
 /// Decodes a successful actions/get-github-actions-permissions-organization response.
 pub fn actions_get_github_actions_permissions_organization_decode(
-  response : @http.Response,
-) -> ActionsOrganizationPermissions raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[ActionsOrganizationPermissions, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -5298,7 +5483,7 @@ pub fn actions_set_github_actions_permissions_organization_request(
     "/orgs/" +
     @http.percent_encode(parameter_value(org)) +
     "/actions/permissions",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -5327,9 +5512,10 @@ pub fn actions_get_artifact_and_log_retention_settings_organization_decode_json(
 ///
 /// Decodes a successful actions/get-artifact-and-log-retention-settings-organization response.
 pub fn actions_get_artifact_and_log_retention_settings_organization_decode(
-  response : @http.Response,
-) -> ActionsArtifactAndLogRetentionResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[ActionsArtifactAndLogRetentionResponse, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -5343,7 +5529,7 @@ pub fn actions_set_artifact_and_log_retention_settings_organization_request(
     "/orgs/" +
     @http.percent_encode(parameter_value(org)) +
     "/actions/permissions/artifact-and-log-retention",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -5372,9 +5558,10 @@ pub fn actions_get_fork_pr_contributor_approval_permissions_organization_decode_
 ///
 /// Decodes a successful actions/get-fork-pr-contributor-approval-permissions-organization response.
 pub fn actions_get_fork_pr_contributor_approval_permissions_organization_decode(
-  response : @http.Response,
-) -> ActionsForkPrContributorApproval raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[ActionsForkPrContributorApproval, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -5388,7 +5575,7 @@ pub fn actions_set_fork_pr_contributor_approval_permissions_organization_request
     "/orgs/" +
     @http.percent_encode(parameter_value(org)) +
     "/actions/permissions/fork-pr-contributor-approval",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -5417,9 +5604,10 @@ pub fn actions_get_private_repo_fork_pr_workflows_settings_organization_decode_j
 ///
 /// Decodes a successful actions/get-private-repo-fork-pr-workflows-settings-organization response.
 pub fn actions_get_private_repo_fork_pr_workflows_settings_organization_decode(
-  response : @http.Response,
-) -> ActionsForkPrWorkflowsPrivateRepos raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[ActionsForkPrWorkflowsPrivateRepos, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -5433,7 +5621,7 @@ pub fn actions_set_private_repo_fork_pr_workflows_settings_organization_request(
     "/orgs/" +
     @http.percent_encode(parameter_value(org)) +
     "/actions/permissions/fork-pr-workflows-private-repos",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -5472,9 +5660,13 @@ pub fn actions_list_selected_repositories_enabled_github_actions_organization_de
 ///
 /// Decodes a successful actions/list-selected-repositories-enabled-github-actions-organization response.
 pub fn actions_list_selected_repositories_enabled_github_actions_organization_decode(
-  response : @http.Response,
-) -> ActionsListSelectedRepositoriesEnabledGithubActionsOrganizationResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[
+  ActionsListSelectedRepositoriesEnabledGithubActionsOrganizationResponse,
+  @client.ResponseFailure,
+] {
+  decode_response(head, body)
 }
 
 ///|
@@ -5488,7 +5680,7 @@ pub fn actions_set_selected_repositories_enabled_github_actions_organization_req
     "/orgs/" +
     @http.percent_encode(parameter_value(org)) +
     "/actions/permissions/repositories",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -5547,9 +5739,10 @@ pub fn actions_get_allowed_actions_organization_decode_json(
 ///
 /// Decodes a successful actions/get-allowed-actions-organization response.
 pub fn actions_get_allowed_actions_organization_decode(
-  response : @http.Response,
-) -> SelectedActions raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[SelectedActions, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -5563,7 +5756,7 @@ pub fn actions_set_allowed_actions_organization_request(
     "/orgs/" +
     @http.percent_encode(parameter_value(org)) +
     "/actions/permissions/selected-actions",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -5592,9 +5785,10 @@ pub fn actions_get_self_hosted_runners_permissions_organization_decode_json(
 ///
 /// Decodes a successful actions/get-self-hosted-runners-permissions-organization response.
 pub fn actions_get_self_hosted_runners_permissions_organization_decode(
-  response : @http.Response,
-) -> SelfHostedRunnersSettings raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[SelfHostedRunnersSettings, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -5608,7 +5802,7 @@ pub fn actions_set_self_hosted_runners_permissions_organization_request(
     "/orgs/" +
     @http.percent_encode(parameter_value(org)) +
     "/actions/permissions/self-hosted-runners",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -5647,9 +5841,13 @@ pub fn actions_list_selected_repositories_self_hosted_runners_organization_decod
 ///
 /// Decodes a successful actions/list-selected-repositories-self-hosted-runners-organization response.
 pub fn actions_list_selected_repositories_self_hosted_runners_organization_decode(
-  response : @http.Response,
-) -> ActionsListSelectedRepositoriesSelfHostedRunnersOrganizationResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[
+  ActionsListSelectedRepositoriesSelfHostedRunnersOrganizationResponse,
+  @client.ResponseFailure,
+] {
+  decode_response(head, body)
 }
 
 ///|
@@ -5663,7 +5861,7 @@ pub fn actions_set_selected_repositories_self_hosted_runners_organization_reques
     "/orgs/" +
     @http.percent_encode(parameter_value(org)) +
     "/actions/permissions/self-hosted-runners/repositories",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -5722,9 +5920,10 @@ pub fn actions_get_github_actions_default_workflow_permissions_organization_deco
 ///
 /// Decodes a successful actions/get-github-actions-default-workflow-permissions-organization response.
 pub fn actions_get_github_actions_default_workflow_permissions_organization_decode(
-  response : @http.Response,
-) -> ActionsGetDefaultWorkflowPermissions raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[ActionsGetDefaultWorkflowPermissions, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -5738,7 +5937,7 @@ pub fn actions_set_github_actions_default_workflow_permissions_organization_requ
     "/orgs/" +
     @http.percent_encode(parameter_value(org)) +
     "/actions/permissions/workflow",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -5783,9 +5982,10 @@ pub fn actions_get_org_actions_policies_decode_json(
 ///
 /// Decodes a successful actions/get-org-actions-policies response.
 pub fn actions_get_org_actions_policies_decode(
-  response : @http.Response,
-) -> ActionsGetOrgActionsPoliciesResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[ActionsGetOrgActionsPoliciesResponse, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -5797,7 +5997,7 @@ pub fn actions_create_org_actions_policy_request(
 ) -> @http.Request {
   @http.Request::post(
     "/orgs/" + @http.percent_encode(parameter_value(org)) + "/actions/policies",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -5813,9 +6013,10 @@ pub fn actions_create_org_actions_policy_decode_json(
 ///
 /// Decodes a successful actions/create-org-actions-policy response.
 pub fn actions_create_org_actions_policy_decode(
-  response : @http.Response,
-) -> ActionsPolicy raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[ActionsPolicy, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -5846,9 +6047,10 @@ pub fn actions_get_org_actions_policy_decode_json(
 ///
 /// Decodes a successful actions/get-org-actions-policy response.
 pub fn actions_get_org_actions_policy_decode(
-  response : @http.Response,
-) -> ActionsPolicy raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[ActionsPolicy, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -5864,7 +6066,7 @@ pub fn actions_update_org_actions_policy_request(
     @http.percent_encode(parameter_value(org)) +
     "/actions/policies/" +
     @http.percent_encode(parameter_value(policy_id)),
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -5880,9 +6082,10 @@ pub fn actions_update_org_actions_policy_decode_json(
 ///
 /// Decodes a successful actions/update-org-actions-policy response.
 pub fn actions_update_org_actions_policy_decode(
-  response : @http.Response,
-) -> ActionsPolicy raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[ActionsPolicy, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -5946,9 +6149,13 @@ pub fn actions_list_self_hosted_runner_groups_for_org_decode_json(
 ///
 /// Decodes a successful actions/list-self-hosted-runner-groups-for-org response.
 pub fn actions_list_self_hosted_runner_groups_for_org_decode(
-  response : @http.Response,
-) -> ActionsListSelfHostedRunnerGroupsForOrgResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[
+  ActionsListSelfHostedRunnerGroupsForOrgResponse,
+  @client.ResponseFailure,
+] {
+  decode_response(head, body)
 }
 
 ///|
@@ -5962,7 +6169,7 @@ pub fn actions_create_self_hosted_runner_group_for_org_request(
     "/orgs/" +
     @http.percent_encode(parameter_value(org)) +
     "/actions/runner-groups",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -5978,9 +6185,10 @@ pub fn actions_create_self_hosted_runner_group_for_org_decode_json(
 ///
 /// Decodes a successful actions/create-self-hosted-runner-group-for-org response.
 pub fn actions_create_self_hosted_runner_group_for_org_decode(
-  response : @http.Response,
-) -> RunnerGroupsOrg raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[RunnerGroupsOrg, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -6011,9 +6219,10 @@ pub fn actions_get_self_hosted_runner_group_for_org_decode_json(
 ///
 /// Decodes a successful actions/get-self-hosted-runner-group-for-org response.
 pub fn actions_get_self_hosted_runner_group_for_org_decode(
-  response : @http.Response,
-) -> RunnerGroupsOrg raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[RunnerGroupsOrg, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -6029,7 +6238,7 @@ pub fn actions_update_self_hosted_runner_group_for_org_request(
     @http.percent_encode(parameter_value(org)) +
     "/actions/runner-groups/" +
     @http.percent_encode(parameter_value(runner_group_id)),
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -6045,9 +6254,10 @@ pub fn actions_update_self_hosted_runner_group_for_org_decode_json(
 ///
 /// Decodes a successful actions/update-self-hosted-runner-group-for-org response.
 pub fn actions_update_self_hosted_runner_group_for_org_decode(
-  response : @http.Response,
-) -> RunnerGroupsOrg raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[RunnerGroupsOrg, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -6104,9 +6314,13 @@ pub fn actions_list_github_hosted_runners_in_group_for_org_decode_json(
 ///
 /// Decodes a successful actions/list-github-hosted-runners-in-group-for-org response.
 pub fn actions_list_github_hosted_runners_in_group_for_org_decode(
-  response : @http.Response,
-) -> ActionsListGithubHostedRunnersInGroupForOrgResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[
+  ActionsListGithubHostedRunnersInGroupForOrgResponse,
+  @client.ResponseFailure,
+] {
+  decode_response(head, body)
 }
 
 ///|
@@ -6148,9 +6362,13 @@ pub fn actions_list_repo_access_to_self_hosted_runner_group_in_org_decode_json(
 ///
 /// Decodes a successful actions/list-repo-access-to-self-hosted-runner-group-in-org response.
 pub fn actions_list_repo_access_to_self_hosted_runner_group_in_org_decode(
-  response : @http.Response,
-) -> ActionsListRepoAccessToSelfHostedRunnerGroupInOrgResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[
+  ActionsListRepoAccessToSelfHostedRunnerGroupInOrgResponse,
+  @client.ResponseFailure,
+] {
+  decode_response(head, body)
 }
 
 ///|
@@ -6167,7 +6385,7 @@ pub fn actions_set_repo_access_to_self_hosted_runner_group_in_org_request(
     "/actions/runner-groups/" +
     @http.percent_encode(parameter_value(runner_group_id)) +
     "/repositories",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -6245,9 +6463,13 @@ pub fn actions_list_self_hosted_runners_in_group_for_org_decode_json(
 ///
 /// Decodes a successful actions/list-self-hosted-runners-in-group-for-org response.
 pub fn actions_list_self_hosted_runners_in_group_for_org_decode(
-  response : @http.Response,
-) -> ActionsListSelfHostedRunnersInGroupForOrgResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[
+  ActionsListSelfHostedRunnersInGroupForOrgResponse,
+  @client.ResponseFailure,
+] {
+  decode_response(head, body)
 }
 
 ///|
@@ -6264,7 +6486,7 @@ pub fn actions_set_self_hosted_runners_in_group_for_org_request(
     "/actions/runner-groups/" +
     @http.percent_encode(parameter_value(runner_group_id)) +
     "/runners",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -6344,9 +6566,10 @@ pub fn actions_list_self_hosted_runners_for_org_decode_json(
 ///
 /// Decodes a successful actions/list-self-hosted-runners-for-org response.
 pub fn actions_list_self_hosted_runners_for_org_decode(
-  response : @http.Response,
-) -> ActionsListSelfHostedRunnersForOrgResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[ActionsListSelfHostedRunnersForOrgResponse, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -6377,9 +6600,13 @@ pub fn actions_get_runner_version_deprecation_for_org_decode_json(
 ///
 /// Decodes a successful actions/get-runner-version-deprecation-for-org response.
 pub fn actions_get_runner_version_deprecation_for_org_decode(
-  response : @http.Response,
-) -> ActionsGetRunnerVersionDeprecationForOrgResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[
+  ActionsGetRunnerVersionDeprecationForOrgResponse,
+  @client.ResponseFailure,
+] {
+  decode_response(head, body)
 }
 
 ///|
@@ -6408,9 +6635,10 @@ pub fn actions_list_runner_applications_for_org_decode_json(
 ///
 /// Decodes a successful actions/list-runner-applications-for-org response.
 pub fn actions_list_runner_applications_for_org_decode(
-  response : @http.Response,
-) -> Array[RunnerApplication] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[RunnerApplication], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -6424,7 +6652,7 @@ pub fn actions_generate_runner_jitconfig_for_org_request(
     "/orgs/" +
     @http.percent_encode(parameter_value(org)) +
     "/actions/runners/generate-jitconfig",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -6453,9 +6681,10 @@ pub fn actions_create_registration_token_for_org_decode_json(
 ///
 /// Decodes a successful actions/create-registration-token-for-org response.
 pub fn actions_create_registration_token_for_org_decode(
-  response : @http.Response,
-) -> AuthenticationToken raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[AuthenticationToken, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -6484,9 +6713,10 @@ pub fn actions_create_remove_token_for_org_decode_json(
 ///
 /// Decodes a successful actions/create-remove-token-for-org response.
 pub fn actions_create_remove_token_for_org_decode(
-  response : @http.Response,
-) -> AuthenticationToken raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[AuthenticationToken, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -6517,9 +6747,10 @@ pub fn actions_get_self_hosted_runner_for_org_decode_json(
 ///
 /// Decodes a successful actions/get-self-hosted-runner-for-org response.
 pub fn actions_get_self_hosted_runner_for_org_decode(
-  response : @http.Response,
-) -> Runner raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Runner, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -6567,7 +6798,7 @@ pub fn actions_add_custom_labels_to_self_hosted_runner_for_org_request(
     "/actions/runners/" +
     @http.percent_encode(parameter_value(runner_id)) +
     "/labels",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -6584,7 +6815,7 @@ pub fn actions_set_custom_labels_for_self_hosted_runner_for_org_request(
     "/actions/runners/" +
     @http.percent_encode(parameter_value(runner_id)) +
     "/labels",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -6657,9 +6888,10 @@ pub fn actions_list_org_secrets_decode_json(
 ///
 /// Decodes a successful actions/list-org-secrets response.
 pub fn actions_list_org_secrets_decode(
-  response : @http.Response,
-) -> ActionsListOrgSecretsResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[ActionsListOrgSecretsResponse, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -6686,9 +6918,10 @@ pub fn actions_get_org_public_key_decode_json(
 ///
 /// Decodes a successful actions/get-org-public-key response.
 pub fn actions_get_org_public_key_decode(
-  response : @http.Response,
-) -> ActionsPublicKey raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[ActionsPublicKey, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -6719,9 +6952,10 @@ pub fn actions_get_org_secret_decode_json(
 ///
 /// Decodes a successful actions/get-org-secret response.
 pub fn actions_get_org_secret_decode(
-  response : @http.Response,
-) -> OrganizationActionsSecret raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[OrganizationActionsSecret, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -6737,7 +6971,7 @@ pub fn actions_create_or_update_org_secret_request(
     @http.percent_encode(parameter_value(org)) +
     "/actions/secrets/" +
     @http.percent_encode(parameter_value(secret_name)),
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -6753,9 +6987,10 @@ pub fn actions_create_or_update_org_secret_decode_json(
 ///
 /// Decodes a successful actions/create-or-update-org-secret response.
 pub fn actions_create_or_update_org_secret_decode(
-  response : @http.Response,
-) -> EmptyObject raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[EmptyObject, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -6812,9 +7047,13 @@ pub fn actions_list_selected_repos_for_org_secret_decode_json(
 ///
 /// Decodes a successful actions/list-selected-repos-for-org-secret response.
 pub fn actions_list_selected_repos_for_org_secret_decode(
-  response : @http.Response,
-) -> ActionsListSelectedReposForOrgSecretResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[
+  ActionsListSelectedReposForOrgSecretResponse,
+  @client.ResponseFailure,
+] {
+  decode_response(head, body)
 }
 
 ///|
@@ -6831,7 +7070,7 @@ pub fn actions_set_selected_repos_for_org_secret_request(
     "/actions/secrets/" +
     @http.percent_encode(parameter_value(secret_name)) +
     "/repositories",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -6906,9 +7145,10 @@ pub fn actions_list_org_variables_decode_json(
 ///
 /// Decodes a successful actions/list-org-variables response.
 pub fn actions_list_org_variables_decode(
-  response : @http.Response,
-) -> ActionsListOrgVariablesResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[ActionsListOrgVariablesResponse, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -6920,7 +7160,7 @@ pub fn actions_create_org_variable_request(
 ) -> @http.Request {
   @http.Request::post(
     "/orgs/" + @http.percent_encode(parameter_value(org)) + "/actions/variables",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -6936,9 +7176,10 @@ pub fn actions_create_org_variable_decode_json(
 ///
 /// Decodes a successful actions/create-org-variable response.
 pub fn actions_create_org_variable_decode(
-  response : @http.Response,
-) -> EmptyObject raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[EmptyObject, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -6969,9 +7210,10 @@ pub fn actions_get_org_variable_decode_json(
 ///
 /// Decodes a successful actions/get-org-variable response.
 pub fn actions_get_org_variable_decode(
-  response : @http.Response,
-) -> OrganizationActionsVariable raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[OrganizationActionsVariable, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -6987,7 +7229,7 @@ pub fn actions_update_org_variable_request(
     @http.percent_encode(parameter_value(org)) +
     "/actions/variables/" +
     @http.percent_encode(parameter_value(name)),
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -7044,9 +7286,13 @@ pub fn actions_list_selected_repos_for_org_variable_decode_json(
 ///
 /// Decodes a successful actions/list-selected-repos-for-org-variable response.
 pub fn actions_list_selected_repos_for_org_variable_decode(
-  response : @http.Response,
-) -> ActionsListSelectedReposForOrgVariableResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[
+  ActionsListSelectedReposForOrgVariableResponse,
+  @client.ResponseFailure,
+] {
+  decode_response(head, body)
 }
 
 ///|
@@ -7063,7 +7309,7 @@ pub fn actions_set_selected_repos_for_org_variable_request(
     "/actions/variables/" +
     @http.percent_encode(parameter_value(name)) +
     "/repositories",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -7138,9 +7384,10 @@ pub fn agents_list_org_secrets_decode_json(
 ///
 /// Decodes a successful agents/list-org-secrets response.
 pub fn agents_list_org_secrets_decode(
-  response : @http.Response,
-) -> AgentsListOrgSecretsResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[AgentsListOrgSecretsResponse, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -7167,9 +7414,10 @@ pub fn agents_get_org_public_key_decode_json(
 ///
 /// Decodes a successful agents/get-org-public-key response.
 pub fn agents_get_org_public_key_decode(
-  response : @http.Response,
-) -> ActionsPublicKey raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[ActionsPublicKey, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -7200,9 +7448,10 @@ pub fn agents_get_org_secret_decode_json(
 ///
 /// Decodes a successful agents/get-org-secret response.
 pub fn agents_get_org_secret_decode(
-  response : @http.Response,
-) -> OrganizationActionsSecret raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[OrganizationActionsSecret, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -7218,7 +7467,7 @@ pub fn agents_create_or_update_org_secret_request(
     @http.percent_encode(parameter_value(org)) +
     "/agents/secrets/" +
     @http.percent_encode(parameter_value(secret_name)),
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -7234,9 +7483,10 @@ pub fn agents_create_or_update_org_secret_decode_json(
 ///
 /// Decodes a successful agents/create-or-update-org-secret response.
 pub fn agents_create_or_update_org_secret_decode(
-  response : @http.Response,
-) -> EmptyObject raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[EmptyObject, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -7293,9 +7543,13 @@ pub fn agents_list_selected_repos_for_org_secret_decode_json(
 ///
 /// Decodes a successful agents/list-selected-repos-for-org-secret response.
 pub fn agents_list_selected_repos_for_org_secret_decode(
-  response : @http.Response,
-) -> AgentsListSelectedReposForOrgSecretResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[
+  AgentsListSelectedReposForOrgSecretResponse,
+  @client.ResponseFailure,
+] {
+  decode_response(head, body)
 }
 
 ///|
@@ -7312,7 +7566,7 @@ pub fn agents_set_selected_repos_for_org_secret_request(
     "/agents/secrets/" +
     @http.percent_encode(parameter_value(secret_name)) +
     "/repositories",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -7387,9 +7641,10 @@ pub fn agents_list_org_variables_decode_json(
 ///
 /// Decodes a successful agents/list-org-variables response.
 pub fn agents_list_org_variables_decode(
-  response : @http.Response,
-) -> AgentsListOrgVariablesResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[AgentsListOrgVariablesResponse, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -7401,7 +7656,7 @@ pub fn agents_create_org_variable_request(
 ) -> @http.Request {
   @http.Request::post(
     "/orgs/" + @http.percent_encode(parameter_value(org)) + "/agents/variables",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -7417,9 +7672,10 @@ pub fn agents_create_org_variable_decode_json(
 ///
 /// Decodes a successful agents/create-org-variable response.
 pub fn agents_create_org_variable_decode(
-  response : @http.Response,
-) -> EmptyObject raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[EmptyObject, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -7450,9 +7706,10 @@ pub fn agents_get_org_variable_decode_json(
 ///
 /// Decodes a successful agents/get-org-variable response.
 pub fn agents_get_org_variable_decode(
-  response : @http.Response,
-) -> OrganizationActionsVariable raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[OrganizationActionsVariable, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -7468,7 +7725,7 @@ pub fn agents_update_org_variable_request(
     @http.percent_encode(parameter_value(org)) +
     "/agents/variables/" +
     @http.percent_encode(parameter_value(name)),
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -7525,9 +7782,13 @@ pub fn agents_list_selected_repos_for_org_variable_decode_json(
 ///
 /// Decodes a successful agents/list-selected-repos-for-org-variable response.
 pub fn agents_list_selected_repos_for_org_variable_decode(
-  response : @http.Response,
-) -> AgentsListSelectedReposForOrgVariableResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[
+  AgentsListSelectedReposForOrgVariableResponse,
+  @client.ResponseFailure,
+] {
+  decode_response(head, body)
 }
 
 ///|
@@ -7544,7 +7805,7 @@ pub fn agents_set_selected_repos_for_org_variable_request(
     "/agents/variables/" +
     @http.percent_encode(parameter_value(name)) +
     "/repositories",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -7594,7 +7855,7 @@ pub fn orgs_create_artifact_deployment_record_request(
     "/orgs/" +
     @http.percent_encode(parameter_value(org)) +
     "/artifacts/metadata/deployment-record",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -7610,9 +7871,10 @@ pub fn orgs_create_artifact_deployment_record_decode_json(
 ///
 /// Decodes a successful orgs/create-artifact-deployment-record response.
 pub fn orgs_create_artifact_deployment_record_decode(
-  response : @http.Response,
-) -> OrgsCreateArtifactDeploymentRecordResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[OrgsCreateArtifactDeploymentRecordResponse, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -7628,7 +7890,7 @@ pub fn orgs_set_cluster_deployment_records_request(
     @http.percent_encode(parameter_value(org)) +
     "/artifacts/metadata/deployment-record/cluster/" +
     @http.percent_encode(parameter_value(cluster)),
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -7644,9 +7906,10 @@ pub fn orgs_set_cluster_deployment_records_decode_json(
 ///
 /// Decodes a successful orgs/set-cluster-deployment-records response.
 pub fn orgs_set_cluster_deployment_records_decode(
-  response : @http.Response,
-) -> OrgsSetClusterDeploymentRecordsResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[OrgsSetClusterDeploymentRecordsResponse, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -7663,7 +7926,7 @@ pub fn orgs_create_cluster_deployment_records_job_request(
     "/artifacts/metadata/deployment-record/cluster/" +
     @http.percent_encode(parameter_value(cluster)) +
     "/jobs",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -7679,9 +7942,13 @@ pub fn orgs_create_cluster_deployment_records_job_decode_json(
 ///
 /// Decodes a successful orgs/create-cluster-deployment-records-job response.
 pub fn orgs_create_cluster_deployment_records_job_decode(
-  response : @http.Response,
-) -> OrgsCreateClusterDeploymentRecordsJobResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[
+  OrgsCreateClusterDeploymentRecordsJobResponse,
+  @client.ResponseFailure,
+] {
+  decode_response(head, body)
 }
 
 ///|
@@ -7715,9 +7982,10 @@ pub fn orgs_get_cluster_deployment_records_job_decode_json(
 ///
 /// Decodes a successful orgs/get-cluster-deployment-records-job response.
 pub fn orgs_get_cluster_deployment_records_job_decode(
-  response : @http.Response,
-) -> OrgsGetClusterDeploymentRecordsJobResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[OrgsGetClusterDeploymentRecordsJobResponse, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -7731,7 +7999,7 @@ pub fn orgs_create_artifact_storage_record_request(
     "/orgs/" +
     @http.percent_encode(parameter_value(org)) +
     "/artifacts/metadata/storage-record",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -7747,9 +8015,10 @@ pub fn orgs_create_artifact_storage_record_decode_json(
 ///
 /// Decodes a successful orgs/create-artifact-storage-record response.
 pub fn orgs_create_artifact_storage_record_decode(
-  response : @http.Response,
-) -> OrgsCreateArtifactStorageRecordResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[OrgsCreateArtifactStorageRecordResponse, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -7781,9 +8050,10 @@ pub fn orgs_list_artifact_deployment_records_decode_json(
 ///
 /// Decodes a successful orgs/list-artifact-deployment-records response.
 pub fn orgs_list_artifact_deployment_records_decode(
-  response : @http.Response,
-) -> OrgsListArtifactDeploymentRecordsResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[OrgsListArtifactDeploymentRecordsResponse, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -7815,9 +8085,10 @@ pub fn orgs_list_artifact_storage_records_decode_json(
 ///
 /// Decodes a successful orgs/list-artifact-storage-records response.
 pub fn orgs_list_artifact_storage_records_decode(
-  response : @http.Response,
-) -> OrgsListArtifactStorageRecordsResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[OrgsListArtifactStorageRecordsResponse, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -7848,7 +8119,7 @@ pub fn orgs_list_attestations_bulk_request(
       url = @http.append_query(url, "after", parameter_value(value))
     None => ()
   }
-  @http.Request::post(url).json_body(Json(body))
+  @http.Request::post(url).body_json(Json(body))
 }
 
 ///|
@@ -7864,9 +8135,10 @@ pub fn orgs_list_attestations_bulk_decode_json(
 ///
 /// Decodes a successful orgs/list-attestations-bulk response.
 pub fn orgs_list_attestations_bulk_decode(
-  response : @http.Response,
-) -> OrgsListAttestationsBulkResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[OrgsListAttestationsBulkResponse, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -7880,7 +8152,7 @@ pub fn orgs_delete_attestations_bulk_request(
     "/orgs/" +
     @http.percent_encode(parameter_value(org)) +
     "/attestations/delete-request",
-  ).json_body(body)
+  ).body_json(body)
 }
 
 ///|
@@ -7947,9 +8219,13 @@ pub fn orgs_list_attestation_repositories_decode_json(
 ///
 /// Decodes a successful orgs/list-attestation-repositories response.
 pub fn orgs_list_attestation_repositories_decode(
-  response : @http.Response,
-) -> Array[OrgsListAttestationRepositoriesResponseItem] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[
+  Array[OrgsListAttestationRepositoriesResponseItem],
+  @client.ResponseFailure,
+] {
+  decode_response(head, body)
 }
 
 ///|
@@ -8018,9 +8294,10 @@ pub fn orgs_list_attestations_decode_json(
 ///
 /// Decodes a successful orgs/list-attestations response.
 pub fn orgs_list_attestations_decode(
-  response : @http.Response,
-) -> OrgsListAttestationsResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[OrgsListAttestationsResponse, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -8059,9 +8336,10 @@ pub fn orgs_list_blocked_users_decode_json(
 ///
 /// Decodes a successful orgs/list-blocked-users response.
 pub fn orgs_list_blocked_users_decode(
-  response : @http.Response,
-) -> Array[SimpleUser] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[SimpleUser], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -8162,9 +8440,10 @@ pub fn campaigns_list_org_campaigns_decode_json(
 ///
 /// Decodes a successful campaigns/list-org-campaigns response.
 pub fn campaigns_list_org_campaigns_decode(
-  response : @http.Response,
-) -> Array[CampaignSummary] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[CampaignSummary], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -8176,7 +8455,7 @@ pub fn campaigns_create_campaign_request(
 ) -> @http.Request {
   @http.Request::post(
     "/orgs/" + @http.percent_encode(parameter_value(org)) + "/campaigns",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -8192,9 +8471,10 @@ pub fn campaigns_create_campaign_decode_json(
 ///
 /// Decodes a successful campaigns/create-campaign response.
 pub fn campaigns_create_campaign_decode(
-  response : @http.Response,
-) -> CampaignSummary raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[CampaignSummary, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -8225,9 +8505,10 @@ pub fn campaigns_get_campaign_summary_decode_json(
 ///
 /// Decodes a successful campaigns/get-campaign-summary response.
 pub fn campaigns_get_campaign_summary_decode(
-  response : @http.Response,
-) -> CampaignSummary raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[CampaignSummary, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -8243,7 +8524,7 @@ pub fn campaigns_update_campaign_request(
     @http.percent_encode(parameter_value(org)) +
     "/campaigns/" +
     @http.percent_encode(parameter_value(campaign_number)),
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -8259,9 +8540,10 @@ pub fn campaigns_update_campaign_decode_json(
 ///
 /// Decodes a successful campaigns/update-campaign response.
 pub fn campaigns_update_campaign_decode(
-  response : @http.Response,
-) -> CampaignSummary raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[CampaignSummary, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -8305,9 +8587,10 @@ pub fn code_scanning_get_ai_scan_enablement_for_org_decode_json(
 ///
 /// Decodes a successful code-scanning/get-ai-scan-enablement-for-org response.
 pub fn code_scanning_get_ai_scan_enablement_for_org_decode(
-  response : @http.Response,
-) -> CodeScanningAiScanOrgSettings raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[CodeScanningAiScanOrgSettings, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -8321,7 +8604,7 @@ pub fn code_scanning_update_ai_scan_enablement_for_org_request(
     "/orgs/" +
     @http.percent_encode(parameter_value(org)) +
     "/code-scanning/ai-scan",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -8337,9 +8620,10 @@ pub fn code_scanning_update_ai_scan_enablement_for_org_decode_json(
 ///
 /// Decodes a successful code-scanning/update-ai-scan-enablement-for-org response.
 pub fn code_scanning_update_ai_scan_enablement_for_org_decode(
-  response : @http.Response,
-) -> CodeScanningAiScanOrgSettings raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[CodeScanningAiScanOrgSettings, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -8431,9 +8715,10 @@ pub fn code_scanning_list_alerts_for_org_decode_json(
 ///
 /// Decodes a successful code-scanning/list-alerts-for-org response.
 pub fn code_scanning_list_alerts_for_org_decode(
-  response : @http.Response,
-) -> Array[CodeScanningOrganizationAlertItems] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[CodeScanningOrganizationAlertItems], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -8485,9 +8770,10 @@ pub fn code_security_get_configurations_for_org_decode_json(
 ///
 /// Decodes a successful code-security/get-configurations-for-org response.
 pub fn code_security_get_configurations_for_org_decode(
-  response : @http.Response,
-) -> Array[CodeSecurityConfiguration] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[CodeSecurityConfiguration], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -8501,7 +8787,7 @@ pub fn code_security_create_configuration_request(
     "/orgs/" +
     @http.percent_encode(parameter_value(org)) +
     "/code-security/configurations",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -8517,9 +8803,10 @@ pub fn code_security_create_configuration_decode_json(
 ///
 /// Decodes a successful code-security/create-configuration response.
 pub fn code_security_create_configuration_decode(
-  response : @http.Response,
-) -> CodeSecurityConfiguration raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[CodeSecurityConfiguration, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -8548,9 +8835,13 @@ pub fn code_security_get_default_configurations_decode_json(
 ///
 /// Decodes a successful code-security/get-default-configurations response.
 pub fn code_security_get_default_configurations_decode(
-  response : @http.Response,
-) -> Array[CodeSecurityDefaultConfigurationsItem] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[
+  Array[CodeSecurityDefaultConfigurationsItem],
+  @client.ResponseFailure,
+] {
+  decode_response(head, body)
 }
 
 ///|
@@ -8564,7 +8855,7 @@ pub fn code_security_detach_configuration_request(
     "/orgs/" +
     @http.percent_encode(parameter_value(org)) +
     "/code-security/configurations/detach",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -8595,9 +8886,10 @@ pub fn code_security_get_configuration_decode_json(
 ///
 /// Decodes a successful code-security/get-configuration response.
 pub fn code_security_get_configuration_decode(
-  response : @http.Response,
-) -> CodeSecurityConfiguration raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[CodeSecurityConfiguration, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -8613,7 +8905,7 @@ pub fn code_security_update_configuration_request(
     @http.percent_encode(parameter_value(org)) +
     "/code-security/configurations/" +
     @http.percent_encode(parameter_value(configuration_id)),
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -8629,9 +8921,10 @@ pub fn code_security_update_configuration_decode_json(
 ///
 /// Decodes a successful code-security/update-configuration response.
 pub fn code_security_update_configuration_decode(
-  response : @http.Response,
-) -> CodeSecurityConfiguration raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[CodeSecurityConfiguration, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -8663,7 +8956,7 @@ pub fn code_security_attach_configuration_request(
     "/code-security/configurations/" +
     @http.percent_encode(parameter_value(configuration_id)) +
     "/attach",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -8680,7 +8973,7 @@ pub fn code_security_set_configuration_as_default_request(
     "/code-security/configurations/" +
     @http.percent_encode(parameter_value(configuration_id)) +
     "/defaults",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -8696,9 +8989,13 @@ pub fn code_security_set_configuration_as_default_decode_json(
 ///
 /// Decodes a successful code-security/set-configuration-as-default response.
 pub fn code_security_set_configuration_as_default_decode(
-  response : @http.Response,
-) -> CodeSecuritySetConfigurationAsDefaultResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[
+  CodeSecuritySetConfigurationAsDefaultResponse,
+  @client.ResponseFailure,
+] {
+  decode_response(head, body)
 }
 
 ///|
@@ -8753,9 +9050,13 @@ pub fn code_security_get_repositories_for_configuration_decode_json(
 ///
 /// Decodes a successful code-security/get-repositories-for-configuration response.
 pub fn code_security_get_repositories_for_configuration_decode(
-  response : @http.Response,
-) -> Array[CodeSecurityConfigurationRepositories] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[
+  Array[CodeSecurityConfigurationRepositories],
+  @client.ResponseFailure,
+] {
+  decode_response(head, body)
 }
 
 ///|
@@ -8794,9 +9095,10 @@ pub fn codespaces_list_in_organization_decode_json(
 ///
 /// Decodes a successful codespaces/list-in-organization response.
 pub fn codespaces_list_in_organization_decode(
-  response : @http.Response,
-) -> CodespacesListInOrganizationResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[CodespacesListInOrganizationResponse, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -8808,7 +9110,7 @@ pub fn codespaces_set_codespaces_access_request(
 ) -> @http.Request {
   @http.Request::put(
     "/orgs/" + @http.percent_encode(parameter_value(org)) + "/codespaces/access",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -8822,7 +9124,7 @@ pub fn codespaces_set_codespaces_access_users_request(
     "/orgs/" +
     @http.percent_encode(parameter_value(org)) +
     "/codespaces/access/selected_users",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -8836,7 +9138,7 @@ pub fn codespaces_delete_codespaces_access_users_request(
     "/orgs/" +
     @http.percent_encode(parameter_value(org)) +
     "/codespaces/access/selected_users",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -8875,9 +9177,10 @@ pub fn codespaces_list_org_secrets_decode_json(
 ///
 /// Decodes a successful codespaces/list-org-secrets response.
 pub fn codespaces_list_org_secrets_decode(
-  response : @http.Response,
-) -> CodespacesListOrgSecretsResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[CodespacesListOrgSecretsResponse, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -8904,9 +9207,10 @@ pub fn codespaces_get_org_public_key_decode_json(
 ///
 /// Decodes a successful codespaces/get-org-public-key response.
 pub fn codespaces_get_org_public_key_decode(
-  response : @http.Response,
-) -> CodespacesPublicKey raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[CodespacesPublicKey, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -8937,9 +9241,10 @@ pub fn codespaces_get_org_secret_decode_json(
 ///
 /// Decodes a successful codespaces/get-org-secret response.
 pub fn codespaces_get_org_secret_decode(
-  response : @http.Response,
-) -> CodespacesOrgSecret raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[CodespacesOrgSecret, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -8955,7 +9260,7 @@ pub fn codespaces_create_or_update_org_secret_request(
     @http.percent_encode(parameter_value(org)) +
     "/codespaces/secrets/" +
     @http.percent_encode(parameter_value(secret_name)),
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -8971,9 +9276,10 @@ pub fn codespaces_create_or_update_org_secret_decode_json(
 ///
 /// Decodes a successful codespaces/create-or-update-org-secret response.
 pub fn codespaces_create_or_update_org_secret_decode(
-  response : @http.Response,
-) -> EmptyObject raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[EmptyObject, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -9030,9 +9336,13 @@ pub fn codespaces_list_selected_repos_for_org_secret_decode_json(
 ///
 /// Decodes a successful codespaces/list-selected-repos-for-org-secret response.
 pub fn codespaces_list_selected_repos_for_org_secret_decode(
-  response : @http.Response,
-) -> CodespacesListSelectedReposForOrgSecretResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[
+  CodespacesListSelectedReposForOrgSecretResponse,
+  @client.ResponseFailure,
+] {
+  decode_response(head, body)
 }
 
 ///|
@@ -9049,7 +9359,7 @@ pub fn codespaces_set_selected_repos_for_org_secret_request(
     "/codespaces/secrets/" +
     @http.percent_encode(parameter_value(secret_name)) +
     "/repositories",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -9131,9 +9441,10 @@ pub fn copilot_spaces_list_for_org_decode_json(
 ///
 /// Decodes a successful copilot-spaces/list-for-org response.
 pub fn copilot_spaces_list_for_org_decode(
-  response : @http.Response,
-) -> CopilotSpacesListForOrgResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[CopilotSpacesListForOrgResponse, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -9145,7 +9456,7 @@ pub fn copilot_spaces_create_for_org_request(
 ) -> @http.Request {
   @http.Request::post(
     "/orgs/" + @http.percent_encode(parameter_value(org)) + "/copilot-spaces",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -9161,9 +9472,10 @@ pub fn copilot_spaces_create_for_org_decode_json(
 ///
 /// Decodes a successful copilot-spaces/create-for-org response.
 pub fn copilot_spaces_create_for_org_decode(
-  response : @http.Response,
-) -> CopilotSpace raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[CopilotSpace, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -9194,9 +9506,10 @@ pub fn copilot_spaces_get_for_org_decode_json(
 ///
 /// Decodes a successful copilot-spaces/get-for-org response.
 pub fn copilot_spaces_get_for_org_decode(
-  response : @http.Response,
-) -> CopilotSpace raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[CopilotSpace, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -9212,7 +9525,7 @@ pub fn copilot_spaces_update_for_org_request(
     @http.percent_encode(parameter_value(org)) +
     "/copilot-spaces/" +
     @http.percent_encode(parameter_value(space_number)),
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -9228,9 +9541,10 @@ pub fn copilot_spaces_update_for_org_decode_json(
 ///
 /// Decodes a successful copilot-spaces/update-for-org response.
 pub fn copilot_spaces_update_for_org_decode(
-  response : @http.Response,
-) -> CopilotSpace raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[CopilotSpace, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -9277,9 +9591,13 @@ pub fn copilot_spaces_list_collaborators_for_org_decode_json(
 ///
 /// Decodes a successful copilot-spaces/list-collaborators-for-org response.
 pub fn copilot_spaces_list_collaborators_for_org_decode(
-  response : @http.Response,
-) -> CopilotSpacesListCollaboratorsForOrgResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[
+  CopilotSpacesListCollaboratorsForOrgResponse,
+  @client.ResponseFailure,
+] {
+  decode_response(head, body)
 }
 
 ///|
@@ -9296,7 +9614,7 @@ pub fn copilot_spaces_add_collaborator_for_org_request(
     "/copilot-spaces/" +
     @http.percent_encode(parameter_value(space_number)) +
     "/collaborators",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -9312,9 +9630,10 @@ pub fn copilot_spaces_add_collaborator_for_org_decode_json(
 ///
 /// Decodes a successful copilot-spaces/add-collaborator-for-org response.
 pub fn copilot_spaces_add_collaborator_for_org_decode(
-  response : @http.Response,
-) -> CopilotSpaceCollaborator raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[CopilotSpaceCollaborator, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -9336,7 +9655,7 @@ pub fn copilot_spaces_update_collaborator_for_org_request(
     @http.percent_encode(parameter_value(actor_type)) +
     "/" +
     @http.percent_encode(parameter_value(actor_identifier)),
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -9352,9 +9671,10 @@ pub fn copilot_spaces_update_collaborator_for_org_decode_json(
 ///
 /// Decodes a successful copilot-spaces/update-collaborator-for-org response.
 pub fn copilot_spaces_update_collaborator_for_org_decode(
-  response : @http.Response,
-) -> CopilotSpaceCollaborator raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[CopilotSpaceCollaborator, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -9407,9 +9727,10 @@ pub fn copilot_spaces_list_resources_for_org_decode_json(
 ///
 /// Decodes a successful copilot-spaces/list-resources-for-org response.
 pub fn copilot_spaces_list_resources_for_org_decode(
-  response : @http.Response,
-) -> CopilotSpacesListResourcesForOrgResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[CopilotSpacesListResourcesForOrgResponse, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -9426,7 +9747,7 @@ pub fn copilot_spaces_create_resource_for_org_request(
     "/copilot-spaces/" +
     @http.percent_encode(parameter_value(space_number)) +
     "/resources",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -9442,9 +9763,10 @@ pub fn copilot_spaces_create_resource_for_org_decode_json(
 ///
 /// Decodes a successful copilot-spaces/create-resource-for-org response.
 pub fn copilot_spaces_create_resource_for_org_decode(
-  response : @http.Response,
-) -> CopilotSpaceResource raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[CopilotSpaceResource, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -9478,9 +9800,10 @@ pub fn copilot_spaces_get_resource_for_org_decode_json(
 ///
 /// Decodes a successful copilot-spaces/get-resource-for-org response.
 pub fn copilot_spaces_get_resource_for_org_decode(
-  response : @http.Response,
-) -> CopilotSpaceResource raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[CopilotSpaceResource, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -9499,7 +9822,7 @@ pub fn copilot_spaces_update_resource_for_org_request(
     @http.percent_encode(parameter_value(space_number)) +
     "/resources/" +
     @http.percent_encode(parameter_value(space_resource_id)),
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -9515,9 +9838,10 @@ pub fn copilot_spaces_update_resource_for_org_decode_json(
 ///
 /// Decodes a successful copilot-spaces/update-resource-for-org response.
 pub fn copilot_spaces_update_resource_for_org_decode(
-  response : @http.Response,
-) -> CopilotSpaceResource raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[CopilotSpaceResource, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -9562,9 +9886,10 @@ pub fn copilot_get_copilot_organization_details_decode_json(
 ///
 /// Decodes a successful copilot/get-copilot-organization-details response.
 pub fn copilot_get_copilot_organization_details_decode(
-  response : @http.Response,
-) -> Json raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Json, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -9603,9 +9928,10 @@ pub fn copilot_list_copilot_seats_decode_json(
 ///
 /// Decodes a successful copilot/list-copilot-seats response.
 pub fn copilot_list_copilot_seats_decode(
-  response : @http.Response,
-) -> CopilotListCopilotSeatsResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[CopilotListCopilotSeatsResponse, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -9619,7 +9945,7 @@ pub fn copilot_add_copilot_seats_for_teams_request(
     "/orgs/" +
     @http.percent_encode(parameter_value(org)) +
     "/copilot/billing/selected_teams",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -9635,9 +9961,10 @@ pub fn copilot_add_copilot_seats_for_teams_decode_json(
 ///
 /// Decodes a successful copilot/add-copilot-seats-for-teams response.
 pub fn copilot_add_copilot_seats_for_teams_decode(
-  response : @http.Response,
-) -> CopilotAddCopilotSeatsForTeamsResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[CopilotAddCopilotSeatsForTeamsResponse, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -9651,7 +9978,7 @@ pub fn copilot_cancel_copilot_seat_assignment_for_teams_request(
     "/orgs/" +
     @http.percent_encode(parameter_value(org)) +
     "/copilot/billing/selected_teams",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -9667,9 +9994,13 @@ pub fn copilot_cancel_copilot_seat_assignment_for_teams_decode_json(
 ///
 /// Decodes a successful copilot/cancel-copilot-seat-assignment-for-teams response.
 pub fn copilot_cancel_copilot_seat_assignment_for_teams_decode(
-  response : @http.Response,
-) -> CopilotCancelCopilotSeatAssignmentForTeamsResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[
+  CopilotCancelCopilotSeatAssignmentForTeamsResponse,
+  @client.ResponseFailure,
+] {
+  decode_response(head, body)
 }
 
 ///|
@@ -9683,7 +10014,7 @@ pub fn copilot_add_copilot_seats_for_users_request(
     "/orgs/" +
     @http.percent_encode(parameter_value(org)) +
     "/copilot/billing/selected_users",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -9699,9 +10030,10 @@ pub fn copilot_add_copilot_seats_for_users_decode_json(
 ///
 /// Decodes a successful copilot/add-copilot-seats-for-users response.
 pub fn copilot_add_copilot_seats_for_users_decode(
-  response : @http.Response,
-) -> CopilotAddCopilotSeatsForUsersResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[CopilotAddCopilotSeatsForUsersResponse, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -9715,7 +10047,7 @@ pub fn copilot_cancel_copilot_seat_assignment_for_users_request(
     "/orgs/" +
     @http.percent_encode(parameter_value(org)) +
     "/copilot/billing/selected_users",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -9731,9 +10063,13 @@ pub fn copilot_cancel_copilot_seat_assignment_for_users_decode_json(
 ///
 /// Decodes a successful copilot/cancel-copilot-seat-assignment-for-users response.
 pub fn copilot_cancel_copilot_seat_assignment_for_users_decode(
-  response : @http.Response,
-) -> CopilotCancelCopilotSeatAssignmentForUsersResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[
+  CopilotCancelCopilotSeatAssignmentForUsersResponse,
+  @client.ResponseFailure,
+] {
+  decode_response(head, body)
 }
 
 ///|
@@ -9762,9 +10098,10 @@ pub fn copilot_get_organization_code_review_runner_decode_json(
 ///
 /// Decodes a successful copilot/get-organization-code-review-runner response.
 pub fn copilot_get_organization_code_review_runner_decode(
-  response : @http.Response,
-) -> OrganizationCopilotCodeReviewRunner raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[OrganizationCopilotCodeReviewRunner, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -9778,7 +10115,7 @@ pub fn copilot_set_organization_code_review_runner_request(
     "/orgs/" +
     @http.percent_encode(parameter_value(org)) +
     "/copilot/code-review/runner",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -9794,9 +10131,10 @@ pub fn copilot_set_organization_code_review_runner_decode_json(
 ///
 /// Decodes a successful copilot/set-organization-code-review-runner response.
 pub fn copilot_set_organization_code_review_runner_decode(
-  response : @http.Response,
-) -> OrganizationCopilotCodeReviewRunner raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[OrganizationCopilotCodeReviewRunner, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -9825,9 +10163,10 @@ pub fn copilot_get_organization_code_review_settings_decode_json(
 ///
 /// Decodes a successful copilot/get-organization-code-review-settings response.
 pub fn copilot_get_organization_code_review_settings_decode(
-  response : @http.Response,
-) -> OrganizationCopilotCodeReviewSettings raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[OrganizationCopilotCodeReviewSettings, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -9841,7 +10180,7 @@ pub fn copilot_update_organization_code_review_settings_request(
     "/orgs/" +
     @http.percent_encode(parameter_value(org)) +
     "/copilot/code-review/settings",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -9857,9 +10196,10 @@ pub fn copilot_update_organization_code_review_settings_decode_json(
 ///
 /// Decodes a successful copilot/update-organization-code-review-settings response.
 pub fn copilot_update_organization_code_review_settings_decode(
-  response : @http.Response,
-) -> OrganizationCopilotCodeReviewSettings raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[OrganizationCopilotCodeReviewSettings, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -9888,9 +10228,13 @@ pub fn copilot_get_copilot_coding_agent_permissions_organization_decode_json(
 ///
 /// Decodes a successful copilot/get-copilot-coding-agent-permissions-organization response.
 pub fn copilot_get_copilot_coding_agent_permissions_organization_decode(
-  response : @http.Response,
-) -> CopilotGetCopilotCodingAgentPermissionsOrganizationResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[
+  CopilotGetCopilotCodingAgentPermissionsOrganizationResponse,
+  @client.ResponseFailure,
+] {
+  decode_response(head, body)
 }
 
 ///|
@@ -9904,7 +10248,7 @@ pub fn copilot_set_copilot_coding_agent_permissions_organization_request(
     "/orgs/" +
     @http.percent_encode(parameter_value(org)) +
     "/copilot/coding-agent/permissions",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -9943,9 +10287,13 @@ pub fn copilot_list_copilot_coding_agent_selected_repositories_for_organization_
 ///
 /// Decodes a successful copilot/list-copilot-coding-agent-selected-repositories-for-organization response.
 pub fn copilot_list_copilot_coding_agent_selected_repositories_for_organization_decode(
-  response : @http.Response,
-) -> CopilotListCopilotCodingAgentSelectedRepositoriesForOrganizationResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[
+  CopilotListCopilotCodingAgentSelectedRepositoriesForOrganizationResponse,
+  @client.ResponseFailure,
+] {
+  decode_response(head, body)
 }
 
 ///|
@@ -9959,7 +10307,7 @@ pub fn copilot_set_copilot_coding_agent_selected_repositories_for_organization_r
     "/orgs/" +
     @http.percent_encode(parameter_value(org)) +
     "/copilot/coding-agent/permissions/repositories",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -10018,9 +10366,10 @@ pub fn copilot_copilot_content_exclusion_for_organization_decode_json(
 ///
 /// Decodes a successful copilot/copilot-content-exclusion-for-organization response.
 pub fn copilot_copilot_content_exclusion_for_organization_decode(
-  response : @http.Response,
-) -> Map[String, Array[String]] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Map[String, Array[String]], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -10034,7 +10383,7 @@ pub fn copilot_set_copilot_content_exclusion_for_organization_request(
     "/orgs/" +
     @http.percent_encode(parameter_value(org)) +
     "/copilot/content_exclusion",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -10050,9 +10399,13 @@ pub fn copilot_set_copilot_content_exclusion_for_organization_decode_json(
 ///
 /// Decodes a successful copilot/set-copilot-content-exclusion-for-organization response.
 pub fn copilot_set_copilot_content_exclusion_for_organization_decode(
-  response : @http.Response,
-) -> CopilotSetCopilotContentExclusionForOrganizationResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[
+  CopilotSetCopilotContentExclusionForOrganizationResponse,
+  @client.ResponseFailure,
+] {
+  decode_response(head, body)
 }
 
 ///|
@@ -10082,9 +10435,10 @@ pub fn copilot_copilot_organization_one_day_usage_metrics_decode_json(
 ///
 /// Decodes a successful copilot/copilot-organization-one-day-usage-metrics response.
 pub fn copilot_copilot_organization_one_day_usage_metrics_decode(
-  response : @http.Response,
-) -> CopilotUsageMetrics1DayReport raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[CopilotUsageMetrics1DayReport, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -10113,9 +10467,10 @@ pub fn copilot_copilot_organization_usage_metrics_decode_json(
 ///
 /// Decodes a successful copilot/copilot-organization-usage-metrics response.
 pub fn copilot_copilot_organization_usage_metrics_decode(
-  response : @http.Response,
-) -> CopilotUsageMetrics28DayReport raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[CopilotUsageMetrics28DayReport, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -10145,9 +10500,10 @@ pub fn copilot_copilot_organization_repos_one_day_report_decode_json(
 ///
 /// Decodes a successful copilot/copilot-organization-repos-one-day-report response.
 pub fn copilot_copilot_organization_repos_one_day_report_decode(
-  response : @http.Response,
-) -> CopilotUsageMetrics1DayReport raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[CopilotUsageMetrics1DayReport, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -10177,9 +10533,10 @@ pub fn copilot_copilot_organization_user_teams_one_day_report_decode_json(
 ///
 /// Decodes a successful copilot/copilot-organization-user-teams-one-day-report response.
 pub fn copilot_copilot_organization_user_teams_one_day_report_decode(
-  response : @http.Response,
-) -> CopilotUsageMetrics1DayReport raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[CopilotUsageMetrics1DayReport, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -10209,9 +10566,10 @@ pub fn copilot_copilot_organization_users_one_day_usage_metrics_decode_json(
 ///
 /// Decodes a successful copilot/copilot-organization-users-one-day-usage-metrics response.
 pub fn copilot_copilot_organization_users_one_day_usage_metrics_decode(
-  response : @http.Response,
-) -> CopilotUsageMetrics1DayReport raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[CopilotUsageMetrics1DayReport, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -10240,9 +10598,10 @@ pub fn copilot_copilot_organization_users_usage_metrics_decode_json(
 ///
 /// Decodes a successful copilot/copilot-organization-users-usage-metrics response.
 pub fn copilot_copilot_organization_users_usage_metrics_decode(
-  response : @http.Response,
-) -> CopilotUsageMetrics28DayReport raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[CopilotUsageMetrics28DayReport, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -10271,9 +10630,10 @@ pub fn copilot_get_organization_code_review_policy_decode_json(
 ///
 /// Decodes a successful copilot/get-organization-code-review-policy response.
 pub fn copilot_get_organization_code_review_policy_decode(
-  response : @http.Response,
-) -> OrganizationCopilotCodeReviewPolicy raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[OrganizationCopilotCodeReviewPolicy, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -10287,7 +10647,7 @@ pub fn copilot_set_organization_code_review_policy_request(
     "/orgs/" +
     @http.percent_encode(parameter_value(org)) +
     "/copilot/policies/code-review",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -10425,9 +10785,10 @@ pub fn dependabot_list_alerts_for_org_decode_json(
 ///
 /// Decodes a successful dependabot/list-alerts-for-org response.
 pub fn dependabot_list_alerts_for_org_decode(
-  response : @http.Response,
-) -> Array[DependabotAlertWithRepository] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[DependabotAlertWithRepository], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -10466,9 +10827,10 @@ pub fn dependabot_repository_access_for_org_decode_json(
 ///
 /// Decodes a successful dependabot/repository-access-for-org response.
 pub fn dependabot_repository_access_for_org_decode(
-  response : @http.Response,
-) -> DependabotRepositoryAccessDetails raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[DependabotRepositoryAccessDetails, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -10482,7 +10844,7 @@ pub fn dependabot_update_repository_access_for_org_request(
     "/orgs/" +
     @http.percent_encode(parameter_value(org)) +
     "/dependabot/repository-access",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -10496,7 +10858,7 @@ pub fn dependabot_set_repository_access_default_level_request(
     "/orgs/" +
     @http.percent_encode(parameter_value(org)) +
     "/dependabot/repository-access/default-level",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -10535,9 +10897,10 @@ pub fn dependabot_list_org_secrets_decode_json(
 ///
 /// Decodes a successful dependabot/list-org-secrets response.
 pub fn dependabot_list_org_secrets_decode(
-  response : @http.Response,
-) -> DependabotListOrgSecretsResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[DependabotListOrgSecretsResponse, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -10564,9 +10927,10 @@ pub fn dependabot_get_org_public_key_decode_json(
 ///
 /// Decodes a successful dependabot/get-org-public-key response.
 pub fn dependabot_get_org_public_key_decode(
-  response : @http.Response,
-) -> DependabotPublicKey raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[DependabotPublicKey, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -10597,9 +10961,10 @@ pub fn dependabot_get_org_secret_decode_json(
 ///
 /// Decodes a successful dependabot/get-org-secret response.
 pub fn dependabot_get_org_secret_decode(
-  response : @http.Response,
-) -> OrganizationDependabotSecret raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[OrganizationDependabotSecret, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -10615,7 +10980,7 @@ pub fn dependabot_create_or_update_org_secret_request(
     @http.percent_encode(parameter_value(org)) +
     "/dependabot/secrets/" +
     @http.percent_encode(parameter_value(secret_name)),
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -10631,9 +10996,10 @@ pub fn dependabot_create_or_update_org_secret_decode_json(
 ///
 /// Decodes a successful dependabot/create-or-update-org-secret response.
 pub fn dependabot_create_or_update_org_secret_decode(
-  response : @http.Response,
-) -> EmptyObject raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[EmptyObject, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -10690,9 +11056,13 @@ pub fn dependabot_list_selected_repos_for_org_secret_decode_json(
 ///
 /// Decodes a successful dependabot/list-selected-repos-for-org-secret response.
 pub fn dependabot_list_selected_repos_for_org_secret_decode(
-  response : @http.Response,
-) -> DependabotListSelectedReposForOrgSecretResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[
+  DependabotListSelectedReposForOrgSecretResponse,
+  @client.ResponseFailure,
+] {
+  decode_response(head, body)
 }
 
 ///|
@@ -10709,7 +11079,7 @@ pub fn dependabot_set_selected_repos_for_org_secret_request(
     "/dependabot/secrets/" +
     @http.percent_encode(parameter_value(secret_name)) +
     "/repositories",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -10772,9 +11142,10 @@ pub fn packages_list_docker_migration_conflicting_packages_for_organization_deco
 ///
 /// Decodes a successful packages/list-docker-migration-conflicting-packages-for-organization response.
 pub fn packages_list_docker_migration_conflicting_packages_for_organization_decode(
-  response : @http.Response,
-) -> Array[Package] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[Package], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -10813,9 +11184,10 @@ pub fn activity_list_public_org_events_decode_json(
 ///
 /// Decodes a successful activity/list-public-org-events response.
 pub fn activity_list_public_org_events_decode(
-  response : @http.Response,
-) -> Array[Event] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[Event], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -10854,9 +11226,10 @@ pub fn orgs_list_failed_invitations_decode_json(
 ///
 /// Decodes a successful orgs/list-failed-invitations response.
 pub fn orgs_list_failed_invitations_decode(
-  response : @http.Response,
-) -> Array[OrganizationInvitation] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[OrganizationInvitation], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -10893,9 +11266,10 @@ pub fn orgs_list_webhooks_decode_json(
 ///
 /// Decodes a successful orgs/list-webhooks response.
 pub fn orgs_list_webhooks_decode(
-  response : @http.Response,
-) -> Array[OrgHook] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[OrgHook], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -10907,7 +11281,7 @@ pub fn orgs_create_webhook_request(
 ) -> @http.Request {
   @http.Request::post(
     "/orgs/" + @http.percent_encode(parameter_value(org)) + "/hooks",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -10923,9 +11297,10 @@ pub fn orgs_create_webhook_decode_json(
 ///
 /// Decodes a successful orgs/create-webhook response.
 pub fn orgs_create_webhook_decode(
-  response : @http.Response,
-) -> OrgHook raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[OrgHook, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -10953,9 +11328,10 @@ pub fn orgs_get_webhook_decode_json(
 ///
 /// Decodes a successful orgs/get-webhook response.
 pub fn orgs_get_webhook_decode(
-  response : @http.Response,
-) -> OrgHook raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[OrgHook, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -10971,7 +11347,7 @@ pub fn orgs_update_webhook_request(
     @http.percent_encode(parameter_value(org)) +
     "/hooks/" +
     @http.percent_encode(parameter_value(hook_id)),
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -10987,9 +11363,10 @@ pub fn orgs_update_webhook_decode_json(
 ///
 /// Decodes a successful orgs/update-webhook response.
 pub fn orgs_update_webhook_decode(
-  response : @http.Response,
-) -> OrgHook raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[OrgHook, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -11036,9 +11413,10 @@ pub fn orgs_get_webhook_config_for_org_decode_json(
 ///
 /// Decodes a successful orgs/get-webhook-config-for-org response.
 pub fn orgs_get_webhook_config_for_org_decode(
-  response : @http.Response,
-) -> WebhookConfig raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[WebhookConfig, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -11055,7 +11433,7 @@ pub fn orgs_update_webhook_config_for_org_request(
     "/hooks/" +
     @http.percent_encode(parameter_value(hook_id)) +
     "/config",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -11071,9 +11449,10 @@ pub fn orgs_update_webhook_config_for_org_decode_json(
 ///
 /// Decodes a successful orgs/update-webhook-config-for-org response.
 pub fn orgs_update_webhook_config_for_org_decode(
-  response : @http.Response,
-) -> WebhookConfig raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[WebhookConfig, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -11122,9 +11501,10 @@ pub fn orgs_list_webhook_deliveries_decode_json(
 ///
 /// Decodes a successful orgs/list-webhook-deliveries response.
 pub fn orgs_list_webhook_deliveries_decode(
-  response : @http.Response,
-) -> Array[HookDeliveryItem] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[HookDeliveryItem], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -11158,9 +11538,10 @@ pub fn orgs_get_webhook_delivery_decode_json(
 ///
 /// Decodes a successful orgs/get-webhook-delivery response.
 pub fn orgs_get_webhook_delivery_decode(
-  response : @http.Response,
-) -> HookDelivery raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[HookDelivery, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -11271,9 +11652,10 @@ pub fn api_insights_get_route_stats_by_actor_decode_json(
 ///
 /// Decodes a successful api-insights/get-route-stats-by-actor response.
 pub fn api_insights_get_route_stats_by_actor_decode(
-  response : @http.Response,
-) -> Array[ApiInsightsRouteStatsItem] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[ApiInsightsRouteStatsItem], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -11344,9 +11726,10 @@ pub fn api_insights_get_subject_stats_decode_json(
 ///
 /// Decodes a successful api-insights/get-subject-stats response.
 pub fn api_insights_get_subject_stats_decode(
-  response : @http.Response,
-) -> Array[ApiInsightsSubjectStatsItem] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[ApiInsightsSubjectStatsItem], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -11382,9 +11765,10 @@ pub fn api_insights_get_summary_stats_decode_json(
 ///
 /// Decodes a successful api-insights/get-summary-stats response.
 pub fn api_insights_get_summary_stats_decode(
-  response : @http.Response,
-) -> ApiInsightsSummaryStats raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[ApiInsightsSummaryStats, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -11422,9 +11806,10 @@ pub fn api_insights_get_summary_stats_by_user_decode_json(
 ///
 /// Decodes a successful api-insights/get-summary-stats-by-user response.
 pub fn api_insights_get_summary_stats_by_user_decode(
-  response : @http.Response,
-) -> ApiInsightsSummaryStats raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[ApiInsightsSummaryStats, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -11465,9 +11850,10 @@ pub fn api_insights_get_summary_stats_by_actor_decode_json(
 ///
 /// Decodes a successful api-insights/get-summary-stats-by-actor response.
 pub fn api_insights_get_summary_stats_by_actor_decode(
-  response : @http.Response,
-) -> ApiInsightsSummaryStats raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[ApiInsightsSummaryStats, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -11509,9 +11895,10 @@ pub fn api_insights_get_time_stats_decode_json(
 ///
 /// Decodes a successful api-insights/get-time-stats response.
 pub fn api_insights_get_time_stats_decode(
-  response : @http.Response,
-) -> Array[ApiInsightsTimeStatsItem] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[ApiInsightsTimeStatsItem], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -11555,9 +11942,10 @@ pub fn api_insights_get_time_stats_by_user_decode_json(
 ///
 /// Decodes a successful api-insights/get-time-stats-by-user response.
 pub fn api_insights_get_time_stats_by_user_decode(
-  response : @http.Response,
-) -> Array[ApiInsightsTimeStatsItem] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[ApiInsightsTimeStatsItem], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -11604,9 +11992,10 @@ pub fn api_insights_get_time_stats_by_actor_decode_json(
 ///
 /// Decodes a successful api-insights/get-time-stats-by-actor response.
 pub fn api_insights_get_time_stats_by_actor_decode(
-  response : @http.Response,
-) -> Array[ApiInsightsTimeStatsItem] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[ApiInsightsTimeStatsItem], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -11679,9 +12068,10 @@ pub fn api_insights_get_user_stats_decode_json(
 ///
 /// Decodes a successful api-insights/get-user-stats response.
 pub fn api_insights_get_user_stats_decode(
-  response : @http.Response,
-) -> Array[ApiInsightsUserStatsItem] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[ApiInsightsUserStatsItem], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -11706,9 +12096,10 @@ pub fn apps_get_org_installation_decode_json(
 ///
 /// Decodes a successful apps/get-org-installation response.
 pub fn apps_get_org_installation_decode(
-  response : @http.Response,
-) -> Installation raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Installation, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -11747,9 +12138,10 @@ pub fn orgs_list_app_installations_decode_json(
 ///
 /// Decodes a successful orgs/list-app-installations response.
 pub fn orgs_list_app_installations_decode(
-  response : @http.Response,
-) -> OrgsListAppInstallationsResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[OrgsListAppInstallationsResponse, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -11778,9 +12170,10 @@ pub fn interactions_get_restrictions_for_org_decode_json(
 ///
 /// Decodes a successful interactions/get-restrictions-for-org response.
 pub fn interactions_get_restrictions_for_org_decode(
-  response : @http.Response,
-) -> Json raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Json, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -11794,7 +12187,7 @@ pub fn interactions_set_restrictions_for_org_request(
     "/orgs/" +
     @http.percent_encode(parameter_value(org)) +
     "/interaction-limits",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -11810,9 +12203,10 @@ pub fn interactions_set_restrictions_for_org_decode_json(
 ///
 /// Decodes a successful interactions/set-restrictions-for-org response.
 pub fn interactions_set_restrictions_for_org_decode(
-  response : @http.Response,
-) -> InteractionLimitResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[InteractionLimitResponse, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -11854,9 +12248,13 @@ pub fn interactions_get_pull_request_creation_cap_for_org_decode_json(
 ///
 /// Decodes a successful interactions/get-pull-request-creation-cap-for-org response.
 pub fn interactions_get_pull_request_creation_cap_for_org_decode(
-  response : @http.Response,
-) -> InteractionsGetPullRequestCreationCapForOrgResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[
+  InteractionsGetPullRequestCreationCapForOrgResponse,
+  @client.ResponseFailure,
+] {
+  decode_response(head, body)
 }
 
 ///|
@@ -11870,7 +12268,7 @@ pub fn interactions_update_pull_request_creation_cap_for_org_request(
     "/orgs/" +
     @http.percent_encode(parameter_value(org)) +
     "/interaction-limits/pulls/creation-cap",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -11886,9 +12284,13 @@ pub fn interactions_update_pull_request_creation_cap_for_org_decode_json(
 ///
 /// Decodes a successful interactions/update-pull-request-creation-cap-for-org response.
 pub fn interactions_update_pull_request_creation_cap_for_org_decode(
-  response : @http.Response,
-) -> InteractionsUpdatePullRequestCreationCapForOrgResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[
+  InteractionsUpdatePullRequestCreationCapForOrgResponse,
+  @client.ResponseFailure,
+] {
+  decode_response(head, body)
 }
 
 ///|
@@ -11938,9 +12340,10 @@ pub fn orgs_list_pending_invitations_decode_json(
 ///
 /// Decodes a successful orgs/list-pending-invitations response.
 pub fn orgs_list_pending_invitations_decode(
-  response : @http.Response,
-) -> Array[OrganizationInvitation] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[OrganizationInvitation], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -11952,7 +12355,7 @@ pub fn orgs_create_invitation_request(
 ) -> @http.Request {
   @http.Request::post(
     "/orgs/" + @http.percent_encode(parameter_value(org)) + "/invitations",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -11968,9 +12371,10 @@ pub fn orgs_create_invitation_decode_json(
 ///
 /// Decodes a successful orgs/create-invitation response.
 pub fn orgs_create_invitation_decode(
-  response : @http.Response,
-) -> OrganizationInvitation raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[OrganizationInvitation, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -12027,9 +12431,10 @@ pub fn orgs_list_invitation_teams_decode_json(
 ///
 /// Decodes a successful orgs/list-invitation-teams response.
 pub fn orgs_list_invitation_teams_decode(
-  response : @http.Response,
-) -> Array[Team] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[Team], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -12054,9 +12459,10 @@ pub fn orgs_list_issue_fields_decode_json(
 ///
 /// Decodes a successful orgs/list-issue-fields response.
 pub fn orgs_list_issue_fields_decode(
-  response : @http.Response,
-) -> Array[IssueField] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[IssueField], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -12068,7 +12474,7 @@ pub fn orgs_create_issue_field_request(
 ) -> @http.Request {
   @http.Request::post(
     "/orgs/" + @http.percent_encode(parameter_value(org)) + "/issue-fields",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -12084,9 +12490,10 @@ pub fn orgs_create_issue_field_decode_json(
 ///
 /// Decodes a successful orgs/create-issue-field response.
 pub fn orgs_create_issue_field_decode(
-  response : @http.Response,
-) -> IssueField raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[IssueField, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -12102,7 +12509,7 @@ pub fn orgs_update_issue_field_request(
     @http.percent_encode(parameter_value(org)) +
     "/issue-fields/" +
     @http.percent_encode(parameter_value(issue_field_id)),
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -12118,9 +12525,10 @@ pub fn orgs_update_issue_field_decode_json(
 ///
 /// Decodes a successful orgs/update-issue-field response.
 pub fn orgs_update_issue_field_decode(
-  response : @http.Response,
-) -> IssueField raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[IssueField, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -12160,9 +12568,10 @@ pub fn orgs_list_issue_types_decode_json(
 ///
 /// Decodes a successful orgs/list-issue-types response.
 pub fn orgs_list_issue_types_decode(
-  response : @http.Response,
-) -> Array[IssueType] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[IssueType], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -12174,7 +12583,7 @@ pub fn orgs_create_issue_type_request(
 ) -> @http.Request {
   @http.Request::post(
     "/orgs/" + @http.percent_encode(parameter_value(org)) + "/issue-types",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -12190,9 +12599,10 @@ pub fn orgs_create_issue_type_decode_json(
 ///
 /// Decodes a successful orgs/create-issue-type response.
 pub fn orgs_create_issue_type_decode(
-  response : @http.Response,
-) -> IssueType raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[IssueType, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -12208,7 +12618,7 @@ pub fn orgs_update_issue_type_request(
     @http.percent_encode(parameter_value(org)) +
     "/issue-types/" +
     @http.percent_encode(parameter_value(issue_type_id)),
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -12224,9 +12634,10 @@ pub fn orgs_update_issue_type_decode_json(
 ///
 /// Decodes a successful orgs/update-issue-type response.
 pub fn orgs_update_issue_type_decode(
-  response : @http.Response,
-) -> IssueType raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[IssueType, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -12320,9 +12731,10 @@ pub fn issues_list_for_org_decode_json(
 ///
 /// Decodes a successful issues/list-for-org response.
 pub fn issues_list_for_org_decode(
-  response : @http.Response,
-) -> Array[Issue] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[Issue], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -12372,9 +12784,10 @@ pub fn orgs_list_members_decode_json(
 ///
 /// Decodes a successful orgs/list-members response.
 pub fn orgs_list_members_decode(
-  response : @http.Response,
-) -> Array[SimpleUser] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[SimpleUser], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -12446,9 +12859,13 @@ pub fn codespaces_get_codespaces_for_user_in_org_decode_json(
 ///
 /// Decodes a successful codespaces/get-codespaces-for-user-in-org response.
 pub fn codespaces_get_codespaces_for_user_in_org_decode(
-  response : @http.Response,
-) -> CodespacesGetCodespacesForUserInOrgResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[
+  CodespacesGetCodespacesForUserInOrgResponse,
+  @client.ResponseFailure,
+] {
+  decode_response(head, body)
 }
 
 ///|
@@ -12501,9 +12918,10 @@ pub fn codespaces_stop_in_organization_decode_json(
 ///
 /// Decodes a successful codespaces/stop-in-organization response.
 pub fn codespaces_stop_in_organization_decode(
-  response : @http.Response,
-) -> Codespace raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Codespace, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -12535,9 +12953,10 @@ pub fn copilot_get_copilot_seat_details_for_user_decode_json(
 ///
 /// Decodes a successful copilot/get-copilot-seat-details-for-user response.
 pub fn copilot_get_copilot_seat_details_for_user_decode(
-  response : @http.Response,
-) -> CopilotSeatDetails raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[CopilotSeatDetails, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -12568,9 +12987,10 @@ pub fn orgs_get_membership_for_user_decode_json(
 ///
 /// Decodes a successful orgs/get-membership-for-user response.
 pub fn orgs_get_membership_for_user_decode(
-  response : @http.Response,
-) -> OrgMembership raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[OrgMembership, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -12586,7 +13006,7 @@ pub fn orgs_set_membership_for_user_request(
     @http.percent_encode(parameter_value(org)) +
     "/memberships/" +
     @http.percent_encode(parameter_value(username)),
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -12602,9 +13022,10 @@ pub fn orgs_set_membership_for_user_decode_json(
 ///
 /// Decodes a successful orgs/set-membership-for-user response.
 pub fn orgs_set_membership_for_user_decode(
-  response : @http.Response,
-) -> OrgMembership raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[OrgMembership, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -12666,9 +13087,10 @@ pub fn migrations_list_for_org_decode_json(
 ///
 /// Decodes a successful migrations/list-for-org response.
 pub fn migrations_list_for_org_decode(
-  response : @http.Response,
-) -> Array[Migration] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[Migration], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -12680,7 +13102,7 @@ pub fn migrations_start_for_org_request(
 ) -> @http.Request {
   @http.Request::post(
     "/orgs/" + @http.percent_encode(parameter_value(org)) + "/migrations",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -12696,9 +13118,10 @@ pub fn migrations_start_for_org_decode_json(
 ///
 /// Decodes a successful migrations/start-for-org response.
 pub fn migrations_start_for_org_decode(
-  response : @http.Response,
-) -> Migration raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Migration, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -12736,9 +13159,10 @@ pub fn migrations_get_status_for_org_decode_json(
 ///
 /// Decodes a successful migrations/get-status-for-org response.
 pub fn migrations_get_status_for_org_decode(
-  response : @http.Response,
-) -> Migration raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Migration, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -12831,9 +13255,10 @@ pub fn migrations_list_repos_for_org_decode_json(
 ///
 /// Decodes a successful migrations/list-repos-for-org response.
 pub fn migrations_list_repos_for_org_decode(
-  response : @http.Response,
-) -> Array[MinimalRepository] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[MinimalRepository], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -12860,9 +13285,10 @@ pub fn orgs_list_org_roles_decode_json(
 ///
 /// Decodes a successful orgs/list-org-roles response.
 pub fn orgs_list_org_roles_decode(
-  response : @http.Response,
-) -> OrgsListOrgRolesResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[OrgsListOrgRolesResponse, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -12995,9 +13421,10 @@ pub fn orgs_get_org_role_decode_json(
 ///
 /// Decodes a successful orgs/get-org-role response.
 pub fn orgs_get_org_role_decode(
-  response : @http.Response,
-) -> OrganizationRole raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[OrganizationRole, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -13039,9 +13466,10 @@ pub fn orgs_list_org_role_teams_decode_json(
 ///
 /// Decodes a successful orgs/list-org-role-teams response.
 pub fn orgs_list_org_role_teams_decode(
-  response : @http.Response,
-) -> Array[TeamRoleAssignment] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[TeamRoleAssignment], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -13083,9 +13511,10 @@ pub fn orgs_list_org_role_users_decode_json(
 ///
 /// Decodes a successful orgs/list-org-role-users response.
 pub fn orgs_list_org_role_users_decode(
-  response : @http.Response,
-) -> Array[UserRoleAssignment] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[UserRoleAssignment], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -13130,9 +13559,10 @@ pub fn orgs_list_outside_collaborators_decode_json(
 ///
 /// Decodes a successful orgs/list-outside-collaborators response.
 pub fn orgs_list_outside_collaborators_decode(
-  response : @http.Response,
-) -> Array[SimpleUser] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[SimpleUser], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -13148,7 +13578,7 @@ pub fn orgs_convert_member_to_outside_collaborator_request(
     @http.percent_encode(parameter_value(org)) +
     "/outside_collaborators/" +
     @http.percent_encode(parameter_value(username)),
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -13164,9 +13594,13 @@ pub fn orgs_convert_member_to_outside_collaborator_decode_json(
 ///
 /// Decodes a successful orgs/convert-member-to-outside-collaborator response.
 pub fn orgs_convert_member_to_outside_collaborator_decode(
-  response : @http.Response,
-) -> OrgsConvertMemberToOutsideCollaboratorResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[
+  OrgsConvertMemberToOutsideCollaboratorResponse,
+  @client.ResponseFailure,
+] {
+  decode_response(head, body)
 }
 
 ///|
@@ -13228,9 +13662,10 @@ pub fn packages_list_packages_for_organization_decode_json(
 ///
 /// Decodes a successful packages/list-packages-for-organization response.
 pub fn packages_list_packages_for_organization_decode(
-  response : @http.Response,
-) -> Array[Package] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[Package], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -13264,9 +13699,10 @@ pub fn packages_get_package_for_organization_decode_json(
 ///
 /// Decodes a successful packages/get-package-for-organization response.
 pub fn packages_get_package_for_organization_decode(
-  response : @http.Response,
-) -> Package raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Package, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -13359,9 +13795,10 @@ pub fn packages_get_all_package_versions_for_package_owned_by_org_decode_json(
 ///
 /// Decodes a successful packages/get-all-package-versions-for-package-owned-by-org response.
 pub fn packages_get_all_package_versions_for_package_owned_by_org_decode(
-  response : @http.Response,
-) -> Array[PackageVersion] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[PackageVersion], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -13398,9 +13835,10 @@ pub fn packages_get_package_version_for_organization_decode_json(
 ///
 /// Decodes a successful packages/get-package-version-for-organization response.
 pub fn packages_get_package_version_for_organization_decode(
-  response : @http.Response,
-) -> PackageVersion raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[PackageVersion, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -13533,9 +13971,13 @@ pub fn orgs_list_pat_grant_requests_decode_json(
 ///
 /// Decodes a successful orgs/list-pat-grant-requests response.
 pub fn orgs_list_pat_grant_requests_decode(
-  response : @http.Response,
-) -> Array[OrganizationProgrammaticAccessGrantRequest] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[
+  Array[OrganizationProgrammaticAccessGrantRequest],
+  @client.ResponseFailure,
+] {
+  decode_response(head, body)
 }
 
 ///|
@@ -13549,7 +13991,7 @@ pub fn orgs_review_pat_grant_requests_in_bulk_request(
     "/orgs/" +
     @http.percent_encode(parameter_value(org)) +
     "/personal-access-token-requests",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -13565,7 +14007,7 @@ pub fn orgs_review_pat_grant_request_request(
     @http.percent_encode(parameter_value(org)) +
     "/personal-access-token-requests/" +
     @http.percent_encode(parameter_value(pat_request_id)),
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -13607,9 +14049,10 @@ pub fn orgs_list_pat_grant_request_repositories_decode_json(
 ///
 /// Decodes a successful orgs/list-pat-grant-request-repositories response.
 pub fn orgs_list_pat_grant_request_repositories_decode(
-  response : @http.Response,
-) -> Array[MinimalRepository] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[MinimalRepository], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -13699,9 +14142,10 @@ pub fn orgs_list_pat_grants_decode_json(
 ///
 /// Decodes a successful orgs/list-pat-grants response.
 pub fn orgs_list_pat_grants_decode(
-  response : @http.Response,
-) -> Array[OrganizationProgrammaticAccessGrant] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[OrganizationProgrammaticAccessGrant], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -13715,7 +14159,7 @@ pub fn orgs_update_pat_accesses_request(
     "/orgs/" +
     @http.percent_encode(parameter_value(org)) +
     "/personal-access-tokens",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -13731,7 +14175,7 @@ pub fn orgs_update_pat_access_request(
     @http.percent_encode(parameter_value(org)) +
     "/personal-access-tokens/" +
     @http.percent_encode(parameter_value(pat_id)),
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -13773,9 +14217,10 @@ pub fn orgs_list_pat_grant_repositories_decode_json(
 ///
 /// Decodes a successful orgs/list-pat-grant-repositories response.
 pub fn orgs_list_pat_grant_repositories_decode(
-  response : @http.Response,
-) -> Array[MinimalRepository] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[MinimalRepository], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -13814,9 +14259,13 @@ pub fn private_registries_list_org_private_registries_decode_json(
 ///
 /// Decodes a successful private-registries/list-org-private-registries response.
 pub fn private_registries_list_org_private_registries_decode(
-  response : @http.Response,
-) -> PrivateRegistriesListOrgPrivateRegistriesResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[
+  PrivateRegistriesListOrgPrivateRegistriesResponse,
+  @client.ResponseFailure,
+] {
+  decode_response(head, body)
 }
 
 ///|
@@ -13830,7 +14279,7 @@ pub fn private_registries_create_org_private_registry_request(
     "/orgs/" +
     @http.percent_encode(parameter_value(org)) +
     "/private-registries",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -13846,9 +14295,13 @@ pub fn private_registries_create_org_private_registry_decode_json(
 ///
 /// Decodes a successful private-registries/create-org-private-registry response.
 pub fn private_registries_create_org_private_registry_decode(
-  response : @http.Response,
-) -> OrgPrivateRegistryConfigurationWithSelectedRepositories raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[
+  OrgPrivateRegistryConfigurationWithSelectedRepositories,
+  @client.ResponseFailure,
+] {
+  decode_response(head, body)
 }
 
 ///|
@@ -13877,9 +14330,10 @@ pub fn private_registries_get_org_public_key_decode_json(
 ///
 /// Decodes a successful private-registries/get-org-public-key response.
 pub fn private_registries_get_org_public_key_decode(
-  response : @http.Response,
-) -> PrivateRegistriesGetOrgPublicKeyResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[PrivateRegistriesGetOrgPublicKeyResponse, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -13910,9 +14364,10 @@ pub fn private_registries_get_org_private_registry_decode_json(
 ///
 /// Decodes a successful private-registries/get-org-private-registry response.
 pub fn private_registries_get_org_private_registry_decode(
-  response : @http.Response,
-) -> OrgPrivateRegistryConfiguration raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[OrgPrivateRegistryConfiguration, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -13928,7 +14383,7 @@ pub fn private_registries_update_org_private_registry_request(
     @http.percent_encode(parameter_value(org)) +
     "/private-registries/" +
     @http.percent_encode(parameter_value(secret_name)),
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -13994,9 +14449,10 @@ pub fn projects_list_for_org_decode_json(
 ///
 /// Decodes a successful projects/list-for-org response.
 pub fn projects_list_for_org_decode(
-  response : @http.Response,
-) -> Array[ProjectsV2] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[ProjectsV2], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -14027,9 +14483,10 @@ pub fn projects_get_for_org_decode_json(
 ///
 /// Decodes a successful projects/get-for-org response.
 pub fn projects_get_for_org_decode(
-  response : @http.Response,
-) -> ProjectsV2 raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[ProjectsV2, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -14046,7 +14503,7 @@ pub fn projects_create_draft_item_for_org_request(
     "/projectsV2/" +
     @http.percent_encode(parameter_value(project_number)) +
     "/drafts",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -14062,9 +14519,10 @@ pub fn projects_create_draft_item_for_org_decode_json(
 ///
 /// Decodes a successful projects/create-draft-item-for-org response.
 pub fn projects_create_draft_item_for_org_decode(
-  response : @http.Response,
-) -> ProjectsV2ItemSimple raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[ProjectsV2ItemSimple, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -14113,9 +14571,10 @@ pub fn projects_list_fields_for_org_decode_json(
 ///
 /// Decodes a successful projects/list-fields-for-org response.
 pub fn projects_list_fields_for_org_decode(
-  response : @http.Response,
-) -> Array[ProjectsV2Field] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[ProjectsV2Field], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -14132,7 +14591,7 @@ pub fn projects_add_field_for_org_request(
     "/projectsV2/" +
     @http.percent_encode(parameter_value(project_number)) +
     "/fields",
-  ).json_body(body)
+  ).body_json(body)
 }
 
 ///|
@@ -14148,9 +14607,10 @@ pub fn projects_add_field_for_org_decode_json(
 ///
 /// Decodes a successful projects/add-field-for-org response.
 pub fn projects_add_field_for_org_decode(
-  response : @http.Response,
-) -> ProjectsV2Field raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[ProjectsV2Field, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -14184,9 +14644,10 @@ pub fn projects_get_field_for_org_decode_json(
 ///
 /// Decodes a successful projects/get-field-for-org response.
 pub fn projects_get_field_for_org_decode(
-  response : @http.Response,
-) -> ProjectsV2Field raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[ProjectsV2Field, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -14246,9 +14707,10 @@ pub fn projects_list_items_for_org_decode_json(
 ///
 /// Decodes a successful projects/list-items-for-org response.
 pub fn projects_list_items_for_org_decode(
-  response : @http.Response,
-) -> Array[ProjectsV2ItemWithContent] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[ProjectsV2ItemWithContent], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -14265,7 +14727,7 @@ pub fn projects_add_item_for_org_request(
     "/projectsV2/" +
     @http.percent_encode(parameter_value(project_number)) +
     "/items",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -14281,9 +14743,10 @@ pub fn projects_add_item_for_org_decode_json(
 ///
 /// Decodes a successful projects/add-item-for-org response.
 pub fn projects_add_item_for_org_decode(
-  response : @http.Response,
-) -> ProjectsV2ItemSimple raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[ProjectsV2ItemSimple, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -14322,9 +14785,10 @@ pub fn projects_get_org_item_decode_json(
 ///
 /// Decodes a successful projects/get-org-item response.
 pub fn projects_get_org_item_decode(
-  response : @http.Response,
-) -> ProjectsV2ItemWithContent raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[ProjectsV2ItemWithContent, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -14343,7 +14807,7 @@ pub fn projects_update_item_for_org_request(
     @http.percent_encode(parameter_value(project_number)) +
     "/items/" +
     @http.percent_encode(parameter_value(item_id)),
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -14359,9 +14823,10 @@ pub fn projects_update_item_for_org_decode_json(
 ///
 /// Decodes a successful projects/update-item-for-org response.
 pub fn projects_update_item_for_org_decode(
-  response : @http.Response,
-) -> ProjectsV2ItemWithContent raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[ProjectsV2ItemWithContent, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -14396,7 +14861,7 @@ pub fn projects_create_view_for_org_request(
     "/projectsV2/" +
     @http.percent_encode(parameter_value(project_number)) +
     "/views",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -14412,9 +14877,10 @@ pub fn projects_create_view_for_org_decode_json(
 ///
 /// Decodes a successful projects/create-view-for-org response.
 pub fn projects_create_view_for_org_decode(
-  response : @http.Response,
-) -> ProjectsV2View raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[ProjectsV2View, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -14472,9 +14938,10 @@ pub fn projects_list_view_items_for_org_decode_json(
 ///
 /// Decodes a successful projects/list-view-items-for-org response.
 pub fn projects_list_view_items_for_org_decode(
-  response : @http.Response,
-) -> Array[ProjectsV2ItemWithContent] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[ProjectsV2ItemWithContent], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -14503,9 +14970,13 @@ pub fn orgs_external_properties_for_repos_get_organization_app_installations_dec
 ///
 /// Decodes a successful orgs/external-properties-for-repos-get-organization-app-installations response.
 pub fn orgs_external_properties_for_repos_get_organization_app_installations_decode(
-  response : @http.Response,
-) -> Array[OrganizationExternalPropertyInstallation] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[
+  Array[OrganizationExternalPropertyInstallation],
+  @client.ResponseFailure,
+] {
+  decode_response(head, body)
 }
 
 ///|
@@ -14519,7 +14990,7 @@ pub fn orgs_external_properties_for_repos_register_organization_app_installation
     "/orgs/" +
     @http.percent_encode(parameter_value(org)) +
     "/properties/installations",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -14535,9 +15006,10 @@ pub fn orgs_external_properties_for_repos_register_organization_app_installation
 ///
 /// Decodes a successful orgs/external-properties-for-repos-register-organization-app-installation response.
 pub fn orgs_external_properties_for_repos_register_organization_app_installation_decode(
-  response : @http.Response,
-) -> OrganizationExternalPropertyInstallation raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[OrganizationExternalPropertyInstallation, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -14566,9 +15038,10 @@ pub fn orgs_external_properties_for_repos_get_organization_definitions_decode_js
 ///
 /// Decodes a successful orgs/external-properties-for-repos-get-organization-definitions response.
 pub fn orgs_external_properties_for_repos_get_organization_definitions_decode(
-  response : @http.Response,
-) -> Array[ExternalProperty] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[ExternalProperty], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -14582,7 +15055,7 @@ pub fn orgs_external_properties_for_repos_create_or_update_organization_values_r
     "/orgs/" +
     @http.percent_encode(parameter_value(org)) +
     "/properties/installations/values",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -14598,7 +15071,7 @@ pub fn orgs_external_properties_for_repos_create_or_update_values_for_organizati
     @http.percent_encode(parameter_value(org)) +
     "/properties/installations/values/" +
     @http.percent_encode(parameter_value(property_name)),
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -14640,9 +15113,10 @@ pub fn orgs_custom_properties_for_repos_get_organization_definitions_decode_json
 ///
 /// Decodes a successful orgs/custom-properties-for-repos-get-organization-definitions response.
 pub fn orgs_custom_properties_for_repos_get_organization_definitions_decode(
-  response : @http.Response,
-) -> Array[CustomProperty] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[CustomProperty], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -14654,7 +15128,7 @@ pub fn orgs_custom_properties_for_repos_create_or_update_organization_definition
 ) -> @http.Request {
   @http.Request::patch(
     "/orgs/" + @http.percent_encode(parameter_value(org)) + "/properties/schema",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -14670,9 +15144,10 @@ pub fn orgs_custom_properties_for_repos_create_or_update_organization_definition
 ///
 /// Decodes a successful orgs/custom-properties-for-repos-create-or-update-organization-definitions response.
 pub fn orgs_custom_properties_for_repos_create_or_update_organization_definitions_decode(
-  response : @http.Response,
-) -> Array[CustomProperty] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[CustomProperty], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -14703,9 +15178,10 @@ pub fn orgs_custom_properties_for_repos_get_organization_definition_decode_json(
 ///
 /// Decodes a successful orgs/custom-properties-for-repos-get-organization-definition response.
 pub fn orgs_custom_properties_for_repos_get_organization_definition_decode(
-  response : @http.Response,
-) -> CustomProperty raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[CustomProperty, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -14721,7 +15197,7 @@ pub fn orgs_custom_properties_for_repos_create_or_update_organization_definition
     @http.percent_encode(parameter_value(org)) +
     "/properties/schema/" +
     @http.percent_encode(parameter_value(custom_property_name)),
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -14737,9 +15213,10 @@ pub fn orgs_custom_properties_for_repos_create_or_update_organization_definition
 ///
 /// Decodes a successful orgs/custom-properties-for-repos-create-or-update-organization-definition response.
 pub fn orgs_custom_properties_for_repos_create_or_update_organization_definition_decode(
-  response : @http.Response,
-) -> CustomProperty raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[CustomProperty, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -14799,9 +15276,10 @@ pub fn orgs_custom_properties_for_repos_get_organization_values_decode_json(
 ///
 /// Decodes a successful orgs/custom-properties-for-repos-get-organization-values response.
 pub fn orgs_custom_properties_for_repos_get_organization_values_decode(
-  response : @http.Response,
-) -> Array[OrgRepoCustomPropertyValues] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[OrgRepoCustomPropertyValues], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -14813,7 +15291,7 @@ pub fn orgs_custom_properties_for_repos_create_or_update_organization_values_req
 ) -> @http.Request {
   @http.Request::patch(
     "/orgs/" + @http.percent_encode(parameter_value(org)) + "/properties/values",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -14852,9 +15330,10 @@ pub fn orgs_list_public_members_decode_json(
 ///
 /// Decodes a successful orgs/list-public-members response.
 pub fn orgs_list_public_members_decode(
-  response : @http.Response,
-) -> Array[SimpleUser] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[SimpleUser], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -14952,9 +15431,10 @@ pub fn repos_list_for_org_decode_json(
 ///
 /// Decodes a successful repos/list-for-org response.
 pub fn repos_list_for_org_decode(
-  response : @http.Response,
-) -> Array[MinimalRepository] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[MinimalRepository], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -14966,7 +15446,7 @@ pub fn repos_create_in_org_request(
 ) -> @http.Request {
   @http.Request::post(
     "/orgs/" + @http.percent_encode(parameter_value(org)) + "/repos",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -14982,9 +15462,10 @@ pub fn repos_create_in_org_decode_json(
 ///
 /// Decodes a successful repos/create-in-org response.
 pub fn repos_create_in_org_decode(
-  response : @http.Response,
-) -> FullRepository raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[FullRepository, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -15029,9 +15510,10 @@ pub fn repos_get_org_rulesets_decode_json(
 ///
 /// Decodes a successful repos/get-org-rulesets response.
 pub fn repos_get_org_rulesets_decode(
-  response : @http.Response,
-) -> Array[RepositoryRuleset] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[RepositoryRuleset], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -15043,7 +15525,7 @@ pub fn repos_create_org_ruleset_request(
 ) -> @http.Request {
   @http.Request::post(
     "/orgs/" + @http.percent_encode(parameter_value(org)) + "/rulesets",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -15059,9 +15541,10 @@ pub fn repos_create_org_ruleset_decode_json(
 ///
 /// Decodes a successful repos/create-org-ruleset response.
 pub fn repos_create_org_ruleset_decode(
-  response : @http.Response,
-) -> RepositoryRuleset raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[RepositoryRuleset, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -15135,9 +15618,10 @@ pub fn repos_get_org_rule_suites_decode_json(
 ///
 /// Decodes a successful repos/get-org-rule-suites response.
 pub fn repos_get_org_rule_suites_decode(
-  response : @http.Response,
-) -> Array[RuleSuitesItem] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[RuleSuitesItem], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -15173,9 +15657,10 @@ pub fn repos_get_org_rule_suite_decode_json(
 ///
 /// Decodes a successful repos/get-org-rule-suite response.
 pub fn repos_get_org_rule_suite_decode(
-  response : @http.Response,
-) -> RuleSuite raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[RuleSuite, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -15206,9 +15691,10 @@ pub fn repos_get_org_ruleset_decode_json(
 ///
 /// Decodes a successful repos/get-org-ruleset response.
 pub fn repos_get_org_ruleset_decode(
-  response : @http.Response,
-) -> RepositoryRuleset raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[RepositoryRuleset, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -15224,7 +15710,7 @@ pub fn repos_update_org_ruleset_request(
     @http.percent_encode(parameter_value(org)) +
     "/rulesets/" +
     @http.percent_encode(parameter_value(ruleset_id)),
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -15240,9 +15726,10 @@ pub fn repos_update_org_ruleset_decode_json(
 ///
 /// Decodes a successful repos/update-org-ruleset response.
 pub fn repos_update_org_ruleset_decode(
-  response : @http.Response,
-) -> RepositoryRuleset raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[RepositoryRuleset, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -15299,9 +15786,10 @@ pub fn orgs_get_org_ruleset_history_decode_json(
 ///
 /// Decodes a successful orgs/get-org-ruleset-history response.
 pub fn orgs_get_org_ruleset_history_decode(
-  response : @http.Response,
-) -> Array[RulesetVersion] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[RulesetVersion], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -15335,9 +15823,10 @@ pub fn orgs_get_org_ruleset_version_decode_json(
 ///
 /// Decodes a successful orgs/get-org-ruleset-version response.
 pub fn orgs_get_org_ruleset_version_decode(
-  response : @http.Response,
-) -> RulesetVersionWithState raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[RulesetVersionWithState, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -15491,9 +15980,10 @@ pub fn secret_scanning_list_alerts_for_org_decode_json(
 ///
 /// Decodes a successful secret-scanning/list-alerts-for-org response.
 pub fn secret_scanning_list_alerts_for_org_decode(
-  response : @http.Response,
-) -> Array[OrganizationSecretScanningAlert] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[OrganizationSecretScanningAlert], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -15556,9 +16046,10 @@ pub fn secret_scanning_list_org_custom_patterns_decode_json(
 ///
 /// Decodes a successful secret-scanning/list-org-custom-patterns response.
 pub fn secret_scanning_list_org_custom_patterns_decode(
-  response : @http.Response,
-) -> Array[SecretScanningCustomPattern] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[SecretScanningCustomPattern], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -15572,7 +16063,7 @@ pub fn secret_scanning_bulk_create_org_custom_patterns_request(
     "/orgs/" +
     @http.percent_encode(parameter_value(org)) +
     "/secret-scanning/custom-patterns",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -15588,9 +16079,13 @@ pub fn secret_scanning_bulk_create_org_custom_patterns_decode_json(
 ///
 /// Decodes a successful secret-scanning/bulk-create-org-custom-patterns response.
 pub fn secret_scanning_bulk_create_org_custom_patterns_decode(
-  response : @http.Response,
-) -> SecretScanningBulkCreateOrgCustomPatternsResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[
+  SecretScanningBulkCreateOrgCustomPatternsResponse,
+  @client.ResponseFailure,
+] {
+  decode_response(head, body)
 }
 
 ///|
@@ -15604,7 +16099,7 @@ pub fn secret_scanning_bulk_delete_org_custom_patterns_request(
     "/orgs/" +
     @http.percent_encode(parameter_value(org)) +
     "/secret-scanning/custom-patterns",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -15620,7 +16115,7 @@ pub fn secret_scanning_update_org_custom_pattern_request(
     @http.percent_encode(parameter_value(org)) +
     "/secret-scanning/custom-patterns/" +
     @http.percent_encode(parameter_value(pattern_id)),
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -15636,9 +16131,10 @@ pub fn secret_scanning_update_org_custom_pattern_decode_json(
 ///
 /// Decodes a successful secret-scanning/update-org-custom-pattern response.
 pub fn secret_scanning_update_org_custom_pattern_decode(
-  response : @http.Response,
-) -> SecretScanningCustomPattern raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[SecretScanningCustomPattern, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -15667,9 +16163,10 @@ pub fn secret_scanning_list_org_pattern_configs_decode_json(
 ///
 /// Decodes a successful secret-scanning/list-org-pattern-configs response.
 pub fn secret_scanning_list_org_pattern_configs_decode(
-  response : @http.Response,
-) -> SecretScanningPatternConfiguration raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[SecretScanningPatternConfiguration, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -15683,7 +16180,7 @@ pub fn secret_scanning_update_org_pattern_configs_request(
     "/orgs/" +
     @http.percent_encode(parameter_value(org)) +
     "/secret-scanning/pattern-configurations",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -15699,9 +16196,13 @@ pub fn secret_scanning_update_org_pattern_configs_decode_json(
 ///
 /// Decodes a successful secret-scanning/update-org-pattern-configs response.
 pub fn secret_scanning_update_org_pattern_configs_decode(
-  response : @http.Response,
-) -> SecretScanningUpdateOrgPatternConfigsResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[
+  SecretScanningUpdateOrgPatternConfigsResponse,
+  @client.ResponseFailure,
+] {
+  decode_response(head, body)
 }
 
 ///|
@@ -15764,9 +16265,10 @@ pub fn security_advisories_list_org_repository_advisories_decode_json(
 ///
 /// Decodes a successful security-advisories/list-org-repository-advisories response.
 pub fn security_advisories_list_org_repository_advisories_decode(
-  response : @http.Response,
-) -> Array[RepositoryAdvisory] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[RepositoryAdvisory], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -15791,9 +16293,10 @@ pub fn orgs_list_security_manager_teams_decode_json(
 ///
 /// Decodes a successful orgs/list-security-manager-teams response.
 pub fn orgs_list_security_manager_teams_decode(
-  response : @http.Response,
-) -> Array[TeamSimple] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[TeamSimple], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -15852,9 +16355,10 @@ pub fn orgs_get_immutable_releases_settings_decode_json(
 ///
 /// Decodes a successful orgs/get-immutable-releases-settings response.
 pub fn orgs_get_immutable_releases_settings_decode(
-  response : @http.Response,
-) -> ImmutableReleasesOrganizationSettings raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[ImmutableReleasesOrganizationSettings, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -15868,7 +16372,7 @@ pub fn orgs_set_immutable_releases_settings_request(
     "/orgs/" +
     @http.percent_encode(parameter_value(org)) +
     "/settings/immutable-releases",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -15907,9 +16411,13 @@ pub fn orgs_get_immutable_releases_settings_repositories_decode_json(
 ///
 /// Decodes a successful orgs/get-immutable-releases-settings-repositories response.
 pub fn orgs_get_immutable_releases_settings_repositories_decode(
-  response : @http.Response,
-) -> OrgsGetImmutableReleasesSettingsRepositoriesResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[
+  OrgsGetImmutableReleasesSettingsRepositoriesResponse,
+  @client.ResponseFailure,
+] {
+  decode_response(head, body)
 }
 
 ///|
@@ -15923,7 +16431,7 @@ pub fn orgs_set_immutable_releases_settings_repositories_request(
     "/orgs/" +
     @http.percent_encode(parameter_value(org)) +
     "/settings/immutable-releases/repositories",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -15992,9 +16500,13 @@ pub fn hosted_compute_list_network_configurations_for_org_decode_json(
 ///
 /// Decodes a successful hosted-compute/list-network-configurations-for-org response.
 pub fn hosted_compute_list_network_configurations_for_org_decode(
-  response : @http.Response,
-) -> HostedComputeListNetworkConfigurationsForOrgResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[
+  HostedComputeListNetworkConfigurationsForOrgResponse,
+  @client.ResponseFailure,
+] {
+  decode_response(head, body)
 }
 
 ///|
@@ -16008,7 +16520,7 @@ pub fn hosted_compute_create_network_configuration_for_org_request(
     "/orgs/" +
     @http.percent_encode(parameter_value(org)) +
     "/settings/network-configurations",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -16024,9 +16536,10 @@ pub fn hosted_compute_create_network_configuration_for_org_decode_json(
 ///
 /// Decodes a successful hosted-compute/create-network-configuration-for-org response.
 pub fn hosted_compute_create_network_configuration_for_org_decode(
-  response : @http.Response,
-) -> NetworkConfiguration raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[NetworkConfiguration, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -16057,9 +16570,10 @@ pub fn hosted_compute_get_network_configuration_for_org_decode_json(
 ///
 /// Decodes a successful hosted-compute/get-network-configuration-for-org response.
 pub fn hosted_compute_get_network_configuration_for_org_decode(
-  response : @http.Response,
-) -> NetworkConfiguration raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[NetworkConfiguration, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -16075,7 +16589,7 @@ pub fn hosted_compute_update_network_configuration_for_org_request(
     @http.percent_encode(parameter_value(org)) +
     "/settings/network-configurations/" +
     @http.percent_encode(parameter_value(network_configuration_id)),
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -16091,9 +16605,10 @@ pub fn hosted_compute_update_network_configuration_for_org_decode_json(
 ///
 /// Decodes a successful hosted-compute/update-network-configuration-for-org response.
 pub fn hosted_compute_update_network_configuration_for_org_decode(
-  response : @http.Response,
-) -> NetworkConfiguration raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[NetworkConfiguration, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -16139,9 +16654,10 @@ pub fn hosted_compute_get_network_settings_for_org_decode_json(
 ///
 /// Decodes a successful hosted-compute/get-network-settings-for-org response.
 pub fn hosted_compute_get_network_settings_for_org_decode(
-  response : @http.Response,
-) -> NetworkSettings raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[NetworkSettings, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -16184,9 +16700,10 @@ pub fn teams_list_decode_json(
 ///
 /// Decodes a successful teams/list response.
 pub fn teams_list_decode(
-  response : @http.Response,
-) -> Array[Team] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[Team], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -16198,7 +16715,7 @@ pub fn teams_create_request(
 ) -> @http.Request {
   @http.Request::post(
     "/orgs/" + @http.percent_encode(parameter_value(org)) + "/teams",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -16214,9 +16731,10 @@ pub fn teams_create_decode_json(
 ///
 /// Decodes a successful teams/create response.
 pub fn teams_create_decode(
-  response : @http.Response,
-) -> TeamFull raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[TeamFull, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -16247,9 +16765,10 @@ pub fn teams_get_by_name_decode_json(
 ///
 /// Decodes a successful teams/get-by-name response.
 pub fn teams_get_by_name_decode(
-  response : @http.Response,
-) -> TeamFull raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[TeamFull, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -16265,7 +16784,7 @@ pub fn teams_update_in_org_request(
     @http.percent_encode(parameter_value(org)) +
     "/teams/" +
     @http.percent_encode(parameter_value(team_slug)),
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -16281,9 +16800,10 @@ pub fn teams_update_in_org_decode_json(
 ///
 /// Decodes a successful teams/update-in-org response.
 pub fn teams_update_in_org_decode(
-  response : @http.Response,
-) -> TeamFull raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[TeamFull, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -16330,9 +16850,10 @@ pub fn copilot_get_copilot_team_customizations_decode_json(
 ///
 /// Decodes a successful copilot/get-copilot-team-customizations response.
 pub fn copilot_get_copilot_team_customizations_decode(
-  response : @http.Response,
-) -> Json raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Json, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -16349,7 +16870,7 @@ pub fn copilot_set_copilot_team_customizations_request(
     "/teams/" +
     @http.percent_encode(parameter_value(team_slug)) +
     "/copilot/customizations",
-  ).json_body(body)
+  ).body_json(body)
 }
 
 ///|
@@ -16365,9 +16886,10 @@ pub fn copilot_set_copilot_team_customizations_decode_json(
 ///
 /// Decodes a successful copilot/set-copilot-team-customizations response.
 pub fn copilot_set_copilot_team_customizations_decode(
-  response : @http.Response,
-) -> Json raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Json, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -16425,9 +16947,10 @@ pub fn teams_list_pending_invitations_in_org_decode_json(
 ///
 /// Decodes a successful teams/list-pending-invitations-in-org response.
 pub fn teams_list_pending_invitations_in_org_decode(
-  response : @http.Response,
-) -> Array[OrganizationInvitation] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[OrganizationInvitation], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -16474,9 +16997,10 @@ pub fn teams_list_members_in_org_decode_json(
 ///
 /// Decodes a successful teams/list-members-in-org response.
 pub fn teams_list_members_in_org_decode(
-  response : @http.Response,
-) -> Array[TeamMember] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[TeamMember], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -16510,9 +17034,10 @@ pub fn teams_get_membership_for_user_in_org_decode_json(
 ///
 /// Decodes a successful teams/get-membership-for-user-in-org response.
 pub fn teams_get_membership_for_user_in_org_decode(
-  response : @http.Response,
-) -> TeamMembership raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[TeamMembership, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -16531,7 +17056,7 @@ pub fn teams_add_or_update_membership_for_user_in_org_request(
     @http.percent_encode(parameter_value(team_slug)) +
     "/memberships/" +
     @http.percent_encode(parameter_value(username)),
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -16547,9 +17072,10 @@ pub fn teams_add_or_update_membership_for_user_in_org_decode_json(
 ///
 /// Decodes a successful teams/add-or-update-membership-for-user-in-org response.
 pub fn teams_add_or_update_membership_for_user_in_org_decode(
-  response : @http.Response,
-) -> TeamMembership raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[TeamMembership, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -16609,9 +17135,10 @@ pub fn teams_list_repos_in_org_decode_json(
 ///
 /// Decodes a successful teams/list-repos-in-org response.
 pub fn teams_list_repos_in_org_decode(
-  response : @http.Response,
-) -> Array[MinimalRepository] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[MinimalRepository], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -16648,9 +17175,10 @@ pub fn teams_check_permissions_for_repo_in_org_decode_json(
 ///
 /// Decodes a successful teams/check-permissions-for-repo-in-org response.
 pub fn teams_check_permissions_for_repo_in_org_decode(
-  response : @http.Response,
-) -> TeamRepository raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[TeamRepository, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -16672,7 +17200,7 @@ pub fn teams_add_or_update_repo_permissions_in_org_request(
     @http.percent_encode(parameter_value(owner)) +
     "/" +
     @http.percent_encode(parameter_value(repo)),
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -16735,9 +17263,10 @@ pub fn teams_list_child_in_org_decode_json(
 ///
 /// Decodes a successful teams/list-child-in-org response.
 pub fn teams_list_child_in_org_decode(
-  response : @http.Response,
-) -> Array[Team] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[Team], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -16756,7 +17285,7 @@ pub fn orgs_enable_or_disable_security_product_on_all_org_repos_request(
     @http.percent_encode(parameter_value(security_product)) +
     "/" +
     @http.percent_encode(parameter_value(enablement)),
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -16779,9 +17308,10 @@ pub fn rate_limit_get_decode_json(
 ///
 /// Decodes a successful rate-limit/get response.
 pub fn rate_limit_get_decode(
-  response : @http.Response,
-) -> RateLimitOverview raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[RateLimitOverview, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -16809,9 +17339,10 @@ pub fn repos_get_decode_json(
 ///
 /// Decodes a successful repos/get response.
 pub fn repos_get_decode(
-  response : @http.Response,
-) -> FullRepository raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[FullRepository, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -16827,7 +17358,7 @@ pub fn repos_update_request(
     @http.percent_encode(parameter_value(owner)) +
     "/" +
     @http.percent_encode(parameter_value(repo)),
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -16843,9 +17374,10 @@ pub fn repos_update_decode_json(
 ///
 /// Decodes a successful repos/update response.
 pub fn repos_update_decode(
-  response : @http.Response,
-) -> FullRepository raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[FullRepository, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -16904,9 +17436,10 @@ pub fn actions_list_artifacts_for_repo_decode_json(
 ///
 /// Decodes a successful actions/list-artifacts-for-repo response.
 pub fn actions_list_artifacts_for_repo_decode(
-  response : @http.Response,
-) -> ActionsListArtifactsForRepoResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[ActionsListArtifactsForRepoResponse, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -16940,9 +17473,10 @@ pub fn actions_get_artifact_decode_json(
 ///
 /// Decodes a successful actions/get-artifact response.
 pub fn actions_get_artifact_decode(
-  response : @http.Response,
-) -> Artifact raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Artifact, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -17013,9 +17547,10 @@ pub fn actions_get_actions_cache_retention_limit_for_repository_decode_json(
 ///
 /// Decodes a successful actions/get-actions-cache-retention-limit-for-repository response.
 pub fn actions_get_actions_cache_retention_limit_for_repository_decode(
-  response : @http.Response,
-) -> ActionsCacheRetentionLimitForRepository raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[ActionsCacheRetentionLimitForRepository, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -17032,7 +17567,7 @@ pub fn actions_set_actions_cache_retention_limit_for_repository_request(
     "/" +
     @http.percent_encode(parameter_value(repo)) +
     "/actions/cache/retention-limit",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -17064,9 +17599,10 @@ pub fn actions_get_actions_cache_storage_limit_for_repository_decode_json(
 ///
 /// Decodes a successful actions/get-actions-cache-storage-limit-for-repository response.
 pub fn actions_get_actions_cache_storage_limit_for_repository_decode(
-  response : @http.Response,
-) -> ActionsCacheStorageLimitForRepository raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[ActionsCacheStorageLimitForRepository, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -17083,7 +17619,7 @@ pub fn actions_set_actions_cache_storage_limit_for_repository_request(
     "/" +
     @http.percent_encode(parameter_value(repo)) +
     "/actions/cache/storage-limit",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -17115,9 +17651,10 @@ pub fn actions_get_actions_cache_usage_decode_json(
 ///
 /// Decodes a successful actions/get-actions-cache-usage response.
 pub fn actions_get_actions_cache_usage_decode(
-  response : @http.Response,
-) -> ActionsCacheUsageByRepository raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[ActionsCacheUsageByRepository, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -17180,9 +17717,10 @@ pub fn actions_get_actions_cache_list_decode_json(
 ///
 /// Decodes a successful actions/get-actions-cache-list response.
 pub fn actions_get_actions_cache_list_decode(
-  response : @http.Response,
-) -> ActionsCacheList raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[ActionsCacheList, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -17220,9 +17758,10 @@ pub fn actions_delete_actions_cache_by_key_decode_json(
 ///
 /// Decodes a successful actions/delete-actions-cache-by-key response.
 pub fn actions_delete_actions_cache_by_key_decode(
-  response : @http.Response,
-) -> ActionsCacheList raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[ActionsCacheList, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -17283,9 +17822,10 @@ pub fn actions_list_concurrency_groups_for_repository_decode_json(
 ///
 /// Decodes a successful actions/list-concurrency-groups-for-repository response.
 pub fn actions_list_concurrency_groups_for_repository_decode(
-  response : @http.Response,
-) -> ConcurrencyGroupList raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[ConcurrencyGroupList, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -17330,9 +17870,10 @@ pub fn actions_get_concurrency_group_for_repository_decode_json(
 ///
 /// Decodes a successful actions/get-concurrency-group-for-repository response.
 pub fn actions_get_concurrency_group_for_repository_decode(
-  response : @http.Response,
-) -> ConcurrencyGroup raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[ConcurrencyGroup, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -17366,9 +17907,10 @@ pub fn actions_get_job_for_workflow_run_decode_json(
 ///
 /// Decodes a successful actions/get-job-for-workflow-run response.
 pub fn actions_get_job_for_workflow_run_decode(
-  response : @http.Response,
-) -> Job raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Job, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -17407,7 +17949,7 @@ pub fn actions_re_run_job_for_workflow_run_request(
     "/actions/jobs/" +
     @http.percent_encode(parameter_value(job_id)) +
     "/rerun",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -17423,9 +17965,10 @@ pub fn actions_re_run_job_for_workflow_run_decode_json(
 ///
 /// Decodes a successful actions/re-run-job-for-workflow-run response.
 pub fn actions_re_run_job_for_workflow_run_decode(
-  response : @http.Response,
-) -> EmptyObject raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[EmptyObject, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -17479,9 +18022,10 @@ pub fn actions_get_custom_oidc_sub_claim_for_repo_decode_json(
 ///
 /// Decodes a successful actions/get-custom-oidc-sub-claim-for-repo response.
 pub fn actions_get_custom_oidc_sub_claim_for_repo_decode(
-  response : @http.Response,
-) -> OidcCustomSubRepo raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[OidcCustomSubRepo, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -17498,7 +18042,7 @@ pub fn actions_set_custom_oidc_sub_claim_for_repo_request(
     "/" +
     @http.percent_encode(parameter_value(repo)) +
     "/actions/oidc/customization/sub",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -17514,9 +18058,10 @@ pub fn actions_set_custom_oidc_sub_claim_for_repo_decode_json(
 ///
 /// Decodes a successful actions/set-custom-oidc-sub-claim-for-repo response.
 pub fn actions_set_custom_oidc_sub_claim_for_repo_decode(
-  response : @http.Response,
-) -> EmptyObject raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[EmptyObject, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -17558,9 +18103,10 @@ pub fn actions_list_repo_organization_secrets_decode_json(
 ///
 /// Decodes a successful actions/list-repo-organization-secrets response.
 pub fn actions_list_repo_organization_secrets_decode(
-  response : @http.Response,
-) -> ActionsListRepoOrganizationSecretsResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[ActionsListRepoOrganizationSecretsResponse, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -17602,9 +18148,13 @@ pub fn actions_list_repo_organization_variables_decode_json(
 ///
 /// Decodes a successful actions/list-repo-organization-variables response.
 pub fn actions_list_repo_organization_variables_decode(
-  response : @http.Response,
-) -> ActionsListRepoOrganizationVariablesResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[
+  ActionsListRepoOrganizationVariablesResponse,
+  @client.ResponseFailure,
+] {
+  decode_response(head, body)
 }
 
 ///|
@@ -17636,9 +18186,10 @@ pub fn actions_get_github_actions_permissions_repository_decode_json(
 ///
 /// Decodes a successful actions/get-github-actions-permissions-repository response.
 pub fn actions_get_github_actions_permissions_repository_decode(
-  response : @http.Response,
-) -> ActionsRepositoryPermissions raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[ActionsRepositoryPermissions, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -17655,7 +18206,7 @@ pub fn actions_set_github_actions_permissions_repository_request(
     "/" +
     @http.percent_encode(parameter_value(repo)) +
     "/actions/permissions",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -17687,9 +18238,10 @@ pub fn actions_get_workflow_access_to_repository_decode_json(
 ///
 /// Decodes a successful actions/get-workflow-access-to-repository response.
 pub fn actions_get_workflow_access_to_repository_decode(
-  response : @http.Response,
-) -> ActionsWorkflowAccessToRepository raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[ActionsWorkflowAccessToRepository, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -17706,7 +18258,7 @@ pub fn actions_set_workflow_access_to_repository_request(
     "/" +
     @http.percent_encode(parameter_value(repo)) +
     "/actions/permissions/access",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -17738,9 +18290,10 @@ pub fn actions_get_artifact_and_log_retention_settings_repository_decode_json(
 ///
 /// Decodes a successful actions/get-artifact-and-log-retention-settings-repository response.
 pub fn actions_get_artifact_and_log_retention_settings_repository_decode(
-  response : @http.Response,
-) -> ActionsArtifactAndLogRetentionResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[ActionsArtifactAndLogRetentionResponse, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -17757,7 +18310,7 @@ pub fn actions_set_artifact_and_log_retention_settings_repository_request(
     "/" +
     @http.percent_encode(parameter_value(repo)) +
     "/actions/permissions/artifact-and-log-retention",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -17789,9 +18342,10 @@ pub fn actions_get_fork_pr_contributor_approval_permissions_repository_decode_js
 ///
 /// Decodes a successful actions/get-fork-pr-contributor-approval-permissions-repository response.
 pub fn actions_get_fork_pr_contributor_approval_permissions_repository_decode(
-  response : @http.Response,
-) -> ActionsForkPrContributorApproval raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[ActionsForkPrContributorApproval, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -17808,7 +18362,7 @@ pub fn actions_set_fork_pr_contributor_approval_permissions_repository_request(
     "/" +
     @http.percent_encode(parameter_value(repo)) +
     "/actions/permissions/fork-pr-contributor-approval",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -17840,9 +18394,10 @@ pub fn actions_get_private_repo_fork_pr_workflows_settings_repository_decode_jso
 ///
 /// Decodes a successful actions/get-private-repo-fork-pr-workflows-settings-repository response.
 pub fn actions_get_private_repo_fork_pr_workflows_settings_repository_decode(
-  response : @http.Response,
-) -> ActionsForkPrWorkflowsPrivateRepos raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[ActionsForkPrWorkflowsPrivateRepos, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -17859,7 +18414,7 @@ pub fn actions_set_private_repo_fork_pr_workflows_settings_repository_request(
     "/" +
     @http.percent_encode(parameter_value(repo)) +
     "/actions/permissions/fork-pr-workflows-private-repos",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -17891,9 +18446,10 @@ pub fn actions_get_allowed_actions_repository_decode_json(
 ///
 /// Decodes a successful actions/get-allowed-actions-repository response.
 pub fn actions_get_allowed_actions_repository_decode(
-  response : @http.Response,
-) -> SelectedActions raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[SelectedActions, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -17910,7 +18466,7 @@ pub fn actions_set_allowed_actions_repository_request(
     "/" +
     @http.percent_encode(parameter_value(repo)) +
     "/actions/permissions/selected-actions",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -17942,9 +18498,10 @@ pub fn actions_get_github_actions_default_workflow_permissions_repository_decode
 ///
 /// Decodes a successful actions/get-github-actions-default-workflow-permissions-repository response.
 pub fn actions_get_github_actions_default_workflow_permissions_repository_decode(
-  response : @http.Response,
-) -> ActionsGetDefaultWorkflowPermissions raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[ActionsGetDefaultWorkflowPermissions, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -17961,7 +18518,7 @@ pub fn actions_set_github_actions_default_workflow_permissions_repository_reques
     "/" +
     @http.percent_encode(parameter_value(repo)) +
     "/actions/permissions/workflow",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -18009,9 +18566,10 @@ pub fn actions_get_repo_actions_policies_decode_json(
 ///
 /// Decodes a successful actions/get-repo-actions-policies response.
 pub fn actions_get_repo_actions_policies_decode(
-  response : @http.Response,
-) -> ActionsGetRepoActionsPoliciesResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[ActionsGetRepoActionsPoliciesResponse, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -18028,7 +18586,7 @@ pub fn actions_create_repo_actions_policy_request(
     "/" +
     @http.percent_encode(parameter_value(repo)) +
     "/actions/policies",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -18044,9 +18602,10 @@ pub fn actions_create_repo_actions_policy_decode_json(
 ///
 /// Decodes a successful actions/create-repo-actions-policy response.
 pub fn actions_create_repo_actions_policy_decode(
-  response : @http.Response,
-) -> ActionsPolicy raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[ActionsPolicy, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -18080,9 +18639,10 @@ pub fn actions_get_repo_actions_policy_decode_json(
 ///
 /// Decodes a successful actions/get-repo-actions-policy response.
 pub fn actions_get_repo_actions_policy_decode(
-  response : @http.Response,
-) -> ActionsPolicy raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[ActionsPolicy, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -18101,7 +18661,7 @@ pub fn actions_update_repo_actions_policy_request(
     @http.percent_encode(parameter_value(repo)) +
     "/actions/policies/" +
     @http.percent_encode(parameter_value(policy_id)),
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -18117,9 +18677,10 @@ pub fn actions_update_repo_actions_policy_decode_json(
 ///
 /// Decodes a successful actions/update-repo-actions-policy response.
 pub fn actions_update_repo_actions_policy_decode(
-  response : @http.Response,
-) -> ActionsPolicy raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[ActionsPolicy, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -18184,9 +18745,13 @@ pub fn actions_list_self_hosted_runners_for_repo_decode_json(
 ///
 /// Decodes a successful actions/list-self-hosted-runners-for-repo response.
 pub fn actions_list_self_hosted_runners_for_repo_decode(
-  response : @http.Response,
-) -> ActionsListSelfHostedRunnersForRepoResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[
+  ActionsListSelfHostedRunnersForRepoResponse,
+  @client.ResponseFailure,
+] {
+  decode_response(head, body)
 }
 
 ///|
@@ -18220,9 +18785,13 @@ pub fn actions_get_runner_version_deprecation_for_repo_decode_json(
 ///
 /// Decodes a successful actions/get-runner-version-deprecation-for-repo response.
 pub fn actions_get_runner_version_deprecation_for_repo_decode(
-  response : @http.Response,
-) -> ActionsGetRunnerVersionDeprecationForRepoResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[
+  ActionsGetRunnerVersionDeprecationForRepoResponse,
+  @client.ResponseFailure,
+] {
+  decode_response(head, body)
 }
 
 ///|
@@ -18254,9 +18823,10 @@ pub fn actions_list_runner_applications_for_repo_decode_json(
 ///
 /// Decodes a successful actions/list-runner-applications-for-repo response.
 pub fn actions_list_runner_applications_for_repo_decode(
-  response : @http.Response,
-) -> Array[RunnerApplication] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[RunnerApplication], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -18273,7 +18843,7 @@ pub fn actions_generate_runner_jitconfig_for_repo_request(
     "/" +
     @http.percent_encode(parameter_value(repo)) +
     "/actions/runners/generate-jitconfig",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -18305,9 +18875,10 @@ pub fn actions_create_registration_token_for_repo_decode_json(
 ///
 /// Decodes a successful actions/create-registration-token-for-repo response.
 pub fn actions_create_registration_token_for_repo_decode(
-  response : @http.Response,
-) -> AuthenticationToken raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[AuthenticationToken, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -18339,9 +18910,10 @@ pub fn actions_create_remove_token_for_repo_decode_json(
 ///
 /// Decodes a successful actions/create-remove-token-for-repo response.
 pub fn actions_create_remove_token_for_repo_decode(
-  response : @http.Response,
-) -> AuthenticationToken raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[AuthenticationToken, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -18375,9 +18947,10 @@ pub fn actions_get_self_hosted_runner_for_repo_decode_json(
 ///
 /// Decodes a successful actions/get-self-hosted-runner-for-repo response.
 pub fn actions_get_self_hosted_runner_for_repo_decode(
-  response : @http.Response,
-) -> Runner raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Runner, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -18434,7 +19007,7 @@ pub fn actions_add_custom_labels_to_self_hosted_runner_for_repo_request(
     "/actions/runners/" +
     @http.percent_encode(parameter_value(runner_id)) +
     "/labels",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -18454,7 +19027,7 @@ pub fn actions_set_custom_labels_for_self_hosted_runner_for_repo_request(
     "/actions/runners/" +
     @http.percent_encode(parameter_value(runner_id)) +
     "/labels",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -18588,9 +19161,10 @@ pub fn actions_list_workflow_runs_for_repo_decode_json(
 ///
 /// Decodes a successful actions/list-workflow-runs-for-repo response.
 pub fn actions_list_workflow_runs_for_repo_decode(
-  response : @http.Response,
-) -> ActionsListWorkflowRunsForRepoResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[ActionsListWorkflowRunsForRepoResponse, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -18633,9 +19207,10 @@ pub fn actions_get_workflow_run_decode_json(
 ///
 /// Decodes a successful actions/get-workflow-run response.
 pub fn actions_get_workflow_run_decode(
-  response : @http.Response,
-) -> WorkflowRun raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[WorkflowRun, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -18688,9 +19263,10 @@ pub fn actions_get_reviews_for_run_decode_json(
 ///
 /// Decodes a successful actions/get-reviews-for-run response.
 pub fn actions_get_reviews_for_run_decode(
-  response : @http.Response,
-) -> Array[EnvironmentApprovals] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[EnvironmentApprovals], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -18725,9 +19301,10 @@ pub fn actions_approve_workflow_run_decode_json(
 ///
 /// Decodes a successful actions/approve-workflow-run response.
 pub fn actions_approve_workflow_run_decode(
-  response : @http.Response,
-) -> EmptyObject raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[EmptyObject, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -18783,9 +19360,10 @@ pub fn actions_list_workflow_run_artifacts_decode_json(
 ///
 /// Decodes a successful actions/list-workflow-run-artifacts response.
 pub fn actions_list_workflow_run_artifacts_decode(
-  response : @http.Response,
-) -> ActionsListWorkflowRunArtifactsResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[ActionsListWorkflowRunArtifactsResponse, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -18831,9 +19409,10 @@ pub fn actions_get_workflow_run_attempt_decode_json(
 ///
 /// Decodes a successful actions/get-workflow-run-attempt response.
 pub fn actions_get_workflow_run_attempt_decode(
-  response : @http.Response,
-) -> WorkflowRun raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[WorkflowRun, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -18881,9 +19460,13 @@ pub fn actions_list_jobs_for_workflow_run_attempt_decode_json(
 ///
 /// Decodes a successful actions/list-jobs-for-workflow-run-attempt response.
 pub fn actions_list_jobs_for_workflow_run_attempt_decode(
-  response : @http.Response,
-) -> ActionsListJobsForWorkflowRunAttemptResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[
+  ActionsListJobsForWorkflowRunAttemptResponse,
+  @client.ResponseFailure,
+] {
+  decode_response(head, body)
 }
 
 ///|
@@ -18940,9 +19523,10 @@ pub fn actions_cancel_workflow_run_decode_json(
 ///
 /// Decodes a successful actions/cancel-workflow-run response.
 pub fn actions_cancel_workflow_run_decode(
-  response : @http.Response,
-) -> EmptyObject raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[EmptyObject, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -18994,9 +19578,10 @@ pub fn actions_list_concurrency_groups_for_workflow_run_decode_json(
 ///
 /// Decodes a successful actions/list-concurrency-groups-for-workflow-run response.
 pub fn actions_list_concurrency_groups_for_workflow_run_decode(
-  response : @http.Response,
-) -> ConcurrencyGroupRunList raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[ConcurrencyGroupRunList, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -19016,7 +19601,7 @@ pub fn actions_review_custom_gates_for_run_request(
     "/actions/runs/" +
     @http.percent_encode(parameter_value(run_id)) +
     "/deployment_protection_rule",
-  ).json_body(body)
+  ).body_json(body)
 }
 
 ///|
@@ -19051,9 +19636,10 @@ pub fn actions_force_cancel_workflow_run_decode_json(
 ///
 /// Decodes a successful actions/force-cancel-workflow-run response.
 pub fn actions_force_cancel_workflow_run_decode(
-  response : @http.Response,
-) -> EmptyObject raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[EmptyObject, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -19104,9 +19690,10 @@ pub fn actions_list_jobs_for_workflow_run_decode_json(
 ///
 /// Decodes a successful actions/list-jobs-for-workflow-run response.
 pub fn actions_list_jobs_for_workflow_run_decode(
-  response : @http.Response,
-) -> ActionsListJobsForWorkflowRunResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[ActionsListJobsForWorkflowRunResponse, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -19179,9 +19766,10 @@ pub fn actions_get_pending_deployments_for_run_decode_json(
 ///
 /// Decodes a successful actions/get-pending-deployments-for-run response.
 pub fn actions_get_pending_deployments_for_run_decode(
-  response : @http.Response,
-) -> Array[PendingDeployment] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[PendingDeployment], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -19201,7 +19789,7 @@ pub fn actions_review_pending_deployments_for_run_request(
     "/actions/runs/" +
     @http.percent_encode(parameter_value(run_id)) +
     "/pending_deployments",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -19217,9 +19805,10 @@ pub fn actions_review_pending_deployments_for_run_decode_json(
 ///
 /// Decodes a successful actions/review-pending-deployments-for-run response.
 pub fn actions_review_pending_deployments_for_run_decode(
-  response : @http.Response,
-) -> Array[Deployment] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[Deployment], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -19239,7 +19828,7 @@ pub fn actions_re_run_workflow_request(
     "/actions/runs/" +
     @http.percent_encode(parameter_value(run_id)) +
     "/rerun",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -19255,9 +19844,10 @@ pub fn actions_re_run_workflow_decode_json(
 ///
 /// Decodes a successful actions/re-run-workflow response.
 pub fn actions_re_run_workflow_decode(
-  response : @http.Response,
-) -> EmptyObject raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[EmptyObject, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -19277,7 +19867,7 @@ pub fn actions_re_run_workflow_failed_jobs_request(
     "/actions/runs/" +
     @http.percent_encode(parameter_value(run_id)) +
     "/rerun-failed-jobs",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -19293,9 +19883,10 @@ pub fn actions_re_run_workflow_failed_jobs_decode_json(
 ///
 /// Decodes a successful actions/re-run-workflow-failed-jobs response.
 pub fn actions_re_run_workflow_failed_jobs_decode(
-  response : @http.Response,
-) -> EmptyObject raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[EmptyObject, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -19330,9 +19921,10 @@ pub fn actions_get_workflow_run_usage_decode_json(
 ///
 /// Decodes a successful actions/get-workflow-run-usage response.
 pub fn actions_get_workflow_run_usage_decode(
-  response : @http.Response,
-) -> WorkflowRunUsage raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[WorkflowRunUsage, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -19374,9 +19966,10 @@ pub fn actions_list_repo_secrets_decode_json(
 ///
 /// Decodes a successful actions/list-repo-secrets response.
 pub fn actions_list_repo_secrets_decode(
-  response : @http.Response,
-) -> ActionsListRepoSecretsResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[ActionsListRepoSecretsResponse, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -19408,9 +20001,10 @@ pub fn actions_get_repo_public_key_decode_json(
 ///
 /// Decodes a successful actions/get-repo-public-key response.
 pub fn actions_get_repo_public_key_decode(
-  response : @http.Response,
-) -> ActionsPublicKey raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[ActionsPublicKey, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -19444,9 +20038,10 @@ pub fn actions_get_repo_secret_decode_json(
 ///
 /// Decodes a successful actions/get-repo-secret response.
 pub fn actions_get_repo_secret_decode(
-  response : @http.Response,
-) -> ActionsSecret raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[ActionsSecret, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -19465,7 +20060,7 @@ pub fn actions_create_or_update_repo_secret_request(
     @http.percent_encode(parameter_value(repo)) +
     "/actions/secrets/" +
     @http.percent_encode(parameter_value(secret_name)),
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -19481,9 +20076,10 @@ pub fn actions_create_or_update_repo_secret_decode_json(
 ///
 /// Decodes a successful actions/create-or-update-repo-secret response.
 pub fn actions_create_or_update_repo_secret_decode(
-  response : @http.Response,
-) -> EmptyObject raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[EmptyObject, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -19543,9 +20139,10 @@ pub fn actions_list_repo_variables_decode_json(
 ///
 /// Decodes a successful actions/list-repo-variables response.
 pub fn actions_list_repo_variables_decode(
-  response : @http.Response,
-) -> ActionsListRepoVariablesResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[ActionsListRepoVariablesResponse, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -19562,7 +20159,7 @@ pub fn actions_create_repo_variable_request(
     "/" +
     @http.percent_encode(parameter_value(repo)) +
     "/actions/variables",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -19578,9 +20175,10 @@ pub fn actions_create_repo_variable_decode_json(
 ///
 /// Decodes a successful actions/create-repo-variable response.
 pub fn actions_create_repo_variable_decode(
-  response : @http.Response,
-) -> EmptyObject raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[EmptyObject, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -19614,9 +20212,10 @@ pub fn actions_get_repo_variable_decode_json(
 ///
 /// Decodes a successful actions/get-repo-variable response.
 pub fn actions_get_repo_variable_decode(
-  response : @http.Response,
-) -> ActionsVariable raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[ActionsVariable, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -19635,7 +20234,7 @@ pub fn actions_update_repo_variable_request(
     @http.percent_encode(parameter_value(repo)) +
     "/actions/variables/" +
     @http.percent_encode(parameter_value(name)),
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -19695,9 +20294,10 @@ pub fn actions_list_repo_workflows_decode_json(
 ///
 /// Decodes a successful actions/list-repo-workflows response.
 pub fn actions_list_repo_workflows_decode(
-  response : @http.Response,
-) -> ActionsListRepoWorkflowsResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[ActionsListRepoWorkflowsResponse, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -19731,9 +20331,10 @@ pub fn actions_get_workflow_decode_json(
 ///
 /// Decodes a successful actions/get-workflow response.
 pub fn actions_get_workflow_decode(
-  response : @http.Response,
-) -> Workflow raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Workflow, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -19772,7 +20373,7 @@ pub fn actions_create_workflow_dispatch_request(
     "/actions/workflows/" +
     @http.percent_encode(parameter_value(workflow_id)) +
     "/dispatches",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -19788,9 +20389,10 @@ pub fn actions_create_workflow_dispatch_decode_json(
 ///
 /// Decodes a successful actions/create-workflow-dispatch response.
 pub fn actions_create_workflow_dispatch_decode(
-  response : @http.Response,
-) -> WorkflowDispatchResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[WorkflowDispatchResponse, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -19906,9 +20508,10 @@ pub fn actions_list_workflow_runs_decode_json(
 ///
 /// Decodes a successful actions/list-workflow-runs response.
 pub fn actions_list_workflow_runs_decode(
-  response : @http.Response,
-) -> ActionsListWorkflowRunsResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[ActionsListWorkflowRunsResponse, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -19943,9 +20546,10 @@ pub fn actions_get_workflow_usage_decode_json(
 ///
 /// Decodes a successful actions/get-workflow-usage response.
 pub fn actions_get_workflow_usage_decode(
-  response : @http.Response,
-) -> WorkflowUsage raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[WorkflowUsage, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -20023,9 +20627,10 @@ pub fn repos_list_activities_decode_json(
 ///
 /// Decodes a successful repos/list-activities response.
 pub fn repos_list_activities_decode(
-  response : @http.Response,
-) -> Array[Activity] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[Activity], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -20067,9 +20672,10 @@ pub fn agents_list_repo_organization_secrets_decode_json(
 ///
 /// Decodes a successful agents/list-repo-organization-secrets response.
 pub fn agents_list_repo_organization_secrets_decode(
-  response : @http.Response,
-) -> AgentsListRepoOrganizationSecretsResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[AgentsListRepoOrganizationSecretsResponse, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -20111,9 +20717,13 @@ pub fn agents_list_repo_organization_variables_decode_json(
 ///
 /// Decodes a successful agents/list-repo-organization-variables response.
 pub fn agents_list_repo_organization_variables_decode(
-  response : @http.Response,
-) -> AgentsListRepoOrganizationVariablesResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[
+  AgentsListRepoOrganizationVariablesResponse,
+  @client.ResponseFailure,
+] {
+  decode_response(head, body)
 }
 
 ///|
@@ -20155,9 +20765,10 @@ pub fn agents_list_repo_secrets_decode_json(
 ///
 /// Decodes a successful agents/list-repo-secrets response.
 pub fn agents_list_repo_secrets_decode(
-  response : @http.Response,
-) -> AgentsListRepoSecretsResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[AgentsListRepoSecretsResponse, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -20189,9 +20800,10 @@ pub fn agents_get_repo_public_key_decode_json(
 ///
 /// Decodes a successful agents/get-repo-public-key response.
 pub fn agents_get_repo_public_key_decode(
-  response : @http.Response,
-) -> ActionsPublicKey raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[ActionsPublicKey, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -20225,9 +20837,10 @@ pub fn agents_get_repo_secret_decode_json(
 ///
 /// Decodes a successful agents/get-repo-secret response.
 pub fn agents_get_repo_secret_decode(
-  response : @http.Response,
-) -> ActionsSecret raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[ActionsSecret, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -20246,7 +20859,7 @@ pub fn agents_create_or_update_repo_secret_request(
     @http.percent_encode(parameter_value(repo)) +
     "/agents/secrets/" +
     @http.percent_encode(parameter_value(secret_name)),
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -20262,9 +20875,10 @@ pub fn agents_create_or_update_repo_secret_decode_json(
 ///
 /// Decodes a successful agents/create-or-update-repo-secret response.
 pub fn agents_create_or_update_repo_secret_decode(
-  response : @http.Response,
-) -> EmptyObject raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[EmptyObject, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -20324,9 +20938,10 @@ pub fn agents_list_repo_variables_decode_json(
 ///
 /// Decodes a successful agents/list-repo-variables response.
 pub fn agents_list_repo_variables_decode(
-  response : @http.Response,
-) -> AgentsListRepoVariablesResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[AgentsListRepoVariablesResponse, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -20343,7 +20958,7 @@ pub fn agents_create_repo_variable_request(
     "/" +
     @http.percent_encode(parameter_value(repo)) +
     "/agents/variables",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -20359,9 +20974,10 @@ pub fn agents_create_repo_variable_decode_json(
 ///
 /// Decodes a successful agents/create-repo-variable response.
 pub fn agents_create_repo_variable_decode(
-  response : @http.Response,
-) -> EmptyObject raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[EmptyObject, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -20395,9 +21011,10 @@ pub fn agents_get_repo_variable_decode_json(
 ///
 /// Decodes a successful agents/get-repo-variable response.
 pub fn agents_get_repo_variable_decode(
-  response : @http.Response,
-) -> ActionsVariable raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[ActionsVariable, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -20416,7 +21033,7 @@ pub fn agents_update_repo_variable_request(
     @http.percent_encode(parameter_value(repo)) +
     "/agents/variables/" +
     @http.percent_encode(parameter_value(name)),
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -20476,9 +21093,10 @@ pub fn issues_list_assignees_decode_json(
 ///
 /// Decodes a successful issues/list-assignees response.
 pub fn issues_list_assignees_decode(
-  response : @http.Response,
-) -> Array[SimpleUser] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[SimpleUser], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -20513,7 +21131,7 @@ pub fn repos_create_attestation_request(
     "/" +
     @http.percent_encode(parameter_value(repo)) +
     "/attestations",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -20529,9 +21147,10 @@ pub fn repos_create_attestation_decode_json(
 ///
 /// Decodes a successful repos/create-attestation response.
 pub fn repos_create_attestation_decode(
-  response : @http.Response,
-) -> ReposCreateAttestationResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[ReposCreateAttestationResponse, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -20588,9 +21207,10 @@ pub fn repos_list_attestations_decode_json(
 ///
 /// Decodes a successful repos/list-attestations response.
 pub fn repos_list_attestations_decode(
-  response : @http.Response,
-) -> ReposListAttestationsResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[ReposListAttestationsResponse, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -20622,9 +21242,10 @@ pub fn repos_list_autolinks_decode_json(
 ///
 /// Decodes a successful repos/list-autolinks response.
 pub fn repos_list_autolinks_decode(
-  response : @http.Response,
-) -> Array[Autolink] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[Autolink], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -20641,7 +21262,7 @@ pub fn repos_create_autolink_request(
     "/" +
     @http.percent_encode(parameter_value(repo)) +
     "/autolinks",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -20657,9 +21278,10 @@ pub fn repos_create_autolink_decode_json(
 ///
 /// Decodes a successful repos/create-autolink response.
 pub fn repos_create_autolink_decode(
-  response : @http.Response,
-) -> Autolink raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Autolink, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -20693,9 +21315,10 @@ pub fn repos_get_autolink_decode_json(
 ///
 /// Decodes a successful repos/get-autolink response.
 pub fn repos_get_autolink_decode(
-  response : @http.Response,
-) -> Autolink raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Autolink, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -20745,9 +21368,10 @@ pub fn repos_check_automated_security_fixes_decode_json(
 ///
 /// Decodes a successful repos/check-automated-security-fixes response.
 pub fn repos_check_automated_security_fixes_decode(
-  response : @http.Response,
-) -> CheckAutomatedSecurityFixes raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[CheckAutomatedSecurityFixes, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -20827,9 +21451,10 @@ pub fn repos_list_branches_decode_json(
 ///
 /// Decodes a successful repos/list-branches response.
 pub fn repos_list_branches_decode(
-  response : @http.Response,
-) -> Array[ShortBranch] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[ShortBranch], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -20863,9 +21488,10 @@ pub fn repos_get_branch_decode_json(
 ///
 /// Decodes a successful repos/get-branch response.
 pub fn repos_get_branch_decode(
-  response : @http.Response,
-) -> BranchWithProtection raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[BranchWithProtection, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -20900,9 +21526,10 @@ pub fn repos_get_branch_protection_decode_json(
 ///
 /// Decodes a successful repos/get-branch-protection response.
 pub fn repos_get_branch_protection_decode(
-  response : @http.Response,
-) -> BranchProtection raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[BranchProtection, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -20922,7 +21549,7 @@ pub fn repos_update_branch_protection_request(
     "/branches/" +
     @http.percent_encode_path(parameter_value(branch)) +
     "/protection",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -20938,9 +21565,10 @@ pub fn repos_update_branch_protection_decode_json(
 ///
 /// Decodes a successful repos/update-branch-protection response.
 pub fn repos_update_branch_protection_decode(
-  response : @http.Response,
-) -> ProtectedBranch raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[ProtectedBranch, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -20994,9 +21622,10 @@ pub fn repos_get_admin_branch_protection_decode_json(
 ///
 /// Decodes a successful repos/get-admin-branch-protection response.
 pub fn repos_get_admin_branch_protection_decode(
-  response : @http.Response,
-) -> ProtectedBranchAdminEnforced raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[ProtectedBranchAdminEnforced, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -21031,9 +21660,10 @@ pub fn repos_set_admin_branch_protection_decode_json(
 ///
 /// Decodes a successful repos/set-admin-branch-protection response.
 pub fn repos_set_admin_branch_protection_decode(
-  response : @http.Response,
-) -> ProtectedBranchAdminEnforced raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[ProtectedBranchAdminEnforced, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -21087,9 +21717,10 @@ pub fn repos_get_pull_request_review_protection_decode_json(
 ///
 /// Decodes a successful repos/get-pull-request-review-protection response.
 pub fn repos_get_pull_request_review_protection_decode(
-  response : @http.Response,
-) -> ProtectedBranchPullRequestReview raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[ProtectedBranchPullRequestReview, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -21109,7 +21740,7 @@ pub fn repos_update_pull_request_review_protection_request(
     "/branches/" +
     @http.percent_encode_path(parameter_value(branch)) +
     "/protection/required_pull_request_reviews",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -21125,9 +21756,10 @@ pub fn repos_update_pull_request_review_protection_decode_json(
 ///
 /// Decodes a successful repos/update-pull-request-review-protection response.
 pub fn repos_update_pull_request_review_protection_decode(
-  response : @http.Response,
-) -> ProtectedBranchPullRequestReview raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[ProtectedBranchPullRequestReview, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -21181,9 +21813,10 @@ pub fn repos_get_commit_signature_protection_decode_json(
 ///
 /// Decodes a successful repos/get-commit-signature-protection response.
 pub fn repos_get_commit_signature_protection_decode(
-  response : @http.Response,
-) -> ProtectedBranchAdminEnforced raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[ProtectedBranchAdminEnforced, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -21218,9 +21851,10 @@ pub fn repos_create_commit_signature_protection_decode_json(
 ///
 /// Decodes a successful repos/create-commit-signature-protection response.
 pub fn repos_create_commit_signature_protection_decode(
-  response : @http.Response,
-) -> ProtectedBranchAdminEnforced raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[ProtectedBranchAdminEnforced, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -21274,9 +21908,10 @@ pub fn repos_get_status_checks_protection_decode_json(
 ///
 /// Decodes a successful repos/get-status-checks-protection response.
 pub fn repos_get_status_checks_protection_decode(
-  response : @http.Response,
-) -> StatusCheckPolicy raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[StatusCheckPolicy, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -21296,7 +21931,7 @@ pub fn repos_update_status_check_protection_request(
     "/branches/" +
     @http.percent_encode_path(parameter_value(branch)) +
     "/protection/required_status_checks",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -21312,9 +21947,10 @@ pub fn repos_update_status_check_protection_decode_json(
 ///
 /// Decodes a successful repos/update-status-check-protection response.
 pub fn repos_update_status_check_protection_decode(
-  response : @http.Response,
-) -> StatusCheckPolicy raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[StatusCheckPolicy, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -21368,9 +22004,10 @@ pub fn repos_get_all_status_check_contexts_decode_json(
 ///
 /// Decodes a successful repos/get-all-status-check-contexts response.
 pub fn repos_get_all_status_check_contexts_decode(
-  response : @http.Response,
-) -> Array[String] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[String], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -21390,7 +22027,7 @@ pub fn repos_add_status_check_contexts_request(
     "/branches/" +
     @http.percent_encode_path(parameter_value(branch)) +
     "/protection/required_status_checks/contexts",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -21406,9 +22043,10 @@ pub fn repos_add_status_check_contexts_decode_json(
 ///
 /// Decodes a successful repos/add-status-check-contexts response.
 pub fn repos_add_status_check_contexts_decode(
-  response : @http.Response,
-) -> Array[String] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[String], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -21428,7 +22066,7 @@ pub fn repos_set_status_check_contexts_request(
     "/branches/" +
     @http.percent_encode_path(parameter_value(branch)) +
     "/protection/required_status_checks/contexts",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -21444,9 +22082,10 @@ pub fn repos_set_status_check_contexts_decode_json(
 ///
 /// Decodes a successful repos/set-status-check-contexts response.
 pub fn repos_set_status_check_contexts_decode(
-  response : @http.Response,
-) -> Array[String] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[String], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -21466,7 +22105,7 @@ pub fn repos_remove_status_check_contexts_request(
     "/branches/" +
     @http.percent_encode_path(parameter_value(branch)) +
     "/protection/required_status_checks/contexts",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -21482,9 +22121,10 @@ pub fn repos_remove_status_check_contexts_decode_json(
 ///
 /// Decodes a successful repos/remove-status-check-contexts response.
 pub fn repos_remove_status_check_contexts_decode(
-  response : @http.Response,
-) -> Array[String] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[String], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -21519,9 +22159,10 @@ pub fn repos_get_access_restrictions_decode_json(
 ///
 /// Decodes a successful repos/get-access-restrictions response.
 pub fn repos_get_access_restrictions_decode(
-  response : @http.Response,
-) -> BranchRestrictionPolicy raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[BranchRestrictionPolicy, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -21575,9 +22216,10 @@ pub fn repos_get_apps_with_access_to_protected_branch_decode_json(
 ///
 /// Decodes a successful repos/get-apps-with-access-to-protected-branch response.
 pub fn repos_get_apps_with_access_to_protected_branch_decode(
-  response : @http.Response,
-) -> Array[Integration] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[Integration], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -21597,7 +22239,7 @@ pub fn repos_add_app_access_restrictions_request(
     "/branches/" +
     @http.percent_encode_path(parameter_value(branch)) +
     "/protection/restrictions/apps",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -21613,9 +22255,10 @@ pub fn repos_add_app_access_restrictions_decode_json(
 ///
 /// Decodes a successful repos/add-app-access-restrictions response.
 pub fn repos_add_app_access_restrictions_decode(
-  response : @http.Response,
-) -> Array[Integration] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[Integration], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -21635,7 +22278,7 @@ pub fn repos_set_app_access_restrictions_request(
     "/branches/" +
     @http.percent_encode_path(parameter_value(branch)) +
     "/protection/restrictions/apps",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -21651,9 +22294,10 @@ pub fn repos_set_app_access_restrictions_decode_json(
 ///
 /// Decodes a successful repos/set-app-access-restrictions response.
 pub fn repos_set_app_access_restrictions_decode(
-  response : @http.Response,
-) -> Array[Integration] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[Integration], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -21673,7 +22317,7 @@ pub fn repos_remove_app_access_restrictions_request(
     "/branches/" +
     @http.percent_encode_path(parameter_value(branch)) +
     "/protection/restrictions/apps",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -21689,9 +22333,10 @@ pub fn repos_remove_app_access_restrictions_decode_json(
 ///
 /// Decodes a successful repos/remove-app-access-restrictions response.
 pub fn repos_remove_app_access_restrictions_decode(
-  response : @http.Response,
-) -> Array[Integration] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[Integration], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -21726,9 +22371,10 @@ pub fn repos_get_teams_with_access_to_protected_branch_decode_json(
 ///
 /// Decodes a successful repos/get-teams-with-access-to-protected-branch response.
 pub fn repos_get_teams_with_access_to_protected_branch_decode(
-  response : @http.Response,
-) -> Array[Team] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[Team], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -21748,7 +22394,7 @@ pub fn repos_add_team_access_restrictions_request(
     "/branches/" +
     @http.percent_encode_path(parameter_value(branch)) +
     "/protection/restrictions/teams",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -21764,9 +22410,10 @@ pub fn repos_add_team_access_restrictions_decode_json(
 ///
 /// Decodes a successful repos/add-team-access-restrictions response.
 pub fn repos_add_team_access_restrictions_decode(
-  response : @http.Response,
-) -> Array[Team] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[Team], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -21786,7 +22433,7 @@ pub fn repos_set_team_access_restrictions_request(
     "/branches/" +
     @http.percent_encode_path(parameter_value(branch)) +
     "/protection/restrictions/teams",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -21802,9 +22449,10 @@ pub fn repos_set_team_access_restrictions_decode_json(
 ///
 /// Decodes a successful repos/set-team-access-restrictions response.
 pub fn repos_set_team_access_restrictions_decode(
-  response : @http.Response,
-) -> Array[Team] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[Team], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -21824,7 +22472,7 @@ pub fn repos_remove_team_access_restrictions_request(
     "/branches/" +
     @http.percent_encode_path(parameter_value(branch)) +
     "/protection/restrictions/teams",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -21840,9 +22488,10 @@ pub fn repos_remove_team_access_restrictions_decode_json(
 ///
 /// Decodes a successful repos/remove-team-access-restrictions response.
 pub fn repos_remove_team_access_restrictions_decode(
-  response : @http.Response,
-) -> Array[Team] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[Team], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -21877,9 +22526,10 @@ pub fn repos_get_users_with_access_to_protected_branch_decode_json(
 ///
 /// Decodes a successful repos/get-users-with-access-to-protected-branch response.
 pub fn repos_get_users_with_access_to_protected_branch_decode(
-  response : @http.Response,
-) -> Array[SimpleUser] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[SimpleUser], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -21899,7 +22549,7 @@ pub fn repos_add_user_access_restrictions_request(
     "/branches/" +
     @http.percent_encode_path(parameter_value(branch)) +
     "/protection/restrictions/users",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -21915,9 +22565,10 @@ pub fn repos_add_user_access_restrictions_decode_json(
 ///
 /// Decodes a successful repos/add-user-access-restrictions response.
 pub fn repos_add_user_access_restrictions_decode(
-  response : @http.Response,
-) -> Array[SimpleUser] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[SimpleUser], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -21937,7 +22588,7 @@ pub fn repos_set_user_access_restrictions_request(
     "/branches/" +
     @http.percent_encode_path(parameter_value(branch)) +
     "/protection/restrictions/users",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -21953,9 +22604,10 @@ pub fn repos_set_user_access_restrictions_decode_json(
 ///
 /// Decodes a successful repos/set-user-access-restrictions response.
 pub fn repos_set_user_access_restrictions_decode(
-  response : @http.Response,
-) -> Array[SimpleUser] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[SimpleUser], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -21975,7 +22627,7 @@ pub fn repos_remove_user_access_restrictions_request(
     "/branches/" +
     @http.percent_encode_path(parameter_value(branch)) +
     "/protection/restrictions/users",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -21991,9 +22643,10 @@ pub fn repos_remove_user_access_restrictions_decode_json(
 ///
 /// Decodes a successful repos/remove-user-access-restrictions response.
 pub fn repos_remove_user_access_restrictions_decode(
-  response : @http.Response,
-) -> Array[SimpleUser] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[SimpleUser], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -22013,7 +22666,7 @@ pub fn repos_rename_branch_request(
     "/branches/" +
     @http.percent_encode_path(parameter_value(branch)) +
     "/rename",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -22029,9 +22682,10 @@ pub fn repos_rename_branch_decode_json(
 ///
 /// Decodes a successful repos/rename-branch response.
 pub fn repos_rename_branch_decode(
-  response : @http.Response,
-) -> BranchWithProtection raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[BranchWithProtection, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -22048,7 +22702,7 @@ pub fn checks_create_request(
     "/" +
     @http.percent_encode(parameter_value(repo)) +
     "/check-runs",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -22064,9 +22718,10 @@ pub fn checks_create_decode_json(
 ///
 /// Decodes a successful checks/create response.
 pub fn checks_create_decode(
-  response : @http.Response,
-) -> CheckRun raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[CheckRun, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -22100,9 +22755,10 @@ pub fn checks_get_decode_json(
 ///
 /// Decodes a successful checks/get response.
 pub fn checks_get_decode(
-  response : @http.Response,
-) -> CheckRun raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[CheckRun, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -22121,7 +22777,7 @@ pub fn checks_update_request(
     @http.percent_encode(parameter_value(repo)) +
     "/check-runs/" +
     @http.percent_encode(parameter_value(check_run_id)),
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -22137,9 +22793,10 @@ pub fn checks_update_decode_json(
 ///
 /// Decodes a successful checks/update response.
 pub fn checks_update_decode(
-  response : @http.Response,
-) -> CheckRun raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[CheckRun, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -22184,9 +22841,10 @@ pub fn checks_list_annotations_decode_json(
 ///
 /// Decodes a successful checks/list-annotations response.
 pub fn checks_list_annotations_decode(
-  response : @http.Response,
-) -> Array[CheckAnnotation] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[CheckAnnotation], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -22221,9 +22879,10 @@ pub fn checks_rerequest_run_decode_json(
 ///
 /// Decodes a successful checks/rerequest-run response.
 pub fn checks_rerequest_run_decode(
-  response : @http.Response,
-) -> EmptyObject raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[EmptyObject, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -22240,7 +22899,7 @@ pub fn checks_create_suite_request(
     "/" +
     @http.percent_encode(parameter_value(repo)) +
     "/check-suites",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -22256,9 +22915,10 @@ pub fn checks_create_suite_decode_json(
 ///
 /// Decodes a successful checks/create-suite response.
 pub fn checks_create_suite_decode(
-  response : @http.Response,
-) -> CheckSuite raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[CheckSuite, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -22275,7 +22935,7 @@ pub fn checks_set_suites_preferences_request(
     "/" +
     @http.percent_encode(parameter_value(repo)) +
     "/check-suites/preferences",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -22291,9 +22951,10 @@ pub fn checks_set_suites_preferences_decode_json(
 ///
 /// Decodes a successful checks/set-suites-preferences response.
 pub fn checks_set_suites_preferences_decode(
-  response : @http.Response,
-) -> CheckSuitePreference raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[CheckSuitePreference, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -22327,9 +22988,10 @@ pub fn checks_get_suite_decode_json(
 ///
 /// Decodes a successful checks/get-suite response.
 pub fn checks_get_suite_decode(
-  response : @http.Response,
-) -> CheckSuite raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[CheckSuite, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -22392,9 +23054,10 @@ pub fn checks_list_for_suite_decode_json(
 ///
 /// Decodes a successful checks/list-for-suite response.
 pub fn checks_list_for_suite_decode(
-  response : @http.Response,
-) -> ChecksListForSuiteResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[ChecksListForSuiteResponse, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -22429,9 +23092,10 @@ pub fn checks_rerequest_suite_decode_json(
 ///
 /// Decodes a successful checks/rerequest-suite response.
 pub fn checks_rerequest_suite_decode(
-  response : @http.Response,
-) -> EmptyObject raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[EmptyObject, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -22492,9 +23156,10 @@ pub fn code_quality_list_findings_for_repo_decode_json(
 ///
 /// Decodes a successful code-quality/list-findings-for-repo response.
 pub fn code_quality_list_findings_for_repo_decode(
-  response : @http.Response,
-) -> Array[CodeQualityFinding] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[CodeQualityFinding], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -22528,9 +23193,10 @@ pub fn code_quality_get_finding_decode_json(
 ///
 /// Decodes a successful code-quality/get-finding response.
 pub fn code_quality_get_finding_decode(
-  response : @http.Response,
-) -> CodeQualityFinding raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[CodeQualityFinding, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -22562,9 +23228,10 @@ pub fn code_quality_get_setup_decode_json(
 ///
 /// Decodes a successful code-quality/get-setup response.
 pub fn code_quality_get_setup_decode(
-  response : @http.Response,
-) -> CodeQualitySetup raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[CodeQualitySetup, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -22581,7 +23248,7 @@ pub fn code_quality_update_setup_request(
     "/" +
     @http.percent_encode(parameter_value(repo)) +
     "/code-quality/setup",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -22597,9 +23264,10 @@ pub fn code_quality_update_setup_decode_json(
 ///
 /// Decodes a successful code-quality/update-setup response.
 pub fn code_quality_update_setup_decode(
-  response : @http.Response,
-) -> CodeQualitySetupUpdateResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[CodeQualitySetupUpdateResponse, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -22631,9 +23299,10 @@ pub fn code_scanning_get_ai_scan_enablement_decode_json(
 ///
 /// Decodes a successful code-scanning/get-ai-scan-enablement response.
 pub fn code_scanning_get_ai_scan_enablement_decode(
-  response : @http.Response,
-) -> CodeScanningAiScanEnablement raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[CodeScanningAiScanEnablement, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -22650,7 +23319,7 @@ pub fn code_scanning_update_ai_scan_enablement_request(
     "/" +
     @http.percent_encode(parameter_value(repo)) +
     "/code-scanning/ai-scan",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -22666,9 +23335,10 @@ pub fn code_scanning_update_ai_scan_enablement_decode_json(
 ///
 /// Decodes a successful code-scanning/update-ai-scan-enablement response.
 pub fn code_scanning_update_ai_scan_enablement_decode(
-  response : @http.Response,
-) -> CodeScanningAiScanEnablement raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[CodeScanningAiScanEnablement, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -22773,9 +23443,10 @@ pub fn code_scanning_list_alerts_for_repo_decode_json(
 ///
 /// Decodes a successful code-scanning/list-alerts-for-repo response.
 pub fn code_scanning_list_alerts_for_repo_decode(
-  response : @http.Response,
-) -> Array[CodeScanningAlertItems] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[CodeScanningAlertItems], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -22809,9 +23480,10 @@ pub fn code_scanning_get_alert_decode_json(
 ///
 /// Decodes a successful code-scanning/get-alert response.
 pub fn code_scanning_get_alert_decode(
-  response : @http.Response,
-) -> CodeScanningAlert raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[CodeScanningAlert, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -22830,7 +23502,7 @@ pub fn code_scanning_update_alert_request(
     @http.percent_encode(parameter_value(repo)) +
     "/code-scanning/alerts/" +
     @http.percent_encode(parameter_value(alert_number)),
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -22846,9 +23518,10 @@ pub fn code_scanning_update_alert_decode_json(
 ///
 /// Decodes a successful code-scanning/update-alert response.
 pub fn code_scanning_update_alert_decode(
-  response : @http.Response,
-) -> CodeScanningAlert raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[CodeScanningAlert, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -22883,9 +23556,10 @@ pub fn code_scanning_get_autofix_decode_json(
 ///
 /// Decodes a successful code-scanning/get-autofix response.
 pub fn code_scanning_get_autofix_decode(
-  response : @http.Response,
-) -> CodeScanningAutofix raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[CodeScanningAutofix, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -22920,9 +23594,10 @@ pub fn code_scanning_create_autofix_decode_json(
 ///
 /// Decodes a successful code-scanning/create-autofix response.
 pub fn code_scanning_create_autofix_decode(
-  response : @http.Response,
-) -> CodeScanningAutofix raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[CodeScanningAutofix, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -22942,7 +23617,7 @@ pub fn code_scanning_commit_autofix_request(
     "/code-scanning/alerts/" +
     @http.percent_encode(parameter_value(alert_number)) +
     "/autofix/commits",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -22958,9 +23633,10 @@ pub fn code_scanning_commit_autofix_decode_json(
 ///
 /// Decodes a successful code-scanning/commit-autofix response.
 pub fn code_scanning_commit_autofix_decode(
-  response : @http.Response,
-) -> CodeScanningAutofixCommitsResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[CodeScanningAutofixCommitsResponse, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -23015,9 +23691,10 @@ pub fn code_scanning_list_alert_instances_decode_json(
 ///
 /// Decodes a successful code-scanning/list-alert-instances response.
 pub fn code_scanning_list_alert_instances_decode(
-  response : @http.Response,
-) -> Array[CodeScanningAlertInstanceList] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[CodeScanningAlertInstanceList], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -23098,9 +23775,10 @@ pub fn code_scanning_list_recent_analyses_decode_json(
 ///
 /// Decodes a successful code-scanning/list-recent-analyses response.
 pub fn code_scanning_list_recent_analyses_decode(
-  response : @http.Response,
-) -> Array[CodeScanningAnalysis] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[CodeScanningAnalysis], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -23134,9 +23812,10 @@ pub fn code_scanning_get_analysis_decode_json(
 ///
 /// Decodes a successful code-scanning/get-analysis response.
 pub fn code_scanning_get_analysis_decode(
-  response : @http.Response,
-) -> CodeScanningAnalysis raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[CodeScanningAnalysis, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -23175,9 +23854,10 @@ pub fn code_scanning_delete_analysis_decode_json(
 ///
 /// Decodes a successful code-scanning/delete-analysis response.
 pub fn code_scanning_delete_analysis_decode(
-  response : @http.Response,
-) -> CodeScanningAnalysisDeletion raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[CodeScanningAnalysisDeletion, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -23209,9 +23889,10 @@ pub fn code_scanning_list_codeql_databases_decode_json(
 ///
 /// Decodes a successful code-scanning/list-codeql-databases response.
 pub fn code_scanning_list_codeql_databases_decode(
-  response : @http.Response,
-) -> Array[CodeScanningCodeqlDatabase] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[CodeScanningCodeqlDatabase], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -23245,9 +23926,10 @@ pub fn code_scanning_get_codeql_database_decode_json(
 ///
 /// Decodes a successful code-scanning/get-codeql-database response.
 pub fn code_scanning_get_codeql_database_decode(
-  response : @http.Response,
-) -> CodeScanningCodeqlDatabase raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[CodeScanningCodeqlDatabase, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -23282,7 +23964,7 @@ pub fn code_scanning_create_variant_analysis_request(
     "/" +
     @http.percent_encode(parameter_value(repo)) +
     "/code-scanning/codeql/variant-analyses",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -23298,9 +23980,10 @@ pub fn code_scanning_create_variant_analysis_decode_json(
 ///
 /// Decodes a successful code-scanning/create-variant-analysis response.
 pub fn code_scanning_create_variant_analysis_decode(
-  response : @http.Response,
-) -> CodeScanningVariantAnalysis raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[CodeScanningVariantAnalysis, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -23334,9 +24017,10 @@ pub fn code_scanning_get_variant_analysis_decode_json(
 ///
 /// Decodes a successful code-scanning/get-variant-analysis response.
 pub fn code_scanning_get_variant_analysis_decode(
-  response : @http.Response,
-) -> CodeScanningVariantAnalysis raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[CodeScanningVariantAnalysis, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -23376,9 +24060,10 @@ pub fn code_scanning_get_variant_analysis_repo_task_decode_json(
 ///
 /// Decodes a successful code-scanning/get-variant-analysis-repo-task response.
 pub fn code_scanning_get_variant_analysis_repo_task_decode(
-  response : @http.Response,
-) -> CodeScanningVariantAnalysisRepoTask raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[CodeScanningVariantAnalysisRepoTask, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -23410,9 +24095,10 @@ pub fn code_scanning_get_default_setup_decode_json(
 ///
 /// Decodes a successful code-scanning/get-default-setup response.
 pub fn code_scanning_get_default_setup_decode(
-  response : @http.Response,
-) -> CodeScanningDefaultSetup raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[CodeScanningDefaultSetup, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -23429,7 +24115,7 @@ pub fn code_scanning_update_default_setup_request(
     "/" +
     @http.percent_encode(parameter_value(repo)) +
     "/code-scanning/default-setup",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -23445,9 +24131,10 @@ pub fn code_scanning_update_default_setup_decode_json(
 ///
 /// Decodes a successful code-scanning/update-default-setup response.
 pub fn code_scanning_update_default_setup_decode(
-  response : @http.Response,
-) -> CodeScanningDefaultSetupUpdateResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[CodeScanningDefaultSetupUpdateResponse, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -23464,7 +24151,7 @@ pub fn code_scanning_upload_sarif_request(
     "/" +
     @http.percent_encode(parameter_value(repo)) +
     "/code-scanning/sarifs",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -23480,9 +24167,10 @@ pub fn code_scanning_upload_sarif_decode_json(
 ///
 /// Decodes a successful code-scanning/upload-sarif response.
 pub fn code_scanning_upload_sarif_decode(
-  response : @http.Response,
-) -> CodeScanningSarifsReceipt raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[CodeScanningSarifsReceipt, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -23516,9 +24204,10 @@ pub fn code_scanning_get_sarif_decode_json(
 ///
 /// Decodes a successful code-scanning/get-sarif response.
 pub fn code_scanning_get_sarif_decode(
-  response : @http.Response,
-) -> CodeScanningSarifsStatus raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[CodeScanningSarifsStatus, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -23550,9 +24239,10 @@ pub fn code_security_get_configuration_for_repository_decode_json(
 ///
 /// Decodes a successful code-security/get-configuration-for-repository response.
 pub fn code_security_get_configuration_for_repository_decode(
-  response : @http.Response,
-) -> CodeSecurityConfigurationForRepository raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[CodeSecurityConfigurationForRepository, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -23588,9 +24278,10 @@ pub fn repos_codeowners_errors_decode_json(
 ///
 /// Decodes a successful repos/codeowners-errors response.
 pub fn repos_codeowners_errors_decode(
-  response : @http.Response,
-) -> CodeownersErrors raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[CodeownersErrors, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -23632,9 +24323,13 @@ pub fn codespaces_list_in_repository_for_authenticated_user_decode_json(
 ///
 /// Decodes a successful codespaces/list-in-repository-for-authenticated-user response.
 pub fn codespaces_list_in_repository_for_authenticated_user_decode(
-  response : @http.Response,
-) -> CodespacesListInRepositoryForAuthenticatedUserResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[
+  CodespacesListInRepositoryForAuthenticatedUserResponse,
+  @client.ResponseFailure,
+] {
+  decode_response(head, body)
 }
 
 ///|
@@ -23651,7 +24346,7 @@ pub fn codespaces_create_with_repo_for_authenticated_user_request(
     "/" +
     @http.percent_encode(parameter_value(repo)) +
     "/codespaces",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -23667,9 +24362,10 @@ pub fn codespaces_create_with_repo_for_authenticated_user_decode_json(
 ///
 /// Decodes a successful codespaces/create-with-repo-for-authenticated-user response.
 pub fn codespaces_create_with_repo_for_authenticated_user_decode(
-  response : @http.Response,
-) -> Codespace raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Codespace, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -23711,9 +24407,13 @@ pub fn codespaces_list_devcontainers_in_repository_for_authenticated_user_decode
 ///
 /// Decodes a successful codespaces/list-devcontainers-in-repository-for-authenticated-user response.
 pub fn codespaces_list_devcontainers_in_repository_for_authenticated_user_decode(
-  response : @http.Response,
-) -> CodespacesListDevcontainersInRepositoryForAuthenticatedUserResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[
+  CodespacesListDevcontainersInRepositoryForAuthenticatedUserResponse,
+  @client.ResponseFailure,
+] {
+  decode_response(head, body)
 }
 
 ///|
@@ -23761,9 +24461,13 @@ pub fn codespaces_repo_machines_for_authenticated_user_decode_json(
 ///
 /// Decodes a successful codespaces/repo-machines-for-authenticated-user response.
 pub fn codespaces_repo_machines_for_authenticated_user_decode(
-  response : @http.Response,
-) -> CodespacesRepoMachinesForAuthenticatedUserResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[
+  CodespacesRepoMachinesForAuthenticatedUserResponse,
+  @client.ResponseFailure,
+] {
+  decode_response(head, body)
 }
 
 ///|
@@ -23805,9 +24509,13 @@ pub fn codespaces_pre_flight_with_repo_for_authenticated_user_decode_json(
 ///
 /// Decodes a successful codespaces/pre-flight-with-repo-for-authenticated-user response.
 pub fn codespaces_pre_flight_with_repo_for_authenticated_user_decode(
-  response : @http.Response,
-) -> CodespacesPreFlightWithRepoForAuthenticatedUserResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[
+  CodespacesPreFlightWithRepoForAuthenticatedUserResponse,
+  @client.ResponseFailure,
+] {
+  decode_response(head, body)
 }
 
 ///|
@@ -23846,9 +24554,10 @@ pub fn codespaces_check_permissions_for_devcontainer_decode_json(
 ///
 /// Decodes a successful codespaces/check-permissions-for-devcontainer response.
 pub fn codespaces_check_permissions_for_devcontainer_decode(
-  response : @http.Response,
-) -> CodespacesPermissionsCheckForDevcontainer raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[CodespacesPermissionsCheckForDevcontainer, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -23890,9 +24599,10 @@ pub fn codespaces_list_repo_secrets_decode_json(
 ///
 /// Decodes a successful codespaces/list-repo-secrets response.
 pub fn codespaces_list_repo_secrets_decode(
-  response : @http.Response,
-) -> CodespacesListRepoSecretsResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[CodespacesListRepoSecretsResponse, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -23924,9 +24634,10 @@ pub fn codespaces_get_repo_public_key_decode_json(
 ///
 /// Decodes a successful codespaces/get-repo-public-key response.
 pub fn codespaces_get_repo_public_key_decode(
-  response : @http.Response,
-) -> CodespacesPublicKey raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[CodespacesPublicKey, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -23960,9 +24671,10 @@ pub fn codespaces_get_repo_secret_decode_json(
 ///
 /// Decodes a successful codespaces/get-repo-secret response.
 pub fn codespaces_get_repo_secret_decode(
-  response : @http.Response,
-) -> RepoCodespacesSecret raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[RepoCodespacesSecret, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -23981,7 +24693,7 @@ pub fn codespaces_create_or_update_repo_secret_request(
     @http.percent_encode(parameter_value(repo)) +
     "/codespaces/secrets/" +
     @http.percent_encode(parameter_value(secret_name)),
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -23997,9 +24709,10 @@ pub fn codespaces_create_or_update_repo_secret_decode_json(
 ///
 /// Decodes a successful codespaces/create-or-update-repo-secret response.
 pub fn codespaces_create_or_update_repo_secret_decode(
-  response : @http.Response,
-) -> EmptyObject raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[EmptyObject, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -24071,9 +24784,10 @@ pub fn repos_list_collaborators_decode_json(
 ///
 /// Decodes a successful repos/list-collaborators response.
 pub fn repos_list_collaborators_decode(
-  response : @http.Response,
-) -> Array[Collaborator] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[Collaborator], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -24110,7 +24824,7 @@ pub fn repos_add_collaborator_request(
     @http.percent_encode(parameter_value(repo)) +
     "/collaborators/" +
     @http.percent_encode(parameter_value(username)),
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -24126,9 +24840,10 @@ pub fn repos_add_collaborator_decode_json(
 ///
 /// Decodes a successful repos/add-collaborator response.
 pub fn repos_add_collaborator_decode(
-  response : @http.Response,
-) -> RepositoryInvitation raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[RepositoryInvitation, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -24181,9 +24896,10 @@ pub fn repos_get_collaborator_permission_level_decode_json(
 ///
 /// Decodes a successful repos/get-collaborator-permission-level response.
 pub fn repos_get_collaborator_permission_level_decode(
-  response : @http.Response,
-) -> RepositoryCollaboratorPermission raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[RepositoryCollaboratorPermission, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -24225,9 +24941,10 @@ pub fn repos_list_commit_comments_for_repo_decode_json(
 ///
 /// Decodes a successful repos/list-commit-comments-for-repo response.
 pub fn repos_list_commit_comments_for_repo_decode(
-  response : @http.Response,
-) -> Array[CommitComment] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[CommitComment], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -24261,9 +24978,10 @@ pub fn repos_get_commit_comment_decode_json(
 ///
 /// Decodes a successful repos/get-commit-comment response.
 pub fn repos_get_commit_comment_decode(
-  response : @http.Response,
-) -> CommitComment raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[CommitComment, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -24282,7 +25000,7 @@ pub fn repos_update_commit_comment_request(
     @http.percent_encode(parameter_value(repo)) +
     "/comments/" +
     @http.percent_encode(parameter_value(comment_id)),
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -24298,9 +25016,10 @@ pub fn repos_update_commit_comment_decode_json(
 ///
 /// Decodes a successful repos/update-commit-comment response.
 pub fn repos_update_commit_comment_decode(
-  response : @http.Response,
-) -> CommitComment raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[CommitComment, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -24369,9 +25088,10 @@ pub fn reactions_list_for_commit_comment_decode_json(
 ///
 /// Decodes a successful reactions/list-for-commit-comment response.
 pub fn reactions_list_for_commit_comment_decode(
-  response : @http.Response,
-) -> Array[Reaction] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[Reaction], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -24391,7 +25111,7 @@ pub fn reactions_create_for_commit_comment_request(
     "/comments/" +
     @http.percent_encode(parameter_value(comment_id)) +
     "/reactions",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -24407,9 +25127,10 @@ pub fn reactions_create_for_commit_comment_decode_json(
 ///
 /// Decodes a successful reactions/create-for-commit-comment response.
 pub fn reactions_create_for_commit_comment_decode(
-  response : @http.Response,
-) -> Reaction raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Reaction, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -24506,9 +25227,10 @@ pub fn repos_list_commits_decode_json(
 ///
 /// Decodes a successful repos/list-commits response.
 pub fn repos_list_commits_decode(
-  response : @http.Response,
-) -> Array[Commit] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[Commit], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -24543,9 +25265,10 @@ pub fn repos_list_branches_for_head_commit_decode_json(
 ///
 /// Decodes a successful repos/list-branches-for-head-commit response.
 pub fn repos_list_branches_for_head_commit_decode(
-  response : @http.Response,
-) -> Array[BranchShort] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[BranchShort], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -24590,9 +25313,10 @@ pub fn repos_list_comments_for_commit_decode_json(
 ///
 /// Decodes a successful repos/list-comments-for-commit response.
 pub fn repos_list_comments_for_commit_decode(
-  response : @http.Response,
-) -> Array[CommitComment] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[CommitComment], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -24612,7 +25336,7 @@ pub fn repos_create_commit_comment_request(
     "/commits/" +
     @http.percent_encode_path(parameter_value(commit_sha)) +
     "/comments",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -24628,9 +25352,10 @@ pub fn repos_create_commit_comment_decode_json(
 ///
 /// Decodes a successful repos/create-commit-comment response.
 pub fn repos_create_commit_comment_decode(
-  response : @http.Response,
-) -> CommitComment raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[CommitComment, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -24675,9 +25400,10 @@ pub fn repos_list_pull_requests_associated_with_commit_decode_json(
 ///
 /// Decodes a successful repos/list-pull-requests-associated-with-commit response.
 pub fn repos_list_pull_requests_associated_with_commit_decode(
-  response : @http.Response,
-) -> Array[PullRequestSimple] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[PullRequestSimple], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -24721,9 +25447,10 @@ pub fn repos_get_commit_decode_json(
 ///
 /// Decodes a successful repos/get-commit response.
 pub fn repos_get_commit_decode(
-  response : @http.Response,
-) -> Commit raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Commit, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -24792,9 +25519,10 @@ pub fn checks_list_for_ref_decode_json(
 ///
 /// Decodes a successful checks/list-for-ref response.
 pub fn checks_list_for_ref_decode(
-  response : @http.Response,
-) -> ChecksListForRefResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[ChecksListForRefResponse, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -24851,9 +25579,10 @@ pub fn checks_list_suites_for_ref_decode_json(
 ///
 /// Decodes a successful checks/list-suites-for-ref response.
 pub fn checks_list_suites_for_ref_decode(
-  response : @http.Response,
-) -> ChecksListSuitesForRefResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[ChecksListSuitesForRefResponse, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -24898,9 +25627,10 @@ pub fn repos_get_combined_status_for_ref_decode_json(
 ///
 /// Decodes a successful repos/get-combined-status-for-ref response.
 pub fn repos_get_combined_status_for_ref_decode(
-  response : @http.Response,
-) -> CombinedCommitStatus raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[CombinedCommitStatus, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -24945,9 +25675,10 @@ pub fn repos_list_commit_statuses_for_ref_decode_json(
 ///
 /// Decodes a successful repos/list-commit-statuses-for-ref response.
 pub fn repos_list_commit_statuses_for_ref_decode(
-  response : @http.Response,
-) -> Array[Status] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[Status], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -24979,9 +25710,10 @@ pub fn repos_get_community_profile_metrics_decode_json(
 ///
 /// Decodes a successful repos/get-community-profile-metrics response.
 pub fn repos_get_community_profile_metrics_decode(
-  response : @http.Response,
-) -> CommunityProfile raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[CommunityProfile, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -25025,9 +25757,10 @@ pub fn repos_compare_commits_decode_json(
 ///
 /// Decodes a successful repos/compare-commits response.
 pub fn repos_compare_commits_decode(
-  response : @http.Response,
-) -> CommitComparison raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[CommitComparison, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -25065,9 +25798,10 @@ pub fn repos_get_content_decode_json(
 ///
 /// Decodes a successful repos/get-content response.
 pub fn repos_get_content_decode(
-  response : @http.Response,
-) -> ReposGetContentResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[ReposGetContentResponse, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -25086,7 +25820,7 @@ pub fn repos_create_or_update_file_contents_request(
     @http.percent_encode(parameter_value(repo)) +
     "/contents/" +
     @http.percent_encode_path(parameter_value(path)),
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -25102,9 +25836,10 @@ pub fn repos_create_or_update_file_contents_decode_json(
 ///
 /// Decodes a successful repos/create-or-update-file-contents response.
 pub fn repos_create_or_update_file_contents_decode(
-  response : @http.Response,
-) -> FileCommit raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[FileCommit, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -25123,7 +25858,7 @@ pub fn repos_delete_file_request(
     @http.percent_encode(parameter_value(repo)) +
     "/contents/" +
     @http.percent_encode_path(parameter_value(path)),
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -25139,9 +25874,10 @@ pub fn repos_delete_file_decode_json(
 ///
 /// Decodes a successful repos/delete-file response.
 pub fn repos_delete_file_decode(
-  response : @http.Response,
-) -> FileCommit raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[FileCommit, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -25188,9 +25924,10 @@ pub fn repos_list_contributors_decode_json(
 ///
 /// Decodes a successful repos/list-contributors response.
 pub fn repos_list_contributors_decode(
-  response : @http.Response,
-) -> Array[Contributor] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[Contributor], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -25222,9 +25959,13 @@ pub fn copilot_get_copilot_cloud_agent_configuration_decode_json(
 ///
 /// Decodes a successful copilot/get-copilot-cloud-agent-configuration response.
 pub fn copilot_get_copilot_cloud_agent_configuration_decode(
-  response : @http.Response,
-) -> CopilotGetCopilotCloudAgentConfigurationResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[
+  CopilotGetCopilotCloudAgentConfigurationResponse,
+  @client.ResponseFailure,
+] {
+  decode_response(head, body)
 }
 
 ///|
@@ -25256,9 +25997,10 @@ pub fn copilot_get_repository_code_review_settings_decode_json(
 ///
 /// Decodes a successful copilot/get-repository-code-review-settings response.
 pub fn copilot_get_repository_code_review_settings_decode(
-  response : @http.Response,
-) -> RepositoryCopilotCodeReviewSettings raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[RepositoryCopilotCodeReviewSettings, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -25275,7 +26017,7 @@ pub fn copilot_update_repository_code_review_settings_request(
     "/" +
     @http.percent_encode(parameter_value(repo)) +
     "/copilot/code-review/settings",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -25291,9 +26033,10 @@ pub fn copilot_update_repository_code_review_settings_decode_json(
 ///
 /// Decodes a successful copilot/update-repository-code-review-settings response.
 pub fn copilot_update_repository_code_review_settings_decode(
-  response : @http.Response,
-) -> RepositoryCopilotCodeReviewSettings raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[RepositoryCopilotCodeReviewSettings, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -25418,9 +26161,10 @@ pub fn dependabot_list_alerts_for_repo_decode_json(
 ///
 /// Decodes a successful dependabot/list-alerts-for-repo response.
 pub fn dependabot_list_alerts_for_repo_decode(
-  response : @http.Response,
-) -> Array[DependabotAlert] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[DependabotAlert], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -25454,9 +26198,10 @@ pub fn dependabot_get_alert_decode_json(
 ///
 /// Decodes a successful dependabot/get-alert response.
 pub fn dependabot_get_alert_decode(
-  response : @http.Response,
-) -> DependabotAlert raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[DependabotAlert, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -25475,7 +26220,7 @@ pub fn dependabot_update_alert_request(
     @http.percent_encode(parameter_value(repo)) +
     "/dependabot/alerts/" +
     @http.percent_encode(parameter_value(alert_number)),
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -25491,9 +26236,10 @@ pub fn dependabot_update_alert_decode_json(
 ///
 /// Decodes a successful dependabot/update-alert response.
 pub fn dependabot_update_alert_decode(
-  response : @http.Response,
-) -> DependabotAlert raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[DependabotAlert, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -25525,9 +26271,10 @@ pub fn dependabot_get_repository_runner_settings_decode_json(
 ///
 /// Decodes a successful dependabot/get-repository-runner-settings response.
 pub fn dependabot_get_repository_runner_settings_decode(
-  response : @http.Response,
-) -> DependabotRunnerSettings raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[DependabotRunnerSettings, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -25544,7 +26291,7 @@ pub fn dependabot_set_repository_runner_settings_request(
     "/" +
     @http.percent_encode(parameter_value(repo)) +
     "/dependabot/runner-settings",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -25560,9 +26307,10 @@ pub fn dependabot_set_repository_runner_settings_decode_json(
 ///
 /// Decodes a successful dependabot/set-repository-runner-settings response.
 pub fn dependabot_set_repository_runner_settings_decode(
-  response : @http.Response,
-) -> DependabotRunnerSettings raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[DependabotRunnerSettings, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -25604,9 +26352,10 @@ pub fn dependabot_list_repo_secrets_decode_json(
 ///
 /// Decodes a successful dependabot/list-repo-secrets response.
 pub fn dependabot_list_repo_secrets_decode(
-  response : @http.Response,
-) -> DependabotListRepoSecretsResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[DependabotListRepoSecretsResponse, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -25638,9 +26387,10 @@ pub fn dependabot_get_repo_public_key_decode_json(
 ///
 /// Decodes a successful dependabot/get-repo-public-key response.
 pub fn dependabot_get_repo_public_key_decode(
-  response : @http.Response,
-) -> DependabotPublicKey raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[DependabotPublicKey, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -25674,9 +26424,10 @@ pub fn dependabot_get_repo_secret_decode_json(
 ///
 /// Decodes a successful dependabot/get-repo-secret response.
 pub fn dependabot_get_repo_secret_decode(
-  response : @http.Response,
-) -> DependabotSecret raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[DependabotSecret, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -25695,7 +26446,7 @@ pub fn dependabot_create_or_update_repo_secret_request(
     @http.percent_encode(parameter_value(repo)) +
     "/dependabot/secrets/" +
     @http.percent_encode(parameter_value(secret_name)),
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -25711,9 +26462,10 @@ pub fn dependabot_create_or_update_repo_secret_decode_json(
 ///
 /// Decodes a successful dependabot/create-or-update-repo-secret response.
 pub fn dependabot_create_or_update_repo_secret_decode(
-  response : @http.Response,
-) -> EmptyObject raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[EmptyObject, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -25769,9 +26521,10 @@ pub fn dependency_graph_diff_range_decode_json(
 ///
 /// Decodes a successful dependency-graph/diff-range response.
 pub fn dependency_graph_diff_range_decode(
-  response : @http.Response,
-) -> Array[DependencyGraphDiffItem] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[DependencyGraphDiffItem], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -25803,9 +26556,10 @@ pub fn dependency_graph_export_sbom_decode_json(
 ///
 /// Decodes a successful dependency-graph/export-sbom response.
 pub fn dependency_graph_export_sbom_decode(
-  response : @http.Response,
-) -> DependencyGraphSpdxSbom raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[DependencyGraphSpdxSbom, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -25855,9 +26609,10 @@ pub fn dependency_graph_generate_sbom_report_decode_json(
 ///
 /// Decodes a successful dependency-graph/generate-sbom-report response.
 pub fn dependency_graph_generate_sbom_report_decode(
-  response : @http.Response,
-) -> DependencyGraphGenerateSbomReportResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[DependencyGraphGenerateSbomReportResponse, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -25874,7 +26629,7 @@ pub fn dependency_graph_create_repository_snapshot_request(
     "/" +
     @http.percent_encode(parameter_value(repo)) +
     "/dependency-graph/snapshots",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -25890,9 +26645,13 @@ pub fn dependency_graph_create_repository_snapshot_decode_json(
 ///
 /// Decodes a successful dependency-graph/create-repository-snapshot response.
 pub fn dependency_graph_create_repository_snapshot_decode(
-  response : @http.Response,
-) -> DependencyGraphCreateRepositorySnapshotResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[
+  DependencyGraphCreateRepositorySnapshotResponse,
+  @client.ResponseFailure,
+] {
+  decode_response(head, body)
 }
 
 ///|
@@ -25955,9 +26714,10 @@ pub fn repos_list_deployments_decode_json(
 ///
 /// Decodes a successful repos/list-deployments response.
 pub fn repos_list_deployments_decode(
-  response : @http.Response,
-) -> Array[Deployment] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[Deployment], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -25974,7 +26734,7 @@ pub fn repos_create_deployment_request(
     "/" +
     @http.percent_encode(parameter_value(repo)) +
     "/deployments",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -25990,9 +26750,10 @@ pub fn repos_create_deployment_decode_json(
 ///
 /// Decodes a successful repos/create-deployment response.
 pub fn repos_create_deployment_decode(
-  response : @http.Response,
-) -> Deployment raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Deployment, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -26026,9 +26787,10 @@ pub fn repos_get_deployment_decode_json(
 ///
 /// Decodes a successful repos/get-deployment response.
 pub fn repos_get_deployment_decode(
-  response : @http.Response,
-) -> Deployment raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Deployment, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -26091,9 +26853,10 @@ pub fn repos_list_deployment_statuses_decode_json(
 ///
 /// Decodes a successful repos/list-deployment-statuses response.
 pub fn repos_list_deployment_statuses_decode(
-  response : @http.Response,
-) -> Array[DeploymentStatus] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[DeploymentStatus], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -26113,7 +26876,7 @@ pub fn repos_create_deployment_status_request(
     "/deployments/" +
     @http.percent_encode(parameter_value(deployment_id)) +
     "/statuses",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -26129,9 +26892,10 @@ pub fn repos_create_deployment_status_decode_json(
 ///
 /// Decodes a successful repos/create-deployment-status response.
 pub fn repos_create_deployment_status_decode(
-  response : @http.Response,
-) -> DeploymentStatus raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[DeploymentStatus, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -26168,9 +26932,10 @@ pub fn repos_get_deployment_status_decode_json(
 ///
 /// Decodes a successful repos/get-deployment-status response.
 pub fn repos_get_deployment_status_decode(
-  response : @http.Response,
-) -> DeploymentStatus raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[DeploymentStatus, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -26187,7 +26952,7 @@ pub fn repos_create_dispatch_event_request(
     "/" +
     @http.percent_encode(parameter_value(repo)) +
     "/dispatches",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -26229,9 +26994,10 @@ pub fn repos_get_all_environments_decode_json(
 ///
 /// Decodes a successful repos/get-all-environments response.
 pub fn repos_get_all_environments_decode(
-  response : @http.Response,
-) -> ReposGetAllEnvironmentsResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[ReposGetAllEnvironmentsResponse, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -26265,9 +27031,10 @@ pub fn repos_get_environment_decode_json(
 ///
 /// Decodes a successful repos/get-environment response.
 pub fn repos_get_environment_decode(
-  response : @http.Response,
-) -> Environment raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Environment, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -26286,7 +27053,7 @@ pub fn repos_create_or_update_environment_request(
     @http.percent_encode(parameter_value(repo)) +
     "/environments/" +
     @http.percent_encode(parameter_value(environment_name)),
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -26302,9 +27069,10 @@ pub fn repos_create_or_update_environment_decode_json(
 ///
 /// Decodes a successful repos/create-or-update-environment response.
 pub fn repos_create_or_update_environment_decode(
-  response : @http.Response,
-) -> Environment raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Environment, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -26367,9 +27135,10 @@ pub fn repos_list_deployment_branch_policies_decode_json(
 ///
 /// Decodes a successful repos/list-deployment-branch-policies response.
 pub fn repos_list_deployment_branch_policies_decode(
-  response : @http.Response,
-) -> ReposListDeploymentBranchPoliciesResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[ReposListDeploymentBranchPoliciesResponse, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -26389,7 +27158,7 @@ pub fn repos_create_deployment_branch_policy_request(
     "/environments/" +
     @http.percent_encode(parameter_value(environment_name)) +
     "/deployment-branch-policies",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -26405,9 +27174,10 @@ pub fn repos_create_deployment_branch_policy_decode_json(
 ///
 /// Decodes a successful repos/create-deployment-branch-policy response.
 pub fn repos_create_deployment_branch_policy_decode(
-  response : @http.Response,
-) -> DeploymentBranchPolicy raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[DeploymentBranchPolicy, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -26444,9 +27214,10 @@ pub fn repos_get_deployment_branch_policy_decode_json(
 ///
 /// Decodes a successful repos/get-deployment-branch-policy response.
 pub fn repos_get_deployment_branch_policy_decode(
-  response : @http.Response,
-) -> DeploymentBranchPolicy raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[DeploymentBranchPolicy, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -26468,7 +27239,7 @@ pub fn repos_update_deployment_branch_policy_request(
     @http.percent_encode(parameter_value(environment_name)) +
     "/deployment-branch-policies/" +
     @http.percent_encode(parameter_value(branch_policy_id)),
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -26484,9 +27255,10 @@ pub fn repos_update_deployment_branch_policy_decode_json(
 ///
 /// Decodes a successful repos/update-deployment-branch-policy response.
 pub fn repos_update_deployment_branch_policy_decode(
-  response : @http.Response,
-) -> DeploymentBranchPolicy raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[DeploymentBranchPolicy, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -26542,9 +27314,13 @@ pub fn repos_get_all_deployment_protection_rules_decode_json(
 ///
 /// Decodes a successful repos/get-all-deployment-protection-rules response.
 pub fn repos_get_all_deployment_protection_rules_decode(
-  response : @http.Response,
-) -> ReposGetAllDeploymentProtectionRulesResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[
+  ReposGetAllDeploymentProtectionRulesResponse,
+  @client.ResponseFailure,
+] {
+  decode_response(head, body)
 }
 
 ///|
@@ -26564,7 +27340,7 @@ pub fn repos_create_deployment_protection_rule_request(
     "/environments/" +
     @http.percent_encode(parameter_value(environment_name)) +
     "/deployment_protection_rules",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -26580,9 +27356,10 @@ pub fn repos_create_deployment_protection_rule_decode_json(
 ///
 /// Decodes a successful repos/create-deployment-protection-rule response.
 pub fn repos_create_deployment_protection_rule_decode(
-  response : @http.Response,
-) -> DeploymentProtectionRule raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[DeploymentProtectionRule, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -26627,9 +27404,13 @@ pub fn repos_list_custom_deployment_rule_integrations_decode_json(
 ///
 /// Decodes a successful repos/list-custom-deployment-rule-integrations response.
 pub fn repos_list_custom_deployment_rule_integrations_decode(
-  response : @http.Response,
-) -> ReposListCustomDeploymentRuleIntegrationsResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[
+  ReposListCustomDeploymentRuleIntegrationsResponse,
+  @client.ResponseFailure,
+] {
+  decode_response(head, body)
 }
 
 ///|
@@ -26666,9 +27447,10 @@ pub fn repos_get_custom_deployment_protection_rule_decode_json(
 ///
 /// Decodes a successful repos/get-custom-deployment-protection-rule response.
 pub fn repos_get_custom_deployment_protection_rule_decode(
-  response : @http.Response,
-) -> DeploymentProtectionRule raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[DeploymentProtectionRule, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -26734,9 +27516,10 @@ pub fn actions_list_environment_secrets_decode_json(
 ///
 /// Decodes a successful actions/list-environment-secrets response.
 pub fn actions_list_environment_secrets_decode(
-  response : @http.Response,
-) -> ActionsListEnvironmentSecretsResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[ActionsListEnvironmentSecretsResponse, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -26771,9 +27554,10 @@ pub fn actions_get_environment_public_key_decode_json(
 ///
 /// Decodes a successful actions/get-environment-public-key response.
 pub fn actions_get_environment_public_key_decode(
-  response : @http.Response,
-) -> ActionsPublicKey raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[ActionsPublicKey, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -26810,9 +27594,10 @@ pub fn actions_get_environment_secret_decode_json(
 ///
 /// Decodes a successful actions/get-environment-secret response.
 pub fn actions_get_environment_secret_decode(
-  response : @http.Response,
-) -> ActionsSecret raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[ActionsSecret, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -26834,7 +27619,7 @@ pub fn actions_create_or_update_environment_secret_request(
     @http.percent_encode(parameter_value(environment_name)) +
     "/secrets/" +
     @http.percent_encode(parameter_value(secret_name)),
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -26850,9 +27635,10 @@ pub fn actions_create_or_update_environment_secret_decode_json(
 ///
 /// Decodes a successful actions/create-or-update-environment-secret response.
 pub fn actions_create_or_update_environment_secret_decode(
-  response : @http.Response,
-) -> EmptyObject raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[EmptyObject, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -26918,9 +27704,10 @@ pub fn actions_list_environment_variables_decode_json(
 ///
 /// Decodes a successful actions/list-environment-variables response.
 pub fn actions_list_environment_variables_decode(
-  response : @http.Response,
-) -> ActionsListEnvironmentVariablesResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[ActionsListEnvironmentVariablesResponse, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -26940,7 +27727,7 @@ pub fn actions_create_environment_variable_request(
     "/environments/" +
     @http.percent_encode(parameter_value(environment_name)) +
     "/variables",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -26956,9 +27743,10 @@ pub fn actions_create_environment_variable_decode_json(
 ///
 /// Decodes a successful actions/create-environment-variable response.
 pub fn actions_create_environment_variable_decode(
-  response : @http.Response,
-) -> EmptyObject raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[EmptyObject, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -26995,9 +27783,10 @@ pub fn actions_get_environment_variable_decode_json(
 ///
 /// Decodes a successful actions/get-environment-variable response.
 pub fn actions_get_environment_variable_decode(
-  response : @http.Response,
-) -> ActionsVariable raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[ActionsVariable, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -27019,7 +27808,7 @@ pub fn actions_update_environment_variable_request(
     @http.percent_encode(parameter_value(environment_name)) +
     "/variables/" +
     @http.percent_encode(parameter_value(name)),
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -27082,9 +27871,10 @@ pub fn activity_list_repo_events_decode_json(
 ///
 /// Decodes a successful activity/list-repo-events response.
 pub fn activity_list_repo_events_decode(
-  response : @http.Response,
-) -> Array[Event] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[Event], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -27131,9 +27921,10 @@ pub fn repos_list_forks_decode_json(
 ///
 /// Decodes a successful repos/list-forks response.
 pub fn repos_list_forks_decode(
-  response : @http.Response,
-) -> Array[MinimalRepository] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[MinimalRepository], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -27150,7 +27941,7 @@ pub fn repos_create_fork_request(
     "/" +
     @http.percent_encode(parameter_value(repo)) +
     "/forks",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -27166,9 +27957,10 @@ pub fn repos_create_fork_decode_json(
 ///
 /// Decodes a successful repos/create-fork response.
 pub fn repos_create_fork_decode(
-  response : @http.Response,
-) -> FullRepository raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[FullRepository, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -27185,7 +27977,7 @@ pub fn git_create_blob_request(
     "/" +
     @http.percent_encode(parameter_value(repo)) +
     "/git/blobs",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -27201,9 +27993,10 @@ pub fn git_create_blob_decode_json(
 ///
 /// Decodes a successful git/create-blob response.
 pub fn git_create_blob_decode(
-  response : @http.Response,
-) -> ShortBlob raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[ShortBlob, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -27237,9 +28030,10 @@ pub fn git_get_blob_decode_json(
 ///
 /// Decodes a successful git/get-blob response.
 pub fn git_get_blob_decode(
-  response : @http.Response,
-) -> Blob raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Blob, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -27256,7 +28050,7 @@ pub fn git_create_commit_request(
     "/" +
     @http.percent_encode(parameter_value(repo)) +
     "/git/commits",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -27272,9 +28066,10 @@ pub fn git_create_commit_decode_json(
 ///
 /// Decodes a successful git/create-commit response.
 pub fn git_create_commit_decode(
-  response : @http.Response,
-) -> GitCommit raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[GitCommit, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -27308,9 +28103,10 @@ pub fn git_get_commit_decode_json(
 ///
 /// Decodes a successful git/get-commit response.
 pub fn git_get_commit_decode(
-  response : @http.Response,
-) -> GitCommit raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[GitCommit, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -27344,9 +28140,10 @@ pub fn git_list_matching_refs_decode_json(
 ///
 /// Decodes a successful git/list-matching-refs response.
 pub fn git_list_matching_refs_decode(
-  response : @http.Response,
-) -> Array[GitRef] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[GitRef], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -27380,9 +28177,10 @@ pub fn git_get_ref_decode_json(
 ///
 /// Decodes a successful git/get-ref response.
 pub fn git_get_ref_decode(
-  response : @http.Response,
-) -> GitRef raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[GitRef, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -27399,7 +28197,7 @@ pub fn git_create_ref_request(
     "/" +
     @http.percent_encode(parameter_value(repo)) +
     "/git/refs",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -27415,9 +28213,10 @@ pub fn git_create_ref_decode_json(
 ///
 /// Decodes a successful git/create-ref response.
 pub fn git_create_ref_decode(
-  response : @http.Response,
-) -> GitRef raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[GitRef, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -27436,7 +28235,7 @@ pub fn git_update_ref_request(
     @http.percent_encode(parameter_value(repo)) +
     "/git/refs/" +
     @http.percent_encode_path(parameter_value(ref_)),
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -27452,9 +28251,10 @@ pub fn git_update_ref_decode_json(
 ///
 /// Decodes a successful git/update-ref response.
 pub fn git_update_ref_decode(
-  response : @http.Response,
-) -> GitRef raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[GitRef, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -27489,7 +28289,7 @@ pub fn git_create_tag_request(
     "/" +
     @http.percent_encode(parameter_value(repo)) +
     "/git/tags",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -27505,9 +28305,10 @@ pub fn git_create_tag_decode_json(
 ///
 /// Decodes a successful git/create-tag response.
 pub fn git_create_tag_decode(
-  response : @http.Response,
-) -> GitTag raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[GitTag, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -27541,9 +28342,10 @@ pub fn git_get_tag_decode_json(
 ///
 /// Decodes a successful git/get-tag response.
 pub fn git_get_tag_decode(
-  response : @http.Response,
-) -> GitTag raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[GitTag, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -27560,7 +28362,7 @@ pub fn git_create_tree_request(
     "/" +
     @http.percent_encode(parameter_value(repo)) +
     "/git/trees",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -27576,9 +28378,10 @@ pub fn git_create_tree_decode_json(
 ///
 /// Decodes a successful git/create-tree response.
 pub fn git_create_tree_decode(
-  response : @http.Response,
-) -> GitTree raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[GitTree, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -27617,9 +28420,10 @@ pub fn git_get_tree_decode_json(
 ///
 /// Decodes a successful git/get-tree response.
 pub fn git_get_tree_decode(
-  response : @http.Response,
-) -> GitTree raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[GitTree, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -27651,9 +28455,10 @@ pub fn repos_get_hash_algorithm_decode_json(
 ///
 /// Decodes a successful repos/get-hash-algorithm response.
 pub fn repos_get_hash_algorithm_decode(
-  response : @http.Response,
-) -> RepositoryHashAlgorithm raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[RepositoryHashAlgorithm, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -27695,9 +28500,10 @@ pub fn repos_list_webhooks_decode_json(
 ///
 /// Decodes a successful repos/list-webhooks response.
 pub fn repos_list_webhooks_decode(
-  response : @http.Response,
-) -> Array[Hook] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[Hook], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -27714,7 +28520,7 @@ pub fn repos_create_webhook_request(
     "/" +
     @http.percent_encode(parameter_value(repo)) +
     "/hooks",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -27730,9 +28536,10 @@ pub fn repos_create_webhook_decode_json(
 ///
 /// Decodes a successful repos/create-webhook response.
 pub fn repos_create_webhook_decode(
-  response : @http.Response,
-) -> Hook raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Hook, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -27766,9 +28573,10 @@ pub fn repos_get_webhook_decode_json(
 ///
 /// Decodes a successful repos/get-webhook response.
 pub fn repos_get_webhook_decode(
-  response : @http.Response,
-) -> Hook raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Hook, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -27787,7 +28595,7 @@ pub fn repos_update_webhook_request(
     @http.percent_encode(parameter_value(repo)) +
     "/hooks/" +
     @http.percent_encode(parameter_value(hook_id)),
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -27803,9 +28611,10 @@ pub fn repos_update_webhook_decode_json(
 ///
 /// Decodes a successful repos/update-webhook response.
 pub fn repos_update_webhook_decode(
-  response : @http.Response,
-) -> Hook raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Hook, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -27858,9 +28667,10 @@ pub fn repos_get_webhook_config_for_repo_decode_json(
 ///
 /// Decodes a successful repos/get-webhook-config-for-repo response.
 pub fn repos_get_webhook_config_for_repo_decode(
-  response : @http.Response,
-) -> WebhookConfig raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[WebhookConfig, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -27880,7 +28690,7 @@ pub fn repos_update_webhook_config_for_repo_request(
     "/hooks/" +
     @http.percent_encode(parameter_value(hook_id)) +
     "/config",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -27896,9 +28706,10 @@ pub fn repos_update_webhook_config_for_repo_decode_json(
 ///
 /// Decodes a successful repos/update-webhook-config-for-repo response.
 pub fn repos_update_webhook_config_for_repo_decode(
-  response : @http.Response,
-) -> WebhookConfig raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[WebhookConfig, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -27950,9 +28761,10 @@ pub fn repos_list_webhook_deliveries_decode_json(
 ///
 /// Decodes a successful repos/list-webhook-deliveries response.
 pub fn repos_list_webhook_deliveries_decode(
-  response : @http.Response,
-) -> Array[HookDeliveryItem] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[HookDeliveryItem], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -27989,9 +28801,10 @@ pub fn repos_get_webhook_delivery_decode_json(
 ///
 /// Decodes a successful repos/get-webhook-delivery response.
 pub fn repos_get_webhook_delivery_decode(
-  response : @http.Response,
-) -> HookDelivery raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[HookDelivery, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -28083,9 +28896,10 @@ pub fn repos_check_immutable_releases_decode_json(
 ///
 /// Decodes a successful repos/check-immutable-releases response.
 pub fn repos_check_immutable_releases_decode(
-  response : @http.Response,
-) -> CheckImmutableReleases raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[CheckImmutableReleases, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -28149,9 +28963,10 @@ pub fn migrations_get_import_status_decode_json(
 ///
 /// Decodes a successful migrations/get-import-status response.
 pub fn migrations_get_import_status_decode(
-  response : @http.Response,
-) -> Import raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Import, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -28168,7 +28983,7 @@ pub fn migrations_start_import_request(
     "/" +
     @http.percent_encode(parameter_value(repo)) +
     "/import",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -28184,9 +28999,10 @@ pub fn migrations_start_import_decode_json(
 ///
 /// Decodes a successful migrations/start-import response.
 pub fn migrations_start_import_decode(
-  response : @http.Response,
-) -> Import raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Import, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -28203,7 +29019,7 @@ pub fn migrations_update_import_request(
     "/" +
     @http.percent_encode(parameter_value(repo)) +
     "/import",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -28219,9 +29035,10 @@ pub fn migrations_update_import_decode_json(
 ///
 /// Decodes a successful migrations/update-import response.
 pub fn migrations_update_import_decode(
-  response : @http.Response,
-) -> Import raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Import, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -28274,9 +29091,10 @@ pub fn migrations_get_commit_authors_decode_json(
 ///
 /// Decodes a successful migrations/get-commit-authors response.
 pub fn migrations_get_commit_authors_decode(
-  response : @http.Response,
-) -> Array[PorterAuthor] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[PorterAuthor], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -28295,7 +29113,7 @@ pub fn migrations_map_commit_author_request(
     @http.percent_encode(parameter_value(repo)) +
     "/import/authors/" +
     @http.percent_encode(parameter_value(author_id)),
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -28311,9 +29129,10 @@ pub fn migrations_map_commit_author_decode_json(
 ///
 /// Decodes a successful migrations/map-commit-author response.
 pub fn migrations_map_commit_author_decode(
-  response : @http.Response,
-) -> PorterAuthor raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[PorterAuthor, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -28345,9 +29164,10 @@ pub fn migrations_get_large_files_decode_json(
 ///
 /// Decodes a successful migrations/get-large-files response.
 pub fn migrations_get_large_files_decode(
-  response : @http.Response,
-) -> Array[PorterLargeFile] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[PorterLargeFile], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -28364,7 +29184,7 @@ pub fn migrations_set_lfs_preference_request(
     "/" +
     @http.percent_encode(parameter_value(repo)) +
     "/import/lfs",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -28380,9 +29200,10 @@ pub fn migrations_set_lfs_preference_decode_json(
 ///
 /// Decodes a successful migrations/set-lfs-preference response.
 pub fn migrations_set_lfs_preference_decode(
-  response : @http.Response,
-) -> Import raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Import, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -28414,9 +29235,10 @@ pub fn apps_get_repo_installation_decode_json(
 ///
 /// Decodes a successful apps/get-repo-installation response.
 pub fn apps_get_repo_installation_decode(
-  response : @http.Response,
-) -> Installation raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Installation, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -28448,9 +29270,10 @@ pub fn interactions_get_restrictions_for_repo_decode_json(
 ///
 /// Decodes a successful interactions/get-restrictions-for-repo response.
 pub fn interactions_get_restrictions_for_repo_decode(
-  response : @http.Response,
-) -> Json raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Json, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -28467,7 +29290,7 @@ pub fn interactions_set_restrictions_for_repo_request(
     "/" +
     @http.percent_encode(parameter_value(repo)) +
     "/interaction-limits",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -28483,9 +29306,10 @@ pub fn interactions_set_restrictions_for_repo_decode_json(
 ///
 /// Decodes a successful interactions/set-restrictions-for-repo response.
 pub fn interactions_set_restrictions_for_repo_decode(
-  response : @http.Response,
-) -> InteractionLimitResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[InteractionLimitResponse, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -28533,9 +29357,10 @@ pub fn interactions_get_pull_request_bypass_list_for_repo_decode_json(
 ///
 /// Decodes a successful interactions/get-pull-request-bypass-list-for-repo response.
 pub fn interactions_get_pull_request_bypass_list_for_repo_decode(
-  response : @http.Response,
-) -> Array[SimpleUser] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[SimpleUser], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -28552,7 +29377,7 @@ pub fn interactions_set_pull_request_bypass_list_for_repo_request(
     "/" +
     @http.percent_encode(parameter_value(repo)) +
     "/interaction-limits/pulls/bypass-list",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -28569,7 +29394,7 @@ pub fn interactions_remove_pull_request_bypass_list_for_repo_request(
     "/" +
     @http.percent_encode(parameter_value(repo)) +
     "/interaction-limits/pulls/bypass-list",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -28601,9 +29426,13 @@ pub fn interactions_get_pull_request_creation_cap_for_repo_decode_json(
 ///
 /// Decodes a successful interactions/get-pull-request-creation-cap-for-repo response.
 pub fn interactions_get_pull_request_creation_cap_for_repo_decode(
-  response : @http.Response,
-) -> InteractionsGetPullRequestCreationCapForRepoResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[
+  InteractionsGetPullRequestCreationCapForRepoResponse,
+  @client.ResponseFailure,
+] {
+  decode_response(head, body)
 }
 
 ///|
@@ -28620,7 +29449,7 @@ pub fn interactions_update_pull_request_creation_cap_for_repo_request(
     "/" +
     @http.percent_encode(parameter_value(repo)) +
     "/interaction-limits/pulls/creation-cap",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -28636,9 +29465,13 @@ pub fn interactions_update_pull_request_creation_cap_for_repo_decode_json(
 ///
 /// Decodes a successful interactions/update-pull-request-creation-cap-for-repo response.
 pub fn interactions_update_pull_request_creation_cap_for_repo_decode(
-  response : @http.Response,
-) -> InteractionsUpdatePullRequestCreationCapForRepoResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[
+  InteractionsUpdatePullRequestCreationCapForRepoResponse,
+  @client.ResponseFailure,
+] {
+  decode_response(head, body)
 }
 
 ///|
@@ -28680,9 +29513,10 @@ pub fn repos_list_invitations_decode_json(
 ///
 /// Decodes a successful repos/list-invitations response.
 pub fn repos_list_invitations_decode(
-  response : @http.Response,
-) -> Array[RepositoryInvitation] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[RepositoryInvitation], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -28701,7 +29535,7 @@ pub fn repos_update_invitation_request(
     @http.percent_encode(parameter_value(repo)) +
     "/invitations/" +
     @http.percent_encode(parameter_value(invitation_id)),
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -28717,9 +29551,10 @@ pub fn repos_update_invitation_decode_json(
 ///
 /// Decodes a successful repos/update-invitation response.
 pub fn repos_update_invitation_decode(
-  response : @http.Response,
-) -> RepositoryInvitation raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[RepositoryInvitation, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -28769,9 +29604,10 @@ pub fn repos_list_issue_types_decode_json(
 ///
 /// Decodes a successful repos/list-issue-types response.
 pub fn repos_list_issue_types_decode(
-  response : @http.Response,
-) -> Array[IssueType] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[IssueType], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -28881,9 +29717,10 @@ pub fn issues_list_for_repo_decode_json(
 ///
 /// Decodes a successful issues/list-for-repo response.
 pub fn issues_list_for_repo_decode(
-  response : @http.Response,
-) -> Array[Issue] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[Issue], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -28900,7 +29737,7 @@ pub fn issues_create_request(
     "/" +
     @http.percent_encode(parameter_value(repo)) +
     "/issues",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -28916,9 +29753,10 @@ pub fn issues_create_decode_json(
 ///
 /// Decodes a successful issues/create response.
 pub fn issues_create_decode(
-  response : @http.Response,
-) -> Issue raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Issue, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -28977,9 +29815,10 @@ pub fn issues_list_comments_for_repo_decode_json(
 ///
 /// Decodes a successful issues/list-comments-for-repo response.
 pub fn issues_list_comments_for_repo_decode(
-  response : @http.Response,
-) -> Array[IssueComment] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[IssueComment], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -29013,9 +29852,10 @@ pub fn issues_get_comment_decode_json(
 ///
 /// Decodes a successful issues/get-comment response.
 pub fn issues_get_comment_decode(
-  response : @http.Response,
-) -> IssueComment raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[IssueComment, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -29034,7 +29874,7 @@ pub fn issues_update_comment_request(
     @http.percent_encode(parameter_value(repo)) +
     "/issues/comments/" +
     @http.percent_encode(parameter_value(comment_id)),
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -29050,9 +29890,10 @@ pub fn issues_update_comment_decode_json(
 ///
 /// Decodes a successful issues/update-comment response.
 pub fn issues_update_comment_decode(
-  response : @http.Response,
-) -> IssueComment raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[IssueComment, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -29105,9 +29946,10 @@ pub fn issues_pin_comment_decode_json(
 ///
 /// Decodes a successful issues/pin-comment response.
 pub fn issues_pin_comment_decode(
-  response : @http.Response,
-) -> IssueComment raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[IssueComment, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -29177,9 +30019,10 @@ pub fn reactions_list_for_issue_comment_decode_json(
 ///
 /// Decodes a successful reactions/list-for-issue-comment response.
 pub fn reactions_list_for_issue_comment_decode(
-  response : @http.Response,
-) -> Array[Reaction] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[Reaction], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -29199,7 +30042,7 @@ pub fn reactions_create_for_issue_comment_request(
     "/issues/comments/" +
     @http.percent_encode(parameter_value(comment_id)) +
     "/reactions",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -29215,9 +30058,10 @@ pub fn reactions_create_for_issue_comment_decode_json(
 ///
 /// Decodes a successful reactions/create-for-issue-comment response.
 pub fn reactions_create_for_issue_comment_decode(
-  response : @http.Response,
-) -> Reaction raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Reaction, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -29280,9 +30124,10 @@ pub fn issues_list_events_for_repo_decode_json(
 ///
 /// Decodes a successful issues/list-events-for-repo response.
 pub fn issues_list_events_for_repo_decode(
-  response : @http.Response,
-) -> Array[IssueEvent] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[IssueEvent], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -29316,9 +30161,10 @@ pub fn issues_get_event_decode_json(
 ///
 /// Decodes a successful issues/get-event response.
 pub fn issues_get_event_decode(
-  response : @http.Response,
-) -> IssueEvent raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[IssueEvent, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -29352,9 +30198,10 @@ pub fn issues_get_decode_json(
 ///
 /// Decodes a successful issues/get response.
 pub fn issues_get_decode(
-  response : @http.Response,
-) -> Issue raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Issue, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -29373,7 +30220,7 @@ pub fn issues_update_request(
     @http.percent_encode(parameter_value(repo)) +
     "/issues/" +
     @http.percent_encode(parameter_value(issue_number)),
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -29389,9 +30236,10 @@ pub fn issues_update_decode_json(
 ///
 /// Decodes a successful issues/update response.
 pub fn issues_update_decode(
-  response : @http.Response,
-) -> IssuesUpdateResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[IssuesUpdateResponse, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -29441,9 +30289,10 @@ pub fn issues_list_issue_artifacts_decode_json(
 ///
 /// Decodes a successful issues/list-issue-artifacts response.
 pub fn issues_list_issue_artifacts_decode(
-  response : @http.Response,
-) -> Array[IssueArtifact] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[IssueArtifact], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -29463,7 +30312,7 @@ pub fn issues_create_issue_artifact_request(
     "/issues/" +
     @http.percent_encode(parameter_value(issue_number)) +
     "/artifacts",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -29479,9 +30328,10 @@ pub fn issues_create_issue_artifact_decode_json(
 ///
 /// Decodes a successful issues/create-issue-artifact response.
 pub fn issues_create_issue_artifact_decode(
-  response : @http.Response,
-) -> IssueArtifact raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[IssueArtifact, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -29528,9 +30378,10 @@ pub fn issues_get_issue_artifact_decode_json(
 ///
 /// Decodes a successful issues/get-issue-artifact response.
 pub fn issues_get_issue_artifact_decode(
-  response : @http.Response,
-) -> Json raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Json, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -29552,7 +30403,7 @@ pub fn issues_update_issue_artifact_request(
     @http.percent_encode(parameter_value(issue_number)) +
     "/artifacts/" +
     @http.percent_encode(parameter_value(artifact_number)),
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -29568,9 +30419,10 @@ pub fn issues_update_issue_artifact_decode_json(
 ///
 /// Decodes a successful issues/update-issue-artifact response.
 pub fn issues_update_issue_artifact_decode(
-  response : @http.Response,
-) -> IssueArtifact raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[IssueArtifact, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -29611,7 +30463,7 @@ pub fn issues_add_assignees_request(
     "/issues/" +
     @http.percent_encode(parameter_value(issue_number)) +
     "/assignees",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -29627,9 +30479,10 @@ pub fn issues_add_assignees_decode_json(
 ///
 /// Decodes a successful issues/add-assignees response.
 pub fn issues_add_assignees_decode(
-  response : @http.Response,
-) -> Issue raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Issue, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -29649,7 +30502,7 @@ pub fn issues_remove_assignees_request(
     "/issues/" +
     @http.percent_encode(parameter_value(issue_number)) +
     "/assignees",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -29665,9 +30518,10 @@ pub fn issues_remove_assignees_decode_json(
 ///
 /// Decodes a successful issues/remove-assignees response.
 pub fn issues_remove_assignees_decode(
-  response : @http.Response,
-) -> Issue raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Issue, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -29739,9 +30593,10 @@ pub fn issues_list_comments_decode_json(
 ///
 /// Decodes a successful issues/list-comments response.
 pub fn issues_list_comments_decode(
-  response : @http.Response,
-) -> Array[IssueComment] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[IssueComment], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -29761,7 +30616,7 @@ pub fn issues_create_comment_request(
     "/issues/" +
     @http.percent_encode(parameter_value(issue_number)) +
     "/comments",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -29777,9 +30632,10 @@ pub fn issues_create_comment_decode_json(
 ///
 /// Decodes a successful issues/create-comment response.
 pub fn issues_create_comment_decode(
-  response : @http.Response,
-) -> IssueComment raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[IssueComment, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -29824,9 +30680,10 @@ pub fn issues_list_dependencies_blocked_by_decode_json(
 ///
 /// Decodes a successful issues/list-dependencies-blocked-by response.
 pub fn issues_list_dependencies_blocked_by_decode(
-  response : @http.Response,
-) -> Array[Issue] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[Issue], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -29846,7 +30703,7 @@ pub fn issues_add_blocked_by_dependency_request(
     "/issues/" +
     @http.percent_encode(parameter_value(issue_number)) +
     "/dependencies/blocked_by",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -29862,9 +30719,10 @@ pub fn issues_add_blocked_by_dependency_decode_json(
 ///
 /// Decodes a successful issues/add-blocked-by-dependency response.
 pub fn issues_add_blocked_by_dependency_decode(
-  response : @http.Response,
-) -> Issue raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Issue, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -29901,9 +30759,10 @@ pub fn issues_remove_dependency_blocked_by_decode_json(
 ///
 /// Decodes a successful issues/remove-dependency-blocked-by response.
 pub fn issues_remove_dependency_blocked_by_decode(
-  response : @http.Response,
-) -> Issue raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Issue, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -29948,9 +30807,10 @@ pub fn issues_list_dependencies_blocking_decode_json(
 ///
 /// Decodes a successful issues/list-dependencies-blocking response.
 pub fn issues_list_dependencies_blocking_decode(
-  response : @http.Response,
-) -> Array[Issue] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[Issue], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -29995,9 +30855,10 @@ pub fn issues_list_events_decode_json(
 ///
 /// Decodes a successful issues/list-events response.
 pub fn issues_list_events_decode(
-  response : @http.Response,
-) -> Array[Json] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[Json], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -30042,9 +30903,10 @@ pub fn issues_list_issue_field_values_for_issue_decode_json(
 ///
 /// Decodes a successful issues/list-issue-field-values-for-issue response.
 pub fn issues_list_issue_field_values_for_issue_decode(
-  response : @http.Response,
-) -> Array[IssueFieldValue] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[IssueFieldValue], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -30064,7 +30926,7 @@ pub fn issues_add_issue_field_values_request(
     "/issues/" +
     @http.percent_encode(parameter_value(issue_number)) +
     "/issue-field-values",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -30080,9 +30942,10 @@ pub fn issues_add_issue_field_values_decode_json(
 ///
 /// Decodes a successful issues/add-issue-field-values response.
 pub fn issues_add_issue_field_values_decode(
-  response : @http.Response,
-) -> Array[IssueFieldValue] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[IssueFieldValue], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -30102,7 +30965,7 @@ pub fn issues_set_issue_field_values_request(
     "/issues/" +
     @http.percent_encode(parameter_value(issue_number)) +
     "/issue-field-values",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -30118,9 +30981,10 @@ pub fn issues_set_issue_field_values_decode_json(
 ///
 /// Decodes a successful issues/set-issue-field-values response.
 pub fn issues_set_issue_field_values_decode(
-  response : @http.Response,
-) -> Array[IssueFieldValue] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[IssueFieldValue], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -30186,9 +31050,10 @@ pub fn issues_list_labels_on_issue_decode_json(
 ///
 /// Decodes a successful issues/list-labels-on-issue response.
 pub fn issues_list_labels_on_issue_decode(
-  response : @http.Response,
-) -> Array[Label] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[Label], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -30208,7 +31073,7 @@ pub fn issues_add_labels_request(
     "/issues/" +
     @http.percent_encode(parameter_value(issue_number)) +
     "/labels",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -30224,9 +31089,10 @@ pub fn issues_add_labels_decode_json(
 ///
 /// Decodes a successful issues/add-labels response.
 pub fn issues_add_labels_decode(
-  response : @http.Response,
-) -> Array[Label] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[Label], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -30246,7 +31112,7 @@ pub fn issues_set_labels_request(
     "/issues/" +
     @http.percent_encode(parameter_value(issue_number)) +
     "/labels",
-  ).json_body(body)
+  ).body_json(body)
 }
 
 ///|
@@ -30262,9 +31128,10 @@ pub fn issues_set_labels_decode_json(
 ///
 /// Decodes a successful issues/set-labels response.
 pub fn issues_set_labels_decode(
-  response : @http.Response,
-) -> Array[Label] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[Label], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -30320,9 +31187,10 @@ pub fn issues_remove_label_decode_json(
 ///
 /// Decodes a successful issues/remove-label response.
 pub fn issues_remove_label_decode(
-  response : @http.Response,
-) -> Array[Label] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[Label], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -30342,7 +31210,7 @@ pub fn issues_lock_request(
     "/issues/" +
     @http.percent_encode(parameter_value(issue_number)) +
     "/lock",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -30396,9 +31264,10 @@ pub fn issues_get_parent_decode_json(
 ///
 /// Decodes a successful issues/get-parent response.
 pub fn issues_get_parent_decode(
-  response : @http.Response,
-) -> Issue raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Issue, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -30449,9 +31318,10 @@ pub fn reactions_list_for_issue_decode_json(
 ///
 /// Decodes a successful reactions/list-for-issue response.
 pub fn reactions_list_for_issue_decode(
-  response : @http.Response,
-) -> Array[Reaction] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[Reaction], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -30471,7 +31341,7 @@ pub fn reactions_create_for_issue_request(
     "/issues/" +
     @http.percent_encode(parameter_value(issue_number)) +
     "/reactions",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -30487,9 +31357,10 @@ pub fn reactions_create_for_issue_decode_json(
 ///
 /// Decodes a successful reactions/create-for-issue response.
 pub fn reactions_create_for_issue_decode(
-  response : @http.Response,
-) -> Reaction raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Reaction, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -30555,9 +31426,10 @@ pub fn issues_list_relates_to_decode_json(
 ///
 /// Decodes a successful issues/list-relates-to response.
 pub fn issues_list_relates_to_decode(
-  response : @http.Response,
-) -> Array[Issue] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[Issue], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -30577,7 +31449,7 @@ pub fn issues_add_relates_to_request(
     "/issues/" +
     @http.percent_encode(parameter_value(issue_number)) +
     "/relates_to",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -30593,9 +31465,10 @@ pub fn issues_add_relates_to_decode_json(
 ///
 /// Decodes a successful issues/add-relates-to response.
 pub fn issues_add_relates_to_decode(
-  response : @http.Response,
-) -> Issue raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Issue, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -30632,9 +31505,10 @@ pub fn issues_remove_relates_to_decode_json(
 ///
 /// Decodes a successful issues/remove-relates-to response.
 pub fn issues_remove_relates_to_decode(
-  response : @http.Response,
-) -> Issue raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Issue, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -30654,7 +31528,7 @@ pub fn issues_remove_sub_issue_request(
     "/issues/" +
     @http.percent_encode(parameter_value(issue_number)) +
     "/sub_issue",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -30670,9 +31544,10 @@ pub fn issues_remove_sub_issue_decode_json(
 ///
 /// Decodes a successful issues/remove-sub-issue response.
 pub fn issues_remove_sub_issue_decode(
-  response : @http.Response,
-) -> Issue raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Issue, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -30717,9 +31592,10 @@ pub fn issues_list_sub_issues_decode_json(
 ///
 /// Decodes a successful issues/list-sub-issues response.
 pub fn issues_list_sub_issues_decode(
-  response : @http.Response,
-) -> Array[Issue] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[Issue], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -30739,7 +31615,7 @@ pub fn issues_add_sub_issue_request(
     "/issues/" +
     @http.percent_encode(parameter_value(issue_number)) +
     "/sub_issues",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -30755,9 +31631,10 @@ pub fn issues_add_sub_issue_decode_json(
 ///
 /// Decodes a successful issues/add-sub-issue response.
 pub fn issues_add_sub_issue_decode(
-  response : @http.Response,
-) -> Issue raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Issue, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -30777,7 +31654,7 @@ pub fn issues_reprioritize_sub_issue_request(
     "/issues/" +
     @http.percent_encode(parameter_value(issue_number)) +
     "/sub_issues/priority",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -30793,9 +31670,10 @@ pub fn issues_reprioritize_sub_issue_decode_json(
 ///
 /// Decodes a successful issues/reprioritize-sub-issue response.
 pub fn issues_reprioritize_sub_issue_decode(
-  response : @http.Response,
-) -> Issue raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Issue, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -30852,9 +31730,10 @@ pub fn issues_list_suggestions_decode_json(
 ///
 /// Decodes a successful issues/list-suggestions response.
 pub fn issues_list_suggestions_decode(
-  response : @http.Response,
-) -> Array[IssueSuggestion] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[IssueSuggestion], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -30892,9 +31771,10 @@ pub fn issues_approve_suggestion_decode_json(
 ///
 /// Decodes a successful issues/approve-suggestion response.
 pub fn issues_approve_suggestion_decode(
-  response : @http.Response,
-) -> IssueSuggestion raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[IssueSuggestion, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -30932,9 +31812,10 @@ pub fn issues_dismiss_suggestion_decode_json(
 ///
 /// Decodes a successful issues/dismiss-suggestion response.
 pub fn issues_dismiss_suggestion_decode(
-  response : @http.Response,
-) -> IssueSuggestion raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[IssueSuggestion, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -30985,9 +31866,10 @@ pub fn issues_list_events_for_timeline_decode_json(
 ///
 /// Decodes a successful issues/list-events-for-timeline response.
 pub fn issues_list_events_for_timeline_decode(
-  response : @http.Response,
-) -> Array[Json] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[Json], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -31029,9 +31911,10 @@ pub fn repos_list_deploy_keys_decode_json(
 ///
 /// Decodes a successful repos/list-deploy-keys response.
 pub fn repos_list_deploy_keys_decode(
-  response : @http.Response,
-) -> Array[DeployKey] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[DeployKey], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -31048,7 +31931,7 @@ pub fn repos_create_deploy_key_request(
     "/" +
     @http.percent_encode(parameter_value(repo)) +
     "/keys",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -31064,9 +31947,10 @@ pub fn repos_create_deploy_key_decode_json(
 ///
 /// Decodes a successful repos/create-deploy-key response.
 pub fn repos_create_deploy_key_decode(
-  response : @http.Response,
-) -> DeployKey raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[DeployKey, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -31100,9 +31984,10 @@ pub fn repos_get_deploy_key_decode_json(
 ///
 /// Decodes a successful repos/get-deploy-key response.
 pub fn repos_get_deploy_key_decode(
-  response : @http.Response,
-) -> DeployKey raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[DeployKey, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -31162,9 +32047,10 @@ pub fn issues_list_labels_for_repo_decode_json(
 ///
 /// Decodes a successful issues/list-labels-for-repo response.
 pub fn issues_list_labels_for_repo_decode(
-  response : @http.Response,
-) -> Array[Label] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[Label], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -31181,7 +32067,7 @@ pub fn issues_create_label_request(
     "/" +
     @http.percent_encode(parameter_value(repo)) +
     "/labels",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -31197,9 +32083,10 @@ pub fn issues_create_label_decode_json(
 ///
 /// Decodes a successful issues/create-label response.
 pub fn issues_create_label_decode(
-  response : @http.Response,
-) -> Label raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Label, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -31233,9 +32120,10 @@ pub fn issues_get_label_decode_json(
 ///
 /// Decodes a successful issues/get-label response.
 pub fn issues_get_label_decode(
-  response : @http.Response,
-) -> Label raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Label, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -31254,7 +32142,7 @@ pub fn issues_update_label_request(
     @http.percent_encode(parameter_value(repo)) +
     "/labels/" +
     @http.percent_encode(parameter_value(name)),
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -31270,9 +32158,10 @@ pub fn issues_update_label_decode_json(
 ///
 /// Decodes a successful issues/update-label response.
 pub fn issues_update_label_decode(
-  response : @http.Response,
-) -> Label raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Label, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -31322,9 +32211,10 @@ pub fn repos_list_languages_decode_json(
 ///
 /// Decodes a successful repos/list-languages response.
 pub fn repos_list_languages_decode(
-  response : @http.Response,
-) -> Map[String, Int32] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Map[String, Int32], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -31360,9 +32250,10 @@ pub fn licenses_get_for_repo_decode_json(
 ///
 /// Decodes a successful licenses/get-for-repo response.
 pub fn licenses_get_for_repo_decode(
-  response : @http.Response,
-) -> LicenseContent raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[LicenseContent, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -31379,7 +32270,7 @@ pub fn repos_merge_upstream_request(
     "/" +
     @http.percent_encode(parameter_value(repo)) +
     "/merge-upstream",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -31395,9 +32286,10 @@ pub fn repos_merge_upstream_decode_json(
 ///
 /// Decodes a successful repos/merge-upstream response.
 pub fn repos_merge_upstream_decode(
-  response : @http.Response,
-) -> MergedUpstream raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[MergedUpstream, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -31414,7 +32306,7 @@ pub fn repos_merge_request(
     "/" +
     @http.percent_encode(parameter_value(repo)) +
     "/merges",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -31430,9 +32322,10 @@ pub fn repos_merge_decode_json(
 ///
 /// Decodes a successful repos/merge response.
 pub fn repos_merge_decode(
-  response : @http.Response,
-) -> Commit raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Commit, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -31491,9 +32384,10 @@ pub fn issues_list_milestones_decode_json(
 ///
 /// Decodes a successful issues/list-milestones response.
 pub fn issues_list_milestones_decode(
-  response : @http.Response,
-) -> Array[Milestone] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[Milestone], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -31510,7 +32404,7 @@ pub fn issues_create_milestone_request(
     "/" +
     @http.percent_encode(parameter_value(repo)) +
     "/milestones",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -31526,9 +32420,10 @@ pub fn issues_create_milestone_decode_json(
 ///
 /// Decodes a successful issues/create-milestone response.
 pub fn issues_create_milestone_decode(
-  response : @http.Response,
-) -> Milestone raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Milestone, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -31562,9 +32457,10 @@ pub fn issues_get_milestone_decode_json(
 ///
 /// Decodes a successful issues/get-milestone response.
 pub fn issues_get_milestone_decode(
-  response : @http.Response,
-) -> Milestone raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Milestone, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -31583,7 +32479,7 @@ pub fn issues_update_milestone_request(
     @http.percent_encode(parameter_value(repo)) +
     "/milestones/" +
     @http.percent_encode(parameter_value(milestone_number)),
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -31599,9 +32495,10 @@ pub fn issues_update_milestone_decode_json(
 ///
 /// Decodes a successful issues/update-milestone response.
 pub fn issues_update_milestone_decode(
-  response : @http.Response,
-) -> Milestone raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Milestone, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -31664,9 +32561,10 @@ pub fn issues_list_labels_for_milestone_decode_json(
 ///
 /// Decodes a successful issues/list-labels-for-milestone response.
 pub fn issues_list_labels_for_milestone_decode(
-  response : @http.Response,
-) -> Array[Label] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[Label], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -31737,9 +32635,10 @@ pub fn activity_list_repo_notifications_for_authenticated_user_decode_json(
 ///
 /// Decodes a successful activity/list-repo-notifications-for-authenticated-user response.
 pub fn activity_list_repo_notifications_for_authenticated_user_decode(
-  response : @http.Response,
-) -> Array[Thread] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[Thread], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -31756,7 +32655,7 @@ pub fn activity_mark_repo_notifications_as_read_request(
     "/" +
     @http.percent_encode(parameter_value(repo)) +
     "/notifications",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -31772,9 +32671,13 @@ pub fn activity_mark_repo_notifications_as_read_decode_json(
 ///
 /// Decodes a successful activity/mark-repo-notifications-as-read response.
 pub fn activity_mark_repo_notifications_as_read_decode(
-  response : @http.Response,
-) -> ActivityMarkRepoNotificationsAsReadResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[
+  ActivityMarkRepoNotificationsAsReadResponse,
+  @client.ResponseFailure,
+] {
+  decode_response(head, body)
 }
 
 ///|
@@ -31803,9 +32706,10 @@ pub fn repos_get_pages_decode_json(
 ///
 /// Decodes a successful repos/get-pages response.
 pub fn repos_get_pages_decode(
-  response : @http.Response,
-) -> Page raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Page, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -31822,7 +32726,7 @@ pub fn repos_create_pages_site_request(
     "/" +
     @http.percent_encode(parameter_value(repo)) +
     "/pages",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -31838,9 +32742,10 @@ pub fn repos_create_pages_site_decode_json(
 ///
 /// Decodes a successful repos/create-pages-site response.
 pub fn repos_create_pages_site_decode(
-  response : @http.Response,
-) -> Page raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Page, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -31857,7 +32762,7 @@ pub fn repos_update_information_about_pages_site_request(
     "/" +
     @http.percent_encode(parameter_value(repo)) +
     "/pages",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -31915,9 +32820,10 @@ pub fn repos_list_pages_builds_decode_json(
 ///
 /// Decodes a successful repos/list-pages-builds response.
 pub fn repos_list_pages_builds_decode(
-  response : @http.Response,
-) -> Array[PageBuild] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[PageBuild], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -31949,9 +32855,10 @@ pub fn repos_request_pages_build_decode_json(
 ///
 /// Decodes a successful repos/request-pages-build response.
 pub fn repos_request_pages_build_decode(
-  response : @http.Response,
-) -> PageBuildStatus raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[PageBuildStatus, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -31983,9 +32890,10 @@ pub fn repos_get_latest_pages_build_decode_json(
 ///
 /// Decodes a successful repos/get-latest-pages-build response.
 pub fn repos_get_latest_pages_build_decode(
-  response : @http.Response,
-) -> PageBuild raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[PageBuild, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -32019,9 +32927,10 @@ pub fn repos_get_pages_build_decode_json(
 ///
 /// Decodes a successful repos/get-pages-build response.
 pub fn repos_get_pages_build_decode(
-  response : @http.Response,
-) -> PageBuild raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[PageBuild, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -32038,7 +32947,7 @@ pub fn repos_create_pages_deployment_request(
     "/" +
     @http.percent_encode(parameter_value(repo)) +
     "/pages/deployments",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -32054,9 +32963,10 @@ pub fn repos_create_pages_deployment_decode_json(
 ///
 /// Decodes a successful repos/create-pages-deployment response.
 pub fn repos_create_pages_deployment_decode(
-  response : @http.Response,
-) -> PageDeployment raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[PageDeployment, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -32090,9 +33000,10 @@ pub fn repos_get_pages_deployment_decode_json(
 ///
 /// Decodes a successful repos/get-pages-deployment response.
 pub fn repos_get_pages_deployment_decode(
-  response : @http.Response,
-) -> PagesDeploymentStatus raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[PagesDeploymentStatus, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -32143,9 +33054,10 @@ pub fn repos_get_pages_health_check_decode_json(
 ///
 /// Decodes a successful repos/get-pages-health-check response.
 pub fn repos_get_pages_health_check_decode(
-  response : @http.Response,
-) -> PagesHealthCheck raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[PagesHealthCheck, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -32177,9 +33089,13 @@ pub fn repos_check_private_vulnerability_reporting_decode_json(
 ///
 /// Decodes a successful repos/check-private-vulnerability-reporting response.
 pub fn repos_check_private_vulnerability_reporting_decode(
-  response : @http.Response,
-) -> ReposCheckPrivateVulnerabilityReportingResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[
+  ReposCheckPrivateVulnerabilityReportingResponse,
+  @client.ResponseFailure,
+] {
+  decode_response(head, body)
 }
 
 ///|
@@ -32243,9 +33159,10 @@ pub fn repos_custom_properties_for_repos_get_repository_values_decode_json(
 ///
 /// Decodes a successful repos/custom-properties-for-repos-get-repository-values response.
 pub fn repos_custom_properties_for_repos_get_repository_values_decode(
-  response : @http.Response,
-) -> Array[CustomPropertyValue] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[CustomPropertyValue], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -32262,7 +33179,7 @@ pub fn repos_custom_properties_for_repos_create_or_update_repository_values_requ
     "/" +
     @http.percent_encode(parameter_value(repo)) +
     "/properties/values",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -32331,9 +33248,10 @@ pub fn pulls_list_decode_json(
 ///
 /// Decodes a successful pulls/list response.
 pub fn pulls_list_decode(
-  response : @http.Response,
-) -> Array[PullRequestSimple] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[PullRequestSimple], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -32350,7 +33268,7 @@ pub fn pulls_create_request(
     "/" +
     @http.percent_encode(parameter_value(repo)) +
     "/pulls",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -32366,9 +33284,10 @@ pub fn pulls_create_decode_json(
 ///
 /// Decodes a successful pulls/create response.
 pub fn pulls_create_decode(
-  response : @http.Response,
-) -> PullRequest raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[PullRequest, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -32427,9 +33346,10 @@ pub fn pulls_list_review_comments_for_repo_decode_json(
 ///
 /// Decodes a successful pulls/list-review-comments-for-repo response.
 pub fn pulls_list_review_comments_for_repo_decode(
-  response : @http.Response,
-) -> Array[PullRequestReviewComment] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[PullRequestReviewComment], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -32463,9 +33383,10 @@ pub fn pulls_get_review_comment_decode_json(
 ///
 /// Decodes a successful pulls/get-review-comment response.
 pub fn pulls_get_review_comment_decode(
-  response : @http.Response,
-) -> PullRequestReviewComment raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[PullRequestReviewComment, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -32484,7 +33405,7 @@ pub fn pulls_update_review_comment_request(
     @http.percent_encode(parameter_value(repo)) +
     "/pulls/comments/" +
     @http.percent_encode(parameter_value(comment_id)),
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -32500,9 +33421,10 @@ pub fn pulls_update_review_comment_decode_json(
 ///
 /// Decodes a successful pulls/update-review-comment response.
 pub fn pulls_update_review_comment_decode(
-  response : @http.Response,
-) -> PullRequestReviewComment raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[PullRequestReviewComment, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -32571,9 +33493,10 @@ pub fn reactions_list_for_pull_request_review_comment_decode_json(
 ///
 /// Decodes a successful reactions/list-for-pull-request-review-comment response.
 pub fn reactions_list_for_pull_request_review_comment_decode(
-  response : @http.Response,
-) -> Array[Reaction] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[Reaction], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -32593,7 +33516,7 @@ pub fn reactions_create_for_pull_request_review_comment_request(
     "/pulls/comments/" +
     @http.percent_encode(parameter_value(comment_id)) +
     "/reactions",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -32609,9 +33532,10 @@ pub fn reactions_create_for_pull_request_review_comment_decode_json(
 ///
 /// Decodes a successful reactions/create-for-pull-request-review-comment response.
 pub fn reactions_create_for_pull_request_review_comment_decode(
-  response : @http.Response,
-) -> Reaction raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Reaction, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -32666,9 +33590,10 @@ pub fn pulls_get_decode_json(
 ///
 /// Decodes a successful pulls/get response.
 pub fn pulls_get_decode(
-  response : @http.Response,
-) -> PullRequest raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[PullRequest, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -32687,7 +33612,7 @@ pub fn pulls_update_request(
     @http.percent_encode(parameter_value(repo)) +
     "/pulls/" +
     @http.percent_encode(parameter_value(pull_number)),
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -32703,9 +33628,10 @@ pub fn pulls_update_decode_json(
 ///
 /// Decodes a successful pulls/update response.
 pub fn pulls_update_decode(
-  response : @http.Response,
-) -> PullRequest raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[PullRequest, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -32725,7 +33651,7 @@ pub fn codespaces_create_with_pr_for_authenticated_user_request(
     "/pulls/" +
     @http.percent_encode(parameter_value(pull_number)) +
     "/codespaces",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -32741,9 +33667,10 @@ pub fn codespaces_create_with_pr_for_authenticated_user_decode_json(
 ///
 /// Decodes a successful codespaces/create-with-pr-for-authenticated-user response.
 pub fn codespaces_create_with_pr_for_authenticated_user_decode(
-  response : @http.Response,
-) -> Codespace raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Codespace, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -32805,9 +33732,10 @@ pub fn pulls_list_review_comments_decode_json(
 ///
 /// Decodes a successful pulls/list-review-comments response.
 pub fn pulls_list_review_comments_decode(
-  response : @http.Response,
-) -> Array[PullRequestReviewComment] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[PullRequestReviewComment], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -32827,7 +33755,7 @@ pub fn pulls_create_review_comment_request(
     "/pulls/" +
     @http.percent_encode(parameter_value(pull_number)) +
     "/comments",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -32843,9 +33771,10 @@ pub fn pulls_create_review_comment_decode_json(
 ///
 /// Decodes a successful pulls/create-review-comment response.
 pub fn pulls_create_review_comment_decode(
-  response : @http.Response,
-) -> PullRequestReviewComment raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[PullRequestReviewComment, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -32868,7 +33797,7 @@ pub fn pulls_create_reply_for_review_comment_request(
     "/comments/" +
     @http.percent_encode(parameter_value(comment_id)) +
     "/replies",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -32884,9 +33813,10 @@ pub fn pulls_create_reply_for_review_comment_decode_json(
 ///
 /// Decodes a successful pulls/create-reply-for-review-comment response.
 pub fn pulls_create_reply_for_review_comment_decode(
-  response : @http.Response,
-) -> PullRequestReviewComment raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[PullRequestReviewComment, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -32931,9 +33861,10 @@ pub fn pulls_list_commits_decode_json(
 ///
 /// Decodes a successful pulls/list-commits response.
 pub fn pulls_list_commits_decode(
-  response : @http.Response,
-) -> Array[Commit] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[Commit], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -32953,7 +33884,7 @@ pub fn pulls_request_copilot_code_review_request(
     "/pulls/" +
     @http.percent_encode(parameter_value(pull_number)) +
     "/copilot-code-review",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -32969,9 +33900,10 @@ pub fn pulls_request_copilot_code_review_decode_json(
 ///
 /// Decodes a successful pulls/request-copilot-code-review response.
 pub fn pulls_request_copilot_code_review_decode(
-  response : @http.Response,
-) -> CopilotCodeReviewRequest raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[CopilotCodeReviewRequest, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -33016,9 +33948,10 @@ pub fn pulls_list_files_decode_json(
 ///
 /// Decodes a successful pulls/list-files response.
 pub fn pulls_list_files_decode(
-  response : @http.Response,
-) -> Array[DiffEntry] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[DiffEntry], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -33057,7 +33990,7 @@ pub fn pulls_merge_request(
     "/pulls/" +
     @http.percent_encode(parameter_value(pull_number)) +
     "/merge",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -33073,9 +34006,10 @@ pub fn pulls_merge_decode_json(
 ///
 /// Decodes a successful pulls/merge response.
 pub fn pulls_merge_decode(
-  response : @http.Response,
-) -> PullRequestMergeResult raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[PullRequestMergeResult, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -33095,7 +34029,7 @@ pub fn pulls_merge_async_request(
     "/pulls/" +
     @http.percent_encode(parameter_value(pull_number)) +
     "/merge-async",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -33111,9 +34045,10 @@ pub fn pulls_merge_async_decode_json(
 ///
 /// Decodes a successful pulls/merge-async response.
 pub fn pulls_merge_async_decode(
-  response : @http.Response,
-) -> PullRequestMergeAsyncResult raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[PullRequestMergeAsyncResult, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -33150,9 +34085,10 @@ pub fn pulls_get_merge_async_result_decode_json(
 ///
 /// Decodes a successful pulls/get-merge-async-result response.
 pub fn pulls_get_merge_async_result_decode(
-  response : @http.Response,
-) -> PullRequestMergeAsyncResult raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[PullRequestMergeAsyncResult, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -33187,9 +34123,10 @@ pub fn pulls_list_requested_reviewers_decode_json(
 ///
 /// Decodes a successful pulls/list-requested-reviewers response.
 pub fn pulls_list_requested_reviewers_decode(
-  response : @http.Response,
-) -> PullRequestReviewRequest raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[PullRequestReviewRequest, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -33209,7 +34146,7 @@ pub fn pulls_request_reviewers_request(
     "/pulls/" +
     @http.percent_encode(parameter_value(pull_number)) +
     "/requested_reviewers",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -33225,9 +34162,10 @@ pub fn pulls_request_reviewers_decode_json(
 ///
 /// Decodes a successful pulls/request-reviewers response.
 pub fn pulls_request_reviewers_decode(
-  response : @http.Response,
-) -> PullRequestSimple raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[PullRequestSimple, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -33247,7 +34185,7 @@ pub fn pulls_remove_requested_reviewers_request(
     "/pulls/" +
     @http.percent_encode(parameter_value(pull_number)) +
     "/requested_reviewers",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -33263,9 +34201,10 @@ pub fn pulls_remove_requested_reviewers_decode_json(
 ///
 /// Decodes a successful pulls/remove-requested-reviewers response.
 pub fn pulls_remove_requested_reviewers_decode(
-  response : @http.Response,
-) -> PullRequestSimple raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[PullRequestSimple, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -33285,7 +34224,7 @@ pub fn pulls_rerequest_reviewers_request(
     "/pulls/" +
     @http.percent_encode(parameter_value(pull_number)) +
     "/requested_reviewers/rerequest",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -33301,9 +34240,10 @@ pub fn pulls_rerequest_reviewers_decode_json(
 ///
 /// Decodes a successful pulls/rerequest-reviewers response.
 pub fn pulls_rerequest_reviewers_decode(
-  response : @http.Response,
-) -> PullRequestSimple raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[PullRequestSimple, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -33348,9 +34288,10 @@ pub fn pulls_list_reviews_decode_json(
 ///
 /// Decodes a successful pulls/list-reviews response.
 pub fn pulls_list_reviews_decode(
-  response : @http.Response,
-) -> Array[PullRequestReview] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[PullRequestReview], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -33370,7 +34311,7 @@ pub fn pulls_create_review_request(
     "/pulls/" +
     @http.percent_encode(parameter_value(pull_number)) +
     "/reviews",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -33386,9 +34327,10 @@ pub fn pulls_create_review_decode_json(
 ///
 /// Decodes a successful pulls/create-review response.
 pub fn pulls_create_review_decode(
-  response : @http.Response,
-) -> PullRequestReview raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[PullRequestReview, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -33425,9 +34367,10 @@ pub fn pulls_get_review_decode_json(
 ///
 /// Decodes a successful pulls/get-review response.
 pub fn pulls_get_review_decode(
-  response : @http.Response,
-) -> PullRequestReview raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[PullRequestReview, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -33449,7 +34392,7 @@ pub fn pulls_update_review_request(
     @http.percent_encode(parameter_value(pull_number)) +
     "/reviews/" +
     @http.percent_encode(parameter_value(review_id)),
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -33465,9 +34408,10 @@ pub fn pulls_update_review_decode_json(
 ///
 /// Decodes a successful pulls/update-review response.
 pub fn pulls_update_review_decode(
-  response : @http.Response,
-) -> PullRequestReview raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[PullRequestReview, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -33504,9 +34448,10 @@ pub fn pulls_delete_pending_review_decode_json(
 ///
 /// Decodes a successful pulls/delete-pending-review response.
 pub fn pulls_delete_pending_review_decode(
-  response : @http.Response,
-) -> PullRequestReview raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[PullRequestReview, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -33554,9 +34499,10 @@ pub fn pulls_list_comments_for_review_decode_json(
 ///
 /// Decodes a successful pulls/list-comments-for-review response.
 pub fn pulls_list_comments_for_review_decode(
-  response : @http.Response,
-) -> Array[ReviewComment] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[ReviewComment], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -33579,7 +34525,7 @@ pub fn pulls_dismiss_review_request(
     "/reviews/" +
     @http.percent_encode(parameter_value(review_id)) +
     "/dismissals",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -33595,9 +34541,10 @@ pub fn pulls_dismiss_review_decode_json(
 ///
 /// Decodes a successful pulls/dismiss-review response.
 pub fn pulls_dismiss_review_decode(
-  response : @http.Response,
-) -> PullRequestReview raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[PullRequestReview, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -33620,7 +34567,7 @@ pub fn pulls_submit_review_request(
     "/reviews/" +
     @http.percent_encode(parameter_value(review_id)) +
     "/events",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -33636,9 +34583,10 @@ pub fn pulls_submit_review_decode_json(
 ///
 /// Decodes a successful pulls/submit-review response.
 pub fn pulls_submit_review_decode(
-  response : @http.Response,
-) -> PullRequestReview raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[PullRequestReview, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -33658,7 +34606,7 @@ pub fn pulls_update_branch_request(
     "/pulls/" +
     @http.percent_encode(parameter_value(pull_number)) +
     "/update-branch",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -33674,9 +34622,10 @@ pub fn pulls_update_branch_decode_json(
 ///
 /// Decodes a successful pulls/update-branch response.
 pub fn pulls_update_branch_decode(
-  response : @http.Response,
-) -> PullsUpdateBranchResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[PullsUpdateBranchResponse, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -33712,9 +34661,10 @@ pub fn repos_get_readme_decode_json(
 ///
 /// Decodes a successful repos/get-readme response.
 pub fn repos_get_readme_decode(
-  response : @http.Response,
-) -> ContentFile raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[ContentFile, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -33752,9 +34702,10 @@ pub fn repos_get_readme_in_directory_decode_json(
 ///
 /// Decodes a successful repos/get-readme-in-directory response.
 pub fn repos_get_readme_in_directory_decode(
-  response : @http.Response,
-) -> ContentFile raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[ContentFile, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -33796,9 +34747,10 @@ pub fn repos_list_releases_decode_json(
 ///
 /// Decodes a successful repos/list-releases response.
 pub fn repos_list_releases_decode(
-  response : @http.Response,
-) -> Array[Release] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[Release], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -33815,7 +34767,7 @@ pub fn repos_create_release_request(
     "/" +
     @http.percent_encode(parameter_value(repo)) +
     "/releases",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -33831,9 +34783,10 @@ pub fn repos_create_release_decode_json(
 ///
 /// Decodes a successful repos/create-release response.
 pub fn repos_create_release_decode(
-  response : @http.Response,
-) -> Release raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Release, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -33867,9 +34820,10 @@ pub fn repos_get_release_asset_decode_json(
 ///
 /// Decodes a successful repos/get-release-asset response.
 pub fn repos_get_release_asset_decode(
-  response : @http.Response,
-) -> ReleaseAsset raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[ReleaseAsset, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -33888,7 +34842,7 @@ pub fn repos_update_release_asset_request(
     @http.percent_encode(parameter_value(repo)) +
     "/releases/assets/" +
     @http.percent_encode(parameter_value(asset_id)),
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -33904,9 +34858,10 @@ pub fn repos_update_release_asset_decode_json(
 ///
 /// Decodes a successful repos/update-release-asset response.
 pub fn repos_update_release_asset_decode(
-  response : @http.Response,
-) -> ReleaseAsset raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[ReleaseAsset, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -33941,7 +34896,7 @@ pub fn repos_generate_release_notes_request(
     "/" +
     @http.percent_encode(parameter_value(repo)) +
     "/releases/generate-notes",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -33957,9 +34912,10 @@ pub fn repos_generate_release_notes_decode_json(
 ///
 /// Decodes a successful repos/generate-release-notes response.
 pub fn repos_generate_release_notes_decode(
-  response : @http.Response,
-) -> ReleaseNotesContent raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[ReleaseNotesContent, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -33991,9 +34947,10 @@ pub fn repos_get_latest_release_decode_json(
 ///
 /// Decodes a successful repos/get-latest-release response.
 pub fn repos_get_latest_release_decode(
-  response : @http.Response,
-) -> Release raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Release, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -34027,9 +34984,10 @@ pub fn repos_get_release_by_tag_decode_json(
 ///
 /// Decodes a successful repos/get-release-by-tag response.
 pub fn repos_get_release_by_tag_decode(
-  response : @http.Response,
-) -> Release raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Release, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -34063,9 +35021,10 @@ pub fn repos_get_release_decode_json(
 ///
 /// Decodes a successful repos/get-release response.
 pub fn repos_get_release_decode(
-  response : @http.Response,
-) -> Release raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Release, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -34084,7 +35043,7 @@ pub fn repos_update_release_request(
     @http.percent_encode(parameter_value(repo)) +
     "/releases/" +
     @http.percent_encode(parameter_value(release_id)),
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -34100,9 +35059,10 @@ pub fn repos_update_release_decode_json(
 ///
 /// Decodes a successful repos/update-release response.
 pub fn repos_update_release_decode(
-  response : @http.Response,
-) -> Release raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Release, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -34165,9 +35125,10 @@ pub fn repos_list_release_assets_decode_json(
 ///
 /// Decodes a successful repos/list-release-assets response.
 pub fn repos_list_release_assets_decode(
-  response : @http.Response,
-) -> Array[ReleaseAsset] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[ReleaseAsset], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -34209,9 +35170,10 @@ pub fn repos_upload_release_asset_decode_json(
 ///
 /// Decodes a successful repos/upload-release-asset response.
 pub fn repos_upload_release_asset_decode(
-  response : @http.Response,
-) -> ReleaseAsset raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[ReleaseAsset, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -34262,9 +35224,10 @@ pub fn reactions_list_for_release_decode_json(
 ///
 /// Decodes a successful reactions/list-for-release response.
 pub fn reactions_list_for_release_decode(
-  response : @http.Response,
-) -> Array[Reaction] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[Reaction], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -34284,7 +35247,7 @@ pub fn reactions_create_for_release_request(
     "/releases/" +
     @http.percent_encode(parameter_value(release_id)) +
     "/reactions",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -34300,9 +35263,10 @@ pub fn reactions_create_for_release_decode_json(
 ///
 /// Decodes a successful reactions/create-for-release response.
 pub fn reactions_create_for_release_decode(
-  response : @http.Response,
-) -> Reaction raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Reaction, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -34367,9 +35331,10 @@ pub fn repos_get_branch_rules_decode_json(
 ///
 /// Decodes a successful repos/get-branch-rules response.
 pub fn repos_get_branch_rules_decode(
-  response : @http.Response,
-) -> Array[RepositoryRuleDetailed] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[RepositoryRuleDetailed], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -34423,9 +35388,10 @@ pub fn repos_get_repo_rulesets_decode_json(
 ///
 /// Decodes a successful repos/get-repo-rulesets response.
 pub fn repos_get_repo_rulesets_decode(
-  response : @http.Response,
-) -> Array[RepositoryRuleset] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[RepositoryRuleset], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -34442,7 +35408,7 @@ pub fn repos_create_repo_ruleset_request(
     "/" +
     @http.percent_encode(parameter_value(repo)) +
     "/rulesets",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -34458,9 +35424,10 @@ pub fn repos_create_repo_ruleset_decode_json(
 ///
 /// Decodes a successful repos/create-repo-ruleset response.
 pub fn repos_create_repo_ruleset_decode(
-  response : @http.Response,
-) -> RepositoryRuleset raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[RepositoryRuleset, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -34531,9 +35498,10 @@ pub fn repos_get_repo_rule_suites_decode_json(
 ///
 /// Decodes a successful repos/get-repo-rule-suites response.
 pub fn repos_get_repo_rule_suites_decode(
-  response : @http.Response,
-) -> Array[RuleSuitesItem] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[RuleSuitesItem], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -34572,9 +35540,10 @@ pub fn repos_get_repo_rule_suite_decode_json(
 ///
 /// Decodes a successful repos/get-repo-rule-suite response.
 pub fn repos_get_repo_rule_suite_decode(
-  response : @http.Response,
-) -> RuleSuite raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[RuleSuite, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -34613,9 +35582,10 @@ pub fn repos_get_repo_ruleset_decode_json(
 ///
 /// Decodes a successful repos/get-repo-ruleset response.
 pub fn repos_get_repo_ruleset_decode(
-  response : @http.Response,
-) -> RepositoryRuleset raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[RepositoryRuleset, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -34634,7 +35604,7 @@ pub fn repos_update_repo_ruleset_request(
     @http.percent_encode(parameter_value(repo)) +
     "/rulesets/" +
     @http.percent_encode(parameter_value(ruleset_id)),
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -34650,9 +35620,10 @@ pub fn repos_update_repo_ruleset_decode_json(
 ///
 /// Decodes a successful repos/update-repo-ruleset response.
 pub fn repos_update_repo_ruleset_decode(
-  response : @http.Response,
-) -> RepositoryRuleset raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[RepositoryRuleset, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -34715,9 +35686,10 @@ pub fn repos_get_repo_ruleset_history_decode_json(
 ///
 /// Decodes a successful repos/get-repo-ruleset-history response.
 pub fn repos_get_repo_ruleset_history_decode(
-  response : @http.Response,
-) -> Array[RulesetVersion] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[RulesetVersion], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -34754,9 +35726,10 @@ pub fn repos_get_repo_ruleset_version_decode_json(
 ///
 /// Decodes a successful repos/get-repo-ruleset-version response.
 pub fn repos_get_repo_ruleset_version_decode(
-  response : @http.Response,
-) -> RulesetVersionWithState raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[RulesetVersionWithState, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -34913,9 +35886,10 @@ pub fn secret_scanning_list_alerts_for_repo_decode_json(
 ///
 /// Decodes a successful secret-scanning/list-alerts-for-repo response.
 pub fn secret_scanning_list_alerts_for_repo_decode(
-  response : @http.Response,
-) -> Array[SecretScanningAlert] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[SecretScanningAlert], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -34954,9 +35928,10 @@ pub fn secret_scanning_get_alert_decode_json(
 ///
 /// Decodes a successful secret-scanning/get-alert response.
 pub fn secret_scanning_get_alert_decode(
-  response : @http.Response,
-) -> SecretScanningAlertWithMetadata raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[SecretScanningAlertWithMetadata, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -34975,7 +35950,7 @@ pub fn secret_scanning_update_alert_request(
     @http.percent_encode(parameter_value(repo)) +
     "/secret-scanning/alerts/" +
     @http.percent_encode(parameter_value(alert_number)),
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -34991,9 +35966,10 @@ pub fn secret_scanning_update_alert_decode_json(
 ///
 /// Decodes a successful secret-scanning/update-alert response.
 pub fn secret_scanning_update_alert_decode(
-  response : @http.Response,
-) -> SecretScanningAlertWithMetadata raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[SecretScanningAlertWithMetadata, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -35038,9 +36014,10 @@ pub fn secret_scanning_list_locations_for_alert_decode_json(
 ///
 /// Decodes a successful secret-scanning/list-locations-for-alert response.
 pub fn secret_scanning_list_locations_for_alert_decode(
-  response : @http.Response,
-) -> Array[SecretScanningLocation] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[SecretScanningLocation], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -35106,9 +36083,10 @@ pub fn secret_scanning_list_repo_custom_patterns_decode_json(
 ///
 /// Decodes a successful secret-scanning/list-repo-custom-patterns response.
 pub fn secret_scanning_list_repo_custom_patterns_decode(
-  response : @http.Response,
-) -> Array[SecretScanningCustomPattern] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[SecretScanningCustomPattern], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -35125,7 +36103,7 @@ pub fn secret_scanning_bulk_create_repo_custom_patterns_request(
     "/" +
     @http.percent_encode(parameter_value(repo)) +
     "/secret-scanning/custom-patterns",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -35141,9 +36119,13 @@ pub fn secret_scanning_bulk_create_repo_custom_patterns_decode_json(
 ///
 /// Decodes a successful secret-scanning/bulk-create-repo-custom-patterns response.
 pub fn secret_scanning_bulk_create_repo_custom_patterns_decode(
-  response : @http.Response,
-) -> SecretScanningBulkCreateRepoCustomPatternsResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[
+  SecretScanningBulkCreateRepoCustomPatternsResponse,
+  @client.ResponseFailure,
+] {
+  decode_response(head, body)
 }
 
 ///|
@@ -35160,7 +36142,7 @@ pub fn secret_scanning_bulk_delete_repo_custom_patterns_request(
     "/" +
     @http.percent_encode(parameter_value(repo)) +
     "/secret-scanning/custom-patterns",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -35179,7 +36161,7 @@ pub fn secret_scanning_update_repo_custom_pattern_request(
     @http.percent_encode(parameter_value(repo)) +
     "/secret-scanning/custom-patterns/" +
     @http.percent_encode(parameter_value(pattern_id)),
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -35195,9 +36177,10 @@ pub fn secret_scanning_update_repo_custom_pattern_decode_json(
 ///
 /// Decodes a successful secret-scanning/update-repo-custom-pattern response.
 pub fn secret_scanning_update_repo_custom_pattern_decode(
-  response : @http.Response,
-) -> SecretScanningCustomPattern raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[SecretScanningCustomPattern, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -35214,7 +36197,7 @@ pub fn secret_scanning_create_push_protection_bypass_request(
     "/" +
     @http.percent_encode(parameter_value(repo)) +
     "/secret-scanning/push-protection-bypasses",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -35230,9 +36213,10 @@ pub fn secret_scanning_create_push_protection_bypass_decode_json(
 ///
 /// Decodes a successful secret-scanning/create-push-protection-bypass response.
 pub fn secret_scanning_create_push_protection_bypass_decode(
-  response : @http.Response,
-) -> SecretScanningPushProtectionBypass raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[SecretScanningPushProtectionBypass, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -35264,9 +36248,10 @@ pub fn secret_scanning_get_scan_history_decode_json(
 ///
 /// Decodes a successful secret-scanning/get-scan-history response.
 pub fn secret_scanning_get_scan_history_decode(
-  response : @http.Response,
-) -> SecretScanningScanHistory raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[SecretScanningScanHistory, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -35332,9 +36317,10 @@ pub fn security_advisories_list_repository_advisories_decode_json(
 ///
 /// Decodes a successful security-advisories/list-repository-advisories response.
 pub fn security_advisories_list_repository_advisories_decode(
-  response : @http.Response,
-) -> Array[RepositoryAdvisory] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[RepositoryAdvisory], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -35351,7 +36337,7 @@ pub fn security_advisories_create_repository_advisory_request(
     "/" +
     @http.percent_encode(parameter_value(repo)) +
     "/security-advisories",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -35367,9 +36353,10 @@ pub fn security_advisories_create_repository_advisory_decode_json(
 ///
 /// Decodes a successful security-advisories/create-repository-advisory response.
 pub fn security_advisories_create_repository_advisory_decode(
-  response : @http.Response,
-) -> RepositoryAdvisory raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[RepositoryAdvisory, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -35386,7 +36373,7 @@ pub fn security_advisories_create_private_vulnerability_report_request(
     "/" +
     @http.percent_encode(parameter_value(repo)) +
     "/security-advisories/reports",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -35402,9 +36389,10 @@ pub fn security_advisories_create_private_vulnerability_report_decode_json(
 ///
 /// Decodes a successful security-advisories/create-private-vulnerability-report response.
 pub fn security_advisories_create_private_vulnerability_report_decode(
-  response : @http.Response,
-) -> RepositoryAdvisory raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[RepositoryAdvisory, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -35438,9 +36426,10 @@ pub fn security_advisories_get_repository_advisory_decode_json(
 ///
 /// Decodes a successful security-advisories/get-repository-advisory response.
 pub fn security_advisories_get_repository_advisory_decode(
-  response : @http.Response,
-) -> RepositoryAdvisory raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[RepositoryAdvisory, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -35459,7 +36448,7 @@ pub fn security_advisories_update_repository_advisory_request(
     @http.percent_encode(parameter_value(repo)) +
     "/security-advisories/" +
     @http.percent_encode(parameter_value(ghsa_id)),
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -35475,9 +36464,10 @@ pub fn security_advisories_update_repository_advisory_decode_json(
 ///
 /// Decodes a successful security-advisories/update-repository-advisory response.
 pub fn security_advisories_update_repository_advisory_decode(
-  response : @http.Response,
-) -> RepositoryAdvisory raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[RepositoryAdvisory, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -35528,9 +36518,10 @@ pub fn security_advisories_list_repository_advisory_comments_decode_json(
 ///
 /// Decodes a successful security-advisories/list-repository-advisory-comments response.
 pub fn security_advisories_list_repository_advisory_comments_decode(
-  response : @http.Response,
-) -> Array[RepositoryAdvisoryComment] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[RepositoryAdvisoryComment], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -35550,7 +36541,7 @@ pub fn security_advisories_create_repository_advisory_comment_request(
     "/security-advisories/" +
     @http.percent_encode(parameter_value(ghsa_id)) +
     "/comments",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -35566,9 +36557,10 @@ pub fn security_advisories_create_repository_advisory_comment_decode_json(
 ///
 /// Decodes a successful security-advisories/create-repository-advisory-comment response.
 pub fn security_advisories_create_repository_advisory_comment_decode(
-  response : @http.Response,
-) -> RepositoryAdvisoryComment raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[RepositoryAdvisoryComment, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -35605,9 +36597,10 @@ pub fn security_advisories_get_repository_advisory_comment_decode_json(
 ///
 /// Decodes a successful security-advisories/get-repository-advisory-comment response.
 pub fn security_advisories_get_repository_advisory_comment_decode(
-  response : @http.Response,
-) -> RepositoryAdvisoryComment raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[RepositoryAdvisoryComment, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -35629,7 +36622,7 @@ pub fn security_advisories_update_repository_advisory_comment_request(
     @http.percent_encode(parameter_value(ghsa_id)) +
     "/comments/" +
     @http.percent_encode(parameter_value(comment_id)),
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -35645,9 +36638,10 @@ pub fn security_advisories_update_repository_advisory_comment_decode_json(
 ///
 /// Decodes a successful security-advisories/update-repository-advisory-comment response.
 pub fn security_advisories_update_repository_advisory_comment_decode(
-  response : @http.Response,
-) -> RepositoryAdvisoryComment raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[RepositoryAdvisoryComment, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -35701,9 +36695,10 @@ pub fn security_advisories_create_fork_decode_json(
 ///
 /// Decodes a successful security-advisories/create-fork response.
 pub fn security_advisories_create_fork_decode(
-  response : @http.Response,
-) -> FullRepository raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[FullRepository, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -35751,9 +36746,10 @@ pub fn pull_request_stacks_list_decode_json(
 ///
 /// Decodes a successful pull-request-stacks/list response.
 pub fn pull_request_stacks_list_decode(
-  response : @http.Response,
-) -> Array[PullRequestStackMinimal] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[PullRequestStackMinimal], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -35770,7 +36766,7 @@ pub fn pull_request_stacks_create_request(
     "/" +
     @http.percent_encode(parameter_value(repo)) +
     "/stacks",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -35786,9 +36782,10 @@ pub fn pull_request_stacks_create_decode_json(
 ///
 /// Decodes a successful pull-request-stacks/create response.
 pub fn pull_request_stacks_create_decode(
-  response : @http.Response,
-) -> PullRequestStacksCreateResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[PullRequestStacksCreateResponse, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -35822,9 +36819,10 @@ pub fn pull_request_stacks_get_decode_json(
 ///
 /// Decodes a successful pull-request-stacks/get response.
 pub fn pull_request_stacks_get_decode(
-  response : @http.Response,
-) -> PullRequestStacksGetResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[PullRequestStacksGetResponse, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -35844,7 +36842,7 @@ pub fn pull_request_stacks_add_request(
     "/stacks/" +
     @http.percent_encode(parameter_value(stack_number)) +
     "/add",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -35860,9 +36858,10 @@ pub fn pull_request_stacks_add_decode_json(
 ///
 /// Decodes a successful pull-request-stacks/add response.
 pub fn pull_request_stacks_add_decode(
-  response : @http.Response,
-) -> PullRequestStacksAddResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[PullRequestStacksAddResponse, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -35897,9 +36896,10 @@ pub fn pull_request_stacks_unstack_decode_json(
 ///
 /// Decodes a successful pull-request-stacks/unstack response.
 pub fn pull_request_stacks_unstack_decode(
-  response : @http.Response,
-) -> PullRequestStacksUnstackResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[PullRequestStacksUnstackResponse, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -35941,9 +36941,10 @@ pub fn activity_list_stargazers_for_repo_decode_json(
 ///
 /// Decodes a successful activity/list-stargazers-for-repo response.
 pub fn activity_list_stargazers_for_repo_decode(
-  response : @http.Response,
-) -> Array[SimpleUser] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[SimpleUser], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -35975,9 +36976,10 @@ pub fn activity_get_stargazer_count_for_repo_decode_json(
 ///
 /// Decodes a successful activity/get-stargazer-count-for-repo response.
 pub fn activity_get_stargazer_count_for_repo_decode(
-  response : @http.Response,
-) -> ActivityGetStargazerCountForRepoResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[ActivityGetStargazerCountForRepoResponse, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -36019,9 +37021,10 @@ pub fn activity_get_stargazer_history_for_repo_decode_json(
 ///
 /// Decodes a successful activity/get-stargazer-history-for-repo response.
 pub fn activity_get_stargazer_history_for_repo_decode(
-  response : @http.Response,
-) -> Array[StargazerHistory] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[StargazerHistory], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -36053,9 +37056,10 @@ pub fn repos_get_code_frequency_stats_decode_json(
 ///
 /// Decodes a successful repos/get-code-frequency-stats response.
 pub fn repos_get_code_frequency_stats_decode(
-  response : @http.Response,
-) -> Array[Array[Int32]] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[Array[Int32]], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -36087,9 +37091,10 @@ pub fn repos_get_commit_activity_stats_decode_json(
 ///
 /// Decodes a successful repos/get-commit-activity-stats response.
 pub fn repos_get_commit_activity_stats_decode(
-  response : @http.Response,
-) -> Array[CommitActivity] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[CommitActivity], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -36121,9 +37126,10 @@ pub fn repos_get_contributors_stats_decode_json(
 ///
 /// Decodes a successful repos/get-contributors-stats response.
 pub fn repos_get_contributors_stats_decode(
-  response : @http.Response,
-) -> Array[ContributorActivity] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[ContributorActivity], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -36155,9 +37161,10 @@ pub fn repos_get_participation_stats_decode_json(
 ///
 /// Decodes a successful repos/get-participation-stats response.
 pub fn repos_get_participation_stats_decode(
-  response : @http.Response,
-) -> ParticipationStats raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[ParticipationStats, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -36189,9 +37196,10 @@ pub fn repos_get_punch_card_stats_decode_json(
 ///
 /// Decodes a successful repos/get-punch-card-stats response.
 pub fn repos_get_punch_card_stats_decode(
-  response : @http.Response,
-) -> Array[Array[Int32]] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[Array[Int32]], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -36210,7 +37218,7 @@ pub fn repos_create_commit_status_request(
     @http.percent_encode(parameter_value(repo)) +
     "/statuses/" +
     @http.percent_encode_path(parameter_value(sha)),
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -36226,9 +37234,10 @@ pub fn repos_create_commit_status_decode_json(
 ///
 /// Decodes a successful repos/create-commit-status response.
 pub fn repos_create_commit_status_decode(
-  response : @http.Response,
-) -> Status raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Status, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -36270,9 +37279,10 @@ pub fn activity_list_watchers_for_repo_decode_json(
 ///
 /// Decodes a successful activity/list-watchers-for-repo response.
 pub fn activity_list_watchers_for_repo_decode(
-  response : @http.Response,
-) -> Array[SimpleUser] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[SimpleUser], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -36304,9 +37314,10 @@ pub fn activity_get_repo_subscription_decode_json(
 ///
 /// Decodes a successful activity/get-repo-subscription response.
 pub fn activity_get_repo_subscription_decode(
-  response : @http.Response,
-) -> RepositorySubscription raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[RepositorySubscription, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -36323,7 +37334,7 @@ pub fn activity_set_repo_subscription_request(
     "/" +
     @http.percent_encode(parameter_value(repo)) +
     "/subscription",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -36339,9 +37350,10 @@ pub fn activity_set_repo_subscription_decode_json(
 ///
 /// Decodes a successful activity/set-repo-subscription response.
 pub fn activity_set_repo_subscription_decode(
-  response : @http.Response,
-) -> RepositorySubscription raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[RepositorySubscription, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -36399,9 +37411,10 @@ pub fn repos_list_tags_decode_json(
 ///
 /// Decodes a successful repos/list-tags response.
 pub fn repos_list_tags_decode(
-  response : @http.Response,
-) -> Array[Tag] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[Tag], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -36461,9 +37474,10 @@ pub fn repos_list_teams_decode_json(
 ///
 /// Decodes a successful repos/list-teams response.
 pub fn repos_list_teams_decode(
-  response : @http.Response,
-) -> Array[Team] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[Team], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -36505,9 +37519,10 @@ pub fn repos_get_all_topics_decode_json(
 ///
 /// Decodes a successful repos/get-all-topics response.
 pub fn repos_get_all_topics_decode(
-  response : @http.Response,
-) -> Topic raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Topic, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -36524,7 +37539,7 @@ pub fn repos_replace_all_topics_request(
     "/" +
     @http.percent_encode(parameter_value(repo)) +
     "/topics",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -36540,9 +37555,10 @@ pub fn repos_replace_all_topics_decode_json(
 ///
 /// Decodes a successful repos/replace-all-topics response.
 pub fn repos_replace_all_topics_decode(
-  response : @http.Response,
-) -> Topic raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Topic, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -36578,9 +37594,10 @@ pub fn repos_get_clones_decode_json(
 ///
 /// Decodes a successful repos/get-clones response.
 pub fn repos_get_clones_decode(
-  response : @http.Response,
-) -> CloneTraffic raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[CloneTraffic, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -36612,9 +37629,10 @@ pub fn repos_get_top_paths_decode_json(
 ///
 /// Decodes a successful repos/get-top-paths response.
 pub fn repos_get_top_paths_decode(
-  response : @http.Response,
-) -> Array[ContentTraffic] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[ContentTraffic], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -36646,9 +37664,10 @@ pub fn repos_get_top_referrers_decode_json(
 ///
 /// Decodes a successful repos/get-top-referrers response.
 pub fn repos_get_top_referrers_decode(
-  response : @http.Response,
-) -> Array[ReferrerTraffic] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[ReferrerTraffic], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -36684,9 +37703,10 @@ pub fn repos_get_views_decode_json(
 ///
 /// Decodes a successful repos/get-views response.
 pub fn repos_get_views_decode(
-  response : @http.Response,
-) -> ViewTraffic raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[ViewTraffic, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -36703,7 +37723,7 @@ pub fn repos_transfer_request(
     "/" +
     @http.percent_encode(parameter_value(repo)) +
     "/transfer",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -36719,9 +37739,10 @@ pub fn repos_transfer_decode_json(
 ///
 /// Decodes a successful repos/transfer response.
 pub fn repos_transfer_decode(
-  response : @http.Response,
-) -> MinimalRepository raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[MinimalRepository, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -36804,7 +37825,7 @@ pub fn repos_create_using_template_request(
     "/" +
     @http.percent_encode(parameter_value(template_repo)) +
     "/generate",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -36820,9 +37841,10 @@ pub fn repos_create_using_template_decode_json(
 ///
 /// Decodes a successful repos/create-using-template response.
 pub fn repos_create_using_template_decode(
-  response : @http.Response,
-) -> FullRepository raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[FullRepository, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -36851,9 +37873,10 @@ pub fn repos_list_public_decode_json(
 ///
 /// Decodes a successful repos/list-public response.
 pub fn repos_list_public_decode(
-  response : @http.Response,
-) -> Array[MinimalRepository] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[MinimalRepository], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -36902,9 +37925,10 @@ pub fn search_code_decode_json(
 ///
 /// Decodes a successful search/code response.
 pub fn search_code_decode(
-  response : @http.Response,
-) -> SearchCodeResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[SearchCodeResponse, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -36953,9 +37977,10 @@ pub fn search_commits_decode_json(
 ///
 /// Decodes a successful search/commits response.
 pub fn search_commits_decode(
-  response : @http.Response,
-) -> SearchCommitsResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[SearchCommitsResponse, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -37016,9 +38041,10 @@ pub fn search_issues_and_pull_requests_decode_json(
 ///
 /// Decodes a successful search/issues-and-pull-requests response.
 pub fn search_issues_and_pull_requests_decode(
-  response : @http.Response,
-) -> SearchIssuesAndPullRequestsResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[SearchIssuesAndPullRequestsResponse, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -37069,9 +38095,10 @@ pub fn search_labels_decode_json(
 ///
 /// Decodes a successful search/labels response.
 pub fn search_labels_decode(
-  response : @http.Response,
-) -> SearchLabelsResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[SearchLabelsResponse, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -37120,9 +38147,10 @@ pub fn search_repos_decode_json(
 ///
 /// Decodes a successful search/repos response.
 pub fn search_repos_decode(
-  response : @http.Response,
-) -> SearchReposResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[SearchReposResponse, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -37160,9 +38188,10 @@ pub fn search_topics_decode_json(
 ///
 /// Decodes a successful search/topics response.
 pub fn search_topics_decode(
-  response : @http.Response,
-) -> SearchTopicsResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[SearchTopicsResponse, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -37211,9 +38240,10 @@ pub fn search_users_decode_json(
 ///
 /// Decodes a successful search/users response.
 pub fn search_users_decode(
-  response : @http.Response,
-) -> SearchUsersResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[SearchUsersResponse, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -37236,9 +38266,10 @@ pub fn teams_get_legacy_decode_json(
 ///
 /// Decodes a successful teams/get-legacy response.
 pub fn teams_get_legacy_decode(
-  response : @http.Response,
-) -> TeamFull raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[TeamFull, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -37250,7 +38281,7 @@ pub fn teams_update_legacy_request(
 ) -> @http.Request {
   @http.Request::patch(
     "/teams/" + @http.percent_encode(parameter_value(team_id)),
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -37266,9 +38297,10 @@ pub fn teams_update_legacy_decode_json(
 ///
 /// Decodes a successful teams/update-legacy response.
 pub fn teams_update_legacy_decode(
-  response : @http.Response,
-) -> TeamFull raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[TeamFull, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -37316,9 +38348,10 @@ pub fn teams_list_pending_invitations_legacy_decode_json(
 ///
 /// Decodes a successful teams/list-pending-invitations-legacy response.
 pub fn teams_list_pending_invitations_legacy_decode(
-  response : @http.Response,
-) -> Array[OrganizationInvitation] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[OrganizationInvitation], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -37362,9 +38395,10 @@ pub fn teams_list_members_legacy_decode_json(
 ///
 /// Decodes a successful teams/list-members-legacy response.
 pub fn teams_list_members_legacy_decode(
-  response : @http.Response,
-) -> Array[TeamMember] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[TeamMember], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -37440,9 +38474,10 @@ pub fn teams_get_membership_for_user_legacy_decode_json(
 ///
 /// Decodes a successful teams/get-membership-for-user-legacy response.
 pub fn teams_get_membership_for_user_legacy_decode(
-  response : @http.Response,
-) -> TeamMembership raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[TeamMembership, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -37458,7 +38493,7 @@ pub fn teams_add_or_update_membership_for_user_legacy_request(
     @http.percent_encode(parameter_value(team_id)) +
     "/memberships/" +
     @http.percent_encode(parameter_value(username)),
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -37474,9 +38509,10 @@ pub fn teams_add_or_update_membership_for_user_legacy_decode_json(
 ///
 /// Decodes a successful teams/add-or-update-membership-for-user-legacy response.
 pub fn teams_add_or_update_membership_for_user_legacy_decode(
-  response : @http.Response,
-) -> TeamMembership raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[TeamMembership, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -37530,9 +38566,10 @@ pub fn teams_list_repos_legacy_decode_json(
 ///
 /// Decodes a successful teams/list-repos-legacy response.
 pub fn teams_list_repos_legacy_decode(
-  response : @http.Response,
-) -> Array[MinimalRepository] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[MinimalRepository], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -37566,9 +38603,10 @@ pub fn teams_check_permissions_for_repo_legacy_decode_json(
 ///
 /// Decodes a successful teams/check-permissions-for-repo-legacy response.
 pub fn teams_check_permissions_for_repo_legacy_decode(
-  response : @http.Response,
-) -> TeamRepository raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[TeamRepository, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -37587,7 +38625,7 @@ pub fn teams_add_or_update_repo_permissions_legacy_request(
     @http.percent_encode(parameter_value(owner)) +
     "/" +
     @http.percent_encode(parameter_value(repo)),
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -37644,9 +38682,10 @@ pub fn teams_list_child_legacy_decode_json(
 ///
 /// Decodes a successful teams/list-child-legacy response.
 pub fn teams_list_child_legacy_decode(
-  response : @http.Response,
-) -> Array[Team] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[Team], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -37669,9 +38708,10 @@ pub fn users_get_authenticated_decode_json(
 ///
 /// Decodes a successful users/get-authenticated response.
 pub fn users_get_authenticated_decode(
-  response : @http.Response,
-) -> UsersGetAuthenticatedResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[UsersGetAuthenticatedResponse, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -37680,7 +38720,7 @@ pub fn users_get_authenticated_decode(
 pub fn users_update_authenticated_request(
   body : UsersUpdateAuthenticatedRequest,
 ) -> @http.Request {
-  @http.Request::patch("/user").json_body(Json(body))
+  @http.Request::patch("/user").body_json(Json(body))
 }
 
 ///|
@@ -37696,9 +38736,10 @@ pub fn users_update_authenticated_decode_json(
 ///
 /// Decodes a successful users/update-authenticated response.
 pub fn users_update_authenticated_decode(
-  response : @http.Response,
-) -> PrivateUser raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[PrivateUser, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -37734,9 +38775,10 @@ pub fn users_list_blocked_by_authenticated_user_decode_json(
 ///
 /// Decodes a successful users/list-blocked-by-authenticated-user response.
 pub fn users_list_blocked_by_authenticated_user_decode(
-  response : @http.Response,
-) -> Array[SimpleUser] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[SimpleUser], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -37805,9 +38847,10 @@ pub fn codespaces_list_for_authenticated_user_decode_json(
 ///
 /// Decodes a successful codespaces/list-for-authenticated-user response.
 pub fn codespaces_list_for_authenticated_user_decode(
-  response : @http.Response,
-) -> CodespacesListForAuthenticatedUserResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[CodespacesListForAuthenticatedUserResponse, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -37816,7 +38859,7 @@ pub fn codespaces_list_for_authenticated_user_decode(
 pub fn codespaces_create_for_authenticated_user_request(
   body : Json,
 ) -> @http.Request {
-  @http.Request::post("/user/codespaces").json_body(body)
+  @http.Request::post("/user/codespaces").body_json(body)
 }
 
 ///|
@@ -37832,9 +38875,10 @@ pub fn codespaces_create_for_authenticated_user_decode_json(
 ///
 /// Decodes a successful codespaces/create-for-authenticated-user response.
 pub fn codespaces_create_for_authenticated_user_decode(
-  response : @http.Response,
-) -> Codespace raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Codespace, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -37870,9 +38914,13 @@ pub fn codespaces_list_secrets_for_authenticated_user_decode_json(
 ///
 /// Decodes a successful codespaces/list-secrets-for-authenticated-user response.
 pub fn codespaces_list_secrets_for_authenticated_user_decode(
-  response : @http.Response,
-) -> CodespacesListSecretsForAuthenticatedUserResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[
+  CodespacesListSecretsForAuthenticatedUserResponse,
+  @client.ResponseFailure,
+] {
+  decode_response(head, body)
 }
 
 ///|
@@ -37895,9 +38943,10 @@ pub fn codespaces_get_public_key_for_authenticated_user_decode_json(
 ///
 /// Decodes a successful codespaces/get-public-key-for-authenticated-user response.
 pub fn codespaces_get_public_key_for_authenticated_user_decode(
-  response : @http.Response,
-) -> CodespacesUserPublicKey raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[CodespacesUserPublicKey, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -37925,9 +38974,10 @@ pub fn codespaces_get_secret_for_authenticated_user_decode_json(
 ///
 /// Decodes a successful codespaces/get-secret-for-authenticated-user response.
 pub fn codespaces_get_secret_for_authenticated_user_decode(
-  response : @http.Response,
-) -> CodespacesSecret raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[CodespacesSecret, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -37940,7 +38990,7 @@ pub fn codespaces_create_or_update_secret_for_authenticated_user_request(
   @http.Request::put(
     "/user/codespaces/secrets/" +
     @http.percent_encode(parameter_value(secret_name)),
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -37956,9 +39006,10 @@ pub fn codespaces_create_or_update_secret_for_authenticated_user_decode_json(
 ///
 /// Decodes a successful codespaces/create-or-update-secret-for-authenticated-user response.
 pub fn codespaces_create_or_update_secret_for_authenticated_user_decode(
-  response : @http.Response,
-) -> EmptyObject raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[EmptyObject, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -37999,9 +39050,13 @@ pub fn codespaces_list_repositories_for_secret_for_authenticated_user_decode_jso
 ///
 /// Decodes a successful codespaces/list-repositories-for-secret-for-authenticated-user response.
 pub fn codespaces_list_repositories_for_secret_for_authenticated_user_decode(
-  response : @http.Response,
-) -> CodespacesListRepositoriesForSecretForAuthenticatedUserResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[
+  CodespacesListRepositoriesForSecretForAuthenticatedUserResponse,
+  @client.ResponseFailure,
+] {
+  decode_response(head, body)
 }
 
 ///|
@@ -38015,7 +39070,7 @@ pub fn codespaces_set_repositories_for_secret_for_authenticated_user_request(
     "/user/codespaces/secrets/" +
     @http.percent_encode(parameter_value(secret_name)) +
     "/repositories",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -38072,9 +39127,10 @@ pub fn codespaces_get_for_authenticated_user_decode_json(
 ///
 /// Decodes a successful codespaces/get-for-authenticated-user response.
 pub fn codespaces_get_for_authenticated_user_decode(
-  response : @http.Response,
-) -> Codespace raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Codespace, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -38086,7 +39142,7 @@ pub fn codespaces_update_for_authenticated_user_request(
 ) -> @http.Request {
   @http.Request::patch(
     "/user/codespaces/" + @http.percent_encode(parameter_value(codespace_name)),
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -38102,9 +39158,10 @@ pub fn codespaces_update_for_authenticated_user_decode_json(
 ///
 /// Decodes a successful codespaces/update-for-authenticated-user response.
 pub fn codespaces_update_for_authenticated_user_decode(
-  response : @http.Response,
-) -> Codespace raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Codespace, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -38144,9 +39201,10 @@ pub fn codespaces_export_for_authenticated_user_decode_json(
 ///
 /// Decodes a successful codespaces/export-for-authenticated-user response.
 pub fn codespaces_export_for_authenticated_user_decode(
-  response : @http.Response,
-) -> CodespaceExportDetails raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[CodespaceExportDetails, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -38177,9 +39235,10 @@ pub fn codespaces_get_export_details_for_authenticated_user_decode_json(
 ///
 /// Decodes a successful codespaces/get-export-details-for-authenticated-user response.
 pub fn codespaces_get_export_details_for_authenticated_user_decode(
-  response : @http.Response,
-) -> CodespaceExportDetails raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[CodespaceExportDetails, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -38208,9 +39267,13 @@ pub fn codespaces_codespace_machines_for_authenticated_user_decode_json(
 ///
 /// Decodes a successful codespaces/codespace-machines-for-authenticated-user response.
 pub fn codespaces_codespace_machines_for_authenticated_user_decode(
-  response : @http.Response,
-) -> CodespacesCodespaceMachinesForAuthenticatedUserResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[
+  CodespacesCodespaceMachinesForAuthenticatedUserResponse,
+  @client.ResponseFailure,
+] {
+  decode_response(head, body)
 }
 
 ///|
@@ -38224,7 +39287,7 @@ pub fn codespaces_publish_for_authenticated_user_request(
     "/user/codespaces/" +
     @http.percent_encode(parameter_value(codespace_name)) +
     "/publish",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -38240,9 +39303,10 @@ pub fn codespaces_publish_for_authenticated_user_decode_json(
 ///
 /// Decodes a successful codespaces/publish-for-authenticated-user response.
 pub fn codespaces_publish_for_authenticated_user_decode(
-  response : @http.Response,
-) -> CodespaceWithFullRepository raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[CodespaceWithFullRepository, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -38271,9 +39335,10 @@ pub fn codespaces_start_for_authenticated_user_decode_json(
 ///
 /// Decodes a successful codespaces/start-for-authenticated-user response.
 pub fn codespaces_start_for_authenticated_user_decode(
-  response : @http.Response,
-) -> Codespace raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Codespace, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -38302,9 +39367,10 @@ pub fn codespaces_stop_for_authenticated_user_decode_json(
 ///
 /// Decodes a successful codespaces/stop-for-authenticated-user response.
 pub fn codespaces_stop_for_authenticated_user_decode(
-  response : @http.Response,
-) -> Codespace raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Codespace, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -38327,9 +39393,10 @@ pub fn packages_list_docker_migration_conflicting_packages_for_authenticated_use
 ///
 /// Decodes a successful packages/list-docker-migration-conflicting-packages-for-authenticated-user response.
 pub fn packages_list_docker_migration_conflicting_packages_for_authenticated_user_decode(
-  response : @http.Response,
-) -> Array[Package] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[Package], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -38338,7 +39405,7 @@ pub fn packages_list_docker_migration_conflicting_packages_for_authenticated_use
 pub fn users_set_primary_email_visibility_for_authenticated_user_request(
   body : UsersSetPrimaryEmailVisibilityForAuthenticatedUserRequest,
 ) -> @http.Request {
-  @http.Request::patch("/user/email/visibility").json_body(Json(body))
+  @http.Request::patch("/user/email/visibility").body_json(Json(body))
 }
 
 ///|
@@ -38354,9 +39421,10 @@ pub fn users_set_primary_email_visibility_for_authenticated_user_decode_json(
 ///
 /// Decodes a successful users/set-primary-email-visibility-for-authenticated-user response.
 pub fn users_set_primary_email_visibility_for_authenticated_user_decode(
-  response : @http.Response,
-) -> Array[Email] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[Email], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -38392,9 +39460,10 @@ pub fn users_list_emails_for_authenticated_user_decode_json(
 ///
 /// Decodes a successful users/list-emails-for-authenticated-user response.
 pub fn users_list_emails_for_authenticated_user_decode(
-  response : @http.Response,
-) -> Array[Email] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[Email], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -38403,7 +39472,7 @@ pub fn users_list_emails_for_authenticated_user_decode(
 pub fn users_add_email_for_authenticated_user_request(
   body : UsersAddEmailForAuthenticatedUserRequest,
 ) -> @http.Request {
-  @http.Request::post("/user/emails").json_body(Json(body))
+  @http.Request::post("/user/emails").body_json(Json(body))
 }
 
 ///|
@@ -38419,9 +39488,10 @@ pub fn users_add_email_for_authenticated_user_decode_json(
 ///
 /// Decodes a successful users/add-email-for-authenticated-user response.
 pub fn users_add_email_for_authenticated_user_decode(
-  response : @http.Response,
-) -> Array[Email] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[Email], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -38430,7 +39500,7 @@ pub fn users_add_email_for_authenticated_user_decode(
 pub fn users_delete_email_for_authenticated_user_request(
   body : UsersDeleteEmailForAuthenticatedUserRequest,
 ) -> @http.Request {
-  @http.Request::delete("/user/emails").json_body(Json(body))
+  @http.Request::delete("/user/emails").body_json(Json(body))
 }
 
 ///|
@@ -38466,9 +39536,10 @@ pub fn users_list_followers_for_authenticated_user_decode_json(
 ///
 /// Decodes a successful users/list-followers-for-authenticated-user response.
 pub fn users_list_followers_for_authenticated_user_decode(
-  response : @http.Response,
-) -> Array[SimpleUser] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[SimpleUser], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -38504,9 +39575,10 @@ pub fn users_list_followed_by_authenticated_user_decode_json(
 ///
 /// Decodes a successful users/list-followed-by-authenticated-user response.
 pub fn users_list_followed_by_authenticated_user_decode(
-  response : @http.Response,
-) -> Array[SimpleUser] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[SimpleUser], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -38571,9 +39643,10 @@ pub fn users_list_gpg_keys_for_authenticated_user_decode_json(
 ///
 /// Decodes a successful users/list-gpg-keys-for-authenticated-user response.
 pub fn users_list_gpg_keys_for_authenticated_user_decode(
-  response : @http.Response,
-) -> Array[GpgKey] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[GpgKey], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -38582,7 +39655,7 @@ pub fn users_list_gpg_keys_for_authenticated_user_decode(
 pub fn users_create_gpg_key_for_authenticated_user_request(
   body : UsersCreateGpgKeyForAuthenticatedUserRequest,
 ) -> @http.Request {
-  @http.Request::post("/user/gpg_keys").json_body(Json(body))
+  @http.Request::post("/user/gpg_keys").body_json(Json(body))
 }
 
 ///|
@@ -38598,9 +39671,10 @@ pub fn users_create_gpg_key_for_authenticated_user_decode_json(
 ///
 /// Decodes a successful users/create-gpg-key-for-authenticated-user response.
 pub fn users_create_gpg_key_for_authenticated_user_decode(
-  response : @http.Response,
-) -> GpgKey raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[GpgKey, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -38627,9 +39701,10 @@ pub fn users_get_gpg_key_for_authenticated_user_decode_json(
 ///
 /// Decodes a successful users/get-gpg-key-for-authenticated-user response.
 pub fn users_get_gpg_key_for_authenticated_user_decode(
-  response : @http.Response,
-) -> GpgKey raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[GpgKey, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -38676,9 +39751,13 @@ pub fn apps_list_installations_for_authenticated_user_decode_json(
 ///
 /// Decodes a successful apps/list-installations-for-authenticated-user response.
 pub fn apps_list_installations_for_authenticated_user_decode(
-  response : @http.Response,
-) -> AppsListInstallationsForAuthenticatedUserResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[
+  AppsListInstallationsForAuthenticatedUserResponse,
+  @client.ResponseFailure,
+] {
+  decode_response(head, body)
 }
 
 ///|
@@ -38717,9 +39796,13 @@ pub fn apps_list_installation_repos_for_authenticated_user_decode_json(
 ///
 /// Decodes a successful apps/list-installation-repos-for-authenticated-user response.
 pub fn apps_list_installation_repos_for_authenticated_user_decode(
-  response : @http.Response,
-) -> AppsListInstallationReposForAuthenticatedUserResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[
+  AppsListInstallationReposForAuthenticatedUserResponse,
+  @client.ResponseFailure,
+] {
+  decode_response(head, body)
 }
 
 ///|
@@ -38772,9 +39855,10 @@ pub fn interactions_get_restrictions_for_authenticated_user_decode_json(
 ///
 /// Decodes a successful interactions/get-restrictions-for-authenticated-user response.
 pub fn interactions_get_restrictions_for_authenticated_user_decode(
-  response : @http.Response,
-) -> Json raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Json, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -38783,7 +39867,7 @@ pub fn interactions_get_restrictions_for_authenticated_user_decode(
 pub fn interactions_set_restrictions_for_authenticated_user_request(
   body : InteractionLimit,
 ) -> @http.Request {
-  @http.Request::put("/user/interaction-limits").json_body(Json(body))
+  @http.Request::put("/user/interaction-limits").body_json(Json(body))
 }
 
 ///|
@@ -38799,9 +39883,10 @@ pub fn interactions_set_restrictions_for_authenticated_user_decode_json(
 ///
 /// Decodes a successful interactions/set-restrictions-for-authenticated-user response.
 pub fn interactions_set_restrictions_for_authenticated_user_decode(
-  response : @http.Response,
-) -> InteractionLimitResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[InteractionLimitResponse, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -38879,9 +39964,10 @@ pub fn issues_list_for_authenticated_user_decode_json(
 ///
 /// Decodes a successful issues/list-for-authenticated-user response.
 pub fn issues_list_for_authenticated_user_decode(
-  response : @http.Response,
-) -> Array[Issue] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[Issue], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -38917,9 +40003,10 @@ pub fn users_list_public_ssh_keys_for_authenticated_user_decode_json(
 ///
 /// Decodes a successful users/list-public-ssh-keys-for-authenticated-user response.
 pub fn users_list_public_ssh_keys_for_authenticated_user_decode(
-  response : @http.Response,
-) -> Array[Key] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[Key], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -38928,7 +40015,7 @@ pub fn users_list_public_ssh_keys_for_authenticated_user_decode(
 pub fn users_create_public_ssh_key_for_authenticated_user_request(
   body : UsersCreatePublicSshKeyForAuthenticatedUserRequest,
 ) -> @http.Request {
-  @http.Request::post("/user/keys").json_body(Json(body))
+  @http.Request::post("/user/keys").body_json(Json(body))
 }
 
 ///|
@@ -38944,9 +40031,10 @@ pub fn users_create_public_ssh_key_for_authenticated_user_decode_json(
 ///
 /// Decodes a successful users/create-public-ssh-key-for-authenticated-user response.
 pub fn users_create_public_ssh_key_for_authenticated_user_decode(
-  response : @http.Response,
-) -> Key raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Key, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -38973,9 +40061,10 @@ pub fn users_get_public_ssh_key_for_authenticated_user_decode_json(
 ///
 /// Decodes a successful users/get-public-ssh-key-for-authenticated-user response.
 pub fn users_get_public_ssh_key_for_authenticated_user_decode(
-  response : @http.Response,
-) -> Key raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Key, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -39022,9 +40111,10 @@ pub fn apps_list_subscriptions_for_authenticated_user_decode_json(
 ///
 /// Decodes a successful apps/list-subscriptions-for-authenticated-user response.
 pub fn apps_list_subscriptions_for_authenticated_user_decode(
-  response : @http.Response,
-) -> Array[UserMarketplacePurchase] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[UserMarketplacePurchase], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -39060,9 +40150,10 @@ pub fn apps_list_subscriptions_for_authenticated_user_stubbed_decode_json(
 ///
 /// Decodes a successful apps/list-subscriptions-for-authenticated-user-stubbed response.
 pub fn apps_list_subscriptions_for_authenticated_user_stubbed_decode(
-  response : @http.Response,
-) -> Array[UserMarketplacePurchase] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[UserMarketplacePurchase], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -39104,9 +40195,10 @@ pub fn orgs_list_memberships_for_authenticated_user_decode_json(
 ///
 /// Decodes a successful orgs/list-memberships-for-authenticated-user response.
 pub fn orgs_list_memberships_for_authenticated_user_decode(
-  response : @http.Response,
-) -> Array[OrgMembership] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[OrgMembership], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -39133,9 +40225,10 @@ pub fn orgs_get_membership_for_authenticated_user_decode_json(
 ///
 /// Decodes a successful orgs/get-membership-for-authenticated-user response.
 pub fn orgs_get_membership_for_authenticated_user_decode(
-  response : @http.Response,
-) -> OrgMembership raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[OrgMembership, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -39147,7 +40240,7 @@ pub fn orgs_update_membership_for_authenticated_user_request(
 ) -> @http.Request {
   @http.Request::patch(
     "/user/memberships/orgs/" + @http.percent_encode(parameter_value(org)),
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -39163,9 +40256,10 @@ pub fn orgs_update_membership_for_authenticated_user_decode_json(
 ///
 /// Decodes a successful orgs/update-membership-for-authenticated-user response.
 pub fn orgs_update_membership_for_authenticated_user_decode(
-  response : @http.Response,
-) -> OrgMembership raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[OrgMembership, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -39201,9 +40295,10 @@ pub fn migrations_list_for_authenticated_user_decode_json(
 ///
 /// Decodes a successful migrations/list-for-authenticated-user response.
 pub fn migrations_list_for_authenticated_user_decode(
-  response : @http.Response,
-) -> Array[Migration] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[Migration], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -39212,7 +40307,7 @@ pub fn migrations_list_for_authenticated_user_decode(
 pub fn migrations_start_for_authenticated_user_request(
   body : MigrationsStartForAuthenticatedUserRequest,
 ) -> @http.Request {
-  @http.Request::post("/user/migrations").json_body(Json(body))
+  @http.Request::post("/user/migrations").body_json(Json(body))
 }
 
 ///|
@@ -39228,9 +40323,10 @@ pub fn migrations_start_for_authenticated_user_decode_json(
 ///
 /// Decodes a successful migrations/start-for-authenticated-user response.
 pub fn migrations_start_for_authenticated_user_decode(
-  response : @http.Response,
-) -> Migration raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Migration, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -39265,9 +40361,10 @@ pub fn migrations_get_status_for_authenticated_user_decode_json(
 ///
 /// Decodes a successful migrations/get-status-for-authenticated-user response.
 pub fn migrations_get_status_for_authenticated_user_decode(
-  response : @http.Response,
-) -> Migration raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Migration, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -39348,9 +40445,10 @@ pub fn migrations_list_repos_for_authenticated_user_decode_json(
 ///
 /// Decodes a successful migrations/list-repos-for-authenticated-user response.
 pub fn migrations_list_repos_for_authenticated_user_decode(
-  response : @http.Response,
-) -> Array[MinimalRepository] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[MinimalRepository], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -39386,9 +40484,10 @@ pub fn orgs_list_for_authenticated_user_decode_json(
 ///
 /// Decodes a successful orgs/list-for-authenticated-user response.
 pub fn orgs_list_for_authenticated_user_decode(
-  response : @http.Response,
-) -> Array[OrganizationSimple] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[OrganizationSimple], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -39432,9 +40531,10 @@ pub fn packages_list_packages_for_authenticated_user_decode_json(
 ///
 /// Decodes a successful packages/list-packages-for-authenticated-user response.
 pub fn packages_list_packages_for_authenticated_user_decode(
-  response : @http.Response,
-) -> Array[Package] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[Package], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -39465,9 +40565,10 @@ pub fn packages_get_package_for_authenticated_user_decode_json(
 ///
 /// Decodes a successful packages/get-package-for-authenticated-user response.
 pub fn packages_get_package_for_authenticated_user_decode(
-  response : @http.Response,
-) -> Package raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Package, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -39551,9 +40652,10 @@ pub fn packages_get_all_package_versions_for_package_owned_by_authenticated_user
 ///
 /// Decodes a successful packages/get-all-package-versions-for-package-owned-by-authenticated-user response.
 pub fn packages_get_all_package_versions_for_package_owned_by_authenticated_user_decode(
-  response : @http.Response,
-) -> Array[PackageVersion] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[PackageVersion], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -39587,9 +40689,10 @@ pub fn packages_get_package_version_for_authenticated_user_decode_json(
 ///
 /// Decodes a successful packages/get-package-version-for-authenticated-user response.
 pub fn packages_get_package_version_for_authenticated_user_decode(
-  response : @http.Response,
-) -> PackageVersion raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[PackageVersion, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -39662,9 +40765,10 @@ pub fn users_list_public_emails_for_authenticated_user_decode_json(
 ///
 /// Decodes a successful users/list-public-emails-for-authenticated-user response.
 pub fn users_list_public_emails_for_authenticated_user_decode(
-  response : @http.Response,
-) -> Array[Email] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[Email], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -39740,9 +40844,10 @@ pub fn repos_list_for_authenticated_user_decode_json(
 ///
 /// Decodes a successful repos/list-for-authenticated-user response.
 pub fn repos_list_for_authenticated_user_decode(
-  response : @http.Response,
-) -> Array[Repository] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[Repository], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -39751,7 +40856,7 @@ pub fn repos_list_for_authenticated_user_decode(
 pub fn repos_create_for_authenticated_user_request(
   body : ReposCreateForAuthenticatedUserRequest,
 ) -> @http.Request {
-  @http.Request::post("/user/repos").json_body(Json(body))
+  @http.Request::post("/user/repos").body_json(Json(body))
 }
 
 ///|
@@ -39767,9 +40872,10 @@ pub fn repos_create_for_authenticated_user_decode_json(
 ///
 /// Decodes a successful repos/create-for-authenticated-user response.
 pub fn repos_create_for_authenticated_user_decode(
-  response : @http.Response,
-) -> FullRepository raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[FullRepository, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -39805,9 +40911,10 @@ pub fn repos_list_invitations_for_authenticated_user_decode_json(
 ///
 /// Decodes a successful repos/list-invitations-for-authenticated-user response.
 pub fn repos_list_invitations_for_authenticated_user_decode(
-  response : @http.Response,
-) -> Array[RepositoryInvitation] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[RepositoryInvitation], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -39867,9 +40974,10 @@ pub fn users_list_social_accounts_for_authenticated_user_decode_json(
 ///
 /// Decodes a successful users/list-social-accounts-for-authenticated-user response.
 pub fn users_list_social_accounts_for_authenticated_user_decode(
-  response : @http.Response,
-) -> Array[SocialAccount] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[SocialAccount], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -39878,7 +40986,7 @@ pub fn users_list_social_accounts_for_authenticated_user_decode(
 pub fn users_add_social_account_for_authenticated_user_request(
   body : UsersAddSocialAccountForAuthenticatedUserRequest,
 ) -> @http.Request {
-  @http.Request::post("/user/social_accounts").json_body(Json(body))
+  @http.Request::post("/user/social_accounts").body_json(Json(body))
 }
 
 ///|
@@ -39894,9 +41002,10 @@ pub fn users_add_social_account_for_authenticated_user_decode_json(
 ///
 /// Decodes a successful users/add-social-account-for-authenticated-user response.
 pub fn users_add_social_account_for_authenticated_user_decode(
-  response : @http.Response,
-) -> Array[SocialAccount] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[SocialAccount], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -39905,7 +41014,7 @@ pub fn users_add_social_account_for_authenticated_user_decode(
 pub fn users_delete_social_account_for_authenticated_user_request(
   body : UsersDeleteSocialAccountForAuthenticatedUserRequest,
 ) -> @http.Request {
-  @http.Request::delete("/user/social_accounts").json_body(Json(body))
+  @http.Request::delete("/user/social_accounts").body_json(Json(body))
 }
 
 ///|
@@ -39941,9 +41050,10 @@ pub fn users_list_ssh_signing_keys_for_authenticated_user_decode_json(
 ///
 /// Decodes a successful users/list-ssh-signing-keys-for-authenticated-user response.
 pub fn users_list_ssh_signing_keys_for_authenticated_user_decode(
-  response : @http.Response,
-) -> Array[SshSigningKey] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[SshSigningKey], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -39952,7 +41062,7 @@ pub fn users_list_ssh_signing_keys_for_authenticated_user_decode(
 pub fn users_create_ssh_signing_key_for_authenticated_user_request(
   body : UsersCreateSshSigningKeyForAuthenticatedUserRequest,
 ) -> @http.Request {
-  @http.Request::post("/user/ssh_signing_keys").json_body(Json(body))
+  @http.Request::post("/user/ssh_signing_keys").body_json(Json(body))
 }
 
 ///|
@@ -39968,9 +41078,10 @@ pub fn users_create_ssh_signing_key_for_authenticated_user_decode_json(
 ///
 /// Decodes a successful users/create-ssh-signing-key-for-authenticated-user response.
 pub fn users_create_ssh_signing_key_for_authenticated_user_decode(
-  response : @http.Response,
-) -> SshSigningKey raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[SshSigningKey, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -39998,9 +41109,10 @@ pub fn users_get_ssh_signing_key_for_authenticated_user_decode_json(
 ///
 /// Decodes a successful users/get-ssh-signing-key-for-authenticated-user response.
 pub fn users_get_ssh_signing_key_for_authenticated_user_decode(
-  response : @http.Response,
-) -> SshSigningKey raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[SshSigningKey, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -40059,9 +41171,10 @@ pub fn activity_list_repos_starred_by_authenticated_user_decode_json(
 ///
 /// Decodes a successful activity/list-repos-starred-by-authenticated-user response.
 pub fn activity_list_repos_starred_by_authenticated_user_decode(
-  response : @http.Response,
-) -> Array[Repository] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[Repository], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -40142,9 +41255,10 @@ pub fn activity_list_watched_repos_for_authenticated_user_decode_json(
 ///
 /// Decodes a successful activity/list-watched-repos-for-authenticated-user response.
 pub fn activity_list_watched_repos_for_authenticated_user_decode(
-  response : @http.Response,
-) -> Array[MinimalRepository] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[MinimalRepository], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -40180,9 +41294,10 @@ pub fn teams_list_for_authenticated_user_decode_json(
 ///
 /// Decodes a successful teams/list-for-authenticated-user response.
 pub fn teams_list_for_authenticated_user_decode(
-  response : @http.Response,
-) -> Array[TeamFull] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[TeamFull], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -40207,9 +41322,10 @@ pub fn users_get_by_id_decode_json(
 ///
 /// Decodes a successful users/get-by-id response.
 pub fn users_get_by_id_decode(
-  response : @http.Response,
-) -> UsersGetByIdResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[UsersGetByIdResponse, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -40226,7 +41342,7 @@ pub fn projects_create_draft_item_for_authenticated_user_request(
     "/projectsV2/" +
     @http.percent_encode(parameter_value(project_number)) +
     "/drafts",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -40242,9 +41358,10 @@ pub fn projects_create_draft_item_for_authenticated_user_decode_json(
 ///
 /// Decodes a successful projects/create-draft-item-for-authenticated-user response.
 pub fn projects_create_draft_item_for_authenticated_user_decode(
-  response : @http.Response,
-) -> ProjectsV2ItemSimple raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[ProjectsV2ItemSimple, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -40278,9 +41395,10 @@ pub fn users_list_decode_json(
 ///
 /// Decodes a successful users/list response.
 pub fn users_list_decode(
-  response : @http.Response,
-) -> Array[SimpleUser] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[SimpleUser], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -40297,7 +41415,7 @@ pub fn projects_create_view_for_user_request(
     "/projectsV2/" +
     @http.percent_encode(parameter_value(project_number)) +
     "/views",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -40313,9 +41431,10 @@ pub fn projects_create_view_for_user_decode_json(
 ///
 /// Decodes a successful projects/create-view-for-user response.
 pub fn projects_create_view_for_user_decode(
-  response : @http.Response,
-) -> ProjectsV2View raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[ProjectsV2View, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -40340,9 +41459,10 @@ pub fn users_get_by_username_decode_json(
 ///
 /// Decodes a successful users/get-by-username response.
 pub fn users_get_by_username_decode(
-  response : @http.Response,
-) -> UsersGetByUsernameResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[UsersGetByUsernameResponse, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -40373,7 +41493,7 @@ pub fn users_list_attestations_bulk_request(
       url = @http.append_query(url, "after", parameter_value(value))
     None => ()
   }
-  @http.Request::post(url).json_body(Json(body))
+  @http.Request::post(url).body_json(Json(body))
 }
 
 ///|
@@ -40389,9 +41509,10 @@ pub fn users_list_attestations_bulk_decode_json(
 ///
 /// Decodes a successful users/list-attestations-bulk response.
 pub fn users_list_attestations_bulk_decode(
-  response : @http.Response,
-) -> UsersListAttestationsBulkResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[UsersListAttestationsBulkResponse, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -40405,7 +41526,7 @@ pub fn users_delete_attestations_bulk_request(
     "/users/" +
     @http.percent_encode(parameter_value(username)) +
     "/attestations/delete-request",
-  ).json_body(body)
+  ).body_json(body)
 }
 
 ///|
@@ -40489,9 +41610,10 @@ pub fn users_list_attestations_decode_json(
 ///
 /// Decodes a successful users/list-attestations response.
 pub fn users_list_attestations_decode(
-  response : @http.Response,
-) -> UsersListAttestationsResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[UsersListAttestationsResponse, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -40537,9 +41659,10 @@ pub fn copilot_spaces_list_for_user_decode_json(
 ///
 /// Decodes a successful copilot-spaces/list-for-user response.
 pub fn copilot_spaces_list_for_user_decode(
-  response : @http.Response,
-) -> CopilotSpacesListForUserResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[CopilotSpacesListForUserResponse, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -40553,7 +41676,7 @@ pub fn copilot_spaces_create_for_user_request(
     "/users/" +
     @http.percent_encode(parameter_value(username)) +
     "/copilot-spaces",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -40569,9 +41692,10 @@ pub fn copilot_spaces_create_for_user_decode_json(
 ///
 /// Decodes a successful copilot-spaces/create-for-user response.
 pub fn copilot_spaces_create_for_user_decode(
-  response : @http.Response,
-) -> CopilotSpace raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[CopilotSpace, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -40602,9 +41726,10 @@ pub fn copilot_spaces_get_for_user_decode_json(
 ///
 /// Decodes a successful copilot-spaces/get-for-user response.
 pub fn copilot_spaces_get_for_user_decode(
-  response : @http.Response,
-) -> CopilotSpace raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[CopilotSpace, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -40620,7 +41745,7 @@ pub fn copilot_spaces_update_for_user_request(
     @http.percent_encode(parameter_value(username)) +
     "/copilot-spaces/" +
     @http.percent_encode(parameter_value(space_number)),
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -40636,9 +41761,10 @@ pub fn copilot_spaces_update_for_user_decode_json(
 ///
 /// Decodes a successful copilot-spaces/update-for-user response.
 pub fn copilot_spaces_update_for_user_decode(
-  response : @http.Response,
-) -> CopilotSpace raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[CopilotSpace, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -40685,9 +41811,13 @@ pub fn copilot_spaces_list_collaborators_for_user_decode_json(
 ///
 /// Decodes a successful copilot-spaces/list-collaborators-for-user response.
 pub fn copilot_spaces_list_collaborators_for_user_decode(
-  response : @http.Response,
-) -> CopilotSpacesListCollaboratorsForUserResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[
+  CopilotSpacesListCollaboratorsForUserResponse,
+  @client.ResponseFailure,
+] {
+  decode_response(head, body)
 }
 
 ///|
@@ -40704,7 +41834,7 @@ pub fn copilot_spaces_add_collaborator_for_user_request(
     "/copilot-spaces/" +
     @http.percent_encode(parameter_value(space_number)) +
     "/collaborators",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -40720,9 +41850,10 @@ pub fn copilot_spaces_add_collaborator_for_user_decode_json(
 ///
 /// Decodes a successful copilot-spaces/add-collaborator-for-user response.
 pub fn copilot_spaces_add_collaborator_for_user_decode(
-  response : @http.Response,
-) -> CopilotSpaceCollaborator raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[CopilotSpaceCollaborator, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -40744,7 +41875,7 @@ pub fn copilot_spaces_update_collaborator_for_user_request(
     @http.percent_encode(parameter_value(actor_type)) +
     "/" +
     @http.percent_encode(parameter_value(actor_identifier)),
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -40760,9 +41891,10 @@ pub fn copilot_spaces_update_collaborator_for_user_decode_json(
 ///
 /// Decodes a successful copilot-spaces/update-collaborator-for-user response.
 pub fn copilot_spaces_update_collaborator_for_user_decode(
-  response : @http.Response,
-) -> CopilotSpaceCollaborator raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[CopilotSpaceCollaborator, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -40815,9 +41947,10 @@ pub fn copilot_spaces_list_resources_for_user_decode_json(
 ///
 /// Decodes a successful copilot-spaces/list-resources-for-user response.
 pub fn copilot_spaces_list_resources_for_user_decode(
-  response : @http.Response,
-) -> CopilotSpacesListResourcesForUserResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[CopilotSpacesListResourcesForUserResponse, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -40834,7 +41967,7 @@ pub fn copilot_spaces_create_resource_for_user_request(
     "/copilot-spaces/" +
     @http.percent_encode(parameter_value(space_number)) +
     "/resources",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -40850,9 +41983,10 @@ pub fn copilot_spaces_create_resource_for_user_decode_json(
 ///
 /// Decodes a successful copilot-spaces/create-resource-for-user response.
 pub fn copilot_spaces_create_resource_for_user_decode(
-  response : @http.Response,
-) -> CopilotSpaceResource raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[CopilotSpaceResource, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -40886,9 +42020,10 @@ pub fn copilot_spaces_get_resource_for_user_decode_json(
 ///
 /// Decodes a successful copilot-spaces/get-resource-for-user response.
 pub fn copilot_spaces_get_resource_for_user_decode(
-  response : @http.Response,
-) -> CopilotSpaceResource raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[CopilotSpaceResource, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -40907,7 +42042,7 @@ pub fn copilot_spaces_update_resource_for_user_request(
     @http.percent_encode(parameter_value(space_number)) +
     "/resources/" +
     @http.percent_encode(parameter_value(space_resource_id)),
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -40923,9 +42058,10 @@ pub fn copilot_spaces_update_resource_for_user_decode_json(
 ///
 /// Decodes a successful copilot-spaces/update-resource-for-user response.
 pub fn copilot_spaces_update_resource_for_user_decode(
-  response : @http.Response,
-) -> CopilotSpaceResource raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[CopilotSpaceResource, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -40972,9 +42108,10 @@ pub fn packages_list_docker_migration_conflicting_packages_for_user_decode_json(
 ///
 /// Decodes a successful packages/list-docker-migration-conflicting-packages-for-user response.
 pub fn packages_list_docker_migration_conflicting_packages_for_user_decode(
-  response : @http.Response,
-) -> Array[Package] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[Package], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -41013,9 +42150,10 @@ pub fn activity_list_events_for_authenticated_user_decode_json(
 ///
 /// Decodes a successful activity/list-events-for-authenticated-user response.
 pub fn activity_list_events_for_authenticated_user_decode(
-  response : @http.Response,
-) -> Array[Event] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[Event], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -41056,9 +42194,10 @@ pub fn activity_list_org_events_for_authenticated_user_decode_json(
 ///
 /// Decodes a successful activity/list-org-events-for-authenticated-user response.
 pub fn activity_list_org_events_for_authenticated_user_decode(
-  response : @http.Response,
-) -> Array[Event] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[Event], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -41097,9 +42236,10 @@ pub fn activity_list_public_events_for_user_decode_json(
 ///
 /// Decodes a successful activity/list-public-events-for-user response.
 pub fn activity_list_public_events_for_user_decode(
-  response : @http.Response,
-) -> Array[Event] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[Event], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -41138,9 +42278,10 @@ pub fn users_list_followers_for_user_decode_json(
 ///
 /// Decodes a successful users/list-followers-for-user response.
 pub fn users_list_followers_for_user_decode(
-  response : @http.Response,
-) -> Array[SimpleUser] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[SimpleUser], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -41179,9 +42320,10 @@ pub fn users_list_following_for_user_decode_json(
 ///
 /// Decodes a successful users/list-following-for-user response.
 pub fn users_list_following_for_user_decode(
-  response : @http.Response,
-) -> Array[SimpleUser] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[SimpleUser], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -41241,9 +42383,10 @@ pub fn gists_list_for_user_decode_json(
 ///
 /// Decodes a successful gists/list-for-user response.
 pub fn gists_list_for_user_decode(
-  response : @http.Response,
-) -> Array[BaseGist] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[BaseGist], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -41282,9 +42425,10 @@ pub fn users_list_gpg_keys_for_user_decode_json(
 ///
 /// Decodes a successful users/list-gpg-keys-for-user response.
 pub fn users_list_gpg_keys_for_user_decode(
-  response : @http.Response,
-) -> Array[GpgKey] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[GpgKey], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -41324,9 +42468,10 @@ pub fn users_get_context_for_user_decode_json(
 ///
 /// Decodes a successful users/get-context-for-user response.
 pub fn users_get_context_for_user_decode(
-  response : @http.Response,
-) -> Hovercard raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Hovercard, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -41353,9 +42498,10 @@ pub fn apps_get_user_installation_decode_json(
 ///
 /// Decodes a successful apps/get-user-installation response.
 pub fn apps_get_user_installation_decode(
-  response : @http.Response,
-) -> Installation raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Installation, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -41394,9 +42540,10 @@ pub fn users_list_public_keys_for_user_decode_json(
 ///
 /// Decodes a successful users/list-public-keys-for-user response.
 pub fn users_list_public_keys_for_user_decode(
-  response : @http.Response,
-) -> Array[KeySimple] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[KeySimple], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -41435,9 +42582,10 @@ pub fn orgs_list_for_user_decode_json(
 ///
 /// Decodes a successful orgs/list-for-user response.
 pub fn orgs_list_for_user_decode(
-  response : @http.Response,
-) -> Array[OrganizationSimple] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[OrganizationSimple], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -41484,9 +42632,10 @@ pub fn packages_list_packages_for_user_decode_json(
 ///
 /// Decodes a successful packages/list-packages-for-user response.
 pub fn packages_list_packages_for_user_decode(
-  response : @http.Response,
-) -> Array[Package] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[Package], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -41520,9 +42669,10 @@ pub fn packages_get_package_for_user_decode_json(
 ///
 /// Decodes a successful packages/get-package-for-user response.
 pub fn packages_get_package_for_user_decode(
-  response : @http.Response,
-) -> Package raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Package, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -41599,9 +42749,10 @@ pub fn packages_get_all_package_versions_for_package_owned_by_user_decode_json(
 ///
 /// Decodes a successful packages/get-all-package-versions-for-package-owned-by-user response.
 pub fn packages_get_all_package_versions_for_package_owned_by_user_decode(
-  response : @http.Response,
-) -> Array[PackageVersion] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[PackageVersion], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -41638,9 +42789,10 @@ pub fn packages_get_package_version_for_user_decode_json(
 ///
 /// Decodes a successful packages/get-package-version-for-user response.
 pub fn packages_get_package_version_for_user_decode(
-  response : @http.Response,
-) -> PackageVersion raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[PackageVersion, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -41734,9 +42886,10 @@ pub fn projects_list_for_user_decode_json(
 ///
 /// Decodes a successful projects/list-for-user response.
 pub fn projects_list_for_user_decode(
-  response : @http.Response,
-) -> Array[ProjectsV2] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[ProjectsV2], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -41767,9 +42920,10 @@ pub fn projects_get_for_user_decode_json(
 ///
 /// Decodes a successful projects/get-for-user response.
 pub fn projects_get_for_user_decode(
-  response : @http.Response,
-) -> ProjectsV2 raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[ProjectsV2, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -41818,9 +42972,10 @@ pub fn projects_list_fields_for_user_decode_json(
 ///
 /// Decodes a successful projects/list-fields-for-user response.
 pub fn projects_list_fields_for_user_decode(
-  response : @http.Response,
-) -> Array[ProjectsV2Field] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[ProjectsV2Field], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -41837,7 +42992,7 @@ pub fn projects_add_field_for_user_request(
     "/projectsV2/" +
     @http.percent_encode(parameter_value(project_number)) +
     "/fields",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -41853,9 +43008,10 @@ pub fn projects_add_field_for_user_decode_json(
 ///
 /// Decodes a successful projects/add-field-for-user response.
 pub fn projects_add_field_for_user_decode(
-  response : @http.Response,
-) -> ProjectsV2Field raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[ProjectsV2Field, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -41889,9 +43045,10 @@ pub fn projects_get_field_for_user_decode_json(
 ///
 /// Decodes a successful projects/get-field-for-user response.
 pub fn projects_get_field_for_user_decode(
-  response : @http.Response,
-) -> ProjectsV2Field raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[ProjectsV2Field, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -41951,9 +43108,10 @@ pub fn projects_list_items_for_user_decode_json(
 ///
 /// Decodes a successful projects/list-items-for-user response.
 pub fn projects_list_items_for_user_decode(
-  response : @http.Response,
-) -> Array[ProjectsV2ItemWithContent] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[ProjectsV2ItemWithContent], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -41970,7 +43128,7 @@ pub fn projects_add_item_for_user_request(
     "/projectsV2/" +
     @http.percent_encode(parameter_value(project_number)) +
     "/items",
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -41986,9 +43144,10 @@ pub fn projects_add_item_for_user_decode_json(
 ///
 /// Decodes a successful projects/add-item-for-user response.
 pub fn projects_add_item_for_user_decode(
-  response : @http.Response,
-) -> ProjectsV2ItemSimple raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[ProjectsV2ItemSimple, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -42027,9 +43186,10 @@ pub fn projects_get_user_item_decode_json(
 ///
 /// Decodes a successful projects/get-user-item response.
 pub fn projects_get_user_item_decode(
-  response : @http.Response,
-) -> ProjectsV2ItemWithContent raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[ProjectsV2ItemWithContent, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -42048,7 +43208,7 @@ pub fn projects_update_item_for_user_request(
     @http.percent_encode(parameter_value(project_number)) +
     "/items/" +
     @http.percent_encode(parameter_value(item_id)),
-  ).json_body(Json(body))
+  ).body_json(Json(body))
 }
 
 ///|
@@ -42064,9 +43224,10 @@ pub fn projects_update_item_for_user_decode_json(
 ///
 /// Decodes a successful projects/update-item-for-user response.
 pub fn projects_update_item_for_user_decode(
-  response : @http.Response,
-) -> ProjectsV2ItemWithContent raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[ProjectsV2ItemWithContent, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -42142,9 +43303,10 @@ pub fn projects_list_view_items_for_user_decode_json(
 ///
 /// Decodes a successful projects/list-view-items-for-user response.
 pub fn projects_list_view_items_for_user_decode(
-  response : @http.Response,
-) -> Array[ProjectsV2ItemWithContent] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[ProjectsV2ItemWithContent], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -42183,9 +43345,10 @@ pub fn activity_list_received_events_for_user_decode_json(
 ///
 /// Decodes a successful activity/list-received-events-for-user response.
 pub fn activity_list_received_events_for_user_decode(
-  response : @http.Response,
-) -> Array[Event] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[Event], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -42224,9 +43387,10 @@ pub fn activity_list_received_public_events_for_user_decode_json(
 ///
 /// Decodes a successful activity/list-received-public-events-for-user response.
 pub fn activity_list_received_public_events_for_user_decode(
-  response : @http.Response,
-) -> Array[Event] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[Event], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -42281,9 +43445,10 @@ pub fn repos_list_for_user_decode_json(
 ///
 /// Decodes a successful repos/list-for-user response.
 pub fn repos_list_for_user_decode(
-  response : @http.Response,
-) -> Array[MinimalRepository] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[MinimalRepository], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -42475,9 +43640,10 @@ pub fn users_list_social_accounts_for_user_decode_json(
 ///
 /// Decodes a successful users/list-social-accounts-for-user response.
 pub fn users_list_social_accounts_for_user_decode(
-  response : @http.Response,
-) -> Array[SocialAccount] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[SocialAccount], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -42516,9 +43682,10 @@ pub fn users_list_ssh_signing_keys_for_user_decode_json(
 ///
 /// Decodes a successful users/list-ssh-signing-keys-for-user response.
 pub fn users_list_ssh_signing_keys_for_user_decode(
-  response : @http.Response,
-) -> Array[SshSigningKey] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[SshSigningKey], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -42568,9 +43735,10 @@ pub fn activity_list_repos_starred_by_user_decode_json(
 ///
 /// Decodes a successful activity/list-repos-starred-by-user response.
 pub fn activity_list_repos_starred_by_user_decode(
-  response : @http.Response,
-) -> Array[Repository] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[Repository], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -42609,9 +43777,10 @@ pub fn activity_list_repos_watched_by_user_decode_json(
 ///
 /// Decodes a successful activity/list-repos-watched-by-user response.
 pub fn activity_list_repos_watched_by_user_decode(
-  response : @http.Response,
-) -> Array[MinimalRepository] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[MinimalRepository], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -42634,9 +43803,10 @@ pub fn meta_get_all_versions_decode_json(
 ///
 /// Decodes a successful meta/get-all-versions response.
 pub fn meta_get_all_versions_decode(
-  response : @http.Response,
-) -> Array[String] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[String], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|

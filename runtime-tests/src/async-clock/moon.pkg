@@ -1,6 +1,10 @@
 import {
-  "gaato/http-async" @adapter,
-  "moonbitlang/async",
+  "gaato/http-async/runtime" @adapter,
+  "moonbitlang/core/async",
 } for "test"
 
 supported_targets = "native"
+
+options(
+  "allow-experimental-packages": [ "moonbitlang/core/async" ],
+)

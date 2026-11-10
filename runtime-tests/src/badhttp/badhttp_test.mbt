@@ -7,17 +7,22 @@ async fn bounded(f : async () -> Unit) -> Unit {
 }
 
 ///|
-fn transport() -> @adapter.AsyncTransport {
-  @adapter.AsyncTransport::new(timeout_ms=15000)
+fn transport(timeout_ms~ : Int32 = 15000) -> @runtime.Client {
+  @runtime.Client::new(
+    @codings.Decompress::new(@backend.AsyncBackend::new()),
+    @adapter.AsyncClock::new(),
+    timeout_ms~,
+    read_idle_ms=timeout_ms,
+  )
 }
 
 ///|
 fn client(retry? : @runtime.RetryPolicy) -> @runtime.Client {
-  let retry : &@runtime.RetryDecider? = retry.map(policy => policy)
   @runtime.Client::new(
-    transport(),
+    @codings.Decompress::new(@backend.AsyncBackend::new()),
     @adapter.AsyncClock::new(),
     base_url=BASE,
+    timeout_ms=15000,
     retry?,
   )
 }
@@ -25,14 +30,20 @@ fn client(retry? : @runtime.RetryPolicy) -> @runtime.Client {
 ///|
 /// Collects (event, data, id) triples of one SSE flavor.
 async fn events(flavor : String) -> Array[(String, String, String?)] {
-  let (head, stream) = transport().send_stream(
-    @http.Request::get("\{BASE}/sse/\{flavor}").header(
-      "accept", "text/event-stream",
+  let c = transport()
+  defer c.close()
+  let out = []
+  let reply = c.send(
+    @runtime.request(
+      @http.Request::get("\{BASE}/sse/\{flavor}").header(
+        "accept", "text/event-stream",
+      ),
+    ).response(
+      @runtime.as_sse(event => out.push((event.event, event.data, event.id))),
     ),
   )
-  assert_eq(head.status, 200)
-  let out = []
-  @sse.each_event(stream, event => out.push((event.event, event.data, event.id)))
+  assert_eq(reply.status, 200)
+  reply.body.unwrap()
   out
 }
 
@@ -105,14 +116,18 @@ async test "sse big delivers a 256 KiB data line intact" {
 ///|
 async test "sse stall trips the idle timeout as Timeout" {
   bounded(() => {
-    let t = @adapter.AsyncTransport::new(timeout_ms=1500)
-    let (head, stream) = t.send_stream(
-      @http.Request::get("\{BASE}/sse/stall?seconds=6"),
-    )
-    assert_eq(head.status, 200)
+    let t = transport(timeout_ms=1500)
+    defer t.close()
     let mut seen = 0
-    try @sse.each_event(stream, _ => seen += 1) catch {
-      @http.HttpError::Timeout(phase=Body, ms=1500) => ()
+    try
+      t.send(
+        @runtime.request(@http.Request::get("\{BASE}/sse/stall?seconds=6")).response(
+          @runtime.as_sse(_ => seen += 1),
+        ),
+      )
+      |> ignore
+    catch {
+      @http.TransportError(kind=Timeout(ms=1500), phase=Body, ..) => ()
       error => fail("expected a Body timeout, got \{@debug.to_string(error)}")
     } noraise {
       _ => fail("expected the stall to time out")
@@ -122,15 +137,17 @@ async test "sse stall trips the idle timeout as Timeout" {
 }
 
 ///|
-async test "truncate: a short body under a longer Content-Length is a Body network failure" {
+async test "truncate: a short body under a longer Content-Length is a Body protocol failure" {
   bounded(() => {
     try
       transport().send(
-        @http.Request::get("\{BASE}/truncate?length=1000&send=500"),
+        @runtime.request(
+          @http.Request::get("\{BASE}/truncate?length=1000&send=500"),
+        ).response(@runtime.as_bytes()),
       )
     catch {
-      @http.HttpError::Network(phase=Body, ..) => ()
-      error => fail("expected Network(Body), got \{@debug.to_string(error)}")
+      @http.TransportError(kind=Protocol, phase=Body, ..) => ()
+      error => fail("expected Protocol(Body), got \{@debug.to_string(error)}")
     } noraise {
       response => fail("expected an error, got status \{response.status}")
     }
@@ -140,9 +157,16 @@ async test "truncate: a short body under a longer Content-Length is a Body netwo
 ///|
 async test "delay beyond the timeout is Timeout" {
   bounded(() => {
-    let t = @adapter.AsyncTransport::new(timeout_ms=1000)
-    try t.send(@http.Request::get("\{BASE}/delay/3")) catch {
-      @http.HttpError::Timeout(phase=Head, ms=1000) => ()
+    let t = transport(timeout_ms=1000)
+    defer t.close()
+    try
+      t.send(
+        @runtime.request(@http.Request::get("\{BASE}/delay/3")).response(
+          @runtime.as_bytes(),
+        ),
+      )
+    catch {
+      @http.TransportError(kind=Timeout(ms=1000), phase=Head, ..) => ()
       error => fail("expected a Head timeout, got \{@debug.to_string(error)}")
     } noraise {
       response => fail("expected an error, got status \{response.status}")
@@ -153,17 +177,18 @@ async test "delay beyond the timeout is Timeout" {
 ///|
 async test "status 429 with retry-after classifies as RateLimited" {
   bounded(() => {
-    try
-      client(retry=@runtime.RetryPolicy::none()).send(
-        @http.Request::get("/status/429?retry-after=1"),
-      )
-    catch {
-      @runtime.RateLimited(retry_after_ms~, ..) =>
-        assert_eq(retry_after_ms, Some(1000))
-      error => fail("expected RateLimited, got \{@debug.to_string(error)}")
-    } noraise {
-      response => fail("expected an error, got status \{response.status}")
+    let c = client(retry=@runtime.RetryPolicy::none())
+    defer c.close()
+    let reply = c.send(
+      @runtime.request(@http.Request::get("/status/429?retry-after=1")).response(
+        @runtime.as_bytes(),
+      ),
+    )
+    guard reply.body is Err(@runtime.UnexpectedStatus(head, ..)) else {
+      fail("expected status failure")
     }
+    assert_eq(head.status, 429)
+    assert_eq(@runtime.retry_after_ms(head.headers), Some(1000))
   })
 }
 
@@ -171,24 +196,42 @@ async test "status 429 with retry-after classifies as RateLimited" {
 async test "generated badhttp fixture builds, decodes and classifies requests" {
   bounded(() => {
     let c = client(retry=@runtime.RetryPolicy::none())
-    let headers_response = c.send(@fixture.get_headers_request())
+    defer c.close()
+    let headers_response = c.send(
+      @runtime.request(@fixture.get_headers_request()).response(
+        @runtime.as_bytes(),
+      ),
+    )
     assert_eq(headers_response.status, 200)
-    guard @fixture.get_headers_decode(headers_response) is Object(_) else {
+    guard @fixture.get_headers_decode(
+        { status: headers_response.status, headers: headers_response.headers, },
+        headers_response.body.unwrap(),
+      )
+      is Ok(Object(_)) else {
       fail("expected GET /headers to decode as a JSON object")
     }
-    let echo_response = c.send(@fixture.post_echo_request())
+    let echo_response = c.send(
+      @runtime.request(@fixture.post_echo_request()).response(
+        @runtime.as_bytes(),
+      ),
+    )
     assert_eq(echo_response.status, 200)
-    guard @fixture.post_echo_decode(echo_response)
-      is { "method": String("POST"), .. } else {
+    guard @fixture.post_echo_decode(
+        { status: echo_response.status, headers: echo_response.headers, },
+        echo_response.body.unwrap(),
+      )
+      is Ok({ "method": String("POST"), .. }) else {
       fail("expected POST /echo to report method POST")
     }
-    try c.send(@fixture.get_status_code_request("429", retry_after=1)) catch {
-      @runtime.RateLimited(retry_after_ms~, ..) =>
-        assert_eq(retry_after_ms, Some(1000))
-      error => fail("expected RateLimited, got \{@debug.to_string(error)}")
-    } noraise {
-      response => fail("expected an error, got status \{response.status}")
-    }
+    let limited = c.send(
+      @runtime.request(@fixture.get_status_code_request("429", retry_after=1)).response(
+        @runtime.as_bytes(),
+      ),
+    )
+    assert_true(
+      limited.body is Err(@runtime.UnexpectedStatus({ status: 429, .. }, ..)),
+    )
+    assert_eq(@runtime.retry_after_ms(limited.headers), Some(1000))
   })
 }
 
@@ -205,7 +248,9 @@ async test "status 503 then 200: the client retries and succeeds" {
       backoff: { ..default.backoff, base_ms: 50, max_ms: 200, },
     })
     let response = client(retry=policy).send(
-      @http.Request::get("/status/503,200"),
+      @runtime.request(@http.Request::get("/status/503,200")).response(
+        @runtime.as_bytes(),
+      ),
     )
     assert_eq(response.status, 200)
   })
@@ -215,17 +260,17 @@ async test "status 503 then 200: the client retries and succeeds" {
 async test "badjson flavors become Decode, not a crash" {
   bounded(() => {
     for flavor in ["truncated", "trailing-comma", "single-quotes", "html"] {
-      try
-        client(retry=@runtime.RetryPolicy::none()).send_json(
-          @http.Request::get("/badjson/\{flavor}"),
-        )
-      catch {
-        @runtime.Decode(..) => ()
-        error =>
-          fail("\{flavor}: expected Decode, got \{@debug.to_string(error)}")
-      } noraise {
-        json => fail("\{flavor}: expected Decode, got \{json.stringify()}")
-      }
+      let c = client(retry=@runtime.RetryPolicy::none())
+      defer c.close()
+      let reply = c.send(
+        @runtime.request(@http.Request::get("/badjson/\{flavor}")).response(
+          @runtime.as_json_value(),
+        ),
+      )
+      assert_true(
+        reply.body is Err(@runtime.Deserialization(_, ..)),
+        msg=flavor,
+      )
     }
   })
 }
@@ -233,7 +278,11 @@ async test "badjson flavors become Decode, not a crash" {
 ///|
 async test "redirects are returned as 3xx, not followed" {
   bounded(() => {
-    let response = transport().send(@http.Request::get("\{BASE}/redirect/2"))
+    let response = transport().send(
+      @runtime.request(@http.Request::get("\{BASE}/redirect/2")).response(
+        @runtime.as_bytes(),
+      ),
+    )
     assert_true(response.status >= 300 && response.status < 400)
     assert_true(response.headers.contains("location"))
   })
@@ -253,9 +302,13 @@ fn header(map : Map[String, Json], name : String) -> Json {
 async test "echo round-trips a Japanese JSON body and lowercases headers" {
   bounded(() => {
     let body : Json = { "message": "日本語のテスト", "n": 42 }
-    let json = client(retry=@runtime.RetryPolicy::none()).send_json(
-      @http.Request::post("/echo").header("X-Probe", "MiXeD").json_body(body),
-    )
+    let c = client(retry=@runtime.RetryPolicy::none())
+    defer c.close()
+    let json = c.send(
+      @runtime.request(
+        @http.Request::post("/echo").header("X-Probe", "MiXeD").body_json(body),
+      ).response(@runtime.as_json_value()),
+    ).body.unwrap()
     guard json is { "method": "POST", "body": echoed, "headers": headers, .. } else {
       fail("unexpected echo shape: \{json.stringify()}")
     }

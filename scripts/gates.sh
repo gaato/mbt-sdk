@@ -26,30 +26,32 @@ run moon update
 run moon run scripts/bounds_check.mbtx
 # READMEs and doc comments follow the rules shared by every gaato MoonBit repository.
 run moon run scripts/docs_audit.mbtx --self-test
-for m in http jsonrpc sdk-runtime openai anthropic codex-protocol github conformance; do
+for m in jsonrpc openai anthropic codex-protocol github conformance; do
   for t in "${all_targets[@]}"; do run moon -C "$m" check --deny-warn --target "$t"; done
 done
 for m in fixtures/gen/badhttp fixtures/gen/petstore3; do
   for t in "${all_targets[@]}"; do run moon -C "$m" check --deny-warn --target "$t"; done
 done
-for m in http-async jsonrpc-async codex-app-server runtime-tests; do
+for m in jsonrpc-async codex-app-server runtime-tests; do
   for t in "${io_targets[@]}"; do run moon -C "$m" check --deny-warn --target "$t"; done
 done
 
-# In a moon.work workspace `moon -C <member> test` runs every member that supports the target.
-run timeout 120 moon -C runtime-tests test --target wasm-gc
-[ "$js" = 1 ] && run timeout 120 moon -C runtime-tests test --target js
-[ "$native_tests" = 1 ] && run timeout 120 moon -C runtime-tests test --target native
-
-# The HTTP adapter on moonrun Wasm.
-run moon check http-async/src http-async/src/loopback --target wasm --deny-warn
-run moon test http-async/src http-async/src/loopback --target wasm --verbose
+# Portable modules also support moonrun Wasm; the runtime adapters stay on
+# native and JS. Select local packages so unpublished dependency workspaces
+# remain read-only, and opt-in network suites never execute in ordinary gates.
+offline_packages=(jsonrpc/src jsonrpc-async/src codex-app-server/src codex-app-server/src/examples/initialize codex-protocol/src/gen codex-protocol/src/tests openai/src openai/src/gen anthropic/src anthropic/src/gen github/src github/src/gen conformance/src/harness conformance/src/jsonrpc conformance/src/sse conformance/src/url conformance/src/cookie fixtures/gen/badhttp/src fixtures/gen/petstore3/src runtime-tests/src/sdk_mock runtime-tests/src/openai runtime-tests/src/anthropic runtime-tests/src/github runtime-tests/src/loopback runtime-tests/src/badhttp_replay runtime-tests/src/async-clock)
+local_packages=("${offline_packages[@]}" runtime-tests/src/live runtime-tests/src/badhttp)
+run timeout 120 moon test "${offline_packages[@]}" --target wasm-gc
+[ "$js" = 1 ] && run timeout 120 moon test "${offline_packages[@]}" --target js
+[ "$native_tests" = 1 ] && run timeout 120 moon test "${offline_packages[@]}" --target native
+run moon check "${local_packages[@]}" --target wasm --deny-warn
+run timeout 120 moon test "${offline_packages[@]}" --target wasm
 
 py=(uv run --with pyyaml --with jsonpath-rfc9535 python); [ -x .venv/bin/python ] && py=(.venv/bin/python)
 run "${py[@]}" -m unittest discover -s tools/gen/tests -v
 run scripts/generate.sh --check
-run moon fmt --check
-run moon info
+run moon fmt --check "${local_packages[@]}"
+run moon info "${local_packages[@]}"
 run "${py[@]}" tools/gen/census.py specs/badhttp/openapi.json badhttp --expect-zero
 run "${py[@]}" tools/gen/census.py specs/petstore3/openapi.json petstore3 --expect-zero
 run "${py[@]}" tools/gen/census.py openai/spec/openai.yaml openai --derive-operation-ids --overlay openai/overlays/fix.yaml --overlay openai/overlays/moonbit.yaml --expect-zero

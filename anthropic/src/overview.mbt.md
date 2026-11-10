@@ -1,13 +1,10 @@
 # gaato/anthropic
 
 An unofficial Anthropic Messages API client for
-[MoonBit](https://www.moonbitlang.com/): buffered and streaming messages, open
-content blocks and stream events, tool use, token counting, and Models. It
-also works against Anthropic-compatible servers through `base_url`. It is
-built on [`gaato/http`](https://mooncakes.io/docs/gaato/http) and
-[`gaato/sdk-runtime`](https://mooncakes.io/docs/gaato/sdk-runtime) and has no
-async runtime of its own: the caller supplies a `Transport` and a `Clock`, for
-example from [`gaato/http-async`](https://mooncakes.io/docs/gaato/http-async).
+[MoonBit](https://www.moonbitlang.com/): messages, streaming, tool use, token
+counting and Models. Compatible servers are selected with `base_url`.
+It uses [`gaato/mttp`](https://github.com/gaato/mttp), with a caller-supplied
+`Backend` and `Clock`. The facade itself requires no async runtime.
 
 > **Status**: unofficial and experimental. Minor releases may contain breaking
 > changes; the
@@ -18,27 +15,33 @@ example from [`gaato/http-async`](https://mooncakes.io/docs/gaato/http-async).
 
 ```sh
 moon add gaato/anthropic
+moon add gaato/http
+moon add gaato/mttp
 moon add gaato/http-async
-moon add moonbitlang/async
 ```
 
 ## Usage
 
-Make a transport, a clock and a timer with `gaato/http-async`:
+With `gaato/http-async/backend` imported as `@backend` and
+`gaato/http-async/runtime` as `@runtime`, `gaato/http-async/codings` as
+`@codings` and `gaato/http/h1client` as `@h1client`, create the adapters.
+Opt in to the exact experimental packages `moonbitlang/core/async` and
+`gaato/http/h1client` in the calling package's moon.pkg:
 
 ```mbt nocheck
 ///|
-let transport = @http_async.AsyncTransport::new(
-  timeout_ms=600_000,
-  connect_timeout_ms=5_000,
-  max_body_bytes=64 * 1024 * 1024,
+let backend = @codings.Decompress::new(
+  @backend.AsyncBackend::new(config={
+    ..@h1client.ClientConfig::default(),
+    connect_timeout_ms: Some(5000),
+  }),
 )
 
 ///|
-let clock = @http_async.AsyncClock::new()
+let clock = @runtime.AsyncClock::new()
 
 ///|
-let timer = @http_async.ClockTimer::new()
+let timer = @runtime.ClockTimer::new()
 ```
 
 Then pass them to the client and send a message:
@@ -47,15 +50,15 @@ Then pass them to the client and send a message:
 ///|
 /// Asks `model` one question and returns its answer.
 pub async fn ask(
-  transport : &@http.Transport,
-  clock : &@clock.Clock,
-  timer : &@sync.Timer,
+  backend : &@http.Backend,
+  clock : &@rt.Clock,
+  timer : &@rt.Timer,
   api_key~ : String,
   model~ : String,
-) -> String raise @runtime.SdkError {
+) -> Result[String, @anthropic.AnthropicFailure] {
   let client = @anthropic.Anthropic::new(
     api_key~,
-    transport,
+    backend,
     clock,
     timer~,
     total_timeout_ms=900_000,
@@ -65,15 +68,22 @@ pub async fn ask(
       @anthropic.Message::user("Hello"),
     ]),
   )
-  reply.text()
+  match reply {
+    Ok(reply) => Ok(reply.text())
+    Err(error) => Err(error)
+  }
 }
 ```
 
-Set `max_body_bytes` as above: the transport reads a buffered body whole
-unless told otherwise, and this client cannot set it because the transport is
-yours. 64 MiB is ample for API JSON; a longer reply fails with
-`@runtime.Transport(Protocol(..))` rather than growing memory. Streaming calls
-are not affected.
+Buffered responses are limited to 64 MiB by default. To change the limit,
+construct an mttp `Client` with `max_body_bytes` and pass it
+to `from_client`. Streaming reads incrementally, with a 16 MiB per-event
+limit. Limit failures raise `TransportError(TooLarge, ...)`. HTTP and decode
+failures return `Err(Response(ResponseFailure))`, preserving the received head
+and bounded diagnostic body. Input checks return `Err(Validation(message))`.
+`api_error` extracts a provider error envelope from an `AnthropicFailure` value.
+Transport failures and unknown callback exceptions remain raised errors;
+cancellation remains a signal.
 
 ## Packages
 
@@ -110,7 +120,7 @@ pub async fn stream_text(
   client : @anthropic.Anthropic,
   model~ : String,
   on_text : (String) -> Unit,
-) -> Unit {
+) -> Result[Unit, @anthropic.AnthropicFailure] {
   client.stream_message(
     @anthropic.MessageRequest::new(model~, max_tokens=1024, messages=[
       @anthropic.Message::user("Write a haiku about rivers."),
@@ -128,22 +138,21 @@ you feed it, so cap a stream by its events or bytes, and set `max_tokens`.
 Retries follow the official Python SDK: two retries of 408, 409, 429 and every
 5xx (529 overloaded included), and of a timeout or network failure, for every
 method. That includes `POST`, so a message can be generated, and billed,
-twice; pass `retry=@runtime.RetryPolicy::conservative()` to retry a `POST`
-only on 429 and on failures that prove nothing was sent. The server's
+twice; pass `retry=@client.RetryPolicy::conservative()` to retry a `POST`
+only when a failure proves nothing was sent, unless replay safety is explicit. The server's
 `x-should-retry` is obeyed, waits back off from 0.5 s to 8 s, and a
 `Retry-After` is waited out however long it is, so bound the call with
 `total_timeout_ms` as above: a wait that would outlast it is not begun.
 
 ## Timeouts
 
-The official SDKs limit a call to 600 s, and connecting to 5 s. This module
-has no clock of its own to enforce that, so pass a timer, as above:
-`ClockTimer` from `gaato/http-async` limits each attempt to `timeout_ms`
-(600 s by default), and `total_timeout_ms` limits the whole call, retries and
-their waits included. Give the transport the same limits, as above:
-`AsyncTransport`'s own exchange timeout defaults to 30 s, which would cut a
-long generation off before the 600 s limit is reached. Without a timer, only
-the transport's timeouts apply.
+Each attempt defaults to 600 s. A configured `total_timeout_ms` requires a
+`timer` and covers admission, retries, waits and streaming callbacks.
+Expiry initiates cancellation; necessary cleanup may finish afterwards.
+Backend phase deadlines can finish a call earlier. The example sets a
+5-second connect deadline; the SDK passes the attempt budget in SendOptions.
+Streaming callbacks run after the attempt has been selected and are not
+retried after delivery starts. Close the backend when its owner shuts down.
 
 ## Links
 
@@ -151,7 +160,6 @@ the transport's timeouts apply.
 - [Repository](https://github.com/gaato/mbt-sdk)
 - [Spec provenance](https://github.com/gaato/mbt-sdk/blob/main/anthropic/spec/SOURCE.md)
   and [generation overlays](https://github.com/gaato/mbt-sdk/blob/main/anthropic/overlays/moonbit.yaml)
-- [Migrating from 0.1.0](https://github.com/gaato/mbt-sdk/blob/main/docs/anthropic-0.2.0.md#migration-from-010)
 
 ## License
 

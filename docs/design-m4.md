@@ -1,3 +1,7 @@
+> Historical design/release record. API sketches describe the implementation
+> at that time. See [the stack migration](stack-migration.md) and
+> [current architecture](../ARCHITECTURE.md) for the current interfaces.
+
 # 設計メモ — M4: 生成と自動化(試作)
 
 M4 の目的は「上流 spec の変更と MoonBit 言語の変更を、人手なしで吸収できる経路」を端から端まで通すこと。ジェネレータの対応範囲は狭くてよいが、**対応していないものを黙って `Json` に落とさない**(oas2moon の失敗)。

@@ -1,3 +1,7 @@
+> Historical design/release record. API sketches describe the implementation
+> at that time. See [the stack migration](stack-migration.md) and
+> [current architecture](../ARCHITECTURE.md) for the current interfaces.
+
 # GitHub 0.1.0 release candidate
 
 Publish only `gaato/github@0.1.0`. Its registry dependencies are

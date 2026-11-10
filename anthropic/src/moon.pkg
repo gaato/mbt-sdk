@@ -1,11 +1,9 @@
 import {
   "gaato/anthropic/gen",
   "gaato/http",
-  "gaato/http/clock",
-  "gaato/http/sse",
-  "gaato/http/sync",
-  "gaato/sdk-runtime" @runtime,
-  "gaato/sdk-runtime/json" @sdkjson,
+  "gaato/http/rt",
+  "gaato/mttp/client",
+  "gaato/mttp/jsonkit" @sdkjson,
   "moonbitlang/core/debug",
   "moonbitlang/core/encoding/utf8",
   "moonbitlang/core/json",
@@ -13,5 +11,11 @@ import {
 
 import {
   "gaato/anthropic/gen",
-  "gaato/http/mock",
+  "gaato/mttp/testing",
+  "gaato/http/driver",
+  "gaato/http/sim" @mock,
 } for "test"
+
+options(
+  "allow-experimental-packages": [ "gaato/http/driver" ],
+)

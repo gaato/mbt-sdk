@@ -22,11 +22,18 @@ fn parse_json_body(body : Bytes) -> Json raise {
 
 ///|
 fn[T : @json.FromJson] decode_response(
-  response : @http.Response,
-) -> T raise @runtime.SdkError {
-  @json.from_json(parse_json_body(response.body)) catch {
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[T, @client.ResponseFailure] {
+  Ok(@json.from_json(parse_json_body(body))) catch {
     error =>
-      raise @runtime.Decode(message=error.to_string(), body=response.body)
+      Err(
+        @client.Deserialization(
+          head,
+          message=error.to_string(),
+          body=body[:body.length().min(@client.max_error_body)].to_owned(),
+        ),
+      )
   }
 }
 
@@ -66,9 +73,10 @@ pub fn get_delay_seconds_decode_json(
 ///
 /// Decodes a successful get_delay_seconds response.
 pub fn get_delay_seconds_decode(
-  response : @http.Response,
-) -> Json raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Json, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -147,9 +155,10 @@ pub fn get_sse_decode_json(value : Json) -> Json raise @json.JsonDecodeError {
 ///
 /// Decodes a successful get_sse response.
 pub fn get_sse_decode(
-  response : @http.Response,
-) -> Json raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Json, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -211,9 +220,10 @@ pub fn get_range_decode_json(value : Json) -> Json raise @json.JsonDecodeError {
 ///
 /// Decodes a successful get_range response.
 pub fn get_range_decode(
-  response : @http.Response,
-) -> Json raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Json, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -261,9 +271,10 @@ pub fn get_etag_decode_json(value : Json) -> Json raise @json.JsonDecodeError {
 ///
 /// Decodes a successful get_etag response.
 pub fn get_etag_decode(
-  response : @http.Response,
-) -> Json raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Json, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -321,9 +332,10 @@ pub fn get_cookies_decode_json(
 ///
 /// Decodes a successful get_cookies response.
 pub fn get_cookies_decode(
-  response : @http.Response,
-) -> Json raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Json, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -367,9 +379,10 @@ pub fn get_cookies_flavor_decode_json(
 ///
 /// Decodes a successful get_cookies_flavor response.
 pub fn get_cookies_flavor_decode(
-  response : @http.Response,
-) -> Json raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Json, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -390,9 +403,10 @@ pub fn get_auth_decode_json(value : Json) -> Json raise @json.JsonDecodeError {
 ///
 /// Decodes a successful get_auth response.
 pub fn get_auth_decode(
-  response : @http.Response,
-) -> Json raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Json, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -415,9 +429,10 @@ pub fn get_auth_flavor_decode_json(
 ///
 /// Decodes a successful get_auth_flavor response.
 pub fn get_auth_flavor_decode(
-  response : @http.Response,
-) -> Json raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Json, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -440,9 +455,10 @@ pub fn get_crosshost_decode_json(
 ///
 /// Decodes a successful get_crosshost response.
 pub fn get_crosshost_decode(
-  response : @http.Response,
-) -> Json raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Json, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -465,9 +481,10 @@ pub fn get_crosshost_land_decode_json(
 ///
 /// Decodes a successful get_crosshost_land response.
 pub fn get_crosshost_land_decode(
-  response : @http.Response,
-) -> Json raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Json, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -501,9 +518,10 @@ pub fn get_compress_decode_json(
 ///
 /// Decodes a successful get_compress response.
 pub fn get_compress_decode(
-  response : @http.Response,
-) -> Json raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Json, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -577,9 +595,10 @@ pub fn get_flaky_percent_decode_json(
 ///
 /// Decodes a successful get_flaky_percent response.
 pub fn get_flaky_percent_decode(
-  response : @http.Response,
-) -> Json raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Json, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -616,9 +635,10 @@ pub fn get_redirect_hops_decode_json(
 ///
 /// Decodes a successful get_redirect_hops response.
 pub fn get_redirect_hops_decode(
-  response : @http.Response,
-) -> Json raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Json, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -641,9 +661,10 @@ pub fn get_headers_decode_json(
 ///
 /// Decodes a successful get_headers response.
 pub fn get_headers_decode(
-  response : @http.Response,
-) -> Json raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Json, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -664,9 +685,10 @@ pub fn post_echo_decode_json(value : Json) -> Json raise @json.JsonDecodeError {
 ///
 /// Decodes a successful post_echo response.
 pub fn post_echo_decode(
-  response : @http.Response,
-) -> Json raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Json, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -687,9 +709,10 @@ pub fn put_echo_decode_json(value : Json) -> Json raise @json.JsonDecodeError {
 ///
 /// Decodes a successful put_echo response.
 pub fn put_echo_decode(
-  response : @http.Response,
-) -> Json raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Json, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -710,9 +733,10 @@ pub fn patch_echo_decode_json(value : Json) -> Json raise @json.JsonDecodeError 
 ///
 /// Decodes a successful patch_echo response.
 pub fn patch_echo_decode(
-  response : @http.Response,
-) -> Json raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Json, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -735,9 +759,10 @@ pub fn delete_echo_decode_json(
 ///
 /// Decodes a successful delete_echo response.
 pub fn delete_echo_decode(
-  response : @http.Response,
-) -> Json raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Json, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -751,7 +776,7 @@ pub fn get_echo_request() -> @http.Request {
 ///
 /// Always 405 with an Allow header, so clients can practice handling it The caller handles the response as @http.Response.
 pub fn head_echo_request() -> @http.Request {
-  @http.Request::new("HEAD", "/echo")
+  @http.Request::new(@http.Method::parse("HEAD"), "/echo")
 }
 
 ///|
@@ -772,9 +797,10 @@ pub fn get_402_decode_json(value : Json) -> Json raise @json.JsonDecodeError {
 ///
 /// Decodes a successful get_402 response.
 pub fn get_402_decode(
-  response : @http.Response,
-) -> Json raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Json, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -900,9 +926,10 @@ pub fn get_books_json_decode_json(
 ///
 /// Decodes a successful get_books_json response.
 pub fn get_books_json_decode(
-  response : @http.Response,
-) -> Json raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Json, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -930,9 +957,10 @@ pub fn get_health_decode_json(value : Json) -> Json raise @json.JsonDecodeError 
 ///
 /// Decodes a successful get_health response.
 pub fn get_health_decode(
-  response : @http.Response,
-) -> Json raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Json, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -953,9 +981,10 @@ pub fn get_corpus_decode_json(value : Json) -> Json raise @json.JsonDecodeError 
 ///
 /// Decodes a successful get_corpus response.
 pub fn get_corpus_decode(
-  response : @http.Response,
-) -> Json raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Json, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -985,9 +1014,10 @@ pub fn get_clients_decode_json(
 ///
 /// Decodes a successful get_clients response.
 pub fn get_clients_decode(
-  response : @http.Response,
-) -> Json raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Json, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -1017,9 +1047,10 @@ pub fn get_funding_json_decode_json(
 ///
 /// Decodes a successful get_funding_json response.
 pub fn get_funding_json_decode(
-  response : @http.Response,
-) -> Json raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Json, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -1042,7 +1073,8 @@ pub fn get_license_decode_json(
 ///
 /// Decodes a successful get_license response.
 pub fn get_license_decode(
-  response : @http.Response,
-) -> Json raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Json, @client.ResponseFailure] {
+  decode_response(head, body)
 }

@@ -48,7 +48,7 @@ fn run_parser_test(fields : Map[String, Json]) -> (String?, String?) raise {
     guard line is String(text) else { fail("malformed line") }
     ("Set-Cookie", text)
   })
-  jar.store(@http.Headers::from_array(lines), from)
+  jar.store(@http.Headers::of(lines), from)
   let to = match string_field(fields, "sent-to") {
     Some(target) =>
       @http.Url::parse("http://home.example.org")

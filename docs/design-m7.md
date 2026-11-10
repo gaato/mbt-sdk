@@ -1,3 +1,7 @@
+> Historical design/release record. API sketches describe the implementation
+> at that time. See [the stack migration](stack-migration.md) and
+> [current architecture](../ARCHITECTURE.md) for the current interfaces.
+
 # 設計メモ — M7: `gaato/jsonrpc` と `gaato/jsonrpc-async`(JSON-RPC 2.0 の語彙と stdio 接続)
 
 背景(2026-09-22): coding agent を外から操るプロトコルは、Codex の `codex app-server`(v2 スキーマ: client 要求 102、server 通知 82、server→client 要求 10)も Zed/JetBrains の Agent Client Protocol(ACP、protocol version 1)も **改行区切り JSON(NDJSON)の JSON-RPC 2.0 を stdio で双方向に流す** 形で共通している。両方の SDK を後で載せられるよう、まず共通の下層を切る。HTTP 層と同じく sans-IO の語彙と transport を別モジュールに分ける(import はモジュール全体に効くため)。

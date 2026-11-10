@@ -1,35 +1,43 @@
 ///|
-fn response(body : String) -> @http.Response {
-  { status: 200, headers: @http.Headers::new(), body: @utf8.encode(body), }
+fn response(body : String) -> Bytes {
+  @utf8.encode(body)
+}
+
+///|
+fn success_head() -> @http.ResponseHead {
+  { status: 200, headers: @http.Headers::empty(), }
 }
 
 ///|
 test "generated model decoders accept spec fixtures and Int64 above Int32" {
   let listed = @gen.list_models_decode(
+    success_head(),
     response(
       "{\"object\":\"list\",\"data\":[{\"id\":\"model-id-0\",\"object\":\"model\",\"created\":2147483648,\"owned_by\":\"organization-owner\"}]}",
     ),
-  )
+  ).unwrap()
   assert_eq(listed.data.length(), 1)
   assert_eq(listed.data[0].id, "model-id-0")
   assert_eq(listed.data[0].created, 2147483648L)
   assert_eq(listed.data[0].owned_by, Some("organization-owner"))
 
   let model = @gen.retrieve_model_decode(
+    success_head(),
     response(
       "{\"id\":\"gpt-4o-mini\",\"object\":\"model\",\"created\":1686935002,\"owned_by\":\"openai\"}",
     ),
-  )
+  ).unwrap()
   assert_eq(model.id, "gpt-4o-mini")
 }
 
 ///|
 test "generated embedding response decoder accepts the M3 fixture" {
   let decoded = @gen.create_embedding_decode(
+    success_head(),
     response(
       "{\"object\":\"list\",\"data\":[{\"object\":\"embedding\",\"embedding\":[0.0023064255,-0.009327292],\"index\":0}],\"model\":\"text-embedding-ada-002\",\"usage\":{\"prompt_tokens\":8,\"total_tokens\":8}}",
     ),
-  )
+  ).unwrap()
   assert_eq(decoded.model, "text-embedding-ada-002")
   assert_eq(decoded.data.length(), 1)
   assert_eq(decoded.data[0].index, 0)
@@ -76,27 +84,25 @@ test "embedding request input variants round-trip and unknown request enums surv
 }
 
 ///|
-test "missing required generated response field becomes SdkError Decode" {
-  try
-    @gen.retrieve_model_decode(
-      response("{\"created\":1,\"owned_by\":\"openai\"}"),
-    )
-  catch {
-    @runtime.Decode(message~, body~) => {
+test "missing required generated response field becomes Deserialization" {
+  let result = @gen.retrieve_model_decode(
+    success_head(),
+    response("{\"created\":1,\"owned_by\":\"openai\"}"),
+  )
+  match result {
+    Err(@client.Deserialization(_, message~, body~)) => {
       assert_eq(body, b"{\"created\":1,\"owned_by\":\"openai\"}")
       assert_true(message.contains("required だが欠落: "))
       assert_true(message.contains("id"))
     }
-    _ => fail("expected SdkError::Decode")
-  } noraise {
-    _ => fail("missing id must fail")
+    _ => fail("missing id must return a decoding failure")
   }
 }
 
 ///|
 test "retrieve model request percent-encodes every non-unreserved path byte" {
   let request = @gen.retrieve_model_request("model/id with space")
-  assert_eq(request.http_method, "GET")
+  assert_eq(request.meth, @http.Get)
   assert_eq(request.url, "/models/model%2Fid%20with%20space")
 }
 
@@ -149,7 +155,10 @@ fn responses_fixture() -> String {
 
 ///|
 test "generated Responses decoder reads OpenRouter reasoning and message items" {
-  let decoded = @gen.create_response_decode(response(responses_fixture()))
+  let decoded = @gen.create_response_decode(
+    success_head(),
+    response(responses_fixture()),
+  ).unwrap()
   assert_eq(decoded.output.length(), 2)
   match decoded.output[0] {
     @gen.Reasoning(item) =>

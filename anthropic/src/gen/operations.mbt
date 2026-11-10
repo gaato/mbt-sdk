@@ -22,11 +22,18 @@ fn parse_json_body(body : Bytes) -> Json raise {
 
 ///|
 fn[T : @json.FromJson] decode_response(
-  response : @http.Response,
-) -> T raise @runtime.SdkError {
-  @json.from_json(parse_json_body(response.body)) catch {
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[T, @client.ResponseFailure] {
+  Ok(@json.from_json(parse_json_body(body))) catch {
     error =>
-      raise @runtime.Decode(message=error.to_string(), body=response.body)
+      Err(
+        @client.Deserialization(
+          head,
+          message=error.to_string(),
+          body=body[:body.length().min(@client.max_error_body)].to_owned(),
+        ),
+      )
   }
 }
 
@@ -39,7 +46,7 @@ pub fn messages_post_request(
   anthropic_user_profile_id? : String,
   anthropic_workspace_id? : String,
 ) -> @http.Request {
-  let mut request = @http.Request::post("/v1/messages").json_body(Json(body))
+  let mut request = @http.Request::post("/v1/messages").body_json(Json(body))
   match anthropic_version {
     Some(value) =>
       request = request.header("anthropic-version", parameter_value(value))
@@ -74,9 +81,10 @@ pub fn messages_post_decode_json(
 ///
 /// Decodes a successful messages_post response.
 pub fn messages_post_decode(
-  response : @http.Response,
-) -> Message raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Message, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -140,9 +148,10 @@ pub fn models_list_decode_json(
 ///
 /// Decodes a successful models_list response.
 pub fn models_list_decode(
-  response : @http.Response,
-) -> ListResponseModelInfo raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[ListResponseModelInfo, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -182,9 +191,10 @@ pub fn models_get_decode_json(
 ///
 /// Decodes a successful models_get response.
 pub fn models_get_decode(
-  response : @http.Response,
-) -> ModelInfo raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[ModelInfo, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -196,7 +206,7 @@ pub fn messages_count_tokens_post_request(
   anthropic_user_profile_id? : String,
   anthropic_workspace_id? : String,
 ) -> @http.Request {
-  let mut request = @http.Request::post("/v1/messages/count_tokens").json_body(
+  let mut request = @http.Request::post("/v1/messages/count_tokens").body_json(
     Json(body),
   )
   match anthropic_version {
@@ -233,7 +243,8 @@ pub fn messages_count_tokens_post_decode_json(
 ///
 /// Decodes a successful messages_count_tokens_post response.
 pub fn messages_count_tokens_post_decode(
-  response : @http.Response,
-) -> CountMessageTokensResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[CountMessageTokensResponse, @client.ResponseFailure] {
+  decode_response(head, body)
 }

@@ -24,10 +24,12 @@ impl @sync.Timer for ScriptedTimer with fn within(self, milliseconds, f) {
 let embeddings_ok : String = "{\"data\":[],\"model\":\"e\",\"usage\":{\"prompt_tokens\":0,\"total_tokens\":0}}"
 
 ///|
-async fn embed(client : @openai_sdk.OpenAI) -> Unit raise @runtime.SdkError {
+async fn embed(client : @openai_sdk.OpenAI) -> Unit raise Error {
   ignore(
-    client.create_embeddings(
-      @openai_sdk.EmbeddingRequest::new(model="e", input=["x"]),
+    expect(
+      client.create_embeddings(
+        @openai_sdk.EmbeddingRequest::new(model="e", input=["x"]),
+      ),
     ),
   )
 }
@@ -43,9 +45,9 @@ fn assert_stainless_backoff(slept : Array[Int32]) -> Unit raise {
 }
 
 ///|
-async test "a POST is retried on 5xx twice with the official backoff" {
+test "a POST is retried on 5xx twice with the official backoff" {
   bounded(() => {
-    let transport = @mock.FakeTransport::new()
+    let transport = @mock.FakeBackend::new()
     transport.expect("POST", "/embeddings", json_response("{}", status=500))
     transport.expect("POST", "/embeddings", json_response(embeddings_ok))
     let clock = @mock.FakeClock::new()
@@ -54,13 +56,13 @@ async test "a POST is retried on 5xx twice with the official backoff" {
     assert_stainless_backoff(clock.slept())
     transport.assert_complete()
 
-    let failing = @mock.FakeTransport::new()
+    let failing = @mock.FakeBackend::new()
     for status in [503, 501, 599] {
       failing.expect("POST", "/embeddings", json_response("{}", status~))
     }
     let clock = @mock.FakeClock::new()
     try embed(@openai_sdk.OpenAI::new(api_key="key", failing, clock)) catch {
-      error => assert_eq(error.status(), Some(599))
+      error => assert_eq(status_of(error), Some(599))
     } noraise {
       _ => fail("the third 5xx must be raised")
     }
@@ -71,9 +73,9 @@ async test "a POST is retried on 5xx twice with the official backoff" {
 }
 
 ///|
-async test "conservative() keeps a POST from being retried on 5xx" {
+test "conservative() keeps a POST from being retried on 5xx" {
   bounded(() => {
-    let transport = @mock.FakeTransport::new()
+    let transport = @mock.FakeBackend::new()
     transport.expect("POST", "/embeddings", json_response("{}", status=500))
     let clock = @mock.FakeClock::new()
     let client = @openai_sdk.OpenAI::new(
@@ -83,7 +85,7 @@ async test "conservative() keeps a POST from being retried on 5xx" {
       retry=@runtime.RetryPolicy::conservative(),
     )
     try embed(client) catch {
-      error => assert_eq(error.status(), Some(500))
+      error => assert_eq(status_of(error), Some(500))
     } noraise {
       _ => fail("500 must be raised")
     }
@@ -93,35 +95,35 @@ async test "conservative() keeps a POST from being retried on 5xx" {
 }
 
 ///|
-async test "x-should-retry overrides the status rules" {
+test "x-should-retry overrides the status rules" {
   bounded(() => {
-    let refused = @mock.FakeTransport::new()
+    let refused = @mock.FakeBackend::new()
     refused.expect(
       "POST",
       "/embeddings",
       json_response(
         "{}",
         status=500,
-        headers=@http.Headers::from_array([("x-should-retry", "false")]),
+        headers=@http.Headers::of([("x-should-retry", "false")]),
       ),
     )
     let clock = @mock.FakeClock::new()
     try embed(@openai_sdk.OpenAI::new(api_key="key", refused, clock)) catch {
-      error => assert_eq(error.status(), Some(500))
+      error => assert_eq(status_of(error), Some(500))
     } noraise {
       _ => fail("x-should-retry: false must stop")
     }
     assert_eq(clock.slept(), [])
     refused.assert_complete()
 
-    let forced = @mock.FakeTransport::new()
+    let forced = @mock.FakeBackend::new()
     forced.expect(
       "POST",
       "/embeddings",
       json_response(
         "{}",
         status=400,
-        headers=@http.Headers::from_array([("x-should-retry", "true")]),
+        headers=@http.Headers::of([("x-should-retry", "true")]),
       ),
     )
     forced.expect("POST", "/embeddings", json_response(embeddings_ok))
@@ -133,21 +135,21 @@ async test "x-should-retry overrides the status rules" {
 }
 
 ///|
-async test "a Retry-After over two minutes is not waited for" {
+test "a Retry-After over two minutes is not waited for" {
   bounded(() => {
-    let transport = @mock.FakeTransport::new()
+    let transport = @mock.FakeBackend::new()
     transport.expect(
       "POST",
       "/embeddings",
       json_response(
         "{}",
         status=429,
-        headers=@http.Headers::from_array([("retry-after", "121")]),
+        headers=@http.Headers::of([("retry-after", "121")]),
       ),
     )
     let clock = @mock.FakeClock::new()
     try embed(@openai_sdk.OpenAI::new(api_key="key", transport, clock)) catch {
-      error => assert_eq(error.status(), Some(429))
+      error => assert_eq(status_of(error), Some(429))
     } noraise {
       _ => fail("a 121 s Retry-After must be raised")
     }
@@ -155,14 +157,14 @@ async test "a Retry-After over two minutes is not waited for" {
     transport.assert_complete()
 
     // Two minutes exactly is waited for.
-    let patient = @mock.FakeTransport::new()
+    let patient = @mock.FakeBackend::new()
     patient.expect(
       "POST",
       "/embeddings",
       json_response(
         "{}",
         status=503,
-        headers=@http.Headers::from_array([("retry-after", "120")]),
+        headers=@http.Headers::of([("retry-after", "120")]),
       ),
     )
     patient.expect("POST", "/embeddings", json_response(embeddings_ok))
@@ -174,9 +176,9 @@ async test "a Retry-After over two minutes is not waited for" {
 }
 
 ///|
-async test "a timer limits each attempt to 600 s and a timed-out POST is retried" {
+test "a timer limits each attempt to 600 s and a timed-out POST is retried" {
   bounded(() => {
-    let transport = @mock.FakeTransport::new()
+    let transport = @mock.FakeBackend::new()
     transport.expect("POST", "/embeddings", json_response(embeddings_ok))
     let timer = ScriptedTimer::{ budgets: [], expire: 1, }
     let clock = @mock.FakeClock::new()
@@ -187,7 +189,7 @@ async test "a timer limits each attempt to 600 s and a timed-out POST is retried
     transport.assert_complete()
 
     // The total limit caps an attempt's budget; timeout_ms sets it.
-    let transport = @mock.FakeTransport::new()
+    let transport = @mock.FakeBackend::new()
     transport.expect("POST", "/embeddings", json_response(embeddings_ok))
     let timer = ScriptedTimer::{ budgets: [], expire: 0, }
     embed(
@@ -200,12 +202,13 @@ async test "a timer limits each attempt to 600 s and a timed-out POST is retried
         total_timeout_ms=20000,
       ),
     )
-    assert_eq(timer.budgets, [20000])
+    // The outer call timer and inner attempt timer share the remaining budget.
+    assert_eq(timer.budgets, [20000, 20000])
     transport.assert_complete()
 
     // Every attempt out of time: the timeout is raised after two retries.
     let timer = ScriptedTimer::{ budgets: [], expire: 3, }
-    let idle = @mock.FakeTransport::new()
+    let idle = @mock.FakeBackend::new()
     try
       embed(
         @openai_sdk.OpenAI::new(
@@ -217,7 +220,7 @@ async test "a timer limits each attempt to 600 s and a timed-out POST is retried
         ),
       )
     catch {
-      @runtime.Transport(Timeout(phase=Unknown, ms=1000)) => ()
+      @http.TransportError(kind=Timeout(ms=1000), phase=Unknown, ..) => ()
       error => fail("expected the attempt timeout: " + @debug.to_string(error))
     } noraise {
       _ => fail("an attempt that never finishes must time out")

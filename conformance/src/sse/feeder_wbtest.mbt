@@ -18,7 +18,7 @@ fn render(events : Array[@sse.SseEvent]) -> Array[String] {
 ///|
 fn failed(error : Error) -> @harness.Failed {
   match error {
-    @http.HttpError::Protocol(_) => Failed("Protocol")
+    @http.TransportError(kind=TooLarge(..), ..) => Failed("Protocol")
     _ => Failed("unexpected")
   }
 }

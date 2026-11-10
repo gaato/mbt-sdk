@@ -53,7 +53,7 @@ async fn replay(raw : Bytes, client : async (Int32) -> Unit) -> Unit {
       group.spawn_bg(no_wait=true, () => {
         let (conn, _) = server.accept()
         defer conn.close()
-        ignore(conn.read_until("\r\n\r\n"))
+        ignore(conn.read_until(b"\r\n\r\n"))
         conn.write(raw)
       })
       client(server.addr.port())
@@ -62,21 +62,41 @@ async fn replay(raw : Bytes, client : async (Int32) -> Unit) -> Unit {
 }
 
 ///|
-fn transport() -> @adapter.AsyncTransport {
-  @adapter.AsyncTransport::new(
+fn transport() -> &@http.Backend {
+  @codings.Decompress::new(@backend.AsyncBackend::new())
+}
+
+///|
+async fn buffered(request : @http.Request) -> @client.Reply[Bytes] {
+  let c = @client.Client::new(
+    transport(),
+    @runtime.AsyncClock::new(),
     timeout_ms=5000,
     max_body_bytes=1024 * 1024,
-    trust_env=false,
   )
+  defer c.close()
+  let reply = c.send(
+    @client.request(request).response(@client.as_bytes().any_status()),
+  )
+  {
+    status: reply.status,
+    headers: reply.headers,
+    request: reply.request,
+    attributes: reply.attributes,
+    body: reply.body.unwrap(),
+  }
 }
 
 ///|
 fn failure(error : Error) -> String {
   match error {
-    @http.HttpError::Protocol(_) => "Protocol"
-    @http.HttpError::Network(phase~, ..) => "Network(\{Repr(phase)})"
-    @http.HttpError::Timeout(phase~, ..) => "Timeout(\{Repr(phase)})"
-    @http.HttpError::Connect(_) => "Connect"
+    @http.TransportError(kind=Protocol, ..) => "Protocol"
+    @http.TransportError(kind=TooLarge(..), ..) => "TooLarge"
+    @http.TransportError(kind=Network, phase~, ..) => "Network(\{Repr(phase)})"
+    @http.TransportError(kind=Timeout(..), phase~, ..) =>
+      "Timeout(\{Repr(phase)})"
+    @http.TransportError(kind=Connect, ..) => "Connect"
+    @http.TransportError(kind=RedirectRefused, ..) => "RedirectRefused"
     _ => "other error"
   }
 }
@@ -88,7 +108,7 @@ fn failure(error : Error) -> String {
 async fn compress_outcome(key : String, document : Bytes) -> String {
   let outcome = Ref("")
   replay(capture(key), port => {
-    let response = transport().send(
+    let response = buffered(
       @http.Request::get("http://127.0.0.1:\{port}/compress"),
     ) catch {
       error => {
@@ -135,7 +155,7 @@ async test "recorded compress responses decode as RFC 9110 and the codings defin
   // and the head. gzip-file is a download wrongly labelled Content-Encoding:
   // gzip, which is decoded as labelled; a caller that wants the file sets
   // Accept-Encoding itself, and the transport then leaves the body alone.
-  // wrong-length ends before its Content-Length; bomb passes max_body_bytes.
+  // wrong-length ends before its Content-Length (Protocol); bomb exceeds max_body_bytes (TooLarge).
   debug_inspect(
     rows,
     content=(
@@ -158,9 +178,9 @@ async test "recorded compress responses decode as RFC 9110 and the codings defin
       #|  "double-hidden: gzip bytes (269)",
       #|  "unknown-coding: the document, content-encoding badhttp",
       #|  "empty: 0 other bytes",
-      #|  "wrong-length: Network(Body)",
+      #|  "wrong-length: Protocol",
       #|  "gzip-file: the document",
-      #|  "bomb: Protocol",
+      #|  "bomb: TooLarge",
       #|]
     ),
   )
@@ -172,7 +192,7 @@ async test "recorded compress responses decode as RFC 9110 and the codings defin
 async fn cookies_outcome(flavor : String) -> String {
   let outcome = Ref("")
   replay(capture("cookies.\{flavor}"), port => {
-    let response = transport().send(
+    let response = buffered(
       @http.Request::get("http://127.0.0.1:\{port}/cookies/\{flavor}"),
     ) catch {
       error => {
@@ -232,11 +252,9 @@ async test "recorded cookies responses reach the jar as RFC 6265bis-22 stores th
   // first semicolon; Max-Age wins over a 1970 Expires; an ISO 8601 Expires
   // is ignored; 9999 is cut to 400 days; Domain=example.com and Domain=dev
   // are refused; of name-prefixes only the two valid ones stay; huge is
-  // exactly 4096 bytes of name and value. nameless keeps one of its two
-  // lines: moonbitlang/async drops the Set-Cookie without "=" (RFC 6265
-  // §5.2), which the jar would keep as a cookie without a name, and hands on
-  // the one with an empty name (see loopback/cookie_roundtrip_test.mbt in
-  // http-async).
+  // exactly 4096 bytes of name and value. The backend preserves nameless
+  // Set-Cookie lines and represents each header octet as Latin-1, so a
+  // server's UTF-8 snowman is the three header characters E2, 98 and 83.
   debug_inspect(
     rows,
     content=(
@@ -255,8 +273,8 @@ async test "recorded cookies responses reach the jar as RFC 6265bis-22 stores th
       #|  "path-prefix: badhttp_path_prefix=1 path=/cookie persistent",
       #|  "name-prefixes: __Host-badhttp_good=1 path=/ persistent secure | __Secure-badhttp_good=1 path=/cookies persistent secure",
       #|  "quoted: badhttp_quoted=\"hello world\" path=/cookies persistent | badhttp_semi=\"semi path=/cookies persistent",
-      #|  "utf8: badhttp_utf8=☃ path=/cookies persistent",
-      #|  "nameless: =badhttp_empty_name path=/cookies/echo persistent",
+      #|  "utf8: badhttp_utf8=â path=/cookies persistent",
+      #|  "nameless: =badhttp-just-a-value path=/cookies session | =badhttp_empty_name path=/cookies/echo persistent",
       #|  "huge: badhttp_huge=4084 bytes path=/cookies persistent",
       #|]
     ),
@@ -270,16 +288,21 @@ async fn sse_outcome(flavor : String) -> String {
   let events = []
   let outcome = Ref("")
   replay(capture("sse.\{flavor}"), port => {
-    let (head, stream) = transport().send_stream(
+    let backend = transport()
+    defer backend.close()
+    let response = backend.send(
       @http.Request::get("http://127.0.0.1:\{port}/sse/\{flavor}"),
+      { timeout_ms: Some(5000), body: Stream(idle_ms=Some(5000)), },
     ) catch {
       error => {
         outcome.val = failure(error)
         return
       }
     }
-    let content_type = head.headers.get("content-type").unwrap_or("none")
-    @sse.each_event(stream, event => {
+    defer response.close()
+    guard response.body is Stream(cell) else { fail("expected streaming body") }
+    let content_type = response.headers.get("content-type").unwrap_or("none")
+    @sse.SseReader::new(cell.take()).each(event => {
       let data = if event.data.length() > 24 {
         "\{event.data.length()} bytes"
       } else {
@@ -318,7 +341,7 @@ async test "recorded sse responses parse as the WHATWG event stream defines" {
       #|[
       #|  "ok: text/event-stream; charset=utf-8; tick:32 bytes tick:32 bytes tick:32 bytes tick:32 bytes tick:32 bytes",
       #|  "cut: text/event-stream; charset=utf-8; message:\"complete\"",
-      #|  "drop: text/event-stream; charset=utf-8; tick:\"{\\\"n\\\":1}\"; then Network(Body)",
+      #|  "drop: text/event-stream; charset=utf-8; tick:\"{\\\"n\\\":1}\"; then Protocol",
       #|  "crlf: text/event-stream; charset=utf-8; tick:32 bytes tick:32 bytes tick:32 bytes",
       #|  "cr: text/event-stream; charset=utf-8; tick:32 bytes tick:32 bytes tick:32 bytes",
       #|  "no-space: text/event-stream; charset=utf-8; message:\"foo\" message:\" foo\" message:\"\" message:\"\"",
@@ -343,13 +366,13 @@ fn parse_response(raw : Bytes) -> @http.Response {
   let status = @string.parse_int(lines[0][9:12].to_owned()) catch {
     _ => abort("bad status line")
   }
-  let headers = @http.Headers::new()
+  let mut headers = @http.Headers::empty()
   for line in lines[1:] {
     if line.split_once(":") is Some((name, value)) {
-      headers.append(name.to_owned(), value.trim(chars=" ").to_owned())
+      headers = headers.add(name.to_owned(), value.trim(chars=" ").to_owned())
     }
   }
-  { status, headers, body, }
+  @http.Response::new(status, headers~, body=Bytes(body))
 }
 
 ///|
@@ -362,7 +385,7 @@ async fn crosshost_outcome(start : String) -> String {
   )
   let send = fn(
     request : @http.Request,
-  ) -> @http.Response raise @http.HttpError {
+  ) -> @http.Response raise @http.TransportError {
     let carried = [
       if request.headers.contains("authorization") {
         " authorization"
@@ -376,15 +399,23 @@ async fn crosshost_outcome(start : String) -> String {
     ].join("")
     hops.push("\{request.url}\{carried}")
     guard captures.get(request.url) is Some(raw) else {
-      raise @http.HttpError::Connect("not recorded")
+      raise @http.TransportError(
+        kind=Connect,
+        phase=Dial,
+        detail="not recorded",
+      )
     }
     let response = parse_response(unhex(raw))
     jar.store(response.headers, request.url)
     response
   }
   let request = @http.Request::get(start).header("Authorization", "Bearer t")
-  let end = try @http.follow_redirects(request, r => send(r)) catch {
-    error => "refused: \{Repr(error)}"
+  let redirects = @client.FollowRedirects::new(
+    @client.from_fn((r, _) => send(r)),
+  )
+  defer redirects.close()
+  let end = try redirects.send(request, @http.SendOptions::default()) catch {
+    error => "refused: \{failure(error)}"
   } noraise {
     response => "\{response.status}"
   }
@@ -419,7 +450,7 @@ async test "recorded crosshost redirects drop credentials at the boundaries" {
       #|  "https://alt.badhttp.dev/crosshost/from-subdomain authorization -> https://badhttp.dev/crosshost/land => 200",
       #|  "https://badhttp.dev/crosshost/boomerang authorization -> https://alt.badhttp.dev/crosshost/boomerang-return -> https://badhttp.dev/crosshost/land => 200",
       #|  "http://badhttp.dev/crosshost/scheme-upgrade authorization -> https://badhttp.dev/crosshost/land authorization => 200",
-      #|  "https://badhttp.dev/crosshost/scheme-downgrade authorization => refused: Downgrade(location=\"http://badhttp.dev/crosshost/land\")",
+      #|  "https://badhttp.dev/crosshost/scheme-downgrade authorization => refused: RedirectRefused",
       #|  "https://badhttp.dev/crosshost/port-change authorization -> https://badhttp.dev:8443/crosshost/land => 200",
       #|  "https://badhttp.dev/crosshost/relative-authority authorization -> https://alt.badhttp.dev/crosshost/land => 200",
       #|  "https://badhttp.dev/crosshost/jar authorization -> https://alt.badhttp.dev/crosshost/land cookie(badhttp_domain=domain-scoped-value) => 200",

@@ -1,6 +1,6 @@
 # GitHub: retry, rate-limit and pacing behaviour
 
-Surveyed 2026-10-19. The method is in [new-sdk.md](../new-sdk.md). The design that consumes this note is [design-m10.md](../design-m10.md).
+Surveyed 2026-10-19. The method is in [new-sdk.md](../new-sdk.md).
 
 ## Sources
 
@@ -42,22 +42,22 @@ Surveyed 2026-10-19. The method is in [new-sdk.md](../new-sdk.md). The design th
 | Rate-limit retries | Retried once per request: the default handlers act only when `retryCount === 0` ("only retries once") | [`octokit.ts#L43-L44`](https://github.com/octokit/octokit.js/blob/bc34deaf357486594c41f167c05921d16e6aabe9/src/octokit.ts#L43-L44) |
 | Pacing | Writes (any method except GET/HEAD) and **every GraphQL request**: ≥ 1 s apart. Search: ≥ 2 s apart. Writes that trigger notifications: ≥ 3 s apart. At most 10 requests in flight. | groups at [`index.ts#L30-L53`](https://github.com/octokit/plugin-throttling.js/blob/eb4215edcd97f20ade800b18d964bf798e0d70b7/src/index.ts#L30-L53); classification at [`wrap-request.ts#L25-L52`](https://github.com/octokit/plugin-throttling.js/blob/eb4215edcd97f20ade800b18d964bf798e0d70b7/src/wrap-request.ts#L25-L52) |
 
-## gaato/github today (mbt-sdk `e6d31aa`)
+## Current implementation
 
-- **Retries:** `RetryPolicy::default()`: 2 retries; 5xx is retried only for idempotent methods; giving up when Retry-After is over 60 s.
-- **`GitHubRetry`** (`github/src/retry.mbt:15`) adds secondary-limit handling. Detection is `is_secondary_rate_limit`, `errors.mbt:78`. The wait is Retry-After, or 60 s doubling. The doubled wait is checked against the 60 s cap (`retry.mbt:38`), so a second secondary-limit retry without Retry-After never happens.
-- **Buckets:** `rate_limit_bucket` (`call.mbt:52`) separates core, search and graphql. The `WindowLimiter` from `default_limiter` (`client.mbt:148`) has no gate and no pacing.
-- **GraphQL:** a 200 that carries `errors` becomes `Decode` after `send` has returned (`graphql.mbt:212`). That is outside the retry loop, so `RATE_LIMITED` and secondary limits reported in a 200 are never retried.
+GitHubRetry in github/src/retry.mbt inspects typed mttp AttemptResult values.
+The default is three conservative retries, with the SDK's exception allowing
+429 for every method (mttp's generic conservative policy permits only
+idempotent requests). Secondary limits wait Retry-After
+or at least 60 seconds with exponential increase. Primary limits retry once,
+one second after the reset. GraphQL transient failures retry only queries.
+Both rate-limited and GraphQL failures retain their actual response head.
 
-## Divergences and what we adopt
+The mttp WindowLimiter shares windows by x-ratelimit-resource. Writes and
+GraphQL use a one-second group, notification writes three seconds, searches
+two seconds. Optional gates serialize groups. A reset and pacing deadline
+may be combined into one wait.
 
-| # | Divergence | Label | Adopt |
-|---|---|---|---|
-| 1 | Second secondary-limit wait (120 s) exceeds our 60 s cap, so we give up | A ("at least one minute", "exponentially increasing") | Secondary-limit branch ignores the generic cap. It waits Retry-After, or else `60 s << n`, bounded by the remaining total time and the retry count. |
-| 2 | GraphQL `RATE_LIMITED` and secondary limits sent in a 200 are not retried | A (GraphQL page), B | `accept` hook in the attempt loop turns them into retryable errors |
-| 3 | No pacing or concurrency control | A (serial requests; ≥ 1 s between mutative requests), B (write 1 s, search 2 s, notifications 3 s) | `WindowLimiter` `pace` covers write and graphql (1 s), search (2 s) and notifications (3 s). An optional caller-supplied `gate` makes requests serial. Notifications share the write group, so a notification write also holds the next plain write 3 s (stricter than octokit's separate queue, and it meets both of its limits). The notification paths are octokit's `src/generated/triggers-notification-paths.ts` at `eb4215e`, matched by whole segments rather than its looser regular expression. |
-| 4 | Retries: 2 vs 3 | B | 3 |
-| 5 | GraphQL "Something went wrong while executing your query" is not retried | B | Retry it **only for documents that are not mutations**. A document counts as a mutation when the keyword `mutation` appears outside every brace, parenthesis and bracket (comments and strings skipped), so a mutation after a fragment, or picked by `operationName` from several operations, is not retried either. The message is matched in any entry of `errors`. |
-| 6 | octokit retries POST on 5xx | B, but it risks duplicate writes and GitHub has no idempotency key | **Not adopted.** 5xx is retried for idempotent methods only. This is a user decision recorded in design-m10. |
-| 7 | octokit retries almost every 4xx and ignores Retry-After | B contradicts A ("should not retry … until after that many seconds") | **Not adopted.** A wins. |
-| 8 | Primary limit: octokit waits for the reset after a failure and retries once; we only paused the next request before sending, and raised the failure | B (retry once after the reset), consistent with A ("should not retry … until after the time specified by the `x-ratelimit-reset` header") | Keep the limiter, and also retry a primary-limit `403`/`429` (or GraphQL `RATE_LIMITED`) **once**, for any method, after `ceil((reset − now) / 1 s) + 1 s` as octokit computes it. A second one is raised. Without a readable `x-ratelimit-reset` it is raised, since there is no reset to wait for. Bounded by the remaining total time. |
+Intentional divergence from octokit: sent writes do not retry arbitrary 5xx
+or almost every 4xx, because GitHub provides no idempotency key and repeated
+writes can create duplicate effects. Explicit primary/secondary rejection
+can retry any method. Header delays take precedence over backoff.

@@ -2,8 +2,8 @@
 fn json_response(
   body : String,
   status~ : Int32 = 200,
-  headers~ : @http.Headers = @http.Headers::new(),
-) -> @http.Response {
+  headers~ : @http.Headers = @http.Headers::empty(),
+) -> @mock.Buffered {
   { status, headers, body: @utf8.encode(body), }
 }
 
@@ -29,8 +29,8 @@ fn response_fixture(
 }
 
 ///|
-async fn bounded(f : async () -> Unit) -> Unit {
-  @async.with_timeout(5000, f)
+fn bounded(f : async () -> Unit) -> Unit raise {
+  @driver.run_sync(f)
 }
 
 ///|
@@ -39,9 +39,9 @@ fn assert_auth_header(request : @http.Request) -> Unit raise {
 }
 
 ///|
-async test "OpenAI operations send exact requests and decode spec examples" {
+test "OpenAI operations send exact requests and decode spec examples" {
   bounded(() => {
-    let transport = @mock.FakeTransport::new()
+    let transport = @mock.FakeBackend::new()
     transport.expect(
       "GET",
       "/v1/models",
@@ -85,7 +85,7 @@ async test "OpenAI operations send exact requests and decode spec examples" {
       project="proj-test",
     )
 
-    let models = client.list_models()
+    let models = expect(client.list_models())
     assert_eq(models, [
       {
         id: "model-id-0",
@@ -93,18 +93,20 @@ async test "OpenAI operations send exact requests and decode spec examples" {
         owned_by: Some("organization-owner"),
       },
     ])
-    assert_eq(client.retrieve_model("gpt-4o-mini"), {
+    assert_eq(expect(client.retrieve_model("gpt-4o-mini")), {
       id: "gpt-4o-mini",
       created: Some(1686935002L),
       owned_by: Some("openai"),
     })
     assert_eq(
-      client.create_embeddings(
-        @openai_sdk.EmbeddingRequest::new(
-          model="text-embedding-ada-002",
-          input=["The food was delicious"],
-          dimensions=2,
-          user="user-1234",
+      expect(
+        client.create_embeddings(
+          @openai_sdk.EmbeddingRequest::new(
+            model="text-embedding-ada-002",
+            input=["The food was delicious"],
+            dimensions=2,
+            user="user-1234",
+          ),
         ),
       ),
       {
@@ -114,15 +116,17 @@ async test "OpenAI operations send exact requests and decode spec examples" {
         total_tokens: 8,
       },
     )
-    let response = client.create_response(
-      @openai_sdk.ResponseRequest::new(
-        model="gpt-4.1",
-        input="Tell me a short story.",
-        instructions="Three sentences.",
-        max_output_tokens=100,
-        temperature=0.5,
-        previous_response_id="resp_previous",
-        extra={ "metadata": { "source": "test" } },
+    let response = expect(
+      client.create_response(
+        @openai_sdk.ResponseRequest::new(
+          model="gpt-4.1",
+          input="Tell me a short story.",
+          instructions="Three sentences.",
+          max_output_tokens=100,
+          temperature=0.5,
+          previous_response_id="resp_previous",
+          extra={ "metadata": { "source": "test" } },
+        ),
       ),
     )
     assert_eq(response.id, "resp_67ccd2")
@@ -140,11 +144,11 @@ async test "OpenAI operations send exact requests and decode spec examples" {
       assert_eq(request.headers.get("openai-organization"), Some("org-test"))
       assert_eq(request.headers.get("openai-project"), Some("proj-test"))
     }
-    assert_eq(sent[0].http_method, "GET")
+    assert_eq(sent[0].meth.to_string(), "GET")
     assert_eq(sent[0].url, "https://api.openai.com/v1/models")
-    assert_eq(sent[0].body, Bytes(b""))
+    assert_eq(sent[0].body, Empty)
     assert_eq(sent[0].headers.get("content-type"), None)
-    assert_eq(sent[1].http_method, "GET")
+    assert_eq(sent[1].meth.to_string(), "GET")
     assert_eq(sent[1].url, "https://api.openai.com/v1/models/gpt-4o-mini")
     assert_eq(@json.parse(@utf8.decode(sent[2].body.as_bytes().unwrap())), {
       "input": ["The food was delicious"],
@@ -184,9 +188,9 @@ fn chat_fixture(
 }
 
 ///|
-async test "chat completions send exact JSON and retain nullable and unknown response values" {
+test "chat completions send exact JSON and retain nullable and unknown response values" {
   bounded(() => {
-    let transport = @mock.FakeTransport::new()
+    let transport = @mock.FakeBackend::new()
     transport.expect(
       "POST",
       "/v1/chat/completions",
@@ -213,16 +217,18 @@ async test "chat completions send exact JSON and retain nullable and unknown res
       transport,
       @mock.FakeClock::new(),
     )
-    let normal = client.chat_completion(
-      @openai_sdk.ChatRequest::new(
-        model="gpt-chat",
-        messages=[
-          @openai_sdk.ChatMessage::system("Be concise."),
-          @openai_sdk.ChatMessage::user("Hello"),
-        ],
-        max_tokens=16,
-        temperature=0.25,
-        extra={ "seed": 7 },
+    let normal = expect(
+      client.chat_completion(
+        @openai_sdk.ChatRequest::new(
+          model="gpt-chat",
+          messages=[
+            @openai_sdk.ChatMessage::system("Be concise."),
+            @openai_sdk.ChatMessage::user("Hello"),
+          ],
+          max_tokens=16,
+          temperature=0.25,
+          extra={ "seed": 7 },
+        ),
       ),
     )
     assert_eq(normal.id, "chatcmpl-1")
@@ -243,17 +249,21 @@ async test "chat completions send exact JSON and retain nullable and unknown res
         ),
       ),
     )
-    let null_content = client.chat_completion(
-      @openai_sdk.ChatRequest::new(model="gpt-chat", messages=[
-        @openai_sdk.ChatMessage::user("Hello"),
-      ]),
+    let null_content = expect(
+      client.chat_completion(
+        @openai_sdk.ChatRequest::new(model="gpt-chat", messages=[
+          @openai_sdk.ChatMessage::user("Hello"),
+        ]),
+      ),
     )
     assert_eq(null_content.text, "")
     assert_eq(null_content.finish_reason, Some(@openai_sdk.Length))
-    let unknown = client.chat_completion(
-      @openai_sdk.ChatRequest::new(model="gpt-chat", messages=[
-        @openai_sdk.ChatMessage::user("Hello"),
-      ]),
+    let unknown = expect(
+      client.chat_completion(
+        @openai_sdk.ChatRequest::new(model="gpt-chat", messages=[
+          @openai_sdk.ChatMessage::user("Hello"),
+        ]),
+      ),
     )
     assert_eq(unknown.finish_reason, Some(@openai_sdk.Unknown("future_reason")))
     let sent = transport.sent()
@@ -273,7 +283,7 @@ async test "chat completions send exact JSON and retain nullable and unknown res
 }
 
 ///|
-async test "chat completion streaming handles split reasoning usage and DONE" {
+test "chat completion streaming handles split reasoning usage and DONE" {
   bounded(() => {
     let chunk1 = "{\"id\":\"chatcmpl-1\",\"object\":\"chat.completion.chunk\",\"created\":1750000000,\"model\":\"gpt-chat\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"Hel\",\"reasoning_content\":\"Think\"},\"finish_reason\":null}]}"
     let chunk2 = "{\"id\":\"chatcmpl-1\",\"object\":\"chat.completion.chunk\",\"created\":1750000000,\"model\":\"gpt-chat\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning\":\" more\"},\"finish_reason\":null}]}"
@@ -288,11 +298,11 @@ async test "chat completion streaming handles split reasoning usage and DONE" {
       "\n\ndata: " +
       usage +
       "\n\ndata: [DONE]\n\ndata: not-json\n\n"
-    let transport = @mock.FakeTransport::new()
+    let transport = @mock.FakeBackend::new()
     transport.expect_stream(
       "POST",
       "/chat/completions",
-      { status: 200, headers: @http.Headers::new(), },
+      { status: 200, headers: @http.Headers::empty(), },
       split_chunks(sse, [1, 5, 17, 61, 157, 311]),
     )
     let client = @openai_sdk.OpenAI::from_client(
@@ -303,11 +313,13 @@ async test "chat completion streaming handles split reasoning usage and DONE" {
       ),
     )
     let events : Array[@openai_sdk.ChatEvent] = []
-    client.stream_chat_completion(
-      @openai_sdk.ChatRequest::new(model="gpt-chat", messages=[
-        @openai_sdk.ChatMessage::user("Hello"),
-      ]),
-      event => events.push(event),
+    expect(
+      client.stream_chat_completion(
+        @openai_sdk.ChatRequest::new(model="gpt-chat", messages=[
+          @openai_sdk.ChatMessage::user("Hello"),
+        ]),
+        event => events.push(event),
+      ),
     )
     assert_eq(events, [
       @openai_sdk.Delta("Hel"),
@@ -331,7 +343,7 @@ async test "chat completion streaming handles split reasoning usage and DONE" {
 }
 
 ///|
-async test "tool calls decode from OpenAI and Ollama fixtures and stream in wire order" {
+test "tool calls decode from OpenAI and Ollama fixtures and stream in wire order" {
   bounded(() => {
     let documented =
       #|{"id":"chatcmpl-tool","object":"chat.completion","created":1750000000,"model":"gpt-chat","choices":[{"index":0,"message":{"role":"assistant","content":null,"refusal":null,"tool_calls":[{"id":"call_1","type":"function","function":{"name":"get_weather","arguments":"{\"city\":\"Tokyo\"}"}}]},"finish_reason":"tool_calls","logprobs":null}],"usage":null}
@@ -351,13 +363,13 @@ async test "tool calls decode from OpenAI and Ollama fixtures and stream in wire
     let finished =
       #|{"id":"chatcmpl-stream","object":"chat.completion.chunk","created":1750000000,"model":"gpt-chat","choices":[{"index":0,"delta":{},"finish_reason":"tool_calls"}]}
       #|
-    let transport = @mock.FakeTransport::new()
+    let transport = @mock.FakeBackend::new()
     transport.expect("POST", "/chat/completions", json_response(documented))
     transport.expect("POST", "/chat/completions", json_response(ollama))
     transport.expect_stream(
       "POST",
       "/chat/completions",
-      { status: 200, headers: @http.Headers::new(), },
+      { status: 200, headers: @http.Headers::empty(), },
       split_chunks(
         "data: " +
         chunk1 +
@@ -382,18 +394,20 @@ async test "tool calls decode from OpenAI and Ollama fixtures and stream in wire
       "type": "object",
       "properties": { "city": { "type": "string" } },
     }
-    let documented_response = client.chat_completion(
-      @openai_sdk.ChatRequest::new(
-        model="gpt-chat",
-        messages=[@openai_sdk.ChatMessage::user("weather")],
-        tools=[
-          @openai_sdk.ToolDef::new(
-            name="get_weather",
-            parameters=schema,
-            description="Get weather",
-          ),
-        ],
-        tool_choice="auto",
+    let documented_response = expect(
+      client.chat_completion(
+        @openai_sdk.ChatRequest::new(
+          model="gpt-chat",
+          messages=[@openai_sdk.ChatMessage::user("weather")],
+          tools=[
+            @openai_sdk.ToolDef::new(
+              name="get_weather",
+              parameters=schema,
+              description="Get weather",
+            ),
+          ],
+          tool_choice="auto",
+        ),
       ),
     )
     assert_eq(documented_response.text, "")
@@ -404,26 +418,30 @@ async test "tool calls decode from OpenAI and Ollama fixtures and stream in wire
     assert_eq(documented_response.tool_calls[0].arguments_json(), {
       "city": "Tokyo",
     })
-    let ollama_response = client.chat_completion(
-      @openai_sdk.ChatRequest::new(model="qwen", messages=[
-        @openai_sdk.ChatMessage::user("weather"),
-      ]),
+    let ollama_response = expect(
+      client.chat_completion(
+        @openai_sdk.ChatRequest::new(model="qwen", messages=[
+          @openai_sdk.ChatMessage::user("weather"),
+        ]),
+      ),
     )
     assert_eq(ollama_response.tool_calls[0].id, "call_ollama")
     assert_eq(ollama_response.tool_calls[0].name, "get_weather")
 
     let events : Array[@openai_sdk.ChatEvent] = []
     let accumulator = @openai_sdk.ToolCallAccumulator::new()
-    client.stream_chat_completion(
-      @openai_sdk.ChatRequest::new(model="gpt-chat", messages=[
-        @openai_sdk.ChatMessage::user("weather"),
-      ]),
-      event => {
-        events.push(event)
-        if event is @openai_sdk.ToolCallDelta(index~, id~, name~, arguments~) {
-          accumulator.feed(index~, id?, name?, arguments~)
-        }
-      },
+    expect(
+      client.stream_chat_completion(
+        @openai_sdk.ChatRequest::new(model="gpt-chat", messages=[
+          @openai_sdk.ChatMessage::user("weather"),
+        ]),
+        event => {
+          events.push(event)
+          if event is @openai_sdk.ToolCallDelta(index~, id~, name~, arguments~) {
+            accumulator.feed(index~, id?, name?, arguments~)
+          }
+        },
+      ),
     )
     assert_eq(events, [
       @openai_sdk.ToolCallDelta(
@@ -480,6 +498,7 @@ impl @runtime.RateLimiter for RecordingLimiter with fn acquire(
 ) {
   ignore(global_exempt)
   self.acquired.push(bucket)
+  @runtime.Admission::new(bucket, sequence=self.acquired.length().to_int64())
 }
 
 ///|
@@ -491,13 +510,13 @@ impl @runtime.RateLimiter for RecordingLimiter with fn release(
 ) {
   ignore(status)
   ignore(headers)
-  self.observed.push(bucket)
+  self.observed.push(bucket.bucket())
 }
 
 ///|
-async test "OpenAI assigns the contract bucket to every operation" {
+test "OpenAI assigns the contract bucket to every operation" {
   bounded(() => {
-    let transport = @mock.FakeTransport::new()
+    let transport = @mock.FakeBackend::new()
     transport.expect("GET", "/models", json_response("{\"data\":[]}"))
     transport.expect(
       "GET",
@@ -524,13 +543,13 @@ async test "OpenAI assigns the contract bucket to every operation" {
     transport.expect_stream(
       "POST",
       "/responses",
-      { status: 200, headers: @http.Headers::new(), },
+      { status: 200, headers: @http.Headers::empty(), },
       [b"data: [DONE]\n\n"],
     )
     transport.expect_stream(
       "POST",
       "/chat/completions",
-      { status: 200, headers: @http.Headers::new(), },
+      { status: 200, headers: @http.Headers::empty(), },
       [b"data: [DONE]\n\n"],
     )
     let limiter = RecordingLimiter::{ acquired: [], observed: [], }
@@ -542,41 +561,51 @@ async test "OpenAI assigns the contract bucket to every operation" {
       limiter~,
     )
     let client = @openai_sdk.OpenAI::from_client(runtime)
-    ignore(client.list_models())
-    ignore(client.retrieve_model("m"))
+    ignore(expect(client.list_models()))
+    ignore(expect(client.retrieve_model("m")))
     ignore(
-      client.create_embeddings(
-        @openai_sdk.EmbeddingRequest::new(model="e", input=[]),
+      expect(
+        client.create_embeddings(
+          @openai_sdk.EmbeddingRequest::new(model="e", input=[]),
+        ),
       ),
     )
     ignore(
-      client.create_response(
+      expect(
+        client.create_response(
+          @openai_sdk.ResponseRequest::new(model="g", input="i"),
+        ),
+      ),
+    )
+    ignore(
+      expect(
+        client.chat_completion(
+          @openai_sdk.ChatRequest::new(model="g", messages=[
+            @openai_sdk.ChatMessage::user("i"),
+          ]),
+        ),
+      ),
+    )
+    expect(
+      client.stream_response(
         @openai_sdk.ResponseRequest::new(model="g", input="i"),
+        _ => (),
       ),
     )
-    ignore(
-      client.chat_completion(
+    expect(
+      client.stream_chat_completion(
         @openai_sdk.ChatRequest::new(model="g", messages=[
           @openai_sdk.ChatMessage::user("i"),
         ]),
+        _ => (),
       ),
-    )
-    client.stream_response(
-      @openai_sdk.ResponseRequest::new(model="g", input="i"),
-      _ => (),
-    )
-    client.stream_chat_completion(
-      @openai_sdk.ChatRequest::new(model="g", messages=[
-        @openai_sdk.ChatMessage::user("i"),
-      ]),
-      _ => (),
     )
     assert_eq(limiter.acquired, [
       "models", "models", "embeddings", "responses", "chat", "responses", "chat",
     ])
     assert_eq(limiter.observed, limiter.acquired)
-    limiter.acquire("direct-check", global_exempt=false)
-    limiter.release("direct-check", status=200, headers=@http.Headers::new())
+    let admission = limiter.acquire("direct-check", global_exempt=false)
+    limiter.release(admission, status=200, headers=@http.Headers::empty())
     assert_eq(limiter.acquired.last(), Some("direct-check"))
     assert_eq(limiter.observed.last(), Some("direct-check"))
     assert_eq(transport.streams_closed(), 2)
@@ -585,9 +614,9 @@ async test "OpenAI assigns the contract bucket to every operation" {
 }
 
 ///|
-async test "HTTP errors expose API bodies and a 429 retries before success" {
+test "HTTP errors expose API bodies and a 429 retries before success" {
   bounded(() => {
-    let failures = @mock.FakeTransport::new()
+    let failures = @mock.FakeBackend::new()
     failures.expect(
       "GET",
       "/models",
@@ -610,10 +639,10 @@ async test "HTTP errors expose API bodies and a 429 retries before success" {
       @mock.FakeClock::new(),
       retry=@runtime.RetryPolicy::none(),
     )
-    try no_retry.list_models() catch {
+    try expect(no_retry.list_models()) catch {
       error =>
         assert_eq(
-          @openai_sdk.api_error(error),
+          api_error(error),
           Some({
             message: "bad key",
             type_: Some("invalid_request_error"),
@@ -625,13 +654,15 @@ async test "HTTP errors expose API bodies and a 429 retries before success" {
       _ => fail("401 must fail")
     }
     try
-      no_retry.create_embeddings(
-        @openai_sdk.EmbeddingRequest::new(model="e", input=["x"]),
+      expect(
+        no_retry.create_embeddings(
+          @openai_sdk.EmbeddingRequest::new(model="e", input=["x"]),
+        ),
       )
     catch {
       error =>
         assert_eq(
-          @openai_sdk.api_error(error),
+          api_error(error),
           Some({
             message: "slow down",
             type_: Some("rate_limit_error"),
@@ -644,14 +675,14 @@ async test "HTTP errors expose API bodies and a 429 retries before success" {
     }
     failures.assert_complete()
 
-    let retrying = @mock.FakeTransport::new()
+    let retrying = @mock.FakeBackend::new()
     retrying.expect(
       "POST",
       "/embeddings",
       json_response(
         "{\"error\":{\"message\":\"slow down\"}}",
         status=429,
-        headers=@http.Headers::from_array([("retry-after", "0.25")]),
+        headers=@http.Headers::of([("retry-after", "0.25")]),
       ),
     )
     retrying.expect(
@@ -664,8 +695,10 @@ async test "HTTP errors expose API bodies and a 429 retries before success" {
     let clock = @mock.FakeClock::new()
     let client = @openai_sdk.OpenAI::new(api_key="key", retrying, clock)
     ignore(
-      client.create_embeddings(
-        @openai_sdk.EmbeddingRequest::new(model="e", input=["x"]),
+      expect(
+        client.create_embeddings(
+          @openai_sdk.EmbeddingRequest::new(model="e", input=["x"]),
+        ),
       ),
     )
     assert_eq(clock.slept(), [250])
@@ -690,7 +723,7 @@ fn split_chunks(text : String, ends : Array[Int32]) -> Array[Bytes] {
 }
 
 ///|
-async test "streaming decodes spec events across chunks and stops at DONE" {
+test "streaming decodes spec events across chunks and stops at DONE" {
   bounded(() => {
     let created = "{\"type\":\"response.created\",\"response\":" +
       response_fixture("resp_123", "in_progress", "gpt-4o", "[]") +
@@ -717,11 +750,11 @@ async test "streaming decodes spec events across chunks and stops at DONE" {
       "\n\ndata: " +
       completed +
       "\n\ndata: [DONE]\n\ndata: not-json\n\n"
-    let transport = @mock.FakeTransport::new()
+    let transport = @mock.FakeBackend::new()
     transport.expect_stream(
       "POST",
       "/responses",
-      { status: 200, headers: @http.Headers::new(), },
+      { status: 200, headers: @http.Headers::empty(), },
       split_chunks(sse, [1, 7, 19, 43, 101, 211]),
     )
     let client = @openai_sdk.OpenAI::new(
@@ -730,9 +763,11 @@ async test "streaming decodes spec events across chunks and stops at DONE" {
       @mock.FakeClock::new(),
     )
     let events : Array[@openai_sdk.ResponseEvent] = []
-    client.stream_response(
-      @openai_sdk.ResponseRequest::new(model="gpt-4o", input="story"),
-      event => events.push(event),
+    expect(
+      client.stream_response(
+        @openai_sdk.ResponseRequest::new(model="gpt-4o", input="story"),
+        event => events.push(event),
+      ),
     )
     assert_eq(events.length(), 6)
     guard events[0] is @openai_sdk.Created(response) else {
@@ -781,16 +816,16 @@ priv suberror CallbackFailure {
 }
 
 ///|
-async test "streaming closes on callback and decode errors" {
+test "streaming closes on callback and decode errors" {
   bounded(() => {
     let created = "{\"type\":\"response.created\",\"response\":" +
       response_fixture("r", "in_progress", "g", "[]") +
       "}"
-    let callback_transport = @mock.FakeTransport::new()
+    let callback_transport = @mock.FakeBackend::new()
     callback_transport.expect_stream(
       "POST",
       "/responses",
-      { status: 200, headers: @http.Headers::new(), },
+      { status: 200, headers: @http.Headers::empty(), },
       [@utf8.encode("data: " + created + "\n\n")],
     )
     let callback_client = @openai_sdk.OpenAI::new(
@@ -799,9 +834,11 @@ async test "streaming closes on callback and decode errors" {
       @mock.FakeClock::new(),
     )
     try
-      callback_client.stream_response(
-        @openai_sdk.ResponseRequest::new(model="g", input="i"),
-        _ => raise CallbackFailure,
+      expect(
+        callback_client.stream_response(
+          @openai_sdk.ResponseRequest::new(model="g", input="i"),
+          _ => raise CallbackFailure,
+        ),
       )
     catch {
       CallbackFailure => ()
@@ -812,11 +849,11 @@ async test "streaming closes on callback and decode errors" {
     assert_eq(callback_transport.streams_closed(), 1)
     callback_transport.assert_complete()
 
-    let decode_transport = @mock.FakeTransport::new()
+    let decode_transport = @mock.FakeBackend::new()
     decode_transport.expect_stream(
       "POST",
       "/responses",
-      { status: 200, headers: @http.Headers::new(), },
+      { status: 200, headers: @http.Headers::empty(), },
       [
         b"data: {\"type\":\"response.output_text.delta\",\"delta\":\"missing generated fields\"}\n\n",
       ],
@@ -827,14 +864,19 @@ async test "streaming closes on callback and decode errors" {
       @mock.FakeClock::new(),
     )
     try
-      decode_client.stream_response(
-        @openai_sdk.ResponseRequest::new(model="g", input="i"),
-        _ => (),
+      expect(
+        decode_client.stream_response(
+          @openai_sdk.ResponseRequest::new(model="g", input="i"),
+          _ => (),
+        ),
       )
     catch {
-      @runtime.Decode(
-        body=b"{\"type\":\"response.output_text.delta\",\"delta\":\"missing generated fields\"}",
-        ..
+      TestResponseFailure(
+        @runtime.Deserialization(
+          _,
+          body=b"{\"type\":\"response.output_text.delta\",\"delta\":\"missing generated fields\"}",
+          ..
+        )
       ) => ()
       _ => fail("invalid generated event payload must become Decode")
     } noraise {
@@ -846,9 +888,9 @@ async test "streaming closes on callback and decode errors" {
 }
 
 ///|
-async test "missing required fields decode and extra collisions send nothing" {
+test "missing required fields decode and extra collisions send nothing" {
   bounded(() => {
-    let missing = @mock.FakeTransport::new()
+    let missing = @mock.FakeBackend::new()
     missing.expect(
       "POST",
       "/responses",
@@ -860,36 +902,42 @@ async test "missing required fields decode and extra collisions send nothing" {
       @mock.FakeClock::new(),
     )
     try
-      client.create_response(
-        @openai_sdk.ResponseRequest::new(model="g", input="i"),
+      expect(
+        client.create_response(
+          @openai_sdk.ResponseRequest::new(model="g", input="i"),
+        ),
       )
     catch {
-      @runtime.Decode(body~, ..) => assert_true(body.length() > 0)
+      TestResponseFailure(@runtime.Deserialization(_, body~, ..)) =>
+        assert_true(body.length() > 0)
       _ => fail("missing id must become Decode")
     } noraise {
       _ => fail("missing id must fail")
     }
     missing.assert_complete()
 
-    let collision_transport = @mock.FakeTransport::new()
+    let collision_transport = @mock.FakeBackend::new()
     let collision_client = @openai_sdk.OpenAI::new(
       api_key="key",
       collision_transport,
       @mock.FakeClock::new(),
     )
     try
-      collision_client.create_response(
-        @openai_sdk.ResponseRequest::new(model="g", input="i", extra={
-          "stream": false,
-        }),
+      expect(
+        collision_client.create_response(
+          @openai_sdk.ResponseRequest::new(model="g", input="i", extra={
+            "stream": false,
+          }),
+        ),
       )
     catch {
-      @runtime.Config(message) => assert_true(message.contains("stream"))
+      @runtime.InvalidRequest(message~) =>
+        assert_true(message.contains("stream"))
       _ => fail("collision must become Config")
     } noraise {
       _ => fail("collision must fail")
     }
-    assert_eq(collision_transport.sent(), [])
+    assert_eq(collision_transport.sent().length(), 0)
     collision_transport.assert_complete()
   })
 }
@@ -899,7 +947,7 @@ test "OpenAI Debug never contains the API key" {
   let key = "sk-runtime-test-secret"
   let client = @openai_sdk.OpenAI::new(
     api_key=key,
-    @mock.FakeTransport::new(),
+    @mock.FakeBackend::new(),
     @mock.FakeClock::new(),
   )
   let representation = @debug.Repr(client).to_string()

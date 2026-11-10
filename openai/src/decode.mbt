@@ -87,21 +87,17 @@ fn chat_stream_finish_reason(
 
 ///|
 fn decode_chat_completion(
-  response : @http.Response,
-) -> ChatCompletion raise @runtime.SdkError {
-  let raw = response.json() catch {
-    error =>
-      raise @runtime.Decode(message=error.to_string(), body=response.body)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> ChatCompletion raise DecodeError {
+  let raw = parse_json_body(body) catch {
+    error => raise decode_error(head, message=error.to_string(), body~)
   }
   let generated = @gen.create_chat_completion_decode_json(raw) catch {
-    error =>
-      raise @runtime.Decode(message=error.to_string(), body=response.body)
+    error => raise decode_error(head, message=error.to_string(), body~)
   }
   guard generated.choices.get(0) is Some(choice) else {
-    raise @runtime.Decode(
-      message="chat completion has no choices",
-      body=response.body,
-    )
+    raise decode_error(head, message="chat completion has no choices", body~)
   }
   {
     id: generated.id,
@@ -282,19 +278,17 @@ impl @json.FromJson for ApiErrorEnvelopeJson with fn from_json(value, path) {
 
 ///|
 fn decode_response(
-  response : @http.Response,
-) -> Response raise @runtime.SdkError {
-  let raw = response.json() catch {
-    error =>
-      raise @runtime.Decode(message=error.to_string(), body=response.body)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Response raise DecodeError {
+  let raw = parse_json_body(body) catch {
+    error => raise decode_error(head, message=error.to_string(), body~)
   }
   let generated = @gen.create_response_decode_json(raw) catch {
-    error =>
-      raise @runtime.Decode(message=error.to_string(), body=response.body)
+    error => raise decode_error(head, message=error.to_string(), body~)
   }
   response_from_generated(generated, raw) catch {
-    error =>
-      raise @runtime.Decode(message=error.to_string(), body=response.body)
+    error => raise decode_error(head, message=error.to_string(), body~)
   }
 }
 
@@ -370,9 +364,9 @@ fn decode_api_error_body(body : Bytes) -> ApiErrorBody raise {
 ///|
 /// Extracts a standard OpenAI error body from an HTTP status failure.
 /// Returns None for transport, decode, configuration, and malformed error bodies.
-pub fn api_error(error : @runtime.SdkError) -> ApiErrorBody? {
+pub fn api_error(error : OpenAIFailure) -> ApiErrorBody? {
   let body = match error {
-    @runtime.Status(body~, ..) | @runtime.RateLimited(body~, ..) => body
+    Response(@client.UnexpectedStatus(_, body~)) => body
     _ => return None
   }
   try decode_api_error_body(body) catch {

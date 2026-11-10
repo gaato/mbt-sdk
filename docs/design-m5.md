@@ -1,3 +1,7 @@
+> Historical design/release record. API sketches describe the implementation
+> at that time. See [the stack migration](stack-migration.md) and
+> [current architecture](../ARCHITECTURE.md) for the current interfaces.
+
 # 設計メモ — M5: 2 本目の SDK `gaato/anthropic` と実 API テスト
 
 目的は 2 つ。(1) `gaato/http` + `gaato/sdk-runtime` が 1 本目(OpenAI)に合わせすぎていないかを、形の違う 2 本目で確かめる。(2) 実際の API に対して `gaato/openai` と `gaato/anthropic` を動かす。

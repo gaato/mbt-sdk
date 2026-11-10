@@ -22,11 +22,18 @@ fn parse_json_body(body : Bytes) -> Json raise {
 
 ///|
 fn[T : @json.FromJson] decode_response(
-  response : @http.Response,
-) -> T raise @runtime.SdkError {
-  @json.from_json(parse_json_body(response.body)) catch {
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[T, @client.ResponseFailure] {
+  Ok(@json.from_json(parse_json_body(body))) catch {
     error =>
-      raise @runtime.Decode(message=error.to_string(), body=response.body)
+      Err(
+        @client.Deserialization(
+          head,
+          message=error.to_string(),
+          body=body[:body.length().min(@client.max_error_body)].to_owned(),
+        ),
+      )
   }
 }
 
@@ -36,7 +43,7 @@ fn[T : @json.FromJson] decode_response(
 pub fn create_chat_completion_request(
   body : CreateChatCompletionRequest,
 ) -> @http.Request {
-  @http.Request::post("/chat/completions").json_body(Json(body))
+  @http.Request::post("/chat/completions").body_json(Json(body))
 }
 
 ///|
@@ -52,16 +59,17 @@ pub fn create_chat_completion_decode_json(
 ///
 /// Decodes a successful createChatCompletion response.
 pub fn create_chat_completion_decode(
-  response : @http.Response,
-) -> CreateChatCompletionResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[CreateChatCompletionResponse, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
 ///
 /// Creates an embedding vector representing the input text.
 pub fn create_embedding_request(body : CreateEmbeddingRequest) -> @http.Request {
-  @http.Request::post("/embeddings").json_body(Json(body))
+  @http.Request::post("/embeddings").body_json(Json(body))
 }
 
 ///|
@@ -77,9 +85,10 @@ pub fn create_embedding_decode_json(
 ///
 /// Decodes a successful createEmbedding response.
 pub fn create_embedding_decode(
-  response : @http.Response,
-) -> CreateEmbeddingResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[CreateEmbeddingResponse, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -102,9 +111,10 @@ pub fn list_models_decode_json(
 ///
 /// Decodes a successful listModels response.
 pub fn list_models_decode(
-  response : @http.Response,
-) -> ListModelsResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[ListModelsResponse, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -127,16 +137,17 @@ pub fn retrieve_model_decode_json(
 ///
 /// Decodes a successful retrieveModel response.
 pub fn retrieve_model_decode(
-  response : @http.Response,
-) -> Model raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Model, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
 ///
 /// Creates a model response. Provide [text](/docs/guides/text) or [image](/docs/guides/images) inputs to generate [text](/docs/guides/text) or [JSON](/docs/guides/structured-outputs) outputs. Have the model call your own [custom code](/docs/guides/function-calling) or use built-in [tools](/docs/guides/tools) like [web search](/docs/guides/tools-web-search) or [file search](/docs/guides/tools-file-search) to use your own data as input for the model's response.
 pub fn create_response_request(body : CreateResponse) -> @http.Request {
-  @http.Request::post("/responses").json_body(Json(body))
+  @http.Request::post("/responses").body_json(Json(body))
 }
 
 ///|
@@ -152,7 +163,8 @@ pub fn create_response_decode_json(
 ///
 /// Decodes a successful createResponse response.
 pub fn create_response_decode(
-  response : @http.Response,
-) -> Response raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Response, @client.ResponseFailure] {
+  decode_response(head, body)
 }

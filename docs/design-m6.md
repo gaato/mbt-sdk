@@ -1,3 +1,7 @@
+> Historical design/release record. API sketches describe the implementation
+> at that time. See [the stack migration](stack-migration.md) and
+> [current architecture](../ARCHITECTURE.md) for the current interfaces.
+
 # 設計メモ — M6: tool calling・互換サーバの実 API テスト・CI
 
 背景(2026-09-22 の他言語 SDK 調査): 「OpenAI 互換」SDK がほぼ全員実装しているのは chat/completions + SSE + tool calling + base_url。`gaato/openai` に足りないのは tool calling の公開 API。Anthropic 側も tool_use は Messages API の中核。互換サーバはローカルに用意済み(Ollama、LiteLLM の `/v1/messages`、vLLM の `/v1/messages`)。

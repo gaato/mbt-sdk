@@ -1,7 +1,7 @@
 ///|
-async test "model pagination follows last_id and collects every item" {
+test "model pagination follows last_id and collects every item" {
   bounded(() => {
-    let transport = @mock.FakeTransport::new()
+    let transport = @mock.FakeBackend::new()
     for
       (id, more, path) in [
         ("m1", true, "/v1/models?limit=1&lifecycle%5B%5D=active"),
@@ -19,6 +19,7 @@ async test "model pagination follows last_id and collects every item" {
     let models = client
       .paginate_models(limit=1, lifecycle=[Active])
       .collect(max=10)
+      .unwrap()
     assert_eq(models.map(model => model.id), ["m1", "m2"])
     assert_true(transport.sent()[1].url.contains("after_id=m1"))
     transport.assert_complete()
@@ -26,10 +27,10 @@ async test "model pagination follows last_id and collects every item" {
 }
 
 ///|
-async test "empty model pages and missing last_id end pagination" {
+test "empty model pages and missing last_id end pagination" {
   bounded(() => {
     for has_more in [false, true] {
-      let transport = @mock.FakeTransport::new()
+      let transport = @mock.FakeBackend::new()
       let body =
         $|{"data":[],"has_more":\{has_more},"first_id":null,"last_id":null}
       transport.expect("GET", "/v1/models", json_response(body))
@@ -39,8 +40,8 @@ async test "empty model pages and missing last_id end pagination" {
         @mock.FakeClock::new(),
       )
       let pages = client.paginate_models()
-      assert_eq(pages.collect(max=10).length(), 0)
-      assert_true(pages.next_page() is None)
+      assert_eq(expect(pages.collect(max=10)).length(), 0)
+      assert_true(pages.next_page() is Ok(None))
       assert_eq(transport.sent().length(), 1)
       transport.assert_complete()
     }

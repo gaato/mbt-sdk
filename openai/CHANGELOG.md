@@ -11,9 +11,20 @@ change itself is the diff of `src/gen/pkg.generated.mbti`.
 
 ## [Unreleased]
 
+## [0.7.0]
+
 ### Changed
 
-- **Builds on `gaato/http` 0.5.0**, whose cookie jar, Retry-After and Link parsing follow RFC 6265bis-22, RFC 9110 and RFC 8288 more closely; see its CHANGELOG.
+- **Use gaato/http 0.6 and gaato/mttp for requests, retries and streaming.**
+  Vendor retry defaults and attempt budgets are retained. Migration: supply
+  Backend and http/rt ports, handle Result[T, OpenAIFailure], and use
+  mttp/jsonkit.Presence. TransportError and user callback exceptions remain
+  effects. Generated decoders now take ResponseHead and Bytes and return
+  Result[T, ResponseFailure]. Buffered bodies default to 64 MiB; total call
+  deadlines require Timer and include streaming callbacks.
+
+- **HTTP infrastructure is supplied by mttp.** This repository no longer
+  ships the HTTP implementation or the former shared runtime.
 - **The README has sections and compile-checked examples.** Install, usage that sends a request, and sections on operations, streaming, compatible servers, retries and timeouts; the examples no longer name a specific model.
 
 ## [0.6.0] - 2026-10-19

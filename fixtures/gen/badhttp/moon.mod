@@ -13,6 +13,6 @@ source = "src"
 preferred_target = "wasm-gc"
 
 import {
-  "gaato/http@0.1.0",
-  "gaato/sdk-runtime@0.1.0",
+  "gaato/http@0.6.0",
+  "gaato/mttp@0.1.0",
 }

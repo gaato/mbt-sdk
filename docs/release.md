@@ -4,18 +4,18 @@ A release is a version bump on `main`. `release.yml` runs after `CI` succeeds on
 
 ## Which modules
 
-`PUBLISH_MODULES` in `scripts/release.sh`: `http`, `http-async`, `sdk-runtime`, `openai`, `anthropic`, `github`. `jsonrpc`, `jsonrpc-async`, `codex-protocol` and `codex-app-server` stay unpublished until they have a consumer; `runtime-tests/` is never published.
+`PUBLISH_MODULES` in `scripts/release.sh`: `openai`, `anthropic`, `github`. `jsonrpc`, `jsonrpc-async`, `codex-protocol` and `codex-app-server` stay unpublished until they have a consumer; `runtime-tests/` is never published.
 
 ## Changelogs
 
 Each published module has a `CHANGELOG.md` next to its `moon.mod`, so it ships with the module. The format is [Keep a Changelog 1.1.0](https://keepachangelog.com/en/1.1.0/): an entry is a bold one-sentence summary followed by why it matters, grouped under `### Added`, `### Changed`, `### Removed` or `### Fixed`, and a breaking change ends with a `Migration:` note.
 
-Write the entry in the PR that makes the change, under `## [Unreleased]` of every module whose shipped behaviour or API it changes, including a module that only moves to a new dependency version. Do not write version headings by hand: `scripts/release.sh bump` turns the `[Unreleased]` entries into `## [<version>] - <date>` (today's date) and leaves an empty `[Unreleased]` above them. It warns when there was nothing to move. `scripts/release.sh check`, run by `gates.sh`, fails when a published module has no changelog, when `[Unreleased]` is not its first section, or when the version in `moon.mod` has no heading.
+Write the entry in the PR that makes the change, under `## [Unreleased]` of every module whose shipped behaviour or API it changes, including a module that only moves to a new dependency version. A prepared migration may leave an undated version heading; it is dated at release. Normally `scripts/release.sh bump` turns the `[Unreleased]` entries into `## [<version>] - <date>` (today's date) and leaves an empty `[Unreleased]` above them. It warns when there was nothing to move. `scripts/release.sh check`, run by `gates.sh`, fails when a published module has no changelog, when `[Unreleased]` is not its first section, or when the version in `moon.mod` has no heading.
 
 ## Cutting a release
 
 ```sh
-scripts/release.sh bump http 0.2.0       # sets http/moon.mod and every "gaato/http@…" import, dates the CHANGELOG
+scripts/release.sh bump openai 0.7.0     # sets the module and sibling pins, dates the CHANGELOG
 scripts/gates.sh                         # green, including native loopback tests
 moon run scripts/coverage_report.mbtx    # ledger OK (CI runs it too; see TEST_COVERAGE.md)
 scripts/release.sh publish --dry-run     # what the job will do

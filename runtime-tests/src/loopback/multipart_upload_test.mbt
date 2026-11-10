@@ -38,7 +38,7 @@ fn fnv(hash : UInt32, bytes : BytesView) -> UInt32 {
 }
 
 ///|
-async test "a 32 MiB streamed file part uploads intact through AsyncTransport" {
+async test "a 32 MiB streamed file part uploads intact through AsyncBackend" {
   let total = 32L * 1024 * 1024
   // What the server must receive: the framing around the generated file.
   let (_, framing) = @multipart.encode_segments(
@@ -69,18 +69,18 @@ async test "a 32 MiB streamed file part uploads intact through AsyncTransport" {
           let request = conn.read_request()
           let mut length = 0L
           let mut hash = 2166136261U
-          while conn.read_some() is Some(chunk) {
+          while conn.read() is Some(chunk) {
             length += chunk.length().to_int64()
             hash = fnv(hash, chunk)
           }
           let declared = request.headers.get("content-length").unwrap_or("-")
           conn.send_response(200, "OK")
-          conn.write("\{declared} \{length} \{hash}")
+          conn.write(@utf8.encode("\{declared} \{length} \{hash}"))
           conn.end_response()
         })
         let file = { total, produced: 0L, closed: false, }
         let length = if known { Some(total) } else { None }
-        let request = @multipart.apply(
+        let request = @multipart.body(
           @http.Request::post("http://127.0.0.1:\{server.addr.port()}/upload"),
           [
             @multipart.Part::text("note", "hi"),
@@ -92,12 +92,15 @@ async test "a 32 MiB streamed file part uploads intact through AsyncTransport" {
               length?,
             ),
           ],
-          "mbt-boundary",
+          boundary="mbt-boundary",
         )
-        let response = @adapter.AsyncTransport::new().send(request)
+        let backend = @backend.AsyncBackend::new()
+        defer backend.close()
+        let response = backend.send(request, @http.SendOptions::default())
+        defer response.close()
         let declared = if known { expected_length.to_string() } else { "-" }
         assert_eq(
-          @utf8.decode(response.body),
+          @utf8.decode(@client.read_body(response.body, 1024)),
           "\{declared} \{expected_length} \{expected}",
         )
         assert_true(file.closed)
@@ -122,44 +125,34 @@ impl @http.BodyStream for Empty with fn close(_) {
 
 ///|
 async test "a multipart part that cannot be sent fails before a large head goes out" {
-  let received = Ref(0)
-  let finished : @async.Queue[Unit] = @async.Queue(kind=Unbounded)
   @async.with_timeout(5000, () => {
     let server = @socket.TcpServer(@socket.Addr::parse("127.0.0.1:0"))
     defer server.close()
-    @async.with_task_group(group => {
-      group.spawn_bg(no_wait=true, () => {
-        let (conn, _) = server.accept()
-        defer conn.close()
-        let buffer = FixedArray::make(65536, b'\x00')
-        while (conn.read(buffer) catch { _ => 0 }) is n && n > 0 {
-          received.val += n
-        }
-        finished.put(())
-      })
-      let part = @multipart.Part::file_stream("b", "b", "x/y", Empty::{ })
-      guard part.body is Stream(stream) else { fail("expected a stream part") }
-      ignore(stream.take())
-      let (content_type, body) = @multipart.encode_body([part], "B")
-      // Far more than any send buffer, so the client would flush part of the
-      // head on its own if it serialized it before taking the parts.
-      let request = @http.Request::post(
-        "http://127.0.0.1:\{server.addr.port()}/",
-      )
-      request.headers.set("content-type", content_type)
-      request.headers.set("x-large", String::make(2 * 1024 * 1024, 'a'))
-      let outcome = try
-        @adapter.AsyncTransport::new().send({ ..request, body, }) |> ignore
-      catch {
-        @http.HttpError::Protocol(_) => "Protocol"
-        error => "unexpected \{Repr(error)}"
-      } noraise {
-        _ => "sent"
-      }
-      assert_eq(outcome, "Protocol")
-      // The refused send closed its connection; the server has read it all.
-      finished.get()
-    })
+    let part = @multipart.Part::file_stream("b", "b", "x/y", Empty::{ })
+    guard part.body is Stream(stream) else { fail("expected a stream part") }
+    ignore(stream.take())
+    let (content_type, body) = @multipart.encode_body([part], "B")
+    // Far more than any send buffer, so the client would flush part of the
+    // head on its own if it serialized it before taking the parts.
+    let request = @http.Request::post("http://127.0.0.1:\{server.addr.port()}/")
+      .set_header("content-type", content_type)
+      .set_header("x-large", String::make(2 * 1024 * 1024, 'a'))
+    let backend = @backend.AsyncBackend::new()
+    defer backend.close()
+    let outcome = try
+      backend.send({ ..request, body, }, @http.SendOptions::default()) |> ignore
+    catch {
+      @http.TransportError(kind=Unreplayable, ..) => "Unreplayable"
+      error => "unexpected \{Repr(error)}"
+    } noraise {
+      _ => "sent"
+    }
+    assert_eq(outcome, "Unreplayable")
+    // Preflight takes the part before dialing, so the listener sees no connection.
+    let accepted = @async.with_timeout_opt(20, () => server.accept())
+    if accepted is Some((conn, _)) {
+      conn.close()
+      fail("an unsendable body must fail before connecting")
+    }
   })
-  assert_eq(received.val, 0)
 }

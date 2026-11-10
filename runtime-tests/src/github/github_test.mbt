@@ -8,14 +8,14 @@
 fn json_response(
   body : String,
   status~ : Int32 = 200,
-  headers~ : @http.Headers = @http.Headers::new(),
-) -> @http.Response {
+  headers~ : @http.Headers = @http.Headers::empty(),
+) -> @mock.Buffered {
   { status, headers, body: @utf8.encode(body), }
 }
 
 ///|
-async fn bounded(f : async () -> Unit) -> Unit {
-  @async.with_timeout(5000, f)
+fn bounded(f : async () -> Unit) -> Unit raise {
+  @driver.run_sync(f)
 }
 
 ///|
@@ -94,7 +94,7 @@ fn rate_limit_headers(
   remaining : Int32,
   reset_unix_seconds : Int32,
 ) -> @http.Headers {
-  @http.Headers::from_array([
+  @http.Headers::of([
     ("x-ratelimit-limit", "5000"),
     ("x-ratelimit-remaining", remaining.to_string()),
     ("x-ratelimit-reset", reset_unix_seconds.to_string()),
@@ -106,9 +106,9 @@ fn rate_limit_headers(
 // -----------------------------------------------------------------------------
 
 ///|
-async test "GitHub sends the documented defaults and omits auth without a token" {
+test "GitHub sends the documented defaults and omits auth without a token" {
   bounded(() => {
-    let transport = @mock.FakeTransport::new()
+    let transport = @mock.FakeBackend::new()
     transport.expect(
       "GET",
       "/repos/octocat/Hello-World",
@@ -133,10 +133,12 @@ async test "GitHub sends the documented defaults and omits auth without a token"
     )
     let clock = @mock.FakeClock::new()
     let gh = @github_sdk.GitHub::new(transport, clock, token="ghp_test")
-    ignore(gh.send(@gen.repos_get_request("octocat", "Hello-World")))
-    let content = gh.call(
-      @gen.repos_get_content_request("octocat", "Hello-World", "README.md"),
-      @gen.repos_get_content_decode,
+    ignore(expect(gh.send(@gen.repos_get_request("octocat", "Hello-World"))))
+    let content = expect(
+      gh.call(
+        @gen.repos_get_content_request("octocat", "Hello-World", "README.md"),
+        @gen.repos_get_content_decode,
+      ),
     )
     // repos/get-content answers with either a directory listing or one object;
     // moonbit.yaml keeps the object arm discriminated on "type", so a file comes
@@ -154,9 +156,9 @@ async test "GitHub sends the documented defaults and omits auth without a token"
     )
     let sent = transport.sent()
     assert_eq(sent.length(), 2)
-    assert_eq(sent[0].http_method, "GET")
+    assert_eq(sent[0].meth.to_string(), "GET")
     assert_eq(sent[0].url, "https://api.github.com/repos/octocat/Hello-World")
-    assert_eq(sent[0].body, Bytes(b""))
+    assert_eq(sent[0].body, Empty)
     assert_eq(sent[0].headers.get("authorization"), Some("Bearer ghp_test"))
     assert_eq(
       sent[0].headers.get("accept"),
@@ -176,7 +178,7 @@ async test "GitHub sends the documented defaults and omits auth without a token"
     transport.assert_complete()
 
     // Unauthenticated against a GitHub Enterprise Server mount.
-    let anonymous = @mock.FakeTransport::new()
+    let anonymous = @mock.FakeBackend::new()
     anonymous.expect(
       "GET",
       "/api/v3/repos/octocat/Hello-World",
@@ -189,7 +191,7 @@ async test "GitHub sends the documented defaults and omits auth without a token"
       api_version="2022-11-01",
       user_agent="my-tool/2",
     )
-    ignore(ghe.send(@gen.repos_get_request("octocat", "Hello-World")))
+    ignore(expect(ghe.send(@gen.repos_get_request("octocat", "Hello-World"))))
     let anonymous_sent = anonymous.sent()
     assert_eq(
       anonymous_sent[0].url,
@@ -211,15 +213,15 @@ async test "GitHub sends the documented defaults and omits auth without a token"
 // -----------------------------------------------------------------------------
 
 ///|
-async test "a request header overrides the client default on the wire" {
+test "a request header overrides the client default on the wire" {
   bounded(() => {
-    let transport = @mock.FakeTransport::new()
+    let transport = @mock.FakeBackend::new()
     transport.expect(
       "GET",
       "/repos/gaato/mbt-sdk/compare/main...topic",
       json_response(
         "diff --git a/README.md b/README.md\n",
-        headers=@http.Headers::from_array([("content-type", "text/plain")]),
+        headers=@http.Headers::of([("content-type", "text/plain")]),
       ),
     )
     let gh = @github_sdk.GitHub::new(
@@ -227,12 +229,17 @@ async test "a request header overrides the client default on the wire" {
       @mock.FakeClock::new(),
       token="ghp_test",
     )
-    let response = gh.send(
-      @http.Request::get("/repos/gaato/mbt-sdk/compare/main...topic")
-      .header("accept", "application/vnd.github.diff")
-      .header("user-agent", "diff-fetcher/1"),
+    let response = expect(
+      gh.send(
+        @http.Request::get("/repos/gaato/mbt-sdk/compare/main...topic")
+        .header("accept", "application/vnd.github.diff")
+        .header("user-agent", "diff-fetcher/1"),
+      ),
     )
-    assert_eq(response.text(), "diff --git a/README.md b/README.md\n")
+    assert_eq(
+      @utf8.decode(response.body),
+      "diff --git a/README.md b/README.md\n",
+    )
     let sent = transport.sent()
     assert_eq(sent.length(), 1)
     // The caller's media type is what travels, and the client default is not
@@ -265,14 +272,14 @@ fn page_url(page : Int32) -> String {
 }
 
 ///|
-fn paging_transport() -> @mock.FakeTransport {
-  let transport = @mock.FakeTransport::new()
+fn paging_transport() -> @mock.FakeBackend {
+  let transport = @mock.FakeBackend::new()
   transport.expect(
     "GET",
     "https://api.github.com/repos/gaato/mbt-sdk/issues?per_page=2",
     json_response(
       issue_page([1, 2]),
-      headers=@http.Headers::from_array([
+      headers=@http.Headers::of([
         ("link", link_header([(page_url(2), "next"), (page_url(3), "last")])),
       ]),
     ),
@@ -282,7 +289,7 @@ fn paging_transport() -> @mock.FakeTransport {
     page_url(2),
     json_response(
       issue_page([3, 4]),
-      headers=@http.Headers::from_array([
+      headers=@http.Headers::of([
         (
           "link",
           link_header([
@@ -299,7 +306,7 @@ fn paging_transport() -> @mock.FakeTransport {
     page_url(3),
     json_response(
       issue_page([5]),
-      headers=@http.Headers::from_array([
+      headers=@http.Headers::of([
         ("link", link_header([(page_url(2), "prev"), (page_url(1), "first")])),
       ]),
     ),
@@ -308,7 +315,7 @@ fn paging_transport() -> @mock.FakeTransport {
 }
 
 ///|
-async test "Link pagination follows the absolute next URL to the last page" {
+test "Link pagination follows the absolute next URL to the last page" {
   bounded(() => {
     let transport = paging_transport()
     let gh = @github_sdk.GitHub::new(
@@ -322,7 +329,11 @@ async test "Link pagination follows the absolute next URL to the last page" {
       @gen.issues_list_for_repo_request("gaato", "mbt-sdk", per_page=2),
       @gen.issues_list_for_repo_decode,
     )
-    .each(issue => numbers.push(issue.number))
+    .each(issue => {
+      numbers.push(issue.number)
+      Ok(())
+    })
+    .unwrap()
     // Three pages, then the page without rel="next" terminates the walk.
     assert_eq(numbers, [1, 2, 3, 4, 5])
     let sent = transport.sent()
@@ -333,7 +344,7 @@ async test "Link pagination follows the absolute next URL to the last page" {
     ])
     // The following pages inherit the method, the auth, and the defaults.
     for request in sent {
-      assert_eq(request.http_method, "GET")
+      assert_eq(request.meth.to_string(), "GET")
       assert_eq(request.headers.get("authorization"), Some("Bearer ghp_test"))
       assert_eq(
         request.headers.get("accept"),
@@ -346,15 +357,15 @@ async test "Link pagination follows the absolute next URL to the last page" {
 }
 
 ///|
-async test "collect stops at max without fetching the page it does not need" {
+test "collect stops at max without fetching the page it does not need" {
   bounded(() => {
-    let transport = @mock.FakeTransport::new()
+    let transport = @mock.FakeBackend::new()
     transport.expect(
       "GET",
       "https://api.github.com/repos/gaato/mbt-sdk/issues?per_page=2",
       json_response(
         issue_page([1, 2]),
-        headers=@http.Headers::from_array([
+        headers=@http.Headers::of([
           ("link", link_header([(page_url(2), "next"), (page_url(3), "last")])),
         ]),
       ),
@@ -364,7 +375,7 @@ async test "collect stops at max without fetching the page it does not need" {
       page_url(2),
       json_response(
         issue_page([3, 4]),
-        headers=@http.Headers::from_array([
+        headers=@http.Headers::of([
           ("link", link_header([(page_url(3), "next")])),
         ]),
       ),
@@ -380,6 +391,7 @@ async test "collect stops at max without fetching the page it does not need" {
         @gen.issues_list_for_repo_decode,
       )
       .collect(max=3)
+      .unwrap()
       .map(issue => issue.title)
     assert_eq(titles, ["issue 1", "issue 2", "issue 3"])
     // The third page is never requested: the script holds only two pages and
@@ -394,9 +406,9 @@ async test "collect stops at max without fetching the page it does not need" {
 // -----------------------------------------------------------------------------
 
 ///|
-async test "an exhausted window makes the next call wait for the reset" {
+test "an exhausted window makes the next call wait for the reset" {
   bounded(() => {
-    let transport = @mock.FakeTransport::new()
+    let transport = @mock.FakeBackend::new()
     transport.expect(
       "GET",
       "/repos/gaato/mbt-sdk",
@@ -416,23 +428,23 @@ async test "an exhausted window makes the next call wait for the reset" {
     let clock = @mock.FakeClock::new()
     let gh = @github_sdk.GitHub::new(transport, clock, token="ghp_test")
     let request = @gen.repos_get_request("gaato", "mbt-sdk")
-    ignore(gh.send(request))
+    ignore(expect(gh.send(request)))
     assert_eq(clock.slept(), [])
-    ignore(gh.send(request))
+    ignore(expect(gh.send(request)))
     // The limiter waited out the whole window before the second request left.
     assert_eq(clock.slept(), [60000])
     assert_eq(clock.now_unix_ms(), 60000L)
     // A window with requests left is not waited on.
-    ignore(gh.send(request))
+    ignore(expect(gh.send(request)))
     assert_eq(clock.slept(), [60000])
     transport.assert_complete()
   })
 }
 
 ///|
-async test "search and core meter in separate buckets" {
+test "search and core meter in separate buckets" {
   bounded(() => {
-    let transport = @mock.FakeTransport::new()
+    let transport = @mock.FakeBackend::new()
     transport.expect(
       "GET",
       "/search/repositories?q=moonbit",
@@ -457,14 +469,14 @@ async test "search and core meter in separate buckets" {
     let clock = @mock.FakeClock::new()
     let gh = @github_sdk.GitHub::new(transport, clock, token="ghp_test")
     let search = @gen.search_repos_request("moonbit")
-    ignore(gh.send(search))
+    ignore(expect(gh.send(search)))
     // Exhausting search does not hold up a core request.
-    ignore(gh.send(@gen.repos_get_request("gaato", "mbt-sdk")))
+    ignore(expect(gh.send(@gen.repos_get_request("gaato", "mbt-sdk"))))
     assert_eq(clock.slept(), [])
     // The next search still pays for the exhausted search window: first the
     // 2 s spacing between searches, then the rest of the window.
-    ignore(gh.send(search))
-    assert_eq(clock.slept(), [2000, 58000])
+    ignore(expect(gh.send(search)))
+    assert_eq(clock.slept(), [60000])
     transport.assert_complete()
   })
 }
@@ -474,9 +486,9 @@ async test "search and core meter in separate buckets" {
 // -----------------------------------------------------------------------------
 
 ///|
-async test "a 502 is retried after a backoff and then succeeds" {
+test "a 502 is retried after a backoff and then succeeds" {
   bounded(() => {
-    let transport = @mock.FakeTransport::new()
+    let transport = @mock.FakeBackend::new()
     transport.expect(
       "GET",
       "/repos/gaato/mbt-sdk",
@@ -496,7 +508,7 @@ async test "a 502 is retried after a backoff and then succeeds" {
         random=() => 0.5,
       ),
     )
-    ignore(gh.send(@gen.repos_get_request("gaato", "mbt-sdk")))
+    ignore(expect(gh.send(@gen.repos_get_request("gaato", "mbt-sdk"))))
     assert_eq(clock.slept(), [500])
     assert_eq(transport.sent().length(), 2)
     transport.assert_complete()
@@ -504,16 +516,16 @@ async test "a 502 is retried after a backoff and then succeeds" {
 }
 
 ///|
-async test "a 429 is RateLimited and its retry-after drives the wait" {
+test "a 429 is RateLimited and its retry-after drives the wait" {
   bounded(() => {
-    let failing = @mock.FakeTransport::new()
+    let failing = @mock.FakeBackend::new()
     failing.expect(
       "GET",
       "/repos/gaato/mbt-sdk",
       json_response(
         "{\"message\":\"You have exceeded a secondary rate limit.\",\"documentation_url\":\"https://docs.github.com/rest/overview/rate-limits-for-the-rest-api\"}",
         status=429,
-        headers=@http.Headers::from_array([("retry-after", "60")]),
+        headers=@http.Headers::of([("retry-after", "60")]),
       ),
     )
     let gh = @github_sdk.GitHub::new(
@@ -523,13 +535,19 @@ async test "a 429 is RateLimited and its retry-after drives the wait" {
       retry=@runtime.RetryPolicy::none(),
       limiter=no_limiter(),
     )
-    try gh.send(@gen.repos_get_request("gaato", "mbt-sdk")) catch {
-      @runtime.RateLimited(retry_after_ms~, ..) as error => {
-        assert_eq(retry_after_ms, Some(60000))
-        assert_eq(error.status(), Some(429))
-        assert_true(error.is_retryable())
-        assert_true(@github_sdk.is_secondary_rate_limit(error))
-        assert_false(@github_sdk.is_not_modified(error))
+    try expect(gh.send(@gen.repos_get_request("gaato", "mbt-sdk"))) catch {
+      TestResponseFailure(@runtime.UnexpectedStatus(head, ..)) as error => {
+        assert_eq(@runtime.retry_after_ms(head.headers), Some(60000))
+        assert_eq(status_of(error), Some(429))
+        assert_true(
+          @runtime.RetryPolicy::conservative().decide(
+            http_outcome(error),
+            @runtime.RetryContext::capture(@http.Request::get("/")),
+          )
+          is Wait(_),
+        )
+        assert_true(is_secondary_rate_limit(error))
+        assert_false(is_not_modified(error))
       }
       other =>
         fail("429 must classify as RateLimited: " + @debug.to_string(other))
@@ -538,14 +556,14 @@ async test "a 429 is RateLimited and its retry-after drives the wait" {
     }
     failing.assert_complete()
 
-    let retrying = @mock.FakeTransport::new()
+    let retrying = @mock.FakeBackend::new()
     retrying.expect(
       "GET",
       "/repos/gaato/mbt-sdk",
       json_response(
         "{\"message\":\"You have exceeded a secondary rate limit.\"}",
         status=429,
-        headers=@http.Headers::from_array([("retry-after", "1")]),
+        headers=@http.Headers::of([("retry-after", "1")]),
       ),
     )
     retrying.expect("GET", "/repos/gaato/mbt-sdk", json_response("{}"))
@@ -556,7 +574,7 @@ async test "a 429 is RateLimited and its retry-after drives the wait" {
       token="ghp_test",
       limiter=no_limiter(),
     )
-    ignore(patient.send(@gen.repos_get_request("gaato", "mbt-sdk")))
+    ignore(expect(patient.send(@gen.repos_get_request("gaato", "mbt-sdk"))))
     // retry-after wins over the backoff schedule.
     assert_eq(clock.slept(), [1000])
     assert_eq(retrying.sent().length(), 2)
@@ -565,9 +583,9 @@ async test "a 429 is RateLimited and its retry-after drives the wait" {
 }
 
 ///|
-async test "a 403 separates the secondary limit from the hourly quota" {
+test "a 403 separates the secondary limit from the hourly quota" {
   bounded(() => {
-    let transport = @mock.FakeTransport::new()
+    let transport = @mock.FakeBackend::new()
     // Secondary limit, reported with retry-after and an untouched quota.
     transport.expect(
       "GET",
@@ -575,7 +593,7 @@ async test "a 403 separates the secondary limit from the hourly quota" {
       json_response(
         "{\"message\":\"You have exceeded a secondary rate limit. Please wait a few minutes before you try again.\",\"documentation_url\":\"https://docs.github.com/rest/overview/rate-limits-for-the-rest-api\"}",
         status=403,
-        headers=@http.Headers::from_array([
+        headers=@http.Headers::of([
           ("retry-after", "60"),
           ("x-ratelimit-remaining", "4987"),
         ]),
@@ -619,11 +637,17 @@ async test "a 403 separates the secondary limit from the hourly quota" {
     let request = @gen.repos_get_request("gaato", "mbt-sdk")
     let verdicts : Array[Bool] = []
     for _ in 0..<4 {
-      try gh.send(request) catch {
+      try expect(gh.send(request)) catch {
         error => {
-          assert_eq(error.status(), Some(403))
-          assert_false(error.is_retryable())
-          verdicts.push(@github_sdk.is_secondary_rate_limit(error))
+          assert_eq(status_of(error), Some(403))
+          assert_false(
+            @runtime.RetryPolicy::conservative().decide(
+              http_outcome(error),
+              @runtime.RetryContext::capture(@http.Request::get("/")),
+            )
+            is Wait(_),
+          )
+          verdicts.push(is_secondary_rate_limit(error))
         }
       } noraise {
         _ => fail("403 must fail")
@@ -635,16 +659,16 @@ async test "a 403 separates the secondary limit from the hourly quota" {
 }
 
 ///|
-async test "a 304 answer to a conditional request is recognised" {
+test "a 304 answer to a conditional request is recognised" {
   bounded(() => {
-    let transport = @mock.FakeTransport::new()
+    let transport = @mock.FakeBackend::new()
     transport.expect(
       "GET",
       "/repos/gaato/mbt-sdk",
       json_response(
         "",
         status=304,
-        headers=@http.Headers::from_array([
+        headers=@http.Headers::of([
           ("etag", "W/\"a1b2c3\""),
           ("x-ratelimit-remaining", "4999"),
         ]),
@@ -658,18 +682,20 @@ async test "a 304 answer to a conditional request is recognised" {
       limiter=no_limiter(),
     )
     try
-      gh.send(
-        @gen.repos_get_request("gaato", "mbt-sdk").header(
-          "if-none-match", "W/\"a1b2c3\"",
+      expect(
+        gh.send(
+          @gen.repos_get_request("gaato", "mbt-sdk").header(
+            "if-none-match", "W/\"a1b2c3\"",
+          ),
         ),
       )
     catch {
       error => {
-        assert_true(@github_sdk.is_not_modified(error))
-        assert_false(@github_sdk.is_secondary_rate_limit(error))
-        assert_eq(error.status(), Some(304))
+        assert_true(is_not_modified(error))
+        assert_false(is_secondary_rate_limit(error))
+        assert_eq(status_of(error), Some(304))
         // An empty body is not a GitHub error object.
-        assert_eq(@github_sdk.api_error(error), None)
+        assert_eq(api_error(error), None)
       }
     } noraise {
       _ => fail("304 must be raised, not returned")
@@ -685,10 +711,10 @@ async test "a 304 answer to a conditional request is recognised" {
 // -----------------------------------------------------------------------------
 
 ///|
-async test "a 422 validation body is readable through api_error" {
+test "a 422 validation body is readable through api_error" {
   bounded(() => {
     let body = "{\"message\":\"Validation Failed\",\"errors\":[{\"resource\":\"Issue\",\"field\":\"title\",\"code\":\"missing_field\"},{\"value\":\"nonexistent\",\"resource\":\"Issue\",\"field\":\"milestone\",\"code\":\"invalid\"}],\"documentation_url\":\"https://docs.github.com/rest/issues/issues#create-an-issue\",\"status\":\"422\"}"
-    let transport = @mock.FakeTransport::new()
+    let transport = @mock.FakeBackend::new()
     transport.expect(
       "POST",
       "/repos/gaato/mbt-sdk/issues",
@@ -701,18 +727,26 @@ async test "a 422 validation body is readable through api_error" {
       limiter=no_limiter(),
     )
     try
-      gh.send(
-        @http.Request::post("/repos/gaato/mbt-sdk/issues").json_body({
-          "body": "no title",
-          "milestone": "nonexistent",
-        }),
+      expect(
+        gh.send(
+          @http.Request::post("/repos/gaato/mbt-sdk/issues").body_json({
+            "body": "no title",
+            "milestone": "nonexistent",
+          }),
+        ),
       )
     catch {
       error => {
-        assert_eq(error.status(), Some(422))
-        assert_false(error.is_retryable())
+        assert_eq(status_of(error), Some(422))
+        assert_false(
+          @runtime.RetryPolicy::conservative().decide(
+            http_outcome(error),
+            @runtime.RetryContext::capture(@http.Request::get("/")),
+          )
+          is Wait(_),
+        )
         assert_eq(
-          @github_sdk.api_error(error),
+          api_error(error),
           Some({
             message: "Validation Failed",
             documentation_url: Some(
@@ -745,9 +779,9 @@ async test "a 422 validation body is readable through api_error" {
 // -----------------------------------------------------------------------------
 
 ///|
-async test "a graphql query leaves as a POST to the graphql endpoint" {
+test "a graphql query leaves as a POST to the graphql endpoint" {
   bounded(() => {
-    let transport = @mock.FakeTransport::new()
+    let transport = @mock.FakeBackend::new()
     transport.expect(
       "POST",
       "https://api.github.com/graphql",
@@ -758,9 +792,11 @@ async test "a graphql query leaves as a POST to the graphql endpoint" {
       @mock.FakeClock::new(),
       token="ghp_test",
     )
-    let data = gh.graphql(
-      query="query($login: String!) { user(login: $login) { id } }",
-      variables={ "login": "gaato" },
+    let data = expect(
+      gh.graphql(
+        query="query($login: String!) { user(login: $login) { id } }",
+        variables={ "login": "gaato" },
+      ),
     )
     // graphql unwraps the envelope: the caller sees data, not {data, errors}.
     assert_eq(data, { "viewer": { "login": "gaato" } })
@@ -783,9 +819,9 @@ async test "a graphql query leaves as a POST to the graphql endpoint" {
 }
 
 ///|
-async test "operationName travels only when a document declares several" {
+test "operationName travels only when a document declares several" {
   bounded(() => {
-    let transport = @mock.FakeTransport::new()
+    let transport = @mock.FakeBackend::new()
     transport.expect(
       "POST",
       "https://api.github.com/graphql",
@@ -801,9 +837,11 @@ async test "operationName travels only when a document declares several" {
       @mock.FakeClock::new(),
       token="ghp_test",
     )
-    ignore(gh.graphql(query="{ viewer { login } }"))
+    ignore(expect(gh.graphql(query="{ viewer { login } }")))
     ignore(
-      gh.graphql(query="query Me { viewer { login } }", operation_name="Me"),
+      expect(
+        gh.graphql(query="query Me { viewer { login } }", operation_name="Me"),
+      ),
     )
     let sent = transport.sent()
     // An absent variables map and an absent operation name are omitted rather
@@ -818,11 +856,11 @@ async test "operationName travels only when a document declares several" {
 }
 
 ///|
-async test "a 200 carrying errors fails instead of passing unnoticed" {
+test "a 200 carrying errors fails instead of passing unnoticed" {
   bounded(() => {
     let envelope =
       #|{"data":{"repository":null},"errors":[{"type":"NOT_FOUND","path":["repository"],"message":"Could not resolve to a Repository with the name 'gaato/nope'."}]}
-    let transport = @mock.FakeTransport::new()
+    let transport = @mock.FakeBackend::new()
     transport.expect(
       "POST",
       "https://api.github.com/graphql",
@@ -831,16 +869,24 @@ async test "a 200 carrying errors fails instead of passing unnoticed" {
     let clock = @mock.FakeClock::new()
     let gh = @github_sdk.GitHub::new(transport, clock, token="ghp_test")
     try
-      gh.graphql(
-        query="{ repository(owner: \"gaato\", name: \"nope\") { id } }",
+      expect(
+        gh.graphql(
+          query="{ repository(owner: \"gaato\", name: \"nope\") { id } }",
+        ),
       )
     catch {
       error => {
         // The HTTP exchange succeeded, so nothing here reports a status: a 200
         // in SdkError::status would mislead every caller that branches on one.
-        assert_eq(error.status(), None)
-        assert_false(error.is_retryable())
-        guard @github_sdk.graphql_errors(error) is Some(errors) else {
+        assert_eq(status_of(error), None)
+        assert_false(
+          @runtime.RetryPolicy::conservative().decide(
+            http_outcome(error),
+            @runtime.RetryContext::capture(@http.Request::get("/")),
+          )
+          is Wait(_),
+        )
+        guard graphql_errors(error) is Some(errors) else {
           fail("the raised error must carry the GraphQL errors array")
         }
         assert_eq(errors.length(), 1)
@@ -858,13 +904,13 @@ async test "a 200 carrying errors fails instead of passing unnoticed" {
 }
 
 ///|
-async test "graphql_response keeps the partial data of a failed field" {
+test "graphql_response keeps the partial data of a failed field" {
   bounded(() => {
     // GraphQL resolves field by field: one field can fail while the rest of the
     // query succeeds, and both halves arrive in the same 200.
     let envelope =
       #|{"data":{"viewer":{"login":"gaato"},"repository":null},"errors":[{"type":"FORBIDDEN","message":"Resource not accessible."}]}
-    let transport = @mock.FakeTransport::new()
+    let transport = @mock.FakeBackend::new()
     transport.expect(
       "POST",
       "https://api.github.com/graphql",
@@ -875,7 +921,7 @@ async test "graphql_response keeps the partial data of a failed field" {
       @mock.FakeClock::new(),
       token="ghp_test",
     )
-    let whole = gh.graphql_response(query="{ viewer { login } }")
+    let whole = expect(gh.graphql_response(query="{ viewer { login } }"))
     guard whole is Object(fields) else { fail("envelope must be an object") }
     assert_eq(
       fields.get("data"),
@@ -887,14 +933,14 @@ async test "graphql_response keeps the partial data of a failed field" {
 }
 
 ///|
-async test "a graphql rate limit is retried once, a second past the reset" {
+test "a graphql rate limit is retried once, a second past the reset" {
   bounded(() => {
     // GitHub reports an exhausted point budget as an ordinary errors entry on a
     // 200, with x-ratelimit-reset. It is raised as RateLimited inside the retry
     // loop and waited out once, as octokit does; a second one is raised.
     let envelope =
       #|{"errors":[{"type":"RATE_LIMITED","message":"API rate limit exceeded for user ID 1."}]}
-    let transport = @mock.FakeTransport::new()
+    let transport = @mock.FakeBackend::new()
     transport.expect(
       "POST",
       "https://api.github.com/graphql",
@@ -907,9 +953,9 @@ async test "a graphql rate limit is retried once, a second past the reset" {
     )
     let clock = @mock.FakeClock::new()
     let gh = @github_sdk.GitHub::new(transport, clock, token="ghp_test")
-    try gh.graphql(query="{ viewer { login } }") catch {
-      @runtime.RateLimited(..) as error => {
-        guard @github_sdk.graphql_errors(error) is Some(errors) else {
+    try expect(gh.graphql(query="{ viewer { login } }")) catch {
+      TestGraphqlFailure(_, ..) as error => {
+        guard graphql_errors(error) is Some(errors) else {
           fail("the raised error must carry the GraphQL errors array")
         }
         assert_eq(errors[0].type_, Some("RATE_LIMITED"))
@@ -924,7 +970,7 @@ async test "a graphql rate limit is retried once, a second past the reset" {
     assert_eq(transport.sent().length(), 2)
     transport.assert_complete()
 
-    let recovering = @mock.FakeTransport::new()
+    let recovering = @mock.FakeBackend::new()
     recovering.expect(
       "POST",
       "https://api.github.com/graphql",
@@ -940,7 +986,7 @@ async test "a graphql rate limit is retried once, a second past the reset" {
     )
     let clock = @mock.FakeClock::new()
     let gh = @github_sdk.GitHub::new(recovering, clock, token="ghp_test")
-    assert_eq(gh.graphql(query="{ viewer { login } }"), {
+    assert_eq(expect(gh.graphql(query="{ viewer { login } }")), {
       "viewer": { "login": "gaato" },
     })
     assert_eq(clock.slept(), [31000])
@@ -949,9 +995,9 @@ async test "a graphql rate limit is retried once, a second past the reset" {
 }
 
 ///|
-async test "graphql and core meter in separate buckets" {
+test "graphql and core meter in separate buckets" {
   bounded(() => {
-    let transport = @mock.FakeTransport::new()
+    let transport = @mock.FakeBackend::new()
     transport.expect(
       "GET",
       "/repos/gaato/mbt-sdk",
@@ -972,22 +1018,22 @@ async test "graphql and core meter in separate buckets" {
     )
     let clock = @mock.FakeClock::new()
     let gh = @github_sdk.GitHub::new(transport, clock, token="ghp_test")
-    ignore(gh.send(@gen.repos_get_request("gaato", "mbt-sdk")))
+    ignore(expect(gh.send(@gen.repos_get_request("gaato", "mbt-sdk"))))
     // Exhausting the core window does not hold up a GraphQL call: GitHub meters
     // GraphQL on a budget of its own and says so in x-ratelimit-resource.
-    ignore(gh.graphql(query="{ viewer { login } }"))
+    ignore(expect(gh.graphql(query="{ viewer { login } }")))
     assert_eq(clock.slept(), [])
     // The next core request still pays for the exhausted core window.
-    ignore(gh.send(@gen.repos_get_request("gaato", "mbt-sdk")))
+    ignore(expect(gh.send(@gen.repos_get_request("gaato", "mbt-sdk"))))
     assert_eq(clock.slept(), [60000])
     transport.assert_complete()
   })
 }
 
 ///|
-async test "an enterprise server reaches graphql outside the rest mount" {
+test "an enterprise server reaches graphql outside the rest mount" {
   bounded(() => {
-    let transport = @mock.FakeTransport::new()
+    let transport = @mock.FakeBackend::new()
     transport.expect(
       "GET",
       "https://ghe.example.com/api/v3/repos/gaato/mbt-sdk",
@@ -1004,18 +1050,18 @@ async test "an enterprise server reaches graphql outside the rest mount" {
       token="ghp_test",
       base_url="https://ghe.example.com/api/v3",
     )
-    ignore(gh.send(@gen.repos_get_request("gaato", "mbt-sdk")))
+    ignore(expect(gh.send(@gen.repos_get_request("gaato", "mbt-sdk"))))
     // REST is mounted at /api/v3 and GraphQL at /api/graphql, so appending to
     // the REST root would address an endpoint that does not exist.
-    ignore(gh.graphql(query="{ viewer { login } }"))
+    ignore(expect(gh.graphql(query="{ viewer { login } }")))
     transport.assert_complete()
   })
 }
 
 ///|
-async test "a graphql paginator threads endCursor through the variables" {
+test "a graphql paginator threads endCursor through the variables" {
   bounded(() => {
-    let transport = @mock.FakeTransport::new()
+    let transport = @mock.FakeBackend::new()
     let page = (number : Int32, cursor : String?) => {
       let nodes = "[{\"number\":" + number.to_string() + "}]"
       let next = match cursor {
@@ -1066,12 +1112,13 @@ async test "a graphql paginator threads endCursor through the variables" {
                 ..
               }
             ) else {
-            raise @runtime.Config("unexpected connection shape")
+            raise @runtime.InvalidRequest(message="unexpected connection shape")
           }
           let items = nodes.map(node => {
             match node {
               Object({ "number": Number(number, ..), .. }) => number.to_int()
-              _ => raise @runtime.Config("unexpected node shape")
+              _ =>
+                raise @runtime.InvalidRequest(message="unexpected node shape")
             }
           })
           // The cursor is only meaningful while there is a page to fetch.
@@ -1090,6 +1137,7 @@ async test "a graphql paginator threads endCursor through the variables" {
         cursor_variable="cursor",
       )
       .collect(max=10)
+      .unwrap()
     assert_eq(numbers, [1, 2, 3])
     let sent = transport.sent()
     assert_eq(sent.length(), 3)

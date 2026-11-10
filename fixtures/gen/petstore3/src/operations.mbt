@@ -22,11 +22,18 @@ fn parse_json_body(body : Bytes) -> Json raise {
 
 ///|
 fn[T : @json.FromJson] decode_response(
-  response : @http.Response,
-) -> T raise @runtime.SdkError {
-  @json.from_json(parse_json_body(response.body)) catch {
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[T, @client.ResponseFailure] {
+  Ok(@json.from_json(parse_json_body(body))) catch {
     error =>
-      raise @runtime.Decode(message=error.to_string(), body=response.body)
+      Err(
+        @client.Deserialization(
+          head,
+          message=error.to_string(),
+          body=body[:body.length().min(@client.max_error_body)].to_owned(),
+        ),
+      )
   }
 }
 
@@ -34,7 +41,7 @@ fn[T : @json.FromJson] decode_response(
 ///
 /// Update an existing pet.
 pub fn update_pet_request(body : Pet) -> @http.Request {
-  @http.Request::put("/pet").json_body(Json(body))
+  @http.Request::put("/pet").body_json(Json(body))
 }
 
 ///|
@@ -48,16 +55,17 @@ pub fn update_pet_decode_json(value : Json) -> Pet raise @json.JsonDecodeError {
 ///
 /// Decodes a successful updatePet response.
 pub fn update_pet_decode(
-  response : @http.Response,
-) -> Pet raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Pet, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
 ///
 /// Add a new pet to the store.
 pub fn add_pet_request(body : Pet) -> @http.Request {
-  @http.Request::post("/pet").json_body(Json(body))
+  @http.Request::post("/pet").body_json(Json(body))
 }
 
 ///|
@@ -70,8 +78,11 @@ pub fn add_pet_decode_json(value : Json) -> Pet raise @json.JsonDecodeError {
 ///|
 ///
 /// Decodes a successful addPet response.
-pub fn add_pet_decode(response : @http.Response) -> Pet raise @runtime.SdkError {
-  decode_response(response)
+pub fn add_pet_decode(
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Pet, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -98,9 +109,10 @@ pub fn find_pets_by_status_decode_json(
 ///
 /// Decodes a successful findPetsByStatus response.
 pub fn find_pets_by_status_decode(
-  response : @http.Response,
-) -> Array[Pet] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[Pet], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -127,9 +139,10 @@ pub fn find_pets_by_tags_decode_json(
 ///
 /// Decodes a successful findPetsByTags response.
 pub fn find_pets_by_tags_decode(
-  response : @http.Response,
-) -> Array[Pet] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[Pet], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -152,9 +165,10 @@ pub fn get_pet_by_id_decode_json(
 ///
 /// Decodes a successful getPetById response.
 pub fn get_pet_by_id_decode(
-  response : @http.Response,
-) -> Pet raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Pet, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -191,9 +205,10 @@ pub fn update_pet_with_form_decode_json(
 ///
 /// Decodes a successful updatePetWithForm response.
 pub fn update_pet_with_form_decode(
-  response : @http.Response,
-) -> Pet raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Pet, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -245,9 +260,10 @@ pub fn upload_file_decode_json(
 ///
 /// Decodes a successful uploadFile response.
 pub fn upload_file_decode(
-  response : @http.Response,
-) -> ApiResponse raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[ApiResponse, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -270,16 +286,17 @@ pub fn get_inventory_decode_json(
 ///
 /// Decodes a successful getInventory response.
 pub fn get_inventory_decode(
-  response : @http.Response,
-) -> Map[String, Int32] raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Map[String, Int32], @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
 ///
 /// Place an order for a pet.
 pub fn place_order_request(body : Order) -> @http.Request {
-  @http.Request::post("/store/order").json_body(Json(body))
+  @http.Request::post("/store/order").body_json(Json(body))
 }
 
 ///|
@@ -295,9 +312,10 @@ pub fn place_order_decode_json(
 ///
 /// Decodes a successful placeOrder response.
 pub fn place_order_decode(
-  response : @http.Response,
-) -> Order raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Order, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -322,9 +340,10 @@ pub fn get_order_by_id_decode_json(
 ///
 /// Decodes a successful getOrderById response.
 pub fn get_order_by_id_decode(
-  response : @http.Response,
-) -> Order raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Order, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -340,7 +359,7 @@ pub fn delete_order_request(order_id : Int64) -> @http.Request {
 ///
 /// Create user.
 pub fn create_user_request(body : User) -> @http.Request {
-  @http.Request::post("/user").json_body(Json(body))
+  @http.Request::post("/user").body_json(Json(body))
 }
 
 ///|
@@ -356,9 +375,10 @@ pub fn create_user_decode_json(
 ///
 /// Decodes a successful createUser response.
 pub fn create_user_decode(
-  response : @http.Response,
-) -> User raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[User, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -367,7 +387,7 @@ pub fn create_user_decode(
 pub fn create_users_with_list_input_request(
   body : Array[User],
 ) -> @http.Request {
-  @http.Request::post("/user/createWithList").json_body(Json(body))
+  @http.Request::post("/user/createWithList").body_json(Json(body))
 }
 
 ///|
@@ -383,9 +403,10 @@ pub fn create_users_with_list_input_decode_json(
 ///
 /// Decodes a successful createUsersWithListInput response.
 pub fn create_users_with_list_input_decode(
-  response : @http.Response,
-) -> User raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[User, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -422,9 +443,10 @@ pub fn login_user_decode_json(
 ///
 /// Decodes a successful loginUser response.
 pub fn login_user_decode(
-  response : @http.Response,
-) -> String raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[String, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
@@ -454,16 +476,17 @@ pub fn get_user_by_name_decode_json(
 ///
 /// Decodes a successful getUserByName response.
 pub fn get_user_by_name_decode(
-  response : @http.Response,
-) -> User raise @runtime.SdkError {
-  decode_response(response)
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[User, @client.ResponseFailure] {
+  decode_response(head, body)
 }
 
 ///|
 ///
 /// Update user resource. The caller handles the response as @http.Response.
 pub fn update_user_request(username : String, body : User) -> @http.Request {
-  @http.Request::put("/user/" + @http.percent_encode(parameter_value(username))).json_body(
+  @http.Request::put("/user/" + @http.percent_encode(parameter_value(username))).body_json(
     Json(body),
   )
 }

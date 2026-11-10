@@ -15,6 +15,18 @@ are optional unless the field is required, and keep a wildcard arm.
 
 ## [Unreleased]
 
+## [0.15.0]
+
+### Changed
+
+- **Use gaato/http 0.6 and gaato/mttp for requests, retries and streaming.**
+  Vendor retry defaults, the API version and the generated vocabulary are
+  retained. Migration: supply Backend and http/rt ports, handle
+  Result[T, AnthropicFailure], and use mttp/jsonkit.Presence. Generated
+  decoders now take ResponseHead and Bytes and return Result[T, ResponseFailure].
+  TransportError and user callback exceptions remain effects. Buffered bodies
+  default to 64 MiB; total call deadlines require Timer and include callbacks.
+
 ## [0.14.0] - 2026-11-09
 
 ### Changed

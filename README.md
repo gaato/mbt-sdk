@@ -1,96 +1,43 @@
 # mbt-sdk
 
-[![CI](https://github.com/gaato/mbt-sdk/actions/workflows/ci.yml/badge.svg)](https://github.com/gaato/mbt-sdk/actions/workflows/ci.yml)
-[![Live compat](https://github.com/gaato/mbt-sdk/actions/workflows/live-compat.yml/badge.svg)](https://github.com/gaato/mbt-sdk/actions/workflows/live-compat.yml)
-[![Canary](https://github.com/gaato/mbt-sdk/actions/workflows/canary.yml/badge.svg)](https://github.com/gaato/mbt-sdk/actions/workflows/canary.yml)
-[![Spec watch](https://github.com/gaato/mbt-sdk/actions/workflows/spec-watch.yml/badge.svg)](https://github.com/gaato/mbt-sdk/actions/workflows/spec-watch.yml)
-[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/gaato/mbt-sdk)
-[![License](https://img.shields.io/github/license/gaato/mbt-sdk)](LICENSE)
+API SDKs and a Codex app-server client for [MoonBit](https://www.moonbitlang.com/).
+Pinned upstream API descriptions generate the public vocabulary; small facades
+add vendor-specific retries, streaming, pagination and error interpretation.
 
-A foundation for writing and *keeping alive* API SDKs in [MoonBit](https://www.moonbitlang.com/). Unofficial SDKs in small languages tend to ship once and rot; this repository is organised so that the two things that rot an SDK — upstream API changes and language changes — are each absorbed in one place.
+| Module | Purpose | Dependencies |
+|---|---|---|
+| [gaato/openai](openai/README.md) | Models, embeddings, Responses and Chat Completions | http, mttp |
+| [gaato/anthropic](anthropic/README.md) | Messages, token counting, Models, tools and streaming | http, mttp |
+| [gaato/github](github/README.md) | Generated REST API, pagination and GraphQL | http, mttp |
+| gaato/jsonrpc | Portable JSON-RPC messages and NDJSON framing | core |
+| gaato/jsonrpc-async | Bidirectional connections and native child processes | jsonrpc, core/async |
+| gaato/codex-protocol | Generated typed Codex calls/events | mttp/jsonkit |
+| [gaato/codex-app-server](codex-app-server/README.md) | Initialized sessions, typed events and handlers | protocol, jsonrpc-async, core/async |
 
-Status: experimental. The HTTP, runtime and API modules are published on [mooncakes](https://mooncakes.io/); the JSON-RPC and Codex modules are not published yet.
+The three HTTP SDKs are published on mooncakes. JSON-RPC and Codex modules
+remain unpublished. HTTP infrastructure lives in [mttp](https://github.com/gaato/mttp):
+gaato/http supplies Backend/Request/Response, gaato/http-async supplies I/O,
+and gaato/mttp supplies client policy. SDK modules do not import a runtime.
 
-## Modules
+The caller supplies a Backend and clock. Wrap AsyncBackend in Decompress when
+content decoding is wanted, and supply ClockTimer for a total call deadline.
+SDK failures are Result values; TransportError and callback exceptions remain
+effects. Buffered bodies default to 64 MiB, SSE events to 16 MiB. Each module
+overview has checked usage examples and its retry/timeout behavior.
 
-| Module | mooncakes | What it is | Depends on |
-|---|---|---|---|
-| `gaato/http` | [![mooncakes](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fmooncakes.io%2Fapi%2Fv0%2Fmodules%2Fgaato%2Fhttp&query=%24.version&label=mooncakes&prefix=v)](https://mooncakes.io/docs/gaato/http) | Sans-IO HTTP vocabulary: `Request`, `Response`, `Headers`, the `Transport` and `BodyStream` traits, middleware, Retry-After and Link parsing, a `Clock` trait, host randomness, a multipart writer, an incremental WHATWG-conformant SSE parser, and a scripted `FakeTransport` / `FakeClock` for tests | nothing (runs on wasm-gc, wasm, js, native) |
-| `gaato/http-async` | [![mooncakes](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fmooncakes.io%2Fapi%2Fv0%2Fmodules%2Fgaato%2Fhttp-async&query=%24.version&label=mooncakes&prefix=v)](https://mooncakes.io/docs/gaato/http-async) | `AsyncTransport` (with a small keep-alive pool per origin) and `AsyncClock` over `moonbitlang/async` (native and js) | `gaato/http`, `moonbitlang/async` |
-| `gaato/jsonrpc` | unpublished | Sans-IO JSON-RPC 2.0 vocabulary: `Message`, `RequestId`, `RpcError`, strict (`"jsonrpc":"2.0"`) and bare (codex app-server) envelopes, NDJSON encoding, an incremental `LineFramer` | nothing (runs on wasm-gc, wasm, js, native) |
-| `gaato/jsonrpc-async` | unpublished | Bidirectional `Connection` over any `moonbitlang/async` reader/writer pair, plus `spawn_child` for JSON-RPC over a child process's stdio (native), with default limits on line size, queued notifications and concurrent inbound requests (`Connection::start` documents them); the base for ACP and codex app-server clients | `gaato/jsonrpc`, `moonbitlang/async` |
-| `gaato/codex-protocol` | unpublished | Codex app-server v2 types, typed calls and events generated from a pinned CLI JSON Schema (draft-07) | `gaato/sdk-runtime` (JSON helpers only) |
-| `gaato/codex-app-server` | unpublished | Initialized Codex connections, native stdio sessions, progress events and explicit approval/user-input handlers; [usage and scope](codex-app-server/README.md) | `gaato/codex-protocol`, `gaato/jsonrpc-async`, `moonbitlang/async` |
-| `gaato/sdk-runtime` | [![mooncakes](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fmooncakes.io%2Fapi%2Fv0%2Fmodules%2Fgaato%2Fsdk-runtime&query=%24.version&label=mooncakes&prefix=v)](https://mooncakes.io/docs/gaato/sdk-runtime) | API-agnostic client runtime: error taxonomy, a pluggable retry decision with `RetryPolicy` presets over `gaato/http/retry` rules, per-attempt and per-call time limits, paired `acquire`/`release` rate limiting, a per-attempt observer, pagination with the SDK's own error type, auth, tri-state JSON fields, open enums | `gaato/http` |
-| `gaato/openai` | [![mooncakes](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fmooncakes.io%2Fapi%2Fv0%2Fmodules%2Fgaato%2Fopenai&query=%24.version&label=mooncakes&prefix=v)](https://mooncakes.io/docs/gaato/openai) | First consumer: a stable hand-written facade for models, embeddings, Responses, and Chat Completions (buffered and streaming), backed by types and operations generated from the vendored OpenAPI spec | `gaato/http`, `gaato/sdk-runtime` |
-| `gaato/anthropic` | [![mooncakes](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fmooncakes.io%2Fapi%2Fv0%2Fmodules%2Fgaato%2Fanthropic&query=%24.version&label=mooncakes&prefix=v)](https://mooncakes.io/docs/gaato/anthropic) | Messages (buffered and streaming), token counting, and Models, backed by generated first-party spec types and operations | `gaato/http`, `gaato/sdk-runtime` |
-| `gaato/github` | [![mooncakes](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fmooncakes.io%2Fapi%2Fv0%2Fmodules%2Fgaato%2Fgithub&query=%24.version&label=mooncakes&prefix=v)](https://mooncakes.io/docs/gaato/github) | The whole GitHub REST API: every operation and its types generated from the first-party OpenAPI description, under a thin facade that sends, paginates and reads errors, plus an untyped GraphQL passthrough; [scope and usage](github/README.md) | `gaato/http`, `gaato/sdk-runtime` |
-| `runtime-tests/` | — | Unpublished. Executes the async behaviour of the modules above (a module without an async runtime cannot run `async test`) | everything |
+## Development
 
-HTTP SDK modules never import an async runtime (see [ARCHITECTURE.md](ARCHITECTURE.md)): the caller passes a `Transport` and a `Clock`. That keeps them portable and makes retry, rate-limit and streaming logic testable with fakes and a fake clock. The Codex SDK keeps generated protocol types portable and puts connection/process ownership in a separate async module.
+- `scripts/generate.sh` regenerates from pinned specs and overlays;
+  `scripts/generate.sh --check` verifies committed output.
+- `scripts/gates.sh` checks supported targets, tests, interfaces, formatting,
+  generation, spec census, resource bounds and documentation.
+- `moon run scripts/coverage_report.mbtx` verifies the coverage ledger.
+- `scripts/live.sh` and `scripts/compat-servers.sh` are opt-in and require
+  credentials or servers. They are excluded from ordinary gates.
 
-```moonbit
-let transport = @http_async.AsyncTransport::new(
-  timeout_ms=600_000,
-  connect_timeout_ms=5_000,
-  max_body_bytes=64 * 1024 * 1024,
-)
-let clock = @http_async.AsyncClock::new()
-let openai = @openai.OpenAI::new(api_key~, transport, clock, timer=@http_async.ClockTimer::new())
-openai.stream_response(@openai.ResponseRequest::new(model~, input="Hello"), event => {
-  if event is OutputTextDelta(text) { print(text) }
-})
-```
-
-Set `max_body_bytes` on the transport: without it a buffered response is read whole however large it is, and an SDK cannot set it for you because the transport is yours. 64 MiB is ample for API JSON; a longer reply fails with `Transport(Protocol(..))` instead of growing memory, and streaming calls are not affected. Error bodies kept in an `SdkError` are cut to their first 1 MiB either way.
-
-The OpenAI and Anthropic clients retry and time out as the official SDKs do (600 s per call, 5 s to connect). An SDK module cannot enforce a time limit without an async runtime, so the caller passes `ClockTimer` as `timer`, and gives the transport matching limits: `AsyncTransport`'s own exchange timeout defaults to 30 s, which would end a long generation first.
-
-For OpenAI-compatible servers that implement Chat Completions, use `ChatRequest` with `chat_completion` or `stream_chat_completion`. The opt-in live suite also accepts `OPENAI_COMPAT_BASE_URL` and `OPENAI_COMPAT_MODEL`; `OPENAI_COMPAT_API_KEY` is optional for local servers.
-
-Anthropic now generates its Messages, token-counting, and Models types and operations from the official SDK's vendored OpenAPI document. See [the Anthropic module](anthropic/README.md) for scope, [the 0.2.0 notes](docs/anthropic-0.2.0.md#migration-from-010) for migrating from 0.1.0, including the `base_url` change, and [live tests](docs/live-tests.md) for the opt-in official API tests.
-
-`gaato/github` is the first module that generates a whole API rather than a chosen slice, and the first consumer of the runtime's `Paginator`, `parse_link_next`, `WindowLimiter` and `rate_limit_headers`. Its facade stays thin on purpose: the generated types are the public surface, so no hand-written mirror has to follow every operation. See [the GitHub module](github/README.md) and `docs/design-m8.md`.
-
-GitHub's GraphQL API is reached through the same client but is deliberately not generated: in OpenAPI a response's shape belongs to the operation, which is what the generator compiles, while in GraphQL it belongs to the query document the caller wrote. There is no operation-to-type table to generate, so `graphql` is a passthrough over `Json` that raises when the reply carries an `errors` array — which GitHub sends with HTTP `200`.
-
-## Generation pipeline
-
-```
-openai/spec/openai.yaml → overlays/fix.yaml → overlays/moonbit.yaml → normalise → IR → openai/src/gen/*.mbt
-      (vendored)          (upstream errors)     (x-moonbit-* hints)       tools/gen (Python)
-```
-
-- Overlays follow the [OpenAPI Overlay Specification 1.0.0](https://spec.openapis.org/overlay/v1.0.0.html) (`update` and `remove` actions). `tools/apply_overlay.py` fails on actions that match nothing or change nothing, so stale corrections surface instead of silently doing nothing.
-- The generator supports JSON and multipart request bodies, form and deep-object query parameters, and tagged unions including disjoint tag-value sets. It refuses unsupported shapes (with a JSON pointer and an overlay annotation) instead of silently degrading to `Json`.
-- Generated code is committed; users do not need Python.
-- GitHub runs the same two stages over `github/spec/api.github.com.2022-11-28.yaml` with `--include-all`, so every operation in the document is generated; `github/overlays/fix.yaml` carries the upstream corrections and `github/overlays/moonbit.yaml` the MoonBit decisions. `docs/census.md` lists which responses stayed raw `Json` and why.
-- Codex uses `codex-protocol/spec/schema.json` → selected JSON Schema (draft-07) reference closure → shared IR/emitter → `codex-protocol/src/gen`. The schema is pinned to CLI 0.155.1; regeneration is offline and is covered by the same `--check` gate.
-
-```sh
-scripts/generate.sh          # apply overlays and regenerate
-scripts/generate.sh --check  # CI: fail if the committed output is stale
-scripts/gates.sh             # every check and test (native tests open loopback sockets)
-scripts/conformance.sh       # opt-in: the SSE parser, transport and runtime against https://badhttp.dev
-scripts/live.sh              # opt-in: live API tests; remote providers need keys, local ones need the servers below
-scripts/compat-servers.sh    # start Ollama (qwen2.5:0.5b, accepts tools) + a LiteLLM proxy speaking Anthropic /v1/messages; prints the *_COMPAT_* env
-```
-
-`scripts/gates.sh` defines the validation suite, including target checks, tests, generation checks, formatting, and `moon info`. It accepts `--no-native-tests` when loopback sockets are unavailable and `--no-js` when Node is unavailable; those options skip coverage. Public interfaces (`pkg.generated.mbti`) are committed alongside the source and regenerated with `moon info` after API changes.
-
-`scripts/live.sh` reads provider settings from the environment or `~/.config/mbt-sdk/env`. Remote tests make actual provider requests and may incur charges. Providers without keys are skipped; `MBT_SDK_ENV=/dev/null` disables loading the settings file.
-
-## Automation
-
-- `ci.yml` — gates on a pinned toolchain image (`ghcr.io/gaato/moonbit:<version>`).
-- `canary.yml` — the same gates daily on `:latest`; red here with green CI means the language moved.
-- `spec-watch.yml` — daily upstream spec check; on change it re-vendors, regenerates, runs the gates and opens a PR.
-- `live-compat.yml` — the live suite against local, key-free OpenAI- and Anthropic-compatible servers (Ollama + LiteLLM, always their latest release, so a change in either shows up here). Remote providers skip without keys.
-
-How the repository is laid out: [ARCHITECTURE.md](ARCHITECTURE.md). What transports, body streams and the incremental parsers guarantee: [CONTRACT.md](CONTRACT.md). Specifications followed, their errata and known deviations: [SPECIFICATIONS.md](SPECIFICATIONS.md).
-
-Design notes (Japanese): `docs/design.md` (M1), `docs/design-m2.md`, `docs/design-m3.md`, `docs/design-m4.md`, `docs/design-m5.md`, `docs/design-m6.md`, `docs/design-m7.md`, `docs/design-m8.md`, `docs/design-m9.md`, `docs/design-m10.md`. Release procedure: `docs/release.md`. Adding an SDK: `docs/new-sdk.md`.
-
-## License
+See [ARCHITECTURE.md](ARCHITECTURE.md), [CONTRACT.md](CONTRACT.md),
+[SPECIFICATIONS.md](SPECIFICATIONS.md), [resource bounds](RESOURCE_BOUNDS.md),
+[coverage](TEST_COVERAGE.md), [adding an SDK](docs/new-sdk.md) and
+[releasing](docs/release.md).
 
 Apache-2.0.
