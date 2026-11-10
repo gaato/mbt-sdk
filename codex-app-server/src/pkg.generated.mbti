@@ -4,14 +4,14 @@ package "gaato/codex-app-server"
 import {
   "gaato/codex-protocol/gen",
   "gaato/jsonrpc",
-  "moonbitlang/async",
-  "moonbitlang/async/io",
+  "moonbitlang/core/async",
+  "moonbitlang/core/async/io",
 }
 
 // Values
-pub async fn[X] connect(@async.TaskGroup[X], &@io.Reader, &@io.Writer, @gen.InitializeParams, close_writer~ : () -> Unit, handlers? : Handlers, on_event? : async (@gen.Event) -> Unit, timeout_ms? : Int32, max_line? : Int32, max_notifications? : Int32, max_inbound? : Int32) -> Client
+pub async fn connect(@async.TaskGroup, &@io.BinaryReader, &@io.BinaryWriter, @gen.InitializeParams, close_writer~ : () -> Unit, handlers? : Handlers, on_event? : async (@gen.Event) -> Unit, timeout_ms? : Int32, max_line? : Int32, max_notifications? : Int32, max_inbound? : Int32) -> Client
 
-pub async fn[X] spawn(@async.TaskGroup[X], @gen.InitializeParams, program? : String, cwd? : String, extra_env? : Map[String, String], handlers? : Handlers, on_event? : async (@gen.Event) -> Unit, timeout_ms? : Int32, max_line? : Int32, max_notifications? : Int32, max_inbound? : Int32) -> Session
+pub async fn spawn(@async.TaskGroup, @gen.InitializeParams, program? : String, cwd? : String, extra_env? : Map[String, String], handlers? : Handlers, on_event? : async (@gen.Event) -> Unit, timeout_ms? : Int32, max_line? : Int32, max_notifications? : Int32, max_inbound? : Int32) -> Session
 
 // Errors
 pub(all) suberror ClientError {

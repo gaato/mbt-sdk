@@ -3,15 +3,15 @@ package "gaato/jsonrpc-async"
 
 import {
   "gaato/jsonrpc",
-  "moonbitlang/async",
-  "moonbitlang/async/io",
-  "moonbitlang/async/process",
+  "moonbitlang/core/async",
+  "moonbitlang/core/async/io",
+  "moonbitlang/core/async/process",
   "moonbitlang/core/debug",
   "moonbitlang/core/json",
 }
 
 // Values
-pub async fn[X] spawn_child(@async.TaskGroup[X], String, Array[String], cwd? : String, extra_env? : Map[String, String], stderr? : &@process.ProcessOutput, envelope? : @jsonrpc.Envelope, max_line? : Int32, max_notifications? : Int32, max_inbound? : Int32, on_request? : async (String, @json.Json?) -> Result[@json.Json, @jsonrpc.RpcError], on_notification? : async (String, @json.Json?) -> Unit) -> Child
+pub async fn spawn_child(@async.TaskGroup, String, Array[String], cwd? : String, extra_env? : Map[String, String], stderr? : @process.ProcessOutput, envelope? : @jsonrpc.Envelope, max_line? : Int32, max_notifications? : Int32, max_inbound? : Int32, on_request? : async (String, @json.Json?) -> Result[@json.Json, @jsonrpc.RpcError], on_notification? : async (String, @json.Json?) -> Unit) -> Child
 
 // Errors
 #derive(@debug.Debug)
@@ -38,7 +38,7 @@ pub fn Connection::close(Self) -> Unit
 pub fn Connection::decode_errors(Self) -> Int32
 pub fn Connection::is_closed(Self) -> Bool
 pub async fn Connection::notify(Self, String, params? : @json.Json) -> Unit raise RpcFailure
-pub fn[X] Connection::start(@async.TaskGroup[X], &@io.Reader, &@io.Writer, close_writer? : () -> Unit, envelope? : @jsonrpc.Envelope, max_line? : Int32, max_notifications? : Int32, max_inbound? : Int32, on_request? : async (String, @json.Json?) -> Result[@json.Json, @jsonrpc.RpcError], on_notification? : async (String, @json.Json?) -> Unit) -> Self
+pub fn Connection::start(@async.TaskGroup, &@io.BinaryReader, &@io.BinaryWriter, close_writer? : () -> Unit, envelope? : @jsonrpc.Envelope, max_line? : Int32, max_notifications? : Int32, max_inbound? : Int32, on_request? : async (String, @json.Json?) -> Result[@json.Json, @jsonrpc.RpcError], on_notification? : async (String, @json.Json?) -> Unit) -> Self
 
 // Type aliases
 pub type NotificationHandler = async (String, @json.Json?) -> Unit

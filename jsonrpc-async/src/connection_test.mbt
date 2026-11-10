@@ -1,6 +1,6 @@
 ///|
-fn[X] pair(
-  group : @async.TaskGroup[X],
+fn pair(
+  group : @async.TaskGroup,
   left_handler? : @jsonrpc_async.RequestHandler,
   right_handler? : @jsonrpc_async.RequestHandler,
   right_notification? : @jsonrpc_async.NotificationHandler,
@@ -175,7 +175,7 @@ async test "peer close fails pending and future calls and is idempotent" {
         _ => fail("expected closed new call")
       }
       // Cancel the waiting handler with its owning group.
-      group.return_immediately(())
+      group.return_immediately()
     })
   })
 }
@@ -220,7 +220,7 @@ async test "garbage strict-envelope errors and unknown responses allow later cal
       for index, line in lines {
         peer_write.write(line)
         let reply = @jsonrpc.decode_line(
-          @utf8.encode(peer_read.read_until("\n").unwrap()),
+          peer_read.read_until(b"\n").unwrap(),
           envelope=Strict,
         )
         guard reply is Failure(id=Null, error~) else {
@@ -246,7 +246,7 @@ async test "garbage strict-envelope errors and unknown responses allow later cal
         ),
       )
       let reply = @jsonrpc.decode_line(
-        @utf8.encode(peer_read.read_until("\n").unwrap()),
+        peer_read.read_until(b"\n").unwrap(),
         envelope=Strict,
       )
       assert_eq(reply, @jsonrpc.Message::Response(id=Str("ok"), result=true))

@@ -45,9 +45,9 @@ fn overloaded_reply(id : @jsonrpc.RequestId) -> @jsonrpc.Message {
 /// Sends a reply that needs no handler from a task of its own. At most
 /// `max_inbound` wait to be written; past that the read loop waits for one to
 /// finish, which depends on the peer reading and never on a handler.
-async fn[X] Connection::reply_later(
+async fn Connection::reply_later(
   self : Connection,
-  group : @async.TaskGroup[X],
+  group : @async.TaskGroup,
   reply : @jsonrpc.Message,
 ) -> Unit {
   self.replies.acquire()
@@ -61,9 +61,9 @@ async fn[X] Connection::reply_later(
 /// Routes one received line. It waits only in `reply_later`: a handler that
 /// awaits a call's response needs this loop to keep reading, so a request past
 /// `max_inbound` is refused rather than waited for.
-async fn[X] Connection::dispatch(
+async fn Connection::dispatch(
   self : Connection,
-  group : @async.TaskGroup[X],
+  group : @async.TaskGroup,
   line : Bytes,
   on_request : RequestHandler,
 ) -> Unit {

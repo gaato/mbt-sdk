@@ -8,13 +8,13 @@ pub struct Child {
 ///|
 /// Starts a child with NDJSON on stdin/stdout. Stderr is inherited by default.
 /// The limits and handlers are passed to `Connection::start`.
-pub async fn[X] spawn_child(
-  group : @async.TaskGroup[X],
+pub async fn spawn_child(
+  group : @async.TaskGroup,
   program : String,
   args : Array[String],
   cwd? : String,
   extra_env? : Map[String, String],
-  stderr? : &@process.ProcessOutput,
+  stderr? : @process.ProcessOutput,
   envelope~ : @jsonrpc.Envelope = Strict,
   max_line? : Int32,
   max_notifications? : Int32,
@@ -30,8 +30,8 @@ pub async fn[X] spawn_child(
     group,
     program,
     args,
-    stdin~,
-    stdout~,
+    stdin=Shared(stdin),
+    stdout=Shared(stdout),
     stderr?,
     cwd?=cwd.map(value => value[:]),
     extra_env?,

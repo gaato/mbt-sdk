@@ -43,8 +43,8 @@ fn thread_result() -> Json {
 }
 
 ///|
-fn[X] pipes(
-  group : @async.TaskGroup[X],
+fn pipes(
+  group : @async.TaskGroup,
 ) -> (@io.PipeRead, @io.PipeWrite, @io.PipeRead, @io.PipeWrite) {
   let (client_read, server_write) = @io.pipe()
   let (server_read, client_write) = @io.pipe()

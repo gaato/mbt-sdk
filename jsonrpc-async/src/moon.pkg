@@ -2,10 +2,10 @@ supported_targets = "js + native"
 
 import {
   "gaato/jsonrpc",
-  "moonbitlang/async",
-  "moonbitlang/async/io",
-  "moonbitlang/async/aqueue",
-  "moonbitlang/async/process",
+  "moonbitlang/core/async",
+  "moonbitlang/core/async/io",
+  "moonbitlang/core/async/aqueue",
+  "moonbitlang/core/async/process",
   "moonbitlang/core/debug",
 }
 
@@ -24,6 +24,12 @@ import {
 warnings = "-unused_package"
 
 options(
+  "allow-experimental-packages": [
+    "moonbitlang/core/async",
+    "moonbitlang/core/async/io",
+    "moonbitlang/core/async/aqueue",
+    "moonbitlang/core/async/process",
+  ],
   targets: {
     "child.mbt": [ "native" ],
     "child_test.mbt": [ "native" ],

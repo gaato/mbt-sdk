@@ -24,7 +24,7 @@ reader/writer pair, not WebSocket frames.
 ## Usage
 
 Import `gaato/codex-app-server` as `@codex`, `gaato/codex-protocol/gen` as
-`@protocol`, `moonbitlang/async`, and `moonbitlang/async/aqueue`. Native example:
+`@protocol`, `moonbitlang/core/async`, and `moonbitlang/core/async/aqueue`. Native example:
 
 ```moonbit
 @async.with_task_group(group => {

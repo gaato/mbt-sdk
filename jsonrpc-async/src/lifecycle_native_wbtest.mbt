@@ -18,7 +18,7 @@ async test "lines are limited to 64 MiB when max_line is omitted" {
         })
         let rpc = Connection::start(group, read, write)
         group.spawn_bg(() => {
-          ignore(peer_read.read_until("\n"))
+          ignore(peer_read.read_until(b"\n"))
           let chunk = Bytes::make(1024 * 1024, b'x')
           for _ in 0..<(limit / chunk.length()) {
             peer_write.write(chunk)

@@ -25,10 +25,10 @@ pub type EventHandler = async (@protocol.Event) -> Unit
 /// once; omitted, the `gaato/jsonrpc-async` defaults (64 MiB, 32,768, 64)
 /// apply. A request past `max_inbound` is refused with error -32001; exceeding
 /// either of the others fails the connection.
-pub async fn[X] connect(
-  group : @async.TaskGroup[X],
-  reader : &@io.Reader,
-  writer : &@io.Writer,
+pub async fn connect(
+  group : @async.TaskGroup,
+  reader : &@io.BinaryReader,
+  writer : &@io.BinaryWriter,
   initialize : @protocol.InitializeParams,
   close_writer~ : () -> Unit,
   handlers~ : Handlers = Handlers::new(),

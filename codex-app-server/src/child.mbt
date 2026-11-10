@@ -10,8 +10,8 @@ pub struct Session {
 /// Pass extra_env (for example CODEX_HOME) to isolate configuration if needed.
 /// Child and pipe lifetime is bounded by the supplied task group.
 /// The limits are passed on as in `connect`.
-pub async fn[X] spawn(
-  group : @async.TaskGroup[X],
+pub async fn spawn(
+  group : @async.TaskGroup,
   initialize : @protocol.InitializeParams,
   program~ : String = "codex",
   cwd? : String,

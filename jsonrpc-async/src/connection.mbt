@@ -32,7 +32,7 @@ pub type NotificationHandler = async (String, Json?) -> Unit
 ///|
 /// A bidirectional NDJSON connection whose tasks belong to the supplied group.
 pub struct Connection {
-  priv writer : &@io.Writer
+  priv writer : &@io.BinaryWriter
   priv close_writer : () -> Unit
   priv envelope : @jsonrpc.Envelope
   priv mutex : @async.Mutex
@@ -108,10 +108,10 @@ fn read_failure(error : Error) -> RpcFailure {
 /// handler, those refusals and the errors for malformed lines, waiting to be
 /// written. Past that, reading waits until the peer reads them.
 /// `max_notifications` and `max_inbound` must be positive.
-pub fn[X] Connection::start(
-  group : @async.TaskGroup[X],
-  reader : &@io.Reader,
-  writer : &@io.Writer,
+pub fn Connection::start(
+  group : @async.TaskGroup,
+  reader : &@io.BinaryReader,
+  writer : &@io.BinaryWriter,
   close_writer~ : () -> Unit = () => (),
   envelope~ : @jsonrpc.Envelope = Strict,
   max_line~ : Int32 = default_max_line,
@@ -151,7 +151,7 @@ pub fn[X] Connection::start(
     let framer = @jsonrpc.LineFramer::new(max_line~)
     let failure : Error? = try {
       for ;; {
-        match reader.read_some(max_len=slice_bytes) {
+        match reader.read() {
           Some(bytes) =>
             // A reader may return more than `max_len`, so slice here too.
             for start = 0; start < bytes.length(); start = start + slice_bytes {

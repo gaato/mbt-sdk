@@ -6,10 +6,19 @@ suberror HandlerBug {
 ///|
 struct RecordedWriter {
   bytes : Array[Byte]
+  controller : @io.BinaryWriterController
 }
 
 ///|
-impl @io.Writer for RecordedWriter with fn write_once(
+impl @io.BinaryWriterImpl for RecordedWriter with fn get_controller(self) {
+  self.controller
+}
+
+///|
+impl @io.BinaryWriter for RecordedWriter
+
+///|
+impl @io.BinaryWriterImpl for RecordedWriter with fn raw_write_impl(
   self,
   bytes,
   offset~,
@@ -24,7 +33,10 @@ impl @io.Writer for RecordedWriter with fn write_once(
 ///|
 async test "raising request handler replies internal error then fails the group" {
   @async.with_timeout(5000, () => {
-    let output : RecordedWriter = { bytes: [], }
+    let output : RecordedWriter = {
+      bytes: [],
+      controller: @io.BinaryWriterController(),
+    }
     try
       @async.with_task_group(group => {
         let (reader, writer) = @io.pipe()
@@ -66,7 +78,10 @@ async test "raising notification handler fails the group" {
     try
       @async.with_task_group(group => {
         let (reader, writer) = @io.pipe()
-        let output : RecordedWriter = { bytes: [], }
+        let output : RecordedWriter = {
+          bytes: [],
+          controller: @io.BinaryWriterController(),
+        }
         group.add_defer(() => {
           reader.close()
           writer.close()
@@ -113,7 +128,7 @@ async test "EOF still permits a response to the final unterminated request" {
       writer.write(b"{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"last\"}")
       writer.close()
       let reply = @jsonrpc.decode_line(
-        @utf8.encode(reply_reader.read_until("\n").unwrap()),
+        reply_reader.read_until(b"\n").unwrap(),
         envelope=Strict,
       )
       assert_eq(reply, @jsonrpc.Message::Response(id=Number(1L), result=true))

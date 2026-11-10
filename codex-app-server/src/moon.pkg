@@ -4,16 +4,21 @@ import {
   "gaato/codex-protocol/gen" @protocol,
   "gaato/jsonrpc",
   "gaato/jsonrpc-async" @rpc,
-  "moonbitlang/async",
-  "moonbitlang/async/io",
+  "moonbitlang/core/async",
+  "moonbitlang/core/async/io",
   "moonbitlang/core/json",
 }
 
 import {
   "gaato/codex-app-server" @codex,
-  "moonbitlang/async/aqueue",
+  "moonbitlang/core/async/aqueue",
 } for "test"
 
 options(
+  "allow-experimental-packages": [
+    "moonbitlang/core/async",
+    "moonbitlang/core/async/io",
+    "moonbitlang/core/async/aqueue",
+  ],
   targets: { "child.mbt": [ "native" ], "child_test.mbt": [ "native" ] },
 )

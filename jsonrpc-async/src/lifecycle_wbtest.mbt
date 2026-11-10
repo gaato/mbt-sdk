@@ -26,7 +26,7 @@ async test "cancellation bypasses catch removes pending and ignores late reply" 
           },
         )
       })
-      ignore(peer_read.read_until("\n"))
+      ignore(peer_read.read_until(b"\n"))
       assert_eq(connection.pending.length(), 1)
       task.cancel()
       // Waiting on an explicitly cancelled task reports
@@ -46,7 +46,7 @@ async test "cancellation bypasses catch removes pending and ignores late reply" 
       )
       assert_eq(connection.decode_errors(), 0)
       let next = group.spawn(() => connection.call("next"))
-      ignore(peer_read.read_until("\n"))
+      ignore(peer_read.read_until(b"\n"))
       peer_write.write(
         @jsonrpc.Message::Response(id=Number(2L), result=false).encode(
           envelope=Strict,
@@ -76,7 +76,7 @@ async test "EOF decodes an unterminated response and preserves its result" {
         write.close()
       })
       let task = group.spawn(() => connection.call("tail"))
-      ignore(peer_read.read_until("\n"))
+      ignore(peer_read.read_until(b"\n"))
       peer_write.write(b"{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":null}")
       peer_write.close()
       assert_eq(task.wait(), Json::null())
@@ -131,7 +131,7 @@ async test "LineTooLong fails pending requests with Transport and exits the grou
         let rpc = Connection::start(group, read, write, max_line=4)
         connection = Some(rpc)
         group.spawn_bg(() => {
-          ignore(peer_read.read_until("\n"))
+          ignore(peer_read.read_until(b"\n"))
           peer_write.write(b"12345")
         })
         ignore(rpc.call("pending"))
@@ -234,10 +234,7 @@ async test "a notification backlog over max_notifications fails the connection" 
 
 ///|
 async fn read_message(reader : @io.PipeRead) -> @jsonrpc.Message {
-  @jsonrpc.decode_line(
-    @utf8.encode(reader.read_until("\n").unwrap()),
-    envelope=Strict,
-  )
+  @jsonrpc.decode_line(reader.read_until(b"\n").unwrap(), envelope=Strict)
 }
 
 ///|
@@ -406,33 +403,33 @@ async test "a request past the default max_inbound of 64 is refused" {
 }
 
 ///|
-/// A reader that returns each chunk whole, whatever `max_len` asks for, as a
-/// reader may, and records the `max_len` of every read. Its other methods go
-/// to an idle pipe, since `read_some` is the only one `Connection` calls.
+/// A binary reader that returns each chunk whole. Connection slices it before
+/// framing, since core/async's BinaryReader::read has no size parameter.
 struct ChunkReader {
+  controller : @io.BinaryReaderController
   idle : @io.PipeRead
   chunks : Array[Bytes]
   max_lens : Array[Int32?]
 }
 
 ///|
-impl @io.Reader for ChunkReader with fn _get_internal_buffer(self) {
-  @io.Reader::_get_internal_buffer(self.idle)
+impl @io.BinaryReaderImpl for ChunkReader with fn get_controller(self) {
+  self.controller
 }
 
 ///|
-impl @io.Reader for ChunkReader with fn _direct_read(
+impl @io.BinaryReaderImpl for ChunkReader with fn raw_read_impl(
   self,
   dst,
   offset~,
   max_len~,
 ) {
-  @io.Reader::_direct_read(self.idle, dst, offset~, max_len~)
+  self.idle.read_into(dst, offset~, max_len~)
 }
 
 ///|
-impl @io.Reader for ChunkReader with fn read_some(self, max_len?) {
-  self.max_lens.push(max_len)
+impl @io.BinaryReader for ChunkReader with fn read(self) {
+  self.max_lens.push(None)
   if self.chunks.is_empty() {
     None
   } else {
@@ -472,6 +469,7 @@ async test "a read's first lines are dispatched before the rest is parsed" {
         backing[i] = byte
       }
       let reader = ChunkReader::{
+        controller: @io.BinaryReaderController(),
         idle,
         chunks: [backing.unsafe_reinterpret_as_bytes()],
         max_lens: [],
@@ -501,7 +499,7 @@ async test "a read's first lines are dispatched before the rest is parsed" {
         ignore(read_message(peer_read))
       }
       assert_eq(notes.get(), Some({ "v": "edit" }))
-      assert_eq(reader.max_lens, [Some(slice_bytes), Some(slice_bytes)])
+      assert_eq(reader.max_lens, [None, None])
     })
   })
 }
