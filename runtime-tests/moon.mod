@@ -19,6 +19,6 @@ import {
   "gaato/mttp@0.1.0",
   "gaato/openai@0.7.0",
   "gaato/anthropic@0.15.0",
-  "gaato/github@0.20.0",
+  "gaato/github@0.21.0",
   "gaato/fixture-badhttp@0.0.0",
 }

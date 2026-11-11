@@ -34276,12 +34276,13 @@ pub impl @json.FromJson for IssueFieldDataType with fn from_json(value, path) {
 
 ///|
 ///
-/// The visibility of the issue field. Can be `organization_members_only` (visible only within the organization) or `all` (visible to all users who can see issues).
+/// The visibility of the issue field. Organization-owned fields return `organization_members_only` for restricted visibility (visible to organization members and to collaborators on the repository the field is read through), or `all` (visible to all users who can see issues). For create and update requests, use `restricted` instead of the deprecated `organization_members_only` input. Existing REST API versions continue to return `organization_members_only` for restricted organization-owned fields, even when a request uses `restricted`. Any change to this response spelling will be introduced in a future REST API version.
 #derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum IssueFieldVisibility {
   OrganizationMembersOnly
   All
+  Restricted
   Unknown(String)
 }
 
@@ -34301,6 +34302,7 @@ pub impl ToJson for IssueFieldVisibility with fn to_json(self) {
   let raw = match self {
     OrganizationMembersOnly => "organization_members_only"
     All => "all"
+    Restricted => "restricted"
     Unknown(raw) => raw
   }
   Json(raw)
@@ -34320,6 +34322,7 @@ pub impl @json.FromJson for IssueFieldVisibility with fn from_json(value, path) 
       match raw {
         "organization_members_only" => Some(OrganizationMembersOnly)
         "all" => Some(All)
+        "restricted" => Some(Restricted)
         _ => None
       }
     },
@@ -34483,7 +34486,7 @@ pub impl @json.FromJson for IssueFieldOptionsItem with fn from_json(value, path)
 
 ///|
 ///
-/// A custom attribute defined at the organization level for attaching structured data to issues.
+/// A custom attribute defined by a repository owner for attaching structured data to issues.
 #derive(Eq, @debug.Debug)
 pub(all) struct IssueField {
   id : Int32
@@ -34638,12 +34641,13 @@ pub impl @json.FromJson for OrganizationCreateIssueFieldDataType with fn from_js
 
 ///|
 ///
-/// The visibility of the issue field. Can be `organization_members_only` (visible only within the organization) or `all` (visible to all users who can see issues). Only used when the visibility settings feature is enabled. Defaults to `organization_members_only`.
+/// The visibility of the issue field. Can be `restricted` (visible to organization members and to collaborators on the repository the field is read through) or `all` (visible to all users who can see issues). `organization_members_only` is deprecated. Use `restricted` instead. Removal will be announced for a future REST API version; existing REST API versions will continue to support this value. Only used when the visibility settings feature is enabled. Defaults to `organization_members_only`.
 #derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum OrganizationCreateIssueFieldVisibility {
   OrganizationMembersOnly
   All
+  Restricted
   Custom(String)
 }
 
@@ -34663,6 +34667,7 @@ pub impl ToJson for OrganizationCreateIssueFieldVisibility with fn to_json(self)
   let raw = match self {
     OrganizationMembersOnly => "organization_members_only"
     All => "all"
+    Restricted => "restricted"
     Custom(raw) => raw
   }
   Json(raw)
@@ -34687,6 +34692,7 @@ pub impl @json.FromJson for OrganizationCreateIssueFieldVisibility with fn from_
       match raw {
         "organization_members_only" => Some(OrganizationMembersOnly)
         "all" => Some(All)
+        "restricted" => Some(Restricted)
         _ => None
       }
     },
@@ -34924,12 +34930,13 @@ pub impl @json.FromJson for OrganizationCreateIssueField with fn from_json(
 
 ///|
 ///
-/// The visibility of the issue field. Can be `organization_members_only` (visible only within the organization) or `all` (visible to all users who can see issues). Only used when the visibility settings feature is enabled.
+/// The visibility of the issue field. Can be `restricted` (visible to organization members and to collaborators on the repository the field is read through) or `all` (visible to all users who can see issues). `organization_members_only` is deprecated. Use `restricted` instead. Removal will be announced for a future REST API version; existing REST API versions will continue to support this value. Only used when the visibility settings feature is enabled.
 #derive(Eq, @debug.Debug)
 #non_exhaustive
 pub(all) enum OrganizationUpdateIssueFieldVisibility {
   OrganizationMembersOnly
   All
+  Restricted
   Custom(String)
 }
 
@@ -34949,6 +34956,7 @@ pub impl ToJson for OrganizationUpdateIssueFieldVisibility with fn to_json(self)
   let raw = match self {
     OrganizationMembersOnly => "organization_members_only"
     All => "all"
+    Restricted => "restricted"
     Custom(raw) => raw
   }
   Json(raw)
@@ -34973,6 +34981,7 @@ pub impl @json.FromJson for OrganizationUpdateIssueFieldVisibility with fn from_
       match raw {
         "organization_members_only" => Some(OrganizationMembersOnly)
         "all" => Some(All)
+        "restricted" => Some(Restricted)
         _ => None
       }
     },
@@ -35213,7 +35222,7 @@ pub impl @json.FromJson for OrganizationUpdateIssueField with fn from_json(
 /// Color for the issue type.
 #derive(Eq, @debug.Debug)
 #non_exhaustive
-pub(all) enum OrganizationCreateIssueTypeColor {
+pub(all) enum IssueTypeRequestColor {
   Gray
   Blue
   Green
@@ -35226,18 +35235,18 @@ pub(all) enum OrganizationCreateIssueTypeColor {
 }
 
 ///|
-pub extend OrganizationCreateIssueTypeColor with Eq::{equal, not_equal}
+pub extend IssueTypeRequestColor with Eq::{equal, not_equal}
 
 ///|
-pub extend OrganizationCreateIssueTypeColor with @debug.Debug::{to_repr}
+pub extend IssueTypeRequestColor with @debug.Debug::{to_repr}
 
 ///|
 ///
 /// Encodes this string enum as JSON.
-pub extend OrganizationCreateIssueTypeColor with ToJson::{to_json}
+pub extend IssueTypeRequestColor with ToJson::{to_json}
 
 ///|
-pub impl ToJson for OrganizationCreateIssueTypeColor with fn to_json(self) {
+pub impl ToJson for IssueTypeRequestColor with fn to_json(self) {
   let raw = match self {
     Gray => "gray"
     Blue => "blue"
@@ -35255,13 +35264,10 @@ pub impl ToJson for OrganizationCreateIssueTypeColor with fn to_json(self) {
 ///|
 ///
 /// Decodes this string enum from JSON.
-pub extend OrganizationCreateIssueTypeColor with @json.FromJson::{from_json}
+pub extend IssueTypeRequestColor with @json.FromJson::{from_json}
 
 ///|
-pub impl @json.FromJson for OrganizationCreateIssueTypeColor with fn from_json(
-  value,
-  path,
-) {
+pub impl @json.FromJson for IssueTypeRequestColor with fn from_json(value, path) {
   @sdkjson.open_string(
     value,
     path,
@@ -35284,30 +35290,30 @@ pub impl @json.FromJson for OrganizationCreateIssueTypeColor with fn from_json(
 
 ///|
 ///
-/// Generated representation of OrganizationCreateIssueType.
+/// Generated representation of IssueTypeRequest.
 #derive(Eq, @debug.Debug)
-pub(all) struct OrganizationCreateIssueType {
+pub(all) struct IssueTypeRequest {
   name : String
   is_enabled : Bool
   description : @sdkjson.Presence[String]
-  color : @sdkjson.Presence[OrganizationCreateIssueTypeColor]
+  color : @sdkjson.Presence[IssueTypeRequestColor]
 }
 
 ///|
-pub extend OrganizationCreateIssueType with Eq::{equal, not_equal}
+pub extend IssueTypeRequest with Eq::{equal, not_equal}
 
 ///|
-pub extend OrganizationCreateIssueType with @debug.Debug::{to_repr}
+pub extend IssueTypeRequest with @debug.Debug::{to_repr}
 
 ///|
 ///
-/// Creates a OrganizationCreateIssueType with omitted optional fields absent.
-pub fn OrganizationCreateIssueType::new(
+/// Creates a IssueTypeRequest with omitted optional fields absent.
+pub fn IssueTypeRequest::new(
   name~ : String,
   is_enabled~ : Bool,
   description? : String,
-  color? : OrganizationCreateIssueTypeColor,
-) -> OrganizationCreateIssueType {
+  color? : IssueTypeRequestColor,
+) -> IssueTypeRequest {
   {
     name,
     is_enabled,
@@ -35319,10 +35325,10 @@ pub fn OrganizationCreateIssueType::new(
 ///|
 ///
 /// Encodes this value as JSON.
-pub extend OrganizationCreateIssueType with ToJson::{to_json}
+pub extend IssueTypeRequest with ToJson::{to_json}
 
 ///|
-pub impl ToJson for OrganizationCreateIssueType with fn to_json(self) {
+pub impl ToJson for IssueTypeRequest with fn to_json(self) {
   @sdkjson.ObjBuilder::new()
   .field("name", self.name)
   .field("is_enabled", self.is_enabled)
@@ -35334,155 +35340,10 @@ pub impl ToJson for OrganizationCreateIssueType with fn to_json(self) {
 ///|
 ///
 /// Decodes this value from JSON.
-pub extend OrganizationCreateIssueType with @json.FromJson::{from_json}
+pub extend IssueTypeRequest with @json.FromJson::{from_json}
 
 ///|
-pub impl @json.FromJson for OrganizationCreateIssueType with fn from_json(
-  value,
-  path,
-) {
-  let obj = @sdkjson.expect_object(value, path)
-  {
-    name: required_field(obj, "name", path),
-    is_enabled: required_field(obj, "is_enabled", path),
-    description: @sdkjson.presence_field(obj, "description", path),
-    color: @sdkjson.presence_field(obj, "color", path),
-  }
-}
-
-///|
-///
-/// Color for the issue type.
-#derive(Eq, @debug.Debug)
-#non_exhaustive
-pub(all) enum OrganizationUpdateIssueTypeColor {
-  Gray
-  Blue
-  Green
-  Yellow
-  Orange
-  Red
-  Pink
-  Purple
-  Custom(String)
-}
-
-///|
-pub extend OrganizationUpdateIssueTypeColor with Eq::{equal, not_equal}
-
-///|
-pub extend OrganizationUpdateIssueTypeColor with @debug.Debug::{to_repr}
-
-///|
-///
-/// Encodes this string enum as JSON.
-pub extend OrganizationUpdateIssueTypeColor with ToJson::{to_json}
-
-///|
-pub impl ToJson for OrganizationUpdateIssueTypeColor with fn to_json(self) {
-  let raw = match self {
-    Gray => "gray"
-    Blue => "blue"
-    Green => "green"
-    Yellow => "yellow"
-    Orange => "orange"
-    Red => "red"
-    Pink => "pink"
-    Purple => "purple"
-    Custom(raw) => raw
-  }
-  Json(raw)
-}
-
-///|
-///
-/// Decodes this string enum from JSON.
-pub extend OrganizationUpdateIssueTypeColor with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for OrganizationUpdateIssueTypeColor with fn from_json(
-  value,
-  path,
-) {
-  @sdkjson.open_string(
-    value,
-    path,
-    raw => {
-      match raw {
-        "gray" => Some(Gray)
-        "blue" => Some(Blue)
-        "green" => Some(Green)
-        "yellow" => Some(Yellow)
-        "orange" => Some(Orange)
-        "red" => Some(Red)
-        "pink" => Some(Pink)
-        "purple" => Some(Purple)
-        _ => None
-      }
-    },
-    raw => Custom(raw),
-  )
-}
-
-///|
-///
-/// Generated representation of OrganizationUpdateIssueType.
-#derive(Eq, @debug.Debug)
-pub(all) struct OrganizationUpdateIssueType {
-  name : String
-  is_enabled : Bool
-  description : @sdkjson.Presence[String]
-  color : @sdkjson.Presence[OrganizationUpdateIssueTypeColor]
-}
-
-///|
-pub extend OrganizationUpdateIssueType with Eq::{equal, not_equal}
-
-///|
-pub extend OrganizationUpdateIssueType with @debug.Debug::{to_repr}
-
-///|
-///
-/// Creates a OrganizationUpdateIssueType with omitted optional fields absent.
-pub fn OrganizationUpdateIssueType::new(
-  name~ : String,
-  is_enabled~ : Bool,
-  description? : String,
-  color? : OrganizationUpdateIssueTypeColor,
-) -> OrganizationUpdateIssueType {
-  {
-    name,
-    is_enabled,
-    description: @sdkjson.Presence::from_option(description),
-    color: @sdkjson.Presence::from_option(color),
-  }
-}
-
-///|
-///
-/// Encodes this value as JSON.
-pub extend OrganizationUpdateIssueType with ToJson::{to_json}
-
-///|
-pub impl ToJson for OrganizationUpdateIssueType with fn to_json(self) {
-  @sdkjson.ObjBuilder::new()
-  .field("name", self.name)
-  .field("is_enabled", self.is_enabled)
-  .presence("description", self.description)
-  .presence("color", self.color)
-  .build()
-}
-
-///|
-///
-/// Decodes this value from JSON.
-pub extend OrganizationUpdateIssueType with @json.FromJson::{from_json}
-
-///|
-pub impl @json.FromJson for OrganizationUpdateIssueType with fn from_json(
-  value,
-  path,
-) {
+pub impl @json.FromJson for IssueTypeRequest with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
   {
     name: required_field(obj, "name", path),
@@ -98872,6 +98733,975 @@ pub impl @json.FromJson for GpgKey with fn from_json(value, path) {
     expires_at: decode_nullable_field(obj, "expires_at", path),
     revoked: required_field(obj, "revoked", path),
     raw_key: decode_nullable_field(obj, "raw_key", path),
+  }
+}
+
+///|
+///
+/// The data type of the issue field.
+#derive(Eq, @debug.Debug)
+#non_exhaustive
+pub(all) enum UserIssueFieldDataType {
+  Text
+  Date
+  SingleSelect
+  MultiSelect
+  Number
+  Unknown(String)
+}
+
+///|
+pub extend UserIssueFieldDataType with Eq::{equal, not_equal}
+
+///|
+pub extend UserIssueFieldDataType with @debug.Debug::{to_repr}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend UserIssueFieldDataType with ToJson::{to_json}
+
+///|
+pub impl ToJson for UserIssueFieldDataType with fn to_json(self) {
+  let raw = match self {
+    Text => "text"
+    Date => "date"
+    SingleSelect => "single_select"
+    MultiSelect => "multi_select"
+    Number => "number"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend UserIssueFieldDataType with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for UserIssueFieldDataType with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "text" => Some(Text)
+        "date" => Some(Date)
+        "single_select" => Some(SingleSelect)
+        "multi_select" => Some(MultiSelect)
+        "number" => Some(Number)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// The visibility of the issue field. Can be `restricted` (visible only to the owner and to collaborators on the repository the field is read through) or `all` (visible to all users who can see issues).
+#derive(Eq, @debug.Debug)
+#non_exhaustive
+pub(all) enum UserIssueFieldVisibility {
+  Restricted
+  All
+  Unknown(String)
+}
+
+///|
+pub extend UserIssueFieldVisibility with Eq::{equal, not_equal}
+
+///|
+pub extend UserIssueFieldVisibility with @debug.Debug::{to_repr}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend UserIssueFieldVisibility with ToJson::{to_json}
+
+///|
+pub impl ToJson for UserIssueFieldVisibility with fn to_json(self) {
+  let raw = match self {
+    Restricted => "restricted"
+    All => "all"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend UserIssueFieldVisibility with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for UserIssueFieldVisibility with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "restricted" => Some(Restricted)
+        "all" => Some(All)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// The color of the option.
+#derive(Eq, @debug.Debug)
+#non_exhaustive
+pub(all) enum UserIssueFieldOptionsItemColor {
+  Gray
+  Blue
+  Green
+  Yellow
+  Orange
+  Red
+  Pink
+  Purple
+  Unknown(String)
+}
+
+///|
+pub extend UserIssueFieldOptionsItemColor with Eq::{equal, not_equal}
+
+///|
+pub extend UserIssueFieldOptionsItemColor with @debug.Debug::{to_repr}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend UserIssueFieldOptionsItemColor with ToJson::{to_json}
+
+///|
+pub impl ToJson for UserIssueFieldOptionsItemColor with fn to_json(self) {
+  let raw = match self {
+    Gray => "gray"
+    Blue => "blue"
+    Green => "green"
+    Yellow => "yellow"
+    Orange => "orange"
+    Red => "red"
+    Pink => "pink"
+    Purple => "purple"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend UserIssueFieldOptionsItemColor with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for UserIssueFieldOptionsItemColor with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "gray" => Some(Gray)
+        "blue" => Some(Blue)
+        "green" => Some(Green)
+        "yellow" => Some(Yellow)
+        "orange" => Some(Orange)
+        "red" => Some(Red)
+        "pink" => Some(Pink)
+        "purple" => Some(Purple)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of UserIssueFieldOptionsItem.
+#derive(Eq, @debug.Debug)
+pub(all) struct UserIssueFieldOptionsItem {
+  id : Int32
+  name : String
+  description : @sdkjson.Presence[String]
+  color : @sdkjson.Presence[UserIssueFieldOptionsItemColor]
+  priority : @sdkjson.Presence[Int32]
+  created_at : String?
+  updated_at : String?
+}
+
+///|
+pub extend UserIssueFieldOptionsItem with Eq::{equal, not_equal}
+
+///|
+pub extend UserIssueFieldOptionsItem with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a UserIssueFieldOptionsItem with omitted optional fields absent.
+pub fn UserIssueFieldOptionsItem::new(
+  id~ : Int32,
+  name~ : String,
+  description? : String,
+  color? : UserIssueFieldOptionsItemColor,
+  priority? : Int32,
+  created_at? : String,
+  updated_at? : String,
+) -> UserIssueFieldOptionsItem {
+  {
+    id,
+    name,
+    description: @sdkjson.Presence::from_option(description),
+    color: @sdkjson.Presence::from_option(color),
+    priority: @sdkjson.Presence::from_option(priority),
+    created_at,
+    updated_at,
+  }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend UserIssueFieldOptionsItem with ToJson::{to_json}
+
+///|
+pub impl ToJson for UserIssueFieldOptionsItem with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("id", self.id)
+  .field("name", self.name)
+  .presence("description", self.description)
+  .presence("color", self.color)
+  .presence("priority", self.priority)
+  .opt("created_at", self.created_at)
+  .opt("updated_at", self.updated_at)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend UserIssueFieldOptionsItem with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for UserIssueFieldOptionsItem with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    id: required_field(obj, "id", path),
+    name: required_field(obj, "name", path),
+    description: @sdkjson.presence_field(obj, "description", path),
+    color: @sdkjson.presence_field(obj, "color", path),
+    priority: @sdkjson.presence_field(obj, "priority", path),
+    created_at: @sdkjson.opt_field(obj, "created_at", path),
+    updated_at: @sdkjson.opt_field(obj, "updated_at", path),
+  }
+}
+
+///|
+///
+/// A custom attribute defined by a personal account for attaching structured data to issues.
+#derive(Eq, @debug.Debug)
+pub(all) struct UserIssueField {
+  id : Int32
+  node_id : String
+  name : String
+  description : @sdkjson.Presence[String]
+  data_type : UserIssueFieldDataType
+  visibility : UserIssueFieldVisibility?
+  options : @sdkjson.Presence[Array[UserIssueFieldOptionsItem]]
+  created_at : String?
+  updated_at : String?
+}
+
+///|
+pub extend UserIssueField with Eq::{equal, not_equal}
+
+///|
+pub extend UserIssueField with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a UserIssueField with omitted optional fields absent.
+pub fn UserIssueField::new(
+  id~ : Int32,
+  node_id~ : String,
+  name~ : String,
+  data_type~ : UserIssueFieldDataType,
+  description? : String,
+  visibility? : UserIssueFieldVisibility,
+  options? : Array[UserIssueFieldOptionsItem],
+  created_at? : String,
+  updated_at? : String,
+) -> UserIssueField {
+  {
+    id,
+    node_id,
+    name,
+    description: @sdkjson.Presence::from_option(description),
+    data_type,
+    visibility,
+    options: @sdkjson.Presence::from_option(options),
+    created_at,
+    updated_at,
+  }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend UserIssueField with ToJson::{to_json}
+
+///|
+pub impl ToJson for UserIssueField with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("id", self.id)
+  .field("node_id", self.node_id)
+  .field("name", self.name)
+  .presence("description", self.description)
+  .field("data_type", self.data_type)
+  .opt("visibility", self.visibility)
+  .presence("options", self.options)
+  .opt("created_at", self.created_at)
+  .opt("updated_at", self.updated_at)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend UserIssueField with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for UserIssueField with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    id: required_field(obj, "id", path),
+    node_id: required_field(obj, "node_id", path),
+    name: required_field(obj, "name", path),
+    description: @sdkjson.presence_field(obj, "description", path),
+    data_type: required_field(obj, "data_type", path),
+    visibility: @sdkjson.opt_field(obj, "visibility", path),
+    options: @sdkjson.presence_field(obj, "options", path),
+    created_at: @sdkjson.opt_field(obj, "created_at", path),
+    updated_at: @sdkjson.opt_field(obj, "updated_at", path),
+  }
+}
+
+///|
+///
+/// The data type of the issue field.
+#derive(Eq, @debug.Debug)
+#non_exhaustive
+pub(all) enum UserCreateIssueFieldDataType {
+  Text
+  Date
+  SingleSelect
+  MultiSelect
+  Number
+  Custom(String)
+}
+
+///|
+pub extend UserCreateIssueFieldDataType with Eq::{equal, not_equal}
+
+///|
+pub extend UserCreateIssueFieldDataType with @debug.Debug::{to_repr}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend UserCreateIssueFieldDataType with ToJson::{to_json}
+
+///|
+pub impl ToJson for UserCreateIssueFieldDataType with fn to_json(self) {
+  let raw = match self {
+    Text => "text"
+    Date => "date"
+    SingleSelect => "single_select"
+    MultiSelect => "multi_select"
+    Number => "number"
+    Custom(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend UserCreateIssueFieldDataType with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for UserCreateIssueFieldDataType with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "text" => Some(Text)
+        "date" => Some(Date)
+        "single_select" => Some(SingleSelect)
+        "multi_select" => Some(MultiSelect)
+        "number" => Some(Number)
+        _ => None
+      }
+    },
+    raw => Custom(raw),
+  )
+}
+
+///|
+///
+/// The visibility of the issue field. Can be `restricted` (visible only to the owner and to collaborators on the repository the field is read through) or `all` (visible to all users who can see issues). Defaults to `restricted`.
+#derive(Eq, @debug.Debug)
+#non_exhaustive
+pub(all) enum UserCreateIssueFieldVisibility {
+  Restricted
+  All
+  Custom(String)
+}
+
+///|
+pub extend UserCreateIssueFieldVisibility with Eq::{equal, not_equal}
+
+///|
+pub extend UserCreateIssueFieldVisibility with @debug.Debug::{to_repr}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend UserCreateIssueFieldVisibility with ToJson::{to_json}
+
+///|
+pub impl ToJson for UserCreateIssueFieldVisibility with fn to_json(self) {
+  let raw = match self {
+    Restricted => "restricted"
+    All => "all"
+    Custom(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend UserCreateIssueFieldVisibility with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for UserCreateIssueFieldVisibility with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "restricted" => Some(Restricted)
+        "all" => Some(All)
+        _ => None
+      }
+    },
+    raw => Custom(raw),
+  )
+}
+
+///|
+///
+/// Color for the option.
+#derive(Eq, @debug.Debug)
+#non_exhaustive
+pub(all) enum UserCreateIssueFieldOptionsItemColor {
+  Gray
+  Blue
+  Green
+  Yellow
+  Orange
+  Red
+  Pink
+  Purple
+  Custom(String)
+}
+
+///|
+pub extend UserCreateIssueFieldOptionsItemColor with Eq::{equal, not_equal}
+
+///|
+pub extend UserCreateIssueFieldOptionsItemColor with @debug.Debug::{to_repr}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend UserCreateIssueFieldOptionsItemColor with ToJson::{to_json}
+
+///|
+pub impl ToJson for UserCreateIssueFieldOptionsItemColor with fn to_json(self) {
+  let raw = match self {
+    Gray => "gray"
+    Blue => "blue"
+    Green => "green"
+    Yellow => "yellow"
+    Orange => "orange"
+    Red => "red"
+    Pink => "pink"
+    Purple => "purple"
+    Custom(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend UserCreateIssueFieldOptionsItemColor with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for UserCreateIssueFieldOptionsItemColor with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "gray" => Some(Gray)
+        "blue" => Some(Blue)
+        "green" => Some(Green)
+        "yellow" => Some(Yellow)
+        "orange" => Some(Orange)
+        "red" => Some(Red)
+        "pink" => Some(Pink)
+        "purple" => Some(Purple)
+        _ => None
+      }
+    },
+    raw => Custom(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of UserCreateIssueFieldOptionsItem.
+#derive(Eq, @debug.Debug)
+pub(all) struct UserCreateIssueFieldOptionsItem {
+  name : String
+  description : @sdkjson.Presence[String]
+  color : UserCreateIssueFieldOptionsItemColor
+  priority : Int32
+}
+
+///|
+pub extend UserCreateIssueFieldOptionsItem with Eq::{equal, not_equal}
+
+///|
+pub extend UserCreateIssueFieldOptionsItem with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a UserCreateIssueFieldOptionsItem with omitted optional fields absent.
+pub fn UserCreateIssueFieldOptionsItem::new(
+  name~ : String,
+  color~ : UserCreateIssueFieldOptionsItemColor,
+  priority~ : Int32,
+  description? : String,
+) -> UserCreateIssueFieldOptionsItem {
+  {
+    name,
+    description: @sdkjson.Presence::from_option(description),
+    color,
+    priority,
+  }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend UserCreateIssueFieldOptionsItem with ToJson::{to_json}
+
+///|
+pub impl ToJson for UserCreateIssueFieldOptionsItem with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("name", self.name)
+  .presence("description", self.description)
+  .field("color", self.color)
+  .field("priority", self.priority)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend UserCreateIssueFieldOptionsItem with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for UserCreateIssueFieldOptionsItem with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    name: required_field(obj, "name", path),
+    description: @sdkjson.presence_field(obj, "description", path),
+    color: required_field(obj, "color", path),
+    priority: required_field(obj, "priority", path),
+  }
+}
+
+///|
+///
+/// Generated representation of UserCreateIssueField.
+#derive(Eq, @debug.Debug)
+pub(all) struct UserCreateIssueField {
+  name : String
+  description : @sdkjson.Presence[String]
+  data_type : UserCreateIssueFieldDataType
+  visibility : UserCreateIssueFieldVisibility?
+  options : @sdkjson.Presence[Array[UserCreateIssueFieldOptionsItem]]
+}
+
+///|
+pub extend UserCreateIssueField with Eq::{equal, not_equal}
+
+///|
+pub extend UserCreateIssueField with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a UserCreateIssueField with omitted optional fields absent.
+pub fn UserCreateIssueField::new(
+  name~ : String,
+  data_type~ : UserCreateIssueFieldDataType,
+  description? : String,
+  visibility? : UserCreateIssueFieldVisibility,
+  options? : Array[UserCreateIssueFieldOptionsItem],
+) -> UserCreateIssueField {
+  {
+    name,
+    description: @sdkjson.Presence::from_option(description),
+    data_type,
+    visibility,
+    options: @sdkjson.Presence::from_option(options),
+  }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend UserCreateIssueField with ToJson::{to_json}
+
+///|
+pub impl ToJson for UserCreateIssueField with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("name", self.name)
+  .presence("description", self.description)
+  .field("data_type", self.data_type)
+  .opt("visibility", self.visibility)
+  .presence("options", self.options)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend UserCreateIssueField with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for UserCreateIssueField with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    name: required_field(obj, "name", path),
+    description: @sdkjson.presence_field(obj, "description", path),
+    data_type: required_field(obj, "data_type", path),
+    visibility: @sdkjson.opt_field(obj, "visibility", path),
+    options: @sdkjson.presence_field(obj, "options", path),
+  }
+}
+
+///|
+///
+/// The visibility of the issue field. Can be `restricted` (visible only to the owner and to collaborators on the repository the field is read through) or `all` (visible to all users who can see issues).
+#derive(Eq, @debug.Debug)
+#non_exhaustive
+pub(all) enum UserUpdateIssueFieldVisibility {
+  Restricted
+  All
+  Custom(String)
+}
+
+///|
+pub extend UserUpdateIssueFieldVisibility with Eq::{equal, not_equal}
+
+///|
+pub extend UserUpdateIssueFieldVisibility with @debug.Debug::{to_repr}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend UserUpdateIssueFieldVisibility with ToJson::{to_json}
+
+///|
+pub impl ToJson for UserUpdateIssueFieldVisibility with fn to_json(self) {
+  let raw = match self {
+    Restricted => "restricted"
+    All => "all"
+    Custom(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend UserUpdateIssueFieldVisibility with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for UserUpdateIssueFieldVisibility with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "restricted" => Some(Restricted)
+        "all" => Some(All)
+        _ => None
+      }
+    },
+    raw => Custom(raw),
+  )
+}
+
+///|
+///
+/// Color for the option.
+#derive(Eq, @debug.Debug)
+#non_exhaustive
+pub(all) enum UserUpdateIssueFieldOptionsItemColor {
+  Gray
+  Blue
+  Green
+  Yellow
+  Orange
+  Red
+  Pink
+  Purple
+  Custom(String)
+}
+
+///|
+pub extend UserUpdateIssueFieldOptionsItemColor with Eq::{equal, not_equal}
+
+///|
+pub extend UserUpdateIssueFieldOptionsItemColor with @debug.Debug::{to_repr}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend UserUpdateIssueFieldOptionsItemColor with ToJson::{to_json}
+
+///|
+pub impl ToJson for UserUpdateIssueFieldOptionsItemColor with fn to_json(self) {
+  let raw = match self {
+    Gray => "gray"
+    Blue => "blue"
+    Green => "green"
+    Yellow => "yellow"
+    Orange => "orange"
+    Red => "red"
+    Pink => "pink"
+    Purple => "purple"
+    Custom(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend UserUpdateIssueFieldOptionsItemColor with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for UserUpdateIssueFieldOptionsItemColor with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "gray" => Some(Gray)
+        "blue" => Some(Blue)
+        "green" => Some(Green)
+        "yellow" => Some(Yellow)
+        "orange" => Some(Orange)
+        "red" => Some(Red)
+        "pink" => Some(Pink)
+        "purple" => Some(Purple)
+        _ => None
+      }
+    },
+    raw => Custom(raw),
+  )
+}
+
+///|
+///
+/// Generated representation of UserUpdateIssueFieldOptionsItem.
+#derive(Eq, @debug.Debug)
+pub(all) struct UserUpdateIssueFieldOptionsItem {
+  id : Int32?
+  name : String
+  description : @sdkjson.Presence[String]
+  color : UserUpdateIssueFieldOptionsItemColor
+  priority : Int32
+}
+
+///|
+pub extend UserUpdateIssueFieldOptionsItem with Eq::{equal, not_equal}
+
+///|
+pub extend UserUpdateIssueFieldOptionsItem with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a UserUpdateIssueFieldOptionsItem with omitted optional fields absent.
+pub fn UserUpdateIssueFieldOptionsItem::new(
+  name~ : String,
+  color~ : UserUpdateIssueFieldOptionsItemColor,
+  priority~ : Int32,
+  id? : Int32,
+  description? : String,
+) -> UserUpdateIssueFieldOptionsItem {
+  {
+    id,
+    name,
+    description: @sdkjson.Presence::from_option(description),
+    color,
+    priority,
+  }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend UserUpdateIssueFieldOptionsItem with ToJson::{to_json}
+
+///|
+pub impl ToJson for UserUpdateIssueFieldOptionsItem with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .opt("id", self.id)
+  .field("name", self.name)
+  .presence("description", self.description)
+  .field("color", self.color)
+  .field("priority", self.priority)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend UserUpdateIssueFieldOptionsItem with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for UserUpdateIssueFieldOptionsItem with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    id: @sdkjson.opt_field(obj, "id", path),
+    name: required_field(obj, "name", path),
+    description: @sdkjson.presence_field(obj, "description", path),
+    color: required_field(obj, "color", path),
+    priority: required_field(obj, "priority", path),
+  }
+}
+
+///|
+///
+/// Generated representation of UserUpdateIssueField.
+#derive(Eq, @debug.Debug)
+pub(all) struct UserUpdateIssueField {
+  name : String?
+  description : @sdkjson.Presence[String]
+  visibility : UserUpdateIssueFieldVisibility?
+  options : Array[UserUpdateIssueFieldOptionsItem]?
+}
+
+///|
+pub extend UserUpdateIssueField with Eq::{equal, not_equal}
+
+///|
+pub extend UserUpdateIssueField with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a UserUpdateIssueField with omitted optional fields absent.
+pub fn UserUpdateIssueField::new(
+  name? : String,
+  description? : String,
+  visibility? : UserUpdateIssueFieldVisibility,
+  options? : Array[UserUpdateIssueFieldOptionsItem],
+) -> UserUpdateIssueField {
+  {
+    name,
+    description: @sdkjson.Presence::from_option(description),
+    visibility,
+    options,
+  }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend UserUpdateIssueField with ToJson::{to_json}
+
+///|
+pub impl ToJson for UserUpdateIssueField with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .opt("name", self.name)
+  .presence("description", self.description)
+  .opt("visibility", self.visibility)
+  .opt("options", self.options)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend UserUpdateIssueField with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for UserUpdateIssueField with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    name: @sdkjson.opt_field(obj, "name", path),
+    description: @sdkjson.presence_field(obj, "description", path),
+    visibility: @sdkjson.opt_field(obj, "visibility", path),
+    options: @sdkjson.opt_field(obj, "options", path),
   }
 }
 
