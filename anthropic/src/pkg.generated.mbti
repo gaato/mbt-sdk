@@ -3,9 +3,9 @@ package "gaato/anthropic"
 
 import {
   "gaato/anthropic/gen",
-  "gaato/http",
-  "gaato/http/rt",
+  "gaato/mttp",
   "gaato/mttp/client",
+  "gaato/mttp/rt",
   "moonbitlang/core/debug",
   "moonbitlang/core/json",
 }
@@ -32,7 +32,7 @@ pub async fn Anthropic::create_message(Self, MessageRequest) -> Result[MessageRe
 pub async fn Anthropic::create_message_params(Self, @gen.CreateMessageParams) -> Result[@gen.Message, AnthropicFailure]
 pub fn Anthropic::from_client(@client.Client, version? : String) -> Self
 pub async fn Anthropic::list_models(Self, limit? : Int32, after_id? : String, before_id? : String, lifecycle? : Array[@gen.ModelsListLifecycleItem]) -> Result[@gen.ListResponseModelInfo, AnthropicFailure]
-pub fn Anthropic::new(api_key~ : String, &@http.Backend, &@rt.Clock, base_url? : String, version? : String, auth_header? : AuthHeader, retry? : @client.RetryPolicy, timer? : &@rt.Timer, timeout_ms? : Int32, max_body_bytes? : Int32, total_timeout_ms? : Int32) -> Self
+pub fn Anthropic::new(api_key~ : String, &@mttp.Backend, &@rt.Clock, base_url? : String, version? : String, auth_header? : AuthHeader, retry? : @client.RetryPolicy, timer? : &@rt.Timer, timeout_ms? : Int32, max_body_bytes? : Int32, total_timeout_ms? : Int32) -> Self
 pub fn Anthropic::paginate_models(Self, limit? : Int32, lifecycle? : Array[@gen.ModelsListLifecycleItem]) -> @client.Paginator[@gen.ModelInfo, AnthropicFailure]
 pub async fn Anthropic::retrieve_model(Self, String) -> Result[@gen.ModelInfo, AnthropicFailure]
 pub async fn Anthropic::stream_message(Self, MessageRequest, async (MessageEvent) -> Unit) -> Result[Unit, AnthropicFailure]

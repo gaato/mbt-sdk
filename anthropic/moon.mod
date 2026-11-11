@@ -13,13 +13,12 @@ repository = "https://github.com/gaato/mbt-sdk"
 
 keywords = [ "anthropic", "llm", "sdk", "messages" ]
 
-description = "Thin Anthropic Messages API client for MoonBit built on gaato/http and gaato/mttp."
+description = "Thin Anthropic Messages API client for MoonBit built on gaato/mttp."
 
 source = "src"
 
 preferred_target = "wasm-gc"
 
 import {
-  "gaato/http@0.6.0",
-  "gaato/mttp@0.1.0",
+  "gaato/mttp@0.2.0",
 }

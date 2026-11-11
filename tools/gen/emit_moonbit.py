@@ -1005,7 +1005,7 @@ fn json_array_matches(
     operations = HEADER + "\n\n".join(operation_helpers + operation_sources) + "\n"
     # Import only what the emitted code references: `--deny-warn` rejects unused packages.
     body = types + operations
-    imports = ['  "gaato/http",'] if "@http." in body else []
+    imports = ['  "gaato/mttp" @http,'] if "@http." in body else []
     if "@client." in body:
         imports.append('  "gaato/mttp/client",')
     if "@sdkjson." in body:

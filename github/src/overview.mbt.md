@@ -15,27 +15,29 @@ caller-supplied `Backend` and `Clock`; the facade has no async runtime.
 
 ```sh
 moon add gaato/github
-moon add gaato/http
-moon add gaato/mttp
-moon add gaato/http-async
+moon add gaato/mttp_async
 ```
+
+An app adds these two modules. A library that wraps this SDK adds only
+`gaato/github` and takes the `Backend` and `Clock` from its caller.
 
 ## Usage
 
-With `gaato/http-async/backend` imported as `@backend` and
-`gaato/http-async/runtime` as `@runtime` and
-`gaato/http-async/codings` as `@codings` (core/async requires an exact
-experimental package opt-in in your moon.pkg):
+`gaato/mttp_async` supplies the real network, the clock and the timer; no
+experimental opt-in is needed:
 
 ```mbt nocheck
 ///|
-let backend = @codings.Decompress::new(@backend.AsyncBackend::new())
-
-///|
-let clock = @runtime.AsyncClock::new()
+let client = @github.GitHub::new(
+  @mttp_async.backend(),
+  @mttp_async.clock(),
+  token~,
+  timer=@mttp_async.timer(),
+)
 ```
 
-Then pass them to the client and call an operation:
+The function below takes the backend and the clock as parameters, so it also
+runs against a fake `Backend` in tests. To call an operation:
 
 ```mbt check
 ///|
@@ -122,12 +124,35 @@ short-lived `location`:
   `accept: application/octet-stream` and `code_scanning_get_codeql_database`
   with `accept: application/zip`
 
-The default backend does not follow redirects. A `302` returns an HTTP failure
-value; its head retains `location`. For large downloads, use
-an mttp Client with `as_stream` and the `FollowRedirects` backend wrapper.
-It strips sensitive headers on cross-origin redirects and closes intermediate
-bodies. Host fetch redirect behavior has platform constraints documented by
-`gaato/http-async`; select the redirect policy before supplying credentials.
+The client follows these redirects, up to ten hops: `send` returns the
+downloaded body, buffered up to `max_body_bytes`. On a hop to another origin
+it drops `authorization` and `cookie`, so the token is not sent to the
+download host, and it closes the intermediate bodies. For a download too large
+to buffer, build an mttp Client with `Client::new` over the same backend and
+read the body with `as_stream`; that Client follows redirects the same way.
+
+To get the `302` back instead, for example to hand the short-lived URL to
+another program, set the `redirect_limit` attribute to 0 on the request. The
+redirect then returns an HTTP failure value whose head keeps `location`:
+
+```mbt check
+///|
+/// The short-lived URL of a repository's tarball, without downloading it.
+pub async fn tarball_url(gh : @github.GitHub, ref_ : String) -> String? {
+  let request = @gen.repos_download_tarball_archive_request(
+    "gaato", "mbt-sdk", ref_,
+  ).attribute(@client.redirect_limit, 0)
+  match gh.send(request) {
+    Err(@github.GitHubFailure::Http(failure)) =>
+      failure.head().headers.get("location")
+    _ => None
+  }
+}
+```
+
+A Client built with `redirect=@client.RedirectConfig::none()` and passed to
+`GitHub::from_client` returns every `3xx` this way. Host fetch redirect
+behavior has platform constraints documented by `gaato/mttp_async`.
 
 ## Pagination
 
@@ -194,7 +219,7 @@ Following GitHub's guidance and octokit, the limiter also spaces requests:
 
 GitHub also asks for requests to be made serially. This module has no async
 runtime to do that, so pass a gate, such as `SemaphoreGate` from
-`gaato/http-async`:
+`gaato/mttp_async`:
 
 ```mbt nocheck
 ///|

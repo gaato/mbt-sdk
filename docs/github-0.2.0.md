@@ -5,7 +5,7 @@
 # GitHub 0.2.0 release candidate
 
 Publish only `gaato/github@0.2.0`. Its registry dependencies remain
-`gaato/http@0.1.0` and `gaato/sdk-runtime@0.1.0`; the transport adapter is
+`gaato/mttp@0.1.0` and `gaato/sdk-runtime@0.1.0`; the transport adapter is
 caller-supplied and is not a package dependency. The unpublished runtime test
 module now imports `gaato/github@0.2.0`.
 

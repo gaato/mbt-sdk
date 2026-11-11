@@ -2,7 +2,7 @@
 package "gaato/openai/gen"
 
 import {
-  "gaato/http",
+  "gaato/mttp",
   "gaato/mttp/client",
   "gaato/mttp/jsonkit",
   "moonbitlang/core/debug",
@@ -10,35 +10,35 @@ import {
 }
 
 // Values
-pub fn create_chat_completion_decode(@http.ResponseHead, Bytes) -> Result[CreateChatCompletionResponse, @client.ResponseFailure]
+pub fn create_chat_completion_decode(@mttp.ResponseHead, Bytes) -> Result[CreateChatCompletionResponse, @client.ResponseFailure]
 
 pub fn create_chat_completion_decode_json(@json.Json) -> CreateChatCompletionResponse raise @json.JsonDecodeError
 
-pub fn create_chat_completion_request(CreateChatCompletionRequest) -> @http.Request
+pub fn create_chat_completion_request(CreateChatCompletionRequest) -> @mttp.Request
 
-pub fn create_embedding_decode(@http.ResponseHead, Bytes) -> Result[CreateEmbeddingResponse, @client.ResponseFailure]
+pub fn create_embedding_decode(@mttp.ResponseHead, Bytes) -> Result[CreateEmbeddingResponse, @client.ResponseFailure]
 
 pub fn create_embedding_decode_json(@json.Json) -> CreateEmbeddingResponse raise @json.JsonDecodeError
 
-pub fn create_embedding_request(CreateEmbeddingRequest) -> @http.Request
+pub fn create_embedding_request(CreateEmbeddingRequest) -> @mttp.Request
 
-pub fn create_response_decode(@http.ResponseHead, Bytes) -> Result[Response, @client.ResponseFailure]
+pub fn create_response_decode(@mttp.ResponseHead, Bytes) -> Result[Response, @client.ResponseFailure]
 
 pub fn create_response_decode_json(@json.Json) -> Response raise @json.JsonDecodeError
 
-pub fn create_response_request(CreateResponse) -> @http.Request
+pub fn create_response_request(CreateResponse) -> @mttp.Request
 
-pub fn list_models_decode(@http.ResponseHead, Bytes) -> Result[ListModelsResponse, @client.ResponseFailure]
+pub fn list_models_decode(@mttp.ResponseHead, Bytes) -> Result[ListModelsResponse, @client.ResponseFailure]
 
 pub fn list_models_decode_json(@json.Json) -> ListModelsResponse raise @json.JsonDecodeError
 
-pub fn list_models_request() -> @http.Request
+pub fn list_models_request() -> @mttp.Request
 
-pub fn retrieve_model_decode(@http.ResponseHead, Bytes) -> Result[Model, @client.ResponseFailure]
+pub fn retrieve_model_decode(@mttp.ResponseHead, Bytes) -> Result[Model, @client.ResponseFailure]
 
 pub fn retrieve_model_decode_json(@json.Json) -> Model raise @json.JsonDecodeError
 
-pub fn retrieve_model_request(String) -> @http.Request
+pub fn retrieve_model_request(String) -> @mttp.Request
 
 // Errors
 

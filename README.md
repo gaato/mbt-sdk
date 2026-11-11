@@ -16,8 +16,9 @@ add vendor-specific retries, streaming, pagination and error interpretation.
 
 The three HTTP SDKs are published on mooncakes. JSON-RPC and Codex modules
 remain unpublished. HTTP infrastructure lives in [mttp](https://github.com/gaato/mttp):
-gaato/http supplies Backend/Request/Response, gaato/http-async supplies I/O,
-and gaato/mttp supplies client policy. SDK modules do not import a runtime.
+gaato/mttp supplies the vocabulary, Backend and the client policy, and
+gaato/mttp_async supplies the I/O an app adds. SDK modules do not import a
+runtime.
 
 The caller supplies a Backend and clock. Wrap AsyncBackend in Decompress when
 content decoding is wanted, and supply ClockTimer for a total call deadline.

@@ -29,7 +29,7 @@ class CodexSchemaTests(unittest.TestCase):
         self.assertFalse(builder.diagnostics)
         self.assertEqual(len(builder.requests), 5)
         self.assertEqual(len(builder.server_requests), 4)
-        self.assertNotIn('"gaato/http"', emit(ir)["moon.pkg"])
+        self.assertNotIn('"gaato/mttp" @http', emit(ir)["moon.pkg"])
         self.assertIn("Call[TurnStartResponse]", protocol(builder))
 
     def test_external_enum_and_nullable_any_json_are_typed(self):

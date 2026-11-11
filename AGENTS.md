@@ -13,7 +13,7 @@
 - Examples in `overview.mbt.md` are `mbt check` blocks so that `moon check`
   breaks when the API changes under them. Use `mbt nocheck` only for code that
   needs a module the package does not depend on (such as
-  `@http_async.AsyncTransport` in the SDK modules); never add a dependency for
+  `@mttp_async.backend()` in the SDK modules); never add a dependency for
   documentation.
 - Links in a published module directory are absolute URLs, because
   mooncakes.io serves those files away from the repository and a relative

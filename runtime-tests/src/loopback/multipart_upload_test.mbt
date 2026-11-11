@@ -100,7 +100,7 @@ async test "a 32 MiB streamed file part uploads intact through AsyncBackend" {
         defer response.close()
         let declared = if known { expected_length.to_string() } else { "-" }
         assert_eq(
-          @utf8.decode(@client.read_body(response.body, 1024)),
+          @utf8.decode(response.body.read_all(max=1024)),
           "\{declared} \{expected_length} \{expected}",
         )
         assert_true(file.closed)

@@ -13,13 +13,12 @@ repository = "https://github.com/gaato/mbt-sdk"
 
 keywords = [ "github", "rest", "graphql", "sdk", "openapi" ]
 
-description = "Thin GitHub API client for MoonBit built on gaato/http and gaato/mttp: the whole REST API generated, plus a GraphQL passthrough."
+description = "Thin GitHub API client for MoonBit built on gaato/mttp: the whole REST API generated, plus a GraphQL passthrough."
 
 source = "src"
 
 preferred_target = "wasm-gc"
 
 import {
-  "gaato/http@0.6.0",
-  "gaato/mttp@0.1.0",
+  "gaato/mttp@0.2.0",
 }

@@ -44,7 +44,7 @@ openai/spec/openai.yaml ─▶ overlays/fix.yaml ─▶ overlays/moonbit.yaml �
 
 - 各 struct / enum に `ToJson` と `@json.FromJson` の実装(`@sdkjson.ObjBuilder` / `field` / `opt_field` / `presence_field` / `open_string` を使う)。未知のフィールドは無視。
 - 各操作に、IO を持たない 2 つの関数: `<op>_request(params...) -> @http.Request`(相対 URL、メソッド、JSON 本文)と `<op>_decode(@http.Response) -> T raise @runtime.SdkError`(JSON 不正・必須欠落は `Decode`)。送信は手書き層が `@runtime.Client` で行う(sans-IO)。パスパラメータは RFC 3986 の unreserved 以外を percent-encode する。
-- `openai/src/gen/` は `gaato/http` `gaato/sdk-runtime` `gaato/sdk-runtime/json` だけに依存する。
+- `openai/src/gen/` は `gaato/mttp` `gaato/sdk-runtime` `gaato/sdk-runtime/json` だけに依存する。
 
 ## 手書き層との関係
 

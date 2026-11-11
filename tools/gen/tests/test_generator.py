@@ -788,7 +788,7 @@ class IRTests(unittest.TestCase):
         self.assertIn('@http.append_query(url, "tag", parameter_value(value))', source)
         self.assertNotIn("fn append_query", source)
         self.assertNotIn("fn percent_encode", source)
-        self.assertIn('"gaato/http"', emit(ir)["moon.pkg"])
+        self.assertIn('"gaato/mttp" @http', emit(ir)["moon.pkg"])
 
     def test_deep_object_query_serializes_bracketed_map_keys(self):
         parameter = {
@@ -973,11 +973,11 @@ class IRTests(unittest.TestCase):
         source = sources["operations.mbt"]
         self.assertNotIn("fn percent_encode", source)
         self.assertIn("@http.percent_encode_path(parameter_value(ref_))", source)
-        self.assertIn('"gaato/http"', sources["moon.pkg"])
+        self.assertIn('"gaato/mttp" @http', sources["moon.pkg"])
         self.assertIn('"moonbitlang/core/encoding/utf8"', sources["moon.pkg"])
         doc["paths"]["/git/ref/{ref}"]["get"]["responses"] = {"204": {"description": "No content"}}
         sources = emit(IRBuilder(doc, "example/gen").build())
-        self.assertIn('"gaato/http"', sources["moon.pkg"])
+        self.assertIn('"gaato/mttp" @http', sources["moon.pkg"])
         self.assertNotIn('"moonbitlang/core/encoding/utf8"', sources["moon.pkg"])
 
     def test_path_segments_outside_a_path_parameter_is_a_diagnostic(self):

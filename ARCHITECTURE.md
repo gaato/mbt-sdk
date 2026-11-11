@@ -11,9 +11,9 @@ HTTP infrastructure lives in [mttp](https://github.com/gaato/mttp).
 | SDKs | openai, anthropic, github | Generated API vocabulary and vendor policy |
 | Codex | codex-protocol, codex-app-server | Generated protocol and initialized sessions |
 | RPC | jsonrpc, jsonrpc-async | Portable messages/framing and runtime connections |
-| External HTTP | gaato/http, gaato/http-async, gaato/mttp | Vocabulary, engines, I/O and client policy |
+| External HTTP | gaato/mttp, gaato/mttp_async | Vocabulary, engines and client policy; I/O |
 
-The SDKs depend on `gaato/http` and `gaato/mttp`, with no runtime dependency.
+The SDKs depend on `gaato/mttp`, with no runtime dependency.
 They accept `&Backend`, `&rt.Clock` and optionally `&rt.Timer`. Their clients
 use mttp RequestPlan/ResponsePlan, Result-based response failures, admission
 tokens, retries, SSE and pagination. Immutable Headers and Request builders
@@ -24,8 +24,8 @@ inside their own packages. GitHub owns its primary/secondary rate-limit and
 GraphQL conditions, using the generic mttp limiter and typed retry callback.
 TransportError and user callback exceptions keep their effect identity.
 
-`gaato/http-async/backend.AsyncBackend` supplies I/O. Content decoding is an
-explicit `gaato/http-async/codings.Decompress` wrapper. Backends take
+`gaato/mttp_async/backend.AsyncBackend` supplies I/O. Content decoding is an
+explicit `gaato/mttp_async/codings.Decompress` wrapper. Backends take
 SendOptions for each attempt; response bodies belong to their consumer.
 
 ## Generation

@@ -1,16 +1,16 @@
 import {
-  "gaato/http",
+  "gaato/mttp" @http,
   "gaato/mbt-sdk-runtime-tests/sdk_mock" @mock,
-  "gaato/http/rt" @sync,
+  "gaato/mttp/rt" @sync,
   "gaato/mttp/client" @runtime,
   "gaato/github" @github_sdk,
   "gaato/github/gen",
-  "gaato/http/driver",
+  "gaato/mttp/driver",
   "moonbitlang/core/encoding/utf8",
   "moonbitlang/core/debug",
   "moonbitlang/core/json",
 } for "test"
 
 options(
-  "allow-experimental-packages": [ "gaato/http/driver" ],
+  "allow-experimental-packages": [ "gaato/mttp/driver" ],
 )

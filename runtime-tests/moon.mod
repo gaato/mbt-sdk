@@ -14,9 +14,8 @@ source = "src"
 preferred_target = "native"
 
 import {
-  "gaato/http@0.6.0",
-  "gaato/http-async@0.6.0",
-  "gaato/mttp@0.1.0",
+  "gaato/mttp_async@0.1.0",
+  "gaato/mttp@0.2.0",
   "gaato/openai@0.7.0",
   "gaato/anthropic@0.15.0",
   "gaato/github@0.21.0",

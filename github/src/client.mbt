@@ -56,7 +56,7 @@ pub impl @debug.Debug for GitHub with fn to_repr(_self) {
 /// notifications 3 s and searches 2 s, as octokit does. `gate` makes the
 /// requests of each of those groups serial, as docs.github.com asks ("make
 /// requests serially instead of concurrently"): pass
-/// `gate=() => @runtime.SemaphoreGate::new()` from `gaato/http-async/runtime`.
+/// `gate=() => @runtime.SemaphoreGate::new()` from `gaato/mttp_async/runtime`.
 /// Without it concurrent requests are only spaced, not serialised. `gate` is
 /// ignored when `limiter` is given. Pass `limiter=@client.NoLimiter::new()`
 /// to opt out of both.

@@ -15,36 +15,29 @@ It uses [`gaato/mttp`](https://github.com/gaato/mttp), with a caller-supplied
 
 ```sh
 moon add gaato/openai
-moon add gaato/http
-moon add gaato/mttp
-moon add gaato/http-async
+moon add gaato/mttp_async
 ```
+
+An app adds these two modules. A library that wraps this SDK adds only
+`gaato/openai` and takes the `Backend` and `Clock` from its caller.
 
 ## Usage
 
-With `gaato/http-async/backend` imported as `@backend` and
-`gaato/http-async/runtime` as `@runtime`, `gaato/http-async/codings` as
-`@codings` and `gaato/http/h1client` as `@h1client`, create the adapters.
-Opt in to the exact experimental packages `moonbitlang/core/async` and
-`gaato/http/h1client` in the calling package's moon.pkg:
+`gaato/mttp_async` supplies the real network, the clock and the timer; no
+experimental opt-in is needed:
 
 ```mbt nocheck
 ///|
-let backend = @codings.Decompress::new(
-  @backend.AsyncBackend::new(config={
-    ..@h1client.ClientConfig::default(),
-    connect_timeout_ms: Some(5000),
-  }),
+let client = @openai.OpenAI::new(
+  api_key~,
+  @mttp_async.backend(),
+  @mttp_async.clock(),
+  timer=@mttp_async.timer(),
 )
-
-///|
-let clock = @runtime.AsyncClock::new()
-
-///|
-let timer = @runtime.ClockTimer::new()
 ```
 
-Then pass them to the client and send a request:
+The function below takes the same three values as parameters, so it also runs
+against a fake `Backend` in tests. To send a request:
 
 ```mbt check
 ///|

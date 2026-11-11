@@ -2,200 +2,200 @@
 package "gaato/fixture-badhttp"
 
 import {
-  "gaato/http",
+  "gaato/mttp",
   "gaato/mttp/client",
   "moonbitlang/core/debug",
   "moonbitlang/core/json",
 }
 
 // Values
-pub fn delete_echo_decode(@http.ResponseHead, Bytes) -> Result[@json.Json, @client.ResponseFailure]
+pub fn delete_echo_decode(@mttp.ResponseHead, Bytes) -> Result[@json.Json, @client.ResponseFailure]
 
 pub fn delete_echo_decode_json(@json.Json) -> @json.Json raise @json.JsonDecodeError
 
-pub fn delete_echo_request() -> @http.Request
+pub fn delete_echo_request() -> @mttp.Request
 
-pub fn get_402_broken_flavor_request(Get402BrokenFlavorFlavor, network? : Get402BrokenFlavorNetwork, amount? : Double) -> @http.Request
+pub fn get_402_broken_flavor_request(Get402BrokenFlavorFlavor, network? : Get402BrokenFlavorNetwork, amount? : Double) -> @mttp.Request
 
-pub fn get_402_decode(@http.ResponseHead, Bytes) -> Result[@json.Json, @client.ResponseFailure]
+pub fn get_402_decode(@mttp.ResponseHead, Bytes) -> Result[@json.Json, @client.ResponseFailure]
 
 pub fn get_402_decode_json(@json.Json) -> @json.Json raise @json.JsonDecodeError
 
-pub fn get_402_pay_base_request(amount? : Double) -> @http.Request
+pub fn get_402_pay_base_request(amount? : Double) -> @mttp.Request
 
-pub fn get_402_pay_base_sepolia_request(amount? : Double) -> @http.Request
+pub fn get_402_pay_base_sepolia_request(amount? : Double) -> @mttp.Request
 
-pub fn get_402_pay_request(network? : Get402PayNetwork, amount? : Double) -> @http.Request
+pub fn get_402_pay_request(network? : Get402PayNetwork, amount? : Double) -> @mttp.Request
 
-pub fn get_402_request() -> @http.Request
+pub fn get_402_request() -> @mttp.Request
 
-pub fn get_402_scenario_request(Get402ScenarioScenario, network? : Get402ScenarioNetwork, amount? : Double, reason? : String, seconds? : Double) -> @http.Request
+pub fn get_402_scenario_request(Get402ScenarioScenario, network? : Get402ScenarioNetwork, amount? : Double, reason? : String, seconds? : Double) -> @mttp.Request
 
-pub fn get_auth_decode(@http.ResponseHead, Bytes) -> Result[@json.Json, @client.ResponseFailure]
+pub fn get_auth_decode(@mttp.ResponseHead, Bytes) -> Result[@json.Json, @client.ResponseFailure]
 
 pub fn get_auth_decode_json(@json.Json) -> @json.Json raise @json.JsonDecodeError
 
-pub fn get_auth_flavor_decode(@http.ResponseHead, Bytes) -> Result[@json.Json, @client.ResponseFailure]
+pub fn get_auth_flavor_decode(@mttp.ResponseHead, Bytes) -> Result[@json.Json, @client.ResponseFailure]
 
 pub fn get_auth_flavor_decode_json(@json.Json) -> @json.Json raise @json.JsonDecodeError
 
-pub fn get_auth_flavor_request(GetAuthFlavorFlavor) -> @http.Request
+pub fn get_auth_flavor_request(GetAuthFlavorFlavor) -> @mttp.Request
 
-pub fn get_auth_request() -> @http.Request
+pub fn get_auth_request() -> @mttp.Request
 
-pub fn get_badjson_flavor_request(GetBadjsonFlavorFlavor, code? : Int32) -> @http.Request
+pub fn get_badjson_flavor_request(GetBadjsonFlavorFlavor, code? : Int32) -> @mttp.Request
 
-pub fn get_books_json_decode(@http.ResponseHead, Bytes) -> Result[@json.Json, @client.ResponseFailure]
+pub fn get_books_json_decode(@mttp.ResponseHead, Bytes) -> Result[@json.Json, @client.ResponseFailure]
 
 pub fn get_books_json_decode_json(@json.Json) -> @json.Json raise @json.JsonDecodeError
 
-pub fn get_books_json_request() -> @http.Request
+pub fn get_books_json_request() -> @mttp.Request
 
-pub fn get_clients_decode(@http.ResponseHead, Bytes) -> Result[@json.Json, @client.ResponseFailure]
+pub fn get_clients_decode(@mttp.ResponseHead, Bytes) -> Result[@json.Json, @client.ResponseFailure]
 
 pub fn get_clients_decode_json(@json.Json) -> @json.Json raise @json.JsonDecodeError
 
-pub fn get_clients_jsonl_request() -> @http.Request
+pub fn get_clients_jsonl_request() -> @mttp.Request
 
-pub fn get_clients_request() -> @http.Request
+pub fn get_clients_request() -> @mttp.Request
 
-pub fn get_compress_decode(@http.ResponseHead, Bytes) -> Result[@json.Json, @client.ResponseFailure]
+pub fn get_compress_decode(@mttp.ResponseHead, Bytes) -> Result[@json.Json, @client.ResponseFailure]
 
 pub fn get_compress_decode_json(@json.Json) -> @json.Json raise @json.JsonDecodeError
 
-pub fn get_compress_flavor_request(GetCompressFlavorFlavor, length? : Int32, code? : Int32, size? : Int32, accept_encoding? : String) -> @http.Request
+pub fn get_compress_flavor_request(GetCompressFlavorFlavor, length? : Int32, code? : Int32, size? : Int32, accept_encoding? : String) -> @mttp.Request
 
-pub fn get_compress_request() -> @http.Request
+pub fn get_compress_request() -> @mttp.Request
 
-pub fn get_cookies_decode(@http.ResponseHead, Bytes) -> Result[@json.Json, @client.ResponseFailure]
+pub fn get_cookies_decode(@mttp.ResponseHead, Bytes) -> Result[@json.Json, @client.ResponseFailure]
 
 pub fn get_cookies_decode_json(@json.Json) -> @json.Json raise @json.JsonDecodeError
 
-pub fn get_cookies_flavor_decode(@http.ResponseHead, Bytes) -> Result[@json.Json, @client.ResponseFailure]
+pub fn get_cookies_flavor_decode(@mttp.ResponseHead, Bytes) -> Result[@json.Json, @client.ResponseFailure]
 
 pub fn get_cookies_flavor_decode_json(@json.Json) -> @json.Json raise @json.JsonDecodeError
 
-pub fn get_cookies_flavor_request(GetCookiesFlavorFlavor, count? : Int32, bytes? : Int32, cookie? : String) -> @http.Request
+pub fn get_cookies_flavor_request(GetCookiesFlavorFlavor, count? : Int32, bytes? : Int32, cookie? : String) -> @mttp.Request
 
-pub fn get_cookies_request() -> @http.Request
+pub fn get_cookies_request() -> @mttp.Request
 
-pub fn get_corpus_decode(@http.ResponseHead, Bytes) -> Result[@json.Json, @client.ResponseFailure]
+pub fn get_corpus_decode(@mttp.ResponseHead, Bytes) -> Result[@json.Json, @client.ResponseFailure]
 
 pub fn get_corpus_decode_json(@json.Json) -> @json.Json raise @json.JsonDecodeError
 
-pub fn get_corpus_jsonl_request() -> @http.Request
+pub fn get_corpus_jsonl_request() -> @mttp.Request
 
-pub fn get_corpus_request() -> @http.Request
+pub fn get_corpus_request() -> @mttp.Request
 
-pub fn get_crosshost_decode(@http.ResponseHead, Bytes) -> Result[@json.Json, @client.ResponseFailure]
+pub fn get_crosshost_decode(@mttp.ResponseHead, Bytes) -> Result[@json.Json, @client.ResponseFailure]
 
 pub fn get_crosshost_decode_json(@json.Json) -> @json.Json raise @json.JsonDecodeError
 
-pub fn get_crosshost_flavor_request(GetCrosshostFlavorFlavor) -> @http.Request
+pub fn get_crosshost_flavor_request(GetCrosshostFlavorFlavor) -> @mttp.Request
 
-pub fn get_crosshost_land_decode(@http.ResponseHead, Bytes) -> Result[@json.Json, @client.ResponseFailure]
+pub fn get_crosshost_land_decode(@mttp.ResponseHead, Bytes) -> Result[@json.Json, @client.ResponseFailure]
 
 pub fn get_crosshost_land_decode_json(@json.Json) -> @json.Json raise @json.JsonDecodeError
 
-pub fn get_crosshost_land_request() -> @http.Request
+pub fn get_crosshost_land_request() -> @mttp.Request
 
-pub fn get_crosshost_request() -> @http.Request
+pub fn get_crosshost_request() -> @mttp.Request
 
-pub fn get_delay_seconds_decode(@http.ResponseHead, Bytes) -> Result[@json.Json, @client.ResponseFailure]
+pub fn get_delay_seconds_decode(@mttp.ResponseHead, Bytes) -> Result[@json.Json, @client.ResponseFailure]
 
 pub fn get_delay_seconds_decode_json(@json.Json) -> @json.Json raise @json.JsonDecodeError
 
-pub fn get_delay_seconds_request(Double) -> @http.Request
+pub fn get_delay_seconds_request(Double) -> @mttp.Request
 
-pub fn get_drip_request(duration? : Double, chunks? : Int32, code? : Int32) -> @http.Request
+pub fn get_drip_request(duration? : Double, chunks? : Int32, code? : Int32) -> @mttp.Request
 
-pub fn get_echo_request() -> @http.Request
+pub fn get_echo_request() -> @mttp.Request
 
-pub fn get_etag_decode(@http.ResponseHead, Bytes) -> Result[@json.Json, @client.ResponseFailure]
+pub fn get_etag_decode(@mttp.ResponseHead, Bytes) -> Result[@json.Json, @client.ResponseFailure]
 
 pub fn get_etag_decode_json(@json.Json) -> @json.Json raise @json.JsonDecodeError
 
-pub fn get_etag_flavor_request(GetEtagFlavorFlavor, if_none_match? : String, if_modified_since? : String, if_match? : String, if_unmodified_since? : String) -> @http.Request
+pub fn get_etag_flavor_request(GetEtagFlavorFlavor, if_none_match? : String, if_modified_since? : String, if_match? : String, if_unmodified_since? : String) -> @mttp.Request
 
-pub fn get_etag_request() -> @http.Request
+pub fn get_etag_request() -> @mttp.Request
 
-pub fn get_flaky_percent_decode(@http.ResponseHead, Bytes) -> Result[@json.Json, @client.ResponseFailure]
+pub fn get_flaky_percent_decode(@mttp.ResponseHead, Bytes) -> Result[@json.Json, @client.ResponseFailure]
 
 pub fn get_flaky_percent_decode_json(@json.Json) -> @json.Json raise @json.JsonDecodeError
 
-pub fn get_flaky_percent_request(Int32, fail? : Int32, seed? : String, i? : Int32) -> @http.Request
+pub fn get_flaky_percent_request(Int32, fail? : Int32, seed? : String, i? : Int32) -> @mttp.Request
 
-pub fn get_funding_json_decode(@http.ResponseHead, Bytes) -> Result[@json.Json, @client.ResponseFailure]
+pub fn get_funding_json_decode(@mttp.ResponseHead, Bytes) -> Result[@json.Json, @client.ResponseFailure]
 
 pub fn get_funding_json_decode_json(@json.Json) -> @json.Json raise @json.JsonDecodeError
 
-pub fn get_funding_json_request() -> @http.Request
+pub fn get_funding_json_request() -> @mttp.Request
 
-pub fn get_headers_decode(@http.ResponseHead, Bytes) -> Result[@json.Json, @client.ResponseFailure]
+pub fn get_headers_decode(@mttp.ResponseHead, Bytes) -> Result[@json.Json, @client.ResponseFailure]
 
 pub fn get_headers_decode_json(@json.Json) -> @json.Json raise @json.JsonDecodeError
 
-pub fn get_headers_request() -> @http.Request
+pub fn get_headers_request() -> @mttp.Request
 
-pub fn get_health_decode(@http.ResponseHead, Bytes) -> Result[@json.Json, @client.ResponseFailure]
+pub fn get_health_decode(@mttp.ResponseHead, Bytes) -> Result[@json.Json, @client.ResponseFailure]
 
 pub fn get_health_decode_json(@json.Json) -> @json.Json raise @json.JsonDecodeError
 
-pub fn get_health_request() -> @http.Request
+pub fn get_health_request() -> @mttp.Request
 
-pub fn get_license_decode(@http.ResponseHead, Bytes) -> Result[@json.Json, @client.ResponseFailure]
+pub fn get_license_decode(@mttp.ResponseHead, Bytes) -> Result[@json.Json, @client.ResponseFailure]
 
 pub fn get_license_decode_json(@json.Json) -> @json.Json raise @json.JsonDecodeError
 
-pub fn get_license_request() -> @http.Request
+pub fn get_license_request() -> @mttp.Request
 
-pub fn get_llms_txt_request() -> @http.Request
+pub fn get_llms_txt_request() -> @mttp.Request
 
-pub fn get_range_decode(@http.ResponseHead, Bytes) -> Result[@json.Json, @client.ResponseFailure]
+pub fn get_range_decode(@mttp.ResponseHead, Bytes) -> Result[@json.Json, @client.ResponseFailure]
 
 pub fn get_range_decode_json(@json.Json) -> @json.Json raise @json.JsonDecodeError
 
-pub fn get_range_flavor_request(GetRangeFlavorFlavor, length? : Int32, range? : String, if_range? : String) -> @http.Request
+pub fn get_range_flavor_request(GetRangeFlavorFlavor, length? : Int32, range? : String, if_range? : String) -> @mttp.Request
 
-pub fn get_range_request() -> @http.Request
+pub fn get_range_request() -> @mttp.Request
 
-pub fn get_redirect_hops_decode(@http.ResponseHead, Bytes) -> Result[@json.Json, @client.ResponseFailure]
+pub fn get_redirect_hops_decode(@mttp.ResponseHead, Bytes) -> Result[@json.Json, @client.ResponseFailure]
 
 pub fn get_redirect_hops_decode_json(@json.Json) -> @json.Json raise @json.JsonDecodeError
 
-pub fn get_redirect_hops_request(GetRedirectHopsHops, code? : Int32, absolute? : Bool) -> @http.Request
+pub fn get_redirect_hops_request(GetRedirectHopsHops, code? : Int32, absolute? : Bool) -> @mttp.Request
 
-pub fn get_sse_decode(@http.ResponseHead, Bytes) -> Result[@json.Json, @client.ResponseFailure]
+pub fn get_sse_decode(@mttp.ResponseHead, Bytes) -> Result[@json.Json, @client.ResponseFailure]
 
 pub fn get_sse_decode_json(@json.Json) -> @json.Json raise @json.JsonDecodeError
 
-pub fn get_sse_flavor_request(GetSseFlavorFlavor, events? : Int32, interval? : Int32, seconds? : Double, bytes? : Int32, last_event_id? : String) -> @http.Request
+pub fn get_sse_flavor_request(GetSseFlavorFlavor, events? : Int32, interval? : Int32, seconds? : Double, bytes? : Int32, last_event_id? : String) -> @mttp.Request
 
-pub fn get_sse_request() -> @http.Request
+pub fn get_sse_request() -> @mttp.Request
 
-pub fn get_status_code_request(String, retry_after? : Int32) -> @http.Request
+pub fn get_status_code_request(String, retry_after? : Int32) -> @mttp.Request
 
-pub fn get_truncate_request(length? : Int32, send? : Int32) -> @http.Request
+pub fn get_truncate_request(length? : Int32, send? : Int32) -> @mttp.Request
 
-pub fn head_echo_request() -> @http.Request
+pub fn head_echo_request() -> @mttp.Request
 
-pub fn patch_echo_decode(@http.ResponseHead, Bytes) -> Result[@json.Json, @client.ResponseFailure]
+pub fn patch_echo_decode(@mttp.ResponseHead, Bytes) -> Result[@json.Json, @client.ResponseFailure]
 
 pub fn patch_echo_decode_json(@json.Json) -> @json.Json raise @json.JsonDecodeError
 
-pub fn patch_echo_request() -> @http.Request
+pub fn patch_echo_request() -> @mttp.Request
 
-pub fn post_echo_decode(@http.ResponseHead, Bytes) -> Result[@json.Json, @client.ResponseFailure]
+pub fn post_echo_decode(@mttp.ResponseHead, Bytes) -> Result[@json.Json, @client.ResponseFailure]
 
 pub fn post_echo_decode_json(@json.Json) -> @json.Json raise @json.JsonDecodeError
 
-pub fn post_echo_request() -> @http.Request
+pub fn post_echo_request() -> @mttp.Request
 
-pub fn put_echo_decode(@http.ResponseHead, Bytes) -> Result[@json.Json, @client.ResponseFailure]
+pub fn put_echo_decode(@mttp.ResponseHead, Bytes) -> Result[@json.Json, @client.ResponseFailure]
 
 pub fn put_echo_decode_json(@json.Json) -> @json.Json raise @json.JsonDecodeError
 
-pub fn put_echo_request() -> @http.Request
+pub fn put_echo_request() -> @mttp.Request
 
 // Errors
 

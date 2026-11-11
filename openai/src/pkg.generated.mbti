@@ -2,9 +2,9 @@
 package "gaato/openai"
 
 import {
-  "gaato/http",
-  "gaato/http/rt",
+  "gaato/mttp",
   "gaato/mttp/client",
+  "gaato/mttp/rt",
   "moonbitlang/core/debug",
   "moonbitlang/core/json",
 }
@@ -150,7 +150,7 @@ pub async fn OpenAI::create_embeddings(Self, EmbeddingRequest) -> Result[Embeddi
 pub async fn OpenAI::create_response(Self, ResponseRequest) -> Result[Response, OpenAIFailure]
 pub fn OpenAI::from_client(@client.Client) -> Self
 pub async fn OpenAI::list_models(Self) -> Result[Array[Model], OpenAIFailure]
-pub fn OpenAI::new(api_key~ : String, &@http.Backend, &@rt.Clock, base_url? : String, organization? : String, project? : String, retry? : @client.RetryPolicy, timer? : &@rt.Timer, timeout_ms? : Int32, max_body_bytes? : Int32, total_timeout_ms? : Int32) -> Self
+pub fn OpenAI::new(api_key~ : String, &@mttp.Backend, &@rt.Clock, base_url? : String, organization? : String, project? : String, retry? : @client.RetryPolicy, timer? : &@rt.Timer, timeout_ms? : Int32, max_body_bytes? : Int32, total_timeout_ms? : Int32) -> Self
 pub async fn OpenAI::retrieve_model(Self, String) -> Result[Model, OpenAIFailure]
 pub async fn OpenAI::stream_chat_completion(Self, ChatRequest, async (ChatEvent) -> Unit) -> Result[Unit, OpenAIFailure]
 pub async fn OpenAI::stream_response(Self, ResponseRequest, async (ResponseEvent) -> Unit) -> Result[Unit, OpenAIFailure]

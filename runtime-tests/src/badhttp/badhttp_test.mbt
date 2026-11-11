@@ -278,10 +278,11 @@ async test "badjson flavors become Decode, not a crash" {
 ///|
 async test "redirects are returned as 3xx, not followed" {
   bounded(() => {
+    // The Client follows redirects by default; this request opts out.
     let response = transport().send(
-      @runtime.request(@http.Request::get("\{BASE}/redirect/2")).response(
-        @runtime.as_bytes(),
-      ),
+      @runtime.request(@http.Request::get("\{BASE}/redirect/2"))
+      .response(@runtime.as_bytes())
+      .follow_redirects(false),
     )
     assert_true(response.status >= 300 && response.status < 400)
     assert_true(response.headers.contains("location"))

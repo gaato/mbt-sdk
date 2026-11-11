@@ -73,6 +73,8 @@ async fn buffered(request : @http.Request) -> @client.Reply[Bytes] {
     @runtime.AsyncClock::new(),
     timeout_ms=5000,
     max_body_bytes=1024 * 1024,
+    // The recordings are read as captured, 3xx included (cookies.on-redirect).
+    redirect=@client.RedirectConfig::none(),
   )
   defer c.close()
   let reply = c.send(

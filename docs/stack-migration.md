@@ -1,6 +1,6 @@
 # HTTP stack migration
 
-The SDKs now use gaato/http 0.6, gaato/http-async 0.6 and gaato/mttp 0.1.
+The SDKs now use gaato/mttp 0.2; apps add gaato/mttp_async 0.1 for I/O.
 The former shared runtime and the HTTP implementation directories have been
 retired from this repository. HTTP engine/client tests and ledgers live in
 [mttp](https://github.com/gaato/mttp).
@@ -25,7 +25,7 @@ envelope, including partial data.
 ## Backend and policy
 
 Supply &http.Backend and &http/rt.Clock. AsyncBackend is in
-gaato/http-async/backend; clocks, Timer and gates are in http-async/runtime.
+gaato/mttp_async/backend; clocks, Timer and gates are in mttp_async/runtime.
 Content decoding uses the explicit codings.Decompress wrapper. Backends receive
 SendOptions per attempt. A response owns its body and must be consumed or closed.
 

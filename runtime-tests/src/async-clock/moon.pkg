@@ -1,5 +1,5 @@
 import {
-  "gaato/http-async/runtime" @adapter,
+  "gaato/mttp_async/runtime" @adapter,
   "moonbitlang/core/async",
 } for "test"
 

@@ -99,3 +99,47 @@ test "mttp preserves partial GraphQL responses and decodes generated REST calls"
     backend.verify()
   })
 }
+
+///|
+test "downloads follow the 302 without the token unless redirect_limit is 0" {
+  @driver.run_sync(() => {
+    let start = "https://api.github.com/repos/gaato/mbt-sdk/tarball/main"
+    let location = "https://codeload.github.com/gaato/mbt-sdk/legacy.tar.gz/main"
+    let redirect = @testing.Canned::bytes(
+      302,
+      headers=@http.Headers::of([("location", location)]),
+    )
+    let backend = @testing.BackendStub::new()
+      .expect(
+        request => {
+          request.url == start &&
+          request.headers.get("authorization") == Some("Bearer secret")
+        },
+        redirect,
+      )
+      .expect(
+        request => {
+          request.url == location && !request.headers.contains("authorization")
+        },
+        @testing.Canned::bytes(200, body=b"archive"),
+      )
+      .expect(request => request.url == start, redirect)
+    let api = @github.GitHub::new(
+      backend,
+      @mock.FakeClock::new(),
+      token="secret",
+      limiter=@client.NoLimiter::new(),
+    )
+    let request = @gen.repos_download_tarball_archive_request(
+      "gaato", "mbt-sdk", "main",
+    )
+    assert_eq(api.send(request).unwrap().body, b"archive")
+    let held = api.send(request.attribute(@client.redirect_limit, 0))
+    guard held is Err(@github.GitHubFailure::Http(failure)) else {
+      fail("the 302 was followed")
+    }
+    assert_eq(failure.head().status, 302)
+    assert_eq(failure.head().headers.get("location"), Some(location))
+    backend.verify()
+  })
+}
