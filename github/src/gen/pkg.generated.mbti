@@ -3634,7 +3634,7 @@ pub fn orgs_create_issue_type_decode(@http.ResponseHead, Bytes) -> Result[IssueT
 
 pub fn orgs_create_issue_type_decode_json(@json.Json) -> IssueType raise @json.JsonDecodeError
 
-pub fn orgs_create_issue_type_request(String, OrganizationCreateIssueType) -> @http.Request
+pub fn orgs_create_issue_type_request(String, IssueTypeRequest) -> @http.Request
 
 pub fn orgs_create_webhook_decode(@http.ResponseHead, Bytes) -> Result[OrgHook, @client.ResponseFailure]
 
@@ -4026,7 +4026,7 @@ pub fn orgs_update_issue_type_decode(@http.ResponseHead, Bytes) -> Result[IssueT
 
 pub fn orgs_update_issue_type_decode_json(@json.Json) -> IssueType raise @json.JsonDecodeError
 
-pub fn orgs_update_issue_type_request(String, Int32, OrganizationUpdateIssueType) -> @http.Request
+pub fn orgs_update_issue_type_request(String, Int32, IssueTypeRequest) -> @http.Request
 
 pub fn orgs_update_membership_for_authenticated_user_decode(@http.ResponseHead, Bytes) -> Result[OrgMembership, @client.ResponseFailure]
 
@@ -6062,6 +6062,18 @@ pub fn users_create_gpg_key_for_authenticated_user_decode_json(@json.Json) -> Gp
 
 pub fn users_create_gpg_key_for_authenticated_user_request(UsersCreateGpgKeyForAuthenticatedUserRequest) -> @http.Request
 
+pub fn users_create_issue_field_for_authenticated_user_decode(@http.ResponseHead, Bytes) -> Result[UserIssueField, @client.ResponseFailure]
+
+pub fn users_create_issue_field_for_authenticated_user_decode_json(@json.Json) -> UserIssueField raise @json.JsonDecodeError
+
+pub fn users_create_issue_field_for_authenticated_user_request(UserCreateIssueField) -> @http.Request
+
+pub fn users_create_issue_type_for_authenticated_user_decode(@http.ResponseHead, Bytes) -> Result[IssueType, @client.ResponseFailure]
+
+pub fn users_create_issue_type_for_authenticated_user_decode_json(@json.Json) -> IssueType raise @json.JsonDecodeError
+
+pub fn users_create_issue_type_for_authenticated_user_request(IssueTypeRequest) -> @http.Request
+
 pub fn users_create_public_ssh_key_for_authenticated_user_decode(@http.ResponseHead, Bytes) -> Result[Key, @client.ResponseFailure]
 
 pub fn users_create_public_ssh_key_for_authenticated_user_decode_json(@json.Json) -> Key raise @json.JsonDecodeError
@@ -6083,6 +6095,10 @@ pub fn users_delete_attestations_by_subject_digest_request(String, String) -> @h
 pub fn users_delete_email_for_authenticated_user_request(UsersDeleteEmailForAuthenticatedUserRequest) -> @http.Request
 
 pub fn users_delete_gpg_key_for_authenticated_user_request(Int32) -> @http.Request
+
+pub fn users_delete_issue_field_for_authenticated_user_request(Int32) -> @http.Request
+
+pub fn users_delete_issue_type_for_authenticated_user_request(Int32) -> @http.Request
 
 pub fn users_delete_public_ssh_key_for_authenticated_user_request(Int32) -> @http.Request
 
@@ -6198,6 +6214,18 @@ pub fn users_list_gpg_keys_for_user_decode_json(@json.Json) -> Array[GpgKey] rai
 
 pub fn users_list_gpg_keys_for_user_request(String, per_page? : Int32, page? : Int32) -> @http.Request
 
+pub fn users_list_issue_fields_for_authenticated_user_decode(@http.ResponseHead, Bytes) -> Result[Array[UserIssueField], @client.ResponseFailure]
+
+pub fn users_list_issue_fields_for_authenticated_user_decode_json(@json.Json) -> Array[UserIssueField] raise @json.JsonDecodeError
+
+pub fn users_list_issue_fields_for_authenticated_user_request() -> @http.Request
+
+pub fn users_list_issue_types_for_authenticated_user_decode(@http.ResponseHead, Bytes) -> Result[Array[IssueType], @client.ResponseFailure]
+
+pub fn users_list_issue_types_for_authenticated_user_decode_json(@json.Json) -> Array[IssueType] raise @json.JsonDecodeError
+
+pub fn users_list_issue_types_for_authenticated_user_request() -> @http.Request
+
 pub fn users_list_public_emails_for_authenticated_user_decode(@http.ResponseHead, Bytes) -> Result[Array[Email], @client.ResponseFailure]
 
 pub fn users_list_public_emails_for_authenticated_user_decode_json(@json.Json) -> Array[Email] raise @json.JsonDecodeError
@@ -6257,6 +6285,18 @@ pub fn users_update_authenticated_decode(@http.ResponseHead, Bytes) -> Result[Pr
 pub fn users_update_authenticated_decode_json(@json.Json) -> PrivateUser raise @json.JsonDecodeError
 
 pub fn users_update_authenticated_request(UsersUpdateAuthenticatedRequest) -> @http.Request
+
+pub fn users_update_issue_field_for_authenticated_user_decode(@http.ResponseHead, Bytes) -> Result[UserIssueField, @client.ResponseFailure]
+
+pub fn users_update_issue_field_for_authenticated_user_decode_json(@json.Json) -> UserIssueField raise @json.JsonDecodeError
+
+pub fn users_update_issue_field_for_authenticated_user_request(Int32, UserUpdateIssueField) -> @http.Request
+
+pub fn users_update_issue_type_for_authenticated_user_decode(@http.ResponseHead, Bytes) -> Result[IssueType, @client.ResponseFailure]
+
+pub fn users_update_issue_type_for_authenticated_user_decode_json(@json.Json) -> IssueType raise @json.JsonDecodeError
+
+pub fn users_update_issue_type_for_authenticated_user_request(Int32, IssueTypeRequest) -> @http.Request
 
 // Errors
 
@@ -37392,6 +37432,7 @@ pub impl @json.ToJson for IssueFieldValueValue
 pub(all) enum IssueFieldVisibility {
   OrganizationMembersOnly
   All
+  Restricted
   Unknown(String)
 }
 pub fn IssueFieldVisibility::equal(Self, Self) -> Bool
@@ -37694,6 +37735,43 @@ pub fn IssueTypeColor::to_json(Self) -> @json.Json
 pub fn IssueTypeColor::to_repr(Self) -> @debug.Repr
 pub impl @json.FromJson for IssueTypeColor
 pub impl @json.ToJson for IssueTypeColor
+
+#derive(Eq, @debug.Debug)
+pub(all) struct IssueTypeRequest {
+  name : String
+  is_enabled : Bool
+  description : @jsonkit.Presence[String]
+  color : @jsonkit.Presence[IssueTypeRequestColor]
+}
+pub fn IssueTypeRequest::equal(Self, Self) -> Bool
+pub fn IssueTypeRequest::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn IssueTypeRequest::new(name~ : String, is_enabled~ : Bool, description? : String, color? : IssueTypeRequestColor) -> Self
+pub fn IssueTypeRequest::not_equal(Self, Self) -> Bool
+pub fn IssueTypeRequest::to_json(Self) -> @json.Json
+pub fn IssueTypeRequest::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for IssueTypeRequest
+pub impl @json.ToJson for IssueTypeRequest
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum IssueTypeRequestColor {
+  Gray
+  Blue
+  Green
+  Yellow
+  Orange
+  Red
+  Pink
+  Purple
+  Custom(String)
+}
+pub fn IssueTypeRequestColor::equal(Self, Self) -> Bool
+pub fn IssueTypeRequestColor::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn IssueTypeRequestColor::not_equal(Self, Self) -> Bool
+pub fn IssueTypeRequestColor::to_json(Self) -> @json.Json
+pub fn IssueTypeRequestColor::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for IssueTypeRequestColor
+pub impl @json.ToJson for IssueTypeRequestColor
 
 #derive(Eq, @debug.Debug)
 pub(all) struct IssueTypeWebhook {
@@ -42273,6 +42351,7 @@ pub impl @json.ToJson for OrganizationCreateIssueFieldOptionsItemColor
 pub(all) enum OrganizationCreateIssueFieldVisibility {
   OrganizationMembersOnly
   All
+  Restricted
   Custom(String)
 }
 pub fn OrganizationCreateIssueFieldVisibility::equal(Self, Self) -> Bool
@@ -42282,43 +42361,6 @@ pub fn OrganizationCreateIssueFieldVisibility::to_json(Self) -> @json.Json
 pub fn OrganizationCreateIssueFieldVisibility::to_repr(Self) -> @debug.Repr
 pub impl @json.FromJson for OrganizationCreateIssueFieldVisibility
 pub impl @json.ToJson for OrganizationCreateIssueFieldVisibility
-
-#derive(Eq, @debug.Debug)
-pub(all) struct OrganizationCreateIssueType {
-  name : String
-  is_enabled : Bool
-  description : @jsonkit.Presence[String]
-  color : @jsonkit.Presence[OrganizationCreateIssueTypeColor]
-}
-pub fn OrganizationCreateIssueType::equal(Self, Self) -> Bool
-pub fn OrganizationCreateIssueType::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
-pub fn OrganizationCreateIssueType::new(name~ : String, is_enabled~ : Bool, description? : String, color? : OrganizationCreateIssueTypeColor) -> Self
-pub fn OrganizationCreateIssueType::not_equal(Self, Self) -> Bool
-pub fn OrganizationCreateIssueType::to_json(Self) -> @json.Json
-pub fn OrganizationCreateIssueType::to_repr(Self) -> @debug.Repr
-pub impl @json.FromJson for OrganizationCreateIssueType
-pub impl @json.ToJson for OrganizationCreateIssueType
-
-#non_exhaustive
-#derive(Eq, @debug.Debug)
-pub(all) enum OrganizationCreateIssueTypeColor {
-  Gray
-  Blue
-  Green
-  Yellow
-  Orange
-  Red
-  Pink
-  Purple
-  Custom(String)
-}
-pub fn OrganizationCreateIssueTypeColor::equal(Self, Self) -> Bool
-pub fn OrganizationCreateIssueTypeColor::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
-pub fn OrganizationCreateIssueTypeColor::not_equal(Self, Self) -> Bool
-pub fn OrganizationCreateIssueTypeColor::to_json(Self) -> @json.Json
-pub fn OrganizationCreateIssueTypeColor::to_repr(Self) -> @debug.Repr
-pub impl @json.FromJson for OrganizationCreateIssueTypeColor
-pub impl @json.ToJson for OrganizationCreateIssueTypeColor
 
 #derive(Eq, @debug.Debug)
 pub(all) struct OrganizationDependabotSecret {
@@ -42810,6 +42852,7 @@ pub impl @json.ToJson for OrganizationUpdateIssueFieldOptionsItemColor
 pub(all) enum OrganizationUpdateIssueFieldVisibility {
   OrganizationMembersOnly
   All
+  Restricted
   Custom(String)
 }
 pub fn OrganizationUpdateIssueFieldVisibility::equal(Self, Self) -> Bool
@@ -42819,43 +42862,6 @@ pub fn OrganizationUpdateIssueFieldVisibility::to_json(Self) -> @json.Json
 pub fn OrganizationUpdateIssueFieldVisibility::to_repr(Self) -> @debug.Repr
 pub impl @json.FromJson for OrganizationUpdateIssueFieldVisibility
 pub impl @json.ToJson for OrganizationUpdateIssueFieldVisibility
-
-#derive(Eq, @debug.Debug)
-pub(all) struct OrganizationUpdateIssueType {
-  name : String
-  is_enabled : Bool
-  description : @jsonkit.Presence[String]
-  color : @jsonkit.Presence[OrganizationUpdateIssueTypeColor]
-}
-pub fn OrganizationUpdateIssueType::equal(Self, Self) -> Bool
-pub fn OrganizationUpdateIssueType::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
-pub fn OrganizationUpdateIssueType::new(name~ : String, is_enabled~ : Bool, description? : String, color? : OrganizationUpdateIssueTypeColor) -> Self
-pub fn OrganizationUpdateIssueType::not_equal(Self, Self) -> Bool
-pub fn OrganizationUpdateIssueType::to_json(Self) -> @json.Json
-pub fn OrganizationUpdateIssueType::to_repr(Self) -> @debug.Repr
-pub impl @json.FromJson for OrganizationUpdateIssueType
-pub impl @json.ToJson for OrganizationUpdateIssueType
-
-#non_exhaustive
-#derive(Eq, @debug.Debug)
-pub(all) enum OrganizationUpdateIssueTypeColor {
-  Gray
-  Blue
-  Green
-  Yellow
-  Orange
-  Red
-  Pink
-  Purple
-  Custom(String)
-}
-pub fn OrganizationUpdateIssueTypeColor::equal(Self, Self) -> Bool
-pub fn OrganizationUpdateIssueTypeColor::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
-pub fn OrganizationUpdateIssueTypeColor::not_equal(Self, Self) -> Bool
-pub fn OrganizationUpdateIssueTypeColor::to_json(Self) -> @json.Json
-pub fn OrganizationUpdateIssueTypeColor::to_repr(Self) -> @debug.Repr
-pub impl @json.FromJson for OrganizationUpdateIssueTypeColor
-pub impl @json.ToJson for OrganizationUpdateIssueTypeColor
 
 #derive(Eq, @debug.Debug)
 pub(all) struct OrgsConvertMemberToOutsideCollaboratorRequest {
@@ -59088,6 +59094,187 @@ pub impl @json.FromJson for UpdateBudgetBudgetBudgetType
 pub impl @json.ToJson for UpdateBudgetBudgetBudgetType
 
 #derive(Eq, @debug.Debug)
+pub(all) struct UserCreateIssueField {
+  name : String
+  description : @jsonkit.Presence[String]
+  data_type : UserCreateIssueFieldDataType
+  visibility : UserCreateIssueFieldVisibility?
+  options : @jsonkit.Presence[Array[UserCreateIssueFieldOptionsItem]]
+}
+pub fn UserCreateIssueField::equal(Self, Self) -> Bool
+pub fn UserCreateIssueField::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn UserCreateIssueField::new(name~ : String, data_type~ : UserCreateIssueFieldDataType, description? : String, visibility? : UserCreateIssueFieldVisibility, options? : Array[UserCreateIssueFieldOptionsItem]) -> Self
+pub fn UserCreateIssueField::not_equal(Self, Self) -> Bool
+pub fn UserCreateIssueField::to_json(Self) -> @json.Json
+pub fn UserCreateIssueField::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for UserCreateIssueField
+pub impl @json.ToJson for UserCreateIssueField
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum UserCreateIssueFieldDataType {
+  Text
+  Date
+  SingleSelect
+  MultiSelect
+  Number
+  Custom(String)
+}
+pub fn UserCreateIssueFieldDataType::equal(Self, Self) -> Bool
+pub fn UserCreateIssueFieldDataType::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn UserCreateIssueFieldDataType::not_equal(Self, Self) -> Bool
+pub fn UserCreateIssueFieldDataType::to_json(Self) -> @json.Json
+pub fn UserCreateIssueFieldDataType::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for UserCreateIssueFieldDataType
+pub impl @json.ToJson for UserCreateIssueFieldDataType
+
+#derive(Eq, @debug.Debug)
+pub(all) struct UserCreateIssueFieldOptionsItem {
+  name : String
+  description : @jsonkit.Presence[String]
+  color : UserCreateIssueFieldOptionsItemColor
+  priority : Int32
+}
+pub fn UserCreateIssueFieldOptionsItem::equal(Self, Self) -> Bool
+pub fn UserCreateIssueFieldOptionsItem::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn UserCreateIssueFieldOptionsItem::new(name~ : String, color~ : UserCreateIssueFieldOptionsItemColor, priority~ : Int32, description? : String) -> Self
+pub fn UserCreateIssueFieldOptionsItem::not_equal(Self, Self) -> Bool
+pub fn UserCreateIssueFieldOptionsItem::to_json(Self) -> @json.Json
+pub fn UserCreateIssueFieldOptionsItem::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for UserCreateIssueFieldOptionsItem
+pub impl @json.ToJson for UserCreateIssueFieldOptionsItem
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum UserCreateIssueFieldOptionsItemColor {
+  Gray
+  Blue
+  Green
+  Yellow
+  Orange
+  Red
+  Pink
+  Purple
+  Custom(String)
+}
+pub fn UserCreateIssueFieldOptionsItemColor::equal(Self, Self) -> Bool
+pub fn UserCreateIssueFieldOptionsItemColor::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn UserCreateIssueFieldOptionsItemColor::not_equal(Self, Self) -> Bool
+pub fn UserCreateIssueFieldOptionsItemColor::to_json(Self) -> @json.Json
+pub fn UserCreateIssueFieldOptionsItemColor::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for UserCreateIssueFieldOptionsItemColor
+pub impl @json.ToJson for UserCreateIssueFieldOptionsItemColor
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum UserCreateIssueFieldVisibility {
+  Restricted
+  All
+  Custom(String)
+}
+pub fn UserCreateIssueFieldVisibility::equal(Self, Self) -> Bool
+pub fn UserCreateIssueFieldVisibility::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn UserCreateIssueFieldVisibility::not_equal(Self, Self) -> Bool
+pub fn UserCreateIssueFieldVisibility::to_json(Self) -> @json.Json
+pub fn UserCreateIssueFieldVisibility::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for UserCreateIssueFieldVisibility
+pub impl @json.ToJson for UserCreateIssueFieldVisibility
+
+#derive(Eq, @debug.Debug)
+pub(all) struct UserIssueField {
+  id : Int32
+  node_id : String
+  name : String
+  description : @jsonkit.Presence[String]
+  data_type : UserIssueFieldDataType
+  visibility : UserIssueFieldVisibility?
+  options : @jsonkit.Presence[Array[UserIssueFieldOptionsItem]]
+  created_at : String?
+  updated_at : String?
+}
+pub fn UserIssueField::equal(Self, Self) -> Bool
+pub fn UserIssueField::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn UserIssueField::new(id~ : Int32, node_id~ : String, name~ : String, data_type~ : UserIssueFieldDataType, description? : String, visibility? : UserIssueFieldVisibility, options? : Array[UserIssueFieldOptionsItem], created_at? : String, updated_at? : String) -> Self
+pub fn UserIssueField::not_equal(Self, Self) -> Bool
+pub fn UserIssueField::to_json(Self) -> @json.Json
+pub fn UserIssueField::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for UserIssueField
+pub impl @json.ToJson for UserIssueField
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum UserIssueFieldDataType {
+  Text
+  Date
+  SingleSelect
+  MultiSelect
+  Number
+  Unknown(String)
+}
+pub fn UserIssueFieldDataType::equal(Self, Self) -> Bool
+pub fn UserIssueFieldDataType::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn UserIssueFieldDataType::not_equal(Self, Self) -> Bool
+pub fn UserIssueFieldDataType::to_json(Self) -> @json.Json
+pub fn UserIssueFieldDataType::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for UserIssueFieldDataType
+pub impl @json.ToJson for UserIssueFieldDataType
+
+#derive(Eq, @debug.Debug)
+pub(all) struct UserIssueFieldOptionsItem {
+  id : Int32
+  name : String
+  description : @jsonkit.Presence[String]
+  color : @jsonkit.Presence[UserIssueFieldOptionsItemColor]
+  priority : @jsonkit.Presence[Int32]
+  created_at : String?
+  updated_at : String?
+}
+pub fn UserIssueFieldOptionsItem::equal(Self, Self) -> Bool
+pub fn UserIssueFieldOptionsItem::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn UserIssueFieldOptionsItem::new(id~ : Int32, name~ : String, description? : String, color? : UserIssueFieldOptionsItemColor, priority? : Int32, created_at? : String, updated_at? : String) -> Self
+pub fn UserIssueFieldOptionsItem::not_equal(Self, Self) -> Bool
+pub fn UserIssueFieldOptionsItem::to_json(Self) -> @json.Json
+pub fn UserIssueFieldOptionsItem::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for UserIssueFieldOptionsItem
+pub impl @json.ToJson for UserIssueFieldOptionsItem
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum UserIssueFieldOptionsItemColor {
+  Gray
+  Blue
+  Green
+  Yellow
+  Orange
+  Red
+  Pink
+  Purple
+  Unknown(String)
+}
+pub fn UserIssueFieldOptionsItemColor::equal(Self, Self) -> Bool
+pub fn UserIssueFieldOptionsItemColor::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn UserIssueFieldOptionsItemColor::not_equal(Self, Self) -> Bool
+pub fn UserIssueFieldOptionsItemColor::to_json(Self) -> @json.Json
+pub fn UserIssueFieldOptionsItemColor::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for UserIssueFieldOptionsItemColor
+pub impl @json.ToJson for UserIssueFieldOptionsItemColor
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum UserIssueFieldVisibility {
+  Restricted
+  All
+  Unknown(String)
+}
+pub fn UserIssueFieldVisibility::equal(Self, Self) -> Bool
+pub fn UserIssueFieldVisibility::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn UserIssueFieldVisibility::not_equal(Self, Self) -> Bool
+pub fn UserIssueFieldVisibility::to_json(Self) -> @json.Json
+pub fn UserIssueFieldVisibility::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for UserIssueFieldVisibility
+pub impl @json.ToJson for UserIssueFieldVisibility
+
+#derive(Eq, @debug.Debug)
 pub(all) struct UserMarketplacePurchase {
   billing_cycle : String
   next_billing_date : String?
@@ -59205,6 +59392,75 @@ pub fn UserSearchResultItem::to_json(Self) -> @json.Json
 pub fn UserSearchResultItem::to_repr(Self) -> @debug.Repr
 pub impl @json.FromJson for UserSearchResultItem
 pub impl @json.ToJson for UserSearchResultItem
+
+#derive(Eq, @debug.Debug)
+pub(all) struct UserUpdateIssueField {
+  name : String?
+  description : @jsonkit.Presence[String]
+  visibility : UserUpdateIssueFieldVisibility?
+  options : Array[UserUpdateIssueFieldOptionsItem]?
+}
+pub fn UserUpdateIssueField::equal(Self, Self) -> Bool
+pub fn UserUpdateIssueField::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn UserUpdateIssueField::new(name? : String, description? : String, visibility? : UserUpdateIssueFieldVisibility, options? : Array[UserUpdateIssueFieldOptionsItem]) -> Self
+pub fn UserUpdateIssueField::not_equal(Self, Self) -> Bool
+pub fn UserUpdateIssueField::to_json(Self) -> @json.Json
+pub fn UserUpdateIssueField::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for UserUpdateIssueField
+pub impl @json.ToJson for UserUpdateIssueField
+
+#derive(Eq, @debug.Debug)
+pub(all) struct UserUpdateIssueFieldOptionsItem {
+  id : Int32?
+  name : String
+  description : @jsonkit.Presence[String]
+  color : UserUpdateIssueFieldOptionsItemColor
+  priority : Int32
+}
+pub fn UserUpdateIssueFieldOptionsItem::equal(Self, Self) -> Bool
+pub fn UserUpdateIssueFieldOptionsItem::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn UserUpdateIssueFieldOptionsItem::new(name~ : String, color~ : UserUpdateIssueFieldOptionsItemColor, priority~ : Int32, id? : Int32, description? : String) -> Self
+pub fn UserUpdateIssueFieldOptionsItem::not_equal(Self, Self) -> Bool
+pub fn UserUpdateIssueFieldOptionsItem::to_json(Self) -> @json.Json
+pub fn UserUpdateIssueFieldOptionsItem::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for UserUpdateIssueFieldOptionsItem
+pub impl @json.ToJson for UserUpdateIssueFieldOptionsItem
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum UserUpdateIssueFieldOptionsItemColor {
+  Gray
+  Blue
+  Green
+  Yellow
+  Orange
+  Red
+  Pink
+  Purple
+  Custom(String)
+}
+pub fn UserUpdateIssueFieldOptionsItemColor::equal(Self, Self) -> Bool
+pub fn UserUpdateIssueFieldOptionsItemColor::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn UserUpdateIssueFieldOptionsItemColor::not_equal(Self, Self) -> Bool
+pub fn UserUpdateIssueFieldOptionsItemColor::to_json(Self) -> @json.Json
+pub fn UserUpdateIssueFieldOptionsItemColor::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for UserUpdateIssueFieldOptionsItemColor
+pub impl @json.ToJson for UserUpdateIssueFieldOptionsItemColor
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum UserUpdateIssueFieldVisibility {
+  Restricted
+  All
+  Custom(String)
+}
+pub fn UserUpdateIssueFieldVisibility::equal(Self, Self) -> Bool
+pub fn UserUpdateIssueFieldVisibility::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn UserUpdateIssueFieldVisibility::not_equal(Self, Self) -> Bool
+pub fn UserUpdateIssueFieldVisibility::to_json(Self) -> @json.Json
+pub fn UserUpdateIssueFieldVisibility::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for UserUpdateIssueFieldVisibility
+pub impl @json.ToJson for UserUpdateIssueFieldVisibility
 
 #non_exhaustive
 #derive(Eq, @debug.Debug)

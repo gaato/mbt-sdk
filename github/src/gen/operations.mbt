@@ -12579,7 +12579,7 @@ pub fn orgs_list_issue_types_decode(
 /// Create issue type for an organization
 pub fn orgs_create_issue_type_request(
   org : String,
-  body : OrganizationCreateIssueType,
+  body : IssueTypeRequest,
 ) -> @http.Request {
   @http.Request::post(
     "/orgs/" + @http.percent_encode(parameter_value(org)) + "/issue-types",
@@ -12611,7 +12611,7 @@ pub fn orgs_create_issue_type_decode(
 pub fn orgs_update_issue_type_request(
   org : String,
   issue_type_id : Int32,
-  body : OrganizationUpdateIssueType,
+  body : IssueTypeRequest,
 ) -> @http.Request {
   @http.Request::put(
     "/orgs/" +
@@ -39894,6 +39894,200 @@ pub fn interactions_set_restrictions_for_authenticated_user_decode(
 /// Remove interaction restrictions from your public repositories The caller handles the response as @http.Response.
 pub fn interactions_remove_restrictions_for_authenticated_user_request() -> @http.Request {
   @http.Request::delete("/user/interaction-limits")
+}
+
+///|
+///
+/// List issue fields
+pub fn users_list_issue_fields_for_authenticated_user_request() -> @http.Request {
+  @http.Request::get("/user/issue-fields")
+}
+
+///|
+///
+/// Decodes a parsed successful users/list-issue-fields-for-authenticated-user response.
+pub fn users_list_issue_fields_for_authenticated_user_decode_json(
+  value : Json,
+) -> Array[UserIssueField] raise @json.JsonDecodeError {
+  @json.from_json(value)
+}
+
+///|
+///
+/// Decodes a successful users/list-issue-fields-for-authenticated-user response.
+pub fn users_list_issue_fields_for_authenticated_user_decode(
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[UserIssueField], @client.ResponseFailure] {
+  decode_response(head, body)
+}
+
+///|
+///
+/// Create an issue field
+pub fn users_create_issue_field_for_authenticated_user_request(
+  body : UserCreateIssueField,
+) -> @http.Request {
+  @http.Request::post("/user/issue-fields").body_json(Json(body))
+}
+
+///|
+///
+/// Decodes a parsed successful users/create-issue-field-for-authenticated-user response.
+pub fn users_create_issue_field_for_authenticated_user_decode_json(
+  value : Json,
+) -> UserIssueField raise @json.JsonDecodeError {
+  @json.from_json(value)
+}
+
+///|
+///
+/// Decodes a successful users/create-issue-field-for-authenticated-user response.
+pub fn users_create_issue_field_for_authenticated_user_decode(
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[UserIssueField, @client.ResponseFailure] {
+  decode_response(head, body)
+}
+
+///|
+///
+/// Update an issue field
+pub fn users_update_issue_field_for_authenticated_user_request(
+  issue_field_id : Int32,
+  body : UserUpdateIssueField,
+) -> @http.Request {
+  @http.Request::patch(
+    "/user/issue-fields/" +
+    @http.percent_encode(parameter_value(issue_field_id)),
+  ).body_json(Json(body))
+}
+
+///|
+///
+/// Decodes a parsed successful users/update-issue-field-for-authenticated-user response.
+pub fn users_update_issue_field_for_authenticated_user_decode_json(
+  value : Json,
+) -> UserIssueField raise @json.JsonDecodeError {
+  @json.from_json(value)
+}
+
+///|
+///
+/// Decodes a successful users/update-issue-field-for-authenticated-user response.
+pub fn users_update_issue_field_for_authenticated_user_decode(
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[UserIssueField, @client.ResponseFailure] {
+  decode_response(head, body)
+}
+
+///|
+///
+/// Delete an issue field The caller handles the response as @http.Response.
+pub fn users_delete_issue_field_for_authenticated_user_request(
+  issue_field_id : Int32,
+) -> @http.Request {
+  @http.Request::delete(
+    "/user/issue-fields/" +
+    @http.percent_encode(parameter_value(issue_field_id)),
+  )
+}
+
+///|
+///
+/// List issue types
+pub fn users_list_issue_types_for_authenticated_user_request() -> @http.Request {
+  @http.Request::get("/user/issue-types")
+}
+
+///|
+///
+/// Decodes a parsed successful users/list-issue-types-for-authenticated-user response.
+pub fn users_list_issue_types_for_authenticated_user_decode_json(
+  value : Json,
+) -> Array[IssueType] raise @json.JsonDecodeError {
+  @json.from_json(value)
+}
+
+///|
+///
+/// Decodes a successful users/list-issue-types-for-authenticated-user response.
+pub fn users_list_issue_types_for_authenticated_user_decode(
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[IssueType], @client.ResponseFailure] {
+  decode_response(head, body)
+}
+
+///|
+///
+/// Create an issue type
+pub fn users_create_issue_type_for_authenticated_user_request(
+  body : IssueTypeRequest,
+) -> @http.Request {
+  @http.Request::post("/user/issue-types").body_json(Json(body))
+}
+
+///|
+///
+/// Decodes a parsed successful users/create-issue-type-for-authenticated-user response.
+pub fn users_create_issue_type_for_authenticated_user_decode_json(
+  value : Json,
+) -> IssueType raise @json.JsonDecodeError {
+  @json.from_json(value)
+}
+
+///|
+///
+/// Decodes a successful users/create-issue-type-for-authenticated-user response.
+pub fn users_create_issue_type_for_authenticated_user_decode(
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[IssueType, @client.ResponseFailure] {
+  decode_response(head, body)
+}
+
+///|
+///
+/// Update an issue type
+pub fn users_update_issue_type_for_authenticated_user_request(
+  issue_type_id : Int32,
+  body : IssueTypeRequest,
+) -> @http.Request {
+  @http.Request::put(
+    "/user/issue-types/" + @http.percent_encode(parameter_value(issue_type_id)),
+  ).body_json(Json(body))
+}
+
+///|
+///
+/// Decodes a parsed successful users/update-issue-type-for-authenticated-user response.
+pub fn users_update_issue_type_for_authenticated_user_decode_json(
+  value : Json,
+) -> IssueType raise @json.JsonDecodeError {
+  @json.from_json(value)
+}
+
+///|
+///
+/// Decodes a successful users/update-issue-type-for-authenticated-user response.
+pub fn users_update_issue_type_for_authenticated_user_decode(
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[IssueType, @client.ResponseFailure] {
+  decode_response(head, body)
+}
+
+///|
+///
+/// Delete an issue type The caller handles the response as @http.Response.
+pub fn users_delete_issue_type_for_authenticated_user_request(
+  issue_type_id : Int32,
+) -> @http.Request {
+  @http.Request::delete(
+    "/user/issue-types/" + @http.percent_encode(parameter_value(issue_type_id)),
+  )
 }
 
 ///|
