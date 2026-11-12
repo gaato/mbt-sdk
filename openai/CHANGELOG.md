@@ -11,6 +11,12 @@ change itself is the diff of `src/gen/pkg.generated.mbti`.
 
 ## [Unreleased]
 
+## [0.8.0] - 2026-11-12
+
+### Changed
+
+- **Build on gaato/mttp 0.2 instead of gaato/http.** `::new` takes an `&@mttp.Backend`, and the request and response types are gaato/mttp's. Apps pass `@mttp_async.backend()`, `@mttp_async.clock()` and `timer=@mttp_async.timer()` from gaato/mttp_async 0.1. gaato/http and gaato/http-async are no longer dependencies.
+
 ## [0.7.0] - 2026-11-10
 
 ### Changed

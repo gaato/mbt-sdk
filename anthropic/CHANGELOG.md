@@ -15,6 +15,12 @@ are optional unless the field is required, and keep a wildcard arm.
 
 ## [Unreleased]
 
+## [0.16.0] - 2026-11-12
+
+### Changed
+
+- **Build on gaato/mttp 0.2 instead of gaato/http.** `::new` takes an `&@mttp.Backend`, and the request and response types are gaato/mttp's. Apps pass `@mttp_async.backend()`, `@mttp_async.clock()` and `timer=@mttp_async.timer()` from gaato/mttp_async 0.1. gaato/http and gaato/http-async are no longer dependencies.
+
 ## [0.15.0] - 2026-11-10
 
 ### Changed

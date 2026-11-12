@@ -14,6 +14,13 @@ are optional unless the field is required, and keep a wildcard arm.
 
 ## [Unreleased]
 
+## [0.22.0] - 2026-11-12
+
+### Changed
+
+- **Build on gaato/mttp 0.2 instead of gaato/http.** `::new` takes an `&@mttp.Backend`, and the request and response types are gaato/mttp's. Apps pass `@mttp_async.backend()`, `@mttp_async.clock()` and `timer=@mttp_async.timer()` from gaato/mttp_async 0.1. gaato/http and gaato/http-async are no longer dependencies. `GitHub::send`, `call` and `paginator` take `@mttp.Request`.
+- **Redirects are followed.** The Client follows up to 10 hops, dropping `authorization` and `cookie` on a hop to another origin, so a download such as a tarball returns its body instead of an HTTP failure with the 302's `location`. To get the 302 back, set the `redirect_limit` attribute to 0 on the request, or pass a Client built with `RedirectConfig::none()` to `GitHub::from_client`.
+
 ## [0.21.0] - 2026-11-11
 
 ### Changed
