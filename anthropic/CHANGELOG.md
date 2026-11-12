@@ -15,6 +15,12 @@ are optional unless the field is required, and keep a wildcard arm.
 
 ## [Unreleased]
 
+## [0.16.1] - 2026-11-12
+
+### Security
+
+- **The API key is no longer sent to another origin on a redirect.** Since 0.16.0 the client follows redirects (gaato/mttp 0.2's default), and mttp removes only `authorization`, `proxy-authorization` and `cookie` when a redirect changes the origin, so with the default `x-api-key` authentication a cross-origin redirect from the API or a compatible gateway forwarded the key to the other origin. `Anthropic::new` now removes `x-api-key` as well; a same-origin redirect still carries it. 0.15.0 and earlier did not follow redirects. A client wrapped with `Anthropic::from_client` keeps its own redirect configuration: add `x-api-key` to its `credential_headers`.
+
 ## [0.16.0] - 2026-11-12
 
 ### Changed

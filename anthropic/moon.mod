@@ -3,7 +3,7 @@
 
 name = "gaato/anthropic"
 
-version = "0.16.0"
+version = "0.16.1"
 
 license = "Apache-2.0"
 

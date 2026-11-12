@@ -42,6 +42,11 @@ pub impl @debug.Debug for Anthropic with fn to_repr(_self) {
 /// `total_timeout_ms` is given, the whole call, retries and their waits
 /// included, to that. A total deadline requires Timer and also covers admission
 /// and stream callbacks. Backend phase deadlines can finish attempts earlier.
+///
+/// Redirects are followed as mttp's `Client` does by default, except that
+/// `x-api-key` is removed along with `authorization`, `proxy-authorization`
+/// and `cookie` when a redirect leaves the origin, so the API key is sent
+/// only to the origin it was given for.
 pub fn Anthropic::new(
   api_key~ : String,
   backend : &@http.Backend,
@@ -73,6 +78,7 @@ pub fn Anthropic::new(
       read_idle_ms=timeout_ms,
       max_body_bytes?,
       retry~,
+      redirect=redirect_config(),
       timer?,
       total_ms?=total_timeout_ms,
     ),
@@ -81,7 +87,22 @@ pub fn Anthropic::new(
 }
 
 ///|
+/// mttp's default redirect handling plus `x-api-key`, the default credential
+/// header, among the headers removed on an origin change. Built from the
+/// default so that headers mttp adds later stay removed too.
+fn redirect_config() -> @client.RedirectConfig {
+  let default = @client.RedirectConfig::default()
+  let credential_headers = default.credential_headers.copy()
+  credential_headers.push("x-api-key")
+  { ..default, credential_headers, }
+}
+
+///|
 /// Wraps a preconfigured runtime client for compatible APIs and tests.
+///
+/// The client's own redirect configuration applies: mttp's default forwards
+/// `x-api-key` across origins, so add it to `credential_headers` when the
+/// client carries one.
 pub fn Anthropic::from_client(
   client : @client.Client,
   version~ : String = "2026-10-21",

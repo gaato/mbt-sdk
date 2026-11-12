@@ -94,3 +94,64 @@ test "mttp SSE decode failure retains the original response head" {
     backend.verify()
   })
 }
+
+///|
+/// Sends one count_tokens call through a stub that answers with `status` and
+/// `location` first, and returns what the stub recorded.
+fn redirected_count_tokens(
+  status : Int32,
+  location : String,
+  auth_header~ : @anthropic.AuthHeader = XApiKey,
+) -> Array[@testing.Recorded] raise {
+  let backend = @testing.BackendStub::new()
+    .expect(
+      _ => true,
+      @testing.Canned::bytes(
+        status,
+        headers=@http.Headers::of([("location", location)]),
+      ),
+    )
+    .expect(
+      _ => true,
+      @testing.Canned::bytes(200, body=b"{\"input_tokens\":7}"),
+    )
+  @driver.run_sync(() => {
+    let api = @anthropic.Anthropic::new(
+      api_key="secret",
+      backend,
+      @mock.FakeClock::new(),
+      auth_header~,
+    )
+    let count = api
+      .count_tokens(
+        @anthropic.MessageRequest::new(model="m", max_tokens=32, messages=[
+          @anthropic.Message::user("hi"),
+        ]),
+      )
+      .unwrap()
+    assert_eq(count, 7)
+  })
+  backend.verify()
+  backend.sent()
+}
+
+///|
+test "redirects keep the API key on the same origin and drop it on another" {
+  let other = "https://gateway.example/v1/messages/count_tokens"
+  for status in [307, 302] {
+    let sent = redirected_count_tokens(status, other)
+    assert_eq(sent[0].request.headers.get("x-api-key"), Some("secret"))
+    assert_eq(sent[1].request.url, other)
+    assert_eq(sent[1].request.headers.get("x-api-key"), None)
+    assert_eq(
+      sent[1].request.headers.get("anthropic-version"),
+      Some("2026-10-21"),
+    )
+  }
+  let bearer = redirected_count_tokens(307, other, auth_header=Bearer)
+  assert_eq(bearer[1].request.headers.get("authorization"), None)
+  let same = "https://api.anthropic.com/v1/messages/count_tokens?beta=true"
+  let sent = redirected_count_tokens(307, same)
+  assert_eq(sent[1].request.url, same)
+  assert_eq(sent[1].request.headers.get("x-api-key"), Some("secret"))
+}
