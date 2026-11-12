@@ -1,5 +1,5 @@
 // Depends on the sans-IO vocabulary and the runtime only. The caller supplies a
-// Transport and a Clock (for example from gaato/mttp_async), so this module
+// Transport and a Clock (for example from gaato/mttp), so this module
 // checks on every backend.
 
 name = "gaato/openai"
@@ -14,12 +14,12 @@ repository = "https://github.com/gaato/mbt-sdk"
 
 keywords = [ "openai", "llm", "sdk", "responses", "embeddings" ]
 
-description = "Thin OpenAI API client for MoonBit built on gaato/mttp: models, embeddings, responses (buffered and streaming)."
+description = "Thin OpenAI API client for MoonBit built on gaato/mttp_core: models, embeddings, responses (buffered and streaming)."
 
 source = "src"
 
 preferred_target = "wasm-gc"
 
 import {
-  "gaato/mttp@0.2.0",
+  "gaato/mttp_core@0.1.0",
 }

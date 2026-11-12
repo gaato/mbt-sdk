@@ -13,7 +13,7 @@
 ## 依存の向き
 
 ```
-gaato/llm            共通の語彙(型と trait)だけ。依存は gaato/mttp と gaato/sdk-runtime
+gaato/llm            共通の語彙(型と trait)だけ。依存は gaato/mttp_core と gaato/sdk-runtime
    ▲        ▲
 gaato/openai  gaato/anthropic     それぞれが llm の trait を実装する(llm に依存する)
 ```

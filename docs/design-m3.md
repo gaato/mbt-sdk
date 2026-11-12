@@ -4,12 +4,12 @@
 
 # 設計メモ — M3: 最初の利用者 `gaato/openai`(薄い手書きスライス)
 
-目的は OpenAI SDK を完成させることではなく、`gaato/mttp` + `gaato/sdk-runtime` が実際の API で使えるかを確かめること。範囲は models / embeddings / responses(通常とストリーム)だけ。ここで手書きした型と操作は、M4 のジェネレータの出力と突き合わせる正解データにもなる。
+目的は OpenAI SDK を完成させることではなく、`gaato/mttp_core` + `gaato/sdk-runtime` が実際の API で使えるかを確かめること。範囲は models / embeddings / responses(通常とストリーム)だけ。ここで手書きした型と操作は、M4 のジェネレータの出力と突き合わせる正解データにもなる。
 
 ## 配置
 
 ```
-openai/                    module gaato/openai — 依存は gaato/mttp と gaato/sdk-runtime だけ(async runtime なし)
+openai/                    module gaato/openai — 依存は gaato/mttp_core と gaato/sdk-runtime だけ(async runtime なし)
   moon.mod
   src/                     OpenAI クライアントと型
   spec/openai.yaml         vendoring した上流 spec(openai/openai-openapi の manual_spec ブランチ)

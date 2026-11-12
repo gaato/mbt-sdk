@@ -3,7 +3,7 @@
 An unofficial Anthropic Messages API client for
 [MoonBit](https://www.moonbitlang.com/): messages, streaming, tool use, token
 counting and Models. Compatible servers are selected with `base_url`.
-It uses [`gaato/mttp`](https://github.com/gaato/mttp), with a caller-supplied
+It uses [`gaato/mttp_core`](https://github.com/gaato/mttp), with a caller-supplied
 `Backend` and `Clock`. The facade itself requires no async runtime.
 
 > **Status**: unofficial and experimental. Minor releases may contain breaking
@@ -15,24 +15,25 @@ It uses [`gaato/mttp`](https://github.com/gaato/mttp), with a caller-supplied
 
 ```sh
 moon add gaato/anthropic
-moon add gaato/mttp_async
+moon add gaato/mttp
 ```
 
-An app adds these two modules. A library that wraps this SDK adds only
-`gaato/anthropic` and takes the `Backend` and `Clock` from its caller.
+An app adds these two modules. A library that wraps this SDK adds
+`gaato/anthropic` and `gaato/mttp_core`, whose `Backend` and `rt.Clock` it takes
+from its caller, instead of `gaato/mttp`.
 
 ## Usage
 
-`gaato/mttp_async` supplies the real network, the clock and the timer; no
+`gaato/mttp` supplies the real network, the clock and the timer; no
 experimental opt-in is needed:
 
 ```mbt nocheck
 ///|
 let client = @anthropic.Anthropic::new(
   api_key~,
-  @mttp_async.backend(),
-  @mttp_async.clock(),
-  timer=@mttp_async.timer(),
+  @mttp.backend(),
+  @mttp.clock(),
+  timer=@mttp.timer(),
 )
 ```
 

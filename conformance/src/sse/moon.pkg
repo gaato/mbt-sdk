@@ -1,6 +1,6 @@
 import {
-  "gaato/mttp" @http,
-  "gaato/mttp/sse",
+  "gaato/mttp_core" @http,
+  "gaato/mttp_core/sse",
   "gaato/mbt-sdk-conformance/harness",
   "moonbitlang/core/encoding/utf8",
   "moonbitlang/core/random",

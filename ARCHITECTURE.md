@@ -11,9 +11,9 @@ HTTP infrastructure lives in [mttp](https://github.com/gaato/mttp).
 | SDKs | openai, anthropic, github | Generated API vocabulary and vendor policy |
 | Codex | codex-protocol, codex-app-server | Generated protocol and initialized sessions |
 | RPC | jsonrpc, jsonrpc-async | Portable messages/framing and runtime connections |
-| External HTTP | gaato/mttp, gaato/mttp_async | Vocabulary, engines and client policy; I/O |
+| External HTTP | gaato/mttp_core, gaato/mttp | Vocabulary, engines and client policy; I/O |
 
-The SDKs depend on `gaato/mttp`, with no runtime dependency.
+The SDKs depend on `gaato/mttp_core`, with no runtime dependency.
 They accept `&Backend`, `&rt.Clock` and optionally `&rt.Timer`. Their clients
 use mttp RequestPlan/ResponsePlan, Result-based response failures, admission
 tokens, retries, SSE and pagination. Immutable Headers and Request builders
@@ -24,8 +24,8 @@ inside their own packages. GitHub owns its primary/secondary rate-limit and
 GraphQL conditions, using the generic mttp limiter and typed retry callback.
 TransportError and user callback exceptions keep their effect identity.
 
-`gaato/mttp_async/backend.AsyncBackend` supplies I/O. Content decoding is an
-explicit `gaato/mttp_async/codings.Decompress` wrapper. Backends take
+`gaato/mttp/backend.AsyncBackend` supplies I/O. Content decoding is an
+explicit `gaato/mttp/codings.Decompress` wrapper. Backends take
 SendOptions for each attempt; response bodies belong to their consumer.
 
 ## Generation
@@ -38,8 +38,8 @@ overlay locations rather than silently degraded to Json. The census documents
 intentional raw Json surfaces.
 
 Generated request functions return http.Request. Successful response decoders
-take ResponseHead and Bytes and return Result with mttp.ResponseFailure. JSON
-model helpers come from mttp/jsonkit. Codex generation uses the same model
+take ResponseHead and Bytes and return Result with mttp_core/client.ResponseFailure. JSON
+model helpers come from mttp_core/jsonkit. Codex generation uses the same model
 emitter without an HTTP dependency.
 
 ## Runtime connections

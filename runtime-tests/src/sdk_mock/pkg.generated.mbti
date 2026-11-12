@@ -2,8 +2,8 @@
 package "gaato/mbt-sdk-runtime-tests/sdk_mock"
 
 import {
-  "gaato/mttp",
-  "gaato/mttp/sim",
+  "gaato/mttp_core",
+  "gaato/mttp_core/sim",
 }
 
 // Values
@@ -13,7 +13,7 @@ import {
 // Types and methods
 pub(all) struct Buffered {
   status : Int32
-  headers : @mttp.Headers
+  headers : @mttp_core.Headers
   body : Bytes
 }
 
@@ -23,13 +23,13 @@ pub struct FakeBackend {
 pub fn FakeBackend::assert_complete(Self) -> Unit raise
 pub fn FakeBackend::close(Self) -> Unit
 pub fn FakeBackend::expect(Self, String, String, Buffered) -> Unit
-pub fn FakeBackend::expect_error(Self, String, String, @mttp.TransportError) -> Unit
-pub fn FakeBackend::expect_stream(Self, String, String, @mttp.ResponseHead, Array[Bytes]) -> Unit
+pub fn FakeBackend::expect_error(Self, String, String, @mttp_core.TransportError) -> Unit
+pub fn FakeBackend::expect_stream(Self, String, String, @mttp_core.ResponseHead, Array[Bytes]) -> Unit
 pub fn FakeBackend::new() -> Self
-pub async fn FakeBackend::send(Self, @mttp.Request, @mttp.SendOptions) -> @mttp.Response raise @mttp.TransportError
-pub fn FakeBackend::sent(Self) -> Array[@mttp.Request]
+pub async fn FakeBackend::send(Self, @mttp_core.Request, @mttp_core.SendOptions) -> @mttp_core.Response raise @mttp_core.TransportError
+pub fn FakeBackend::sent(Self) -> Array[@mttp_core.Request]
 pub fn FakeBackend::streams_closed(Self) -> Int32
-pub impl @mttp.Backend for FakeBackend
+pub impl @mttp_core.Backend for FakeBackend
 
 // Type aliases
 pub using @sim {type FakeClock}

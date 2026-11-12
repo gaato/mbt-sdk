@@ -4,13 +4,13 @@
 
 # 設計メモ — M5: 2 本目の SDK `gaato/anthropic` と実 API テスト
 
-目的は 2 つ。(1) `gaato/mttp` + `gaato/sdk-runtime` が 1 本目(OpenAI)に合わせすぎていないかを、形の違う 2 本目で確かめる。(2) 実際の API に対して `gaato/openai` と `gaato/anthropic` を動かす。
+目的は 2 つ。(1) `gaato/mttp_core` + `gaato/sdk-runtime` が 1 本目(OpenAI)に合わせすぎていないかを、形の違う 2 本目で確かめる。(2) 実際の API に対して `gaato/openai` と `gaato/anthropic` を動かす。
 
 実 API の相手は OpenRouter(`https://openrouter.ai/api/v1`)を主にする: Responses API 互換の `/responses` と Anthropic Messages 互換の `/messages`(SSE も Anthropic のイベント形式)を持ち、`:free` モデルなら課金されない(キーの limit は 0)。OpenAI 本家は `OPENAI_API_KEY` があるときだけ、最小のリクエストで確認する。Anthropic 本家はキーが無いので今回は対象外(同じテストを `base_url` を変えて回せる形にしておく)。
 
 ## `gaato/anthropic` の公開 API(契約)
 
-配置は `anthropic/`(module `gaato/anthropic`、依存は `gaato/mttp` と `gaato/sdk-runtime` だけ)。
+配置は `anthropic/`(module `gaato/anthropic`、依存は `gaato/mttp_core` と `gaato/sdk-runtime` だけ)。
 
 ```moonbit
 pub struct Anthropic

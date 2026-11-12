@@ -4,7 +4,7 @@
 
 # 設計メモ — M8: 3 本目の SDK `gaato/github`(REST API 全面生成)
 
-目的は 2 つ。(1) `gaato/mttp` + `gaato/sdk-runtime` が LLM API に寄っていないかを、REST らしい相手で確かめる。(2) 生成器を「API の一部を選んで通す」のではなく「ドキュメントを丸ごと通す」使い方で動かし、それが MoonBit で成立するかを実測する。
+目的は 2 つ。(1) `gaato/mttp_core` + `gaato/sdk-runtime` が LLM API に寄っていないかを、REST らしい相手で確かめる。(2) 生成器を「API の一部を選んで通す」のではなく「ドキュメントを丸ごと通す」使い方で動かし、それが MoonBit で成立するかを実測する。
 
 ## なぜ 3 本目が LLM ではなく REST なのか
 
@@ -55,7 +55,7 @@ openai / anthropic は、生成型を安定した手書き facade 型へ写す(`
 
 ## 公開 API(契約)
 
-配置は `github/`(module `gaato/github`、依存は `gaato/mttp` と `gaato/sdk-runtime` だけ)。`github/src/pkg.generated.mbti` の全量が以下と次節の GraphQL 分で、これ以外は `gaato/github/gen` の生成物である。
+配置は `github/`(module `gaato/github`、依存は `gaato/mttp_core` と `gaato/sdk-runtime` だけ)。`github/src/pkg.generated.mbti` の全量が以下と次節の GraphQL 分で、これ以外は `gaato/github/gen` の生成物である。
 
 ```moonbit
 pub struct GitHub                                   // priv client, priv graphql_url

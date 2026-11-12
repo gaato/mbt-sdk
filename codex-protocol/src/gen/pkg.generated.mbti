@@ -2,7 +2,7 @@
 package "gaato/codex-protocol/gen"
 
 import {
-  "gaato/mttp/jsonkit",
+  "gaato/mttp_core/jsonkit",
   "moonbitlang/core/debug",
   "moonbitlang/core/json",
 }

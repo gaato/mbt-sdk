@@ -3,7 +3,7 @@
 An unofficial GitHub API client for [MoonBit](https://www.moonbitlang.com/).
 Every operation of GitHub's REST API is generated, with its types, from the
 first-party OpenAPI description; GraphQL is a passthrough over `Json`. It is
-built on [`gaato/mttp`](https://github.com/gaato/mttp) and requires a
+built on [`gaato/mttp_core`](https://github.com/gaato/mttp) and requires a
 caller-supplied `Backend` and `Clock`; the facade has no async runtime.
 
 > **Status**: unofficial and experimental. Minor releases may contain breaking
@@ -15,24 +15,25 @@ caller-supplied `Backend` and `Clock`; the facade has no async runtime.
 
 ```sh
 moon add gaato/github
-moon add gaato/mttp_async
+moon add gaato/mttp
 ```
 
-An app adds these two modules. A library that wraps this SDK adds only
-`gaato/github` and takes the `Backend` and `Clock` from its caller.
+An app adds these two modules. A library that wraps this SDK adds
+`gaato/github` and `gaato/mttp_core`, whose `Backend` and `rt.Clock` it takes
+from its caller, instead of `gaato/mttp`.
 
 ## Usage
 
-`gaato/mttp_async` supplies the real network, the clock and the timer; no
+`gaato/mttp` supplies the real network, the clock and the timer; no
 experimental opt-in is needed:
 
 ```mbt nocheck
 ///|
 let client = @github.GitHub::new(
-  @mttp_async.backend(),
-  @mttp_async.clock(),
+  @mttp.backend(),
+  @mttp.clock(),
   token~,
-  timer=@mttp_async.timer(),
+  timer=@mttp.timer(),
 )
 ```
 
@@ -152,7 +153,7 @@ pub async fn tarball_url(gh : @github.GitHub, ref_ : String) -> String? {
 
 A Client built with `redirect=@client.RedirectConfig::none()` and passed to
 `GitHub::from_client` returns every `3xx` this way. Host fetch redirect
-behavior has platform constraints documented by `gaato/mttp_async`.
+behavior has platform constraints documented by `gaato/mttp`.
 
 ## Pagination
 
@@ -219,7 +220,7 @@ Following GitHub's guidance and octokit, the limiter also spaces requests:
 
 GitHub also asks for requests to be made serially. This module has no async
 runtime to do that, so pass a gate, such as `SemaphoreGate` from
-`gaato/mttp_async`:
+`gaato/mttp/runtime`:
 
 ```mbt nocheck
 ///|

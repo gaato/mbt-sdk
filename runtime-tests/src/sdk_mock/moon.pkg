@@ -1,5 +1,5 @@
 import {
-  "gaato/mttp" @http,
-  "gaato/mttp/testing",
-  "gaato/mttp/sim",
+  "gaato/mttp_core" @http,
+  "gaato/mttp_core/testing",
+  "gaato/mttp_core/sim",
 }

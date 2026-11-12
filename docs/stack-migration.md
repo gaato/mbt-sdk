@@ -1,6 +1,7 @@
 # HTTP stack migration
 
-The SDKs now use gaato/mttp 0.2; apps add gaato/mttp_async 0.1 for I/O.
+The SDKs now use gaato/mttp_core 0.1 (formerly gaato/mttp 0.2); apps add
+gaato/mttp 0.3 (formerly gaato/mttp_async 0.1) for I/O.
 The former shared runtime and the HTTP implementation directories have been
 retired from this repository. HTTP engine/client tests and ledgers live in
 [mttp](https://github.com/gaato/mttp).
@@ -12,9 +13,9 @@ of set/add/remove. A request's method is Method (`meth`), and Body distinguishes
 Empty, Bytes and a one-reader stream. Use body_json/body_bytes/body_stream.
 
 Generated successful-response decoders take ResponseHead and Bytes and return
-Result[T, mttp/client.ResponseFailure]. Pair them with a buffered response plan
+Result[T, mttp_core/client.ResponseFailure]. Pair them with a buffered response plan
 or pass them to GitHub.call. JSON model helpers and Presence come from
-mttp/jsonkit. No schema pins changed in this migration.
+mttp_core/jsonkit. No schema pins changed in this migration.
 
 Facade calls return Result with OpenAIFailure, AnthropicFailure or GitHubFailure.
 HTTP/deserialization failures retain real status, headers and bounded bytes.
@@ -25,7 +26,7 @@ envelope, including partial data.
 ## Backend and policy
 
 Supply &http.Backend and &http/rt.Clock. AsyncBackend is in
-gaato/mttp_async/backend; clocks, Timer and gates are in mttp_async/runtime.
+gaato/mttp/backend; clocks, Timer and gates are in gaato/mttp/runtime.
 Content decoding uses the explicit codings.Decompress wrapper. Backends receive
 SendOptions per attempt. A response owns its body and must be consumed or closed.
 
@@ -37,8 +38,8 @@ retains 429 for every method; mttp's generic conservative preset restricts
 Timer and includes admission, retry waits and streaming callbacks. A streaming
 callback runs once after attempt selection and is never retried.
 
-Mttp Paginator failures are values. SSE uses mttp/sse (through client.as_sse in
-the facades); uploads use mttp/multipart. SDK-local helpers retained here are
+Mttp Paginator failures are values. SSE uses mttp_core/sse (through client.as_sse in
+the facades); uploads use mttp_core/multipart. SDK-local helpers retained here are
 vendor presets, validation, generated-model conversion, bounded response
 diagnostics and GraphQL interpretation. They do not implement HTTP scheduling,
 body framing, retry loops, timers, rate-limit state machines or parsers.

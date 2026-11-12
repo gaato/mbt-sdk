@@ -15,6 +15,6 @@ source = "src"
 preferred_target = "wasm-gc"
 
 import {
-  "gaato/mttp@0.2.0",
+  "gaato/mttp_core@0.1.0",
   "gaato/jsonrpc@0.1.0",
 }

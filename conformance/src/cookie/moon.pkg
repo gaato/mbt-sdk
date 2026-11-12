@@ -1,7 +1,7 @@
 import {
-  "gaato/mttp" @http,
-  "gaato/mttp/cookie",
-  "gaato/mttp/sim" @mock,
+  "gaato/mttp_core" @http,
+  "gaato/mttp_core/cookie",
+  "gaato/mttp_core/sim" @mock,
   "moonbitlang/core/json",
   "moonbitlang/core/string",
 } for "wbtest"

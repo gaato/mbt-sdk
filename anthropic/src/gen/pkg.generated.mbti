@@ -2,37 +2,37 @@
 package "gaato/anthropic/gen"
 
 import {
-  "gaato/mttp",
-  "gaato/mttp/client",
-  "gaato/mttp/jsonkit",
+  "gaato/mttp_core",
+  "gaato/mttp_core/client",
+  "gaato/mttp_core/jsonkit",
   "moonbitlang/core/debug",
   "moonbitlang/core/json",
 }
 
 // Values
-pub fn messages_count_tokens_post_decode(@mttp.ResponseHead, Bytes) -> Result[CountMessageTokensResponse, @client.ResponseFailure]
+pub fn messages_count_tokens_post_decode(@mttp_core.ResponseHead, Bytes) -> Result[CountMessageTokensResponse, @client.ResponseFailure]
 
 pub fn messages_count_tokens_post_decode_json(@json.Json) -> CountMessageTokensResponse raise @json.JsonDecodeError
 
-pub fn messages_count_tokens_post_request(CountMessageTokensParams, anthropic_version? : String, anthropic_user_profile_id? : String, anthropic_workspace_id? : String) -> @mttp.Request
+pub fn messages_count_tokens_post_request(CountMessageTokensParams, anthropic_version? : String, anthropic_user_profile_id? : String, anthropic_workspace_id? : String) -> @mttp_core.Request
 
-pub fn messages_post_decode(@mttp.ResponseHead, Bytes) -> Result[Message, @client.ResponseFailure]
+pub fn messages_post_decode(@mttp_core.ResponseHead, Bytes) -> Result[Message, @client.ResponseFailure]
 
 pub fn messages_post_decode_json(@json.Json) -> Message raise @json.JsonDecodeError
 
-pub fn messages_post_request(CreateMessageParams, anthropic_version? : String, anthropic_user_profile_id? : String, anthropic_workspace_id? : String) -> @mttp.Request
+pub fn messages_post_request(CreateMessageParams, anthropic_version? : String, anthropic_user_profile_id? : String, anthropic_workspace_id? : String) -> @mttp_core.Request
 
-pub fn models_get_decode(@mttp.ResponseHead, Bytes) -> Result[ModelInfo, @client.ResponseFailure]
+pub fn models_get_decode(@mttp_core.ResponseHead, Bytes) -> Result[ModelInfo, @client.ResponseFailure]
 
 pub fn models_get_decode_json(@json.Json) -> ModelInfo raise @json.JsonDecodeError
 
-pub fn models_get_request(String, anthropic_version? : String, anthropic_workspace_id? : String) -> @mttp.Request
+pub fn models_get_request(String, anthropic_version? : String, anthropic_workspace_id? : String) -> @mttp_core.Request
 
-pub fn models_list_decode(@mttp.ResponseHead, Bytes) -> Result[ListResponseModelInfo, @client.ResponseFailure]
+pub fn models_list_decode(@mttp_core.ResponseHead, Bytes) -> Result[ListResponseModelInfo, @client.ResponseFailure]
 
 pub fn models_list_decode_json(@json.Json) -> ListResponseModelInfo raise @json.JsonDecodeError
 
-pub fn models_list_request(before_id? : String, after_id? : String, limit? : Int32, lifecycle? : Array[ModelsListLifecycleItem], anthropic_version? : String, anthropic_workspace_id? : String) -> @mttp.Request
+pub fn models_list_request(before_id? : String, after_id? : String, limit? : Int32, lifecycle? : Array[ModelsListLifecycleItem], anthropic_version? : String, anthropic_workspace_id? : String) -> @mttp_core.Request
 
 // Errors
 

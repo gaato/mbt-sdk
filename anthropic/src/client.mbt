@@ -37,7 +37,7 @@ pub impl @debug.Debug for Anthropic with fn to_repr(_self) {
 /// `retry=@client.RetryPolicy::conservative()` to retry a POST only on failures
 /// that prove nothing was sent, unless explicitly declared replay-safe.
 ///
-/// With a `timer` (such as `@mttp_async.timer()`), each attempt
+/// With a `timer` (such as `@mttp.timer()`), each attempt
 /// is limited to `timeout_ms` (600 s, the official default) and, when
 /// `total_timeout_ms` is given, the whole call, retries and their waits
 /// included, to that. A total deadline requires Timer and also covers admission

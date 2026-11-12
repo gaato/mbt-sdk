@@ -2,106 +2,106 @@
 package "gaato/fixture-petstore3"
 
 import {
-  "gaato/mttp",
-  "gaato/mttp/client",
+  "gaato/mttp_core",
+  "gaato/mttp_core/client",
   "moonbitlang/core/debug",
   "moonbitlang/core/json",
 }
 
 // Values
-pub fn add_pet_decode(@mttp.ResponseHead, Bytes) -> Result[Pet, @client.ResponseFailure]
+pub fn add_pet_decode(@mttp_core.ResponseHead, Bytes) -> Result[Pet, @client.ResponseFailure]
 
 pub fn add_pet_decode_json(@json.Json) -> Pet raise @json.JsonDecodeError
 
-pub fn add_pet_request(Pet) -> @mttp.Request
+pub fn add_pet_request(Pet) -> @mttp_core.Request
 
-pub fn create_user_decode(@mttp.ResponseHead, Bytes) -> Result[User, @client.ResponseFailure]
+pub fn create_user_decode(@mttp_core.ResponseHead, Bytes) -> Result[User, @client.ResponseFailure]
 
 pub fn create_user_decode_json(@json.Json) -> User raise @json.JsonDecodeError
 
-pub fn create_user_request(User) -> @mttp.Request
+pub fn create_user_request(User) -> @mttp_core.Request
 
-pub fn create_users_with_list_input_decode(@mttp.ResponseHead, Bytes) -> Result[User, @client.ResponseFailure]
+pub fn create_users_with_list_input_decode(@mttp_core.ResponseHead, Bytes) -> Result[User, @client.ResponseFailure]
 
 pub fn create_users_with_list_input_decode_json(@json.Json) -> User raise @json.JsonDecodeError
 
-pub fn create_users_with_list_input_request(Array[User]) -> @mttp.Request
+pub fn create_users_with_list_input_request(Array[User]) -> @mttp_core.Request
 
-pub fn delete_order_request(Int64) -> @mttp.Request
+pub fn delete_order_request(Int64) -> @mttp_core.Request
 
-pub fn delete_pet_request(Int64, api_key? : String) -> @mttp.Request
+pub fn delete_pet_request(Int64, api_key? : String) -> @mttp_core.Request
 
-pub fn delete_user_request(String) -> @mttp.Request
+pub fn delete_user_request(String) -> @mttp_core.Request
 
-pub fn find_pets_by_status_decode(@mttp.ResponseHead, Bytes) -> Result[Array[Pet], @client.ResponseFailure]
+pub fn find_pets_by_status_decode(@mttp_core.ResponseHead, Bytes) -> Result[Array[Pet], @client.ResponseFailure]
 
 pub fn find_pets_by_status_decode_json(@json.Json) -> Array[Pet] raise @json.JsonDecodeError
 
-pub fn find_pets_by_status_request(FindPetsByStatusStatus) -> @mttp.Request
+pub fn find_pets_by_status_request(FindPetsByStatusStatus) -> @mttp_core.Request
 
-pub fn find_pets_by_tags_decode(@mttp.ResponseHead, Bytes) -> Result[Array[Pet], @client.ResponseFailure]
+pub fn find_pets_by_tags_decode(@mttp_core.ResponseHead, Bytes) -> Result[Array[Pet], @client.ResponseFailure]
 
 pub fn find_pets_by_tags_decode_json(@json.Json) -> Array[Pet] raise @json.JsonDecodeError
 
-pub fn find_pets_by_tags_request(Array[String]) -> @mttp.Request
+pub fn find_pets_by_tags_request(Array[String]) -> @mttp_core.Request
 
-pub fn get_inventory_decode(@mttp.ResponseHead, Bytes) -> Result[Map[String, Int32], @client.ResponseFailure]
+pub fn get_inventory_decode(@mttp_core.ResponseHead, Bytes) -> Result[Map[String, Int32], @client.ResponseFailure]
 
 pub fn get_inventory_decode_json(@json.Json) -> Map[String, Int32] raise @json.JsonDecodeError
 
-pub fn get_inventory_request() -> @mttp.Request
+pub fn get_inventory_request() -> @mttp_core.Request
 
-pub fn get_order_by_id_decode(@mttp.ResponseHead, Bytes) -> Result[Order, @client.ResponseFailure]
+pub fn get_order_by_id_decode(@mttp_core.ResponseHead, Bytes) -> Result[Order, @client.ResponseFailure]
 
 pub fn get_order_by_id_decode_json(@json.Json) -> Order raise @json.JsonDecodeError
 
-pub fn get_order_by_id_request(Int64) -> @mttp.Request
+pub fn get_order_by_id_request(Int64) -> @mttp_core.Request
 
-pub fn get_pet_by_id_decode(@mttp.ResponseHead, Bytes) -> Result[Pet, @client.ResponseFailure]
+pub fn get_pet_by_id_decode(@mttp_core.ResponseHead, Bytes) -> Result[Pet, @client.ResponseFailure]
 
 pub fn get_pet_by_id_decode_json(@json.Json) -> Pet raise @json.JsonDecodeError
 
-pub fn get_pet_by_id_request(Int64) -> @mttp.Request
+pub fn get_pet_by_id_request(Int64) -> @mttp_core.Request
 
-pub fn get_user_by_name_decode(@mttp.ResponseHead, Bytes) -> Result[User, @client.ResponseFailure]
+pub fn get_user_by_name_decode(@mttp_core.ResponseHead, Bytes) -> Result[User, @client.ResponseFailure]
 
 pub fn get_user_by_name_decode_json(@json.Json) -> User raise @json.JsonDecodeError
 
-pub fn get_user_by_name_request(String) -> @mttp.Request
+pub fn get_user_by_name_request(String) -> @mttp_core.Request
 
-pub fn login_user_decode(@mttp.ResponseHead, Bytes) -> Result[String, @client.ResponseFailure]
+pub fn login_user_decode(@mttp_core.ResponseHead, Bytes) -> Result[String, @client.ResponseFailure]
 
 pub fn login_user_decode_json(@json.Json) -> String raise @json.JsonDecodeError
 
-pub fn login_user_request(username? : String, password? : String) -> @mttp.Request
+pub fn login_user_request(username? : String, password? : String) -> @mttp_core.Request
 
-pub fn logout_user_request() -> @mttp.Request
+pub fn logout_user_request() -> @mttp_core.Request
 
-pub fn place_order_decode(@mttp.ResponseHead, Bytes) -> Result[Order, @client.ResponseFailure]
+pub fn place_order_decode(@mttp_core.ResponseHead, Bytes) -> Result[Order, @client.ResponseFailure]
 
 pub fn place_order_decode_json(@json.Json) -> Order raise @json.JsonDecodeError
 
-pub fn place_order_request(Order) -> @mttp.Request
+pub fn place_order_request(Order) -> @mttp_core.Request
 
-pub fn update_pet_decode(@mttp.ResponseHead, Bytes) -> Result[Pet, @client.ResponseFailure]
+pub fn update_pet_decode(@mttp_core.ResponseHead, Bytes) -> Result[Pet, @client.ResponseFailure]
 
 pub fn update_pet_decode_json(@json.Json) -> Pet raise @json.JsonDecodeError
 
-pub fn update_pet_request(Pet) -> @mttp.Request
+pub fn update_pet_request(Pet) -> @mttp_core.Request
 
-pub fn update_pet_with_form_decode(@mttp.ResponseHead, Bytes) -> Result[Pet, @client.ResponseFailure]
+pub fn update_pet_with_form_decode(@mttp_core.ResponseHead, Bytes) -> Result[Pet, @client.ResponseFailure]
 
 pub fn update_pet_with_form_decode_json(@json.Json) -> Pet raise @json.JsonDecodeError
 
-pub fn update_pet_with_form_request(Int64, name? : String, status? : String) -> @mttp.Request
+pub fn update_pet_with_form_request(Int64, name? : String, status? : String) -> @mttp_core.Request
 
-pub fn update_user_request(String, User) -> @mttp.Request
+pub fn update_user_request(String, User) -> @mttp_core.Request
 
-pub fn upload_file_decode(@mttp.ResponseHead, Bytes) -> Result[ApiResponse, @client.ResponseFailure]
+pub fn upload_file_decode(@mttp_core.ResponseHead, Bytes) -> Result[ApiResponse, @client.ResponseFailure]
 
 pub fn upload_file_decode_json(@json.Json) -> ApiResponse raise @json.JsonDecodeError
 
-pub fn upload_file_request(Int64, additional_metadata? : String) -> @mttp.Request
+pub fn upload_file_request(Int64, additional_metadata? : String) -> @mttp_core.Request
 
 // Errors
 

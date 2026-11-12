@@ -1005,13 +1005,13 @@ fn json_array_matches(
     operations = HEADER + "\n\n".join(operation_helpers + operation_sources) + "\n"
     # Import only what the emitted code references: `--deny-warn` rejects unused packages.
     body = types + operations
-    imports = ['  "gaato/mttp" @http,'] if "@http." in body else []
+    imports = ['  "gaato/mttp_core" @http,'] if "@http." in body else []
     if "@client." in body:
-        imports.append('  "gaato/mttp/client",')
+        imports.append('  "gaato/mttp_core/client",')
     if "@sdkjson." in body:
-        imports.append('  "gaato/mttp/jsonkit" @sdkjson,')
+        imports.append('  "gaato/mttp_core/jsonkit" @sdkjson,')
     if "@multipart." in body:
-        imports.append('  "gaato/mttp/multipart",')
+        imports.append('  "gaato/mttp_core/multipart",')
     if "@debug." in body:
         imports.append('  "moonbitlang/core/debug",')
     if "@utf8." in body:

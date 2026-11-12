@@ -1,5 +1,5 @@
 import {
   "gaato/codex-protocol/gen" @protocol,
-  "gaato/mttp/jsonkit" @sdkjson,
+  "gaato/mttp_core/jsonkit" @sdkjson,
   "moonbitlang/core/json",
 } for "test"

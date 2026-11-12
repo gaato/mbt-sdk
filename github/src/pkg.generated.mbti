@@ -2,10 +2,10 @@
 package "gaato/github"
 
 import {
-  "gaato/mttp",
-  "gaato/mttp/client",
-  "gaato/mttp/client/retry",
-  "gaato/mttp/rt",
+  "gaato/mttp_core",
+  "gaato/mttp_core/client",
+  "gaato/mttp_core/client/retry",
+  "gaato/mttp_core/rt",
   "moonbitlang/core/debug",
   "moonbitlang/core/json",
 }
@@ -36,21 +36,21 @@ pub fn ApiErrorBody::to_repr(Self) -> @debug.Repr
 pub struct GitHub {
   // private fields
 }
-pub async fn[T] GitHub::call(Self, @mttp.Request, (@mttp.ResponseHead, Bytes) -> Result[T, @client.ResponseFailure] raise?) -> Result[T, GitHubFailure]
+pub async fn[T] GitHub::call(Self, @mttp_core.Request, (@mttp_core.ResponseHead, Bytes) -> Result[T, @client.ResponseFailure] raise?) -> Result[T, GitHubFailure]
 pub fn GitHub::from_client(@client.Client, graphql_url? : String) -> Self
 pub async fn GitHub::graphql(Self, query~ : String, variables? : @json.Json, operation_name? : String) -> Result[@json.Json, GitHubFailure]
 pub fn[T] GitHub::graphql_paginator(Self, (@json.Json) -> (Array[T], String?) raise, query~ : String, variables? : @json.Json, cursor_variable? : String, operation_name? : String) -> @client.Paginator[T, GitHubFailure]
 pub async fn GitHub::graphql_response(Self, query~ : String, variables? : @json.Json, operation_name? : String) -> Result[@json.Json, GitHubFailure]
-pub fn GitHub::new(&@mttp.Backend, &@rt.Clock, token? : String, base_url? : String, api_version? : String, user_agent? : String, retry? : @client.RetryPolicy, limiter? : &@client.RateLimiter, graphql_url? : String, gate? : () -> &@rt.Gate, timer? : &@rt.Timer, timeout_ms? : Int32, max_body_bytes? : Int32, read_idle_ms? : Int32, total_timeout_ms? : Int32) -> Self
-pub fn[T] GitHub::paginator(Self, @mttp.Request, (@mttp.ResponseHead, Bytes) -> Result[Array[T], @client.ResponseFailure] raise?) -> @client.Paginator[T, GitHubFailure]
-pub async fn GitHub::send(Self, @mttp.Request) -> Result[@client.Reply[Bytes], GitHubFailure]
+pub fn GitHub::new(&@mttp_core.Backend, &@rt.Clock, token? : String, base_url? : String, api_version? : String, user_agent? : String, retry? : @client.RetryPolicy, limiter? : &@client.RateLimiter, graphql_url? : String, gate? : () -> &@rt.Gate, timer? : &@rt.Timer, timeout_ms? : Int32, max_body_bytes? : Int32, read_idle_ms? : Int32, total_timeout_ms? : Int32) -> Self
+pub fn[T] GitHub::paginator(Self, @mttp_core.Request, (@mttp_core.ResponseHead, Bytes) -> Result[Array[T], @client.ResponseFailure] raise?) -> @client.Paginator[T, GitHubFailure]
+pub async fn GitHub::send(Self, @mttp_core.Request) -> Result[@client.Reply[Bytes], GitHubFailure]
 pub fn GitHub::to_repr(Self) -> @debug.Repr
 pub impl @debug.Debug for GitHub
 
 #derive(@debug.Debug)
 pub(all) enum GitHubFailure {
   Http(@client.ResponseFailure)
-  GraphqlFailure(@mttp.ResponseHead, message~ : String, body~ : Bytes)
+  GraphqlFailure(@mttp_core.ResponseHead, message~ : String, body~ : Bytes)
   Validation(String)
 }
 pub fn GitHubFailure::to_repr(Self) -> @debug.Repr

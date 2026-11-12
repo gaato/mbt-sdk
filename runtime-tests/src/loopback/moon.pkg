@@ -1,9 +1,9 @@
 // Native only: the server side of these uploads is moonbitlang/core/async's HTTP
 // server, which has no JS implementation.
 import {
-  "gaato/mttp" @http,
-  "gaato/mttp_async/backend",
-  "gaato/mttp/multipart",
+  "gaato/mttp_core" @http,
+  "gaato/mttp/backend",
+  "gaato/mttp_core/multipart",
   "moonbitlang/core/async",
   "moonbitlang/core/async/http" @ahttp,
   "moonbitlang/core/async/socket",

@@ -29,7 +29,13 @@ class CodexSchemaTests(unittest.TestCase):
         self.assertFalse(builder.diagnostics)
         self.assertEqual(len(builder.requests), 5)
         self.assertEqual(len(builder.server_requests), 4)
-        self.assertNotIn('"gaato/mttp" @http', emit(ir)["moon.pkg"])
+        moon_pkg = emit(ir)["moon.pkg"]
+        # The protocol needs only the JSON helpers of gaato/mttp_core, not its
+        # HTTP vocabulary; gaato/mttp is the app module and never belongs here.
+        self.assertIn('"gaato/mttp_core/jsonkit" @sdkjson', moon_pkg)
+        self.assertNotIn('"gaato/mttp_core" @http', moon_pkg)
+        self.assertNotIn('"gaato/mttp"', moon_pkg)
+        self.assertNotIn('"gaato/mttp/', moon_pkg)
         self.assertIn("Call[TurnStartResponse]", protocol(builder))
 
     def test_external_enum_and_nullable_any_json_are_typed(self):

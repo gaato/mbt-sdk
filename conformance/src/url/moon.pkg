@@ -1,5 +1,5 @@
 import {
-  "gaato/mttp" @http,
+  "gaato/mttp_core" @http,
   "moonbitlang/core/json",
   "moonbitlang/core/string",
 } for "wbtest"

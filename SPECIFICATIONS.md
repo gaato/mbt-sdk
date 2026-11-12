@@ -32,7 +32,7 @@ normalizes the content of a line.
 
 Generated models ignore unknown object properties and retain unknown open-enum
 or explicitly extensible union cases. Request Presence fields distinguish
-omission, null and a value using mttp/jsonkit. Int64 helpers preserve integral
+omission, null and a value using mttp_core/jsonkit. Int64 helpers preserve integral
 wire values without a floating-point round trip.
 
 ## HTTP migration observations
