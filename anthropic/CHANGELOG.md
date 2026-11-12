@@ -15,6 +15,8 @@ are optional unless the field is required, and keep a wildcard arm.
 
 ## [Unreleased]
 
+## [0.17.0] - 2026-11-12
+
 ### Changed
 
 - **Build on gaato/mttp_core 0.1.** gaato/mttp 0.2, the HTTP library without I/O that this SDK builds on, is renamed gaato/mttp_core, and gaato/mttp is now the module an app adds (formerly gaato/mttp_async). `::new` takes `&@mttp_core.Backend`, the same type as before under the new name, and the request and response types are gaato/mttp_core's. Apps pass `@mttp.backend()`, `@mttp.clock()` and `timer=@mttp.timer()` from gaato/mttp 0.3: in moon.mod, replace `"gaato/mttp@0.2.0"` with `"gaato/mttp_core@0.1.0"` (or drop it if no package imports it) and then `"gaato/mttp_async@0.1.0"` with `"gaato/mttp@0.3.0"`, in that order; [gaato/mttp's changelog](https://github.com/gaato/mttp/blob/main/mttp/CHANGELOG.md) has the whole table.
