@@ -44,3 +44,5 @@ The date and hash come from `spec/SOURCE.md`; "The public API is unchanged." rep
 ## After a release
 
 Bump the pinned toolchain image in `ci.yml` and `release.yml` only in its own commit, after `canary.yml` has been green on `:latest`.
+
+The same commit updates `moonbit-version`, which `scripts/gates.sh` reads to tell the pinned toolchain from the canary's: only on the pinned one do formatting, generated output and interfaces have to match the committed files byte for byte. When it moves past MoonBit 0.10.20, move each `compat/core_async_next/<path>.mbt.next` to `<path>.mbt` (the canary already builds with them there), delete `compat/`, and run `scripts/generate.sh` and `moon info` with the new toolchain.

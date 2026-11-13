@@ -4,22 +4,28 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 py=(uv run --with pyyaml --with jsonpath-rfc9535 python); [ -x .venv/bin/python ] && py=(.venv/bin/python)
+# A generator exits 1 when --check finds its output differs and 2 when it
+# fails. A difference does not stop the others, so one run lists every
+# differing file; the script exits with the highest status.
+status=0
+gen() { local s=0; "${py[@]}" "$@" || s=$?; [ "$s" -le 1 ] || exit "$s"; [ "$s" -le "$status" ] || status=$s; }
 "${py[@]}" tools/apply_overlay.py openai/spec/openai.yaml openai/spec/openai.patched.json openai/overlays/*.yaml
 overlays=(); for o in openai/overlays/*.yaml; do overlays+=(--overlay "$o"); done
-"${py[@]}" tools/gen/main.py --spec openai/spec/openai.yaml "${overlays[@]}" \
+gen tools/gen/main.py --spec openai/spec/openai.yaml "${overlays[@]}" \
   --out openai/src/gen --package gaato/openai/gen "$@"
 "${py[@]}" tools/apply_overlay.py anthropic/spec/anthropic.json anthropic/spec/anthropic.patched.json anthropic/overlays/*.yaml
 overlays=(); for o in anthropic/overlays/*.yaml; do overlays+=(--overlay "$o"); done
-"${py[@]}" tools/gen/main.py --spec anthropic/spec/anthropic.json "${overlays[@]}" \
+gen tools/gen/main.py --spec anthropic/spec/anthropic.json "${overlays[@]}" \
   --out anthropic/src/gen --package gaato/anthropic/gen "$@"
 "${py[@]}" tools/apply_overlay.py github/spec/api.github.com.2022-11-28.yaml github/spec/api.github.com.2022-11-28.patched.json github/overlays/*.yaml
 overlays=(); for o in github/overlays/*.yaml; do overlays+=(--overlay "$o"); done
-"${py[@]}" tools/gen/main.py --spec github/spec/api.github.com.2022-11-28.yaml "${overlays[@]}" \
+gen tools/gen/main.py --spec github/spec/api.github.com.2022-11-28.yaml "${overlays[@]}" \
   --include-all --out github/src/gen --package gaato/github/gen "$@"
-"${py[@]}" tools/gen/main.py --spec specs/badhttp/openapi.json \
+gen tools/gen/main.py --spec specs/badhttp/openapi.json \
   --include-all --derive-operation-ids --out fixtures/gen/badhttp/src \
   --package gaato/fixture-badhttp "$@"
-"${py[@]}" tools/gen/main.py --spec specs/petstore3/openapi.json \
+gen tools/gen/main.py --spec specs/petstore3/openapi.json \
   --include-all --derive-operation-ids --out fixtures/gen/petstore3/src \
   --package gaato/fixture-petstore3 "$@"
-"${py[@]}" tools/gen/codex.py "$@"
+gen tools/gen/codex.py "$@"
+exit "$status"

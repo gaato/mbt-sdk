@@ -18,6 +18,37 @@ io_targets=(native); [ "$js" = 1 ] && io_targets+=(js)
 
 run() { echo "+ $*"; "$@"; }
 
+# Formatting and interfaces are the rendering of the toolchain moonbit-version
+# pins, which CI runs. The canary runs these gates on newer toolchains too,
+# where the same code may render otherwise; that is news about the toolchain,
+# so there the checks below report it instead of failing.
+pinned=0
+case "$(moon version --all)" in *"$(cat moonbit-version)"*) pinned=1 ;; esac
+note() { echo "note: $* (this toolchain is not moonbit-version's)" >&2; }
+
+# `moon fmt --check`. Off the pinned toolchain, a difference that only adds or
+# drops a comma at the end of lines is a note: MoonBit's formatter after 0.10.20
+# puts a trailing comma after the last item of a list it breaks over lines,
+# where 0.10.20's removes it, and an enum constructor whose payload is too
+# long for one line (generated code, ChatEvent::ToolCallDelta) has no form
+# both accept. Any other difference fails.
+fmt_check() {
+  echo "+ moon fmt --check $*"
+  local out
+  out=$(moon fmt --check "$@" 2>&1) && return 0
+  if [ "$pinned" = 1 ]; then echo "$out"; return 1; fi
+  local plain lines removed added
+  plain=$(echo "$out" | sed 's/\x1b\[[0-9;]*m//g')
+  lines=$(echo "$plain" | grep -E '^[-+]' | grep -vE '^(---|\+\+\+) ' || true)
+  removed=$(echo "$lines" | sed -n 's/^-//p' | sed 's/,$//' | sort)
+  added=$(echo "$lines" | sed -n 's/^+//p' | sed 's/,$//' | sort)
+  if [ -n "$lines" ] && [ "$removed" = "$added" ]; then
+    note "moon fmt only moves trailing commas in $(echo "$plain" | grep -c '^diff ' || true) files"
+    return 0
+  fi
+  echo "$out"; return 1
+}
+
 # Every published module's CHANGELOG has [Unreleased] and a heading for its version.
 run scripts/release.sh check
 # The registry index, which the .mbtx scripts need to resolve their imports.
@@ -49,8 +80,17 @@ run timeout 120 moon test "${offline_packages[@]}" --target wasm
 
 py=(uv run --with pyyaml --with jsonpath-rfc9535 python); [ -x .venv/bin/python ] && py=(.venv/bin/python)
 run "${py[@]}" -m unittest discover -s tools/gen/tests -v
-run scripts/generate.sh --check
-run moon fmt --check "${local_packages[@]}"
+# The generators format their output with the running moonfmt, so off the
+# pinned toolchain the trailing commas above make their output differ (exit
+# status 1); any other failure still fails.
+if [ "$pinned" = 1 ]; then
+  run scripts/generate.sh --check
+else
+  status=0; run scripts/generate.sh --check || status=$?
+  [ "$status" = 0 ] || [ "$status" = 1 ] || exit "$status"
+  [ "$status" = 0 ] || note "generated files differ from this toolchain's formatting"
+fi
+fmt_check "${local_packages[@]}"
 run moon info "${local_packages[@]}"
 run "${py[@]}" tools/gen/census.py specs/badhttp/openapi.json badhttp --expect-zero
 run "${py[@]}" tools/gen/census.py specs/petstore3/openapi.json petstore3 --expect-zero
@@ -62,6 +102,10 @@ run "${py[@]}" tools/gen/census.py github/spec/api.github.com.2022-11-28.yaml gi
 # Only meaningful in CI: in a jj working copy `git diff` compares against the parent change,
 # so uncommitted edits would look stale. Set MBT_SDK_CHECK_MBTI=1 to enforce locally.
 if [ "${CI:-}" = true ] || [ "${MBT_SDK_CHECK_MBTI:-}" = 1 ]; then
-  git diff --exit-code -- '*.mbti' || { echo "pkg.generated.mbti is stale: run 'moon info' and commit" >&2; exit 1; }
+  if [ "$pinned" = 1 ]; then
+    git diff --exit-code -- '*.mbti' || { echo "pkg.generated.mbti is stale: run 'moon info' and commit" >&2; exit 1; }
+  else
+    git diff --exit-code -- '*.mbti' || note "'moon info' renders the interfaces above differently"
+  fi
 fi
 echo "gates: OK"
