@@ -8,8 +8,8 @@ async test "lines are limited to 64 MiB when max_line is omitted" {
     let mut message = ""
     try
       @async.with_task_group(group => {
-        let (read, peer_write) = @io.pipe()
-        let (peer_read, write) = @io.pipe()
+        let (read, peer_write) = test_pipe()
+        let (peer_read, write) = test_pipe()
         group.add_defer(() => {
           read.close()
           peer_write.close()
@@ -44,8 +44,8 @@ async test "the notification backlog is limited to 32,768 when max_notifications
     let mut message = ""
     try
       @async.with_task_group(group => {
-        let (read, peer_write) = @io.pipe()
-        let (peer_read, write) = @io.pipe()
+        let (read, peer_write) = test_pipe()
+        let (peer_read, write) = test_pipe()
         group.add_defer(() => {
           read.close()
           peer_write.close()

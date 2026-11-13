@@ -1,0 +1,26 @@
+// The version of codex-app-server/src/pipe_test.mbt for MoonBit after 0.10.20,
+// whose core/async renamed @io.pipe, PipeRead and PipeWrite to memory_pipe,
+// MemoryPipeRead and MemoryPipeWrite, with no alias. On a toolchain that has
+// them, the canary (.github/workflows/canary.yml) copies this file over that
+// one. When moonbit-version moves past 0.10.20, move it there for good and
+// delete compat/.
+
+///|
+fn pipes(
+  group : @async.TaskGroup,
+) -> (
+  @io.MemoryPipeRead,
+  @io.MemoryPipeWrite,
+  @io.MemoryPipeRead,
+  @io.MemoryPipeWrite,
+) {
+  let (client_read, server_write) = @io.memory_pipe()
+  let (server_read, client_write) = @io.memory_pipe()
+  group.add_defer(() => {
+    client_read.close()
+    client_write.close()
+    server_read.close()
+    server_write.close()
+  })
+  (client_read, client_write, server_read, server_write)
+}

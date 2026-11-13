@@ -1,0 +1,10 @@
+// The impl core/async's reader trait requires after MoonBit 0.10.20, which
+// 0.10.20 refuses, so no source file builds on both. On a toolchain that
+// requires it, the canary (.github/workflows/canary.yml) copies this file to
+// jsonrpc-async/src/lifecycle_next_wbtest.mbt. When moonbit-version moves past
+// 0.10.20, move it there for good and delete compat/.
+
+///|
+impl @io.BinaryReaderImpl for ChunkReader with fn name(_) {
+  "ChunkReader"
+}

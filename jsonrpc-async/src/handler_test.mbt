@@ -39,7 +39,7 @@ async test "raising request handler replies internal error then fails the group"
     }
     try
       @async.with_task_group(group => {
-        let (reader, writer) = @io.pipe()
+        let (reader, writer) = test_pipe()
         group.add_defer(() => {
           reader.close()
           writer.close()
@@ -77,7 +77,7 @@ async test "raising notification handler fails the group" {
   @async.with_timeout(5000, () => {
     try
       @async.with_task_group(group => {
-        let (reader, writer) = @io.pipe()
+        let (reader, writer) = test_pipe()
         let output : RecordedWriter = {
           bytes: [],
           controller: @io.BinaryWriterController(),
@@ -110,8 +110,8 @@ async test "raising notification handler fails the group" {
 async test "EOF still permits a response to the final unterminated request" {
   @async.with_timeout(5000, () => {
     @async.with_task_group(group => {
-      let (reader, writer) = @io.pipe()
-      let (reply_reader, reply_writer) = @io.pipe()
+      let (reader, writer) = test_pipe()
+      let (reply_reader, reply_writer) = test_pipe()
       group.add_defer(() => {
         reader.close()
         writer.close()

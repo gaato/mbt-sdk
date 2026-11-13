@@ -1,0 +1,16 @@
+// The impls core/async's writer trait requires after MoonBit 0.10.20, which
+// 0.10.20 refuses, so no source file builds on both. On a toolchain that
+// requires them, the canary (.github/workflows/canary.yml) copies this file to
+// jsonrpc-async/src/handler_next_test.mbt. When moonbit-version moves past
+// 0.10.20, move it there for good and delete compat/.
+
+///|
+impl @io.BinaryWriterImpl for RecordedWriter with fn name(_) {
+  "RecordedWriter"
+}
+
+///|
+/// RecordedWriter keeps no bytes back: each write is recorded whole.
+impl @io.BinaryWriterImpl for RecordedWriter with fn flush_partial_data(_) {
+
+}

@@ -2,8 +2,8 @@
 async test "cancellation bypasses catch removes pending and ignores late reply" {
   @async.with_timeout(5000, () => {
     @async.with_task_group(group => {
-      let (read, peer_write) = @io.pipe()
-      let (peer_read, write) = @io.pipe()
+      let (read, peer_write) = test_pipe()
+      let (peer_read, write) = test_pipe()
       group.add_defer(() => {
         read.close()
         write.close()
@@ -62,8 +62,8 @@ async test "cancellation bypasses catch removes pending and ignores late reply" 
 async test "EOF decodes an unterminated response and preserves its result" {
   @async.with_timeout(5000, () => {
     @async.with_task_group(group => {
-      let (read, peer_write) = @io.pipe()
-      let (peer_read, write) = @io.pipe()
+      let (read, peer_write) = test_pipe()
+      let (peer_read, write) = test_pipe()
       group.add_defer(() => {
         read.close()
         write.close()
@@ -93,8 +93,8 @@ async test "EOF decodes an unterminated response and preserves its result" {
 async test "write failure is Transport and clears all pending requests" {
   @async.with_timeout(5000, () => {
     @async.with_task_group(group => {
-      let (read, peer_write) = @io.pipe()
-      let (peer_read, write) = @io.pipe()
+      let (read, peer_write) = test_pipe()
+      let (peer_read, write) = test_pipe()
       group.add_defer(() => {
         read.close()
         write.close()
@@ -120,8 +120,8 @@ async test "LineTooLong fails pending requests with Transport and exits the grou
     let mut connection : Connection? = None
     try
       @async.with_task_group(group => {
-        let (read, peer_write) = @io.pipe()
-        let (peer_read, write) = @io.pipe()
+        let (read, peer_write) = test_pipe()
+        let (peer_read, write) = test_pipe()
         group.add_defer(() => {
           read.close()
           peer_write.close()
@@ -153,8 +153,8 @@ async test "a response in the same chunk as an overlong line is dispatched first
     let queue : @aqueue.Queue[Json] = @aqueue.Queue(kind=Unbounded)
     try
       @async.with_task_group(group => {
-        let (read, peer_write) = @io.pipe()
-        let (peer_read, write) = @io.pipe()
+        let (read, peer_write) = test_pipe()
+        let (peer_read, write) = test_pipe()
         group.add_defer(() => {
           read.close()
           peer_write.close()
@@ -187,8 +187,8 @@ async test "a notification backlog over max_notifications fails the connection" 
     let mut message = ""
     try
       @async.with_task_group(group => {
-        let (read, peer_write) = @io.pipe()
-        let (peer_read, write) = @io.pipe()
+        let (read, peer_write) = test_pipe()
+        let (peer_read, write) = test_pipe()
         group.add_defer(() => {
           read.close()
           peer_write.close()
@@ -233,7 +233,7 @@ async test "a notification backlog over max_notifications fails the connection" 
 }
 
 ///|
-async fn read_message(reader : @io.PipeRead) -> @jsonrpc.Message {
+async fn read_message(reader : &@io.BinaryReader) -> @jsonrpc.Message {
   @jsonrpc.decode_line(reader.read_until(b"\n").unwrap(), envelope=Strict)
 }
 
@@ -241,8 +241,8 @@ async fn read_message(reader : @io.PipeRead) -> @jsonrpc.Message {
 async test "a request past max_inbound is refused while handlers' own calls still complete" {
   @async.with_timeout(5000, () => {
     @async.with_task_group(group => {
-      let (read, peer_write) = @io.pipe()
-      let (peer_read, write) = @io.pipe()
+      let (read, peer_write) = test_pipe()
+      let (peer_read, write) = test_pipe()
       group.add_defer(() => {
         read.close()
         write.close()
@@ -311,8 +311,8 @@ async test "a request past max_inbound is refused while handlers' own calls stil
 async test "unread error replies hold the read loop at max_inbound until the peer reads" {
   @async.with_timeout(5000, () => {
     @async.with_task_group(group => {
-      let (read, peer_write) = @io.pipe()
-      let (peer_read, write) = @io.pipe()
+      let (read, peer_write) = test_pipe()
+      let (peer_read, write) = test_pipe()
       group.add_defer(() => {
         read.close()
         write.close()
@@ -350,8 +350,8 @@ async test "unread error replies hold the read loop at max_inbound until the pee
 async test "a request past the default max_inbound of 64 is refused" {
   @async.with_timeout(5000, () => {
     @async.with_task_group(group => {
-      let (read, peer_write) = @io.pipe()
-      let (peer_read, write) = @io.pipe()
+      let (read, peer_write) = test_pipe()
+      let (peer_read, write) = test_pipe()
       group.add_defer(() => {
         read.close()
         write.close()
@@ -407,7 +407,7 @@ async test "a request past the default max_inbound of 64 is refused" {
 /// framing, since core/async's BinaryReader::read has no size parameter.
 struct ChunkReader {
   controller : @io.BinaryReaderController
-  idle : @io.PipeRead
+  idle : &@io.BinaryReader
   chunks : Array[Bytes]
   max_lens : Array[Int32?]
 }
@@ -441,8 +441,8 @@ impl @io.BinaryReader for ChunkReader with fn read(self) {
 async test "a read's first lines are dispatched before the rest is parsed" {
   @async.with_timeout(5000, () => {
     @async.with_task_group(group => {
-      let (idle, idle_write) = @io.pipe()
-      let (peer_read, write) = @io.pipe()
+      let (idle, idle_write) = test_pipe()
+      let (peer_read, write) = test_pipe()
       group.add_defer(() => {
         idle.close()
         idle_write.close()

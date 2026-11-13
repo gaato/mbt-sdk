@@ -5,8 +5,8 @@ fn pair(
   right_handler? : @jsonrpc_async.RequestHandler,
   right_notification? : @jsonrpc_async.NotificationHandler,
 ) -> (@jsonrpc_async.Connection, @jsonrpc_async.Connection) {
-  let (left_read, right_write) = @io.pipe()
-  let (right_read, left_write) = @io.pipe()
+  let (left_read, right_write) = test_pipe()
+  let (right_read, left_write) = test_pipe()
   group.add_defer(() => {
     left_read.close()
     right_read.close()
@@ -202,8 +202,8 @@ async test "request handlers can call the peer without blocking the reader" {
 async test "garbage strict-envelope errors and unknown responses allow later calls" {
   @async.with_timeout(5000, () => {
     @async.with_task_group(group => {
-      let (read, peer_write) = @io.pipe()
-      let (peer_read, write) = @io.pipe()
+      let (read, peer_write) = test_pipe()
+      let (peer_read, write) = test_pipe()
       group.add_defer(() => {
         read.close()
         write.close()

@@ -43,21 +43,6 @@ fn thread_result() -> Json {
 }
 
 ///|
-fn pipes(
-  group : @async.TaskGroup,
-) -> (@io.PipeRead, @io.PipeWrite, @io.PipeRead, @io.PipeWrite) {
-  let (client_read, server_write) = @io.pipe()
-  let (server_read, client_write) = @io.pipe()
-  group.add_defer(() => {
-    client_read.close()
-    client_write.close()
-    server_read.close()
-    server_write.close()
-  })
-  (client_read, client_write, server_read, server_write)
-}
-
-///|
 async test "handshake and typed turn loop with concurrent approval and events" {
   @async.with_timeout(5000, () => {
     @async.with_task_group(group => {
