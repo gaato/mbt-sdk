@@ -871,13 +871,10 @@ test "streaming closes on callback and decode errors" {
         ),
       )
     catch {
-      TestResponseFailure(
-        @runtime.Deserialization(
-          _,
-          body=b"{\"type\":\"response.output_text.delta\",\"delta\":\"missing generated fields\"}",
-          ..
-        )
-      ) => ()
+      TestResponseFailure(@runtime.Deserialization(_, body~, ..)) => {
+        let sent = b"{\"type\":\"response.output_text.delta\",\"delta\":\"missing generated fields\"}"
+        assert_eq(body, sent)
+      }
       _ => fail("invalid generated event payload must become Decode")
     } noraise {
       _ => fail("invalid event data must fail")

@@ -67,10 +67,12 @@ fn is_not_modified(error : Error) -> Bool {
 ///|
 fn http_outcome(error : Error) -> @runtime.AttemptOutcome {
   match error {
-    TestResponseFailure(
-      @runtime.UnexpectedStatus(head, ..)
-      | @runtime.Deserialization(head, ..)
-    ) =>
+    TestResponseFailure(@runtime.UnexpectedStatus(head, ..)) =>
+      @runtime.AttemptOutcome::Response(
+        status=head.status,
+        headers=head.headers,
+      )
+    TestResponseFailure(@runtime.Deserialization(head, ..)) =>
       @runtime.AttemptOutcome::Response(
         status=head.status,
         headers=head.headers,

@@ -1098,22 +1098,17 @@ test "a graphql paginator threads endCursor through the variables" {
         data => {
           // The extractor runs inside the paginator, so a shape it cannot read
           // has to fail the way the rest of the call does.
-          guard data
-            is Object(
-              {
-                "repository": Object(
-                  {
-                    "issues": Object(
-                      { "nodes": Array(nodes), "pageInfo": Object(info), .. }
-                    ),
-                    ..
-                  }
-                ),
-                ..
-              }
-            ) else {
-            raise @runtime.InvalidRequest(message="unexpected connection shape")
+          let shape = @runtime.InvalidRequest(
+            message="unexpected connection shape",
+          )
+          guard data is Object({ "repository": Object(repository), .. }) else {
+            raise shape
           }
+          guard repository is { "issues": Object(issues), .. } else {
+            raise shape
+          }
+          guard issues is { "nodes": Array(nodes), .. } else { raise shape }
+          guard issues is { "pageInfo": Object(info), .. } else { raise shape }
           let items = nodes.map(node => {
             match node {
               Object({ "number": Number(number, ..), .. }) => number.to_int()
