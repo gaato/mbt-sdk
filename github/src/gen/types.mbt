@@ -15221,6 +15221,62 @@ pub impl @json.FromJson for IssueFieldValue with fn from_json(value, path) {
 
 ///|
 ///
+/// The status of the issue, or `null` if it has none. Issue statuses are in preview and only available to accounts enrolled in the preview.
+#derive(Eq, @debug.Debug)
+pub(all) struct IssueStatus {
+  id : Int64
+  name : String
+  category : String
+}
+
+///|
+pub extend IssueStatus with Eq::{equal, not_equal}
+
+///|
+pub extend IssueStatus with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a IssueStatus with omitted optional fields absent.
+pub fn IssueStatus::new(
+  id~ : Int64,
+  name~ : String,
+  category~ : String,
+) -> IssueStatus {
+  { id, name, category, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend IssueStatus with ToJson::{to_json}
+
+///|
+pub impl ToJson for IssueStatus with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("id", json_int64_to_json(self.id))
+  .field("name", self.name)
+  .field("category", self.category)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend IssueStatus with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for IssueStatus with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    id: json_int64(required_field(obj, "id", path), path.add_key("id")),
+    name: required_field(obj, "name", path),
+    category: required_field(obj, "category", path),
+  }
+}
+
+///|
+///
 /// The reason for the current state
 #derive(Eq, @debug.Debug)
 #non_exhaustive
@@ -15497,6 +15553,7 @@ pub(all) struct Issue {
   html_url : String
   number : Int32
   state : String
+  status : @sdkjson.Presence[IssueStatus]
   state_reason : @sdkjson.Presence[IssueStateReason]
   title : String
   body : @sdkjson.Presence[String]
@@ -15555,6 +15612,7 @@ pub fn Issue::new(
   comments~ : Int32,
   created_at~ : String,
   updated_at~ : String,
+  status? : IssueStatus,
   state_reason? : IssueStateReason,
   body? : String,
   user? : NullableSimpleUser,
@@ -15591,6 +15649,7 @@ pub fn Issue::new(
     html_url,
     number,
     state,
+    status: @sdkjson.Presence::from_option(status),
     state_reason: @sdkjson.Presence::from_option(state_reason),
     title,
     body: @sdkjson.Presence::from_option(body),
@@ -15644,6 +15703,7 @@ pub impl ToJson for Issue with fn to_json(self) {
   .field("html_url", self.html_url)
   .field("number", self.number)
   .field("state", self.state)
+  .presence("status", self.status)
   .presence("state_reason", self.state_reason)
   .field("title", self.title)
   .presence("body", self.body)
@@ -15696,6 +15756,7 @@ pub impl @json.FromJson for Issue with fn from_json(value, path) {
     html_url: required_field(obj, "html_url", path),
     number: required_field(obj, "number", path),
     state: required_field(obj, "state", path),
+    status: @sdkjson.presence_field(obj, "status", path),
     state_reason: @sdkjson.presence_field(obj, "state_reason", path),
     title: required_field(obj, "title", path),
     body: @sdkjson.presence_field(obj, "body", path),
@@ -78373,6 +78434,62 @@ pub impl @json.FromJson for InteractionLimitPullRequestBypassList with fn from_j
 
 ///|
 ///
+/// The status of the issue, or `null` if it has none. Issue statuses are in preview and only available to accounts enrolled in the preview.
+#derive(Eq, @debug.Debug)
+pub(all) struct NullableIssueStatus {
+  id : Int64
+  name : String
+  category : String
+}
+
+///|
+pub extend NullableIssueStatus with Eq::{equal, not_equal}
+
+///|
+pub extend NullableIssueStatus with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a NullableIssueStatus with omitted optional fields absent.
+pub fn NullableIssueStatus::new(
+  id~ : Int64,
+  name~ : String,
+  category~ : String,
+) -> NullableIssueStatus {
+  { id, name, category, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend NullableIssueStatus with ToJson::{to_json}
+
+///|
+pub impl ToJson for NullableIssueStatus with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("id", json_int64_to_json(self.id))
+  .field("name", self.name)
+  .field("category", self.category)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend NullableIssueStatus with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for NullableIssueStatus with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    id: json_int64(required_field(obj, "id", path), path.add_key("id")),
+    name: required_field(obj, "name", path),
+    category: required_field(obj, "category", path),
+  }
+}
+
+///|
+///
 /// The reason for the current state
 #derive(Eq, @debug.Debug)
 #non_exhaustive
@@ -78661,6 +78778,7 @@ pub(all) struct NullableIssue {
   html_url : String
   number : Int32
   state : String
+  status : @sdkjson.Presence[NullableIssueStatus]
   state_reason : @sdkjson.Presence[NullableIssueStateReason]
   title : String
   body : @sdkjson.Presence[String]
@@ -78719,6 +78837,7 @@ pub fn NullableIssue::new(
   comments~ : Int32,
   created_at~ : String,
   updated_at~ : String,
+  status? : NullableIssueStatus,
   state_reason? : NullableIssueStateReason,
   body? : String,
   user? : NullableSimpleUser,
@@ -78755,6 +78874,7 @@ pub fn NullableIssue::new(
     html_url,
     number,
     state,
+    status: @sdkjson.Presence::from_option(status),
     state_reason: @sdkjson.Presence::from_option(state_reason),
     title,
     body: @sdkjson.Presence::from_option(body),
@@ -78808,6 +78928,7 @@ pub impl ToJson for NullableIssue with fn to_json(self) {
   .field("html_url", self.html_url)
   .field("number", self.number)
   .field("state", self.state)
+  .presence("status", self.status)
   .presence("state_reason", self.state_reason)
   .field("title", self.title)
   .presence("body", self.body)
@@ -78860,6 +78981,7 @@ pub impl @json.FromJson for NullableIssue with fn from_json(value, path) {
     html_url: required_field(obj, "html_url", path),
     number: required_field(obj, "number", path),
     state: required_field(obj, "state", path),
+    status: @sdkjson.presence_field(obj, "status", path),
     state_reason: @sdkjson.presence_field(obj, "state_reason", path),
     title: required_field(obj, "title", path),
     body: @sdkjson.presence_field(obj, "body", path),
@@ -83015,6 +83137,62 @@ pub impl @json.FromJson for PagesHealthCheck with fn from_json(value, path) {
   {
     domain: @sdkjson.opt_field(obj, "domain", path),
     alt_domain: @sdkjson.presence_field(obj, "alt_domain", path),
+  }
+}
+
+///|
+///
+/// A planning status and its lifecycle category.
+#derive(Eq, @debug.Debug)
+pub(all) struct PlanningStatus {
+  id : Int64
+  name : String
+  category : String
+}
+
+///|
+pub extend PlanningStatus with Eq::{equal, not_equal}
+
+///|
+pub extend PlanningStatus with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a PlanningStatus with omitted optional fields absent.
+pub fn PlanningStatus::new(
+  id~ : Int64,
+  name~ : String,
+  category~ : String,
+) -> PlanningStatus {
+  { id, name, category, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend PlanningStatus with ToJson::{to_json}
+
+///|
+pub impl ToJson for PlanningStatus with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("id", json_int64_to_json(self.id))
+  .field("name", self.name)
+  .field("category", self.category)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend PlanningStatus with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for PlanningStatus with fn from_json(value, path) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    id: json_int64(required_field(obj, "id", path), path.add_key("id")),
+    name: required_field(obj, "name", path),
+    category: required_field(obj, "category", path),
   }
 }
 
@@ -95451,6 +95629,65 @@ pub impl @json.FromJson for CommitSearchResultItem with fn from_json(
 
 ///|
 ///
+/// The status of the issue, or `null` if it has none. Issue statuses are in preview and only available to accounts enrolled in the preview.
+#derive(Eq, @debug.Debug)
+pub(all) struct IssueSearchResultItemStatus {
+  id : Int64
+  name : String
+  category : String
+}
+
+///|
+pub extend IssueSearchResultItemStatus with Eq::{equal, not_equal}
+
+///|
+pub extend IssueSearchResultItemStatus with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a IssueSearchResultItemStatus with omitted optional fields absent.
+pub fn IssueSearchResultItemStatus::new(
+  id~ : Int64,
+  name~ : String,
+  category~ : String,
+) -> IssueSearchResultItemStatus {
+  { id, name, category, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend IssueSearchResultItemStatus with ToJson::{to_json}
+
+///|
+pub impl ToJson for IssueSearchResultItemStatus with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("id", json_int64_to_json(self.id))
+  .field("name", self.name)
+  .field("category", self.category)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend IssueSearchResultItemStatus with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for IssueSearchResultItemStatus with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    id: json_int64(required_field(obj, "id", path), path.add_key("id")),
+    name: required_field(obj, "name", path),
+    category: required_field(obj, "category", path),
+  }
+}
+
+///|
+///
 /// Generated representation of IssueSearchResultItemLabelsItem.
 #derive(Eq, @debug.Debug)
 pub(all) struct IssueSearchResultItemLabelsItem {
@@ -95620,6 +95857,7 @@ pub impl @json.FromJson for IssueSearchResultItemPullRequest with fn from_json(
 /// Issue Search Result Item
 #derive(Eq, @debug.Debug)
 pub(all) struct IssueSearchResultItem {
+  status : @sdkjson.Presence[IssueSearchResultItemStatus]
   url : String
   repository_url : String
   labels_url : String
@@ -95690,6 +95928,7 @@ pub fn IssueSearchResultItem::new(
   updated_at~ : String,
   score~ : Double,
   author_association~ : AuthorAssociation,
+  status? : IssueSearchResultItemStatus,
   active_lock_reason? : String,
   assignees? : Array[SimpleUser],
   user? : NullableSimpleUser,
@@ -95714,6 +95953,7 @@ pub fn IssueSearchResultItem::new(
   reactions? : ReactionRollup,
 ) -> IssueSearchResultItem {
   {
+    status: @sdkjson.Presence::from_option(status),
     url,
     repository_url,
     labels_url,
@@ -95767,6 +96007,7 @@ pub extend IssueSearchResultItem with ToJson::{to_json}
 ///|
 pub impl ToJson for IssueSearchResultItem with fn to_json(self) {
   @sdkjson.ObjBuilder::new()
+  .presence("status", self.status)
   .field("url", self.url)
   .field("repository_url", self.repository_url)
   .field("labels_url", self.labels_url)
@@ -95819,6 +96060,7 @@ pub extend IssueSearchResultItem with @json.FromJson::{from_json}
 pub impl @json.FromJson for IssueSearchResultItem with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
   {
+    status: @sdkjson.presence_field(obj, "status", path),
     url: required_field(obj, "url", path),
     repository_url: required_field(obj, "repository_url", path),
     labels_url: required_field(obj, "labels_url", path),
@@ -184943,7 +185185,7 @@ pub impl @json.FromJson for OrgsListAppInstallationsResponse with fn from_json(
 pub(all) struct InteractionsGetPullRequestCreationCapForOrgResponse {
   enabled : Bool
   max_open_pull_requests : Int32
-  include_drafts : Bool?
+  include_drafts : Bool
 }
 
 ///|
@@ -184963,7 +185205,7 @@ pub extend InteractionsGetPullRequestCreationCapForOrgResponse with @debug.Debug
 pub fn InteractionsGetPullRequestCreationCapForOrgResponse::new(
   enabled~ : Bool,
   max_open_pull_requests~ : Int32,
-  include_drafts? : Bool,
+  include_drafts~ : Bool,
 ) -> InteractionsGetPullRequestCreationCapForOrgResponse {
   { enabled, max_open_pull_requests, include_drafts, }
 }
@@ -184982,7 +185224,7 @@ pub impl ToJson for InteractionsGetPullRequestCreationCapForOrgResponse with fn 
   @sdkjson.ObjBuilder::new()
   .field("enabled", self.enabled)
   .field("max_open_pull_requests", self.max_open_pull_requests)
-  .opt("include_drafts", self.include_drafts)
+  .field("include_drafts", self.include_drafts)
   .build()
 }
 
@@ -185002,7 +185244,7 @@ pub impl @json.FromJson for InteractionsGetPullRequestCreationCapForOrgResponse 
   {
     enabled: required_field(obj, "enabled", path),
     max_open_pull_requests: required_field(obj, "max_open_pull_requests", path),
-    include_drafts: @sdkjson.opt_field(obj, "include_drafts", path),
+    include_drafts: required_field(obj, "include_drafts", path),
   }
 }
 
@@ -185085,7 +185327,7 @@ pub impl @json.FromJson for InteractionsUpdatePullRequestCreationCapForOrgReques
 pub(all) struct InteractionsUpdatePullRequestCreationCapForOrgResponse {
   enabled : Bool
   max_open_pull_requests : Int32
-  include_drafts : Bool?
+  include_drafts : Bool
 }
 
 ///|
@@ -185105,7 +185347,7 @@ pub extend InteractionsUpdatePullRequestCreationCapForOrgResponse with @debug.De
 pub fn InteractionsUpdatePullRequestCreationCapForOrgResponse::new(
   enabled~ : Bool,
   max_open_pull_requests~ : Int32,
-  include_drafts? : Bool,
+  include_drafts~ : Bool,
 ) -> InteractionsUpdatePullRequestCreationCapForOrgResponse {
   { enabled, max_open_pull_requests, include_drafts, }
 }
@@ -185124,7 +185366,7 @@ pub impl ToJson for InteractionsUpdatePullRequestCreationCapForOrgResponse with 
   @sdkjson.ObjBuilder::new()
   .field("enabled", self.enabled)
   .field("max_open_pull_requests", self.max_open_pull_requests)
-  .opt("include_drafts", self.include_drafts)
+  .field("include_drafts", self.include_drafts)
   .build()
 }
 
@@ -185144,7 +185386,7 @@ pub impl @json.FromJson for InteractionsUpdatePullRequestCreationCapForOrgRespon
   {
     enabled: required_field(obj, "enabled", path),
     max_open_pull_requests: required_field(obj, "max_open_pull_requests", path),
-    include_drafts: @sdkjson.opt_field(obj, "include_drafts", path),
+    include_drafts: required_field(obj, "include_drafts", path),
   }
 }
 
@@ -208328,7 +208570,7 @@ pub impl @json.FromJson for MigrationsSetLfsPreferenceRequest with fn from_json(
 pub(all) struct InteractionsGetPullRequestCreationCapForRepoResponse {
   enabled : Bool
   max_open_pull_requests : Int32
-  include_drafts : Bool?
+  include_drafts : Bool
 }
 
 ///|
@@ -208348,7 +208590,7 @@ pub extend InteractionsGetPullRequestCreationCapForRepoResponse with @debug.Debu
 pub fn InteractionsGetPullRequestCreationCapForRepoResponse::new(
   enabled~ : Bool,
   max_open_pull_requests~ : Int32,
-  include_drafts? : Bool,
+  include_drafts~ : Bool,
 ) -> InteractionsGetPullRequestCreationCapForRepoResponse {
   { enabled, max_open_pull_requests, include_drafts, }
 }
@@ -208367,7 +208609,7 @@ pub impl ToJson for InteractionsGetPullRequestCreationCapForRepoResponse with fn
   @sdkjson.ObjBuilder::new()
   .field("enabled", self.enabled)
   .field("max_open_pull_requests", self.max_open_pull_requests)
-  .opt("include_drafts", self.include_drafts)
+  .field("include_drafts", self.include_drafts)
   .build()
 }
 
@@ -208387,7 +208629,7 @@ pub impl @json.FromJson for InteractionsGetPullRequestCreationCapForRepoResponse
   {
     enabled: required_field(obj, "enabled", path),
     max_open_pull_requests: required_field(obj, "max_open_pull_requests", path),
-    include_drafts: @sdkjson.opt_field(obj, "include_drafts", path),
+    include_drafts: required_field(obj, "include_drafts", path),
   }
 }
 
@@ -208470,7 +208712,7 @@ pub impl @json.FromJson for InteractionsUpdatePullRequestCreationCapForRepoReque
 pub(all) struct InteractionsUpdatePullRequestCreationCapForRepoResponse {
   enabled : Bool
   max_open_pull_requests : Int32
-  include_drafts : Bool?
+  include_drafts : Bool
 }
 
 ///|
@@ -208490,7 +208732,7 @@ pub extend InteractionsUpdatePullRequestCreationCapForRepoResponse with @debug.D
 pub fn InteractionsUpdatePullRequestCreationCapForRepoResponse::new(
   enabled~ : Bool,
   max_open_pull_requests~ : Int32,
-  include_drafts? : Bool,
+  include_drafts~ : Bool,
 ) -> InteractionsUpdatePullRequestCreationCapForRepoResponse {
   { enabled, max_open_pull_requests, include_drafts, }
 }
@@ -208509,7 +208751,7 @@ pub impl ToJson for InteractionsUpdatePullRequestCreationCapForRepoResponse with
   @sdkjson.ObjBuilder::new()
   .field("enabled", self.enabled)
   .field("max_open_pull_requests", self.max_open_pull_requests)
-  .opt("include_drafts", self.include_drafts)
+  .field("include_drafts", self.include_drafts)
   .build()
 }
 
@@ -208529,7 +208771,7 @@ pub impl @json.FromJson for InteractionsUpdatePullRequestCreationCapForRepoRespo
   {
     enabled: required_field(obj, "enabled", path),
     max_open_pull_requests: required_field(obj, "max_open_pull_requests", path),
-    include_drafts: @sdkjson.opt_field(obj, "include_drafts", path),
+    include_drafts: required_field(obj, "include_drafts", path),
   }
 }
 
@@ -209187,6 +209429,7 @@ pub impl @json.FromJson for IssuesCreateRequestIssueFieldValuesItem with fn from
 pub(all) struct IssuesCreateRequest {
   title : IssuesCreateRequestTitle
   body : String?
+  status : String?
   assignee : @sdkjson.Presence[String]
   milestone : @sdkjson.Presence[IssuesCreateRequestMilestone]
   labels : Array[IssuesCreateRequestLabelsItem]?
@@ -209208,6 +209451,7 @@ pub extend IssuesCreateRequest with @debug.Debug::{to_repr}
 pub fn IssuesCreateRequest::new(
   title~ : IssuesCreateRequestTitle,
   body? : String,
+  status? : String,
   assignee? : String,
   milestone? : IssuesCreateRequestMilestone,
   labels? : Array[IssuesCreateRequestLabelsItem],
@@ -209219,6 +209463,7 @@ pub fn IssuesCreateRequest::new(
   {
     title,
     body,
+    status,
     assignee: @sdkjson.Presence::from_option(assignee),
     milestone: @sdkjson.Presence::from_option(milestone),
     labels,
@@ -209239,6 +209484,7 @@ pub impl ToJson for IssuesCreateRequest with fn to_json(self) {
   @sdkjson.ObjBuilder::new()
   .field("title", self.title)
   .opt("body", self.body)
+  .opt("status", self.status)
   .presence("assignee", self.assignee)
   .presence("milestone", self.milestone)
   .opt("labels", self.labels)
@@ -209260,6 +209506,7 @@ pub impl @json.FromJson for IssuesCreateRequest with fn from_json(value, path) {
   {
     title: required_field(obj, "title", path),
     body: @sdkjson.opt_field(obj, "body", path),
+    status: @sdkjson.opt_field(obj, "status", path),
     assignee: @sdkjson.presence_field(obj, "assignee", path),
     milestone: @sdkjson.presence_field(obj, "milestone", path),
     labels: @sdkjson.opt_field(obj, "labels", path),
@@ -210659,6 +210906,7 @@ pub(all) struct IssuesUpdateRequest {
   body : @sdkjson.Presence[String]
   assignee : @sdkjson.Presence[String]
   state : IssuesUpdateRequestState?
+  status : String?
   state_reason : @sdkjson.Presence[IssuesUpdateRequestStateReason]
   duplicate_issue_id : Int32?
   milestone : @sdkjson.Presence[IssuesUpdateRequestMilestone]
@@ -210682,6 +210930,7 @@ pub fn IssuesUpdateRequest::new(
   body? : String,
   assignee? : String,
   state? : IssuesUpdateRequestState,
+  status? : String,
   state_reason? : IssuesUpdateRequestStateReason,
   duplicate_issue_id? : Int32,
   milestone? : IssuesUpdateRequestMilestone,
@@ -210695,6 +210944,7 @@ pub fn IssuesUpdateRequest::new(
     body: @sdkjson.Presence::from_option(body),
     assignee: @sdkjson.Presence::from_option(assignee),
     state,
+    status,
     state_reason: @sdkjson.Presence::from_option(state_reason),
     duplicate_issue_id,
     milestone: @sdkjson.Presence::from_option(milestone),
@@ -210717,6 +210967,7 @@ pub impl ToJson for IssuesUpdateRequest with fn to_json(self) {
   .presence("body", self.body)
   .presence("assignee", self.assignee)
   .opt("state", self.state)
+  .opt("status", self.status)
   .presence("state_reason", self.state_reason)
   .opt("duplicate_issue_id", self.duplicate_issue_id)
   .presence("milestone", self.milestone)
@@ -210740,6 +210991,7 @@ pub impl @json.FromJson for IssuesUpdateRequest with fn from_json(value, path) {
     body: @sdkjson.presence_field(obj, "body", path),
     assignee: @sdkjson.presence_field(obj, "assignee", path),
     state: @sdkjson.opt_field(obj, "state", path),
+    status: @sdkjson.opt_field(obj, "status", path),
     state_reason: @sdkjson.presence_field(obj, "state_reason", path),
     duplicate_issue_id: @sdkjson.opt_field(obj, "duplicate_issue_id", path),
     milestone: @sdkjson.presence_field(obj, "milestone", path),
@@ -210747,6 +210999,65 @@ pub impl @json.FromJson for IssuesUpdateRequest with fn from_json(value, path) {
     assignees: @sdkjson.opt_field(obj, "assignees", path),
     issue_field_values: @sdkjson.opt_field(obj, "issue_field_values", path),
     type_: @sdkjson.presence_field(obj, "type", path),
+  }
+}
+
+///|
+///
+/// The status of the issue, or `null` if it has none. Issue statuses are in preview and only available to accounts enrolled in the preview.
+#derive(Eq, @debug.Debug)
+pub(all) struct IssuesUpdateResponseStatus {
+  id : Int64
+  name : String
+  category : String
+}
+
+///|
+pub extend IssuesUpdateResponseStatus with Eq::{equal, not_equal}
+
+///|
+pub extend IssuesUpdateResponseStatus with @debug.Debug::{to_repr}
+
+///|
+///
+/// Creates a IssuesUpdateResponseStatus with omitted optional fields absent.
+pub fn IssuesUpdateResponseStatus::new(
+  id~ : Int64,
+  name~ : String,
+  category~ : String,
+) -> IssuesUpdateResponseStatus {
+  { id, name, category, }
+}
+
+///|
+///
+/// Encodes this value as JSON.
+pub extend IssuesUpdateResponseStatus with ToJson::{to_json}
+
+///|
+pub impl ToJson for IssuesUpdateResponseStatus with fn to_json(self) {
+  @sdkjson.ObjBuilder::new()
+  .field("id", json_int64_to_json(self.id))
+  .field("name", self.name)
+  .field("category", self.category)
+  .build()
+}
+
+///|
+///
+/// Decodes this value from JSON.
+pub extend IssuesUpdateResponseStatus with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for IssuesUpdateResponseStatus with fn from_json(
+  value,
+  path,
+) {
+  let obj = @sdkjson.expect_object(value, path)
+  {
+    id: json_int64(required_field(obj, "id", path), path.add_key("id")),
+    name: required_field(obj, "name", path),
+    category: required_field(obj, "category", path),
   }
 }
 
@@ -212454,6 +212765,7 @@ pub(all) struct IssuesUpdateResponse {
   html_url : String
   number : Int32
   state : String
+  status : @sdkjson.Presence[IssuesUpdateResponseStatus]
   state_reason : @sdkjson.Presence[IssuesUpdateResponseStateReason]
   title : String
   body : @sdkjson.Presence[String]
@@ -212513,6 +212825,7 @@ pub fn IssuesUpdateResponse::new(
   comments~ : Int32,
   created_at~ : String,
   updated_at~ : String,
+  status? : IssuesUpdateResponseStatus,
   state_reason? : IssuesUpdateResponseStateReason,
   body? : String,
   user? : NullableSimpleUser,
@@ -212550,6 +212863,7 @@ pub fn IssuesUpdateResponse::new(
     html_url,
     number,
     state,
+    status: @sdkjson.Presence::from_option(status),
     state_reason: @sdkjson.Presence::from_option(state_reason),
     title,
     body: @sdkjson.Presence::from_option(body),
@@ -212604,6 +212918,7 @@ pub impl ToJson for IssuesUpdateResponse with fn to_json(self) {
   .field("html_url", self.html_url)
   .field("number", self.number)
   .field("state", self.state)
+  .presence("status", self.status)
   .presence("state_reason", self.state_reason)
   .field("title", self.title)
   .presence("body", self.body)
@@ -212657,6 +212972,7 @@ pub impl @json.FromJson for IssuesUpdateResponse with fn from_json(value, path) 
     html_url: required_field(obj, "html_url", path),
     number: required_field(obj, "number", path),
     state: required_field(obj, "state", path),
+    status: @sdkjson.presence_field(obj, "status", path),
     state_reason: @sdkjson.presence_field(obj, "state_reason", path),
     title: required_field(obj, "title", path),
     body: @sdkjson.presence_field(obj, "body", path),
