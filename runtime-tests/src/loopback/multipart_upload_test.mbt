@@ -81,7 +81,7 @@ async test "a 32 MiB streamed file part uploads intact through AsyncBackend" {
         let file = { total, produced: 0L, closed: false, }
         let length = if known { Some(total) } else { None }
         let request = @multipart.body(
-          @http.Request::post("http://127.0.0.1:\{server.addr.port()}/upload"),
+          @http.Request::post("http://\{server.addr}/upload"),
           [
             @multipart.Part::text("note", "hi"),
             @multipart.Part::file_stream(
@@ -134,7 +134,7 @@ async test "a multipart part that cannot be sent fails before a large head goes 
     let (content_type, body) = @multipart.encode_body([part], "B")
     // Far more than any send buffer, so the client would flush part of the
     // head on its own if it serialized it before taking the parts.
-    let request = @http.Request::post("http://127.0.0.1:\{server.addr.port()}/")
+    let request = @http.Request::post("http://\{server.addr}/")
       .set_header("content-type", content_type)
       .set_header("x-large", String::make(2 * 1024 * 1024, 'a'))
     let backend = @backend.AsyncBackend::new()

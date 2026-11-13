@@ -44,8 +44,8 @@ fn plain_body(raw : Bytes) -> Bytes {
 
 ///|
 /// Serves `raw` to one connection, after reading its request head, then
-/// closes it, and runs `client` with the server's port.
-async fn replay(raw : Bytes, client : async (Int32) -> Unit) -> Unit {
+/// closes it, and runs `client` with the server's origin.
+async fn replay(raw : Bytes, client : async (String) -> Unit) -> Unit {
   @async.with_timeout(10000, () => {
     let server = @socket.TcpServer(@socket.Addr::parse("127.0.0.1:0"))
     defer server.close()
@@ -56,7 +56,7 @@ async fn replay(raw : Bytes, client : async (Int32) -> Unit) -> Unit {
         ignore(conn.read_until(b"\r\n\r\n"))
         conn.write(raw)
       })
-      client(server.addr.port())
+      client("http://\{server.addr}")
     })
   })
 }
@@ -109,10 +109,8 @@ fn failure(error : Error) -> String {
 /// `Content-Encoding` left on the head.
 async fn compress_outcome(key : String, document : Bytes) -> String {
   let outcome = Ref("")
-  replay(capture(key), port => {
-    let response = buffered(
-      @http.Request::get("http://127.0.0.1:\{port}/compress"),
-    ) catch {
+  replay(capture(key), origin => {
+    let response = buffered(@http.Request::get("\{origin}/compress")) catch {
       error => {
         outcome.val = failure(error)
         return
@@ -193,10 +191,8 @@ async test "recorded compress responses decode as RFC 9110 and the codings defin
 /// transport, for the request URL badhttp.dev answered.
 async fn cookies_outcome(flavor : String) -> String {
   let outcome = Ref("")
-  replay(capture("cookies.\{flavor}"), port => {
-    let response = buffered(
-      @http.Request::get("http://127.0.0.1:\{port}/cookies/\{flavor}"),
-    ) catch {
+  replay(capture("cookies.\{flavor}"), origin => {
+    let response = buffered(@http.Request::get("\{origin}/cookies/\{flavor}")) catch {
       error => {
         outcome.val = failure(error)
         return
@@ -289,13 +285,13 @@ async test "recorded cookies responses reach the jar as RFC 6265bis-22 stores th
 async fn sse_outcome(flavor : String) -> String {
   let events = []
   let outcome = Ref("")
-  replay(capture("sse.\{flavor}"), port => {
+  replay(capture("sse.\{flavor}"), origin => {
     let backend = transport()
     defer backend.close()
-    let response = backend.send(
-      @http.Request::get("http://127.0.0.1:\{port}/sse/\{flavor}"),
-      { timeout_ms: Some(5000), body: Stream(idle_ms=Some(5000)), },
-    ) catch {
+    let response = backend.send(@http.Request::get("\{origin}/sse/\{flavor}"), {
+      timeout_ms: Some(5000),
+      body: Stream(idle_ms=Some(5000)),
+    }) catch {
       error => {
         outcome.val = failure(error)
         return
