@@ -14,6 +14,12 @@ are optional unless the field is required, and keep a wildcard arm.
 
 ## [Unreleased]
 
+## [0.24.0] - 2026-11-13
+
+### Changed
+
+- **Regenerated from the upstream spec fetched 2026-11-13** (sha256 `bad9314236ef`). The public API changed; see the `pkg.generated.mbti` diff.
+
 ## [0.23.0] - 2026-11-12
 
 ### Changed

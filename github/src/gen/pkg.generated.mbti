@@ -5438,6 +5438,12 @@ pub fn repos_list_pages_builds_decode_json(@json.Json) -> Array[PageBuild] raise
 
 pub fn repos_list_pages_builds_request(String, String, per_page? : Int32, page? : Int32) -> @mttp_core.Request
 
+pub fn repos_list_planning_statuses_decode(@mttp_core.ResponseHead, Bytes) -> Result[Array[PlanningStatus], @client.ResponseFailure]
+
+pub fn repos_list_planning_statuses_decode_json(@json.Json) -> Array[PlanningStatus] raise @json.JsonDecodeError
+
+pub fn repos_list_planning_statuses_request(String, String) -> @mttp_core.Request
+
 pub fn repos_list_public_decode(@mttp_core.ResponseHead, Bytes) -> Result[Array[MinimalRepository], @client.ResponseFailure]
 
 pub fn repos_list_public_decode_json(@json.Json) -> Array[MinimalRepository] raise @json.JsonDecodeError
@@ -36917,11 +36923,11 @@ pub impl @json.ToJson for InteractionLimitResponse
 pub(all) struct InteractionsGetPullRequestCreationCapForOrgResponse {
   enabled : Bool
   max_open_pull_requests : Int32
-  include_drafts : Bool?
+  include_drafts : Bool
 }
 pub fn InteractionsGetPullRequestCreationCapForOrgResponse::equal(Self, Self) -> Bool
 pub fn InteractionsGetPullRequestCreationCapForOrgResponse::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
-pub fn InteractionsGetPullRequestCreationCapForOrgResponse::new(enabled~ : Bool, max_open_pull_requests~ : Int32, include_drafts? : Bool) -> Self
+pub fn InteractionsGetPullRequestCreationCapForOrgResponse::new(enabled~ : Bool, max_open_pull_requests~ : Int32, include_drafts~ : Bool) -> Self
 pub fn InteractionsGetPullRequestCreationCapForOrgResponse::not_equal(Self, Self) -> Bool
 pub fn InteractionsGetPullRequestCreationCapForOrgResponse::to_json(Self) -> @json.Json
 pub fn InteractionsGetPullRequestCreationCapForOrgResponse::to_repr(Self) -> @debug.Repr
@@ -36932,11 +36938,11 @@ pub impl @json.ToJson for InteractionsGetPullRequestCreationCapForOrgResponse
 pub(all) struct InteractionsGetPullRequestCreationCapForRepoResponse {
   enabled : Bool
   max_open_pull_requests : Int32
-  include_drafts : Bool?
+  include_drafts : Bool
 }
 pub fn InteractionsGetPullRequestCreationCapForRepoResponse::equal(Self, Self) -> Bool
 pub fn InteractionsGetPullRequestCreationCapForRepoResponse::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
-pub fn InteractionsGetPullRequestCreationCapForRepoResponse::new(enabled~ : Bool, max_open_pull_requests~ : Int32, include_drafts? : Bool) -> Self
+pub fn InteractionsGetPullRequestCreationCapForRepoResponse::new(enabled~ : Bool, max_open_pull_requests~ : Int32, include_drafts~ : Bool) -> Self
 pub fn InteractionsGetPullRequestCreationCapForRepoResponse::not_equal(Self, Self) -> Bool
 pub fn InteractionsGetPullRequestCreationCapForRepoResponse::to_json(Self) -> @json.Json
 pub fn InteractionsGetPullRequestCreationCapForRepoResponse::to_repr(Self) -> @debug.Repr
@@ -36962,11 +36968,11 @@ pub impl @json.ToJson for InteractionsUpdatePullRequestCreationCapForOrgRequest
 pub(all) struct InteractionsUpdatePullRequestCreationCapForOrgResponse {
   enabled : Bool
   max_open_pull_requests : Int32
-  include_drafts : Bool?
+  include_drafts : Bool
 }
 pub fn InteractionsUpdatePullRequestCreationCapForOrgResponse::equal(Self, Self) -> Bool
 pub fn InteractionsUpdatePullRequestCreationCapForOrgResponse::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
-pub fn InteractionsUpdatePullRequestCreationCapForOrgResponse::new(enabled~ : Bool, max_open_pull_requests~ : Int32, include_drafts? : Bool) -> Self
+pub fn InteractionsUpdatePullRequestCreationCapForOrgResponse::new(enabled~ : Bool, max_open_pull_requests~ : Int32, include_drafts~ : Bool) -> Self
 pub fn InteractionsUpdatePullRequestCreationCapForOrgResponse::not_equal(Self, Self) -> Bool
 pub fn InteractionsUpdatePullRequestCreationCapForOrgResponse::to_json(Self) -> @json.Json
 pub fn InteractionsUpdatePullRequestCreationCapForOrgResponse::to_repr(Self) -> @debug.Repr
@@ -36992,11 +36998,11 @@ pub impl @json.ToJson for InteractionsUpdatePullRequestCreationCapForRepoRequest
 pub(all) struct InteractionsUpdatePullRequestCreationCapForRepoResponse {
   enabled : Bool
   max_open_pull_requests : Int32
-  include_drafts : Bool?
+  include_drafts : Bool
 }
 pub fn InteractionsUpdatePullRequestCreationCapForRepoResponse::equal(Self, Self) -> Bool
 pub fn InteractionsUpdatePullRequestCreationCapForRepoResponse::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
-pub fn InteractionsUpdatePullRequestCreationCapForRepoResponse::new(enabled~ : Bool, max_open_pull_requests~ : Int32, include_drafts? : Bool) -> Self
+pub fn InteractionsUpdatePullRequestCreationCapForRepoResponse::new(enabled~ : Bool, max_open_pull_requests~ : Int32, include_drafts~ : Bool) -> Self
 pub fn InteractionsUpdatePullRequestCreationCapForRepoResponse::not_equal(Self, Self) -> Bool
 pub fn InteractionsUpdatePullRequestCreationCapForRepoResponse::to_json(Self) -> @json.Json
 pub fn InteractionsUpdatePullRequestCreationCapForRepoResponse::to_repr(Self) -> @debug.Repr
@@ -37015,6 +37021,7 @@ pub(all) struct Issue {
   html_url : String
   number : Int32
   state : String
+  status : @jsonkit.Presence[IssueStatus]
   state_reason : @jsonkit.Presence[IssueStateReason]
   title : String
   body : @jsonkit.Presence[String]
@@ -37048,7 +37055,7 @@ pub(all) struct Issue {
 }
 pub fn Issue::equal(Self, Self) -> Bool
 pub fn Issue::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
-pub fn Issue::new(id~ : Int64, node_id~ : String, url~ : String, repository_url~ : String, labels_url~ : String, comments_url~ : String, events_url~ : String, html_url~ : String, number~ : Int32, state~ : String, title~ : String, labels~ : Array[IssueLabelsItem], locked~ : Bool, comments~ : Int32, created_at~ : String, updated_at~ : String, state_reason? : IssueStateReason, body? : String, user? : NullableSimpleUser, assignee? : NullableSimpleUser, assignees? : Array[SimpleUser], milestone? : NullableMilestone, active_lock_reason? : String, pull_request? : IssuePullRequest, closed_at? : String, draft? : Bool, closed_by? : NullableSimpleUser, body_html? : String, body_text? : String, timeline_url? : String, type_? : IssueType, repository? : Repository, performed_via_github_app? : NullableIntegration, author_association? : AuthorAssociation, reactions? : ReactionRollup, sub_issues_summary? : SubIssuesSummary, parent_issue_url? : String, pinned_comment? : NullableIssueComment, issue_dependencies_summary? : IssueDependenciesSummary, issue_field_values? : Array[IssueFieldValue]) -> Self
+pub fn Issue::new(id~ : Int64, node_id~ : String, url~ : String, repository_url~ : String, labels_url~ : String, comments_url~ : String, events_url~ : String, html_url~ : String, number~ : Int32, state~ : String, title~ : String, labels~ : Array[IssueLabelsItem], locked~ : Bool, comments~ : Int32, created_at~ : String, updated_at~ : String, status? : IssueStatus, state_reason? : IssueStateReason, body? : String, user? : NullableSimpleUser, assignee? : NullableSimpleUser, assignees? : Array[SimpleUser], milestone? : NullableMilestone, active_lock_reason? : String, pull_request? : IssuePullRequest, closed_at? : String, draft? : Bool, closed_by? : NullableSimpleUser, body_html? : String, body_text? : String, timeline_url? : String, type_? : IssueType, repository? : Repository, performed_via_github_app? : NullableIntegration, author_association? : AuthorAssociation, reactions? : ReactionRollup, sub_issues_summary? : SubIssuesSummary, parent_issue_url? : String, pinned_comment? : NullableIssueComment, issue_dependencies_summary? : IssueDependenciesSummary, issue_field_values? : Array[IssueFieldValue]) -> Self
 pub fn Issue::not_equal(Self, Self) -> Bool
 pub fn Issue::to_json(Self) -> @json.Json
 pub fn Issue::to_repr(Self) -> @debug.Repr
@@ -37496,6 +37503,7 @@ pub impl @json.ToJson for IssuePullRequest
 
 #derive(Eq, @debug.Debug)
 pub(all) struct IssueSearchResultItem {
+  status : @jsonkit.Presence[IssueSearchResultItemStatus]
   url : String
   repository_url : String
   labels_url : String
@@ -37539,7 +37547,7 @@ pub(all) struct IssueSearchResultItem {
 }
 pub fn IssueSearchResultItem::equal(Self, Self) -> Bool
 pub fn IssueSearchResultItem::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
-pub fn IssueSearchResultItem::new(url~ : String, repository_url~ : String, labels_url~ : String, comments_url~ : String, events_url~ : String, html_url~ : String, id~ : Int64, node_id~ : String, number~ : Int32, title~ : String, locked~ : Bool, labels~ : Array[IssueSearchResultItemLabelsItem], state~ : String, comments~ : Int32, created_at~ : String, updated_at~ : String, score~ : Double, author_association~ : AuthorAssociation, active_lock_reason? : String, assignees? : Array[SimpleUser], user? : NullableSimpleUser, sub_issues_summary? : SubIssuesSummary, issue_dependencies_summary? : IssueDependenciesSummary, issue_field_values? : Array[IssueFieldValue], state_reason? : String, assignee? : NullableSimpleUser, milestone? : NullableMilestone, closed_at? : String, text_matches? : Array[SearchResultTextMatchesItem], pull_request? : IssueSearchResultItemPullRequest, body? : String, draft? : Bool, repository? : Repository, body_html? : String, body_text? : String, timeline_url? : String, type_? : IssueType, performed_via_github_app? : NullableIntegration, pinned_comment? : NullableIssueComment, reactions? : ReactionRollup) -> Self
+pub fn IssueSearchResultItem::new(url~ : String, repository_url~ : String, labels_url~ : String, comments_url~ : String, events_url~ : String, html_url~ : String, id~ : Int64, node_id~ : String, number~ : Int32, title~ : String, locked~ : Bool, labels~ : Array[IssueSearchResultItemLabelsItem], state~ : String, comments~ : Int32, created_at~ : String, updated_at~ : String, score~ : Double, author_association~ : AuthorAssociation, status? : IssueSearchResultItemStatus, active_lock_reason? : String, assignees? : Array[SimpleUser], user? : NullableSimpleUser, sub_issues_summary? : SubIssuesSummary, issue_dependencies_summary? : IssueDependenciesSummary, issue_field_values? : Array[IssueFieldValue], state_reason? : String, assignee? : NullableSimpleUser, milestone? : NullableMilestone, closed_at? : String, text_matches? : Array[SearchResultTextMatchesItem], pull_request? : IssueSearchResultItemPullRequest, body? : String, draft? : Bool, repository? : Repository, body_html? : String, body_text? : String, timeline_url? : String, type_? : IssueType, performed_via_github_app? : NullableIntegration, pinned_comment? : NullableIssueComment, reactions? : ReactionRollup) -> Self
 pub fn IssueSearchResultItem::not_equal(Self, Self) -> Bool
 pub fn IssueSearchResultItem::to_json(Self) -> @json.Json
 pub fn IssueSearchResultItem::to_repr(Self) -> @debug.Repr
@@ -37584,6 +37592,21 @@ pub fn IssueSearchResultItemPullRequest::to_repr(Self) -> @debug.Repr
 pub impl @json.FromJson for IssueSearchResultItemPullRequest
 pub impl @json.ToJson for IssueSearchResultItemPullRequest
 
+#derive(Eq, @debug.Debug)
+pub(all) struct IssueSearchResultItemStatus {
+  id : Int64
+  name : String
+  category : String
+}
+pub fn IssueSearchResultItemStatus::equal(Self, Self) -> Bool
+pub fn IssueSearchResultItemStatus::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn IssueSearchResultItemStatus::new(id~ : Int64, name~ : String, category~ : String) -> Self
+pub fn IssueSearchResultItemStatus::not_equal(Self, Self) -> Bool
+pub fn IssueSearchResultItemStatus::to_json(Self) -> @json.Json
+pub fn IssueSearchResultItemStatus::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for IssueSearchResultItemStatus
+pub impl @json.ToJson for IssueSearchResultItemStatus
+
 #non_exhaustive
 #derive(Eq, @debug.Debug)
 pub(all) enum IssueStateReason {
@@ -37600,6 +37623,21 @@ pub fn IssueStateReason::to_json(Self) -> @json.Json
 pub fn IssueStateReason::to_repr(Self) -> @debug.Repr
 pub impl @json.FromJson for IssueStateReason
 pub impl @json.ToJson for IssueStateReason
+
+#derive(Eq, @debug.Debug)
+pub(all) struct IssueStatus {
+  id : Int64
+  name : String
+  category : String
+}
+pub fn IssueStatus::equal(Self, Self) -> Bool
+pub fn IssueStatus::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn IssueStatus::new(id~ : Int64, name~ : String, category~ : String) -> Self
+pub fn IssueStatus::not_equal(Self, Self) -> Bool
+pub fn IssueStatus::to_json(Self) -> @json.Json
+pub fn IssueStatus::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for IssueStatus
+pub impl @json.ToJson for IssueStatus
 
 #derive(Eq, @debug.Debug)
 pub(all) struct IssueSuggestion {
@@ -38151,6 +38189,7 @@ pub impl @json.ToJson for IssuesCreateMilestoneRequestState
 pub(all) struct IssuesCreateRequest {
   title : IssuesCreateRequestTitle
   body : String?
+  status : String?
   assignee : @jsonkit.Presence[String]
   milestone : @jsonkit.Presence[IssuesCreateRequestMilestone]
   labels : Array[IssuesCreateRequestLabelsItem]?
@@ -38161,7 +38200,7 @@ pub(all) struct IssuesCreateRequest {
 }
 pub fn IssuesCreateRequest::equal(Self, Self) -> Bool
 pub fn IssuesCreateRequest::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
-pub fn IssuesCreateRequest::new(title~ : IssuesCreateRequestTitle, body? : String, assignee? : String, milestone? : IssuesCreateRequestMilestone, labels? : Array[IssuesCreateRequestLabelsItem], assignees? : Array[String], issue_field_values? : Array[IssuesCreateRequestIssueFieldValuesItem], type_? : String, parent_issue_id? : Int32) -> Self
+pub fn IssuesCreateRequest::new(title~ : IssuesCreateRequestTitle, body? : String, status? : String, assignee? : String, milestone? : IssuesCreateRequestMilestone, labels? : Array[IssuesCreateRequestLabelsItem], assignees? : Array[String], issue_field_values? : Array[IssuesCreateRequestIssueFieldValuesItem], type_? : String, parent_issue_id? : Int32) -> Self
 pub fn IssuesCreateRequest::not_equal(Self, Self) -> Bool
 pub fn IssuesCreateRequest::to_json(Self) -> @json.Json
 pub fn IssuesCreateRequest::to_repr(Self) -> @debug.Repr
@@ -38823,6 +38862,7 @@ pub(all) struct IssuesUpdateRequest {
   body : @jsonkit.Presence[String]
   assignee : @jsonkit.Presence[String]
   state : IssuesUpdateRequestState?
+  status : String?
   state_reason : @jsonkit.Presence[IssuesUpdateRequestStateReason]
   duplicate_issue_id : Int32?
   milestone : @jsonkit.Presence[IssuesUpdateRequestMilestone]
@@ -38833,7 +38873,7 @@ pub(all) struct IssuesUpdateRequest {
 }
 pub fn IssuesUpdateRequest::equal(Self, Self) -> Bool
 pub fn IssuesUpdateRequest::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
-pub fn IssuesUpdateRequest::new(title? : IssuesUpdateRequestTitle, body? : String, assignee? : String, state? : IssuesUpdateRequestState, state_reason? : IssuesUpdateRequestStateReason, duplicate_issue_id? : Int32, milestone? : IssuesUpdateRequestMilestone, labels? : Array[IssuesUpdateRequestLabelsItem], assignees? : Array[IssuesUpdateRequestAssigneesItem], issue_field_values? : Array[IssuesUpdateRequestIssueFieldValuesItem], type_? : IssuesUpdateRequestType) -> Self
+pub fn IssuesUpdateRequest::new(title? : IssuesUpdateRequestTitle, body? : String, assignee? : String, state? : IssuesUpdateRequestState, status? : String, state_reason? : IssuesUpdateRequestStateReason, duplicate_issue_id? : Int32, milestone? : IssuesUpdateRequestMilestone, labels? : Array[IssuesUpdateRequestLabelsItem], assignees? : Array[IssuesUpdateRequestAssigneesItem], issue_field_values? : Array[IssuesUpdateRequestIssueFieldValuesItem], type_? : IssuesUpdateRequestType) -> Self
 pub fn IssuesUpdateRequest::not_equal(Self, Self) -> Bool
 pub fn IssuesUpdateRequest::to_json(Self) -> @json.Json
 pub fn IssuesUpdateRequest::to_repr(Self) -> @debug.Repr
@@ -39101,6 +39141,7 @@ pub(all) struct IssuesUpdateResponse {
   html_url : String
   number : Int32
   state : String
+  status : @jsonkit.Presence[IssuesUpdateResponseStatus]
   state_reason : @jsonkit.Presence[IssuesUpdateResponseStateReason]
   title : String
   body : @jsonkit.Presence[String]
@@ -39135,7 +39176,7 @@ pub(all) struct IssuesUpdateResponse {
 }
 pub fn IssuesUpdateResponse::equal(Self, Self) -> Bool
 pub fn IssuesUpdateResponse::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
-pub fn IssuesUpdateResponse::new(id~ : Int64, node_id~ : String, url~ : String, repository_url~ : String, labels_url~ : String, comments_url~ : String, events_url~ : String, html_url~ : String, number~ : Int32, state~ : String, title~ : String, labels~ : Array[IssuesUpdateResponseLabelsItem], locked~ : Bool, comments~ : Int32, created_at~ : String, updated_at~ : String, state_reason? : IssuesUpdateResponseStateReason, body? : String, user? : NullableSimpleUser, assignee? : NullableSimpleUser, assignees? : Array[SimpleUser], milestone? : NullableMilestone, active_lock_reason? : String, pull_request? : IssuesUpdateResponsePullRequest, closed_at? : String, draft? : Bool, closed_by? : NullableSimpleUser, body_html? : String, body_text? : String, timeline_url? : String, type_? : IssueType, repository? : Repository, performed_via_github_app? : NullableIntegration, author_association? : AuthorAssociation, reactions? : ReactionRollup, sub_issues_summary? : SubIssuesSummary, parent_issue_url? : String, pinned_comment? : NullableIssueComment, issue_dependencies_summary? : IssueDependenciesSummary, issue_field_values? : Array[IssueFieldValue], suggestions? : IssuesUpdateResponseSuggestions) -> Self
+pub fn IssuesUpdateResponse::new(id~ : Int64, node_id~ : String, url~ : String, repository_url~ : String, labels_url~ : String, comments_url~ : String, events_url~ : String, html_url~ : String, number~ : Int32, state~ : String, title~ : String, labels~ : Array[IssuesUpdateResponseLabelsItem], locked~ : Bool, comments~ : Int32, created_at~ : String, updated_at~ : String, status? : IssuesUpdateResponseStatus, state_reason? : IssuesUpdateResponseStateReason, body? : String, user? : NullableSimpleUser, assignee? : NullableSimpleUser, assignees? : Array[SimpleUser], milestone? : NullableMilestone, active_lock_reason? : String, pull_request? : IssuesUpdateResponsePullRequest, closed_at? : String, draft? : Bool, closed_by? : NullableSimpleUser, body_html? : String, body_text? : String, timeline_url? : String, type_? : IssueType, repository? : Repository, performed_via_github_app? : NullableIntegration, author_association? : AuthorAssociation, reactions? : ReactionRollup, sub_issues_summary? : SubIssuesSummary, parent_issue_url? : String, pinned_comment? : NullableIssueComment, issue_dependencies_summary? : IssueDependenciesSummary, issue_field_values? : Array[IssueFieldValue], suggestions? : IssuesUpdateResponseSuggestions) -> Self
 pub fn IssuesUpdateResponse::not_equal(Self, Self) -> Bool
 pub fn IssuesUpdateResponse::to_json(Self) -> @json.Json
 pub fn IssuesUpdateResponse::to_repr(Self) -> @debug.Repr
@@ -39243,6 +39284,21 @@ pub fn IssuesUpdateResponseStateReason::to_json(Self) -> @json.Json
 pub fn IssuesUpdateResponseStateReason::to_repr(Self) -> @debug.Repr
 pub impl @json.FromJson for IssuesUpdateResponseStateReason
 pub impl @json.ToJson for IssuesUpdateResponseStateReason
+
+#derive(Eq, @debug.Debug)
+pub(all) struct IssuesUpdateResponseStatus {
+  id : Int64
+  name : String
+  category : String
+}
+pub fn IssuesUpdateResponseStatus::equal(Self, Self) -> Bool
+pub fn IssuesUpdateResponseStatus::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn IssuesUpdateResponseStatus::new(id~ : Int64, name~ : String, category~ : String) -> Self
+pub fn IssuesUpdateResponseStatus::not_equal(Self, Self) -> Bool
+pub fn IssuesUpdateResponseStatus::to_json(Self) -> @json.Json
+pub fn IssuesUpdateResponseStatus::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for IssuesUpdateResponseStatus
+pub impl @json.ToJson for IssuesUpdateResponseStatus
 
 #derive(Eq, @debug.Debug)
 pub(all) struct IssuesUpdateResponseSuggestions {
@@ -40674,6 +40730,7 @@ pub(all) struct NullableIssue {
   html_url : String
   number : Int32
   state : String
+  status : @jsonkit.Presence[NullableIssueStatus]
   state_reason : @jsonkit.Presence[NullableIssueStateReason]
   title : String
   body : @jsonkit.Presence[String]
@@ -40707,7 +40764,7 @@ pub(all) struct NullableIssue {
 }
 pub fn NullableIssue::equal(Self, Self) -> Bool
 pub fn NullableIssue::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
-pub fn NullableIssue::new(id~ : Int64, node_id~ : String, url~ : String, repository_url~ : String, labels_url~ : String, comments_url~ : String, events_url~ : String, html_url~ : String, number~ : Int32, state~ : String, title~ : String, labels~ : Array[NullableIssueLabelsItem], locked~ : Bool, comments~ : Int32, created_at~ : String, updated_at~ : String, state_reason? : NullableIssueStateReason, body? : String, user? : NullableSimpleUser, assignee? : NullableSimpleUser, assignees? : Array[SimpleUser], milestone? : NullableMilestone, active_lock_reason? : String, pull_request? : NullableIssuePullRequest, closed_at? : String, draft? : Bool, closed_by? : NullableSimpleUser, body_html? : String, body_text? : String, timeline_url? : String, type_? : IssueType, repository? : Repository, performed_via_github_app? : NullableIntegration, author_association? : AuthorAssociation, reactions? : ReactionRollup, sub_issues_summary? : SubIssuesSummary, parent_issue_url? : String, pinned_comment? : NullableIssueComment, issue_dependencies_summary? : IssueDependenciesSummary, issue_field_values? : Array[IssueFieldValue]) -> Self
+pub fn NullableIssue::new(id~ : Int64, node_id~ : String, url~ : String, repository_url~ : String, labels_url~ : String, comments_url~ : String, events_url~ : String, html_url~ : String, number~ : Int32, state~ : String, title~ : String, labels~ : Array[NullableIssueLabelsItem], locked~ : Bool, comments~ : Int32, created_at~ : String, updated_at~ : String, status? : NullableIssueStatus, state_reason? : NullableIssueStateReason, body? : String, user? : NullableSimpleUser, assignee? : NullableSimpleUser, assignees? : Array[SimpleUser], milestone? : NullableMilestone, active_lock_reason? : String, pull_request? : NullableIssuePullRequest, closed_at? : String, draft? : Bool, closed_by? : NullableSimpleUser, body_html? : String, body_text? : String, timeline_url? : String, type_? : IssueType, repository? : Repository, performed_via_github_app? : NullableIntegration, author_association? : AuthorAssociation, reactions? : ReactionRollup, sub_issues_summary? : SubIssuesSummary, parent_issue_url? : String, pinned_comment? : NullableIssueComment, issue_dependencies_summary? : IssueDependenciesSummary, issue_field_values? : Array[IssueFieldValue]) -> Self
 pub fn NullableIssue::not_equal(Self, Self) -> Bool
 pub fn NullableIssue::to_json(Self) -> @json.Json
 pub fn NullableIssue::to_repr(Self) -> @debug.Repr
@@ -40886,6 +40943,21 @@ pub fn NullableIssueStateReason::to_json(Self) -> @json.Json
 pub fn NullableIssueStateReason::to_repr(Self) -> @debug.Repr
 pub impl @json.FromJson for NullableIssueStateReason
 pub impl @json.ToJson for NullableIssueStateReason
+
+#derive(Eq, @debug.Debug)
+pub(all) struct NullableIssueStatus {
+  id : Int64
+  name : String
+  category : String
+}
+pub fn NullableIssueStatus::equal(Self, Self) -> Bool
+pub fn NullableIssueStatus::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn NullableIssueStatus::new(id~ : Int64, name~ : String, category~ : String) -> Self
+pub fn NullableIssueStatus::not_equal(Self, Self) -> Bool
+pub fn NullableIssueStatus::to_json(Self) -> @json.Json
+pub fn NullableIssueStatus::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for NullableIssueStatus
+pub impl @json.ToJson for NullableIssueStatus
 
 #derive(Eq, @debug.Debug)
 pub(all) struct NullableLicenseSimple {
@@ -45148,6 +45220,21 @@ pub fn PendingDeploymentReviewersItem::to_json(Self) -> @json.Json
 pub fn PendingDeploymentReviewersItem::to_repr(Self) -> @debug.Repr
 pub impl @json.FromJson for PendingDeploymentReviewersItem
 pub impl @json.ToJson for PendingDeploymentReviewersItem
+
+#derive(Eq, @debug.Debug)
+pub(all) struct PlanningStatus {
+  id : Int64
+  name : String
+  category : String
+}
+pub fn PlanningStatus::equal(Self, Self) -> Bool
+pub fn PlanningStatus::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn PlanningStatus::new(id~ : Int64, name~ : String, category~ : String) -> Self
+pub fn PlanningStatus::not_equal(Self, Self) -> Bool
+pub fn PlanningStatus::to_json(Self) -> @json.Json
+pub fn PlanningStatus::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for PlanningStatus
+pub impl @json.ToJson for PlanningStatus
 
 #derive(Eq, @debug.Debug)
 pub(all) struct PorterAuthor {

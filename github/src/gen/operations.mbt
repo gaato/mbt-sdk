@@ -33062,6 +33062,41 @@ pub fn repos_get_pages_health_check_decode(
 
 ///|
 ///
+/// List planning statuses for a repository
+pub fn repos_list_planning_statuses_request(
+  owner : String,
+  repo : String,
+) -> @http.Request {
+  @http.Request::get(
+    "/repos/" +
+    @http.percent_encode(parameter_value(owner)) +
+    "/" +
+    @http.percent_encode(parameter_value(repo)) +
+    "/planning-statuses",
+  )
+}
+
+///|
+///
+/// Decodes a parsed successful repos/list-planning-statuses response.
+pub fn repos_list_planning_statuses_decode_json(
+  value : Json,
+) -> Array[PlanningStatus] raise @json.JsonDecodeError {
+  @json.from_json(value)
+}
+
+///|
+///
+/// Decodes a successful repos/list-planning-statuses response.
+pub fn repos_list_planning_statuses_decode(
+  head : @http.ResponseHead,
+  body : Bytes,
+) -> Result[Array[PlanningStatus], @client.ResponseFailure] {
+  decode_response(head, body)
+}
+
+///|
+///
 /// Check if private vulnerability reporting is enabled for a repository
 pub fn repos_check_private_vulnerability_reporting_request(
   owner : String,
