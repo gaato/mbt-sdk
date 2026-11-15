@@ -5,6 +5,7 @@ HTTP infrastructure lives in [mttp](https://github.com/gaato/mttp).
 
 ## Layers
 
+<!-- BEGIN sdks: http-layer -->
 | Layer | Modules | Responsibility |
 |---|---|---|
 | Applications | consumer code | Backend, clock, timer and credentials |
@@ -12,6 +13,7 @@ HTTP infrastructure lives in [mttp](https://github.com/gaato/mttp).
 | Codex | codex-protocol, codex-app-server | Generated protocol and initialized sessions |
 | RPC | jsonrpc, jsonrpc-async | Portable messages/framing and runtime connections |
 | External HTTP | gaato/mttp_core, gaato/mttp | Vocabulary, engines and client policy; I/O |
+<!-- END sdks: http-layer -->
 
 The SDKs depend on `gaato/mttp_core`, with no runtime dependency.
 They accept `&Backend`, `&rt.Clock` and optionally `&rt.Timer`. Their clients

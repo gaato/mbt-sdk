@@ -4,6 +4,11 @@ An SDK built here should behave the way users of the API expect: it retries what
 
 It deliberately records no current values. Constants, versions and status lists change upstream; they belong in the per-SDK note (`docs/behavior/<sdk>.md`), pinned to a commit and dated.
 
+Register the generated module once in root `sdks.toml` (including its spec,
+generation/census flags, package list, publication choice and host/auth pins),
+then run `uv run --with pyyaml --with jsonpath-rfc9535 python tools/sdks.py sync`. Check it with `scripts/generate.sh <name> --check`
+and `scripts/gates.sh --sdk <name>`; gates reject stale derived registration.
+
 ## 1. Classify every source
 
 Every fact you collect gets one of three labels, and the label decides how much weight it carries:

@@ -1,4 +1,12 @@
 {
-  "modules": ["openai", "anthropic", "github"],
-  "generated": ["openai/src/gen", "anthropic/src/gen", "github/src/gen"]
+  "modules": [
+    "openai",
+    "anthropic",
+    "github"
+  ],
+  "generated": [
+    "openai/src/gen",
+    "anthropic/src/gen",
+    "github/src/gen"
+  ]
 }

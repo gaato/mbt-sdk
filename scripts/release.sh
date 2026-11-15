@@ -20,9 +20,14 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
-# Bottom-up: a module is listed after everything it imports.
-PUBLISH_MODULES=(openai anthropic github)
-# Not published until they have a consumer: jsonrpc jsonrpc-async codex-protocol codex-app-server
+# Bottom-up: sdks.toml lists published modules after everything they import.
+py=(uv run --no-project python); command -v python3 >/dev/null && py=(python3)
+published=$("${py[@]}" tools/sdks.py list --publish)
+PUBLISH_MODULES=()
+while IFS= read -r sdk; do
+  [ -z "$sdk" ] || PUBLISH_MODULES+=("$("${py[@]}" tools/sdks.py get "$sdk" dir)")
+done <<< "$published"
+# Non-generated modules stay unpublished until they have a consumer.
 
 module_name() { sed -nE 's/^name = "(.*)"$/\1/p' "$1/moon.mod"; }
 module_version() { sed -nE 's/^version = "(.*)"$/\1/p' "$1/moon.mod"; }

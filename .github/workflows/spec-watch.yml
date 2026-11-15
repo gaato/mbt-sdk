@@ -1,6 +1,6 @@
 name: Spec watch
 
-# Fetches the upstream OpenAI, Anthropic and GitHub specs daily. When changed: re-vendor, apply the
+# Fetches the ledger-selected upstream specs daily. When changed: re-vendor, apply the
 # overlays, regenerate, run the gates, bump the module version when src changed,
 # and open a PR. When generation, the gates and CI all pass, the PR is merged
 # here and release.yml publishes; otherwise it stays open for a human.
@@ -24,24 +24,31 @@ env:
   MOONBIT_IMAGE: ghcr.io/gaato/moonbit:0.10.20-65efd5b93
 
 jobs:
+  matrix:
+    runs-on: ubuntu-26.04
+    permissions:
+      contents: read
+    outputs:
+      sdks: ${{ steps.sdks.outputs.matrix }}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Read SDK ledger
+        id: sdks
+        run: echo "matrix=$(python3 tools/sdks.py matrix)" >> "$GITHUB_OUTPUT"
+
   watch:
+    needs: matrix
     strategy:
       fail-fast: false
-      matrix:
-        include:
-          - provider: openai
-            spec_file: openai.yaml
-            spec_url: https://raw.githubusercontent.com/openai/openai-openapi/manual_spec/openapi.yaml
-          - provider: anthropic
-            spec_file: anthropic.json
-            spec_url: https://raw.githubusercontent.com/anthropics/anthropic-sdk-python/main/scripts/mock-spec.json.gz
-          - provider: github
-            spec_file: api.github.com.2022-11-28.yaml
-            spec_url: https://raw.githubusercontent.com/github/rest-api-description/main/descriptions/api.github.com/api.github.com.2022-11-28.yaml
+      matrix: ${{ fromJSON(needs.matrix.outputs.sdks) }}
     env:
       PROVIDER: ${{ matrix.provider }}
       SPEC_FILE: ${{ matrix.spec_file }}
+      SPEC_PATH: ${{ matrix.spec_path }}
       SPEC_URL: ${{ matrix.spec_url }}
+      SDK_DIR: ${{ matrix.dir }}
+      SPEC_FETCH: ${{ matrix.spec_fetch }}
     runs-on: ubuntu-26.04
     timeout-minutes: 60
     steps:
@@ -53,14 +60,14 @@ jobs:
         run: |
           curl --proto '=https' --tlsv1.2 --fail --silent --show-error --location \
             "$SPEC_URL" --output "$RUNNER_TEMP/download"
-          if [ "$PROVIDER" = anthropic ]; then
+          if [ "$SPEC_FETCH" = gzip ]; then
             gzip -dc "$RUNNER_TEMP/download" > "$RUNNER_TEMP/$SPEC_FILE"
             echo "gzip_sha=$(sha256sum "$RUNNER_TEMP/download" | cut -d' ' -f1)" >> "$GITHUB_OUTPUT"
           else
             cp "$RUNNER_TEMP/download" "$RUNNER_TEMP/$SPEC_FILE"
           fi
           new="$(sha256sum "$RUNNER_TEMP/$SPEC_FILE" | cut -d' ' -f1)"
-          old="$(sha256sum "$PROVIDER/spec/$SPEC_FILE" | cut -d' ' -f1)"
+          old="$(sha256sum "$SPEC_PATH" | cut -d' ' -f1)"
           echo "new=$new" >> "$GITHUB_OUTPUT"
           if [ "$new" = "$old" ]; then echo "changed=false" >> "$GITHUB_OUTPUT"; else echo "changed=true" >> "$GITHUB_OUTPUT"; fi
 
@@ -87,20 +94,23 @@ jobs:
         if: steps.fetch.outputs.changed == 'true'
         id: regen
         run: |
-          cp "$RUNNER_TEMP/$SPEC_FILE" "$PROVIDER/spec/$SPEC_FILE"
+          cp "$RUNNER_TEMP/$SPEC_FILE" "$SPEC_PATH"
+          source_file="$(dirname "$SPEC_PATH")/SOURCE.md"
           today="$(date -u +%F)"
-          sed -i -E "s/^- Fetched: .*/- Fetched: $today/; s/^- sha256: .*/- sha256: ${{ steps.fetch.outputs.new }}/" "$PROVIDER/spec/SOURCE.md"
-          if [ "$PROVIDER" = anthropic ]; then
-            sed -i -E "s/^- sha256 \(gzip as downloaded\): .*/- sha256 (gzip as downloaded): ${{ steps.fetch.outputs.gzip_sha }}/" "$PROVIDER/spec/SOURCE.md"
+          sed -i -E "s/^- Fetched: .*/- Fetched: $today/; s/^- sha256: .*/- sha256: ${{ steps.fetch.outputs.new }}/" "$source_file"
+          if [ "$SPEC_FETCH" = gzip ]; then
+            sed -i -E "s/^- sha256 \(gzip as downloaded\): .*/- sha256 (gzip as downloaded): ${{ steps.fetch.outputs.gzip_sha }}/" "$source_file"
           fi
           set +e
-          moonbit scripts/generate.sh > "$RUNNER_TEMP/generate.log" 2>&1
+          moonbit scripts/generate.sh "$PROVIDER" > "$RUNNER_TEMP/generate.log" 2>&1
           status=$?
           echo "generate_status=$status" >> "$GITHUB_OUTPUT"
           echo "generate.sh exited $status"; tail -n 20 "$RUNNER_TEMP/generate.log"
           # Each container starts without the registry index, which moon info needs.
           # The bump reads the .mbti diff, which is only meaningful when this succeeded.
-          moonbit bash -c 'moon update && moon fmt && moon info' > "$RUNNER_TEMP/info.log" 2>&1
+          # Expand the SDK directory in the container shell.
+          # shellcheck disable=SC2016
+          moonbit bash -c 'moon update && moon -C "$1" fmt && moon -C "$1" info' _ "$SDK_DIR" > "$RUNNER_TEMP/info.log" 2>&1
           status=$?
           echo "info_status=$status" >> "$GITHUB_OUTPUT"
           echo "moon info exited $status"; tail -n 20 "$RUNNER_TEMP/info.log"
@@ -110,7 +120,7 @@ jobs:
         id: gates
         run: |
           set +e
-          moonbit scripts/gates.sh --no-js > "$RUNNER_TEMP/gates.log" 2>&1
+          moonbit scripts/gates.sh --sdk "$PROVIDER" --no-js > "$RUNNER_TEMP/gates.log" 2>&1
           status=$?
           echo "gates_status=$status" >> "$GITHUB_OUTPUT"
           echo "gates.sh exited $status"; tail -n 20 "$RUNNER_TEMP/gates.log"
@@ -127,8 +137,8 @@ jobs:
         env:
           INFO_STATUS: ${{ steps.regen.outputs.info_status }}
         run: |
-          if [ -z "$(git status --porcelain -- "$PROVIDER/src")" ]; then
-            echo "Nothing under $PROVIDER/src changed; no release."
+          if [ -z "$(git status --porcelain -- "$SDK_DIR/src")" ]; then
+            echo "Nothing under $SDK_DIR/src changed; no release."
             exit 0
           fi
           # Without a fresh moon info the .mbti files are stale, and an unchanged
@@ -137,25 +147,26 @@ jobs:
             echo "summary=not decided (moon info failed, so the public API change is unknown; a human picks the version)" >> "$GITHUB_OUTPUT"
             exit 0
           fi
-          current="$(sed -nE 's/^version = "(.*)"$/\1/p' "$PROVIDER/moon.mod")"
+          current="$(sed -nE 's/^version = "(.*)"$/\1/p' "$SDK_DIR/moon.mod")"
           IFS=. read -r major minor patch <<< "$current"
-          if [ -n "$(git status --porcelain -- ":(glob)$PROVIDER/src/**/*.mbti")" ]; then
+          if [ -n "$(git status --porcelain -- ":(glob)$SDK_DIR/src/**/*.mbti")" ]; then
             kind="public API changed"
             if [ "$major" = 0 ]; then next="0.$((minor + 1)).0"; else next="$((major + 1)).0.0"; fi
           else
             kind="public API unchanged"
             next="$major.$minor.$((patch + 1))"
           fi
-          fetched="$(sed -nE 's/^- Fetched: (.*)$/\1/p' "$PROVIDER/spec/SOURCE.md")"
-          sha="$(sed -nE 's/^- sha256: (.*)$/\1/p' "$PROVIDER/spec/SOURCE.md")"
+          source_file="$(dirname "$SPEC_PATH")/SOURCE.md"
+          fetched="$(sed -nE 's/^- Fetched: (.*)$/\1/p' "$source_file")"
+          sha="$(sed -nE 's/^- sha256: (.*)$/\1/p' "$source_file")"
           if [ "$kind" = "public API changed" ]; then
             api="The public API changed; see the \`pkg.generated.mbti\` diff."
           else
             api="The public API is unchanged."
           fi
-          scripts/release.sh note "$PROVIDER" Changed \
+          scripts/release.sh note "$SDK_DIR" Changed \
             "**Regenerated from the upstream spec fetched $fetched** (sha256 \`${sha:0:12}\`). $api"
-          scripts/release.sh bump "$PROVIDER" "$next"
+          scripts/release.sh bump "$SDK_DIR" "$next"
           echo "version=$next" >> "$GITHUB_OUTPUT"
           echo "summary=$current → $next ($kind)" >> "$GITHUB_OUTPUT"
 
@@ -183,7 +194,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git switch -c "$branch"
-          git add -A -- "$PROVIDER" ':(glob)*/moon.mod'
+          git add -A -- "$SDK_DIR" "$SPEC_PATH" "$(dirname "$SPEC_PATH")/SOURCE.md" ':(glob)*/moon.mod'
           git commit -m "Update vendored $PROVIDER spec and regenerate"
           git push origin "$branch"
           {

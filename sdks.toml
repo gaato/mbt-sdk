@@ -1,0 +1,119 @@
+# Registration and publish order (dependencies before their consumers).
+[[sdk]]
+name = "openai"
+dir = "openai"
+module = "gaato/openai"
+generator = "openapi"
+spec_file = "openai/spec/openai.yaml"
+spec_url = "https://raw.githubusercontent.com/openai/openai-openapi/manual_spec/openapi.yaml"
+spec_fetch = "plain"
+include_all = false
+derive_operation_ids = false
+package = "gaato/openai/gen"
+out = "openai/src/gen"
+census_args = ["--derive-operation-ids", "--overlay", "openai/overlays/fix.yaml", "--overlay", "openai/overlays/moonbit.yaml"]
+report_census_args = ["--overlay", "openai/overlays/fix.yaml"]
+offline_packages = ["openai/src", "openai/src/gen", "runtime-tests/src/openai"]
+base_url = "https://api.openai.com/v1"
+auth = { kind = "bearer" }
+publish = true
+spec_watch = true
+
+[[sdk]]
+name = "anthropic"
+dir = "anthropic"
+module = "gaato/anthropic"
+generator = "openapi"
+spec_file = "anthropic/spec/anthropic.json"
+spec_url = "https://raw.githubusercontent.com/anthropics/anthropic-sdk-python/main/scripts/mock-spec.json.gz"
+spec_fetch = "gzip"
+include_all = false
+derive_operation_ids = false
+package = "gaato/anthropic/gen"
+out = "anthropic/src/gen"
+census_args = ["--ops", "messages_post,messages_count_tokens_post,models_list,models_get", "--overlay", "anthropic/overlays/moonbit.yaml"]
+report_census_args = []
+offline_packages = ["anthropic/src", "anthropic/src/gen", "runtime-tests/src/anthropic"]
+base_url = "https://api.anthropic.com"
+auth = { kind = "header", name = "x-api-key" }
+auth_reason = "The vendored mock spec omits securitySchemes; the facade defaults to XApiKey and also supports bearer authentication."
+auth_spec = {}
+publish = true
+spec_watch = true
+
+[[sdk]]
+name = "github"
+dir = "github"
+module = "gaato/github"
+generator = "openapi"
+spec_file = "github/spec/api.github.com.2022-11-28.yaml"
+spec_url = "https://raw.githubusercontent.com/github/rest-api-description/main/descriptions/api.github.com/api.github.com.2022-11-28.yaml"
+spec_fetch = "plain"
+include_all = true
+derive_operation_ids = false
+package = "gaato/github/gen"
+out = "github/src/gen"
+census_args = ["--overlay", "github/overlays/fix.yaml", "--overlay", "github/overlays/moonbit.yaml"]
+report_census_args = ["--overlay", "github/overlays/fix.yaml", "--overlay", "github/overlays/moonbit.yaml"]
+offline_packages = ["github/src", "github/src/gen", "runtime-tests/src/github"]
+base_url = "https://api.github.com"
+auth = { kind = "bearer" }
+auth_reason = "The vendored REST description omits securitySchemes; the facade sends a bearer token when supplied."
+auth_spec = {}
+publish = true
+spec_watch = true
+
+[[sdk]]
+name = "badhttp"
+dir = "fixtures/gen/badhttp"
+module = "gaato/fixture-badhttp"
+generator = "openapi"
+spec_file = "specs/badhttp/openapi.json"
+spec_url = "https://badhttp.dev/openapi.json"
+spec_fetch = "plain"
+include_all = true
+derive_operation_ids = true
+package = "gaato/fixture-badhttp"
+out = "fixtures/gen/badhttp/src"
+census_args = []
+report_census_args = []
+offline_packages = ["fixtures/gen/badhttp/src", "runtime-tests/src/badhttp_replay"]
+publish = false
+spec_watch = false
+
+[[sdk]]
+name = "petstore3"
+dir = "fixtures/gen/petstore3"
+module = "gaato/fixture-petstore3"
+generator = "openapi"
+spec_file = "specs/petstore3/openapi.json"
+spec_url = "https://petstore3.swagger.io/api/v3/openapi.json"
+spec_fetch = "plain"
+include_all = true
+derive_operation_ids = true
+package = "gaato/fixture-petstore3"
+out = "fixtures/gen/petstore3/src"
+census_args = []
+report_census_args = []
+offline_packages = ["fixtures/gen/petstore3/src"]
+publish = false
+spec_watch = false
+
+[[sdk]]
+name = "codex"
+dir = "codex-protocol"
+module = "gaato/codex-protocol"
+generator = "custom"
+spec_file = "codex-protocol/spec/schema.json"
+# Locally produced JSON Schema bundle, not an HTTP spec download.
+spec_url = ""
+spec_fetch = "plain"
+include_all = false
+derive_operation_ids = false
+package = "gaato/codex-protocol/gen"
+out = "codex-protocol/src/gen"
+census_args = []
+offline_packages = ["codex-protocol/src/gen", "codex-protocol/src/tests"]
+command = "tools/gen/codex.py"
+publish = false
+spec_watch = false

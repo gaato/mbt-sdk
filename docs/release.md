@@ -4,7 +4,18 @@ A release is a version bump on `main`. `release.yml` runs after `CI` succeeds on
 
 ## Which modules
 
-`PUBLISH_MODULES` in `scripts/release.sh`: `openai`, `anthropic`, `github`. `jsonrpc`, `jsonrpc-async`, `codex-protocol` and `codex-app-server` stay unpublished until they have a consumer; `runtime-tests/` is never published.
+`sdks.toml` is the single registration ledger. `scripts/release.sh` reads its
+`publish = true` entries in ledger order: dependencies must precede consumers.
+Run `uv run --with pyyaml --with jsonpath-rfc9535 python tools/sdks.py sync` after registration changes; gates check the derived files.
+
+<!-- BEGIN sdks: publish -->
+Published modules (ledger order): `openai`, `anthropic`, `github`.
+
+Generated modules kept unpublished: `fixtures/gen/badhttp`, `fixtures/gen/petstore3`, `codex-protocol`.
+<!-- END sdks: publish -->
+
+`jsonrpc`, `jsonrpc-async` and `codex-app-server` also remain unpublished until
+they have a consumer; `runtime-tests/` is never published.
 
 ## Changelogs
 
@@ -27,7 +38,7 @@ Commit, push `main`, and watch the `Release` run. Public API changes show up as 
 
 ## Automated releases from spec-watch
 
-`spec-watch.yml` bumps `openai`, `anthropic` and `github` itself when a new upstream spec changes their `src`: a patch when every `pkg.generated.mbti` is unchanged, otherwise the minor version (the next major after `1.0`), because the generated types are `pub(all)` and any public API change can break a caller. A spec change that leaves `src` alone releases nothing. When generation, the gates and CI all pass, it merges the PR and dispatches `release.yml`, since a merge made with `GITHUB_TOKEN` starts no CI run on `main`. Anything that fails leaves the PR open and the run red.
+`spec-watch.yml` reads the ledger's `spec_watch = true` entries and bumps each module itself when a new upstream spec changes their `src`: a patch when every `pkg.generated.mbti` is unchanged, otherwise the minor version (the next major after `1.0`), because the generated types are `pub(all)` and any public API change can break a caller. A spec change that leaves `src` alone releases nothing. Each job regenerates and gates only its own SDK. Gates also compare the ledger's host and authentication pins with the vendored spec; a change requires review, with a reason and the expected spec baseline for any deliberate override. When generation, the gates and CI all pass, it merges the PR and dispatches `release.yml`, since a merge made with `GITHUB_TOKEN` starts no CI run on `main`. Anything that fails leaves the PR open and the run red.
 
 Before bumping, it adds one entry under `[Unreleased]` with `scripts/release.sh note`, which `bump` then dates together with anything already there:
 
