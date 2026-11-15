@@ -1,0 +1,25 @@
+overlay: 1.0.0
+info:
+  title: Preserve ambiguous Jina unions as JSON
+  version: 1.0.0
+actions:
+  # These input alternatives overlap by JSON shape and have no wire tag.
+  # Preserve every accepted variant instead of guessing a typed discriminator.
+  - target: '$.components.schemas["ClipV1Request","ClipV2Request","CodeEmbeddings1500MRequest","CodeEmbeddings500MRequest","ColbertV1Request","ColbertV2Request","EmbeddingsV2Request","EmbeddingsV3Request","EmbeddingsV4Request","EmbeddingsV5Request"].properties.input'
+    update:
+      x-moonbit-json: true
+  # Embedding encodings share array/object shapes; usage objects have no tag.
+  # Keep their wire data available until a client-layer decoder chooses a variant.
+  - target: '$.components.schemas.EmbeddingResponse.properties["data","usage"]'
+    update:
+      x-moonbit-json: true
+  # Multimodal content and rerank documents similarly overlap as objects.
+  - target: '$.components.schemas.MergedContentGroup.properties.content.items'
+    update:
+      x-moonbit-json: true
+  - target: '$.components.schemas.RerankerM0Request.properties.documents.items'
+    update:
+      x-moonbit-json: true
+  - target: '$.components.schemas.RerankingResult.properties.document'
+    update:
+      x-moonbit-json: true

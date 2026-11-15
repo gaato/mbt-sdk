@@ -25,6 +25,7 @@ class CensusResult:
     operations: int
     diagnostics: int
     kinds: dict[str, int]
+    notes: list[dict[str, str]]
 
     def to_dict(self) -> dict[str, object]:
         return asdict(self)
@@ -39,16 +40,19 @@ def census(
     spec: str | Path, name: str, *, ops: set[str] | None = None, overlays: list[str] | None = None
 ) -> CensusResult:
     """Run the selected-operations generator census without writing files."""
-    doc = normalize_spec(spec, list(overlays or []))
-    if ops is None:
-        operations = include_all_operations(doc)
-    else:
-        operations, missing = include_operations(doc, ops)
-        if missing:
-            raise ValueError(f"unknown operationId(s): {', '.join(sorted(missing))}")
+    operations = 0
     diagnostics: list[Diagnostic] = []
+    builder = None
     try:
-        ir = IRBuilder(doc, "census/generated", derive_operation_ids=True).build()
+        doc = normalize_spec(spec, list(overlays or []))
+        if ops is None:
+            operations = include_all_operations(doc)
+        else:
+            operations, missing = include_operations(doc, ops)
+            if missing:
+                raise ValueError(f"unknown operationId(s): {', '.join(sorted(missing))}")
+        builder = IRBuilder(doc, "census/generated", derive_operation_ids=True)
+        ir = builder.build()
         emit(ir)
     except GenerationError as error:
         diagnostics = error.diagnostics
@@ -59,6 +63,7 @@ def census(
         operations=operations,
         diagnostics=len(diagnostics),
         kinds=dict(kinds.most_common()),
+        notes=[asdict(note) for note in builder.notes] if builder else [],
     )
 
 
@@ -90,9 +95,15 @@ def run(argv: list[str] | None = None) -> int:
 
         print(json.dumps(result.to_dict(), ensure_ascii=False, sort_keys=True))
     else:
-        print(f"== {result.name}: operations={result.operations} diagnostics={result.diagnostics}")
+        print(f"== {result.name}: operations={result.operations} diagnostics={result.diagnostics} notes={len(result.notes)}")
+        if result.diagnostics:
+            print("  diagnostics:")
         for kind, count in list(result.kinds.items())[:12]:
             print(f"  {count:5d}  {kind}")
+        if result.notes:
+            print("  notes (non-failing):")
+        for note in result.notes:
+            print(f"  note: {note['pointer']}: {note['message']}")
     return 1 if args.expect_zero and result.diagnostics else 0
 
 

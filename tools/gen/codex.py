@@ -116,7 +116,7 @@ class SchemaBuilder(IRBuilder):
             return result
 
         schemas = {names[ref]: convert(value) for ref, value in reachable.items()}
-        super().__init__({"components": {"schemas": schemas}, "paths": {}}, "gaato/codex-protocol")
+        super().__init__({"openapi": "3.1.0", "components": {"schemas": schemas}, "paths": {}}, "gaato/codex-protocol")
         self.roots = [(convert(s), u) for s, u in roots]
         self.requests = [(m, convert(p), convert(r)) for m, p, r in self.requests]
         self.notifications = [(m, convert(p)) for m, p in self.notifications]

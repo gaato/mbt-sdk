@@ -317,6 +317,24 @@ def pointer_join(pointer: str, part: str | int) -> str:
     return pointer + "/" + escaped
 
 
+def media_type(value: str) -> str:
+    return value.split(";", 1)[0].strip().lower()
+
+
+def json_response_media(value: str) -> bool:
+    # Preserve the published lowering: vendor +json responses remain raw until
+    # the client layer models their content negotiation explicitly.
+    return media_type(value) == "application/json"
+
+
+def validate_openapi_version(doc: dict[str, Any]) -> None:
+    version = doc.get("openapi", "")
+    if str(doc.get("swagger", "")) == "2.0":
+        raise GenerationError([Diagnostic("/swagger", "Swagger 2.0 is not supported; convert to OpenAPI 3 first", "convert the source specification")])
+    if not isinstance(version, str) or not re.fullmatch(r"3\.[01]\.\d+", version):
+        raise GenerationError([Diagnostic("/openapi", f"unsupported OpenAPI version {version!r}; expected 3.0.x or 3.1.x", "use an OpenAPI 3.0 or 3.1 specification")])
+
+
 def _split_nullable(schema: dict[str, Any]) -> tuple[dict[str, Any], bool]:
     result = dict(schema)
     nullable = result.pop("nullable", None) is True
@@ -351,17 +369,20 @@ def _split_nullable(schema: dict[str, Any]) -> tuple[dict[str, Any], bool]:
     return result, nullable
 
 
-def _primitive_shape(schema: dict[str, Any], resolve: callable) -> str | None:
+def _primitive_shape(schema: dict[str, Any], resolve: callable, seen: frozenset[str] = frozenset()) -> str | None:
     schema, _ = _split_nullable(schema)
     if "$ref" in schema:
-        return _primitive_shape(resolve(schema["$ref"]), resolve)
+        ref = schema["$ref"]
+        if ref in seen:
+            return None
+        return _primitive_shape(resolve(ref), resolve, seen | {ref})
     if "$recursiveRef" in schema:
         return "object"
     if "allOf" in schema:
         return "object"
     union = schema.get("oneOf") or schema.get("anyOf")
     if union:
-        shapes = {_primitive_shape(item, resolve) for item in union}
+        shapes = {_primitive_shape(item, resolve, seen) for item in union}
         return shapes.pop() if len(shapes) == 1 else None
     kind = schema.get("type")
     if kind == "string":
@@ -373,7 +394,7 @@ def _primitive_shape(schema: dict[str, Any], resolve: callable) -> str | None:
     if kind == "object" or "properties" in schema:
         return "object"
     if kind == "array":
-        item = _primitive_shape(schema.get("items", {}), resolve)
+        item = _primitive_shape(schema.get("items", {}), resolve, seen)
         return f"array:{item}" if item else None
     if not (set(schema) - {"description", "title", "default", "example", "examples"}):
         return "any"
@@ -399,13 +420,14 @@ def _shape_variant_name(schema: dict[str, Any], resolve: callable) -> str:
     return "Value"
 
 
-def _is_string_schema(schema: dict[str, Any], resolve: callable) -> bool:
+def _is_string_schema(schema: dict[str, Any], resolve: callable, seen: frozenset[str] = frozenset()) -> bool:
     schema, _ = _split_nullable(schema)
     if "$ref" in schema:
-        return _is_string_schema(resolve(schema["$ref"]), resolve)
+        ref = schema["$ref"]
+        return ref not in seen and _is_string_schema(resolve(ref), resolve, seen | {ref})
     union = schema.get("oneOf") or schema.get("anyOf")
     if isinstance(union, list) and union:
-        return all(isinstance(item, dict) and _is_string_schema(item, resolve) for item in union)
+        return all(isinstance(item, dict) and _is_string_schema(item, resolve, seen) for item in union)
     return schema.get("type") == "string" or isinstance(schema.get("const"), str)
 
 
@@ -796,10 +818,10 @@ class IRBuilder:
             schema = self.doc.get("components", {}).get("schemas", {}).get(component)
             walk(schema)
 
-    def _walk_refs(self, schema: Any, usage: str, seen: set[tuple[str, str]]) -> None:
+    def _walk_refs(self, schema: Any, usage: str, seen: set[tuple[str, str]], pointer: str = "") -> None:
         if isinstance(schema, list):
-            for item in schema:
-                self._walk_refs(item, usage, seen)
+            for index, item in enumerate(schema):
+                self._walk_refs(item, usage, seen, pointer_join(pointer, index))
             return
         if not isinstance(schema, dict):
             return
@@ -807,8 +829,13 @@ class IRBuilder:
             return
         ref = schema.get("$ref")
         if ref:
+            try:
+                target = self.resolve(ref)
+            except (KeyError, TypeError, IndexError):
+                self.add_diag(pointer_join(pointer, "$ref"), f"unresolved local $ref {ref}", "fix the $ref target in overlays/fix.yaml")
+                return
             if not ref.startswith("#/components/schemas/"):
-                self.add_diag("#", f"unsupported non-schema or external $ref {ref}", "replace it with a local components.schemas reference")
+                self.add_diag(pointer_join(pointer, "$ref"), f"unsupported non-schema or external $ref {ref}", "replace it with a local components.schemas reference")
                 return
             name = ref.rsplit("/", 1)[-1].replace("~1", "/").replace("~0", "~")
             self.component_usage.setdefault(name, set()).add(usage)
@@ -817,29 +844,42 @@ class IRBuilder:
             if key in seen:
                 return
             seen.add(key)
-            try:
-                target = self.resolve(ref)
-            except (KeyError, TypeError):
-                self.add_diag(ref[1:], f"unresolved local $ref {ref}", "fix the $ref target in overlays/fix.yaml")
-                return
-            self._walk_refs(target, usage, seen)
+            self._walk_refs(target, usage, seen, ref[1:])
             return
+        discriminator = schema.get("discriminator")
+        mapping = discriminator.get("mapping") if isinstance(discriminator, dict) else None
+        if not isinstance(mapping, dict):
+            mapping = {}
+        for tag, target in mapping.items():
+            mapping_pointer = pointer_join(pointer_join(pointer_join(pointer, "discriminator"), "mapping"), tag)
+            if not isinstance(target, str):
+                self.add_diag(mapping_pointer, "discriminator mapping target must be a string reference", "use a local component schema reference")
+                continue
+            # OAS also permits a component name in place of a URI.
+            ref = target if target.startswith("#/") else "#/components/schemas/" + target
+            try:
+                self.resolve(ref)
+            except (KeyError, TypeError, IndexError):
+                self.add_diag(mapping_pointer, f"unresolved discriminator mapping $ref {target}", "fix the mapping target in overlays/fix.yaml")
+                continue
+            self._walk_refs({"$ref": ref}, usage, seen, mapping_pointer)
         for key in ("allOf", "oneOf", "anyOf"):
-            self._walk_refs(schema.get(key, []), usage, seen)
-        self._walk_refs(schema.get("items"), usage, seen)
-        self._walk_refs(schema.get("additionalProperties") if isinstance(schema.get("additionalProperties"), dict) else None, usage, seen)
-        for value in schema.get("properties", {}).values():
-            self._walk_refs(value, usage, seen)
+            self._walk_refs(schema.get(key, []), usage, seen, pointer_join(pointer, key))
+        self._walk_refs(schema.get("items"), usage, seen, pointer_join(pointer, "items"))
+        self._walk_refs(schema.get("additionalProperties") if isinstance(schema.get("additionalProperties"), dict) else None, usage, seen, pointer_join(pointer, "additionalProperties"))
+        for key, value in schema.get("properties", {}).items():
+            self._walk_refs(value, usage, seen, pointer_join(pointer_join(pointer, "properties"), key))
 
-    def _operation_schemas(self, operation: dict[str, Any]) -> Iterable[tuple[dict[str, Any], str]]:
-        body = operation.get("requestBody", {}).get("content", {}).get("application/json", {}).get("schema")
-        if isinstance(body, dict):
-            yield body, "request"
-        for response in operation.get("responses", {}).values():
-            for media in response.get("content", {}).values():
+    def _operation_schemas(self, operation: dict[str, Any], pointer: str) -> Iterable[tuple[dict[str, Any], str, str]]:
+        for kind, media in operation.get("requestBody", {}).get("content", {}).items():
+            body = media.get("schema")
+            if media_type(kind) == "application/json" and isinstance(body, dict):
+                yield body, "request", pointer_join(pointer_join(pointer_join(pointer_join(pointer, "requestBody"), "content"), kind), "schema")
+        for status, response in operation.get("responses", {}).items():
+            for kind, media in response.get("content", {}).items():
                 schema = media.get("schema")
                 if isinstance(schema, dict):
-                    yield schema, "response"
+                    yield schema, "response", pointer_join(pointer_join(pointer_join(pointer_join(pointer_join(pointer, "responses"), status), "content"), kind), "schema")
 
     def _multipart_object(self, schema: dict[str, Any], pointer: str) -> dict[str, Any] | None:
         try:
@@ -928,20 +968,51 @@ class IRBuilder:
                     continue
                 parameters = self._parameters(path_item, operation)
                 selected.append((path, method, operation, parameters))
-                for schema, usage in self._operation_schemas(operation):
-                    self._walk_refs(schema, usage, seen)
-                multipart = operation.get("requestBody", {}).get("content", {}).get("multipart/form-data", {}).get("schema")
+                pointer = pointer_join(pointer_join("/paths", path), method)
+                content = operation.get("requestBody", {}).get("content", {})
+                json_kind = next((kind for kind in content if media_type(kind) == "application/json"), "application/json")
+                multipart_kind = next((kind for kind in content if media_type(kind) == "multipart/form-data"), "multipart/form-data")
+                chosen = None
+                if isinstance(content.get(json_kind, {}).get("schema"), dict):
+                    chosen = json_kind
+                elif not any(media_type(kind) == "application/x-www-form-urlencoded" for kind in content) and multipart_kind in content:
+                    chosen = multipart_kind
+                for kind in content:
+                    if kind != chosen:
+                        media_pointer = pointer_join(pointer_join(pointer_join(pointer, "requestBody"), "content"), kind)
+                        message = f"request body {kind} is not modelled; the caller sets the body"
+                        if chosen is not None:
+                            message += f" (ignored alternative; using {chosen})"
+                        self.add_note(media_pointer, message)
+                for status, response in operation.get("responses", {}).items():
+                    if str(status).startswith("2"):
+                        for kind in response.get("content", {}):
+                            if not json_response_media(kind):
+                                media_pointer = pointer_join(pointer_join(pointer_join(pointer_join(pointer, "responses"), status), "content"), kind)
+                                self.add_note(media_pointer, f"unmodelled success response {kind}; caller must handle the raw @http.Response")
+                for schema, usage, schema_pointer in self._operation_schemas(operation, pointer):
+                    self._walk_refs(schema, usage, seen, schema_pointer)
+                multipart = content.get(multipart_kind, {}).get("schema")
                 if isinstance(multipart, dict):
-                    multipart_pointer = pointer_join(pointer_join(pointer_join(pointer_join(f"/paths/{path.replace('~', '~0').replace('/', '~1')}/{method}", "requestBody"), "content"), "multipart/form-data"), "schema")
+                    multipart_pointer = pointer_join(pointer_join(pointer_join(pointer_join(pointer, "requestBody"), "content"), multipart_kind), "schema")
                     multipart_object = self._multipart_object(multipart, multipart_pointer)
                     if multipart_object is not None:
-                        for field_schema in multipart_object.get("properties", {}).values():
+                        for field_name, field_schema in multipart_object.get("properties", {}).items():
                             if isinstance(field_schema, dict) and self._binary_kind(field_schema) is None:
-                                self._walk_refs(field_schema, "request", seen)
+                                field_pointer = pointer_join(pointer_join(multipart_pointer, "properties"), field_name)
+                                self._walk_refs(field_schema, "request", seen, field_pointer)
+                parameter_pointers = {
+                    id(value): pointer_join(pointer_join(pointer_join("/paths", path), "parameters"), index)
+                    for index, value in enumerate(path_item.get("parameters", []))
+                }
+                parameter_pointers.update({
+                    id(value): pointer_join(pointer_join(pointer, "parameters"), index)
+                    for index, value in enumerate(operation.get("parameters", []))
+                })
                 for parameter in parameters:
                     schema = parameter.get("schema")
                     if isinstance(schema, dict):
-                        self._walk_refs(schema, "request", seen)
+                        self._walk_refs(schema, "request", seen, pointer_join(parameter_pointers[id(parameter)], "schema"))
         return selected
 
     def _add_declaration(self, declaration: Declaration, pointer: str) -> None:
@@ -1430,6 +1501,11 @@ class IRBuilder:
         )
         self._building.remove(name)
         self._building_stack.pop()
+        inner = result
+        while inner.item is not None:
+            inner = inner.item
+        if inner.kind == "named" and inner.name == type_name(name) and inner.name not in self.declaration_names:
+            self.add_diag(pointer, "recursive type alias cannot be represented", "use an object wrapper or explicitly preserve raw JSON in the overlay")
         self._component_types[name] = result
         return result
 
@@ -1619,17 +1695,21 @@ class IRBuilder:
                 )
             )
         request_content = operation.get("requestBody", {}).get("content", {})
-        request_schema = request_content.get("application/json", {}).get("schema")
+        content_pointer = pointer_join(pointer_join(pointer, "requestBody"), "content")
+        json_kind = next((kind for kind in request_content if media_type(kind) == "application/json"), "application/json")
+        multipart_kind = next((kind for kind in request_content if media_type(kind) == "multipart/form-data"), "multipart/form-data")
+        request_schema = request_content.get(json_kind, {}).get("schema")
         request_type = None
         multipart_fields: list[MultipartField] = []
         if isinstance(request_schema, dict):
-            request_pointer = pointer_join(pointer_join(pointer_join(pointer_join(pointer, "requestBody"), "content"), "application/json"), "schema")
+            request_pointer = pointer_join(pointer_join(content_pointer, json_kind), "schema")
             request_type = self.compile_type(request_schema, pascal_case(operation_id) + "Request", {"request"}, request_pointer)
-        elif "application/x-www-form-urlencoded" in request_content:
-            self.add_diag(pointer_join(pointer_join(pointer, "requestBody"), "content"), "application/x-www-form-urlencoded request bodies are not supported", "use application/json or remove the operation from x-moonbit-include")
-        elif "multipart/form-data" in request_content:
-            multipart_schema = request_content.get("multipart/form-data", {}).get("schema")
-            multipart_pointer = pointer_join(pointer_join(pointer_join(pointer_join(pointer, "requestBody"), "content"), "multipart/form-data"), "schema")
+        elif any(media_type(kind) == "application/x-www-form-urlencoded" for kind in request_content):
+            # Raw body construction is left to the caller, as reported in notes.
+            pass
+        elif multipart_kind in request_content:
+            multipart_schema = request_content.get(multipart_kind, {}).get("schema")
+            multipart_pointer = pointer_join(pointer_join(content_pointer, multipart_kind), "schema")
             if not isinstance(multipart_schema, dict):
                 self.add_diag(multipart_pointer, "multipart request has no schema", "add an object schema for its fields")
             else:
@@ -1667,10 +1747,13 @@ class IRBuilder:
         response_schemas: list[tuple[dict[str, Any], str]] = []
         for status, response in operation.get("responses", {}).items():
             if str(status).startswith("2"):
-                schema = response.get("content", {}).get("application/json", {}).get("schema")
-                if isinstance(schema, dict):
-                    response_pointer = pointer_join(pointer_join(pointer_join(pointer_join(pointer_join(pointer, "responses"), status), "content"), "application/json"), "schema")
-                    response_schemas.append((schema, response_pointer))
+                for kind, media in response.get("content", {}).items():
+                    media_pointer = pointer_join(pointer_join(pointer_join(pointer_join(pointer, "responses"), status), "content"), kind)
+                    if not json_response_media(kind):
+                        continue
+                    schema = media.get("schema")
+                    if isinstance(schema, dict):
+                        response_schemas.append((schema, pointer_join(media_pointer, "schema")))
         if not response_schemas:
             response_type = None
         else:
@@ -1680,7 +1763,11 @@ class IRBuilder:
         return Operation(operation_id, snake_case(operation_id), method.upper(), path, tuple(parameters), request_type, tuple(multipart_fields), response_type, operation.get("summary", operation.get("description", "")))
 
     def build(self) -> IR:
+        validate_openapi_version(self.doc)
         selected = self.discover()
+        # Invalid references must not reach union inference or component lowering.
+        if self.diagnostics:
+            raise GenerationError(self.diagnostics)
         self._scan_discriminator_fields()
         schemas = self.doc.get("components", {}).get("schemas", {})
         for name in schemas:

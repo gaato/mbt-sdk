@@ -117,6 +117,10 @@ def normalize_spec(spec_path: str | Path, overlay_paths: list[str | Path]) -> di
         overlay_problems.extend(apply_overlay.apply(doc, apply_overlay.load(str(path)), str(path)))
     if overlay_problems:
         raise GenerationError([Diagnostic("/", problem, "fix the overlay action target or update") for problem in overlay_problems])
+    # Reject the document dialect before parameter normalization, so Swagger's
+    # different reference layout produces one actionable version diagnostic.
+    from .ir import validate_openapi_version
+    validate_openapi_version(doc)
     _resolve_parameter_refs(doc)
     # allOf is merged lazily while lowering the selected schema closure.  The
     # vendored document contains unrelated unsupported constructs, which must

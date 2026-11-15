@@ -117,3 +117,43 @@ offline_packages = ["codex-protocol/src/gen", "codex-protocol/src/tests"]
 command = "tools/gen/codex.py"
 publish = false
 spec_watch = false
+
+[[sdk]]
+name = "jina"
+dir = "jina"
+module = "gaato/jina"
+generator = "openapi"
+spec_file = "jina/spec/openapi.json"
+spec_url = "https://api.jina.ai/openapi.json"
+spec_fetch = "plain"
+include_all = true
+derive_operation_ids = true
+package = "gaato/jina/gen"
+out = "jina/src/gen"
+census_args = ["--overlay", "jina/overlays/fix.yaml", "--overlay", "jina/overlays/moonbit.yaml"]
+report_census_args = ["--overlay", "jina/overlays/fix.yaml"]
+offline_packages = ["jina/src", "jina/src/gen"]
+base_url = "https://api.jina.ai"
+auth = { kind = "bearer" }
+publish = false
+spec_watch = false
+
+[[sdk]]
+name = "replicate"
+dir = "replicate"
+module = "gaato/replicate"
+generator = "openapi"
+spec_file = "replicate/spec/openapi.json"
+spec_url = "https://api.replicate.com/openapi.json"
+spec_fetch = "plain"
+include_all = true
+derive_operation_ids = true
+package = "gaato/replicate/gen"
+out = "replicate/src/gen"
+census_args = ["--overlay", "replicate/overlays/fix.yaml", "--overlay", "replicate/overlays/moonbit.yaml"]
+report_census_args = ["--overlay", "replicate/overlays/fix.yaml"]
+offline_packages = ["replicate/src", "replicate/src/gen"]
+base_url = "https://api.replicate.com/v1"
+auth = { kind = "bearer" }
+publish = false
+spec_watch = false

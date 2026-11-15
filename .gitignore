@@ -5,7 +5,7 @@ target/
 
 # overlay applier cache
 __pycache__/
-.venv/
+.venv
 
 # local secrets never belong here
 .env

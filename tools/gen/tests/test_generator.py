@@ -865,12 +865,11 @@ class IRTests(unittest.TestCase):
             IRBuilder(document(operation(request=schema)), "example/gen").build()
         self.assertIn("cannot coexist", str(caught.exception))
 
-    def test_unsupported_parameter_and_body_forms_are_diagnostics(self):
+    def test_unsupported_parameter_forms_are_diagnostics(self):
         cases = [
             (operation(parameters=[{"name": "session", "in": "cookie", "schema": {"type": "string"}}]), "cookie"),
             (operation(parameters=[{"name": "q", "in": "query", "style": "deepObject", "schema": {"type": "string"}}]), "deepObject"),
             (operation(parameters=[{"name": "Authorization", "in": "header", "schema": {"type": "string"}}]), "reserved header"),
-            (operation(request_content={"application/x-www-form-urlencoded": {"schema": {"type": "object"}}}), "urlencoded"),
         ]
         for op, fragment in cases:
             with self.subTest(fragment=fragment), self.assertRaises(GenerationError) as caught:

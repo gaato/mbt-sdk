@@ -1,0 +1,1616 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "gaato/jina/gen"
+
+import {
+  "gaato/mttp_core",
+  "gaato/mttp_core/client",
+  "gaato/mttp_core/jsonkit",
+  "moonbitlang/core/debug",
+  "moonbitlang/core/json",
+}
+
+// Values
+pub fn cancel_batch_job_v1_batch_batch_id_delete_decode(@mttp_core.ResponseHead, Bytes) -> Result[BatchStatus, @client.ResponseFailure]
+
+pub fn cancel_batch_job_v1_batch_batch_id_delete_decode_json(@json.Json) -> BatchStatus raise @json.JsonDecodeError
+
+pub fn cancel_batch_job_v1_batch_batch_id_delete_request(String) -> @mttp_core.Request
+
+pub fn chat_completions_v1_chat_completions_post_decode(@mttp_core.ResponseHead, Bytes) -> Result[@json.Json, @client.ResponseFailure]
+
+pub fn chat_completions_v1_chat_completions_post_decode_json(@json.Json) -> @json.Json raise @json.JsonDecodeError
+
+pub fn chat_completions_v1_chat_completions_post_request(ChatCompletionRequest) -> @mttp_core.Request
+
+pub fn create_batch_job_v1_batch_embeddings_post_decode(@mttp_core.ResponseHead, Bytes) -> Result[BatchStatus, @client.ResponseFailure]
+
+pub fn create_batch_job_v1_batch_embeddings_post_decode_json(@json.Json) -> BatchStatus raise @json.JsonDecodeError
+
+pub fn create_batch_job_v1_batch_embeddings_post_request(BatchEmbeddingRequest) -> @mttp_core.Request
+
+pub fn download_batch_errors_v1_batch_batch_id_errors_get_decode(@mttp_core.ResponseHead, Bytes) -> Result[@json.Json, @client.ResponseFailure]
+
+pub fn download_batch_errors_v1_batch_batch_id_errors_get_decode_json(@json.Json) -> @json.Json raise @json.JsonDecodeError
+
+pub fn download_batch_errors_v1_batch_batch_id_errors_get_request(String) -> @mttp_core.Request
+
+pub fn download_batch_output_v1_batch_batch_id_output_get_decode(@mttp_core.ResponseHead, Bytes) -> Result[@json.Json, @client.ResponseFailure]
+
+pub fn download_batch_output_v1_batch_batch_id_output_get_decode_json(@json.Json) -> @json.Json raise @json.JsonDecodeError
+
+pub fn download_batch_output_v1_batch_batch_id_output_get_request(String) -> @mttp_core.Request
+
+pub fn embeddings_v1_embeddings_post_decode(@mttp_core.ResponseHead, Bytes) -> Result[EmbeddingResponse, @client.ResponseFailure]
+
+pub fn embeddings_v1_embeddings_post_decode_json(@json.Json) -> EmbeddingResponse raise @json.JsonDecodeError
+
+pub fn embeddings_v1_embeddings_post_request(EmbeddingsV1EmbeddingsPostRequest) -> @mttp_core.Request
+
+pub fn get_batch_status_v1_batch_batch_id_get_decode(@mttp_core.ResponseHead, Bytes) -> Result[BatchStatus, @client.ResponseFailure]
+
+pub fn get_batch_status_v1_batch_batch_id_get_decode_json(@json.Json) -> BatchStatus raise @json.JsonDecodeError
+
+pub fn get_batch_status_v1_batch_batch_id_get_request(String) -> @mttp_core.Request
+
+pub fn get_model_v1_models_model_id_get_decode(@mttp_core.ResponseHead, Bytes) -> Result[ModelInfo, @client.ResponseFailure]
+
+pub fn get_model_v1_models_model_id_get_decode_json(@json.Json) -> ModelInfo raise @json.JsonDecodeError
+
+pub fn get_model_v1_models_model_id_get_request(String) -> @mttp_core.Request
+
+pub fn list_batch_jobs_v1_batches_get_decode(@mttp_core.ResponseHead, Bytes) -> Result[Array[BatchStatus], @client.ResponseFailure]
+
+pub fn list_batch_jobs_v1_batches_get_decode_json(@json.Json) -> Array[BatchStatus] raise @json.JsonDecodeError
+
+pub fn list_batch_jobs_v1_batches_get_request(limit? : Int32) -> @mttp_core.Request
+
+pub fn list_models_v1_models_get_decode(@mttp_core.ResponseHead, Bytes) -> Result[ModelListResponse, @client.ResponseFailure]
+
+pub fn list_models_v1_models_get_decode_json(@json.Json) -> ModelListResponse raise @json.JsonDecodeError
+
+pub fn list_models_v1_models_get_request() -> @mttp_core.Request
+
+pub fn rerank_v1_rerank_post_decode(@mttp_core.ResponseHead, Bytes) -> Result[RerankingResponse, @client.ResponseFailure]
+
+pub fn rerank_v1_rerank_post_decode_json(@json.Json) -> RerankingResponse raise @json.JsonDecodeError
+
+pub fn rerank_v1_rerank_post_request(RerankV1RerankPostRequest) -> @mttp_core.Request
+
+// Errors
+
+// Types and methods
+#derive(Eq, @debug.Debug)
+pub(all) struct BaseUsage {
+  total_tokens : Int32
+}
+pub fn BaseUsage::equal(Self, Self) -> Bool
+pub fn BaseUsage::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn BaseUsage::new(total_tokens~ : Int32) -> Self
+pub fn BaseUsage::not_equal(Self, Self) -> Bool
+pub fn BaseUsage::to_json(Self) -> @json.Json
+pub fn BaseUsage::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for BaseUsage
+pub impl @json.ToJson for BaseUsage
+
+#derive(Eq, @debug.Debug)
+pub(all) struct BatchEmbeddingRequest {
+  model : BatchEmbeddingRequestModel
+  input_url : @jsonkit.Presence[String]
+  input : @jsonkit.Presence[Array[@json.Json]]
+  task : @jsonkit.Presence[String]
+  dimensions : @jsonkit.Presence[Int32]
+  normalized : @jsonkit.Presence[Bool]
+  webhook_url : @jsonkit.Presence[String]
+}
+pub fn BatchEmbeddingRequest::equal(Self, Self) -> Bool
+pub fn BatchEmbeddingRequest::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn BatchEmbeddingRequest::new(model~ : BatchEmbeddingRequestModel, input_url? : String, input? : Array[@json.Json], task? : String, dimensions? : Int32, normalized? : Bool, webhook_url? : String) -> Self
+pub fn BatchEmbeddingRequest::not_equal(Self, Self) -> Bool
+pub fn BatchEmbeddingRequest::to_json(Self) -> @json.Json
+pub fn BatchEmbeddingRequest::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for BatchEmbeddingRequest
+pub impl @json.ToJson for BatchEmbeddingRequest
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum BatchEmbeddingRequestModel {
+  JinaEmbeddingsV5TextNano
+  JinaEmbeddingsV5TextSmall
+  Custom(String)
+}
+pub fn BatchEmbeddingRequestModel::equal(Self, Self) -> Bool
+pub fn BatchEmbeddingRequestModel::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn BatchEmbeddingRequestModel::not_equal(Self, Self) -> Bool
+pub fn BatchEmbeddingRequestModel::to_json(Self) -> @json.Json
+pub fn BatchEmbeddingRequestModel::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for BatchEmbeddingRequestModel
+pub impl @json.ToJson for BatchEmbeddingRequestModel
+
+#derive(Eq, @debug.Debug)
+pub(all) struct BatchStats {
+  total : Int32
+  completed : Int32?
+  failed : Int32?
+  total_tokens : Int32?
+}
+pub fn BatchStats::equal(Self, Self) -> Bool
+pub fn BatchStats::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn BatchStats::new(total~ : Int32, completed? : Int32, failed? : Int32, total_tokens? : Int32) -> Self
+pub fn BatchStats::not_equal(Self, Self) -> Bool
+pub fn BatchStats::to_json(Self) -> @json.Json
+pub fn BatchStats::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for BatchStats
+pub impl @json.ToJson for BatchStats
+
+#derive(Eq, @debug.Debug)
+pub(all) struct BatchStatus {
+  batch_id : String
+  status : BatchStatusStatus
+  model : String
+  created_at : String
+  completed_at : @jsonkit.Presence[String]
+  expires_at : @jsonkit.Presence[String]
+  output_url : @jsonkit.Presence[String]
+  error_file_url : @jsonkit.Presence[String]
+  error : @jsonkit.Presence[String]
+  stats : @jsonkit.Presence[BatchStats]
+}
+pub fn BatchStatus::equal(Self, Self) -> Bool
+pub fn BatchStatus::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn BatchStatus::new(batch_id~ : String, status~ : BatchStatusStatus, model~ : String, created_at~ : String, completed_at? : String, expires_at? : String, output_url? : String, error_file_url? : String, error? : String, stats? : BatchStats) -> Self
+pub fn BatchStatus::not_equal(Self, Self) -> Bool
+pub fn BatchStatus::to_json(Self) -> @json.Json
+pub fn BatchStatus::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for BatchStatus
+pub impl @json.ToJson for BatchStatus
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum BatchStatusStatus {
+  Pending
+  Processing
+  Completed
+  Failed
+  Expired
+  Cancelled
+  Unknown(String)
+}
+pub fn BatchStatusStatus::equal(Self, Self) -> Bool
+pub fn BatchStatusStatus::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn BatchStatusStatus::not_equal(Self, Self) -> Bool
+pub fn BatchStatusStatus::to_json(Self) -> @json.Json
+pub fn BatchStatusStatus::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for BatchStatusStatus
+pub impl @json.ToJson for BatchStatusStatus
+
+#derive(Eq, @debug.Debug)
+pub(all) struct ChatCompletionRequest {
+  messages : Array[ChatMessage]
+  stream : Bool?
+  stream_options : @jsonkit.Presence[StreamOptions]
+  max_completion_tokens : @jsonkit.Presence[Int32]
+  temperature : @jsonkit.Presence[Double]
+  top_p : @jsonkit.Presence[Double]
+  presence_penalty : @jsonkit.Presence[Double]
+  frequency_penalty : @jsonkit.Presence[Double]
+  stop : @jsonkit.Presence[ChatCompletionRequestStop]
+  seed : @jsonkit.Presence[Int32]
+  logprobs : @jsonkit.Presence[Bool]
+  top_logprobs : @jsonkit.Presence[Int32]
+  logit_bias : @jsonkit.Presence[Map[String, Double]]
+  response_format : @jsonkit.Presence[ChatCompletionRequestResponseFormat]
+}
+pub fn ChatCompletionRequest::equal(Self, Self) -> Bool
+pub fn ChatCompletionRequest::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ChatCompletionRequest::new(messages~ : Array[ChatMessage], stream? : Bool, stream_options? : StreamOptions, max_completion_tokens? : Int32, temperature? : Double, top_p? : Double, presence_penalty? : Double, frequency_penalty? : Double, stop? : ChatCompletionRequestStop, seed? : Int32, logprobs? : Bool, top_logprobs? : Int32, logit_bias? : Map[String, Double], response_format? : ChatCompletionRequestResponseFormat) -> Self
+pub fn ChatCompletionRequest::not_equal(Self, Self) -> Bool
+pub fn ChatCompletionRequest::to_json(Self) -> @json.Json
+pub fn ChatCompletionRequest::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for ChatCompletionRequest
+pub impl @json.ToJson for ChatCompletionRequest
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum ChatCompletionRequestResponseFormat {
+  JsonObject(ResponseFormatJSONObject)
+  JsonSchema(ResponseFormatJSONSchema)
+  Text(ResponseFormatText)
+  Unknown(String, @json.Json)
+}
+pub fn ChatCompletionRequestResponseFormat::equal(Self, Self) -> Bool
+pub fn ChatCompletionRequestResponseFormat::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ChatCompletionRequestResponseFormat::not_equal(Self, Self) -> Bool
+pub fn ChatCompletionRequestResponseFormat::to_json(Self) -> @json.Json
+pub fn ChatCompletionRequestResponseFormat::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for ChatCompletionRequestResponseFormat
+pub impl @json.ToJson for ChatCompletionRequestResponseFormat
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum ChatCompletionRequestStop {
+  Text(String)
+  TextArray(Array[String])
+}
+pub fn ChatCompletionRequestStop::equal(Self, Self) -> Bool
+pub fn ChatCompletionRequestStop::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ChatCompletionRequestStop::not_equal(Self, Self) -> Bool
+pub fn ChatCompletionRequestStop::to_json(Self) -> @json.Json
+pub fn ChatCompletionRequestStop::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for ChatCompletionRequestStop
+pub impl @json.ToJson for ChatCompletionRequestStop
+
+#derive(Eq, @debug.Debug)
+pub(all) struct ChatMessage {
+  role : ChatMessageRole
+  content : @jsonkit.Presence[ChatMessageContent]
+}
+pub fn ChatMessage::equal(Self, Self) -> Bool
+pub fn ChatMessage::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ChatMessage::new(role~ : ChatMessageRole, content? : ChatMessageContent) -> Self
+pub fn ChatMessage::not_equal(Self, Self) -> Bool
+pub fn ChatMessage::to_json(Self) -> @json.Json
+pub fn ChatMessage::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for ChatMessage
+pub impl @json.ToJson for ChatMessage
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum ChatMessageContent {
+  Text(String)
+  ValueArray(Array[ChatMessageContentValueArrayItem])
+}
+pub fn ChatMessageContent::equal(Self, Self) -> Bool
+pub fn ChatMessageContent::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ChatMessageContent::not_equal(Self, Self) -> Bool
+pub fn ChatMessageContent::to_json(Self) -> @json.Json
+pub fn ChatMessageContent::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for ChatMessageContent
+pub impl @json.ToJson for ChatMessageContent
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum ChatMessageContentValueArrayItem {
+  ImageUrl(ImageContentPart)
+  Text(TextContentPart)
+  Unknown(String, @json.Json)
+}
+pub fn ChatMessageContentValueArrayItem::equal(Self, Self) -> Bool
+pub fn ChatMessageContentValueArrayItem::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ChatMessageContentValueArrayItem::not_equal(Self, Self) -> Bool
+pub fn ChatMessageContentValueArrayItem::to_json(Self) -> @json.Json
+pub fn ChatMessageContentValueArrayItem::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for ChatMessageContentValueArrayItem
+pub impl @json.ToJson for ChatMessageContentValueArrayItem
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum ChatMessageRole {
+  System
+  Developer
+  User
+  Assistant
+  Custom(String)
+}
+pub fn ChatMessageRole::equal(Self, Self) -> Bool
+pub fn ChatMessageRole::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ChatMessageRole::not_equal(Self, Self) -> Bool
+pub fn ChatMessageRole::to_json(Self) -> @json.Json
+pub fn ChatMessageRole::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for ChatMessageRole
+pub impl @json.ToJson for ChatMessageRole
+
+#derive(Eq, @debug.Debug)
+pub(all) struct ClipV1Request {
+  embedding_type : @jsonkit.Presence[ClipV1RequestEmbeddingType]
+  normalized : @jsonkit.Presence[Bool]
+  truncate : @jsonkit.Presence[Bool]
+  input : @json.Json
+}
+pub fn ClipV1Request::equal(Self, Self) -> Bool
+pub fn ClipV1Request::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ClipV1Request::new(input~ : @json.Json, embedding_type? : ClipV1RequestEmbeddingType, normalized? : Bool, truncate? : Bool) -> Self
+pub fn ClipV1Request::not_equal(Self, Self) -> Bool
+pub fn ClipV1Request::to_json(Self) -> @json.Json
+pub fn ClipV1Request::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for ClipV1Request
+pub impl @json.ToJson for ClipV1Request
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum ClipV1RequestEmbeddingType {
+  Text(ClipV1RequestEmbeddingTypeText)
+  TextArray(Array[ClipV1RequestEmbeddingTypeTextArrayItem])
+}
+pub fn ClipV1RequestEmbeddingType::equal(Self, Self) -> Bool
+pub fn ClipV1RequestEmbeddingType::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ClipV1RequestEmbeddingType::not_equal(Self, Self) -> Bool
+pub fn ClipV1RequestEmbeddingType::to_json(Self) -> @json.Json
+pub fn ClipV1RequestEmbeddingType::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for ClipV1RequestEmbeddingType
+pub impl @json.ToJson for ClipV1RequestEmbeddingType
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum ClipV1RequestEmbeddingTypeText {
+  Float
+  Base64
+  Binary
+  Ubinary
+  Custom(String)
+}
+pub fn ClipV1RequestEmbeddingTypeText::equal(Self, Self) -> Bool
+pub fn ClipV1RequestEmbeddingTypeText::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ClipV1RequestEmbeddingTypeText::not_equal(Self, Self) -> Bool
+pub fn ClipV1RequestEmbeddingTypeText::to_json(Self) -> @json.Json
+pub fn ClipV1RequestEmbeddingTypeText::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for ClipV1RequestEmbeddingTypeText
+pub impl @json.ToJson for ClipV1RequestEmbeddingTypeText
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum ClipV1RequestEmbeddingTypeTextArrayItem {
+  Float
+  Base64
+  Binary
+  Ubinary
+  Custom(String)
+}
+pub fn ClipV1RequestEmbeddingTypeTextArrayItem::equal(Self, Self) -> Bool
+pub fn ClipV1RequestEmbeddingTypeTextArrayItem::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ClipV1RequestEmbeddingTypeTextArrayItem::not_equal(Self, Self) -> Bool
+pub fn ClipV1RequestEmbeddingTypeTextArrayItem::to_json(Self) -> @json.Json
+pub fn ClipV1RequestEmbeddingTypeTextArrayItem::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for ClipV1RequestEmbeddingTypeTextArrayItem
+pub impl @json.ToJson for ClipV1RequestEmbeddingTypeTextArrayItem
+
+#derive(Eq, @debug.Debug)
+pub(all) struct ClipV2Request {
+  embedding_type : @jsonkit.Presence[ClipV2RequestEmbeddingType]
+  normalized : @jsonkit.Presence[Bool]
+  truncate : @jsonkit.Presence[Bool]
+  input : @json.Json
+  dimensions : @jsonkit.Presence[Int32]
+}
+pub fn ClipV2Request::equal(Self, Self) -> Bool
+pub fn ClipV2Request::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ClipV2Request::new(input~ : @json.Json, embedding_type? : ClipV2RequestEmbeddingType, normalized? : Bool, truncate? : Bool, dimensions? : Int32) -> Self
+pub fn ClipV2Request::not_equal(Self, Self) -> Bool
+pub fn ClipV2Request::to_json(Self) -> @json.Json
+pub fn ClipV2Request::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for ClipV2Request
+pub impl @json.ToJson for ClipV2Request
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum ClipV2RequestEmbeddingType {
+  Text(ClipV2RequestEmbeddingTypeText)
+  TextArray(Array[ClipV2RequestEmbeddingTypeTextArrayItem])
+}
+pub fn ClipV2RequestEmbeddingType::equal(Self, Self) -> Bool
+pub fn ClipV2RequestEmbeddingType::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ClipV2RequestEmbeddingType::not_equal(Self, Self) -> Bool
+pub fn ClipV2RequestEmbeddingType::to_json(Self) -> @json.Json
+pub fn ClipV2RequestEmbeddingType::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for ClipV2RequestEmbeddingType
+pub impl @json.ToJson for ClipV2RequestEmbeddingType
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum ClipV2RequestEmbeddingTypeText {
+  Float
+  Base64
+  Binary
+  Ubinary
+  Custom(String)
+}
+pub fn ClipV2RequestEmbeddingTypeText::equal(Self, Self) -> Bool
+pub fn ClipV2RequestEmbeddingTypeText::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ClipV2RequestEmbeddingTypeText::not_equal(Self, Self) -> Bool
+pub fn ClipV2RequestEmbeddingTypeText::to_json(Self) -> @json.Json
+pub fn ClipV2RequestEmbeddingTypeText::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for ClipV2RequestEmbeddingTypeText
+pub impl @json.ToJson for ClipV2RequestEmbeddingTypeText
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum ClipV2RequestEmbeddingTypeTextArrayItem {
+  Float
+  Base64
+  Binary
+  Ubinary
+  Custom(String)
+}
+pub fn ClipV2RequestEmbeddingTypeTextArrayItem::equal(Self, Self) -> Bool
+pub fn ClipV2RequestEmbeddingTypeTextArrayItem::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ClipV2RequestEmbeddingTypeTextArrayItem::not_equal(Self, Self) -> Bool
+pub fn ClipV2RequestEmbeddingTypeTextArrayItem::to_json(Self) -> @json.Json
+pub fn ClipV2RequestEmbeddingTypeTextArrayItem::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for ClipV2RequestEmbeddingTypeTextArrayItem
+pub impl @json.ToJson for ClipV2RequestEmbeddingTypeTextArrayItem
+
+#derive(Eq, @debug.Debug)
+pub(all) struct CodeEmbeddings1500MRequest {
+  embedding_type : @jsonkit.Presence[CodeEmbeddings1500MRequestEmbeddingType]
+  input : @json.Json
+  truncate : @jsonkit.Presence[Bool]
+  dimensions : @jsonkit.Presence[Int32]
+  task : @jsonkit.Presence[CodeEmbeddings1500MRequestTask]
+}
+pub fn CodeEmbeddings1500MRequest::equal(Self, Self) -> Bool
+pub fn CodeEmbeddings1500MRequest::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn CodeEmbeddings1500MRequest::new(input~ : @json.Json, embedding_type? : CodeEmbeddings1500MRequestEmbeddingType, truncate? : Bool, dimensions? : Int32, task? : CodeEmbeddings1500MRequestTask) -> Self
+pub fn CodeEmbeddings1500MRequest::not_equal(Self, Self) -> Bool
+pub fn CodeEmbeddings1500MRequest::to_json(Self) -> @json.Json
+pub fn CodeEmbeddings1500MRequest::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for CodeEmbeddings1500MRequest
+pub impl @json.ToJson for CodeEmbeddings1500MRequest
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum CodeEmbeddings1500MRequestEmbeddingType {
+  Text(CodeEmbeddings1500MRequestEmbeddingTypeText)
+  TextArray(Array[CodeEmbeddings1500MRequestEmbeddingTypeTextArrayItem])
+}
+pub fn CodeEmbeddings1500MRequestEmbeddingType::equal(Self, Self) -> Bool
+pub fn CodeEmbeddings1500MRequestEmbeddingType::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn CodeEmbeddings1500MRequestEmbeddingType::not_equal(Self, Self) -> Bool
+pub fn CodeEmbeddings1500MRequestEmbeddingType::to_json(Self) -> @json.Json
+pub fn CodeEmbeddings1500MRequestEmbeddingType::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for CodeEmbeddings1500MRequestEmbeddingType
+pub impl @json.ToJson for CodeEmbeddings1500MRequestEmbeddingType
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum CodeEmbeddings1500MRequestEmbeddingTypeText {
+  Float
+  Base64
+  Binary
+  Ubinary
+  Custom(String)
+}
+pub fn CodeEmbeddings1500MRequestEmbeddingTypeText::equal(Self, Self) -> Bool
+pub fn CodeEmbeddings1500MRequestEmbeddingTypeText::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn CodeEmbeddings1500MRequestEmbeddingTypeText::not_equal(Self, Self) -> Bool
+pub fn CodeEmbeddings1500MRequestEmbeddingTypeText::to_json(Self) -> @json.Json
+pub fn CodeEmbeddings1500MRequestEmbeddingTypeText::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for CodeEmbeddings1500MRequestEmbeddingTypeText
+pub impl @json.ToJson for CodeEmbeddings1500MRequestEmbeddingTypeText
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum CodeEmbeddings1500MRequestEmbeddingTypeTextArrayItem {
+  Float
+  Base64
+  Binary
+  Ubinary
+  Custom(String)
+}
+pub fn CodeEmbeddings1500MRequestEmbeddingTypeTextArrayItem::equal(Self, Self) -> Bool
+pub fn CodeEmbeddings1500MRequestEmbeddingTypeTextArrayItem::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn CodeEmbeddings1500MRequestEmbeddingTypeTextArrayItem::not_equal(Self, Self) -> Bool
+pub fn CodeEmbeddings1500MRequestEmbeddingTypeTextArrayItem::to_json(Self) -> @json.Json
+pub fn CodeEmbeddings1500MRequestEmbeddingTypeTextArrayItem::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for CodeEmbeddings1500MRequestEmbeddingTypeTextArrayItem
+pub impl @json.ToJson for CodeEmbeddings1500MRequestEmbeddingTypeTextArrayItem
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum CodeEmbeddings1500MRequestTask {
+  Nl2codeQuery
+  Nl2codePassage
+  QaQuery
+  QaPassage
+  Code2codeQuery
+  Code2codePassage
+  Code2nlQuery
+  Code2nlPassage
+  Code2completionQuery
+  Code2completionPassage
+  Custom(String)
+}
+pub fn CodeEmbeddings1500MRequestTask::equal(Self, Self) -> Bool
+pub fn CodeEmbeddings1500MRequestTask::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn CodeEmbeddings1500MRequestTask::not_equal(Self, Self) -> Bool
+pub fn CodeEmbeddings1500MRequestTask::to_json(Self) -> @json.Json
+pub fn CodeEmbeddings1500MRequestTask::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for CodeEmbeddings1500MRequestTask
+pub impl @json.ToJson for CodeEmbeddings1500MRequestTask
+
+#derive(Eq, @debug.Debug)
+pub(all) struct CodeEmbeddings500MRequest {
+  embedding_type : @jsonkit.Presence[CodeEmbeddings500MRequestEmbeddingType]
+  input : @json.Json
+  truncate : @jsonkit.Presence[Bool]
+  dimensions : @jsonkit.Presence[Int32]
+  task : @jsonkit.Presence[CodeEmbeddings500MRequestTask]
+}
+pub fn CodeEmbeddings500MRequest::equal(Self, Self) -> Bool
+pub fn CodeEmbeddings500MRequest::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn CodeEmbeddings500MRequest::new(input~ : @json.Json, embedding_type? : CodeEmbeddings500MRequestEmbeddingType, truncate? : Bool, dimensions? : Int32, task? : CodeEmbeddings500MRequestTask) -> Self
+pub fn CodeEmbeddings500MRequest::not_equal(Self, Self) -> Bool
+pub fn CodeEmbeddings500MRequest::to_json(Self) -> @json.Json
+pub fn CodeEmbeddings500MRequest::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for CodeEmbeddings500MRequest
+pub impl @json.ToJson for CodeEmbeddings500MRequest
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum CodeEmbeddings500MRequestEmbeddingType {
+  Text(CodeEmbeddings500MRequestEmbeddingTypeText)
+  TextArray(Array[CodeEmbeddings500MRequestEmbeddingTypeTextArrayItem])
+}
+pub fn CodeEmbeddings500MRequestEmbeddingType::equal(Self, Self) -> Bool
+pub fn CodeEmbeddings500MRequestEmbeddingType::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn CodeEmbeddings500MRequestEmbeddingType::not_equal(Self, Self) -> Bool
+pub fn CodeEmbeddings500MRequestEmbeddingType::to_json(Self) -> @json.Json
+pub fn CodeEmbeddings500MRequestEmbeddingType::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for CodeEmbeddings500MRequestEmbeddingType
+pub impl @json.ToJson for CodeEmbeddings500MRequestEmbeddingType
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum CodeEmbeddings500MRequestEmbeddingTypeText {
+  Float
+  Base64
+  Binary
+  Ubinary
+  Custom(String)
+}
+pub fn CodeEmbeddings500MRequestEmbeddingTypeText::equal(Self, Self) -> Bool
+pub fn CodeEmbeddings500MRequestEmbeddingTypeText::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn CodeEmbeddings500MRequestEmbeddingTypeText::not_equal(Self, Self) -> Bool
+pub fn CodeEmbeddings500MRequestEmbeddingTypeText::to_json(Self) -> @json.Json
+pub fn CodeEmbeddings500MRequestEmbeddingTypeText::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for CodeEmbeddings500MRequestEmbeddingTypeText
+pub impl @json.ToJson for CodeEmbeddings500MRequestEmbeddingTypeText
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum CodeEmbeddings500MRequestEmbeddingTypeTextArrayItem {
+  Float
+  Base64
+  Binary
+  Ubinary
+  Custom(String)
+}
+pub fn CodeEmbeddings500MRequestEmbeddingTypeTextArrayItem::equal(Self, Self) -> Bool
+pub fn CodeEmbeddings500MRequestEmbeddingTypeTextArrayItem::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn CodeEmbeddings500MRequestEmbeddingTypeTextArrayItem::not_equal(Self, Self) -> Bool
+pub fn CodeEmbeddings500MRequestEmbeddingTypeTextArrayItem::to_json(Self) -> @json.Json
+pub fn CodeEmbeddings500MRequestEmbeddingTypeTextArrayItem::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for CodeEmbeddings500MRequestEmbeddingTypeTextArrayItem
+pub impl @json.ToJson for CodeEmbeddings500MRequestEmbeddingTypeTextArrayItem
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum CodeEmbeddings500MRequestTask {
+  Nl2codeQuery
+  Nl2codePassage
+  QaQuery
+  QaPassage
+  Code2codeQuery
+  Code2codePassage
+  Code2nlQuery
+  Code2nlPassage
+  Code2completionQuery
+  Code2completionPassage
+  Custom(String)
+}
+pub fn CodeEmbeddings500MRequestTask::equal(Self, Self) -> Bool
+pub fn CodeEmbeddings500MRequestTask::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn CodeEmbeddings500MRequestTask::not_equal(Self, Self) -> Bool
+pub fn CodeEmbeddings500MRequestTask::to_json(Self) -> @json.Json
+pub fn CodeEmbeddings500MRequestTask::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for CodeEmbeddings500MRequestTask
+pub impl @json.ToJson for CodeEmbeddings500MRequestTask
+
+#derive(Eq, @debug.Debug)
+pub(all) struct ColbertV1Request {
+  embedding_type : @jsonkit.Presence[ColbertV1RequestEmbeddingType]
+  input : @json.Json
+  input_type : @jsonkit.Presence[ColbertV1RequestInputType]
+}
+pub fn ColbertV1Request::equal(Self, Self) -> Bool
+pub fn ColbertV1Request::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ColbertV1Request::new(input~ : @json.Json, embedding_type? : ColbertV1RequestEmbeddingType, input_type? : ColbertV1RequestInputType) -> Self
+pub fn ColbertV1Request::not_equal(Self, Self) -> Bool
+pub fn ColbertV1Request::to_json(Self) -> @json.Json
+pub fn ColbertV1Request::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for ColbertV1Request
+pub impl @json.ToJson for ColbertV1Request
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum ColbertV1RequestEmbeddingType {
+  Text(ColbertV1RequestEmbeddingTypeText)
+  TextArray(Array[ColbertV1RequestEmbeddingTypeTextArrayItem])
+}
+pub fn ColbertV1RequestEmbeddingType::equal(Self, Self) -> Bool
+pub fn ColbertV1RequestEmbeddingType::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ColbertV1RequestEmbeddingType::not_equal(Self, Self) -> Bool
+pub fn ColbertV1RequestEmbeddingType::to_json(Self) -> @json.Json
+pub fn ColbertV1RequestEmbeddingType::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for ColbertV1RequestEmbeddingType
+pub impl @json.ToJson for ColbertV1RequestEmbeddingType
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum ColbertV1RequestEmbeddingTypeText {
+  Float
+  Base64
+  Binary
+  Ubinary
+  Custom(String)
+}
+pub fn ColbertV1RequestEmbeddingTypeText::equal(Self, Self) -> Bool
+pub fn ColbertV1RequestEmbeddingTypeText::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ColbertV1RequestEmbeddingTypeText::not_equal(Self, Self) -> Bool
+pub fn ColbertV1RequestEmbeddingTypeText::to_json(Self) -> @json.Json
+pub fn ColbertV1RequestEmbeddingTypeText::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for ColbertV1RequestEmbeddingTypeText
+pub impl @json.ToJson for ColbertV1RequestEmbeddingTypeText
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum ColbertV1RequestEmbeddingTypeTextArrayItem {
+  Float
+  Base64
+  Binary
+  Ubinary
+  Custom(String)
+}
+pub fn ColbertV1RequestEmbeddingTypeTextArrayItem::equal(Self, Self) -> Bool
+pub fn ColbertV1RequestEmbeddingTypeTextArrayItem::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ColbertV1RequestEmbeddingTypeTextArrayItem::not_equal(Self, Self) -> Bool
+pub fn ColbertV1RequestEmbeddingTypeTextArrayItem::to_json(Self) -> @json.Json
+pub fn ColbertV1RequestEmbeddingTypeTextArrayItem::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for ColbertV1RequestEmbeddingTypeTextArrayItem
+pub impl @json.ToJson for ColbertV1RequestEmbeddingTypeTextArrayItem
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum ColbertV1RequestInputType {
+  Query
+  Document
+  Custom(String)
+}
+pub fn ColbertV1RequestInputType::equal(Self, Self) -> Bool
+pub fn ColbertV1RequestInputType::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ColbertV1RequestInputType::not_equal(Self, Self) -> Bool
+pub fn ColbertV1RequestInputType::to_json(Self) -> @json.Json
+pub fn ColbertV1RequestInputType::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for ColbertV1RequestInputType
+pub impl @json.ToJson for ColbertV1RequestInputType
+
+#derive(Eq, @debug.Debug)
+pub(all) struct ColbertV2Request {
+  embedding_type : @jsonkit.Presence[ColbertV2RequestEmbeddingType]
+  input : @json.Json
+  input_type : @jsonkit.Presence[ColbertV2RequestInputType]
+  dimensions : @jsonkit.Presence[Int32]
+}
+pub fn ColbertV2Request::equal(Self, Self) -> Bool
+pub fn ColbertV2Request::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ColbertV2Request::new(input~ : @json.Json, embedding_type? : ColbertV2RequestEmbeddingType, input_type? : ColbertV2RequestInputType, dimensions? : Int32) -> Self
+pub fn ColbertV2Request::not_equal(Self, Self) -> Bool
+pub fn ColbertV2Request::to_json(Self) -> @json.Json
+pub fn ColbertV2Request::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for ColbertV2Request
+pub impl @json.ToJson for ColbertV2Request
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum ColbertV2RequestEmbeddingType {
+  Text(ColbertV2RequestEmbeddingTypeText)
+  TextArray(Array[ColbertV2RequestEmbeddingTypeTextArrayItem])
+}
+pub fn ColbertV2RequestEmbeddingType::equal(Self, Self) -> Bool
+pub fn ColbertV2RequestEmbeddingType::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ColbertV2RequestEmbeddingType::not_equal(Self, Self) -> Bool
+pub fn ColbertV2RequestEmbeddingType::to_json(Self) -> @json.Json
+pub fn ColbertV2RequestEmbeddingType::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for ColbertV2RequestEmbeddingType
+pub impl @json.ToJson for ColbertV2RequestEmbeddingType
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum ColbertV2RequestEmbeddingTypeText {
+  Float
+  Base64
+  Binary
+  Ubinary
+  Custom(String)
+}
+pub fn ColbertV2RequestEmbeddingTypeText::equal(Self, Self) -> Bool
+pub fn ColbertV2RequestEmbeddingTypeText::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ColbertV2RequestEmbeddingTypeText::not_equal(Self, Self) -> Bool
+pub fn ColbertV2RequestEmbeddingTypeText::to_json(Self) -> @json.Json
+pub fn ColbertV2RequestEmbeddingTypeText::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for ColbertV2RequestEmbeddingTypeText
+pub impl @json.ToJson for ColbertV2RequestEmbeddingTypeText
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum ColbertV2RequestEmbeddingTypeTextArrayItem {
+  Float
+  Base64
+  Binary
+  Ubinary
+  Custom(String)
+}
+pub fn ColbertV2RequestEmbeddingTypeTextArrayItem::equal(Self, Self) -> Bool
+pub fn ColbertV2RequestEmbeddingTypeTextArrayItem::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ColbertV2RequestEmbeddingTypeTextArrayItem::not_equal(Self, Self) -> Bool
+pub fn ColbertV2RequestEmbeddingTypeTextArrayItem::to_json(Self) -> @json.Json
+pub fn ColbertV2RequestEmbeddingTypeTextArrayItem::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for ColbertV2RequestEmbeddingTypeTextArrayItem
+pub impl @json.ToJson for ColbertV2RequestEmbeddingTypeTextArrayItem
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum ColbertV2RequestInputType {
+  Query
+  Document
+  Custom(String)
+}
+pub fn ColbertV2RequestInputType::equal(Self, Self) -> Bool
+pub fn ColbertV2RequestInputType::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ColbertV2RequestInputType::not_equal(Self, Self) -> Bool
+pub fn ColbertV2RequestInputType::to_json(Self) -> @json.Json
+pub fn ColbertV2RequestInputType::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for ColbertV2RequestInputType
+pub impl @json.ToJson for ColbertV2RequestInputType
+
+#derive(Eq, @debug.Debug)
+pub(all) struct EmbeddingResponse {
+  model : String
+  object : String?
+  usage : @json.Json
+  data : @json.Json
+}
+pub fn EmbeddingResponse::equal(Self, Self) -> Bool
+pub fn EmbeddingResponse::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn EmbeddingResponse::new(model~ : String, usage~ : @json.Json, data~ : @json.Json, object? : String) -> Self
+pub fn EmbeddingResponse::not_equal(Self, Self) -> Bool
+pub fn EmbeddingResponse::to_json(Self) -> @json.Json
+pub fn EmbeddingResponse::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for EmbeddingResponse
+pub impl @json.ToJson for EmbeddingResponse
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum EmbeddingsV1EmbeddingsPostRequest {
+  JinaEmbeddingsV2BaseEn(EmbeddingsV2Request)
+  JinaEmbeddingsV2BaseZh(EmbeddingsV2Request)
+  JinaEmbeddingsV2BaseDe(EmbeddingsV2Request)
+  JinaEmbeddingsV2BaseEs(EmbeddingsV2Request)
+  JinaEmbeddingsV2BaseCode(EmbeddingsV2Request)
+  JinaEmbeddingsV3(EmbeddingsV3Request)
+  JinaEmbeddingsV4(EmbeddingsV4Request)
+  JinaEmbeddingsV5TextNano(EmbeddingsV5Request)
+  JinaEmbeddingsV5TextSmall(EmbeddingsV5Request)
+  JinaEmbeddingsV5OmniSmall(EmbeddingsV5Request)
+  JinaEmbeddingsV5OmniNano(EmbeddingsV5Request)
+  JinaCodeEmbeddings05b(CodeEmbeddings500MRequest)
+  JinaCodeEmbeddings15b(CodeEmbeddings1500MRequest)
+  JinaClipV1(ClipV1Request)
+  JinaClipV2(ClipV2Request)
+  JinaColbertV1En(ColbertV1Request)
+  JinaColbertV2(ColbertV2Request)
+  Unknown(String, @json.Json)
+}
+pub fn EmbeddingsV1EmbeddingsPostRequest::equal(Self, Self) -> Bool
+pub fn EmbeddingsV1EmbeddingsPostRequest::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn EmbeddingsV1EmbeddingsPostRequest::not_equal(Self, Self) -> Bool
+pub fn EmbeddingsV1EmbeddingsPostRequest::to_json(Self) -> @json.Json
+pub fn EmbeddingsV1EmbeddingsPostRequest::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for EmbeddingsV1EmbeddingsPostRequest
+pub impl @json.ToJson for EmbeddingsV1EmbeddingsPostRequest
+
+#derive(Eq, @debug.Debug)
+pub(all) struct EmbeddingsV2Request {
+  embedding_type : @jsonkit.Presence[EmbeddingsV2RequestEmbeddingType]
+  normalized : @jsonkit.Presence[Bool]
+  truncate : @jsonkit.Presence[Bool]
+  model : EmbeddingsV2RequestModel
+  input : @json.Json
+}
+pub fn EmbeddingsV2Request::equal(Self, Self) -> Bool
+pub fn EmbeddingsV2Request::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn EmbeddingsV2Request::new(model~ : EmbeddingsV2RequestModel, input~ : @json.Json, embedding_type? : EmbeddingsV2RequestEmbeddingType, normalized? : Bool, truncate? : Bool) -> Self
+pub fn EmbeddingsV2Request::not_equal(Self, Self) -> Bool
+pub fn EmbeddingsV2Request::to_json(Self) -> @json.Json
+pub fn EmbeddingsV2Request::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for EmbeddingsV2Request
+pub impl @json.ToJson for EmbeddingsV2Request
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum EmbeddingsV2RequestEmbeddingType {
+  Text(EmbeddingsV2RequestEmbeddingTypeText)
+  TextArray(Array[EmbeddingsV2RequestEmbeddingTypeTextArrayItem])
+}
+pub fn EmbeddingsV2RequestEmbeddingType::equal(Self, Self) -> Bool
+pub fn EmbeddingsV2RequestEmbeddingType::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn EmbeddingsV2RequestEmbeddingType::not_equal(Self, Self) -> Bool
+pub fn EmbeddingsV2RequestEmbeddingType::to_json(Self) -> @json.Json
+pub fn EmbeddingsV2RequestEmbeddingType::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for EmbeddingsV2RequestEmbeddingType
+pub impl @json.ToJson for EmbeddingsV2RequestEmbeddingType
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum EmbeddingsV2RequestEmbeddingTypeText {
+  Float
+  Base64
+  Binary
+  Ubinary
+  Custom(String)
+}
+pub fn EmbeddingsV2RequestEmbeddingTypeText::equal(Self, Self) -> Bool
+pub fn EmbeddingsV2RequestEmbeddingTypeText::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn EmbeddingsV2RequestEmbeddingTypeText::not_equal(Self, Self) -> Bool
+pub fn EmbeddingsV2RequestEmbeddingTypeText::to_json(Self) -> @json.Json
+pub fn EmbeddingsV2RequestEmbeddingTypeText::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for EmbeddingsV2RequestEmbeddingTypeText
+pub impl @json.ToJson for EmbeddingsV2RequestEmbeddingTypeText
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum EmbeddingsV2RequestEmbeddingTypeTextArrayItem {
+  Float
+  Base64
+  Binary
+  Ubinary
+  Custom(String)
+}
+pub fn EmbeddingsV2RequestEmbeddingTypeTextArrayItem::equal(Self, Self) -> Bool
+pub fn EmbeddingsV2RequestEmbeddingTypeTextArrayItem::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn EmbeddingsV2RequestEmbeddingTypeTextArrayItem::not_equal(Self, Self) -> Bool
+pub fn EmbeddingsV2RequestEmbeddingTypeTextArrayItem::to_json(Self) -> @json.Json
+pub fn EmbeddingsV2RequestEmbeddingTypeTextArrayItem::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for EmbeddingsV2RequestEmbeddingTypeTextArrayItem
+pub impl @json.ToJson for EmbeddingsV2RequestEmbeddingTypeTextArrayItem
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum EmbeddingsV2RequestModel {
+  JinaEmbeddingsV2BaseEn
+  JinaEmbeddingsV2BaseZh
+  JinaEmbeddingsV2BaseDe
+  JinaEmbeddingsV2BaseEs
+  JinaEmbeddingsV2BaseCode
+  Custom(String)
+}
+pub fn EmbeddingsV2RequestModel::equal(Self, Self) -> Bool
+pub fn EmbeddingsV2RequestModel::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn EmbeddingsV2RequestModel::not_equal(Self, Self) -> Bool
+pub fn EmbeddingsV2RequestModel::to_json(Self) -> @json.Json
+pub fn EmbeddingsV2RequestModel::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for EmbeddingsV2RequestModel
+pub impl @json.ToJson for EmbeddingsV2RequestModel
+
+#derive(Eq, @debug.Debug)
+pub(all) struct EmbeddingsV3Request {
+  embedding_type : @jsonkit.Presence[EmbeddingsV3RequestEmbeddingType]
+  normalized : @jsonkit.Presence[Bool]
+  truncate : @jsonkit.Presence[Bool]
+  input : @json.Json
+  task : @jsonkit.Presence[EmbeddingsV3RequestTask]
+  late_chunking : @jsonkit.Presence[Bool]
+  dimensions : @jsonkit.Presence[Int32]
+}
+pub fn EmbeddingsV3Request::equal(Self, Self) -> Bool
+pub fn EmbeddingsV3Request::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn EmbeddingsV3Request::new(input~ : @json.Json, embedding_type? : EmbeddingsV3RequestEmbeddingType, normalized? : Bool, truncate? : Bool, task? : EmbeddingsV3RequestTask, late_chunking? : Bool, dimensions? : Int32) -> Self
+pub fn EmbeddingsV3Request::not_equal(Self, Self) -> Bool
+pub fn EmbeddingsV3Request::to_json(Self) -> @json.Json
+pub fn EmbeddingsV3Request::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for EmbeddingsV3Request
+pub impl @json.ToJson for EmbeddingsV3Request
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum EmbeddingsV3RequestEmbeddingType {
+  Text(EmbeddingsV3RequestEmbeddingTypeText)
+  TextArray(Array[EmbeddingsV3RequestEmbeddingTypeTextArrayItem])
+}
+pub fn EmbeddingsV3RequestEmbeddingType::equal(Self, Self) -> Bool
+pub fn EmbeddingsV3RequestEmbeddingType::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn EmbeddingsV3RequestEmbeddingType::not_equal(Self, Self) -> Bool
+pub fn EmbeddingsV3RequestEmbeddingType::to_json(Self) -> @json.Json
+pub fn EmbeddingsV3RequestEmbeddingType::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for EmbeddingsV3RequestEmbeddingType
+pub impl @json.ToJson for EmbeddingsV3RequestEmbeddingType
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum EmbeddingsV3RequestEmbeddingTypeText {
+  Float
+  Base64
+  Binary
+  Ubinary
+  Custom(String)
+}
+pub fn EmbeddingsV3RequestEmbeddingTypeText::equal(Self, Self) -> Bool
+pub fn EmbeddingsV3RequestEmbeddingTypeText::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn EmbeddingsV3RequestEmbeddingTypeText::not_equal(Self, Self) -> Bool
+pub fn EmbeddingsV3RequestEmbeddingTypeText::to_json(Self) -> @json.Json
+pub fn EmbeddingsV3RequestEmbeddingTypeText::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for EmbeddingsV3RequestEmbeddingTypeText
+pub impl @json.ToJson for EmbeddingsV3RequestEmbeddingTypeText
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum EmbeddingsV3RequestEmbeddingTypeTextArrayItem {
+  Float
+  Base64
+  Binary
+  Ubinary
+  Custom(String)
+}
+pub fn EmbeddingsV3RequestEmbeddingTypeTextArrayItem::equal(Self, Self) -> Bool
+pub fn EmbeddingsV3RequestEmbeddingTypeTextArrayItem::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn EmbeddingsV3RequestEmbeddingTypeTextArrayItem::not_equal(Self, Self) -> Bool
+pub fn EmbeddingsV3RequestEmbeddingTypeTextArrayItem::to_json(Self) -> @json.Json
+pub fn EmbeddingsV3RequestEmbeddingTypeTextArrayItem::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for EmbeddingsV3RequestEmbeddingTypeTextArrayItem
+pub impl @json.ToJson for EmbeddingsV3RequestEmbeddingTypeTextArrayItem
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum EmbeddingsV3RequestTask {
+  RetrievalQuery
+  RetrievalPassage
+  TextMatching
+  Classification
+  Separation
+  Custom(String)
+}
+pub fn EmbeddingsV3RequestTask::equal(Self, Self) -> Bool
+pub fn EmbeddingsV3RequestTask::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn EmbeddingsV3RequestTask::not_equal(Self, Self) -> Bool
+pub fn EmbeddingsV3RequestTask::to_json(Self) -> @json.Json
+pub fn EmbeddingsV3RequestTask::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for EmbeddingsV3RequestTask
+pub impl @json.ToJson for EmbeddingsV3RequestTask
+
+#derive(Eq, @debug.Debug)
+pub(all) struct EmbeddingsV4Request {
+  embedding_type : @jsonkit.Presence[EmbeddingsV4RequestEmbeddingType]
+  input : @json.Json
+  truncate : @jsonkit.Presence[Bool]
+  late_chunking : @jsonkit.Presence[Bool]
+  dimensions : @jsonkit.Presence[Int32]
+  task : @jsonkit.Presence[EmbeddingsV4RequestTask]
+  return_multivector : @jsonkit.Presence[Bool]
+  return_tokenized_input : @jsonkit.Presence[Bool]
+}
+pub fn EmbeddingsV4Request::equal(Self, Self) -> Bool
+pub fn EmbeddingsV4Request::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn EmbeddingsV4Request::new(input~ : @json.Json, embedding_type? : EmbeddingsV4RequestEmbeddingType, truncate? : Bool, late_chunking? : Bool, dimensions? : Int32, task? : EmbeddingsV4RequestTask, return_multivector? : Bool, return_tokenized_input? : Bool) -> Self
+pub fn EmbeddingsV4Request::not_equal(Self, Self) -> Bool
+pub fn EmbeddingsV4Request::to_json(Self) -> @json.Json
+pub fn EmbeddingsV4Request::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for EmbeddingsV4Request
+pub impl @json.ToJson for EmbeddingsV4Request
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum EmbeddingsV4RequestEmbeddingType {
+  Text(EmbeddingsV4RequestEmbeddingTypeText)
+  TextArray(Array[EmbeddingsV4RequestEmbeddingTypeTextArrayItem])
+}
+pub fn EmbeddingsV4RequestEmbeddingType::equal(Self, Self) -> Bool
+pub fn EmbeddingsV4RequestEmbeddingType::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn EmbeddingsV4RequestEmbeddingType::not_equal(Self, Self) -> Bool
+pub fn EmbeddingsV4RequestEmbeddingType::to_json(Self) -> @json.Json
+pub fn EmbeddingsV4RequestEmbeddingType::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for EmbeddingsV4RequestEmbeddingType
+pub impl @json.ToJson for EmbeddingsV4RequestEmbeddingType
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum EmbeddingsV4RequestEmbeddingTypeText {
+  Float
+  Base64
+  Binary
+  Ubinary
+  Custom(String)
+}
+pub fn EmbeddingsV4RequestEmbeddingTypeText::equal(Self, Self) -> Bool
+pub fn EmbeddingsV4RequestEmbeddingTypeText::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn EmbeddingsV4RequestEmbeddingTypeText::not_equal(Self, Self) -> Bool
+pub fn EmbeddingsV4RequestEmbeddingTypeText::to_json(Self) -> @json.Json
+pub fn EmbeddingsV4RequestEmbeddingTypeText::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for EmbeddingsV4RequestEmbeddingTypeText
+pub impl @json.ToJson for EmbeddingsV4RequestEmbeddingTypeText
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum EmbeddingsV4RequestEmbeddingTypeTextArrayItem {
+  Float
+  Base64
+  Binary
+  Ubinary
+  Custom(String)
+}
+pub fn EmbeddingsV4RequestEmbeddingTypeTextArrayItem::equal(Self, Self) -> Bool
+pub fn EmbeddingsV4RequestEmbeddingTypeTextArrayItem::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn EmbeddingsV4RequestEmbeddingTypeTextArrayItem::not_equal(Self, Self) -> Bool
+pub fn EmbeddingsV4RequestEmbeddingTypeTextArrayItem::to_json(Self) -> @json.Json
+pub fn EmbeddingsV4RequestEmbeddingTypeTextArrayItem::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for EmbeddingsV4RequestEmbeddingTypeTextArrayItem
+pub impl @json.ToJson for EmbeddingsV4RequestEmbeddingTypeTextArrayItem
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum EmbeddingsV4RequestTask {
+  TextMatching
+  RetrievalQuery
+  RetrievalPassage
+  CodeQuery
+  CodePassage
+  Custom(String)
+}
+pub fn EmbeddingsV4RequestTask::equal(Self, Self) -> Bool
+pub fn EmbeddingsV4RequestTask::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn EmbeddingsV4RequestTask::not_equal(Self, Self) -> Bool
+pub fn EmbeddingsV4RequestTask::to_json(Self) -> @json.Json
+pub fn EmbeddingsV4RequestTask::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for EmbeddingsV4RequestTask
+pub impl @json.ToJson for EmbeddingsV4RequestTask
+
+#derive(Eq, @debug.Debug)
+pub(all) struct EmbeddingsV5Request {
+  embedding_type : @jsonkit.Presence[EmbeddingsV5RequestEmbeddingType]
+  normalized : @jsonkit.Presence[Bool]
+  truncate : @jsonkit.Presence[Bool]
+  model : EmbeddingsV5RequestModel
+  input : @json.Json
+  task : @jsonkit.Presence[EmbeddingsV5RequestTask]
+  dimensions : @jsonkit.Presence[Int32]
+}
+pub fn EmbeddingsV5Request::equal(Self, Self) -> Bool
+pub fn EmbeddingsV5Request::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn EmbeddingsV5Request::new(model~ : EmbeddingsV5RequestModel, input~ : @json.Json, embedding_type? : EmbeddingsV5RequestEmbeddingType, normalized? : Bool, truncate? : Bool, task? : EmbeddingsV5RequestTask, dimensions? : Int32) -> Self
+pub fn EmbeddingsV5Request::not_equal(Self, Self) -> Bool
+pub fn EmbeddingsV5Request::to_json(Self) -> @json.Json
+pub fn EmbeddingsV5Request::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for EmbeddingsV5Request
+pub impl @json.ToJson for EmbeddingsV5Request
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum EmbeddingsV5RequestEmbeddingType {
+  Text(EmbeddingsV5RequestEmbeddingTypeText)
+  TextArray(Array[EmbeddingsV5RequestEmbeddingTypeTextArrayItem])
+}
+pub fn EmbeddingsV5RequestEmbeddingType::equal(Self, Self) -> Bool
+pub fn EmbeddingsV5RequestEmbeddingType::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn EmbeddingsV5RequestEmbeddingType::not_equal(Self, Self) -> Bool
+pub fn EmbeddingsV5RequestEmbeddingType::to_json(Self) -> @json.Json
+pub fn EmbeddingsV5RequestEmbeddingType::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for EmbeddingsV5RequestEmbeddingType
+pub impl @json.ToJson for EmbeddingsV5RequestEmbeddingType
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum EmbeddingsV5RequestEmbeddingTypeText {
+  Float
+  Base64
+  Binary
+  Ubinary
+  Custom(String)
+}
+pub fn EmbeddingsV5RequestEmbeddingTypeText::equal(Self, Self) -> Bool
+pub fn EmbeddingsV5RequestEmbeddingTypeText::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn EmbeddingsV5RequestEmbeddingTypeText::not_equal(Self, Self) -> Bool
+pub fn EmbeddingsV5RequestEmbeddingTypeText::to_json(Self) -> @json.Json
+pub fn EmbeddingsV5RequestEmbeddingTypeText::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for EmbeddingsV5RequestEmbeddingTypeText
+pub impl @json.ToJson for EmbeddingsV5RequestEmbeddingTypeText
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum EmbeddingsV5RequestEmbeddingTypeTextArrayItem {
+  Float
+  Base64
+  Binary
+  Ubinary
+  Custom(String)
+}
+pub fn EmbeddingsV5RequestEmbeddingTypeTextArrayItem::equal(Self, Self) -> Bool
+pub fn EmbeddingsV5RequestEmbeddingTypeTextArrayItem::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn EmbeddingsV5RequestEmbeddingTypeTextArrayItem::not_equal(Self, Self) -> Bool
+pub fn EmbeddingsV5RequestEmbeddingTypeTextArrayItem::to_json(Self) -> @json.Json
+pub fn EmbeddingsV5RequestEmbeddingTypeTextArrayItem::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for EmbeddingsV5RequestEmbeddingTypeTextArrayItem
+pub impl @json.ToJson for EmbeddingsV5RequestEmbeddingTypeTextArrayItem
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum EmbeddingsV5RequestModel {
+  JinaEmbeddingsV5TextNano
+  JinaEmbeddingsV5TextSmall
+  JinaEmbeddingsV5OmniSmall
+  JinaEmbeddingsV5OmniNano
+  Custom(String)
+}
+pub fn EmbeddingsV5RequestModel::equal(Self, Self) -> Bool
+pub fn EmbeddingsV5RequestModel::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn EmbeddingsV5RequestModel::not_equal(Self, Self) -> Bool
+pub fn EmbeddingsV5RequestModel::to_json(Self) -> @json.Json
+pub fn EmbeddingsV5RequestModel::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for EmbeddingsV5RequestModel
+pub impl @json.ToJson for EmbeddingsV5RequestModel
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum EmbeddingsV5RequestTask {
+  RetrievalQuery
+  RetrievalPassage
+  TextMatching
+  Clustering
+  Classification
+  Custom(String)
+}
+pub fn EmbeddingsV5RequestTask::equal(Self, Self) -> Bool
+pub fn EmbeddingsV5RequestTask::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn EmbeddingsV5RequestTask::not_equal(Self, Self) -> Bool
+pub fn EmbeddingsV5RequestTask::to_json(Self) -> @json.Json
+pub fn EmbeddingsV5RequestTask::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for EmbeddingsV5RequestTask
+pub impl @json.ToJson for EmbeddingsV5RequestTask
+
+#derive(Eq, @debug.Debug)
+pub(all) struct ErrorResponse {
+  detail : String
+  code : @jsonkit.Presence[String]
+  request_id : @jsonkit.Presence[String]
+  errors : @jsonkit.Presence[Array[FieldError]]
+}
+pub fn ErrorResponse::equal(Self, Self) -> Bool
+pub fn ErrorResponse::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ErrorResponse::new(detail~ : String, code? : String, request_id? : String, errors? : Array[FieldError]) -> Self
+pub fn ErrorResponse::not_equal(Self, Self) -> Bool
+pub fn ErrorResponse::to_json(Self) -> @json.Json
+pub fn ErrorResponse::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for ErrorResponse
+pub impl @json.ToJson for ErrorResponse
+
+#derive(Eq, @debug.Debug)
+pub(all) struct FieldError {
+  field : String
+  message : String
+  type_ : String
+  input : @jsonkit.Presence[@json.Json]
+}
+pub fn FieldError::equal(Self, Self) -> Bool
+pub fn FieldError::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn FieldError::new(field~ : String, message~ : String, type_~ : String, input? : @json.Json) -> Self
+pub fn FieldError::not_equal(Self, Self) -> Bool
+pub fn FieldError::to_json(Self) -> @json.Json
+pub fn FieldError::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for FieldError
+pub impl @json.ToJson for FieldError
+
+#derive(Eq, @debug.Debug)
+pub(all) struct ImageContentPart {
+  type_ : String
+  image_url : ImageURL
+}
+pub fn ImageContentPart::equal(Self, Self) -> Bool
+pub fn ImageContentPart::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ImageContentPart::new(type_~ : String, image_url~ : ImageURL) -> Self
+pub fn ImageContentPart::not_equal(Self, Self) -> Bool
+pub fn ImageContentPart::to_json(Self) -> @json.Json
+pub fn ImageContentPart::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for ImageContentPart
+pub impl @json.ToJson for ImageContentPart
+
+#derive(Eq, @debug.Debug)
+pub(all) struct ImageDoc {
+  image : String
+}
+pub fn ImageDoc::equal(Self, Self) -> Bool
+pub fn ImageDoc::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ImageDoc::new(image~ : String) -> Self
+pub fn ImageDoc::not_equal(Self, Self) -> Bool
+pub fn ImageDoc::to_json(Self) -> @json.Json
+pub fn ImageDoc::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for ImageDoc
+pub impl @json.ToJson for ImageDoc
+
+#derive(Eq, @debug.Debug)
+pub(all) struct ImageURL {
+  url : String
+}
+pub fn ImageURL::equal(Self, Self) -> Bool
+pub fn ImageURL::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ImageURL::new(url~ : String) -> Self
+pub fn ImageURL::not_equal(Self, Self) -> Bool
+pub fn ImageURL::to_json(Self) -> @json.Json
+pub fn ImageURL::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for ImageURL
+pub impl @json.ToJson for ImageURL
+
+#derive(Eq, @debug.Debug)
+pub(all) struct JSONSchemaSpec {
+  name : String
+  schema : @jsonkit.Presence[@json.Json]
+}
+pub fn JSONSchemaSpec::equal(Self, Self) -> Bool
+pub fn JSONSchemaSpec::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn JSONSchemaSpec::new(name~ : String, schema? : @json.Json) -> Self
+pub fn JSONSchemaSpec::not_equal(Self, Self) -> Bool
+pub fn JSONSchemaSpec::to_json(Self) -> @json.Json
+pub fn JSONSchemaSpec::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for JSONSchemaSpec
+pub impl @json.ToJson for JSONSchemaSpec
+
+#derive(Eq, @debug.Debug)
+pub(all) struct ModelDatacenter {
+  country_code : String
+}
+pub fn ModelDatacenter::equal(Self, Self) -> Bool
+pub fn ModelDatacenter::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ModelDatacenter::new(country_code~ : String) -> Self
+pub fn ModelDatacenter::not_equal(Self, Self) -> Bool
+pub fn ModelDatacenter::to_json(Self) -> @json.Json
+pub fn ModelDatacenter::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for ModelDatacenter
+pub impl @json.ToJson for ModelDatacenter
+
+#derive(Eq, @debug.Debug)
+pub(all) struct ModelInfo {
+  id : String
+  hugging_face_id : String
+  name : String
+  created : Int32
+  input_modalities : Array[String]
+  output_modalities : Array[String]
+  quantization : String
+  context_length : Int32
+  max_output_length : Int32
+  pricing : ModelPricing
+  supported_sampling_parameters : Array[String]
+  supported_features : Array[String]
+  description : String
+  datacenters : Array[ModelDatacenter]
+}
+pub fn ModelInfo::equal(Self, Self) -> Bool
+pub fn ModelInfo::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ModelInfo::new(id~ : String, hugging_face_id~ : String, name~ : String, created~ : Int32, input_modalities~ : Array[String], output_modalities~ : Array[String], quantization~ : String, context_length~ : Int32, max_output_length~ : Int32, pricing~ : ModelPricing, supported_sampling_parameters~ : Array[String], supported_features~ : Array[String], description~ : String, datacenters~ : Array[ModelDatacenter]) -> Self
+pub fn ModelInfo::not_equal(Self, Self) -> Bool
+pub fn ModelInfo::to_json(Self) -> @json.Json
+pub fn ModelInfo::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for ModelInfo
+pub impl @json.ToJson for ModelInfo
+
+#derive(Eq, @debug.Debug)
+pub(all) struct ModelListResponse {
+  data : Array[ModelInfo]
+}
+pub fn ModelListResponse::equal(Self, Self) -> Bool
+pub fn ModelListResponse::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ModelListResponse::new(data~ : Array[ModelInfo]) -> Self
+pub fn ModelListResponse::not_equal(Self, Self) -> Bool
+pub fn ModelListResponse::to_json(Self) -> @json.Json
+pub fn ModelListResponse::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for ModelListResponse
+pub impl @json.ToJson for ModelListResponse
+
+#derive(Eq, @debug.Debug)
+pub(all) struct ModelPricing {
+  prompt : String
+  completion : String
+  image : String
+  request : String
+  input_cache_read : String
+  input_cache_write : String
+}
+pub fn ModelPricing::equal(Self, Self) -> Bool
+pub fn ModelPricing::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ModelPricing::new(prompt~ : String, completion~ : String, image~ : String, request~ : String, input_cache_read~ : String, input_cache_write~ : String) -> Self
+pub fn ModelPricing::not_equal(Self, Self) -> Bool
+pub fn ModelPricing::to_json(Self) -> @json.Json
+pub fn ModelPricing::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for ModelPricing
+pub impl @json.ToJson for ModelPricing
+
+#derive(Eq, @debug.Debug)
+pub(all) struct OpenAIError {
+  message : String
+  type_ : String
+  param : @jsonkit.Presence[String]
+  code : @jsonkit.Presence[String]
+  request_id : @jsonkit.Presence[String]
+}
+pub fn OpenAIError::equal(Self, Self) -> Bool
+pub fn OpenAIError::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn OpenAIError::new(message~ : String, type_~ : String, param? : String, code? : String, request_id? : String) -> Self
+pub fn OpenAIError::not_equal(Self, Self) -> Bool
+pub fn OpenAIError::to_json(Self) -> @json.Json
+pub fn OpenAIError::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for OpenAIError
+pub impl @json.ToJson for OpenAIError
+
+#derive(Eq, @debug.Debug)
+pub(all) struct OpenAIErrorResponse {
+  error : OpenAIError
+}
+pub fn OpenAIErrorResponse::equal(Self, Self) -> Bool
+pub fn OpenAIErrorResponse::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn OpenAIErrorResponse::new(error~ : OpenAIError) -> Self
+pub fn OpenAIErrorResponse::not_equal(Self, Self) -> Bool
+pub fn OpenAIErrorResponse::to_json(Self) -> @json.Json
+pub fn OpenAIErrorResponse::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for OpenAIErrorResponse
+pub impl @json.ToJson for OpenAIErrorResponse
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum RerankV1RerankPostRequest {
+  JinaRerankerV2BaseMultilingual(TextRerankerRequest)
+  JinaRerankerV1TinyEn(TextRerankerRequest)
+  JinaRerankerV1TurboEn(TextRerankerRequest)
+  JinaRerankerV1BaseEn(TextRerankerRequest)
+  JinaColbertV1En(TextRerankerRequest)
+  JinaColbertV2(TextRerankerRequest)
+  JinaRerankerM0(RerankerM0Request)
+  JinaRerankerV3(RerankerV3Request)
+  JinaRerankerV35(RerankerV3Request)
+  Unknown(String, @json.Json)
+}
+pub fn RerankV1RerankPostRequest::equal(Self, Self) -> Bool
+pub fn RerankV1RerankPostRequest::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn RerankV1RerankPostRequest::not_equal(Self, Self) -> Bool
+pub fn RerankV1RerankPostRequest::to_json(Self) -> @json.Json
+pub fn RerankV1RerankPostRequest::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for RerankV1RerankPostRequest
+pub impl @json.ToJson for RerankV1RerankPostRequest
+
+#derive(Eq, @debug.Debug)
+pub(all) struct RerankerM0Request {
+  query : RerankerM0RequestQuery
+  top_n : @jsonkit.Presence[Int32]
+  return_documents : @jsonkit.Presence[Bool]
+  documents : Array[@json.Json]
+}
+pub fn RerankerM0Request::equal(Self, Self) -> Bool
+pub fn RerankerM0Request::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn RerankerM0Request::new(query~ : RerankerM0RequestQuery, documents~ : Array[@json.Json], top_n? : Int32, return_documents? : Bool) -> Self
+pub fn RerankerM0Request::not_equal(Self, Self) -> Bool
+pub fn RerankerM0Request::to_json(Self) -> @json.Json
+pub fn RerankerM0Request::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for RerankerM0Request
+pub impl @json.ToJson for RerankerM0Request
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum RerankerM0RequestQuery {
+  Text(String)
+  ImageDoc(ImageDoc)
+}
+pub fn RerankerM0RequestQuery::equal(Self, Self) -> Bool
+pub fn RerankerM0RequestQuery::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn RerankerM0RequestQuery::not_equal(Self, Self) -> Bool
+pub fn RerankerM0RequestQuery::to_json(Self) -> @json.Json
+pub fn RerankerM0RequestQuery::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for RerankerM0RequestQuery
+pub impl @json.ToJson for RerankerM0RequestQuery
+
+#derive(Eq, @debug.Debug)
+pub(all) struct RerankerV3Request {
+  query : String
+  top_n : @jsonkit.Presence[Int32]
+  return_documents : @jsonkit.Presence[Bool]
+  model : RerankerV3RequestModel
+  documents : Array[RerankerV3RequestDocumentsItem]
+  max_doc_length : @jsonkit.Presence[Int32]
+  return_embeddings : @jsonkit.Presence[Bool]
+}
+pub fn RerankerV3Request::equal(Self, Self) -> Bool
+pub fn RerankerV3Request::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn RerankerV3Request::new(query~ : String, model~ : RerankerV3RequestModel, documents~ : Array[RerankerV3RequestDocumentsItem], top_n? : Int32, return_documents? : Bool, max_doc_length? : Int32, return_embeddings? : Bool) -> Self
+pub fn RerankerV3Request::not_equal(Self, Self) -> Bool
+pub fn RerankerV3Request::to_json(Self) -> @json.Json
+pub fn RerankerV3Request::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for RerankerV3Request
+pub impl @json.ToJson for RerankerV3Request
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum RerankerV3RequestDocumentsItem {
+  Text(String)
+  TextDoc(TextDoc)
+}
+pub fn RerankerV3RequestDocumentsItem::equal(Self, Self) -> Bool
+pub fn RerankerV3RequestDocumentsItem::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn RerankerV3RequestDocumentsItem::not_equal(Self, Self) -> Bool
+pub fn RerankerV3RequestDocumentsItem::to_json(Self) -> @json.Json
+pub fn RerankerV3RequestDocumentsItem::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for RerankerV3RequestDocumentsItem
+pub impl @json.ToJson for RerankerV3RequestDocumentsItem
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum RerankerV3RequestModel {
+  JinaRerankerV3
+  JinaRerankerV35
+  Custom(String)
+}
+pub fn RerankerV3RequestModel::equal(Self, Self) -> Bool
+pub fn RerankerV3RequestModel::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn RerankerV3RequestModel::not_equal(Self, Self) -> Bool
+pub fn RerankerV3RequestModel::to_json(Self) -> @json.Json
+pub fn RerankerV3RequestModel::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for RerankerV3RequestModel
+pub impl @json.ToJson for RerankerV3RequestModel
+
+#derive(Eq, @debug.Debug)
+pub(all) struct RerankingResponse {
+  model : String
+  object : String?
+  usage : BaseUsage
+  results : Array[RerankingResult]
+}
+pub fn RerankingResponse::equal(Self, Self) -> Bool
+pub fn RerankingResponse::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn RerankingResponse::new(model~ : String, usage~ : BaseUsage, results~ : Array[RerankingResult], object? : String) -> Self
+pub fn RerankingResponse::not_equal(Self, Self) -> Bool
+pub fn RerankingResponse::to_json(Self) -> @json.Json
+pub fn RerankingResponse::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for RerankingResponse
+pub impl @json.ToJson for RerankingResponse
+
+#derive(Eq, @debug.Debug)
+pub(all) struct RerankingResult {
+  index : Int32
+  relevance_score : Double
+  document : @jsonkit.Presence[@json.Json]
+  embedding : @jsonkit.Presence[Array[Double]]
+}
+pub fn RerankingResult::equal(Self, Self) -> Bool
+pub fn RerankingResult::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn RerankingResult::new(index~ : Int32, relevance_score~ : Double, document? : @json.Json, embedding? : Array[Double]) -> Self
+pub fn RerankingResult::not_equal(Self, Self) -> Bool
+pub fn RerankingResult::to_json(Self) -> @json.Json
+pub fn RerankingResult::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for RerankingResult
+pub impl @json.ToJson for RerankingResult
+
+#derive(Eq, @debug.Debug)
+pub(all) struct ResponseFormatJSONObject {
+  type_ : String
+}
+pub fn ResponseFormatJSONObject::equal(Self, Self) -> Bool
+pub fn ResponseFormatJSONObject::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ResponseFormatJSONObject::new(type_~ : String) -> Self
+pub fn ResponseFormatJSONObject::not_equal(Self, Self) -> Bool
+pub fn ResponseFormatJSONObject::to_json(Self) -> @json.Json
+pub fn ResponseFormatJSONObject::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for ResponseFormatJSONObject
+pub impl @json.ToJson for ResponseFormatJSONObject
+
+#derive(Eq, @debug.Debug)
+pub(all) struct ResponseFormatJSONSchema {
+  type_ : String
+  json_schema : JSONSchemaSpec
+}
+pub fn ResponseFormatJSONSchema::equal(Self, Self) -> Bool
+pub fn ResponseFormatJSONSchema::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ResponseFormatJSONSchema::new(type_~ : String, json_schema~ : JSONSchemaSpec) -> Self
+pub fn ResponseFormatJSONSchema::not_equal(Self, Self) -> Bool
+pub fn ResponseFormatJSONSchema::to_json(Self) -> @json.Json
+pub fn ResponseFormatJSONSchema::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for ResponseFormatJSONSchema
+pub impl @json.ToJson for ResponseFormatJSONSchema
+
+#derive(Eq, @debug.Debug)
+pub(all) struct ResponseFormatText {
+  type_ : String
+}
+pub fn ResponseFormatText::equal(Self, Self) -> Bool
+pub fn ResponseFormatText::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ResponseFormatText::new(type_~ : String) -> Self
+pub fn ResponseFormatText::not_equal(Self, Self) -> Bool
+pub fn ResponseFormatText::to_json(Self) -> @json.Json
+pub fn ResponseFormatText::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for ResponseFormatText
+pub impl @json.ToJson for ResponseFormatText
+
+#derive(Eq, @debug.Debug)
+pub(all) struct StreamOptions {
+  include_usage : Bool?
+}
+pub fn StreamOptions::equal(Self, Self) -> Bool
+pub fn StreamOptions::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn StreamOptions::new(include_usage? : Bool) -> Self
+pub fn StreamOptions::not_equal(Self, Self) -> Bool
+pub fn StreamOptions::to_json(Self) -> @json.Json
+pub fn StreamOptions::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for StreamOptions
+pub impl @json.ToJson for StreamOptions
+
+#derive(Eq, @debug.Debug)
+pub(all) struct TextContentPart {
+  type_ : String
+  text : String
+}
+pub fn TextContentPart::equal(Self, Self) -> Bool
+pub fn TextContentPart::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn TextContentPart::new(type_~ : String, text~ : String) -> Self
+pub fn TextContentPart::not_equal(Self, Self) -> Bool
+pub fn TextContentPart::to_json(Self) -> @json.Json
+pub fn TextContentPart::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for TextContentPart
+pub impl @json.ToJson for TextContentPart
+
+#derive(Eq, @debug.Debug)
+pub(all) struct TextDoc {
+  text : String
+}
+pub fn TextDoc::equal(Self, Self) -> Bool
+pub fn TextDoc::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn TextDoc::new(text~ : String) -> Self
+pub fn TextDoc::not_equal(Self, Self) -> Bool
+pub fn TextDoc::to_json(Self) -> @json.Json
+pub fn TextDoc::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for TextDoc
+pub impl @json.ToJson for TextDoc
+
+#derive(Eq, @debug.Debug)
+pub(all) struct TextRerankerRequest {
+  query : String
+  top_n : @jsonkit.Presence[Int32]
+  return_documents : @jsonkit.Presence[Bool]
+  model : TextRerankerRequestModel
+  documents : Array[TextRerankerRequestDocumentsItem]
+}
+pub fn TextRerankerRequest::equal(Self, Self) -> Bool
+pub fn TextRerankerRequest::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn TextRerankerRequest::new(query~ : String, model~ : TextRerankerRequestModel, documents~ : Array[TextRerankerRequestDocumentsItem], top_n? : Int32, return_documents? : Bool) -> Self
+pub fn TextRerankerRequest::not_equal(Self, Self) -> Bool
+pub fn TextRerankerRequest::to_json(Self) -> @json.Json
+pub fn TextRerankerRequest::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for TextRerankerRequest
+pub impl @json.ToJson for TextRerankerRequest
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum TextRerankerRequestDocumentsItem {
+  Text(String)
+  TextDoc(TextDoc)
+}
+pub fn TextRerankerRequestDocumentsItem::equal(Self, Self) -> Bool
+pub fn TextRerankerRequestDocumentsItem::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn TextRerankerRequestDocumentsItem::not_equal(Self, Self) -> Bool
+pub fn TextRerankerRequestDocumentsItem::to_json(Self) -> @json.Json
+pub fn TextRerankerRequestDocumentsItem::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for TextRerankerRequestDocumentsItem
+pub impl @json.ToJson for TextRerankerRequestDocumentsItem
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum TextRerankerRequestModel {
+  JinaRerankerV2BaseMultilingual
+  JinaRerankerV1TinyEn
+  JinaRerankerV1TurboEn
+  JinaRerankerV1BaseEn
+  JinaColbertV1En
+  JinaColbertV2
+  Custom(String)
+}
+pub fn TextRerankerRequestModel::equal(Self, Self) -> Bool
+pub fn TextRerankerRequestModel::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn TextRerankerRequestModel::not_equal(Self, Self) -> Bool
+pub fn TextRerankerRequestModel::to_json(Self) -> @json.Json
+pub fn TextRerankerRequestModel::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for TextRerankerRequestModel
+pub impl @json.ToJson for TextRerankerRequestModel
+
+// Type aliases
+
+// Traits

@@ -10,14 +10,17 @@ add vendor-specific retries, streaming, pagination and error interpretation.
 | [gaato/openai](openai/README.md) | Models, embeddings, Responses and Chat Completions | mttp_core |
 | [gaato/anthropic](anthropic/README.md) | Messages, token counting, Models, tools and streaming | mttp_core |
 | [gaato/github](github/README.md) | Generated REST API, pagination and GraphQL | mttp_core |
-| gaato/codex-protocol | Generated typed Codex calls/events | mttp_core/jsonkit |
+| gaato/codex-protocol | Generated typed Codex calls/events (not published yet) | mttp_core/jsonkit |
+| [gaato/jina](jina/README.md) | Generated API vocabulary (not published yet) | mttp_core |
+| [gaato/replicate](replicate/README.md) | Generated API vocabulary (not published yet) | mttp_core |
 | gaato/jsonrpc | Portable JSON-RPC messages and NDJSON framing | core |
 | gaato/jsonrpc-async | Bidirectional connections and native child processes | jsonrpc, core/async |
 | [gaato/codex-app-server](codex-app-server/README.md) | Initialized sessions, typed events and handlers | protocol, jsonrpc-async, core/async |
 <!-- END sdks: modules -->
 
-The HTTP SDKs are published on mooncakes. JSON-RPC and Codex modules
-remain unpublished. HTTP infrastructure lives in [mttp](https://github.com/gaato/mttp):
+Published HTTP SDKs are available on mooncakes; the table marks modules not
+published yet. JSON-RPC and Codex modules remain unpublished.
+HTTP infrastructure lives in [mttp](https://github.com/gaato/mttp):
 gaato/mttp_core supplies the vocabulary, Backend and the client policy, and
 gaato/mttp supplies the I/O an app adds. SDK modules do not import a
 runtime.
