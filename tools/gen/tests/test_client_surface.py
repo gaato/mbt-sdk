@@ -152,11 +152,9 @@ class ClientSurfaceTests(unittest.TestCase):
         sdk = next(s for s in sdks.load() if s['name'] == 'replicate')
         files, ir = build(surface_spec(), retry=sdk['retry'], timeout_ms=70000)
         files['contract_gen.mbt'] += SURFACE_CONTRACT
-        root = Path(__file__).resolve().parents[3]
         with tempfile.TemporaryDirectory(prefix='f2b-surface-') as tmp:
             tmp = Path(tmp)
             (tmp / 'moon.mod').write_text('name = "gaato/sample"\nversion = "0.1.0"\nsource = "src"\nimport { "gaato/mttp_core@0.1.0" }\n')
-            (tmp / '.mooncakes').symlink_to(root / '.mooncakes', target_is_directory=True)
             _write(tmp / 'src/gen', _format(emit(ir)))
             _write(tmp / 'src', _format(files))
             process = subprocess.run(['moon', '-C', str(tmp), 'test', '--target', 'wasm-gc', '--deny-warn'], text=True, capture_output=True)

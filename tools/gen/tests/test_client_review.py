@@ -17,9 +17,6 @@ from tools.gen.ir import IRBuilder
 from tools.gen.tests.test_client_layer import ledger
 from tools.gen.tests.test_client_surface import surface_spec, operation
 
-ROOT = Path(__file__).resolve().parents[3]
-
-
 def review_spec():
     doc = surface_spec()
     doc['paths']['/search'] = {'get': operation('search', security=[])}
@@ -52,7 +49,6 @@ class ClientReviewTests(unittest.TestCase):
         with tempfile.TemporaryDirectory(prefix='f2r-review-') as directory:
             root = Path(directory)
             (root / 'moon.mod').write_text('name = "gaato/sample"\nversion = "0.1.0"\nsource = "src"\nimport { "gaato/mttp_core@0.1.0" }\n')
-            (root / '.mooncakes').symlink_to(ROOT / '.mooncakes', target_is_directory=True)
             generator._write(root / 'src/gen', generator._format(emit(ir)))
             generator._write(root / 'src', generator._format(files))
             result = subprocess.run(['moon', '-C', str(root), 'test', '--target', 'wasm-gc', '--deny-warn'], text=True, capture_output=True)

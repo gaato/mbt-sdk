@@ -196,13 +196,11 @@ test "raw wrapper preserves upload bytes and marks caller idempotency key" {
   }
 }
 '''
-        root = Path(__file__).resolve().parents[3]
         with tempfile.TemporaryDirectory(prefix='f2-client-') as tmp:
             tmp = Path(tmp)
             (tmp / 'moon.mod').write_text('name = "gaato/sample"\nversion = "0.1.0"\nsource = "src"\nimport { "gaato/mttp_core@0.1.0" }\n')
-            # Reuse the already resolved repository dependency graph; no registry
-            # request or additional package is necessary for this temporary module.
-            (tmp / '.mooncakes').symlink_to(root / '.mooncakes', target_is_directory=True)
+            # Moon owns this module's dependency directory. A repository symlink
+            # is dangling on a fresh checkout and blocks Moon's mkdir with EEXIST.
             _write(tmp / 'src/gen', _format(emit(ir)))
             _write(tmp / 'src', _format(files))
             process = subprocess.run(['moon', '-C', str(tmp), 'test', '--target', 'wasm-gc'], text=True, capture_output=True)
