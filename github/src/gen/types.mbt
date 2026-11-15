@@ -67255,6 +67255,68 @@ pub impl @json.FromJson for CodeScanningVariantAnalysisSkippedRepoGroup with fn 
 
 ///|
 ///
+/// Generated string enum CodeScanningVariantAnalysisRunStatus.
+#derive(Eq, @debug.Debug)
+#non_exhaustive
+pub(all) enum CodeScanningVariantAnalysisRunStatus {
+  InProgress
+  Succeeded
+  Failed
+  Cancelled
+  Unknown(String)
+}
+
+///|
+pub extend CodeScanningVariantAnalysisRunStatus with Eq::{equal, not_equal}
+
+///|
+pub extend CodeScanningVariantAnalysisRunStatus with @debug.Debug::{to_repr}
+
+///|
+///
+/// Encodes this string enum as JSON.
+pub extend CodeScanningVariantAnalysisRunStatus with ToJson::{to_json}
+
+///|
+pub impl ToJson for CodeScanningVariantAnalysisRunStatus with fn to_json(self) {
+  let raw = match self {
+    InProgress => "in_progress"
+    Succeeded => "succeeded"
+    Failed => "failed"
+    Cancelled => "cancelled"
+    Unknown(raw) => raw
+  }
+  Json(raw)
+}
+
+///|
+///
+/// Decodes this string enum from JSON.
+pub extend CodeScanningVariantAnalysisRunStatus with @json.FromJson::{from_json}
+
+///|
+pub impl @json.FromJson for CodeScanningVariantAnalysisRunStatus with fn from_json(
+  value,
+  path,
+) {
+  @sdkjson.open_string(
+    value,
+    path,
+    raw => {
+      match raw {
+        "in_progress" => Some(InProgress)
+        "succeeded" => Some(Succeeded)
+        "failed" => Some(Failed)
+        "cancelled" => Some(Cancelled)
+        _ => None
+      }
+    },
+    raw => Unknown(raw),
+  )
+}
+
+///|
+///
 /// The reason for a failure of the variant analysis. This is only available if the variant analysis has failed.
 #derive(Eq, @debug.Debug)
 #non_exhaustive
@@ -67558,7 +67620,7 @@ pub(all) struct CodeScanningVariantAnalysis {
   created_at : String?
   updated_at : String?
   completed_at : @sdkjson.Presence[String]
-  status : CodeScanningVariantAnalysisStatus
+  status : CodeScanningVariantAnalysisRunStatus
   actions_workflow_run_id : Int32?
   failure_reason : CodeScanningVariantAnalysisFailureReason?
   scanned_repositories : Array[
@@ -67582,7 +67644,7 @@ pub fn CodeScanningVariantAnalysis::new(
   actor~ : SimpleUser,
   query_language~ : CodeScanningVariantAnalysisLanguage,
   query_pack_url~ : String,
-  status~ : CodeScanningVariantAnalysisStatus,
+  status~ : CodeScanningVariantAnalysisRunStatus,
   created_at? : String,
   updated_at? : String,
   completed_at? : String,

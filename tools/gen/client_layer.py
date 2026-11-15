@@ -13,6 +13,14 @@ from tools.gen.ir import IR, IRBuilder, HTTP_METHODS, Struct, json_response_medi
 
 TEMPLATES = Path(__file__).with_name('templates')
 
+# Client methods share a namespace with operation wrappers, including private
+# helpers and the Debug method, so reserve the complete facade surface together.
+CLIENT_METHOD_NAMES = frozenset({
+    'new', 'from_client', 'to_repr', 'authenticate', 'operation_config',
+    'infer_operation', 'operation_base', 'prepare', 'call', 'send', 'stream',
+    'stream_with_head', 'paginate',
+})
+
 
 def quote(value):
     return json.dumps(value, ensure_ascii=False)
@@ -31,6 +39,66 @@ def scheme_auth(scheme):
     if scheme.get('type') == 'http' and scheme.get('scheme', '').lower() in ('bearer', 'basic'):
         return {'kind': scheme['scheme'].lower()}
     raise ValueError(f'unsupported authentication scheme: {scheme!r}')
+
+
+def security_requirements(security, label):
+    """Return OR requirements, spelling an empty array as anonymous access."""
+    if not isinstance(security, list):
+        raise ValueError(f'{label}: security must be an array')
+    return security or [{}]
+
+
+def security_auth_choices(doc):
+    """Return credential choices selected by OpenAPI security requirements.
+
+    Requirement objects are OR alternatives; multiple schemes inside one object
+    are an AND requirement, which the generated client deliberately cannot model.
+    The boolean records whether the document supplied any security requirement,
+    so scaffolding never infers policy from definitions alone.
+    """
+    schemes = doc.get('components', {}).get('securitySchemes', {})
+    if not isinstance(schemes, dict) or not all(isinstance(value, dict) for value in schemes.values()):
+        raise ValueError('securitySchemes must be an object of scheme definitions')
+    choices = []
+    saw_security = False
+
+    def add(security, label):
+        nonlocal saw_security
+        saw_security = True
+        for requirement in security_requirements(security, label):
+            if not isinstance(requirement, dict):
+                raise ValueError(f'{label}: security requirement must be an object')
+            if len(requirement) > 1:
+                raise ValueError(f'{label}: AND authentication is not supported')
+            if not requirement:
+                choice = {'kind': 'none'}
+                if choice not in choices:
+                    choices.append(choice)
+            for name in requirement:
+                definition = schemes.get(name)
+                if not isinstance(definition, dict):
+                    raise ValueError(f'{label}: unknown security scheme {name}')
+                choice = scheme_auth(definition)
+                if choice not in choices:
+                    choices.append(choice)
+
+    root_security = doc.get('security')
+    root_present = 'security' in doc
+    operations_found = False
+    for path, item in doc.get('paths', {}).items():
+        if not isinstance(item, dict):
+            continue
+        for method, operation in item.items():
+            if method not in HTTP_METHODS or not isinstance(operation, dict):
+                continue
+            operations_found = True
+            if 'security' in operation:
+                add(operation['security'], f'{method.upper()} {path}')
+            elif root_present:
+                add(root_security, f'{method.upper()} {path}')
+    if root_present and not operations_found:
+        add(root_security, 'document')
+    return choices, saw_security
 
 
 def auth_constructor(auth):
@@ -101,7 +169,6 @@ def operations(doc, ir):
 
 def client_names(doc, ir):
     """Shorten only the exact suffix FastAPI derives from path and method."""
-    reserved = {'new', 'from_client', 'call', 'send', 'stream', 'paginate'}
     names, explicit = {}, set()
     full = {op.operation_id: op.moon_name for op in ir.operations}
     for op, raw, _ in operations(doc, ir):
@@ -115,14 +182,17 @@ def client_names(doc, ir):
             suffix = re.sub(r'[^A-Za-z0-9_]', '_', op.path) + '_' + op.method.lower()
             short = op.operation_id[:-len(suffix)] if op.operation_id.endswith(suffix) else ''
             names[op.operation_id] = snake_case(short) if short else op.moon_name
+        if names[op.operation_id] in CLIENT_METHOD_NAMES:
+            fallback = full[op.operation_id]
+            names[op.operation_id] = fallback if fallback not in CLIENT_METHOD_NAMES else fallback + '_operation'
     while True:
         counts = Counter(names.values())
-        collisions = {key for key, name in names.items() if counts[name] > 1 or name in reserved}
+        collisions = {key for key, name in names.items() if counts[name] > 1 or name in CLIENT_METHOD_NAMES}
         if not collisions:
             return names
         changed = False
         for key in sorted(collisions):
-            if key not in explicit and names[key] != full[key]:
+            if key not in explicit and names[key] != full[key] and full[key] not in CLIENT_METHOD_NAMES:
                 names[key] = full[key]
                 changed = True
         if not changed:
@@ -217,6 +287,45 @@ def success_media(raw):
 
 def wrapper(op, raw, prefix, client, auth_headers, name):
     params, request = request_parts(op, raw, prefix, auth_headers)
+    stream_kind = raw.get('x-moonbit-stream')
+    if stream_kind is not None and stream_kind != 'sse':
+        raise ValueError(f'{op.operation_id}: unsupported x-moonbit-stream {stream_kind!r}')
+    if stream_kind == 'sse':
+        if op.response_type is None:
+            raise ValueError(f'{op.operation_id}: SSE operation needs a JSON response schema')
+        result = qualify_type(op.response_type.moon_type(), prefix)
+        params = 'self : ' + client + (', ' + params if params else '')
+        params += f', receive : async ({result}) -> Unit, stop? : ({result}) -> Bool'
+        return f'''///|
+/// Streams {op.operation_id} as typed SSE JSON events; alt=sse is always set.
+pub async fn {client}::{name}({params}) -> Result[Unit, Failure] {{
+  let request = {request}.query("alt", "sse")
+  let decoded : Ref[{result}?] = Ref(None)
+  let decode_error : Ref[@client.ResponseFailure?] = Ref(None)
+  let stream_result = self.stream_with_head(
+    request,
+    _event => match decoded.val {{
+      Some(value) => {{ decoded.val = None; receive(value) }}
+      None => ()
+    }},
+    stop=(head, event) => match {prefix}{op.moon_name}_decode(
+      head,
+      @utf8.encode(event.data),
+    ) {{
+      Err(error) => {{ decode_error.val = Some(error); true }}
+      Ok(value) => match stop {{
+        Some(predicate) if predicate(value) => true
+        _ => {{ decoded.val = Some(value); false }}
+      }}
+    }},
+    operation={quote(op.operation_id)},
+  )
+  match decode_error.val {{
+    Some(error) => Err(Decode(error))
+    None => stream_result
+  }}
+}}
+'''
     if op.response_type:
         result = qualify_type(op.response_type.moon_type(), prefix)
         expression = f'self.call(request, {prefix}{op.moon_name}_decode, operation={quote(op.operation_id)})'
@@ -266,7 +375,7 @@ def multipart_names(field):
 def qualify_type(text, prefix):
     if not prefix:
         return text
-    primitives = {'Array', 'Map', 'String', 'Bytes', 'Int32', 'Int64', 'Double', 'Bool', 'Json', 'Unit'}
+    primitives = {'Array', 'Map', 'String', 'Bytes', 'Int32', 'UInt32', 'Int64', 'UInt64', 'Double', 'Bool', 'Json', 'Unit'}
     return re.sub(r'\b[A-Z][A-Za-z0-9_]*\b', lambda m: m[0] if m[0] in primitives else prefix + m[0], text)
 
 
@@ -328,9 +437,14 @@ pub impl @debug.Debug for Auth with fn to_repr(_) {
             # Missing security in vendor descriptions uses the pinned auth.
             allowed = choices
         else:
-            for requirement in security:
+            for requirement in security_requirements(security, op.operation_id):
                 if len(requirement) > 1:
                     raise ValueError(f'{op.operation_id}: AND authentication is not supported')
+                if not requirement:
+                    a = {'kind': 'none'}
+                    if a not in choices:
+                        raise ValueError(f'{op.operation_id}: anonymous access is absent from the pinned auth')
+                    allowed.append(a)
                 for name in requirement:
                     definition = doc.get('components', {}).get('securitySchemes', {}).get(name)
                     if definition is None:
@@ -342,7 +456,9 @@ pub impl @debug.Debug for Auth with fn to_repr(_) {
                         raise ValueError(f'{op.operation_id}: scheme {name} is absent from the pinned auth')
                     allowed.append(a)
         patterns = [auth_constructor(a) + ('(_, _)' if a['kind'] == 'basic' else '(_)' if a['kind'] != 'none' else '') for a in allowed]
-        auth_bool = 'false' if not patterns else 'match self.auth { ' + ' | '.join(dict.fromkeys(patterns)) + ' => true; _ => false }'
+        # Anonymous-only access means credentials are never attached.  Keep the
+        # compact historical representation while retaining Anonymous in the pin.
+        auth_bool = 'false' if not patterns or all(a['kind'] == 'none' for a in allowed) else 'match self.auth { ' + ' | '.join(dict.fromkeys(patterns)) + ' => true; _ => false }'
         servers = raw.get('servers', item.get('servers', []))
         server = servers[0]['url'] if servers else ''
         if '{' in server:

@@ -7,7 +7,7 @@ import tempfile
 import unittest
 from unittest.mock import patch
 
-from tools.gen.client_layer import emit_client, retry_source
+from tools.gen.client_layer import emit_client, retry_source, security_auth_choices
 from tools.gen.emit_moonbit import HEADER, emit
 from tools.gen.ir import IRBuilder
 from tools.gen.main import _differences, _format, _protected_conflicts, _write
@@ -49,6 +49,7 @@ def ledger(**kwargs):
     return dict(name='sample', dir='sample', module='gaato/sample', out='sample/src/gen',
                 base_url='https://api.example', auth={'kind': 'alternatives', 'schemes': [
                     {'kind': 'header', 'name': 'X-Api-Key'}, {'kind': 'bearer'}, {'kind': 'basic'}, {'kind': 'query', 'name': 'api_key'},
+                    {'kind': 'none'},
                 ]}, idempotency_headers=['Idempotency-Key'], **kwargs)
 
 
@@ -83,7 +84,8 @@ class ClientLayerTests(unittest.TestCase):
         self.assertIn('.body_bytes(body, content_type~)', files['operations_gen.mbt'])
         self.assertIn('Sample::events(', files['operations_gen.mbt'])
         self.assertIn('Sample::mixed_stream(', files['operations_gen.mbt'])
-        self.assertIn('as_sse(receive, stop?)', files['client_gen.mbt'])
+        self.assertIn('@client.from_head(head =>', files['client_gen.mbt'])
+        self.assertIn('stop=event => stop(head, event)', files['client_gen.mbt'])
         self.assertIn('Sample::items_pages', files['paginate_gen.mbt'])
         self.assertIn('merge_query_params', files['paginate_gen.mbt'])
         self.assertIn('@client.RetryPolicy::conservative()', files['retry_gen.mbt'])
@@ -127,6 +129,67 @@ class ClientLayerTests(unittest.TestCase):
         doc['x-moonbit-auth'] = doc['components'].pop('securitySchemes')
         files, _ = build(doc)
         self.assertIn('XApiKey(String)', files['client_gen.mbt'])
+
+    def test_empty_security_requirement_keeps_anonymous_or_alternative(self):
+        doc = {
+            'openapi': '3.1.0',
+            'servers': [{'url': 'https://api.example'}],
+            'components': {'securitySchemes': {
+                'token': {'type': 'http', 'scheme': 'bearer'},
+            }},
+            'paths': {'/items': {'get': {
+                'x-moonbit-include': True,
+                'operationId': 'items',
+                'security': [{}, {'token': []}],
+                'responses': {'200': {}},
+            }}},
+        }
+        choices, saw_security = security_auth_choices(doc)
+        self.assertTrue(saw_security)
+        self.assertEqual(choices, [
+            {'kind': 'none'},
+            {'kind': 'bearer'},
+        ])
+        sdk = ledger()
+        sdk['auth'] = {'kind': 'alternatives', 'schemes': choices}
+        ir = IRBuilder(doc, 'gaato/sample/gen', auth_headers={'authorization', 'x-api-key'}).build()
+        source = emit_client(doc, ir, sdk)['client_gen.mbt']
+        self.assertIn('"items" => (match self.auth { Anonymous | Bearer(_) => true; _ => false }', source)
+
+    def test_empty_security_array_is_anonymous_in_a_mixed_document(self):
+        doc = {
+            'openapi': '3.1.0',
+            'servers': [{'url': 'https://api.example'}],
+            'security': [{'token': []}],
+            'components': {'securitySchemes': {
+                'token': {'type': 'http', 'scheme': 'bearer'},
+            }},
+            'paths': {
+                '/protected': {'get': {
+                    'x-moonbit-include': True,
+                    'operationId': 'protected',
+                    'responses': {'200': {}},
+                }},
+                '/public': {'get': {
+                    'x-moonbit-include': True,
+                    'operationId': 'public',
+                    'security': [],
+                    'responses': {'200': {}},
+                }},
+            },
+        }
+        choices, saw_security = security_auth_choices(doc)
+        self.assertTrue(saw_security)
+        self.assertEqual(choices, [{'kind': 'bearer'}, {'kind': 'none'}])
+        sdk = ledger()
+        sdk['auth'] = {'kind': 'alternatives', 'schemes': choices}
+        ir = IRBuilder(doc, 'gaato/sample/gen').build()
+        source = emit_client(doc, ir, sdk)['client_gen.mbt']
+        self.assertIn(
+            '"protected" => (match self.auth { Bearer(_) => true; _ => false }',
+            source,
+        )
+        self.assertIn('"public" => (false, "")', source)
 
     def test_error_schema_diagnostics_are_available_to_census(self):
         doc = spec()

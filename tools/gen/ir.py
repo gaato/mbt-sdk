@@ -30,6 +30,10 @@ class TypeRef:
         if self.kind == "map":
             assert self.item is not None
             return f"Map[String, {self.item.moon_type()}]"
+        if self.kind == "string_int64":
+            return "Int64"
+        if self.kind == "string_uint64":
+            return "UInt64"
         return self.name or self.kind
 
 
@@ -248,6 +252,7 @@ RESERVED = {
     "type",
     "typeof",
     "unsafe",
+    "unreachable",
     "use",
     "using",
     "var",
@@ -991,6 +996,16 @@ class IRBuilder:
                             if not json_response_media(kind):
                                 media_pointer = pointer_join(pointer_join(pointer_join(pointer_join(pointer, "responses"), status), "content"), kind)
                                 self.add_note(media_pointer, f"unmodelled success response {kind}; caller must handle the raw @http.Response")
+                if "x-moonbit-media-upload" in operation:
+                    self.add_note(
+                        pointer_join(pointer, "x-moonbit-media-upload"),
+                        "Discovery media upload protocol recorded; resumable upload requires handwritten facade support",
+                    )
+                if operation.get("x-moonbit-media-download") is True:
+                    self.add_note(
+                        pointer_join(pointer, "x-moonbit-media-download"),
+                        "Discovery media download recorded; the generated operation keeps its declared JSON response",
+                    )
                 for schema, usage, schema_pointer in self._operation_schemas(operation, pointer):
                     self._walk_refs(schema, usage, seen, schema_pointer)
                 multipart = content.get(multipart_kind, {}).get("schema")
@@ -1018,6 +1033,13 @@ class IRBuilder:
 
     def _add_declaration(self, declaration: Declaration, pointer: str) -> None:
         if declaration.name in self.declaration_names:
+            existing = next(item for item in self.declarations if item.name == declaration.name)
+            if existing != declaration:
+                self.add_diag(
+                    pointer,
+                    f"different schemas claim generated declaration {declaration.name}",
+                    "rename one schema or operation in overlays/fix.yaml so generated declaration names are unique",
+                )
             return
         self.declaration_names.add(declaration.name)
         self.declarations.append(declaration)
@@ -1448,10 +1470,25 @@ class IRBuilder:
             return TypeRef("map", item=item)
         required = set(schema.get("required", []))
         fields: list[Field] = []
+        field_names: set[str] = set()
         properties = schema.get("properties", {})
         for json_name, field_schema in properties.items():
             field_pointer = pointer_join(pointer_join(pointer, "properties"), json_name)
-            if snake_case(json_name) == "new":
+            moon_name = snake_case(json_name)
+            declaration_name = name + pascal_case(json_name)
+            if moon_name in field_names:
+                base = moon_name
+                suffix = 2
+                while moon_name in field_names:
+                    moon_name = f"{base}_{suffix}"
+                    suffix += 1
+                declaration_name = name + pascal_case(moon_name)
+                self.add_note(
+                    field_pointer,
+                    f"field name collision after MoonBit normalization; renamed to {moon_name}",
+                )
+            field_names.add(moon_name)
+            if moon_name == "new":
                 self.add_diag(
                     field_pointer,
                     "generated struct field name collides with constructor new",
@@ -1463,13 +1500,13 @@ class IRBuilder:
             constant = normalized_field.get("const")
             single_value = constant if constant is not None else values[0] if isinstance(values, list) and len(values) == 1 else None
             if single_value is not None and json_name not in (preserve_constants or set()):
-                fields.append(Field(json_name, snake_case(json_name), TypeRef("constant"), Presence.REQUIRED if json_name in required else Presence.OPTIONAL, field_schema.get("description", ""), single_value))
+                fields.append(Field(json_name, moon_name, TypeRef("constant"), Presence.REQUIRED if json_name in required else Presence.OPTIONAL, field_schema.get("description", ""), single_value))
                 continue
             if json_name in required:
                 presence = Presence.NULLABLE_REQUIRED if nullable else Presence.REQUIRED
             else:
                 presence = Presence.PRESENCE if nullable else Presence.OPTIONAL
-            field_type = self.compile_type(normalized_field, name + pascal_case(json_name), usage, field_pointer)
+            field_type = self.compile_type(normalized_field, declaration_name, usage, field_pointer)
             if field_type.moon_type() == name and field_type.kind != "array" and presence == Presence.REQUIRED:
                 self.add_diag(
                     field_pointer,
@@ -1479,7 +1516,7 @@ class IRBuilder:
             default = None
             if field_schema.get("x-moonbit-default-on-missing") is True and presence == Presence.REQUIRED and field_schema.get("default") is not None and field_type.kind != "map" and field_type.moon_type() != "Int64":
                 default = field_schema["default"]
-            fields.append(Field(json_name, snake_case(json_name), field_type, presence, field_schema.get("description", ""), None, default))
+            fields.append(Field(json_name, moon_name, field_type, presence, field_schema.get("description", ""), None, default))
         self._add_declaration(Struct(name, tuple(fields), schema.get("description", "")), pointer)
         return TypeRef("named", name=name)
 
@@ -1601,8 +1638,15 @@ class IRBuilder:
             self._add_declaration(Newtype(newtype_name, inner, schema.get("description", "")), pointer)
             return TypeRef("named", name=newtype_name)
         if kind == "string":
+            encoded_integer = schema.get("x-moonbit-int-string")
+            if encoded_integer == "int64":
+                return TypeRef("string_int64")
+            if encoded_integer == "uint64":
+                return TypeRef("string_uint64")
             return TypeRef(str(override) if override else "String")
         if kind == "integer":
+            if schema.get("format") == "uint32" and override != "Int64":
+                return TypeRef("UInt32")
             return TypeRef("Int64" if schema.get("format") == "int64" or override == "Int64" else "Int32")
         if kind == "number":
             return TypeRef("Double")
@@ -1767,6 +1811,17 @@ class IRBuilder:
 
     def build(self) -> IR:
         validate_openapi_version(self.doc)
+        discovery = self.doc.get("x-moonbit-discovery")
+        if isinstance(discovery, dict):
+            globals_ = discovery.get("optionalGlobalParameters")
+            if isinstance(globals_, list) and globals_ and all(
+                isinstance(name, str) for name in globals_
+            ):
+                self.add_note(
+                    "/parameters",
+                    "optional Discovery top-level parameters are intentionally omitted "
+                    "from operation signatures: " + ", ".join(globals_),
+                )
         selected = self.discover()
         # Invalid references must not reach union inference or component lowering.
         if self.diagnostics:

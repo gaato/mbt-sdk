@@ -7,6 +7,8 @@ import tempfile
 import unittest
 from unittest.mock import patch
 
+import yaml
+
 from tools import new_sdk, sdks
 from test_generator import document, operation
 
@@ -23,6 +25,7 @@ class FactoryTests(unittest.TestCase):
         self.doc = document(operation())
         self.doc.update(servers=[{'url': 'https://example.invalid/v1'}])
         self.doc['components']['securitySchemes'] = {'token': {'type': 'http', 'scheme': 'bearer'}}
+        self.doc['security'] = [{'token': []}]
         self.spec = self.root / 'input.json'
         self.spec.write_text(json.dumps(self.doc))
         self.write('seed/moon.mod', 'name = "gaato/seed"\nversion = "0.1.0"\nimport {\n  "gaato/mttp_core@0.1.0",\n}\n')
@@ -61,6 +64,18 @@ offline_packages = []
         with redirect_stdout(io.StringIO()), redirect_stderr(io.StringIO()):
             return new_sdk.run(['sample', '--spec-url', 'https://example.invalid/spec.json', '--spec-file', str(self.spec), *flags])
 
+    def snapshot(self):
+        result = {}
+        for path in sorted(self.root.rglob('*')):
+            relative = str(path.relative_to(self.root))
+            if path.is_symlink():
+                result[relative] = ('symlink', path.readlink())
+            elif path.is_dir():
+                result[relative] = ('directory', None)
+            else:
+                result[relative] = ('file', path.read_bytes())
+        return result
+
     def test_scaffold_pins_provenance_empty_overlays_and_sync(self):
         self.assertEqual(self.create(), 0)
         sdk = sdks.load()[-1]
@@ -79,6 +94,71 @@ offline_packages = []
         self.assertFalse(sdks.sync(sdks.load(), True))
         for label in ('A —', 'B —', 'C —'):
             self.assertIn(label, (self.root / 'docs/behavior/sample.md').read_text())
+
+    def test_yaml_scaffold_retains_root_auth_with_public_operation(self):
+        self.doc['paths']['/public'] = {'get': {
+            'operationId': 'public_get', 'security': [], 'responses': {'200': {}},
+        }}
+        self.spec = self.root / 'input.yaml'
+        # Keep the date unquoted so PyYAML constructs a non-JSON date value.
+        self.spec.write_text(yaml.safe_dump(self.doc, sort_keys=False).replace(
+            '  securitySchemes:', '  schemas:\n    Dated:\n      type: string\n      format: date\n      example: 2026-11-16\n  securitySchemes:'))
+        self.assertEqual(self.create(), 0)
+        sdk = sdks.load()[-1]
+        self.assertEqual(sdk['auth'], {'kind': 'alternatives', 'schemes': [
+            {'kind': 'bearer'}, {'kind': 'none'},
+        ]})
+        sdks.pins([sdk])
+        self.assertFalse(sdks.sync(sdks.load(), True))
+        with self.assertRaisesRegex(ValueError, 'auth pin disagrees'):
+            sdks.pins([{**sdk, 'auth': {'kind': 'none'}}])
+
+    def test_discovery_scaffold_records_revision_and_auth_alternatives(self):
+        discovery = {
+            'kind': 'discovery#restDescription', 'discoveryVersion': 'v1',
+            'name': 'demo', 'version': 'v1', 'revision': '20261116',
+            'rootUrl': 'https://api.example/', 'servicePath': 'v1/',
+            'parameters': {'key': {'type': 'string', 'location': 'query'}},
+            'schemas': {}, 'resources': {},
+        }
+        self.spec.write_text(json.dumps(discovery))
+        self.assertEqual(self.create('--generator', 'discovery'), 0)
+        sdk = sdks.load()[-1]
+        self.assertEqual(sdk['generator'], 'discovery')
+        self.assertEqual(sdk['spec_file'], 'sample/spec/discovery.json')
+        self.assertEqual(sdk['base_url'], 'https://api.example/v1')
+        self.assertEqual(sdk['auth'], {'kind': 'alternatives', 'schemes': [
+            {'kind': 'header', 'name': 'x-goog-api-key'},
+            {'kind': 'query', 'name': 'key'},
+        ]})
+        source = (self.root / 'sample/spec/SOURCE.md').read_text()
+        self.assertIn('- Discovery revision: 20261116', source)
+        self.assertFalse(sdks.sync(sdks.load(), True))
+
+    def test_discovery_scaffold_includes_oauth_bearer_alternative(self):
+        scope = 'https://www.googleapis.com/auth/example.read'
+        discovery = {
+            'kind': 'discovery#restDescription', 'discoveryVersion': 'v1',
+            'name': 'demo', 'version': 'v1', 'revision': '20261116',
+            'rootUrl': 'https://api.example/', 'servicePath': 'v1/',
+            'parameters': {'key': {'type': 'string', 'location': 'query'}},
+            'auth': {'oauth2': {'scopes': {scope: {'description': 'Read examples.'}}}},
+            'schemas': {},
+            'resources': {'items': {'methods': {'get': {
+                'id': 'demo.items.get', 'path': 'items', 'httpMethod': 'GET',
+                'scopes': [scope], 'response': {'type': 'object'},
+            }}}},
+        }
+        self.spec.write_text(json.dumps(discovery))
+        self.assertEqual(self.create('--generator', 'discovery'), 0)
+        self.assertEqual(sdks.load()[-1]['auth'], {
+            'kind': 'alternatives',
+            'schemes': [
+                {'kind': 'header', 'name': 'x-goog-api-key'},
+                {'kind': 'query', 'name': 'key'},
+                {'kind': 'bearer'},
+            ],
+        })
 
     def test_generate_is_opt_in_and_overwrite_is_refused(self):
         self.assertEqual(self.create('--generate'), 0)
@@ -149,7 +229,59 @@ offline_packages = []
         self.assertFalse(sdks.sync(sdks.load(), True))
 
     def test_unrepresentable_auth_refuses_before_creation(self):
-        self.doc['components']['securitySchemes']['token'] = {'type': 'oauth2'}
+        self.doc['components']['securitySchemes']['token'] = {
+            'type': 'openIdConnect',
+            'openIdConnectUrl': 'https://example.invalid/.well-known/openid-configuration',
+        }
         self.spec.write_text(json.dumps(self.doc))
         self.assertEqual(self.create(), 1)
         self.assertFalse((self.root / 'sample').exists())
+
+    def test_cookie_auth_refuses_without_any_files_or_ledger_change(self):
+        self.doc['components']['securitySchemes']['token'] = {
+            'type': 'apiKey',
+            'in': 'cookie',
+            'name': 'session',
+        }
+        self.spec.write_text(json.dumps(self.doc))
+        before = self.snapshot()
+        ledger = (self.root / 'sdks.toml').read_bytes()
+
+        self.assertEqual(self.create(), 1)
+
+        self.assertEqual(self.snapshot(), before)
+        self.assertEqual((self.root / 'sdks.toml').read_bytes(), ledger)
+        self.assertFalse((self.root / 'sample').exists())
+        self.assertFalse((self.root / 'docs/behavior/sample.md').exists())
+
+    def test_auth_pin_uses_or_requirements_and_rejects_and_requirements(self):
+        doc = document(operation())
+        doc['components']['securitySchemes'] = {
+            'header': {'type': 'apiKey', 'in': 'header', 'name': 'x-api-key'},
+            'query': {'type': 'apiKey', 'in': 'query', 'name': 'key'},
+            'bearer': {'type': 'http', 'scheme': 'bearer'},
+        }
+        doc['security'] = [{'bearer': []}]
+        self.assertEqual(new_sdk.auth_pin(doc), {'kind': 'bearer'})
+        public = operation(operation_id='public')
+        public['security'] = []
+        doc['paths']['/public'] = {'get': public}
+        self.assertEqual(new_sdk.auth_pin(doc), {
+            'kind': 'alternatives',
+            'schemes': [
+                {'kind': 'bearer'},
+                {'kind': 'none'},
+            ],
+        })
+        doc['paths'].pop('/public')
+        doc['security'] = [{'header': []}, {'query': []}]
+        self.assertEqual(new_sdk.auth_pin(doc), {
+            'kind': 'alternatives',
+            'schemes': [
+                {'kind': 'header', 'name': 'x-api-key'},
+                {'kind': 'query', 'name': 'key'},
+            ],
+        })
+        doc['security'] = [{'header': [], 'bearer': []}]
+        with self.assertRaisesRegex(ValueError, 'AND authentication'):
+            new_sdk.auth_pin(doc)

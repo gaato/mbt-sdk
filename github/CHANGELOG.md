@@ -14,6 +14,12 @@ are optional unless the field is required, and keep a wildcard arm.
 
 ## [Unreleased]
 
+## [0.25.0] - 2026-11-16
+
+### Changed
+
+- **Breaking: `CodeScanningVariantAnalysis.status` now has type `CodeScanningVariantAnalysisRunStatus`.** Its values are `InProgress` (`in_progress`), `Succeeded` (`succeeded`), `Failed` (`failed`), and `Cancelled` (`cancelled`). Replace values of the old `CodeScanningVariantAnalysisStatus` at this field with the corresponding run-status value. `CodeScanningVariantAnalysisStatus` remains the distinct repository-task status type, including its `pending`, `canceled`, and `timed_out` wire values.
+
 ## [0.24.0] - 2026-11-13
 
 ### Changed

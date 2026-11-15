@@ -112,6 +112,11 @@ def merge_all_of(
 
 def normalize_spec(spec_path: str | Path, overlay_paths: list[str | Path]) -> dict[str, Any]:
     doc = apply_overlay.load(str(spec_path))
+    # Discovery is adapted before overlays so Google-only gaps (streaming,
+    # oneof, pagination) can use the same reviewed overlay mechanism as OpenAPI.
+    from .discovery import convert_discovery, is_discovery
+    if is_discovery(doc):
+        doc = convert_discovery(doc)
     overlay_problems: list[str] = []
     for path in overlay_paths:
         overlay_problems.extend(apply_overlay.apply(doc, apply_overlay.load(str(path)), str(path)))

@@ -20,10 +20,13 @@ gen() { local s=0; echo "+ ${py[*]} $*"; "${py[@]}" "$@" || s=$?; [ "$s" -le 1 ]
 get() { "${py[@]}" tools/sdks.py get "$sdk" "$1"; }
 for sdk in "${sdks[@]}"; do
   args=(--spec "$(get spec_file)" --out "$(get out)")
-  if [ "$(get generator)" = custom ]; then
-    gen "$(get command)" "${args[@]}" "${flags[@]}"
-    continue
-  fi
+  case "$(get generator)" in
+    custom)
+      gen "$(get command)" "${args[@]}" "${flags[@]}"
+      continue
+      ;;
+    openapi|discovery) ;;
+  esac
   args+=(--package "$(get package)")
   [ "$(get client_layer)" = false ] || args+=(--client-sdk "$sdk")
   [ "$(get include_all)" = false ] || args+=(--include-all)

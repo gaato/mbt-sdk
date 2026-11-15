@@ -28,61 +28,68 @@ def require(ok, message):
         raise ValueError(message)
 
 
+def validate_sdk(sdk, seen=None):
+    """Validate one ledger entry without requiring its files to exist yet."""
+    label = sdk.get('name', '<unnamed>')
+    require(not set(sdk) - set(STRINGS + BOOLS + ARRAYS) - OPTIONAL,
+            f'{label}: unknown keys: {set(sdk) - set(STRINGS + BOOLS + ARRAYS) - OPTIONAL}')
+    for key in STRINGS + BOOLS + ARRAYS:
+        typ = str if key in STRINGS else bool if key in BOOLS else list
+        require(type(sdk.get(key)) is typ, f'{label}: {key} must be {typ.__name__}')
+        if typ is str:
+            require('\n' not in sdk[key], f'{label}: {key} must be single-line')
+    for key in ARRAYS + ['report_census_args']:
+        require(isinstance(sdk.get(key, []), list) and all(isinstance(v, str) and '\n' not in v for v in sdk.get(key, [])),
+                f'{label}: {key} must contain single-line strings')
+    # Reporting includes all operations when no separate flags are supplied.
+    sdk.setdefault('report_census_args', [])
+    sdk.setdefault('client_layer', False)
+    require(type(sdk['client_layer']) is bool, f'{label}: client_layer must be boolean')
+    require(type(sdk.get('operation_wrappers', True)) is bool, f'{label}: operation_wrappers must be boolean')
+    for key in ('extra_imports', 'idempotency_headers', 'server_urls'):
+        require(isinstance(sdk.get(key, []), list) and all(isinstance(v, str) and v.strip() for v in sdk.get(key, [])), f'{label}: invalid {key}')
+    if sdk['client_layer']:
+        require('base_url' in sdk and 'auth' in sdk, f'{label}: client_layer needs base_url and auth pins')
+    validate_retry(sdk.get('retry'), label)
+    for key in ('timeout_ms', 'total_timeout_ms'):
+        if key in sdk:
+            require(type(sdk[key]) is int and 0 < sdk[key] <= 2147483647, f'{label}: invalid {key}')
+    require(re.fullmatch(r'[a-z][a-z0-9_-]*', label), f'invalid SDK name: {label}')
+    if seen is not None:
+        for key, values in seen.items():
+            require(sdk[key] not in values, f'{label}: duplicate {key}: {sdk[key]}')
+            values.add(sdk[key])
+    require(sdk['generator'] in ('openapi', 'discovery', 'custom'), f'{label}: invalid generator')
+    require(sdk['spec_fetch'] in ('plain', 'gzip'), f'{label}: invalid spec_fetch')
+    require(not sdk['spec_watch'] or (sdk['generator'] in ('openapi', 'discovery') and sdk['spec_url'].startswith('https://')),
+            f'{label}: spec_watch needs an OpenAPI or Discovery HTTPS source')
+    for key in ('base_url', 'base_url_reason', 'auth_reason', 'base_url_spec'):
+        if key in sdk:
+            require(isinstance(sdk[key], str) and sdk[key].strip(), f'{label}: {key} must be nonempty')
+    if 'auth' in sdk:
+        validate_auth(sdk['auth'], label)
+    for key in ('base_url', 'auth'):
+        require((key + '_reason' in sdk) == (key + '_spec' in sdk), f'{label}: {key} override needs both reason and spec baseline')
+    if 'auth_spec' in sdk:
+        require(isinstance(sdk['auth_spec'], dict), f'{label}: auth_spec must be a table')
+    return label
+
+
 def load():
     data = tomllib.loads((ROOT / 'sdks.toml').read_bytes().decode())
     require(set(data) == {'sdk'} and isinstance(data['sdk'], list), 'expected [[sdk]] tables only')
     require(data['sdk'], 'the SDK ledger must not be empty')
     seen = {key: set() for key in ('name', 'dir', 'module', 'out')}
     for sdk in data['sdk']:
-        label = sdk.get('name', '<unnamed>')
-        require(not set(sdk) - set(STRINGS + BOOLS + ARRAYS) - OPTIONAL,
-                f'{label}: unknown keys: {set(sdk) - set(STRINGS + BOOLS + ARRAYS) - OPTIONAL}')
-        for key in STRINGS + BOOLS + ARRAYS:
-            typ = str if key in STRINGS else bool if key in BOOLS else list
-            require(type(sdk.get(key)) is typ, f'{label}: {key} must be {typ.__name__}')
-            if typ is str:
-                require('\n' not in sdk[key], f'{label}: {key} must be single-line')
-        for key in ARRAYS + ['report_census_args']:
-            require(isinstance(sdk.get(key, []), list) and all(isinstance(v, str) and '\n' not in v for v in sdk.get(key, [])),
-                    f'{label}: {key} must contain single-line strings')
-        # Reporting includes all operations when no separate flags are supplied.
-        sdk.setdefault('report_census_args', [])
-        sdk.setdefault('client_layer', False)
-        require(type(sdk['client_layer']) is bool, f'{label}: client_layer must be boolean')
-        require(type(sdk.get('operation_wrappers', True)) is bool, f'{label}: operation_wrappers must be boolean')
-        for key in ('extra_imports', 'idempotency_headers', 'server_urls'):
-            require(isinstance(sdk.get(key, []), list) and all(isinstance(v, str) and v.strip() for v in sdk.get(key, [])), f'{label}: invalid {key}')
-        if sdk['client_layer']:
-            require('base_url' in sdk and 'auth' in sdk, f'{label}: client_layer needs base_url and auth pins')
-        validate_retry(sdk.get('retry'), label)
-        for key in ('timeout_ms', 'total_timeout_ms'):
-            if key in sdk:
-                require(type(sdk[key]) is int and 0 < sdk[key] <= 2147483647, f'{label}: invalid {key}')
-        require(re.fullmatch(r'[a-z][a-z0-9_-]*', label), f'invalid SDK name: {label}')
-        for key, values in seen.items():
-            require(sdk[key] not in values, f'{label}: duplicate {key}: {sdk[key]}')
-            values.add(sdk[key])
+        label = validate_sdk(sdk, seen)
         for key in ('dir', 'out', 'spec_file'):
             path = ROOT / sdk[key]
             require(path.resolve().is_relative_to(ROOT) and (key == 'out' or path.exists()), f'{label}: missing or invalid {key}: {sdk[key]}')
         require((ROOT / sdk['dir']).is_dir(), f'{label}: dir must be a directory')
         mod = (ROOT / sdk['dir'] / 'moon.mod').read_bytes().decode()
         require(re.search(r'^name = "' + re.escape(sdk['module']) + '"$', mod, re.M), f'{label}: moon.mod name mismatch')
-        require(sdk['generator'] in ('openapi', 'custom'), f'{label}: invalid generator')
-        require(sdk['spec_fetch'] in ('plain', 'gzip'), f'{label}: invalid spec_fetch')
-        require(not sdk['spec_watch'] or (sdk['generator'] == 'openapi' and sdk['spec_url'].startswith('https://')),
-                f'{label}: spec_watch needs an OpenAPI HTTPS source')
         if sdk['generator'] == 'custom':
             require(isinstance(sdk.get('command'), str) and (ROOT / sdk['command']).is_file(), f'{label}: missing custom command')
-        for key in ('base_url', 'base_url_reason', 'auth_reason', 'base_url_spec'):
-            if key in sdk:
-                require(isinstance(sdk[key], str) and sdk[key].strip(), f'{label}: {key} must be nonempty')
-        if 'auth' in sdk:
-            validate_auth(sdk['auth'], label)
-        for key in ('base_url', 'auth'):
-            require((key + '_reason' in sdk) == (key + '_spec' in sdk), f'{label}: {key} override needs both reason and spec baseline')
-        if 'auth_spec' in sdk:
-            require(isinstance(sdk['auth_spec'], dict), f'{label}: auth_spec must be a table')
     return data['sdk']
 
 
@@ -192,7 +199,7 @@ def sync(sdks, check):
     for sdk in sdks:
         source = ROOT / sdk['spec_file']
         source = source.parent / 'SOURCE.md'
-        if sdk['generator'] == 'openapi':
+        if sdk['generator'] in ('openapi', 'discovery'):
             text = source.read_text()
             match = re.search(r'^-?\s*Source:\s*(.*?)\s*$', text, re.M)
             require(match is not None and match[1] == sdk['spec_url'],
@@ -245,7 +252,7 @@ def sync(sdks, check):
     extras = [r for r in old_rows if not any(s['module'] in r for s in sdks) and not r.startswith(('| Module |', '|---'))]
     update('README.md', marked(readme, 'modules', '\n'.join(['| Module | Purpose | Dependencies |', '|---|---|---|'] + rows + extras)))
     arch = (ROOT / 'ARCHITECTURE.md').read_bytes().decode()
-    layer = '| SDKs | ' + ', '.join(s['name'] + ('' if s['publish'] else unpublished) for s in sdks if s['generator'] == 'openapi' and not s['dir'].startswith('fixtures/')) + ' | Generated API vocabulary and vendor policy |'
+    layer = '| SDKs | ' + ', '.join(s['name'] + ('' if s['publish'] else unpublished) for s in sdks if s['generator'] in ('openapi', 'discovery') and not s['dir'].startswith('fixtures/')) + ' | Generated API vocabulary and vendor policy |'
     block = re.search(r'<!-- BEGIN sdks: http-layer -->(.*?)<!-- END sdks: http-layer -->', arch, re.S)
     require(block, 'ARCHITECTURE.md: missing layer markers')
     layers = re.sub(r'^\| SDKs \|.*$', lambda _: layer, block[1].strip(), flags=re.M)
@@ -268,15 +275,18 @@ def sync(sdks, check):
 
 def pins(sdks):
     for sdk in sdks:
-        if sdk['generator'] != 'openapi' or not ({'base_url', 'auth'} & sdk.keys()):
+        if sdk['generator'] not in ('openapi', 'discovery') or not ({'base_url', 'auth'} & sdk.keys()):
             continue
         spec = ROOT / sdk['spec_file']
         if spec.suffix == '.json':
             doc = json.loads(spec.read_bytes().decode())
+            if sdk['generator'] == 'discovery':
+                from tools.gen.discovery import convert_discovery
+                doc = convert_discovery(doc)
         else:
             # Reuse the already-required generator environment for YAML only.
             py = [sys.executable]
-            code = 'import json,sys,yaml; d=yaml.load(open(sys.argv[1]), Loader=getattr(yaml,"CSafeLoader",yaml.SafeLoader)); print(json.dumps({"servers":d.get("servers"),"components":{"securitySchemes":d.get("components",{}).get("securitySchemes",{})},"paths":d.get("paths",{})}))'
+            code = 'import json,sys,yaml; d=yaml.load(open(sys.argv[1]), Loader=getattr(yaml,"CSafeLoader",yaml.SafeLoader)); print(json.dumps({**{k: d[k] for k in ("servers", "security", "paths") if k in d}, "components": {"securitySchemes": d.get("components", {}).get("securitySchemes", {})}}))'
             try:
                 output = subprocess.check_output(py + ['-c', code, str(spec)], text=True, cwd=ROOT, stderr=subprocess.PIPE)
             except subprocess.CalledProcessError as error:
@@ -304,9 +314,10 @@ def pins(sdks):
             if 'auth_reason' in sdk:
                 ok = schemes == sdk['auth_spec']
             else:
-                from tools.gen.client_layer import auth_choices, scheme_auth
+                from tools.gen.client_layer import auth_choices, scheme_auth, security_auth_choices
                 choices = auth_choices(sdk['auth'])
-                actual_auth = [scheme_auth(s) for s in schemes.values()]
+                required_auth, saw_security = security_auth_choices(doc)
+                actual_auth = required_auth if saw_security else [scheme_auth(s) for s in schemes.values()]
                 ok = (not schemes and choices == [{'kind': 'none'}]) or bool(schemes) and all(a in choices for a in actual_auth) and all(a in actual_auth for a in choices if a['kind'] != 'none')
             require(ok, f'{sdk["name"]}: auth pin disagrees with securitySchemes {schemes!r}; review authentication (a deliberate override needs auth_reason and auth_spec)')
 
@@ -317,7 +328,7 @@ def main():
     listing = sub.add_parser('list')
     listing.add_argument('--publish', action='store_true')
     listing.add_argument('--spec-watch', action='store_true')
-    listing.add_argument('--generator', choices=['openapi', 'custom'])
+    listing.add_argument('--generator', choices=['openapi', 'discovery', 'custom'])
     get = sub.add_parser('get')
     get.add_argument('name')
     get.add_argument('field')
@@ -336,7 +347,7 @@ def main():
         value = sdk[args.field]
         print('\n'.join(value) if isinstance(value, list) else json.dumps(value) if isinstance(value, (bool, dict)) else value)
     elif args.cmd == 'matrix':
-        print(json.dumps({'include': [dict(provider=s['name'], dir=s['dir'], spec_file=Path(s['spec_file']).name, spec_path=s['spec_file'], spec_url=s['spec_url'], spec_fetch=s['spec_fetch']) for s in sdks if s['spec_watch']]}))
+        print(json.dumps({'include': [dict(provider=s['name'], dir=s['dir'], generator=s['generator'], spec_file=Path(s['spec_file']).name, spec_path=s['spec_file'], spec_url=s['spec_url'], spec_fetch=s['spec_fetch']) for s in sdks if s['spec_watch']]}))
     elif args.cmd == 'behavior-check':
         behavior_notes(sdks)
     else:

@@ -209,6 +209,66 @@ class IRTests(unittest.TestCase):
         struct = declaration(ir, "TestOperationRequest")
         self.assertEqual([field.moon_name for field in struct.fields], ["ref_", "package_", "protected_", "value_2fa"])
 
+    def test_colliding_field_names_disambiguate_inline_declarations(self):
+        schema = {
+            "type": "object",
+            "properties": {
+                "object-name": {
+                    "type": "object",
+                    "properties": {"left": {"type": "string"}},
+                    "required": ["left"],
+                },
+                "object_name": {
+                    "type": "object",
+                    "properties": {"right": {"type": "integer"}},
+                    "required": ["right"],
+                },
+                "enum-name": {"type": "string", "enum": ["left", "right"]},
+                "enum_name": {"type": "string", "enum": ["up", "down"]},
+            },
+            "required": ["object-name", "object_name", "enum-name", "enum_name"],
+        }
+        ir = IRBuilder(document(operation(request=schema)), "example/gen").build()
+        request = declaration(ir, "TestOperationRequest")
+        self.assertEqual(
+            [(field.moon_name, field.type.moon_type()) for field in request.fields],
+            [
+                ("object_name", "TestOperationRequestObjectName"),
+                ("object_name_2", "TestOperationRequestObjectName2"),
+                ("enum_name", "TestOperationRequestEnumName"),
+                ("enum_name_2", "TestOperationRequestEnumName2"),
+            ],
+        )
+        self.assertEqual([field.json_name for field in declaration(ir, "TestOperationRequestObjectName").fields], ["left"])
+        self.assertEqual([field.json_name for field in declaration(ir, "TestOperationRequestObjectName2").fields], ["right"])
+        self.assertEqual([variant.value for variant in declaration(ir, "TestOperationRequestEnumName").variants], ["left", "right"])
+        self.assertEqual([variant.value for variant in declaration(ir, "TestOperationRequestEnumName2").variants], ["up", "down"])
+
+    def test_different_schemas_claiming_one_declaration_name_are_diagnostic(self):
+        schemas = {
+            "TestOperationRequest": {
+                "type": "object",
+                "properties": {"component_value": {"type": "string"}},
+            },
+            "Envelope": {
+                "type": "object",
+                "properties": {"value": {"$ref": "#/components/schemas/TestOperationRequest"}},
+            },
+        }
+        request = {
+            "type": "object",
+            "properties": {"operation_value": {"type": "integer"}},
+        }
+        with self.assertRaises(GenerationError) as caught:
+            IRBuilder(
+                document(
+                    operation(request=request, response={"$ref": "#/components/schemas/Envelope"}),
+                    schemas,
+                ),
+                "example/gen",
+            ).build()
+        self.assertIn("different schemas claim generated declaration TestOperationRequest", str(caught.exception))
+
     def test_named_primitive_expands_without_annotation_and_newtypes_with_it(self):
         schemas = {
             "Plain": {"type": "string"},

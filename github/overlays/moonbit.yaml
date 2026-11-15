@@ -9,6 +9,34 @@ info:
   version: 0.1.0
 actions:
 
+  # --- inline declaration name collisions --------------------------------------------
+  - target: "$['components']['schemas']"
+    description: >-
+      `code-scanning-variant-analysis.status` is the status of the overall variant-analysis run
+      (`in_progress`, `succeeded`, `failed`, `cancelled`). Its path-derived MoonBit name collides
+      with the distinct component `code-scanning-variant-analysis-status`, which describes a
+      repository task and also admits `pending`, `canceled`, and `timed_out`. Preserve both wire
+      contracts by extracting the run status under a deterministic component name; the normal
+      component naming rule emits `CodeScanningVariantAnalysisRunStatus`.
+    update:
+      code-scanning-variant-analysis-run-status:
+        type: string
+        enum:
+          - in_progress
+          - succeeded
+          - failed
+          - cancelled
+  - target: "$['components']['schemas']['code-scanning-variant-analysis']['properties']['status']['type']"
+    description: Remove the inline type before replacing this schema with the extracted component reference.
+    remove: true
+  - target: "$['components']['schemas']['code-scanning-variant-analysis']['properties']['status']['enum']"
+    description: Remove the inline values before replacing this schema with the extracted component reference.
+    remove: true
+  - target: "$['components']['schemas']['code-scanning-variant-analysis']['properties']['status']"
+    description: Use the separately named run-status enum so it cannot collide with repository-task status.
+    update:
+      $ref: "#/components/schemas/code-scanning-variant-analysis-run-status"
+
   # --- multi-segment path parameters -------------------------------------------------
   - target: "$['components']['parameters'][?@['x-multi-segment'] == true && @['in'] == 'path']"
     description: >-

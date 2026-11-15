@@ -143,8 +143,16 @@ pub async fn[T] __CLIENT__::call(self : __CLIENT__, request : @http.Request, dec
 /// Consumes SSE events; stop finishes at a protocol sentinel and closes the body.
 /// Callback errors propagate. Streaming bodies are never replayed after consumption.
 pub async fn __CLIENT__::stream(self : __CLIENT__, request : @http.Request, receive : async (@sse.SseEvent) -> Unit, stop? : (@sse.SseEvent) -> Bool, operation~ : String = self.infer_operation(request)) -> Result[Unit, Failure] {
+  self.stream_with_head(request, receive, stop=(_, event) => match stop {
+    Some(predicate) => predicate(event)
+    None => false
+  }, operation~)
+}
+
+///|
+async fn __CLIENT__::stream_with_head(self : __CLIENT__, request : @http.Request, receive : async (@sse.SseEvent) -> Unit, stop~ : (@http.ResponseHead, @sse.SseEvent) -> Bool, operation~ : String) -> Result[Unit, Failure] {
   try {
-    let reply = self.client.send(@client.request(self.prepare(request, operation)).response(@client.as_sse(receive, stop?)))
+    let reply = self.client.send(@client.request(self.prepare(request, operation)).response(@client.from_head(head => @client.as_sse(receive, stop=event => stop(head, event)))))
     match reply.body {
       Ok(value) => Ok(value)
       Err(error) => Err(response_failure(operation, error))

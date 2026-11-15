@@ -166,7 +166,7 @@ census_args = ["--overlay", "replicate/overlays/fix.yaml", "--overlay", "replica
 report_census_args = ["--overlay", "replicate/overlays/fix.yaml"]
 offline_packages = ["replicate/src", "replicate/src/gen"]
 base_url = "https://api.replicate.com/v1"
-auth = { kind = "bearer" }
+auth = { kind = "alternatives", schemes = [{ kind = "bearer" }, { kind = "none" }] }
 publish = false
 spec_watch = false
 

@@ -28,7 +28,9 @@ runtime Client; its owner controls its lifetime and retry budget.
 API-key alternatives declared in the pin. An OAuth2 security scheme accepts
 an already obtained bearer token; it performs no OAuth flow. Security arrays
 are OR alternatives; AND requirements are rejected. With no security declaration
-the pinned constructor auth applies; `security: []` disables it. Auth header
+the pinned constructor auth applies. An empty requirement object (`{}`) or an
+operation-level empty array (`security: []`) is the `Anonymous` alternative and
+prevents credentials from being attached. Auth header
 parameters disappear from facade signatures. Legacy fixture builders retain
 their existing parameters, allowing vocabulary output to stay stable.
 
@@ -37,6 +39,20 @@ returns `Reply[Bytes]` after consuming the body, retaining status and headers.
 Generic calls infer operations from relative paths or from absolute URLs within
 the configured operation base, including server replacements; public operations
 therefore keep their no-auth rule on both paths.
+
+Google Discovery top-level parameters are system-wide controls, so they are
+intentionally absent from every generated operation signature. API keys and
+OAuth access tokens use the generated `Auth` alternatives. For another optional
+system parameter such as `fields`, `quotaUser`, `prettyPrint`, `alt`, or
+`$.xgafv`, build the ordinary request with
+`@gen.<operation>_request(...)`, add it with
+`.query("fields", value)` (or the corresponding parameter name), and pass the
+result to `call(request, @gen.<operation>_decode)`. Use `send(request)` instead
+when consuming the raw buffered response or applying a custom decoder. A
+method-level parameter with the same name is still emitted on that method and
+does not require this generic path. A required non-auth top-level parameter is
+rejected during generation because silently omitting it would make every
+affected request invalid.
 Operation methods default on; `operation_wrappers = false` leaves the generic
 surface for large specs. Required path/query parameters use labels derived from
 spec names in snake case, with keyword escaping; request bodies stay positional.

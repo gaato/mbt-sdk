@@ -49,6 +49,7 @@ jobs:
       SPEC_URL: ${{ matrix.spec_url }}
       SDK_DIR: ${{ matrix.dir }}
       SPEC_FETCH: ${{ matrix.spec_fetch }}
+      GENERATOR: ${{ matrix.generator }}
     runs-on: ubuntu-26.04
     timeout-minutes: 60
     steps:
@@ -69,7 +70,15 @@ jobs:
           new="$(sha256sum "$RUNNER_TEMP/$SPEC_FILE" | cut -d' ' -f1)"
           old="$(sha256sum "$SPEC_PATH" | cut -d' ' -f1)"
           echo "new=$new" >> "$GITHUB_OUTPUT"
-          if [ "$new" = "$old" ]; then echo "changed=false" >> "$GITHUB_OUTPUT"; else echo "changed=true" >> "$GITHUB_OUTPUT"; fi
+          if [ "$new" = "$old" ]; then
+            changed=false
+          elif [ "$GENERATOR" = discovery ] && python3 tools/gen/discovery.py watch-equal "$SPEC_PATH" "$RUNNER_TEMP/$SPEC_FILE"; then
+            # Discovery revision/etag churn alone has no generated API effect.
+            changed=false
+          else
+            changed=true
+          fi
+          echo "changed=$changed" >> "$GITHUB_OUTPUT"
 
       - name: Set up uv
         if: steps.fetch.outputs.changed == 'true'
@@ -98,6 +107,10 @@ jobs:
           source_file="$(dirname "$SPEC_PATH")/SOURCE.md"
           today="$(date -u +%F)"
           sed -i -E "s/^- Fetched: .*/- Fetched: $today/; s/^- sha256: .*/- sha256: ${{ steps.fetch.outputs.new }}/" "$source_file"
+          if [ "$GENERATOR" = discovery ]; then
+            revision="$(python3 tools/gen/discovery.py revision "$SPEC_PATH")"
+            sed -i -E "s/^- Discovery revision: .*/- Discovery revision: $revision/" "$source_file"
+          fi
           if [ "$SPEC_FETCH" = gzip ]; then
             sed -i -E "s/^- sha256 \(gzip as downloaded\): .*/- sha256 (gzip as downloaded): ${{ steps.fetch.outputs.gzip_sha }}/" "$source_file"
           fi

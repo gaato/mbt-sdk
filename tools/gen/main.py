@@ -46,7 +46,7 @@ def _owned_name(out: Path, name: str) -> bool:
     # Flat vocabulary outputs predate the facade suffix convention. The ledger
     # identifies their owners without granting other root files that exception.
     from tools import sdks
-    return any(sdk['generator'] == 'openapi' and sdk['out'] == sdk['dir'] + '/src'
+    return any(sdk['generator'] in ('openapi', 'discovery') and sdk['out'] == sdk['dir'] + '/src'
                and (ROOT / sdk['out']).resolve() == out.resolve() for sdk in sdks.load())
 
 

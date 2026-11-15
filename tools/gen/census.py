@@ -26,9 +26,13 @@ class CensusResult:
     diagnostics: int
     kinds: dict[str, int]
     notes: list[dict[str, str]]
+    discovery: dict[str, object] | None = None
 
     def to_dict(self) -> dict[str, object]:
-        return asdict(self)
+        result = asdict(self)
+        if self.discovery is None:
+            result.pop("discovery")
+        return result
 
 
 def diagnostic_kind(diagnostic: Diagnostic) -> str:
@@ -43,8 +47,11 @@ def census(
     operations = 0
     diagnostics: list[Diagnostic] = []
     builder = None
+    discovery = None
     try:
         doc = normalize_spec(spec, list(overlays or []))
+        if isinstance(doc.get("x-moonbit-discovery"), dict):
+            discovery = dict(doc["x-moonbit-discovery"])
         if ops is None:
             operations = include_all_operations(doc)
         else:
@@ -69,6 +76,7 @@ def census(
         diagnostics=len(diagnostics),
         kinds=dict(kinds.most_common()),
         notes=[asdict(note) for note in builder.notes] if builder else [],
+        discovery=discovery,
     )
 
 
@@ -102,6 +110,14 @@ def run(argv: list[str] | None = None) -> int:
         print(json.dumps(result.to_dict(), ensure_ascii=False, sort_keys=True))
     else:
         print(f"== {result.name}: operations={result.operations} diagnostics={result.diagnostics} notes={len(result.notes)}")
+        if result.discovery is not None:
+            print(
+                "  discovery: "
+                f"schemas={result.discovery.get('schemas')} "
+                f"methods={result.discovery.get('methods')} "
+                f"resources={result.discovery.get('resources')} "
+                f"revision={result.discovery.get('revision')}"
+            )
         if result.diagnostics:
             print("  diagnostics:")
         for kind, count in list(result.kinds.items())[:12]:

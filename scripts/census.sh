@@ -4,7 +4,10 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 py=(uv run --with pyyaml --with jsonpath-rfc9535 python)
 [ -x .venv/bin/python ] && py=(.venv/bin/python)
-registered=$("${py[@]}" tools/sdks.py list --generator openapi)
+registered=$( {
+  "${py[@]}" tools/sdks.py list --generator openapi
+  "${py[@]}" tools/sdks.py list --generator discovery
+} )
 mapfile -t sdks <<< "$registered"
 specs=()
 for sdk in "${sdks[@]}"; do specs+=("$("${py[@]}" tools/sdks.py get "$sdk" spec_file)"); done

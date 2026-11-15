@@ -26628,7 +26628,7 @@ pub(all) struct CodeScanningVariantAnalysis {
   created_at : String?
   updated_at : String?
   completed_at : @jsonkit.Presence[String]
-  status : CodeScanningVariantAnalysisStatus
+  status : CodeScanningVariantAnalysisRunStatus
   actions_workflow_run_id : Int32?
   failure_reason : CodeScanningVariantAnalysisFailureReason?
   scanned_repositories : Array[CodeScanningVariantAnalysisScannedRepositoriesItem]?
@@ -26636,7 +26636,7 @@ pub(all) struct CodeScanningVariantAnalysis {
 }
 pub fn CodeScanningVariantAnalysis::equal(Self, Self) -> Bool
 pub fn CodeScanningVariantAnalysis::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
-pub fn CodeScanningVariantAnalysis::new(id~ : Int32, controller_repo~ : SimpleRepository, actor~ : SimpleUser, query_language~ : CodeScanningVariantAnalysisLanguage, query_pack_url~ : String, status~ : CodeScanningVariantAnalysisStatus, created_at? : String, updated_at? : String, completed_at? : String, actions_workflow_run_id? : Int32, failure_reason? : CodeScanningVariantAnalysisFailureReason, scanned_repositories? : Array[CodeScanningVariantAnalysisScannedRepositoriesItem], skipped_repositories? : CodeScanningVariantAnalysisSkippedRepositories) -> Self
+pub fn CodeScanningVariantAnalysis::new(id~ : Int32, controller_repo~ : SimpleRepository, actor~ : SimpleUser, query_language~ : CodeScanningVariantAnalysisLanguage, query_pack_url~ : String, status~ : CodeScanningVariantAnalysisRunStatus, created_at? : String, updated_at? : String, completed_at? : String, actions_workflow_run_id? : Int32, failure_reason? : CodeScanningVariantAnalysisFailureReason, scanned_repositories? : Array[CodeScanningVariantAnalysisScannedRepositoriesItem], skipped_repositories? : CodeScanningVariantAnalysisSkippedRepositories) -> Self
 pub fn CodeScanningVariantAnalysis::not_equal(Self, Self) -> Bool
 pub fn CodeScanningVariantAnalysis::to_json(Self) -> @json.Json
 pub fn CodeScanningVariantAnalysis::to_repr(Self) -> @debug.Repr
@@ -26719,6 +26719,23 @@ pub fn CodeScanningVariantAnalysisRepository::to_json(Self) -> @json.Json
 pub fn CodeScanningVariantAnalysisRepository::to_repr(Self) -> @debug.Repr
 pub impl @json.FromJson for CodeScanningVariantAnalysisRepository
 pub impl @json.ToJson for CodeScanningVariantAnalysisRepository
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum CodeScanningVariantAnalysisRunStatus {
+  InProgress
+  Succeeded
+  Failed
+  Cancelled
+  Unknown(String)
+}
+pub fn CodeScanningVariantAnalysisRunStatus::equal(Self, Self) -> Bool
+pub fn CodeScanningVariantAnalysisRunStatus::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn CodeScanningVariantAnalysisRunStatus::not_equal(Self, Self) -> Bool
+pub fn CodeScanningVariantAnalysisRunStatus::to_json(Self) -> @json.Json
+pub fn CodeScanningVariantAnalysisRunStatus::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for CodeScanningVariantAnalysisRunStatus
+pub impl @json.ToJson for CodeScanningVariantAnalysisRunStatus
 
 #derive(Eq, @debug.Debug)
 pub(all) struct CodeScanningVariantAnalysisScannedRepositoriesItem {

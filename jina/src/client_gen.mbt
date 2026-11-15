@@ -212,10 +212,33 @@ pub async fn Jina::stream(
   stop? : (@sse.SseEvent) -> Bool,
   operation~ : String = self.infer_operation(request),
 ) -> Result[Unit, Failure] {
+  self.stream_with_head(
+    request,
+    receive,
+    stop=(_, event) => {
+      match stop {
+        Some(predicate) => predicate(event)
+        None => false
+      }
+    },
+    operation~,
+  )
+}
+
+///|
+async fn Jina::stream_with_head(
+  self : Jina,
+  request : @http.Request,
+  receive : async (@sse.SseEvent) -> Unit,
+  stop~ : (@http.ResponseHead, @sse.SseEvent) -> Bool,
+  operation~ : String,
+) -> Result[Unit, Failure] {
   try {
     let reply = self.client.send(
       @client.request(self.prepare(request, operation)).response(
-        @client.as_sse(receive, stop?),
+        @client.from_head(head => {
+          @client.as_sse(receive, stop=event => stop(head, event))
+        }),
       ),
     )
     match reply.body {

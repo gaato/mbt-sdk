@@ -7,7 +7,7 @@ import subprocess
 import tempfile
 import unittest
 
-from tools.gen.client_layer import client_names, pagination_notes
+from tools.gen.client_layer import CLIENT_METHOD_NAMES, client_names, pagination_notes
 from tools.gen.emit_moonbit import emit
 from tools.gen.ir import IRBuilder
 from tools.gen.main import _format, _write
@@ -57,6 +57,49 @@ def surface_spec():
 
 
 class ClientSurfaceTests(unittest.TestCase):
+    @unittest.skipUnless(shutil.which('moon'), 'MoonBit toolchain is required for integration')
+    def test_helper_operation_names_compile_and_execute(self):
+        doc = spec()
+        doc['paths'] = {}
+        calls = []
+        for helper in sorted(CLIENT_METHOD_NAMES):
+            doc['paths']['/direct/' + helper] = {'get': operation(helper)}
+            doc['paths']['/override/' + helper] = {'get': operation(
+                'lookup_' + helper, **{'x-moonbit-name': helper})}
+            calls.extend([helper + '_operation', 'lookup_' + helper])
+        files, ir = build(doc)
+        names = client_names(doc, ir)
+        for helper in CLIENT_METHOD_NAMES:
+            self.assertEqual(names[helper], helper + '_operation')
+            self.assertEqual(names['lookup_' + helper], 'lookup_' + helper)
+        checks = '\n'.join('    assert_true(sdk.' + name + '() is Ok(_))' for name in calls)
+        files['contract_gen.mbt'] += '''
+///|
+test "operations cannot shadow client helpers" {
+  let seen : Array[String] = []
+  let backend = @client.from_fn((request, _) => {
+    seen.push(request.url)
+    @http.Response::new(204)
+  })
+  let sdk = Sample::new(backend, @sim.FakeClock::new())
+  @driver.run_sync(() => {
+''' + checks + '''
+  })
+  assert_eq(seen.length(), ''' + str(len(calls)) + ''')
+}
+'''
+        with tempfile.TemporaryDirectory(prefix='helper-collisions-') as tmp:
+            root = Path(tmp)
+            (root / 'moon.mod').write_text(
+                'name = "gaato/sample"\nversion = "0.1.0"\nsource = "src"\n'
+                'import { "gaato/mttp_core@0.1.0" }\n')
+            _write(root / 'src/gen', _format(emit(ir)))
+            _write(root / 'src', _format(files))
+            process = subprocess.run(
+                ['moon', '-C', str(root), 'test', '--target', 'wasm-gc', '--deny-warn'],
+                text=True, capture_output=True)
+            self.assertEqual(process.returncode, 0, process.stdout + process.stderr)
+
     def test_exact_fastapi_suffix_and_collision_fallback_and_override(self):
         doc = {'openapi': '3.1.0', 'paths': {
             '/v1/models': {'get': operation('list_v1_models_get')},
