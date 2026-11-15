@@ -65,6 +65,9 @@ spec_watch = true
 
 [[sdk]]
 name = "badhttp"
+client_layer = true
+base_url = "https://badhttp.dev"
+auth = { kind = "none" }
 dir = "fixtures/gen/badhttp"
 module = "gaato/fixture-badhttp"
 generator = "openapi"
@@ -83,6 +86,11 @@ spec_watch = false
 
 [[sdk]]
 name = "petstore3"
+client_layer = true
+base_url = "https://petstore3.swagger.io/api/v3"
+base_url_spec = "/api/v3"
+base_url_reason = "The relative server is resolved against the pinned specification origin so the fixture is usable without a hosting page."
+auth = { kind = "alternatives", schemes = [{kind = "bearer"}, {kind = "header", name = "api_key"}] }
 dir = "fixtures/gen/petstore3"
 module = "gaato/fixture-petstore3"
 generator = "openapi"
@@ -120,6 +128,8 @@ spec_watch = false
 
 [[sdk]]
 name = "jina"
+client_layer = true
+timeout_ms = 60000
 dir = "jina"
 module = "gaato/jina"
 generator = "openapi"
@@ -140,6 +150,8 @@ spec_watch = false
 
 [[sdk]]
 name = "replicate"
+client_layer = true
+timeout_ms = 70000
 dir = "replicate"
 module = "gaato/replicate"
 generator = "openapi"
@@ -157,3 +169,18 @@ base_url = "https://api.replicate.com/v1"
 auth = { kind = "bearer" }
 publish = false
 spec_watch = false
+
+[sdk.retry]
+retries = 5
+methods = ["GET", "HEAD", "PUT", "DELETE", "OPTIONS"]
+statuses = [429, 500, 502, 503, 504]
+status_overrides = [{ methods = ["POST"], statuses = [429] }]
+sent_failures = "never"
+unprocessed_failures = false
+retry_after = "header"
+retry_after_cap_ms = 60000
+retry_after_cap = "backoff"
+zero_means_backoff = false
+backoff_base_ms = 500
+backoff_max_ms = 60000
+jitter = [900, 1100]

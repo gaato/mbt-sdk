@@ -2,8 +2,16 @@
 import {
   "gaato/mttp_core" @http,
   "gaato/mttp_core/client",
-  "gaato/mttp_core/jsonkit" @sdkjson,
+  "gaato/mttp_core/rt",
   "moonbitlang/core/debug",
   "moonbitlang/core/encoding/utf8",
   "moonbitlang/core/json",
+  "gaato/mttp_core/sse",
+  "gaato/mttp_core/jsonkit" @sdkjson,
+  "gaato/mttp_core/sim",
+  "gaato/mttp_core/driver",
 }
+
+options(
+  "allow-experimental-packages": [ "gaato/mttp_core/driver" ],
+)

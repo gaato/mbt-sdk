@@ -2,4 +2,36 @@ overlay: 1.0.0
 info:
   title: SDK overlay
   version: 1.0.0
-actions: []
+actions:
+  - target: $.paths['/collections'].get
+    description: Follow the spec's next URL until null, consuming results on each page.
+    update:
+      x-moonbit-paginate: {kind: url, items: results, next: next}
+  - target: $.paths['/models'].get
+    description: Follow the spec's next URL rather than guessing offset pagination.
+    update:
+      x-moonbit-paginate: {kind: url, items: results, next: next}
+  - target: $.paths['/models/{model_owner}/{model_name}/versions'].get
+    description: Model version lists use the same results and next envelope.
+    update:
+      x-moonbit-paginate: {kind: url, items: results, next: next}
+  - target: $.paths['/models/{model_owner}/{model_name}/examples'].get
+    description: Model examples use the paginated prediction envelope with next URLs.
+    update:
+      x-moonbit-paginate: {kind: url, items: results, next: next}
+  - target: $.paths['/predictions'].get
+    description: Prediction history exposes next URLs and stops at null.
+    update:
+      x-moonbit-paginate: {kind: url, items: results, next: next}
+  - target: $.paths['/deployments'].get
+    description: Deployment lists expose the paginated results envelope.
+    update:
+      x-moonbit-paginate: {kind: url, items: results, next: next}
+  - target: $.paths['/trainings'].get
+    description: Training history exposes the paginated results envelope.
+    update:
+      x-moonbit-paginate: {kind: url, items: results, next: next}
+  - target: $.paths['/files'].get
+    description: File lists expose the paginated results envelope.
+    update:
+      x-moonbit-paginate: {kind: url, items: results, next: next}

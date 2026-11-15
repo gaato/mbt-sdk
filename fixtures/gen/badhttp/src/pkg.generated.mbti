@@ -4,11 +4,15 @@ package "gaato/fixture-badhttp"
 import {
   "gaato/mttp_core",
   "gaato/mttp_core/client",
+  "gaato/mttp_core/rt",
+  "gaato/mttp_core/sse",
   "moonbitlang/core/debug",
   "moonbitlang/core/json",
 }
 
 // Values
+pub fn default_retry() -> @client.RetryPolicy
+
 pub fn delete_echo_decode(@mttp_core.ResponseHead, Bytes) -> Result[@json.Json, @client.ResponseFailure]
 
 pub fn delete_echo_decode_json(@json.Json) -> @json.Json raise @json.JsonDecodeError
@@ -200,6 +204,84 @@ pub fn put_echo_request() -> @mttp_core.Request
 // Errors
 
 // Types and methods
+pub(all) enum Auth {
+  Anonymous
+}
+pub fn Auth::to_repr(Self) -> @debug.Repr
+pub impl @debug.Debug for Auth
+
+pub struct Badhttp {
+  // private fields
+}
+pub async fn[T] Badhttp::call(Self, @mttp_core.Request, (@mttp_core.ResponseHead, Bytes) -> Result[T, @client.ResponseFailure] raise?, operation? : String) -> Result[T, Failure]
+pub async fn Badhttp::delete_echo(Self) -> Result[@json.Json, Failure]
+pub fn Badhttp::from_client(@client.Client, auth? : Auth, base_url? : String, server_urls? : Map[String, String]) -> Self
+pub async fn Badhttp::get_402(Self) -> Result[@json.Json, Failure]
+pub async fn Badhttp::get_402_broken_flavor(Self, flavor~ : Get402BrokenFlavorFlavor, network? : Get402BrokenFlavorNetwork, amount? : Double) -> Result[Unit, Failure]
+pub async fn Badhttp::get_402_pay(Self, network? : Get402PayNetwork, amount? : Double) -> Result[Unit, Failure]
+pub async fn Badhttp::get_402_pay_base(Self, amount? : Double) -> Result[Unit, Failure]
+pub async fn Badhttp::get_402_pay_base_sepolia(Self, amount? : Double) -> Result[Unit, Failure]
+pub async fn Badhttp::get_402_scenario(Self, scenario~ : Get402ScenarioScenario, network? : Get402ScenarioNetwork, amount? : Double, reason? : String, seconds? : Double) -> Result[Unit, Failure]
+pub async fn Badhttp::get_auth(Self) -> Result[@json.Json, Failure]
+pub async fn Badhttp::get_auth_flavor(Self, flavor~ : GetAuthFlavorFlavor) -> Result[@json.Json, Failure]
+pub async fn Badhttp::get_badjson_flavor(Self, flavor~ : GetBadjsonFlavorFlavor, code? : Int32) -> Result[Unit, Failure]
+pub async fn Badhttp::get_books_json(Self) -> Result[@json.Json, Failure]
+pub async fn Badhttp::get_clients(Self) -> Result[@json.Json, Failure]
+pub async fn Badhttp::get_clients_jsonl(Self) -> Result[Unit, Failure]
+pub async fn Badhttp::get_compress(Self) -> Result[@json.Json, Failure]
+pub async fn Badhttp::get_compress_flavor(Self, flavor~ : GetCompressFlavorFlavor, length? : Int32, code? : Int32, size? : Int32, accept_encoding? : String) -> Result[Unit, Failure]
+pub async fn Badhttp::get_cookies(Self) -> Result[@json.Json, Failure]
+pub async fn Badhttp::get_cookies_flavor(Self, flavor~ : GetCookiesFlavorFlavor, count? : Int32, bytes? : Int32, cookie? : String) -> Result[@json.Json, Failure]
+pub async fn Badhttp::get_corpus(Self) -> Result[@json.Json, Failure]
+pub async fn Badhttp::get_corpus_jsonl(Self) -> Result[Unit, Failure]
+pub async fn Badhttp::get_crosshost(Self) -> Result[@json.Json, Failure]
+pub async fn Badhttp::get_crosshost_flavor(Self, flavor~ : GetCrosshostFlavorFlavor) -> Result[Unit, Failure]
+pub async fn Badhttp::get_crosshost_land(Self) -> Result[@json.Json, Failure]
+pub async fn Badhttp::get_delay_seconds(Self, seconds~ : Double) -> Result[@json.Json, Failure]
+pub async fn Badhttp::get_drip(Self, duration? : Double, chunks? : Int32, code? : Int32) -> Result[Unit, Failure]
+pub async fn Badhttp::get_echo(Self) -> Result[Unit, Failure]
+pub async fn Badhttp::get_etag(Self) -> Result[@json.Json, Failure]
+pub async fn Badhttp::get_etag_flavor(Self, flavor~ : GetEtagFlavorFlavor, if_none_match? : String, if_modified_since? : String, if_match? : String, if_unmodified_since? : String) -> Result[String, Failure]
+pub async fn Badhttp::get_flaky_percent(Self, percent~ : Int32, fail? : Int32, seed? : String, i? : Int32) -> Result[@json.Json, Failure]
+pub async fn Badhttp::get_funding_json(Self) -> Result[@json.Json, Failure]
+pub async fn Badhttp::get_headers(Self) -> Result[@json.Json, Failure]
+pub async fn Badhttp::get_health(Self) -> Result[@json.Json, Failure]
+pub async fn Badhttp::get_license(Self) -> Result[@json.Json, Failure]
+pub async fn Badhttp::get_llms_txt(Self) -> Result[Unit, Failure]
+pub async fn Badhttp::get_range(Self) -> Result[@json.Json, Failure]
+pub async fn Badhttp::get_range_flavor(Self, flavor~ : GetRangeFlavorFlavor, length? : Int32, range? : String, if_range? : String) -> Result[String, Failure]
+pub async fn Badhttp::get_redirect_hops(Self, hops~ : GetRedirectHopsHops, code? : Int32, absolute? : Bool) -> Result[@json.Json, Failure]
+pub async fn Badhttp::get_sse(Self) -> Result[@json.Json, Failure]
+pub async fn Badhttp::get_sse_flavor(Self, flavor~ : GetSseFlavorFlavor, events? : Int32, interval? : Int32, seconds? : Double, bytes? : Int32, last_event_id? : String, async (@sse.SseEvent) -> Unit, stop? : (@sse.SseEvent) -> Bool) -> Result[Unit, Failure]
+pub async fn Badhttp::get_status_code(Self, code~ : String, retry_after? : Int32) -> Result[Unit, Failure]
+pub async fn Badhttp::get_truncate(Self, length? : Int32, send? : Int32) -> Result[Unit, Failure]
+pub async fn Badhttp::head_echo(Self) -> Result[Unit, Failure]
+pub fn Badhttp::new(&@mttp_core.Backend, &@rt.Clock, auth? : Auth, base_url? : String, server_urls? : Map[String, String], retry? : @client.RetryPolicy, timer? : &@rt.Timer, timeout_ms? : Int32, total_timeout_ms? : Int32, max_body_bytes? : Int32) -> Self
+pub fn[T : @json.FromJson] Badhttp::paginate(Self, @mttp_core.Request, kind~ : PageKind, items~ : String, next~ : String, operation? : String) -> @client.Paginator[T, Failure]
+pub async fn Badhttp::patch_echo(Self) -> Result[@json.Json, Failure]
+pub async fn Badhttp::post_echo(Self) -> Result[@json.Json, Failure]
+pub async fn Badhttp::put_echo(Self) -> Result[@json.Json, Failure]
+pub async fn Badhttp::send(Self, @mttp_core.Request, operation? : String) -> Result[@client.Reply[Bytes], Failure]
+pub async fn Badhttp::stream(Self, @mttp_core.Request, async (@sse.SseEvent) -> Unit, stop? : (@sse.SseEvent) -> Bool, operation? : String) -> Result[Unit, Failure]
+pub fn Badhttp::to_repr(Self) -> @debug.Repr
+pub impl @debug.Debug for Badhttp
+
+#non_exhaustive
+#derive(@debug.Debug)
+pub(all) enum ErrorBody {
+  RawJson(@json.Json)
+}
+pub fn ErrorBody::to_repr(Self) -> @debug.Repr
+
+#non_exhaustive
+#derive(@debug.Debug)
+pub(all) enum Failure {
+  Http(HttpFailure)
+  Transport(@mttp_core.TransportError)
+  Decode(@client.ResponseFailure)
+}
+pub fn Failure::to_repr(Self) -> @debug.Repr
+
 #non_exhaustive
 #derive(Eq, @debug.Debug)
 pub(all) enum Get402BrokenFlavorFlavor {
@@ -526,6 +608,20 @@ pub fn GetSseFlavorFlavor::to_json(Self) -> @json.Json
 pub fn GetSseFlavorFlavor::to_repr(Self) -> @debug.Repr
 pub impl @json.FromJson for GetSseFlavorFlavor
 pub impl @json.ToJson for GetSseFlavorFlavor
+
+#derive(@debug.Debug)
+pub(all) struct HttpFailure {
+  operation : String
+  head : @mttp_core.ResponseHead
+  body : Bytes
+  typed : ErrorBody?
+}
+pub fn HttpFailure::to_repr(Self) -> @debug.Repr
+
+pub(all) enum PageKind {
+  Cursor(String)
+  NextUrl
+}
 
 // Type aliases
 

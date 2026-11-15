@@ -1,11 +1,145 @@
 // Generated using `moon info`, DON'T EDIT IT
 package "gaato/jina"
 
+import {
+  "gaato/jina/gen",
+  "gaato/mttp_core",
+  "gaato/mttp_core/client",
+  "gaato/mttp_core/jsonkit",
+  "gaato/mttp_core/rt",
+  "gaato/mttp_core/sse",
+  "moonbitlang/core/debug",
+  "moonbitlang/core/json",
+}
+
 // Values
+pub fn default_retry() -> @client.RetryPolicy
 
 // Errors
 
 // Types and methods
+pub(all) enum Auth {
+  Anonymous
+  Bearer(String)
+}
+pub fn Auth::to_repr(Self) -> @debug.Repr
+pub impl @debug.Debug for Auth
+
+#non_exhaustive
+#derive(@debug.Debug)
+pub(all) enum ErrorBody {
+  ErrorResponse(ErrorResponse)
+  OpenAIErrorResponse(OpenAIErrorResponse)
+}
+pub fn ErrorBody::to_repr(Self) -> @debug.Repr
+
+#derive(Eq, @debug.Debug)
+pub(all) struct ErrorResponse {
+  detail : String
+  code : @jsonkit.Presence[String]
+  request_id : @jsonkit.Presence[String]
+  errors : @jsonkit.Presence[Array[FieldError]]
+}
+pub fn ErrorResponse::equal(Self, Self) -> Bool
+pub fn ErrorResponse::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ErrorResponse::new(detail~ : String, code? : String, request_id? : String, errors? : Array[FieldError]) -> Self
+pub fn ErrorResponse::not_equal(Self, Self) -> Bool
+pub fn ErrorResponse::to_json(Self) -> @json.Json
+pub fn ErrorResponse::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for ErrorResponse
+pub impl @json.ToJson for ErrorResponse
+
+#non_exhaustive
+#derive(@debug.Debug)
+pub(all) enum Failure {
+  Http(HttpFailure)
+  Transport(@mttp_core.TransportError)
+  Decode(@client.ResponseFailure)
+}
+pub fn Failure::to_repr(Self) -> @debug.Repr
+
+#derive(Eq, @debug.Debug)
+pub(all) struct FieldError {
+  field : String
+  message : String
+  type_ : String
+  input : @jsonkit.Presence[@json.Json]
+}
+pub fn FieldError::equal(Self, Self) -> Bool
+pub fn FieldError::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn FieldError::new(field~ : String, message~ : String, type_~ : String, input? : @json.Json) -> Self
+pub fn FieldError::not_equal(Self, Self) -> Bool
+pub fn FieldError::to_json(Self) -> @json.Json
+pub fn FieldError::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for FieldError
+pub impl @json.ToJson for FieldError
+
+#derive(@debug.Debug)
+pub(all) struct HttpFailure {
+  operation : String
+  head : @mttp_core.ResponseHead
+  body : Bytes
+  typed : ErrorBody?
+}
+pub fn HttpFailure::to_repr(Self) -> @debug.Repr
+
+pub struct Jina {
+  // private fields
+}
+pub async fn[T] Jina::call(Self, @mttp_core.Request, (@mttp_core.ResponseHead, Bytes) -> Result[T, @client.ResponseFailure] raise?, operation? : String) -> Result[T, Failure]
+pub async fn Jina::cancel_batch_job(Self, batch_id~ : String) -> Result[@gen.BatchStatus, Failure]
+pub async fn Jina::chat_completions(Self, @gen.ChatCompletionRequest) -> Result[@json.Json, Failure]
+pub async fn Jina::create_batch_job(Self, @gen.BatchEmbeddingRequest) -> Result[@gen.BatchStatus, Failure]
+pub async fn Jina::download_batch_errors(Self, batch_id~ : String) -> Result[@json.Json, Failure]
+pub async fn Jina::download_batch_output(Self, batch_id~ : String) -> Result[@json.Json, Failure]
+pub async fn Jina::embeddings(Self, @gen.EmbeddingsV1EmbeddingsPostRequest) -> Result[@gen.EmbeddingResponse, Failure]
+pub fn Jina::from_client(@client.Client, auth? : Auth, base_url? : String, server_urls? : Map[String, String]) -> Self
+pub async fn Jina::get_batch_status(Self, batch_id~ : String) -> Result[@gen.BatchStatus, Failure]
+pub async fn Jina::get_model(Self, model_id~ : String) -> Result[@gen.ModelInfo, Failure]
+pub async fn Jina::list_batch_jobs(Self, limit? : Int32) -> Result[Array[@gen.BatchStatus], Failure]
+pub async fn Jina::list_models(Self) -> Result[@gen.ModelListResponse, Failure]
+pub fn Jina::new(&@mttp_core.Backend, &@rt.Clock, auth? : Auth, base_url? : String, server_urls? : Map[String, String], retry? : @client.RetryPolicy, timer? : &@rt.Timer, timeout_ms? : Int32, total_timeout_ms? : Int32, max_body_bytes? : Int32) -> Self
+pub fn[T : @json.FromJson] Jina::paginate(Self, @mttp_core.Request, kind~ : PageKind, items~ : String, next~ : String, operation? : String) -> @client.Paginator[T, Failure]
+pub async fn Jina::rerank(Self, @gen.RerankV1RerankPostRequest) -> Result[@gen.RerankingResponse, Failure]
+pub async fn Jina::send(Self, @mttp_core.Request, operation? : String) -> Result[@client.Reply[Bytes], Failure]
+pub async fn Jina::stream(Self, @mttp_core.Request, async (@sse.SseEvent) -> Unit, stop? : (@sse.SseEvent) -> Bool, operation? : String) -> Result[Unit, Failure]
+pub fn Jina::to_repr(Self) -> @debug.Repr
+pub impl @debug.Debug for Jina
+
+#derive(Eq, @debug.Debug)
+pub(all) struct OpenAIError {
+  message : String
+  type_ : String
+  param : @jsonkit.Presence[String]
+  code : @jsonkit.Presence[String]
+  request_id : @jsonkit.Presence[String]
+}
+pub fn OpenAIError::equal(Self, Self) -> Bool
+pub fn OpenAIError::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn OpenAIError::new(message~ : String, type_~ : String, param? : String, code? : String, request_id? : String) -> Self
+pub fn OpenAIError::not_equal(Self, Self) -> Bool
+pub fn OpenAIError::to_json(Self) -> @json.Json
+pub fn OpenAIError::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for OpenAIError
+pub impl @json.ToJson for OpenAIError
+
+#derive(Eq, @debug.Debug)
+pub(all) struct OpenAIErrorResponse {
+  error : OpenAIError
+}
+pub fn OpenAIErrorResponse::equal(Self, Self) -> Bool
+pub fn OpenAIErrorResponse::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn OpenAIErrorResponse::new(error~ : OpenAIError) -> Self
+pub fn OpenAIErrorResponse::not_equal(Self, Self) -> Bool
+pub fn OpenAIErrorResponse::to_json(Self) -> @json.Json
+pub fn OpenAIErrorResponse::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for OpenAIErrorResponse
+pub impl @json.ToJson for OpenAIErrorResponse
+
+pub(all) enum PageKind {
+  Cursor(String)
+  NextUrl
+}
 
 // Type aliases
 

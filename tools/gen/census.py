@@ -37,7 +37,7 @@ def diagnostic_kind(diagnostic: Diagnostic) -> str:
 
 
 def census(
-    spec: str | Path, name: str, *, ops: set[str] | None = None, overlays: list[str] | None = None
+    spec: str | Path, name: str, *, ops: set[str] | None = None, overlays: list[str] | None = None, client_layer: bool = False
 ) -> CensusResult:
     """Run the selected-operations generator census without writing files."""
     operations = 0
@@ -54,6 +54,11 @@ def census(
         builder = IRBuilder(doc, "census/generated", derive_operation_ids=True)
         ir = builder.build()
         emit(ir)
+        if client_layer:
+            from tools.gen.client_layer import error_ir, pagination_notes
+            error_types, _ = error_ir(doc, ir)
+            emit(error_types)
+            builder.notes.extend(pagination_notes(doc, ir))
     except GenerationError as error:
         diagnostics = error.diagnostics
     kinds = Counter(diagnostic_kind(item) for item in diagnostics)
@@ -74,6 +79,7 @@ def parser() -> argparse.ArgumentParser:
     result.add_argument("--json", action="store_true", dest="as_json")
     result.add_argument("--expect-zero", action="store_true")
     result.add_argument("--derive-operation-ids", action="store_true")
+    result.add_argument("--client-layer", action="store_true", help="also lower typed HTTP error bodies")
     result.add_argument("--ops", help="comma-separated operationIds to include")
     result.add_argument("--overlay", action="append", default=[], help="overlay to apply first (repeatable)")
     return result
@@ -87,7 +93,7 @@ def run(argv: list[str] | None = None) -> int:
         if not ops:
             parser().error("--ops requires at least one operationId")
     try:
-        result = census(args.spec, args.name, ops=ops, overlays=args.overlay)
+        result = census(args.spec, args.name, ops=ops, overlays=args.overlay, client_layer=args.client_layer)
     except ValueError as error:
         parser().error(str(error))
     if args.as_json:

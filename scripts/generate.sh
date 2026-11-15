@@ -25,6 +25,7 @@ for sdk in "${sdks[@]}"; do
     continue
   fi
   args+=(--package "$(get package)")
+  [ "$(get client_layer)" = false ] || args+=(--client-sdk "$sdk")
   [ "$(get include_all)" = false ] || args+=(--include-all)
   [ "$(get derive_operation_ids)" = false ] || args+=(--derive-operation-ids)
   for overlay in "$(get dir)"/overlays/*.yaml; do

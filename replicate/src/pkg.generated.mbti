@@ -1,11 +1,141 @@
 // Generated using `moon info`, DON'T EDIT IT
 package "gaato/replicate"
 
+import {
+  "gaato/mttp_core",
+  "gaato/mttp_core/client",
+  "gaato/mttp_core/rt",
+  "gaato/mttp_core/sse",
+  "gaato/replicate/gen",
+  "moonbitlang/core/debug",
+  "moonbitlang/core/json",
+}
+
 // Values
+pub fn default_retry() -> @client.RetryPolicy
 
 // Errors
 
 // Types and methods
+pub(all) enum Auth {
+  Anonymous
+  Bearer(String)
+}
+pub fn Auth::to_repr(Self) -> @debug.Repr
+pub impl @debug.Debug for Auth
+
+#non_exhaustive
+#derive(@debug.Debug)
+pub(all) enum ErrorBody {
+  ErrorSearch400Response(ErrorSearch400Response)
+  ErrorSearch500Response(ErrorSearch500Response)
+}
+pub fn ErrorBody::to_repr(Self) -> @debug.Repr
+
+#derive(Eq, @debug.Debug)
+pub(all) struct ErrorSearch400Response {
+  detail : String?
+}
+pub fn ErrorSearch400Response::equal(Self, Self) -> Bool
+pub fn ErrorSearch400Response::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ErrorSearch400Response::new(detail? : String) -> Self
+pub fn ErrorSearch400Response::not_equal(Self, Self) -> Bool
+pub fn ErrorSearch400Response::to_json(Self) -> @json.Json
+pub fn ErrorSearch400Response::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for ErrorSearch400Response
+pub impl @json.ToJson for ErrorSearch400Response
+
+#derive(Eq, @debug.Debug)
+pub(all) struct ErrorSearch500Response {
+  detail : String?
+}
+pub fn ErrorSearch500Response::equal(Self, Self) -> Bool
+pub fn ErrorSearch500Response::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ErrorSearch500Response::new(detail? : String) -> Self
+pub fn ErrorSearch500Response::not_equal(Self, Self) -> Bool
+pub fn ErrorSearch500Response::to_json(Self) -> @json.Json
+pub fn ErrorSearch500Response::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for ErrorSearch500Response
+pub impl @json.ToJson for ErrorSearch500Response
+
+#non_exhaustive
+#derive(@debug.Debug)
+pub(all) enum Failure {
+  Http(HttpFailure)
+  Transport(@mttp_core.TransportError)
+  Decode(@client.ResponseFailure)
+}
+pub fn Failure::to_repr(Self) -> @debug.Repr
+
+#derive(@debug.Debug)
+pub(all) struct HttpFailure {
+  operation : String
+  head : @mttp_core.ResponseHead
+  body : Bytes
+  typed : ErrorBody?
+}
+pub fn HttpFailure::to_repr(Self) -> @debug.Repr
+
+pub(all) enum PageKind {
+  Cursor(String)
+  NextUrl
+}
+
+pub struct Replicate {
+  // private fields
+}
+pub async fn Replicate::account_get(Self) -> Result[@gen.AccountGetResponse, Failure]
+pub async fn[T] Replicate::call(Self, @mttp_core.Request, (@mttp_core.ResponseHead, Bytes) -> Result[T, @client.ResponseFailure] raise?, operation? : String) -> Result[T, Failure]
+pub async fn Replicate::collections_get(Self, collection_slug~ : String) -> Result[@gen.SchemasCollectionResponse, Failure]
+pub async fn Replicate::collections_list(Self) -> Result[@gen.SchemasPaginatedCollectionResponse, Failure]
+pub fn Replicate::collections_list_pages(Self) -> @client.Paginator[@gen.SchemasCollectionListItem, Failure]
+pub async fn Replicate::deployments_create(Self, @gen.DeploymentsCreateRequest) -> Result[@gen.SchemasDeploymentResponse, Failure]
+pub async fn Replicate::deployments_delete(Self, deployment_owner~ : String, deployment_name~ : String) -> Result[Unit, Failure]
+pub async fn Replicate::deployments_get(Self, deployment_owner~ : String, deployment_name~ : String) -> Result[@gen.SchemasDeploymentResponse, Failure]
+pub async fn Replicate::deployments_list(Self) -> Result[@gen.DeploymentsListResponse, Failure]
+pub fn Replicate::deployments_list_pages(Self) -> @client.Paginator[@gen.SchemasDeploymentResponse, Failure]
+pub async fn Replicate::deployments_predictions_create(Self, deployment_owner~ : String, deployment_name~ : String, @gen.SchemasPredictionRequest, prefer? : String, cancel_after? : String) -> Result[@gen.SchemasPredictionResponse, Failure]
+pub async fn Replicate::deployments_update(Self, deployment_owner~ : String, deployment_name~ : String, @gen.DeploymentsUpdateRequest) -> Result[@gen.SchemasDeploymentResponse, Failure]
+pub async fn Replicate::files_create(Self, Bytes, String, String, String, filename? : String, metadata? : @json.Json, type_? : String) -> Result[@gen.SchemasFileResponse, Failure]
+pub async fn Replicate::files_delete(Self, file_id~ : String) -> Result[Unit, Failure]
+pub async fn Replicate::files_download(Self, file_id~ : String, owner~ : String, expiry~ : Int64, signature~ : String) -> Result[@client.Reply[Bytes], Failure]
+pub async fn Replicate::files_get(Self, file_id~ : String) -> Result[@gen.SchemasFileResponse, Failure]
+pub async fn Replicate::files_list(Self) -> Result[@gen.FilesListResponse, Failure]
+pub fn Replicate::files_list_pages(Self) -> @client.Paginator[@gen.SchemasFileResponse, Failure]
+pub fn Replicate::from_client(@client.Client, auth? : Auth, base_url? : String, server_urls? : Map[String, String]) -> Self
+pub async fn Replicate::hardware_list(Self) -> Result[Array[@gen.HardwareListResponseItem], Failure]
+pub async fn Replicate::models_create(Self, @gen.ModelsCreateRequest) -> Result[@gen.SchemasModelResponse, Failure]
+pub async fn Replicate::models_delete(Self, model_owner~ : String, model_name~ : String) -> Result[Unit, Failure]
+pub async fn Replicate::models_examples_list(Self, model_owner~ : String, model_name~ : String) -> Result[@gen.SchemasPaginatedPredictionResponse, Failure]
+pub fn Replicate::models_examples_list_pages(Self, model_owner~ : String, model_name~ : String) -> @client.Paginator[@gen.SchemasPredictionResponse, Failure]
+pub async fn Replicate::models_get(Self, model_owner~ : String, model_name~ : String) -> Result[@gen.SchemasModelResponse, Failure]
+pub async fn Replicate::models_list(Self, sort_by? : @gen.ModelsListSortBy, sort_direction? : @gen.ModelsListSortDirection) -> Result[@gen.SchemasPaginatedModelResponse, Failure]
+pub fn Replicate::models_list_pages(Self, sort_by? : @gen.ModelsListSortBy, sort_direction? : @gen.ModelsListSortDirection) -> @client.Paginator[@gen.SchemasModelResponse, Failure]
+pub async fn Replicate::models_predictions_create(Self, model_owner~ : String, model_name~ : String, @gen.SchemasPredictionRequest, prefer? : String, cancel_after? : String) -> Result[@gen.SchemasPredictionResponse, Failure]
+pub async fn Replicate::models_readme_get(Self, model_owner~ : String, model_name~ : String) -> Result[String, Failure]
+pub async fn Replicate::models_update(Self, model_owner~ : String, model_name~ : String, @gen.ModelsUpdateRequest) -> Result[@gen.SchemasModelResponse, Failure]
+pub async fn Replicate::models_versions_delete(Self, model_owner~ : String, model_name~ : String, version_id~ : String) -> Result[Unit, Failure]
+pub async fn Replicate::models_versions_get(Self, model_owner~ : String, model_name~ : String, version_id~ : String) -> Result[@gen.SchemasVersionResponse, Failure]
+pub async fn Replicate::models_versions_list(Self, model_owner~ : String, model_name~ : String) -> Result[@gen.SchemasPaginatedVersionResponse, Failure]
+pub fn Replicate::models_versions_list_pages(Self, model_owner~ : String, model_name~ : String) -> @client.Paginator[@gen.SchemasVersionResponse, Failure]
+pub fn Replicate::new(&@mttp_core.Backend, &@rt.Clock, auth? : Auth, base_url? : String, server_urls? : Map[String, String], retry? : @client.RetryPolicy, timer? : &@rt.Timer, timeout_ms? : Int32, total_timeout_ms? : Int32, max_body_bytes? : Int32) -> Self
+pub fn[T : @json.FromJson] Replicate::paginate(Self, @mttp_core.Request, kind~ : PageKind, items~ : String, next~ : String, operation? : String) -> @client.Paginator[T, Failure]
+pub async fn Replicate::predictions_cancel(Self, prediction_id~ : String) -> Result[@gen.SchemasPredictionResponse, Failure]
+pub async fn Replicate::predictions_create(Self, @gen.SchemasVersionPredictionRequest, prefer? : String, cancel_after? : String) -> Result[@gen.SchemasPredictionResponse, Failure]
+pub async fn Replicate::predictions_get(Self, prediction_id~ : String) -> Result[@gen.SchemasPredictionResponse, Failure]
+pub async fn Replicate::predictions_list(Self, created_after? : String, created_before? : String, source? : String) -> Result[@gen.PredictionsListResponse, Failure]
+pub fn Replicate::predictions_list_pages(Self, created_after? : String, created_before? : String, source? : String) -> @client.Paginator[@gen.SchemasPredictionResponse, Failure]
+pub async fn Replicate::search(Self, query~ : String, limit? : Int32) -> Result[@gen.SchemasSearchResponse, Failure]
+pub async fn Replicate::send(Self, @mttp_core.Request, operation? : String) -> Result[@client.Reply[Bytes], Failure]
+pub async fn Replicate::stream(Self, @mttp_core.Request, async (@sse.SseEvent) -> Unit, stop? : (@sse.SseEvent) -> Bool, operation? : String) -> Result[Unit, Failure]
+pub fn Replicate::to_repr(Self) -> @debug.Repr
+pub async fn Replicate::trainings_cancel(Self, training_id~ : String) -> Result[@gen.SchemasTrainingResponse, Failure]
+pub async fn Replicate::trainings_create(Self, model_owner~ : String, model_name~ : String, version_id~ : String, @gen.SchemasTrainingRequest) -> Result[@gen.SchemasTrainingResponse, Failure]
+pub async fn Replicate::trainings_get(Self, training_id~ : String) -> Result[@gen.SchemasTrainingResponse, Failure]
+pub async fn Replicate::trainings_list(Self) -> Result[@gen.TrainingsListResponse, Failure]
+pub fn Replicate::trainings_list_pages(Self) -> @client.Paginator[@gen.SchemasTrainingResponse, Failure]
+pub async fn Replicate::webhooks_default_secret_get(Self) -> Result[@gen.WebhooksDefaultSecretGetResponse, Failure]
+pub impl @debug.Debug for Replicate
 
 // Type aliases
 

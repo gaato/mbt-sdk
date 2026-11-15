@@ -1,6 +1,7 @@
 // Replays recorded badhttp.dev responses (see scripts/capture_badhttp.mbtx)
 // through a loopback server; runs offline, in the gates.
 import {
+  "gaato/fixture-badhttp" @badhttp,
   "gaato/mttp_core" @http,
   "gaato/mttp_core/cookie",
   "gaato/mttp_core/sim" @mock,

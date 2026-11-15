@@ -20,6 +20,8 @@ from tools.gen.emit_moonbit import HEADER, emit
 from tools.gen.ir import IRBuilder, include_all_operations
 from tools.gen.normalize import normalize_spec
 
+ROOT = Path(__file__).resolve().parents[2]
+
 
 def parser() -> argparse.ArgumentParser:
     result = argparse.ArgumentParser(description=__doc__)
@@ -32,7 +34,20 @@ def parser() -> argparse.ArgumentParser:
     result.add_argument("--derive-operation-ids", action="store_true")
     result.add_argument("--include-all", action="store_true")
     result.add_argument("--verbose", action="store_true")
+    result.add_argument("--client-sdk", help="Opt-in ledger entry for root-package client generation")
     return result
+
+
+def _owned_name(out: Path, name: str) -> bool:
+    if (out.name == 'gen' and out.parent.name == 'src') or (out.name == 'src' and name.endswith('_gen.mbt')):
+        return True
+    if name not in {'types.mbt', 'operations.mbt'} or not out.resolve().is_relative_to(ROOT):
+        return False
+    # Flat vocabulary outputs predate the facade suffix convention. The ledger
+    # identifies their owners without granting other root files that exception.
+    from tools import sdks
+    return any(sdk['generator'] == 'openapi' and sdk['out'] == sdk['dir'] + '/src'
+               and (ROOT / sdk['out']).resolve() == out.resolve() for sdk in sdks.load())
 
 
 def _differences(out: Path, files: dict[str, str]) -> list[str]:
@@ -48,7 +63,7 @@ def _differences(out: Path, files: dict[str, str]) -> list[str]:
                     generated = path.read_text(encoding="utf-8").startswith(HEADER.rstrip("\n"))
                 except UnicodeDecodeError:
                     generated = False
-                if generated:
+                if generated and _owned_name(out, path.name):
                     differences.append(str(path))
     return differences
 
@@ -63,7 +78,7 @@ def _protected_conflicts(out: Path, files: dict[str, str]) -> list[str]:
             generated = path.read_text(encoding="utf-8").startswith(HEADER.rstrip("\n"))
         except UnicodeDecodeError:
             generated = False
-        if not generated:
+        if not generated or not (_owned_name(out, name) or name == 'moon.pkg'):
             conflicts.append(str(path))
     return conflicts
 
@@ -98,20 +113,32 @@ def _write(out: Path, files: dict[str, str]) -> None:
                 generated = path.read_text(encoding="utf-8").startswith(HEADER.rstrip("\n"))
             except UnicodeDecodeError:
                 generated = False
-            if generated:
+            if generated and _owned_name(out, path.name):
                 path.unlink()
     for name, content in files.items():
-        (out / name).write_text(content, encoding="utf-8")
+        path = out / name
+        if not path.exists() or path.read_text(encoding="utf-8") != content:
+            path.write_text(content, encoding="utf-8")
 
 
 def run(argv: list[str] | None = None) -> int:
     args = parser().parse_args(argv)
     builder = None
+    sdk = None
     try:
         doc = normalize_spec(args.spec, args.overlay)
         if args.include_all:
             include_all_operations(doc)
-        builder = IRBuilder(doc, args.package, derive_operation_ids=args.derive_operation_ids)
+        auth_headers = set()
+        if args.client_sdk:
+            from tools import sdks
+            from tools.gen.client_layer import auth_choices
+            sdk = next(s for s in sdks.load() if s['name'] == args.client_sdk)
+            if not sdk.get('client_layer'):
+                raise ValueError('client layer is not enabled in the ledger')
+            if sdk['out'] != sdk['dir'] + '/src':
+                auth_headers = {'authorization'} | {a['name'].lower() for a in auth_choices(sdk['auth']) if a['kind'] == 'header'}
+        builder = IRBuilder(doc, args.package, derive_operation_ids=args.derive_operation_ids, auth_headers=auth_headers)
         ir = builder.build()
     except GenerationError as error:
         for diagnostic in error.diagnostics:
@@ -120,28 +147,48 @@ def run(argv: list[str] | None = None) -> int:
             for note in sorted(builder.notes, key=lambda item: (item.pointer, item.message)):
                 print(f"note: {note.pointer}: {note.message}", file=sys.stderr)
         return 2
+    except (ValueError, StopIteration) as error:
+        print(f'client ledger: {error}', file=sys.stderr)
+        return 2
     if args.verbose:
         for note in sorted(builder.notes, key=lambda item: (item.pointer, item.message)):
             print(f"note: {note.pointer}: {note.message}", file=sys.stderr)
+    out = Path(args.out)
+    outputs = {out: emit(ir)}
+    if args.client_sdk:
+        from tools.gen.client_layer import emit_client, pagination_notes
+        try:
+            root = Path(sdk['dir']) / 'src'
+            legacy = outputs[out] if root == out else None
+            facade = emit_client(doc, ir, sdk, legacy)
+            for note in pagination_notes(doc, ir):
+                print(f'note: {note.pointer}: {note.message}', file=sys.stderr)
+            if root == out:
+                outputs[out].update(facade)
+            else:
+                outputs[root] = facade
+        except (ValueError, GenerationError) as error:
+            print(f'client layer: {error}', file=sys.stderr)
+            return 2
     try:
-        files = _format(emit(ir))
+        outputs = {path: _format(files) for path, files in outputs.items()}
     except GenerationError:
         print("moonfmt failed; install the MoonBit toolchain before generating", file=sys.stderr)
         return 2
-    out = Path(args.out)
-    conflicts = _protected_conflicts(out, files)
+    conflicts = [name for path, files in outputs.items() for name in _protected_conflicts(path, files)]
     if conflicts:
         for path in conflicts:
             print(f"refusing to overwrite non-generated file: {path}", file=sys.stderr)
         return 2
     if args.ir_out:
         Path(args.ir_out).write_text(json.dumps(ir.to_dict(), ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    differences = _differences(out, files)
+    differences = [name for path, files in outputs.items() for name in _differences(path, files)]
     if args.check:
         for path in differences:
             print(f"generated file differs: {path}", file=sys.stderr)
         return 1 if differences else 0
-    _write(out, files)
+    for path, files in outputs.items():
+        _write(path, files)
     return 0
 
 

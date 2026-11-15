@@ -443,7 +443,8 @@ def _string_values(schema: dict[str, Any]) -> list[str] | None:
 
 
 class IRBuilder:
-    def __init__(self, doc: dict[str, Any], package: str, *, derive_operation_ids: bool = False):
+    def __init__(self, doc: dict[str, Any], package: str, *, derive_operation_ids: bool = False, auth_headers: set[str] | None = None):
+        self.auth_headers = auth_headers or set()
         self.doc = doc
         self.package = package
         self.derive_operation_ids = derive_operation_ids
@@ -1640,6 +1641,8 @@ class IRBuilder:
         parameter_names: set[str] = set()
         for index, parameter in enumerate(raw_parameters):
             location = parameter.get("in")
+            if location == 'header' and str(parameter.get('name', '')).lower() in self.auth_headers:
+                continue
             parameter_pointer = pointer_join(pointer_join(pointer, "parameters"), index)
             if location == "cookie":
                 self.add_diag(parameter_pointer, "cookie parameters are not supported", "remove the operation from x-moonbit-include or model the Cookie header in handwritten code")

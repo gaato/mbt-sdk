@@ -58,6 +58,7 @@ fmt_check() {
 
 # Every published module's CHANGELOG has [Unreleased] and a heading for its version.
 run "${py[@]}" tools/sdks.py sync --check
+run "${py[@]}" tools/sdks.py behavior-check
 run scripts/release.sh check
 # The registry index, which the .mbtx scripts need to resolve their imports.
 run moon update
@@ -109,6 +110,7 @@ for sdk in "${sdks[@]}"; do
   [ "$("${py[@]}" tools/sdks.py get "$sdk" generator)" = openapi ] || continue
   flags=$("${py[@]}" tools/sdks.py get "$sdk" census_args)
   args=(); [ -z "$flags" ] || mapfile -t args <<< "$flags"
+  [ "$("${py[@]}" tools/sdks.py get "$sdk" client_layer)" = false ] || args+=(--client-layer)
   run "${py[@]}" tools/gen/census.py "$("${py[@]}" tools/sdks.py get "$sdk" spec_file)" "$sdk" "${args[@]}" --expect-zero
 done
 # Only meaningful in CI: in a jj working copy `git diff` compares against the parent change,

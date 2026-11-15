@@ -13,11 +13,14 @@ import sys
 import tomllib
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
 STRINGS = 'name dir module generator spec_file spec_url spec_fetch package out'.split()
 BOOLS = 'include_all derive_operation_ids publish spec_watch'.split()
 ARRAYS = 'census_args offline_packages'.split()
 OPTIONAL = {'command', 'report_census_args', 'base_url', 'auth', 'base_url_reason',
-            'base_url_spec', 'auth_reason', 'auth_spec'}
+            'base_url_spec', 'auth_reason', 'auth_spec', 'client_layer', 'extra_imports',
+            'operation_wrappers', 'retry', 'idempotency_headers', 'behavior_note', 'server_urls',
+            'timeout_ms', 'total_timeout_ms'}
 
 
 def require(ok, message):
@@ -44,6 +47,17 @@ def load():
                     f'{label}: {key} must contain single-line strings')
         # Reporting includes all operations when no separate flags are supplied.
         sdk.setdefault('report_census_args', [])
+        sdk.setdefault('client_layer', False)
+        require(type(sdk['client_layer']) is bool, f'{label}: client_layer must be boolean')
+        require(type(sdk.get('operation_wrappers', True)) is bool, f'{label}: operation_wrappers must be boolean')
+        for key in ('extra_imports', 'idempotency_headers', 'server_urls'):
+            require(isinstance(sdk.get(key, []), list) and all(isinstance(v, str) and v.strip() for v in sdk.get(key, [])), f'{label}: invalid {key}')
+        if sdk['client_layer']:
+            require('base_url' in sdk and 'auth' in sdk, f'{label}: client_layer needs base_url and auth pins')
+        validate_retry(sdk.get('retry'), label)
+        for key in ('timeout_ms', 'total_timeout_ms'):
+            if key in sdk:
+                require(type(sdk[key]) is int and 0 < sdk[key] <= 2147483647, f'{label}: invalid {key}')
         require(re.fullmatch(r'[a-z][a-z0-9_-]*', label), f'invalid SDK name: {label}')
         for key, values in seen.items():
             require(sdk[key] not in values, f'{label}: duplicate {key}: {sdk[key]}')
@@ -64,16 +78,73 @@ def load():
             if key in sdk:
                 require(isinstance(sdk[key], str) and sdk[key].strip(), f'{label}: {key} must be nonempty')
         if 'auth' in sdk:
-            auth = sdk['auth']
-            require(isinstance(auth, dict) and auth.get('kind') in ('bearer', 'header'), f'{label}: invalid auth')
-            require(set(auth) == ({'kind', 'name'} if auth['kind'] == 'header' else {'kind'}), f'{label}: unknown/missing auth keys')
-            if auth['kind'] == 'header':
-                require(isinstance(auth['name'], str) and auth['name'].strip(), f'{label}: empty auth header')
+            validate_auth(sdk['auth'], label)
         for key in ('base_url', 'auth'):
             require((key + '_reason' in sdk) == (key + '_spec' in sdk), f'{label}: {key} override needs both reason and spec baseline')
         if 'auth_spec' in sdk:
             require(isinstance(sdk['auth_spec'], dict), f'{label}: auth_spec must be a table')
     return data['sdk']
+
+
+def validate_auth(auth, label):
+    require(isinstance(auth, dict), f'{label}: invalid auth')
+    kind = auth.get('kind')
+    require(kind in ('none', 'bearer', 'basic', 'header', 'query', 'alternatives'), f'{label}: invalid auth kind')
+    if kind == 'alternatives':
+        require(set(auth) == {'kind', 'schemes'} and isinstance(auth['schemes'], list) and len(auth['schemes']) >= 2, f'{label}: invalid auth alternatives')
+        for scheme in auth['schemes']:
+            require(scheme.get('kind') != 'alternatives', f'{label}: nested auth alternatives')
+            validate_auth(scheme, label)
+    else:
+        require(set(auth) == ({'kind', 'name'} if kind in ('header', 'query') else {'kind'}), f'{label}: unknown/missing auth keys')
+        if kind in ('header', 'query'):
+            require(isinstance(auth['name'], str) and auth['name'].strip(), f'{label}: empty auth name')
+
+
+def validate_retry(retry, label):
+    if retry is None:
+        return
+    allowed = {'retries', 'methods', 'statuses', 'status_overrides', 'sent_failures', 'unprocessed_failures', 'override_header', 'retry_after', 'retry_after_cap_ms', 'retry_after_cap', 'zero_means_backoff', 'backoff_base_ms', 'backoff_max_ms', 'jitter'}
+    require(isinstance(retry, dict) and not set(retry) - allowed, f'{label}: unknown retry fields')
+    for key in ('retries', 'backoff_base_ms', 'backoff_max_ms'):
+        if key in retry:
+            require(type(retry[key]) is int and 0 <= retry[key] <= 2147483647, f'{label}: invalid retry {key}')
+    for key in ('methods', 'sent_failures'):
+        value = retry.get(key, 'idempotent')
+        require(value in ('idempotent', 'any', 'never') if isinstance(value, str) else isinstance(value, list) and all(v in ('GET', 'HEAD', 'PUT', 'DELETE', 'OPTIONS', 'TRACE', 'POST', 'PATCH') for v in value), f'{label}: invalid retry {key}')
+    for status in retry.get('statuses', []):
+        require((type(status) is int and 100 <= status <= 599) or (isinstance(status, list) and len(status) == 2 and all(type(s) is int for s in status) and 100 <= status[0] <= status[1] <= 599), f'{label}: invalid retry status')
+    require(isinstance(retry.get('status_overrides', []), list), f'{label}: status_overrides must be an array')
+    for rule in retry.get('status_overrides', []):
+        require(isinstance(rule, dict) and set(rule) == {'methods', 'statuses'}, f'{label}: invalid status override')
+        require(isinstance(rule['methods'], list) and bool(rule['methods']) and isinstance(rule['statuses'], list) and bool(rule['statuses']), f'{label}: status override requires methods and statuses arrays')
+        validate_retry(rule, label)
+    require(retry.get('retry_after', 'ms_then_header') in ('ignore', 'header', 'ms_then_header'), f'{label}: invalid retry_after')
+    cap = retry.get('retry_after_cap_ms', 60000)
+    require(cap == 'none' or type(cap) is int and 0 <= cap <= 2147483647, f'{label}: invalid retry cap')
+    require(retry.get('retry_after_cap', 'stop') in ('stop', 'backoff'), f'{label}: invalid retry cap mode')
+    jitter = retry.get('jitter', [800, 1200])
+    require(jitter in ('none', 'full') if isinstance(jitter, str) else isinstance(jitter, list) and len(jitter) == 2 and all(type(v) is int for v in jitter) and 0 <= jitter[0] <= jitter[1] <= 2147483647, f'{label}: invalid jitter')
+    for key in ('unprocessed_failures', 'zero_means_backoff'):
+        require(type(retry.get(key, False)) is bool, f'{label}: invalid retry {key}')
+    if 'override_header' in retry:
+        require(isinstance(retry['override_header'], str) and retry['override_header'].strip(), f'{label}: invalid override_header')
+
+
+def behavior_notes(sdks):
+    for sdk in sdks:
+        if not (sdk['publish'] or sdk['client_layer']):
+            continue
+        deferred = sdk.get('behavior_note', '')
+        if deferred:
+            require(not sdk['publish'] and deferred.startswith('pending: ') and len(deferred) > 15, f'{sdk["name"]}: invalid behavior_note deferral')
+            print(f'{sdk["name"]}: behavior survey explicitly deferred: {deferred}')
+            continue
+        path = ROOT / 'docs/behavior' / (sdk['name'] + '.md')
+        require(path.is_file(), f'{sdk["name"]}: behavior note missing: {path}')
+        text = path.read_text()
+        require(not re.search(r'\bTODO\b', text, re.I), f'{sdk["name"]}: behavior note contains TODO')
+        require(re.search(r'(?i)survey(?:ed| date)?[^\n]*\b\d{4}-\d{2}-\d{2}\b', text), f'{sdk["name"]}: behavior note has no survey date')
 
 
 def marked(text, marker, body):
@@ -205,7 +276,7 @@ def pins(sdks):
         else:
             # Reuse the already-required generator environment for YAML only.
             py = [sys.executable]
-            code = 'import json,sys,yaml; d=yaml.load(open(sys.argv[1]), Loader=getattr(yaml,"CSafeLoader",yaml.SafeLoader)); print(json.dumps({"servers":d.get("servers"),"components":{"securitySchemes":d.get("components",{}).get("securitySchemes",{})}}))'
+            code = 'import json,sys,yaml; d=yaml.load(open(sys.argv[1]), Loader=getattr(yaml,"CSafeLoader",yaml.SafeLoader)); print(json.dumps({"servers":d.get("servers"),"components":{"securitySchemes":d.get("components",{}).get("securitySchemes",{})},"paths":d.get("paths",{})}))'
             try:
                 output = subprocess.check_output(py + ['-c', code, str(spec)], text=True, cwd=ROOT, stderr=subprocess.PIPE)
             except subprocess.CalledProcessError as error:
@@ -220,18 +291,23 @@ def pins(sdks):
             actual = servers[0].get('url')
             expected = sdk.get('base_url_spec', sdk['base_url'])
             require(actual == expected, f'{sdk["name"]}: base_url pin {expected!r} disagrees with servers[0].url {actual!r}; review the host change (a deliberate override needs base_url_reason and base_url_spec)')
+        if sdk.get('client_layer'):
+            from tools.gen.ir import HTTP_METHODS
+            override_urls = set()
+            for item in doc.get('paths', {}).values():
+                for value in [item] + [op for method, op in item.items() if method in HTTP_METHODS and isinstance(op, dict)]:
+                    override_urls.update(server['url'] for server in value.get('servers', []))
+            require(override_urls == set(sdk.get('server_urls', [])), f'{sdk["name"]}: path/operation servers changed; review and pin server_urls: {sorted(override_urls)}')
         if 'auth' in sdk:
             schemes = doc.get('components', {}).get('securitySchemes', {})
             require(isinstance(schemes, dict) and all(isinstance(s, dict) for s in schemes.values()), f'{sdk["name"]}: invalid securitySchemes; review authentication')
             if 'auth_reason' in sdk:
                 ok = schemes == sdk['auth_spec']
             else:
-                def matches(scheme):
-                    auth = sdk['auth']
-                    if auth['kind'] == 'bearer':
-                        return scheme.get('type') == 'http' and str(scheme.get('scheme', '')).lower() == 'bearer'
-                    return scheme.get('type') == 'apiKey' and scheme.get('in') == 'header' and scheme.get('name', '').lower() == auth['name'].lower()
-                ok = bool(schemes) and all(matches(s) for s in schemes.values())
+                from tools.gen.client_layer import auth_choices, scheme_auth
+                choices = auth_choices(sdk['auth'])
+                actual_auth = [scheme_auth(s) for s in schemes.values()]
+                ok = (not schemes and choices == [{'kind': 'none'}]) or bool(schemes) and all(a in choices for a in actual_auth) and all(a in actual_auth for a in choices if a['kind'] != 'none')
             require(ok, f'{sdk["name"]}: auth pin disagrees with securitySchemes {schemes!r}; review authentication (a deliberate override needs auth_reason and auth_spec)')
 
 
@@ -248,6 +324,7 @@ def main():
     sub.add_parser('matrix')
     syncing = sub.add_parser('sync')
     syncing.add_argument('--check', action='store_true')
+    sub.add_parser('behavior-check')
     args = parser.parse_args()
     sdks = load()
     if args.cmd == 'list':
@@ -260,6 +337,8 @@ def main():
         print('\n'.join(value) if isinstance(value, list) else json.dumps(value) if isinstance(value, (bool, dict)) else value)
     elif args.cmd == 'matrix':
         print(json.dumps({'include': [dict(provider=s['name'], dir=s['dir'], spec_file=Path(s['spec_file']).name, spec_path=s['spec_file'], spec_url=s['spec_url'], spec_fetch=s['spec_fetch']) for s in sdks if s['spec_watch']]}))
+    elif args.cmd == 'behavior-check':
+        behavior_notes(sdks)
     else:
         return int(sync(sdks, args.check))
     return 0

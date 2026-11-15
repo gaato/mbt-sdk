@@ -82,6 +82,7 @@ class CodexSchemaTests(unittest.TestCase):
 
     def test_regeneration_detects_changes_and_stale_generated_files(self):
         with tempfile.TemporaryDirectory() as tmp, redirect_stdout(io.StringIO()):
+            tmp = str(Path(tmp) / 'src/gen')
             args = ["--spec", str(ROOT / "codex-protocol/spec/schema.json"),
                     "--surface", str(ROOT / "codex-protocol/spec/surface.json"), "--out", tmp]
             self.assertEqual(run(args), 0)

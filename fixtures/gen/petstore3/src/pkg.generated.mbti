@@ -4,6 +4,8 @@ package "gaato/fixture-petstore3"
 import {
   "gaato/mttp_core",
   "gaato/mttp_core/client",
+  "gaato/mttp_core/rt",
+  "gaato/mttp_core/sse",
   "moonbitlang/core/debug",
   "moonbitlang/core/json",
 }
@@ -26,6 +28,8 @@ pub fn create_users_with_list_input_decode(@mttp_core.ResponseHead, Bytes) -> Re
 pub fn create_users_with_list_input_decode_json(@json.Json) -> User raise @json.JsonDecodeError
 
 pub fn create_users_with_list_input_request(Array[User]) -> @mttp_core.Request
+
+pub fn default_retry() -> @client.RetryPolicy
 
 pub fn delete_order_request(Int64) -> @mttp_core.Request
 
@@ -121,6 +125,14 @@ pub fn ApiResponse::to_repr(Self) -> @debug.Repr
 pub impl @json.FromJson for ApiResponse
 pub impl @json.ToJson for ApiResponse
 
+pub(all) enum Auth {
+  Anonymous
+  Bearer(String)
+  ApiKey(String)
+}
+pub fn Auth::to_repr(Self) -> @debug.Repr
+pub impl @debug.Debug for Auth
+
 #derive(Eq, @debug.Debug)
 pub(all) struct Category {
   id : Int64?
@@ -134,6 +146,22 @@ pub fn Category::to_json(Self) -> @json.Json
 pub fn Category::to_repr(Self) -> @debug.Repr
 pub impl @json.FromJson for Category
 pub impl @json.ToJson for Category
+
+#non_exhaustive
+#derive(@debug.Debug)
+pub(all) enum ErrorBody {
+  RawJson(@json.Json)
+}
+pub fn ErrorBody::to_repr(Self) -> @debug.Repr
+
+#non_exhaustive
+#derive(@debug.Debug)
+pub(all) enum Failure {
+  Http(HttpFailure)
+  Transport(@mttp_core.TransportError)
+  Decode(@client.ResponseFailure)
+}
+pub fn Failure::to_repr(Self) -> @debug.Repr
 
 #non_exhaustive
 #derive(Eq, @debug.Debug)
@@ -150,6 +178,15 @@ pub fn FindPetsByStatusStatus::to_json(Self) -> @json.Json
 pub fn FindPetsByStatusStatus::to_repr(Self) -> @debug.Repr
 pub impl @json.FromJson for FindPetsByStatusStatus
 pub impl @json.ToJson for FindPetsByStatusStatus
+
+#derive(@debug.Debug)
+pub(all) struct HttpFailure {
+  operation : String
+  head : @mttp_core.ResponseHead
+  body : Bytes
+  typed : ErrorBody?
+}
+pub fn HttpFailure::to_repr(Self) -> @debug.Repr
 
 #derive(Eq, @debug.Debug)
 pub(all) struct Order {
@@ -185,6 +222,11 @@ pub fn OrderStatus::to_repr(Self) -> @debug.Repr
 pub impl @json.FromJson for OrderStatus
 pub impl @json.ToJson for OrderStatus
 
+pub(all) enum PageKind {
+  Cursor(String)
+  NextUrl
+}
+
 #derive(Eq, @debug.Debug)
 pub(all) struct Pet {
   id : Int64?
@@ -218,6 +260,37 @@ pub fn PetStatus::to_json(Self) -> @json.Json
 pub fn PetStatus::to_repr(Self) -> @debug.Repr
 pub impl @json.FromJson for PetStatus
 pub impl @json.ToJson for PetStatus
+
+pub struct Petstore3 {
+  // private fields
+}
+pub async fn Petstore3::add_pet(Self, Pet) -> Result[Pet, Failure]
+pub async fn[T] Petstore3::call(Self, @mttp_core.Request, (@mttp_core.ResponseHead, Bytes) -> Result[T, @client.ResponseFailure] raise?, operation? : String) -> Result[T, Failure]
+pub async fn Petstore3::create_user(Self, User) -> Result[User, Failure]
+pub async fn Petstore3::create_users_with_list_input(Self, Array[User]) -> Result[User, Failure]
+pub async fn Petstore3::delete_order(Self, order_id~ : Int64) -> Result[Unit, Failure]
+pub async fn Petstore3::delete_pet(Self, pet_id~ : Int64) -> Result[Unit, Failure]
+pub async fn Petstore3::delete_user(Self, username~ : String) -> Result[Unit, Failure]
+pub async fn Petstore3::find_pets_by_status(Self, status~ : FindPetsByStatusStatus) -> Result[Array[Pet], Failure]
+pub async fn Petstore3::find_pets_by_tags(Self, tags~ : Array[String]) -> Result[Array[Pet], Failure]
+pub fn Petstore3::from_client(@client.Client, auth? : Auth, base_url? : String, server_urls? : Map[String, String]) -> Self
+pub async fn Petstore3::get_inventory(Self) -> Result[Map[String, Int32], Failure]
+pub async fn Petstore3::get_order_by_id(Self, order_id~ : Int64) -> Result[Order, Failure]
+pub async fn Petstore3::get_pet_by_id(Self, pet_id~ : Int64) -> Result[Pet, Failure]
+pub async fn Petstore3::get_user_by_name(Self, username~ : String) -> Result[User, Failure]
+pub async fn Petstore3::login_user(Self, username? : String, password? : String) -> Result[String, Failure]
+pub async fn Petstore3::logout_user(Self) -> Result[Unit, Failure]
+pub fn Petstore3::new(&@mttp_core.Backend, &@rt.Clock, auth? : Auth, base_url? : String, server_urls? : Map[String, String], retry? : @client.RetryPolicy, timer? : &@rt.Timer, timeout_ms? : Int32, total_timeout_ms? : Int32, max_body_bytes? : Int32) -> Self
+pub fn[T : @json.FromJson] Petstore3::paginate(Self, @mttp_core.Request, kind~ : PageKind, items~ : String, next~ : String, operation? : String) -> @client.Paginator[T, Failure]
+pub async fn Petstore3::place_order(Self, Order) -> Result[Order, Failure]
+pub async fn Petstore3::send(Self, @mttp_core.Request, operation? : String) -> Result[@client.Reply[Bytes], Failure]
+pub async fn Petstore3::stream(Self, @mttp_core.Request, async (@sse.SseEvent) -> Unit, stop? : (@sse.SseEvent) -> Bool, operation? : String) -> Result[Unit, Failure]
+pub fn Petstore3::to_repr(Self) -> @debug.Repr
+pub async fn Petstore3::update_pet(Self, Pet) -> Result[Pet, Failure]
+pub async fn Petstore3::update_pet_with_form(Self, pet_id~ : Int64, name? : String, status? : String) -> Result[Pet, Failure]
+pub async fn Petstore3::update_user(Self, username~ : String, User) -> Result[Unit, Failure]
+pub async fn Petstore3::upload_file(Self, pet_id~ : Int64, additional_metadata? : String, Bytes, content_type~ : String) -> Result[ApiResponse, Failure]
+pub impl @debug.Debug for Petstore3
 
 #derive(Eq, @debug.Debug)
 pub(all) struct Tag {
