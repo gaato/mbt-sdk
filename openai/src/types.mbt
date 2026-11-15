@@ -149,6 +149,8 @@ pub(all) struct ChatMessage {
   name : String?
   tool_calls : Array[ToolCall]?
   tool_call_id : String?
+  /// Provider reasoning to carry back with an assistant turn, including tool calls.
+  reasoning_content : String?
 }
 
 ///|
@@ -168,7 +170,14 @@ pub extend ChatMessage with @debug.Debug::{to_repr}
 /// }
 /// ```
 pub fn ChatMessage::system(content : String) -> ChatMessage {
-  { role: "system", content, name: None, tool_calls: None, tool_call_id: None, }
+  {
+    role: "system",
+    content,
+    name: None,
+    tool_calls: None,
+    tool_call_id: None,
+    reasoning_content: None,
+  }
 }
 
 ///|
@@ -180,7 +189,14 @@ pub fn ChatMessage::system(content : String) -> ChatMessage {
 /// }
 /// ```
 pub fn ChatMessage::user(content : String) -> ChatMessage {
-  { role: "user", content, name: None, tool_calls: None, tool_call_id: None, }
+  {
+    role: "user",
+    content,
+    name: None,
+    tool_calls: None,
+    tool_call_id: None,
+    reasoning_content: None,
+  }
 }
 
 ///|
@@ -191,13 +207,17 @@ pub fn ChatMessage::user(content : String) -> ChatMessage {
 ///   assert_eq(@openai.ChatMessage::assistant("hello").role, "assistant")
 /// }
 /// ```
-pub fn ChatMessage::assistant(content : String) -> ChatMessage {
+pub fn ChatMessage::assistant(
+  content : String,
+  reasoning_content? : String,
+) -> ChatMessage {
   {
     role: "assistant",
     content,
     name: None,
     tool_calls: None,
     tool_call_id: None,
+    reasoning_content,
   }
 }
 
@@ -220,6 +240,7 @@ pub fn ChatMessage::tool(
     name: None,
     tool_calls: None,
     tool_call_id: Some(tool_call_id),
+    reasoning_content: None,
   }
 }
 
@@ -238,6 +259,7 @@ pub fn ChatMessage::tool(
 pub fn ChatMessage::assistant_tool_calls(
   tool_calls : Array[ToolCall],
   content? : String,
+  reasoning_content? : String,
 ) -> ChatMessage {
   {
     role: "assistant",
@@ -245,6 +267,7 @@ pub fn ChatMessage::assistant_tool_calls(
     name: None,
     tool_calls: Some(tool_calls.copy()),
     tool_call_id: None,
+    reasoning_content,
   }
 }
 
@@ -337,6 +360,8 @@ pub(all) struct ChatCompletion {
   id : String
   model : String
   text : String
+  /// Complete reasoning, or None when the provider did not supply it.
+  reasoning_content : String?
   finish_reason : FinishReason?
   usage : Usage?
   tool_calls : Array[ToolCall]
@@ -507,7 +532,7 @@ pub extend Embedding with @debug.Debug::{to_repr}
 pub(all) struct EmbeddingResponse {
   data : Array[Embedding]
   model : String
-  prompt_tokens : Int32
+  prompt_tokens : Int32?
   total_tokens : Int32
 }
 

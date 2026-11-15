@@ -103,6 +103,7 @@ fn decode_chat_completion(
     id: generated.id,
     model: generated.model,
     text: choice.message.content.unwrap_or(""),
+    reasoning_content: chat_reasoning_at(raw, 0, "message"),
     finish_reason: Some(chat_finish_reason(choice.finish_reason)),
     usage: generated.usage.map(chat_usage_from_generated),
     tool_calls: choice.message.tool_calls
@@ -114,10 +115,15 @@ fn decode_chat_completion(
 
 ///|
 fn reasoning_delta_at(value : Json, index : Int32) -> String? {
+  chat_reasoning_at(value, index, "delta")
+}
+
+///|
+fn chat_reasoning_at(value : Json, index : Int32, field : String) -> String? {
   guard value is Object(root) else { return None }
   guard root.get("choices") is Some(Array(choices)) else { return None }
   guard choices.get(index) is Some(Object(choice)) else { return None }
-  guard choice.get("delta") is Some(Object(delta)) else { return None }
+  guard choice.get(field) is Some(Object(delta)) else { return None }
   match delta.get("reasoning_content") {
     Some(String(text)) => Some(text)
     _ =>
@@ -262,7 +268,10 @@ impl @json.FromJson for ApiErrorJson with fn from_json(value, path) {
     message: @sdkjson.field(obj, "message", path),
     type_: @sdkjson.opt_field(obj, "type", path),
     param: @sdkjson.opt_field(obj, "param", path),
-    code: @sdkjson.opt_field(obj, "code", path),
+    code: match obj.get("code") {
+      Some(Number(_, ..) as number) => Some(number.stringify())
+      _ => @sdkjson.opt_field(obj, "code", path)
+    },
   })
 }
 
@@ -362,10 +371,11 @@ fn decode_api_error_body(body : Bytes) -> ApiErrorBody raise {
 }
 
 ///|
-/// Extracts a standard OpenAI error body from an HTTP status failure.
+/// Extracts a provider error body from an HTTP status failure or an Api failure.
 /// Returns None for transport, decode, configuration, and malformed error bodies.
 pub fn api_error(error : OpenAIFailure) -> ApiErrorBody? {
   let body = match error {
+    Api(_, error, ..) => return Some(error)
     Response(@client.UnexpectedStatus(_, body~)) => body
     _ => return None
   }

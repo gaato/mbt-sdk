@@ -131,6 +131,19 @@ fn json_int64_to_json(value : Int64) -> Json {
 }
 
 ///|
+fn decode_optional_int64(
+  obj : Map[String, Json],
+  key : String,
+  path : @json.JsonPath,
+) -> Int64? raise @json.JsonDecodeError {
+  let raw : Json? = @sdkjson.opt_field(obj, key, path)
+  match raw {
+    Some(value) => Some(json_int64(value, path.add_key(key)))
+    None => None
+  }
+}
+
+///|
 fn[T] nullable_presence(value : T?) -> @sdkjson.Presence[T] {
   match value {
     Some(value) => @sdkjson.Value(value)
@@ -171,19 +184,6 @@ fn[T : @json.FromJson] decode_json_map(
     result[key] = @json.from_json(item, path=path.add_key(key))
   }
   result
-}
-
-///|
-fn[T : @json.FromJson] decode_nullable_json_map(
-  obj : Map[String, Json],
-  key : String,
-  path : @json.JsonPath,
-) -> Map[String, T]? raise @json.JsonDecodeError {
-  let raw : Json = required_field(obj, key, path)
-  match raw {
-    Null => None
-    value => Some(decode_json_map(value, path.add_key(key)))
-  }
 }
 
 ///|
@@ -6987,7 +6987,7 @@ pub impl @json.FromJson for Embedding with fn from_json(value, path) {
 /// The usage information for the request.
 #derive(Eq, @debug.Debug)
 pub(all) struct CreateEmbeddingResponseUsage {
-  prompt_tokens : Int32
+  prompt_tokens : Int32?
   total_tokens : Int32
 }
 
@@ -7001,8 +7001,8 @@ pub extend CreateEmbeddingResponseUsage with @debug.Debug::{to_repr}
 ///
 /// Creates a CreateEmbeddingResponseUsage with omitted optional fields absent.
 pub fn CreateEmbeddingResponseUsage::new(
-  prompt_tokens~ : Int32,
   total_tokens~ : Int32,
+  prompt_tokens? : Int32,
 ) -> CreateEmbeddingResponseUsage {
   { prompt_tokens, total_tokens, }
 }
@@ -7015,7 +7015,7 @@ pub extend CreateEmbeddingResponseUsage with ToJson::{to_json}
 ///|
 pub impl ToJson for CreateEmbeddingResponseUsage with fn to_json(self) {
   @sdkjson.ObjBuilder::new()
-  .field("prompt_tokens", self.prompt_tokens)
+  .opt("prompt_tokens", self.prompt_tokens)
   .field("total_tokens", self.total_tokens)
   .build()
 }
@@ -7032,7 +7032,7 @@ pub impl @json.FromJson for CreateEmbeddingResponseUsage with fn from_json(
 ) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    prompt_tokens: required_field(obj, "prompt_tokens", path),
+    prompt_tokens: @sdkjson.opt_field(obj, "prompt_tokens", path),
     total_tokens: required_field(obj, "total_tokens", path),
   }
 }
@@ -10861,7 +10861,7 @@ pub impl @json.FromJson for Item with fn from_json(value, path) {
 #derive(Eq, @debug.Debug)
 pub(all) struct Model {
   id : String
-  created : Int64
+  created : Int64?
   owned_by : String?
 }
 
@@ -10874,7 +10874,7 @@ pub extend Model with @debug.Debug::{to_repr}
 ///|
 ///
 /// Creates a Model with omitted optional fields absent.
-pub fn Model::new(id~ : String, created~ : Int64, owned_by? : String) -> Model {
+pub fn Model::new(id~ : String, created? : Int64, owned_by? : String) -> Model {
   { id, created, owned_by, }
 }
 
@@ -10887,7 +10887,7 @@ pub extend Model with ToJson::{to_json}
 pub impl ToJson for Model with fn to_json(self) {
   @sdkjson.ObjBuilder::new()
   .field("id", self.id)
-  .field("created", json_int64_to_json(self.created))
+  .opt("created", self.created.map(value => json_int64_to_json(value)))
   .field("object", "model")
   .opt("owned_by", self.owned_by)
   .build()
@@ -10903,10 +10903,7 @@ pub impl @json.FromJson for Model with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
   {
     id: required_field(obj, "id", path),
-    created: json_int64(
-      required_field(obj, "created", path),
-      path.add_key("created"),
-    ),
+    created: decode_optional_int64(obj, "created", path),
     owned_by: @sdkjson.opt_field(obj, "owned_by", path),
   }
 }
@@ -11529,9 +11526,9 @@ pub impl @json.FromJson for ResponseUsageOutputTokensDetails with fn from_json(
 #derive(Eq, @debug.Debug)
 pub(all) struct ResponseUsage {
   input_tokens : Int32
-  input_tokens_details : ResponseUsageInputTokensDetails
+  input_tokens_details : ResponseUsageInputTokensDetails?
   output_tokens : Int32
-  output_tokens_details : ResponseUsageOutputTokensDetails
+  output_tokens_details : ResponseUsageOutputTokensDetails?
   total_tokens : Int32
 }
 
@@ -11546,10 +11543,10 @@ pub extend ResponseUsage with @debug.Debug::{to_repr}
 /// Creates a ResponseUsage with omitted optional fields absent.
 pub fn ResponseUsage::new(
   input_tokens~ : Int32,
-  input_tokens_details~ : ResponseUsageInputTokensDetails,
   output_tokens~ : Int32,
-  output_tokens_details~ : ResponseUsageOutputTokensDetails,
   total_tokens~ : Int32,
+  input_tokens_details? : ResponseUsageInputTokensDetails,
+  output_tokens_details? : ResponseUsageOutputTokensDetails,
 ) -> ResponseUsage {
   {
     input_tokens,
@@ -11569,9 +11566,9 @@ pub extend ResponseUsage with ToJson::{to_json}
 pub impl ToJson for ResponseUsage with fn to_json(self) {
   @sdkjson.ObjBuilder::new()
   .field("input_tokens", self.input_tokens)
-  .field("input_tokens_details", self.input_tokens_details)
+  .opt("input_tokens_details", self.input_tokens_details)
   .field("output_tokens", self.output_tokens)
-  .field("output_tokens_details", self.output_tokens_details)
+  .opt("output_tokens_details", self.output_tokens_details)
   .field("total_tokens", self.total_tokens)
   .build()
 }
@@ -11586,9 +11583,11 @@ pub impl @json.FromJson for ResponseUsage with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
   {
     input_tokens: required_field(obj, "input_tokens", path),
-    input_tokens_details: required_field(obj, "input_tokens_details", path),
+    input_tokens_details: @sdkjson.opt_field(obj, "input_tokens_details", path),
     output_tokens: required_field(obj, "output_tokens", path),
-    output_tokens_details: required_field(obj, "output_tokens_details", path),
+    output_tokens_details: @sdkjson.opt_field(
+      obj, "output_tokens_details", path,
+    ),
     total_tokens: required_field(obj, "total_tokens", path),
   }
 }
@@ -11598,29 +11597,29 @@ pub impl @json.FromJson for ResponseUsage with fn from_json(value, path) {
 /// Generated representation of Response.
 #derive(Eq, @debug.Debug)
 pub(all) struct Response {
-  metadata : Map[String, String]?
-  temperature : Double?
-  top_p : Double?
+  metadata : @sdkjson.Presence[Map[String, String]]
+  temperature : @sdkjson.Presence[Double]
+  top_p : @sdkjson.Presence[Double]
   user : String?
   service_tier : @sdkjson.Presence[ServiceTier]
   previous_response_id : @sdkjson.Presence[String]
   model : String
   reasoning : @sdkjson.Presence[Reasoning]
   max_output_tokens : @sdkjson.Presence[Int32]
-  instructions : String?
+  instructions : @sdkjson.Presence[String]
   text : ResponseText?
-  tools : Array[Tool]
-  tool_choice : Json
+  tools : Array[Tool]?
+  tool_choice : Json?
   truncation : @sdkjson.Presence[ResponseTruncation]
   id : String
   status : ResponseStatus?
   created_at : Double
-  error : ResponseError?
-  incomplete_details : ResponseIncompleteDetails?
+  error : @sdkjson.Presence[ResponseError]
+  incomplete_details : @sdkjson.Presence[ResponseIncompleteDetails]
   output : Array[OutputItem]
   output_text : @sdkjson.Presence[String]
   usage : ResponseUsage?
-  parallel_tool_calls : Bool
+  parallel_tool_calls : Bool?
 }
 
 ///|
@@ -11634,12 +11633,9 @@ pub extend Response with @debug.Debug::{to_repr}
 /// Creates a Response with omitted optional fields absent.
 pub fn Response::new(
   model~ : String,
-  tools~ : Array[Tool],
-  tool_choice~ : Json,
   id~ : String,
   created_at~ : Double,
   output~ : Array[OutputItem],
-  parallel_tool_calls~ : Bool,
   metadata? : Map[String, String],
   temperature? : Double,
   top_p? : Double,
@@ -11650,24 +11646,27 @@ pub fn Response::new(
   max_output_tokens? : Int32,
   instructions? : String,
   text? : ResponseText,
+  tools? : Array[Tool],
+  tool_choice? : Json,
   truncation? : ResponseTruncation,
   status? : ResponseStatus,
   error? : ResponseError,
   incomplete_details? : ResponseIncompleteDetails,
   output_text? : String,
   usage? : ResponseUsage,
+  parallel_tool_calls? : Bool,
 ) -> Response {
   {
-    metadata,
-    temperature,
-    top_p,
+    metadata: @sdkjson.Presence::from_option(metadata),
+    temperature: @sdkjson.Presence::from_option(temperature),
+    top_p: @sdkjson.Presence::from_option(top_p),
     user,
     service_tier: @sdkjson.Presence::from_option(service_tier),
     previous_response_id: @sdkjson.Presence::from_option(previous_response_id),
     model,
     reasoning: @sdkjson.Presence::from_option(reasoning),
     max_output_tokens: @sdkjson.Presence::from_option(max_output_tokens),
-    instructions,
+    instructions: @sdkjson.Presence::from_option(instructions),
     text,
     tools,
     tool_choice,
@@ -11675,8 +11674,8 @@ pub fn Response::new(
     id,
     status,
     created_at,
-    error,
-    incomplete_details,
+    error: @sdkjson.Presence::from_option(error),
+    incomplete_details: @sdkjson.Presence::from_option(incomplete_details),
     output,
     output_text: @sdkjson.Presence::from_option(output_text),
     usage,
@@ -11692,42 +11691,30 @@ pub extend Response with ToJson::{to_json}
 ///|
 pub impl ToJson for Response with fn to_json(self) {
   @sdkjson.ObjBuilder::new()
-  .presence(
-    "metadata",
-    nullable_presence(self.metadata.map(value => json_map_to_json(value))),
-  )
-  .presence(
-    "temperature",
-    nullable_presence(self.temperature.map(value => value)),
-  )
-  .presence("top_p", nullable_presence(self.top_p.map(value => value)))
+  .presence("metadata", self.metadata.map(value => json_map_to_json(value)))
+  .presence("temperature", self.temperature)
+  .presence("top_p", self.top_p)
   .opt("user", self.user)
   .presence("service_tier", self.service_tier)
   .presence("previous_response_id", self.previous_response_id)
   .field("model", self.model)
   .presence("reasoning", self.reasoning)
   .presence("max_output_tokens", self.max_output_tokens)
-  .presence(
-    "instructions",
-    nullable_presence(self.instructions.map(value => value)),
-  )
+  .presence("instructions", self.instructions)
   .opt("text", self.text)
-  .field("tools", self.tools)
-  .field("tool_choice", self.tool_choice)
+  .opt("tools", self.tools)
+  .opt("tool_choice", self.tool_choice)
   .presence("truncation", self.truncation)
   .field("id", self.id)
   .field("object", "response")
   .opt("status", self.status)
   .field("created_at", self.created_at)
-  .presence("error", nullable_presence(self.error.map(value => value)))
-  .presence(
-    "incomplete_details",
-    nullable_presence(self.incomplete_details.map(value => value)),
-  )
+  .presence("error", self.error)
+  .presence("incomplete_details", self.incomplete_details)
   .field("output", self.output)
   .presence("output_text", self.output_text)
   .opt("usage", self.usage)
-  .field("parallel_tool_calls", self.parallel_tool_calls)
+  .opt("parallel_tool_calls", self.parallel_tool_calls)
   .build()
 }
 
@@ -11740,9 +11727,9 @@ pub extend Response with @json.FromJson::{from_json}
 pub impl @json.FromJson for Response with fn from_json(value, path) {
   let obj = @sdkjson.expect_object(value, path)
   {
-    metadata: decode_nullable_json_map(obj, "metadata", path),
-    temperature: decode_nullable_field(obj, "temperature", path),
-    top_p: decode_nullable_field(obj, "top_p", path),
+    metadata: decode_presence_json_map(obj, "metadata", path),
+    temperature: @sdkjson.presence_field(obj, "temperature", path),
+    top_p: @sdkjson.presence_field(obj, "top_p", path),
     user: @sdkjson.opt_field(obj, "user", path),
     service_tier: @sdkjson.presence_field(obj, "service_tier", path),
     previous_response_id: @sdkjson.presence_field(
@@ -11751,20 +11738,20 @@ pub impl @json.FromJson for Response with fn from_json(value, path) {
     model: required_field(obj, "model", path),
     reasoning: @sdkjson.presence_field(obj, "reasoning", path),
     max_output_tokens: @sdkjson.presence_field(obj, "max_output_tokens", path),
-    instructions: decode_nullable_field(obj, "instructions", path),
+    instructions: @sdkjson.presence_field(obj, "instructions", path),
     text: @sdkjson.opt_field(obj, "text", path),
-    tools: required_field(obj, "tools", path),
-    tool_choice: required_field(obj, "tool_choice", path),
+    tools: @sdkjson.opt_field(obj, "tools", path),
+    tool_choice: @sdkjson.opt_field(obj, "tool_choice", path),
     truncation: @sdkjson.presence_field(obj, "truncation", path),
     id: required_field(obj, "id", path),
     status: @sdkjson.opt_field(obj, "status", path),
     created_at: required_field(obj, "created_at", path),
-    error: decode_nullable_field(obj, "error", path),
-    incomplete_details: decode_nullable_field(obj, "incomplete_details", path),
+    error: @sdkjson.presence_field(obj, "error", path),
+    incomplete_details: @sdkjson.presence_field(obj, "incomplete_details", path),
     output: required_field(obj, "output", path),
     output_text: @sdkjson.presence_field(obj, "output_text", path),
     usage: @sdkjson.opt_field(obj, "usage", path),
-    parallel_tool_calls: required_field(obj, "parallel_tool_calls", path),
+    parallel_tool_calls: @sdkjson.opt_field(obj, "parallel_tool_calls", path),
   }
 }
 

@@ -35,3 +35,40 @@ stream callbacks. Connection limits belong to Backend configuration; the
 overview shows 5 seconds. POST retries can duplicate generation and billing.
 Expected response/validation failures are Result values. TransportError,
 cancellation and callback exceptions retain their effects.
+
+## Compatible-provider refinement (0.10.0)
+
+Checked 2026-11-15. The HTTP policy above is retained. The SDK uses mttp_core's
+existing `RequestPlan::send(decide_retry=...)` hook to refine its default
+decision after a buffered 429 body is available. It stops recognized quota,
+balance and disabled-account codes, even with `x-should-retry: true`:
+
+- Z.AI `1113` (balance), `1308` and `1310` (usage windows), from the
+  [official business-code table](https://docs.z.ai/api-reference/api-code).
+  Window exhaustion can clear later, but is not transient within the SDK's
+  short retry budget. `1302` (rate) and `1305` (overload) retain HTTP retries.
+- OpenAI/DashScope `insufficient_quota`, described in
+  [OpenAI API errors](https://developers.openai.com/api/docs/guides/error-codes)
+  and [DashScope error codes](https://help.aliyun.com/en/model-studio/error-code).
+  DashScope allocation-quota exhaustion is also stopped.
+  The official OpenAI codes `credit_balance_exhausted`,
+  `organization_spend_limit_exceeded`, `project_spend_limit_exceeded` and
+  `organization_usage_limit_exceeded` stop even without a broader
+  `insufficient_quota` type; `slow_down` retains HTTP retries.
+- Explicit `insufficient_balance` and `account_disabled` codes/types are
+  recognized as a compatibility contract. These names are constructed cases,
+  not a claim that every provider uses them.
+
+Unknown/malformed bodies, other statuses and transport failures return
+`RetryContext.default_decision` unchanged. No free-text message matching is
+used, since a message mentioning quota does not establish a non-transient
+condition. Caller-supplied policies remain authoritative for all other cases.
+Non-success stream heads are buffered by mttp before handoff, so the same
+classification applies; delivered stream events are never retried.
+
+[OpenRouter's error documentation](https://openrouter.ai/docs/api-reference/errors)
+specifies numeric codes and errors after HTTP 200. Numeric codes normalize to
+strings. Buffered error envelopes and Chat stream error envelopes/named SSE
+errors return `OpenAIFailure::Api` with the actual head and at most 1 MiB of
+body. Ordinary typed Responses `Error` data events retain their existing
+`ResponseEvent::Error` representation; named SSE `event: error` fails the call.

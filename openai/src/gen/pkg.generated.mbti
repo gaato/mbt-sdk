@@ -1526,12 +1526,12 @@ pub impl @json.ToJson for CreateEmbeddingResponse
 
 #derive(Eq, @debug.Debug)
 pub(all) struct CreateEmbeddingResponseUsage {
-  prompt_tokens : Int32
+  prompt_tokens : Int32?
   total_tokens : Int32
 }
 pub fn CreateEmbeddingResponseUsage::equal(Self, Self) -> Bool
 pub fn CreateEmbeddingResponseUsage::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
-pub fn CreateEmbeddingResponseUsage::new(prompt_tokens~ : Int32, total_tokens~ : Int32) -> Self
+pub fn CreateEmbeddingResponseUsage::new(total_tokens~ : Int32, prompt_tokens? : Int32) -> Self
 pub fn CreateEmbeddingResponseUsage::not_equal(Self, Self) -> Bool
 pub fn CreateEmbeddingResponseUsage::to_json(Self) -> @json.Json
 pub fn CreateEmbeddingResponseUsage::to_repr(Self) -> @debug.Repr
@@ -2131,12 +2131,12 @@ pub impl @json.ToJson for ListModelsResponse
 #derive(Eq, @debug.Debug)
 pub(all) struct Model {
   id : String
-  created : Int64
+  created : Int64?
   owned_by : String?
 }
 pub fn Model::equal(Self, Self) -> Bool
 pub fn Model::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
-pub fn Model::new(id~ : String, created~ : Int64, owned_by? : String) -> Self
+pub fn Model::new(id~ : String, created? : Int64, owned_by? : String) -> Self
 pub fn Model::not_equal(Self, Self) -> Bool
 pub fn Model::to_json(Self) -> @json.Json
 pub fn Model::to_repr(Self) -> @debug.Repr
@@ -2451,33 +2451,33 @@ pub impl @json.ToJson for RefusalContent
 
 #derive(Eq, @debug.Debug)
 pub(all) struct Response {
-  metadata : Map[String, String]?
-  temperature : Double?
-  top_p : Double?
+  metadata : @jsonkit.Presence[Map[String, String]]
+  temperature : @jsonkit.Presence[Double]
+  top_p : @jsonkit.Presence[Double]
   user : String?
   service_tier : @jsonkit.Presence[ServiceTier]
   previous_response_id : @jsonkit.Presence[String]
   model : String
   reasoning : @jsonkit.Presence[Reasoning]
   max_output_tokens : @jsonkit.Presence[Int32]
-  instructions : String?
+  instructions : @jsonkit.Presence[String]
   text : ResponseText?
-  tools : Array[Tool]
-  tool_choice : @json.Json
+  tools : Array[Tool]?
+  tool_choice : @json.Json?
   truncation : @jsonkit.Presence[ResponseTruncation]
   id : String
   status : ResponseStatus?
   created_at : Double
-  error : ResponseError?
-  incomplete_details : ResponseIncompleteDetails?
+  error : @jsonkit.Presence[ResponseError]
+  incomplete_details : @jsonkit.Presence[ResponseIncompleteDetails]
   output : Array[OutputItem]
   output_text : @jsonkit.Presence[String]
   usage : ResponseUsage?
-  parallel_tool_calls : Bool
+  parallel_tool_calls : Bool?
 }
 pub fn Response::equal(Self, Self) -> Bool
 pub fn Response::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
-pub fn Response::new(model~ : String, tools~ : Array[Tool], tool_choice~ : @json.Json, id~ : String, created_at~ : Double, output~ : Array[OutputItem], parallel_tool_calls~ : Bool, metadata? : Map[String, String], temperature? : Double, top_p? : Double, user? : String, service_tier? : ServiceTier, previous_response_id? : String, reasoning? : Reasoning, max_output_tokens? : Int32, instructions? : String, text? : ResponseText, truncation? : ResponseTruncation, status? : ResponseStatus, error? : ResponseError, incomplete_details? : ResponseIncompleteDetails, output_text? : String, usage? : ResponseUsage) -> Self
+pub fn Response::new(model~ : String, id~ : String, created_at~ : Double, output~ : Array[OutputItem], metadata? : Map[String, String], temperature? : Double, top_p? : Double, user? : String, service_tier? : ServiceTier, previous_response_id? : String, reasoning? : Reasoning, max_output_tokens? : Int32, instructions? : String, text? : ResponseText, tools? : Array[Tool], tool_choice? : @json.Json, truncation? : ResponseTruncation, status? : ResponseStatus, error? : ResponseError, incomplete_details? : ResponseIncompleteDetails, output_text? : String, usage? : ResponseUsage, parallel_tool_calls? : Bool) -> Self
 pub fn Response::not_equal(Self, Self) -> Bool
 pub fn Response::to_json(Self) -> @json.Json
 pub fn Response::to_repr(Self) -> @debug.Repr
@@ -3310,14 +3310,14 @@ pub impl @json.ToJson for ResponseTruncation
 #derive(Eq, @debug.Debug)
 pub(all) struct ResponseUsage {
   input_tokens : Int32
-  input_tokens_details : ResponseUsageInputTokensDetails
+  input_tokens_details : ResponseUsageInputTokensDetails?
   output_tokens : Int32
-  output_tokens_details : ResponseUsageOutputTokensDetails
+  output_tokens_details : ResponseUsageOutputTokensDetails?
   total_tokens : Int32
 }
 pub fn ResponseUsage::equal(Self, Self) -> Bool
 pub fn ResponseUsage::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
-pub fn ResponseUsage::new(input_tokens~ : Int32, input_tokens_details~ : ResponseUsageInputTokensDetails, output_tokens~ : Int32, output_tokens_details~ : ResponseUsageOutputTokensDetails, total_tokens~ : Int32) -> Self
+pub fn ResponseUsage::new(input_tokens~ : Int32, output_tokens~ : Int32, total_tokens~ : Int32, input_tokens_details? : ResponseUsageInputTokensDetails, output_tokens_details? : ResponseUsageOutputTokensDetails) -> Self
 pub fn ResponseUsage::not_equal(Self, Self) -> Bool
 pub fn ResponseUsage::to_json(Self) -> @json.Json
 pub fn ResponseUsage::to_repr(Self) -> @debug.Repr

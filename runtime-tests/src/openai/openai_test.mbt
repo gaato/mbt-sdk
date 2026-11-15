@@ -112,7 +112,7 @@ test "OpenAI operations send exact requests and decode spec examples" {
       {
         data: [{ index: 0, embedding: [0.0023064255, -0.009327292], }],
         model: "text-embedding-ada-002",
-        prompt_tokens: 8,
+        prompt_tokens: Some(8),
         total_tokens: 8,
       },
     )

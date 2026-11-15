@@ -3,6 +3,21 @@ info:
   title: MoonBit generation slice
   version: 0.1.0
 actions:
+  - target: "$['components']['schemas']['Model']['required'][?@ == 'created']"
+    description: DeepSeek documents models without a creation timestamp; preserve absence rather than inventing a timestamp.
+    remove: true
+  - target: "$['components']['schemas']['Response']['allOf'][*]['required'][?@ == 'tools' || @ == 'tool_choice' || @ == 'parallel_tool_calls']"
+    description: Compatible Responses implementations need not echo tool request options in their documented smaller objects.
+    remove: true
+  - target: "$['components']['schemas']['Response']['allOf'][*]['required'][?@ == 'metadata' || @ == 'temperature' || @ == 'top_p' || @ == 'instructions' || @ == 'error' || @ == 'incomplete_details']"
+    description: The documented minimal DeepSeek Responses shape also omits these nullable request echoes and diagnostics; accepting absent tool options alone still fails on metadata. Preserve omission in the generated type without changing the facade.
+    remove: true
+  - target: "$['components']['schemas']['ResponseUsage']['required'][?@ == 'input_tokens_details' || @ == 'output_tokens_details']"
+    description: DeepSeek documents aggregate counts without the OpenAI token breakdowns; preserve missing details.
+    remove: true
+  - target: "$['components']['schemas']['CreateEmbeddingResponse']['properties']['usage']['required'][?@ == 'prompt_tokens']"
+    description: DashScope documents total_tokens alone; do not invent a prompt count when none was reported.
+    remove: true
   - target: "$['paths']['/models']['get']"
     description: Include the listModels operation in the M4 MoonBit generator slice.
     update:

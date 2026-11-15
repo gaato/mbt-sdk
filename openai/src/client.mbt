@@ -27,6 +27,8 @@ pub impl @debug.Debug for OpenAI with fn to_repr(_self) {
 /// waited for. Pass `retry=@client.RetryPolicy::conservative()` to retry a
 /// POST only on failures that prove nothing was sent, unless explicitly
 /// declared replay-safe.
+/// Recognized quota, balance and disabled-account codes in a 429 body stop
+/// retries even when x-should-retry is true; unknown codes retain this policy.
 ///
 /// Each attempt
 /// is limited to `timeout_ms` (600 s, the official default) and, when

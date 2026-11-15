@@ -18,7 +18,7 @@ test "generated model decoders accept spec fixtures and Int64 above Int32" {
   ).unwrap()
   assert_eq(listed.data.length(), 1)
   assert_eq(listed.data[0].id, "model-id-0")
-  assert_eq(listed.data[0].created, 2147483648L)
+  assert_eq(listed.data[0].created, Some(2147483648L))
   assert_eq(listed.data[0].owned_by, Some("organization-owner"))
 
   let model = @gen.retrieve_model_decode(
@@ -42,7 +42,7 @@ test "generated embedding response decoder accepts the M3 fixture" {
   assert_eq(decoded.data.length(), 1)
   assert_eq(decoded.data[0].index, 0)
   assert_eq(decoded.data[0].embedding, [0.0023064255, -0.009327292])
-  assert_eq(decoded.usage.prompt_tokens, 8)
+  assert_eq(decoded.usage.prompt_tokens, Some(8))
   assert_eq(decoded.usage.total_tokens, 8)
 }
 
@@ -178,8 +178,8 @@ test "generated Responses decoder reads OpenRouter reasoning and message items" 
   }
   match decoded.usage {
     Some(usage) => {
-      assert_eq(usage.input_tokens_details.cached_tokens, 2)
-      assert_eq(usage.output_tokens_details.reasoning_tokens, 3)
+      assert_eq(usage.input_tokens_details.unwrap().cached_tokens, 2)
+      assert_eq(usage.output_tokens_details.unwrap().reasoning_tokens, 3)
     }
     None => fail("expected usage")
   }

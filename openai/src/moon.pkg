@@ -3,6 +3,7 @@ import {
   "gaato/mttp_core/rt",
   "gaato/openai/gen",
   "gaato/mttp_core/client",
+  "gaato/mttp_core/client/retry",
   "gaato/mttp_core/jsonkit" @sdkjson,
   "moonbitlang/core/debug",
   "moonbitlang/core/encoding/utf8",

@@ -1,6 +1,6 @@
 ///|
 fn model_from_generated(model : @gen.Model) -> Model {
-  { id: model.id, created: Some(model.created), owned_by: model.owned_by, }
+  { id: model.id, created: model.created, owned_by: model.owned_by, }
 }
 
 ///|
@@ -29,12 +29,13 @@ async fn[T, M : @client.ResponseMode] OpenAI::send_with(
     match
       @client.RequestPlan::new(request, reader)
       .attribute(@client.rate_limit_bucket, bucket)
-      .send(self.client).body {
+      .send(self.client, decide_retry=compatible_retry).body {
       Ok(value) => Ok(value)
       Err(error) => Err(Response(error))
     }
   } catch {
     DecodeError(error) => Err(Response(error))
+    ApiError(head, error, body~) => Err(Api(head, error, body~))
     error => raise error
   }
 }
@@ -62,8 +63,9 @@ pub async fn OpenAI::chat_completion(
 fn decode_chat_stream_data(
   head : @http.ResponseHead,
   data : String,
-) -> Array[ChatEvent] raise DecodeError {
+) -> Array[ChatEvent] raise {
   let body = @utf8.encode(data)
+  check_api_error(head, body)
   let raw = parse_json_body(body) catch {
     error => raise decode_error(head, message=error.to_string(), body~)
   }
@@ -89,6 +91,7 @@ pub async fn OpenAI::stream_chat_completion(
       @client.from_head(head => {
         @client.as_sse(
           event => {
+            check_named_error(head, event.event, event.data)
             for decoded in decode_chat_stream_data(head, event.data) {
               f(decoded)
             }
@@ -192,9 +195,13 @@ pub async fn OpenAI::create_response(
 fn decode_stream_data(
   head : @http.ResponseHead,
   data : String,
-) -> ResponseEvent raise DecodeError {
+) -> ResponseEvent raise {
   let body = @utf8.encode(data)
-  decode_response_event(parse_json_body(body)) catch {
+  check_api_error(head, body)
+  let raw = parse_json_body(body) catch {
+    error => raise decode_error(head, message=error.to_string(), body~)
+  }
+  decode_response_event(raw) catch {
     error => raise decode_error(head, message=error.to_string(), body~)
   }
 }
@@ -214,9 +221,13 @@ pub async fn OpenAI::stream_response(
       .header("accept", "text/event-stream")
       .body_json(body),
       @client.from_head(head => {
-        @client.as_sse(event => f(decode_stream_data(head, event.data)), stop=event => {
-          event.data == "[DONE]"
-        })
+        @client.as_sse(
+          event => {
+            check_named_error(head, event.event, event.data)
+            f(decode_stream_data(head, event.data))
+          },
+          stop=event => event.data == "[DONE]",
+        )
       }),
       "responses",
     )

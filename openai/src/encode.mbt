@@ -32,6 +32,11 @@ fn is_chat_key(key : String) -> Bool {
 
 ///|
 fn chat_message_json(message : ChatMessage) -> Json raise ValidationError {
+  if message.role != "assistant" && message.reasoning_content is Some(_) {
+    raise ValidationError(
+      message="reasoning_content requires an assistant message",
+    )
+  }
   let fields : Map[String, Json] = { "role": message.role }
   if !(message.role == "assistant" &&
     message.tool_calls is Some(_) &&
@@ -166,6 +171,14 @@ fn chat_parts(
     raise ValidationError(message="generated chat messages must be an array")
   }
   for index, message in request.messages {
+    if message.reasoning_content is Some(reasoning) {
+      guard messages.get(index) is Some(Object(fields)) else {
+        raise ValidationError(
+          message="generated chat message must be an object",
+        )
+      }
+      fields["reasoning_content"] = Json(reasoning)
+    }
     if message.role == "tool" && message.name is Some(name) {
       guard messages.get(index) is Some(Object(fields)) else {
         raise ValidationError(

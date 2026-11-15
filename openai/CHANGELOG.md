@@ -11,6 +11,36 @@ change itself is the diff of `src/gen/pkg.generated.mbti`.
 
 ## [Unreleased]
 
+## [0.10.0]
+
+### Changed
+
+- **Compatible provider decoding.** Responses accepts omitted tool options,
+  nullable request echoes and usage breakdowns. `gaato/openai/gen.Model.created`
+  is now `Int64?`; handle `None` when a provider omits its timestamp. The facade's
+  `Model.created` was already optional. Generated Responses fields also become
+  optional; handle omission rather than assuming OpenAI request echoes.
+- **Embedding prompt usage is optional.** `EmbeddingResponse.prompt_tokens`
+  and its generated counterpart are now `Int32?`; `None` means unreported,
+  not zero. Embeddings still use float arrays.
+- **Chat messages retain reasoning.** `ChatMessage` and `ChatCompletion` gain
+  `reasoning_content : String?`. Record literals must supply this field.
+  Pass it to `ChatMessage::assistant` or `assistant_tool_calls` when returning
+  an assistant turn to a provider that requires thinking history.
+- **Non-transient 429 errors stop retries.** Recognized quota, balance and
+  disabled-account codes stop immediately; transient or unknown codes retain
+  the configured HTTP retry policy.
+
+### Added
+
+- Numeric API error codes are exposed as strings by `api_error`.
+- `OpenAIFailure::Api(head, error, body~)` represents an error envelope in an
+  HTTP 200 body or a mid-stream Chat Completions error. Update exhaustive
+  failure matches for this case. The original response head and bounded
+  diagnostic body are retained, and streaming stops without replaying delivery.
+- Compatible-provider setup and endpoint caveats for DeepSeek, DashScope,
+  Zhipu/Z.AI, Moonshot, OpenRouter and Ollama.
+
 ## [0.9.0] - 2026-11-12
 
 ### Changed

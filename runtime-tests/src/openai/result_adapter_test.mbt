@@ -4,6 +4,7 @@
 // never catches TransportError or exceptions raised by callbacks.
 suberror TestResponseFailure {
   TestResponseFailure(@runtime.ResponseFailure)
+  TestApiFailure(@openai_sdk.OpenAIFailure)
 }
 
 ///|
@@ -13,6 +14,7 @@ fn[T] expect(result : Result[T, @openai_sdk.OpenAIFailure]) -> T raise {
     Err(@openai_sdk.Response(error)) => raise TestResponseFailure(error)
     Err(@openai_sdk.Validation(message)) =>
       raise @runtime.InvalidRequest(message~)
+    Err(@openai_sdk.Api(_, _, ..) as error) => raise TestApiFailure(error)
   }
 }
 
@@ -27,6 +29,7 @@ fn status_of(error : Error) -> Int32? {
 ///|
 fn api_error(error : Error) -> @openai_sdk.ApiErrorBody? {
   match error {
+    TestApiFailure(error) => @openai_sdk.api_error(error)
     TestResponseFailure(error) =>
       @openai_sdk.api_error(@openai_sdk.Response(error))
     _ => None

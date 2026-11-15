@@ -173,6 +173,7 @@ test "request body builder uses generated JSON and rejects every known extra col
 ///|
 test "chat request conversion validates roles and uses explicit tool_call_id" {
   let tool : ChatMessage = {
+    reasoning_content: None,
     role: "tool",
     content: "result",
     name: Some("weather_result"),
@@ -227,6 +228,7 @@ test "chat request conversion validates roles and uses explicit tool_call_id" {
         ChatRequest::new(model="g", messages=[
           {
             role: "future",
+            reasoning_content: None,
             content: "hello",
             name: None,
             tool_calls: None,
