@@ -11,7 +11,7 @@ change itself is the diff of `src/gen/pkg.generated.mbti`.
 
 ## [Unreleased]
 
-## [0.10.0]
+## [0.10.0] - 2026-11-15
 
 ### Changed
 
