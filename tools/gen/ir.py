@@ -109,6 +109,8 @@ class TaggedUnion:
     default_variant: str | None = None
     # The catch-all constructor, moved aside when a variant already spells Unknown.
     fallback: str = "Unknown"
+    # Some wire unions select their variant by a required field, without a tag value.
+    field_discriminator: bool = False
 
 
 @dataclass(frozen=True)
@@ -147,6 +149,9 @@ class Parameter:
     # x-moonbit-path-segments: this path parameter carries several path segments, so `/`
     # is a separator to keep rather than data to escape (GitHub's `contents/{path}`).
     path_segments: bool = False
+    # Discovery canonical names require validation before reserved expansion.
+    resource_name: bool = False
+    pattern: str | None = None
 
 
 @dataclass(frozen=True)
@@ -170,6 +175,7 @@ class Operation:
     multipart_fields: tuple[MultipartField, ...]
     response_type: TypeRef | None
     description: str = ""
+    source_path: str = ""
 
 
 @dataclass(frozen=True)
@@ -1075,6 +1081,28 @@ class IRBuilder:
     ) -> TypeRef:
         key = "oneOf" if "oneOf" in schema else "anyOf"
         choices = schema[key]
+        field_tags = schema.get("x-moonbit-discriminator-fields")
+        if field_tags is not None:
+            if not (isinstance(field_tags, list) and len(field_tags) == len(choices)
+                    and all(isinstance(tag, str) for tag in field_tags)
+                    and len(set(field_tags)) == len(field_tags)):
+                self.add_diag(pointer, "field discriminator must name one unique field per variant", "align x-moonbit-discriminator-fields with oneOf")
+                return TypeRef("Json")
+            variants = []
+            names = set()
+            for index, (tag, choice) in enumerate(zip(field_tags, choices, strict=True)):
+                properties = self._properties(choice) or {}
+                resolved = self._dereference(choice)
+                if tag not in resolved.get('required', []) or any(other in properties for other in field_tags if other != tag):
+                    self.add_diag(pointer, "field-discriminated variant must require its field and exclude the other variant fields", "use one payload schema per field")
+                variant_name = pascal_case(tag)
+                if variant_name in names:
+                    self.add_diag(pointer, "field discriminator variant name collision", "use fields with distinct normalized names")
+                names.add(variant_name)
+                item = self.compile_type(choice, name + variant_name, usage, pointer_join(pointer_join(pointer, key), index))
+                variants.append(TaggedVariant(variant_name, tag, item))
+            self._add_declaration(TaggedUnion(name, "", tuple(variants), schema.get("description", ""), field_discriminator=True), pointer)
+            return TypeRef("named", name=name)
         discriminator = schema.get("discriminator")
         mapping = discriminator.get("mapping") if isinstance(discriminator, dict) else None
         if not isinstance(mapping, dict):
@@ -1739,6 +1767,8 @@ class IRBuilder:
                     str(parameter.get("style", "")),
                     parameter.get("description", ""),
                     path_segments,
+                    parameter.get("x-moonbit-resource-name") is True,
+                    schema.get("pattern") if parameter.get("x-moonbit-resource-name") is True else None,
                 )
             )
         request_content = operation.get("requestBody", {}).get("content", {})
@@ -1807,7 +1837,8 @@ class IRBuilder:
             response_type = self.compile_type(response_schemas[0][0], pascal_case(operation_id) + "Response", {"response"}, response_schemas[0][1])
             if any(schema != response_schemas[0][0] for schema, _ in response_schemas[1:]):
                 self.add_diag(pointer_join(pointer, "responses"), "multiple distinct success response schemas are not supported", "make the success schemas consistent in overlays/fix.yaml")
-        return Operation(operation_id, snake_case(operation_id), method.upper(), path, tuple(parameters), request_type, tuple(multipart_fields), response_type, operation.get("summary", operation.get("description", "")))
+        request_path = operation.get("x-moonbit-request-path", path)
+        return Operation(operation_id, snake_case(operation_id), method.upper(), request_path, tuple(parameters), request_type, tuple(multipart_fields), response_type, operation.get("summary", operation.get("description", "")), path if request_path != path else "")
 
     def build(self) -> IR:
         validate_openapi_version(self.doc)

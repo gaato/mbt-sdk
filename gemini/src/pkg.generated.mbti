@@ -1,0 +1,123 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "gaato/gemini"
+
+import {
+  "gaato/gemini/gen",
+  "gaato/mttp_core",
+  "gaato/mttp_core/client",
+  "gaato/mttp_core/rt",
+  "gaato/mttp_core/sse",
+  "moonbitlang/core/debug",
+  "moonbitlang/core/json",
+}
+
+// Values
+pub fn default_retry() -> @client.RetryPolicy
+
+// Errors
+
+// Types and methods
+pub(all) enum Auth {
+  Anonymous
+  ApiKey(String)
+  ApiKeyInQuery(String)
+  OAuthToken(String)
+}
+pub fn Auth::to_repr(Self) -> @debug.Repr
+pub impl @debug.Debug for Auth
+
+#non_exhaustive
+#derive(@debug.Debug)
+pub(all) enum ErrorBody {
+  GoogleError(GoogleError)
+}
+pub fn ErrorBody::to_repr(Self) -> @debug.Repr
+
+#non_exhaustive
+#derive(@debug.Debug)
+pub(all) enum Failure {
+  Http(HttpFailure)
+  Transport(@mttp_core.TransportError)
+  Decode(@client.ResponseFailure)
+  Validation(operation~ : String, parameter~ : String, message~ : String)
+}
+pub fn Failure::to_repr(Self) -> @debug.Repr
+
+pub struct Gemini {
+  // private fields
+}
+pub async fn Gemini::batch_embed_contents(Self, model~ : String, @gen.BatchEmbedContentsRequest) -> Result[@gen.BatchEmbedContentsResponse, Failure]
+pub async fn[T] Gemini::call(Self, @mttp_core.Request, (@mttp_core.ResponseHead, Bytes) -> Result[T, @client.ResponseFailure], operation? : String) -> Result[T, Failure]
+pub async fn Gemini::count_tokens(Self, model~ : String, @gen.CountTokensRequest) -> Result[@gen.CountTokensResponse, Failure]
+pub async fn Gemini::create_cached_content(Self, @gen.CachedContent) -> Result[@gen.CachedContent, Failure]
+pub async fn Gemini::create_file_metadata(Self, @gen.CreateFileRequest) -> Result[@gen.CreateFileResponse, Failure]
+pub async fn Gemini::delete_cached_content(Self, name~ : String) -> Result[Unit, Failure]
+pub async fn Gemini::delete_file(Self, name~ : String) -> Result[Unit, Failure]
+pub async fn Gemini::embed_content(Self, model~ : String, @gen.EmbedContentRequest) -> Result[@gen.EmbedContentResponse, Failure]
+pub fn Gemini::from_client(@client.Client, auth? : Auth, base_url? : String, server_urls? : Map[String, String]) -> Self
+pub async fn Gemini::generate_content(Self, model~ : String, @gen.GenerateContentRequest) -> Result[@gen.GenerateContentResponse, Failure]
+pub async fn Gemini::get_cached_content(Self, name~ : String) -> Result[@gen.CachedContent, Failure]
+pub async fn Gemini::get_file(Self, name~ : String) -> Result[@gen.File, Failure]
+pub async fn Gemini::get_model(Self, name~ : String) -> Result[@gen.Model, Failure]
+pub async fn Gemini::list_cached_contents(Self, page_size? : Int32, page_token? : String) -> Result[@gen.ListCachedContentsResponse, Failure]
+pub fn Gemini::list_cached_contents_pages(Self, page_size? : Int32, page_token? : String) -> @client.Paginator[@gen.CachedContent, Failure]
+pub async fn Gemini::list_files(Self, page_token? : String, page_size? : Int32) -> Result[@gen.ListFilesResponse, Failure]
+pub fn Gemini::list_files_pages(Self, page_token? : String, page_size? : Int32) -> @client.Paginator[@gen.File, Failure]
+pub async fn Gemini::list_models(Self, page_token? : String, page_size? : Int32) -> Result[@gen.ListModelsResponse, Failure]
+pub fn Gemini::list_models_pages(Self, page_token? : String, page_size? : Int32) -> @client.Paginator[@gen.Model, Failure]
+pub fn Gemini::new(&@mttp_core.Backend, &@rt.Clock, auth? : Auth, base_url? : String, server_urls? : Map[String, String], retry? : @client.RetryPolicy, timer? : &@rt.Timer, timeout_ms? : Int32, total_timeout_ms? : Int32, max_body_bytes? : Int32) -> Self
+pub fn[T : @json.FromJson] Gemini::paginate(Self, @mttp_core.Request, kind~ : PageKind, items~ : String, next~ : String, operation? : String) -> @client.Paginator[T, Failure]
+pub async fn Gemini::send(Self, @mttp_core.Request, operation? : String) -> Result[@client.Reply[Bytes], Failure]
+pub async fn Gemini::stream(Self, @mttp_core.Request, async (@sse.SseEvent) -> Unit, stop? : (@sse.SseEvent) -> Bool, operation? : String) -> Result[Unit, Failure]
+pub async fn Gemini::stream_generate_content(Self, model~ : String, @gen.GenerateContentRequest, async (@gen.GenerateContentResponse) -> Unit, stop? : (@gen.GenerateContentResponse) -> Bool) -> Result[Unit, Failure]
+pub fn Gemini::to_repr(Self) -> @debug.Repr
+pub async fn Gemini::update_cached_content(Self, name~ : String, @gen.CachedContent, update_mask? : String) -> Result[@gen.CachedContent, Failure]
+pub async fn Gemini::upload_file(Self, Bytes, mime_type~ : String, display_name? : String) -> Result[@gen.CreateFileResponse, Failure]
+pub impl @debug.Debug for Gemini
+
+#derive(Eq, @debug.Debug)
+pub(all) struct GoogleError {
+  error : GoogleErrorStatus
+}
+pub fn GoogleError::equal(Self, Self) -> Bool
+pub fn GoogleError::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn GoogleError::new(error~ : GoogleErrorStatus) -> Self
+pub fn GoogleError::not_equal(Self, Self) -> Bool
+pub fn GoogleError::to_json(Self) -> @json.Json
+pub fn GoogleError::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for GoogleError
+pub impl @json.ToJson for GoogleError
+
+#derive(Eq, @debug.Debug)
+pub(all) struct GoogleErrorStatus {
+  code : Int32
+  message : String
+  status : String
+  details : Array[@json.Json]?
+}
+pub fn GoogleErrorStatus::equal(Self, Self) -> Bool
+pub fn GoogleErrorStatus::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn GoogleErrorStatus::new(code~ : Int32, message~ : String, status~ : String, details? : Array[@json.Json]) -> Self
+pub fn GoogleErrorStatus::not_equal(Self, Self) -> Bool
+pub fn GoogleErrorStatus::to_json(Self) -> @json.Json
+pub fn GoogleErrorStatus::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for GoogleErrorStatus
+pub impl @json.ToJson for GoogleErrorStatus
+
+#derive(@debug.Debug)
+pub(all) struct HttpFailure {
+  operation : String
+  head : @mttp_core.ResponseHead
+  body : Bytes
+  typed : ErrorBody?
+}
+pub fn HttpFailure::to_repr(Self) -> @debug.Repr
+
+pub(all) enum PageKind {
+  Cursor(String)
+  NextUrl
+}
+
+// Type aliases
+
+// Traits

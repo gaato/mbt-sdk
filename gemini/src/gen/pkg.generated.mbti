@@ -1,0 +1,2862 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "gaato/gemini/gen"
+
+import {
+  "gaato/mttp_core",
+  "gaato/mttp_core/client",
+  "moonbitlang/core/debug",
+  "moonbitlang/core/json",
+}
+
+// Values
+pub fn cached_contents_create_decode(@mttp_core.ResponseHead, Bytes) -> Result[CachedContent, @client.ResponseFailure]
+
+pub fn cached_contents_create_decode_json(@json.Json) -> CachedContent raise @json.JsonDecodeError
+
+pub fn cached_contents_create_request(CachedContent) -> @mttp_core.Request
+
+pub fn cached_contents_delete_request(String) -> @mttp_core.Request raise ValidationError
+
+pub fn cached_contents_get_decode(@mttp_core.ResponseHead, Bytes) -> Result[CachedContent, @client.ResponseFailure]
+
+pub fn cached_contents_get_decode_json(@json.Json) -> CachedContent raise @json.JsonDecodeError
+
+pub fn cached_contents_get_request(String) -> @mttp_core.Request raise ValidationError
+
+pub fn cached_contents_list_decode(@mttp_core.ResponseHead, Bytes) -> Result[ListCachedContentsResponse, @client.ResponseFailure]
+
+pub fn cached_contents_list_decode_json(@json.Json) -> ListCachedContentsResponse raise @json.JsonDecodeError
+
+pub fn cached_contents_list_request(page_size? : Int32, page_token? : String) -> @mttp_core.Request
+
+pub fn cached_contents_patch_decode(@mttp_core.ResponseHead, Bytes) -> Result[CachedContent, @client.ResponseFailure]
+
+pub fn cached_contents_patch_decode_json(@json.Json) -> CachedContent raise @json.JsonDecodeError
+
+pub fn cached_contents_patch_request(String, CachedContent, update_mask? : String) -> @mttp_core.Request raise ValidationError
+
+pub fn files_delete_request(String) -> @mttp_core.Request raise ValidationError
+
+pub fn files_get_decode(@mttp_core.ResponseHead, Bytes) -> Result[File, @client.ResponseFailure]
+
+pub fn files_get_decode_json(@json.Json) -> File raise @json.JsonDecodeError
+
+pub fn files_get_request(String) -> @mttp_core.Request raise ValidationError
+
+pub fn files_list_decode(@mttp_core.ResponseHead, Bytes) -> Result[ListFilesResponse, @client.ResponseFailure]
+
+pub fn files_list_decode_json(@json.Json) -> ListFilesResponse raise @json.JsonDecodeError
+
+pub fn files_list_request(page_token? : String, page_size? : Int32) -> @mttp_core.Request
+
+pub fn media_upload_decode(@mttp_core.ResponseHead, Bytes) -> Result[CreateFileResponse, @client.ResponseFailure]
+
+pub fn media_upload_decode_json(@json.Json) -> CreateFileResponse raise @json.JsonDecodeError
+
+pub fn media_upload_request(CreateFileRequest) -> @mttp_core.Request
+
+pub fn models_batch_embed_contents_decode(@mttp_core.ResponseHead, Bytes) -> Result[BatchEmbedContentsResponse, @client.ResponseFailure]
+
+pub fn models_batch_embed_contents_decode_json(@json.Json) -> BatchEmbedContentsResponse raise @json.JsonDecodeError
+
+pub fn models_batch_embed_contents_request(String, BatchEmbedContentsRequest) -> @mttp_core.Request raise ValidationError
+
+pub fn models_count_tokens_decode(@mttp_core.ResponseHead, Bytes) -> Result[CountTokensResponse, @client.ResponseFailure]
+
+pub fn models_count_tokens_decode_json(@json.Json) -> CountTokensResponse raise @json.JsonDecodeError
+
+pub fn models_count_tokens_request(String, CountTokensRequest) -> @mttp_core.Request raise ValidationError
+
+pub fn models_embed_content_decode(@mttp_core.ResponseHead, Bytes) -> Result[EmbedContentResponse, @client.ResponseFailure]
+
+pub fn models_embed_content_decode_json(@json.Json) -> EmbedContentResponse raise @json.JsonDecodeError
+
+pub fn models_embed_content_request(String, EmbedContentRequest) -> @mttp_core.Request raise ValidationError
+
+pub fn models_generate_content_decode(@mttp_core.ResponseHead, Bytes) -> Result[GenerateContentResponse, @client.ResponseFailure]
+
+pub fn models_generate_content_decode_json(@json.Json) -> GenerateContentResponse raise @json.JsonDecodeError
+
+pub fn models_generate_content_request(String, GenerateContentRequest) -> @mttp_core.Request raise ValidationError
+
+pub fn models_get_decode(@mttp_core.ResponseHead, Bytes) -> Result[Model, @client.ResponseFailure]
+
+pub fn models_get_decode_json(@json.Json) -> Model raise @json.JsonDecodeError
+
+pub fn models_get_request(String) -> @mttp_core.Request raise ValidationError
+
+pub fn models_list_decode(@mttp_core.ResponseHead, Bytes) -> Result[ListModelsResponse, @client.ResponseFailure]
+
+pub fn models_list_decode_json(@json.Json) -> ListModelsResponse raise @json.JsonDecodeError
+
+pub fn models_list_request(page_token? : String, page_size? : Int32) -> @mttp_core.Request
+
+pub fn models_stream_generate_content_decode(@mttp_core.ResponseHead, Bytes) -> Result[GenerateContentResponse, @client.ResponseFailure]
+
+pub fn models_stream_generate_content_decode_json(@json.Json) -> GenerateContentResponse raise @json.JsonDecodeError
+
+pub fn models_stream_generate_content_request(String, GenerateContentRequest) -> @mttp_core.Request raise ValidationError
+
+// Errors
+#derive(@debug.Debug)
+pub(all) suberror ValidationError {
+  ValidationError(parameter~ : String, message~ : String)
+}
+pub fn ValidationError::to_repr(Self) -> @debug.Repr
+
+// Types and methods
+#derive(Eq, @debug.Debug)
+pub(all) struct AttributionSourceId {
+  semantic_retriever_chunk : SemanticRetrieverChunk?
+  grounding_passage : GroundingPassageId?
+}
+pub fn AttributionSourceId::equal(Self, Self) -> Bool
+pub fn AttributionSourceId::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn AttributionSourceId::new(semantic_retriever_chunk? : SemanticRetrieverChunk, grounding_passage? : GroundingPassageId) -> Self
+pub fn AttributionSourceId::not_equal(Self, Self) -> Bool
+pub fn AttributionSourceId::to_json(Self) -> @json.Json
+pub fn AttributionSourceId::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for AttributionSourceId
+pub impl @json.ToJson for AttributionSourceId
+
+#derive(Eq, @debug.Debug)
+pub(all) struct AudioResponseFormat {
+  sample_rate : Int32?
+  delivery : AudioResponseFormatDelivery?
+  bit_rate : Int32?
+  mime_type : AudioResponseFormatMimeType?
+}
+pub fn AudioResponseFormat::equal(Self, Self) -> Bool
+pub fn AudioResponseFormat::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn AudioResponseFormat::new(sample_rate? : Int32, delivery? : AudioResponseFormatDelivery, bit_rate? : Int32, mime_type? : AudioResponseFormatMimeType) -> Self
+pub fn AudioResponseFormat::not_equal(Self, Self) -> Bool
+pub fn AudioResponseFormat::to_json(Self) -> @json.Json
+pub fn AudioResponseFormat::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for AudioResponseFormat
+pub impl @json.ToJson for AudioResponseFormat
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum AudioResponseFormatDelivery {
+  DELIVERYUNSPECIFIED
+  INLINE
+  URI
+  Custom(String)
+}
+pub fn AudioResponseFormatDelivery::equal(Self, Self) -> Bool
+pub fn AudioResponseFormatDelivery::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn AudioResponseFormatDelivery::not_equal(Self, Self) -> Bool
+pub fn AudioResponseFormatDelivery::to_json(Self) -> @json.Json
+pub fn AudioResponseFormatDelivery::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for AudioResponseFormatDelivery
+pub impl @json.ToJson for AudioResponseFormatDelivery
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum AudioResponseFormatMimeType {
+  MIMETYPEUNSPECIFIED
+  AUDIOMP3
+  AUDIOOGGOPUS
+  AUDIOL16
+  AUDIOWAV
+  AUDIOALAW
+  AUDIOMULAW
+  Custom(String)
+}
+pub fn AudioResponseFormatMimeType::equal(Self, Self) -> Bool
+pub fn AudioResponseFormatMimeType::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn AudioResponseFormatMimeType::not_equal(Self, Self) -> Bool
+pub fn AudioResponseFormatMimeType::to_json(Self) -> @json.Json
+pub fn AudioResponseFormatMimeType::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for AudioResponseFormatMimeType
+pub impl @json.ToJson for AudioResponseFormatMimeType
+
+#derive(Eq, @debug.Debug)
+pub(all) struct AudioTranscription {
+  speaker_label : String?
+  text : String?
+  words : Array[WordInfo]?
+}
+pub fn AudioTranscription::equal(Self, Self) -> Bool
+pub fn AudioTranscription::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn AudioTranscription::new(speaker_label? : String, text? : String, words? : Array[WordInfo]) -> Self
+pub fn AudioTranscription::not_equal(Self, Self) -> Bool
+pub fn AudioTranscription::to_json(Self) -> @json.Json
+pub fn AudioTranscription::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for AudioTranscription
+pub impl @json.ToJson for AudioTranscription
+
+#derive(Eq, @debug.Debug)
+pub(all) struct AudioTranscriptionConfig {
+  adaptation_phrases : Array[String]?
+  language_hints : LanguageHints?
+  mode : AudioTranscriptionConfigMode?
+  diarization : Bool?
+  language_auto : @json.Json?
+  source_text : String?
+  language_codes : Array[String]?
+  word_timestamp : Bool?
+  custom_vocabulary : Array[String]?
+}
+pub fn AudioTranscriptionConfig::equal(Self, Self) -> Bool
+pub fn AudioTranscriptionConfig::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn AudioTranscriptionConfig::new(adaptation_phrases? : Array[String], language_hints? : LanguageHints, mode? : AudioTranscriptionConfigMode, diarization? : Bool, language_auto? : @json.Json, source_text? : String, language_codes? : Array[String], word_timestamp? : Bool, custom_vocabulary? : Array[String]) -> Self
+pub fn AudioTranscriptionConfig::not_equal(Self, Self) -> Bool
+pub fn AudioTranscriptionConfig::to_json(Self) -> @json.Json
+pub fn AudioTranscriptionConfig::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for AudioTranscriptionConfig
+pub impl @json.ToJson for AudioTranscriptionConfig
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum AudioTranscriptionConfigMode {
+  MODEUNSPECIFIED
+  VERBATIM
+  SMART
+  Custom(String)
+}
+pub fn AudioTranscriptionConfigMode::equal(Self, Self) -> Bool
+pub fn AudioTranscriptionConfigMode::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn AudioTranscriptionConfigMode::not_equal(Self, Self) -> Bool
+pub fn AudioTranscriptionConfigMode::to_json(Self) -> @json.Json
+pub fn AudioTranscriptionConfigMode::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for AudioTranscriptionConfigMode
+pub impl @json.ToJson for AudioTranscriptionConfigMode
+
+#derive(Eq, @debug.Debug)
+pub(all) struct BatchEmbedContentsRequest {
+  requests : Array[EmbedContentRequest]?
+}
+pub fn BatchEmbedContentsRequest::equal(Self, Self) -> Bool
+pub fn BatchEmbedContentsRequest::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn BatchEmbedContentsRequest::new(requests? : Array[EmbedContentRequest]) -> Self
+pub fn BatchEmbedContentsRequest::not_equal(Self, Self) -> Bool
+pub fn BatchEmbedContentsRequest::to_json(Self) -> @json.Json
+pub fn BatchEmbedContentsRequest::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for BatchEmbedContentsRequest
+pub impl @json.ToJson for BatchEmbedContentsRequest
+
+#derive(Eq, @debug.Debug)
+pub(all) struct BatchEmbedContentsResponse {
+  embeddings : Array[ContentEmbedding]?
+  usage_metadata : EmbeddingUsageMetadata?
+}
+pub fn BatchEmbedContentsResponse::equal(Self, Self) -> Bool
+pub fn BatchEmbedContentsResponse::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn BatchEmbedContentsResponse::new(embeddings? : Array[ContentEmbedding], usage_metadata? : EmbeddingUsageMetadata) -> Self
+pub fn BatchEmbedContentsResponse::not_equal(Self, Self) -> Bool
+pub fn BatchEmbedContentsResponse::to_json(Self) -> @json.Json
+pub fn BatchEmbedContentsResponse::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for BatchEmbedContentsResponse
+pub impl @json.ToJson for BatchEmbedContentsResponse
+
+#derive(Eq, @debug.Debug)
+pub(all) struct Blob {
+  data : String?
+  mime_type : String?
+  display_name : String?
+}
+pub fn Blob::equal(Self, Self) -> Bool
+pub fn Blob::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn Blob::new(data? : String, mime_type? : String, display_name? : String) -> Self
+pub fn Blob::not_equal(Self, Self) -> Bool
+pub fn Blob::to_json(Self) -> @json.Json
+pub fn Blob::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for Blob
+pub impl @json.ToJson for Blob
+
+#derive(Eq, @debug.Debug)
+pub(all) struct CachedContent {
+  create_time : String?
+  usage_metadata : CachedContentUsageMetadata?
+  expire_time : String?
+  name : String?
+  tools : Array[Tool]?
+  update_time : String?
+  display_name : String?
+  contents : Array[Content]?
+  system_instruction : Content?
+  ttl : String?
+  model : String?
+  tool_config : ToolConfig?
+}
+pub fn CachedContent::equal(Self, Self) -> Bool
+pub fn CachedContent::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn CachedContent::new(create_time? : String, usage_metadata? : CachedContentUsageMetadata, expire_time? : String, name? : String, tools? : Array[Tool], update_time? : String, display_name? : String, contents? : Array[Content], system_instruction? : Content, ttl? : String, model? : String, tool_config? : ToolConfig) -> Self
+pub fn CachedContent::not_equal(Self, Self) -> Bool
+pub fn CachedContent::to_json(Self) -> @json.Json
+pub fn CachedContent::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for CachedContent
+pub impl @json.ToJson for CachedContent
+
+#derive(Eq, @debug.Debug)
+pub(all) struct CachedContentUsageMetadata {
+  total_token_count : Int32?
+}
+pub fn CachedContentUsageMetadata::equal(Self, Self) -> Bool
+pub fn CachedContentUsageMetadata::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn CachedContentUsageMetadata::new(total_token_count? : Int32) -> Self
+pub fn CachedContentUsageMetadata::not_equal(Self, Self) -> Bool
+pub fn CachedContentUsageMetadata::to_json(Self) -> @json.Json
+pub fn CachedContentUsageMetadata::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for CachedContentUsageMetadata
+pub impl @json.ToJson for CachedContentUsageMetadata
+
+#derive(Eq, @debug.Debug)
+pub(all) struct Candidate {
+  finish_message : String?
+  finish_reason : CandidateFinishReason?
+  grounding_attributions : Array[GroundingAttribution]?
+  logprobs_result : LogprobsResult?
+  content : Content?
+  citation_metadata : CitationMetadata?
+  index : Int32?
+  grounding_metadata : GroundingMetadata?
+  avg_logprobs : Double?
+  safety_ratings : Array[SafetyRating]?
+  token_count : Int32?
+  url_context_metadata : UrlContextMetadata?
+  continuation_token : String?
+}
+pub fn Candidate::equal(Self, Self) -> Bool
+pub fn Candidate::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn Candidate::new(finish_message? : String, finish_reason? : CandidateFinishReason, grounding_attributions? : Array[GroundingAttribution], logprobs_result? : LogprobsResult, content? : Content, citation_metadata? : CitationMetadata, index? : Int32, grounding_metadata? : GroundingMetadata, avg_logprobs? : Double, safety_ratings? : Array[SafetyRating], token_count? : Int32, url_context_metadata? : UrlContextMetadata, continuation_token? : String) -> Self
+pub fn Candidate::not_equal(Self, Self) -> Bool
+pub fn Candidate::to_json(Self) -> @json.Json
+pub fn Candidate::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for Candidate
+pub impl @json.ToJson for Candidate
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum CandidateFinishReason {
+  FINISHREASONUNSPECIFIED
+  STOP
+  MAXTOKENS
+  SAFETY
+  RECITATION
+  LANGUAGE
+  OTHER
+  BLOCKLIST
+  PROHIBITEDCONTENT
+  SPII
+  MALFORMEDFUNCTIONCALL
+  IMAGESAFETY
+  IMAGEPROHIBITEDCONTENT
+  IMAGEOTHER
+  NOIMAGE
+  IMAGERECITATION
+  UNEXPECTEDTOOLCALL
+  TOOMANYTOOLCALLS
+  MISSINGTHOUGHTSIGNATURE
+  MALFORMEDRESPONSE
+  ESCALATION
+  PUPLIMITEDDISABLED
+  CONTINUATION
+  Unknown(String)
+}
+pub fn CandidateFinishReason::equal(Self, Self) -> Bool
+pub fn CandidateFinishReason::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn CandidateFinishReason::not_equal(Self, Self) -> Bool
+pub fn CandidateFinishReason::to_json(Self) -> @json.Json
+pub fn CandidateFinishReason::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for CandidateFinishReason
+pub impl @json.ToJson for CandidateFinishReason
+
+#derive(Eq, @debug.Debug)
+pub(all) struct CitationMetadata {
+  citation_sources : Array[CitationSource]?
+}
+pub fn CitationMetadata::equal(Self, Self) -> Bool
+pub fn CitationMetadata::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn CitationMetadata::new(citation_sources? : Array[CitationSource]) -> Self
+pub fn CitationMetadata::not_equal(Self, Self) -> Bool
+pub fn CitationMetadata::to_json(Self) -> @json.Json
+pub fn CitationMetadata::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for CitationMetadata
+pub impl @json.ToJson for CitationMetadata
+
+#derive(Eq, @debug.Debug)
+pub(all) struct CitationSource {
+  start_index : Int32?
+  end_index : Int32?
+  license : String?
+  uri : String?
+}
+pub fn CitationSource::equal(Self, Self) -> Bool
+pub fn CitationSource::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn CitationSource::new(start_index? : Int32, end_index? : Int32, license? : String, uri? : String) -> Self
+pub fn CitationSource::not_equal(Self, Self) -> Bool
+pub fn CitationSource::to_json(Self) -> @json.Json
+pub fn CitationSource::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for CitationSource
+pub impl @json.ToJson for CitationSource
+
+#derive(Eq, @debug.Debug)
+pub(all) struct CodeExecutionResult {
+  outcome : CodeExecutionResultOutcome?
+  id : String?
+  output : String?
+}
+pub fn CodeExecutionResult::equal(Self, Self) -> Bool
+pub fn CodeExecutionResult::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn CodeExecutionResult::new(outcome? : CodeExecutionResultOutcome, id? : String, output? : String) -> Self
+pub fn CodeExecutionResult::not_equal(Self, Self) -> Bool
+pub fn CodeExecutionResult::to_json(Self) -> @json.Json
+pub fn CodeExecutionResult::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for CodeExecutionResult
+pub impl @json.ToJson for CodeExecutionResult
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum CodeExecutionResultOutcome {
+  OUTCOMEUNSPECIFIED
+  OUTCOMEOK
+  OUTCOMEFAILED
+  OUTCOMEDEADLINEEXCEEDED
+  Unknown(String)
+}
+pub fn CodeExecutionResultOutcome::equal(Self, Self) -> Bool
+pub fn CodeExecutionResultOutcome::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn CodeExecutionResultOutcome::not_equal(Self, Self) -> Bool
+pub fn CodeExecutionResultOutcome::to_json(Self) -> @json.Json
+pub fn CodeExecutionResultOutcome::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for CodeExecutionResultOutcome
+pub impl @json.ToJson for CodeExecutionResultOutcome
+
+#derive(Eq, @debug.Debug)
+pub(all) struct ComputerUse {
+  disabled_safety_policies : Array[ComputerUseDisabledSafetyPoliciesItem]?
+  excluded_predefined_functions : Array[String]?
+  environment : ComputerUseEnvironment?
+  enable_prompt_injection_detection : Bool?
+}
+pub fn ComputerUse::equal(Self, Self) -> Bool
+pub fn ComputerUse::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ComputerUse::new(disabled_safety_policies? : Array[ComputerUseDisabledSafetyPoliciesItem], excluded_predefined_functions? : Array[String], environment? : ComputerUseEnvironment, enable_prompt_injection_detection? : Bool) -> Self
+pub fn ComputerUse::not_equal(Self, Self) -> Bool
+pub fn ComputerUse::to_json(Self) -> @json.Json
+pub fn ComputerUse::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for ComputerUse
+pub impl @json.ToJson for ComputerUse
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum ComputerUseDisabledSafetyPoliciesItem {
+  SAFETYPOLICYUNSPECIFIED
+  FINANCIALTRANSACTIONS
+  SENSITIVEDATAMODIFICATION
+  COMMUNICATIONTOOL
+  ACCOUNTCREATION
+  DATAMODIFICATION
+  USERCONSENTMANAGEMENT
+  LEGALTERMSANDAGREEMENTS
+  Unknown(String)
+}
+pub fn ComputerUseDisabledSafetyPoliciesItem::equal(Self, Self) -> Bool
+pub fn ComputerUseDisabledSafetyPoliciesItem::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ComputerUseDisabledSafetyPoliciesItem::not_equal(Self, Self) -> Bool
+pub fn ComputerUseDisabledSafetyPoliciesItem::to_json(Self) -> @json.Json
+pub fn ComputerUseDisabledSafetyPoliciesItem::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for ComputerUseDisabledSafetyPoliciesItem
+pub impl @json.ToJson for ComputerUseDisabledSafetyPoliciesItem
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum ComputerUseEnvironment {
+  ENVIRONMENTUNSPECIFIED
+  ENVIRONMENTBROWSER
+  ENVIRONMENTMOBILE
+  ENVIRONMENTDESKTOP
+  Unknown(String)
+}
+pub fn ComputerUseEnvironment::equal(Self, Self) -> Bool
+pub fn ComputerUseEnvironment::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ComputerUseEnvironment::not_equal(Self, Self) -> Bool
+pub fn ComputerUseEnvironment::to_json(Self) -> @json.Json
+pub fn ComputerUseEnvironment::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for ComputerUseEnvironment
+pub impl @json.ToJson for ComputerUseEnvironment
+
+#derive(Eq, @debug.Debug)
+pub(all) struct Content {
+  parts : Array[Part]?
+  role : String?
+}
+pub fn Content::equal(Self, Self) -> Bool
+pub fn Content::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn Content::new(parts? : Array[Part], role? : String) -> Self
+pub fn Content::not_equal(Self, Self) -> Bool
+pub fn Content::to_json(Self) -> @json.Json
+pub fn Content::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for Content
+pub impl @json.ToJson for Content
+
+#derive(Eq, @debug.Debug)
+pub(all) struct ContentEmbedding {
+  values : Array[Double]?
+  shape : Array[Int32]?
+}
+pub fn ContentEmbedding::equal(Self, Self) -> Bool
+pub fn ContentEmbedding::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ContentEmbedding::new(values? : Array[Double], shape? : Array[Int32]) -> Self
+pub fn ContentEmbedding::not_equal(Self, Self) -> Bool
+pub fn ContentEmbedding::to_json(Self) -> @json.Json
+pub fn ContentEmbedding::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for ContentEmbedding
+pub impl @json.ToJson for ContentEmbedding
+
+#derive(Eq, @debug.Debug)
+pub(all) struct CountTokensRequest {
+  contents : Array[Content]?
+  generate_content_request : GenerateContentRequest?
+}
+pub fn CountTokensRequest::equal(Self, Self) -> Bool
+pub fn CountTokensRequest::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn CountTokensRequest::new(contents? : Array[Content], generate_content_request? : GenerateContentRequest) -> Self
+pub fn CountTokensRequest::not_equal(Self, Self) -> Bool
+pub fn CountTokensRequest::to_json(Self) -> @json.Json
+pub fn CountTokensRequest::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for CountTokensRequest
+pub impl @json.ToJson for CountTokensRequest
+
+#derive(Eq, @debug.Debug)
+pub(all) struct CountTokensResponse {
+  cache_tokens_details : Array[ModalityTokenCount]?
+  cached_content_token_count : Int32?
+  total_tokens : Int32?
+  prompt_tokens_details : Array[ModalityTokenCount]?
+}
+pub fn CountTokensResponse::equal(Self, Self) -> Bool
+pub fn CountTokensResponse::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn CountTokensResponse::new(cache_tokens_details? : Array[ModalityTokenCount], cached_content_token_count? : Int32, total_tokens? : Int32, prompt_tokens_details? : Array[ModalityTokenCount]) -> Self
+pub fn CountTokensResponse::not_equal(Self, Self) -> Bool
+pub fn CountTokensResponse::to_json(Self) -> @json.Json
+pub fn CountTokensResponse::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for CountTokensResponse
+pub impl @json.ToJson for CountTokensResponse
+
+#derive(Eq, @debug.Debug)
+pub(all) struct CreateFileRequest {
+  file : File?
+}
+pub fn CreateFileRequest::equal(Self, Self) -> Bool
+pub fn CreateFileRequest::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn CreateFileRequest::new(file? : File) -> Self
+pub fn CreateFileRequest::not_equal(Self, Self) -> Bool
+pub fn CreateFileRequest::to_json(Self) -> @json.Json
+pub fn CreateFileRequest::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for CreateFileRequest
+pub impl @json.ToJson for CreateFileRequest
+
+#derive(Eq, @debug.Debug)
+pub(all) struct CreateFileResponse {
+  file : File?
+}
+pub fn CreateFileResponse::equal(Self, Self) -> Bool
+pub fn CreateFileResponse::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn CreateFileResponse::new(file? : File) -> Self
+pub fn CreateFileResponse::not_equal(Self, Self) -> Bool
+pub fn CreateFileResponse::to_json(Self) -> @json.Json
+pub fn CreateFileResponse::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for CreateFileResponse
+pub impl @json.ToJson for CreateFileResponse
+
+#derive(Eq, @debug.Debug)
+pub(all) struct DynamicRetrievalConfig {
+  mode : DynamicRetrievalConfigMode?
+  dynamic_threshold : Double?
+}
+pub fn DynamicRetrievalConfig::equal(Self, Self) -> Bool
+pub fn DynamicRetrievalConfig::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn DynamicRetrievalConfig::new(mode? : DynamicRetrievalConfigMode, dynamic_threshold? : Double) -> Self
+pub fn DynamicRetrievalConfig::not_equal(Self, Self) -> Bool
+pub fn DynamicRetrievalConfig::to_json(Self) -> @json.Json
+pub fn DynamicRetrievalConfig::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for DynamicRetrievalConfig
+pub impl @json.ToJson for DynamicRetrievalConfig
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum DynamicRetrievalConfigMode {
+  MODEUNSPECIFIED
+  MODEDYNAMIC
+  Unknown(String)
+}
+pub fn DynamicRetrievalConfigMode::equal(Self, Self) -> Bool
+pub fn DynamicRetrievalConfigMode::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn DynamicRetrievalConfigMode::not_equal(Self, Self) -> Bool
+pub fn DynamicRetrievalConfigMode::to_json(Self) -> @json.Json
+pub fn DynamicRetrievalConfigMode::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for DynamicRetrievalConfigMode
+pub impl @json.ToJson for DynamicRetrievalConfigMode
+
+#derive(Eq, @debug.Debug)
+pub(all) struct EmbedContentConfig {
+  auto_truncate : Bool?
+  title : String?
+  audio_track_extraction : Bool?
+  output_dimensionality : Int32?
+  task_type : EmbedContentConfigTaskType?
+  document_ocr : Bool?
+}
+pub fn EmbedContentConfig::equal(Self, Self) -> Bool
+pub fn EmbedContentConfig::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn EmbedContentConfig::new(auto_truncate? : Bool, title? : String, audio_track_extraction? : Bool, output_dimensionality? : Int32, task_type? : EmbedContentConfigTaskType, document_ocr? : Bool) -> Self
+pub fn EmbedContentConfig::not_equal(Self, Self) -> Bool
+pub fn EmbedContentConfig::to_json(Self) -> @json.Json
+pub fn EmbedContentConfig::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for EmbedContentConfig
+pub impl @json.ToJson for EmbedContentConfig
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum EmbedContentConfigTaskType {
+  TASKTYPEUNSPECIFIED
+  RETRIEVALQUERY
+  RETRIEVALDOCUMENT
+  SEMANTICSIMILARITY
+  CLASSIFICATION
+  CLUSTERING
+  QUESTIONANSWERING
+  FACTVERIFICATION
+  CODERETRIEVALQUERY
+  Custom(String)
+}
+pub fn EmbedContentConfigTaskType::equal(Self, Self) -> Bool
+pub fn EmbedContentConfigTaskType::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn EmbedContentConfigTaskType::not_equal(Self, Self) -> Bool
+pub fn EmbedContentConfigTaskType::to_json(Self) -> @json.Json
+pub fn EmbedContentConfigTaskType::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for EmbedContentConfigTaskType
+pub impl @json.ToJson for EmbedContentConfigTaskType
+
+#derive(Eq, @debug.Debug)
+pub(all) struct EmbedContentRequest {
+  content : Content?
+  output_dimensionality : Int32?
+  task_type : EmbedContentRequestTaskType?
+  model : String?
+  title : String?
+  embed_content_config : EmbedContentConfig?
+}
+pub fn EmbedContentRequest::equal(Self, Self) -> Bool
+pub fn EmbedContentRequest::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn EmbedContentRequest::new(content? : Content, output_dimensionality? : Int32, task_type? : EmbedContentRequestTaskType, model? : String, title? : String, embed_content_config? : EmbedContentConfig) -> Self
+pub fn EmbedContentRequest::not_equal(Self, Self) -> Bool
+pub fn EmbedContentRequest::to_json(Self) -> @json.Json
+pub fn EmbedContentRequest::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for EmbedContentRequest
+pub impl @json.ToJson for EmbedContentRequest
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum EmbedContentRequestTaskType {
+  TASKTYPEUNSPECIFIED
+  RETRIEVALQUERY
+  RETRIEVALDOCUMENT
+  SEMANTICSIMILARITY
+  CLASSIFICATION
+  CLUSTERING
+  QUESTIONANSWERING
+  FACTVERIFICATION
+  CODERETRIEVALQUERY
+  Custom(String)
+}
+pub fn EmbedContentRequestTaskType::equal(Self, Self) -> Bool
+pub fn EmbedContentRequestTaskType::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn EmbedContentRequestTaskType::not_equal(Self, Self) -> Bool
+pub fn EmbedContentRequestTaskType::to_json(Self) -> @json.Json
+pub fn EmbedContentRequestTaskType::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for EmbedContentRequestTaskType
+pub impl @json.ToJson for EmbedContentRequestTaskType
+
+#derive(Eq, @debug.Debug)
+pub(all) struct EmbedContentResponse {
+  embedding : ContentEmbedding?
+  usage_metadata : EmbeddingUsageMetadata?
+}
+pub fn EmbedContentResponse::equal(Self, Self) -> Bool
+pub fn EmbedContentResponse::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn EmbedContentResponse::new(embedding? : ContentEmbedding, usage_metadata? : EmbeddingUsageMetadata) -> Self
+pub fn EmbedContentResponse::not_equal(Self, Self) -> Bool
+pub fn EmbedContentResponse::to_json(Self) -> @json.Json
+pub fn EmbedContentResponse::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for EmbedContentResponse
+pub impl @json.ToJson for EmbedContentResponse
+
+#derive(Eq, @debug.Debug)
+pub(all) struct EmbeddingUsageMetadata {
+  prompt_token_details : Array[ModalityTokenCount]?
+  prompt_token_count : Int32?
+}
+pub fn EmbeddingUsageMetadata::equal(Self, Self) -> Bool
+pub fn EmbeddingUsageMetadata::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn EmbeddingUsageMetadata::new(prompt_token_details? : Array[ModalityTokenCount], prompt_token_count? : Int32) -> Self
+pub fn EmbeddingUsageMetadata::not_equal(Self, Self) -> Bool
+pub fn EmbeddingUsageMetadata::to_json(Self) -> @json.Json
+pub fn EmbeddingUsageMetadata::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for EmbeddingUsageMetadata
+pub impl @json.ToJson for EmbeddingUsageMetadata
+
+#derive(Eq, @debug.Debug)
+pub(all) struct ExecutableCode {
+  language : ExecutableCodeLanguage?
+  id : String?
+  code : String?
+}
+pub fn ExecutableCode::equal(Self, Self) -> Bool
+pub fn ExecutableCode::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ExecutableCode::new(language? : ExecutableCodeLanguage, id? : String, code? : String) -> Self
+pub fn ExecutableCode::not_equal(Self, Self) -> Bool
+pub fn ExecutableCode::to_json(Self) -> @json.Json
+pub fn ExecutableCode::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for ExecutableCode
+pub impl @json.ToJson for ExecutableCode
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum ExecutableCodeLanguage {
+  LANGUAGEUNSPECIFIED
+  PYTHON
+  Unknown(String)
+}
+pub fn ExecutableCodeLanguage::equal(Self, Self) -> Bool
+pub fn ExecutableCodeLanguage::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ExecutableCodeLanguage::not_equal(Self, Self) -> Bool
+pub fn ExecutableCodeLanguage::to_json(Self) -> @json.Json
+pub fn ExecutableCodeLanguage::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for ExecutableCodeLanguage
+pub impl @json.ToJson for ExecutableCodeLanguage
+
+#derive(Eq, @debug.Debug)
+pub(all) struct File {
+  uri : String?
+  create_time : String?
+  name : String?
+  update_time : String?
+  expiration_time : String?
+  source : FileSource?
+  video_metadata : VideoFileMetadata?
+  sha256_hash : String?
+  error : Status?
+  download_uri : String?
+  state : FileState?
+  mime_type : String?
+  display_name : String?
+  size_bytes : Int64?
+}
+pub fn File::equal(Self, Self) -> Bool
+pub fn File::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn File::new(uri? : String, create_time? : String, name? : String, update_time? : String, expiration_time? : String, source? : FileSource, video_metadata? : VideoFileMetadata, sha256_hash? : String, error? : Status, download_uri? : String, state? : FileState, mime_type? : String, display_name? : String, size_bytes? : Int64) -> Self
+pub fn File::not_equal(Self, Self) -> Bool
+pub fn File::to_json(Self) -> @json.Json
+pub fn File::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for File
+pub impl @json.ToJson for File
+
+#derive(Eq, @debug.Debug)
+pub(all) struct FileData {
+  mime_type : String?
+  file_uri : String?
+  display_name : String?
+}
+pub fn FileData::equal(Self, Self) -> Bool
+pub fn FileData::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn FileData::new(mime_type? : String, file_uri? : String, display_name? : String) -> Self
+pub fn FileData::not_equal(Self, Self) -> Bool
+pub fn FileData::to_json(Self) -> @json.Json
+pub fn FileData::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for FileData
+pub impl @json.ToJson for FileData
+
+#derive(Eq, @debug.Debug)
+pub(all) struct FileSearch {
+  file_search_store_names : Array[String]?
+  metadata_filter : String?
+  top_k : Int32?
+}
+pub fn FileSearch::equal(Self, Self) -> Bool
+pub fn FileSearch::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn FileSearch::new(file_search_store_names? : Array[String], metadata_filter? : String, top_k? : Int32) -> Self
+pub fn FileSearch::not_equal(Self, Self) -> Bool
+pub fn FileSearch::to_json(Self) -> @json.Json
+pub fn FileSearch::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for FileSearch
+pub impl @json.ToJson for FileSearch
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum FileSource {
+  SOURCEUNSPECIFIED
+  UPLOADED
+  GENERATED
+  REGISTERED
+  Unknown(String)
+}
+pub fn FileSource::equal(Self, Self) -> Bool
+pub fn FileSource::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn FileSource::not_equal(Self, Self) -> Bool
+pub fn FileSource::to_json(Self) -> @json.Json
+pub fn FileSource::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for FileSource
+pub impl @json.ToJson for FileSource
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum FileState {
+  STATEUNSPECIFIED
+  PROCESSING
+  ACTIVE
+  FAILED
+  Unknown(String)
+}
+pub fn FileState::equal(Self, Self) -> Bool
+pub fn FileState::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn FileState::not_equal(Self, Self) -> Bool
+pub fn FileState::to_json(Self) -> @json.Json
+pub fn FileState::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for FileState
+pub impl @json.ToJson for FileState
+
+#derive(Eq, @debug.Debug)
+pub(all) struct FunctionCall {
+  args : Map[String, @json.Json]?
+  name : String?
+  id : String?
+}
+pub fn FunctionCall::equal(Self, Self) -> Bool
+pub fn FunctionCall::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn FunctionCall::new(args? : Map[String, @json.Json], name? : String, id? : String) -> Self
+pub fn FunctionCall::not_equal(Self, Self) -> Bool
+pub fn FunctionCall::to_json(Self) -> @json.Json
+pub fn FunctionCall::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for FunctionCall
+pub impl @json.ToJson for FunctionCall
+
+#derive(Eq, @debug.Debug)
+pub(all) struct FunctionCallingConfig {
+  allowed_function_names : Array[String]?
+  mode : FunctionCallingConfigMode?
+}
+pub fn FunctionCallingConfig::equal(Self, Self) -> Bool
+pub fn FunctionCallingConfig::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn FunctionCallingConfig::new(allowed_function_names? : Array[String], mode? : FunctionCallingConfigMode) -> Self
+pub fn FunctionCallingConfig::not_equal(Self, Self) -> Bool
+pub fn FunctionCallingConfig::to_json(Self) -> @json.Json
+pub fn FunctionCallingConfig::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for FunctionCallingConfig
+pub impl @json.ToJson for FunctionCallingConfig
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum FunctionCallingConfigMode {
+  MODEUNSPECIFIED
+  AUTO
+  ANY
+  NONE
+  VALIDATED
+  Unknown(String)
+}
+pub fn FunctionCallingConfigMode::equal(Self, Self) -> Bool
+pub fn FunctionCallingConfigMode::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn FunctionCallingConfigMode::not_equal(Self, Self) -> Bool
+pub fn FunctionCallingConfigMode::to_json(Self) -> @json.Json
+pub fn FunctionCallingConfigMode::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for FunctionCallingConfigMode
+pub impl @json.ToJson for FunctionCallingConfigMode
+
+#derive(Eq, @debug.Debug)
+pub(all) struct FunctionDeclaration {
+  parameters_json_schema : @json.Json?
+  description : String?
+  parameters : Schema?
+  response : Schema?
+  behavior : FunctionDeclarationBehavior?
+  response_json_schema : @json.Json?
+  name : String?
+}
+pub fn FunctionDeclaration::equal(Self, Self) -> Bool
+pub fn FunctionDeclaration::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn FunctionDeclaration::new(parameters_json_schema? : @json.Json, description? : String, parameters? : Schema, response? : Schema, behavior? : FunctionDeclarationBehavior, response_json_schema? : @json.Json, name? : String) -> Self
+pub fn FunctionDeclaration::not_equal(Self, Self) -> Bool
+pub fn FunctionDeclaration::to_json(Self) -> @json.Json
+pub fn FunctionDeclaration::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for FunctionDeclaration
+pub impl @json.ToJson for FunctionDeclaration
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum FunctionDeclarationBehavior {
+  UNSPECIFIED
+  BLOCKING
+  NONBLOCKING
+  Unknown(String)
+}
+pub fn FunctionDeclarationBehavior::equal(Self, Self) -> Bool
+pub fn FunctionDeclarationBehavior::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn FunctionDeclarationBehavior::not_equal(Self, Self) -> Bool
+pub fn FunctionDeclarationBehavior::to_json(Self) -> @json.Json
+pub fn FunctionDeclarationBehavior::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for FunctionDeclarationBehavior
+pub impl @json.ToJson for FunctionDeclarationBehavior
+
+#derive(Eq, @debug.Debug)
+pub(all) struct FunctionResponse {
+  parts : Array[FunctionResponsePart]?
+  name : String?
+  will_continue : Bool?
+  scheduling : FunctionResponseScheduling?
+  id : String?
+  response : Map[String, @json.Json]?
+}
+pub fn FunctionResponse::equal(Self, Self) -> Bool
+pub fn FunctionResponse::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn FunctionResponse::new(parts? : Array[FunctionResponsePart], name? : String, will_continue? : Bool, scheduling? : FunctionResponseScheduling, id? : String, response? : Map[String, @json.Json]) -> Self
+pub fn FunctionResponse::not_equal(Self, Self) -> Bool
+pub fn FunctionResponse::to_json(Self) -> @json.Json
+pub fn FunctionResponse::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for FunctionResponse
+pub impl @json.ToJson for FunctionResponse
+
+#derive(Eq, @debug.Debug)
+pub(all) struct FunctionResponseBlob {
+  mime_type : String?
+  data : String?
+  display_name : String?
+}
+pub fn FunctionResponseBlob::equal(Self, Self) -> Bool
+pub fn FunctionResponseBlob::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn FunctionResponseBlob::new(mime_type? : String, data? : String, display_name? : String) -> Self
+pub fn FunctionResponseBlob::not_equal(Self, Self) -> Bool
+pub fn FunctionResponseBlob::to_json(Self) -> @json.Json
+pub fn FunctionResponseBlob::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for FunctionResponseBlob
+pub impl @json.ToJson for FunctionResponseBlob
+
+#derive(Eq, @debug.Debug)
+pub(all) struct FunctionResponseFileData {
+  file_uri : String?
+  display_name : String?
+  mime_type : String?
+}
+pub fn FunctionResponseFileData::equal(Self, Self) -> Bool
+pub fn FunctionResponseFileData::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn FunctionResponseFileData::new(file_uri? : String, display_name? : String, mime_type? : String) -> Self
+pub fn FunctionResponseFileData::not_equal(Self, Self) -> Bool
+pub fn FunctionResponseFileData::to_json(Self) -> @json.Json
+pub fn FunctionResponseFileData::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for FunctionResponseFileData
+pub impl @json.ToJson for FunctionResponseFileData
+
+#derive(Eq, @debug.Debug)
+pub(all) struct FunctionResponsePart {
+  inline_data : FunctionResponseBlob?
+  media_processing : FunctionResponsePartMediaProcessing?
+  file_data : FunctionResponseFileData?
+}
+pub fn FunctionResponsePart::equal(Self, Self) -> Bool
+pub fn FunctionResponsePart::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn FunctionResponsePart::new(inline_data? : FunctionResponseBlob, media_processing? : FunctionResponsePartMediaProcessing, file_data? : FunctionResponseFileData) -> Self
+pub fn FunctionResponsePart::not_equal(Self, Self) -> Bool
+pub fn FunctionResponsePart::to_json(Self) -> @json.Json
+pub fn FunctionResponsePart::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for FunctionResponsePart
+pub impl @json.ToJson for FunctionResponsePart
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum FunctionResponsePartMediaProcessing {
+  MEDIAPROCESSINGUNSPECIFIED
+  STATIC
+  AGENTIC
+  Unknown(String)
+}
+pub fn FunctionResponsePartMediaProcessing::equal(Self, Self) -> Bool
+pub fn FunctionResponsePartMediaProcessing::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn FunctionResponsePartMediaProcessing::not_equal(Self, Self) -> Bool
+pub fn FunctionResponsePartMediaProcessing::to_json(Self) -> @json.Json
+pub fn FunctionResponsePartMediaProcessing::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for FunctionResponsePartMediaProcessing
+pub impl @json.ToJson for FunctionResponsePartMediaProcessing
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum FunctionResponseScheduling {
+  SCHEDULINGUNSPECIFIED
+  SILENT
+  WHENIDLE
+  INTERRUPT
+  Unknown(String)
+}
+pub fn FunctionResponseScheduling::equal(Self, Self) -> Bool
+pub fn FunctionResponseScheduling::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn FunctionResponseScheduling::not_equal(Self, Self) -> Bool
+pub fn FunctionResponseScheduling::to_json(Self) -> @json.Json
+pub fn FunctionResponseScheduling::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for FunctionResponseScheduling
+pub impl @json.ToJson for FunctionResponseScheduling
+
+#derive(Eq, @debug.Debug)
+pub(all) struct GenerateContentRequest {
+  labels : Map[String, String]?
+  tools : Array[Tool]?
+  continuation_token : String?
+  model : String?
+  generation_config : GenerationConfig?
+  cached_content : String?
+  contents : Array[Content]?
+  safety_settings : Array[SafetySetting]?
+  store : Bool?
+  tool_config : ToolConfig?
+  system_instruction : Content?
+  service_tier : GenerateContentRequestServiceTier?
+}
+pub fn GenerateContentRequest::equal(Self, Self) -> Bool
+pub fn GenerateContentRequest::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn GenerateContentRequest::new(labels? : Map[String, String], tools? : Array[Tool], continuation_token? : String, model? : String, generation_config? : GenerationConfig, cached_content? : String, contents? : Array[Content], safety_settings? : Array[SafetySetting], store? : Bool, tool_config? : ToolConfig, system_instruction? : Content, service_tier? : GenerateContentRequestServiceTier) -> Self
+pub fn GenerateContentRequest::not_equal(Self, Self) -> Bool
+pub fn GenerateContentRequest::to_json(Self) -> @json.Json
+pub fn GenerateContentRequest::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for GenerateContentRequest
+pub impl @json.ToJson for GenerateContentRequest
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum GenerateContentRequestServiceTier {
+  Unspecified
+  Standard
+  Flex
+  Priority
+  Custom(String)
+}
+pub fn GenerateContentRequestServiceTier::equal(Self, Self) -> Bool
+pub fn GenerateContentRequestServiceTier::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn GenerateContentRequestServiceTier::not_equal(Self, Self) -> Bool
+pub fn GenerateContentRequestServiceTier::to_json(Self) -> @json.Json
+pub fn GenerateContentRequestServiceTier::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for GenerateContentRequestServiceTier
+pub impl @json.ToJson for GenerateContentRequestServiceTier
+
+#derive(Eq, @debug.Debug)
+pub(all) struct GenerateContentResponse {
+  model_status : ModelStatus?
+  usage_metadata : UsageMetadata?
+  model_version : String?
+  candidates : Array[Candidate]?
+  prompt_feedback : PromptFeedback?
+  response_id : String?
+}
+pub fn GenerateContentResponse::equal(Self, Self) -> Bool
+pub fn GenerateContentResponse::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn GenerateContentResponse::new(model_status? : ModelStatus, usage_metadata? : UsageMetadata, model_version? : String, candidates? : Array[Candidate], prompt_feedback? : PromptFeedback, response_id? : String) -> Self
+pub fn GenerateContentResponse::not_equal(Self, Self) -> Bool
+pub fn GenerateContentResponse::to_json(Self) -> @json.Json
+pub fn GenerateContentResponse::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for GenerateContentResponse
+pub impl @json.ToJson for GenerateContentResponse
+
+#derive(Eq, @debug.Debug)
+pub(all) struct GenerationConfig {
+  media_resolution : GenerationConfigMediaResolution?
+  presence_penalty : Double?
+  enable_enhanced_civic_answers : Bool?
+  speech_config : SpeechConfig?
+  stop_sequences : Array[String]?
+  response_schema : Schema?
+  response_json_schema : @json.Json?
+  image_config : ImageConfig?
+  response_modalities : Array[GenerationConfigResponseModalitiesItem]?
+  enable_affective_dialog : Bool?
+  temperature : Double?
+  response_mime_type : String?
+  frequency_penalty : Double?
+  candidate_count : Int32?
+  response_format : ResponseFormatConfig?
+  audio_transcription_config : AudioTranscriptionConfig?
+  top_p : Double?
+  logprobs : Int32?
+  translation_config : TranslationConfig?
+  thinking_config : ThinkingConfig?
+  response_logprobs : Bool?
+  max_output_tokens : Int32?
+  response_json_schema_2 : @json.Json?
+  top_k : Int32?
+  seed : Int32?
+}
+pub fn GenerationConfig::equal(Self, Self) -> Bool
+pub fn GenerationConfig::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn GenerationConfig::new(media_resolution? : GenerationConfigMediaResolution, presence_penalty? : Double, enable_enhanced_civic_answers? : Bool, speech_config? : SpeechConfig, stop_sequences? : Array[String], response_schema? : Schema, response_json_schema? : @json.Json, image_config? : ImageConfig, response_modalities? : Array[GenerationConfigResponseModalitiesItem], enable_affective_dialog? : Bool, temperature? : Double, response_mime_type? : String, frequency_penalty? : Double, candidate_count? : Int32, response_format? : ResponseFormatConfig, audio_transcription_config? : AudioTranscriptionConfig, top_p? : Double, logprobs? : Int32, translation_config? : TranslationConfig, thinking_config? : ThinkingConfig, response_logprobs? : Bool, max_output_tokens? : Int32, response_json_schema_2? : @json.Json, top_k? : Int32, seed? : Int32) -> Self
+pub fn GenerationConfig::not_equal(Self, Self) -> Bool
+pub fn GenerationConfig::to_json(Self) -> @json.Json
+pub fn GenerationConfig::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for GenerationConfig
+pub impl @json.ToJson for GenerationConfig
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum GenerationConfigMediaResolution {
+  MEDIARESOLUTIONUNSPECIFIED
+  MEDIARESOLUTIONLOW
+  MEDIARESOLUTIONMEDIUM
+  MEDIARESOLUTIONHIGH
+  Custom(String)
+}
+pub fn GenerationConfigMediaResolution::equal(Self, Self) -> Bool
+pub fn GenerationConfigMediaResolution::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn GenerationConfigMediaResolution::not_equal(Self, Self) -> Bool
+pub fn GenerationConfigMediaResolution::to_json(Self) -> @json.Json
+pub fn GenerationConfigMediaResolution::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for GenerationConfigMediaResolution
+pub impl @json.ToJson for GenerationConfigMediaResolution
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum GenerationConfigResponseModalitiesItem {
+  MODALITYUNSPECIFIED
+  TEXT
+  IMAGE
+  AUDIO
+  Custom(String)
+}
+pub fn GenerationConfigResponseModalitiesItem::equal(Self, Self) -> Bool
+pub fn GenerationConfigResponseModalitiesItem::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn GenerationConfigResponseModalitiesItem::not_equal(Self, Self) -> Bool
+pub fn GenerationConfigResponseModalitiesItem::to_json(Self) -> @json.Json
+pub fn GenerationConfigResponseModalitiesItem::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for GenerationConfigResponseModalitiesItem
+pub impl @json.ToJson for GenerationConfigResponseModalitiesItem
+
+#derive(Eq, @debug.Debug)
+pub(all) struct GoogleAiGenerativelanguageV1betaGroundingSupport {
+  segment : GoogleAiGenerativelanguageV1betaSegment?
+  grounding_chunk_indices : Array[Int32]?
+  rendered_parts : Array[Int32]?
+  confidence_scores : Array[Double]?
+}
+pub fn GoogleAiGenerativelanguageV1betaGroundingSupport::equal(Self, Self) -> Bool
+pub fn GoogleAiGenerativelanguageV1betaGroundingSupport::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn GoogleAiGenerativelanguageV1betaGroundingSupport::new(segment? : GoogleAiGenerativelanguageV1betaSegment, grounding_chunk_indices? : Array[Int32], rendered_parts? : Array[Int32], confidence_scores? : Array[Double]) -> Self
+pub fn GoogleAiGenerativelanguageV1betaGroundingSupport::not_equal(Self, Self) -> Bool
+pub fn GoogleAiGenerativelanguageV1betaGroundingSupport::to_json(Self) -> @json.Json
+pub fn GoogleAiGenerativelanguageV1betaGroundingSupport::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for GoogleAiGenerativelanguageV1betaGroundingSupport
+pub impl @json.ToJson for GoogleAiGenerativelanguageV1betaGroundingSupport
+
+#derive(Eq, @debug.Debug)
+pub(all) struct GoogleAiGenerativelanguageV1betaSegment {
+  end_index : Int32?
+  part_index : Int32?
+  text : String?
+  start_index : Int32?
+}
+pub fn GoogleAiGenerativelanguageV1betaSegment::equal(Self, Self) -> Bool
+pub fn GoogleAiGenerativelanguageV1betaSegment::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn GoogleAiGenerativelanguageV1betaSegment::new(end_index? : Int32, part_index? : Int32, text? : String, start_index? : Int32) -> Self
+pub fn GoogleAiGenerativelanguageV1betaSegment::not_equal(Self, Self) -> Bool
+pub fn GoogleAiGenerativelanguageV1betaSegment::to_json(Self) -> @json.Json
+pub fn GoogleAiGenerativelanguageV1betaSegment::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for GoogleAiGenerativelanguageV1betaSegment
+pub impl @json.ToJson for GoogleAiGenerativelanguageV1betaSegment
+
+#derive(Eq, @debug.Debug)
+pub(all) struct GoogleError {
+  error : GoogleErrorStatus
+}
+pub fn GoogleError::equal(Self, Self) -> Bool
+pub fn GoogleError::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn GoogleError::new(error~ : GoogleErrorStatus) -> Self
+pub fn GoogleError::not_equal(Self, Self) -> Bool
+pub fn GoogleError::to_json(Self) -> @json.Json
+pub fn GoogleError::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for GoogleError
+pub impl @json.ToJson for GoogleError
+
+#derive(Eq, @debug.Debug)
+pub(all) struct GoogleErrorStatus {
+  code : Int32
+  message : String
+  status : String
+  details : Array[@json.Json]?
+}
+pub fn GoogleErrorStatus::equal(Self, Self) -> Bool
+pub fn GoogleErrorStatus::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn GoogleErrorStatus::new(code~ : Int32, message~ : String, status~ : String, details? : Array[@json.Json]) -> Self
+pub fn GoogleErrorStatus::not_equal(Self, Self) -> Bool
+pub fn GoogleErrorStatus::to_json(Self) -> @json.Json
+pub fn GoogleErrorStatus::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for GoogleErrorStatus
+pub impl @json.ToJson for GoogleErrorStatus
+
+#derive(Eq, @debug.Debug)
+pub(all) struct GoogleMaps {
+  enable_widget : Bool?
+}
+pub fn GoogleMaps::equal(Self, Self) -> Bool
+pub fn GoogleMaps::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn GoogleMaps::new(enable_widget? : Bool) -> Self
+pub fn GoogleMaps::not_equal(Self, Self) -> Bool
+pub fn GoogleMaps::to_json(Self) -> @json.Json
+pub fn GoogleMaps::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for GoogleMaps
+pub impl @json.ToJson for GoogleMaps
+
+#derive(Eq, @debug.Debug)
+pub(all) struct GoogleSearch {
+  time_range_filter : Interval?
+  search_types : SearchTypes?
+}
+pub fn GoogleSearch::equal(Self, Self) -> Bool
+pub fn GoogleSearch::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn GoogleSearch::new(time_range_filter? : Interval, search_types? : SearchTypes) -> Self
+pub fn GoogleSearch::not_equal(Self, Self) -> Bool
+pub fn GoogleSearch::to_json(Self) -> @json.Json
+pub fn GoogleSearch::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for GoogleSearch
+pub impl @json.ToJson for GoogleSearch
+
+#derive(Eq, @debug.Debug)
+pub(all) struct GoogleSearchRetrieval {
+  dynamic_retrieval_config : DynamicRetrievalConfig?
+}
+pub fn GoogleSearchRetrieval::equal(Self, Self) -> Bool
+pub fn GoogleSearchRetrieval::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn GoogleSearchRetrieval::new(dynamic_retrieval_config? : DynamicRetrievalConfig) -> Self
+pub fn GoogleSearchRetrieval::not_equal(Self, Self) -> Bool
+pub fn GoogleSearchRetrieval::to_json(Self) -> @json.Json
+pub fn GoogleSearchRetrieval::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for GoogleSearchRetrieval
+pub impl @json.ToJson for GoogleSearchRetrieval
+
+#derive(Eq, @debug.Debug)
+pub(all) struct GroundingAttribution {
+  source_id : AttributionSourceId?
+  content : Content?
+}
+pub fn GroundingAttribution::equal(Self, Self) -> Bool
+pub fn GroundingAttribution::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn GroundingAttribution::new(source_id? : AttributionSourceId, content? : Content) -> Self
+pub fn GroundingAttribution::not_equal(Self, Self) -> Bool
+pub fn GroundingAttribution::to_json(Self) -> @json.Json
+pub fn GroundingAttribution::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for GroundingAttribution
+pub impl @json.ToJson for GroundingAttribution
+
+#derive(Eq, @debug.Debug)
+pub(all) struct GroundingChunk {
+  image : Image?
+  web : Web?
+  maps : Maps?
+  retrieved_context : RetrievedContext?
+}
+pub fn GroundingChunk::equal(Self, Self) -> Bool
+pub fn GroundingChunk::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn GroundingChunk::new(image? : Image, web? : Web, maps? : Maps, retrieved_context? : RetrievedContext) -> Self
+pub fn GroundingChunk::not_equal(Self, Self) -> Bool
+pub fn GroundingChunk::to_json(Self) -> @json.Json
+pub fn GroundingChunk::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for GroundingChunk
+pub impl @json.ToJson for GroundingChunk
+
+#derive(Eq, @debug.Debug)
+pub(all) struct GroundingChunkCustomMetadata {
+  numeric_value : Double?
+  string_list_value : GroundingChunkStringList?
+  string_value : String?
+  key : String?
+}
+pub fn GroundingChunkCustomMetadata::equal(Self, Self) -> Bool
+pub fn GroundingChunkCustomMetadata::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn GroundingChunkCustomMetadata::new(numeric_value? : Double, string_list_value? : GroundingChunkStringList, string_value? : String, key? : String) -> Self
+pub fn GroundingChunkCustomMetadata::not_equal(Self, Self) -> Bool
+pub fn GroundingChunkCustomMetadata::to_json(Self) -> @json.Json
+pub fn GroundingChunkCustomMetadata::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for GroundingChunkCustomMetadata
+pub impl @json.ToJson for GroundingChunkCustomMetadata
+
+#derive(Eq, @debug.Debug)
+pub(all) struct GroundingChunkStringList {
+  values : Array[String]?
+}
+pub fn GroundingChunkStringList::equal(Self, Self) -> Bool
+pub fn GroundingChunkStringList::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn GroundingChunkStringList::new(values? : Array[String]) -> Self
+pub fn GroundingChunkStringList::not_equal(Self, Self) -> Bool
+pub fn GroundingChunkStringList::to_json(Self) -> @json.Json
+pub fn GroundingChunkStringList::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for GroundingChunkStringList
+pub impl @json.ToJson for GroundingChunkStringList
+
+#derive(Eq, @debug.Debug)
+pub(all) struct GroundingMetadata {
+  google_maps_widget_context_token : String?
+  search_entry_point : SearchEntryPoint?
+  grounding_chunks : Array[GroundingChunk]?
+  retrieval_metadata : RetrievalMetadata?
+  grounding_supports : Array[GoogleAiGenerativelanguageV1betaGroundingSupport]?
+  web_search_queries : Array[String]?
+  image_search_queries : Array[String]?
+}
+pub fn GroundingMetadata::equal(Self, Self) -> Bool
+pub fn GroundingMetadata::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn GroundingMetadata::new(google_maps_widget_context_token? : String, search_entry_point? : SearchEntryPoint, grounding_chunks? : Array[GroundingChunk], retrieval_metadata? : RetrievalMetadata, grounding_supports? : Array[GoogleAiGenerativelanguageV1betaGroundingSupport], web_search_queries? : Array[String], image_search_queries? : Array[String]) -> Self
+pub fn GroundingMetadata::not_equal(Self, Self) -> Bool
+pub fn GroundingMetadata::to_json(Self) -> @json.Json
+pub fn GroundingMetadata::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for GroundingMetadata
+pub impl @json.ToJson for GroundingMetadata
+
+#derive(Eq, @debug.Debug)
+pub(all) struct GroundingPassageId {
+  passage_id : String?
+  part_index : Int32?
+}
+pub fn GroundingPassageId::equal(Self, Self) -> Bool
+pub fn GroundingPassageId::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn GroundingPassageId::new(passage_id? : String, part_index? : Int32) -> Self
+pub fn GroundingPassageId::not_equal(Self, Self) -> Bool
+pub fn GroundingPassageId::to_json(Self) -> @json.Json
+pub fn GroundingPassageId::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for GroundingPassageId
+pub impl @json.ToJson for GroundingPassageId
+
+#derive(Eq, @debug.Debug)
+pub(all) struct Image {
+  source_uri : String?
+  domain : String?
+  image_uri : String?
+  title : String?
+}
+pub fn Image::equal(Self, Self) -> Bool
+pub fn Image::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn Image::new(source_uri? : String, domain? : String, image_uri? : String, title? : String) -> Self
+pub fn Image::not_equal(Self, Self) -> Bool
+pub fn Image::to_json(Self) -> @json.Json
+pub fn Image::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for Image
+pub impl @json.ToJson for Image
+
+#derive(Eq, @debug.Debug)
+pub(all) struct ImageConfig {
+  aspect_ratio : String?
+  image_size : String?
+}
+pub fn ImageConfig::equal(Self, Self) -> Bool
+pub fn ImageConfig::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ImageConfig::new(aspect_ratio? : String, image_size? : String) -> Self
+pub fn ImageConfig::not_equal(Self, Self) -> Bool
+pub fn ImageConfig::to_json(Self) -> @json.Json
+pub fn ImageConfig::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for ImageConfig
+pub impl @json.ToJson for ImageConfig
+
+#derive(Eq, @debug.Debug)
+pub(all) struct ImageResponseFormat {
+  delivery : ImageResponseFormatDelivery?
+  image_size : ImageResponseFormatImageSize?
+  aspect_ratio : ImageResponseFormatAspectRatio?
+  mime_type : ImageResponseFormatMimeType?
+}
+pub fn ImageResponseFormat::equal(Self, Self) -> Bool
+pub fn ImageResponseFormat::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ImageResponseFormat::new(delivery? : ImageResponseFormatDelivery, image_size? : ImageResponseFormatImageSize, aspect_ratio? : ImageResponseFormatAspectRatio, mime_type? : ImageResponseFormatMimeType) -> Self
+pub fn ImageResponseFormat::not_equal(Self, Self) -> Bool
+pub fn ImageResponseFormat::to_json(Self) -> @json.Json
+pub fn ImageResponseFormat::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for ImageResponseFormat
+pub impl @json.ToJson for ImageResponseFormat
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum ImageResponseFormatAspectRatio {
+  ASPECTRATIOUNSPECIFIED
+  ASPECTRATIOONEBYONE
+  ASPECTRATIOTWOBYTHREE
+  ASPECTRATIOTHREEBYTWO
+  ASPECTRATIOTHREEBYFOUR
+  ASPECTRATIOFOURBYTHREE
+  ASPECTRATIOFOURBYFIVE
+  ASPECTRATIOFIVEBYFOUR
+  ASPECTRATIONINEBYSIXTEEN
+  ASPECTRATIOSIXTEENBYNINE
+  ASPECTRATIOTWENTYONEBYNINE
+  ASPECTRATIOONEBYEIGHT
+  ASPECTRATIOEIGHTBYONE
+  ASPECTRATIOONEBYFOUR
+  ASPECTRATIOFOURBYONE
+  Custom(String)
+}
+pub fn ImageResponseFormatAspectRatio::equal(Self, Self) -> Bool
+pub fn ImageResponseFormatAspectRatio::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ImageResponseFormatAspectRatio::not_equal(Self, Self) -> Bool
+pub fn ImageResponseFormatAspectRatio::to_json(Self) -> @json.Json
+pub fn ImageResponseFormatAspectRatio::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for ImageResponseFormatAspectRatio
+pub impl @json.ToJson for ImageResponseFormatAspectRatio
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum ImageResponseFormatDelivery {
+  DELIVERYUNSPECIFIED
+  INLINE
+  URI
+  Custom(String)
+}
+pub fn ImageResponseFormatDelivery::equal(Self, Self) -> Bool
+pub fn ImageResponseFormatDelivery::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ImageResponseFormatDelivery::not_equal(Self, Self) -> Bool
+pub fn ImageResponseFormatDelivery::to_json(Self) -> @json.Json
+pub fn ImageResponseFormatDelivery::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for ImageResponseFormatDelivery
+pub impl @json.ToJson for ImageResponseFormatDelivery
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum ImageResponseFormatImageSize {
+  IMAGESIZEUNSPECIFIED
+  IMAGESIZEFIVETWELVE
+  IMAGESIZEONEK
+  IMAGESIZETWOK
+  IMAGESIZEFOURK
+  Custom(String)
+}
+pub fn ImageResponseFormatImageSize::equal(Self, Self) -> Bool
+pub fn ImageResponseFormatImageSize::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ImageResponseFormatImageSize::not_equal(Self, Self) -> Bool
+pub fn ImageResponseFormatImageSize::to_json(Self) -> @json.Json
+pub fn ImageResponseFormatImageSize::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for ImageResponseFormatImageSize
+pub impl @json.ToJson for ImageResponseFormatImageSize
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum ImageResponseFormatMimeType {
+  MIMETYPEUNSPECIFIED
+  IMAGEJPEG
+  Custom(String)
+}
+pub fn ImageResponseFormatMimeType::equal(Self, Self) -> Bool
+pub fn ImageResponseFormatMimeType::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ImageResponseFormatMimeType::not_equal(Self, Self) -> Bool
+pub fn ImageResponseFormatMimeType::to_json(Self) -> @json.Json
+pub fn ImageResponseFormatMimeType::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for ImageResponseFormatMimeType
+pub impl @json.ToJson for ImageResponseFormatMimeType
+
+#derive(Eq, @debug.Debug)
+pub(all) struct Interval {
+  end_time : String?
+  start_time : String?
+}
+pub fn Interval::equal(Self, Self) -> Bool
+pub fn Interval::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn Interval::new(end_time? : String, start_time? : String) -> Self
+pub fn Interval::not_equal(Self, Self) -> Bool
+pub fn Interval::to_json(Self) -> @json.Json
+pub fn Interval::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for Interval
+pub impl @json.ToJson for Interval
+
+#derive(Eq, @debug.Debug)
+pub(all) struct LanguageHints {
+  language_codes : Array[String]?
+}
+pub fn LanguageHints::equal(Self, Self) -> Bool
+pub fn LanguageHints::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn LanguageHints::new(language_codes? : Array[String]) -> Self
+pub fn LanguageHints::not_equal(Self, Self) -> Bool
+pub fn LanguageHints::to_json(Self) -> @json.Json
+pub fn LanguageHints::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for LanguageHints
+pub impl @json.ToJson for LanguageHints
+
+#derive(Eq, @debug.Debug)
+pub(all) struct LatLng {
+  longitude : Double?
+  latitude : Double?
+}
+pub fn LatLng::equal(Self, Self) -> Bool
+pub fn LatLng::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn LatLng::new(longitude? : Double, latitude? : Double) -> Self
+pub fn LatLng::not_equal(Self, Self) -> Bool
+pub fn LatLng::to_json(Self) -> @json.Json
+pub fn LatLng::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for LatLng
+pub impl @json.ToJson for LatLng
+
+#derive(Eq, @debug.Debug)
+pub(all) struct ListCachedContentsResponse {
+  next_page_token : String?
+  cached_contents : Array[CachedContent]?
+}
+pub fn ListCachedContentsResponse::equal(Self, Self) -> Bool
+pub fn ListCachedContentsResponse::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ListCachedContentsResponse::new(next_page_token? : String, cached_contents? : Array[CachedContent]) -> Self
+pub fn ListCachedContentsResponse::not_equal(Self, Self) -> Bool
+pub fn ListCachedContentsResponse::to_json(Self) -> @json.Json
+pub fn ListCachedContentsResponse::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for ListCachedContentsResponse
+pub impl @json.ToJson for ListCachedContentsResponse
+
+#derive(Eq, @debug.Debug)
+pub(all) struct ListFilesResponse {
+  next_page_token : String?
+  files : Array[File]?
+}
+pub fn ListFilesResponse::equal(Self, Self) -> Bool
+pub fn ListFilesResponse::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ListFilesResponse::new(next_page_token? : String, files? : Array[File]) -> Self
+pub fn ListFilesResponse::not_equal(Self, Self) -> Bool
+pub fn ListFilesResponse::to_json(Self) -> @json.Json
+pub fn ListFilesResponse::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for ListFilesResponse
+pub impl @json.ToJson for ListFilesResponse
+
+#derive(Eq, @debug.Debug)
+pub(all) struct ListModelsResponse {
+  next_page_token : String?
+  models : Array[Model]?
+}
+pub fn ListModelsResponse::equal(Self, Self) -> Bool
+pub fn ListModelsResponse::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ListModelsResponse::new(next_page_token? : String, models? : Array[Model]) -> Self
+pub fn ListModelsResponse::not_equal(Self, Self) -> Bool
+pub fn ListModelsResponse::to_json(Self) -> @json.Json
+pub fn ListModelsResponse::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for ListModelsResponse
+pub impl @json.ToJson for ListModelsResponse
+
+#derive(Eq, @debug.Debug)
+pub(all) struct LogprobsResult {
+  top_candidates : Array[TopCandidates]?
+  chosen_candidates : Array[LogprobsResultCandidate]?
+  log_probability_sum : Double?
+}
+pub fn LogprobsResult::equal(Self, Self) -> Bool
+pub fn LogprobsResult::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn LogprobsResult::new(top_candidates? : Array[TopCandidates], chosen_candidates? : Array[LogprobsResultCandidate], log_probability_sum? : Double) -> Self
+pub fn LogprobsResult::not_equal(Self, Self) -> Bool
+pub fn LogprobsResult::to_json(Self) -> @json.Json
+pub fn LogprobsResult::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for LogprobsResult
+pub impl @json.ToJson for LogprobsResult
+
+#derive(Eq, @debug.Debug)
+pub(all) struct LogprobsResultCandidate {
+  token_id : Int32?
+  token : String?
+  log_probability : Double?
+}
+pub fn LogprobsResultCandidate::equal(Self, Self) -> Bool
+pub fn LogprobsResultCandidate::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn LogprobsResultCandidate::new(token_id? : Int32, token? : String, log_probability? : Double) -> Self
+pub fn LogprobsResultCandidate::not_equal(Self, Self) -> Bool
+pub fn LogprobsResultCandidate::to_json(Self) -> @json.Json
+pub fn LogprobsResultCandidate::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for LogprobsResultCandidate
+pub impl @json.ToJson for LogprobsResultCandidate
+
+#derive(Eq, @debug.Debug)
+pub(all) struct Maps {
+  place_id : String?
+  text : String?
+  uri : String?
+  place_answer_sources : PlaceAnswerSources?
+  title : String?
+}
+pub fn Maps::equal(Self, Self) -> Bool
+pub fn Maps::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn Maps::new(place_id? : String, text? : String, uri? : String, place_answer_sources? : PlaceAnswerSources, title? : String) -> Self
+pub fn Maps::not_equal(Self, Self) -> Bool
+pub fn Maps::to_json(Self) -> @json.Json
+pub fn Maps::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for Maps
+pub impl @json.ToJson for Maps
+
+#derive(Eq, @debug.Debug)
+pub(all) struct McpServer {
+  streamable_http_transport : StreamableHttpTransport?
+  name : String?
+}
+pub fn McpServer::equal(Self, Self) -> Bool
+pub fn McpServer::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn McpServer::new(streamable_http_transport? : StreamableHttpTransport, name? : String) -> Self
+pub fn McpServer::not_equal(Self, Self) -> Bool
+pub fn McpServer::to_json(Self) -> @json.Json
+pub fn McpServer::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for McpServer
+pub impl @json.ToJson for McpServer
+
+#derive(Eq, @debug.Debug)
+pub(all) struct ModalityTokenCount {
+  token_count : Int32?
+  modality : ModalityTokenCountModality?
+}
+pub fn ModalityTokenCount::equal(Self, Self) -> Bool
+pub fn ModalityTokenCount::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ModalityTokenCount::new(token_count? : Int32, modality? : ModalityTokenCountModality) -> Self
+pub fn ModalityTokenCount::not_equal(Self, Self) -> Bool
+pub fn ModalityTokenCount::to_json(Self) -> @json.Json
+pub fn ModalityTokenCount::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for ModalityTokenCount
+pub impl @json.ToJson for ModalityTokenCount
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum ModalityTokenCountModality {
+  MODALITYUNSPECIFIED
+  TEXT
+  IMAGE
+  VIDEO
+  AUDIO
+  DOCUMENT
+  Unknown(String)
+}
+pub fn ModalityTokenCountModality::equal(Self, Self) -> Bool
+pub fn ModalityTokenCountModality::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ModalityTokenCountModality::not_equal(Self, Self) -> Bool
+pub fn ModalityTokenCountModality::to_json(Self) -> @json.Json
+pub fn ModalityTokenCountModality::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for ModalityTokenCountModality
+pub impl @json.ToJson for ModalityTokenCountModality
+
+#derive(Eq, @debug.Debug)
+pub(all) struct Model {
+  output_token_limit : Int32?
+  version : String?
+  base_model_id : String?
+  name : String?
+  top_p : Double?
+  thinking : Bool?
+  max_temperature : Double?
+  supported_generation_methods : Array[String]?
+  display_name : String?
+  description : String?
+  top_k : Int32?
+  input_token_limit : Int32?
+  temperature : Double?
+}
+pub fn Model::equal(Self, Self) -> Bool
+pub fn Model::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn Model::new(output_token_limit? : Int32, version? : String, base_model_id? : String, name? : String, top_p? : Double, thinking? : Bool, max_temperature? : Double, supported_generation_methods? : Array[String], display_name? : String, description? : String, top_k? : Int32, input_token_limit? : Int32, temperature? : Double) -> Self
+pub fn Model::not_equal(Self, Self) -> Bool
+pub fn Model::to_json(Self) -> @json.Json
+pub fn Model::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for Model
+pub impl @json.ToJson for Model
+
+#derive(Eq, @debug.Debug)
+pub(all) struct ModelStatus {
+  retirement_time : String?
+  message : String?
+  model_stage : ModelStatusModelStage?
+}
+pub fn ModelStatus::equal(Self, Self) -> Bool
+pub fn ModelStatus::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ModelStatus::new(retirement_time? : String, message? : String, model_stage? : ModelStatusModelStage) -> Self
+pub fn ModelStatus::not_equal(Self, Self) -> Bool
+pub fn ModelStatus::to_json(Self) -> @json.Json
+pub fn ModelStatus::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for ModelStatus
+pub impl @json.ToJson for ModelStatus
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum ModelStatusModelStage {
+  MODELSTAGEUNSPECIFIED
+  UNSTABLEEXPERIMENTAL
+  EXPERIMENTAL
+  PREVIEW
+  STABLE
+  LEGACY
+  DEPRECATED
+  RETIRED
+  Unknown(String)
+}
+pub fn ModelStatusModelStage::equal(Self, Self) -> Bool
+pub fn ModelStatusModelStage::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ModelStatusModelStage::not_equal(Self, Self) -> Bool
+pub fn ModelStatusModelStage::to_json(Self) -> @json.Json
+pub fn ModelStatusModelStage::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for ModelStatusModelStage
+pub impl @json.ToJson for ModelStatusModelStage
+
+#derive(Eq, @debug.Debug)
+pub(all) struct MultiSpeakerVoiceConfig {
+  speaker_voice_configs : Array[SpeakerVoiceConfig]?
+}
+pub fn MultiSpeakerVoiceConfig::equal(Self, Self) -> Bool
+pub fn MultiSpeakerVoiceConfig::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn MultiSpeakerVoiceConfig::new(speaker_voice_configs? : Array[SpeakerVoiceConfig]) -> Self
+pub fn MultiSpeakerVoiceConfig::not_equal(Self, Self) -> Bool
+pub fn MultiSpeakerVoiceConfig::to_json(Self) -> @json.Json
+pub fn MultiSpeakerVoiceConfig::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for MultiSpeakerVoiceConfig
+pub impl @json.ToJson for MultiSpeakerVoiceConfig
+
+#derive(Eq, @debug.Debug)
+pub(all) enum Part {
+  Text(PartText)
+  InlineData(PartInlineData)
+  FileData(PartFileData)
+  FunctionCall(PartFunctionCall)
+  FunctionResponse(PartFunctionResponse)
+  ExecutableCode(PartExecutableCode)
+  CodeExecutionResult(PartCodeExecutionResult)
+  ToolCall(PartToolCall)
+  ToolResponse(PartToolResponse)
+}
+pub fn Part::equal(Self, Self) -> Bool
+pub fn Part::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn Part::not_equal(Self, Self) -> Bool
+pub fn Part::to_json(Self) -> @json.Json
+pub fn Part::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for Part
+pub impl @json.ToJson for Part
+
+#derive(Eq, @debug.Debug)
+pub(all) struct PartCodeExecutionResult {
+  speech_metadata : SpeechMetadata?
+  code_execution_result : CodeExecutionResult
+  thought : Bool?
+  thought_signature : String?
+  part_metadata : Map[String, @json.Json]?
+  media_processing : PartCodeExecutionResultMediaProcessing?
+  video_metadata : VideoMetadata?
+  audio_transcription : AudioTranscription?
+  media_resolution : V1mainMediaResolution?
+}
+pub fn PartCodeExecutionResult::equal(Self, Self) -> Bool
+pub fn PartCodeExecutionResult::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn PartCodeExecutionResult::new(code_execution_result~ : CodeExecutionResult, speech_metadata? : SpeechMetadata, thought? : Bool, thought_signature? : String, part_metadata? : Map[String, @json.Json], media_processing? : PartCodeExecutionResultMediaProcessing, video_metadata? : VideoMetadata, audio_transcription? : AudioTranscription, media_resolution? : V1mainMediaResolution) -> Self
+pub fn PartCodeExecutionResult::not_equal(Self, Self) -> Bool
+pub fn PartCodeExecutionResult::to_json(Self) -> @json.Json
+pub fn PartCodeExecutionResult::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for PartCodeExecutionResult
+pub impl @json.ToJson for PartCodeExecutionResult
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum PartCodeExecutionResultMediaProcessing {
+  MEDIAPROCESSINGUNSPECIFIED
+  STATIC
+  AGENTIC
+  Unknown(String)
+}
+pub fn PartCodeExecutionResultMediaProcessing::equal(Self, Self) -> Bool
+pub fn PartCodeExecutionResultMediaProcessing::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn PartCodeExecutionResultMediaProcessing::not_equal(Self, Self) -> Bool
+pub fn PartCodeExecutionResultMediaProcessing::to_json(Self) -> @json.Json
+pub fn PartCodeExecutionResultMediaProcessing::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for PartCodeExecutionResultMediaProcessing
+pub impl @json.ToJson for PartCodeExecutionResultMediaProcessing
+
+#derive(Eq, @debug.Debug)
+pub(all) struct PartExecutableCode {
+  speech_metadata : SpeechMetadata?
+  thought : Bool?
+  thought_signature : String?
+  part_metadata : Map[String, @json.Json]?
+  executable_code : ExecutableCode
+  media_processing : PartExecutableCodeMediaProcessing?
+  video_metadata : VideoMetadata?
+  audio_transcription : AudioTranscription?
+  media_resolution : V1mainMediaResolution?
+}
+pub fn PartExecutableCode::equal(Self, Self) -> Bool
+pub fn PartExecutableCode::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn PartExecutableCode::new(executable_code~ : ExecutableCode, speech_metadata? : SpeechMetadata, thought? : Bool, thought_signature? : String, part_metadata? : Map[String, @json.Json], media_processing? : PartExecutableCodeMediaProcessing, video_metadata? : VideoMetadata, audio_transcription? : AudioTranscription, media_resolution? : V1mainMediaResolution) -> Self
+pub fn PartExecutableCode::not_equal(Self, Self) -> Bool
+pub fn PartExecutableCode::to_json(Self) -> @json.Json
+pub fn PartExecutableCode::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for PartExecutableCode
+pub impl @json.ToJson for PartExecutableCode
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum PartExecutableCodeMediaProcessing {
+  MEDIAPROCESSINGUNSPECIFIED
+  STATIC
+  AGENTIC
+  Unknown(String)
+}
+pub fn PartExecutableCodeMediaProcessing::equal(Self, Self) -> Bool
+pub fn PartExecutableCodeMediaProcessing::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn PartExecutableCodeMediaProcessing::not_equal(Self, Self) -> Bool
+pub fn PartExecutableCodeMediaProcessing::to_json(Self) -> @json.Json
+pub fn PartExecutableCodeMediaProcessing::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for PartExecutableCodeMediaProcessing
+pub impl @json.ToJson for PartExecutableCodeMediaProcessing
+
+#derive(Eq, @debug.Debug)
+pub(all) struct PartFileData {
+  speech_metadata : SpeechMetadata?
+  thought : Bool?
+  thought_signature : String?
+  file_data : FileData
+  part_metadata : Map[String, @json.Json]?
+  media_processing : PartFileDataMediaProcessing?
+  video_metadata : VideoMetadata?
+  audio_transcription : AudioTranscription?
+  media_resolution : V1mainMediaResolution?
+}
+pub fn PartFileData::equal(Self, Self) -> Bool
+pub fn PartFileData::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn PartFileData::new(file_data~ : FileData, speech_metadata? : SpeechMetadata, thought? : Bool, thought_signature? : String, part_metadata? : Map[String, @json.Json], media_processing? : PartFileDataMediaProcessing, video_metadata? : VideoMetadata, audio_transcription? : AudioTranscription, media_resolution? : V1mainMediaResolution) -> Self
+pub fn PartFileData::not_equal(Self, Self) -> Bool
+pub fn PartFileData::to_json(Self) -> @json.Json
+pub fn PartFileData::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for PartFileData
+pub impl @json.ToJson for PartFileData
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum PartFileDataMediaProcessing {
+  MEDIAPROCESSINGUNSPECIFIED
+  STATIC
+  AGENTIC
+  Unknown(String)
+}
+pub fn PartFileDataMediaProcessing::equal(Self, Self) -> Bool
+pub fn PartFileDataMediaProcessing::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn PartFileDataMediaProcessing::not_equal(Self, Self) -> Bool
+pub fn PartFileDataMediaProcessing::to_json(Self) -> @json.Json
+pub fn PartFileDataMediaProcessing::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for PartFileDataMediaProcessing
+pub impl @json.ToJson for PartFileDataMediaProcessing
+
+#derive(Eq, @debug.Debug)
+pub(all) struct PartFunctionCall {
+  speech_metadata : SpeechMetadata?
+  thought : Bool?
+  thought_signature : String?
+  part_metadata : Map[String, @json.Json]?
+  media_processing : PartFunctionCallMediaProcessing?
+  function_call : FunctionCall
+  video_metadata : VideoMetadata?
+  audio_transcription : AudioTranscription?
+  media_resolution : V1mainMediaResolution?
+}
+pub fn PartFunctionCall::equal(Self, Self) -> Bool
+pub fn PartFunctionCall::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn PartFunctionCall::new(function_call~ : FunctionCall, speech_metadata? : SpeechMetadata, thought? : Bool, thought_signature? : String, part_metadata? : Map[String, @json.Json], media_processing? : PartFunctionCallMediaProcessing, video_metadata? : VideoMetadata, audio_transcription? : AudioTranscription, media_resolution? : V1mainMediaResolution) -> Self
+pub fn PartFunctionCall::not_equal(Self, Self) -> Bool
+pub fn PartFunctionCall::to_json(Self) -> @json.Json
+pub fn PartFunctionCall::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for PartFunctionCall
+pub impl @json.ToJson for PartFunctionCall
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum PartFunctionCallMediaProcessing {
+  MEDIAPROCESSINGUNSPECIFIED
+  STATIC
+  AGENTIC
+  Unknown(String)
+}
+pub fn PartFunctionCallMediaProcessing::equal(Self, Self) -> Bool
+pub fn PartFunctionCallMediaProcessing::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn PartFunctionCallMediaProcessing::not_equal(Self, Self) -> Bool
+pub fn PartFunctionCallMediaProcessing::to_json(Self) -> @json.Json
+pub fn PartFunctionCallMediaProcessing::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for PartFunctionCallMediaProcessing
+pub impl @json.ToJson for PartFunctionCallMediaProcessing
+
+#derive(Eq, @debug.Debug)
+pub(all) struct PartFunctionResponse {
+  speech_metadata : SpeechMetadata?
+  thought : Bool?
+  thought_signature : String?
+  part_metadata : Map[String, @json.Json]?
+  function_response : FunctionResponse
+  media_processing : PartFunctionResponseMediaProcessing?
+  video_metadata : VideoMetadata?
+  audio_transcription : AudioTranscription?
+  media_resolution : V1mainMediaResolution?
+}
+pub fn PartFunctionResponse::equal(Self, Self) -> Bool
+pub fn PartFunctionResponse::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn PartFunctionResponse::new(function_response~ : FunctionResponse, speech_metadata? : SpeechMetadata, thought? : Bool, thought_signature? : String, part_metadata? : Map[String, @json.Json], media_processing? : PartFunctionResponseMediaProcessing, video_metadata? : VideoMetadata, audio_transcription? : AudioTranscription, media_resolution? : V1mainMediaResolution) -> Self
+pub fn PartFunctionResponse::not_equal(Self, Self) -> Bool
+pub fn PartFunctionResponse::to_json(Self) -> @json.Json
+pub fn PartFunctionResponse::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for PartFunctionResponse
+pub impl @json.ToJson for PartFunctionResponse
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum PartFunctionResponseMediaProcessing {
+  MEDIAPROCESSINGUNSPECIFIED
+  STATIC
+  AGENTIC
+  Unknown(String)
+}
+pub fn PartFunctionResponseMediaProcessing::equal(Self, Self) -> Bool
+pub fn PartFunctionResponseMediaProcessing::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn PartFunctionResponseMediaProcessing::not_equal(Self, Self) -> Bool
+pub fn PartFunctionResponseMediaProcessing::to_json(Self) -> @json.Json
+pub fn PartFunctionResponseMediaProcessing::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for PartFunctionResponseMediaProcessing
+pub impl @json.ToJson for PartFunctionResponseMediaProcessing
+
+#derive(Eq, @debug.Debug)
+pub(all) struct PartInlineData {
+  inline_data : Blob
+  speech_metadata : SpeechMetadata?
+  thought : Bool?
+  thought_signature : String?
+  part_metadata : Map[String, @json.Json]?
+  media_processing : PartInlineDataMediaProcessing?
+  video_metadata : VideoMetadata?
+  audio_transcription : AudioTranscription?
+  media_resolution : V1mainMediaResolution?
+}
+pub fn PartInlineData::equal(Self, Self) -> Bool
+pub fn PartInlineData::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn PartInlineData::new(inline_data~ : Blob, speech_metadata? : SpeechMetadata, thought? : Bool, thought_signature? : String, part_metadata? : Map[String, @json.Json], media_processing? : PartInlineDataMediaProcessing, video_metadata? : VideoMetadata, audio_transcription? : AudioTranscription, media_resolution? : V1mainMediaResolution) -> Self
+pub fn PartInlineData::not_equal(Self, Self) -> Bool
+pub fn PartInlineData::to_json(Self) -> @json.Json
+pub fn PartInlineData::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for PartInlineData
+pub impl @json.ToJson for PartInlineData
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum PartInlineDataMediaProcessing {
+  MEDIAPROCESSINGUNSPECIFIED
+  STATIC
+  AGENTIC
+  Unknown(String)
+}
+pub fn PartInlineDataMediaProcessing::equal(Self, Self) -> Bool
+pub fn PartInlineDataMediaProcessing::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn PartInlineDataMediaProcessing::not_equal(Self, Self) -> Bool
+pub fn PartInlineDataMediaProcessing::to_json(Self) -> @json.Json
+pub fn PartInlineDataMediaProcessing::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for PartInlineDataMediaProcessing
+pub impl @json.ToJson for PartInlineDataMediaProcessing
+
+#derive(Eq, @debug.Debug)
+pub(all) struct PartText {
+  speech_metadata : SpeechMetadata?
+  thought : Bool?
+  thought_signature : String?
+  part_metadata : Map[String, @json.Json]?
+  text : String
+  media_processing : PartTextMediaProcessing?
+  video_metadata : VideoMetadata?
+  audio_transcription : AudioTranscription?
+  media_resolution : V1mainMediaResolution?
+}
+pub fn PartText::equal(Self, Self) -> Bool
+pub fn PartText::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn PartText::new(text~ : String, speech_metadata? : SpeechMetadata, thought? : Bool, thought_signature? : String, part_metadata? : Map[String, @json.Json], media_processing? : PartTextMediaProcessing, video_metadata? : VideoMetadata, audio_transcription? : AudioTranscription, media_resolution? : V1mainMediaResolution) -> Self
+pub fn PartText::not_equal(Self, Self) -> Bool
+pub fn PartText::to_json(Self) -> @json.Json
+pub fn PartText::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for PartText
+pub impl @json.ToJson for PartText
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum PartTextMediaProcessing {
+  MEDIAPROCESSINGUNSPECIFIED
+  STATIC
+  AGENTIC
+  Unknown(String)
+}
+pub fn PartTextMediaProcessing::equal(Self, Self) -> Bool
+pub fn PartTextMediaProcessing::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn PartTextMediaProcessing::not_equal(Self, Self) -> Bool
+pub fn PartTextMediaProcessing::to_json(Self) -> @json.Json
+pub fn PartTextMediaProcessing::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for PartTextMediaProcessing
+pub impl @json.ToJson for PartTextMediaProcessing
+
+#derive(Eq, @debug.Debug)
+pub(all) struct PartToolCall {
+  speech_metadata : SpeechMetadata?
+  thought : Bool?
+  thought_signature : String?
+  part_metadata : Map[String, @json.Json]?
+  tool_call : ToolCall
+  media_processing : PartToolCallMediaProcessing?
+  video_metadata : VideoMetadata?
+  audio_transcription : AudioTranscription?
+  media_resolution : V1mainMediaResolution?
+}
+pub fn PartToolCall::equal(Self, Self) -> Bool
+pub fn PartToolCall::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn PartToolCall::new(tool_call~ : ToolCall, speech_metadata? : SpeechMetadata, thought? : Bool, thought_signature? : String, part_metadata? : Map[String, @json.Json], media_processing? : PartToolCallMediaProcessing, video_metadata? : VideoMetadata, audio_transcription? : AudioTranscription, media_resolution? : V1mainMediaResolution) -> Self
+pub fn PartToolCall::not_equal(Self, Self) -> Bool
+pub fn PartToolCall::to_json(Self) -> @json.Json
+pub fn PartToolCall::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for PartToolCall
+pub impl @json.ToJson for PartToolCall
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum PartToolCallMediaProcessing {
+  MEDIAPROCESSINGUNSPECIFIED
+  STATIC
+  AGENTIC
+  Unknown(String)
+}
+pub fn PartToolCallMediaProcessing::equal(Self, Self) -> Bool
+pub fn PartToolCallMediaProcessing::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn PartToolCallMediaProcessing::not_equal(Self, Self) -> Bool
+pub fn PartToolCallMediaProcessing::to_json(Self) -> @json.Json
+pub fn PartToolCallMediaProcessing::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for PartToolCallMediaProcessing
+pub impl @json.ToJson for PartToolCallMediaProcessing
+
+#derive(Eq, @debug.Debug)
+pub(all) struct PartToolResponse {
+  speech_metadata : SpeechMetadata?
+  thought : Bool?
+  thought_signature : String?
+  part_metadata : Map[String, @json.Json]?
+  media_processing : PartToolResponseMediaProcessing?
+  video_metadata : VideoMetadata?
+  audio_transcription : AudioTranscription?
+  tool_response : ToolResponse
+  media_resolution : V1mainMediaResolution?
+}
+pub fn PartToolResponse::equal(Self, Self) -> Bool
+pub fn PartToolResponse::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn PartToolResponse::new(tool_response~ : ToolResponse, speech_metadata? : SpeechMetadata, thought? : Bool, thought_signature? : String, part_metadata? : Map[String, @json.Json], media_processing? : PartToolResponseMediaProcessing, video_metadata? : VideoMetadata, audio_transcription? : AudioTranscription, media_resolution? : V1mainMediaResolution) -> Self
+pub fn PartToolResponse::not_equal(Self, Self) -> Bool
+pub fn PartToolResponse::to_json(Self) -> @json.Json
+pub fn PartToolResponse::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for PartToolResponse
+pub impl @json.ToJson for PartToolResponse
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum PartToolResponseMediaProcessing {
+  MEDIAPROCESSINGUNSPECIFIED
+  STATIC
+  AGENTIC
+  Unknown(String)
+}
+pub fn PartToolResponseMediaProcessing::equal(Self, Self) -> Bool
+pub fn PartToolResponseMediaProcessing::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn PartToolResponseMediaProcessing::not_equal(Self, Self) -> Bool
+pub fn PartToolResponseMediaProcessing::to_json(Self) -> @json.Json
+pub fn PartToolResponseMediaProcessing::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for PartToolResponseMediaProcessing
+pub impl @json.ToJson for PartToolResponseMediaProcessing
+
+#derive(Eq, @debug.Debug)
+pub(all) struct PlaceAnswerSources {
+  review_snippets : Array[ReviewSnippet]?
+}
+pub fn PlaceAnswerSources::equal(Self, Self) -> Bool
+pub fn PlaceAnswerSources::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn PlaceAnswerSources::new(review_snippets? : Array[ReviewSnippet]) -> Self
+pub fn PlaceAnswerSources::not_equal(Self, Self) -> Bool
+pub fn PlaceAnswerSources::to_json(Self) -> @json.Json
+pub fn PlaceAnswerSources::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for PlaceAnswerSources
+pub impl @json.ToJson for PlaceAnswerSources
+
+#derive(Eq, @debug.Debug)
+pub(all) struct PrebuiltVoiceConfig {
+  voice_name : String?
+}
+pub fn PrebuiltVoiceConfig::equal(Self, Self) -> Bool
+pub fn PrebuiltVoiceConfig::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn PrebuiltVoiceConfig::new(voice_name? : String) -> Self
+pub fn PrebuiltVoiceConfig::not_equal(Self, Self) -> Bool
+pub fn PrebuiltVoiceConfig::to_json(Self) -> @json.Json
+pub fn PrebuiltVoiceConfig::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for PrebuiltVoiceConfig
+pub impl @json.ToJson for PrebuiltVoiceConfig
+
+#derive(Eq, @debug.Debug)
+pub(all) struct PromptFeedback {
+  safety_ratings : Array[SafetyRating]?
+  block_reason : PromptFeedbackBlockReason?
+}
+pub fn PromptFeedback::equal(Self, Self) -> Bool
+pub fn PromptFeedback::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn PromptFeedback::new(safety_ratings? : Array[SafetyRating], block_reason? : PromptFeedbackBlockReason) -> Self
+pub fn PromptFeedback::not_equal(Self, Self) -> Bool
+pub fn PromptFeedback::to_json(Self) -> @json.Json
+pub fn PromptFeedback::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for PromptFeedback
+pub impl @json.ToJson for PromptFeedback
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum PromptFeedbackBlockReason {
+  BLOCKREASONUNSPECIFIED
+  SAFETY
+  OTHER
+  BLOCKLIST
+  PROHIBITEDCONTENT
+  IMAGESAFETY
+  Unknown(String)
+}
+pub fn PromptFeedbackBlockReason::equal(Self, Self) -> Bool
+pub fn PromptFeedbackBlockReason::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn PromptFeedbackBlockReason::not_equal(Self, Self) -> Bool
+pub fn PromptFeedbackBlockReason::to_json(Self) -> @json.Json
+pub fn PromptFeedbackBlockReason::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for PromptFeedbackBlockReason
+pub impl @json.ToJson for PromptFeedbackBlockReason
+
+#derive(Eq, @debug.Debug)
+pub(all) struct ResponseFormatConfig {
+  image : ImageResponseFormat?
+  text : TextResponseFormat?
+  audio : AudioResponseFormat?
+}
+pub fn ResponseFormatConfig::equal(Self, Self) -> Bool
+pub fn ResponseFormatConfig::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ResponseFormatConfig::new(image? : ImageResponseFormat, text? : TextResponseFormat, audio? : AudioResponseFormat) -> Self
+pub fn ResponseFormatConfig::not_equal(Self, Self) -> Bool
+pub fn ResponseFormatConfig::to_json(Self) -> @json.Json
+pub fn ResponseFormatConfig::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for ResponseFormatConfig
+pub impl @json.ToJson for ResponseFormatConfig
+
+#derive(Eq, @debug.Debug)
+pub(all) struct RetrievalConfig {
+  language_code : String?
+  lat_lng : LatLng?
+}
+pub fn RetrievalConfig::equal(Self, Self) -> Bool
+pub fn RetrievalConfig::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn RetrievalConfig::new(language_code? : String, lat_lng? : LatLng) -> Self
+pub fn RetrievalConfig::not_equal(Self, Self) -> Bool
+pub fn RetrievalConfig::to_json(Self) -> @json.Json
+pub fn RetrievalConfig::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for RetrievalConfig
+pub impl @json.ToJson for RetrievalConfig
+
+#derive(Eq, @debug.Debug)
+pub(all) struct RetrievalMetadata {
+  google_search_dynamic_retrieval_score : Double?
+}
+pub fn RetrievalMetadata::equal(Self, Self) -> Bool
+pub fn RetrievalMetadata::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn RetrievalMetadata::new(google_search_dynamic_retrieval_score? : Double) -> Self
+pub fn RetrievalMetadata::not_equal(Self, Self) -> Bool
+pub fn RetrievalMetadata::to_json(Self) -> @json.Json
+pub fn RetrievalMetadata::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for RetrievalMetadata
+pub impl @json.ToJson for RetrievalMetadata
+
+#derive(Eq, @debug.Debug)
+pub(all) struct RetrievedContext {
+  text : String?
+  file_search_store : String?
+  media_id : String?
+  page_number : Int32?
+  uri : String?
+  custom_metadata : Array[GroundingChunkCustomMetadata]?
+  title : String?
+}
+pub fn RetrievedContext::equal(Self, Self) -> Bool
+pub fn RetrievedContext::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn RetrievedContext::new(text? : String, file_search_store? : String, media_id? : String, page_number? : Int32, uri? : String, custom_metadata? : Array[GroundingChunkCustomMetadata], title? : String) -> Self
+pub fn RetrievedContext::not_equal(Self, Self) -> Bool
+pub fn RetrievedContext::to_json(Self) -> @json.Json
+pub fn RetrievedContext::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for RetrievedContext
+pub impl @json.ToJson for RetrievedContext
+
+#derive(Eq, @debug.Debug)
+pub(all) struct ReviewSnippet {
+  title : String?
+  google_maps_uri : String?
+  review_id : String?
+}
+pub fn ReviewSnippet::equal(Self, Self) -> Bool
+pub fn ReviewSnippet::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ReviewSnippet::new(title? : String, google_maps_uri? : String, review_id? : String) -> Self
+pub fn ReviewSnippet::not_equal(Self, Self) -> Bool
+pub fn ReviewSnippet::to_json(Self) -> @json.Json
+pub fn ReviewSnippet::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for ReviewSnippet
+pub impl @json.ToJson for ReviewSnippet
+
+#derive(Eq, @debug.Debug)
+pub(all) struct SafetyRating {
+  probability : SafetyRatingProbability?
+  category : SafetyRatingCategory?
+  blocked : Bool?
+}
+pub fn SafetyRating::equal(Self, Self) -> Bool
+pub fn SafetyRating::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn SafetyRating::new(probability? : SafetyRatingProbability, category? : SafetyRatingCategory, blocked? : Bool) -> Self
+pub fn SafetyRating::not_equal(Self, Self) -> Bool
+pub fn SafetyRating::to_json(Self) -> @json.Json
+pub fn SafetyRating::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for SafetyRating
+pub impl @json.ToJson for SafetyRating
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum SafetyRatingCategory {
+  HARMCATEGORYUNSPECIFIED
+  HARMCATEGORYDEROGATORY
+  HARMCATEGORYTOXICITY
+  HARMCATEGORYVIOLENCE
+  HARMCATEGORYSEXUAL
+  HARMCATEGORYMEDICAL
+  HARMCATEGORYDANGEROUS
+  HARMCATEGORYHARASSMENT
+  HARMCATEGORYHATESPEECH
+  HARMCATEGORYSEXUALLYEXPLICIT
+  HARMCATEGORYDANGEROUSCONTENT
+  HARMCATEGORYCIVICINTEGRITY
+  HARMCATEGORYJAILBREAK
+  Unknown(String)
+}
+pub fn SafetyRatingCategory::equal(Self, Self) -> Bool
+pub fn SafetyRatingCategory::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn SafetyRatingCategory::not_equal(Self, Self) -> Bool
+pub fn SafetyRatingCategory::to_json(Self) -> @json.Json
+pub fn SafetyRatingCategory::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for SafetyRatingCategory
+pub impl @json.ToJson for SafetyRatingCategory
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum SafetyRatingProbability {
+  HARMPROBABILITYUNSPECIFIED
+  NEGLIGIBLE
+  LOW
+  MEDIUM
+  HIGH
+  Unknown(String)
+}
+pub fn SafetyRatingProbability::equal(Self, Self) -> Bool
+pub fn SafetyRatingProbability::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn SafetyRatingProbability::not_equal(Self, Self) -> Bool
+pub fn SafetyRatingProbability::to_json(Self) -> @json.Json
+pub fn SafetyRatingProbability::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for SafetyRatingProbability
+pub impl @json.ToJson for SafetyRatingProbability
+
+#derive(Eq, @debug.Debug)
+pub(all) struct SafetySetting {
+  category : SafetySettingCategory?
+  threshold : SafetySettingThreshold?
+}
+pub fn SafetySetting::equal(Self, Self) -> Bool
+pub fn SafetySetting::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn SafetySetting::new(category? : SafetySettingCategory, threshold? : SafetySettingThreshold) -> Self
+pub fn SafetySetting::not_equal(Self, Self) -> Bool
+pub fn SafetySetting::to_json(Self) -> @json.Json
+pub fn SafetySetting::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for SafetySetting
+pub impl @json.ToJson for SafetySetting
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum SafetySettingCategory {
+  HARMCATEGORYUNSPECIFIED
+  HARMCATEGORYDEROGATORY
+  HARMCATEGORYTOXICITY
+  HARMCATEGORYVIOLENCE
+  HARMCATEGORYSEXUAL
+  HARMCATEGORYMEDICAL
+  HARMCATEGORYDANGEROUS
+  HARMCATEGORYHARASSMENT
+  HARMCATEGORYHATESPEECH
+  HARMCATEGORYSEXUALLYEXPLICIT
+  HARMCATEGORYDANGEROUSCONTENT
+  HARMCATEGORYCIVICINTEGRITY
+  HARMCATEGORYJAILBREAK
+  Custom(String)
+}
+pub fn SafetySettingCategory::equal(Self, Self) -> Bool
+pub fn SafetySettingCategory::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn SafetySettingCategory::not_equal(Self, Self) -> Bool
+pub fn SafetySettingCategory::to_json(Self) -> @json.Json
+pub fn SafetySettingCategory::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for SafetySettingCategory
+pub impl @json.ToJson for SafetySettingCategory
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum SafetySettingThreshold {
+  HARMBLOCKTHRESHOLDUNSPECIFIED
+  BLOCKLOWANDABOVE
+  BLOCKMEDIUMANDABOVE
+  BLOCKONLYHIGH
+  BLOCKNONE
+  OFF
+  Custom(String)
+}
+pub fn SafetySettingThreshold::equal(Self, Self) -> Bool
+pub fn SafetySettingThreshold::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn SafetySettingThreshold::not_equal(Self, Self) -> Bool
+pub fn SafetySettingThreshold::to_json(Self) -> @json.Json
+pub fn SafetySettingThreshold::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for SafetySettingThreshold
+pub impl @json.ToJson for SafetySettingThreshold
+
+#derive(Eq, @debug.Debug)
+pub(all) struct Schema {
+  example : @json.Json?
+  description : String?
+  default : @json.Json?
+  min_length : Int64?
+  minimum : Double?
+  min_items : Int64?
+  items : Schema?
+  type_ : SchemaType?
+  required : Array[String]?
+  title : String?
+  max_length : Int64?
+  property_ordering : Array[String]?
+  enum_ : Array[String]?
+  pattern : String?
+  format : String?
+  min_properties : Int64?
+  max_properties : Int64?
+  properties : Map[String, Schema]?
+  nullable : Bool?
+  max_items : Int64?
+  any_of : Array[Schema]?
+  maximum : Double?
+}
+pub fn Schema::equal(Self, Self) -> Bool
+pub fn Schema::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn Schema::new(example? : @json.Json, description? : String, default? : @json.Json, min_length? : Int64, minimum? : Double, min_items? : Int64, items? : Self, type_? : SchemaType, required? : Array[String], title? : String, max_length? : Int64, property_ordering? : Array[String], enum_? : Array[String], pattern? : String, format? : String, min_properties? : Int64, max_properties? : Int64, properties? : Map[String, Self], nullable? : Bool, max_items? : Int64, any_of? : Array[Self], maximum? : Double) -> Self
+pub fn Schema::not_equal(Self, Self) -> Bool
+pub fn Schema::to_json(Self) -> @json.Json
+pub fn Schema::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for Schema
+pub impl @json.ToJson for Schema
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum SchemaType {
+  TYPEUNSPECIFIED
+  STRING
+  NUMBER
+  INTEGER
+  BOOLEAN
+  ARRAY
+  OBJECT
+  NULL
+  Unknown(String)
+}
+pub fn SchemaType::equal(Self, Self) -> Bool
+pub fn SchemaType::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn SchemaType::not_equal(Self, Self) -> Bool
+pub fn SchemaType::to_json(Self) -> @json.Json
+pub fn SchemaType::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for SchemaType
+pub impl @json.ToJson for SchemaType
+
+#derive(Eq, @debug.Debug)
+pub(all) struct SearchEntryPoint {
+  rendered_content : String?
+  sdk_blob : String?
+}
+pub fn SearchEntryPoint::equal(Self, Self) -> Bool
+pub fn SearchEntryPoint::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn SearchEntryPoint::new(rendered_content? : String, sdk_blob? : String) -> Self
+pub fn SearchEntryPoint::not_equal(Self, Self) -> Bool
+pub fn SearchEntryPoint::to_json(Self) -> @json.Json
+pub fn SearchEntryPoint::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for SearchEntryPoint
+pub impl @json.ToJson for SearchEntryPoint
+
+#derive(Eq, @debug.Debug)
+pub(all) struct SearchTypes {
+  image_search : @json.Json?
+  web_search : @json.Json?
+}
+pub fn SearchTypes::equal(Self, Self) -> Bool
+pub fn SearchTypes::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn SearchTypes::new(image_search? : @json.Json, web_search? : @json.Json) -> Self
+pub fn SearchTypes::not_equal(Self, Self) -> Bool
+pub fn SearchTypes::to_json(Self) -> @json.Json
+pub fn SearchTypes::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for SearchTypes
+pub impl @json.ToJson for SearchTypes
+
+#derive(Eq, @debug.Debug)
+pub(all) struct SemanticRetrieverChunk {
+  source : String?
+  chunk : String?
+}
+pub fn SemanticRetrieverChunk::equal(Self, Self) -> Bool
+pub fn SemanticRetrieverChunk::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn SemanticRetrieverChunk::new(source? : String, chunk? : String) -> Self
+pub fn SemanticRetrieverChunk::not_equal(Self, Self) -> Bool
+pub fn SemanticRetrieverChunk::to_json(Self) -> @json.Json
+pub fn SemanticRetrieverChunk::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for SemanticRetrieverChunk
+pub impl @json.ToJson for SemanticRetrieverChunk
+
+#derive(Eq, @debug.Debug)
+pub(all) struct SpeakerVoiceConfig {
+  speaker : String?
+  voice_config : VoiceConfig?
+}
+pub fn SpeakerVoiceConfig::equal(Self, Self) -> Bool
+pub fn SpeakerVoiceConfig::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn SpeakerVoiceConfig::new(speaker? : String, voice_config? : VoiceConfig) -> Self
+pub fn SpeakerVoiceConfig::not_equal(Self, Self) -> Bool
+pub fn SpeakerVoiceConfig::to_json(Self) -> @json.Json
+pub fn SpeakerVoiceConfig::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for SpeakerVoiceConfig
+pub impl @json.ToJson for SpeakerVoiceConfig
+
+#derive(Eq, @debug.Debug)
+pub(all) struct SpeechConfig {
+  voice_config : VoiceConfig?
+  multi_speaker_voice_config : MultiSpeakerVoiceConfig?
+  language_code : String?
+}
+pub fn SpeechConfig::equal(Self, Self) -> Bool
+pub fn SpeechConfig::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn SpeechConfig::new(voice_config? : VoiceConfig, multi_speaker_voice_config? : MultiSpeakerVoiceConfig, language_code? : String) -> Self
+pub fn SpeechConfig::not_equal(Self, Self) -> Bool
+pub fn SpeechConfig::to_json(Self) -> @json.Json
+pub fn SpeechConfig::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for SpeechConfig
+pub impl @json.ToJson for SpeechConfig
+
+#derive(Eq, @debug.Debug)
+pub(all) struct SpeechMetadata {
+  speaker : String?
+  style : String?
+}
+pub fn SpeechMetadata::equal(Self, Self) -> Bool
+pub fn SpeechMetadata::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn SpeechMetadata::new(speaker? : String, style? : String) -> Self
+pub fn SpeechMetadata::not_equal(Self, Self) -> Bool
+pub fn SpeechMetadata::to_json(Self) -> @json.Json
+pub fn SpeechMetadata::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for SpeechMetadata
+pub impl @json.ToJson for SpeechMetadata
+
+#derive(Eq, @debug.Debug)
+pub(all) struct Status {
+  details : Array[Map[String, @json.Json]]?
+  code : Int32?
+  message : String?
+}
+pub fn Status::equal(Self, Self) -> Bool
+pub fn Status::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn Status::new(details? : Array[Map[String, @json.Json]], code? : Int32, message? : String) -> Self
+pub fn Status::not_equal(Self, Self) -> Bool
+pub fn Status::to_json(Self) -> @json.Json
+pub fn Status::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for Status
+pub impl @json.ToJson for Status
+
+#derive(Eq, @debug.Debug)
+pub(all) struct StreamableHttpTransport {
+  timeout : String?
+  sse_read_timeout : String?
+  url : String?
+  headers : Map[String, String]?
+  terminate_on_close : Bool?
+}
+pub fn StreamableHttpTransport::equal(Self, Self) -> Bool
+pub fn StreamableHttpTransport::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn StreamableHttpTransport::new(timeout? : String, sse_read_timeout? : String, url? : String, headers? : Map[String, String], terminate_on_close? : Bool) -> Self
+pub fn StreamableHttpTransport::not_equal(Self, Self) -> Bool
+pub fn StreamableHttpTransport::to_json(Self) -> @json.Json
+pub fn StreamableHttpTransport::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for StreamableHttpTransport
+pub impl @json.ToJson for StreamableHttpTransport
+
+#derive(Eq, @debug.Debug)
+pub(all) struct TextResponseFormat {
+  mime_type : TextResponseFormatMimeType?
+  schema : @json.Json?
+}
+pub fn TextResponseFormat::equal(Self, Self) -> Bool
+pub fn TextResponseFormat::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn TextResponseFormat::new(mime_type? : TextResponseFormatMimeType, schema? : @json.Json) -> Self
+pub fn TextResponseFormat::not_equal(Self, Self) -> Bool
+pub fn TextResponseFormat::to_json(Self) -> @json.Json
+pub fn TextResponseFormat::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for TextResponseFormat
+pub impl @json.ToJson for TextResponseFormat
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum TextResponseFormatMimeType {
+  MIMETYPEUNSPECIFIED
+  APPLICATIONJSON
+  TEXTPLAIN
+  Custom(String)
+}
+pub fn TextResponseFormatMimeType::equal(Self, Self) -> Bool
+pub fn TextResponseFormatMimeType::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn TextResponseFormatMimeType::not_equal(Self, Self) -> Bool
+pub fn TextResponseFormatMimeType::to_json(Self) -> @json.Json
+pub fn TextResponseFormatMimeType::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for TextResponseFormatMimeType
+pub impl @json.ToJson for TextResponseFormatMimeType
+
+#derive(Eq, @debug.Debug)
+pub(all) struct ThinkingConfig {
+  thinking_level : ThinkingConfigThinkingLevel?
+  include_thoughts : Bool?
+  thinking_budget : Int32?
+}
+pub fn ThinkingConfig::equal(Self, Self) -> Bool
+pub fn ThinkingConfig::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ThinkingConfig::new(thinking_level? : ThinkingConfigThinkingLevel, include_thoughts? : Bool, thinking_budget? : Int32) -> Self
+pub fn ThinkingConfig::not_equal(Self, Self) -> Bool
+pub fn ThinkingConfig::to_json(Self) -> @json.Json
+pub fn ThinkingConfig::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for ThinkingConfig
+pub impl @json.ToJson for ThinkingConfig
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum ThinkingConfigThinkingLevel {
+  THINKINGLEVELUNSPECIFIED
+  MINIMAL
+  LOW
+  MEDIUM
+  HIGH
+  XHIGH
+  Custom(String)
+}
+pub fn ThinkingConfigThinkingLevel::equal(Self, Self) -> Bool
+pub fn ThinkingConfigThinkingLevel::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ThinkingConfigThinkingLevel::not_equal(Self, Self) -> Bool
+pub fn ThinkingConfigThinkingLevel::to_json(Self) -> @json.Json
+pub fn ThinkingConfigThinkingLevel::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for ThinkingConfigThinkingLevel
+pub impl @json.ToJson for ThinkingConfigThinkingLevel
+
+#derive(Eq, @debug.Debug)
+pub(all) struct Tool {
+  url_context : @json.Json?
+  google_maps : GoogleMaps?
+  mcp_servers : Array[McpServer]?
+  google_search_retrieval : GoogleSearchRetrieval?
+  computer_use : ComputerUse?
+  google_search : GoogleSearch?
+  file_search : FileSearch?
+  code_execution : @json.Json?
+  function_declarations : Array[FunctionDeclaration]?
+}
+pub fn Tool::equal(Self, Self) -> Bool
+pub fn Tool::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn Tool::new(url_context? : @json.Json, google_maps? : GoogleMaps, mcp_servers? : Array[McpServer], google_search_retrieval? : GoogleSearchRetrieval, computer_use? : ComputerUse, google_search? : GoogleSearch, file_search? : FileSearch, code_execution? : @json.Json, function_declarations? : Array[FunctionDeclaration]) -> Self
+pub fn Tool::not_equal(Self, Self) -> Bool
+pub fn Tool::to_json(Self) -> @json.Json
+pub fn Tool::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for Tool
+pub impl @json.ToJson for Tool
+
+#derive(Eq, @debug.Debug)
+pub(all) struct ToolCall {
+  args : Map[String, @json.Json]?
+  tool_name : String?
+  tool_type : ToolCallToolType?
+  id : String?
+}
+pub fn ToolCall::equal(Self, Self) -> Bool
+pub fn ToolCall::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ToolCall::new(args? : Map[String, @json.Json], tool_name? : String, tool_type? : ToolCallToolType, id? : String) -> Self
+pub fn ToolCall::not_equal(Self, Self) -> Bool
+pub fn ToolCall::to_json(Self) -> @json.Json
+pub fn ToolCall::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for ToolCall
+pub impl @json.ToJson for ToolCall
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum ToolCallToolType {
+  TOOLTYPEUNSPECIFIED
+  GOOGLESEARCHWEB
+  GOOGLESEARCHIMAGE
+  URLCONTEXT
+  GOOGLEMAPS
+  FILESEARCH
+  MEDIAPROCESSING
+  Unknown(String)
+}
+pub fn ToolCallToolType::equal(Self, Self) -> Bool
+pub fn ToolCallToolType::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ToolCallToolType::not_equal(Self, Self) -> Bool
+pub fn ToolCallToolType::to_json(Self) -> @json.Json
+pub fn ToolCallToolType::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for ToolCallToolType
+pub impl @json.ToJson for ToolCallToolType
+
+#derive(Eq, @debug.Debug)
+pub(all) struct ToolConfig {
+  include_server_side_tool_invocations : Bool?
+  function_calling_config : FunctionCallingConfig?
+  retrieval_config : RetrievalConfig?
+}
+pub fn ToolConfig::equal(Self, Self) -> Bool
+pub fn ToolConfig::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ToolConfig::new(include_server_side_tool_invocations? : Bool, function_calling_config? : FunctionCallingConfig, retrieval_config? : RetrievalConfig) -> Self
+pub fn ToolConfig::not_equal(Self, Self) -> Bool
+pub fn ToolConfig::to_json(Self) -> @json.Json
+pub fn ToolConfig::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for ToolConfig
+pub impl @json.ToJson for ToolConfig
+
+#derive(Eq, @debug.Debug)
+pub(all) struct ToolResponse {
+  id : String?
+  response : Map[String, @json.Json]?
+  tool_type : ToolResponseToolType?
+}
+pub fn ToolResponse::equal(Self, Self) -> Bool
+pub fn ToolResponse::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ToolResponse::new(id? : String, response? : Map[String, @json.Json], tool_type? : ToolResponseToolType) -> Self
+pub fn ToolResponse::not_equal(Self, Self) -> Bool
+pub fn ToolResponse::to_json(Self) -> @json.Json
+pub fn ToolResponse::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for ToolResponse
+pub impl @json.ToJson for ToolResponse
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum ToolResponseToolType {
+  TOOLTYPEUNSPECIFIED
+  GOOGLESEARCHWEB
+  GOOGLESEARCHIMAGE
+  URLCONTEXT
+  GOOGLEMAPS
+  FILESEARCH
+  MEDIAPROCESSING
+  Unknown(String)
+}
+pub fn ToolResponseToolType::equal(Self, Self) -> Bool
+pub fn ToolResponseToolType::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn ToolResponseToolType::not_equal(Self, Self) -> Bool
+pub fn ToolResponseToolType::to_json(Self) -> @json.Json
+pub fn ToolResponseToolType::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for ToolResponseToolType
+pub impl @json.ToJson for ToolResponseToolType
+
+#derive(Eq, @debug.Debug)
+pub(all) struct TopCandidates {
+  candidates : Array[LogprobsResultCandidate]?
+}
+pub fn TopCandidates::equal(Self, Self) -> Bool
+pub fn TopCandidates::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn TopCandidates::new(candidates? : Array[LogprobsResultCandidate]) -> Self
+pub fn TopCandidates::not_equal(Self, Self) -> Bool
+pub fn TopCandidates::to_json(Self) -> @json.Json
+pub fn TopCandidates::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for TopCandidates
+pub impl @json.ToJson for TopCandidates
+
+#derive(Eq, @debug.Debug)
+pub(all) struct TranslationConfig {
+  echo_target_language : Bool?
+  target_language_code : String?
+}
+pub fn TranslationConfig::equal(Self, Self) -> Bool
+pub fn TranslationConfig::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn TranslationConfig::new(echo_target_language? : Bool, target_language_code? : String) -> Self
+pub fn TranslationConfig::not_equal(Self, Self) -> Bool
+pub fn TranslationConfig::to_json(Self) -> @json.Json
+pub fn TranslationConfig::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for TranslationConfig
+pub impl @json.ToJson for TranslationConfig
+
+#derive(Eq, @debug.Debug)
+pub(all) struct UrlContextMetadata {
+  url_metadata : Array[UrlMetadata]?
+}
+pub fn UrlContextMetadata::equal(Self, Self) -> Bool
+pub fn UrlContextMetadata::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn UrlContextMetadata::new(url_metadata? : Array[UrlMetadata]) -> Self
+pub fn UrlContextMetadata::not_equal(Self, Self) -> Bool
+pub fn UrlContextMetadata::to_json(Self) -> @json.Json
+pub fn UrlContextMetadata::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for UrlContextMetadata
+pub impl @json.ToJson for UrlContextMetadata
+
+#derive(Eq, @debug.Debug)
+pub(all) struct UrlMetadata {
+  retrieved_url : String?
+  url_retrieval_status : UrlMetadataUrlRetrievalStatus?
+}
+pub fn UrlMetadata::equal(Self, Self) -> Bool
+pub fn UrlMetadata::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn UrlMetadata::new(retrieved_url? : String, url_retrieval_status? : UrlMetadataUrlRetrievalStatus) -> Self
+pub fn UrlMetadata::not_equal(Self, Self) -> Bool
+pub fn UrlMetadata::to_json(Self) -> @json.Json
+pub fn UrlMetadata::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for UrlMetadata
+pub impl @json.ToJson for UrlMetadata
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum UrlMetadataUrlRetrievalStatus {
+  URLRETRIEVALSTATUSUNSPECIFIED
+  URLRETRIEVALSTATUSSUCCESS
+  URLRETRIEVALSTATUSERROR
+  URLRETRIEVALSTATUSPAYWALL
+  URLRETRIEVALSTATUSUNSAFE
+  Unknown(String)
+}
+pub fn UrlMetadataUrlRetrievalStatus::equal(Self, Self) -> Bool
+pub fn UrlMetadataUrlRetrievalStatus::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn UrlMetadataUrlRetrievalStatus::not_equal(Self, Self) -> Bool
+pub fn UrlMetadataUrlRetrievalStatus::to_json(Self) -> @json.Json
+pub fn UrlMetadataUrlRetrievalStatus::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for UrlMetadataUrlRetrievalStatus
+pub impl @json.ToJson for UrlMetadataUrlRetrievalStatus
+
+#derive(Eq, @debug.Debug)
+pub(all) struct UsageMetadata {
+  tool_use_prompt_token_count : Int32?
+  prompt_token_count : Int32?
+  service_tier : UsageMetadataServiceTier?
+  cache_tokens_details : Array[ModalityTokenCount]?
+  total_token_count : Int32?
+  prompt_tokens_details : Array[ModalityTokenCount]?
+  thoughts_token_count : Int32?
+  candidates_tokens_details : Array[ModalityTokenCount]?
+  candidates_token_count : Int32?
+  cached_content_token_count : Int32?
+  tool_use_prompt_tokens_details : Array[ModalityTokenCount]?
+}
+pub fn UsageMetadata::equal(Self, Self) -> Bool
+pub fn UsageMetadata::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn UsageMetadata::new(tool_use_prompt_token_count? : Int32, prompt_token_count? : Int32, service_tier? : UsageMetadataServiceTier, cache_tokens_details? : Array[ModalityTokenCount], total_token_count? : Int32, prompt_tokens_details? : Array[ModalityTokenCount], thoughts_token_count? : Int32, candidates_tokens_details? : Array[ModalityTokenCount], candidates_token_count? : Int32, cached_content_token_count? : Int32, tool_use_prompt_tokens_details? : Array[ModalityTokenCount]) -> Self
+pub fn UsageMetadata::not_equal(Self, Self) -> Bool
+pub fn UsageMetadata::to_json(Self) -> @json.Json
+pub fn UsageMetadata::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for UsageMetadata
+pub impl @json.ToJson for UsageMetadata
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum UsageMetadataServiceTier {
+  Unspecified
+  Standard
+  Flex
+  Priority
+  Unknown(String)
+}
+pub fn UsageMetadataServiceTier::equal(Self, Self) -> Bool
+pub fn UsageMetadataServiceTier::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn UsageMetadataServiceTier::not_equal(Self, Self) -> Bool
+pub fn UsageMetadataServiceTier::to_json(Self) -> @json.Json
+pub fn UsageMetadataServiceTier::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for UsageMetadataServiceTier
+pub impl @json.ToJson for UsageMetadataServiceTier
+
+#derive(Eq, @debug.Debug)
+pub(all) struct V1mainMediaResolution {
+  level : V1mainMediaResolutionLevel?
+}
+pub fn V1mainMediaResolution::equal(Self, Self) -> Bool
+pub fn V1mainMediaResolution::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn V1mainMediaResolution::new(level? : V1mainMediaResolutionLevel) -> Self
+pub fn V1mainMediaResolution::not_equal(Self, Self) -> Bool
+pub fn V1mainMediaResolution::to_json(Self) -> @json.Json
+pub fn V1mainMediaResolution::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for V1mainMediaResolution
+pub impl @json.ToJson for V1mainMediaResolution
+
+#non_exhaustive
+#derive(Eq, @debug.Debug)
+pub(all) enum V1mainMediaResolutionLevel {
+  MEDIARESOLUTIONUNSPECIFIED
+  MEDIARESOLUTIONLOW
+  MEDIARESOLUTIONMEDIUM
+  MEDIARESOLUTIONHIGH
+  MEDIARESOLUTIONULTRAHIGH
+  Unknown(String)
+}
+pub fn V1mainMediaResolutionLevel::equal(Self, Self) -> Bool
+pub fn V1mainMediaResolutionLevel::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn V1mainMediaResolutionLevel::not_equal(Self, Self) -> Bool
+pub fn V1mainMediaResolutionLevel::to_json(Self) -> @json.Json
+pub fn V1mainMediaResolutionLevel::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for V1mainMediaResolutionLevel
+pub impl @json.ToJson for V1mainMediaResolutionLevel
+
+#derive(Eq, @debug.Debug)
+pub(all) struct VideoFileMetadata {
+  video_duration : String?
+}
+pub fn VideoFileMetadata::equal(Self, Self) -> Bool
+pub fn VideoFileMetadata::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn VideoFileMetadata::new(video_duration? : String) -> Self
+pub fn VideoFileMetadata::not_equal(Self, Self) -> Bool
+pub fn VideoFileMetadata::to_json(Self) -> @json.Json
+pub fn VideoFileMetadata::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for VideoFileMetadata
+pub impl @json.ToJson for VideoFileMetadata
+
+#derive(Eq, @debug.Debug)
+pub(all) struct VideoMetadata {
+  fps : Double?
+  end_offset : String?
+  start_offset : String?
+}
+pub fn VideoMetadata::equal(Self, Self) -> Bool
+pub fn VideoMetadata::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn VideoMetadata::new(fps? : Double, end_offset? : String, start_offset? : String) -> Self
+pub fn VideoMetadata::not_equal(Self, Self) -> Bool
+pub fn VideoMetadata::to_json(Self) -> @json.Json
+pub fn VideoMetadata::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for VideoMetadata
+pub impl @json.ToJson for VideoMetadata
+
+#derive(Eq, @debug.Debug)
+pub(all) struct VoiceConfig {
+  prebuilt_voice_config : PrebuiltVoiceConfig?
+  voice : String?
+}
+pub fn VoiceConfig::equal(Self, Self) -> Bool
+pub fn VoiceConfig::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn VoiceConfig::new(prebuilt_voice_config? : PrebuiltVoiceConfig, voice? : String) -> Self
+pub fn VoiceConfig::not_equal(Self, Self) -> Bool
+pub fn VoiceConfig::to_json(Self) -> @json.Json
+pub fn VoiceConfig::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for VoiceConfig
+pub impl @json.ToJson for VoiceConfig
+
+#derive(Eq, @debug.Debug)
+pub(all) struct Web {
+  title : String?
+  uri : String?
+}
+pub fn Web::equal(Self, Self) -> Bool
+pub fn Web::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn Web::new(title? : String, uri? : String) -> Self
+pub fn Web::not_equal(Self, Self) -> Bool
+pub fn Web::to_json(Self) -> @json.Json
+pub fn Web::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for Web
+pub impl @json.ToJson for Web
+
+#derive(Eq, @debug.Debug)
+pub(all) struct WordInfo {
+  word : String?
+  end_offset : String?
+  start_offset : String?
+}
+pub fn WordInfo::equal(Self, Self) -> Bool
+pub fn WordInfo::from_json(@json.Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn WordInfo::new(word? : String, end_offset? : String, start_offset? : String) -> Self
+pub fn WordInfo::not_equal(Self, Self) -> Bool
+pub fn WordInfo::to_json(Self) -> @json.Json
+pub fn WordInfo::to_repr(Self) -> @debug.Repr
+pub impl @json.FromJson for WordInfo
+pub impl @json.ToJson for WordInfo
+
+// Type aliases
+
+// Traits

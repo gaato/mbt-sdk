@@ -254,15 +254,15 @@ class DiscoveryAdapterTests(unittest.TestCase):
         self.assertEqual(wrapped["allOf"][0]["$ref"], "#/components/schemas/Payload")
         self.assertEqual(wrapped["description"], "Wrapped payload.")
 
-    def test_nested_naming_flat_path_repeated_globals_auth_and_media_notes(self):
+    def test_nested_naming_canonical_path_repeated_globals_auth_and_media_notes(self):
         doc = convert_discovery(schema_fixture())
-        flat = doc["paths"]["/v1/models/{modelsId}/operations/{operationsId}"]["get"]
+        flat = doc["paths"]["/v1/{name}"]["get"]
         self.assertEqual(flat["operationId"], "models_operations_get")
         self.assertEqual(
             [item["name"] for item in flat["parameters"]],
-            ["modelsId", "operationsId"],
+            ["name"],
         )
-        self.assertNotIn("pattern", flat["parameters"][0]["schema"])
+        self.assertEqual(flat["parameters"][0]["schema"]["pattern"], "^models/[^/]+/operations/[^/]+$")
         generate = doc["paths"]["/v1/{name}:generateContent"]["post"]
         self.assertEqual(generate["operationId"], "models_generate_content")
         self.assertTrue(generate["parameters"][0]["x-moonbit-path-segments"])
@@ -270,9 +270,9 @@ class DiscoveryAdapterTests(unittest.TestCase):
         self.assertTrue(generate["parameters"][1]["explode"])
         self.assertEqual({item["name"] for item in generate["parameters"]}, {"name", "labels"})
         schemes = doc["components"]["securitySchemes"]
-        self.assertEqual(list(schemes), ["googleApiKeyHeader", "googleApiKeyQuery"])
-        self.assertEqual(schemes["googleApiKeyHeader"]["name"], "x-goog-api-key")
-        self.assertEqual(doc["security"][0], {"googleApiKeyHeader": []})
+        self.assertEqual(list(schemes), ["ApiKey", "ApiKeyInQuery"])
+        self.assertEqual(schemes["ApiKey"]["name"], "x-goog-api-key")
+        self.assertEqual(doc["security"][0], {"ApiKey": []})
         upload = doc["paths"]["/v1/files"]["post"]
         self.assertIn("resumable", upload["x-moonbit-media-upload"]["protocols"])
         self.assertTrue(upload["x-moonbit-media-download"])
@@ -322,7 +322,7 @@ class DiscoveryAdapterTests(unittest.TestCase):
             caught.exception.diagnostics[0].reason,
         )
 
-    def test_flat_path_uses_individual_parameter_names_when_counts_match(self):
+    def test_path_uses_spec_parameter_names_despite_flat_path(self):
         raw = schema_fixture()
         method = raw["resources"]["models"]["methods"]["generateContent"]
         method["path"] = "v1/{parent}/items/{item}"
@@ -333,8 +333,8 @@ class DiscoveryAdapterTests(unittest.TestCase):
             "item": {"type": "string", "location": "path", "description": "ITEM"},
             "parent": {"type": "string", "location": "path", "description": "PARENT"},
         }
-        operation = convert_discovery(raw)["paths"]["/v1/parents/{parentsId}/items/{itemsId}"]["post"]
-        self.assertEqual([item["name"] for item in operation["parameters"]], ["parentsId", "itemsId"])
+        operation = convert_discovery(raw)["paths"]["/v1/{parent}/items/{item}"]["post"]
+        self.assertEqual([item["name"] for item in operation["parameters"]], ["parent", "item"])
         self.assertEqual([item["description"] for item in operation["parameters"]], ["PARENT", "ITEM"])
 
     def test_oauth_scopes_become_per_method_security_and_documentation(self):
@@ -343,14 +343,14 @@ class DiscoveryAdapterTests(unittest.TestCase):
         raw["auth"] = {"oauth2": {"scopes": {scope: {"description": "Read examples."}}}}
         raw["resources"]["models"]["methods"]["generateContent"]["scopes"] = [scope]
         doc = convert_discovery(raw)
-        oauth = doc["components"]["securitySchemes"]["googleOAuth2"]
+        oauth = doc["components"]["securitySchemes"]["OAuthToken"]
         self.assertEqual(oauth["type"], "oauth2")
         self.assertEqual(oauth["flows"]["authorizationCode"]["scopes"][scope], "Read examples.")
         generate = doc["paths"]["/v1/{name}:generateContent"]["post"]
         self.assertEqual(generate["security"], [
-            {"googleApiKeyHeader": []},
-            {"googleApiKeyQuery": []},
-            {"googleOAuth2": [scope]},
+            {"ApiKey": []},
+            {"ApiKeyInQuery": []},
+            {"OAuthToken": [scope]},
         ])
         self.assertIn(f"OAuth scope `{scope}`: Read examples.", generate["description"])
         include_all_operations(doc)
@@ -365,7 +365,7 @@ class DiscoveryAdapterTests(unittest.TestCase):
                 {"kind": "bearer"},
             ]},
         })
-        self.assertIn("Bearer(_) => true", "\n".join(client.values()))
+        self.assertIn("OAuthToken(_) => true", "\n".join(client.values()))
         without_key = schema_fixture()
         without_key["parameters"].pop("key")
         without_key["auth"] = raw["auth"]
@@ -373,7 +373,7 @@ class DiscoveryAdapterTests(unittest.TestCase):
         oauth_only = convert_discovery(without_key)
         self.assertEqual(
             oauth_only["paths"]["/v1/{name}:generateContent"]["post"]["security"],
-            [{"googleOAuth2": [scope]}],
+            [{"OAuthToken": [scope]}],
         )
 
     def test_operation_string_integer_request_emits_its_helpers(self):
@@ -466,6 +466,99 @@ class DiscoveryAdapterTests(unittest.TestCase):
 
 @unittest.skipUnless(shutil.which("moon"), "MoonBit toolchain is required for integration")
 class DiscoveryGeneratedMoonTests(unittest.TestCase):
+    def test_field_discriminated_oneof_round_trip(self):
+        doc = convert_discovery(schema_fixture())
+        doc['x-moonbit-nonraising-decoders'] = True
+        doc['security'] = [{'ApiKey': []}]
+        doc['components']['schemas'] = {
+            'TextPart': {'type': 'object', 'properties': {'text': {'type': 'string'}, 'thoughtSignature': {'type': 'string'}}, 'required': ['text']},
+            'FilePart': {'type': 'object', 'properties': {'fileData': {'type': 'string'}, 'thoughtSignature': {'type': 'string'}}, 'required': ['fileData']},
+            'Part': {'oneOf': [{'$ref': '#/components/schemas/TextPart'}, {'$ref': '#/components/schemas/FilePart'}], 'x-moonbit-discriminator-fields': ['text', 'fileData']},
+        }
+        doc['paths'] = {'/part': {'post': {'operationId': 'part', 'requestBody': {'content': {'application/json': {'schema': {'$ref': '#/components/schemas/Part'}}}}, 'responses': {'200': {'content': {'application/json': {'schema': {'$ref': '#/components/schemas/Part'}}}}}}}}
+        include_all_operations(doc)
+        ir = IRBuilder(doc, 'gaato/demo/gen').build()
+        with tempfile.TemporaryDirectory(prefix='field-oneof-') as tmp:
+            root = Path(tmp)
+            (root / 'moon.mod').write_text('name = "gaato/demo"\nversion = "0.1.0"\nsource = "src"\nimport { "gaato/mttp_core@0.1.0" }\n')
+            _write(root / 'src/gen', _format(emit(ir)))
+            _write(root / 'src', _format(emit_client(doc, ir, {
+                'name': 'demo', 'dir': 'demo', 'module': 'gaato/demo',
+                'out': 'demo/src/gen', 'base_url': 'https://api.example',
+                'auth': {'kind': 'header', 'name': 'x-goog-api-key'},
+            })))
+            (root / 'src/callback_test.mbt').write_text('''///|
+test "typed facade with a concrete nonraising decoder effect links externally" {
+  let backend = @client.from_fn((_, _) => @http.Response::new(200, body=Bytes(b"{\\"text\\":\\"hello\\"}")))
+  let sdk = @demo.Demo::new(backend, @sim.FakeClock::new())
+  let body : @gen.Part = Text(@gen.TextPart::new(text="hello"))
+  assert_true(@driver.run_sync(() => sdk.part(body)) is Ok(_))
+}
+''')
+            (root / 'src/gen/part_wbtest.mbt').write_text('''///|
+test "strict field oneof" {
+  let part : Part = Text(TextPart::new(text="hello", thought_signature="c2ln"))
+  assert_eq(Json(part), {"text": "hello", "thoughtSignature": "c2ln"})
+  assert_eq(part_decode_json(Json(part)), part)
+  let invalids : Array[Json] = [{}, {"text": "hello", "fileData": "uri"}, {"text": Json::null()}]
+  for invalid in invalids {
+    assert_true((try Some(part_decode_json(invalid)) catch { _ => None }) is None)
+  }
+}
+''')
+            process = _install_and_test(root)
+            self.assertEqual(process.returncode, 0, process.stdout + process.stderr)
+
+    def test_string_integer_missing_default(self):
+        doc = convert_discovery(integer_wire_fixture())
+        doc['components']['schemas'] = {'Defaults': {
+            'type': 'object', 'required': ['values'], 'properties': {
+                'values': {'type': 'array', 'items': {'type': 'string', 'x-moonbit-int-string': 'uint64'},
+                           'default': [], 'x-moonbit-default-on-missing': True},
+            },
+        }}
+        doc['paths'] = {'/defaults': {'get': {'operationId': 'defaults', 'responses': {
+            '200': {'content': {'application/json': {'schema': {'$ref': '#/components/schemas/Defaults'}}}},
+        }}}}
+        include_all_operations(doc)
+        ir = IRBuilder(doc, 'gaato/demo/gen').build()
+        with tempfile.TemporaryDirectory(prefix='discovery-default-') as tmp:
+            root = Path(tmp)
+            (root / 'moon.mod').write_text('name = "gaato/demo"\nversion = "0.1.0"\nsource = "src"\nimport { "gaato/mttp_core@0.1.0" }\n')
+            _write(root / 'src/gen', _format(emit(ir)))
+            (root / 'src/gen/default_wbtest.mbt').write_text('''///|
+test "string integer array missing defaults and present validation" {
+  assert_eq(defaults_decode_json({}).values, [])
+  assert_eq(defaults_decode_json({ "values": ["18446744073709551615"] }).values, [18446744073709551615UL])
+  assert_true((try Some(defaults_decode_json({ "values": ["bad"] })) catch { _ => None }) is None)
+  assert_true((try Some(defaults_decode_json({ "values": Json::null() })) catch { _ => None }) is None)
+}
+''')
+            process = _install_and_test(root)
+            self.assertEqual(process.returncode, 0, process.stdout + process.stderr)
+
+    def test_string_integer_error_contract_sample(self):
+        from tools.gen.tests.test_client_layer import ledger
+        doc = convert_discovery(integer_wire_fixture())
+        doc['security'] = [{'bearer': []}]
+        doc['components']['securitySchemes'] = {'bearer': {'type': 'http', 'scheme': 'bearer'}}
+        doc['paths'] = {'/error': {'get': {'operationId': 'error', 'responses': {
+            '200': {}, '429': {'content': {'application/json': {'schema': {
+                'type': 'object', 'required': ['quota'], 'properties': {
+                    'quota': {'type': 'string', 'x-moonbit-int-string': 'uint64'},
+                },
+            }}}},
+        }}}}
+        include_all_operations(doc)
+        ir = IRBuilder(doc, 'gaato/sample/gen').build()
+        with tempfile.TemporaryDirectory(prefix='discovery-error-sample-') as tmp:
+            root = Path(tmp)
+            (root / 'moon.mod').write_text('name = "gaato/sample"\nversion = "0.1.0"\nsource = "src"\nimport { "gaato/mttp_core@0.1.0" }\n')
+            _write(root / 'src/gen', _format(emit(ir)))
+            _write(root / 'src', _format(emit_client(doc, ir, ledger())))
+            process = _install_and_test(root)
+            self.assertEqual(process.returncode, 0, process.stdout + process.stderr)
+
     def test_custom_only_nullable_fields_pass_deny_warn(self):
         raw = integer_wire_fixture()
         raw['schemas'] = {'NullableNumber': {
@@ -712,7 +805,7 @@ test "typed SSE failures preserve response status headers and event bytes" {
     headers=@http.Headers::of([("x-request-id", "stream-request")]),
     body=Bytes(b"data: nope\n\n"),
   ))
-  let sdk = Demo::new(backend, @sim.FakeClock::new(), auth=XGoogApiKey("test"))
+  let sdk = Demo::new(backend, @sim.FakeClock::new(), auth=ApiKey("test"))
   let payload = @gen.Payload::new(signed=0L, unsigned=0UL)
   match @driver.run_sync(() => sdk.models_stream_generate_content(
     name="models/demo", payload, _ => fail("unexpected event"),

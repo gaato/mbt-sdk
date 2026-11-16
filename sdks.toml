@@ -184,3 +184,38 @@ zero_means_backoff = false
 backoff_base_ms = 500
 backoff_max_ms = 60000
 jitter = [900, 1100]
+
+[[sdk]]
+name = "gemini"
+client_layer = true
+dir = "gemini"
+module = "gaato/gemini"
+generator = "discovery"
+spec_file = "gemini/spec/discovery.json"
+spec_url = "https://generativelanguage.googleapis.com/$discovery/rest?version=v1beta"
+spec_fetch = "plain"
+include_all = false
+derive_operation_ids = true
+package = "gaato/gemini/gen"
+out = "gemini/src/gen"
+census_args = ["--ops", "models_generate_content,models_stream_generate_content,models_embed_content,models_batch_embed_contents,models_count_tokens,models_get,models_list,files_get,files_list,files_delete,media_upload,cached_contents_create,cached_contents_get,cached_contents_list,cached_contents_patch,cached_contents_delete", "--overlay", "gemini/overlays/fix.yaml", "--overlay", "gemini/overlays/moonbit.yaml"]
+report_census_args = ["--ops", "models_generate_content,models_stream_generate_content,models_embed_content,models_batch_embed_contents,models_count_tokens,models_get,models_list,files_get,files_list,files_delete,media_upload,cached_contents_create,cached_contents_get,cached_contents_list,cached_contents_patch,cached_contents_delete", "--overlay", "gemini/overlays/fix.yaml", "--overlay", "gemini/overlays/moonbit.yaml"]
+offline_packages = ["gemini/src", "gemini/src/gen"]
+base_url = "https://generativelanguage.googleapis.com"
+auth = { kind = "alternatives", schemes = [{ kind = "header", name = "x-goog-api-key" }, { kind = "query", name = "key" }, { kind = "bearer" }] }
+publish = false
+spec_watch = false
+
+[sdk.retry]
+retries = 4
+methods = "any"
+statuses = [503]
+sent_failures = "never"
+unprocessed_failures = true
+retry_after = "header"
+retry_after_cap_ms = 60000
+retry_after_cap = "stop"
+zero_means_backoff = false
+backoff_base_ms = 1000
+backoff_max_ms = 60000
+jitter = [1000, 2000]

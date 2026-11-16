@@ -39,6 +39,9 @@ def review_spec():
 
 
 class ClientReviewTests(unittest.TestCase):
+    @unittest.skipUnless(shutil.which('moon'), 'MoonBit toolchain required')
+    def test_omitted_pagination_items_are_empty_but_present_values_must_be_arrays(self):
+        self.run_contract(EMPTY_ITEMS)
     def run_contract(self, source):
         doc = review_spec()
         ir = IRBuilder(doc, 'gaato/sample/gen', auth_headers={'authorization', 'x-api-key'}).build()
@@ -104,6 +107,38 @@ class ClientReviewTests(unittest.TestCase):
     @unittest.skipUnless(shutil.which('moon'), 'MoonBit toolchain required')
     def test_pagination_and_text_diagnostics_are_bounded(self):
         self.run_contract(DIAGNOSTIC_BOUNDS)
+
+
+EMPTY_ITEMS = r'''
+///|
+test "generic paginator skips omitted empty arrays and rejects invalid present values" {
+  let calls = Ref(0)
+  let backend = @client.from_fn((_, _) => {
+    calls.val += 1
+    let body = match calls.val {
+      1 => b"{\"next\":\"two\"}"
+      2 => b"{\"items\":[7],\"next\":\"three\"}"
+      _ => b"{}"
+    }
+    @http.Response::new(200, body=Bytes(body))
+  })
+  let sdk = Sample::new(backend, @sim.FakeClock::new())
+  @driver.run_sync(() => {
+    let pages : @client.Paginator[Int32, Failure] = sdk.paginate(@http.Request::get("/items"), kind=Cursor("cursor"), items="items", next="next")
+    guard pages.next_page() is Ok(Some(items)) else { fail("expected page") }
+    assert_eq(items, [7])
+    assert_true(pages.next_page() is Ok(None))
+    assert_true(pages.next_page() is Ok(None))
+  })
+  assert_eq(calls.val, 3)
+  for body in [b"{\"items\":null}", b"{\"items\":{}}", b"{\"items\":1}", b"{\"items\":\"bad\"}", b"null", b"[]"] {
+    let backend = @client.from_fn((_, _) => @http.Response::new(200, body=Bytes(body)))
+    let sdk = Sample::new(backend, @sim.FakeClock::new())
+    let pages : @client.Paginator[Int32, Failure] = sdk.paginate(@http.Request::get("/items"), kind=Cursor("cursor"), items="items", next="next")
+    assert_true(@driver.run_sync(() => pages.next_page()) is Err(Decode(_)))
+  }
+}
+'''
 
 
 ABSOLUTE_URLS = r'''

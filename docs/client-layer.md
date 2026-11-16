@@ -40,6 +40,19 @@ Generic calls infer operations from relative paths or from absolute URLs within
 the configured operation base, including server replacements; public operations
 therefore keep their no-auth rule on both paths.
 
+New modules may opt into `x-moonbit-nonraising-decoders: true` in their overlay.
+Their generic `call` accepts a decoder returning `Result` without raising. This
+avoids a link-core assertion in the pinned compiler when a typed async wrapper
+instantiates a `raise?` callback. Gemini uses this mode; existing module callback
+contracts and output remain unchanged. Streaming callback errors still propagate.
+
+For a wire oneof selected by the presence of a field, an overlay can use `oneOf`
+plus `x-moonbit-discriminator-fields`, with one field name per payload schema.
+Each payload must require that field and exclude every other variant field.
+This generates a union with flat JSON and rejects missing or ambiguous data.
+Gemini's Part payloads retain their common metadata fields alongside the chosen
+data field, so thought signatures and video metadata survive a round trip.
+
 Google Discovery top-level parameters are system-wide controls, so they are
 intentionally absent from every generated operation signature. API keys and
 OAuth access tokens use the generated `Auth` alternatives. For another optional
@@ -53,6 +66,21 @@ method-level parameter with the same name is still emitted on that method and
 does not require this generic path. A required non-auth top-level parameter is
 rejected during generation because silently omitting it would make every
 affected request invalid.
+Discovery operations use their canonical `path`, not `flatPath`, so returned
+resource names can be passed back with the original `name` or `model` label.
+An exact `^collection/[^/]+$` pattern additionally accepts a bare ID by prepending
+the collection. Other patterns require a full name. Every name is checked against
+the whole pattern, with URL delimiters, percent escapes, whitespace, backslashes,
+empty segments and dot segments rejected before request construction. Low-level
+builders raise `ValidationError`; facade methods return `Failure::Validation`.
+When distinct Google methods reuse a path template with different collection
+patterns, the converter gives their internal OpenAPI dictionary entries unique
+keys and records `x-moonbit-request-path`. IR and emitted requests retain the
+original wire template. Generic call inference uses the collection patterns too.
+Discovery security scheme names become the auth variant names (`ApiKey`,
+`ApiKeyInQuery`, `OAuthToken`); OpenAPI SDKs retain their existing naming rule.
+References to fieldless protobuf messages yield Unit responses; empty OpenAPI
+object schemas retain their ordinary arbitrary-object semantics.
 Operation methods default on; `operation_wrappers = false` leaves the generic
 surface for large specs. Required path/query parameters use labels derived from
 spec names in snake case, with keyword escaping; request bodies stay positional.
@@ -158,6 +186,9 @@ Empty intermediate pages are skipped when a next
 cursor exists; null/absent/empty next stops. Failed decoding or transport does
 not advance. Cursor replacement preserves other query parameters. Offset/limit
 pagination is deferred until a concrete SDK needs it.
+An omitted items field is an empty page, as protobuf JSON may omit empty
+repeated fields. A present non-array field or a non-object path traversal is a
+decode failure; an empty page with a next cursor still advances.
 Next-URL references resolve against the effective URL of the successful page
 (after redirects). Query-relative, path-relative and root-relative references
 therefore retain the correct endpoint without duplicating a base path. Each

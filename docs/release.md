@@ -11,7 +11,7 @@ Run `uv run --with pyyaml --with jsonpath-rfc9535 python tools/sdks.py sync` aft
 <!-- BEGIN sdks: publish -->
 Published modules (ledger order): `openai`, `anthropic`, `github`.
 
-Generated modules kept unpublished: `fixtures/gen/badhttp`, `fixtures/gen/petstore3`, `codex-protocol`, `jina`, `replicate`.
+Generated modules kept unpublished: `fixtures/gen/badhttp`, `fixtures/gen/petstore3`, `codex-protocol`, `jina`, `replicate`, `gemini`.
 <!-- END sdks: publish -->
 
 `jsonrpc`, `jsonrpc-async` and `codex-app-server` also remain unpublished until

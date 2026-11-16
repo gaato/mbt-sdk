@@ -13,6 +13,7 @@ add vendor-specific retries, streaming, pagination and error interpretation.
 | gaato/codex-protocol | Generated typed Codex calls/events (not published yet) | mttp_core/jsonkit |
 | [gaato/jina](jina/README.md) | Generated API vocabulary (not published yet) | mttp_core |
 | [gaato/replicate](replicate/README.md) | Generated API vocabulary (not published yet) | mttp_core |
+| [gaato/gemini](gemini/README.md) | Generated API vocabulary (not published yet) | mttp_core |
 | gaato/jsonrpc | Portable JSON-RPC messages and NDJSON framing | core |
 | gaato/jsonrpc-async | Bidirectional connections and native child processes | jsonrpc, core/async |
 | [gaato/codex-app-server](codex-app-server/README.md) | Initialized sessions, typed events and handlers | protocol, jsonrpc-async, core/async |

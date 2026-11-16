@@ -20,4 +20,5 @@ import {
   "gaato/anthropic@0.17.0",
   "gaato/github@0.25.0",
   "gaato/fixture-badhttp@0.0.0",
+  "gaato/gemini@0.1.0",
 }

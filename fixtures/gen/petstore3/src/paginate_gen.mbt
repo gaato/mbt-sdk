@@ -13,7 +13,7 @@ priv suberror PageDecodeError {
 }
 
 ///|
-fn page_field(value : Json, path : String) -> Json? {
+fn page_field(value : Json, path : String) -> Json? raise PageDecodeError {
   let mut current = value
   for part in path.split(".") {
     match current {
@@ -22,7 +22,7 @@ fn page_field(value : Json, path : String) -> Json? {
           Some(value) => current = value
           None => return None
         }
-      _ => return None
+      _ => raise PageDecodeError("pagination field path traverses a non-object")
     }
   }
   Some(current)
@@ -67,6 +67,7 @@ pub fn[T : @json.FromJson] Petstore3::paginate(
             let json = @json.parse(@utf8.decode(reply.body))
             let values = match page_field(json, items) {
               Some(Array(values)) => values
+              None => []
               _ => raise PageDecodeError("pagination items must be an array")
             }
             let next_cursor = match page_field(json, next) {

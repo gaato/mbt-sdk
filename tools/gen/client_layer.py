@@ -101,7 +101,11 @@ def security_auth_choices(doc):
     return choices, saw_security
 
 
-def auth_constructor(auth):
+def auth_constructor(auth, doc=None):
+    if doc and 'x-moonbit-discovery' in doc:
+        for name, scheme in doc.get('components', {}).get('securitySchemes', {}).items():
+            if scheme_auth(scheme) == auth:
+                return pascal_case(name)
     kind = auth['kind']
     return {'none': 'Anonymous', 'bearer': 'Bearer', 'basic': 'Basic'}.get(kind, pascal_case(str(auth.get('name', ''))))
 
@@ -157,7 +161,7 @@ def retry_source(config):
 
 
 def operations(doc, ir):
-    by_route = {(op.path, op.method): op for op in ir.operations}
+    by_route = {(op.source_path or op.path, op.method): op for op in ir.operations}
     for path, item in doc.get('paths', {}).items():
         for method, raw in item.items():
             if method not in HTTP_METHODS or not isinstance(raw, dict):
@@ -287,6 +291,7 @@ def success_media(raw):
 
 def wrapper(op, raw, prefix, client, auth_headers, name):
     params, request = request_parts(op, raw, prefix, auth_headers)
+    request = validated_request(op, request, prefix)
     stream_kind = raw.get('x-moonbit-stream')
     if stream_kind is not None and stream_kind != 'sse':
         raise ValueError(f'{op.operation_id}: unsupported x-moonbit-stream {stream_kind!r}')
@@ -372,6 +377,17 @@ def multipart_names(field):
     return [field.moon_name + s for s in suffixes.get(field.kind, [''])]
 
 
+def validated_request(op, request, prefix, *, paginator=False):
+    if not any(parameter.resource_name for parameter in op.parameters):
+        return request
+    failure = f'Validation(operation={quote(op.operation_id)}, parameter~, message~)'
+    result = f'@client.Paginator::new(() => Err({failure}))' if paginator else f'Err({failure})'
+    other = '\n      error => raise error' if op.multipart_fields else ''
+    return f'''(try {{ {request} }} catch {{
+      {prefix}ValidationError(parameter~, message~) => return {result}{other}
+    }})'''
+
+
 def qualify_type(text, prefix):
     if not prefix:
         return text
@@ -387,7 +403,7 @@ def emit_client(doc, ir, sdk, vocabulary_files=None):
     auth_headers = {'authorization'} | {a['name'].lower() for a in choices if a['kind'] == 'header'}
     variants = ['  Anonymous']
     for a in choices:
-        ctor = auth_constructor(a)
+        ctor = auth_constructor(a, doc)
         if a['kind'] != 'none':
             variants.append('  ' + ctor + ('(String, String)' if a['kind'] == 'basic' else '(String)'))
     if len(set(v.split('(')[0] for v in variants)) != len(variants):
@@ -402,7 +418,7 @@ pub impl @debug.Debug for Auth with fn to_repr(_) {
 '''
     apply = ['match self.auth {', 'Anonymous => request']
     for a in choices:
-        ctor = auth_constructor(a)
+        ctor = auth_constructor(a, doc)
         if a['kind'] == 'none':
             continue
         args = 'username, password' if a['kind'] == 'basic' else 'value'
@@ -455,7 +471,7 @@ pub impl @debug.Debug for Auth with fn to_repr(_) {
                     if a not in choices:
                         raise ValueError(f'{op.operation_id}: scheme {name} is absent from the pinned auth')
                     allowed.append(a)
-        patterns = [auth_constructor(a) + ('(_, _)' if a['kind'] == 'basic' else '(_)' if a['kind'] != 'none' else '') for a in allowed]
+        patterns = [auth_constructor(a, doc) + ('(_, _)' if a['kind'] == 'basic' else '(_)' if a['kind'] != 'none' else '') for a in allowed]
         # Anonymous-only access means credentials are never attached.  Keep the
         # compact historical representation while retaining Anonymous in the pin.
         auth_bool = 'false' if not patterns or all(a['kind'] == 'none' for a in allowed) else 'match self.auth { ' + ' | '.join(dict.fromkeys(patterns)) + ' => true; _ => false }'
@@ -464,7 +480,20 @@ pub impl @debug.Debug for Auth with fn to_repr(_) {
         if '{' in server:
             raise ValueError(f'{op.operation_id}: server variables require an overlay')
         metadata.append(f'{quote(op.operation_id)} => ({auth_bool}, {quote(server)})')
-        routes.append(f'if request.meth == @http.Method::parse({quote(op.method)}) && route_matches(request.url, {quote(op.path)}, self.operation_base({quote(server)})) {{ return {quote(op.operation_id)} }}')
+        if any(parameter.resource_name for parameter in op.parameters):
+            parameters = {parameter.json_name: parameter for parameter in op.parameters}
+            parts = []
+            for part in re.split(r'(\{[^}]+\})', op.path):
+                if part.startswith('{') and part.endswith('}'):
+                    parameter = parameters[part[1:-1]]
+                    pattern = parameter.pattern or ('.+' if parameter.path_segments else '[^/]+')
+                    parts.append('(?:' + pattern.removeprefix('^').removesuffix('$') + ')')
+                else:
+                    parts.append(re.escape(part))
+            condition = f'resource_route_matches(request.url, {quote("^" + "".join(parts) + "$")}, self.operation_base({quote(server)}))'
+        else:
+            condition = f'route_matches(request.url, {quote(op.path)}, self.operation_base({quote(server)}))'
+        routes.append(f'if request.meth == @http.Method::parse({quote(op.method)}) && {condition} {{ return {quote(op.operation_id)} }}')
     metadata_code = f'''///|
 fn {client}::operation_config(self : {client}, operation : String) -> (Bool, String) {{
   ignore(self)
@@ -478,6 +507,25 @@ fn {client}::infer_operation(self : {client}, request : @http.Request) -> String
   {'\n'.join(routes)}
   ""
 }}
+'''
+    if any(parameter.resource_name for op in ir.operations for parameter in op.parameters):
+        metadata_code += '''///|
+// Match the complete canonical name, including its collection, so operations
+// sharing /{name} retain distinct error/auth/observer metadata on generic calls.
+fn resource_route_matches(url : String, pattern : String, base_url : String) -> Bool {
+  try {
+    let parsed = @http.Url::parse(url)
+    let path = if parsed.is_absolute() {
+      let base = @http.Url::parse(base_url)
+      if !parsed.same_origin(base) { return false }
+      let prefix = base.path.trim_end(chars="/").to_owned()
+      if parsed.path == prefix { "/" } else if parsed.path.has_prefix(prefix + "/") {
+        parsed.path[prefix.length():].to_owned()
+      } else { return false }
+    } else { parsed.path }
+    Regex(pattern).execute(path) is Some(_)
+  } catch { _ => false }
+}
 '''
     failure = '''///|
 /// HTTP failure with exact response bytes and an optional typed interpretation.
@@ -506,6 +554,9 @@ pub extend Failure with @debug.Debug::{to_repr}
 #non_exhaustive
 pub(all) enum ErrorBody {
 ''' + ('\n'.join(f'  {variant}({typ})' for variant, typ in error_variants.items()) if error_variants else '  RawJson(Json)') + '\n}\n///|\npub extend ErrorBody with @debug.Debug::{to_repr}\n'
+    if any(parameter.resource_name for op in ir.operations for parameter in op.parameters):
+        failure = failure.replace('  Decode(@client.ResponseFailure)',
+            '  Decode(@client.ResponseFailure)\n  Validation(operation~ : String, parameter~ : String, message~ : String)')
     if error_cases:
         # An explicit status outranks a range, which outranks default, even when
         # the spec lists the broader schema first.
@@ -522,6 +573,17 @@ fn typed_error(operation : String, head : @http.ResponseHead, body : Bytes) -> E
     # error schemas get the same proven JSON codecs, but stay in the facade.
     error_code = emit(IR(ir.package, error_types.declarations, ()))['types.mbt'][len(HEADER):]
     runtime = (TEMPLATES / 'client.mbt').read_text().replace('__CLIENT__', client).replace('__BASE_URL__', quote(sdk['base_url'])).replace('__PROVIDER__', quote(sdk['name']))
+    if ir.operations and all(any(p.resource_name for p in op.parameters) for op in ir.operations):
+        # Resource-only clients use the pattern matcher; keep strict builds free
+        # of an unused legacy template matcher without changing existing SDKs.
+        start = runtime.index('///|\nfn route_matches(')
+        end = runtime.index('///|\nfn ' + client + '::operation_base', start)
+        runtime = runtime[:start] + runtime[end:]
+    if doc.get('x-moonbit-nonraising-decoders') is True:
+        # Opt-in for new modules: the pinned compiler cannot link an async generic
+        # call with a raise? decoder instantiated by a typed external wrapper.
+        # Existing modules retain their callback contract and byte-identical output.
+        runtime = runtime.replace('Result[T, @client.ResponseFailure] raise?', 'Result[T, @client.ResponseFailure]')
     runtime = runtime.replace('__CREDENTIAL_HEADERS__', '\n'.join('credential_headers.push(' + quote(n) + ')' for n in credential_headers))
     runtime = runtime.replace('__STRIP_HEADERS__', ''.join(f'.remove({quote(h)})' for h in sorted(auth_headers)))
     runtime = runtime.replace('__IDEMPOTENCY__', '\n'.join(f'if request.headers.get({quote(h)}) is Some(value) && value != "" {{ request = request.attribute(@http.replay_safe, true) }}' for h in sdk.get('idempotency_headers', doc.get('x-moonbit-idempotency-headers', []))))
@@ -559,7 +621,7 @@ fn decode_text(head : @http.ResponseHead, body : Bytes) -> Result[String, @clien
 '''
     files['paginate_gen.mbt'] = HEADER + (TEMPLATES / 'paginate.mbt').read_text().replace('__CLIENT__', client) + '\n'.join(pagination)
     files['contract_gen.mbt'] = HEADER + (TEMPLATES / 'contract.mbt').read_text().replace('__CLIENT__', client).replace('__BASE_URL__', quote(sdk['base_url'])).replace('__PROVIDER__', quote(sdk['name']))
-    files['contract_gen.mbt'] += contract_auth(choices, client)
+    files['contract_gen.mbt'] += contract_auth(choices, client, doc)
     files['contract_gen.mbt'] += contract_operations(doc, ir, sdk, client, choices)
     files['contract_gen.mbt'] += contract_error(doc, ir, client)
     if 'timeout_ms' in sdk:
@@ -606,6 +668,8 @@ def sample_json(schema, doc, seen=()):
         return sample_json(current, doc, (*seen, ref))
     if 'enum' in schema:
         return schema['enum'][0]
+    if schema.get('x-moonbit-int-string') in ('int64', 'uint64'):
+        return '1'
     for key in ('anyOf', 'oneOf'):
         if key in schema:
             return sample_json(schema[key][0], doc, seen)
@@ -674,10 +738,10 @@ test "generated server replacement {op.operation_id}" {{
             for auth in choices:
                 if auth['kind'] == 'none':
                     continue
-                ctor = auth_constructor(auth) + ('("u", "p")' if auth['kind'] == 'basic' else '("secret")')
+                ctor = auth_constructor(auth, doc) + ('("u", "p")' if auth['kind'] == 'basic' else '("secret")')
                 check = 'assert_false(request.url.contains("secret"))' if auth['kind'] == 'query' else f'assert_eq(request.headers.get({quote(auth.get("name", "authorization"))}), None)'
                 tests.append(f'''///|
-test "generated public operation {op.operation_id} {auth_constructor(auth)}" {{
+test "generated public operation {op.operation_id} {auth_constructor(auth, doc)}" {{
   let backend = @client.from_fn((request, _) => {{ {check}; @http.Response::new(200) }})
   let sdk = {client}::new(backend, @sim.FakeClock::new(), auth={ctor})
   ignore(@driver.run_sync(() => sdk.send(@http.Request::new(@http.Method::parse({quote(op.method)}), {quote(path)}))))
@@ -726,6 +790,7 @@ def paginator(op, raw, ir, prefix, client, auth_headers, name):
     item = paginator_item_type(ir, op, config)
     item_type = qualify_type(item.moon_type(), prefix) if item else 'Json'
     params, request = request_parts(op, raw, prefix, auth_headers)
+    request = validated_request(op, request, prefix, paginator=True)
     params = 'self : ' + client + (', ' + params if params else '')
     kind = 'NextUrl' if config['kind'] == 'url' else 'Cursor(' + quote(config['param']) + ')'
     return f'''///|
@@ -737,18 +802,18 @@ pub fn {client}::{name}_pages({params}) -> @client.Paginator[{item_type}, Failur
 '''
 
 
-def contract_auth(choices, client):
+def contract_auth(choices, client, doc=None):
     tests = []
     for a in choices:
         if a['kind'] == 'none':
             continue
-        auth = auth_constructor(a) + ('("user", "pass")' if a['kind'] == 'basic' else '("test-secret")')
+        auth = auth_constructor(a, doc) + ('("user", "pass")' if a['kind'] == 'basic' else '("test-secret")')
         key = a.get('name', 'authorization').lower()
         value = {'bearer': 'Bearer test-secret', 'basic': 'Basic dXNlcjpwYXNz'}.get(a['kind'], 'test-secret')
         check = f'assert_eq(request.headers.get({quote(key)}), Some({quote(value)}))' if a['kind'] != 'query' else f'assert_true(request.url.contains({quote(key + "=test-secret")}))'
         redirect_check = f'assert_eq(request.headers.get({quote(key)}), if same_origin {{ Some({quote(value)}) }} else {{ None }})' if a['kind'] != 'query' else '()'
         tests.append(f'''///|
-test "generated auth {auth_constructor(a)} and redirect boundaries" {{
+test "generated auth {auth_constructor(a, doc)} and redirect boundaries" {{
   for same_origin in [true, false] {{
     let count = Ref(0)
     let backend = @client.from_fn((request, _) => {{

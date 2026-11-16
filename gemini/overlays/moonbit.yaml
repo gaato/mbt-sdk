@@ -1,0 +1,1136 @@
+{
+  "overlay": "1.0.0",
+  "info": {
+    "title": "Gemini scope, field oneof and facade ergonomics",
+    "version": "1.0.0"
+  },
+  "actions": [
+    {
+      "target": "$",
+      "update": {
+        "x-moonbit-nonraising-decoders": true
+      },
+      "description": "All generated decoders return Result without raising. A concrete callback effect avoids the pinned compiler's link-core assertion on typed facade calls; existing SDK APIs retain their original effect."
+    },
+    {
+      "target": "$.components.schemas.Part",
+      "remove": true,
+      "description": "Replace the Discovery flat data fields with the proto oneof; keep every non-data field on each payload."
+    },
+    {
+      "target": "$.components.schemas",
+      "update": {
+        "PartText": {
+          "type": "object",
+          "required": [
+            "text"
+          ],
+          "properties": {
+            "speechMetadata": {
+              "$ref": "#/components/schemas/SpeechMetadata",
+              "description": "Optional. Metadata applied to text parts to customize how they should be spoken or synthesized, such as specifying speaker identity or speaking style."
+            },
+            "thought": {
+              "type": "boolean",
+              "description": "Optional. Indicates if the part is thought from the model."
+            },
+            "thoughtSignature": {
+              "format": "byte",
+              "type": "string",
+              "description": "Optional. An opaque signature for the thought so it can be reused in subsequent requests."
+            },
+            "partMetadata": {
+              "description": "Custom metadata associated with the Part. Agents using genai.Part as content representation may need to keep track of the additional information. For example it can be name of a file/source from which the Part originates or a way to multiplex multiple Part streams.",
+              "additionalProperties": {
+                "description": "Properties of the object.",
+                "x-moonbit-json": true
+              },
+              "type": "object"
+            },
+            "text": {
+              "description": "Inline text.",
+              "type": "string"
+            },
+            "mediaProcessing": {
+              "enum": [
+                "MEDIA_PROCESSING_UNSPECIFIED",
+                "STATIC",
+                "AGENTIC"
+              ],
+              "type": "string",
+              "description": "Optional. How the model processes this part's media for understanding. Only meaningful for video parts (`inline_data` or `file_data` with video mime). Non-video parts ignore this field.",
+              "enumDescriptions": [
+                "Defaults to model-specific processing.",
+                "Fixed-rate frame extraction. All frames placed in context.",
+                "Model-driven dynamic navigation. Recommended for most use cases."
+              ]
+            },
+            "videoMetadata": {
+              "description": "Optional. Video metadata. The metadata should only be specified while the video data is presented in inline_data or file_data.",
+              "$ref": "#/components/schemas/VideoMetadata"
+            },
+            "audioTranscription": {
+              "description": "Optional. Audio (input or output) transcription. This is only set when this Part contains audio data.",
+              "$ref": "#/components/schemas/AudioTranscription"
+            },
+            "mediaResolution": {
+              "$ref": "#/components/schemas/V1mainMediaResolution",
+              "description": "Optional. Media resolution for the input media."
+            }
+          }
+        },
+        "PartInlineData": {
+          "type": "object",
+          "required": [
+            "inlineData"
+          ],
+          "properties": {
+            "inlineData": {
+              "description": "Inline media bytes.",
+              "$ref": "#/components/schemas/Blob"
+            },
+            "speechMetadata": {
+              "$ref": "#/components/schemas/SpeechMetadata",
+              "description": "Optional. Metadata applied to text parts to customize how they should be spoken or synthesized, such as specifying speaker identity or speaking style."
+            },
+            "thought": {
+              "type": "boolean",
+              "description": "Optional. Indicates if the part is thought from the model."
+            },
+            "thoughtSignature": {
+              "format": "byte",
+              "type": "string",
+              "description": "Optional. An opaque signature for the thought so it can be reused in subsequent requests."
+            },
+            "partMetadata": {
+              "description": "Custom metadata associated with the Part. Agents using genai.Part as content representation may need to keep track of the additional information. For example it can be name of a file/source from which the Part originates or a way to multiplex multiple Part streams.",
+              "additionalProperties": {
+                "description": "Properties of the object.",
+                "x-moonbit-json": true
+              },
+              "type": "object"
+            },
+            "mediaProcessing": {
+              "enum": [
+                "MEDIA_PROCESSING_UNSPECIFIED",
+                "STATIC",
+                "AGENTIC"
+              ],
+              "type": "string",
+              "description": "Optional. How the model processes this part's media for understanding. Only meaningful for video parts (`inline_data` or `file_data` with video mime). Non-video parts ignore this field.",
+              "enumDescriptions": [
+                "Defaults to model-specific processing.",
+                "Fixed-rate frame extraction. All frames placed in context.",
+                "Model-driven dynamic navigation. Recommended for most use cases."
+              ]
+            },
+            "videoMetadata": {
+              "description": "Optional. Video metadata. The metadata should only be specified while the video data is presented in inline_data or file_data.",
+              "$ref": "#/components/schemas/VideoMetadata"
+            },
+            "audioTranscription": {
+              "description": "Optional. Audio (input or output) transcription. This is only set when this Part contains audio data.",
+              "$ref": "#/components/schemas/AudioTranscription"
+            },
+            "mediaResolution": {
+              "$ref": "#/components/schemas/V1mainMediaResolution",
+              "description": "Optional. Media resolution for the input media."
+            }
+          }
+        },
+        "PartFileData": {
+          "type": "object",
+          "required": [
+            "fileData"
+          ],
+          "properties": {
+            "speechMetadata": {
+              "$ref": "#/components/schemas/SpeechMetadata",
+              "description": "Optional. Metadata applied to text parts to customize how they should be spoken or synthesized, such as specifying speaker identity or speaking style."
+            },
+            "thought": {
+              "type": "boolean",
+              "description": "Optional. Indicates if the part is thought from the model."
+            },
+            "thoughtSignature": {
+              "format": "byte",
+              "type": "string",
+              "description": "Optional. An opaque signature for the thought so it can be reused in subsequent requests."
+            },
+            "fileData": {
+              "$ref": "#/components/schemas/FileData",
+              "description": "URI based data."
+            },
+            "partMetadata": {
+              "description": "Custom metadata associated with the Part. Agents using genai.Part as content representation may need to keep track of the additional information. For example it can be name of a file/source from which the Part originates or a way to multiplex multiple Part streams.",
+              "additionalProperties": {
+                "description": "Properties of the object.",
+                "x-moonbit-json": true
+              },
+              "type": "object"
+            },
+            "mediaProcessing": {
+              "enum": [
+                "MEDIA_PROCESSING_UNSPECIFIED",
+                "STATIC",
+                "AGENTIC"
+              ],
+              "type": "string",
+              "description": "Optional. How the model processes this part's media for understanding. Only meaningful for video parts (`inline_data` or `file_data` with video mime). Non-video parts ignore this field.",
+              "enumDescriptions": [
+                "Defaults to model-specific processing.",
+                "Fixed-rate frame extraction. All frames placed in context.",
+                "Model-driven dynamic navigation. Recommended for most use cases."
+              ]
+            },
+            "videoMetadata": {
+              "description": "Optional. Video metadata. The metadata should only be specified while the video data is presented in inline_data or file_data.",
+              "$ref": "#/components/schemas/VideoMetadata"
+            },
+            "audioTranscription": {
+              "description": "Optional. Audio (input or output) transcription. This is only set when this Part contains audio data.",
+              "$ref": "#/components/schemas/AudioTranscription"
+            },
+            "mediaResolution": {
+              "$ref": "#/components/schemas/V1mainMediaResolution",
+              "description": "Optional. Media resolution for the input media."
+            }
+          }
+        },
+        "PartFunctionCall": {
+          "type": "object",
+          "required": [
+            "functionCall"
+          ],
+          "properties": {
+            "speechMetadata": {
+              "$ref": "#/components/schemas/SpeechMetadata",
+              "description": "Optional. Metadata applied to text parts to customize how they should be spoken or synthesized, such as specifying speaker identity or speaking style."
+            },
+            "thought": {
+              "type": "boolean",
+              "description": "Optional. Indicates if the part is thought from the model."
+            },
+            "thoughtSignature": {
+              "format": "byte",
+              "type": "string",
+              "description": "Optional. An opaque signature for the thought so it can be reused in subsequent requests."
+            },
+            "partMetadata": {
+              "description": "Custom metadata associated with the Part. Agents using genai.Part as content representation may need to keep track of the additional information. For example it can be name of a file/source from which the Part originates or a way to multiplex multiple Part streams.",
+              "additionalProperties": {
+                "description": "Properties of the object.",
+                "x-moonbit-json": true
+              },
+              "type": "object"
+            },
+            "mediaProcessing": {
+              "enum": [
+                "MEDIA_PROCESSING_UNSPECIFIED",
+                "STATIC",
+                "AGENTIC"
+              ],
+              "type": "string",
+              "description": "Optional. How the model processes this part's media for understanding. Only meaningful for video parts (`inline_data` or `file_data` with video mime). Non-video parts ignore this field.",
+              "enumDescriptions": [
+                "Defaults to model-specific processing.",
+                "Fixed-rate frame extraction. All frames placed in context.",
+                "Model-driven dynamic navigation. Recommended for most use cases."
+              ]
+            },
+            "functionCall": {
+              "$ref": "#/components/schemas/FunctionCall",
+              "description": "A predicted `FunctionCall` returned from the model that contains a string representing the `FunctionDeclaration.name` with the arguments and their values."
+            },
+            "videoMetadata": {
+              "description": "Optional. Video metadata. The metadata should only be specified while the video data is presented in inline_data or file_data.",
+              "$ref": "#/components/schemas/VideoMetadata"
+            },
+            "audioTranscription": {
+              "description": "Optional. Audio (input or output) transcription. This is only set when this Part contains audio data.",
+              "$ref": "#/components/schemas/AudioTranscription"
+            },
+            "mediaResolution": {
+              "$ref": "#/components/schemas/V1mainMediaResolution",
+              "description": "Optional. Media resolution for the input media."
+            }
+          }
+        },
+        "PartFunctionResponse": {
+          "type": "object",
+          "required": [
+            "functionResponse"
+          ],
+          "properties": {
+            "speechMetadata": {
+              "$ref": "#/components/schemas/SpeechMetadata",
+              "description": "Optional. Metadata applied to text parts to customize how they should be spoken or synthesized, such as specifying speaker identity or speaking style."
+            },
+            "thought": {
+              "type": "boolean",
+              "description": "Optional. Indicates if the part is thought from the model."
+            },
+            "thoughtSignature": {
+              "format": "byte",
+              "type": "string",
+              "description": "Optional. An opaque signature for the thought so it can be reused in subsequent requests."
+            },
+            "partMetadata": {
+              "description": "Custom metadata associated with the Part. Agents using genai.Part as content representation may need to keep track of the additional information. For example it can be name of a file/source from which the Part originates or a way to multiplex multiple Part streams.",
+              "additionalProperties": {
+                "description": "Properties of the object.",
+                "x-moonbit-json": true
+              },
+              "type": "object"
+            },
+            "functionResponse": {
+              "description": "The result output of a `FunctionCall` that contains a string representing the `FunctionDeclaration.name` and a structured JSON object containing any output from the function is used as context to the model.",
+              "$ref": "#/components/schemas/FunctionResponse"
+            },
+            "mediaProcessing": {
+              "enum": [
+                "MEDIA_PROCESSING_UNSPECIFIED",
+                "STATIC",
+                "AGENTIC"
+              ],
+              "type": "string",
+              "description": "Optional. How the model processes this part's media for understanding. Only meaningful for video parts (`inline_data` or `file_data` with video mime). Non-video parts ignore this field.",
+              "enumDescriptions": [
+                "Defaults to model-specific processing.",
+                "Fixed-rate frame extraction. All frames placed in context.",
+                "Model-driven dynamic navigation. Recommended for most use cases."
+              ]
+            },
+            "videoMetadata": {
+              "description": "Optional. Video metadata. The metadata should only be specified while the video data is presented in inline_data or file_data.",
+              "$ref": "#/components/schemas/VideoMetadata"
+            },
+            "audioTranscription": {
+              "description": "Optional. Audio (input or output) transcription. This is only set when this Part contains audio data.",
+              "$ref": "#/components/schemas/AudioTranscription"
+            },
+            "mediaResolution": {
+              "$ref": "#/components/schemas/V1mainMediaResolution",
+              "description": "Optional. Media resolution for the input media."
+            }
+          }
+        },
+        "PartExecutableCode": {
+          "type": "object",
+          "required": [
+            "executableCode"
+          ],
+          "properties": {
+            "speechMetadata": {
+              "$ref": "#/components/schemas/SpeechMetadata",
+              "description": "Optional. Metadata applied to text parts to customize how they should be spoken or synthesized, such as specifying speaker identity or speaking style."
+            },
+            "thought": {
+              "type": "boolean",
+              "description": "Optional. Indicates if the part is thought from the model."
+            },
+            "thoughtSignature": {
+              "format": "byte",
+              "type": "string",
+              "description": "Optional. An opaque signature for the thought so it can be reused in subsequent requests."
+            },
+            "partMetadata": {
+              "description": "Custom metadata associated with the Part. Agents using genai.Part as content representation may need to keep track of the additional information. For example it can be name of a file/source from which the Part originates or a way to multiplex multiple Part streams.",
+              "additionalProperties": {
+                "description": "Properties of the object.",
+                "x-moonbit-json": true
+              },
+              "type": "object"
+            },
+            "executableCode": {
+              "description": "Code generated by the model that is meant to be executed.",
+              "$ref": "#/components/schemas/ExecutableCode"
+            },
+            "mediaProcessing": {
+              "enum": [
+                "MEDIA_PROCESSING_UNSPECIFIED",
+                "STATIC",
+                "AGENTIC"
+              ],
+              "type": "string",
+              "description": "Optional. How the model processes this part's media for understanding. Only meaningful for video parts (`inline_data` or `file_data` with video mime). Non-video parts ignore this field.",
+              "enumDescriptions": [
+                "Defaults to model-specific processing.",
+                "Fixed-rate frame extraction. All frames placed in context.",
+                "Model-driven dynamic navigation. Recommended for most use cases."
+              ]
+            },
+            "videoMetadata": {
+              "description": "Optional. Video metadata. The metadata should only be specified while the video data is presented in inline_data or file_data.",
+              "$ref": "#/components/schemas/VideoMetadata"
+            },
+            "audioTranscription": {
+              "description": "Optional. Audio (input or output) transcription. This is only set when this Part contains audio data.",
+              "$ref": "#/components/schemas/AudioTranscription"
+            },
+            "mediaResolution": {
+              "$ref": "#/components/schemas/V1mainMediaResolution",
+              "description": "Optional. Media resolution for the input media."
+            }
+          }
+        },
+        "PartCodeExecutionResult": {
+          "type": "object",
+          "required": [
+            "codeExecutionResult"
+          ],
+          "properties": {
+            "speechMetadata": {
+              "$ref": "#/components/schemas/SpeechMetadata",
+              "description": "Optional. Metadata applied to text parts to customize how they should be spoken or synthesized, such as specifying speaker identity or speaking style."
+            },
+            "codeExecutionResult": {
+              "$ref": "#/components/schemas/CodeExecutionResult",
+              "description": "Result of executing the `ExecutableCode`."
+            },
+            "thought": {
+              "type": "boolean",
+              "description": "Optional. Indicates if the part is thought from the model."
+            },
+            "thoughtSignature": {
+              "format": "byte",
+              "type": "string",
+              "description": "Optional. An opaque signature for the thought so it can be reused in subsequent requests."
+            },
+            "partMetadata": {
+              "description": "Custom metadata associated with the Part. Agents using genai.Part as content representation may need to keep track of the additional information. For example it can be name of a file/source from which the Part originates or a way to multiplex multiple Part streams.",
+              "additionalProperties": {
+                "description": "Properties of the object.",
+                "x-moonbit-json": true
+              },
+              "type": "object"
+            },
+            "mediaProcessing": {
+              "enum": [
+                "MEDIA_PROCESSING_UNSPECIFIED",
+                "STATIC",
+                "AGENTIC"
+              ],
+              "type": "string",
+              "description": "Optional. How the model processes this part's media for understanding. Only meaningful for video parts (`inline_data` or `file_data` with video mime). Non-video parts ignore this field.",
+              "enumDescriptions": [
+                "Defaults to model-specific processing.",
+                "Fixed-rate frame extraction. All frames placed in context.",
+                "Model-driven dynamic navigation. Recommended for most use cases."
+              ]
+            },
+            "videoMetadata": {
+              "description": "Optional. Video metadata. The metadata should only be specified while the video data is presented in inline_data or file_data.",
+              "$ref": "#/components/schemas/VideoMetadata"
+            },
+            "audioTranscription": {
+              "description": "Optional. Audio (input or output) transcription. This is only set when this Part contains audio data.",
+              "$ref": "#/components/schemas/AudioTranscription"
+            },
+            "mediaResolution": {
+              "$ref": "#/components/schemas/V1mainMediaResolution",
+              "description": "Optional. Media resolution for the input media."
+            }
+          }
+        },
+        "PartToolCall": {
+          "type": "object",
+          "required": [
+            "toolCall"
+          ],
+          "properties": {
+            "speechMetadata": {
+              "$ref": "#/components/schemas/SpeechMetadata",
+              "description": "Optional. Metadata applied to text parts to customize how they should be spoken or synthesized, such as specifying speaker identity or speaking style."
+            },
+            "thought": {
+              "type": "boolean",
+              "description": "Optional. Indicates if the part is thought from the model."
+            },
+            "thoughtSignature": {
+              "format": "byte",
+              "type": "string",
+              "description": "Optional. An opaque signature for the thought so it can be reused in subsequent requests."
+            },
+            "partMetadata": {
+              "description": "Custom metadata associated with the Part. Agents using genai.Part as content representation may need to keep track of the additional information. For example it can be name of a file/source from which the Part originates or a way to multiplex multiple Part streams.",
+              "additionalProperties": {
+                "description": "Properties of the object.",
+                "x-moonbit-json": true
+              },
+              "type": "object"
+            },
+            "toolCall": {
+              "description": "Server-side tool call. This field is populated when the model predicts a tool invocation that should be executed on the server. The client is expected to echo this message back to the API.",
+              "$ref": "#/components/schemas/ToolCall"
+            },
+            "mediaProcessing": {
+              "enum": [
+                "MEDIA_PROCESSING_UNSPECIFIED",
+                "STATIC",
+                "AGENTIC"
+              ],
+              "type": "string",
+              "description": "Optional. How the model processes this part's media for understanding. Only meaningful for video parts (`inline_data` or `file_data` with video mime). Non-video parts ignore this field.",
+              "enumDescriptions": [
+                "Defaults to model-specific processing.",
+                "Fixed-rate frame extraction. All frames placed in context.",
+                "Model-driven dynamic navigation. Recommended for most use cases."
+              ]
+            },
+            "videoMetadata": {
+              "description": "Optional. Video metadata. The metadata should only be specified while the video data is presented in inline_data or file_data.",
+              "$ref": "#/components/schemas/VideoMetadata"
+            },
+            "audioTranscription": {
+              "description": "Optional. Audio (input or output) transcription. This is only set when this Part contains audio data.",
+              "$ref": "#/components/schemas/AudioTranscription"
+            },
+            "mediaResolution": {
+              "$ref": "#/components/schemas/V1mainMediaResolution",
+              "description": "Optional. Media resolution for the input media."
+            }
+          }
+        },
+        "PartToolResponse": {
+          "type": "object",
+          "required": [
+            "toolResponse"
+          ],
+          "properties": {
+            "speechMetadata": {
+              "$ref": "#/components/schemas/SpeechMetadata",
+              "description": "Optional. Metadata applied to text parts to customize how they should be spoken or synthesized, such as specifying speaker identity or speaking style."
+            },
+            "thought": {
+              "type": "boolean",
+              "description": "Optional. Indicates if the part is thought from the model."
+            },
+            "thoughtSignature": {
+              "format": "byte",
+              "type": "string",
+              "description": "Optional. An opaque signature for the thought so it can be reused in subsequent requests."
+            },
+            "partMetadata": {
+              "description": "Custom metadata associated with the Part. Agents using genai.Part as content representation may need to keep track of the additional information. For example it can be name of a file/source from which the Part originates or a way to multiplex multiple Part streams.",
+              "additionalProperties": {
+                "description": "Properties of the object.",
+                "x-moonbit-json": true
+              },
+              "type": "object"
+            },
+            "mediaProcessing": {
+              "enum": [
+                "MEDIA_PROCESSING_UNSPECIFIED",
+                "STATIC",
+                "AGENTIC"
+              ],
+              "type": "string",
+              "description": "Optional. How the model processes this part's media for understanding. Only meaningful for video parts (`inline_data` or `file_data` with video mime). Non-video parts ignore this field.",
+              "enumDescriptions": [
+                "Defaults to model-specific processing.",
+                "Fixed-rate frame extraction. All frames placed in context.",
+                "Model-driven dynamic navigation. Recommended for most use cases."
+              ]
+            },
+            "videoMetadata": {
+              "description": "Optional. Video metadata. The metadata should only be specified while the video data is presented in inline_data or file_data.",
+              "$ref": "#/components/schemas/VideoMetadata"
+            },
+            "audioTranscription": {
+              "description": "Optional. Audio (input or output) transcription. This is only set when this Part contains audio data.",
+              "$ref": "#/components/schemas/AudioTranscription"
+            },
+            "toolResponse": {
+              "$ref": "#/components/schemas/ToolResponse",
+              "description": "The output from a server-side `ToolCall` execution. This field is populated by the client with the results of executing the corresponding `ToolCall`."
+            },
+            "mediaResolution": {
+              "$ref": "#/components/schemas/V1mainMediaResolution",
+              "description": "Optional. Media resolution for the input media."
+            }
+          }
+        },
+        "Part": {
+          "description": "A datatype containing media that is part of a multi-part `Content` message. A `Part` consists of data which has an associated datatype. A `Part` can only contain one of the accepted types in `Part.data`. A `Part` must have a fixed IANA MIME type identifying the type and subtype of the media if the `inline_data` field is filled with raw bytes.",
+          "oneOf": [
+            {
+              "$ref": "#/components/schemas/PartText"
+            },
+            {
+              "$ref": "#/components/schemas/PartInlineData"
+            },
+            {
+              "$ref": "#/components/schemas/PartFileData"
+            },
+            {
+              "$ref": "#/components/schemas/PartFunctionCall"
+            },
+            {
+              "$ref": "#/components/schemas/PartFunctionResponse"
+            },
+            {
+              "$ref": "#/components/schemas/PartExecutableCode"
+            },
+            {
+              "$ref": "#/components/schemas/PartCodeExecutionResult"
+            },
+            {
+              "$ref": "#/components/schemas/PartToolCall"
+            },
+            {
+              "$ref": "#/components/schemas/PartToolResponse"
+            }
+          ],
+          "x-moonbit-discriminator-fields": [
+            "text",
+            "inlineData",
+            "fileData",
+            "functionCall",
+            "functionResponse",
+            "executableCode",
+            "codeExecutionResult",
+            "toolCall",
+            "toolResponse"
+          ]
+        },
+        "GoogleError": {
+          "type": "object",
+          "required": [
+            "error"
+          ],
+          "properties": {
+            "error": {
+              "$ref": "#/components/schemas/GoogleErrorStatus"
+            }
+          }
+        },
+        "GoogleErrorStatus": {
+          "type": "object",
+          "required": [
+            "code",
+            "message",
+            "status"
+          ],
+          "properties": {
+            "code": {
+              "type": "integer"
+            },
+            "message": {
+              "type": "string"
+            },
+            "status": {
+              "type": "string"
+            },
+            "details": {
+              "type": "array",
+              "items": {
+                "x-moonbit-json": true
+              }
+            }
+          }
+        }
+      },
+      "description": "Exactly one Part data field is selected by its wire field name. Google errors use the documented google.rpc.Status envelope (GoogleErrorStatus), absent from Discovery responses."
+    },
+    {
+      "target": "$.paths.*[?@.operationId == 'models_generate_content']",
+      "description": "Include models.generateContent; use a verb-first facade name rather than the Discovery resource prefix. media.upload exposes metadata only; upload_file implements the resumable protocol.",
+      "update": {
+        "x-moonbit-include": true,
+        "x-moonbit-name": "generate_content",
+        "responses": {
+          "4XX": {
+            "description": "Google client error envelope (AIP-193).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GoogleError"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "Google server error envelope (AIP-193).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GoogleError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "target": "$.paths.*[?@.operationId == 'models_stream_generate_content']",
+      "description": "Include models.streamGenerateContent; use a verb-first facade name rather than the Discovery resource prefix. media.upload exposes metadata only; upload_file implements the resumable protocol.",
+      "update": {
+        "x-moonbit-include": true,
+        "x-moonbit-name": "stream_generate_content",
+        "responses": {
+          "4XX": {
+            "description": "Google client error envelope (AIP-193).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GoogleError"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "Google server error envelope (AIP-193).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GoogleError"
+                }
+              }
+            }
+          }
+        },
+        "x-moonbit-stream": "sse"
+      }
+    },
+    {
+      "target": "$.paths.*[?@.operationId == 'models_embed_content']",
+      "description": "Include models.embedContent; use a verb-first facade name rather than the Discovery resource prefix. media.upload exposes metadata only; upload_file implements the resumable protocol.",
+      "update": {
+        "x-moonbit-include": true,
+        "x-moonbit-name": "embed_content",
+        "responses": {
+          "4XX": {
+            "description": "Google client error envelope (AIP-193).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GoogleError"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "Google server error envelope (AIP-193).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GoogleError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "target": "$.paths.*[?@.operationId == 'models_batch_embed_contents']",
+      "description": "Include models.batchEmbedContents; use a verb-first facade name rather than the Discovery resource prefix. media.upload exposes metadata only; upload_file implements the resumable protocol.",
+      "update": {
+        "x-moonbit-include": true,
+        "x-moonbit-name": "batch_embed_contents",
+        "responses": {
+          "4XX": {
+            "description": "Google client error envelope (AIP-193).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GoogleError"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "Google server error envelope (AIP-193).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GoogleError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "target": "$.paths.*[?@.operationId == 'models_count_tokens']",
+      "description": "Include models.countTokens; use a verb-first facade name rather than the Discovery resource prefix. media.upload exposes metadata only; upload_file implements the resumable protocol.",
+      "update": {
+        "x-moonbit-include": true,
+        "x-moonbit-name": "count_tokens",
+        "responses": {
+          "4XX": {
+            "description": "Google client error envelope (AIP-193).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GoogleError"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "Google server error envelope (AIP-193).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GoogleError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "target": "$.paths.*[?@.operationId == 'models_get']",
+      "description": "Include models.get; use a verb-first facade name rather than the Discovery resource prefix. media.upload exposes metadata only; upload_file implements the resumable protocol.",
+      "update": {
+        "x-moonbit-include": true,
+        "x-moonbit-name": "get_model",
+        "responses": {
+          "4XX": {
+            "description": "Google client error envelope (AIP-193).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GoogleError"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "Google server error envelope (AIP-193).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GoogleError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "target": "$.paths.*[?@.operationId == 'models_list']",
+      "description": "Include models.list; use a verb-first facade name rather than the Discovery resource prefix. media.upload exposes metadata only; upload_file implements the resumable protocol.",
+      "update": {
+        "x-moonbit-include": true,
+        "x-moonbit-name": "list_models",
+        "responses": {
+          "4XX": {
+            "description": "Google client error envelope (AIP-193).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GoogleError"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "Google server error envelope (AIP-193).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GoogleError"
+                }
+              }
+            }
+          }
+        },
+        "x-moonbit-paginate": {
+          "kind": "cursor",
+          "param": "pageToken",
+          "items": "models",
+          "next": "nextPageToken"
+        }
+      }
+    },
+    {
+      "target": "$.paths.*[?@.operationId == 'files_get']",
+      "description": "Include files.get; use a verb-first facade name rather than the Discovery resource prefix. media.upload exposes metadata only; upload_file implements the resumable protocol.",
+      "update": {
+        "x-moonbit-include": true,
+        "x-moonbit-name": "get_file",
+        "responses": {
+          "4XX": {
+            "description": "Google client error envelope (AIP-193).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GoogleError"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "Google server error envelope (AIP-193).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GoogleError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "target": "$.paths.*[?@.operationId == 'files_list']",
+      "description": "Include files.list; use a verb-first facade name rather than the Discovery resource prefix. media.upload exposes metadata only; upload_file implements the resumable protocol.",
+      "update": {
+        "x-moonbit-include": true,
+        "x-moonbit-name": "list_files",
+        "responses": {
+          "4XX": {
+            "description": "Google client error envelope (AIP-193).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GoogleError"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "Google server error envelope (AIP-193).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GoogleError"
+                }
+              }
+            }
+          }
+        },
+        "x-moonbit-paginate": {
+          "kind": "cursor",
+          "param": "pageToken",
+          "items": "files",
+          "next": "nextPageToken"
+        }
+      }
+    },
+    {
+      "target": "$.paths.*[?@.operationId == 'files_delete']",
+      "description": "Include files.delete; use a verb-first facade name rather than the Discovery resource prefix. media.upload exposes metadata only; upload_file implements the resumable protocol.",
+      "update": {
+        "x-moonbit-include": true,
+        "x-moonbit-name": "delete_file",
+        "responses": {
+          "4XX": {
+            "description": "Google client error envelope (AIP-193).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GoogleError"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "Google server error envelope (AIP-193).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GoogleError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "target": "$.paths.*[?@.operationId == 'cached_contents_create']",
+      "description": "Include cachedContents.create; use a verb-first facade name rather than the Discovery resource prefix. media.upload exposes metadata only; upload_file implements the resumable protocol.",
+      "update": {
+        "x-moonbit-include": true,
+        "x-moonbit-name": "create_cached_content",
+        "responses": {
+          "4XX": {
+            "description": "Google client error envelope (AIP-193).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GoogleError"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "Google server error envelope (AIP-193).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GoogleError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "target": "$.paths.*[?@.operationId == 'cached_contents_get']",
+      "description": "Include cachedContents.get; use a verb-first facade name rather than the Discovery resource prefix. media.upload exposes metadata only; upload_file implements the resumable protocol.",
+      "update": {
+        "x-moonbit-include": true,
+        "x-moonbit-name": "get_cached_content",
+        "responses": {
+          "4XX": {
+            "description": "Google client error envelope (AIP-193).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GoogleError"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "Google server error envelope (AIP-193).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GoogleError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "target": "$.paths.*[?@.operationId == 'cached_contents_list']",
+      "description": "Include cachedContents.list; use a verb-first facade name rather than the Discovery resource prefix. media.upload exposes metadata only; upload_file implements the resumable protocol.",
+      "update": {
+        "x-moonbit-include": true,
+        "x-moonbit-name": "list_cached_contents",
+        "responses": {
+          "4XX": {
+            "description": "Google client error envelope (AIP-193).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GoogleError"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "Google server error envelope (AIP-193).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GoogleError"
+                }
+              }
+            }
+          }
+        },
+        "x-moonbit-paginate": {
+          "kind": "cursor",
+          "param": "pageToken",
+          "items": "cachedContents",
+          "next": "nextPageToken"
+        }
+      }
+    },
+    {
+      "target": "$.paths.*[?@.operationId == 'cached_contents_patch']",
+      "description": "Include cachedContents.patch; use a verb-first facade name rather than the Discovery resource prefix. media.upload exposes metadata only; upload_file implements the resumable protocol.",
+      "update": {
+        "x-moonbit-include": true,
+        "x-moonbit-name": "update_cached_content",
+        "responses": {
+          "4XX": {
+            "description": "Google client error envelope (AIP-193).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GoogleError"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "Google server error envelope (AIP-193).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GoogleError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "target": "$.paths.*[?@.operationId == 'cached_contents_delete']",
+      "description": "Include cachedContents.delete; use a verb-first facade name rather than the Discovery resource prefix. media.upload exposes metadata only; upload_file implements the resumable protocol.",
+      "update": {
+        "x-moonbit-include": true,
+        "x-moonbit-name": "delete_cached_content",
+        "responses": {
+          "4XX": {
+            "description": "Google client error envelope (AIP-193).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GoogleError"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "Google server error envelope (AIP-193).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GoogleError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "target": "$.paths.*[?@.operationId == 'media_upload']",
+      "description": "Include media.upload; use a verb-first facade name rather than the Discovery resource prefix. media.upload exposes metadata only; upload_file implements the resumable protocol.",
+      "update": {
+        "x-moonbit-include": true,
+        "x-moonbit-name": "create_file_metadata",
+        "responses": {
+          "4XX": {
+            "description": "Google client error envelope (AIP-193).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GoogleError"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "Google server error envelope (AIP-193).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GoogleError"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

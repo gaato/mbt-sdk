@@ -12,4 +12,5 @@ members = [
   "fixtures/gen/petstore3",
   "jina",
   "replicate",
+  "gemini",
 ]

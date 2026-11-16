@@ -224,7 +224,9 @@ def _struct(declaration: Struct) -> str:
                 field.type, value, value_path
             )
             if field.presence == Presence.REQUIRED:
-                expression = decoder(f"required_field(obj, {key}, path)", path)
+                raw = (f"decode_defaulted_field(obj, {key}, path, {_json_literal(field.default)})"
+                       if field.default is not None else f"required_field(obj, {key}, path)")
+                expression = decoder(raw, path)
             elif field.presence == Presence.NULLABLE_REQUIRED:
                 expression = (
                     f"decode_nullable_custom(obj, {key}, path, "
@@ -371,7 +373,30 @@ def _external_union(declaration: ExternalUnion) -> str:
     return "\n".join(lines)
 
 
+def _field_tagged_union(declaration: TaggedUnion) -> str:
+    lines = _doc(declaration.description, f"Generated field-discriminated union {declaration.name}.")
+    lines.extend([DERIVE, f"pub(all) enum {declaration.name} {{"])
+    lines.extend(f"  {variant.name}({variant.type.moon_type()})" for variant in declaration.variants)
+    lines.append("}")
+    lines.extend(_derive_extends(declaration.name))
+    lines.extend(["///|", f"pub extend {declaration.name} with ToJson::{{to_json}}", "///|",
+                  f"pub impl ToJson for {declaration.name} with fn to_json(self) {{", "  match self {"])
+    lines.extend(f"    {variant.name}(payload) => Json(payload)" for variant in declaration.variants)
+    lines.extend(["  }", "}", "///|", f"pub extend {declaration.name} with @json.FromJson::{{from_json}}", "///|",
+                  f"pub impl @json.FromJson for {declaration.name} with fn from_json(value, path) {{",
+                  "  let obj = @sdkjson.expect_object(value, path)", "  let mut count = 0"])
+    for variant in declaration.variants:
+        lines.append(f"  if obj.contains({_moon_string(variant.tag)}) {{ count += 1 }}")
+    lines.append('  if count != 1 { raise @json.JsonDecodeError((path, "expected exactly one data field")) }')
+    for variant in declaration.variants:
+        lines.append(f"  if obj.contains({_moon_string(variant.tag)}) {{ return {variant.name}(@json.from_json(value, path~)) }}")
+    lines.extend(['  raise @json.JsonDecodeError((path, "missing data field"))', "}"])
+    return "\n".join(lines)
+
+
 def _tagged_union(declaration: TaggedUnion) -> str:
+    if declaration.field_discriminator:
+        return _field_tagged_union(declaration)
     lines = _doc(declaration.description, f"Generated tagged union {declaration.name}.")
     lines.extend([DERIVE, "#non_exhaustive", f"pub(all) enum {declaration.name} {{"])
     lines.extend(f"  {variant.name}({variant.type.moon_type()})" for variant in declaration.variants)
@@ -1015,8 +1040,14 @@ def _operation(operation: Operation, response_codec_name: str | None = None) -> 
         fallback += " The caller handles the response as @http.Response."
     description = " ".join((operation.description, "The caller handles the response as @http.Response." if operation.response_type is None else "")).strip()
     lines = _doc(description, fallback)
-    raises = " raise @multipart.MultipartError" if operation.multipart_fields else ""
+    resource_parameters = [parameter for parameter in operation.parameters if parameter.resource_name]
+    raises = (" raise" if operation.multipart_fields else " raise ValidationError") if resource_parameters else (" raise @multipart.MultipartError" if operation.multipart_fields else "")
     lines.append(f"pub fn {request_name}({', '.join(parameters)}) -> @http.Request{raises} {{")
+    for parameter in resource_parameters:
+        pattern = parameter.pattern or "^.*$"
+        short = re.fullmatch(r"\^([A-Za-z0-9_-]+)/\[\^/\]\+\$", pattern)
+        prefix = short[1] + "/" if short else ""
+        lines.append(f"  let {parameter.moon_name} = normalize_resource_name(parameter_value({parameter.moon_name}), {_moon_string(parameter.json_name)}, {_moon_string(pattern)}, {_moon_string(prefix)})")
     query_parameters = [parameter for parameter in operation.parameters if parameter.location == "query"]
     if query_parameters:
         lines.append(f"  let mut url = {_path_expression(operation)}")
@@ -1164,6 +1195,50 @@ def _operation(operation: Operation, response_codec_name: str | None = None) -> 
     return "\n".join(lines)
 
 
+RESOURCE_NAME_HELPER = r'''///|
+/// A canonical resource name failed validation before request construction.
+#derive(@debug.Debug)
+pub(all) suberror ValidationError {
+  ValidationError(parameter~ : String, message~ : String)
+}
+
+///|
+pub extend ValidationError with @debug.Debug::{to_repr}
+
+///|
+fn normalize_resource_name(
+  value : String,
+  parameter : String,
+  pattern : String,
+  prefix : String,
+) -> String raise ValidationError {
+  if value.is_empty() {
+    raise ValidationError(parameter~, message="resource name must not be empty")
+  }
+  // These characters can change URL structure or survive a second decoding
+  // pass. Reject them even when a permissive provider regex accepts them.
+  for char in value {
+    if char.is_whitespace() || char.to_int() < 32 || char.to_int() == 127 ||
+      char is ('?' | '#' | '&' | '%' | ':' | '\\') {
+      raise ValidationError(parameter~, message="unsafe character in resource name")
+    }
+  }
+  for segment in value.split("/") {
+    if segment == "" || segment == "." || segment == ".." {
+      raise ValidationError(parameter~, message="invalid resource-name segment")
+    }
+  }
+  let normalized = if prefix != "" && !value.contains("/") { prefix + value } else { value }
+  let matched = try {
+    Regex("^(?:" + pattern + ")$").execute(normalized) is Some(_)
+  } catch { _ => false }
+  if !matched {
+    raise ValidationError(parameter~, message="resource name does not match " + pattern)
+  }
+  normalized
+}'''
+
+
 PARAMETER_VALUE_HELPER = r'''///|
 fn[T : ToJson] parameter_value(value : T) -> String {
   match Json(value) {
@@ -1292,6 +1367,7 @@ def emit(ir: IR) -> dict[str, str]:
             needs_required_field = needs_required_field or any(
                 field.constant is None
                 and field.presence in (Presence.REQUIRED, Presence.NULLABLE_REQUIRED)
+                and field.default is None
                 for field in declaration.fields
             )
             has_int64 = has_int64 or any(field.type.kind == "Int64" for field in declaration.fields)
@@ -1337,7 +1413,7 @@ def emit(ir: IR) -> dict[str, str]:
             has_union = True
         elif isinstance(declaration, TaggedUnion):
             declarations.append(_tagged_union(declaration))
-            needs_required_field = True
+            needs_required_field = needs_required_field or not declaration.field_discriminator
         elif isinstance(declaration, ExternalUnion):
             declarations.append(_external_union(declaration))
         elif isinstance(declaration, Newtype):
@@ -1428,6 +1504,8 @@ fn json_array_matches(
             used_names.add(codec)
         operation_sources.append(_operation(operation, response_codec_name=codec))
     operation_helpers: list[str] = []
+    if any(parameter.resource_name for operation in ir.operations for parameter in operation.parameters):
+        operation_helpers.append(RESOURCE_NAME_HELPER)
     if any(operation.parameters or operation.multipart_fields for operation in ir.operations):
         operation_helpers.append(PARAMETER_VALUE_HELPER)
     if any(operation.response_type is not None for operation in ir.operations):

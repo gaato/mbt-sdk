@@ -1,0 +1,14 @@
+import {
+  "gaato/gemini",
+  "gaato/gemini/gen",
+  "gaato/mttp/backend",
+  "gaato/mttp/runtime" @adapter,
+  "moonbitlang/core/env",
+  "moonbitlang/core/async",
+} for "test"
+
+supported_targets = "native"
+
+options(
+  "allow-experimental-packages": [ "moonbitlang/core/async" ],
+)
